@@ -639,7 +639,7 @@
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>HTTP agentt</name>
+                    <name>HTTP agent</name>
                     <type>HTTP_AGENT</type>
                     <key>httpagent</key>
                     <authtype>BASIC</authtype>
@@ -671,7 +671,7 @@
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>IPMI agentt</name>
+                    <name>IPMI agent</name>
                     <type>IPMI</type>
                     <key>ipmi.get</key>
                     <trends>0</trends>
@@ -717,14 +717,14 @@
                     <interface_ref>if2</interface_ref>
                 </item>
                 <item>
-                    <name>SNMP agentt</name>
+                    <name>SNMP agent</name>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>SNMPv2-MIB::sysContact.0</snmp_oid>
                     <key>snmp_test</key>
                     <interface_ref>if2</interface_ref>
                 </item>
                 <item>
-                    <name>SSH agentt</name>
+                    <name>SSH agent</name>
                     <type>SSH</type>
                     <key>ssh.run[x,localhost]</key>
                     <params>echo</params>
@@ -733,7 +733,7 @@
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>Telnet agentt</name>
+                    <name>Telnet agent</name>
                     <type>TELNET</type>
                     <key>telnet.run[a,localhost]</key>
                     <params>echo</params>
