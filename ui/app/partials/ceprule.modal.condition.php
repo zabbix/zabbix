@@ -39,6 +39,7 @@ echo (new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addClass(ZBX_STYLE_DISPLAY_NONE)
+	->addVar('row_index', '')
 	->addItem((new CFormGrid())
 		->addItem([
 			new CLabel('Type', 'ceprule-condition-type-focus'),

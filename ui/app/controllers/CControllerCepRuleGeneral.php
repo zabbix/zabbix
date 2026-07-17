@@ -29,11 +29,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 		$request = $this->getInputAll();
 		unset($request['_cep_rule_reset']);
 
-		if (!in_array($request['window_type'], [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-				CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH])) {
-			unset($request['window']);
-		}
-
 		if (array_key_exists('cepruleid', $request)) {
 			$request['cep_ruleid'] = $request['cepruleid'];
 			unset($request['cepruleid']);
@@ -53,12 +48,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 
 		if (array_key_exists('filter', $request)) {
 			if (array_key_exists('conditions', $request['filter'])) {
-				if ($request['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-					array_walk($request['filter']['conditions'], function (array &$condition) {
-						unset($condition['formulaid']);
-					});
-				}
-
 				array_walk($request['filter']['conditions'], function (array &$condition) {
 					$condition['operator'] = match ($condition['type']) {
 						CCepRuleHelper::CONDITION_TAG,
@@ -174,7 +163,9 @@ abstract class CControllerCepRuleGeneral extends CController {
 						'use' => [CTimePeriodParser::class, ['usermacros' => false, 'lldmacros' => false]],
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
 					],
-					'formulaid' => ['string', 'required', 'not_empty']
+					'formulaid' => ['string', 'required', 'not_empty',
+						'when' => ['../evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
+					]
 				]],
 				'formula' => ['db cep_rule.formula', 'required', 'not_empty',
 					'use' => [CConditionFormulaParser::class, []],
