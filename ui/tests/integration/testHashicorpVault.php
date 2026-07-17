@@ -520,7 +520,7 @@ class testHashicorpVault extends CIntegrationTest {
 			'Vault' => 'CyberArk',
 			'VaultToken' => self::$static_token
 		], 'configuration parameter "VaultToken" or "VAULT_TOKEN" environment variable ' .
-				"cannot be used with CyberArk vault'
+				'cannot be used with CyberArk vault'
 		);
 	}
 
