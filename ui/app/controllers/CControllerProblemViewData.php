@@ -556,10 +556,6 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$filter['tags'] = array_filter($filter['tags'], static fn(array $tag) => $tag && $tag['tag'] != '');
 		}
 
-		if (array_key_exists('severities', $filter) && !$filter['severities']) {
-			unset($filter['severities']);
-		}
-
 		if ($filter['show'] == TRIGGERS_OPTION_ALL) {
 			$timeline = getTimeSelectorPeriod([
 				'profileIdx' => 'web.monitoring.problem',

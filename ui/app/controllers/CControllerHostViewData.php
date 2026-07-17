@@ -135,7 +135,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => array_keys($triggers),
-			'suppressed' => !$show_suppressed && array_key_exists('severities', $filter) && !$filter['severities'],
+			'suppressed' => $show_suppressed ? null : false,
 			'symptom' => false
 		]);
 
@@ -143,7 +143,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			'countOutput' => true,
 			'groupCount' => true,
 			'hostids' => array_keys($hosts),
-			'webitems' =>true,
+			'webitems' => true,
 			'monitored' => true
 		]);
 		$items_count = $items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
