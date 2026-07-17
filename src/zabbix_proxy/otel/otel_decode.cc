@@ -25,19 +25,102 @@ extern "C" {
 namespace otlpm = opentelemetry::proto::metrics::v1;			/* data types */
 namespace otlpc = opentelemetry::proto::collector::metrics::v1;		/* ExportMetricsServiceRequest */
 
+static std::string	bytes_to_hex(const std::string &b)
+{
+	static const char	*hex = "0123456789abcdef";
+	std::string		out;
+
+	out.reserve(b.size() * 2);
+	for (unsigned char c : b)
+	{
+		out += hex[c >> 4];
+		out += hex[c & 0xf];
+	}
+	return out;
+}
+
+static void	any_value_add_to_json(struct zbx_json *j, const char *key,
+		const opentelemetry::proto::common::v1::AnyValue &v)
+{
+	using AV = opentelemetry::proto::common::v1::AnyValue;
+
+	switch (v.value_case())
+	{
+		case AV::kStringValue:
+			zbx_json_addstring(j, key, v.string_value().c_str(), ZBX_JSON_TYPE_STRING);
+			break;
+		case AV::kBoolValue:
+			zbx_json_addstring(j, key, v.bool_value() ? "true" : "false", ZBX_JSON_TYPE_INT);
+			break;
+		case AV::kIntValue:
+			zbx_json_addint64(j, key, v.int_value());
+			break;
+		case AV::kDoubleValue:
+			zbx_json_adddouble(j, key, v.double_value());
+			break;
+		case AV::kBytesValue:
+			zbx_json_addstring(j, key, bytes_to_hex(v.bytes_value()).c_str(), ZBX_JSON_TYPE_STRING);
+			break;
+		case AV::kArrayValue:
+			zbx_json_addarray(j, key);
+			for (const auto &e : v.array_value().values())
+				any_value_add_to_json(j, NULL, e);
+			zbx_json_close(j);
+			break;
+		case AV::kKvlistValue:
+			zbx_json_addobject(j, key);
+			for (const auto &kv : v.kvlist_value().values())
+				any_value_add_to_json(j, kv.key().c_str(), kv.value());
+			zbx_json_close(j);
+			break;
+		default:
+			zbx_json_addstring(j, key, "", ZBX_JSON_TYPE_STRING);
+			break;
+	}
+}
+
 static std::string	any_value_to_string(const opentelemetry::proto::common::v1::AnyValue &v)
 {
 	using AV = opentelemetry::proto::common::v1::AnyValue;
 
 	switch (v.value_case())
 	{
-		case AV::kStringValue: return v.string_value();
-		case AV::kBoolValue:   return v.bool_value() ? "true" : "false";
-		case AV::kIntValue:    return std::to_string(v.int_value());
-		case AV::kDoubleValue: return std::to_string(v.double_value());
-		/* bytes/array/kvlist: simplified — refine if you need pdata AsString parity */
-		case AV::kBytesValue:  return v.bytes_value();
-		default:               return "";
+		case AV::kStringValue:
+			return v.string_value();
+		case AV::kBoolValue:
+			return v.bool_value() ? "true" : "false";
+		case AV::kIntValue:
+			return std::to_string(v.int_value());
+		case AV::kDoubleValue:
+			return std::to_string(v.double_value());
+		case AV::kBytesValue:
+			return bytes_to_hex(v.bytes_value());
+		case AV::kKvlistValue:
+		{
+			struct zbx_json	j;
+			std::string	out;
+
+			zbx_json_init(&j, 1024);			/* object root */
+			for (const auto &kv : v.kvlist_value().values())
+				any_value_add_to_json(&j, kv.key().c_str(), kv.value());
+			out = j.buffer;
+			zbx_json_free(&j);
+			return out;
+		}
+		case AV::kArrayValue:
+		{
+			struct zbx_json	j;
+			std::string	out;
+
+			zbx_json_initarray(&j, 1024);			/* array root */
+			for (const auto &e : v.array_value().values())
+				any_value_add_to_json(&j, NULL, e);
+			out = j.buffer;
+			zbx_json_free(&j);
+			return out;
+		}
+		default:	/* VALUE_NOT_SET */
+			return "";
 	}
 }
 
@@ -84,19 +167,6 @@ static std::string	unixnano_to_secs(uint64_t nano)
 	return std::to_string(nano / 1000000000ULL);	/* DateTime column = seconds */
 }
 
-static std::string	bytes_to_hex(const std::string &b)
-{
-	static const char	*hex = "0123456789abcdef";
-	std::string		out;
-
-	out.reserve(b.size() * 2);
-	for (unsigned char c : b)
-	{
-		out += hex[c >> 4];
-		out += hex[c & 0xf];
-	}
-	return out;
-}
 
 static inline void	SET(zbx_otel_row_t &row, int idx, const std::string &s)
 {
@@ -122,7 +192,7 @@ static std::string	service_name_of(
 }
 
 /* fills cols[0..13], common to all five metric types; returns next index (14) */
-static int	fill_common(zbx_otel_row_t &row,
+static int	metrics_fill_common(zbx_otel_row_t &row,
 		const opentelemetry::proto::metrics::v1::ResourceMetrics &rm,
 		const opentelemetry::proto::metrics::v1::ScopeMetrics &sm,
 		const opentelemetry::proto::metrics::v1::Metric &metric,
@@ -195,7 +265,7 @@ static void	otel_decode_gauge(const otlpm::ResourceMetrics &rm, const otlpm::Sco
 	for (const auto &dp : metric.gauge().data_points())
 	{
 		zbx_otel_row_t	row = otel_rowset_add(&ds->gauge);
-		int		i = fill_common(row, rm, sm, metric, dp.attributes(),
+		int		i = metrics_fill_common(row, rm, sm, metric, dp.attributes(),
 				dp.start_time_unix_nano(), dp.time_unix_nano());
 
 		SET(row, i++, std::to_string(np_value(dp)));
@@ -210,7 +280,7 @@ static void	otel_decode_sum(const otlpm::ResourceMetrics &rm, const otlpm::Scope
 	for (const auto &dp : metric.sum().data_points())
 	{
 		zbx_otel_row_t	row = otel_rowset_add(&ds->sum);
-		int		i = fill_common(row, rm, sm, metric, dp.attributes(),
+		int		i = metrics_fill_common(row, rm, sm, metric, dp.attributes(),
 				dp.start_time_unix_nano(), dp.time_unix_nano());
 
 		SET(row, i++, std::to_string(np_value(dp)));	/* Value */
@@ -227,7 +297,7 @@ static void	otel_decode_histogram(const otlpm::ResourceMetrics &rm, const otlpm:
 	for (const auto &dp : metric.histogram().data_points())
 	{
 		zbx_otel_row_t	row = otel_rowset_add(&ds->histogram);
-		int		i = fill_common(row, rm, sm, metric, dp.attributes(),
+		int		i = metrics_fill_common(row, rm, sm, metric, dp.attributes(),
 				dp.start_time_unix_nano(), dp.time_unix_nano());
 
 		SET(row, i++, std::to_string(dp.count()));		/* Count */
@@ -248,7 +318,7 @@ static void	otel_decode_exponential_histogram(const otlpm::ResourceMetrics &rm, 
 	for (const auto &dp : metric.exponential_histogram().data_points())
 	{
 		zbx_otel_row_t	row = otel_rowset_add(&ds->exponential_histogram);
-		int		i = fill_common(row, rm, sm, metric, dp.attributes(),
+		int		i = metrics_fill_common(row, rm, sm, metric, dp.attributes(),
 				dp.start_time_unix_nano(), dp.time_unix_nano());
 
 		SET(row, i++, std::to_string(dp.count()));		/* Count */
@@ -273,7 +343,7 @@ static void	otel_decode_summary(const otlpm::ResourceMetrics &rm, const otlpm::S
 	for (const auto &dp : metric.summary().data_points())
 	{
 		zbx_otel_row_t	row = otel_rowset_add(&ds->summary);
-		int		i = fill_common(row, rm, sm, metric, dp.attributes(),
+		int		i = metrics_fill_common(row, rm, sm, metric, dp.attributes(),
 				dp.start_time_unix_nano(), dp.time_unix_nano());
 
 		SET(row, i++, std::to_string(dp.count()));	/* Count */
@@ -352,6 +422,48 @@ static void	otel_request_decode_traces(zbx_otel_request_t request, zbx_otel_data
 
 static void	otel_request_decode_logs(zbx_otel_request_t request, zbx_otel_dataset_t *ds)
 {
+	namespace otlplc = opentelemetry::proto::collector::logs::v1;
+
+	const auto	*req = reinterpret_cast<const otlplc::ExportLogsServiceRequest *>(request);
+
+	if (NULL == req)
+		return;
+
+	for (const auto &rl : req->resource_logs())
+	{
+		const auto	&res = rl.resource();
+		const auto	res_schema_url = rl.schema_url();
+		const auto	service_name = service_name_of(res);
+
+		for (const auto &sl : rl.scope_logs())
+		{
+			const auto	&scope = sl.scope();
+			const auto	scope_schema_url = sl.schema_url();
+
+			for (const auto &lr : sl.log_records())
+			{
+				zbx_otel_row_t	row = otel_rowset_add(&ds->logs);
+				int		i = 0;
+
+				SET(row, i++, std::to_string(lr.time_unix_nano()));	/* Timestamp, DateTime64(9) */
+				SET(row, i++, bytes_to_hex(lr.trace_id()));		/* TraceId */
+				SET(row, i++, bytes_to_hex(lr.span_id()));		/* SpanId */
+				SET(row, i++, std::to_string(lr.flags()));		/* TraceFlags */
+				SET(row, i++, lr.severity_text());			/* SeverityText */
+				SET(row, i++, std::to_string(lr.severity_number()));	/* SeverityNumber */
+				SET(row, i++, service_name);				/* ServiceName */
+				SET(row, i++, any_value_to_string(lr.body()));		/* Body (AnyValue) */
+				SET(row, i++, res_schema_url);				/* ResourceSchemaUrl */
+				SETC(row, i++, attrs_to_json(res.attributes()));	/* ResourceAttributes */
+				SET(row, i++, scope_schema_url);			/* ScopeSchemaUrl */
+				SET(row, i++, scope.name());				/* ScopeName */
+				SET(row, i++, scope.version());				/* ScopeVersion */
+				SETC(row, i++, attrs_to_json(scope.attributes()));	/* ScopeAttributes */
+				SETC(row, i++, attrs_to_json(lr.attributes()));		/* LogAttributes */
+				SET(row, i++, lr.event_name());				/* EventName */
+			}
+		}
+	}
 }
 
 void	zbx_otel_request_decode(zbx_otel_request_t request, zbx_otel_request_type_t type, zbx_otel_dataset_t *ds)
