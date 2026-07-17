@@ -65,7 +65,7 @@ zabbix_export:
         You can also set up evaluation periods for replica mismatch triggers (Deployments, ReplicaSets, StatefulSets) with the field `Replica Mismatch Evaluation Period`, which supports context and regular expressions.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -2521,7 +2521,6 @@ zabbix_export:
       dashboards:
         - uuid: 152f9c1e7f4c4afd9d8542068a55396e
           name: Global
-          auto_start: 'NO'
           pages:
             - name: Overview
               display_period: '600'
