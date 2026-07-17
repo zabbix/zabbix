@@ -19,7 +19,7 @@
  */
 class CApiUserGroupHelper {
 
-	private static ?array $usrgrpid_lists = null;
+	private static array $usrgrpid_lists = [];
 
 	public static function getProxyPermissionsCondition(string $alias): string {
 		if (CApiService::$userData['ugsetid'] == 0) {
@@ -117,7 +117,7 @@ class CApiUserGroupHelper {
 	}
 
 	private static function getUserGroupIdsByPermissionLists(): array {
-		if (self::$usrgrpid_lists === null) {
+		if (!self::$usrgrpid_lists) {
 			self::$usrgrpid_lists = [
 				'proxy_deny_list_usrgrpids' => [],
 				'proxy_allow_list_usrgrpids' => [],
