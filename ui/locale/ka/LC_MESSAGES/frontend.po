@@ -27853,6 +27853,10 @@ msgstr "შეიყვანეთ საძებნი სტრიქონ�
 msgid "unacceptable URL"
 msgstr "მიუღებელი URL"
 
+#: include/classes/validators/CUrlValidator.php:147
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""
