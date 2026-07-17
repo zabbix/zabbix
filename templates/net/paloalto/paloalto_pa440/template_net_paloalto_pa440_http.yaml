@@ -69,7 +69,7 @@ zabbix_export:
         3. Set the password of the user that you created in the `Monitoring Password`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -3160,7 +3160,6 @@ zabbix_export:
       dashboards:
         - uuid: e5df35b446eb4ad8a5b831595505ba82
           name: 'PA-440: Overview'
-          auto_start: 'NO'
           pages:
             - name: 'PA-440: Overview'
               widgets:
