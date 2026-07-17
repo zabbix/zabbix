@@ -144,7 +144,7 @@ $service_tab = (new CFormGrid())
 				new CFormField(
 					(new CTextBox('created_at', zbx_date2str(DATE_FORMAT, $data['form']['created_at'])))
 						->setEnabled(false)
-						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				)
 			]
 			: null

@@ -1186,7 +1186,7 @@ class CUserGroup extends CApiService {
 		$this->validateDelete($usrgrpids, $db_usrgrps);
 
 		self::unlinkUsers($db_usrgrps);
-		self::deleteUnusedUgSets($usrgrpids);
+		self::deleteUnusedUgSetGroups($usrgrpids);
 
 		DB::delete('usrgrp', ['usrgrpid' => $usrgrpids]);
 
@@ -1350,19 +1350,11 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Deletes user group sets that have no users linked to them.
+	 * Deletes ugset groups of user group sets that have no users linked to them.
 	 * This may happen during parallel deletion of users which have the same user group set.
 	 */
-	private static function deleteUnusedUgSets(array $usrgrpids): void {
-		DBexecute(
-			'DELETE FROM ugset'.
-			' WHERE EXISTS ('.
-				'SELECT NULL'.
-				' FROM ugset_group ug'.
-				' WHERE ugset.ugsetid=ug.ugsetid'.
-					' AND '.dbConditionId('ug.usrgrpid', $usrgrpids).
-			')'
-		);
+	private static function deleteUnusedUgSetGroups(array $usrgrpids): void {
+		DB::delete('ugset_group', ['usrgrpid' => $usrgrpids]);
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
