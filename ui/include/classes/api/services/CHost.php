@@ -2159,34 +2159,32 @@ class CHost extends CHostGeneral {
 			}
 
 			if (array_key_exists('monitored_by', $host)) {
-				if (bccomp($host['monitored_by'], (int) $db_hosts[$host['hostid']]['monitored_by'])
+				if (bccomp($host['monitored_by'], $db_hosts[$host['hostid']]['monitored_by']) != 0
 						&& $db_hosts[$host['hostid']]['monitored_by'] != ZBX_MONITORED_BY_SERVER) {
 					$monitored_by_upd[$host['hostid']] = true;
 
 					if ($db_hosts[$host['hostid']]['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
-						$proxyids[$host['hostid']] = (int) $db_hosts[$host['hostid']]['proxyid'];
+						$proxyids[$host['hostid']] = $db_hosts[$host['hostid']]['proxyid'];
 					}
 					elseif ($db_hosts[$host['hostid']]['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-						$proxy_groupids[$host['hostid']] = (int) $db_hosts[$host['hostid']]['proxy_groupid'];
+						$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
 					}
 				}
 			}
 
-			if (array_key_exists('proxyid', $host)
-					&& array_key_exists('proxyid', $db_hosts[$host['hostid']])
-					&& $host['proxyid'] !== "0") {
-				if (bccomp($host['proxyid'], $db_hosts[$host['hostid']]['proxyid']) != 0
-						&& $db_hosts[$host['hostid']]['proxyid'] != 0) {
-					$proxyids[$host['hostid']] = (int) $db_hosts[$host['hostid']]['proxyid'];
+			if (!array_key_exists($host['hostid'], $monitored_by_upd)) {
+				if (array_key_exists('proxyid', $host)) {
+					if (bccomp($host['proxyid'], $db_hosts[$host['hostid']]['proxyid']) != 0
+							&& $db_hosts[$host['hostid']]['proxyid'] != 0) {
+						$proxyids[$host['hostid']] = $db_hosts[$host['hostid']]['proxyid'];
+					}
 				}
-			}
 
-			if (array_key_exists('proxy_groupid', $host)
-					&& array_key_exists('proxy_groupid', $db_hosts[$host['hostid']])
-					&& $host['proxy_groupid'] !== "0") {
-				if (bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0
-						&& $db_hosts[$host['hostid']]['proxy_groupid'] != 0) {
-					$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
+				if (array_key_exists('proxy_groupid', $host)) {
+					if (bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0
+							&& $db_hosts[$host['hostid']]['proxy_groupid'] != 0) {
+						$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
+					}
 				}
 			}
 		}
@@ -2213,10 +2211,7 @@ class CHost extends CHostGeneral {
 		foreach ($hosts as $i => $host) {
 			if (array_key_exists($host['hostid'], $proxyids)
 					&& !array_key_exists($proxyids[$host['hostid']], $accessible_proxy)) {
-				$field = !empty($monitored_by_upd[$host['hostid']])
-					? 'monitored_by'
-					: 'proxyid';
-
+				$field = array_key_exists($host['hostid'], $monitored_by_upd) ? 'monitored_by' : 'proxyid';
 				$path = '/'.($i + 1).'/'.$field;
 
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
@@ -2226,10 +2221,7 @@ class CHost extends CHostGeneral {
 
 			if (array_key_exists($host['hostid'], $proxy_groupids)
 					&& !array_key_exists($proxy_groupids[$host['hostid']], $accessible_proxy_group)) {
-				$field = !empty($monitored_by_upd[$host['hostid']])
-					? 'monitored_by'
-					: 'proxy_groupid';
-
+				$field = array_key_exists($host['hostid'], $monitored_by_upd) ? 'monitored_by' : 'proxy_groupid';
 				$path = '/'.($i + 1).'/'.$field;
 
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
