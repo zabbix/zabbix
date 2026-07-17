@@ -213,7 +213,7 @@ class CControllerLldRuleEdit extends CController
 			'types' => array_intersect_key(item_type2str(), array_flip(CControllerLldRuleUpdateGeneral::getItemTypes())),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
 			'js_test_validation_rules' => (new CFormValidator(
-				CControllerPopupItemTestSend::getValidationRules(false)
+				CControllerPopupItemTestEdit::getValidationRules(false)
 			))->getRules()
 		];
 
