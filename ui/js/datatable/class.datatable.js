@@ -457,7 +457,7 @@ class CDataTable {
 					if (this.#options_popup?.getColumn().getColumnIndex() == column.getColumnIndex()) {
 						context_handle.classList.add(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
 
-						this.#options_popup.setHandle(context_handle);
+						this.#options_popup?.setHandle(context_handle);
 					}
 
 					cell.appendChild(context_handle);
@@ -1127,17 +1127,22 @@ class CDataTable {
 
 		this.updateUserConfig();
 
-		this.dispatchEvent(CDataTable.EVENT_INIT, {reset: true});
-		this.dispatchEvent(CDataTable.EVENT_SAVE);
+		this.#options_popup_updated = true;
 
-		requestAnimationFrame(() => {
-			const header_cell = column.getHeaderCell();
-			if (header_cell === null) {
-				return;
+		this.dispatchEvent(CDataTable.EVENT_INIT, {
+			onFinally: () => {
+				requestAnimationFrame(() => {
+					const header_cell = column.getHeaderCell();
+					if (header_cell === null) {
+						return;
+					}
+
+					this.#scrollBodyToTarget(header_cell.target);
+				});
 			}
-
-			this.#scrollBodyToTarget(header_cell.target);
 		});
+
+		this.dispatchEvent(CDataTable.EVENT_SAVE);
 	}
 
 	onColumnsSort(e) {
@@ -2180,7 +2185,6 @@ class CDataTable {
 
 	#afterRender(response) {
 		this.#calculateColumnWidths(requestAnimationFrame);
-		this.#handleScrollbar();
 
 		this.#pager.update(response);
 
@@ -2188,10 +2192,7 @@ class CDataTable {
 		this.#body.scrollTo({left: this.#body_scroll_left});
 
 		requestAnimationFrame(() => {
-			requestAnimationFrame(() => {
-				this.#options_popup?.position();
-			});
-
+			this.#handleScrollbar();
 			this.#applyLastColumnPadding();
 			this.#updateTableOptionsButtonPosition();
 			this.#initCheckBoxRange();
@@ -2326,13 +2327,15 @@ class CDataTable {
 			return;
 		}
 
-		let min_width = this.#getColumnMinWidth(column);
-		if (this.#customizable && this.#visible_columns.at(-1) === column) {
-			min_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
+		const overrides = column.getOverrides();
+
+		const min_width = this.#getColumnMinWidth(column);
+
+		let header_width = Math.floor(column.getHeaderCell()?.target.getBoundingClientRect().width ?? 0);
+		if (!('width' in overrides) && this.#visible_columns.at(-1) === column) {
+			header_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
 		}
 
-		const default_width = column.getDefaults().getWidth();
-		const header_width = Math.floor(column.getHeaderCell()?.target.getBoundingClientRect().width ?? 0);
 		const data_width = Math.floor(column.getDataCells().at(0)?.target.getBoundingClientRect().width ?? 0);
 
 		let width = Math.max(min_width, header_width, data_width);
@@ -2340,6 +2343,8 @@ class CDataTable {
 		if (column.getWidth() === 'max-content') {
 			width += 2;
 		}
+
+		const default_width = column.getDefaults().getWidth();
 
 		if (default_width === 'max-content') {
 			width = Math.min(width, CDataTable.COLUMN_MAX_ALLOWED_CALC_WIDTH);
@@ -2350,10 +2355,8 @@ class CDataTable {
 
 		const calculated_width = `${width}px`;
 
-		column.setWidth(calculated_width);
-
-		const overrides = column.getOverrides();
-		column.setOverrides({...overrides, width: calculated_width});
+		column.setWidth(calculated_width)
+			.setOverrides({...overrides, width: calculated_width});
 	}
 
 	#renderHeaderCells() {
@@ -2790,7 +2793,6 @@ class CDataTable {
 
 		if (this.#scrollbar) {
 			this.#updateScrollbarInnerWidth();
-			this.#applyLastColumnPadding();
 
 			return;
 		}
@@ -2800,7 +2802,6 @@ class CDataTable {
 
 		this.#bindScrollbarEvents();
 		this.#updateScrollbarInnerWidth();
-		this.#applyLastColumnPadding();
 
 		this.#element.insertBefore(this.#scrollbar, this.#footer);
 	}

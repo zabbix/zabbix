@@ -133,7 +133,8 @@
 						.setTogglable(false)
 						.setWidth('auto'),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
-						.setFields(['duration']),
+						.setFields(['duration'])
+						.setWidth('94px'),
 					new CDataTableColumn('update', <?= json_encode(_('Update')); ?>)
 						.setFields(['can_be_closed', 'eventid'])
 						.setRenderer('update'),
