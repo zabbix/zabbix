@@ -16,15 +16,6 @@
 
 abstract class CControllerCepRuleGeneral extends CController {
 
-	protected function init(): void {
-		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
-		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
-	}
-
-	protected function checkPermissions(): bool {
-		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
-	}
-
 	protected function prepareApiRequest(): array {
 		$request = $this->getInputAll();
 		unset($request['_cep_rule_reset']);

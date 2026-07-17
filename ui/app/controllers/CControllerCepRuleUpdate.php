@@ -16,6 +16,15 @@
 
 class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkPermissions(): bool {
+		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
+	}
+
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules(existing: true));
 
