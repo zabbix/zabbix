@@ -3328,7 +3328,6 @@ class CAction extends CApiService {
 			'output' => ['proxyid'],
 			'proxyids' => $proxyids,
 			'preservekeys' => true
-
 		]);
 
 		foreach ($actions as $i1 => $action) {
