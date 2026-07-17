@@ -153,7 +153,7 @@ static void	zbx_um_mock_kv_free_wrap(zbx_um_mock_kv_t *kv)
 
 /*********************************************************************************
  *                                                                               *
- * Purpose: free mock mock kv path                                               *
+ * Purpose: free mock kv path                                                    *
  *                                                                               *
  *********************************************************************************/
 static void	um_mock_kvset_free(zbx_um_mock_kvset_t *kvset)

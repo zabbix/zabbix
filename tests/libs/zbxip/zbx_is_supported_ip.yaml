@@ -48,7 +48,7 @@ in:
 out:
   return: FAIL
 ---
-test case: '7. ipv4 with with newline'
+test case: '7. ipv4 with newline'
 in:
   string: "255.255.255.255\n"
   ipv: 0

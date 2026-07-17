@@ -40,33 +40,4 @@ abstract class CControllerConnectorUpdateGeneral extends CController {
 
 		return array_values($tags);
 	}
-
-	// TODO: remove when DEV-4580 is merged
-	final protected static function removeInvalidWhenRuleInput(array &$connector): void {
-		if ($connector['data_type'] != ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES) {
-			unset($connector['item_value_types']);
-		}
-
-		if ($connector['authtype'] == ZBX_HTTP_AUTH_BEARER) {
-			unset($connector['username']);
-			unset($connector['password']);
-		}
-		else {
-			unset($connector['token']);
-		}
-
-		if ($connector['max_records_mode'] == 0) {
-			unset($connector['max_records']);
-		}
-
-		if ($connector['max_attempts'] < 2) {
-			unset($connector['attempt_interval']);
-		}
-
-		foreach ($connector['tags'] as &$tag) {
-			if ($tag['operator'] == CONDITION_OPERATOR_EXISTS || $tag['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
-				unset($tag['value']);
-			}
-		}
-	}
 }

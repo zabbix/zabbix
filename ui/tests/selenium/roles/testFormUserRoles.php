@@ -871,12 +871,6 @@ class testFormUserRoles extends CWebTest {
 
 				// Scroll up after filling the form to take the correct screenshot.
 				$this->page->scrollToTop();
-
-				// Remove border radius to prevent screenshot instability on segmented radio elements.
-				$this->page->getDriver()->executeScript(
-					'document.querySelectorAll(\'.radio-list-control li, .radio-list-control label\')'.
-					'.forEach(function (e){ e.style.borderRadius = 0; });'
-				);
 			}
 
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://z-textarea-flexible[@id="name"]'], $role);

@@ -25,7 +25,7 @@ class CControllerTriggerPrototypeUpdate extends CController {
 		return ['object', 'fields' => [
 			'triggerid' => ['db triggers.triggerid', 'required'],
 			'name' => ['db triggers.description', 'required', 'not_empty'],
-			'event_name' => ['db triggers.event_name'],
+			'event_name' => ['db triggers.event_name', 'use' => [CEventNameValidator::class]],
 			'opdata' => ['db triggers.opdata'],
 			'priority' => ['db triggers.priority', 'required', 'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED,
 				TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH,

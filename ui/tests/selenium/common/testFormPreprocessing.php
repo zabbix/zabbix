@@ -3136,10 +3136,6 @@ abstract class testFormPreprocessing extends CWebTest {
 			// TODO: Added updateViewport due to not centered screenshot for an item's preprocessing
 			// which makes unclear if result is correct.
 			$this->page->updateViewport();
-			// TODO: unstable screenshots on Jenkins. Added border radius 0 for checkboxes.
-			$this->page->getDriver()->executeScript('document.querySelectorAll(\'.checkbox-radio[type="checkbox"]'.
-					'+ label span\').forEach(function (e){ e.style.borderRadius = 0; });'
-			);
 			$this->assertScreenshot($this->query('id:preprocessing')->one(), 'Preprocessing'.$this->link);
 		}
 
