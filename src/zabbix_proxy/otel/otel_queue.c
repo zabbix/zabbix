@@ -14,6 +14,7 @@
 
 #include "otel_queue.h"
 #include "otel_task.h"
+#include "zbxmw.h"
 #include <bits/time.h>
 
 #define OTEL_THROTTLE_WINDOW	SEC_PER_MIN
@@ -70,7 +71,7 @@ int	otel_queue_push_request(zbx_otel_queue_t *queue, zbx_otel_request_t request,
 	}
 
 	if (SUCCEED == ret)
-		zbx_mw_queue_push_priority(&queue->base, otel_task_request_create(request, type));
+		zbx_mw_queue_push_completed_direct(&queue->base, otel_task_request_create(request, type));
 
 	zbx_mw_queue_unlock(&queue->base);
 

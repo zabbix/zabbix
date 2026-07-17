@@ -66,12 +66,16 @@ libzbxotel_a_SOURCES = \
 	otel_manager.c \
 	otel_worker.c \
 	otel_worker.h \
-	otel_grpc.cc \
-	otel_grpc.h \
 	otel_task.c \
 	otel_task.h \
 	otel_queue.c \
 	otel_queue.h \
+	otel_dataset.c  \
+	otel_dataset.h \
+	otel_grpc.cc \
+	otel_grpc.h \
+	otel_decode.cc \
+	otel_decode.h \
 	$(OTEL_PROTO_SRCS)
 
 # --- message-only protos: --cpp_out only ---

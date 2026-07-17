@@ -27,17 +27,26 @@
 #include "zbxsupervisor_client.h"
 
 #define OTEL_WORKERS_MAX		100
-#define OTEL_WORKERS_DEFAULT	10
+#define OTEL_WORKERS_DEFAULT		10
 
 typedef struct
 {
-	zbx_mw_manager_t	base;
-	zbx_grpc_handle_t	grpc;
+	zbx_mw_manager_t		base;
+	zbx_grpc_handle_t		grpc;
+
+	zbx_vector_mw_task_ptr_t	commits;
+
+	int				commit_limit;
+	int				commit_task_num;
 }
 zbx_otel_manager_t;
 
 static void	otel_manager_free(zbx_otel_manager_t *manager)
 {
+	for (int i = 0; i < manager->commits.values_num; i++)
+		otel_task_free(manager->commits.values[i]);
+	zbx_vector_mw_task_ptr_destroy(&manager->commits);
+
 	if (NULL != manager->grpc)
 		zbx_grpc_stop(manager->grpc);
 
@@ -84,6 +93,12 @@ static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, in
 	if (NULL == (manager->grpc = zbx_grpc_start(NULL, NULL, queue, error)))
 		goto out;
 
+	/* TODO: make configuratble */
+	manager->commit_limit = 10;
+	manager->commit_task_num = 0;
+
+	zbx_vector_mw_task_ptr_create(&manager->commits);
+
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
@@ -98,9 +113,31 @@ out:
 static void	otel_manager_process_finished(zbx_otel_manager_t *manager, zbx_vector_mw_task_ptr_t *tasks)
 {
 	for (int i = 0; i < tasks->values_num; i++)
-		otel_task_free(tasks->values[i]);
+	{
+		switch (tasks->values[i]->type)
+		{
+			case OTEL_TASK_REQUEST:
+				zbx_vector_mw_task_ptr_append(&manager->commits, tasks->values[i]);
+				break;
+			case OTEL_TASK_COMMIT:
+				otel_task_free(tasks->values[i]);
+				manager->commit_task_num--;
+				break;
+		}
+	}
 
 	zbx_vector_mw_task_ptr_clear(tasks);
+}
+
+static void	otel_manager_commit_tasks(zbx_otel_manager_t *manager)
+{
+	zbx_mw_task_t	*t = otel_task_commit_create(&manager->commits);
+
+	zbx_mw_queue_lock(manager->base.queue);
+	zbx_mw_queue_push_normal(manager->base.queue, t);
+	zbx_mw_queue_unlock(manager->base.queue);
+
+	manager->commit_task_num++;
 }
 
 void	*zbx_otel_manager_thread(void *args)
@@ -196,7 +233,12 @@ void	*zbx_otel_manager_thread(void *args)
 		if (0 != tasks.values_num)
 		{
 			otel_manager_process_finished(manager, &tasks);
+			zbx_vector_mw_task_ptr_clear(&tasks);
 		}
+
+		if (0 != manager->commits.values_num && manager->commit_task_num < manager->commit_limit)
+			otel_manager_commit_tasks(manager);
+
 	}
 
 	zbx_supervisor_update_activity("%s [terminating]", unit_args->name);

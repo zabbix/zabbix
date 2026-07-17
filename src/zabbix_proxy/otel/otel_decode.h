@@ -12,38 +12,23 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_OTEL_TASK_H
-#define ZABBIX_OTEL_TASK_H
+#ifndef ZABBIX_OTEL_DECODE_H
+#define ZABBIX_OTEL_DECODE_H
 
-#include "otel_queue.h"
-#include "zbxmw.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-typedef enum
-{
-	OTEL_TASK_REQUEST,
-	OTEL_TASK_COMMIT
+#include "otel_dataset.h"
+#include "otel_grpc.h"
+
+void	zbx_otel_request_decode(zbx_otel_request_t request, zbx_otel_request_type_t type, zbx_otel_dataset_t *ds);
+
+#ifdef __cplusplus
 }
-zbx_cep_task_type_t;
+#endif
 
-typedef struct
-{
-	zbx_mw_task_t		base;
-	zbx_otel_request_type_t	type;
-	zbx_otel_request_t	request;
-	char			*data;
-}
-zbx_otel_task_request_t;
-
-typedef struct
-{
-	zbx_mw_task_t		base;
-	zbx_vector_mw_task_ptr_t	tasks;
-}
-zbx_otel_task_commit_t;
-
-zbx_mw_task_t	*otel_task_request_create(zbx_otel_request_t request, zbx_otel_request_type_t type);
-zbx_mw_task_t	*otel_task_commit_create(zbx_vector_mw_task_ptr_t *tasks);
-
-void	otel_task_free(zbx_mw_task_t *mw_task);
 
 #endif
+
+

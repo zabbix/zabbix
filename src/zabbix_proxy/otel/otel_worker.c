@@ -13,8 +13,10 @@
 **/
 
 #include "otel_worker.h"
-#include "zabbix_proxy/otel/otel_grpc.h"
-#include "zabbix_proxy/otel/otel_task.h"
+#include "otel_dataset.h"
+#include "otel_decode.h"
+#include "otel_task.h"
+#include "zbxlog.h"
 #include "zbxmw.h"
 #include "zbxnix.h"
 #include "zbxsupervisor_client.h"
@@ -28,19 +30,25 @@ zbx_otel_worker_t	*otel_worker_create(void)
 	return worker;
 }
 
-static void	otel_worker_process_message(zbx_otel_task_request_t *task)
+static void	otel_worker_process_commit(zbx_otel_task_commit_t *task)
 {
-	char	*error = NULL;
+	zbx_otel_dataset_t	ds;
 
-	if (SUCCEED != zbx_otel_decode_request(task->request, task->type, &task->data, &error))
+	otel_dataset_init(&ds);
+
+	for (int i = 0; i < task->tasks.values_num; i++)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
-		zbx_free(error);
+		zbx_otel_task_request_t	*t = (zbx_otel_task_request_t *)task->tasks.values[i];
+
+		zbx_otel_request_decode(t->request, t->type, &ds);
 	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "OTEL: %s", task->data);
-	}
+
+	/* TODO: debug dump */
+	int	loglevel = zbx_set_log_level(LOG_LEVEL_TRACE);
+	otel_dataset_dump(&ds);
+	zbx_set_log_level(loglevel);
+
+	otel_dataset_clear(&ds);
 }
 
 void	*otel_worker_entry(void *args)
@@ -69,8 +77,11 @@ void	*otel_worker_entry(void *args)
 
 			switch (task->type)
 			{
+				case OTEL_TASK_COMMIT:
+					otel_worker_process_commit((zbx_otel_task_commit_t *)task);
+					break;
 				case OTEL_TASK_REQUEST:
-					otel_worker_process_message((zbx_otel_task_request_t *)task);
+					THIS_SHOULD_NEVER_HAPPEN_MSG("incomplete request task received");
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN_MSG("unknown task type %d", task->type);

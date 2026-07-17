@@ -98,7 +98,7 @@ ServerUnaryReactor *TraceServiceImpl::Export(CallbackServerContext *context,
 	auto *heap_request = new otlp_trace::ExportTraceServiceRequest();
 	heap_request->Swap(const_cast<otlp_trace::ExportTraceServiceRequest *>(request));
 
-	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_TRACE))
+	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_TRACES))
 	{
 		reactor->Finish(grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "export rate limit exceeded"));
 		delete heap_request;
@@ -118,7 +118,7 @@ ServerUnaryReactor *MetricsServiceImpl::Export(CallbackServerContext *context,
 	auto *heap_request = new otlp_metrics::ExportMetricsServiceRequest();
 	heap_request->Swap(const_cast<otlp_metrics::ExportMetricsServiceRequest *>(request));
 
-	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_METRIC))
+	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_METRICS))
 	{
 		reactor->Finish(grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "export rate limit exceeded"));
 		delete heap_request;
@@ -139,7 +139,7 @@ ServerUnaryReactor *LogsServiceImpl::Export(CallbackServerContext *context,
 	auto *heap_request = new otlp_logs::ExportLogsServiceRequest();
 	heap_request->Swap(const_cast<otlp_logs::ExportLogsServiceRequest *>(request));
 
-	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_LOG))
+	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_LOGS))
 	{
 		reactor->Finish(grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "export rate limit exceeded"));
 		delete heap_request;
@@ -239,19 +239,19 @@ extern "C"
 
 			switch (type)
 			{
-				case OTEL_TRACE:
+				case OTEL_TRACES:
 				{
 					auto *req = static_cast<otlp_trace::ExportTraceServiceRequest *>(request);
 					debug_string = req->DebugString();
 					break;
 				}
-				case OTEL_METRIC:
+				case OTEL_METRICS:
 				{
 					auto *req = static_cast<otlp_metrics::ExportMetricsServiceRequest *>(request);
 					debug_string = req->DebugString();
 					break;
 				}
-				case OTEL_LOG:
+				case OTEL_LOGS:
 				{
 					auto *req = static_cast<otlp_logs::ExportLogsServiceRequest *>(request);
 					debug_string = req->DebugString();
@@ -280,19 +280,19 @@ extern "C"
 	{
 		switch (type)
 		{
-			case OTEL_TRACE:
+			case OTEL_TRACES:
 			{
 				auto *req = static_cast<otlp_trace::ExportTraceServiceRequest *>(request);
 				delete req;
 				break;
 			}
-			case OTEL_METRIC:
+			case OTEL_METRICS:
 			{
 				auto *req = static_cast<otlp_metrics::ExportMetricsServiceRequest *>(request);
 				delete req;
 				break;
 			}
-			case OTEL_LOG:
+			case OTEL_LOGS:
 			{
 				auto *req = static_cast<otlp_logs::ExportLogsServiceRequest *>(request);
 				delete req;
