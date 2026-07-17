@@ -63,6 +63,10 @@ class testTriggerCEP extends CIntegrationTest {
 	// Extra tag added to problem events by a webhook (see createExtraTagWebhookAction), used to verify that
 	// tags returned by a media type are applied to the events they were generated for.
 	const WEB_SERVICE_TAG = 'web_service';
+	// Tag added by the second, independent webhook created alongside the first one (see
+	// createExtraTagWebhookAction): a different tag name whose value is the same trailing number prefixed
+	// with 'second_', verifying that tags returned by two separate media types both land on the same event.
+	const WEB_SERVICE_TAG2 = 'web_service2';
 	// Second webhook-applied tag carrying the event's component (copied from the 'component' event tag by
 	// the same webhook). The web-tag services (see createWebTagServices) match problems only on this tag,
 	// so they can go into problem state only via tags applied by the webhook, never via a trigger tag.
@@ -133,6 +137,8 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $mediatypeid;
 	private static $tag_mediatypeid;
 	private static $tag_actionid;
+	private static $tag_mediatypeid2;
+	private static $tag_actionid2;
 	private static $web_tag_serviceids = [];
 	private static $sessionid = null;
 
@@ -158,7 +164,9 @@ class testTriggerCEP extends CIntegrationTest {
 				'LogSlowQueries' => 10000,
 				'StartEscalators' => 8,
 				'MaxHousekeeperDelete' => 0,
-				'StartTrappers' => 32
+				'StartTrappers' => 32,
+				'StartAlerters' => 10,
+				'StartTimers' => 2
 			]
 		];
 	}
@@ -1367,24 +1375,28 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * Create a webhook media type and a trigger action that together add an extra WEB_SERVICE_TAG tag (the
-	 * trailing number of the item value, e.g. "0" for "down_0") to every discovered CEP problem event using
-	 * JavaScript. This does not affect correlation (which still uses the 'service' trigger tag) — it lets
-	 * the test verify that tags returned by a media type are applied to the events they were generated for.
+	 * Create two independent webhook media types and two trigger actions that together add extra tags to
+	 * every discovered CEP problem event using JavaScript. The first webhook adds a WEB_SERVICE_TAG tag (the
+	 * trailing number of the item value, e.g. "0" for "down_0"); the second adds a WEB_SERVICE_TAG2 tag
+	 * whose value is the same trailing number prefixed with 'second_'. This does not affect correlation
+	 * (which still uses the 'service' trigger tag) — it lets the test verify that tags returned by media
+	 * types are applied to the events they were generated for, including when two separate webhook actions
+	 * tag the same event.
 	 *
-	 * The media type has process_tags enabled; its script parses the item value passed as a parameter,
+	 * Both media types have process_tags enabled; each script parses the item value passed as a parameter,
 	 * extracts the trailing number and returns it in the {"tags": {...}} form the alerter applies to the
-	 * event. The script also copies the event's 'component' tag (passed via {EVENT.TAGS.component}) into a
-	 * WEB_COMPONENT_TAG tag, which the web-tag services (see createWebTagServices) match their problems on.
-	 * A second media is attached to the Admin user for this media type, and a trigger action firing
-	 * on the discovered CEP triggers (event tag type=cep / type=cep-dep) routes its problem operation
-	 * through the webhook, so each PROBLEM event ("down_N" and, since the expression matches "up", "up_N")
-	 * gets a WEB_SERVICE_TAG tag.
+	 * event. The first script also copies the event's 'component' tag (passed via {EVENT.TAGS.component})
+	 * into a WEB_COMPONENT_TAG tag, which the web-tag services (see createWebTagServices) match their
+	 * problems on. Medias are attached to the Admin user for both media types, and two trigger actions
+	 * firing on the discovered CEP triggers route their problem operations through the webhooks, so each
+	 * PROBLEM event ("down_N" and, since the expression matches "up", "up_N") gets both a WEB_SERVICE_TAG
+	 * and a WEB_SERVICE_TAG2 tag.
 	 *
 	 * Everything created here is removed in removeExtraTagWebhookAction() / clearData().
 	 */
 	private function createExtraTagWebhookAction(): void {
 		$tag = self::WEB_SERVICE_TAG;
+		$tag2 = self::WEB_SERVICE_TAG2;
 		$component_tag = self::WEB_COMPONENT_TAG;
 		$script_code = <<<HEREDOC
 var params = JSON.parse(value),
@@ -1392,6 +1404,14 @@ var params = JSON.parse(value),
 	tags = {'$tag': match === null ? '' : match[1]};
 
 tags['$component_tag'] = params.component;
+
+return JSON.stringify({tags: tags});
+HEREDOC;
+
+		$script_code2 = <<<HEREDOC
+var params = JSON.parse(value),
+	match = params.item_value.match(/([0-9]+)\$/),
+	tags = {'$tag2': match === null ? '' : 'second_' + match[1]};
 
 return JSON.stringify({tags: tags});
 HEREDOC;
@@ -1411,13 +1431,28 @@ HEREDOC;
 		$this->assertArrayHasKey(0, $response['result']['mediatypeids']);
 		self::$tag_mediatypeid = $response['result']['mediatypeids'][0];
 
-		// Attach the tagging media type to the Admin user alongside the shared CEP webhook media, so the
-		// action's message operation actually generates an alert (and thus runs the webhook).
+		$response = $this->call('mediatype.create', [
+			'name' => 'CEP extra tag webhook 2',
+			'type' => MEDIA_TYPE_WEBHOOK,
+			'script' => $script_code2,
+			'process_tags' => ZBX_MEDIA_TYPE_TAGS_ENABLED,
+			'status' => MEDIA_TYPE_STATUS_ACTIVE,
+			'parameters' => [
+				['name' => 'item_value', 'value' => '{ITEM.VALUE}']
+			]
+		]);
+		$this->assertArrayHasKey('mediatypeids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['mediatypeids']);
+		self::$tag_mediatypeid2 = $response['result']['mediatypeids'][0];
+
+		// Attach both tagging media types to the Admin user alongside the shared CEP webhook media, so the
+		// actions' message operations actually generate alerts (and thus run the webhooks).
 		$this->call('user.update', [
 			'userid' => 1,
 			'medias' => [
 				['mediatypeid' => self::$mediatypeid, 'sendto' => 'cep'],
-				['mediatypeid' => self::$tag_mediatypeid, 'sendto' => 'cep']
+				['mediatypeid' => self::$tag_mediatypeid, 'sendto' => 'cep'],
+				['mediatypeid' => self::$tag_mediatypeid2, 'sendto' => 'cep']
 			]
 		]);
 
@@ -1465,14 +1500,41 @@ HEREDOC;
 		$this->assertArrayHasKey(0, $response['result']['actionids']);
 		self::$tag_actionid = $response['result']['actionids'][0];
 
+		// Second trigger action, identical except that it routes its problem operation through the second
+		// tagging webhook, so every problem event is tagged by two independent webhook actions.
+		$response = $this->call('action.create', [
+			'name' => 'CEP extra tag action 2',
+			'eventsource' => EVENT_SOURCE_TRIGGERS,
+			'status' => ACTION_STATUS_ENABLED,
+			'esc_period' => '1h',
+			'pause_suppressed' => 0,
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$tag_mediatypeid2,
+						'message' => 'Problem', 'subject' => 'Problem'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+		self::$tag_actionid2 = $response['result']['actionids'][0];
+
 		// The service/trigger actions are already disabled once the services-specific tests finish (see
-		// disableServicesActions), so only the tagging webhook fires in this scenario.
+		// disableServicesActions), so only the tagging webhooks fire in this scenario.
 	}
 
 	/**
-	 * Tear down the webhook media type, its user media and the trigger action created by
+	 * Tear down the webhook media types, their user medias and the trigger actions created by
 	 * createExtraTagWebhookAction(), restoring the Admin user to only the shared CEP webhook media so the
-	 * tagging webhook does not leak into subsequent tests.
+	 * tagging webhooks do not leak into subsequent tests.
 	 */
 	private function removeExtraTagWebhookAction(): void {
 		if (!empty(self::$tag_actionid)) {
@@ -1480,15 +1542,28 @@ HEREDOC;
 			self::$tag_actionid = null;
 		}
 
-		if (!empty(self::$tag_mediatypeid)) {
+		if (!empty(self::$tag_actionid2)) {
+			$this->call('action.delete', [self::$tag_actionid2]);
+			self::$tag_actionid2 = null;
+		}
+
+		if (!empty(self::$tag_mediatypeid) || !empty(self::$tag_mediatypeid2)) {
 			$this->call('user.update', [
 				'userid' => 1,
 				'medias' => [
 					['mediatypeid' => self::$mediatypeid, 'sendto' => 'cep']
 				]
 			]);
-			$this->call('mediatype.delete', [self::$tag_mediatypeid]);
-			self::$tag_mediatypeid = null;
+
+			if (!empty(self::$tag_mediatypeid)) {
+				$this->call('mediatype.delete', [self::$tag_mediatypeid]);
+				self::$tag_mediatypeid = null;
+			}
+
+			if (!empty(self::$tag_mediatypeid2)) {
+				$this->call('mediatype.delete', [self::$tag_mediatypeid2]);
+				self::$tag_mediatypeid2 = null;
+			}
 		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -2348,6 +2423,10 @@ HEREDOC;
 
 		// Each per-trigger service goes to PROBLEM (disaster) with one open service problem.
 		$this->assertServicesStatus(TRIGGER_SEVERITY_DISASTER, count(self::$serviceids));
+
+		// And each service holds exactly one open service problem — no duplicates (regression guard for the
+		// service manager matching the same event to a service more than once).
+		$this->assertOneServiceProblemPerService();
 	}
 
 	/**
@@ -3223,11 +3302,13 @@ HEREDOC;
 
 	/**
 	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp
-	 * (correlation still pairs on the 'service' trigger tag), but a webhook media type with process_tags
-	 * enabled additionally adds a WEB_SERVICE_TAG tag to every problem event from JavaScript, driven by a
-	 * trigger action on the discovered CEP triggers. After the scenario the test asserts that every problem
-	 * event carries WEB_SERVICE_TAG whose value matches the trailing number of the event name, verifying that
-	 * tags returned by a media type are applied to the events they were generated for.
+	 * (correlation still pairs on the 'service' trigger tag), but two independent webhook media types with
+	 * process_tags enabled additionally add a WEB_SERVICE_TAG and a WEB_SERVICE_TAG2 tag to every problem
+	 * event from JavaScript, each driven by its own trigger action on the discovered CEP triggers. After the
+	 * scenario the test asserts that every problem event carries both tags (WEB_SERVICE_TAG matching the
+	 * trailing number of the event name, WEB_SERVICE_TAG2 the same number prefixed with 'second_'),
+	 * verifying that tags returned by separate media types are all applied to the events they were
+	 * generated for.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpJS$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -3251,6 +3332,7 @@ HEREDOC;
 			$this->waitForNoOpenProblems($all);
 
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 2 * $m);
 		}
 		finally {
 			$this->removeExtraTagWebhookAction();
@@ -4124,8 +4206,9 @@ HEREDOC;
 
 	/**
 	 * Drive the "close old down when new up" scenario across four waves (down, down, up, up). When
-	 * $check_tags is true, after each wave the test asserts how many problem events carry WEB_SERVICE_TAG:
-	 * every problem is tagged by the webhook as it opens and the tag is never removed, and all problems
+	 * $check_tags is true, after each wave the test asserts how many problem events carry WEB_SERVICE_TAG
+	 * and WEB_SERVICE_TAG2 (each applied by its own webhook action, see createExtraTagWebhookAction):
+	 * every problem is tagged by the webhooks as it opens and the tags are never removed, and all problems
 	 * open (both "down" waves) before any closes (the "up" waves), so the tagged count is the high-water
 	 * mark of the open-problem count — $m after wave 1, then 2 * $m from wave 2 onwards (unchanged as the
 	 * "up" waves close problems back down). Requires captureEventBaseline() and the tag webhook action to
@@ -4199,9 +4282,10 @@ HEREDOC;
 			$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
 		}
 
-		// Wave 1 is fully open ($m problems), so $m problem events are tagged.
+		// Wave 1 is fully open ($m problems), so $m problem events are tagged by both webhooks.
 		if ($check_tags) {
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, $m);
 		}
 
 		// Wave 1 covered every key, so the webhook has tagged an open problem of every component with
@@ -4287,9 +4371,11 @@ HEREDOC;
 			}
 		}
 
-		// Both "down" waves are now open (2 * $m problems), so 2 * $m problem events are tagged.
+		// Both "down" waves are now open (2 * $m problems), so 2 * $m problem events are tagged by both
+		// webhooks.
 		if ($check_tags) {
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 2 * $m);
 		}
 
 		// Wave 2 keeps every component with open webhook-tagged problems, so the services stay DISASTER.
@@ -4308,9 +4394,10 @@ HEREDOC;
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
 		// Wave 3 closed $m problems, but the "up" events are closed on creation and never tagged, and the
-		// down problems keep their tags, so the tagged count is unchanged at 2 * $m.
+		// down problems keep their tags, so the tagged count is unchanged at 2 * $m for both webhooks.
 		if ($check_tags) {
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 2 * $m);
 		}
 
 		// Wave 2's webhook-tagged problems are still open on every component, so the services stay DISASTER.
@@ -4331,9 +4418,10 @@ HEREDOC;
 		$this->waitForNoOpenProblems($all);
 
 		// Wave 4 closed the rest; nothing stays open, but the tagged count still reflects every down
-		// problem ever opened: 2 * $m.
+		// problem ever opened: 2 * $m for both webhooks.
 		if ($check_tags) {
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 2 * $m);
 		}
 
 		// No webhook-tagged problem stays open, so every web-tag service recovers to OK.
@@ -5947,6 +6035,40 @@ HEREDOC;
 	}
 
 	/**
+	 * Assert that every per-trigger service has exactly one open service problem, i.e. the service manager
+	 * created a single service problem per matched service and did not add the same event to a service more
+	 * than once. This is a regression guard for duplicated service problems: the aggregate count checked by
+	 * assertServicesStatus() can be satisfied by an uneven distribution (one service with two problems and
+	 * another with none), so the per-service breakdown is verified explicitly here.
+	 */
+	private function assertOneServiceProblemPerService(): void {
+		$serviceids = self::$serviceids;
+
+		if (empty($serviceids)) {
+			return;
+		}
+
+		$response = $this->call('problem.get', [
+			'objectids' => $serviceids,
+			'object' => EVENT_OBJECT_SERVICE,
+			'source' => EVENT_SOURCE_SERVICE,
+			'output' => ['eventid', 'objectid']
+		]);
+
+		$counts = [];
+		foreach ($response['result'] as $problem) {
+			$objectid = $problem['objectid'];
+			$counts[$objectid] = isset($counts[$objectid]) ? $counts[$objectid] + 1 : 1;
+		}
+
+		foreach ($serviceids as $serviceid) {
+			$count = isset($counts[$serviceid]) ? $counts[$serviceid] : 0;
+			$this->assertSame(1, $count, 'Service '.$serviceid.' must have exactly one open service problem, '.
+				'got '.$count.'. Open service problems: '.json_encode($response['result']));
+		}
+	}
+
+	/**
 	 * Poll the per-trigger CEP services until every one reports $expected_status (a ZBX_SEVERITY_* value,
 	 * or ZBX_SEVERITY_OK once recovered). Unlike assertServicesStatus() this only checks the status, so it
 	 * can be used after a manual problem-severity change where the open service problem count is irrelevant.
@@ -6237,20 +6359,30 @@ HEREDOC;
 			self::$trigger_actionid = null;
 		}
 
-		// Remove the extra-tag webhook action (created by createExtraTagWebhookAction) in case a test
+		// Remove the extra-tag webhook actions (created by createExtraTagWebhookAction) in case a test
 		// aborted before its own teardown ran.
 		if (!empty(self::$tag_actionid)) {
 			CDataHelper::call('action.delete', [self::$tag_actionid]);
 			self::$tag_actionid = null;
 		}
 
+		if (!empty(self::$tag_actionid2)) {
+			CDataHelper::call('action.delete', [self::$tag_actionid2]);
+			self::$tag_actionid2 = null;
+		}
+
 		// Detach the media from the Admin user before deleting the media types they reference.
-		if (!empty(self::$mediatypeid) || !empty(self::$tag_mediatypeid)) {
+		if (!empty(self::$mediatypeid) || !empty(self::$tag_mediatypeid) || !empty(self::$tag_mediatypeid2)) {
 			CDataHelper::call('user.update', ['userid' => 1, 'medias' => []]);
 
 			if (!empty(self::$tag_mediatypeid)) {
 				CDataHelper::call('mediatype.delete', [self::$tag_mediatypeid]);
 				self::$tag_mediatypeid = null;
+			}
+
+			if (!empty(self::$tag_mediatypeid2)) {
+				CDataHelper::call('mediatype.delete', [self::$tag_mediatypeid2]);
+				self::$tag_mediatypeid2 = null;
 			}
 
 			if (!empty(self::$mediatypeid)) {
