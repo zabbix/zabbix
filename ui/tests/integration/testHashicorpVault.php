@@ -464,7 +464,7 @@ class testHashicorpVault extends CIntegrationTest {
 			'Vault' => 'HashiCorp',
 			'VaultURL' => self::VAULT_ADDR,
 			'VaultDBPath' => self::VAULT_DB_PATH
-		], 'at least one configuration parameter ("VaultToken" or "VaultAppRoleID")');
+		], 'either "VaultToken" or "VaultAppRoleID" configuration parameter should be defined');
 	}
 
 	public function testHashicorpVault_appRoleIdWithoutSecretId() {
@@ -484,7 +484,7 @@ class testHashicorpVault extends CIntegrationTest {
 			'VaultToken' => self::$static_token,
 			'VaultAppRoleID' => self::$role_id
 		], 'either "VaultToken" or "VaultAppRoleID" configuration parameter or corresponding environment '.
-				'variable can be defined but not both'
+				'variable can be defined for HashiCorp vault but not both'
 		);
 	}
 
@@ -507,7 +507,7 @@ class testHashicorpVault extends CIntegrationTest {
 			'VaultDBPath' => self::VAULT_DB_PATH,
 			'VaultAppRoleID' => self::$role_id,
 			'VaultAppSecretID' => '00000000-0000-0000-0000-000000000000'
-		], 'cannot initialize vault: cannot login with AppRole method');
+		], 'cannot login into HashiCorp vault with AppRole method');
 	}
 
 	// The three tests below don't need a running CyberArk vault: "Vault=CyberArk" together with any

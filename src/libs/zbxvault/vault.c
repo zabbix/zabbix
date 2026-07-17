@@ -149,7 +149,8 @@ int	zbx_vault_validate_config(const zbx_config_vault_t *conf, const char *dbuser
 			if (NULL != conf->app_secret_id)
 			{
 				*error = zbx_strdup(*error, "\"VaultToken\" and \"VaultAppSecretID\" configuration"
-						" parameters cannot be defined at the same time for HashiCorp vault");
+						" parameters or corresponding environment variables cannot be defined"
+						" at the same time for HashiCorp vault");
 				return FAIL;
 			}
 		}
@@ -164,8 +165,8 @@ int	zbx_vault_validate_config(const zbx_config_vault_t *conf, const char *dbuser
 
 			if (NULL == conf->app_secret_id)
 			{
-				*error = zbx_strdup(*error, "if \"VaultAppRoleID\" is defined then \"VaultAppSecretID\""
-						" configuration parameter should be defined, too");
+				*error = zbx_strdup(*error, "\"VaultAppRoleID\" is defined but \"VaultAppSecretID\""
+						" is not defined");
 				return FAIL;
 			}
 		}
@@ -174,21 +175,21 @@ int	zbx_vault_validate_config(const zbx_config_vault_t *conf, const char *dbuser
 	{
 		if (NULL != conf->token)
 		{
-			*error = zbx_strdup(*error, "\"VaultToken\" configuration parameter cannot be used"
+			*error = zbx_strdup(*error, "configuration parameter \"VaultToken\" cannot be used"
 					" with CyberArk vault");
 			return FAIL;
 		}
 
 		if (NULL != conf->app_role_id)
 		{
-			*error = zbx_strdup(*error, "\"VaultAppRoleID\" configuration parameter cannot be used"
+			*error = zbx_strdup(*error, "configuration parameter \"VaultAppRoleID\" cannot be used"
 					" with CyberArk vault");
 			return FAIL;
 		}
 
 		if (NULL != conf->app_secret_id)
 		{
-			*error = zbx_strdup(*error, "\"VaultAppSecretID\" configuration parameter cannot be used"
+			*error = zbx_strdup(*error, "configuration parameter \"VaultAppSecretID\" cannot be used"
 					" with CyberArk vault");
 			return FAIL;
 		}
