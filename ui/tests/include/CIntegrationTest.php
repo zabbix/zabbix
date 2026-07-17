@@ -684,7 +684,7 @@ class CIntegrationTest extends CAPITest {
 
 		if (array_key_exists($component, $values) && $values[$component] && is_array($values[$component])) {
 			foreach ($values[$component] as $key => $value) {
-				$config = preg_replace('/^(\s*'.$key.'\s*=.*)$/m', '#\1', $config);
+				$config = preg_replace('/^([ \t]*'.$key.'[ \t]*=.*)$/m', '#\1', $config);
 				foreach ((array) $value as $val) {
 					$config .= "\n".$key.'='.$val;
 				}

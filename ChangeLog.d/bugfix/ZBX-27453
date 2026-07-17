@@ -1,0 +1,1 @@
+........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)

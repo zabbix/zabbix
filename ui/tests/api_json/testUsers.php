@@ -3373,7 +3373,6 @@ class testUsers extends CAPITest {
 		foreach ($handles as $curl) {
 			$responses[] = curl_multi_getcontent($curl);
 			curl_multi_remove_handle($multi_handle, $curl);
-			curl_close($curl);
 		}
 
 		curl_multi_close($multi_handle);

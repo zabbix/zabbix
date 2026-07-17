@@ -39,6 +39,7 @@ require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
 require_once dirname(__FILE__).'/testActiveAvailability.php';
+require_once dirname(__FILE__).'/testActiveCheckHeartbeat.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
 /* require_once dirname(__FILE__).'/testDiscoveryRules.php'; snmpsim does not work properly on new Debian */
 require_once dirname(__FILE__).'/testAutoregistration.php';
@@ -99,6 +100,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
 		$suite->addTestSuite('testActiveAvailability');
+		$suite->addTestSuite('testActiveCheckHeartbeat');
 		$suite->addTestSuite('testProxyConfSync');
 		$suite->addTestSuite('testInitialConfSync');
 		$suite->addTestSuite('testEventsCauseAndSymptoms');
