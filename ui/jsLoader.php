@@ -663,6 +663,7 @@ $translate_strings = [
 	],
 	'common.js' => [
 		'Add' => _('Add'),
+		'Update' => _('Update'),
 		'Cancel' => _('Cancel'),
 		'Condition details' => _('Condition details'),
 		'Historical condition details' => _('Historical condition details'),
