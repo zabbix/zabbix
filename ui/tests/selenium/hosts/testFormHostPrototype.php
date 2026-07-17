@@ -1045,8 +1045,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->query('class:datatable')->waitUntilReady()->asDatatable()->one()->findRow('Name', $host)->getColumn('Discovery')
 				->query('link:Discovery')->one()->click();
 
-		$this->zbxTestClickLinkTextWait($discovery_rule);
-		$this->zbxTestClickLinkTextWait('Host prototypes');
+		$this->query('tag:table')->waitUntilPresent()->asTable()->one()->findRow('Name', $discovery_rule)
+				->query('link:Host prototypes')->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
 
 		COverlayDialogElement::find()->waitUntilReady()->one();
