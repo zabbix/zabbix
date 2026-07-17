@@ -51,7 +51,7 @@ if ($data['admin_mode']) {
 						]
 					]
 				]))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 		]);
 }
@@ -83,12 +83,11 @@ $form->addItem(
 		->addClass('qr-code-container')
 );
 
-$title = $data['admin_mode'] ? _('Select user to add device') : _('Add device');
 $buttons = [];
 
 if ($data['admin_mode']) {
 	$buttons[] = [
-		'title' => _('Add device'),
+		'title' => _('Add'),
 		'class' => 'js-submit',
 		'keepOpen' => true,
 		'isSubmit' => true
@@ -96,7 +95,7 @@ if ($data['admin_mode']) {
 }
 
 $output = [
-	'header' => $title,
+	'header' => _('Add device'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::USERS_DEVICE),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
@@ -106,7 +105,7 @@ $output = [
 			'rules' => $data['js_validation_rules'],
 			'admin_mode' => $data['admin_mode']
 		]).');',
-	'dialogue_class' => 'modal-popup-static'
+	'dialogue_class' => 'modal-popup-medium'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

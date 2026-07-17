@@ -76,7 +76,6 @@ window.user_device_create_popup = new class {
 				this.#post(zabbixUrl({action: 'user.device.init'}), fields, (response) => {
 					this.#footer.querySelector('.js-submit')?.remove();
 					this.#footer.querySelector('.js-cancel')?.remove();
-					this.#overlay.setProperties({title: <?= json_encode(_('Add device')) ?>});
 					this.#qr_expires_at_ms = response.expires_at * 1000;
 					this.#refresh_interval_countdown = setInterval(() => this.#updateCountdownMessage(), 200);
 
