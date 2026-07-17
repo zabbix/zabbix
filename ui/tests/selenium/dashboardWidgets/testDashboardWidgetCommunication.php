@@ -4029,7 +4029,13 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 			);
 
 			if ($field) {
-				$widget_form = $listener_widget->edit();
+				try {
+					$widget_form = $listener_widget->edit();
+				}
+				catch (\Exception $e) {
+					var_dump($listener_name);
+					throw $e;
+				}
 
 				if (in_array($listener_name, ['SVG graph listener', 'Pie chart listener']) && $field === 'Item') {
 					$this->assertEquals('Unavailable widget', $widget_form->query('xpath:.//td[contains(@class,"table-col-name")]')
