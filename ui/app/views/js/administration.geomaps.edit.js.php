@@ -45,14 +45,31 @@
 			this.form_element = document.getElementById('geomaps-form');
 			this.form = new CForm(this.form_element, rules);
 
-			this.tile_providers = tile_providers;
 			this.defaults = {
 				geomaps_tile_url: '',
+				geomaps_attribution: '',
 				geomaps_max_zoom: ''
 			};
+			this.tile_providers = Object.assign(tile_providers, { other: this.defaults });
 
-			document.querySelector('[name="geomaps_tile_provider"]')
-				.addEventListener('change', (e) => this.#tileProviderChange(e));
+			const tile_provider = document.querySelector('[name="geomaps_tile_provider"]');
+			tile_provider.addEventListener('change', (e) => this.#tileProviderChange(e));
+
+			if (!tile_provider.value) {
+				const values = this.form.getAllValues();
+
+				for (const key of Object.keys(this.defaults)) {
+					this.tile_providers.other[key] = values[key] || '';
+				}
+			}
+
+			this.form_element.addEventListener('input', e => {
+				if (tile_provider.value) {
+					return;
+				}
+
+				this.tile_providers.other[e.target.name] = e.target.value;
+			});
 
 			this.form_element.addEventListener('submit', (e) => this.#submit(e));
 		}
@@ -82,11 +99,11 @@
 				attribution_label.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 			}
 
-			const data = this.tile_providers[e.target.value] || this.defaults;
+			const data = this.tile_providers[e.target.value || 'other'] || this.defaults;
 			title_url_field.value = data.geomaps_tile_url;
 			max_zoom_field.value = data.geomaps_max_zoom;
 
-			attribution_field.value = '';
+			attribution_field.value = data.geomaps_attribution || '';
 
 			this.form.validateChanges(['geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution']);
 		}
