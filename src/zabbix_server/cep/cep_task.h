@@ -41,8 +41,8 @@ zbx_cep_task_type_t;
 typedef struct
 {
 	zbx_mw_task_t			base;
-	zbx_vector_mw_task_ptr_t	blocked;
-	int				blockers;
+	zbx_vector_mw_task_ptr_t	blocked;	/* tasks blocked by this task */
+	int				blockers;	/* number of tasks blocking this task */
 }
 zbx_cep_task_t;
 
