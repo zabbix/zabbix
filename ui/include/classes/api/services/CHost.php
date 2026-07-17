@@ -1734,8 +1734,6 @@ class CHost extends CHostGeneral {
 			'elementid' => $hostids
 		]);
 
-		self::deleteHgSets($db_hosts);
-
 		// delete host
 		DB::delete('host_proxy', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
