@@ -100,19 +100,16 @@ class CWidgetElement extends CElement {
 		$this->hoverMouse();
 		$button->hoverMouse();
 
-		// Hovering a widget in edit mode adds resize handles and starts the header slide-up animation. While
-		// it plays, the top resize border (ui-resizable-border-n) can overlap the edit button and intercept the click.
-		// Retry the click for a few seconds until the border clears.
-		CElementQuery::wait(3)->until(function () use ($button) {
-			try {
-				$button->click();
-
-				return true;
-			}
-			catch (ElementClickInterceptedException $exception) {
-				return false;
-			}
-		}, 'Failed to click the widget edit button: it stayed obscured by another element.');
+		// Hovering a widget in edit mode adds resize handles, and the top resize border (ui-resizable-border-n) can
+		// overlap the edit button and intercept the click. If that happens, scroll the widget into view to remove the
+		// overlap, then click again.
+		try {
+			$button->click();
+		}
+		catch (ElementClickInterceptedException $exception) {
+			$this->scrollIntoView();
+			$button->click();
+		}
 
 		return $this->query('xpath://div[@data-dialogueid="widget_form"]//form')->waitUntilVisible()
 				->asForm()->one();
