@@ -20,8 +20,8 @@
 typedef enum
 {
 	OTEL_METRICS,
-	OTEL_TRACES,
-	OTEL_LOGS
+	OTEL_LOGS,
+	OTEL_TRACES
 }
 zbx_otel_request_type_t;
 
