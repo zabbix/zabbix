@@ -15,12 +15,14 @@
 #ifndef ZABBIX_OTEL_CLICKHOUSE_H
 #define ZABBIX_OTEL_CLICKHOUSE_H
 
+#include "libs/zbxhistory/history_curl.h"
 #include "otel_dataset.h"
 #include "zbxcommon.h"
 
 typedef struct
 {
 	char	*url;
+	char	*database;
 	char	*username;
 	char	*password;
 }
@@ -28,7 +30,8 @@ zbx_otel_clickhouse_cfg_t;
 
 typedef struct
 {
-	CURLM	*mhandle;
+	CURL			*handle;
+	zbx_curl_response_t	resp;
 }
 zbx_otel_clickhouse_t;
 

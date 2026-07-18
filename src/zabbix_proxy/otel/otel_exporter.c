@@ -19,6 +19,7 @@ ZBX_PTR_VECTOR_LITE_IMPL(otel_exporter_ptr, zbx_otel_exporter_t *)
 static void	otel_clickhouse_cfg_clear(zbx_otel_clickhouse_cfg_t *cfg)
 {
 	zbx_free(cfg->url);
+	zbx_free(cfg->database);
 	zbx_free(cfg->username);
 	zbx_free(cfg->password);
 }
@@ -93,6 +94,11 @@ void	otel_exporter_pool_destroy(zbx_otel_exporter_pool_t *pool)
 {
 	for (int i = 0; i < pool->exporters.values_num; i++)
 		otel_exporter_destroy(pool->exporters.values[i]);
+
+	zbx_vector_otel_exporter_ptr_destroy(&pool->exporters);
+	otel_exporter_cfg_clear(&pool->cfg);
+
+	zbx_free(pool);
 }
 
 zbx_otel_exporter_t	*otel_exporter_acquire(zbx_otel_exporter_pool_t *pool)
@@ -143,9 +149,10 @@ int	otel_exporter_cfg_init(zbx_otel_exporter_cfg_t *cfg, const char *options, ch
 {
 	/* TODO: implement proper options parsing */
 	cfg->type = OTEL_EXPORTER_CLICKHOUSE;
-	cfg->data.clickhouse.url = "http://localhost";
-	cfg->data.clickhouse.username = "zb";
-	cfg->data.clickhouse.password = "2b";
+	cfg->data.clickhouse.url = zbx_strdup(NULL, "http://localhost");
+	cfg->data.clickhouse.database = zbx_strdup(NULL, "zabbix");
+	cfg->data.clickhouse.username = zbx_strdup(NULL, "zb");
+	cfg->data.clickhouse.password = zbx_strdup(NULL, "2b");
 
 	return SUCCEED;
 }
