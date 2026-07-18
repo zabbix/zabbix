@@ -1701,6 +1701,7 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 	zbx_thread_otel_manager_args_t	otel_args =
 	{
 		.config_timeout = zbx_config_timeout,
+		.exporter_options = ""	/* TODO: get correct configuration parameter */
 	};
 
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_OTEL_MANAGER] = (zbx_supervisor_unit_def_t){

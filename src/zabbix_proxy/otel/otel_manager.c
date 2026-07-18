@@ -14,8 +14,9 @@
 
 #include "otel_worker.h"
 #include "otel_grpc.h"
-#include "zabbix_proxy/otel/otel_queue.h"
-#include "zabbix_proxy/otel/otel_task.h"
+#include "otel_exporter.h"
+#include "otel_queue.h"
+#include "otel_task.h"
 #include "zbx_otel.h"
 #include "zbx_otel_client.h"
 #include "zbxmw.h"
@@ -38,6 +39,8 @@ typedef struct
 
 	int				commit_limit;
 	int				commit_task_num;
+
+	zbx_otel_exporter_pool_t	*exporters;
 }
 zbx_otel_manager_t;
 
@@ -65,22 +68,33 @@ static void	otel_manager_free(zbx_otel_manager_t *manager)
 		}
 	}
 
+	if (NULL != manager->exporters)
+		otel_exporter_pool_destroy(manager->exporters);
+
 	zbx_free(manager);
 }
 
-static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, int quota, char **error)
+static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, int quota, const char *options,
+		char **error)
 {
 	zbx_otel_manager_t	*manager;
 	zbx_otel_worker_t	**workers;
-	zbx_otel_queue_t		*queue;
+	zbx_otel_queue_t	*queue;
 	int			ret = FAIL;
+	zbx_otel_exporter_cfg_t	cfg;
 
 	manager = (zbx_otel_manager_t *)zbx_calloc(NULL, 1, sizeof(zbx_otel_manager_t));
 	queue = otel_queue_create(quota);
 	workers = (zbx_otel_worker_t **)zbx_calloc(NULL, (size_t)OTEL_WORKERS_MAX, sizeof(zbx_otel_worker_t));
 
+	if (SUCCEED != otel_exporter_cfg_init(&cfg, options, error))
+		goto out;
+
+	if (NULL == (manager->exporters = otel_exporter_pool_create(&cfg, error)))
+		goto out;
+
 	for (int i = 0; i < OTEL_WORKERS_MAX; i++)
-		workers[i] = otel_worker_create();
+		workers[i] = otel_worker_create(manager->exporters);
 
 	if (SUCCEED != zbx_mw_manager_init(&manager->base, info, ZBX_IPC_SERVICE_OTEL, ZBX_PROCESS_TYPE_OTEL_WORKER,
 			(zbx_mw_worker_t **)workers, OTEL_WORKERS_MAX, OTEL_WORKERS_DEFAULT, otel_worker_entry,
@@ -162,7 +176,7 @@ void	*zbx_otel_manager_thread(void *args)
 	otel_args = (const zbx_thread_otel_manager_args_t *)unit_args->args.args;
 
 	/* TODO: fetch requests throttle limit from settings/configuration cache */
-	if (NULL == (manager = otel_manager_create(info, 0, &error)))
+	if (NULL == (manager = otel_manager_create(info, 0, otel_args->exporter_options, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize open telemetry manager: %s", error);
 		zbx_free(error);

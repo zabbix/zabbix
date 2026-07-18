@@ -15,14 +15,17 @@
 #ifndef ZABBIX_OTEL_WORKER_H
 #define ZABBIX_OTEL_WORKER_H
 
+#include "otel_exporter.h"
 #include "zbxmw.h"
+
 typedef struct
 {
-	zbx_mw_worker_t		base;
+	zbx_mw_worker_t			base;
+	zbx_otel_exporter_pool_t	*exporters;
 }
 zbx_otel_worker_t;
 
-zbx_otel_worker_t	*otel_worker_create(void);
+zbx_otel_worker_t	*otel_worker_create(zbx_otel_exporter_pool_t *exporters);
 
 void	*otel_worker_entry(void *args);
 

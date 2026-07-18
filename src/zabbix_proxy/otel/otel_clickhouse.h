@@ -12,16 +12,29 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_ZBX_OTEL_H
-#define ZABBIX_ZBX_OTEL_H
+#ifndef ZABBIX_OTEL_CLICKHOUSE_H
+#define ZABBIX_OTEL_CLICKHOUSE_H
+
+#include "otel_dataset.h"
+#include "zbxcommon.h"
 
 typedef struct
 {
-	int		config_timeout;
-	const char	*exporter_options;
+	char	*url;
+	char	*username;
+	char	*password;
 }
-zbx_thread_otel_manager_args_t;
+zbx_otel_clickhouse_cfg_t;
 
-void	*zbx_otel_manager_thread(void *args);
+typedef struct
+{
+	CURLM	*mhandle;
+}
+zbx_otel_clickhouse_t;
+
+int	otel_clickhouse_init(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg, char **error);
+void	otel_clickhouse_clear(zbx_otel_clickhouse_t *conn);
+void	otel_clickhouse_commit(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg,
+	zbx_otel_dataset_t *ds);
 
 #endif

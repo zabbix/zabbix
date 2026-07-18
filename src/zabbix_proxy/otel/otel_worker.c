@@ -21,16 +21,17 @@
 #include "zbxnix.h"
 #include "zbxsupervisor_client.h"
 
-zbx_otel_worker_t	*otel_worker_create(void)
+zbx_otel_worker_t	*otel_worker_create(zbx_otel_exporter_pool_t *exporters)
 {
 	zbx_otel_worker_t	*worker;
 
 	worker = (zbx_otel_worker_t *)zbx_calloc(NULL, 1, sizeof(zbx_otel_worker_t));
+	worker->exporters = exporters;
 
 	return worker;
 }
 
-static void	otel_worker_process_commit(zbx_otel_task_commit_t *task)
+static void	otel_worker_process_commit(zbx_otel_worker_t *worker, zbx_otel_task_commit_t *task)
 {
 	zbx_otel_dataset_t	ds;
 
@@ -43,10 +44,11 @@ static void	otel_worker_process_commit(zbx_otel_task_commit_t *task)
 		zbx_otel_request_decode(t->request, t->type, &ds);
 	}
 
-	/* TODO: debug dump */
-	int	loglevel = zbx_set_log_level(LOG_LEVEL_TRACE);
-	otel_dataset_dump(&ds);
-	zbx_set_log_level(loglevel);
+	zbx_otel_exporter_t	*exporter;
+
+	exporter = otel_exporter_acquire(worker->exporters);
+	otel_exporter_commit(exporter, &ds);
+	otel_exporter_release(worker->exporters, exporter);
 
 	otel_dataset_clear(&ds);
 }
@@ -78,7 +80,7 @@ void	*otel_worker_entry(void *args)
 			switch (task->type)
 			{
 				case OTEL_TASK_COMMIT:
-					otel_worker_process_commit((zbx_otel_task_commit_t *)task);
+					otel_worker_process_commit(worker, (zbx_otel_task_commit_t *)task);
 					break;
 				case OTEL_TASK_REQUEST:
 					THIS_SHOULD_NEVER_HAPPEN_MSG("incomplete request task received");

@@ -180,8 +180,6 @@ static inline void	SETC(zbx_otel_row_t &row, int idx, char *str)
 	row.cols[idx] = str;
 }
 
-/* ---- shared column fills ---- */
-
 static std::string	service_name_of(
 		const opentelemetry::proto::resource::v1::Resource &res)
 {
@@ -193,7 +191,25 @@ static std::string	service_name_of(
 	return "";
 }
 
-/* fills cols[0..13], common to all five metric types; returns next index (14) */
+/******************************************************************************
+ *                                                                            *
+ * Purpose: fill row columns common to all metric types                       *
+ *                                                                            *
+ * Parameters: row         - [OUT] row to populate                            *
+ *             rm          - [IN] resource metrics containing the metric      *
+ *             sm          - [IN] scope metrics containing the metric         *
+ *             metric      - [IN] metric being converted                      *
+ *             dp_attrs    - [IN] data point attributes                       *
+ *             start_nano  - [IN] start time in unix nanoseconds              *
+ *             time_nano   - [IN] collection time in unix nanoseconds         *
+ *                                                                            *
+ * Return value: index of the first column after the common columns           *
+ *                                                                            *
+ * Comments: Column layout is fixed and shared by all five metric types, so   *
+ *           type-specific fill functions must continue writing at the        *
+ *           returned index.                                                  *
+ *                                                                            *
+ ******************************************************************************/
 static int	metrics_fill_common(zbx_otel_row_t &row,
 		const opentelemetry::proto::metrics::v1::ResourceMetrics &rm,
 		const opentelemetry::proto::metrics::v1::ScopeMetrics &sm,
