@@ -225,7 +225,7 @@ static void	otel_rowset_init(zbx_otel_rowset_t *rs, const zbx_otel_col_t *cols, 
 	rs->cols_num = cols_num;
 }
 
-static void	otel_rowset_clear(zbx_otel_rowset_t *rs)
+void	otel_rowset_clear(zbx_otel_rowset_t *rs)
 {
 	for (int i = 0; i < rs->rows.values_num; i++)
 	{

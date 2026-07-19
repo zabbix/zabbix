@@ -37,7 +37,7 @@ zbx_otel_clickhouse_t;
 
 int	otel_clickhouse_init(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg, char **error);
 void	otel_clickhouse_clear(zbx_otel_clickhouse_t *conn);
-void	otel_clickhouse_commit(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg,
+int	otel_clickhouse_commit(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg,
 	zbx_otel_dataset_t *ds);
 
 #endif

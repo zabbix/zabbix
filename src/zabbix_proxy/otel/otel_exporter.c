@@ -135,21 +135,25 @@ void	otel_exporter_release(zbx_otel_exporter_pool_t *pool, zbx_otel_exporter_t *
 	pthread_mutex_unlock(&pool->lock);
 }
 
-void	otel_exporter_commit(zbx_otel_exporter_t *exporter, zbx_otel_dataset_t *ds)
+int	otel_exporter_commit(zbx_otel_exporter_t *exporter, zbx_otel_dataset_t *ds)
 {
+	int	ret = SUCCEED;
+
 	switch (exporter->cfg->type)
 	{
 		case OTEL_EXPORTER_CLICKHOUSE:
-			otel_clickhouse_commit(&exporter->conn.clickhouse, &exporter->cfg->data.clickhouse, ds);
+			ret = otel_clickhouse_commit(&exporter->conn.clickhouse, &exporter->cfg->data.clickhouse, ds);
 			break;
 	}
+
+	return ret;
 }
 
 int	otel_exporter_cfg_init(zbx_otel_exporter_cfg_t *cfg, const char *options, char **error)
 {
 	/* TODO: implement proper options parsing */
 	cfg->type = OTEL_EXPORTER_CLICKHOUSE;
-	cfg->data.clickhouse.url = zbx_strdup(NULL, "http://localhost");
+	cfg->data.clickhouse.url = zbx_strdup(NULL, "http://localhost:8123");
 	cfg->data.clickhouse.database = zbx_strdup(NULL, "zabbix");
 	cfg->data.clickhouse.username = zbx_strdup(NULL, "zb");
 	cfg->data.clickhouse.password = zbx_strdup(NULL, "2b");

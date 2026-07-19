@@ -88,6 +88,7 @@ void	otel_dataset_init(zbx_otel_dataset_t *ds);
 void	otel_dataset_clear(zbx_otel_dataset_t *ds);
 void	otel_dataset_dump(zbx_otel_dataset_t *ds);
 
+void	otel_rowset_clear(zbx_otel_rowset_t *rs);
 zbx_otel_row_t	otel_rowset_add(zbx_otel_rowset_t *rs);
 
 
