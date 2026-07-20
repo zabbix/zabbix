@@ -2294,6 +2294,7 @@ class testManualActionScripts extends CWebTest {
 					$host_name = (array_key_exists('host', $data)) ? $data['host'] : self::HOST;
 					$this->assertEquals($host_name, $this->query('id:host')->waitUntilVisible()->one()->getValue());
 					COverlayDialogElement::find()->one()->close();
+					$this->page->waitUntilReady();
 				}
 				else {
 					$this->query('button:Ok')->waitUntilVisible()->one();

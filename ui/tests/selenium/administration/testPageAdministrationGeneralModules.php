@@ -1633,7 +1633,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	private function changeModuleStatusFromPage($name, $current_status) {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Name', $name);
-		$row->query('link', $current_status)->one()->click();
+		$row->query('link', $current_status)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 	}
 
