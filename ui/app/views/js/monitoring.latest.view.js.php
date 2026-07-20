@@ -338,7 +338,6 @@
 
 					const {show_item_key} = column.getColumnOptions();
 
-					console.log(show_item_key);
 					if (show_item_key == 1) {
 						const overflow_ellipsis = document.createElement('div');
 						overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
