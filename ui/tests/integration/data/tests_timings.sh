@@ -1,7 +1,7 @@
 PERFORMANCE_RATIO_THRESHOLD=3.0
 
 declare -A BASELINE_TIMES=(
-  [Integration]=4268
+  [Integration]=4423
   [testEscalations]=443
   [testProxyHa]=417
   [testLLDHistorySyncAtScale]=300
@@ -10,6 +10,7 @@ declare -A BASELINE_TIMES=(
   [testAgentJsonProtocol]=188
   [testHighAvailability]=165
   [testAlertingForServices]=160
+  [testActiveCheckHeartbeat]=155
   [testPermissions]=138
   [testServiceRoles]=122
   [testBinaryValueTypeDataCollection]=113

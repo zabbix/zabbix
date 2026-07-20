@@ -18,7 +18,6 @@
 
 #define ZBX_MATH_EPSILON	(1e-6)
 
-#define ZBX_IS_NAN(x)	((x) != (x))
 #define ZBX_VALID_MATRIX(m)		(0 < (m)->rows && 0 < (m)->columns && NULL != (m)->elements)
 #define ZBX_MATRIX_EL(m, row, col)	((m)->elements[(row) * (m)->columns + (col)])
 #define ZBX_MATRIX_ROW(m, row)		((m)->elements + (row) * (m)->columns)
@@ -1114,7 +1113,7 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
-	else if (ZBX_IS_NAN(result))
+	else if (0 != isnan(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
@@ -1189,14 +1188,14 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
-	else if (0.0 > result || DBL_MAX < result)
-	{
-		result = DBL_MAX;
-	}
-	else if (ZBX_IS_NAN(result))
+	else if (0 != isnan(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
+	}
+	else if (0.0 > result || DBL_MAX < result)
+	{
+		result = DBL_MAX;
 	}
 
 	zbx_matrix_free(coefficients);
