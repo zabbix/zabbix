@@ -268,6 +268,13 @@ int	zbx_vault_db_credentials_get(zbx_config_vault_t *config_vault, char **dbuser
 	if (NULL == config_vault->db_path)
 		return SUCCEED;
 
+	/* defensive programming */
+	if (NULL == zbx_vault_get_kvs_cb)
+	{
+		*error = zbx_strdup(*error, "vault is not configured");
+		return FAIL;
+	}
+
 	zbx_kvs_create(&kvs, 2);
 
 	if (SUCCEED != zbx_vault_get_kvs_cb(config_vault->url, config_vault->prefix, config_vault->token,
