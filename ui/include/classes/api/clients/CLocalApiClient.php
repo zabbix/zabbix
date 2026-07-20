@@ -181,7 +181,7 @@ class CLocalApiClient extends CApiClient {
 	 * @return bool
 	 */
 	public function supportsAuthentication(string $api, string $method): bool {
-		return $api === 'apiinfo' && $method === 'version';
+		return ($api === 'apiinfo' && $method === 'version') || ($api === 'serverinfo' && $method === 'get');
 	}
 
 	/**
