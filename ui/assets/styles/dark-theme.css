@@ -2553,11 +2553,11 @@ button {
           .datatable .datatable-options .datatable-options-list .datatable-options-list-item .checkbox-radio + label span {
             vertical-align: middle; }
         .datatable .datatable-options .datatable-options-list .datatable-options-list-item label {
-          display: flex; }
+          display: flex;
+          overflow: hidden; }
           .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label {
             display: inline-block;
             flex-grow: 1;
-            max-width: 140px;
             vertical-align: middle;
             cursor: pointer; }
       .datatable .datatable-options .datatable-options-list.sortable .datatable-options-list-item {
@@ -2585,6 +2585,8 @@ button {
     box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
     .datatable .datatable-options-popup.is-loading {
       pointer-events: all; }
+    .datatable .datatable-options-popup.datatable-options {
+      width: 230px; }
     .datatable .datatable-options-popup:focus {
       outline: none; }
     .datatable .datatable-options-popup .datatable-options-popup-links {

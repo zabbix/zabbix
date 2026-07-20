@@ -106,12 +106,12 @@
 
 				label {
 					display: flex;
+					overflow: hidden;
 
 					.datatable-options-list-item-label {
 						@extend %overflow-ellipsis;
 						display: inline-block;
 						flex-grow: 1;
-						max-width: 140px;
 						vertical-align: middle;
 						cursor: pointer;
 					}
@@ -150,6 +150,10 @@
 
 		&.is-loading {
 			pointer-events: all;
+		}
+
+		&.datatable-options {
+			width: 230px;
 		}
 
 		&:focus {
