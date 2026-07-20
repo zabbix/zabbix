@@ -1,8 +1,21 @@
 Changes for 8.0.0rc1
 
 New features:
+.........T [ZBXNEXT-10328] added Percona by Zabbix agent template (mruszczyk)
+.........T [ZBXNEXT-10326] added MariaDB by Zabbix agent template (mruszczyk)
+.........T [ZBXNEXT-10320] added new metrics, expanded discovery rules for tables and improved dashboard in MySQL by Zabbix agent template (mruszczyk)
+A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-27665] fixed remote command execution failing for trigger action operations when the target host is monitored by a proxy group (vsmelovs)
+..F....... [ZBX-27689] fixed permission check for bulk actions in hosts web monitoring list (scernisenko)
+...G...... [ZBX-27922] added retry to persistent buffer writes (esneiders)
+..F....... [ZBX-27413] renamed Approaching to Upcoming in Maintenance (vskalbins)
+...G...... [ZBX-26916] fixed some websites not having their certificates accessed (dbriedis)
+...G...... [ZBX-27724] fixed build script for Zabbix web service (opucka)
+...G...... [ZBX-27024] resolved systemrun failing and race conditions (opucka)
+.........T [ZBX-25578] fixed GCP get db instances script (kflorowski)
+.........T [ZBX-27139] fixed naming and description of PLE trigger in 'MSSQL by Zabbix agent 2' template (smansurovs)
 ........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
 .........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
 ..F....... [ZBX-27145] improved selected row color for dark themes (gklavins)
@@ -409,8 +422,19 @@ A......... [ZBX-27567] prevented low-privilege users from modifying entities via
 Changes for 7.4.13rc1
 
 New features:
+A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
+.........T [ZBXNEXT-10558] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-27665] fixed remote command execution failing for trigger action operations when the target host is monitored by a proxy group (vsmelovs)
+..F....... [ZBX-27689] fixed permission check for bulk actions in hosts web monitoring list (scernisenko)
+...G...... [ZBX-27922] added retry to persistent buffer writes (esneiders)
+...G...... [ZBX-26916] fixed some websites not having their certificates accessed (dbriedis)
+...G...... [ZBX-27724] fixed build script for Zabbix web service (opucka)
+...G...... [ZBX-18840] fixed misleading comments in agent 2 (dbriedis)
+...G...... [ZBX-27024] resolved systemrun failing and race conditions (opucka)
+.........T [ZBX-25578] fixed GCP get db instances script (kflorowski)
+.........T [ZBX-27139] fixed naming and description of PLE trigger in 'MSSQL by Zabbix agent 2' template (smansurovs)
 .........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
 ........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
 
@@ -1910,8 +1934,19 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.29rc1
 
 New features:
+A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
+........S. [ZBX-27665] fixed remote command execution failing for trigger action operations when the target host is monitored by a proxy group (vsmelovs)
+..F....... [ZBX-27689] fixed permission check for bulk actions in hosts web monitoring list (scernisenko)
+...G...... [ZBX-27922] added retry to persistent buffer writes (esneiders)
+...G...... [ZBX-26916] fixed some websites not having their certificates accessed (dbriedis)
+...G...... [ZBX-27724] fixed build script for Zabbix web service (opucka)
+...G...... [ZBX-18840] fixed misleading comments in agent 2 (dbriedis)
+.........T [ZBX-25578] fixed GCP get db instances script (kflorowski)
+...G...... [ZBX-27024] resolved systemrun failing and race conditions (opucka)
+.........T [ZBX-27139] fixed naming and description of PLE trigger in 'MSSQL by Zabbix agent 2' template (smansurovs)
 .........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
 ..F....... [ZBX-26465] improved aria-label text for all functional buttons and icons and aria-expanded of side menu elements for Screen Reader users (aluchko)
 
@@ -6046,8 +6081,10 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.48rc1
 
 New features:
+A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27024] resolved systemrun failing and race conditions (opucka)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.47
