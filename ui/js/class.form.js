@@ -452,6 +452,10 @@ class CForm {
 						raw_errors[field_path] = [...raw_errors[field_path], ...raw_errors[error_path]]
 							.filter(({message}) => message.length);
 						delete raw_errors[error_path];
+
+						if (raw_errors[field_path].length == 0) {
+							raw_errors[field_path] = [{message: '', level: -1}];
+						}
 					}
 				}
 			}
