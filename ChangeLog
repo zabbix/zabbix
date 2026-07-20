@@ -7,6 +7,13 @@ New features:
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+.........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates. (abrosimovs)
+..F....... [ZBX-26583] fixed incorrectly displayed templates after clearing search field in host wizard (aluchko, gklavins)
+....I..... [ZBX-27125] added DB patches for graph themes (gklavins)
+..F....... [ZBX-27886] renamed datatable element ids (gklavins)
+..F....... [ZBX-26953] fixed redirect functionality for the Discovery rules, Discovery prototypes, Web scenarios and Maps (msnihach)
+..F....... [ZBX-27663] fixed switching between tag lists in host, host prototypes, and templates edit form in case there are no tags (scernisenko)
+..F....... [ZBX-27918] fixed a bug, where "Menu entry URL" input was enabled when "Include event menu entry" checkbox was unchecked (scernisenko)
 ........S. [ZBX-27665] fixed remote command execution failing for trigger action operations when the target host is monitored by a proxy group (vsmelovs)
 ..F....... [ZBX-27689] fixed permission check for bulk actions in hosts web monitoring list (scernisenko)
 ...G...... [ZBX-27922] added retry to persistent buffer writes (esneiders)
@@ -426,6 +433,9 @@ A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28
 .........T [ZBXNEXT-10558] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates (egordymov)
 
 Bug fixes:
+.........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates. (abrosimovs)
+..F....... [ZBX-26583] fixed incorrectly displayed templates after clearing search field in host wizard (aluchko, gklavins)
+..F....... [ZBX-26953] fixed redirect functionality for the Discovery rules, Discovery prototypes, Host prototypes, Web scenarios and Maps (msnihach)
 ........S. [ZBX-27665] fixed remote command execution failing for trigger action operations when the target host is monitored by a proxy group (vsmelovs)
 ..F....... [ZBX-27689] fixed permission check for bulk actions in hosts web monitoring list (scernisenko)
 ...G...... [ZBX-27922] added retry to persistent buffer writes (esneiders)
@@ -1937,6 +1947,8 @@ New features:
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+.........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates. (abrosimovs)
+..F....... [ZBX-26953] fixed redirect functionality for the Discovery rules, Host prototypes, Graphs, Graph prototypes, Web scenarios and Maps (msnihach)
 ........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
 ........S. [ZBX-27665] fixed remote command execution failing for trigger action operations when the target host is monitored by a proxy group (vsmelovs)
 ..F....... [ZBX-27689] fixed permission check for bulk actions in hosts web monitoring list (scernisenko)
