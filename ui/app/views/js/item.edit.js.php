@@ -645,7 +645,6 @@ window.item_edit_form = new class {
 				this.tags_table.innerHTML = response.body;
 
 				if (!this.tags_form_grid.dataset.readonly) {
-					console.log('dataset.readonly: ' + this.tags_form_grid.dataset.readonly);
 					const $tags_table = jQuery(this.tags_table);
 
 					$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
