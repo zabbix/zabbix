@@ -454,7 +454,7 @@ $SSO[\'CERT_STORAGE\']		= \'database\';
 //$ZBX_FEATURE_FLAGS[\'modules_config_enabled\'] = true;
 
 // Uncomment and set to desired values to disable editing of specific media types.
-// Possible values: \'email\', \'script\', \'sms\', \'webhook\'. One or more values can be set.
+// Possible values: \'email\', \'script\', \'sms\', \'webhook\', \'push\'. One or more values can be set.
 //$ZBX_FEATURE_FLAGS[\'media_type_denylist\'] = [];
 
 $ZBX_SERVER_TLS[\'ACTIVE\'] = '.($this->config['ZBX_SERVER_TLS']['ACTIVE'] ? 'true' : 'false').';
@@ -478,7 +478,8 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			MEDIA_TYPE_EMAIL => 'email',
 			MEDIA_TYPE_EXEC => 'script',
 			MEDIA_TYPE_SMS => 'sms',
-			MEDIA_TYPE_WEBHOOK => 'webhook'
+			MEDIA_TYPE_WEBHOOK => 'webhook',
+			MEDIA_TYPE_PUSH => 'push'
 		];
 
 		if (array_diff($media_type_denylist, $type_flag)) {
