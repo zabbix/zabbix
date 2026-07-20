@@ -71,6 +71,10 @@ zbx_otel_exporter_t	*otel_exporter_acquire(zbx_otel_exporter_pool_t *pool);
 void	otel_exporter_release(zbx_otel_exporter_pool_t *pool, zbx_otel_exporter_t *exporter);
 int	otel_exporter_cfg_init(zbx_otel_exporter_cfg_t *cfg, const char *options, char **error);
 
+#define OTEL_COMMIT_OK		0x00
+#define OTEL_COMMIT_ERR		0x01
+#define OTEL_COMMIT_RETRY	0x02
+
 int	otel_exporter_commit(zbx_otel_exporter_t *exporter, zbx_otel_dataset_t *ds);
 
 

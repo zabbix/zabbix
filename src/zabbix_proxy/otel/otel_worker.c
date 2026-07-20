@@ -48,10 +48,9 @@ static void	otel_worker_process_commit(zbx_otel_worker_t *worker, zbx_otel_task_
 
 	exporter = otel_exporter_acquire(worker->exporters);
 
-	while (SUCCEED != otel_exporter_commit(exporter, &ds))
+	while (0 != (otel_exporter_commit(exporter, &ds) & OTEL_COMMIT_RETRY) &&
+			SUCCEED == zbx_mw_worker_is_running(&worker->base))
 	{
-		/* TODO: handle commit failures, number of retries ? */
-		break;
 	}
 
 	otel_exporter_release(worker->exporters, exporter);

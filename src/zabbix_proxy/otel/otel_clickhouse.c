@@ -15,6 +15,7 @@
 #include "otel_clickhouse.h"
 #include "otel_dataset.h"
 #include "libs/zbxhistory/history_curl.h"
+#include "zabbix_proxy/otel/otel_exporter.h"
 #include "zbxcommon.h"
 #include "zbxcurl.h"
 #include "zbxhttp.h"
@@ -117,7 +118,7 @@ static int	otel_clickhouse_commit_rowset(zbx_otel_clickhouse_t *conn, const zbx_
 
 	char		url[MAX_STRING_LEN];
 	CURLcode	err;
-	int		ret = FAIL;
+	int		ret = OTEL_COMMIT_ERR;
 	char		*data = NULL;
 	size_t		data_alloc = 0, data_offset = 0;
 	long		http_ret;
@@ -158,6 +159,7 @@ static int	otel_clickhouse_commit_rowset(zbx_otel_clickhouse_t *conn, const zbx_
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, data)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot post telemetry data: %s", curl_easy_strerror(err));
+		ret |= OTEL_COMMIT_RETRY;
 		goto out;
 	}
 
@@ -184,8 +186,11 @@ static int	otel_clickhouse_commit_rowset(zbx_otel_clickhouse_t *conn, const zbx_
 
 	otel_rowset_clear(rs);
 
-	ret = SUCCEED;
+	ret = OTEL_COMMIT_OK;
 out:
+	if (0 != (ret & OTEL_COMMIT_RETRY))
+		otel_rowset_clear(rs);
+
 	zbx_free(data);
 
 	return ret;
@@ -196,25 +201,16 @@ out:
 int	otel_clickhouse_commit(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg,
 		zbx_otel_dataset_t *ds)
 {
-	int	ret = SUCCEED;
+	int	ret = OTEL_COMMIT_OK;
 
-	if (FAIL == otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_gauge", &ds->metrics_gauge))
-		ret = FAIL;
-	if (FAIL == otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_sum", &ds->metrics_sum))
-		ret = FAIL;
-	if (FAIL == otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_histogram", &ds->metrics_histogram))
-		ret = FAIL;
-	if (FAIL == otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_exponential_histogram",
-			&ds->metrics_exponential_histogram))
-	{
-		ret = FAIL;
-	}
-	if (FAIL == otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_summary", &ds->metrics_summary))
-		ret = FAIL;
-	if (FAIL == otel_clickhouse_commit_rowset(conn, cfg, "otel_logs", &ds->logs))
-		ret = FAIL;
-	if (FAIL == otel_clickhouse_commit_rowset(conn, cfg, "otel_traces", &ds->traces))
-		ret = FAIL;
+	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_gauge", &ds->metrics_gauge);
+	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_sum", &ds->metrics_sum);
+	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_histogram", &ds->metrics_histogram);
+	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_exponential_histogram",
+			&ds->metrics_exponential_histogram);
+	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_summary", &ds->metrics_summary);
+	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_logs", &ds->logs);
+	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_traces", &ds->traces);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		otel_dataset_dump(ds);
