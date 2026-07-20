@@ -57,6 +57,7 @@ $form_grid = (new CFormGrid())
 		new CFormField([
 			new CHorList([
 				(new CNumericBox('limit_value', $data['form']['limit_value'], 7, allow_negative: false))
+					->setDefaultValue(1)
 					->setId('service-status-rule-limit-value')
 					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					->setAriaRequired()
