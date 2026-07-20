@@ -2547,10 +2547,6 @@ class CDataTable {
 	}
 
 	onWindowResize = () => {
-		for (const column of this.#visible_columns.filter(column => !column.isResized())) {
-			column.resetWidth();
-		}
-
 		this.#calculateColumnWidths();
 		this.#handleScrollbar();
 	}
@@ -2655,6 +2651,11 @@ class CDataTable {
 
 	#bindColumnResizeEvent(column, resizer) {
 		resizer.addEventListener('pointerdown', e => {
+			// Continue only, if left mouse button.
+			if (e.which !== 1) {
+				return false;
+			}
+
 			resizer.setPointerCapture(e.pointerId);
 
 			this.dispatchEvent(CDataTable.EVENT_COLUMN_RESIZE_START, {

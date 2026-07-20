@@ -2972,7 +2972,8 @@ button {
   pointer-events: none; }
 .datatable-resizing .datatable {
   user-select: none;
-  pointer-events: none; }
+  pointer-events: none;
+  -webkit-user-select: none; }
   .datatable-resizing .datatable .cell.cell-resizing .header-resizer {
     z-index: 4; }
 

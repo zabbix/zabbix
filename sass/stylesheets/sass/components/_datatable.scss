@@ -773,6 +773,7 @@
 	.datatable {
 		user-select: none;
 		pointer-events: none;
+		-webkit-user-select: none;
 
 		.cell.cell-resizing .header-resizer {
 			z-index: 4;
