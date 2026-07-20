@@ -216,10 +216,6 @@ class CDevice extends CApiService {
 			return;
 		}
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
 		if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
 		}
