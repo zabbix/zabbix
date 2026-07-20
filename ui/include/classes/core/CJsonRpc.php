@@ -112,6 +112,18 @@ class CJsonRpc {
 				continue;
 			}
 
+			if ($auth['type'] !== CJsonRpc::AUTH_TYPE_COOKIE
+					&& !$this->apiClient->requiresAuthentication($api, $method)
+					&& !$this->apiClient->supportsAuthentication($api, $method)) {
+				$this->jsonError($call, '-32602',
+					_s('The "%1$s.%2$s" method must be called without authorization header.', $request_api,
+						$request_method
+					)
+				);
+
+				continue;
+			}
+
 			if (!$authentication_required
 					&& ($this->apiClient->requiresAuthentication($api, $method)
 						|| ($this->apiClient->supportsAuthentication($api, $method) && $auth['auth'] !== null))) {
@@ -136,24 +148,7 @@ class CJsonRpc {
 
 		if ($authenticate_response === null || $authenticate_response->errorCode === null) {
 			foreach ($calls_data as $call) {
-				$api = strtolower($call['api']);
-				$method = strtolower($call['method']);
-
-				if ($auth['type'] !== CJsonRpc::AUTH_TYPE_COOKIE
-						&& !$this->apiClient->requiresAuthentication($api, $method)
-						&& !$this->apiClient->supportsAuthentication($api, $method)) {
-					$result = new CApiClientResponse();
-
-					$result->errorCode = ZBX_API_ERROR_PARAMETERS;
-					$result->errorMessage = _s('The "%1$s.%2$s" method must be called without authorization header.',
-						$call['api'], $call['method']
-					);
-				}
-				else {
-					$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'],
-						$auth['type']
-					);
-				}
+				$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
 
 				$this->processResult($call, $result);
 			}
