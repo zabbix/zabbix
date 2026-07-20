@@ -393,7 +393,7 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 			"<ns0:pathSet>parent</ns0:pathSet>"							\
 		"</ns0:propSet>"
 
-#	define ZBX_POST_SOAP_CUSTER										\
+#	define ZBX_POST_SOAP_CLUSTER										\
 		"<ns0:propSet>"											\
 			"<ns0:type>ClusterComputeResource</ns0:type>"						\
 			"<ns0:pathSet>name</ns0:pathSet>"							\
@@ -415,7 +415,7 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DATACENTER_NAME,
 			get_vmware_service_objects()[service->type].property_collector,
-			NULL != hv->clusterid ? ZBX_POST_SOAP_CUSTER : ZBX_POST_SOAP_FOLDER, hv->id);
+			NULL != hv->clusterid ? ZBX_POST_SOAP_CLUSTER : ZBX_POST_SOAP_FOLDER, hv->id);
 
 	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, error))
 		goto out;
@@ -456,7 +456,7 @@ out:
 
 #	undef	ZBX_POST_HV_DATACENTER_NAME
 #	undef	ZBX_POST_SOAP_FOLDER
-#	undef	ZBX_POST_SOAP_CUSTER
+#	undef	ZBX_POST_SOAP_CLUSTER
 #	undef	ZBX_XPATH_HV_PARENTID
 #	undef	ZBX_XPATH_NAME_BY_TYPE
 }
