@@ -16,11 +16,11 @@
 
 class CControllerDashboardView extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'dashboardid' =>		'db dashboard.dashboardid',
 			'hostid' =>				'db hosts.hostid',
@@ -29,7 +29,7 @@ class CControllerDashboardView extends CController {
 			'clone' =>				'in 1',
 			'from' =>				'range_time',
 			'to' =>					'range_time',
-			'slideshow' =>			'in 1'
+			'slideshow' =>			'in '.DASHBOARD_SLIDESHOW_OFF.','.DASHBOARD_SLIDESHOW_ON
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -55,7 +55,7 @@ class CControllerDashboardView extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)) {
 			return false;
 		}
@@ -78,7 +78,7 @@ class CControllerDashboardView extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$widget_defaults = APP::ModuleManager()->getWidgetsDefaults();
 
 		[$dashboard, $stats, $error] = $this->getDashboard($widget_defaults);
@@ -102,10 +102,6 @@ class CControllerDashboardView extends CController {
 			));
 
 			return;
-		}
-
-		if ($this->hasInput('slideshow')) {
-			$dashboard['auto_start'] = '1';
 		}
 
 		$dashboard['can_edit_dashboards'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
@@ -132,12 +128,22 @@ class CControllerDashboardView extends CController {
 
 		$dashboard_time_period = getTimeSelectorPeriod($time_selector_options);
 
+		if ($dashboard['dashboardid'] === null) {
+			$start_slideshow = false;
+		}
+		else {
+			$start_slideshow = $this->hasInput('slideshow')
+				? $this->getInput('slideshow') === DASHBOARD_SLIDESHOW_ON
+				: $dashboard['auto_start'] == 1;
+		}
+
 		$data = [
 			// The dashboard property shall only contain data used by the JavaScript framework.
 			'dashboard' => $dashboard,
 			'widget_defaults' => $widget_defaults,
 			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
 			'configuration_hash' => $stats['configuration_hash'],
+			'start_slideshow' => $start_slideshow,
 			'can_view_reports' => $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS),
 			'can_create_reports' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS),
 			'has_related_reports' => $stats['has_related_reports'],

@@ -475,6 +475,9 @@ class XMLSecurityKey
             // obtain and remove the authentication tag
             $offset = 0 - self::AUTHTAG_LENGTH;
             $authTag = substr($data, $offset);
+            if (strlen($authTag) !== self::AUTHTAG_LENGTH) {
+                throw new Exception('Authentication tag length is invalid');
+            }
             $data = substr($data, 0, $offset);
             $decrypted = openssl_decrypt($data, $this->cryptParams['cipher'], $this->key, OPENSSL_RAW_DATA, $this->iv, $authTag);
         } else {
