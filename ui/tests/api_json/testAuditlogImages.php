@@ -26,6 +26,11 @@ class testAuditlogImages extends testAuditlogCommon {
 	 */
 	protected const IMAGEID = 5;
 
+	/**
+	 * Resource type Images
+	 */
+	const RESOURCE_TYPE = 16;
+
 	public function testAuditlogImages_Create() {
 		$create = $this->call('image.create', [
 			[
@@ -53,7 +58,7 @@ class testAuditlogImages extends testAuditlogCommon {
 			'image.imageid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -82,11 +87,11 @@ class testAuditlogImages extends testAuditlogCommon {
 			'image.image' => ['update']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::IMAGEID);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::IMAGEID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogImages_Delete() {
 		$this->call('image.delete', [self::IMAGEID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated image', self::IMAGEID);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Updated image', self::IMAGEID, self::RESOURCE_TYPE);
 	}
 }

@@ -33,7 +33,7 @@ zabbix_export:
         3. Change the `API scheme` and `API port` host wizard configuration fields if needed.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Server hardware'
       items:
@@ -6831,7 +6831,6 @@ zabbix_export:
       dashboards:
         - uuid: 144b6727a17542d58449cc66728c40b9
           name: 'Server overview'
-          auto_start: 'NO'
           pages:
             - name: Enclosures
               widgets:
