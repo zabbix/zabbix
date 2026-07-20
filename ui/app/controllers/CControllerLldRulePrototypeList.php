@@ -126,8 +126,8 @@ class CControllerLldRulePrototypeList extends CController {
 
 	protected function getDiscoveries(array $filter): array {
 		$options = [
-			'output' => ['delay', 'key_', 'name', 'status', 'type', 'discover', 'itemid', 'templateid',
-				'master_itemid', 'flags'
+			'output' => ['itemid', 'type', 'name', 'key_', 'delay', 'status', 'templateid', 'flags', 'master_itemid',
+				'discover'
 			],
 			'selectHosts' => ['hostid', 'name', 'status', 'flags'],
 			'selectItems' => API_OUTPUT_COUNT,
