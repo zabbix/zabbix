@@ -177,6 +177,14 @@ static int	zbx_openssl_init_ssl(zbx_uint64_t opts, void *settings)
 }
 #endif /* OPENSSL_VERSION_NUMBER >= 0x1010000fL && !defined(LIBRESSL_VERSION_NUMBER) */
 
+/* OpenSSL 3.0 renamed SSL_get_peer_certificate() to SSL_get1_peer_certificate().
+ * Both functions increment the refcount and require X509_free(). */
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_MAJOR >= 3
+#	define zbx_ssl_get_peer_cert(ssl)	SSL_get1_peer_certificate(ssl)
+#else
+#	define zbx_ssl_get_peer_cert(ssl)	SSL_get_peer_certificate(ssl)
+#endif
+
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 
 static ZBX_THREAD_LOCAL const char	*my_psk_identity	= NULL;
@@ -643,7 +651,7 @@ static void	zbx_log_peer_cert(const char *function_name, const zbx_tls_context_t
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		return;
 
-	if (NULL == (cert = SSL_get_peer_certificate(tls_ctx->ctx)))
+	if (NULL == (cert = zbx_ssl_get_peer_cert(tls_ctx->ctx)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot obtain peer certificate", function_name);
 	}
@@ -696,7 +704,7 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 	tls_issuer[0] = '\0';
 	tls_subject[0] = '\0';
 
-	if (NULL == (cert = SSL_get_peer_certificate(tls_ctx->ctx)))
+	if (NULL == (cert = zbx_ssl_get_peer_cert(tls_ctx->ctx)))
 	{
 		*error = zbx_strdup(*error, "cannot obtain peer certificate");
 		return FAIL;
@@ -2308,9 +2316,9 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 	char	*error = NULL;
 	X509	*peer_cert;
 
-	if (NULL == (peer_cert = SSL_get_peer_certificate(s->tls_ctx->ctx)))
+	if (NULL == (peer_cert = zbx_ssl_get_peer_cert(s->tls_ctx->ctx)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "no peer certificate, SSL_get_peer_certificate() returned NULL");
+		zabbix_log(LOG_LEVEL_WARNING, "no peer certificate, zbx_ssl_get_peer_cert() returned NULL");
 		return FAIL;
 	}
 
