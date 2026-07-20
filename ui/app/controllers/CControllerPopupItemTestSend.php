@@ -471,7 +471,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						'valuemapids' => $this->getInput('valuemapid')
 					])[0];
 
-				if ($valuemap) {
+				if ($valuemap && $result_preproc['result'] !== null) {
 					$output['mapped_value'] = CValueMapHelper::applyValueMap($data['item']['value_type'],
 						$result_preproc['result'], $valuemap
 					);
