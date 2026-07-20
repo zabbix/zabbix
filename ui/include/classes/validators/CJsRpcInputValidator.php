@@ -351,7 +351,8 @@ class CJsRpcInputValidator {
 			case 'users':
 				$rules = ['type' => API_OBJECT, 'fields' => $head_rules['fields'] + [
 					'context' => ['type' => API_STRING_UTF8],
-					'exclude_provisioned' => ['type' => API_STRING_UTF8]
+					'exclude_provisioned' => ['type' => API_STRING_UTF8],
+					'has_devices_access' => ['type' => API_INT32, 'in' => '1']
 				]];
 				break;
 
