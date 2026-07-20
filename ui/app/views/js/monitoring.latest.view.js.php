@@ -209,6 +209,7 @@
 						.setFields(['last_check']),
 					new CDataTableColumn('last_value', <?= json_encode(_('Last value')); ?>)
 						.setFields(['last_value'])
+						.setRenderer('last_value')
 						.setWidth('20%'),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
 						.setFields(['change']),
@@ -364,6 +365,15 @@
 					else {
 						cell.textContent = type;
 					}
+				})
+				.setCellRenderer('last_value', ({cell_data, cell}) => {
+					const [last_value] = cell_data;
+
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					flex_wrapper.innerHTML = last_value;
+
+					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('actions', ({cell_data, cell}) => {
 					const [itemid, is_graph, show_link] = cell_data;

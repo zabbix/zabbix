@@ -220,9 +220,11 @@ class CDataTable {
 	#header_scroll = false;
 
 	/**
-	 * @type {ResizeObserver|null}
+	 * Stores temporary reference to the toggled column.
+	 *
+	 * @type {null}
 	 */
-	#element_resize_observer = null;
+	#toggled_column = null;
 
 	/**
 	 * Observer instance that monitors changes in the body dimensions.
@@ -1127,21 +1129,13 @@ class CDataTable {
 
 		this.updateUserConfig();
 
+		this.#toggled_column = visible
+			? column
+			: this.#visible_columns.at(this.#visible_columns.indexOf(column) - 1) ?? this.#visible_columns.at(0);
+
 		this.#options_popup_updated = true;
 
-		this.dispatchEvent(CDataTable.EVENT_INIT, {
-			onFinally: () => {
-				requestAnimationFrame(() => {
-					const header_cell = column.getHeaderCell();
-					if (header_cell === null) {
-						return;
-					}
-
-					this.#scrollBodyToTarget(header_cell.target);
-				});
-			}
-		});
-
+		this.dispatchEvent(CDataTable.EVENT_INIT);
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
 	}
 
@@ -1425,7 +1419,9 @@ class CDataTable {
 
 		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
-		column.setResized(false);
+		for (const visible_column of this.#visible_columns) {
+			visible_column.setResized(true);
+		}
 
 		this.#resizing = true;
 		this.#resize_column_index = column_index;
@@ -2184,23 +2180,34 @@ class CDataTable {
 	}
 
 	#afterRender(response) {
-		this.#calculateColumnWidths(requestAnimationFrame);
+		this.#calculateColumnWidths();
 
 		this.#pager.update(response);
 
-		this.#header.scrollTo({left: this.#body_scroll_left});
-		this.#body.scrollTo({left: this.#body_scroll_left});
+		this.#initCheckBoxRange();
+		this.#unlockHeight();
+
+		this.#element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
+
+		this.#options_popup?.getElement()?.classList.remove(ZBX_STYLE_LOADING);
 
 		requestAnimationFrame(() => {
+			if (this.#toggled_column !== null) {
+				this.#options_popup_updated = true;
+
+				this.#scrollBodyToTarget(this.#toggled_column?.getHeaderCell()?.target);
+
+				this.#toggled_column = null;
+			} else {
+				const scroll_to = {left: this.#body_scroll_left};
+
+				this.#header.scrollTo(scroll_to);
+				this.#body.scrollTo(scroll_to);
+			}
+
 			this.#handleScrollbar();
 			this.#applyLastColumnPadding();
 			this.#updateTableOptionsButtonPosition();
-			this.#initCheckBoxRange();
-			this.#unlockHeight();
-
-			this.#element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
-
-			this.#options_popup?.getElement()?.classList.remove(ZBX_STYLE_LOADING);
 		});
 	}
 
@@ -2292,13 +2299,10 @@ class CDataTable {
 		return min_width;
 	}
 
-	#calculateColumnWidths(requestAnimationFrame) {
-		const user_config = this.#user_configs[this.#tabfilter_item._index] ?? null;
-
-		if (!user_config || Object.entries(user_config).length == 0) {
-			for (const column of this.#columns) {
-				column.setWidth(column.getDefaults().getWidth());
-			}
+	#calculateColumnWidths() {
+		for (const column of this.#columns.filter(column => !column.isResized())) {
+			column.setOverrides({})
+				.setWidth(column.getDefaults().getWidth());
 		}
 
 		this.#row_spacer_width = '0px';
@@ -2311,14 +2315,12 @@ class CDataTable {
 
 			this.#applyColumnWidths();
 
-			requestAnimationFrame(() => {
-				for (const column of this.#visible_columns.filter(column => column.getWidth() === 'auto')) {
-					this.#calculateColumnWidth(column);
-				}
+			for (const column of this.#visible_columns.filter(column => column.getWidth() === 'auto')) {
+				this.#calculateColumnWidth(column);
+			}
 
-				this.#row_spacer_width = 'auto';
-				this.#applyColumnWidths();
-			});
+			this.#row_spacer_width = 'auto';
+			this.#applyColumnWidths();
 		});
 	}
 
@@ -2332,7 +2334,7 @@ class CDataTable {
 		const min_width = this.#getColumnMinWidth(column);
 
 		let header_width = Math.floor(column.getHeaderCell()?.target.getBoundingClientRect().width ?? 0);
-		if (!('width' in overrides) && this.#visible_columns.at(-1) === column) {
+		if (!('width' in overrides) && this.#visible_columns.length > 2 && this.#visible_columns.at(-1) === column) {
 			header_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
 		}
 
@@ -2549,7 +2551,7 @@ class CDataTable {
 			column.resetWidth();
 		}
 
-		this.#calculateColumnWidths(callback => callback());
+		this.#calculateColumnWidths();
 		this.#handleScrollbar();
 	}
 
@@ -2576,12 +2578,6 @@ class CDataTable {
 
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.addEventListener('scroll', this.onWrapperScroll);
 
-		this.#element_resize_observer = new ResizeObserver(() => {
-			this.#handleScrollbar();
-			this.#applyLastColumnPadding();
-		});
-		this.#element_resize_observer.observe(this.#element);
-
 		if (this.#tabfilter_item._parent) {
 			this.#tabfilter_item._parent.on(TABFILTER_EVENT_NEWITEM, this.onTabfilterNewItem);
 			this.#tabfilter_item.on(TABFILTERITEM_EVENT_DELETE, this.onTabfilterDelete);
@@ -2603,9 +2599,6 @@ class CDataTable {
 
 		this.#body_resize_observer?.disconnect();
 		this.#body_resize_observer = null;
-
-		this.#element_resize_observer?.disconnect();
-		this.#element_resize_observer = null;
 
 		if (this.#pager) {
 			this.#pager
