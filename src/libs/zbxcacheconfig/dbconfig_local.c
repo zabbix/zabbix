@@ -34,6 +34,8 @@ void	zbx_dc_config_local_init(void)
 
 	config_local->correlation_config = correlation_config_create();
 
+	memset(&config_local->otel_config, 0, sizeof(config_local->otel_config));
+
 	atomic_fetch_add(&config_local_refcount, 1);
 }
 
@@ -64,6 +66,9 @@ void	zbx_dc_config_local_release(void)
 	zbx_hashset_destroy(&config_local->trigger_depends_links);
 	zbx_hashset_destroy(&config_local->item_tag_links);
 	correlation_config_destroy(config_local->correlation_config);
+
+	zbx_dc_otel_config_clear(&config_local->otel_config);
+
 	zbx_free(config_local);
 }
 
@@ -86,5 +91,10 @@ void	zbx_dc_local_set_itservices_num(int num)
 int	zbx_dc_local_get_itservices_num(void)
 {
 	return atomic_load(&dc_local()->itservices_num);
+}
+
+void	zbx_dc_otel_config_clear(zbx_dc_otel_config_t *cfg)
+{
+	zbx_free(cfg->attributes);
 }
 

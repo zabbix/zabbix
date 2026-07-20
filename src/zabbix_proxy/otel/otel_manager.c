@@ -19,6 +19,7 @@
 #include "otel_task.h"
 #include "zbx_otel.h"
 #include "zbx_otel_client.h"
+#include "zbxcacheconfig.h"
 #include "zbxmw.h"
 #include "zbxcommon.h"
 #include "zbxnix.h"
@@ -29,7 +30,6 @@
 
 #define OTEL_WORKERS_MAX		100
 #define OTEL_WORKERS_DEFAULT		10
-
 typedef struct
 {
 	zbx_mw_manager_t		base;
@@ -74,8 +74,8 @@ static void	otel_manager_free(zbx_otel_manager_t *manager)
 	zbx_free(manager);
 }
 
-static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, int quota, const char *options,
-		char **error)
+static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, int workers_num, int quota,
+		const char *options, char **error)
 {
 	zbx_otel_manager_t	*manager;
 	zbx_otel_worker_t	**workers;
@@ -97,7 +97,7 @@ static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, in
 		workers[i] = otel_worker_create(manager->exporters);
 
 	if (SUCCEED != zbx_mw_manager_init(&manager->base, info, ZBX_IPC_SERVICE_OTEL, ZBX_PROCESS_TYPE_OTEL_WORKER,
-			(zbx_mw_worker_t **)workers, OTEL_WORKERS_MAX, OTEL_WORKERS_DEFAULT, otel_worker_entry,
+			(zbx_mw_worker_t **)workers, OTEL_WORKERS_MAX, workers_num, otel_worker_entry,
 			(zbx_mw_queue_t *)queue, error))
 	{
 		goto out;
@@ -158,6 +158,7 @@ void	*zbx_otel_manager_thread(void *args)
 {
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 			/* once in STAT_INTERVAL seconds */
+#define CONFIG_INTERVAL 1
 
 	zbx_supervisor_unit_args_t		*unit_args = (zbx_supervisor_unit_args_t *)args;
 	const zbx_thread_info_t			*info = &unit_args->args.info;
@@ -167,16 +168,22 @@ void	*zbx_otel_manager_thread(void *args)
 	const zbx_thread_otel_manager_args_t	*otel_args;
 	zbx_otel_manager_t			*manager;
 	char					*error = NULL;
-	double					time_stat, time_flush, time_idle = 0;
+	double					time_stat, time_flush, time_idle = 0, time_config;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	int					shutdown = 0;
+	int					shutdown = 0, workers_num;
 	zbx_vector_mw_task_ptr_t		tasks;
+	zbx_dc_otel_config_t			cfg = {0};
+	zbx_uint64_t				cfg_revision = 0;
 
 	otel_args = (const zbx_thread_otel_manager_args_t *)unit_args->args.args;
 
-	/* TODO: fetch requests throttle limit from settings/configuration cache */
-	if (NULL == (manager = otel_manager_create(info, 0, otel_args->exporter_options, &error)))
+	zbx_dc_get_otel_config(&cfg, &cfg_revision);
+
+	/* when disabled leave one worker running */
+	workers_num = (0 == cfg.enabled ? 1 : OTEL_WORKERS_DEFAULT);
+
+	if (NULL == (manager = otel_manager_create(info, workers_num, cfg.quota, otel_args->exporter_options, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize open telemetry manager: %s", error);
 		zbx_free(error);
@@ -186,7 +193,7 @@ void	*zbx_otel_manager_thread(void *args)
 	zbx_vector_mw_task_ptr_create(&tasks);
 
 	/* initialize statistics */
-	time_stat = zbx_time();
+	time_config = time_stat = zbx_time();
 
 	zbx_supervisor_update_activity("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -207,6 +214,9 @@ void	*zbx_otel_manager_thread(void *args)
 			time_stat = time_start;
 			time_idle = 0;
 		}
+
+		if (CONFIG_INTERVAL < time_start - time_config)
+			zbx_dc_get_otel_config(&cfg, &cfg_revision);
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
@@ -263,11 +273,14 @@ void	*zbx_otel_manager_thread(void *args)
 	if (SUCCEED != ZBX_EXIT_STATUS())
 		zbx_rtc_unsubscribe_service(otel_args->config_timeout, ZBX_IPC_SERVICE_OTEL);
 
+	zbx_dc_otel_config_clear(&cfg);
+
 	otel_manager_free(manager);
 	zbx_free(args);
 
 	return NULL;
 
+#undef CONFIG_INTERVAL
 #undef STAT_INTERVAL
 }
 

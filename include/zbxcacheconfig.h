@@ -1692,12 +1692,28 @@ void	zbx_dc_config_local_release(void);
 void	zbx_dc_local_set_itservices_num(int num);
 int	zbx_dc_local_get_itservices_num(void);
 
-
 typedef struct zbx_correlation_config_handle *	zbx_correlation_config_handle_t;
 
 zbx_correlation_config_handle_t	zbx_correlation_config_open(void);
 void	zbx_correlation_config_close(zbx_correlation_config_handle_t handle);
 
 zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correlation_config_handle_t handle);
+
+/* open telemetry settings */
+#define ZBX_SETTINGS_OTEL		"otel_"
+#define ZBX_SETTINGS_OTEL_ENABLED	ZBX_SETTINGS_OTEL "enabled"
+#define ZBX_SETTINGS_OTEL_QUOTA		ZBX_SETTINGS_OTEL "quota"
+#define ZBX_SETTINGS_OTEL_ATTRIBUTES	ZBX_SETTINGS_OTEL "atributes"
+
+typedef struct
+{
+	int		enabled;
+	zbx_uint64_t	quota;
+	char		*attributes;
+}
+zbx_dc_otel_config_t;
+
+void	zbx_dc_get_otel_config(zbx_dc_otel_config_t *cfg, zbx_uint64_t *revision);
+void	zbx_dc_otel_config_clear(zbx_dc_otel_config_t *cfg);
 
 #endif

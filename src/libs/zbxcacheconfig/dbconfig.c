@@ -17043,3 +17043,18 @@ void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uin
 
 	UNLOCK_CACHE;
 }
+
+void	zbx_dc_get_otel_config(zbx_dc_otel_config_t *cfg, zbx_uint64_t *revision)
+{
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	if (*revision < config->revision.settings_table)
+	{
+		cfg->enabled = dc_local()->otel_config.enabled;
+		cfg->quota = dc_local()->otel_config.quota;
+		cfg->attributes = zbx_strdup(cfg->attributes, dc_local()->otel_config.attributes);
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+}
+
