@@ -1332,11 +1332,15 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	{
 		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
 
+		zabbix_log(LOG_LEVEL_DEBUG, "closing ipc services");
+
 		if (NULL != args->listen_sock)
 			zbx_tcp_unlisten(args->listen_sock);
 
 		if (NULL != args->rtc)
 			zbx_ipc_service_close(&args->rtc->service);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "ipc services closed");
 	}
 
 	zbx_close_log();
