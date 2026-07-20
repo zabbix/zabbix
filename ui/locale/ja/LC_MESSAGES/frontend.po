@@ -27868,6 +27868,10 @@ msgstr "検索文字列を入力"
 msgid "unacceptable URL"
 msgstr "アクセスできないURLです"
 
+#: include/classes/validators/CUrlValidator.php:147
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""

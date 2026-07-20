@@ -27871,6 +27871,10 @@ msgstr "在此输入搜索"
 msgid "unacceptable URL"
 msgstr "不可用的URL"
 
+#: include/classes/validators/CUrlValidator.php:147
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""

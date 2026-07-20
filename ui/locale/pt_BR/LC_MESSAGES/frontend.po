@@ -28069,6 +28069,10 @@ msgstr "informe aqui o argumento para pesquisa"
 msgid "unacceptable URL"
 msgstr "uRL inaceitável"
 
+#: include/classes/validators/CUrlValidator.php:147
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""
