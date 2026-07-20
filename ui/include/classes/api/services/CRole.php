@@ -222,7 +222,7 @@ class CRole extends CApiService {
 
 	private static function addFieldDefaultsByType(array &$roles): void {
 		foreach ($roles as &$role) {
-			if ($role['type'] === USER_TYPE_ZABBIX_USER) {
+			if ($role['type'] == USER_TYPE_ZABBIX_USER) {
 				$role['rules'] += ['api.access' => ZBX_ROLE_RULE_DISABLED];
 			}
 		}
@@ -1504,7 +1504,7 @@ class CRole extends CApiService {
 				$result['api.access'] = $rules['api.access'];
 			}
 			else {
-				$result['api.access'] = in_array($type, [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true)
+				$result['api.access'] = ($type == USER_TYPE_ZABBIX_ADMIN || $type == USER_TYPE_SUPER_ADMIN)
 					? (string) ZBX_ROLE_RULE_ENABLED
 					: (string) ZBX_ROLE_RULE_DISABLED;
 			}

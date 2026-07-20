@@ -158,6 +158,7 @@
 					checkbox.readOnly = false;
 				}
 			}
+
 			const access_max = <?= json_encode([
 					CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW => USER_TYPE_ZABBIX_ADMIN
 			], JSON_FORCE_OBJECT) ?>;

@@ -401,7 +401,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'modules' => [],
 			'modules.default_access' => true,
 			'api' => [],
-			'api.access' => in_array($user_type, [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true),
+			'api.access' => $user_type == USER_TYPE_ZABBIX_ADMIN || $user_type == USER_TYPE_SUPER_ADMIN,
 			'api.mode' => 'api.mode',
 			'actions' => array_fill_keys(CRoleHelper::getActionsByUserType($user_type), true),
 			'actions.default_access' => true
