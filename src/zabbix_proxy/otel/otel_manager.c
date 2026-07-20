@@ -185,11 +185,13 @@ void	*zbx_otel_manager_thread(void *args)
 	int					shutdown = 0, workers_num, activated = 0;
 	zbx_vector_mw_task_ptr_t		tasks;
 	zbx_dc_otel_config_t			cfg = {0};
-	zbx_uint64_t				cfg_revision = 0;
+	zbx_uint64_t				cfg_revision = 0, quota;
 
 	otel_args = (const zbx_thread_otel_manager_args_t *)unit_args->args.args;
 
 	zbx_dc_get_otel_config(&cfg, &cfg_revision);
+
+	quota = cfg.quota;
 
 	/* when disabled leave one worker running */
 	workers_num = (0 == cfg.enabled ? 1 : OTEL_WORKERS_DEFAULT);
@@ -247,6 +249,17 @@ void	*zbx_otel_manager_thread(void *args)
 					otel_manager_deactivate(manager);
 				}
 				activated = cfg.enabled;
+			}
+
+			if (quota != cfg.quota)
+			{
+				zbx_mw_queue_lock(manager->base.queue);
+				otel_queue_set_quota((zbx_otel_queue_t *)manager->base.queue, cfg.quota);
+				zbx_mw_queue_unlock(manager->base.queue);
+
+				zabbix_log(LOG_LEVEL_WARNING, "changed Open Telemetry quota from " ZBX_FS_UI64 " to "
+						ZBX_FS_UI64, quota, cfg.quota);
+				quota = cfg.quota;
 			}
 		}
 
