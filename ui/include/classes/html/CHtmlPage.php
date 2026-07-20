@@ -144,7 +144,9 @@ class CHtmlPage {
 		];
 
 		if ($this->title !== '') {
-			$title_tag = (new CTag('h1', true, $this->title))->setId(self::PAGE_TITLE_ID);
+			$title_tag = (new CTag('h1', true, $this->title))
+				->setId(self::PAGE_TITLE_ID)
+				->setAttribute('tabindex', '-1');
 
 			if ($this->title_submenu !== []) {
 				$title_tag = (new CLinkAction($title_tag))
