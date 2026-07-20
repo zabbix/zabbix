@@ -103,10 +103,6 @@ static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, in
 		goto out;
 	}
 
-	/* TODO: use grpc listen address / port */
-	if (NULL == (manager->grpc = zbx_grpc_start(NULL, NULL, queue, error)))
-		goto out;
-
 	/* TODO: make configuratble */
 	manager->commit_limit = 10;
 	manager->commit_task_num = 0;
@@ -143,6 +139,21 @@ static void	otel_manager_process_finished(zbx_otel_manager_t *manager, zbx_vecto
 	zbx_vector_mw_task_ptr_clear(tasks);
 }
 
+static int	otel_manager_activate(zbx_otel_manager_t *manager, char **error)
+{
+	/* TODO: use configured address/port */
+	if (NULL == (manager->grpc = zbx_grpc_start(NULL, NULL, (zbx_otel_queue_t *)manager->base.queue, error)))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static void	otel_manager_deactivate(zbx_otel_manager_t *manager)
+{
+	zbx_grpc_stop(manager->grpc);
+	manager->grpc = NULL;
+}
+
 static void	otel_manager_commit_tasks(zbx_otel_manager_t *manager)
 {
 	zbx_mw_task_t	*t = otel_task_commit_create(&manager->commits);
@@ -171,7 +182,7 @@ void	*zbx_otel_manager_thread(void *args)
 	double					time_stat, time_flush, time_idle = 0, time_config;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	int					shutdown = 0, workers_num;
+	int					shutdown = 0, workers_num, activated = 0;
 	zbx_vector_mw_task_ptr_t		tasks;
 	zbx_dc_otel_config_t			cfg = {0};
 	zbx_uint64_t				cfg_revision = 0;
@@ -216,7 +227,28 @@ void	*zbx_otel_manager_thread(void *args)
 		}
 
 		if (CONFIG_INTERVAL < time_start - time_config)
+		{
 			zbx_dc_get_otel_config(&cfg, &cfg_revision);
+
+			if (activated != cfg.enabled)
+			{
+				if (1 == cfg.enabled)
+				{
+					if (FAIL == otel_manager_activate(manager, &error))
+					{
+						zabbix_log(LOG_LEVEL_CRIT, "cannot activate Open Telemetry listener:"
+								" %s", error);
+						zbx_free(error);
+						zbx_exit(EXIT_FAILURE);
+					}
+				}
+				else
+				{
+					otel_manager_deactivate(manager);
+				}
+				activated = cfg.enabled;
+			}
+		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
