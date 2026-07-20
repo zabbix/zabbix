@@ -657,8 +657,13 @@ class CRoleHelper {
 			USER_TYPE_SUPER_ADMIN => []
 		];
 		$api_method_masks = $api_methods;
+		$allowed_api_services = CApiServiceFactory::API_SERVICES;
 
-		foreach (CApiServiceFactory::API_SERVICES as $service => $class_name) {
+		if (!CSettingsHelper::isMobileDevicesEnabled()) {
+			unset($allowed_api_services['device']);
+		}
+
+		foreach ($allowed_api_services as $service => $class_name) {
 			foreach (constant($class_name.'::ACCESS_RULES') as $method => $rules) {
 				if (array_key_exists('min_user_type', $rules)) {
 					switch ($rules['min_user_type']) {
