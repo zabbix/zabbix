@@ -342,6 +342,11 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	$(overlay.$dialogue||document).on('remove', () => {
 		$(document).off('add.popup', processAddfromPopup);
 	});
+
+	$(overlay.$dialogue).find('.js-cancel').on('click', () => {
+		$(document).off('add.popup', processAddfromPopup);
+	});
+
 	$(document).on('add.popup', processAddfromPopup);
 
 	function processAddfromPopup(ev, data) {
