@@ -52,8 +52,6 @@ const ZBX_STYLE_BTN_TAG = 'btn-tag';
 
 const ZBX_STYLE_ACTION_CONTAINER = 'action-container';
 
-const ZBX_STYLE_OVERLAY_DIALOGUE_HEADER = 'overlay-dialogue-header';
-
 const ZBX_STYLE_GRID_COLUMN_FIRST = 'column-first';
 const ZBX_STYLE_GRID_COLUMN_LAST = 'column-last';
 
@@ -74,8 +72,8 @@ const ZBX_STYLE_FORMATED_TEXT = 'formated-text';
 
 const ZBX_STYLE_GREY = 'grey';
 
-const ZBX_STYLE_PAGING_BTN_CONTAINER = 'paging-btn-container';
-const ZBX_STYLE_TABLE_PAGING = 'table-paging';
+const ZBX_STYLE_PAGER = 'pager';
+const ZBX_STYLE_PAGER_CONTAINER = 'pager-container';
 const ZBX_STYLE_TABLE_STATS = 'table-stats';
 
 const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
@@ -134,6 +132,9 @@ const ZBX_STYLE_TAGS_WRAPPER = 'tags-wrapper';
 const ZBX_STYLE_CHECKBOX_RADIO = 'checkbox-radio';
 
 const ZBX_STYLE_OVERLAY_DIALOGUE = 'overlay-dialogue';
+const ZBX_STYLE_OVERLAY_DIALOGUE_HEADER = 'overlay-dialogue-header';
+const ZBX_STYLE_OVERLAY_DIALOGUE_BODY = 'overlay-dialogue-body';
+const ZBX_STYLE_OVERLAY_DIALOGUE_FOOTER = 'overlay-dialogue-footer';
 
 const ZBX_STYLE_HEADER_CONTROLS = 'header-controls';
 
@@ -345,6 +346,9 @@ const TAG_NAME_NONE = 2;
 const OPERATIONAL_DATA_SHOW_NONE = 0;
 const OPERATIONAL_DATA_SHOW_SEPARATELY = 1;
 const OPERATIONAL_DATA_SHOW_WITH_PROBLEM = 2;
+
+const DASHBOARD_SLIDESHOW_OFF = 'off';
+const DASHBOARD_SLIDESHOW_ON = 'on';
 
 const EVENT_CONTEXT_PAGE_NAVIGATION = 'page_navigation';
 const EVENT_BACK_FORWARD = 'back_forward';

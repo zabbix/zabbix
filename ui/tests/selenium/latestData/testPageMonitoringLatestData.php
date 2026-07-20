@@ -691,12 +691,12 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 
-		$this->query('id:latest')->asDatatable()->one()->waitUntilRowsCount(count($data['result']));
+		$this->query('id:datatable-latest')->asDatatable()->one()->waitUntilRowsCount(count($data['result']));
 		$this->assertDatatableData($data['result']);
 
 		// Check that subfilter remains selected after main field is cleared.
 		if (CTestArrayHelper::get($data, 'check_after_clear', false)) {
-			$table = $this->query('id:latest')->one()->asDatatable();
+			$table = $this->query('id:datatable-latest')->one()->asDatatable();
 			$headers = $table->getHeaders();
 			CFilterElement::find()->one()->getForm()->fill(['Name' => ''])->submit();
 
@@ -740,7 +740,7 @@ class testPageMonitoringLatestData extends CWebTest {
 			$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent();
 		}
 
-		$this->query('id:latest')->one()->asDatatable()->waitUntilReady()->query('button', $tag['tag'].$tag['value'])
+		$this->query('id:datatable-latest')->one()->asDatatable()->waitUntilReady()->query('button', $tag['tag'].$tag['value'])
 				->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 
@@ -806,7 +806,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['State' => 'Normal']);
-		$table = $this->query('id:latest')->one()->asDatatable();
+		$table = $this->query('id:datatable-latest')->one()->asDatatable();
 		$this->query('button:Apply')->one()->click();
 		$this->page->waitUntilReady();
 		$table->waitUntilReady()->invalidate();
@@ -823,7 +823,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					$table->waitUntilReady();
 				}
 
-				$this->query('class:paging-btn-container')->query('link:1')->waitUntilClickable()->one()->click();
+				$this->query('class:pager')->query('link:1')->waitUntilClickable()->one()->click();
 				$table->waitUntilReady();
 			}
 		}
@@ -922,7 +922,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				self::$hostids['Host with item descriptions'])->waitUntilReady();
 
 		// Find rows from the data provider and click on the description icon if such should persist.
-		$row = $this->query('id:latest')->one()->asDatatable()->waitUntilReady()->findRow('Name', $data['Item name'], true);
+		$row = $this->query('id:datatable-latest')->one()->asDatatable()->waitUntilReady()->findRow('Name', $data['Item name'], true);
 
 		if (CTestArrayHelper::get($data, 'description', false)) {
 			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
@@ -954,7 +954,7 @@ class testPageMonitoringLatestData extends CWebTest {
 	 */
 	public function testPageMonitoringLatestData_checkMaintenanceIcon() {
 		// Change datatable layout to make sure that the maintenance icon is visible.
-		$layout = '{"columns":[{"id":"host","resized":true,"width":"249px"},{"id":"name","resized":true,"width":"239px"}'.
+		$layout = '{"columns":[{"id":"datatable-host","resized":true,"width":"249px"},{"id":"name","resized":true,"width":"239px"}'.
 				',{"id":"interval"},{"id":"history"},{"id":"trends"},{"id":"type"},{"id":"last_check","width":"79px"},'.
 				'{"id":"last_value","resized":true,"width":"142px"},{"id":"change","width":"62px"},'.
 				'{"id":"tags","resized":true,"width":"194px"},{"id":"tagvalue"},{"id":"actions","width":"60px"},'.
@@ -988,7 +988,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->query('id:latest')->one()->asDatatable()->waitUntilReady();
+		$table = $this->query('id:datatable-latest')->one()->asDatatable()->waitUntilReady();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$form->fill(['Name' => '4_item'])->submit();
