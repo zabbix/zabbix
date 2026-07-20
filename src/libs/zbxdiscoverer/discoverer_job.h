@@ -18,6 +18,7 @@
 #include "zbxdiscovery.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
+#include "zbxip.h"
 
 #define DISCOVERER_JOB_STATUS_QUEUED	0
 #define DISCOVERER_JOB_STATUS_WAITING	1
