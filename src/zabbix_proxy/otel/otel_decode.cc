@@ -126,8 +126,9 @@ static std::string	any_value_to_string(const opentelemetry::proto::common::v1::A
 	}
 }
 
-static char 	*attrs_to_json(
-		const google::protobuf::RepeatedPtrField<opentelemetry::proto::common::v1::KeyValue> &attrs)
+static char 	*attrs_to_json_ex(
+		const google::protobuf::RepeatedPtrField<opentelemetry::proto::common::v1::KeyValue> &attrs,
+		const char *resource_attrs)
 {
 	struct zbx_json	j;
 	char		*out;
@@ -139,10 +140,19 @@ static char 	*attrs_to_json(
 		zbx_json_addstring(&j, kv.key().c_str(), any_value_to_string(kv.value()).c_str(), ZBX_JSON_TYPE_STRING);
 	}
 
+	if (NULL != resource_attrs)
+		zbx_json_addraw(&j, NULL, resource_attrs);
+
 	out = zbx_strdup(NULL, j.buffer);
 	zbx_json_free(&j);
 
 	return out;
+}
+
+static char 	*attrs_to_json(
+	const google::protobuf::RepeatedPtrField<opentelemetry::proto::common::v1::KeyValue> &attrs)
+{
+	return attrs_to_json_ex(attrs, NULL);
 }
 
 template <typename Repeated>
@@ -215,6 +225,7 @@ static std::string	service_name_of(
  *             dp_attrs    - [IN] data point attributes                       *
  *             start_nano  - [IN] start time in unix nanoseconds              *
  *             time_nano   - [IN] collection time in unix nanoseconds         *
+ *             resource_atrrs - [IN] optional resource attributes to add      *
  *                                                                            *
  * Return value: index of the first column after the common columns           *
  *                                                                            *
@@ -228,9 +239,9 @@ static int	metrics_fill_common(zbx_otel_row_t &row,
 		const opentelemetry::proto::metrics::v1::ScopeMetrics &sm,
 		const opentelemetry::proto::metrics::v1::Metric &metric,
 		const google::protobuf::RepeatedPtrField<opentelemetry::proto::common::v1::KeyValue> &dp_attrs,
-		uint64_t start_nano, uint64_t time_nano)
+		uint64_t start_nano, uint64_t time_nano, const char *resource_attrs)
 {
-	SETC(row, 0, attrs_to_json(rm.resource().attributes()));	/* ResourceAttributes */
+	SETC(row, 0, attrs_to_json_ex(rm.resource().attributes(), resource_attrs));	/* ResourceAttributes */
 	SETS(row, 1, rm.schema_url());					/* ResourceSchemaUrl */
 	SETS(row, 2, sm.scope().name());				/* ScopeName */
 	SETS(row, 3, sm.scope().version());				/* ScopeVersion */
@@ -301,13 +312,13 @@ static double	np_value(const opentelemetry::proto::metrics::v1::NumberDataPoint 
 }
 
 static void	otel_decode_gauge(const otlpm::ResourceMetrics &rm, const otlpm::ScopeMetrics &sm,
-		const otlpm::Metric &metric, zbx_otel_dataset_t *ds)
+		const otlpm::Metric &metric, zbx_otel_dataset_t *ds, const char *resource_attrs)
 {
 	for (const auto &dp : metric.gauge().data_points())
 	{
 		zbx_otel_row_t	row = otel_rowset_add(&ds->metrics_gauge);
 		int		i = metrics_fill_common(row, rm, sm, metric, dp.attributes(),
-				dp.start_time_unix_nano(), dp.time_unix_nano());
+				dp.start_time_unix_nano(), dp.time_unix_nano(), resource_attrs);
 
 		SETD(row, i++, np_value(dp));
 		SETU(row, i++, dp.flags());
@@ -316,13 +327,13 @@ static void	otel_decode_gauge(const otlpm::ResourceMetrics &rm, const otlpm::Sco
 }
 
 static void	otel_decode_sum(const otlpm::ResourceMetrics &rm, const otlpm::ScopeMetrics &sm,
-		const otlpm::Metric &metric, zbx_otel_dataset_t *ds)
+		const otlpm::Metric &metric, zbx_otel_dataset_t *ds, const char *resource_attrs)
 {
 	for (const auto &dp : metric.sum().data_points())
 	{
 		zbx_otel_row_t	row = otel_rowset_add(&ds->metrics_sum);
 		int		i = metrics_fill_common(row, rm, sm, metric, dp.attributes(),
-				dp.start_time_unix_nano(), dp.time_unix_nano());
+				dp.start_time_unix_nano(), dp.time_unix_nano(), resource_attrs);
 
 		SETD(row, i++, np_value(dp));					/* Value */
 		SETU(row, i++, dp.flags());					/* Flags */
@@ -333,13 +344,13 @@ static void	otel_decode_sum(const otlpm::ResourceMetrics &rm, const otlpm::Scope
 }
 
 static void	otel_decode_histogram(const otlpm::ResourceMetrics &rm, const otlpm::ScopeMetrics &sm,
-		const otlpm::Metric &metric, zbx_otel_dataset_t *ds)
+		const otlpm::Metric &metric, zbx_otel_dataset_t *ds, const char *resource_attrs)
 {
 	for (const auto &dp : metric.histogram().data_points())
 	{
 		zbx_otel_row_t	row = otel_rowset_add(&ds->metrics_histogram);
 		int		i = metrics_fill_common(row, rm, sm, metric, dp.attributes(),
-				dp.start_time_unix_nano(), dp.time_unix_nano());
+				dp.start_time_unix_nano(), dp.time_unix_nano(), resource_attrs);
 
 		SETU(row, i++, dp.count());					/* Count */
 		SETD(row, i++, dp.sum());					/* Sum */
@@ -354,13 +365,13 @@ static void	otel_decode_histogram(const otlpm::ResourceMetrics &rm, const otlpm:
 }
 
 static void	otel_decode_exponential_histogram(const otlpm::ResourceMetrics &rm, const otlpm::ScopeMetrics &sm,
-		const otlpm::Metric &metric, zbx_otel_dataset_t *ds)
+		const otlpm::Metric &metric, zbx_otel_dataset_t *ds, const char *resource_attrs)
 {
 	for (const auto &dp : metric.exponential_histogram().data_points())
 	{
 		zbx_otel_row_t	row = otel_rowset_add(&ds->metrics_exponential_histogram);
 		int		i = metrics_fill_common(row, rm, sm, metric, dp.attributes(),
-				dp.start_time_unix_nano(), dp.time_unix_nano());
+				dp.start_time_unix_nano(), dp.time_unix_nano(), resource_attrs);
 
 		SETU(row, i++, dp.count());						/* Count */
 		SETD(row, i++, dp.sum());						/* Sum */
@@ -379,13 +390,13 @@ static void	otel_decode_exponential_histogram(const otlpm::ResourceMetrics &rm, 
 }
 
 static void	otel_decode_summary(const otlpm::ResourceMetrics &rm, const otlpm::ScopeMetrics &sm,
-		const otlpm::Metric &metric, zbx_otel_dataset_t *ds)
+		const otlpm::Metric &metric, zbx_otel_dataset_t *ds, const char *resource_attrs)
 {
 	for (const auto &dp : metric.summary().data_points())
 	{
 		zbx_otel_row_t	row = otel_rowset_add(&ds->metrics_summary);
 		int		i = metrics_fill_common(row, rm, sm, metric, dp.attributes(),
-				dp.start_time_unix_nano(), dp.time_unix_nano());
+				dp.start_time_unix_nano(), dp.time_unix_nano(), resource_attrs);
 
 		SETU(row, i++, dp.count());	/* Count */
 		SETD(row, i++, dp.sum());	/* Sum */
@@ -412,7 +423,8 @@ static void	otel_decode_summary(const otlpm::ResourceMetrics &rm, const otlpm::S
 	}
 }
 
-static void	otel_request_decode_metrics(zbx_otel_request_t request, zbx_otel_dataset_t *ds)
+static void	otel_request_decode_metrics(zbx_otel_request_t request, zbx_otel_dataset_t *ds,
+		const char *resource_attrs)
 {
 	const auto	*req = reinterpret_cast<const otlpmc::ExportMetricsServiceRequest *>(request);
 
@@ -435,19 +447,19 @@ static void	otel_request_decode_metrics(zbx_otel_request_t request, zbx_otel_dat
 				switch (metric.data_case())
 				{
 					case otlpm::Metric::kGauge:
-						otel_decode_gauge(rm, sm, metric, ds);
+						otel_decode_gauge(rm, sm, metric, ds, resource_attrs);
 						break;
 					case otlpm::Metric::kSum:
-						otel_decode_sum(rm, sm, metric, ds);
+						otel_decode_sum(rm, sm, metric, ds, resource_attrs);
 						break;
 					case otlpm::Metric::kHistogram:
-						otel_decode_histogram(rm, sm, metric, ds);
+						otel_decode_histogram(rm, sm, metric, ds, resource_attrs);
 						break;
 					case otlpm::Metric::kExponentialHistogram:
-						otel_decode_exponential_histogram(rm, sm, metric, ds);
+						otel_decode_exponential_histogram(rm, sm, metric, ds, resource_attrs);
 						break;
 					case otlpm::Metric::kSummary:
-						otel_decode_summary(rm, sm, metric, ds);
+						otel_decode_summary(rm, sm, metric, ds, resource_attrs);
 						break;
 					default:	/* DATA_NOT_SET */
 						break;
@@ -457,7 +469,7 @@ static void	otel_request_decode_metrics(zbx_otel_request_t request, zbx_otel_dat
 	}
 }
 
-static void	otel_request_decode_logs(zbx_otel_request_t request, zbx_otel_dataset_t *ds)
+static void	otel_request_decode_logs(zbx_otel_request_t request, zbx_otel_dataset_t *ds, const char *resource_attrs)
 {
 	const auto	*req = reinterpret_cast<const otlplc::ExportLogsServiceRequest *>(request);
 
@@ -489,7 +501,10 @@ static void	otel_request_decode_logs(zbx_otel_request_t request, zbx_otel_datase
 				SETS(row, i++, service_name);				/* ServiceName */
 				SETS(row, i++, any_value_to_string(lr.body()));		/* Body (AnyValue) */
 				SETS(row, i++, res_schema_url);				/* ResourceSchemaUrl */
-				SETC(row, i++, attrs_to_json(res.attributes()));	/* ResourceAttributes */
+
+				/* ResourceAttributes */
+				SETC(row, i++, attrs_to_json_ex(res.attributes(), resource_attrs));
+
 				SETS(row, i++, scope_schema_url);			/* ScopeSchemaUrl */
 				SETS(row, i++, scope.name());				/* ScopeName */
 				SETS(row, i++, scope.version());			/* ScopeVersion */
@@ -599,7 +614,8 @@ static const char	*status_code_str(otlpt::Status_StatusCode code)
 	}
 }
 
-static void	otel_request_decode_traces(zbx_otel_request_t request, zbx_otel_dataset_t *ds)
+static void	otel_request_decode_traces(zbx_otel_request_t request, zbx_otel_dataset_t *ds,
+		const char *resource_attrs)
 {
 	namespace otlptc = opentelemetry::proto::collector::trace::v1;
 
@@ -630,7 +646,10 @@ static void	otel_request_decode_traces(zbx_otel_request_t request, zbx_otel_data
 				SETS(row, i++, span.name());				/* SpanName */
 				SETS(row, i++, span_kind_str(span.kind()));		/* SpanKind */
 				SETS(row, i++, service_name);				/* ServiceName */
-				SETC(row, i++, attrs_to_json(res.attributes()));	/* ResourceAttributes */
+
+				/* ResourceAttributes */
+				SETC(row, i++, attrs_to_json_ex(res.attributes(), resource_attrs));
+
 				SETS(row, i++, scope.name());				/* ScopeName */
 				SETS(row, i++, scope.version());			/* ScopeVersion */
 				SETC(row, i++, attrs_to_json(span.attributes()));	/* SpanAttributes */
@@ -646,18 +665,19 @@ static void	otel_request_decode_traces(zbx_otel_request_t request, zbx_otel_data
 	}
 }
 
-void	zbx_otel_request_decode(zbx_otel_request_t request, zbx_otel_request_type_t type, zbx_otel_dataset_t *ds)
+void	zbx_otel_request_decode(zbx_otel_request_t request, zbx_otel_request_type_t type, zbx_otel_dataset_t *ds,
+		const char *resource_attrs)
 {
 	switch (type)
 	{
 		case OTEL_METRICS:
-			otel_request_decode_metrics(request, ds);
+			otel_request_decode_metrics(request, ds, resource_attrs);
 			break;
 		case OTEL_LOGS:
-			otel_request_decode_logs(request, ds);
+			otel_request_decode_logs(request, ds, resource_attrs);
 			break;
 		case OTEL_TRACES:
-			otel_request_decode_traces(request, ds);
+			otel_request_decode_traces(request, ds, resource_attrs);
 			break;
 	}
 }

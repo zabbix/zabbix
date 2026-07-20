@@ -154,9 +154,9 @@ static void	otel_manager_deactivate(zbx_otel_manager_t *manager)
 	manager->grpc = NULL;
 }
 
-static void	otel_manager_commit_tasks(zbx_otel_manager_t *manager)
+static void	otel_manager_commit_tasks(zbx_otel_manager_t *manager, const char *attributes)
 {
-	zbx_mw_task_t	*t = otel_task_commit_create(&manager->commits);
+	zbx_mw_task_t	*t = otel_task_commit_create(&manager->commits, attributes);
 
 	zbx_mw_queue_lock(manager->base.queue);
 	zbx_mw_queue_push_normal(manager->base.queue, t);
@@ -306,7 +306,7 @@ void	*zbx_otel_manager_thread(void *args)
 		}
 
 		if (0 != manager->commits.values_num && manager->commit_task_num < manager->commit_limit)
-			otel_manager_commit_tasks(manager);
+			otel_manager_commit_tasks(manager, cfg.attributes);
 
 	}
 

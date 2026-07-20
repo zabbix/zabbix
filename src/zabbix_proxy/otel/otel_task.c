@@ -41,7 +41,7 @@ static void	otel_task_request_free(void *task)
 	zbx_free(otel_task);
 }
 
-zbx_mw_task_t	*otel_task_commit_create(zbx_vector_mw_task_ptr_t *tasks)
+zbx_mw_task_t	*otel_task_commit_create(zbx_vector_mw_task_ptr_t *tasks, const char *attributes)
 {
 	zbx_otel_task_commit_t	*task;
 
@@ -51,6 +51,8 @@ zbx_mw_task_t	*otel_task_commit_create(zbx_vector_mw_task_ptr_t *tasks)
 	zbx_vector_mw_task_ptr_create(&task->tasks);
 	zbx_vector_mw_task_ptr_append_array(&task->tasks, tasks->values, tasks->values_num);
 	zbx_vector_mw_task_ptr_clear(tasks);
+
+	task->attributes = zbx_strdup(NULL, attributes);
 
 	return (zbx_mw_task_t *)task;
 }
@@ -63,6 +65,8 @@ static void	otel_task_commit_free(void *task)
 		otel_task_free(otel_task->tasks.values[i]);
 
 	zbx_vector_mw_task_ptr_destroy(&otel_task->tasks);
+
+	zbx_free(otel_task->attributes);
 
 	zbx_free(otel_task);
 }

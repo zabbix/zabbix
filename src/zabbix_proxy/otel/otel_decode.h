@@ -22,7 +22,8 @@ extern "C" {
 #include "otel_dataset.h"
 #include "otel_grpc.h"
 
-void	zbx_otel_request_decode(zbx_otel_request_t request, zbx_otel_request_type_t type, zbx_otel_dataset_t *ds);
+void	zbx_otel_request_decode(zbx_otel_request_t request, zbx_otel_request_type_t type, zbx_otel_dataset_t *ds,
+		const char *resource_attrs);
 
 #ifdef __cplusplus
 }

@@ -1703,7 +1703,7 @@ zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correl
 #define ZBX_SETTINGS_OTEL		"otel_"
 #define ZBX_SETTINGS_OTEL_ENABLED	ZBX_SETTINGS_OTEL "enabled"
 #define ZBX_SETTINGS_OTEL_QUOTA		ZBX_SETTINGS_OTEL "quota"
-#define ZBX_SETTINGS_OTEL_ATTRIBUTES	ZBX_SETTINGS_OTEL "atributes"
+#define ZBX_SETTINGS_OTEL_ATTRIBUTES	ZBX_SETTINGS_OTEL "attributes"
 
 typedef struct
 {
