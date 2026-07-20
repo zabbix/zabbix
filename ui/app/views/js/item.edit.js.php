@@ -75,6 +75,7 @@ window.item_edit_form = new class {
 		});
 
 		this.footer = this.overlay.$dialogue.$footer[0];
+		this.tags_form_grid = this.form_element.querySelector('#tags-tab .form-grid');
 		this.tags_table = this.form_element.querySelector('.tags-table');
 		this.tags_abort_controller = null;
 
@@ -658,9 +659,11 @@ window.item_edit_form = new class {
 			.then((response) => {
 				this.tags_table.innerHTML = response.body;
 
-				const $tags_table = jQuery(this.tags_table);
+				if (!this.tags_form_grid.dataset.readonly) {
+					const $tags_table = jQuery(this.tags_table);
 
-				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+					$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+				}
 			})
 			.catch((message) => {
 				if (abort_controller.signal.aborted) {
