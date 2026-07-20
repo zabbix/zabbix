@@ -407,6 +407,9 @@ class CDevice extends CApiService {
 
 		$this->validateOffboard($data, $db_device);
 
+		$force_delete = array_key_exists('force', $data) && $data['force'];
+		unset($data['force']);
+
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
@@ -417,7 +420,13 @@ class CDevice extends CApiService {
 		$result = $server->offboardDevice($data, self::getAuthIdentifier());
 
 		if ($result === false) {
-			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
+			$error_code = $server->getErrorCode() == CZabbixServer::ERROR_CODE_DEVICE_NOT_FOUND
+				? ZBX_API_ERROR_NO_EXTERNAL_ENTITY
+				: ZBX_API_ERROR_INTERNAL;
+
+			if ($error_code == ZBX_API_ERROR_INTERNAL || !$force_delete) {
+				self::exception($error_code, $server->getError());
+			}
 		}
 
 		if ($db_device['userid'] != 0) {
@@ -442,10 +451,16 @@ class CDevice extends CApiService {
 		return $data;
 	}
 
-	private function validateOffboard(array $data, ?array &$db_device): void {
+	private function validateOffboard(array &$data, ?array &$db_device): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'uuid' =>	['type' => API_UUID_V7, 'flags' => API_REQUIRED]
 		]];
+
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$api_input_rules['fields'] += [
+				'force' =>	['type' => API_BOOLEAN, 'default' => false]
+			];
+		}
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
