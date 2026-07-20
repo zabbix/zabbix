@@ -610,6 +610,8 @@ static void	zbx_set_defaults(void)
 	if (NULL == zbx_config_vault.url)
 		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, ZBX_VAULT_DEFAULT_URL);
 
+	zbx_rtrim(zbx_config_vault.url, "/");
+
 	if (-1 != config_heartbeat_frequency)
 		zabbix_log(LOG_LEVEL_WARNING, "HeartbeatFrequency parameter is deprecated, and has no effect");
 
