@@ -886,7 +886,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == zbx_config_webservice_url)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"WebServiceURL\" configuration parameter must be set when "
+		zabbix_log(LOG_LEVEL_CRIT, "\"WebServiceURL\" configuration parameter must be set when"
 				" setting \"StartReportWriters\" configuration parameter");
 		err = 1;
 	}
@@ -1718,7 +1718,9 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.discovery_open_cb = zbx_discovery_open_server,
 			.discovery_close_cb = zbx_discovery_close_server,
 			.discovery_find_host_cb = zbx_discovery_find_host_server,
+			.discovery_update_interface_cb = zbx_discovery_update_interface_server,
 			.discovery_update_host_cb = zbx_discovery_update_host_server,
+			.discovery_update_hosts_cb = zbx_discovery_update_hosts_server,
 			.discovery_update_service_cb = zbx_discovery_update_service_server,
 			.discovery_update_service_down_cb = zbx_discovery_update_service_down_server,
 			.discovery_update_drule_cb = zbx_discovery_update_drule_server
@@ -2652,6 +2654,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (SUCCEED != zbx_db_update_software_update_checkid())
 			goto out;
 	}
+
+	if (SUCCEED != zbx_db_check_serverid())
+		goto out;
 
 	zbx_db_save_server_status();
 

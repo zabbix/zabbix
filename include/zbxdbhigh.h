@@ -623,6 +623,7 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 
 int	zbx_db_check_instanceid(void);
 int	zbx_db_update_software_update_checkid(void);
+int	zbx_db_check_serverid(void);
 
 /* tags */
 typedef struct
