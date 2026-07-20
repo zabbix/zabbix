@@ -134,8 +134,12 @@ if (hasRequest('httptestid')) {
 		access_deny();
 	}
 }
-elseif (hasRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
-	access_deny();
+elseif (hasRequest('hostid')) {
+	$hostid = getRequest('hostid');
+
+	if ($hostid != 0 && !isWritableHostTemplates([$hostid])) {
+		access_deny();
+	}
 }
 
 // Validate backurl.
