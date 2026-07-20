@@ -1,0 +1,1 @@
+.......PS. [ZBX-27975] fixed potential crash of VMware collector caused by network connectivity issues with vCenter (MVekslers)
