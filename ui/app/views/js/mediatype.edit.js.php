@@ -717,7 +717,7 @@ window.mediatype_edit_popup = new class {
 				element.style.display = 'none';
 
 				if (element.classList.contains('form-field')) {
-					element.querySelectorAll('.multilineinput-control, input:not(.js-inactive), select, textarea')
+					element.querySelectorAll('.multilineinput-control, input:not(.js-inactive), select, z-textarea-flexible:not(.js-inactive)')
 						.forEach((input) => {
 							input.disabled = true;
 					});
@@ -734,7 +734,7 @@ window.mediatype_edit_popup = new class {
 				element.style.display = '';
 
 				if (element.classList.contains('form-field')) {
-					element.querySelectorAll('.multilineinput-control, input:not(.js-inactive), select, textarea')
+					element.querySelectorAll('.multilineinput-control, input:not(.js-inactive), select, z-textarea-flexible:not(.js-inactive)')
 						.forEach((input) => {
 							input.disabled = false;
 					});
