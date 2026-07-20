@@ -1580,6 +1580,7 @@ class CDataTable {
 		this.#element.appendChild(this.#options_popup.getElement());
 
 		this.#options_popup.position();
+		this.#options_popup.resize();
 		this.#options_popup.getElement().focus({preventScroll: true});
 	}
 
@@ -2549,6 +2550,9 @@ class CDataTable {
 	onWindowResize = () => {
 		this.#calculateColumnWidths();
 		this.#handleScrollbar();
+
+		this.#options_popup?.position();
+		this.#options_popup?.resize();
 	}
 
 	onWindowBeforeUnload = () => {
@@ -2557,6 +2561,7 @@ class CDataTable {
 
 	onWrapperScroll = () => {
 		this.#options_popup?.position();
+		this.#options_popup?.resize();
 	}
 
 	#bindEvents() {
