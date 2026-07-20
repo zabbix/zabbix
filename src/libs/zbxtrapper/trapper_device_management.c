@@ -55,14 +55,18 @@ static int	device_check_permissions(const zbx_user_t *user, zbx_uint64_t target_
 	int				ret = FAIL;
 	zbx_user_role_permission_t	default_access = ROLE_PERM_DENY, permission;
 	const char		*required_rule;
-	zbx_db_result_t		result;
+	zbx_db_result_t		result = NULL;
 	zbx_db_row_t		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " target_userid:" ZBX_FS_UI64,
 			__func__, user->userid, target_userid);
 
-	required_rule = (user->userid == target_userid ? ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_OWN :
-			ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_USER);
+	if (user->userid == target_userid)
+		required_rule = ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_OWN;
+	else if (USER_TYPE_SUPER_ADMIN == user->type)
+		required_rule = ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_USER;
+	else
+		goto out;
 
 	result = zbx_db_select(
 			"select name,value_int"
