@@ -2549,7 +2549,10 @@ class CDataTable {
 
 	onWindowResize = () => {
 		this.#calculateColumnWidths();
-		this.#handleScrollbar();
+
+		requestAnimationFrame(() => {
+			this.#handleScrollbar();
+		});
 
 		this.#options_popup?.position();
 		this.#options_popup?.resize();
