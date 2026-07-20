@@ -50,6 +50,10 @@ if (!is_array($data) || !isset($data['method'])
 	fatal_error('Wrong RPC call to JS RPC!');
 }
 
+if (!CJsRpcInputValidator::validate($data)) {
+	fatal_error('Wrong RPC call to JS RPC!');
+}
+
 $result = [];
 $limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
@@ -518,10 +522,6 @@ switch ($data['method']) {
 				break;
 
 			case 'valuemap_names':
-				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
-					break;
-				}
-
 				$hostids = $data['hostids'];
 
 				if (array_key_exists('with_inherited', $data)) {
@@ -540,10 +540,6 @@ switch ($data['method']) {
 				break;
 
 			case 'valuemaps':
-				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
-					break;
-				}
-
 				if ($data['context'] === 'host') {
 					$hosts = API::Host()->get([
 						'output' => ['name'],
@@ -727,9 +723,6 @@ switch ($data['method']) {
 			}
 		}
 		break;
-
-	default:
-		fatal_error('Wrong RPC call to JS RPC!');
 }
 
 if ($requestType == PAGE_TYPE_JSON) {
