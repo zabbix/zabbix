@@ -71,6 +71,7 @@ window.item_edit_form = new class {
 		});
 
 		this.footer = this.overlay.$dialogue.$footer[0];
+		this.tags_form_grid = this.form_element.querySelector('#tags-tab .form-grid');
 		this.tags_table = document.getElementById('tagsFormList').querySelector('[data-field-name="tags"]');
 
 		ZABBIX.PopupManager.setReturnUrl(return_url);
@@ -643,10 +644,13 @@ window.item_edit_form = new class {
 			.then((response) => {
 				this.tags_table.innerHTML = response.body;
 
-				const $tags_table = jQuery(this.tags_table);
+				if (!this.tags_form_grid.dataset.readonly) {
+					console.log('dataset.readonly: ' + this.tags_form_grid.dataset.readonly);
+					const $tags_table = jQuery(this.tags_table);
 
-				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
-				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
+					$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+					$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
+				}
 			})
 			.catch((message) => {
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});

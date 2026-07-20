@@ -28,7 +28,9 @@ if (!$data['readonly']) {
 }
 
 // form list
-$form_grid = (new CFormGrid())->setId('tagsFormList');
+$form_grid = (new CFormGrid())
+	->setId('tagsFormList')
+	->setAttribute('data-readonly', (bool) $data['readonly']);
 
 if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest'])) {
 	switch ($data['source']) {
