@@ -59,15 +59,8 @@ class CServerInfo extends CApiService {
 	}
 
 	private static function getServerLastAccess(): int {
-		global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-		if ($ZBX_SERVER === null) {
-			return 0;
-		}
-
 		$active_node = DB::select('ha_node', [
 			'output' => ['lastaccess'],
-			'filter' => ['address' => $ZBX_SERVER, 'port' => $ZBX_SERVER_PORT],
 			'sortfield' => ['lastaccess'],
 			'sortorder' => [ZBX_SORT_DOWN],
 			'limit' => 1
