@@ -4641,17 +4641,25 @@ static void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
  *                                                                            *
  * Purpose: schedule trigger timer to be executed at the specified time       *
  *                                                                            *
- * Parameter: timer   - [IN] the timer to schedule                            *
+ * Parameter: timer   - [IN] timer to schedule                                *
  *            now     - [IN] current time                                     *
- *            eval_ts - [IN] the history snapshot time, by default (NULL)     *
- *                           execution time will be used.                     *
- *            exec_ts - [IN] the tiemer execution time                        *
+ *            eval_ts - [IN] history snapshot time, optional                  *
+ *                           (will use execution time if null)                *
+ *            exec_ts - [IN] timer execution time, optional                   *
+*                            (will use current timestamp if null)             *
  *                                                                            *
  ******************************************************************************/
 static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, int now, const zbx_timespec_t *eval_ts,
 		const zbx_timespec_t *exec_ts)
 {
 	zbx_binary_heap_elem_t	elem;
+	zbx_timespec_t		ts_now;
+
+	if (NULL == exec_ts)
+	{
+		zbx_timespec(&ts_now);
+		exec_ts = &ts_now;
+	}
 
 	if (NULL == eval_ts)
 		timer->eval_ts = *exec_ts;
@@ -11205,20 +11213,33 @@ void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_dc_tr
 	UNLOCK_CACHE;
 }
 
+typedef enum
+{
+	TRIGGER_TIMER_STATE_OK,		/* timer is valid, but trigger might not be functional */
+	TRIGGER_TIMER_STATE_INVALID	/* timer is based on invalid data and must be removed  */
+}
+zbx_trigger_timer_state_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: validate trigger timer                                            *
  *                                                                            *
  * Parameters: timer      - [IN] trigger timer                                *
  *             dc_trigger - [OUT] the trigger data                            *
+ *             state      - [OUT] timer state                                 *
+ *                                  OK - keep scheduling                      *
+ *                                  INVALID - remove timer                    *
  *                                                                            *
  * Return value: SUCCEED - the timer is valid                                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **dc_trigger)
+static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **dc_trigger,
+		zbx_trigger_timer_state_t *state)
 {
 	ZBX_DC_FUNCTION		*dc_function;
+
+	*state = TRIGGER_TIMER_STATE_INVALID;
 
 	*dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &timer->triggerid);
 
@@ -11229,11 +11250,22 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 
 		if (dc_function->revision > timer->revision ||
 				NULL == *dc_trigger ||
-				TRIGGER_STATUS_ENABLED != (*dc_trigger)->status ||
-				TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
+				TRIGGER_STATUS_ENABLED != (*dc_trigger)->status)
 		{
 			if (dc_function->timer_revision == timer->revision)
 				dc_function->timer_revision = 0;
+
+			return FAIL;
+		}
+
+		if (TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
+		{
+			if (dc_function->timer_revision == timer->revision)
+				dc_function->timer_revision = 0;
+
+			/* keep non functional triggers scheduled, since they could be      */
+			/* because it might depend on indirect changes, like disabling item */
+			*state = TRIGGER_TIMER_STATE_OK;
 			return FAIL;
 		}
 	}
@@ -11243,15 +11275,26 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 			return FAIL;
 
 		if ((*dc_trigger)->revision > timer->revision ||
-				TRIGGER_STATUS_ENABLED != (*dc_trigger)->status ||
-				TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
+				TRIGGER_STATUS_ENABLED != (*dc_trigger)->status)
 		{
 			if ((*dc_trigger)->timer_revision == timer->revision)
 				(*dc_trigger)->timer_revision = 0;
 			return FAIL;
 		}
+
+		if (TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
+		{
+			if ((*dc_trigger)->timer_revision == timer->revision)
+				(*dc_trigger)->timer_revision = 0;
+
+			/* keep non functional triggers scheduled, since they could be      */
+			/* because it might depend on indirect changes, like disabling item */
+			*state = TRIGGER_TIMER_STATE_OK;
+			return FAIL;
+		}
 	}
 
+	*state = TRIGGER_TIMER_STATE_OK;
 	return SUCCEED;
 }
 
@@ -11325,7 +11368,8 @@ void	zbx_dc_get_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now, 
 
 	while (SUCCEED != zbx_binary_heap_empty(&config->trigger_queue) && timers->values_num < hard_limit)
 	{
-		ZBX_DC_TRIGGER	*dc_trigger;
+		ZBX_DC_TRIGGER			*dc_trigger;
+		zbx_trigger_timer_state_t	timer_state;
 
 		elem = zbx_binary_heap_find_min(&config->trigger_queue);
 		timer = (zbx_trigger_timer_t *)elem->data;
@@ -11348,9 +11392,13 @@ void	zbx_dc_get_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now, 
 
 		zbx_binary_heap_remove_min(&config->trigger_queue);
 
-		if (SUCCEED != trigger_timer_validate(timer, &dc_trigger))
+		if (SUCCEED != trigger_timer_validate(timer, &dc_trigger, &timer_state))
 		{
-			dc_remove_invalid_timer(timer);
+			if (TRIGGER_TIMER_STATE_INVALID == timer_state)
+				dc_remove_invalid_timer(timer);
+			else
+				dc_schedule_trigger_timer(timer, now, NULL, NULL);
+
 			continue;
 		}
 
