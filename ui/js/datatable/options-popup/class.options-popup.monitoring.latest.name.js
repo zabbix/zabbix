@@ -65,7 +65,7 @@ class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup 
 
 		const input = this.getField('show_item_key');
 		input.checked = show_item_key == 1;
-		input.addEventListener('change', e => {
+		input.addEventListener('input', e => {
 			e.stopPropagation();
 
 			this.getColumn().setColumnOptions({
