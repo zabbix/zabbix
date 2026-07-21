@@ -43,12 +43,15 @@ class BridgeAdapterMock(BaseHTTPRequestHandler):
 
 
 class AdapterServer(ThreadingHTTPServer):
-    def __init__(self, address, log_file, status_code, notify_error, init_error, ssl_context=None):
+    def __init__(self, address, log_file, status_code, notify_error, init_error, init_error_detail,
+            offboard_error_detail, ssl_context=None):
         super().__init__(address, BridgeAdapterMock)
         self.log_file = log_file
         self.status_code = status_code
         self.notify_error = notify_error
         self.init_error = init_error
+        self.init_error_detail = init_error_detail
+        self.offboard_error_detail = offboard_error_detail
         self.ssl_context = ssl_context
 
     def get_request(self):
@@ -95,6 +98,44 @@ class AdapterServer(ThreadingHTTPServer):
                 }
             }
 
+        if method == "device.init" and self.init_error_detail:
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "error": {
+                    "code": "bridge.adapter.error",
+                    "message": "Mock bridge-adapter rejected init",
+                    "data": {
+                        "details": [
+                            {
+                                "@type": "bridge_jsonrpc.ErrorInfo",
+                                "reason": "DEVICE_LIMIT_EXCEEDED",
+                                "domain": "bridge.device"
+                            }
+                        ]
+                    }
+                }
+            }
+
+        if method == "device.deactivate" and self.offboard_error_detail:
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "error": {
+                    "code": "bridge.adapter.error",
+                    "message": "Mock bridge-adapter rejected offboard",
+                    "data": {
+                        "details": [
+                            {
+                                "@type": "bridge_jsonrpc.ErrorInfo",
+                                "reason": "DEVICE_NOT_FOUND",
+                                "domain": "bridge.device"
+                            }
+                        ]
+                    }
+                }
+            }
+
         if method == "device.init":
             return {
                 "jsonrpc": "2.0",
@@ -130,6 +171,8 @@ def main():
     parser.add_argument("--status-code", type=int, default=200)
     parser.add_argument("--notify-error", action="store_true")
     parser.add_argument("--init-error", action="store_true")
+    parser.add_argument("--init-error-detail", action="store_true")
+    parser.add_argument("--offboard-error-detail", action="store_true")
     parser.add_argument("--tls", action="store_true")
     parser.add_argument("--mtls", action="store_true")
     parser.add_argument("--cert")
@@ -157,7 +200,7 @@ def main():
             ssl_context.load_verify_locations(cafile=args.ca)
 
     server = AdapterServer((args.host, args.port), args.log_file, args.status_code, args.notify_error,
-                           args.init_error, ssl_context)
+                           args.init_error, args.init_error_detail, args.offboard_error_detail, ssl_context)
 
     open(args.log_file, "a", encoding="utf-8").close()
 

@@ -38,6 +38,21 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const PUSH_ALERT_ERROR_DEVICE_UNKNOWN = 'Cannot deliver alert, device id is not known.';
 	private const PUSH_ALERT_ERROR_DEVICE_NOT_ACTIVE =
 		'Cannot deliver notification, target device is not in Active state.';
+	private const PUSH_ERROR_NOT_CONFIGURED =
+		'Cannot deliver mobile device notification, bridge-adapter is not configured.';
+	private const PUSH_ERROR_RETURNED_ERROR =
+		'Cannot deliver mobile device notification, bridge-adapter returned an error.';
+	private const DEVICE_INIT_ERROR_NOT_CONFIGURED =
+		'Cannot initialize mobile device, bridge-adapter is not configured.';
+	private const DEVICE_INIT_ERROR_RETURNED_ERROR =
+		'Cannot initialize mobile device, bridge-adapter returned an error.';
+	private const DEVICE_INIT_ERROR_DEVICE_LIMIT_EXCEEDED =
+		'Cannot add device because the device limit has been reached. Please remove redundant devices, or '.
+		'contact your system administrator.';
+	private const DEVICE_OFFBOARD_ERROR_NOT_CONFIGURED =
+		'Cannot remove mobile device, bridge-adapter is not configured.';
+	private const DEVICE_OFFBOARD_ERROR_DEVICE_NOT_FOUND =
+		'Cannot unlink device. Please contact your system administrator.';
 	private const LOG_MOBILE_DEVICES_DISABLED_INIT = 'cannot initialize device: mobile devices are disabled';
 	private const LOG_MOBILE_DEVICES_DISABLED_NOTIFY =
 		'cannot send device notification: mobile devices are disabled';
@@ -552,6 +567,14 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::startBridgeAdapterMockInternal(['--init-error']);
 	}
 
+	public static function startBridgeAdapterMockWithInitErrorDetail(): void {
+		self::startBridgeAdapterMockInternal(['--init-error-detail']);
+	}
+
+	public static function startBridgeAdapterMockWithOffboardErrorDetail(): void {
+		self::startBridgeAdapterMockInternal(['--offboard-error-detail']);
+	}
+
 	public static function startBridgeAdapterMockNoTls(): void {
 		self::startBridgeAdapterMockInternal([], false);
 	}
@@ -1056,6 +1079,32 @@ class testBridgeAdapter extends CIntegrationTest {
 		);
 
 		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_RETURNED_ERROR, $client->getError());
+
+		$this->assertAdapterRequest('device.init', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithInitErrorDetail
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initAdapterErrorDetail(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_init()', true,
+			120, 1
+		);
+
+		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_DEVICE_LIMIT_EXCEEDED, $client->getError());
+		$this->assertSame(CZabbixServer::ERROR_CODE_NONE, $client->getErrorCode());
 
 		$this->assertAdapterRequest('device.init', static function (array $request): bool {
 			return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
@@ -1098,6 +1147,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		);
 
 		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_NOT_CONFIGURED, $client->getError());
 	}
 
 	/**
@@ -1145,6 +1195,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
 
 		$this->assertFalse($result);
+		$this->assertSame(self::PUSH_ERROR_RETURNED_ERROR, $client->getError());
 
 		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
 			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
@@ -1173,6 +1224,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		);
 
 		$this->assertFalse($result);
+		$this->assertSame(self::PUSH_ERROR_NOT_CONFIGURED, $client->getError());
 	}
 
 	/**
@@ -1206,6 +1258,31 @@ class testBridgeAdapter extends CIntegrationTest {
 		);
 
 		$this->assertFalse($offboard_response);
+		$this->assertSame(self::DEVICE_OFFBOARD_ERROR_NOT_CONFIGURED, $client->getError());
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithOffboardErrorDetail
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_offboardAdapterErrorDetail(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$offboard_response = $client->offboardDevice([
+			'uuid' => self::OFFBOARD_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_offboard()', true,
+			120, 1
+		);
+
+		$this->assertFalse($offboard_response);
+		$this->assertSame(self::DEVICE_OFFBOARD_ERROR_DEVICE_NOT_FOUND, $client->getError());
+		$this->assertSame(CZabbixServer::ERROR_CODE_DEVICE_NOT_FOUND, $client->getErrorCode());
+
+		$this->assertAdapterRequest('device.deactivate', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::OFFBOARD_DEVICE_UUID;
+		});
 	}
 
 	public function noMtlsConfigurationProvider(): array {
