@@ -264,7 +264,7 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 		#position_tags = ['$IS.FIRST', '$IS.LAST'];
 
 		/** @type {Array} */
-		#property_tags = ['$IS.COPIED', '$IS.SYMPTOM', '$STATUS.CODE'];
+		#property_tags = ['$IS.COPIED', '$IS.SYMPTOM', '$IS.OPEN'];
 
 		/** @type {Function} */
 		#handler;
