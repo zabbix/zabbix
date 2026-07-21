@@ -95,7 +95,7 @@
 				filter.to = this.#global_timerange.to;
 			}
 
-			this.#datatable = new CDataTable(document.getElementById('problems'), data_provider)
+			this.#datatable = new CDataTable(document.getElementById('datatable-problems'), data_provider)
 				.setColumns([
 					new CDataTableColumn('time', <?= json_encode(_('Time')); ?>)
 						.setColumnOptions({

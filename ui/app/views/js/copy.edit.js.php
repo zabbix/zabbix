@@ -53,7 +53,7 @@ window.copy_popup = new class {
 			id: 'copy_targetids',
 			name: 'copy_targetids[]',
 			objectOptions: {
-				editable: true
+				editable: 1
 			},
 			popup: {
 				parameters: {
