@@ -106,7 +106,11 @@ static void	mw_manager_stop_workers(zbx_mw_manager_t *manager, int workers_num)
 	manager->worker_pool_state = MW_WORKER_POOL_SHRINKING;
 
 	if (NULL != manager->queue)
+	{
+		zbx_mw_queue_lock(manager->queue);
 		zbx_mw_queue_notify_all(manager->queue);
+		zbx_mw_queue_unlock(manager->queue);
+	}
 }
 
 /******************************************************************************

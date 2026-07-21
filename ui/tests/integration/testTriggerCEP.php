@@ -63,6 +63,14 @@ class testTriggerCEP extends CIntegrationTest {
 	// Extra tag added to problem events by a webhook (see createExtraTagWebhookAction), used to verify that
 	// tags returned by a media type are applied to the events they were generated for.
 	const WEB_SERVICE_TAG = 'web_service';
+	// Tag added by the second, independent webhook created alongside the first one (see
+	// createExtraTagWebhookAction): a different tag name whose value is the same trailing number prefixed
+	// with 'second_', verifying that tags returned by two separate media types both land on the same event.
+	const WEB_SERVICE_TAG2 = 'web_service2';
+	// Second webhook-applied tag carrying the event's component (copied from the 'component' event tag by
+	// the same webhook). The web-tag services (see createWebTagServices) match problems only on this tag,
+	// so they can go into problem state only via tags applied by the webhook, never via a trigger tag.
+	const WEB_COMPONENT_TAG = 'web_component';
 
 	// Separate template used to stress single-trigger event generation. The template (linked directly to
 	// the HOST_NAME host) carries a master log item plus an LLD rule with a dependent log item prototype.
@@ -129,12 +137,16 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $mediatypeid;
 	private static $tag_mediatypeid;
 	private static $tag_actionid;
+	private static $tag_mediatypeid2;
+	private static $tag_actionid2;
+	private static $web_tag_serviceids = [];
 	private static $sessionid = null;
 
-	// Number of internal-source alerts that exist before the current *Unknown cycle starts generating its
-	// own; captured by runOpenUnknownTest() so runCloseUnknownTest() can wait for exactly this cycle's
-	// notifications to finish before disabling the internal actions. @see waitForInternalAlertsCompleted().
-	private static $internal_alert_baseline = 0;
+	// Highest internal-source eventid that exists before the current *Unknown cycle starts generating its
+	// own events; captured by runOpenUnknownTest() so runCloseUnknownTest() can restrict the alert wait to
+	// exactly this cycle's notifications (the alerts of events with a larger eventid) before disabling the
+	// internal actions. @see waitForInternalAlertsCompleted().
+	private static $internal_event_baseline_id = 0;
 
 	/**
 	 * Component configuration provider.
@@ -153,7 +165,9 @@ class testTriggerCEP extends CIntegrationTest {
 				'LogSlowQueries' => 10000,
 				'StartEscalators' => 8,
 				'MaxHousekeeperDelete' => 0,
-				'StartTrappers' => 32
+				'StartTrappers' => 32,
+				'StartAlerters' => 10,
+				'StartTimers' => 2
 			]
 		];
 	}
@@ -1362,27 +1376,45 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * Create a webhook media type and a trigger action that together add an extra WEB_SERVICE_TAG tag (the
-	 * trailing number of the item value, e.g. "0" for "down_0") to every discovered CEP problem event using
-	 * JavaScript. This does not affect correlation (which still uses the 'service' trigger tag) — it lets
-	 * the test verify that tags returned by a media type are applied to the events they were generated for.
+	 * Create two independent webhook media types and two trigger actions that together add extra tags to
+	 * every discovered CEP problem event using JavaScript. The first webhook adds a WEB_SERVICE_TAG tag (the
+	 * trailing number of the item value, e.g. "0" for "down_0"); the second adds a WEB_SERVICE_TAG2 tag
+	 * whose value is the same trailing number prefixed with 'second_'. This does not affect correlation
+	 * (which still uses the 'service' trigger tag) — it lets the test verify that tags returned by media
+	 * types are applied to the events they were generated for, including when two separate webhook actions
+	 * tag the same event.
 	 *
-	 * The media type has process_tags enabled; its script parses the item value passed as a parameter,
+	 * Both media types have process_tags enabled; each script parses the item value passed as a parameter,
 	 * extracts the trailing number and returns it in the {"tags": {...}} form the alerter applies to the
-	 * event. A second media is attached to the Admin user for this media type, and a trigger action firing
-	 * on the discovered CEP triggers (event tag type=cep / type=cep-dep) routes its problem operation
-	 * through the webhook, so each PROBLEM event ("down_N" and, since the expression matches "up", "up_N")
-	 * gets a WEB_SERVICE_TAG tag.
+	 * event. The first script also copies the event's 'component' tag (passed via {EVENT.TAGS.component})
+	 * into a WEB_COMPONENT_TAG tag, which the web-tag services (see createWebTagServices) match their
+	 * problems on. Medias are attached to the Admin user for both media types, and two trigger actions
+	 * firing on the discovered CEP triggers route their problem operations through the webhooks, so each
+	 * PROBLEM event ("down_N" and, since the expression matches "up", "up_N") gets both a WEB_SERVICE_TAG
+	 * and a WEB_SERVICE_TAG2 tag.
 	 *
 	 * Everything created here is removed in removeExtraTagWebhookAction() / clearData().
 	 */
 	private function createExtraTagWebhookAction(): void {
 		$tag = self::WEB_SERVICE_TAG;
+		$tag2 = self::WEB_SERVICE_TAG2;
+		$component_tag = self::WEB_COMPONENT_TAG;
 		$script_code = <<<HEREDOC
 var params = JSON.parse(value),
-	match = params.item_value.match(/([0-9]+)\$/);
+	match = params.item_value.match(/([0-9]+)\$/),
+	tags = {'$tag': match === null ? '' : match[1]};
 
-return JSON.stringify({tags: {'$tag': match === null ? '' : match[1]}});
+tags['$component_tag'] = params.component;
+
+return JSON.stringify({tags: tags});
+HEREDOC;
+
+		$script_code2 = <<<HEREDOC
+var params = JSON.parse(value),
+	match = params.item_value.match(/([0-9]+)\$/),
+	tags = {'$tag2': match === null ? '' : 'second_' + match[1]};
+
+return JSON.stringify({tags: tags});
 HEREDOC;
 
 		$response = $this->call('mediatype.create', [
@@ -1392,20 +1424,36 @@ HEREDOC;
 			'process_tags' => ZBX_MEDIA_TYPE_TAGS_ENABLED,
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
 			'parameters' => [
-				['name' => 'item_value', 'value' => '{ITEM.VALUE}']
+				['name' => 'item_value', 'value' => '{ITEM.VALUE}'],
+				['name' => 'component', 'value' => '{EVENT.TAGS.component}']
 			]
 		]);
 		$this->assertArrayHasKey('mediatypeids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['mediatypeids']);
 		self::$tag_mediatypeid = $response['result']['mediatypeids'][0];
 
-		// Attach the tagging media type to the Admin user alongside the shared CEP webhook media, so the
-		// action's message operation actually generates an alert (and thus runs the webhook).
+		$response = $this->call('mediatype.create', [
+			'name' => 'CEP extra tag webhook 2',
+			'type' => MEDIA_TYPE_WEBHOOK,
+			'script' => $script_code2,
+			'process_tags' => ZBX_MEDIA_TYPE_TAGS_ENABLED,
+			'status' => MEDIA_TYPE_STATUS_ACTIVE,
+			'parameters' => [
+				['name' => 'item_value', 'value' => '{ITEM.VALUE}']
+			]
+		]);
+		$this->assertArrayHasKey('mediatypeids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['mediatypeids']);
+		self::$tag_mediatypeid2 = $response['result']['mediatypeids'][0];
+
+		// Attach both tagging media types to the Admin user alongside the shared CEP webhook media, so the
+		// actions' message operations actually generate alerts (and thus run the webhooks).
 		$this->call('user.update', [
 			'userid' => 1,
 			'medias' => [
 				['mediatypeid' => self::$mediatypeid, 'sendto' => 'cep'],
-				['mediatypeid' => self::$tag_mediatypeid, 'sendto' => 'cep']
+				['mediatypeid' => self::$tag_mediatypeid, 'sendto' => 'cep'],
+				['mediatypeid' => self::$tag_mediatypeid2, 'sendto' => 'cep']
 			]
 		]);
 
@@ -1453,14 +1501,41 @@ HEREDOC;
 		$this->assertArrayHasKey(0, $response['result']['actionids']);
 		self::$tag_actionid = $response['result']['actionids'][0];
 
+		// Second trigger action, identical except that it routes its problem operation through the second
+		// tagging webhook, so every problem event is tagged by two independent webhook actions.
+		$response = $this->call('action.create', [
+			'name' => 'CEP extra tag action 2',
+			'eventsource' => EVENT_SOURCE_TRIGGERS,
+			'status' => ACTION_STATUS_ENABLED,
+			'esc_period' => '1h',
+			'pause_suppressed' => 0,
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$tag_mediatypeid2,
+						'message' => 'Problem', 'subject' => 'Problem'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+		self::$tag_actionid2 = $response['result']['actionids'][0];
+
 		// The service/trigger actions are already disabled once the services-specific tests finish (see
-		// disableServicesActions), so only the tagging webhook fires in this scenario.
+		// disableServicesActions), so only the tagging webhooks fire in this scenario.
 	}
 
 	/**
-	 * Tear down the webhook media type, its user media and the trigger action created by
+	 * Tear down the webhook media types, their user medias and the trigger actions created by
 	 * createExtraTagWebhookAction(), restoring the Admin user to only the shared CEP webhook media so the
-	 * tagging webhook does not leak into subsequent tests.
+	 * tagging webhooks do not leak into subsequent tests.
 	 */
 	private function removeExtraTagWebhookAction(): void {
 		if (!empty(self::$tag_actionid)) {
@@ -1468,18 +1543,78 @@ HEREDOC;
 			self::$tag_actionid = null;
 		}
 
-		if (!empty(self::$tag_mediatypeid)) {
+		if (!empty(self::$tag_actionid2)) {
+			$this->call('action.delete', [self::$tag_actionid2]);
+			self::$tag_actionid2 = null;
+		}
+
+		if (!empty(self::$tag_mediatypeid) || !empty(self::$tag_mediatypeid2)) {
 			$this->call('user.update', [
 				'userid' => 1,
 				'medias' => [
 					['mediatypeid' => self::$mediatypeid, 'sendto' => 'cep']
 				]
 			]);
-			$this->call('mediatype.delete', [self::$tag_mediatypeid]);
-			self::$tag_mediatypeid = null;
+
+			if (!empty(self::$tag_mediatypeid)) {
+				$this->call('mediatype.delete', [self::$tag_mediatypeid]);
+				self::$tag_mediatypeid = null;
+			}
+
+			if (!empty(self::$tag_mediatypeid2)) {
+				$this->call('mediatype.delete', [self::$tag_mediatypeid2]);
+				self::$tag_mediatypeid2 = null;
+			}
 		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
+	}
+
+	/**
+	 * Create one service per discovered component whose only problem tag is the webhook-applied
+	 * WEB_COMPONENT_TAG (see createExtraTagWebhookAction). Unlike the per-trigger CEP services (which match
+	 * the SERVICE_TAG trigger tag), no trigger tag matches these services: each can enter problem state
+	 * only after the tagging webhook runs for an open problem event and the tags it returns are applied to
+	 * that event. Removed in removeWebTagServices() / clearData().
+	 */
+	private function createWebTagServices(): void {
+		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
+
+		$services = [];
+		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
+			$services[] = [
+				'name' => 'CEP web tag service '.$base.$i,
+				'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
+				'sortorder' => 0,
+				'problem_tags' => [
+					[
+						'tag' => self::WEB_COMPONENT_TAG,
+						'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL,
+						'value' => $base.$i
+					]
+				]
+			];
+		}
+
+		$response = $this->call('service.create', $services);
+		$this->assertArrayHasKey('serviceids', $response['result']);
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
+			'Not all web-tag services were created.');
+		self::$web_tag_serviceids = $response['result']['serviceids'];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+	}
+
+	/**
+	 * Delete the services created by createWebTagServices() so they do not react to the events of later
+	 * scenarios. Guarded, so it is safe in a finally block even if creation failed. The caller is expected
+	 * to follow up with removeExtraTagWebhookAction(), which reloads the configuration cache.
+	 */
+	private function removeWebTagServices(): void {
+		if (!empty(self::$web_tag_serviceids)) {
+			$this->call('service.delete', self::$web_tag_serviceids);
+			self::$web_tag_serviceids = [];
+		}
 	}
 
 	/**
@@ -2249,6 +2384,32 @@ HEREDOC;
 	}
 
 	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecovery but the single batch is grouped by value ("waves")
+	 * instead of by key: every discovered item first gets 0 (the triggers are already OK, so this wave
+	 * must emit no events), then every item gets 1 (every trigger opens) and finally every item gets 0
+	 * again (every trigger recovers). Verifies CEP handles the cross-item interleaved ordering, emitting
+	 * exactly one PROBLEM and one RESOLVED event per trigger and leaving no open problems.
+	 * (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_OpenAndImmediateRecoveryValueWaves)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoveryValueWaves() {
+		$this->runOpenAndImmediateRecoveryValueWavesTest(false);
+	}
+
+	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecoveryValueWaves but with an even number of waves (1, 0, 1, 0),
+	 * so the single batch itself ends on a recovery wave: every trigger opens twice and recovers twice
+	 * within the batch and no separate closing wave is needed. Verifies CEP handles the cross-item
+	 * interleaved ordering when the batch ends on a recovery, emitting exactly one PROBLEM and one
+	 * RESOLVED event per trigger per cycle and leaving no open problems.
+	 * (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_OpenAndImmediateRecoveryValueWavesEndOk)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoveryValueWavesEndOk() {
+		$this->runOpenAndImmediateRecoveryValueWavesEndOkTest(false);
+	}
+
+	/**
 	 * Open the problem and let every per-trigger service follow it to PROBLEM (disaster). When $restart is
 	 * true, the server is restarted first.
 	 */
@@ -2263,6 +2424,10 @@ HEREDOC;
 
 		// Each per-trigger service goes to PROBLEM (disaster) with one open service problem.
 		$this->assertServicesStatus(TRIGGER_SEVERITY_DISASTER, count(self::$serviceids));
+
+		// And each service holds exactly one open service problem — no duplicates (regression guard for the
+		// service manager matching the same event to a service more than once).
+		$this->assertOneServiceProblemPerService();
 	}
 
 	/**
@@ -2487,6 +2652,133 @@ HEREDOC;
 		}
 
 		$this->waitForNoOpenProblems([$triggerid], 'open and immediate recovery single item');
+	}
+
+	/**
+	 * Same as runOpenAndImmediateRecoveryTest but the batch is grouped by value instead of by key:
+	 * alternating waves of 1, 0, 1, each wave sent to every discovered item, all in one batch with
+	 * strictly increasing (clock, ns). Each 1 wave opens one problem per trigger and the 0 wave
+	 * recovers it, so the batch ends with every trigger in PROBLEM. Once the batch is fully processed,
+	 * a separate closing 0 wave is sent to recover the open problems. So unlike the per-key bursts,
+	 * each trigger's transitions are separated by values for every other item, and CEP must still emit
+	 * exactly one event per transition and leave no open problems. When $restart is true, the server
+	 * is restarted first.
+	 */
+	private function runOpenAndImmediateRecoveryValueWavesTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		$this->captureEventBaseline($triggerids);
+
+		$data = [];
+		foreach (['1', '0', '1'] as $value) {
+			foreach ($keys as $key) {
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
+			}
+		}
+		$vps_written = $this->getVpsWritten();
+		$this->dispatchSenderValues($data);
+
+		// Confirm the whole batch was ingested (written to the history cache) before asserting on
+		// events, so a dropped or not-yet-processed value surfaces here rather than as a confusing
+		// event mismatch.
+		$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
+
+		// Every wave flips each trigger, so the batch produces exactly three events per trigger:
+		// PROBLEM, RESOLVED, PROBLEM. Waiting for the exact count also ensures the whole batch is
+		// processed before the closing 0 wave is sent.
+		$this->waitForAllTriggerEventCounts($triggerids, 3);
+
+		// The batch ends on a 1 wave, so every trigger must be left in PROBLEM.
+		$this->assertAllTriggerValues($triggerids, TRIGGER_VALUE_TRUE, 'must be PROBLEM after the batch');
+
+		// Send the closing 0 wave separately, after the batch has been fully processed, to recover
+		// the problems left open by the batch's final 1 wave.
+		$data = [];
+		foreach ($keys as $key) {
+			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'];
+		}
+		$vps_written = $this->getVpsWritten();
+		$this->dispatchSenderValues($data);
+		$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
+
+		// The closing wave adds one RESOLVED event per trigger: PROBLEM, RESOLVED, PROBLEM, RESOLVED
+		// in total. The wait requires an exact total, so a collapsed or extra event fails it too.
+		$expected_events = 4;
+		$this->waitForAllTriggerEventCounts($triggerids, $expected_events);
+
+		// The closing 0 wave must have recovered every trigger back to OK.
+		$this->assertAllTriggerValues($triggerids, TRIGGER_VALUE_FALSE, 'must be OK after the closing 0 wave');
+
+		// Events are newest-first, so they alternate RESOLVED, PROBLEM, RESOLVED, PROBLEM (the batch
+		// ends on a 0 wave, so the newest event is RESOLVED).
+		$events_by_trigger = $this->getScenarioEventsByTrigger($triggerids);
+		foreach ($triggerids as $idx => $triggerid) {
+			$events = $events_by_trigger[$triggerid];
+			$info = 'trigger #'.$idx.': '.count($events).' events';
+			$this->assertCount($expected_events, $events, $info);
+			foreach ($events as $pos => $event) {
+				$expected_value = ($pos % 2 === 0) ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+				$this->assertEquals($expected_value, (int) $event['value'], $info.' at pos '.$pos);
+			}
+		}
+
+		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery value waves');
+	}
+
+	/**
+	 * Same as runOpenAndImmediateRecoveryValueWavesTest but with an even number of waves (1, 0, 1, 0),
+	 * all in one batch with strictly increasing (clock, ns). The batch itself ends on a 0 wave, so it
+	 * leaves every trigger OK and no separate closing wave is needed. When $restart is true, the server
+	 * is restarted first.
+	 */
+	private function runOpenAndImmediateRecoveryValueWavesEndOkTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		$this->captureEventBaseline($triggerids);
+
+		$data = [];
+		foreach (['1', '0', '1', '0'] as $value) {
+			foreach ($keys as $key) {
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
+			}
+		}
+		$vps_written = $this->getVpsWritten();
+		$this->dispatchSenderValues($data);
+
+		// Confirm the whole batch was ingested (written to the history cache) before asserting on
+		// events, so a dropped or not-yet-processed value surfaces here rather than as a confusing
+		// event mismatch.
+		$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
+
+		// Every wave flips each trigger, so the batch produces exactly four events per trigger:
+		// PROBLEM, RESOLVED, PROBLEM, RESOLVED. The wait requires an exact total, so a collapsed or
+		// extra event fails it too.
+		$expected_events = 4;
+		$this->waitForAllTriggerEventCounts($triggerids, $expected_events);
+
+		// The batch ends on a 0 wave, so every trigger must be left OK.
+		$this->assertAllTriggerValues($triggerids, TRIGGER_VALUE_FALSE, 'must be OK after the batch');
+
+		// Events are newest-first, so they alternate RESOLVED, PROBLEM, RESOLVED, PROBLEM (the batch
+		// ends on a 0 wave, so the newest event is RESOLVED).
+		$events_by_trigger = $this->getScenarioEventsByTrigger($triggerids);
+		foreach ($triggerids as $idx => $triggerid) {
+			$events = $events_by_trigger[$triggerid];
+			$info = 'trigger #'.$idx.': '.count($events).' events';
+			$this->assertCount($expected_events, $events, $info);
+			foreach ($events as $pos => $event) {
+				$expected_value = ($pos % 2 === 0) ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+				$this->assertEquals($expected_value, (int) $event['value'], $info.' at pos '.$pos);
+			}
+		}
+
+		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery value waves end OK');
 	}
 
 	/**
@@ -2989,6 +3281,16 @@ HEREDOC;
 	}
 
 	/**
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpFromSameTrigger$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpFromSameTrigger() {
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, false, false, false);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
 	 * Test correlation rule update behavior: verify that changing from CLOSE_OLD+CLOSE_NEW to CLOSE_NEW only
 	 * leaves old problems open, and changing back to CLOSE_OLD+CLOSE_NEW restores the closing behavior.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpUpdateBehavior$)
@@ -3001,11 +3303,13 @@ HEREDOC;
 
 	/**
 	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp
-	 * (correlation still pairs on the 'service' trigger tag), but a webhook media type with process_tags
-	 * enabled additionally adds a WEB_SERVICE_TAG tag to every problem event from JavaScript, driven by a
-	 * trigger action on the discovered CEP triggers. After the scenario the test asserts that every problem
-	 * event carries WEB_SERVICE_TAG whose value matches the trailing number of the event name, verifying that
-	 * tags returned by a media type are applied to the events they were generated for.
+	 * (correlation still pairs on the 'service' trigger tag), but two independent webhook media types with
+	 * process_tags enabled additionally add a WEB_SERVICE_TAG and a WEB_SERVICE_TAG2 tag to every problem
+	 * event from JavaScript, each driven by its own trigger action on the discovered CEP triggers. After the
+	 * scenario the test asserts that every problem event carries both tags (WEB_SERVICE_TAG matching the
+	 * trailing number of the event name, WEB_SERVICE_TAG2 the same number prefixed with 'second_'),
+	 * verifying that tags returned by separate media types are all applied to the events they were
+	 * generated for.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpJS$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -3029,6 +3333,7 @@ HEREDOC;
 			$this->waitForNoOpenProblems($all);
 
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 2 * $m);
 		}
 		finally {
 			$this->removeExtraTagWebhookAction();
@@ -3060,6 +3365,42 @@ HEREDOC;
 			$this->waitForNoOpenProblems($all);
 		}
 		finally {
+			$this->removeExtraTagWebhookAction();
+		}
+	}
+
+	/**
+	 * Same tag-application scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpJS, but the
+	 * webhook-applied tags drive services into problem state instead of only being asserted on the events.
+	 * The webhook additionally returns a WEB_COMPONENT_TAG tag (the event's 'component' tag value), and one
+	 * service per discovered component is created whose only problem tag matches that webhook-applied tag.
+	 * Unlike the per-trigger CEP services (matched via the SERVICE_TAG trigger tag), no trigger tag matches
+	 * these services, so each can go into problem state only after the escalation runs the tagging webhook
+	 * and the tags it returns are applied to the open problem event. The run asserts the services start OK,
+	 * turn DISASTER once the webhook tags the open problems (and stay DISASTER through waves 2 and 3), drop
+	 * to WARNING once the still-open problems are manually downgraded after wave 3 and recover to OK once
+	 * global correlation closes every problem in wave 4.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpJSServices$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpJSServices() {
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_AND_OR, true);
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		try {
+			// Bound the event.get verification inside the run to events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			$this->createWebTagServices();
+
+			// $check_tags sequences each wave on the webhook having tagged the events; $check_web_services
+			// asserts the service state transitions driven by those webhook-applied tags.
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, true, false, true, true);
+			$this->waitForNoOpenProblems($all);
+		}
+		finally {
+			$this->removeWebTagServices();
 			$this->removeExtraTagWebhookAction();
 		}
 	}
@@ -3512,9 +3853,10 @@ HEREDOC;
 			$this->enableInternalActions();
 		}
 
-		// Record how many internal-source alerts already exist (the previous cycle, if any, was fully
-		// drained by runCloseUnknownTest()) so this cycle's notifications can be awaited as a delta.
-		self::$internal_alert_baseline = $this->getInternalAlertCount();
+		// Record the highest internal-source eventid that already exists (the previous cycle, if any, was
+		// fully drained by runCloseUnknownTest()) so this cycle's notifications can be awaited by restricting
+		// the alert wait to the events generated after this baseline.
+		$this->captureInternalEventBaseline();
 
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 
@@ -3866,15 +4208,30 @@ HEREDOC;
 
 	/**
 	 * Drive the "close old down when new up" scenario across four waves (down, down, up, up). When
-	 * $check_tags is true, after each wave the test asserts how many problem events carry WEB_SERVICE_TAG:
-	 * every problem is tagged by the webhook as it opens and the tag is never removed, and all problems
+	 * $check_tags is true, after each wave the test asserts how many problem events carry WEB_SERVICE_TAG
+	 * and WEB_SERVICE_TAG2 (each applied by its own webhook action, see createExtraTagWebhookAction):
+	 * every problem is tagged by the webhooks as it opens and the tags are never removed, and all problems
 	 * open (both "down" waves) before any closes (the "up" waves), so the tagged count is the high-water
 	 * mark of the open-problem count — $m after wave 1, then 2 * $m from wave 2 onwards (unchanged as the
 	 * "up" waves close problems back down). Requires captureEventBaseline() and the tag webhook action to
 	 * be set up by the caller.
+	 *
+	 * When $up_from_other_trigger is true, each "up_N" value is sent to the next discovered item instead
+	 * of the one whose trigger opened "down_N", so the closing "up" PROBLEM event is raised on a different
+	 * trigger and the correlation service tag pair must close the relevant "down" problem by its id across
+	 * triggers rather than each trigger receiving its own "up".
+	 *
+	 * When $check_web_services is true, the run additionally asserts the per-component web-tag services
+	 * (see createWebTagServices, to be created by the caller) follow the webhook-applied WEB_COMPONENT_TAG
+	 * tag: OK before the first wave, DISASTER once the webhook has tagged the open problems (waves 1-3, the
+	 * triggers have DISASTER priority), WARNING after wave 3 once the still-open problems are manually
+	 * downgraded via event.acknowledge (the services must follow the severity down, not only up) and OK
+	 * again once wave 4 closes everything.
 	 */
 	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart,
-			bool $maintenance_after_first = false, bool $check_tags = false, bool $stop_maintenance_and_verify_suppression = false): void {
+			bool $maintenance_after_first = false, bool $check_tags = false,
+			bool $stop_maintenance_and_verify_suppression = false, bool $up_from_other_trigger = true,
+			bool $check_web_services = false): void {
 		$keys = array_merge(
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
@@ -3882,16 +4239,29 @@ HEREDOC;
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
 		$m = count($keys);
 
-		// Build one sender value per key with a unique id: value "<prefix>_<offset + key index>".
-		$values = fn(string $prefix, int $offset) => array_map(
-			fn($key, $i) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $prefix.'_'.($offset + $i)],
-			$keys, array_keys($keys)
+		// Build one sender value per key with a unique id: value "<prefix>_<offset + key index>". A
+		// non-zero $shift sends the value carrying id N at the item $shift positions over, so the event
+		// with service=N originates from a different trigger than the one that opened "down_N".
+		$values = fn(string $prefix, int $offset, int $shift = 0) => array_map(
+			fn($i) => [
+				'host' => self::HOST_DISC_VALUE,
+				'key' => $keys[($i + $shift) % $m],
+				'value' => $prefix.'_'.($offset + $i)
+			],
+			array_keys($keys)
 		);
+		$up_shift = $up_from_other_trigger ? 1 : 0;
 
 		// All triggers must start in OK state.
 		foreach ($this->getTriggers($all) as $t) {
 			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
 				'All triggers must start in OK state for close-on-up global correlation test.');
+		}
+
+		// The web-tag services (matched only by the webhook-applied WEB_COMPONENT_TAG tag) must start OK:
+		// no problem has been tagged for them yet.
+		if ($check_web_services) {
+			$this->waitForWebTagServicesStatus(ZBX_SEVERITY_OK);
 		}
 
 		// 1. Open the first problem on every trigger (unique id per trigger); triggers go TRUE.
@@ -3914,9 +4284,17 @@ HEREDOC;
 			$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
 		}
 
-		// Wave 1 is fully open ($m problems), so $m problem events are tagged.
+		// Wave 1 is fully open ($m problems), so $m problem events are tagged by both webhooks.
 		if ($check_tags) {
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, $m);
+		}
+
+		// Wave 1 covered every key, so the webhook has tagged an open problem of every component with
+		// WEB_COMPONENT_TAG and every web-tag service goes to PROBLEM (DISASTER trigger priority) purely
+		// via the webhook-applied tag - no trigger tag matches these services.
+		if ($check_web_services) {
+			$this->waitForWebTagServicesStatus(TRIGGER_SEVERITY_DISASTER);
 		}
 
 		$this->maybeRestartServer($restart);
@@ -3995,36 +4373,62 @@ HEREDOC;
 			}
 		}
 
-		// Both "down" waves are now open (2 * $m problems), so 2 * $m problem events are tagged.
+		// Both "down" waves are now open (2 * $m problems), so 2 * $m problem events are tagged by both
+		// webhooks.
 		if ($check_tags) {
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 2 * $m);
+		}
+
+		// Wave 2 keeps every component with open webhook-tagged problems, so the services stay DISASTER.
+		if ($check_web_services) {
+			$this->waitForWebTagServicesStatus(TRIGGER_SEVERITY_DISASTER);
 		}
 
 		$this->maybeRestartServer($restart);
 
 		// 3. "up" for the first id set: each is a PROBLEM that closes only its corresponding "down"
-		//    (CLOSE_OLD) and itself (CLOSE_NEW). Each trigger's second problem stays open, so triggers
-		//    stay TRUE and exactly $m problems remain.
-		$this->dispatchSenderValues($values('up', 0));
+		//    (CLOSE_OLD) and itself (CLOSE_NEW) — matched by the service id even when the "up" was
+		//    raised on another trigger ($up_shift). Each trigger's second problem stays open, so
+		//    triggers stay TRUE and exactly $m problems remain.
+		$this->dispatchSenderValues($values('up', 0, $up_shift));
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
 		// Wave 3 closed $m problems, but the "up" events are closed on creation and never tagged, and the
-		// down problems keep their tags, so the tagged count is unchanged at 2 * $m.
+		// down problems keep their tags, so the tagged count is unchanged at 2 * $m for both webhooks.
 		if ($check_tags) {
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 2 * $m);
+		}
+
+		// Wave 2's webhook-tagged problems are still open on every component, so the services stay DISASTER.
+		if ($check_web_services) {
+			$this->waitForWebTagServicesStatus(TRIGGER_SEVERITY_DISASTER);
+
+			// Manually downgrade the still-open problems to WARNING: the service manager must recompute
+			// the web-tag service status from the new lower severity, so every service drops
+			// DISASTER -> WARNING without any problem closing.
+			$this->updateOpenProblemsSeverity($all, TRIGGER_SEVERITY_WARNING);
+			$this->waitForWebTagServicesStatus(TRIGGER_SEVERITY_WARNING);
 		}
 
 		$this->maybeRestartServer($restart);
 
 		// 4. "up" for the second id set closes each trigger's remaining problem; nothing stays open.
-		$this->dispatchSenderValues($values('up', $m));
+		$this->dispatchSenderValues($values('up', $m, $up_shift));
 		$this->waitForNoOpenProblems($all);
 
 		// Wave 4 closed the rest; nothing stays open, but the tagged count still reflects every down
-		// problem ever opened: 2 * $m.
+		// problem ever opened: 2 * $m for both webhooks.
 		if ($check_tags) {
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 2 * $m);
+		}
+
+		// No webhook-tagged problem stays open, so every web-tag service recovers to OK.
+		if ($check_web_services) {
+			$this->waitForWebTagServicesStatus(ZBX_SEVERITY_OK);
 		}
 	}
 
@@ -5165,16 +5569,24 @@ HEREDOC;
 	}
 
 	/**
-	 * Return the number of alerts generated for internal-source events (item-not-supported and
-	 * trigger-unknown notifications produced by the built-in internal actions).
+	 * Capture the highest internal-source eventid currently recorded and store it as the *Unknown cycle
+	 * baseline. waitForInternalAlertsCompleted() then restricts its alert wait to the events generated after
+	 * this point (eventid greater than the baseline), so the wait counts only this cycle's notifications
+	 * regardless of how many internal-source alerts already accumulated in the database.
 	 */
-	private function getInternalAlertCount(): int {
-		$response = $this->call('alert.get', [
-			'eventsource' => EVENT_SOURCE_INTERNAL,
-			'countOutput' => true
+	private function captureInternalEventBaseline(): int {
+		$response = $this->call('event.get', [
+			'source' => EVENT_SOURCE_INTERNAL,
+			'sortfield' => 'eventid',
+			'sortorder' => 'DESC',
+			'limit' => 1,
+			'output' => ['eventid']
 		]);
 
-		return (int) $response['result'];
+		self::$internal_event_baseline_id = empty($response['result'])
+			? 0 : (int) $response['result'][0]['eventid'];
+
+		return self::$internal_event_baseline_id;
 	}
 
 	/**
@@ -5182,23 +5594,37 @@ HEREDOC;
 	 * caller can safely disable the internal actions without the escalator dropping a queued alert.
 	 *
 	 * runOpenUnknownTest() opens one internal problem per unsupported item and per unknown trigger
-	 * (LLD_DISCOVERY_COUNT each), and runCloseUnknownTest() recovers all of them; the internal actions
-	 * notify once on problem and once on recovery, so the cycle adds 4 * LLD_DISCOVERY_COUNT alerts on top
-	 * of the baseline captured in runOpenUnknownTest(). We first wait for all of them to be created (the
-	 * recovery notifications are produced only after the escalator processes the recovery events, which
-	 * lags the problem.get resolution the caller already checked), then wait for none to be left queued.
+	 * (LLD_DISCOVERY_COUNT each) and runCloseUnknownTest() recovers all of them, so the internal actions add
+	 * 2 * LLD_DISCOVERY_COUNT notifications for this cycle. Rather than trusting a total-count delta against
+	 * a pre-cycle baseline, the alerts are anchored to the events generated after captureInternalEventBaseline():
+	 * every internal event (problem and recovery) already exists by now (runCloseUnknownTest() waited for all
+	 * problems to resolve), so their eventids are resolved here and the alert wait is restricted to them.
+	 * alert.get has no eventid range filter, hence the explicit eventid list. We first wait for all of this
+	 * cycle's alerts to be created (they lag the problem.get resolution the caller already checked, since the
+	 * escalator produces them only after processing the events), then wait for none to be left queued.
 	 */
 	private function waitForInternalAlertsCompleted(): void {
-		$expected_alerts = self::$internal_alert_baseline + 2 * self::LLD_DISCOVERY_COUNT;
+		// Resolve the events generated by this cycle, i.e. those with an eventid past the baseline captured
+		// in runOpenUnknownTest(). Their alerts are the only ones this wait may count.
+		$response = $this->call('event.get', [
+			'source' => EVENT_SOURCE_INTERNAL,
+			'eventid_from' => self::$internal_event_baseline_id + 1,
+			'output' => ['eventid']
+		]);
+		$eventids = array_column($response['result'], 'eventid');
 
-		// All problem and recovery notifications of this cycle must have been created ...
+		$expected_alerts = 2 * self::LLD_DISCOVERY_COUNT;
+
+		// All notifications of this cycle must have been created ...
 		$this->callUntilCountIsPresent('alert.get', [
-			'eventsource' => EVENT_SOURCE_INTERNAL
+			'eventsource' => EVENT_SOURCE_INTERNAL,
+			'eventids' => $eventids
 		], $expected_alerts, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		// ... and none may still be queued for delivery (NEW or NOT_SENT).
 		$this->callUntilCountIsPresent('alert.get', [
 			'eventsource' => EVENT_SOURCE_INTERNAL,
+			'eventids' => $eventids,
 			'filter' => ['status' => [ALERT_STATUS_NEW, ALERT_STATUS_NOT_SENT]]
 		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
@@ -5383,6 +5809,25 @@ HEREDOC;
 			'output' => ['triggerid', 'value', 'lastchange', 'state', 'recovery_mode', 'type', 'correlation_mode']
 		]);
 		return array_column($response['result'], null, 'triggerid');
+	}
+
+	/**
+	 * Assert that every trigger currently has the expected value. Instead of failing on the first
+	 * mismatch, all triggers are checked and the failure message reports how many were correct, how
+	 * many were wrong and the full data of every wrong one.
+	 */
+	private function assertAllTriggerValues(array $triggerids, int $expected_value, string $info): void {
+		$triggers = $this->getTriggers($triggerids);
+		$wrong = [];
+		foreach ($triggerids as $idx => $triggerid) {
+			if (!isset($triggers[$triggerid]) || (int) $triggers[$triggerid]['value'] !== $expected_value) {
+				$wrong[] = 'trigger #'.$idx.': '
+					.(isset($triggers[$triggerid]) ? json_encode($triggers[$triggerid]) : 'missing from trigger.get');
+			}
+		}
+		$this->assertCount(0, $wrong, $info.': expected value '.$expected_value.' on all '.count($triggerids)
+			.' triggers, '.(count($triggerids) - count($wrong)).' correct, '.count($wrong).' wrong: '
+			.implode('; ', $wrong));
 	}
 
 	/**
@@ -5614,6 +6059,40 @@ HEREDOC;
 	}
 
 	/**
+	 * Assert that every per-trigger service has exactly one open service problem, i.e. the service manager
+	 * created a single service problem per matched service and did not add the same event to a service more
+	 * than once. This is a regression guard for duplicated service problems: the aggregate count checked by
+	 * assertServicesStatus() can be satisfied by an uneven distribution (one service with two problems and
+	 * another with none), so the per-service breakdown is verified explicitly here.
+	 */
+	private function assertOneServiceProblemPerService(): void {
+		$serviceids = self::$serviceids;
+
+		if (empty($serviceids)) {
+			return;
+		}
+
+		$response = $this->call('problem.get', [
+			'objectids' => $serviceids,
+			'object' => EVENT_OBJECT_SERVICE,
+			'source' => EVENT_SOURCE_SERVICE,
+			'output' => ['eventid', 'objectid']
+		]);
+
+		$counts = [];
+		foreach ($response['result'] as $problem) {
+			$objectid = $problem['objectid'];
+			$counts[$objectid] = isset($counts[$objectid]) ? $counts[$objectid] + 1 : 1;
+		}
+
+		foreach ($serviceids as $serviceid) {
+			$count = isset($counts[$serviceid]) ? $counts[$serviceid] : 0;
+			$this->assertSame(1, $count, 'Service '.$serviceid.' must have exactly one open service problem, '.
+				'got '.$count.'. Open service problems: '.json_encode($response['result']));
+		}
+	}
+
+	/**
 	 * Poll the per-trigger CEP services until every one reports $expected_status (a ZBX_SEVERITY_* value,
 	 * or ZBX_SEVERITY_OK once recovered). Unlike assertServicesStatus() this only checks the status, so it
 	 * can be used after a manual problem-severity change where the open service problem count is irrelevant.
@@ -5630,6 +6109,36 @@ HEREDOC;
 			'serviceids' => $serviceids,
 			'filter' => ['status' => $expected_status]
 		], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Poll the web-tag services (created by createWebTagServices) until every one reports $expected_status.
+	 * Unlike the per-trigger CEP services these are matched to problems only via the webhook-applied
+	 * WEB_COMPONENT_TAG tag, so reaching a problem status here proves the tags returned by the media type
+	 * were applied to the open problem events and picked up by the service manager.
+	 */
+	private function waitForWebTagServicesStatus(int $expected_status): void {
+		$serviceids = self::$web_tag_serviceids;
+
+		$this->assertNotEmpty($serviceids, 'Web-tag services must be created before waiting for their status.');
+
+		try {
+			$this->callUntilCountIsPresent('service.get', [
+				'serviceids' => $serviceids,
+				'filter' => ['status' => $expected_status]
+			], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		} catch (Exception $e) {
+			$response = $this->call('service.get', [
+				'serviceids' => $serviceids,
+				'output' => ['serviceid', 'status']
+			]);
+			$wrong = array_values(array_filter($response['result'],
+				fn($service) => (int) $service['status'] !== $expected_status
+			));
+			throw new Exception('Expected all '.count($serviceids).' web-tag services to have status '
+				.$expected_status.', but '.count($wrong).' differ, first (max 5): '
+				.json_encode(array_slice($wrong, 0, 5)).'. '.$e->getMessage());
+		}
 	}
 
 	private function waitForServicesSuppressed(): void {
@@ -5874,20 +6383,30 @@ HEREDOC;
 			self::$trigger_actionid = null;
 		}
 
-		// Remove the extra-tag webhook action (created by createExtraTagWebhookAction) in case a test
+		// Remove the extra-tag webhook actions (created by createExtraTagWebhookAction) in case a test
 		// aborted before its own teardown ran.
 		if (!empty(self::$tag_actionid)) {
 			CDataHelper::call('action.delete', [self::$tag_actionid]);
 			self::$tag_actionid = null;
 		}
 
+		if (!empty(self::$tag_actionid2)) {
+			CDataHelper::call('action.delete', [self::$tag_actionid2]);
+			self::$tag_actionid2 = null;
+		}
+
 		// Detach the media from the Admin user before deleting the media types they reference.
-		if (!empty(self::$mediatypeid) || !empty(self::$tag_mediatypeid)) {
+		if (!empty(self::$mediatypeid) || !empty(self::$tag_mediatypeid) || !empty(self::$tag_mediatypeid2)) {
 			CDataHelper::call('user.update', ['userid' => 1, 'medias' => []]);
 
 			if (!empty(self::$tag_mediatypeid)) {
 				CDataHelper::call('mediatype.delete', [self::$tag_mediatypeid]);
 				self::$tag_mediatypeid = null;
+			}
+
+			if (!empty(self::$tag_mediatypeid2)) {
+				CDataHelper::call('mediatype.delete', [self::$tag_mediatypeid2]);
+				self::$tag_mediatypeid2 = null;
 			}
 
 			if (!empty(self::$mediatypeid)) {
@@ -5899,6 +6418,13 @@ HEREDOC;
 		if (!empty(self::$serviceids)) {
 			CDataHelper::call('service.delete', self::$serviceids);
 			self::$serviceids = [];
+		}
+
+		// Remove the web-tag services (created by createWebTagServices) in case a test aborted before its
+		// own teardown ran.
+		if (!empty(self::$web_tag_serviceids)) {
+			CDataHelper::call('service.delete', self::$web_tag_serviceids);
+			self::$web_tag_serviceids = [];
 		}
 
 		if (!empty(self::$correlationid)) {

@@ -113,11 +113,11 @@ static void	cep_worker_check_trigger_deps(zbx_cep_task_remote_t *task)
  *                                                                            *
  * Purpose: deserialize events and enqueue corresponding event creation tasks *
  *                                                                            *
- * Parameters: worker - [IN]                                                  *
- *             task   - [IN]  remote task containing serialized events        *
+ * Parameters: task   - [IN]  remote task containing serialized events        *
+ *             tasks  - [OUT] new tasks to be queued                          *
  *                                                                            *
  ******************************************************************************/
-static void	cep_worker_add_events(zbx_cep_worker_t *worker, zbx_cep_task_remote_t *task)
+static void	cep_worker_add_events(zbx_cep_task_remote_t *task, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_vector_db_event_t		events;
 
@@ -127,20 +127,8 @@ static void	cep_worker_add_events(zbx_cep_worker_t *worker, zbx_cep_task_remote_
 
 	if (0 != events.values_num)
 	{
-		zbx_vector_mw_task_ptr_t	tasks;
-
-		zbx_vector_mw_task_ptr_create(&tasks);
-
 		for (int i = 0; i < events.values_num; i++)
-		{
-			zbx_vector_mw_task_ptr_append(&tasks, cep_create_task_event(events.values[i]));
-		}
-
-		zbx_mw_queue_lock(worker->base.queue);
-		cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
-		zbx_mw_queue_unlock(worker->base.queue);
-
-		zbx_vector_mw_task_ptr_destroy(&tasks);
+			zbx_vector_mw_task_ptr_append(tasks, cep_create_task_event(events.values[i]));
 	}
 
 	(void)zbx_serialize_value(task->response, events.values_num);
@@ -269,6 +257,8 @@ static void	cep_worker_add_event_tags(zbx_cep_worker_t *worker, zbx_cep_task_rem
 
 	zbx_deserialize_event_tags(task->message->data, &event_tags);
 
+	zbx_vector_event_tags_sort(&event_tags, zbx_event_tags_compare);
+
 	zbx_vector_cep_event_handle_create(&handles);
 	zbx_vector_cep_event_handle_reserve(&handles, (size_t)event_tags.values_num);
 
@@ -277,14 +267,11 @@ static void	cep_worker_add_event_tags(zbx_cep_worker_t *worker, zbx_cep_task_rem
 	cep_cache_release(&cep);
 
 	zbx_cep_get_eventids_from_handles(handles.values, handles.values_num, &eventids);
-	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_cep_task_add_tags_t	*db_task = (zbx_cep_task_add_tags_t *)cep_create_task_add_tags(&event_tags, &eventids);
 
 	if (0 != handles.values_num)
 	{
-		zbx_vector_event_tags_sort(&event_tags, zbx_event_tags_compare);
-
 		/* remove non trigger event handles from returned handles - no need */
 		/* to notify IT service manager about internal event tag changes    */
 
@@ -416,9 +403,11 @@ static void	cep_worker_set_event_cause(zbx_cep_task_remote_t *task)
  *                                                                            *
  * Parameters: worker - [IN]                                                  *
  *             task   - [IN]  remote task to process                          *
+ *             tasks  - [OUT] new tasks to be queued                          *
  *                                                                            *
  ******************************************************************************/
-static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_task_remote_t *task)
+static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_task_remote_t *task,
+		zbx_vector_mw_task_ptr_t *tasks)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() task :%u", __func__, task->message->code);
 
@@ -431,7 +420,7 @@ static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_tas
 			cep_worker_check_trigger_deps(task);
 			break;
 		case ZBX_CEP_ADD_EVENTS:
-			cep_worker_add_events(worker, task);
+			cep_worker_add_events(task, tasks);
 			break;
 		case ZBX_CEP_ADD_USER_CLOSE_EVENT:
 			cep_worker_add_close_problem(worker, task);
@@ -468,9 +457,11 @@ static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_tas
  *                                                                            *
  * Parameters: worker - [IN]                                                  *
  *             task   - [IN]  trigger event task describing the problem       *
+ *             tasks  - [OUT] new tasks to be queued                          *
  *                                                                            *
  ******************************************************************************/
-static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task_event_t *task)
+static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task_event_t *task,
+		zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_t		*cep;
 	zbx_db_event		*db_event = task->db_event;
@@ -507,14 +498,12 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	zbx_cep_config_handle_t		hconfig;
 	zbx_cep_event_context_t		event_ctx = {.db_event = db_event, .event = cep_event_addref(event),
 						.pos = CEP_POS_LAST};
-	zbx_vector_mw_task_ptr_t	tasks;
-
-	zbx_vector_mw_task_ptr_create(&tasks);
+	int				corr_ret;
 
 	/* cep config returns NULL handle if there are no cep rules to process */
 	if (NULL != (hconfig = zbx_cep_config_open()))
 	{
-		if (SUCCEED != cep_event_process_rules(hconfig, &rules, &rules_num, &event_ctx, &tasks))
+		if (SUCCEED != cep_event_process_rules(hconfig, &rules, &rules_num, &event_ctx, tasks))
 		{
 			zbx_cep_event_release(event);
 			goto out;
@@ -526,28 +515,17 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	cep_cache_release(&cep);
 
 	if (0 != rules_num)
-		cep_event_add_to_rules(&event_ctx, rules, rules_num, &tasks);
+		cep_event_add_to_rules(&event_ctx, rules, rules_num, tasks);
 
-	int	corr_ret;
-
-	corr_ret = cep_correlate_db_event(db_event, worker->dbpool, &tasks);
+	corr_ret = cep_correlate_db_event(db_event, worker->dbpool, tasks);
 
 	/* 'close new' operations must skip actions for the problem and generated ok event */
 	if (0 != (corr_ret & CORRELATION_RESULT_CLOSE_NEW))
 		task->action_state = CEP_ACTION_DISABLED;
 
-	/* queue tasks created by cep and correlation */
-	if (0 != tasks.values_num)
-	{
-		zbx_mw_queue_lock(worker->base.queue);
-		cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
-		zbx_mw_queue_unlock(worker->base.queue);
-	}
-
-	zbx_vector_mw_task_ptr_destroy(&tasks);
-
 	task->event_op = CEP_EVENT_OPEN;
-	task->event = cep_event_addref(event_ctx.event);
+	task->event = cep_event_addref(event);
+	task->hevent = zbx_cep_event_handle_addref(h);
 
 	if (0 != zbx_dc_local_get_itservices_num() && CEP_ACTION_DISABLED != task->action_state)
 	{
@@ -672,12 +650,14 @@ static void	cep_worker_close_trigger_event(zbx_cep_task_event_t *task)
  *                                                                            *
  * Parameters: worker - [IN]                                                  *
  *             task   - [IN]  trigger event task to process                   *
+ *             tasks  - [OUT] new tasks to be queued                          *
  *                                                                            *
  ******************************************************************************/
-static void	cep_worker_process_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task_event_t *task)
+static void	cep_worker_process_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task_event_t *task,
+		zbx_vector_mw_task_ptr_t *tasks)
 {
 	if (TRIGGER_VALUE_PROBLEM == task->db_event->value)
-		cep_worker_open_trigger_event(worker, task);
+		cep_worker_open_trigger_event(worker, task, tasks);
 	else
 		cep_worker_close_trigger_event(task);
 }
@@ -722,6 +702,7 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 
 	task->event_op = CEP_EVENT_OPEN;
 	task->event = NULL;
+	task->hevent = NULL;
 
 	return;
 }
@@ -791,10 +772,12 @@ static void	cep_worker_process_internal_event(zbx_cep_task_event_t *task)
  *                                                                            *
  * Purpose: process an event task by delegating handling based on its type    *
  *                                                                            *
- * Parameters: task - [IN] event task                                         *
+ * Parameters: task  - [IN] event task                                        *
+ *             tasks - [OUT] new tasks to be queued                           *
  *                                                                            *
  ******************************************************************************/
-static void	cep_worker_process_task_event(zbx_cep_worker_t *worker, zbx_cep_task_event_t *task)
+static void	cep_worker_process_task_event(zbx_cep_worker_t *worker, zbx_cep_task_event_t *task,
+		zbx_vector_mw_task_ptr_t *tasks)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:%d object:%d objectid:" ZBX_FS_UI64 " name:%s value:%d ts:%d.%09d",
 			__func__, task->db_event->source, task->db_event->object, task->db_event->objectid,
@@ -803,7 +786,7 @@ static void	cep_worker_process_task_event(zbx_cep_worker_t *worker, zbx_cep_task
 	/* check if event must be created */
 	if (EVENT_SOURCE_TRIGGERS == task->db_event->source && EVENT_OBJECT_TRIGGER == task->db_event->object)
 	{
-		cep_worker_process_trigger_event(worker, task);
+		cep_worker_process_trigger_event(worker, task, tasks);
 	}
 	else if (EVENT_SOURCE_INTERNAL == task->db_event->source)
 	{
@@ -1000,8 +983,9 @@ void	*cep_worker_entry(void *args)
 {
 #define CEP_RTC_OPEN_TIMEOUT	10
 
-	zbx_cep_worker_t	*worker = (zbx_cep_worker_t *)args;
-	char			*error = NULL;
+	zbx_cep_worker_t		*worker = (zbx_cep_worker_t *)args;
+	char				*error = NULL;
+	zbx_vector_mw_task_ptr_t	tasks;
 
 	zbx_supervisor_update_activity("%s starting", worker->base.name);
 
@@ -1013,6 +997,8 @@ void	*cep_worker_entry(void *args)
 		zbx_free(error);
 		zbx_exit(EXIT_FAILURE);
 	}
+
+	zbx_vector_mw_task_ptr_create(&tasks);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		worker->problem_export = zbx_problems_export_init("event-processor", worker->base.id);
@@ -1037,10 +1023,10 @@ void	*cep_worker_entry(void *args)
 			switch (task->type)
 			{
 				case CEP_TASK_REMOTE:
-					cep_worker_process_task_remote(worker, (zbx_cep_task_remote_t *)task);
+					cep_worker_process_task_remote(worker, (zbx_cep_task_remote_t *)task, &tasks);
 					break;
 				case CEP_TASK_EVENT:
-					cep_worker_process_task_event(worker, (zbx_cep_task_event_t *)task);
+					cep_worker_process_task_event(worker, (zbx_cep_task_event_t *)task, &tasks);
 					break;
 				case CEP_TASK_COMMIT:
 					cep_worker_process_task_commit(worker, (zbx_cep_task_commit_t *)task);
@@ -1063,6 +1049,11 @@ void	*cep_worker_entry(void *args)
 
 			zbx_mw_queue_lock(worker->base.queue);
 			cep_queue_push_completed((zbx_cep_queue_t *)worker->base.queue, task);
+			if (0 != tasks.values_num)
+			{
+				cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
+				zbx_vector_mw_task_ptr_clear(&tasks);
+			}
 			zbx_mw_worker_notify(&worker->base);
 
 			continue;
@@ -1088,6 +1079,8 @@ void	*cep_worker_entry(void *args)
 		zbx_export_deinit(worker->problem_export);
 
 	zbx_dc_config_local_release();
+
+	zbx_vector_mw_task_ptr_destroy(&tasks);
 
 	zbx_supervisor_update_activity("%s stopped", worker->base.name);
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped");

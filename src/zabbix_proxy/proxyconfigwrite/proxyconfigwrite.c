@@ -1020,7 +1020,7 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, zbx_dbconn_t *db, id_un
 				case ZBX_TYPE_CHAR:
 				case ZBX_TYPE_TEXT:
 				case ZBX_TYPE_LONGTEXT:
-					value_esc = zbx_db_dyn_escape_string_len(buf, field->length);
+					value_esc = zbx_dbconn_dyn_escape_string_len(db, buf, field->length);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s'", value_esc);
 					zbx_free(value_esc);
 					break;

@@ -72,7 +72,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'HistoryIndexCacheSize' => '32M',
 				'ValueCacheSize' => '128M',
 				'LogSlowQueries' => '60000',
-				'StartDBSyncers' => '32' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX */
+				'StartDBSyncers' => '24' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX */
 				/*'HistoryProvider'=> [
 					'clickhouse;value_types="uint,dbl,str,log,text,json",url=http://localhost:8123,db=zabbix,username=zabbix,password=zabbix'
 				]*/

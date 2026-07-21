@@ -22,7 +22,7 @@
 #include "zbxtimekeeper.h"
 #include "zbxtypes.h"
 
-ZBX_PTR_VECTOR_IMPL(mw_task_ptr, zbx_mw_task_t *)
+ZBX_PTR_VECTOR_LITE_IMPL(mw_task_ptr, zbx_mw_task_t *)
 
 /******************************************************************************
  *                                                                            *

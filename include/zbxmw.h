@@ -29,7 +29,7 @@ typedef struct zbx_mw_task
 }
 zbx_mw_task_t;
 
-ZBX_PTR_VECTOR_DECL(mw_task_ptr, zbx_mw_task_t *)
+ZBX_PTR_VECTOR_LITE_DECL(mw_task_ptr, zbx_mw_task_t *)
 
 typedef struct
 {

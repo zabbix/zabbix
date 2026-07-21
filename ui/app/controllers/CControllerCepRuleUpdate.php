@@ -16,8 +16,202 @@
 
 class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkPermissions(): bool {
+		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
+	}
+
+	public static function getValidationRules(): array {
+		$api_uniq = ['ceprule.get', ['name' => '{name}'], 'cepruleid'];
+
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'_cep_rule_reset' => ['boolean'],
+			'cepruleid' => ['db cep_rule.cep_ruleid'],
+			'name' => ['db cep_rule.name', 'required', 'not_empty'],
+			'filter' => ['object', 'fields' => [
+				'evaltype' => ['db cep_rule.evaltype', 'required',
+					'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
+						CONDITION_EVAL_TYPE_EXPRESSION
+					]
+				],
+				'conditions' => ['objects', 'fields' => [
+					'type' => ['integer', 'required', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
+						CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_SEVERITY, CCepRuleHelper::CONDITION_HOST,
+						CCepRuleHelper::CONDITION_HOST_GROUP, CCepRuleHelper::CONDITION_TIME_PERIOD
+					]],
+					'operator' => [
+						[
+							'integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
+								CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
+							],
+							'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
+								CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP
+							]]
+						],
+						[
+							'integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
+								CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_MORE_EQUAL
+							],
+							'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_SEVERITY]]
+						],
+						[
+							'integer', 'required',
+							'in' => [CONDITION_OPERATOR_IN, CONDITION_OPERATOR_NOT_IN],
+							'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
+						]
+					],
+					'event_name' => ['db cep_condition.event_name', 'required', 'not_empty',
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME]]
+					],
+					'tag_operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
+							CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS,
+							CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
+						],
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
+					],
+					'tag' => ['db cep_condition.tag', 'required', 'not_empty',
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
+					],
+					'tag_value' => ['db cep_condition.tag_value',
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
+					],
+					'host' => ['db cep_condition.host', 'required', 'not_empty',
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST]]
+					],
+					'host_group' => ['db cep_condition.host_group', 'required', 'not_empty',
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST_GROUP]]
+					],
+					'severity' => ['db cep_condition.severity', 'required',
+						'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
+							TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_SEVERITY]]
+					],
+					'time_period' => ['db cep_condition.time_period', 'required', 'not_empty',
+						'use' => [CTimePeriodParser::class, ['usermacros' => false, 'lldmacros' => false]],
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
+					],
+					'formulaid' => ['string', 'required', 'not_empty',
+						'when' => ['../evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
+					]
+				]],
+				'formula' => ['db cep_rule.formula', 'required', 'not_empty',
+					'use' => [CConditionFormulaParser::class, []],
+					'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
+				]
+			]],
+			'window_type' => ['db cep_window.type', 'required', 'in' => [CCepRuleHelper::WINDOW_NONE,
+				CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+				CCepRuleHelper::WINDOW_PATTERN_MATCH
+			]],
+			'window' => ['object', 'required',
+				'fields' => [
+					'duration' => ['db cep_window.duration', 'required', 'not_empty',
+						'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_YEAR, 'min' => 1, 'usermacros' => true,
+							'lldmacros' => false, 'accept_zero' => false, 'with_year' => false
+						]],
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+							CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+							CCepRuleHelper::WINDOW_PATTERN_MATCH
+						]]
+					],
+					'capacity_enabled' => ['boolean', 'required',
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+							CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+							CCepRuleHelper::WINDOW_PATTERN_MATCH
+						]]
+					],
+					'capacity' => ['db cep_window.capacity', 'required', 'not_empty',
+						'use' => [CNumberValidator::class, ['min' => 1, 'max' => ZBX_MAX_INT64, 'with_float' => false,
+							'usermacros' => true, 'lldmacros' => false
+						]],
+						'when' => [
+							['capacity_enabled', 'in' => [1]],
+							['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+								CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH
+							]]
+						]
+					],
+					'group_by_host_group' => ['integer',
+						'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+							CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+							CCepRuleHelper::WINDOW_PATTERN_MATCH
+						]]
+					],
+					'group_by_host' => ['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+							CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+							CCepRuleHelper::WINDOW_PATTERN_MATCH
+						]]
+					],
+					'group_by_tags' => [
+						['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
+							'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+								CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+								CCepRuleHelper::WINDOW_PATTERN_MATCH
+							]]
+						],
+						['integer', 'required', 'in' => [CCepRuleHelper::GROUP_BY_YES],
+							'messages' => ['in' => _('At least one of "Group by" options must be selected.')],
+							'when' => [
+								['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]],
+								['group_by_host', 'in' => [CCepRuleHelper::GROUP_BY_NO]],
+								['group_by_host_group', 'in' => [CCepRuleHelper::GROUP_BY_NO]]
+							]
+						]
+					],
+					'tags' => ['array', 'required', 'not_empty', 'field' => ['string', 'not_empty'],
+						'when' => ['group_by_tags', 'in' => [CCepRuleHelper::GROUP_BY_YES]]
+					],
+					'event_count_tag_enabled' => ['integer', 'required', 'in' => [0, 1],
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]]
+					],
+					'event_count_tag' => ['db cep_window.event_count_tag', 'required', 'not_empty',
+						'when' => ['event_count_tag_enabled', 'in' => [1]]
+					],
+					'script' => ['db cep_window.script', 'required', 'not_empty',
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]]
+					]
+				],
+				'when' => ['window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]]
+			],
+			'operations' => [
+				['objects', 'required', 'fields' => self::getOperationValidationFields()],
+				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(), 'when' => [
+					'window_type', 'in' => [CCepRuleHelper::WINDOW_NONE, CCepRuleHelper::WINDOW_SIMPLE,
+						CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH
+					]
+				]],
+				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(), 'when' => [
+						'window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]],
+					'count_values' => [
+						'field_rules' => ['execute_when', 'in' => [(string) CCepRuleHelper::WHEN_PATTERN_MATCHED]],
+						'min' => 1,
+						'message' => _('At least one operation must execute when event pattern matched.')
+					]
+				]
+			],
+			'stop' => ['db cep_rule.stop', 'required', 'in' => [CCepRuleHelper::EXECUTION_CONTINUE,
+				CCepRuleHelper::EXECUTION_STOP
+			]],
+			'sortorder' => ['db cep_rule.sortorder', 'required',
+				'use' => [CNumberValidator::class, ['min' => 1, 'max' => ZBX_MAX_INT64, 'with_float' => false,
+					'usermacros' => false, 'lldmacros' => false
+				]]
+			],
+			'description' => ['db cep_rule.description'],
+			'status' => ['db cep_rule.status', 'required',
+				'in' => [CCepRuleHelper::STATUS_ENABLED, CCepRuleHelper::STATUS_DISABLED]
+			]
+		]];
+	}
+
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules(existing: true));
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();

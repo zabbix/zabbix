@@ -33,20 +33,17 @@ window.ceprule_operation_edit_popup = new class {
 	/** @type {Template} */
 	#tag_template;
 
-	/** @type {String} */
-	#window_type;
-
 	init({rules, operation, overlay, window_type}) {
-		this.#window_type = String(window_type);
 		this.#overlay = overlay;
-		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
-
 		this.#tag_template = new Template(window['ceprule-operation-tag-template'].innerHTML);
-		this.#setValues(operation);
+
+		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#setValues({...operation, window_type: String(window_type)});
 
 		this.#initActions();
+
 		this.form = new CForm(this.form_element, rules);
-		this.#setAvailableExecuteWhenOptions();
+
 		this.#setAvailableOperationOptions();
 		window['ceprule-operation-execute-when'].dispatchEvent(new Event('change'));
 		window['ceprule-operation-type'].dispatchEvent(new Event('change'));
@@ -57,7 +54,7 @@ window.ceprule_operation_edit_popup = new class {
 	#initActions() {
 		this.form_element.addEventListener('change', (e) => {
 			e.target.id === 'ceprule-operation-execute-when' && this.#handleExecuteWhenChanged(e.target.value);
-			e.target.id === 'ceprule-operation-type' && this.#handleActionChanged(e.target.value);
+			e.target.id === 'ceprule-operation-type' && this.#handleOperationTypeChanged(e.target.value);
 		}, {capture: true});
 
 		this.form_element.addEventListener('click', (e) => {
@@ -67,6 +64,8 @@ window.ceprule_operation_edit_popup = new class {
 			else if (e.target.classList.contains('js-tag-remove')) {
 				e.target.closest('tr').remove();
 			}
+
+			this.#togglePositionTags(window['ceprule-operation-execute-when'].value);
 		});
 	}
 
@@ -95,24 +94,11 @@ window.ceprule_operation_edit_popup = new class {
 		return tag_row;
 	}
 
-	#setAvailableExecuteWhenOptions() {
-		const zselect = window['ceprule-operation-execute-when'];
-		const options = zselect.options;
-		const execute_when_by_window_type = JSON.parse('<?=
-			json_encode(CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE)
-		?>');
-		const available_options = execute_when_by_window_type[Number(this.#window_type)];
+	#togglePositionTags(value) {
+		const has_position_tags = value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>;
 
-		zselect.clearOptions();
-		zselect.addOptions(options.map(option => {
-			option.disabled = !available_options.includes(Number(option.value));
-
-			return option;
-		}));
-
-		if (!zselect.value.length) {
-			zselect.value = zselect.options.find(option => !option.disabled).value;
-		}
+		[...this.form_element.querySelectorAll('[is="z-cep-tagsuggest"]')]
+			.map(node => node.toggleAttribute('disable-position-tags', has_position_tags));
 	}
 
 	#setAvailableOperationOptions() {
@@ -157,22 +143,38 @@ window.ceprule_operation_edit_popup = new class {
 			this.#addTagRow(tag);
 		}
 
-		for (const field_name in operation) {
-			const field_value = operation[field_name];
+		this.form_element.querySelector(`[name="execute_when"]`).value = operation.execute_when;
+		this.form_element.querySelector(`[name="window_type"]`).value = operation.window_type;
+		this.form_element.querySelector(`[name="sortorder"]`).value = operation.sortorder;
+		this.form_element.querySelector(`[name="tag_value"]`).value = operation.tag_value;
+		this.form_element.querySelector(`[name="tag"]`).value = operation.tag;
+		this.form_element.querySelector(`[name="new_tag"]`).value = operation.new_tag;
+		this.form_element.querySelector(`[name="suppress_until"]`).value = operation.suppress_until;
+		[...this.form_element.querySelectorAll(`[name="severity"]`)].map(node => {
+			node.checked = node.value === operation.severity;
+		});
+		[...this.form_element.querySelectorAll(`[name="evaltype"]`)].map(node => {
+			node.checked = node.value === operation.evaltype;
+		});
+		this.form_element.querySelector(`[name="event_name"]`).value = operation.event_name;
 
-			[...this.form_element.querySelectorAll(`[name="${field_name}"]`)]
-				.map(node => {
-					if (node.type === 'radio') {
-						node.checked = node.value === field_value;
-					}
-					else {
-						node.value = field_value
-					}
-				});
-		}
+		// Set enabled options.
+		const zselect = window['ceprule-operation-execute-when'];
+		const available_options = JSON.parse('<?=
+			json_encode(CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE)
+		?>')[Number(operation.window_type)];
+		const options = zselect.options.map(option => ({...option,
+			is_disabled: !available_options.includes(Number(option.value))
+		}));
+
+		zselect.clearOptions();
+		zselect.addOptions(options);
+		zselect.init();
+
+		this.#togglePositionTags(window['ceprule-operation-execute-when'].value);
 	}
 
-	#handleActionChanged(value) {
+	#handleOperationTypeChanged(value) {
 		value = Number(value);
 		const name = window['ceprule-operation-name-argument'];
 		const tag = window['ceprule-operation-tag-argument'];
@@ -250,18 +252,8 @@ window.ceprule_operation_edit_popup = new class {
 	}
 
 	#handleExecuteWhenChanged(value) {
-		// Update a dependent selector view.
 		this.#setAvailableOperationOptions();
-
-		[...this.form_element.querySelectorAll('[is="z-cep-tagsuggest"]')]
-			.map(node => {
-				if (value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>) {
-					node.setAttribute('disable-position-tags', '');
-				}
-				else {
-					node.removeAttribute('disable-position-tags');
-				}
-			});
+		this.#togglePositionTags(value);
 	}
 };
 

@@ -833,12 +833,16 @@ int	zbx_process_events(void)
  ******************************************************************************/
 int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid)
 {
-	zbx_dc_trigger_t	trigger;
-	int			errcode, ret = FAIL;
-	zbx_timespec_t		ts;
+	zbx_dc_trigger_t		trigger;
+	int				errcode, ret = FAIL;
+	zbx_timespec_t			ts;
 	zbx_cep_assessment_query_t	query;
-	unsigned char		*results;
-	zbx_db_event		*event;
+	unsigned char			*results = NULL;
+	zbx_db_event			*event;
+
+	zbx_dc_config_get_triggers_by_triggerids(&trigger, &triggerid, &errcode, 1);
+	if (SUCCEED != errcode)
+		goto out;
 
 	query.triggerid = triggerid;
 	query.flags = TRIGGER_VALUE_OK;
@@ -846,10 +850,6 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 	zbx_cep_assess_trigger_events(&query, 1, &results);
 
 	if (CEP_EVENT_DENY == results[0])
-		goto out;
-
-	zbx_dc_config_get_triggers_by_triggerids(&trigger, &triggerid, &errcode, 1);
-	if (SUCCEED != errcode)
 		goto out;
 
 	zbx_timespec(&ts);
@@ -881,10 +881,9 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		}
 	}
 
-	zbx_dc_config_clean_triggers(&trigger, &errcode, 1);
-
 	ret = SUCCEED;
 out:
+	zbx_dc_config_clean_triggers(&trigger, &errcode, 1);
 	zbx_vector_uint64_destroy(&query.dep_triggerids);
 	zbx_free(results);
 

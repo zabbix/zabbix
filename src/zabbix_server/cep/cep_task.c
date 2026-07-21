@@ -31,6 +31,17 @@ static void	cep_task_acknowledge_free(void *mw_task);
 static void	cep_task_rule_error_free(void *mw_task);
 static void	cep_task_rule_reset_free(void *mw_task);
 
+static void	cep_task_init(zbx_cep_task_t *task)
+{
+	zbx_vector_mw_task_ptr_create(&task->blocked);
+	task->blockers = 0;
+}
+
+static void	cep_task_clear(zbx_cep_task_t *task)
+{
+	zbx_vector_mw_task_ptr_destroy(&task->blocked);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: create task to handle remote request                              *
@@ -51,6 +62,7 @@ zbx_mw_task_t	*cep_create_task_remote(zbx_ipc_client_t *client, zbx_ipc_message_
 	task = (zbx_cep_task_remote_t *)zbx_mw_task_create(CEP_TASK_REMOTE, cep_task_request_remote_free,
 			sizeof(zbx_cep_task_remote_t));
 
+	cep_task_init(&task->base);
 	task->message = message;
 	task->client = client;
 	task->response = response;
@@ -89,6 +101,7 @@ zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event)
 
 	task = (zbx_cep_task_event_t *)zbx_mw_task_create(CEP_TASK_EVENT, cep_task_event_free,
 			sizeof(zbx_cep_task_event_t));
+	cep_task_init(&task->base);
 
 	task->db_event = event;
 	zbx_vector_uint64_create(&task->eventids);
@@ -98,6 +111,7 @@ zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event)
 	zbx_vector_cep_event_update_create(&task->updates);
 	task->event = NULL;
 	task->flags = ZBX_EVENT_NORMAL;
+	task->hevent = NULL;
 
 	return (zbx_mw_task_t *)task;
 }
@@ -164,6 +178,8 @@ zbx_mw_task_t	*cep_create_task_event_by_correlation(zbx_db_event *event, zbx_uin
 	zbx_mw_task_t		*task = cep_create_task_event(event);
 	zbx_cep_task_event_t	*event_task = (zbx_cep_task_event_t *)task;
 
+	cep_task_init(&event_task->base);
+
 	event_task->target_eventid = eventid;
 	event_task->creator.correlationid = correlationid;
 	event_task->creator.c_eventid = c_eventid;
@@ -216,6 +232,9 @@ static void	cep_task_event_clear(zbx_cep_task_event_t *task)
 
 	if (NULL != task->event)
 		zbx_cep_event_release(task->event);
+
+	if (NULL != task->hevent)
+		zbx_cep_event_handle_release(task->hevent);
 }
 
 /******************************************************************************
@@ -249,6 +268,7 @@ zbx_mw_task_t	*cep_create_task_commit(zbx_vector_mw_task_ptr_t *tasks)
 
 	task = (zbx_cep_task_commit_t *)zbx_mw_task_create(CEP_TASK_COMMIT, cep_task_event_commit_free,
 			sizeof(zbx_cep_task_commit_t));
+	cep_task_init(&task->base);
 
 	zbx_vector_mw_task_ptr_create(&task->tasks);
 	zbx_vector_mw_task_ptr_append_array(&task->tasks, tasks->values, tasks->values_num);
@@ -289,6 +309,7 @@ zbx_mw_task_t	*cep_create_task_add_tags(zbx_vector_event_tags_t *event_tags, zbx
 
 	task = (zbx_cep_task_add_tags_t *)zbx_mw_task_create(CEP_TASK_ADD_TAGS, cep_task_add_tags_free,
 			sizeof(zbx_cep_task_add_tags_t));
+	cep_task_init(&task->base);
 
 	zbx_vector_cep_event_update_create(&task->updates);
 
@@ -521,6 +542,8 @@ static void	cep_task_rule_reset_free(void *mw_task)
 void	cep_task_free(zbx_mw_task_t *mw_task)
 {
 	zbx_mw_task_t	*task = (zbx_mw_task_t *)mw_task;
+
+	cep_task_clear((zbx_cep_task_t *)mw_task);
 
 	switch (task->type)
 	{

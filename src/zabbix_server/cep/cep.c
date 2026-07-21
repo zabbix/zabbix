@@ -66,13 +66,17 @@ typedef enum
 }
 zbx_cep_event_state_t;
 
+#define CEP_EVENT_STATE_NEW		0x00
+#define CEP_EVENT_STATE_COMMITTED	0x01
+#define CEP_EVENT_STATE_DELETED		0x02
+
 /* event handle implementation */
 struct zbx_cep_event_ptr
 {
 	zbx_uint64_t		eventid;
 	zbx_cep_event_t		*event;
 	zbx_atomic_uint32_t	refcount;
-	zbx_cep_event_state_t	state;
+	zbx_atomic_uint32_t	state;
 };
 
 ZBX_VECTOR_IMPL(cep_event_handle, zbx_cep_event_handle_t)
@@ -182,12 +186,12 @@ static int	cep_release_event_handle(zbx_cep_t *cep, zbx_cep_event_handle_t h)
 	return SUCCEED;
 }
 
-static zbx_cep_event_handle_t	cep_create_event_handle(zbx_cep_t *cep, zbx_cep_event_t *event)
+static zbx_cep_event_handle_t	cep_create_event_handle(zbx_cep_t *cep, zbx_cep_event_t *event, int state)
 {
 	zbx_cep_event_ptr_t	handle_local = {
 			.eventid = event->eventid,
 			.event = event,
-			.state = CEP_EVENT_STATE_ACTIVE,
+			.state = state,
 			.refcount = 1
 		};
 
@@ -325,7 +329,7 @@ static zbx_uint64_t	cep_eventid_next(zbx_cep_t *cep)
 
 static zbx_cep_event_handle_t	cep_event_handle_acquire(zbx_cep_event_handle_t h)
 {
-	if (CEP_EVENT_STATE_ACTIVE != h->state)
+	if (0 != (atomic_load(&h->state) & CEP_EVENT_STATE_DELETED))
 		return NULL;
 
 	if (0 == atomic_fetch_add(&h->refcount, 1))
@@ -501,7 +505,10 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_sta
 			event->value = cep_origin_problem(&origin);
 
 			obj = cep_get_object_or_create(cep, &event->origin);
-			zbx_vector_cep_event_handle_append(&obj->events, cep_create_event_handle(cep, event));
+
+			zbx_cep_event_handle_t	h = cep_create_event_handle(cep, event, CEP_EVENT_STATE_COMMITTED);
+
+			zbx_vector_cep_event_handle_append(&obj->events, h);
 
 			zbx_vector_uint64_append(&eventids, eventid);
 			events_num++;
@@ -929,7 +936,7 @@ zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event)
 	zbx_cep_object_t	*obj;
 
 	obj = cep_get_object_or_create(cep, &event->origin);
-	h = cep_create_event_handle(cep, event);
+	h = cep_create_event_handle(cep, event, CEP_EVENT_STATE_NEW);
 	zbx_vector_cep_event_handle_append(&obj->events, h);
 
 	obj->pending_events_num--;
@@ -1536,7 +1543,7 @@ void	cep_event_add_suppress(zbx_cep_event_t *event, const zbx_db_event_suppress_
 		}
 	}
 
-	if (event->suppress.values_num == suppress_num)
+	if (event->suppress.values_num == event_suppress_num)
 		return;
 
 	if (0 == event_suppress_num)
@@ -1785,7 +1792,7 @@ void	cep_get_events_by_handles(zbx_cep_t *cep, zbx_cep_event_handle_t *handles, 
 
 	for (int i = 0; i < handles_num; i++)
 	{
-		if (CEP_EVENT_STATE_ACTIVE == handles[i]->state)
+		if (0 == (atomic_load(&handles[i]->state) & CEP_EVENT_STATE_DELETED))
 			events[i] = cep_event_addref(handles[i]->event);
 		else
 			events[i] = NULL;
@@ -1811,7 +1818,7 @@ void	cep_get_events_by_updates(zbx_cep_t *cep, zbx_cep_event_update_t *updates, 
 
 	for (int i = 0; i < updates_num; i++)
 	{
-		if (CEP_EVENT_STATE_ACTIVE == updates[i].handle->state)
+		if (0 == (atomic_load(&updates[i].handle->state) & CEP_EVENT_STATE_DELETED))
 			events[i] = cep_event_addref(updates[i].handle->event);
 		else
 			events[i] = NULL;
@@ -1868,6 +1875,12 @@ void	cep_get_events(zbx_cep_t *cep, unsigned char source, zbx_vector_cep_event_h
 		if (NULL == (h = cep_event_handle_acquire(h)))
 			continue;
 
+		if (0 == (atomic_load(&h->state) & CEP_EVENT_STATE_COMMITTED))
+		{
+			zbx_cep_event_handle_release(h);
+			continue;
+		}
+
 		zbx_vector_cep_event_handle_append(handles, h);
 	}
 }
@@ -1910,7 +1923,7 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
 			}
 		}
 
-		h->state = CEP_EVENT_STATE_DELETED;
+		atomic_fetch_or(&h->state, CEP_EVENT_STATE_DELETED);
 		zbx_vector_cep_event_handle_append(handles, h);
 	}
 }
@@ -2127,3 +2140,8 @@ time_t	cep_rule_get_window_start_time(zbx_cep_t *cep, zbx_uint64_t ruleid, int d
 
 	return rt->window_start;
 }
+void	cep_event_handle_set_committed(zbx_cep_event_handle_t hevent)
+{
+	atomic_fetch_or(&hevent->state, CEP_EVENT_STATE_COMMITTED);
+}
+

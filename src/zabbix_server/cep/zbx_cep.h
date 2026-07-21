@@ -117,5 +117,6 @@ void	zbx_cep_get_eventids_from_handles(const zbx_cep_event_handle_t *handles, in
 zbx_uint64_t	zbx_cep_event_handle_eventid(zbx_cep_event_handle_t h);
 
 int	zbx_cep_event_handle_compare(const void *a1, const void *a2);
+void	cep_event_handle_set_committed(zbx_cep_event_handle_t hevent);
 
 #endif

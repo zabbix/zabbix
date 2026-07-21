@@ -47,7 +47,15 @@ zbx_cep_task_type_t;
 
 typedef struct
 {
-	zbx_mw_task_t		base;
+	zbx_mw_task_t			base;
+	zbx_vector_mw_task_ptr_t	blocked;	/* tasks blocked by this task */
+	int				blockers;	/* number of tasks blocking this task */
+}
+zbx_cep_task_t;
+
+typedef struct
+{
+	zbx_cep_task_t		base;
 	zbx_ipc_message_t	*message;
 	zbx_ipc_client_t	*client;
 	unsigned char		*response;
@@ -57,7 +65,7 @@ zbx_cep_task_remote_t;
 
 typedef struct
 {
-	zbx_mw_task_t			base;
+	zbx_cep_task_t			base;
 	zbx_db_event			*db_event;	/* in - event data */
 	unsigned char			flags;		/* in - event flags */
 	zbx_uint64_t			target_eventid;	/* in - specific event to act on (0 if none) */
@@ -70,12 +78,13 @@ typedef struct
 							/*       open event - created event     */
 							/*       close event - closed events    */
 	zbx_cep_event_t			*event;		/* out - created event */
+	zbx_cep_event_handle_t		hevent;		/* out - created event handle */
 }
 zbx_cep_task_event_t;
 
 typedef struct
 {
-	zbx_mw_task_t			base;
+	zbx_cep_task_t			base;
 	zbx_vector_event_tags_t		cached_tags;	/* tags validated in cachce */
 	zbx_vector_event_tags_t		db_tags;	/* tags to be validated in db */
 	zbx_vector_cep_event_update_t	updates;	/* out - updated events + actions  */
@@ -84,7 +93,7 @@ zbx_cep_task_add_tags_t;
 
 typedef struct
 {
-	zbx_mw_task_t			base;
+	zbx_cep_task_t			base;
 	zbx_vector_mw_task_ptr_t	tasks;
 }
 zbx_cep_task_commit_t;

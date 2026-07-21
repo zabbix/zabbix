@@ -59,15 +59,15 @@ class CControllerCepRuleEdit extends CController {
 	protected function doAction(): void {
 		if ($this->hasInput('cepruleid')) {
 			$rules = (new CFormValidator(
-				CControllerCepRuleGeneral::getValidationRules(existing: true)
+				CControllerCepRuleUpdate::getValidationRules()
 			))->getRules();
 			$rules_for_clone = (new CFormValidator(
-				CControllerCepRuleGeneral::getValidationRules(existing: false)
+				CControllerCepRuleCreate::getValidationRules()
 			))->getRules();
 		}
 		else {
 			$rules = (new CFormValidator(
-				CControllerCepRuleGeneral::getValidationRules(existing: false)
+				CControllerCepRuleCreate::getValidationRules()
 			))->getRules();
 			$rules_for_clone = $rules;
 		}
@@ -158,9 +158,7 @@ class CControllerCepRuleEdit extends CController {
 				$condition['type'] = CCepRuleHelper::CONDITION_TAG;
 			}
 
-			if ($condition['type'] == CCepRuleHelper::CONDITION_TAG) {
-				$condition['tag_operator'] = $condition['operator'];
-			}
+			$condition['tag_operator'] = $condition['operator'];
 
 			return $condition;
 		}, $conditions);
@@ -179,11 +177,18 @@ class CControllerCepRuleEdit extends CController {
 
 	protected static function getOperationPopupValidationRules(): array {
 		return (new CFormValidator(['object', 'fields' => [
-			'execute_when' => ['db cep_operation.execute_when', 'required', 'in' => [
-				CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED,
-				CCepRuleHelper::WHEN_WINDOW_CLOSED, CCepRuleHelper::WHEN_TAGS_CORRELATED,
-				CCepRuleHelper::WHEN_PATTERN_MATCHED
+			'window_type' => ['db cep_window.type', 'required', 'in' => [CCepRuleHelper::WINDOW_NONE,
+				CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+				CCepRuleHelper::WINDOW_PATTERN_MATCH
 			]],
+			'execute_when' => array_map(fn(int $window_type) => ['db cep_operation.execute_when', 'required',
+				'in' => CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$window_type],
+				'messages' => ['in' => _s(
+					'Execute when type not allowed for window type "%1$s".',
+					CCepRuleHelper::getWindowLabelString(compact('window_type'))
+				)],
+				'when' => ['window_type', 'in' => [$window_type]]
+			], array_keys(CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE)),
 			'tags' => ['objects', 'fields' => [
 				'tag' => ['db cep_operation_condition.tag', 'required', 'not_empty'],
 				'operator' => ['db cep_operation_condition.operator', 'required', 'in' => [TAG_OPERATOR_EXISTS,
