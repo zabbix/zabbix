@@ -59,7 +59,6 @@ switch ($data['source']) {
 }
 
 $form_grid = (new CFormGrid())
-	->setAttribute('data-readonly', (bool) $data['readonly'])
 	->addItem(new CFormField(
 		(new CRadioButtonList($show_inherited_tags_id, (int) $data['show_inherited_tags']))
 			->addValue($btn_labels[0], 0, null, $on_change)
