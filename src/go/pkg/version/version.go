@@ -28,7 +28,7 @@ import (
 
 //nolint:revive,nolintlint // these consts are part of higher level script.
 const (
-	ZABBIX_REVDATE          = "7 July 2026"
+	ZABBIX_REVDATE          = "21 July 2026"
 	ZABBIX_VERSION_MAJOR    = 6
 	ZABBIX_VERSION_MINOR    = 0
 	ZABBIX_VERSION_PATCH    = 48
