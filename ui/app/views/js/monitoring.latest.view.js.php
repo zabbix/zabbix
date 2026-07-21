@@ -208,7 +208,7 @@
 					new CDataTableColumn('last_check', <?= json_encode(_('Last check')); ?>)
 						.setFields(['last_check']),
 					new CDataTableColumn('last_value', <?= json_encode(_('Last value')); ?>)
-						.setFields(['last_value'])
+						.setFields(['value_type', 'last_value', 'last_history_value'])
 						.setRenderer('last_value')
 						.setWidth('20%'),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
@@ -366,11 +366,39 @@
 					}
 				})
 				.setCellRenderer('last_value', ({cell_data, cell}) => {
-					const [last_value] = cell_data;
+					const [value_type, last_value, last_history_value] = cell_data;
 
 					const flex_wrapper = document.createElement('div');
 					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-					flex_wrapper.innerHTML = last_value;
+
+					if (value_type == ITEM_VALUE_TYPE_BINARY) {
+						const italic = document.createElement('i');
+						italic.classList.add(ZBX_STYLE_GREY);
+						italic.textContent = last_value;
+
+						flex_wrapper.appendChild(italic);
+					}
+					else {
+						const span = document.createElement('span');
+						span.classList.add(ZBX_STYLE_CURSOR_POINTER, ZBX_STYLE_OVERFLOW_ELLIPSIS);
+						span.textContent = last_value;
+
+						const hint = document.createElement('span');
+						hint.classList.add(ZBX_STYLE_HINTBOX_RAW_DATA, ZBX_STYLE_HINTBOX_WRAP);
+						hint.textContent = last_history_value;
+
+						if (last_history_value !== null
+								&& Array.from(last_history_value).length === ZBX_HINTBOX_HTML_LIMIT) {
+							hint.classList.add(ZBX_STYLE_TRIMMED_CONTENT);
+						}
+
+						span.setAttribute('data-hintbox-html', hint.outerHTML);
+						span.setAttribute('data-hintbox', '1');
+						span.setAttribute('data-hintbox-static', '1');
+						span.setAttribute('aria-expanded', 'false');
+
+						flex_wrapper.appendChild(span);
+					}
 
 					cell.appendChild(flex_wrapper);
 				})
