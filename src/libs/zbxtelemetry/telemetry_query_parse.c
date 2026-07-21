@@ -649,7 +649,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			return ret_errf(FAIL, error, max_error_len, "Unsupported column type for column #%d", i);
 
 		if (NULL == col->attribute_key)
-			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for attribute column #%d",
+			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for column #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 
 		if (FAIL == tq_validate_str(col->attribute_key))
@@ -751,7 +751,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 
 			if (NULL == cond->attribute_key)
 				return ret_errf(FAIL, error, max_error_len,
-						"\"%s\" is not set for attribute condition #%d",
+						"\"%s\" is not set for condition #%d",
 						ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 
 			if (FAIL == tq_validate_str(cond->attribute_key))
