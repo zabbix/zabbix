@@ -961,6 +961,7 @@ class CFormValidator {
 		};
 
 		let subset = Object.create(null);
+		fields_to_validate.sort();
 
 		fields_to_validate.forEach((field_path) => {
 			const parts = field_path.split('/').slice(1);
