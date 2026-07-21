@@ -316,12 +316,11 @@ class CLocalApiClient extends CApiClient {
 				CJsonRpc::AUTH_TYPE_COOKIE => $this->serviceFactory->getObject('user')->checkAuthentication([
 					'sessionid' => $auth['auth']
 				]),
-				CJsonRpc::AUTH_TYPE_DPOP => $this->serviceFactory->getObject('user')
-					->checkAuthenticationDpop([
-						'token' => $auth['auth'],
-						'signature' => $auth['sign'],
-						'requested_api_method' => $requested_api_method
-					])
+				CJsonRpc::AUTH_TYPE_DPOP => $this->serviceFactory->getObject('user')->checkAuthenticationDpop([
+					'token' => $auth['auth'],
+					'signature' => $auth['sign'],
+					'requested_api_method' => $requested_api_method
+				])
 			};
 
 			if (array_key_exists('debug_mode', $user)) {
