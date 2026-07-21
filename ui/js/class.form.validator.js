@@ -430,6 +430,18 @@ class CFormValidator {
 		const checkField = (rule_set, field, data, field_path) => {
 			const when_paths = updateWhenReferences(rule_set, field_path);
 
+			const when_match = when_paths.every((when_path, index) => {
+				const when_rules = {...rule_set.when[index]};
+				delete when_rules[0];
+
+				return when_path in when_fields_data
+					&& this.#checkValue(when_rules, when_fields_data[when_path]);
+			});
+
+			if (!when_match) {
+				return;
+			}
+
 			if (rule_set.type === 'objects' || rule_set.type === 'array') {
 				if (data[field] !== null) {
 					Object.entries(data[field]).forEach(([key, value]) => {
@@ -447,20 +459,7 @@ class CFormValidator {
 				}
 			}
 			else if (['id', 'integer', 'float', 'string'].includes(rule_set.type)) {
-				if (!when_paths.length) {
-					checkUse(rule_set, field_path);
-				}
-				else {
-					const when_match = when_paths.every((when_path, index) => {
-						const when_rules = {...rule_set.when[index]};
-						delete when_rules[0];
-
-						return when_path in when_fields_data
-							&& this.#checkValue(when_rules, when_fields_data[when_path]);
-					});
-
-					when_match && checkUse(rule_set, field_path);
-				}
+				checkUse(rule_set, field_path);
 			}
 		};
 
