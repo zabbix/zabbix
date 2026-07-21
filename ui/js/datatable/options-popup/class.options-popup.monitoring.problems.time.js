@@ -66,7 +66,7 @@ class CDataTableOptionsPopupMonitoringProblemsTime extends CDataTableOptionsPopu
 		const show_timeline_field = this.getField('show_timeline');
 		show_timeline_field.checked = show_timeline == 1;
 		show_timeline_field.disabled = compact_view.checked;
-		show_timeline_field.addEventListener('change', e => {
+		show_timeline_field.addEventListener('input', e => {
 			e.stopPropagation();
 
 			const column_options = {
