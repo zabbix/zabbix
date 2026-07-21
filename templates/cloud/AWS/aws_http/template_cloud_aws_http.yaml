@@ -12203,7 +12203,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.10.color
-                      value: E45F5F
+                      value: EF9F9F
                     - type: STRING
                       name: ds.10.data_set_label
                       value: developer_tools
@@ -12666,7 +12666,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.10.color
-                      value: E45F5F
+                      value: EF9F9F
                     - type: STRING
                       name: ds.10.data_set_label
                       value: developer_tools
