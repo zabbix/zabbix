@@ -255,6 +255,8 @@ static void	cep_worker_add_event_tags(zbx_cep_worker_t *worker, zbx_cep_task_rem
 
 	zbx_deserialize_event_tags(task->message->data, &event_tags);
 
+	zbx_vector_event_tags_sort(&event_tags, zbx_event_tags_compare);
+
 	zbx_vector_cep_event_handle_create(&handles);
 	zbx_vector_cep_event_handle_reserve(&handles, (size_t)event_tags.values_num);
 
@@ -263,14 +265,11 @@ static void	cep_worker_add_event_tags(zbx_cep_worker_t *worker, zbx_cep_task_rem
 	cep_cache_release(&cep);
 
 	zbx_cep_get_eventids_from_handles(handles.values, handles.values_num, &eventids);
-	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_cep_task_add_tags_t	*db_task = (zbx_cep_task_add_tags_t *)cep_create_task_add_tags(&event_tags, &eventids);
 
 	if (0 != handles.values_num)
 	{
-		zbx_vector_event_tags_sort(&event_tags, zbx_event_tags_compare);
-
 		/* remove non trigger event handles from returned handles - no need */
 		/* to notify IT service manager about internal event tag changes    */
 
