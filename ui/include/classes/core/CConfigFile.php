@@ -85,13 +85,14 @@ class CConfigFile {
 				self::exception('Configuration parameter VAULT_DB_PATH is missing.');
 			}
 			elseif (!array_key_exists('VAULT_TOKEN', $DB) || $DB['VAULT_TOKEN'] === '') {
-				if (!array_key_exists('VAULT_APP_ROLE_ID', $DB) && !array_key_exists('VAULT_APP_SECRET_ID', $DB)) {
+				if ((!array_key_exists('VAULT_APP_ROLE_ID', $DB) || $DB['VAULT_APP_ROLE_ID'] === '')
+						&& (!array_key_exists('VAULT_APP_SECRET_ID', $DB) || $DB['VAULT_APP_SECRET_ID'] === '')) {
 					self::exception('Configuration parameter VAULT_TOKEN is missing.');
 				}
-				elseif (!array_key_exists('VAULT_APP_ROLE_ID', $DB)) {
+				elseif (!array_key_exists('VAULT_APP_ROLE_ID', $DB) || $DB['VAULT_APP_ROLE_ID'] === '') {
 					self::exception('Configuration parameter VAULT_APP_ROLE_ID is missing.');
 				}
-				elseif (!array_key_exists('VAULT_APP_SECRET_ID', $DB)) {
+				elseif (!array_key_exists('VAULT_APP_SECRET_ID', $DB) || $DB['VAULT_APP_SECRET_ID'] === '') {
 					self::exception('Configuration parameter VAULT_APP_SECRET_ID is missing.');
 				}
 			}
