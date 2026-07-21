@@ -54,9 +54,9 @@ static int	device_check_permissions(const zbx_user_t *user, zbx_uint64_t target_
 #define ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_USER	"devices.actions.manage_user"
 	int				ret = FAIL;
 	zbx_user_role_permission_t	default_access = ROLE_PERM_DENY, permission;
-	const char		*required_rule;
-	zbx_db_result_t		result = NULL;
-	zbx_db_row_t		row;
+	const char			*required_rule;
+	zbx_db_result_t			result = NULL;
+	zbx_db_row_t			row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " target_userid:" ZBX_FS_UI64,
 			__func__, user->userid, target_userid);
@@ -207,8 +207,8 @@ static int	trapper_device_bridge_adapter_error_info(const struct zbx_json_parse 
 
 	while (NULL != (p = zbx_json_next(&jp_details, p)))
 	{
-		char			*detail_reason = NULL, *detail_domain = NULL;
-		size_t			detail_reason_alloc = 0, detail_domain_alloc = 0;
+		char		*detail_reason = NULL, *detail_domain = NULL;
+		size_t		detail_reason_alloc = 0, detail_domain_alloc = 0;
 		zbx_json_type_t	reason_type, domain_type;
 
 		if (ZBX_JSON_TYPE_OBJECT != zbx_json_valuetype(p) ||
