@@ -58,13 +58,14 @@ switch ($data['source']) {
 		break;
 }
 
-$form_grid = (new CFormGrid())
-	->addItem(new CFormField(
+$form_grid = (new CFormGrid())->addItem(
+	new CFormField(
 		(new CRadioButtonList($show_inherited_tags_id, (int) $data['show_inherited_tags']))
 			->addValue($btn_labels[0], 0, null, $on_change)
 			->addValue($btn_labels[1], 1, null, $on_change)
 			->setModern()
-	));
+	)
+);
 
 $table = new CPartial('tags.list.html', $data);
 
