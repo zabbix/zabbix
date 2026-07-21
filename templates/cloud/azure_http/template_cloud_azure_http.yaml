@@ -8594,13 +8594,17 @@ zabbix_export:
                   
                   		row = rows[i];
                   
-                  		cost = parseFloat(getField(row, 'PreTaxCost', 0));
+                  		if (!row) {
+                  			continue;
+                  		}
+                  
+                  		cost = parseFloat(row.PreTaxCost);
                   
                   		if (isNaN(cost)) {
                   			cost = 0;
                   		}
                   
-                  		month_raw = getField(row, 'BillingMonth', '');
+                  		month_raw = row.BillingMonth;
                   
                   		month = '';
                   
@@ -8618,8 +8622,8 @@ zabbix_export:
                   			continue;
                   		}
                   
-                  		if (getField(row, 'Currency', null)) {
-                  			currency = getField(row, 'Currency', null);
+                  		if (row.Currency) {
+                  			currency = row.Currency;
                   		}
                   
                   		month_map[month] = (month_map[month] || 0) + cost;
@@ -8803,15 +8807,19 @@ zabbix_export:
                   
                   		row = rows[i];
                   
-                  		region = getField(row, 'ResourceLocation', null);
+                  		if (!row) {
+                  			continue;
+                  		}
+                  
+                  		region = row.ResourceLocation;
                   
                   		if (!region) {
                   			continue;
                   		}
                   
-                  		currency = getField(row, 'Currency', '');
+                  		currency = row.Currency || '';
                   
-                  		cost = parseFloat(getField(row, 'PreTaxCost', 0));
+                  		cost = parseFloat(row.PreTaxCost);
                   
                   		if (isNaN(cost)) {
                   			cost = 0;
@@ -9424,32 +9432,9 @@ zabbix_export:
                 - |
                   try {
                   
-                  	var data,
-                  		rows,
-                  		totals,
-                  		counts,
-                  		result,
-                  		service,
-                  		cost,
-                  		group,
-                  		arr,
-                  		currency;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var normalize = function (s) {
-                  		return (s || '').toLowerCase().replace(/\s+/g, ' ').trim();
-                  	};
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  
-                  		var parts = path.split(separator);
-                  		var current = data;
+                  	function getField(obj, path, default_value) {
+                  		var parts = path.split('.');
+                  		var current = obj;
                   
                   		for (var i = 0; i < parts.length; i++) {
                   
@@ -9463,96 +9448,95 @@ zabbix_export:
                   		return (current === undefined || current === null)
                   			? default_value
                   			: current;
-                  	};
-                  
-                  	var rules = {
-                  		ai_ml: ['openai','machine learning','ai','foundry','vision','speech','translator','bot','databricks','language','video indexer','custom vision','metrics advisor','personalizer','immersive reader','phi','document intelligence','anomaly','model'],
-                  		analytics: ['synapse','fabric','power bi','data explorer','data factory','stream','analysis','hdinsight','event hubs','data lake'],
-                  		compute: ['vm','virtual machine','app service','function','batch','scale set','compute','dedicated host'],
-                  		containers: ['aks','kubernetes','container','aci','container apps','open shift','registry'],
-                  		databases: ['sql','cosmos','postgres','mysql','redis','cassandra','database','documentdb','horizon'],
-                  		storage: ['storage','blob','disk','files','backup','netapp','elastic san','queue','archive'],
-                  		networking: ['network','vpn','firewall','dns','front door','gateway','load balancer','vnet','expressroute','traffic manager'],
-                  		security: ['defender','sentinel','key vault','security','waf','entra','attestation','hsm'],
-                  		dev_tools: ['devops','pipelines','repos','boards','artifacts','visual studio','github','copilot','dev box'],
-                  		identity: ['entra','active directory','identity','domain services','external id'],
-                  		integration: ['api management','logic apps','service bus','event grid','web pubsub','integration'],
-                  		iot: ['iot','digital twins','event hub','stream analytics','maps'],
-                  		mgmt: ['monitor','policy','lighthouse','advisor','cost','resource','blueprint','automation','chaos'],
-                  		media: ['cdn','media','stream'],
-                  		migration: ['migrate','site recovery','data box','storage mover'],
-                  		mixed_reality: ['mixed reality','planetary'],
-                  		mobile: ['notification hubs','communication services','signalr'],
-                  		hybrid: ['arc','stack','hybrid','multicloud','expressroute'],
-                  		web: ['app service','static web','web app','signalr','front door'],
-                  		vdi: ['virtual desktop','dev box','lab services']
-                  	};
-                  
-                  	data = (typeof value === 'string')
-                  		? JSON.parse(value)
-                  		: value;
-                  
-                  	rows = getField(data, 'serviceCost.data', '.', []);
-                  
-                  	if (!Array.isArray(rows) || !rows.length) {
+                  	}
+                  	if (!value) {
+                  		throw 'Empty input value';
+                  	}
+                  	var data = JSON.parse(value);
+                  	var rows = getField(data, 'serviceCost.data', null);
+                  	if (!Array.isArray(rows)) {
                   		throw 'serviceCost.data not found';
                   	}
                   
-                  	totals = {};
-                  	counts = {};
-                  	result = [];
-                  	currency = null;
                   
-                  	for (var i = 0; i < rows.length; i++) {
+                  	var rules = {
+                  		ai_ml:['openai','machine learning','ai','foundry','vision','speech','translator','bot','databricks','language','video indexer','custom vision','metrics advisor','personalizer','immersive reader','phi','document intelligence','anomaly','model'],
+                  		analytics:['synapse','fabric','power bi','data explorer','data factory','stream','analysis','hdinsight','event hubs','data lake'],
+                  		compute:['vm','virtual machine','app service','function','batch','scale set','compute','dedicated host'],
+                  		containers:['aks','kubernetes','container','aci','container apps','open shift','registry'],
+                  		databases:['sql','cosmos','postgres','mysql','redis','cassandra','database','documentdb','horizon'],
+                  		storage:['storage','blob','disk','files','backup','netapp','elastic san','queue','archive'],
+                  		networking:['network','vpn','firewall','dns','front door','gateway','load balancer','vnet','expressroute','traffic manager'],
+                  		security:['defender','sentinel','key vault','security','waf','entra','attestation','hsm'],
+                  		dev_tools:['devops','pipelines','repos','boards','artifacts','visual studio','github','copilot','dev box'],
+                  		identity:['entra','active directory','identity','domain services','external id'],
+                  		integration:['api management','logic apps','service bus','event grid','web pubsub','integration'],
+                  		iot:['iot','digital twins','event hub','stream analytics','maps'],
+                  		mgmt:['monitor','policy','lighthouse','advisor','cost','resource','blueprint','automation','chaos'],
+                  		media:['cdn','media','stream'],
+                  		migration:['migrate','site recovery','data box','storage mover'],
+                  		mixed_reality:['mixed reality','planetary'],
+                  		mobile:['notification hubs','communication services','signalr'],
+                  		hybrid:['arc','stack','hybrid','multicloud','expressroute'],
+                  		web:['app service','static web','web app','signalr','front door'],
+                  		vdi:['virtual desktop','dev box','lab services']
+                  	};
                   
-                  		if (!currency) {
-                  			currency =
-                  				getField(rows[i], 'Currency', '.', null) ||
-                  				getField(rows[i], 'CurrencyCode', '.', null) ||
-                  				'UNKNOWN';
+                  	var category_cache = {};
+                  	function getCategory(service) {
+                  		if (category_cache[service]) {
+                  			return category_cache[service];
                   		}
-                  
-                  		service = normalize(getField(rows[i], 'ServiceName', '.', null));
-                  		cost = parseFloat(getField(rows[i], 'PreTaxCost', '.', 0));
-                  
-                  		if (!service || isNaN(cost)) {
-                  			continue;
-                  		}
-                  
-                  		group = 'other';
-                  
-                  		for (var k in rules) {
-                  
-                  			arr = rules[k];
-                  
-                  			for (var j = 0; j < arr.length; j++) {
-                  
-                  				if (service.indexOf(arr[j]) !== -1) {
-                  					group = k;
-                  					break;
+                  		var s = service.toLowerCase();
+                  		for (var category in rules) {
+                  			var words = rules[category];
+                  			for (var i = 0; i < words.length; i++) {
+                  				if (s.indexOf(words[i]) !== -1) {
+                  					category_cache[service] = category;
+                  					return category;
                   				}
                   			}
-                  
-                  			if (group !== 'other') {
-                  				break;
-                  			}
                   		}
                   
-                  		totals[group] = (totals[group] || 0) + cost;
-                  		counts[group] = (counts[group] || 0) + 1;
+                  
+                  		category_cache[service] = 'other';
+                  		return 'other';
                   	}
                   
-                  	for (var k in totals) {
                   
-                  		if (Object.prototype.hasOwnProperty.call(totals, k)) {
+                  	var totals = {};
+                  	var counts = {};
+                  	var currency = 'UNKNOWN';
                   
-                  			result.push({
-                  				category: k,
-                  				total_cost: String(totals[k]),
-                  				service_count: String(counts[k]),
-                  				currency: currency
-                  			});
+                  
+                  	for (var i = 0; i < rows.length; i++) {
+                  		var row = rows[i];
+                  		if (!row || !row.ServiceName) {
+                  			continue;
                   		}
+                  		if (row.Currency) {
+                  			currency = row.Currency;
+                  		}
+                  		var service = row.ServiceName;
+                  		var cost = parseFloat(row.PreTaxCost);
+                  		if (isNaN(cost)) {
+                  			continue;
+                  		}
+                  		var category = getCategory(service);
+                  		totals[category] = (totals[category] || 0) + cost;
+                  		if (!counts[category]) {
+                  			counts[category] = {};
+                  		}
+                  		counts[category][service] = true;
+                  	}
+                  	var result = [];
+                  	for (var key in totals) {
+                  		result.push({
+                  			category:key,
+                  			total_cost:totals[key].toFixed(2),
+                  			service_count:String(Object.keys(counts[key]).length),
+                  			currency:currency
+                  		});
                   	}
                   
                   	return JSON.stringify(result);
@@ -9633,15 +9617,19 @@ zabbix_export:
                   
                   		row = rows[i];
                   
-                  		service = getField(row, 'ServiceName', null);
+                  		if (!row) {
+                  			continue;
+                  		}
+                  
+                  		service = row.ServiceName;
                   
                   		if (!service) {
                   			continue;
                   		}
                   
-                  		currency = getField(row, 'Currency', '');
+                  		currency = row.Currency || '';
                   
-                  		cost = parseFloat(getField(row, 'PreTaxCost', 0));
+                  		cost = parseFloat(row.PreTaxCost);
                   
                   		if (isNaN(cost)) {
                   			cost = 0;
@@ -11151,7 +11139,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -11163,7 +11151,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -11195,7 +11183,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: 007FFF
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -11210,19 +11198,19 @@ zabbix_export:
                       value: '3'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 00838F
+                      value: '360000'
                     - type: STRING
                       name: thresholds.0.threshold
-                      value: '1000'
+                      value: '20000'
                     - type: STRING
                       name: thresholds.1.color
-                      value: AB47BC
+                      value: '500000'
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '40000'
                     - type: STRING
                       name: thresholds.2.color
-                      value: 673AB7
+                      value: '850000'
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '90000'
@@ -11239,11 +11227,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -11267,10 +11252,13 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: 007FFF
+                      value: 0275B8
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '1'
                     - type: ITEM
                       name: ds.0.itemids.0
                       value:
@@ -11281,7 +11269,7 @@ zabbix_export:
                       value: '3'
                     - type: INTEGER
                       name: ds.0.transparency
-                      value: '4'
+                      value: '1'
                     - type: INTEGER
                       name: ds.0.type
                       value: '2'
@@ -11293,13 +11281,10 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: ds.1.color.0
-                      value: 00838F
+                      value: 60A9D3
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
-                    - type: INTEGER
-                      name: ds.1.fill
-                      value: '5'
                     - type: ITEM
                       name: ds.1.itemids.0
                       value:
@@ -11310,7 +11295,7 @@ zabbix_export:
                       value: '3'
                     - type: INTEGER
                       name: ds.1.transparency
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: ds.1.type
                       value: '2'
@@ -11319,13 +11304,13 @@ zabbix_export:
                       value: '3'
                     - type: STRING
                       name: ds.2.color.0
-                      value: FF9800
+                      value: D40000
                     - type: INTEGER
                       name: ds.2.dataset_type
                       value: '0'
                     - type: INTEGER
                       name: ds.2.fill
-                      value: '1'
+                      value: '0'
                     - type: ITEM
                       name: ds.2.itemids.0
                       value:
@@ -11337,9 +11322,6 @@ zabbix_export:
                     - type: INTEGER
                       name: ds.2.transparency
                       value: '3'
-                    - type: INTEGER
-                      name: ds.2.width
-                      value: '2'
                     - type: INTEGER
                       name: legend_aggregation
                       value: '1'
@@ -11375,7 +11357,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color
-                      value: 0097A7
+                      value: D40000
                     - type: INTEGER
                       name: ds.0.fill
                       value: '1'
@@ -11396,7 +11378,7 @@ zabbix_export:
                       value: '3'
                     - type: STRING
                       name: ds.1.color.0
-                      value: 007FFF
+                      value: 0275B8
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
@@ -11413,7 +11395,7 @@ zabbix_export:
                       value: '3'
                     - type: INTEGER
                       name: ds.1.transparency
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: ds.1.type
                       value: '2'
@@ -11425,7 +11407,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: ds.2.color.0
-                      value: FF9800
+                      value: 60A9D3
                     - type: INTEGER
                       name: ds.2.dataset_type
                       value: '0'
@@ -11543,7 +11525,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -11555,7 +11537,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -11587,7 +11569,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: B71C1C
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -11613,11 +11595,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -11641,7 +11620,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -11653,7 +11632,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -11685,7 +11664,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: FBC02D
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -11711,11 +11690,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -11743,7 +11719,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: ds.0.color
-                      value: FF9800
+                      value: D40000
                     - type: INTEGER
                       name: ds.0.fill
                       value: '2'
@@ -11764,7 +11740,7 @@ zabbix_export:
                       value: '3'
                     - type: STRING
                       name: ds.1.color.0
-                      value: 007FFF
+                      value: 0275B8
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
@@ -11814,7 +11790,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -11826,7 +11802,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -11858,7 +11834,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: 006D5B
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -11884,11 +11860,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -11978,7 +11951,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -11993,7 +11966,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -12025,7 +11998,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: 007FFF
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -12051,11 +12024,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!services'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -12080,7 +12050,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color
-                      value: 007FFF
+                      value: 0A466A
                     - type: INTEGER
                       name: ds.0.fill
                       value: '8'
@@ -12104,7 +12074,7 @@ zabbix_export:
                       value: '7'
                     - type: STRING
                       name: ds.1.color
-                      value: 00838F
+                      value: 0275B8
                     - type: INTEGER
                       name: ds.1.fill
                       value: '1'
@@ -12125,7 +12095,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: ds.2.color
-                      value: FF9800
+                      value: D40000
                     - type: INTEGER
                       name: ds.2.fill
                       value: '1'
@@ -12182,7 +12152,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -12197,7 +12167,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -12229,7 +12199,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: B71C1C
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -12244,19 +12214,19 @@ zabbix_export:
                       value: '3'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 00838F
+                      value: '360000'
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '1000'
                     - type: STRING
                       name: thresholds.1.color
-                      value: AB47BC
+                      value: '500000'
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '5000'
                     - type: STRING
                       name: thresholds.2.color
-                      value: 673AB7
+                      value: '850000'
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '10000'
@@ -12273,11 +12243,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -12302,7 +12269,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color
-                      value: 006D5B
+                      value: 60A9D3
                     - type: INTEGER
                       name: ds.0.marker
                       value: '4'
@@ -12329,7 +12296,7 @@ zabbix_export:
                       value: AZIQ
                     - type: STRING
                       name: thresholds.0.color
-                      value: 007FFF
+                      value: '500000'
                     - type: STRING
                       name: thresholds.0.x_axis_threshold
                       value: ''
@@ -12338,7 +12305,7 @@ zabbix_export:
                       value: '25'
                     - type: STRING
                       name: thresholds.1.color
-                      value: FBC02D
+                      value: '850000'
                     - type: STRING
                       name: thresholds.1.x_axis_threshold
                       value: ''
@@ -12347,7 +12314,7 @@ zabbix_export:
                       value: '30'
                     - type: STRING
                       name: thresholds.2.color
-                      value: B71C1C
+                      value: D40000
                     - type: STRING
                       name: thresholds.2.x_axis_threshold
                       value: ''
@@ -12368,7 +12335,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -12383,7 +12350,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -12415,7 +12382,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: FBC02D
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -12430,19 +12397,19 @@ zabbix_export:
                       value: '3'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 00838F
+                      value: '360000'
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '25'
                     - type: STRING
                       name: thresholds.1.color
-                      value: AB47BC
+                      value: '500000'
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '50'
                     - type: STRING
                       name: thresholds.2.color
-                      value: 673AB7
+                      value: '850000'
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '75'
@@ -12459,11 +12426,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!%'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -12553,7 +12517,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -12568,7 +12532,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -12600,7 +12564,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: 006D5B
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -12615,22 +12579,22 @@ zabbix_export:
                       value: '3'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 00838F
+                      value: '360000'
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '-20000'
                     - type: STRING
                       name: thresholds.1.color
-                      value: AB47BC
+                      value: '500000'
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.2.color
-                      value: 673AB7
+                      value: '850000'
                     - type: STRING
                       name: thresholds.2.threshold
-                      value: '10000'
+                      value: '5000'
                     - type: INTEGER
                       name: time_bold
                       value: '1'
@@ -12644,11 +12608,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -12685,7 +12646,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: primary_label_color
-                      value: FFE0B2
+                      value: FFFFFF
                     - type: INTEGER
                       name: primary_label_size
                       value: '25'
@@ -12697,7 +12658,7 @@ zabbix_export:
                       value: AZDST
                     - type: STRING
                       name: secondary_label_color
-                      value: FFE0B2
+                      value: FFFFFF
                     - type: INTEGER
                       name: secondary_label_decimal_places
                       value: '0'
@@ -12709,28 +12670,22 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 007FFF
+                      value: 9FCBE4
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: 006D5B
+                      value: 0275B8
                     - type: STRING
                       name: thresholds.1.threshold
-                      value: '11'
+                      value: '3'
                     - type: STRING
                       name: thresholds.2.color
-                      value: FBC02D
+                      value: 0A466A
                     - type: STRING
                       name: thresholds.2.threshold
-                      value: '22'
-                    - type: STRING
-                      name: thresholds.3.color
-                      value: B71C1C
-                    - type: STRING
-                      name: thresholds.3.threshold
-                      value: '33'
+                      value: '6'
             - name: 'Azure: Yearly scope'
               widgets:
                 - type: item
@@ -12740,7 +12695,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -12752,7 +12707,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -12784,7 +12739,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: 007FFF
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -12810,11 +12765,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -12831,7 +12783,7 @@ zabbix_export:
                       name: value_size
                       value: '20'
                 - type: svggraph
-                  name: 'Yearly scope graph'
+                  name: 'Yearly graph'
                   'y': '2'
                   width: '48'
                   height: '5'
@@ -12847,7 +12799,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.0.color
-                      value: 007FFF
+                      value: 9FCBE4
                     - type: STRING
                       name: ds.0.data_set_label
                       value: q1-1
@@ -12856,7 +12808,7 @@ zabbix_export:
                       value: 'Month ["*-01"] cost'
                     - type: INTEGER
                       name: ds.0.transparency
-                      value: '1'
+                      value: '0'
                     - type: INTEGER
                       name: ds.0.type
                       value: '3'
@@ -12871,7 +12823,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.1.color
-                      value: 90CAF9
+                      value: 60A9D3
                     - type: STRING
                       name: ds.1.data_set_label
                       value: q1-2
@@ -12880,7 +12832,7 @@ zabbix_export:
                       value: 'Month ["*-02"] cost'
                     - type: INTEGER
                       name: ds.1.transparency
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: ds.1.type
                       value: '3'
@@ -12895,7 +12847,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.2.color
-                      value: 1164B4
+                      value: 2186C1
                     - type: STRING
                       name: ds.2.data_set_label
                       value: q1-3
@@ -12904,7 +12856,7 @@ zabbix_export:
                       value: 'Month ["*-03"] cost'
                     - type: INTEGER
                       name: ds.2.transparency
-                      value: '3'
+                      value: '0'
                     - type: INTEGER
                       name: ds.2.type
                       value: '3'
@@ -12919,7 +12871,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.3.color
-                      value: EF5350
+                      value: 0275B8
                     - type: STRING
                       name: ds.3.data_set_label
                       value: q2-1
@@ -12928,7 +12880,7 @@ zabbix_export:
                       value: 'Month ["*-04"] cost'
                     - type: INTEGER
                       name: ds.3.transparency
-                      value: '1'
+                      value: '0'
                     - type: INTEGER
                       name: ds.3.type
                       value: '3'
@@ -12943,7 +12895,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.4.color
-                      value: EF9A9A
+                      value: '075786'
                     - type: STRING
                       name: ds.4.data_set_label
                       value: q2-2
@@ -12952,7 +12904,7 @@ zabbix_export:
                       value: 'Month ["*-05"] cost'
                     - type: INTEGER
                       name: ds.4.transparency
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: ds.4.type
                       value: '3'
@@ -12967,7 +12919,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.5.color
-                      value: B71C1C
+                      value: 0A466A
                     - type: STRING
                       name: ds.5.data_set_label
                       value: q2-3
@@ -12976,7 +12928,7 @@ zabbix_export:
                       value: 'Month ["*-06"] cost'
                     - type: INTEGER
                       name: ds.5.transparency
-                      value: '3'
+                      value: '0'
                     - type: INTEGER
                       name: ds.5.type
                       value: '3'
@@ -12991,7 +12943,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.6.color
-                      value: FBC02D
+                      value: EF9F9F
                     - type: STRING
                       name: ds.6.data_set_label
                       value: q3-1
@@ -13000,7 +12952,7 @@ zabbix_export:
                       value: 'Month ["*-07"] cost'
                     - type: INTEGER
                       name: ds.6.transparency
-                      value: '1'
+                      value: '0'
                     - type: INTEGER
                       name: ds.6.type
                       value: '3'
@@ -13015,7 +12967,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.7.color
-                      value: FFF176
+                      value: E45F5F
                     - type: STRING
                       name: ds.7.data_set_label
                       value: q3-2
@@ -13024,7 +12976,7 @@ zabbix_export:
                       value: 'Month ["*-08"] cost'
                     - type: INTEGER
                       name: ds.7.transparency
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: ds.7.type
                       value: '3'
@@ -13039,7 +12991,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.8.color
-                      value: FF6F00
+                      value: D40000
                     - type: STRING
                       name: ds.8.data_set_label
                       value: q3-3
@@ -13048,7 +13000,7 @@ zabbix_export:
                       value: 'Month ["*-09"] cost'
                     - type: INTEGER
                       name: ds.8.transparency
-                      value: '3'
+                      value: '0'
                     - type: INTEGER
                       name: ds.8.type
                       value: '3'
@@ -13063,7 +13015,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.9.color
-                      value: 00A86B
+                      value: 9F0000
                     - type: STRING
                       name: ds.9.data_set_label
                       value: q4-1
@@ -13072,7 +13024,7 @@ zabbix_export:
                       value: 'Month ["*-10"] cost'
                     - type: INTEGER
                       name: ds.9.transparency
-                      value: '1'
+                      value: '0'
                     - type: INTEGER
                       name: ds.9.type
                       value: '3'
@@ -13087,7 +13039,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.10.color
-                      value: C5E1A5
+                      value: 6B0000
                     - type: STRING
                       name: ds.10.data_set_label
                       value: q4-2
@@ -13096,7 +13048,7 @@ zabbix_export:
                       value: 'Month ["*-11"] cost'
                     - type: INTEGER
                       name: ds.10.transparency
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: ds.10.type
                       value: '3'
@@ -13111,7 +13063,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.11.color
-                      value: 006D5B
+                      value: '500000'
                     - type: STRING
                       name: ds.11.data_set_label
                       value: q4-3
@@ -13120,7 +13072,7 @@ zabbix_export:
                       value: 'Month ["*-12"] cost'
                     - type: INTEGER
                       name: ds.11.transparency
-                      value: '3'
+                      value: '0'
                     - type: INTEGER
                       name: ds.11.type
                       value: '3'
@@ -13171,7 +13123,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.0.color
-                      value: 007FFF
+                      value: 9FCBE4
                     - type: STRING
                       name: ds.0.data_set_label
                       value: q1-1
@@ -13180,7 +13132,7 @@ zabbix_export:
                       value: 'Month ["*-01"] cost'
                     - type: INTEGER
                       name: ds.0.transparency
-                      value: '1'
+                      value: '0'
                     - type: INTEGER
                       name: ds.0.type
                       value: '3'
@@ -13195,7 +13147,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.1.color
-                      value: 90CAF9
+                      value: 60A9D3
                     - type: STRING
                       name: ds.1.data_set_label
                       value: q1-2
@@ -13204,7 +13156,7 @@ zabbix_export:
                       value: 'Month ["*-02"] cost'
                     - type: INTEGER
                       name: ds.1.transparency
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: ds.1.type
                       value: '3'
@@ -13219,7 +13171,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.2.color
-                      value: 1164B4
+                      value: 2186C1
                     - type: STRING
                       name: ds.2.data_set_label
                       value: q1-3
@@ -13228,7 +13180,7 @@ zabbix_export:
                       value: 'Month ["*-03"] cost'
                     - type: INTEGER
                       name: ds.2.transparency
-                      value: '3'
+                      value: '0'
                     - type: INTEGER
                       name: ds.2.type
                       value: '3'
@@ -13332,7 +13284,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -13344,7 +13296,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -13376,7 +13328,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: B71C1C
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -13402,11 +13354,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -13440,7 +13389,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.0.color
-                      value: EF5350
+                      value: 0275B8
                     - type: STRING
                       name: ds.0.data_set_label
                       value: q2-1
@@ -13449,7 +13398,7 @@ zabbix_export:
                       value: 'Month ["*-04"] cost'
                     - type: INTEGER
                       name: ds.0.transparency
-                      value: '1'
+                      value: '0'
                     - type: INTEGER
                       name: ds.0.type
                       value: '3'
@@ -13464,7 +13413,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.1.color
-                      value: EF9A9A
+                      value: '075786'
                     - type: STRING
                       name: ds.1.data_set_label
                       value: q2-2
@@ -13473,7 +13422,7 @@ zabbix_export:
                       value: 'Month ["*-05"] cost'
                     - type: INTEGER
                       name: ds.1.transparency
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: ds.1.type
                       value: '3'
@@ -13488,7 +13437,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.2.color
-                      value: B71C1C
+                      value: 0A466A
                     - type: STRING
                       name: ds.2.data_set_label
                       value: q2-3
@@ -13497,7 +13446,7 @@ zabbix_export:
                       value: 'Month ["*-06"] cost'
                     - type: INTEGER
                       name: ds.2.transparency
-                      value: '3'
+                      value: '0'
                     - type: INTEGER
                       name: ds.2.type
                       value: '3'
@@ -13536,7 +13485,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -13548,7 +13497,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -13580,7 +13529,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: FBC02D
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -13606,11 +13555,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -13634,7 +13580,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -13646,7 +13592,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -13678,7 +13624,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: 006D5B
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -13704,11 +13650,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -13742,7 +13685,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.0.color
-                      value: FBC02D
+                      value: EF9F9F
                     - type: STRING
                       name: ds.0.data_set_label
                       value: q3-1
@@ -13751,7 +13694,7 @@ zabbix_export:
                       value: 'Month ["*-07"] cost'
                     - type: INTEGER
                       name: ds.0.transparency
-                      value: '1'
+                      value: '0'
                     - type: INTEGER
                       name: ds.0.type
                       value: '3'
@@ -13766,7 +13709,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.1.color
-                      value: FFF176
+                      value: E45F5F
                     - type: STRING
                       name: ds.1.data_set_label
                       value: q3-2
@@ -13775,7 +13718,7 @@ zabbix_export:
                       value: 'Month ["*-08"] cost'
                     - type: INTEGER
                       name: ds.1.transparency
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: ds.1.type
                       value: '3'
@@ -13790,7 +13733,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.2.color
-                      value: FF6F00
+                      value: D40000
                     - type: STRING
                       name: ds.2.data_set_label
                       value: q3-3
@@ -13799,7 +13742,7 @@ zabbix_export:
                       value: 'Month ["*-09"] cost'
                     - type: INTEGER
                       name: ds.2.transparency
-                      value: '3'
+                      value: '0'
                     - type: INTEGER
                       name: ds.2.type
                       value: '3'
@@ -13904,7 +13847,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -13916,7 +13859,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -13948,7 +13891,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: BF00FF
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -13974,11 +13917,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -14012,7 +13952,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.0.color
-                      value: 00A86B
+                      value: 9F0000
                     - type: STRING
                       name: ds.0.data_set_label
                       value: q4-1
@@ -14021,7 +13961,7 @@ zabbix_export:
                       value: 'Month ["*-10"] cost'
                     - type: INTEGER
                       name: ds.0.transparency
-                      value: '1'
+                      value: '0'
                     - type: INTEGER
                       name: ds.0.type
                       value: '3'
@@ -14036,7 +13976,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.1.color
-                      value: C5E1A5
+                      value: 6B0000
                     - type: STRING
                       name: ds.1.data_set_label
                       value: q4-2
@@ -14045,7 +13985,7 @@ zabbix_export:
                       value: 'Month ["*-11"] cost'
                     - type: INTEGER
                       name: ds.1.transparency
-                      value: '2'
+                      value: '0'
                     - type: INTEGER
                       name: ds.1.type
                       value: '3'
@@ -14060,7 +14000,7 @@ zabbix_export:
                       value: 12h
                     - type: STRING
                       name: ds.2.color
-                      value: 006D5B
+                      value: '500000'
                     - type: STRING
                       name: ds.2.data_set_label
                       value: q4-3
@@ -14069,7 +14009,7 @@ zabbix_export:
                       value: 'Month ["*-12"] cost'
                     - type: INTEGER
                       name: ds.2.transparency
-                      value: '3'
+                      value: '0'
                     - type: INTEGER
                       name: ds.2.type
                       value: '3'
@@ -14108,7 +14048,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -14120,7 +14060,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -14152,7 +14092,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: 007FFF
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -14178,11 +14118,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -14206,7 +14143,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -14218,7 +14155,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -14250,7 +14187,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: B71C1C
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -14276,11 +14213,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -14317,7 +14251,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.0.color
-                      value: 01579B
+                      value: DEEDF6
                     - type: STRING
                       name: ds.0.data_set_label
                       value: ai_ml
@@ -14344,7 +14278,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.1.color
-                      value: 7986CB
+                      value: 9FCBE4
                     - type: STRING
                       name: ds.1.data_set_label
                       value: analytics
@@ -14371,7 +14305,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.2.color
-                      value: 673AB7
+                      value: 60A9D3
                     - type: STRING
                       name: ds.2.data_set_label
                       value: compute
@@ -14398,7 +14332,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.3.color
-                      value: 5C6BC0
+                      value: 2186C1
                     - type: STRING
                       name: ds.3.data_set_label
                       value: containers
@@ -14425,7 +14359,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.4.color
-                      value: B39DDB
+                      value: 0275B8
                     - type: STRING
                       name: ds.4.data_set_label
                       value: databases
@@ -14452,7 +14386,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.5.color
-                      value: 3F51B5
+                      value: '075786'
                     - type: STRING
                       name: ds.5.data_set_label
                       value: storage
@@ -14479,7 +14413,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.6.color
-                      value: 0288D1
+                      value: 0A466A
                     - type: STRING
                       name: ds.6.data_set_label
                       value: networking
@@ -14506,7 +14440,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.7.color
-                      value: 4FC3F7
+                      value: 093A57
                     - type: STRING
                       name: ds.7.data_set_label
                       value: security
@@ -14533,7 +14467,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.8.color
-                      value: 4DD0E1
+                      value: 082C41
                     - type: STRING
                       name: ds.8.data_set_label
                       value: dev_tools
@@ -14560,7 +14494,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.9.color
-                      value: 4DB6AC
+                      value: 071E2C
                     - type: STRING
                       name: ds.9.data_set_label
                       value: identity
@@ -14587,7 +14521,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.10.color
-                      value: 00897B
+                      value: F9DEDE
                     - type: STRING
                       name: ds.10.data_set_label
                       value: integration
@@ -14614,7 +14548,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.11.color
-                      value: 004D40
+                      value: EF9F9F
                     - type: STRING
                       name: ds.11.data_set_label
                       value: iot
@@ -14641,7 +14575,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.12.color
-                      value: 00838F
+                      value: E45F5F
                     - type: STRING
                       name: ds.12.data_set_label
                       value: mgmt
@@ -14668,7 +14602,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.13.color
-                      value: '283593'
+                      value: D40000
                     - type: STRING
                       name: ds.13.data_set_label
                       value: media
@@ -14695,7 +14629,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.14.color
-                      value: 1976D2
+                      value: 9F0000
                     - type: STRING
                       name: ds.14.data_set_label
                       value: migration
@@ -14722,7 +14656,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.15.color
-                      value: 00BFFF
+                      value: '850000'
                     - type: STRING
                       name: ds.15.data_set_label
                       value: mixed_reality
@@ -14749,7 +14683,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.16.color
-                      value: 0080FF
+                      value: 6B0000
                     - type: STRING
                       name: ds.16.data_set_label
                       value: mobile
@@ -14776,7 +14710,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.17.color
-                      value: 26A69A
+                      value: '500000'
                     - type: STRING
                       name: ds.17.data_set_label
                       value: hybrid
@@ -14803,7 +14737,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.18.color
-                      value: 80CBC4
+                      value: '360000'
                     - type: STRING
                       name: ds.18.data_set_label
                       value: web
@@ -14830,7 +14764,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.19.color
-                      value: '006064'
+                      value: 1C0000
                     - type: STRING
                       name: ds.19.data_set_label
                       value: vdi
@@ -14888,7 +14822,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.0.color
-                      value: 01579B
+                      value: DEEDF6
                     - type: STRING
                       name: ds.0.data_set_label
                       value: ai_ml
@@ -14915,7 +14849,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.1.color
-                      value: 7986CB
+                      value: 9FCBE4
                     - type: STRING
                       name: ds.1.data_set_label
                       value: analytics
@@ -14942,7 +14876,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.2.color
-                      value: 673AB7
+                      value: 60A9D3
                     - type: STRING
                       name: ds.2.data_set_label
                       value: compute
@@ -14969,7 +14903,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.3.color
-                      value: 5C6BC0
+                      value: 2186C1
                     - type: STRING
                       name: ds.3.data_set_label
                       value: containers
@@ -14996,7 +14930,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.4.color
-                      value: B39DDB
+                      value: 0275B8
                     - type: STRING
                       name: ds.4.data_set_label
                       value: databases
@@ -15023,7 +14957,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.5.color
-                      value: 3F51B5
+                      value: '075786'
                     - type: STRING
                       name: ds.5.data_set_label
                       value: storage
@@ -15050,7 +14984,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.6.color
-                      value: 0288D1
+                      value: 0A466A
                     - type: STRING
                       name: ds.6.data_set_label
                       value: networking
@@ -15077,7 +15011,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.7.color
-                      value: 4FC3F7
+                      value: 093A57
                     - type: STRING
                       name: ds.7.data_set_label
                       value: security
@@ -15104,7 +15038,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.8.color
-                      value: 4DD0E1
+                      value: 082C41
                     - type: STRING
                       name: ds.8.data_set_label
                       value: dev_tools
@@ -15131,7 +15065,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.9.color
-                      value: 4DB6AC
+                      value: 071E2C
                     - type: STRING
                       name: ds.9.data_set_label
                       value: identity
@@ -15158,7 +15092,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.10.color
-                      value: 00897B
+                      value: F9DEDE
                     - type: STRING
                       name: ds.10.data_set_label
                       value: integration
@@ -15185,7 +15119,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.11.color
-                      value: 004D40
+                      value: EF9F9F
                     - type: STRING
                       name: ds.11.data_set_label
                       value: iot
@@ -15212,7 +15146,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.12.color
-                      value: 00838F
+                      value: E45F5F
                     - type: STRING
                       name: ds.12.data_set_label
                       value: mgmt
@@ -15239,7 +15173,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.13.color
-                      value: '283593'
+                      value: D40000
                     - type: STRING
                       name: ds.13.data_set_label
                       value: media
@@ -15266,7 +15200,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.14.color
-                      value: 1976D2
+                      value: 9F0000
                     - type: STRING
                       name: ds.14.data_set_label
                       value: migration
@@ -15293,7 +15227,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.15.color
-                      value: 00BFFF
+                      value: '850000'
                     - type: STRING
                       name: ds.15.data_set_label
                       value: mixed_reality
@@ -15320,7 +15254,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.16.color
-                      value: 0080FF
+                      value: 6B0000
                     - type: STRING
                       name: ds.16.data_set_label
                       value: mobile
@@ -15347,7 +15281,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.17.color
-                      value: 26A69A
+                      value: '500000'
                     - type: STRING
                       name: ds.17.data_set_label
                       value: hybrid
@@ -15374,7 +15308,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.18.color
-                      value: 80CBC4
+                      value: '360000'
                     - type: STRING
                       name: ds.18.data_set_label
                       value: web
@@ -15401,7 +15335,7 @@ zabbix_export:
                       value: '4'
                     - type: STRING
                       name: ds.19.color
-                      value: '006064'
+                      value: 1C0000
                     - type: STRING
                       name: ds.19.data_set_label
                       value: vdi
@@ -15512,7 +15446,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -15524,7 +15458,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -15556,7 +15490,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: FBC02D
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -15582,11 +15516,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
@@ -15610,7 +15541,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: bg_color
-                      value: '093578'
+                      value: 0A466A
                     - type: INTEGER
                       name: decimal_size
                       value: '25'
@@ -15622,7 +15553,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: desc_color
-                      value: FFFFFF
+                      value: 9FCBE4
                     - type: INTEGER
                       name: desc_h_pos
                       value: '0'
@@ -15654,7 +15585,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: sparkline.color
-                      value: 006D5B
+                      value: 082C41
                     - type: INTEGER
                       name: sparkline.fill
                       value: '7'
@@ -15680,11 +15611,8 @@ zabbix_export:
                       name: time_v_pos
                       value: '2'
                     - type: STRING
-                      name: units
-                      value: '!EUR'
-                    - type: STRING
                       name: units_color
-                      value: BBDEFB
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '3'
