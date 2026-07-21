@@ -364,23 +364,18 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 			"{HOST.ID6},{HOST.ID7},{HOST.ID8},{HOST.ID9},");
 	trigger_id = zbx_strdup(NULL, "{TRIGGER.ID}");
 
-	substitute_message_macros(&trigger_severity, NULL, 0, message_type, um_handle_unmasked, &actionid,
-			event, r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
+	{
+		char	**macro_fields[] = {&trigger_severity, &event_id, &event_value, &event_update_action,
+				&host_ids, &trigger_id};
+		size_t	i;
 
-	substitute_message_macros(&event_id, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
-			r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
-
-	substitute_message_macros(&event_value, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
-			r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
-
-	substitute_message_macros(&event_update_action, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
-			r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
-
-	substitute_message_macros(&host_ids, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
-			r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
-
-	substitute_message_macros(&trigger_id, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
-			r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
+		for (i = 0; i < ARRSIZE(macro_fields); i++)
+		{
+			substitute_message_macros(macro_fields[i], NULL, 0, message_type, um_handle_unmasked,
+					&actionid, event, r_event, &userid, NULL, &alert, service_alarm, service, tz,
+					ack);
+		}
+	}
 
 	for (int i = 0; i < targets.values_num; i++)
 	{

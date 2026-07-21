@@ -44,7 +44,6 @@
 
 #if defined(HAVE_LIBCURL)
 #	include "zbxhttp.h"
-#	include "zbxcurl.h"
 #endif
 
 #define	ALARM_ACTION_TIMEOUT	40
@@ -550,207 +549,36 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
 	alerter_send_result(socket, NULL, FAIL, "Application compiled without cURL library.", NULL);
 #else
-	int			ret = FAIL;
-	zbx_uint64_t		alertid;
-	char			*params;
-	long			http_code = 0;
-	CURL			*curl = NULL;
-	CURLcode		err;
-	CURLoption		opt;
-	struct curl_slist	*headers = NULL, *connect_to = NULL;
-	zbx_http_response_t	body = {0}, response_header = {0};
-	struct zbx_json_parse	jp_body, jp_result;
-	char			*payload = NULL, *error = NULL, *error_curl = NULL, *error_data = NULL,
-				errbuf[CURL_ERROR_SIZE],
-				code[ZBX_BRIDGE_ERROR_CODE_LEN], message[ZBX_BRIDGE_MESSAGE_LEN],
-				jsonrpc[ZBX_MAX_UINT64_LEN];
+	int				ret = FAIL;
+	zbx_uint64_t			alertid;
+	char				*params, *payload = NULL, *error = NULL, *error_data = NULL, *body_data = NULL,
+					code[ZBX_BRIDGE_ERROR_CODE_LEN], message[ZBX_BRIDGE_MESSAGE_LEN];
+	struct zbx_json_parse		jp_body, jp_result;
+	zbx_http_jsonrpc_error_t	err_kind;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
 	payload = zbx_strdup(NULL, params);
 
-	if (NULL == config_bridge_adapter_url || '\0' == *config_bridge_adapter_url)
+	if (SUCCEED != zbx_http_post_json_rpc(config_bridge_adapter_url, config_bridge_adapter_ca_file,
+			config_bridge_adapter_crl_file, config_bridge_adapter_cert_file, config_bridge_adapter_key_file,
+			config_bridge_adapter_connect_to, payload, (long)ZBX_BRIDGE_ADAPTER_TIMEOUT, &body_data,
+			&jp_body, &err_kind))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: \"BridgeAdapterURL\""
-				" configuration parameter is not set");
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_NOT_CONFIGURED);
-		goto out;
-	}
-
-	if (NULL == (curl = curl_easy_init()))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to initialize cURL library");
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-		goto out;
-	}
-
-	if (SUCCEED != zbx_http_prepare_callbacks(curl, &response_header, &body, zbx_curl_ignore_cb, zbx_curl_write_cb,
-			errbuf, &error_curl))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s", ZBX_NULL2EMPTY_STR(error_curl));
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-		goto out;
-	}
-
-	headers = curl_slist_append(headers, "Content-Type:application/json");
-
-	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, config_bridge_adapter_url)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, payload)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDSIZE, strlen(payload))) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT,
-					(long)ZBX_BRIDGE_ADAPTER_TIMEOUT)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-		goto out;
-	}
-
-	if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL HTTPS options: %s",
-				ZBX_NULL2EMPTY_STR(error_curl));
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-		goto out;
-	}
-
-	if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error_curl))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL SSL version: %s",
-				ZBX_NULL2EMPTY_STR(error_curl));
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-		goto out;
-	}
-
-	/*
-	 * Bridge-adapter connection mode is selected by URL scheme and TLS files:
-	 * - http:// uses unencrypted HTTP;
-	 * - https:// uses TLS with the default CA trust store;
-	 * - https:// with TLSCAFile overrides the CA trust store;
-	 * - https:// with TLSCRLFile enables certificate revocation checks;
-	 * - https:// with TLSCAFile, TLSCertFile and TLSKeyFile uses mTLS.
-	 */
-	if (0 == zbx_strncasecmp(config_bridge_adapter_url, ZBX_BRIDGE_ADAPTER_HTTPS_SCHEME,
-			ZBX_CONST_STRLEN(ZBX_BRIDGE_ADAPTER_HTTPS_SCHEME)))
-	{
-		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
-				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
+		switch (err_kind)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
-					curl_easy_strerror(err));
-			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-			goto out;
+			case ZBX_HTTP_JSONRPC_ERR_NOT_CONFIGURED:
+				error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_NOT_CONFIGURED);
+				break;
+			case ZBX_HTTP_JSONRPC_ERR_CONNECT:
+				error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
+				break;
+			default:
+				error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
+				break;
 		}
 
-		if (NULL != config_bridge_adapter_ca_file &&
-				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO,
-				config_bridge_adapter_ca_file)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
-					curl_easy_strerror(err));
-			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-			goto out;
-		}
-
-		if (NULL != config_bridge_adapter_crl_file &&
-				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CRLFILE,
-				config_bridge_adapter_crl_file)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
-					curl_easy_strerror(err));
-			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-			goto out;
-		}
-
-		if ((NULL != config_bridge_adapter_cert_file &&
-				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT,
-				config_bridge_adapter_cert_file))) ||
-				(NULL != config_bridge_adapter_key_file &&
-				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY,
-				config_bridge_adapter_key_file))))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
-					curl_easy_strerror(err));
-			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-			goto out;
-		}
-	}
-
-	if (NULL != config_bridge_adapter_connect_to)
-	{
-		connect_to = curl_slist_append(connect_to, config_bridge_adapter_connect_to);
-
-		if (NULL == connect_to)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to prepare CURLOPT_CONNECT_TO value");
-			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-			goto out;
-		}
-
-		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECT_TO, connect_to)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
-				curl_easy_strerror(err));
-			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-			goto out;
-		}
-	}
-
-	if (CURLE_OK != (err = curl_easy_perform(curl)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: %s", curl_easy_strerror(err));
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
-		goto out;
-	}
-
-	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to obtain bridge-adapter response code: %s",
-				curl_easy_strerror(err));
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
-		goto out;
-	}
-
-	if (ZBX_MAX_RECV_2KB_DATA_SIZE < body.offset)
-	{
-		body.data[ZBX_MAX_RECV_2KB_DATA_SIZE] = '\0';
-		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned too large response body for "
-				ZBX_PROTO_VALUE_DEVICE_NOTIFY " request: size:" ZBX_FS_SIZE_T " body:'%s'",
-				(zbx_fs_size_t)body.offset, body.data);
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
-		goto out;
-	}
-
-	if (http_code < 200 || http_code >= 300)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
-				ZBX_NULL2EMPTY_STR(body.data));
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
-		goto out;
-	}
-
-	if (NULL == body.data || FAIL == zbx_json_open(body.data, &jp_body))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
-				ZBX_NULL2EMPTY_STR(body.data));
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
-		goto out;
-	}
-
-	if (FAIL == zbx_json_value_by_name(&jp_body, "jsonrpc", jsonrpc, sizeof(jsonrpc), NULL))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "missing JSON-RPC version in bridge-adapter response body: %s",
-				ZBX_NULL2EMPTY_STR(body.data));
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
-		goto out;
-	}
-
-	if (0 != strcmp(jsonrpc, "2.0"))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid JSON-RPC version in bridge-adapter response body: %s,"
-				" expected 2.0", jsonrpc);
-		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
 		goto out;
 	}
 
@@ -781,15 +609,10 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 out:
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
-	curl_slist_free_all(headers);
-	curl_slist_free_all(connect_to);
-	curl_easy_cleanup(curl);
 	zbx_free(params);
-	zbx_free(error_curl);
 	zbx_free(error_data);
 	zbx_free(error);
-	zbx_free(response_header.data);
-	zbx_free(body.data);
+	zbx_free(body_data);
 	zbx_free(payload);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
