@@ -66,17 +66,17 @@ class CVaultHashiCorp extends CVault {
 			}
 			else {
 				if ($this->role_id === '') {
-					$this->addError(_s('Provided authentication role id "%1$s" is empty.', $this->role_id));
+					$this->addError(_s('Provided authentication role ID "%1$s" is empty.', $this->role_id));
 				}
 
 				if ($this->secret_id === '') {
-					$this->addError(_s('Provided authentication secret id "%1$s" is empty.', $this->secret_id));
+					$this->addError(_s('Provided authentication secret ID "%1$s" is empty.', $this->secret_id));
 				}
 			}
 		}
 		elseif ($this->role_id !== '' || $this->secret_id !== '') {
 			$this->addError(
-				_s('Provided authentication role id and secret id should be empty if authentication token provided.')
+				_s('Authentication role ID and secret ID must be empty if authentication token is provided.')
 			);
 		}
 
