@@ -86,7 +86,7 @@ $html_page
 			->setId('problem_form')
 			->setName('problem')
 			->addItem([
-				(new CDataTable())->setId('problems'),
+				(new CDataTable())->setId('datatable-problems'),
 				(new CActionButtonList('action', 'eventids', [
 					'acknowledge.edit' => [
 						'content' => (new CSimpleButton(_('Mass update')))

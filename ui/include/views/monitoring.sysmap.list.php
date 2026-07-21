@@ -28,7 +28,9 @@ $html_page = (new CHtmlPage())
 				->addItem(
 					(new CForm('get'))
 						->addItem(
-							(new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit'])
+							(new CRedirectButton(_('Create map'), (new CUrl('sysmaps.php'))
+								->setArgument('form', 'create')
+							))->setEnabled($data['allowed_edit'])
 						)
 				)
 				->addItem(
@@ -57,7 +59,6 @@ $html_page = (new CHtmlPage())
 				(new CFormList())->addRow(_('Name'),
 					(new CTextBox('filter_name', $data['filter']['name']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-						->setAttribute('autofocus', 'autofocus')
 				)
 			])
 	);
@@ -144,3 +145,5 @@ $sysmapForm->addItem([
 $html_page
 	->addItem($sysmapForm)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");

@@ -174,7 +174,7 @@
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
-			this.#datatable = new CDataTable(document.getElementById('latest'), data_provider)
+			this.#datatable = new CDataTable(document.getElementById('datatable-latest'), data_provider)
 				.setColumns([
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host', 'maintenance', 'maintenanceid', 'maintenance_type', 'maintenance_status'])
@@ -219,7 +219,8 @@
 						.setFields(['itemid', 'is_graph', 'show_link'])
 						.setRenderer('actions'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
-						.setFields(['item_icons'])
+						.setFields(['item_icons']),
+					new CDataTableColumnCustomText('custom_text', <?= json_encode(_('Custom text')); ?>)
 				])
 				.setPage(page)
 				.setFilter(filter)

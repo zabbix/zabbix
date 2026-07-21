@@ -92,7 +92,7 @@ zabbix_export:
         ```
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -596,7 +596,6 @@ zabbix_export:
         - uuid: ef0d9bd48e174e4abccda391336f3ccc
           name: Hyper-V
           display_period: '600'
-          auto_start: 'NO'
           pages:
             - name: Overview
               widgets:

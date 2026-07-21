@@ -35,7 +35,6 @@ $filter = (new CFilter())
 			->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
 			)
 			->addRow(_('Expires in less than'), [
 				(new CCheckBox('filter_expires_state'))
