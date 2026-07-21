@@ -487,10 +487,6 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 			db_event->objectid, db_event->name, db_event->clock, db_event->ns, TRIGGER_VALUE_PROBLEM,
 			db_event->severity, task->flags, 0, &db_event->tags, db_event->suppress);
 
-	cep_cache_acquire(&cep);
-	h = cep_add_event(cep, event);
-	cep_cache_release(&cep);
-
 	cep_stats_update_events_processed(1);
 
 	const zbx_cep_rule_t		**rules = NULL;
@@ -511,7 +507,8 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	}
 
 	cep_cache_acquire(&cep);
-	event_ctx.hevent = zbx_cep_event_handle_addref(cep_add_event(cep, event));
+	h = cep_add_event(cep, event);
+	event_ctx.hevent = zbx_cep_event_handle_addref(h);
 	cep_cache_release(&cep);
 
 	if (0 != rules_num)
