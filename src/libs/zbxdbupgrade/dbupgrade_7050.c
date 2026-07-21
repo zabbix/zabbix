@@ -856,34 +856,74 @@ static int	DBpatch_7050061(void)
 
 static int	DBpatch_7050062(void)
 {
+#define ZBX_COLORPALETTE_LIGHT	"1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,"	\
+				"5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4"
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= zbx_db_execute(
+			"insert into graph_theme"
+			" values (5,'blue-classic-theme','FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33',"
+				"'E33734','429E47','E33734','EBEBEB','" ZBX_COLORPALETTE_LIGHT "')"))
+	{
+		return SUCCEED;
+	}
+#undef ZBX_COLORPALETTE_LIGHT
+
+	return FAIL;
+}
+
+static int	DBpatch_7050063(void)
+{
+#define ZBX_COLORPALETTE_DARK	"199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,"	\
+				"AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4"
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= zbx_db_execute(
+			"insert into graph_theme"
+			" values (6,'dark-classic-theme','2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2',"
+				"'E45959','59DB8F','E45959','333333','" ZBX_COLORPALETTE_DARK "')"))
+	{
+		return SUCCEED;
+	}
+#undef ZBX_COLORPALETTE_DARK
+
+	return FAIL;
+}
+
+static int	DBpatch_7050064(void)
+{
 	const zbx_db_field_t	field = {"auth_scheme", "0", NULL, NULL, 32, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("token", &field);
 }
 
-static int	DBpatch_7050063(void)
+static int	DBpatch_7050065(void)
 {
 	return DBdrop_foreign_key("token", 1);
 }
 
-static int	DBpatch_7050064(void)
+static int	DBpatch_7050066(void)
 {
 	return DBdrop_index("token", "token_2");
 }
 
-static int	DBpatch_7050065(void)
+static int	DBpatch_7050067(void)
 {
 	return DBcreate_index("token", "token_2", "userid,auth_scheme,name", 1);
 }
 
-static int	DBpatch_7050066(void)
+static int	DBpatch_7050068(void)
 {
 	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("token", 1, &field);
 }
 
-static int	DBpatch_7050067(void)
+static int	DBpatch_7050069(void)
 {
 	const zbx_db_table_t	table =
 			{"dpop_jti_cache", "jti", 0,
@@ -898,7 +938,7 @@ static int	DBpatch_7050067(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050068(void)
+static int	DBpatch_7050070(void)
 {
 	const zbx_db_table_t	table =
 			{"device", "deviceid", 0,
@@ -918,19 +958,19 @@ static int	DBpatch_7050068(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050069(void)
+static int	DBpatch_7050071(void)
 {
 	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("device", 1, &field);
 }
 
-static int	DBpatch_7050070(void)
+static int	DBpatch_7050072(void)
 {
 	return DBcreate_index("device", "device_1", "userid", 0);
 }
 
-static int	DBpatch_7050071(void)
+static int	DBpatch_7050073(void)
 {
 	const zbx_db_table_t	table =
 			{"token_device", "tokenid", 0,
@@ -945,26 +985,26 @@ static int	DBpatch_7050071(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050072(void)
+static int	DBpatch_7050074(void)
 {
 	const zbx_db_field_t	field = {"tokenid", NULL, "token", "tokenid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("token_device", 1, &field);
 }
 
-static int	DBpatch_7050073(void)
+static int	DBpatch_7050075(void)
 {
 	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("token_device", 2, &field);
 }
 
-static int	DBpatch_7050074(void)
+static int	DBpatch_7050076(void)
 {
 	return DBcreate_index("token_device", "token_device_1", "deviceid", 0);
 }
 
-static int	DBpatch_7050075(void)
+static int	DBpatch_7050077(void)
 {
 	const zbx_db_table_t	table =
 			{"device_key", "device_keyid", 0,
@@ -984,7 +1024,7 @@ static int	DBpatch_7050075(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050076(void)
+static int	DBpatch_7050078(void)
 {
 	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -992,17 +1032,17 @@ static int	DBpatch_7050076(void)
 	return DBadd_foreign_key("device_key", 1, &field);
 }
 
-static int	DBpatch_7050077(void)
+static int	DBpatch_7050079(void)
 {
 	return DBcreate_index("device_key", "device_key_1", "deviceid", 0);
 }
 
-static int	DBpatch_7050078(void)
+static int	DBpatch_7050080(void)
 {
 	return DBcreate_index("device_key", "device_key_2", "kid", 0);
 }
 
-static int	DBpatch_7050079(void)
+static int	DBpatch_7050081(void)
 {
 	const zbx_db_table_t	table =
 			{"device_enrollment_token", "deviceid", 0,
@@ -1018,7 +1058,7 @@ static int	DBpatch_7050079(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050080(void)
+static int	DBpatch_7050082(void)
 {
 	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -1026,12 +1066,12 @@ static int	DBpatch_7050080(void)
 	return DBadd_foreign_key("device_enrollment_token", 1, &field);
 }
 
-static int	DBpatch_7050081(void)
+static int	DBpatch_7050083(void)
 {
 	return DBcreate_index("device_enrollment_token", "device_enrollment_token_1", "token", 1);
 }
 
-static int	DBpatch_7050082(void)
+static int	DBpatch_7050084(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1045,7 +1085,7 @@ static int	DBpatch_7050082(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050083(void)
+static int	DBpatch_7050085(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -1081,7 +1121,7 @@ static int	DBpatch_7050083(void)
 	return ret;
 }
 
-static int	DBpatch_7050084(void)
+static int	DBpatch_7050086(void)
 {
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	mediatypeid;
@@ -1118,7 +1158,7 @@ static int	DBpatch_7050084(void)
 	return ret;
 }
 
-static int	DBpatch_7050085(void)
+static int	DBpatch_7050087(void)
 {
 	return DBcreate_index("device", "device_2", "uuid", 1);
 }
@@ -1215,5 +1255,7 @@ DBPATCH_ADD(7050082, 0, 1)
 DBPATCH_ADD(7050083, 0, 1)
 DBPATCH_ADD(7050084, 0, 1)
 DBPATCH_ADD(7050085, 0, 1)
+DBPATCH_ADD(7050086, 0, 1)
+DBPATCH_ADD(7050087, 0, 1)
 
 DBPATCH_END()
