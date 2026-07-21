@@ -131,8 +131,12 @@ else {
 }
 
 $url = (new CUrl('graphs.php'))
-	->setArgument('context', $data['context'])
-	->getUrl();
+	->setArgument('context', $data['context']);
+if ($this->data['parent_discoveryid']) {
+	$url->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);
+}
+
+$url = $url->getUrl();
 
 // create form
 $graphForm = (new CForm('post', $url))
@@ -214,8 +218,8 @@ foreach ($data['graphs'] as $graph) {
 	$url = (new CUrl('graphs.php'))
 		->setArgument('form', 'update')
 		->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-		->setArgument('graphid', $graphid)
-		->setArgument('context', $data['context']);
+		->setArgument('context', $data['context'])
+		->setArgument('graphid', $graphid);
 
 	if ($data['parent_discoveryid'] === null) {
 		$url->setArgument('filter_hostids', [$data['hostid']]);
@@ -234,12 +238,6 @@ foreach ($data['graphs'] as $graph) {
 					->setArgument('graphid', $graphid)
 					->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
 					->setArgument('context', $data['context'])
-					->setArgument('backurl',
-						(new CUrl('graphs.php'))
-							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-							->setArgument('context', $data['context'])
-							->getUrl()
-					)
 					->getUrl()
 			))
 				->addCsrfToken($csrf_token)
@@ -306,3 +304,5 @@ $graphForm->addItem([
 $html_page
 	->addItem($graphForm)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
