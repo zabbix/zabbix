@@ -106,7 +106,7 @@ zbx_cep_task_commit_t;
 
 typedef struct
 {
-	zbx_mw_task_t		base;
+	zbx_cep_task_t		base;
 	zbx_cep_event_handle_t	hevent;
 	zbx_uint64_t		flags;
 }
@@ -114,7 +114,7 @@ zbx_cep_task_sync_event_t;
 
 typedef struct
 {
-	zbx_mw_task_t		base;
+	zbx_cep_task_t		base;
 	zbx_cep_window_t	*window;
 	time_t			now;
 }
@@ -122,7 +122,7 @@ zbx_cep_task_window_t;
 
 typedef struct
 {
-	zbx_mw_task_t		base;
+	zbx_cep_task_t		base;
 	zbx_uint64_t		ruleid;
 	zbx_uint64_t		eventid;
 	struct zbx_json		details;
@@ -131,7 +131,7 @@ zbx_cep_task_acknowledge_t;
 
 typedef struct
 {
-	zbx_mw_task_t	base;
+	zbx_cep_task_t	base;
 	zbx_uint64_t	ruleid;
 	char		*error;
 }
@@ -139,16 +139,10 @@ zbx_cep_task_rule_error_t;
 
 typedef struct
 {
-	zbx_mw_task_t	base;
+	zbx_cep_task_t	base;
 	zbx_uint64_t	ruleid;
 }
 zbx_cep_task_rule_reset_t;
-
-typedef struct
-{
-	zbx_mw_task_t	base;
-}
-zbx_cep_task_prune_events_t;
 
 zbx_mw_task_t	*cep_create_task_remote(zbx_ipc_client_t *client, zbx_ipc_message_t *message, unsigned char *response,
 		zbx_uint32_t response_len);

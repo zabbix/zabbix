@@ -501,7 +501,7 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 	for (int i = 0; i < tasks->values_num; i++)
 	{
 		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
-		const zbx_db_event		*event;
+		const zbx_cep_event_t		*event;
 
 		if (EVENT_SOURCE_TRIGGERS != task->db_event->source || EVENT_OBJECT_TRIGGER != task->db_event->object)
 			continue;
@@ -509,9 +509,7 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		if (CEP_EVENT_OPEN != task->event_op)
 			continue;
 
-		event = task->db_event;
-
-		if (NULL == event->suppress)
+		if (NULL == (event = task->event))
 			continue;
 
 		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert_es))
@@ -523,9 +521,9 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 					"eventid", "clock", "action", "suppress_until", "maintenanceid", (char *)NULL);
 		}
 
-		for (int j = 0; j < event->suppress->values_num; j++)
+		for (int j = 0; j < event->suppress.values_num; j++)
 		{
-			zbx_db_event_suppress_t	*suppress = &event->suppress->values[j];
+			zbx_db_event_suppress_t	*suppress = &event->suppress.values[j];
 
 			zbx_db_insert_add_values(&db_insert_es, __UINT64_C(0), event->eventid, suppress->maintenanceid,
 			suppress->cep_ruleid, suppress->until);
