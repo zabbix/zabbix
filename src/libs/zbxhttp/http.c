@@ -417,27 +417,27 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: POSTs a JSON-RPC 2.0 request over HTTP(S), optionally with mTLS, *
- *          and returns the response body opened as JSON                    *
+ * Purpose: POSTs a JSON-RPC 2.0 request over HTTP(S), optionally with mTLS,  *
+ *          and returns the response body opened as JSON                      *
  *                                                                            *
- * Parameters: url               - [IN]                                      *
- *             ca_file           - [IN] optional, https:// only              *
- *             crl_file          - [IN] optional, https:// only              *
- *             cert_file         - [IN] optional, https:// only (mTLS)       *
- *             key_file          - [IN] optional, https:// only (mTLS)       *
- *             connect_to_value  - [IN] optional CURLOPT_CONNECT_TO value    *
- *             payload           - [IN] JSON-RPC request body                *
- *             timeout           - [IN]                                     *
- *             body_data         - [OUT] raw response body, caller frees    *
- *             jp_body           - [OUT] response body opened as JSON       *
- *             err_kind          - [OUT] set only if this function fails    *
+ * Parameters: url               - [IN]                                       *
+ *             ca_file           - [IN] optional, https:// only               *
+ *             crl_file          - [IN] optional, https:// only               *
+ *             cert_file         - [IN] optional, https:// only (mTLS)        *
+ *             key_file          - [IN] optional, https:// only (mTLS)        *
+ *             connect_to_value  - [IN] optional CURLOPT_CONNECT_TO value     *
+ *             payload           - [IN] JSON-RPC request body                 *
+ *             timeout           - [IN]                                       *
+ *             body_data         - [OUT] raw response body, caller frees      *
+ *             jp_body           - [OUT] response body opened as JSON         *
+ *             err_kind          - [OUT] set only if this function fails      *
  *                                                                            *
- * Return value:  SUCCEED - request performed, response is a valid          *
- *                          JSON-RPC 2.0 envelope                            *
- *                FAIL    - otherwise, see *err_kind for the failure class   *
+ * Return value:  SUCCEED - request performed, response is a valid            *
+ *                          JSON-RPC 2.0 envelope                             *
+ *                FAIL    - otherwise, see *err_kind for the failure class    *
  *                                                                            *
- * Comments: does not inspect the JSON-RPC "result"/"error" members of the   *
- *           response, that part is request-specific and left to the caller *
+ * Comments: does not inspect the JSON-RPC "result"/"error" members of the    *
+ *           response, that part is request-specific and left to the caller   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl_file, const char *cert_file,
