@@ -1089,6 +1089,8 @@ class CIntegrationTest extends CAPITest {
 			$component = $this->getActiveComponent();
 		}
 
+		$this->clearLog($component);
+
 		$line = '';
 		$this->reloadConfigurationCache($component, $delayOverride);
 
