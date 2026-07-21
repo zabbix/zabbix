@@ -1469,7 +1469,7 @@ void	cep_event_add_suppress(zbx_cep_event_t *event, const zbx_db_event_suppress_
 		}
 	}
 
-	if (event->suppress.values_num == suppress_num)
+	if (event->suppress.values_num == event_suppress_num)
 		return;
 
 	if (0 == event_suppress_num)
