@@ -2230,6 +2230,191 @@ zabbix_export:
                     - type: INTEGER
                       name: value_size
                       value: '35'
+            - name: 'Ribbon: Resources'
+              widgets:
+                - type: honeycomb
+                  name: 'Fan speed'
+                  width: '72'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 81C784
+                    - type: STRING
+                      name: items.0
+                      value: 'Fan *: Speed'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Fan.*\]\[(.*)\]: Speed", \1)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: PHWFA
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 81C784
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                - type: honeycomb
+                  name: 'PSU present'
+                  'y': '6'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 81D4FA
+                    - type: STRING
+                      name: items.0
+                      value: 'Power supply *: Present'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Power supply.*\]\[(.*)\]: Present", \1)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: PHWPP
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                - type: honeycomb
+                  name: 'PSU power fault'
+                  x: '24'
+                  'y': '6'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 81D4FA
+                    - type: STRING
+                      name: items.0
+                      value: 'Power supply *: Power fault'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Power supply.*\]\[(.*)\]: Power fault", \1)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: PHWPF
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                - type: honeycomb
+                  name: 'PSU voltage fault'
+                  x: '48'
+                  'y': '6'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 81D4FA
+                    - type: STRING
+                      name: items.0
+                      value: 'Power supply *: Voltage fault'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Power supply.*\]\[(.*)\]: Voltage fault", \1)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: PHWVF
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                - type: honeycomb
+                  name: 'Disk health test'
+                  'y': '12'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 81D4FA
+                    - type: STRING
+                      name: items.0
+                      value: 'Disk *: Health test'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Disk.*\]\[(.*)\]: Health test", Disk \1)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: PHWDH
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                - type: honeycomb
+                  name: 'Disk present'
+                  x: '24'
+                  'y': '12'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 81D4FA
+                    - type: STRING
+                      name: items.0
+                      value: 'Disk *: Present'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Disk.*\]\[(.*)\]: Present", Disk \1)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: PHWDP
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                - type: honeycomb
+                  name: 'Disk status'
+                  x: '48'
+                  'y': '12'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 81D4FA
+                    - type: STRING
+                      name: items.0
+                      value: 'Disk *: Status'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Disk.*\]\[(.*)\]: Status", Disk \1)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: PHWDS
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
             - name: 'Ribbon: Ports'
               widgets:
                 - type: honeycomb
