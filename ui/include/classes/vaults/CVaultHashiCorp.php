@@ -84,18 +84,21 @@ class CVaultHashiCorp extends CVault {
 	}
 
 	public function getCredentials(): ?array {
+		$api_endpoint = rtrim($this->api_endpoint, '/');
+
 		if ($this->db_prefix == self::DB_PREFIX_DEFAULT) {
 			$path_parts = explode('/', $this->db_path);
 			array_splice($path_parts, 1, 0, 'data');
 
-			$url = $this->api_endpoint.'/v1/'.implode('/', $path_parts);
+			$url = $api_endpoint.'/v1/'.implode('/', $path_parts);
 		}
 		else {
-			$url = $this->api_endpoint.$this->db_prefix.$this->db_path;
+			$url = $api_endpoint.$this->db_prefix.$this->db_path;
 		}
 
 		if (!$this->token) {
-			$login_url = rtrim($this->api_endpoint, '/').self::APP_ROLE_LOGIN_PATH;
+			$login_url = $api_endpoint.self::APP_ROLE_LOGIN_PATH;
+
 			$data = [
 				'role_id' => $this->role_id,
 				'secret_id' => $this->secret_id
@@ -124,7 +127,9 @@ class CVaultHashiCorp extends CVault {
 				return null;
 			}
 
-			if (!array_key_exists('auth', $fetch_token)	|| !array_key_exists('client_token', $fetch_token['auth'])) {
+			if (!array_key_exists('auth', $fetch_token) || !array_key_exists('client_token', $fetch_token['auth'])
+					|| !is_string($fetch_token['auth']['client_token'])
+					|| $fetch_token['auth']['client_token'] === '') {
 				$this->addError(_('Unable to load token from Vault.'));
 
 				if (array_key_exists('errors', $fetch_token)) {
