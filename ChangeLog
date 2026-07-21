@@ -4,6 +4,7 @@ New features:
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-27975] fixed potential VMware collector crash caused by network connectivity issues to vCenter (MVekslers)
 .........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates (abrosimovs)
 ..F....... [ZBX-26953] fixed redirect functionality for discovery rules, host prototypes, graphs, graph prototypes, web scenarios, and maps (msnihach)
 ........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
