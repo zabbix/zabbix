@@ -1,7 +1,6 @@
 ---
 test case: NULL string defaults to disk mode
-in:
-  mode_str: "(null)"
+in: {}
 out:
   result: SUCCEED
   mode: 0

@@ -26,4 +26,10 @@
  * zbx_mock_test_entry; tests that never write rows can skip this. */
 void	zbx_pb_mock_set_nextid(zbx_uint64_t id);
 
+/* Deterministic allocation-failure injection for the proxy memory buffer.
+ * Makes the call_no'th call (1-based, counted from this call) to the shmem
+ * allocator underlying pb_malloc()/pb_strdup() return NULL; every other call
+ * behaves normally. Pass 0 to disable (the default). */
+void	zbx_pb_mock_fail_alloc_at(int call_no);
+
 #endif

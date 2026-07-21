@@ -46,7 +46,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	buffer_size = (zbx_uint64_t)(1024 * 1024);
+	buffer_size = ZBX_MEBIBYTE;
 
 	ip = zbx_mock_get_parameter_string("in.ip");
 	dns = zbx_mock_get_parameter_string("in.dns");
@@ -66,8 +66,8 @@ void	zbx_mock_test_entry(void **state)
 
 	/* verify mem/state info after buffer creation */
 	zbx_mock_assert_result_eq("get_mem_info", SUCCEED, zbx_pb_get_mem_info(&mem_info, &error));
-	zbx_mock_assert_int_eq("mem_total > 0", 1, mem_info.mem_total > 0 ? 1 : 0);
-	zbx_mock_assert_int_eq("mem_used > 0",  1, mem_info.mem_used  > 0 ? 1 : 0);
+	zbx_mock_assert_uint64_ne("mem_total", 0, mem_info.mem_total);
+	zbx_mock_assert_uint64_ne("mem_used", 0, mem_info.mem_used);
 	zbx_pb_get_state_info(&state_info);
 	zbx_mock_assert_int_eq("state_info.state", 1, state_info.state);
 
@@ -76,7 +76,18 @@ void	zbx_mock_test_entry(void **state)
 	for (i = 0; i < rows_written; i++)
 		zbx_pb_discovery_write_host(handle, 1, ip, dns, 1, 1234567890, err);
 
+	/* optional: force the Nth shmem allocation made while flushing the queued rows to
+	 * fail, to reach pb_discovery_add_row_mem()'s allocation-failure cleanup branches */
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.fail_alloc_at", &hparam))
+	{
+		int	fail_alloc_at;
+
+		zbx_mock_int(hparam, &fail_alloc_at);
+		zbx_pb_mock_fail_alloc_at(fail_alloc_at);
+	}
+
 	zbx_pb_discovery_close(handle);
+	zbx_pb_mock_fail_alloc_at(0);
 
 	pb = get_pb_data();
 
@@ -87,9 +98,9 @@ void	zbx_mock_test_entry(void **state)
 	while (SUCCEED == zbx_list_iterator_next(&li))
 	{
 		zbx_list_iterator_peek(&li, (void **)&row);
-		zbx_mock_assert_str_eq("ip", ip,  row->ip);
+		zbx_mock_assert_str_eq("ip", ip, row->ip);
 		zbx_mock_assert_str_eq("dns", dns, row->dns);
-		zbx_mock_assert_str_eq("value", "",  row->value);
+		zbx_mock_assert_str_eq("value", "", row->value);
 		zbx_mock_assert_str_eq("error", err, row->error);
 		zbx_mock_assert_uint64_eq("dcheckid", 0, row->dcheckid);
 		zbx_mock_assert_int_eq("port", 0, row->port);

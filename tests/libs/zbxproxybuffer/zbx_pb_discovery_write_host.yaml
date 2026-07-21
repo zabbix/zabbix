@@ -63,28 +63,70 @@ out:
   rows: 3
   rows_after_partial_clear: 2
 ---
-# Regression test for the bug fixed in commit 4bfdaaa0297.
-#
-# With buffer_size=1708 on 64-bit Linux, the shmem free space after
-# zbx_pb_create (zbx_pb_t + handleids preallocation) is ~184 bytes.
-# In pb_discovery_add_row_mem:
-#   - pb_malloc(sizeof(zbx_pb_discovery_t)=80)  uses 96B → 88B remain
-#   - pb_strdup(ip="")                           uses 40B → 48B remain
-#   - pb_strdup(dns=200-char string, needs 208B) FAILS    → goto out
-#
-# WITHOUT the fix: memcpy already copied src->error into row->error, and
-# the early-exit path does not null it out.  pb_list_free_discovery then
-# calls shmem_free(row->error) on a heap pointer → __mem_free reads
-# row->error-8 (ASAN left-redzone) → heap-buffer-overflow detected.
-#
-# WITH the fix: row->error=NULL before goto out → pb_list_free_discovery
-# skips it → no corruption → row is discarded safely → out.rows=0.
-test case: OOM mid-alloc triggers invalid-free of error field without fix
+# Regression tests for the crash fixed in commit 4bfdaaa0297: in
+# pb_discovery_add_row_mem(), a shmem allocation failure partway through
+# building a row must null out the fields not yet assigned, otherwise
+# pb_list_free_discovery() frees pointers copied verbatim from the (unowned)
+# source row. Each case fails the Nth shmem allocation made while flushing
+# the 2 queued rows; the first row is discarded, but the second must still
+# be written correctly afterwards, proving the failure did not corrupt the
+# allocator or leak into subsequent writes.
+test case: row allocation fails - nothing to free, second row still written
 in:
-  ip: ""
-  dns: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.example.com"
+  ip: "192.168.1.1"
+  dns: "host.example.com"
   error: "connection refused"
-  rows: 1
-  buffer_size: 1708
+  rows: 2
+  fail_alloc_at: 1
 out:
-  rows: 0
+  rows: 1
+---
+test case: ip allocation fails - dns/value/error must not be freed
+in:
+  ip: "192.168.1.1"
+  dns: "host.example.com"
+  error: "connection refused"
+  rows: 2
+  fail_alloc_at: 2
+out:
+  rows: 1
+---
+test case: dns allocation fails - ip must be freed, value/error must not
+in:
+  ip: "192.168.1.1"
+  dns: "host.example.com"
+  error: "connection refused"
+  rows: 2
+  fail_alloc_at: 3
+out:
+  rows: 1
+---
+test case: value allocation fails - ip/dns must be freed, error must not
+in:
+  ip: "192.168.1.1"
+  dns: "host.example.com"
+  error: "connection refused"
+  rows: 2
+  fail_alloc_at: 4
+out:
+  rows: 1
+---
+test case: error allocation fails - ip/dns/value must be freed
+in:
+  ip: "192.168.1.1"
+  dns: "host.example.com"
+  error: "connection refused"
+  rows: 2
+  fail_alloc_at: 5
+out:
+  rows: 1
+---
+test case: list insertion fails - fully-built row must still be freed
+in:
+  ip: "192.168.1.1"
+  dns: "host.example.com"
+  error: "connection refused"
+  rows: 2
+  fail_alloc_at: 6
+out:
+  rows: 1

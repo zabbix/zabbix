@@ -56,15 +56,25 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_result_eq("locks_create", SUCCEED, zbx_locks_create(&error));
 	zbx_mock_assert_result_eq("pb_create", SUCCEED,
-			zbx_pb_create(ZBX_PB_MODE_MEMORY, 1024 * 1024, 0, 0, &error));
+			zbx_pb_create(ZBX_PB_MODE_MEMORY, ZBX_MEBIBYTE, 0, 0, &error));
 	zbx_pb_init();
 
 	/* verify mem/state info after buffer creation */
 	zbx_mock_assert_result_eq("get_mem_info", SUCCEED, zbx_pb_get_mem_info(&mem_info, &error));
-	zbx_mock_assert_int_eq("mem_total > 0", 1, mem_info.mem_total > 0 ? 1 : 0);
-	zbx_mock_assert_int_eq("mem_used > 0",  1, mem_info.mem_used  > 0 ? 1 : 0);
+	zbx_mock_assert_uint64_ne("mem_total", 0, mem_info.mem_total);
+	zbx_mock_assert_uint64_ne("mem_used", 0, mem_info.mem_used);
 	zbx_pb_get_state_info(&state_info);
 	zbx_mock_assert_int_eq("state_info.state", 1, state_info.state);
+
+	/* optional: force the Nth shmem allocation made while writing the rows below to
+	 * fail, to reach pb_autoreg_add_row_mem()'s allocation-failure cleanup branches */
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.fail_alloc_at", &hparam))
+	{
+		int	fail_alloc_at;
+
+		zbx_mock_int(hparam, &fail_alloc_at);
+		zbx_pb_mock_fail_alloc_at(fail_alloc_at);
+	}
 
 	for (i = 0; i < rows_written; i++)
 	{
@@ -75,6 +85,8 @@ void	zbx_mock_test_entry(void **state)
 		zbx_pb_autoreg_write_host(host, ip, dns, (unsigned short)port,
 				1, host_metadata, flags, (int)time(NULL));
 	}
+
+	zbx_pb_mock_fail_alloc_at(0);
 
 	pb = get_pb_data();
 

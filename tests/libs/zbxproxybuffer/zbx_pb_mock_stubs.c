@@ -13,104 +13,35 @@
 **/
 
 /*
- * Shared stubs for all zbxproxybuffer cmocka tests.
+ * Module-specific stubs for the zbxproxybuffer cmocka tests.
  *
- * Defining every __wrap_* symbol here prevents zbxmockdb.o, zbxmockexit.o
- * and zbxmockfile.o from being extracted out of libzbxmockdata.a — their
- * duplicate definitions of zbx_db_fetch / zbx_db_free_result / __wrap_fopen
- * etc. would otherwise conflict with the stubs below.
+ * DB access (zbx_db_select/execute/begin/commit/...), exit() and file I/O are handled by the
+ * existing tests/zbxmockdb.c, zbxmockexit.c mocks (linked from libzbxmockdata.a, activated by the
+ * --wrap flags below) - they fail the test on any unexpected call instead of silently succeeding.
  *
- * Each test binary lists this file alongside its own test source in _SOURCES;
- * automake compiles a separate object for each binary so there are no
- * multiple-definition problems across binaries.
+ * What remains here is only what has no existing mock, proven by unresolved symbols at link time:
+ *   - libzbxproxybuffer.a calls the zbx_db_insert_*()/zbx_db_get_maxid_num() family directly (not
+ *     through --wrap; that layer lives in libzbxdbhigh, which these tests do not link). All of the
+ *     tested code paths run in ZBX_PB_MODE_MEMORY, so these are never actually reached - fail loudly
+ *     if that assumption ever breaks.
+ *   - zbx_dc_get_nextid()/zbx_dc_config_*(): the config cache is not linked; nextid is a real
+ *     stateful counter used by the tests, the rest are unreachable in these tests.
+ *   - zbx_init_library_nix()/zbx_backtrace(): required by libzbxmocktest.a; avoids linking libzbxnix.
+ *   - __wrap___zbx_shmem_malloc(): deterministic allocation-failure injection for
+ *     pb_discovery_add_row_mem()/pb_autoreg_add_row_mem() - the only way to reach their
+ *     allocation-failure branches without guessing buffer sizes/allocator chunk overhead.
  */
 
 #include "zbx_pb_mock_stubs.h"
 
-#include "zbxalgo.h"
+#include "zbxmocktest.h"
+
+#include "zbxcommon.h"
 #include "zbxdb.h"
+#include "zbxdbhigh.h"
 #include "zbxnix.h"
+#include "zbxshmem.h"
 
-#include <sys/stat.h>
-
-/* ── fopen / fclose ────────────────────────────────────────────────────────── */
-FILE	*__real_fopen(const char *path, const char *mode);
-FILE	*__wrap_fopen(const char *path, const char *mode);
-int	 __real_fclose(FILE *fp);
-int	 __wrap_fclose(FILE *fp);
-
-FILE	*__wrap_fopen(const char *path, const char *mode) { return __real_fopen(path, mode); }
-int	 __wrap_fclose(FILE *fp)                           { return __real_fclose(fp); }
-
-/* ── open / close / stat ────────────────────────────────────────────────────
- * libzbxlog.a references open/close/stat; --wrap is only active when
- * COMMON_WRAP_FUNCS is injected (tests_build), so __real_* do not exist in
- * a direct local build.  Return failure values — the test never exercises
- * log-file I/O paths anyway.
- * EXCEPTION: pass .gcda paths through to __real_open so the gcov atexit
- * handler can write coverage data; without this, --wrap=open silently blocks
- * all gcov output and no .gcda files are produced.                           */
-int	__real_open(const char *path, int oflag, ...);
-int	__wrap_open(const char *path, int oflag, ...);
-int	__wrap_close(int fd);
-int	__wrap_stat(const char *path, struct stat *buf);
-
-int	__wrap_open(const char *path, int oflag, ...)
-{
-	size_t	len = strlen(path);
-
-	if (len > 5 && 0 == strcmp(path + len - 5, ".gcda"))
-	{
-		va_list	args;
-		int	mode;
-
-		va_start(args, oflag);
-		mode = va_arg(args, int);
-		va_end(args);
-		return __real_open(path, oflag, mode);
-	}
-
-	ZBX_UNUSED(oflag);
-	return -1;
-}
-
-int	__wrap_close(int fd)			       { ZBX_UNUSED(fd);  return 0; }
-int	__wrap_stat(const char *path, struct stat *buf){ ZBX_UNUSED(path); ZBX_UNUSED(buf); return -1; }
-
-/* ── exit ───────────────────────────────────────────────────────────────────
- * Fatal paths in libzbxproxybuffer.a call exit(); use __real_exit so gcov
- * atexit handlers flush .gcda files before the process terminates.           */
-void	__real_exit(int status);
-void	__wrap_exit(int status);
-void	__wrap_exit(int status) { ZBX_UNUSED(status); __real_exit(EXIT_SUCCESS); }
-
-/* ── __wrap_zbx_db_* ────────────────────────────────────────────────────────
- * libzbxproxybuffer.a calls these in DB/hybrid mode only; they are never
- * reached when running tests in ZBX_PB_MODE_MEMORY.                          */
-zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...);
-zbx_db_result_t	__wrap_zbx_db_vselect(const char *fmt, va_list args);
-zbx_db_result_t	__wrap_zbx_db_select_n(const char *q, int n);
-int		__wrap_zbx_db_execute(const char *fmt, ...);
-void		__wrap_zbx_db_begin(void);
-int		__wrap_zbx_db_commit(void);
-int		__wrap_zbx_db_execute_multiple_query(const char *q, const char *f,
-		const zbx_vector_uint64_t *v);
-
-zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...)
-		{ ZBX_UNUSED(fmt); return NULL; }
-zbx_db_result_t	__wrap_zbx_db_vselect(const char *fmt, va_list args)
-		{ ZBX_UNUSED(fmt); ZBX_UNUSED(args); return NULL; }
-zbx_db_result_t	__wrap_zbx_db_select_n(const char *q, int n)
-		{ ZBX_UNUSED(q); ZBX_UNUSED(n); return NULL; }
-int		__wrap_zbx_db_execute(const char *fmt, ...) { ZBX_UNUSED(fmt); return 0; }
-void		__wrap_zbx_db_begin(void)		    {}
-int		__wrap_zbx_db_commit(void)		    { return ZBX_DB_OK; }
-int		__wrap_zbx_db_execute_multiple_query(const char *q, const char *f,
-		const zbx_vector_uint64_t *v)
-		{ ZBX_UNUSED(q); ZBX_UNUSED(f); ZBX_UNUSED(v); return SUCCEED; }
-
-/* ── zbx_init_library_nix / zbx_backtrace ──────────────────────────────────
- * Required by libzbxmocktest.a; avoids linking libzbxnix.                    */
 void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb,
 		zbx_get_process_info_by_thread_f get_process_info_by_thread_cb)
 {
@@ -118,62 +49,125 @@ void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb,
 	ZBX_UNUSED(get_process_info_by_thread_cb);
 }
 
-void	zbx_backtrace(void) {}
+void	zbx_backtrace(void)
+{
+}
 
-/* ── DC stubs ───────────────────────────────────────────────────────────────
- * Real cacheconfig is not linked; ID counter resets per process invocation.  */
-static zbx_uint64_t	g_nextid;
-
-zbx_uint64_t	zbx_dc_get_nextid(const char *t, int n);
-void		zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemids,
-			int *errcodes, size_t num);
-void		zbx_dc_config_clean_items(void *items, int *errcodes, size_t num);
+static zbx_uint64_t	pb_mock_nextid;
 
 void	zbx_pb_mock_set_nextid(zbx_uint64_t id)
 {
-	g_nextid = id;
+	pb_mock_nextid = id;
 }
 
-zbx_uint64_t	zbx_dc_get_nextid(const char *t, int n)
+zbx_uint64_t	zbx_dc_get_nextid(const char *table, int num)
 {
-	zbx_uint64_t	id = g_nextid;
+	zbx_uint64_t	id = pb_mock_nextid;
 
-	ZBX_UNUSED(t);
-	g_nextid += (zbx_uint64_t)n;
+	ZBX_UNUSED(table);
+	pb_mock_nextid += (zbx_uint64_t)num;
+
 	return id;
 }
 
-void	zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemids,
-		int *errcodes, size_t num)
+void	zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemids, int *errcodes, size_t num)
 {
-	ZBX_UNUSED(items); ZBX_UNUSED(itemids); ZBX_UNUSED(errcodes); ZBX_UNUSED(num);
+	ZBX_UNUSED(items);
+	ZBX_UNUSED(itemids);
+	ZBX_UNUSED(errcodes);
+	ZBX_UNUSED(num);
+
+	fail_msg("unexpected zbx_dc_config_get_items_by_itemids() call - not exercised by these tests");
 }
 
 void	zbx_dc_config_clean_items(void *items, int *errcodes, size_t num)
 {
-	ZBX_UNUSED(items); ZBX_UNUSED(errcodes); ZBX_UNUSED(num);
+	ZBX_UNUSED(items);
+	ZBX_UNUSED(errcodes);
+	ZBX_UNUSED(num);
+
+	fail_msg("unexpected zbx_dc_config_clean_items() call - not exercised by these tests");
 }
 
-/* ── direct zbx_db_* stubs ──────────────────────────────────────────────────
- * zbx_db_insert_* and the non-wrapped DB functions are called directly
- * (not through --wrap); stubs here prevent the real libzbxdb from being
- * required at link time.                                                      */
-void		zbx_db_insert_prepare(zbx_db_insert_t *s, const char *t, ...)
-		{ ZBX_UNUSED(s); ZBX_UNUSED(t); }
-void		zbx_db_insert_add_values(zbx_db_insert_t *s, ...)  { ZBX_UNUSED(s); }
-int		zbx_db_insert_execute(zbx_db_insert_t *s)          { ZBX_UNUSED(s); return SUCCEED; }
-void		zbx_db_insert_clean(zbx_db_insert_t *s)            { ZBX_UNUSED(s); }
-void		zbx_db_insert_autoincrement(zbx_db_insert_t *s, const char *f)
-		{ ZBX_UNUSED(s); ZBX_UNUSED(f); }
-zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *s)       { ZBX_UNUSED(s); return 0; }
-void		zbx_db_begin(void)                                  {}
-int		zbx_db_commit(void)                                 { return ZBX_DB_OK; }
-int		zbx_db_execute(const char *fmt, ...)                { ZBX_UNUSED(fmt); return 0; }
-zbx_db_result_t	zbx_db_select(const char *fmt, ...)             { ZBX_UNUSED(fmt); return NULL; }
-zbx_db_result_t	zbx_db_select_n(const char *q, int n)
-		{ ZBX_UNUSED(q); ZBX_UNUSED(n); return NULL; }
-zbx_db_row_t	zbx_db_fetch(zbx_db_result_t r)                 { ZBX_UNUSED(r); return NULL; }
-void		zbx_db_free_result(zbx_db_result_t r)              { ZBX_UNUSED(r); }
-zbx_uint64_t	zbx_db_get_maxid_num(const char *t, int n)
-		{ ZBX_UNUSED(t); ZBX_UNUSED(n); return 0; }
-int		zbx_db_is_null(const char *f)                       { ZBX_UNUSED(f); return SUCCEED; }
+void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
+{
+	ZBX_UNUSED(self);
+	ZBX_UNUSED(table);
+
+	fail_msg("unexpected zbx_db_insert_prepare() call - these tests force ZBX_PB_MODE_MEMORY");
+}
+
+void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
+{
+	ZBX_UNUSED(self);
+
+	fail_msg("unexpected zbx_db_insert_add_values() call - these tests force ZBX_PB_MODE_MEMORY");
+}
+
+int	zbx_db_insert_execute(zbx_db_insert_t *self)
+{
+	ZBX_UNUSED(self);
+
+	fail_msg("unexpected zbx_db_insert_execute() call - these tests force ZBX_PB_MODE_MEMORY");
+
+	return FAIL;
+}
+
+void	zbx_db_insert_clean(zbx_db_insert_t *self)
+{
+	ZBX_UNUSED(self);
+
+	fail_msg("unexpected zbx_db_insert_clean() call - these tests force ZBX_PB_MODE_MEMORY");
+}
+
+void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field)
+{
+	ZBX_UNUSED(self);
+	ZBX_UNUSED(field);
+
+	fail_msg("unexpected zbx_db_insert_autoincrement() call - these tests force ZBX_PB_MODE_MEMORY");
+}
+
+zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self)
+{
+	ZBX_UNUSED(self);
+
+	fail_msg("unexpected zbx_db_insert_get_lastid() call - these tests force ZBX_PB_MODE_MEMORY");
+
+	return 0;
+}
+
+zbx_uint64_t	zbx_db_get_maxid_num(const char *table, int num)
+{
+	ZBX_UNUSED(table);
+	ZBX_UNUSED(num);
+
+	fail_msg("unexpected zbx_db_get_maxid_num() call - these tests force ZBX_PB_MODE_MEMORY");
+
+	return 0;
+}
+
+int	zbx_db_is_null(const char *field)
+{
+	return (NULL == field) ? SUCCEED : FAIL;
+}
+
+static int	pb_mock_fail_alloc_at;
+static int	pb_mock_alloc_call_no;
+
+void	zbx_pb_mock_fail_alloc_at(int call_no)
+{
+	pb_mock_fail_alloc_at = call_no;
+	pb_mock_alloc_call_no = 0;
+}
+
+void	*__real___zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, const void *old, size_t size);
+void	*__wrap___zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, const void *old, size_t size)
+{
+	pb_mock_alloc_call_no++;
+
+	if (0 != pb_mock_fail_alloc_at && pb_mock_alloc_call_no == pb_mock_fail_alloc_at)
+		return NULL;
+
+	return __real___zbx_shmem_malloc(file, line, info, old, size);
+}

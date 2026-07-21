@@ -83,3 +83,87 @@ in:
 out:
   rows: 3
   rows_after_partial_clear: 2
+---
+# Allocation-failure coverage for pb_autoreg_add_row_mem() - parity with the
+# pb_discovery_add_row_mem() regression tests. Each case fails the Nth shmem
+# allocation made while writing the 2 rows below; the first row is
+# discarded, but the second must still be written correctly afterwards,
+# proving the failure did not corrupt the allocator or leak into subsequent
+# writes.
+test case: row allocation fails - nothing to free, second row still written
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 1
+out:
+  rows: 1
+---
+test case: host allocation fails - ip/dns/host_metadata must not be freed
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 2
+out:
+  rows: 1
+---
+test case: ip allocation fails - host must be freed, dns/host_metadata must not
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 3
+out:
+  rows: 1
+---
+test case: dns allocation fails - host/ip must be freed, host_metadata must not
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 4
+out:
+  rows: 1
+---
+test case: host_metadata allocation fails - host/ip/dns must be freed
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 5
+out:
+  rows: 1
+---
+test case: list insertion fails - fully-built row must still be freed
+in:
+  host: "allochost"
+  ip: "192.168.6.6"
+  dns: "allochost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  fail_alloc_at: 6
+out:
+  rows: 1

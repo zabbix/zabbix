@@ -16,6 +16,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
+#include "zbxmockdb.h"
 
 #include "zbxcommon.h"
 #include "zbxmutexs.h"
@@ -33,8 +34,8 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	mode = zbx_mock_get_parameter_int("in.mode");
-	size = (zbx_uint64_t)zbx_mock_get_parameter_int("in.size");
-	expected_create_result = zbx_mock_get_parameter_int("out.create_result");
+	size = zbx_mock_get_parameter_uint64("in.size");
+	expected_create_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.create_result"));
 
 	zbx_mock_assert_result_eq("locks_create", SUCCEED, zbx_locks_create(&error));
 
@@ -47,14 +48,19 @@ void	zbx_mock_test_entry(void **state)
 		zbx_pb_state_info_t	state_info;
 		char			*mem_error = NULL;
 
+		/* zbx_pb_init() queries the DB in disk/hybrid mode */
+		zbx_mockdb_init();
 		zbx_pb_init();
+		zbx_mockdb_destroy();
 
 		/* test get_mem_info */
 		if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.mem_info_result", &hparam))
 		{
-			int	expected_mem_result, mem_result;
+			int		mem_result, expected_mem_result;
+			const char	*mem_result_str;
 
-			zbx_mock_int(hparam, &expected_mem_result);
+			zbx_mock_string(hparam, &mem_result_str);
+			expected_mem_result = zbx_mock_str_to_return_code(mem_result_str);
 
 			mem_result = zbx_pb_get_mem_info(&mem_info, &mem_error);
 			zbx_mock_assert_result_eq("mem_info result", expected_mem_result, mem_result);
@@ -62,8 +68,8 @@ void	zbx_mock_test_entry(void **state)
 			if (SUCCEED == mem_result)
 			{
 				/* memory mode: buffer must report non-zero usage */
-				zbx_mock_assert_int_eq("mem_total > 0", 1, mem_info.mem_total > 0 ? 1 : 0);
-				zbx_mock_assert_int_eq("mem_used > 0",  1, mem_info.mem_used  > 0 ? 1 : 0);
+				zbx_mock_assert_uint64_ne("mem_total", 0, mem_info.mem_total);
+				zbx_mock_assert_uint64_ne("mem_used", 0, mem_info.mem_used);
 			}
 			else
 			{
