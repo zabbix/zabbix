@@ -1603,6 +1603,7 @@ class CFormValidator {
 
 		if ('field' in rules) {
 			const normalized_values = Object.create(null);
+			let has_error = false;
 
 			for (const i of Object.keys(array_values)) {
 				const {result, error, value = array_values} = this.#validateField(rules.field, array_values, i,
@@ -1610,15 +1611,19 @@ class CFormValidator {
 				);
 
 				if (result === CFormValidator.ERROR) {
+					has_error = true;
 					error && this.#addError(path + '/' + i, error, CFormValidator.ERROR_LEVEL_PRIMARY);
-
-					return {result: CFormValidator.ERROR};
 				}
 				else {
 					this.#addPath(path + '/' + i, CFormValidator.ERROR_LEVEL_PRIMARY);
 					normalized_values[i] = value[i];
 				}
 			}
+
+			if (has_error) {
+				return {result: CFormValidator.ERROR};
+			}
+
 			array_values = normalized_values;
 		}
 
