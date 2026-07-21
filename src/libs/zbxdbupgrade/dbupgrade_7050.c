@@ -854,6 +854,86 @@ static int	DBpatch_7050061(void)
 	return DBset_default("dashboard", &field);
 }
 
+static int	DBpatch_7050062(void)
+{
+	const zbx_db_field_t	field =
+			{"default_maintenance_period", "1h", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("users", &field);
+}
+
+static int	DBpatch_7050063(void)
+{
+	const zbx_db_table_t	table =
+			{"maintenances_triggers", "maintenance_triggerid", 0,
+				{
+					{"maintenance_triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050064(void)
+{
+	const zbx_db_field_t	field =
+			{"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenances_triggers", 1, &field);
+}
+
+static int	DBpatch_7050065(void)
+{
+	const zbx_db_field_t	field =
+			{"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenances_triggers", 2, &field);
+}
+
+static int	DBpatch_7050066(void)
+{
+	return DBcreate_index("maintenances_triggers", "maintenances_triggers_1", "maintenanceid,triggerid", 1);
+}
+
+static int	DBpatch_7050067(void)
+{
+	return DBcreate_index("maintenances_triggers", "maintenances_triggers_2", "triggerid", 0);
+}
+
+static int	DBpatch_7050068(void)
+{
+	const zbx_db_table_t	table =
+			{"maintenance_eventname", "maintenance_eventnameid", 0,
+				{
+					{"maintenance_eventnameid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"operator", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", NULL, NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050069(void)
+{
+	const zbx_db_field_t	field =
+			{"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_eventname", 1, &field);
+}
+
+static int	DBpatch_7050070(void)
+{
+	return DBcreate_index("maintenance_eventname", "maintenance_eventname_1", "maintenanceid", 0);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -922,5 +1002,14 @@ DBPATCH_ADD(7050058, 0, 1)
 DBPATCH_ADD(7050059, 0, 1)
 DBPATCH_ADD(7050060, 0, 1)
 DBPATCH_ADD(7050061, 0, 1)
+DBPATCH_ADD(7050062, 0, 1)
+DBPATCH_ADD(7050063, 0, 1)
+DBPATCH_ADD(7050064, 0, 1)
+DBPATCH_ADD(7050065, 0, 1)
+DBPATCH_ADD(7050066, 0, 1)
+DBPATCH_ADD(7050067, 0, 1)
+DBPATCH_ADD(7050068, 0, 1)
+DBPATCH_ADD(7050069, 0, 1)
+DBPATCH_ADD(7050070, 0, 1)
 
 DBPATCH_END()
