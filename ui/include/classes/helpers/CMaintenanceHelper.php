@@ -121,7 +121,7 @@ class CMaintenanceHelper {
 	}
 
 	public static function normalizeTimePeriod($period): int {
-		$period = timeUnitToSeconds($period, true);
+		$period = timeUnitToSeconds($period);
 
 		return $period - $period % SEC_PER_MIN;
 	}

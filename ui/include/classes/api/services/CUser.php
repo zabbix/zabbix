@@ -201,6 +201,12 @@ class CUser extends CApiService {
 				$options['filter']['refresh'] = getTimeUnitFilters($options['filter']['refresh']);
 			}
 
+			if (array_key_exists('default_maintenance_period', $options['filter'])
+					&& $options['filter']['default_maintenance_period'] !== null) {
+				$options['filter']['default_maintenance_period'] =
+					getTimeUnitFilters($options['filter']['default_maintenance_period']);
+			}
+
 			$provisioned_condition = null;
 
 			if (array_key_exists('provisioned', $options['filter']) && $options['filter']['provisioned'] !== null) {
@@ -432,7 +438,7 @@ class CUser extends CApiService {
 			'autologin' =>					['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
-			'default_maintenance_period' => ['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [5 * SEC_PER_MIN, CMaintenanceHelper::MAX_TIMEPERIOD]), 'default' => SEC_PER_HOUR],
+			'default_maintenance_period' => ['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [5 * SEC_PER_MIN, CMaintenanceHelper::MAX_TIMEPERIOD]), 'length' => DB::getFieldLength('users', 'default_maintenance_period'), 'default' => DB::getDefault('users', 'default_maintenance_period')],
 			'refresh' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
 			'theme' =>						['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'rows_per_page' =>				['type' => API_INT32, 'in' => '1:999999'],
@@ -550,7 +556,7 @@ class CUser extends CApiService {
 			'autologin' =>					['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
-			'default_maintenance_period' => ['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [5 * SEC_PER_MIN, CMaintenanceHelper::MAX_TIMEPERIOD])],
+			'default_maintenance_period' => ['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [5 * SEC_PER_MIN, CMaintenanceHelper::MAX_TIMEPERIOD]), 'length' => DB::getFieldLength('users', 'default_maintenance_period')],
 			'refresh' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
 			'theme' =>						['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'rows_per_page' =>				['type' => API_INT32, 'in' => '1:999999'],
@@ -1274,8 +1280,13 @@ class CUser extends CApiService {
 				continue;
 			}
 
-			$user['default_maintenance_period'] =
-				CMaintenanceHelper::normalizeTimePeriod($user['default_maintenance_period']);
+			$period = CMaintenanceHelper::normalizeTimePeriod($user['default_maintenance_period']);
+
+			if ($period !== timeUnitToSeconds($user['default_maintenance_period'])) {
+				$normalized_period = (string) $period;
+
+				$user['default_maintenance_period'] = $normalized_period;
+			}
 		}
 		unset($user);
 	}
