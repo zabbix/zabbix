@@ -53,7 +53,7 @@ if ($data['has_inline_validation']) {
 }
 
 if ($data['readonly']) {
-	$table->setAttribute('data-readonly', 'set');
+	$table->setAttribute('data-readonly', '');
 }
 
 // fields
