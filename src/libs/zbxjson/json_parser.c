@@ -51,6 +51,27 @@ zbx_int64_t	json_error(const char *message, const char *ptr, char **error)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Prepares JSON parsing error message with count                    *
+ *                                                                            *
+ * Parameters: message - [IN] the error message format string                 *
+ *             count   - [IN] the integer value to be inserted into message   *
+ *             ptr     - [IN] the failing data fragment                       *
+ *             error   - [OUT] the parsing error message (can be NULL)        *
+ *                                                                            *
+ * Return value: 0 - the json_error() function always returns 0 value         *
+ *               so it can be used to return from failed parses               *
+ *                                                                            *
+ ******************************************************************************/
+zbx_int64_t json_error_with_count(const char *message, int count, const char *ptr, char **error)
+{
+    char err_buf[MAX_STRING_LEN];
+
+    zbx_snprintf(err_buf, sizeof(err_buf), message, count);
+    return json_error(err_buf, ptr, error);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Parses JSON string value or object name                           *
  *                                                                            *
  * Parameters: start - [IN] the JSON data without leading whitespace          *
@@ -330,12 +351,7 @@ zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, int depth, c
 	double		number;
 
 	if (ZBX_MAX_JSON_DEPTH < depth)
-	{
-		char	err_buf[MAX_STRING_LEN];
-
-		zbx_snprintf(err_buf, sizeof(err_buf), "JSON depth exceeds %d", ZBX_MAX_JSON_DEPTH);
-		return json_error(err_buf, ptr, error);
-	}
+		return json_error_with_count("JSON depth exceeds %d", ZBX_MAX_JSON_DEPTH, ptr, error);	
 
 	depth++;
 

@@ -885,11 +885,11 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 		array_loc = NULL;
 		pname = NULL;
 
-		if (NULL != (json_string_ptr = zbx_json_pair_next(jp, json_string_ptr, name, sizeof(name))))
+		if (NULL != (json_string_ptr = zbx_json_pair_next(jp, json_string_ptr, name, MAX_STRING_LEN)))
 		{
 			pname = name;
 
-			if (NULL == zbx_json_decodevalue(json_string_ptr, value, sizeof(value), &type))
+			if (NULL == zbx_json_decodevalue(json_string_ptr, value, MAX_STRING_LEN, &type))
 				type = zbx_json_valuetype(json_string_ptr);
 			else
 				pvalue = zbx_xml_escape_dyn(value);
@@ -901,7 +901,7 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 		else
 		{
 			json_string_ptr = json_string_ptr_old;
-			if (NULL != (json_string_ptr = zbx_json_next_value(jp, json_string_ptr, value, sizeof(value),
+			if (NULL != (json_string_ptr = zbx_json_next_value(jp, json_string_ptr, value, MAX_STRING_LEN,
 					&type)))
 			{
 				pvalue = zbx_xml_escape_dyn(value);
@@ -1032,10 +1032,10 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 	{
 		*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 		goto clean;
-	}
+	}	
 
-	char *json_name = (char *)malloc(MAX_STRING_LEN);
-	char *json_value = (char *)malloc(MAX_STRING_LEN);
+	char *json_name = (char *)zbx_malloc(NULL, sizeof(MAX_STRING_LEN));
+	char *json_value = (char *)zbx_malloc(NULL, sizeof(MAX_STRING_LEN));
 
 	int json_ret = json_to_xmlnode(&jp, NULL, 0, doc, NULL, &attr, &attr_val, &text, json_name, json_value);
 
