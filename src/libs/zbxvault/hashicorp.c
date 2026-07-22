@@ -258,7 +258,7 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 					if (NULL != vault_ret)
 						*vault_ret = FAIL;
 
-					*error = zbx_strdup(*error, "approle token is likely expired or revoked"
+					*error = zbx_strdup(*error, "AppRole token is likely expired or revoked"
 							" (lookup-self response code 403)");
 					break;
 				default:
@@ -347,7 +347,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 					ssl_key_file, config_source_ip, config_ssl_ca_location,
 					config_ssl_cert_location, config_ssl_key_location, timeout, &errmsg, token))
 		{
-			error = zbx_dsprintf(NULL, "cannot login with approle method: %s", errmsg);
+			error = zbx_dsprintf(NULL, "cannot login into HashiCorp vault with AppRole method: %s", errmsg);
 			zbx_free(errmsg);
 
 			goto out;
