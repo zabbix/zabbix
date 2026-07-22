@@ -3544,6 +3544,51 @@ HEREDOC;
 	}
 
 	/**
+	 * Same "close old down when new up" scenario as testTriggerCEP_SuppressUnsuppressProblems, but instead
+	 * of host-wide maintenances that suppress every problem, one maintenance is created per discovered
+	 * component, each scoped to that component through a 'component' problem-tag filter. Every open problem
+	 * must then be suppressed by exactly the single maintenance whose tag matches it (and by no other),
+	 * verifying tag-scoped maintenance suppression in CEP. Stopping the maintenances clears the
+	 * suppression, resuming brings it back per matching tag, and global correlation still closes the
+	 * problems normally.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_SuppressUnsuppressProblemsPerTag$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_SuppressUnsuppressProblemsPerTag() {
+		self::$disc_maintenanceids = [];
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		try {
+			// maintenance_after_first=true, stop_maintenance_and_verify_suppression=true,
+			// maintenance_by_tag=true
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true, false, true, true, false, true);
+		}
+		finally {
+			// Clean up: ensure maintenance is stopped
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+		}
+	}
+
+	/**
+	 * Same "per problem tag" scenario as testTriggerCEP_SuppressUnsuppressProblemsPerTag, but the server
+	 * component is stopped and restarted between each step.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_SuppressUnsuppressProblemsPerTagRestart$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_SuppressUnsuppressProblemsPerTagRestart() {
+		$this->skipIfRestartTestsDisabled();
+		self::$disc_maintenanceids = [];
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		try {
+			// Same as testTriggerCEP_SuppressUnsuppressProblemsPerTag but with restart=true.
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true, false, true, true, false, true);
+		}
+		finally {
+			// Clean up: ensure maintenance is stopped
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+		}
+	}
+
+	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
 	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
@@ -4231,7 +4276,7 @@ HEREDOC;
 	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart,
 			bool $maintenance_after_first = false, bool $check_tags = false,
 			bool $stop_maintenance_and_verify_suppression = false, bool $up_from_other_trigger = true,
-			bool $check_web_services = false): void {
+			bool $check_web_services = false, bool $maintenance_by_tag = false): void {
 		$keys = array_merge(
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
@@ -4269,19 +4314,34 @@ HEREDOC;
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
+		// In $maintenance_by_tag mode the host is placed under one maintenance per discovered component,
+		// each scoped to that component via a 'component' tag filter, so a problem is suppressed only by
+		// the single maintenance whose tag matches it; the map component value => maintenanceid drives the
+		// per-component suppression assertions below.
+		$maintenance_by_component = [];
+
 		// The host only enters maintenance after the first problems are already open: creating the
 		// maintenance now must retroactively suppress those $m open problems (and every problem opened
 		// later), while global correlation still closes them normally below.
 		if ($maintenance_after_first) {
-			$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT);
-			$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
+			if ($maintenance_by_tag) {
+				$maintenance_by_component = $this->startDiscHostTagMaintenances();
+				$this->waitForOpenProblemsSuppressedPerComponent($all, $m, $maintenance_by_component);
+			}
+			else {
+				$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT);
+				$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
+			}
 			$this->waitForServicesSuppressed();
 
-			// Start additional maintenances on the already-suppressed host: the extra overlapping
-			// maintenances must not disturb the existing suppression, and every open problem must end
-			// up suppressed by every active maintenance.
-			$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT_EXTRA);
-			$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
+			if (!$maintenance_by_tag) {
+				// Start additional maintenances on the already-suppressed host: the extra overlapping
+				// maintenances must not disturb the existing suppression, and every open problem must end
+				// up suppressed by every active maintenance. (Tag-scoped maintenances are one-per-component,
+				// so there is nothing to overlap.)
+				$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT_EXTRA);
+				$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
+			}
 		}
 
 		// Wave 1 is fully open ($m problems), so $m problem events are tagged by both webhooks.
@@ -4309,15 +4369,123 @@ HEREDOC;
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
 		// The host is in maintenance by now, so this second wave (opened while maintenance is active) must
-		// be suppressed at creation time as well: all 2 * $m open problems suppressed, each by every
-		// active maintenance.
+		// be suppressed at creation time as well: all 2 * $m open problems suppressed - each by every
+		// active maintenance in host-wide mode, or by its single matching component maintenance in
+		// $maintenance_by_tag mode.
 		if ($maintenance_after_first) {
-			$this->waitForOpenProblemsSuppressedByMaintenances($all, 2 * $m, self::$disc_maintenanceids);
+			if ($maintenance_by_tag) {
+				$this->waitForOpenProblemsSuppressedPerComponent($all, 2 * $m, $maintenance_by_component);
+			}
+			else {
+				$this->waitForOpenProblemsSuppressedByMaintenances($all, 2 * $m, self::$disc_maintenanceids);
+			}
 			$this->waitForServicesSuppressed();
 
 			// If requested, verify services are suppressed while problems are still open,
 			// then stop maintenance and verify suppression is cleared.
-			if ($stop_maintenance_and_verify_suppression) {
+			if ($stop_maintenance_and_verify_suppression && $maintenance_by_tag) {
+				// Stop all tag maintenances at once: suppression of the still-open problems and services
+				// must be cleared.
+				$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+
+				$this->maybeRestartServer($restart);
+
+				$this->reloadConfigurationCacheAndWaitForLogLine();
+
+				$this->waitForSuppressionCleared();
+
+				// Each service is matched to one component via its SERVICE_TAG problem tag, so a service is
+				// suppressed exactly while its component's maintenance is active; this map drives the
+				// per-component service assertions in the resume/stop steps below.
+				$service_by_component = $this->getServiceIdsByComponent();
+
+				$per_component = intdiv(2 * $m, count($maintenance_by_component));
+
+				// Process the per-component maintenances out of creation order in the same
+				// [last, middle bulk, last-1] grouping as the host-wide branch: highest index (id) first,
+				// then everything but the last two at once, then the gap. The middle group is skipped when
+				// there are fewer than three components.
+				$components = array_keys($maintenance_by_component);
+				$last = count($components) - 1;
+				$groups = [[$last]];
+				if ($last >= 2) {
+					$groups[] = range(0, $last - 2);
+				}
+				if ($last >= 1) {
+					$groups[] = [$last - 1];
+				}
+
+				// Resume the maintenances group by group: after each group exactly the resumed components'
+				// problems are suppressed (each only by its own maintenance) and exactly their services are
+				// suppressed, while the not-yet-resumed components' problems and services stay in problem.
+				$resumed_by_component = [];
+				foreach ($groups as $indexes) {
+					$ids = [];
+					foreach ($indexes as $index) {
+						$component = $components[$index];
+						$ids[] = $maintenance_by_component[$component];
+						$resumed_by_component[$component] = $maintenance_by_component[$component];
+					}
+					$this->resumeDiscHostMaintenances($ids);
+
+					$suppressed = $per_component * count($resumed_by_component);
+					$this->waitForOpenProblemsSuppressedPerComponent($all, $suppressed, $resumed_by_component);
+					$this->waitForServicesSuppressedForComponents($service_by_component,
+						array_keys($resumed_by_component));
+				}
+
+				// Every component maintenance is active again, so every problem is suppressed and every
+				// service is suppressed once more.
+				$this->waitForServicesSuppressed();
+
+				$this->maybeRestartServer($restart);
+
+				// Now stop the maintenances again group by group, but split the bulk group so its last
+				// (highest-id) component comes out of maintenance on its own first, then the remaining bulk
+				// components: this exercises the suppression-data merge with the bulk's highest id removed
+				// ahead of the lower ones. Stopping a group must unsuppress exactly its components' problems
+				// while the others stay suppressed by their own still-active maintenance, so the suppressed
+				// count shrinks by that group's worth per step and only stopping the final group clears the
+				// suppression entirely. Each stopped group's services return to problem at the same step
+				// while the still-maintained ones stay suppressed.
+				$stop_groups = [[$last]];
+				if ($last >= 2) {
+					// Take the last of the bulk out first on its own, then the rest of the bulk.
+					$stop_groups[] = [$last - 2];
+					if ($last >= 3) {
+						$stop_groups[] = range(0, $last - 3);
+					}
+				}
+				if ($last >= 1) {
+					$stop_groups[] = [$last - 1];
+				}
+
+				$remaining_by_component = $resumed_by_component;
+				foreach ($stop_groups as $indexes) {
+					$ids = [];
+					foreach ($indexes as $index) {
+						$component = $components[$index];
+						$ids[] = $maintenance_by_component[$component];
+						unset($remaining_by_component[$component]);
+					}
+					$this->stopDiscHostMaintenances($ids);
+					$this->reloadConfigurationCacheAndWaitForLogLine();
+
+					if (!empty($remaining_by_component)) {
+						$suppressed = $per_component * count($remaining_by_component);
+						$this->waitForOpenProblemsSuppressedPerComponent($all, $suppressed,
+							$remaining_by_component);
+						$this->waitForServicesSuppressedForComponents($service_by_component,
+							array_keys($remaining_by_component));
+					}
+					else {
+						// Last group stopped: nothing stays suppressed and every service returns to problem
+						// (waitForSuppressionCleared() also asserts services are no longer suppressed).
+						$this->waitForSuppressionCleared();
+					}
+				}
+			}
+			elseif ($stop_maintenance_and_verify_suppression) {
 				// Stop all maintenances at once: suppression of the still-open problems and services
 				// must be cleared.
 				$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
@@ -4825,6 +4993,58 @@ HEREDOC;
 	}
 
 	/**
+	 * Wait until exactly $expected open problems on the given triggers are suppressed and each one is
+	 * suppressed by exactly the single tag-scoped maintenance matching its 'component' tag: a problem
+	 * carrying component=X must be suppressed by $maintenance_by_component[X] and by nothing else. This
+	 * proves the tag filter on a maintenance suppresses only the problems whose tag it matches, unlike a
+	 * host-wide maintenance which suppresses every problem.
+	 */
+	private function waitForOpenProblemsSuppressedPerComponent(array $triggerids, int $expected,
+			array $maintenance_by_component): void {
+		$this->callUntilDataIsPresent('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'suppressed' => true,
+			'selectTags' => ['tag', 'value'],
+			'selectSuppressionData' => ['maintenanceid']
+		], 120, self::WAIT_ITERATION_DELAY, function (array $response) use ($expected, $maintenance_by_component) {
+			if (count($response['result']) != $expected) {
+				return 'expected '.$expected.' suppressed problems, got '.count($response['result']);
+			}
+
+			foreach ($response['result'] as $problem) {
+				$component_tag = current(array_filter($problem['tags'],
+					fn($t) => $t['tag'] === 'component'
+				));
+
+				if ($component_tag === false) {
+					return 'problem '.$problem['eventid'].' has no component tag';
+				}
+
+				$component = $component_tag['value'];
+
+				if (!isset($maintenance_by_component[$component])) {
+					return 'problem '.$problem['eventid'].' has unexpected component "'.$component.'"';
+				}
+
+				$ids = array_column($problem['suppression_data'], 'maintenanceid');
+				$expected_ids = [$maintenance_by_component[$component]];
+
+				sort($ids);
+				sort($expected_ids);
+
+				if ($ids !== $expected_ids) {
+					return 'problem '.$problem['eventid'].' (component "'.$component.'") is suppressed by ['.
+							implode(', ', $ids).'], expected ['.implode(', ', $expected_ids).']';
+				}
+			}
+
+			return true;
+		});
+	}
+
+	/**
 	 * Wait until no suppressed trigger events remain on the discovered host and its services are no
 	 * longer suppressed - the state expected once every maintenance is out of its active window.
 	 */
@@ -5196,8 +5416,12 @@ HEREDOC;
 	 * Bulk variant of upsertDiscHostMaintenance(): one maintenance.get to find leftovers by name, then a
 	 * single maintenance.update for the existing ones and a single maintenance.create for the rest.
 	 * Returns the maintenance ids in the same order as the given names.
+	 *
+	 * $extra_by_name optionally maps a name to extra maintenance fields (e.g. a tag filter) merged on top
+	 * of the host-wide defaults, so a caller can scope individual maintenances without duplicating the
+	 * leftover-safe upsert logic.
 	 */
-	private function upsertDiscHostMaintenances(array $names): array {
+	private function upsertDiscHostMaintenances(array $names, array $extra_by_name = []): array {
 		if (empty($names)) {
 			return [];
 		}
@@ -5229,11 +5453,13 @@ HEREDOC;
 		$updates = [];
 		$creates = [];
 		foreach ($names as $name) {
+			$fields = isset($extra_by_name[$name]) ? array_merge($defaults, $extra_by_name[$name]) : $defaults;
+
 			if (isset($ids_by_name[$name])) {
-				$updates[] = array_merge(['maintenanceid' => $ids_by_name[$name]], $defaults);
+				$updates[] = array_merge(['maintenanceid' => $ids_by_name[$name]], $fields);
 			}
 			else {
-				$creates[] = array_merge(['name' => $name], $defaults);
+				$creates[] = array_merge(['name' => $name], $fields);
 			}
 		}
 
@@ -5343,6 +5569,45 @@ HEREDOC;
 		self::$disc_maintenanceids = array_merge(self::$disc_maintenanceids, $this->upsertDiscHostMaintenances($names));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
+	}
+
+	/**
+	 * Create one maintenance per discovered component, each scoped to that component via a 'component'
+	 * problem-tag filter (host + tag), so a maintenance suppresses only the problems carrying its own
+	 * component tag rather than every problem on the host. Appends the created ids to
+	 * self::$disc_maintenanceids and reloads the configuration cache once. Returns a map of
+	 * component value => maintenanceid so callers can assert which maintenance must suppress each problem.
+	 */
+	private function startDiscHostTagMaintenances(): array {
+		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
+
+		$names = [];
+		$extra_by_name = [];
+		$component_by_name = [];
+		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
+			$component = $base.$i;
+			$name = 'CEP per-tag maintenance '.$component;
+
+			$names[] = $name;
+			$component_by_name[$name] = $component;
+			$extra_by_name[$name] = [
+				'tags' => [
+					['tag' => 'component', 'operator' => MAINTENANCE_TAG_OPERATOR_EQUAL, 'value' => $component]
+				]
+			];
+		}
+
+		$ids = $this->upsertDiscHostMaintenances($names, $extra_by_name);
+		self::$disc_maintenanceids = array_merge(self::$disc_maintenanceids, $ids);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		$maintenance_by_component = [];
+		foreach ($names as $index => $name) {
+			$maintenance_by_component[$component_by_name[$name]] = $ids[$index];
+		}
+
+		return $maintenance_by_component;
 	}
 
 	/**
@@ -6184,6 +6449,81 @@ HEREDOC;
 				TRIGGER_SEVERITY_DISASTER
 			]]
 		], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Build a map of component value => serviceid for the CEP services, read from each service's
+	 * SERVICE_TAG problem-tag value (the tag by which a service is matched to its component's trigger).
+	 * Returns an empty array when no services exist (service tests skipped).
+	 */
+	private function getServiceIdsByComponent(): array {
+		if (empty(self::$serviceids)) {
+			return [];
+		}
+
+		$response = $this->call('service.get', [
+			'serviceids' => self::$serviceids,
+			'output' => ['serviceid'],
+			'selectProblemTags' => ['tag', 'value']
+		]);
+
+		$service_by_component = [];
+		foreach ($response['result'] as $service) {
+			$service_tag = current(array_filter($service['problem_tags'],
+				fn($t) => $t['tag'] === self::SERVICE_TAG
+			));
+
+			if ($service_tag !== false) {
+				$service_by_component[$service_tag['value']] = $service['serviceid'];
+			}
+		}
+
+		return $service_by_component;
+	}
+
+	/**
+	 * Wait until exactly the services of $suppressed_components are suppressed (status -1, i.e. OK because
+	 * all their problems are suppressed) while every other CEP service shows a problem severity (its
+	 * problems are no longer suppressed). $service_by_component maps a component value to its serviceid.
+	 * No-op when there are no services (service tests skipped).
+	 */
+	private function waitForServicesSuppressedForComponents(array $service_by_component,
+			array $suppressed_components): void {
+		if (empty($service_by_component)) {
+			return;
+		}
+
+		$suppressed_ids = [];
+		$unsuppressed_ids = [];
+		foreach ($service_by_component as $component => $serviceid) {
+			if (in_array($component, $suppressed_components, true)) {
+				$suppressed_ids[] = $serviceid;
+			}
+			else {
+				$unsuppressed_ids[] = $serviceid;
+			}
+		}
+
+		if (!empty($suppressed_ids)) {
+			$this->callUntilCountIsPresent('service.get', [
+				'serviceids' => $suppressed_ids,
+				'filter' => ['status' => -1]
+			], count($suppressed_ids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		}
+
+		if (!empty($unsuppressed_ids)) {
+			$this->callUntilCountIsPresent('service.get', [
+				'serviceids' => $unsuppressed_ids,
+				'filter' => ['status' => [
+					TRIGGER_SEVERITY_NOT_CLASSIFIED,
+					TRIGGER_SEVERITY_INFORMATION,
+					TRIGGER_SEVERITY_WARNING,
+					TRIGGER_SEVERITY_AVERAGE,
+					TRIGGER_SEVERITY_HIGH,
+					TRIGGER_SEVERITY_DISASTER
+				]]
+			], count($unsuppressed_ids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		}
 	}
 
 	/**
