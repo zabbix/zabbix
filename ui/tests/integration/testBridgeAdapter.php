@@ -57,6 +57,8 @@ class testBridgeAdapter extends CIntegrationTest {
 		'contact your system administrator.';
 	private const DEVICE_OFFBOARD_ERROR_NOT_CONFIGURED =
 		'Cannot remove mobile device, bridge-adapter is not configured.';
+	private const DEVICE_OFFBOARD_ERROR_INVALID_RESPONSE =
+		'Cannot remove mobile device, bridge-adapter returned an invalid response.';
 	private const DEVICE_OFFBOARD_ERROR_DEVICE_NOT_FOUND =
 		'Cannot unlink device. Please contact your system administrator.';
 	private const LOG_MOBILE_DEVICES_DISABLED_INIT = 'cannot initialize device: mobile devices are disabled';
@@ -75,14 +77,30 @@ class testBridgeAdapter extends CIntegrationTest {
 		'bridge-adapter returned too large response body for device.init request';
 	private const LOG_ADAPTER_OVERSIZED_RESPONSE_NOTIFY =
 		'bridge-adapter returned too large response body for device.notify request';
+	private const LOG_ADAPTER_INCOMPLETE_ERROR = 'incomplete error in bridge-adapter response body';
+	private const LOG_ADAPTER_MISSING_RESULT = 'missing result in bridge-adapter response body';
+	private const LOG_ADAPTER_MISSING_RESULT_FIELDS =
+		'missing enrollment_token/adapter_enc_key/bridge_url in bridge-adapter';
 	private const LOG_INIT_PERMISSION_DENIED = 'cannot initialize device: permission denied for userid';
 	private const LOG_OFFBOARD_PERMISSION_DENIED = 'cannot offboard device: permission denied for userid';
 	private const LOG_OFFBOARD_UNKNOWN_UUID = 'cannot offboard device: failed to resolve device owner by uuid';
+	private const LOG_INIT_INVALID_SESSION = 'cannot initialize device: failed to get user from request';
+	private const LOG_INIT_MISSING_USERID = 'cannot initialize device: missing userid in request data';
+	private const LOG_INIT_MISSING_UUID = 'missing uuid in device.init request';
+	private const LOG_OFFBOARD_INVALID_SESSION = 'cannot offboard device: failed to get user from request';
+	private const LOG_OFFBOARD_MISSING_UUID = 'cannot offboard device: missing uuid in request data';
 	private const DEVICE_NOT_LINKED_UUID = '019dde8a-4040-7000-8000-000000000105';
+	private const CROSS_USER_INIT_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000106';
+	private const CROSS_USER_OFFBOARD_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000107';
+	private const INVALID_SESSION_ID = 'deadbeefdeadbeefdeadbeefdeadbeef';
 	private const RESTRICTED_USER_NAME = 'bridge_adapter_restricted';
 	private const RESTRICTED_USER_PASSWD = 'BridgeAdapterR3stricted!';
 	private const ACKNOWLEDGER_USER_NAME = 'bridge_adapter_acknowledger';
 	private const ACKNOWLEDGER_USER_PASSWD = 'BridgeAdapterAcknowledger#1';
+	private const SEVERITY_NOTIFY_HOST = 'bridge_adapter_severity_notification_host';
+	private const SEVERITY_NOTIFY_ITEM_KEY = 'bridge.adapter.severity.notify';
+	private const SEVERITY_NOTIFY_TRIGGER_NAME = 'Bridge adapter severity notification trigger';
+	private const SEVERITY_NOTIFY_SEVERITY = TRIGGER_SEVERITY_WARNING;
 	private const HOUSEKEEPER_TEST_JTI = 'bridge-adapter-test-jti';
 
 	private static string $adapter_log_file;
@@ -101,6 +119,11 @@ class testBridgeAdapter extends CIntegrationTest {
 	private static ?string $restricted_userid = null;
 	private static ?string $restricted_roleid = null;
 	private static ?string $acknowledger_userid = null;
+	private static ?string $cross_user_offboard_deviceid = null;
+	private static array $severity_hostids = [];
+	private static array $severity_itemids = [];
+	private static array $severity_triggerids = [];
+	private static array $severity_actionids = [];
 
 	public function serverConfigurationProvider(): array {
 		self::$cert_base_dir = self::generateCertificates();
@@ -270,6 +293,35 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::$restricted_userid = $response['result']['userids'][0];
 	}
 
+	/**
+	 * Creates a device belonging to the restricted (non-super-admin) user, so that a super-admin
+	 * session can offboard it to exercise the "manage user" cross-user permission path. There is no
+	 * API to create an already-activated device, so this is inserted directly, mirroring prepareData().
+	 */
+	private function ensureCrossUserOffboardDevice(): void {
+		$this->ensureRestrictedUser();
+
+		if (self::$cross_user_offboard_deviceid !== null) {
+			return;
+		}
+
+		$deviceid = DB::reserveIds('device', 1);
+
+		DB::insertBatch('device', [
+			[
+				'deviceid' => $deviceid,
+				'userid' => self::$restricted_userid,
+				'uuid' => self::CROSS_USER_OFFBOARD_DEVICE_UUID,
+				'name' => 'Bridge adapter integration cross-user offboard device',
+				'status' => ZBX_DEVICE_STATUS_ACTIVATED,
+				'push_token' => 'bridge-adapter-integration-cross-user-push-token',
+				'activated_at' => time()
+			]
+		], false);
+
+		self::$cross_user_offboard_deviceid = $deviceid;
+	}
+
 	private function clearPreparedData(): void {
 		$response = $this->call('action.get', [
 			'output' => [],
@@ -330,6 +382,7 @@ class testBridgeAdapter extends CIntegrationTest {
 
 	public static function clearData(): void {
 		self::clearRealNotificationObjects();
+		self::clearSeverityNotificationObjects();
 		self::stopBridgeAdapterMock();
 
 		if (isset(self::$adapter_pid_file)) {
@@ -365,6 +418,11 @@ class testBridgeAdapter extends CIntegrationTest {
 				'mediatypeid' => self::$push_mediatypeid,
 				'status' => self::$push_mediatype_status
 			]);
+		}
+
+		if (self::$cross_user_offboard_deviceid !== null) {
+			DB::delete('device', ['deviceid' => self::$cross_user_offboard_deviceid]);
+			self::$cross_user_offboard_deviceid = null;
 		}
 
 		if (self::$restricted_userid !== null) {
@@ -543,6 +601,97 @@ class testBridgeAdapter extends CIntegrationTest {
 		}
 	}
 
+	/**
+	 * Creates a host/item/trigger/action set for a severity other than TRIGGER_SEVERITY_HIGH, with the
+	 * message operation using default_msg=1, to prove severity passthrough and default-template
+	 * resolution in get_build_push_param.c independently of the custom-subject/message flow already
+	 * covered by createRealNotificationObjects().
+	 */
+	private function createSeverityNotificationObjects(): void {
+		$response = $this->call('host.create', [
+			'host' => self::SEVERITY_NOTIFY_HOST,
+			'groups' => [
+				['groupid' => 4] // Zabbix servers
+			],
+			'status' => HOST_STATUS_MONITORED
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		self::$severity_hostids = $response['result']['hostids'];
+
+		$response = $this->call('item.create', [
+			[
+				'name' => self::SEVERITY_NOTIFY_ITEM_KEY,
+				'key_' => self::SEVERITY_NOTIFY_ITEM_KEY,
+				'type' => ITEM_TYPE_TRAPPER,
+				'hostid' => self::$severity_hostids[0],
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
+			]
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		self::$severity_itemids = $response['result']['itemids'];
+
+		$response = $this->call('trigger.create', [
+			'description' => self::SEVERITY_NOTIFY_TRIGGER_NAME,
+			'expression' => 'last(/'.self::SEVERITY_NOTIFY_HOST.'/'.self::SEVERITY_NOTIFY_ITEM_KEY.')>5',
+			'priority' => self::SEVERITY_NOTIFY_SEVERITY
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		self::$severity_triggerids = $response['result']['triggerids'];
+
+		$response = $this->call('action.create', [
+			'esc_period' => '1m',
+			'eventsource' => EVENT_SOURCE_TRIGGERS,
+			'status' => ACTION_STATUS_ENABLED,
+			'filter' => [
+				'conditions' => [
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value' => self::$severity_triggerids[0]
+					]
+				],
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
+			],
+			'name' => 'Bridge adapter severity notification action',
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => [
+						'default_msg' => 1,
+						'mediatypeid' => self::$push_mediatypeid
+					],
+					'opmessage_usr' => [
+						['userid' => 1]
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		self::$severity_actionids = $response['result']['actionids'];
+	}
+
+	private static function clearSeverityNotificationObjects(): void {
+		if (self::$severity_actionids) {
+			CDataHelper::call('action.delete', self::$severity_actionids);
+		}
+
+		if (self::$severity_triggerids) {
+			CDataHelper::call('trigger.delete', self::$severity_triggerids);
+		}
+
+		if (self::$severity_itemids) {
+			CDataHelper::call('item.delete', self::$severity_itemids);
+		}
+
+		if (self::$severity_hostids) {
+			CDataHelper::call('host.delete', self::$severity_hostids);
+		}
+	}
+
 	private static function startBridgeAdapterMockInternal(array $extra_args = [], bool $tls = true): void {
 		self::$adapter_log_file = PHPUNIT_COMPONENT_DIR.'bridge_adapter_mock_'.self::getAdapterRunId().'.log';
 		self::$adapter_pid_file = PHPUNIT_COMPONENT_DIR.'bridge_adapter_mock_'.self::getAdapterRunId().'.pid';
@@ -622,6 +771,18 @@ class testBridgeAdapter extends CIntegrationTest {
 
 	public static function startBridgeAdapterMockWithOversizedResponse(): void {
 		self::startBridgeAdapterMockInternal(['--oversized-response']);
+	}
+
+	public static function startBridgeAdapterMockWithIncompleteError(): void {
+		self::startBridgeAdapterMockInternal(['--incomplete-error']);
+	}
+
+	public static function startBridgeAdapterMockWithNoResult(): void {
+		self::startBridgeAdapterMockInternal(['--init-no-result']);
+	}
+
+	public static function startBridgeAdapterMockWithIncompleteResult(): void {
+		self::startBridgeAdapterMockInternal(['--init-incomplete-result']);
 	}
 
 	public static function startBridgeAdapterMockNoTls(): void {
@@ -1101,6 +1262,36 @@ class testBridgeAdapter extends CIntegrationTest {
 	 * @onBeforeOnce startBridgeAdapterMock
 	 * @onAfterOnce stopBridgeAdapterMock
 	 */
+	public function testBridgeAdapter_realNotificationSeverityAndDefaultMessage(): void {
+		$this->createSeverityNotificationObjects();
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->sendSenderValue(self::SEVERITY_NOTIFY_HOST, self::SEVERITY_NOTIFY_ITEM_KEY, 6,
+			self::COMPONENT_SERVER
+		);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
+
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			$params = $request['body']['params'];
+
+			if ($params['to']['device_id'] !== self::NOTIFY_DEVICE_UUID
+					|| $params['priority'] !== self::SEVERITY_NOTIFY_SEVERITY) {
+				return false;
+			}
+
+			$data = $params['payload']['data'];
+
+			return $data['severity'] === self::SEVERITY_NOTIFY_SEVERITY
+				&& $data['title'] === self::SEVERITY_NOTIFY_HOST.' - '.self::SEVERITY_NOTIFY_TRIGGER_NAME
+				&& strpos($data['body'], 'Started on ') === 0;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMock
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
 	public function testBridgeAdapter_offboard(): void {
 		[$client, $sid] = $this->getServerClientAndSid();
 
@@ -1301,6 +1492,74 @@ class testBridgeAdapter extends CIntegrationTest {
 		});
 	}
 
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithIncompleteError
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initAdapterIncompleteError(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_INCOMPLETE_ERROR, true, 120, 1);
+
+		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.init', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithNoResult
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initAdapterMissingResult(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_MISSING_RESULT, true, 120, 1);
+
+		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.init', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithIncompleteResult
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initAdapterIncompleteResult(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_MISSING_RESULT_FIELDS, true,
+			120, 1
+		);
+
+		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.init', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
+		});
+	}
+
 	public function mobileDevicesEnabledConfigurationProvider(): array {
 		return [
 			self::COMPONENT_SERVER => [
@@ -1362,6 +1621,98 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->assertFalse($init_response);
 
 		$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+	}
+
+	/**
+	 * A non-super-admin managing a device that belongs to neither themselves nor the target userid hits
+	 * device_check_permissions()'s immediate deny branch (no role_rule lookup at all), which differs from
+	 * testBridgeAdapter_initPermissionDenied() above (restricted user managing their OWN device, denied via
+	 * the "devices.actions.default_access" role rule lookup).
+	 *
+	 * @configurationDataProvider mobileDevicesEnabledConfigurationProvider
+	 */
+	public function testBridgeAdapter_initManageOtherUserDenied(): void {
+		[$client] = $this->getServerClientAndSid();
+
+		$this->ensureRestrictedUser();
+		$this->authorize(self::RESTRICTED_USER_NAME, self::RESTRICTED_USER_PASSWD);
+		$restricted_sid = CAPIHelper::getSessionId();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], $restricted_sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_INIT_PERMISSION_DENIED, true, 120, 1);
+
+		$this->assertFalse($init_response);
+
+		$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+	}
+
+	/**
+	 * A super-admin session initializing a device for a DIFFERENT (non-super-admin) user exercises the
+	 * "devices.actions.manage_user" branch of device_check_permissions(), as opposed to every other init
+	 * test which always targets userid=1, the super-admin's own id (the "manage_own" branch).
+	 *
+	 * @onBeforeOnce startBridgeAdapterMock
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initManageOtherUser(): void {
+		$this->ensureRestrictedUser();
+
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => self::$restricted_userid,
+			'uuid' => self::CROSS_USER_INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_init()', true, 120, 1);
+
+		$this->assertNotFalse($init_response, $client->getError() ?? '');
+
+		$this->assertAdapterRequest('device.init', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::CROSS_USER_INIT_DEVICE_UUID;
+		});
+	}
+
+	public function testBridgeAdapter_initInvalidSession(): void {
+		[$client] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], self::INVALID_SESSION_ID);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_INIT_INVALID_SESSION, true, 120, 1);
+
+		$this->assertFalse($init_response);
+	}
+
+	public function testBridgeAdapter_initMissingUserid(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'uuid' => self::INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_INIT_MISSING_USERID, true, 120, 1);
+
+		$this->assertFalse($init_response);
+	}
+
+	public function testBridgeAdapter_initMissingUuid(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_INIT_MISSING_UUID, true, 120, 1);
+
+		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_INVALID_RESPONSE, $client->getError());
 	}
 
 	/**
@@ -1518,6 +1869,34 @@ class testBridgeAdapter extends CIntegrationTest {
 		});
 	}
 
+	/**
+	 * Unlike the matching branches in trapper_device_management.c (device.init/device.offboard),
+	 * alerter_process_push()'s "error object present but missing code/message" branch logs nothing before
+	 * setting the invalid-response error, so this can only be anchored on the generic function-end line.
+	 *
+	 * @onBeforeOnce startBridgeAdapterMockWithIncompleteError
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_notifyAdapterIncompleteError(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$result = $client->testMediaType([
+			'mediatypeid' => self::$push_mediatypeid,
+			'sendto' => self::NOTIFY_DEVICE_UUID,
+			'subject' => 'Bridge adapter integration test',
+			'message' => 'Bridge adapter integration test message'
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
+
+		$this->assertFalse($result);
+		$this->assertSame(self::PUSH_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
+		});
+	}
+
 	public function notifyConnectionRefusedConfigurationProvider(): array {
 		$closed_port = self::getClosedPort();
 
@@ -1637,6 +2016,27 @@ class testBridgeAdapter extends CIntegrationTest {
 		});
 	}
 
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithIncompleteError
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_offboardAdapterIncompleteError(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$offboard_response = $client->offboardDevice([
+			'uuid' => self::OFFBOARD_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_INCOMPLETE_ERROR, true, 120, 1);
+
+		$this->assertFalse($offboard_response);
+		$this->assertSame(self::DEVICE_OFFBOARD_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.deactivate', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::OFFBOARD_DEVICE_UUID;
+		});
+	}
+
 	public function noMtlsConfigurationProvider(): array {
 		return [
 			self::COMPONENT_SERVER => [
@@ -1653,6 +2053,10 @@ class testBridgeAdapter extends CIntegrationTest {
 	}
 
 	/**
+	 * OFFBOARD_DEVICE_UUID belongs to userid=1, not the restricted user, so this already exercises
+	 * device_check_permissions()'s immediate deny branch (non-super-admin managing someone else's
+	 * device) - the offboard-side counterpart of testBridgeAdapter_initManageOtherUserDenied() above.
+	 *
 	 * @configurationDataProvider mobileDevicesEnabledConfigurationProvider
 	 */
 	public function testBridgeAdapter_offboardPermissionDenied(): void {
@@ -1673,6 +2077,56 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->assertFalse($offboard_response);
 
 		$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+	}
+
+	/**
+	 * A super-admin session offboarding a device owned by a DIFFERENT (non-super-admin) user exercises
+	 * the "devices.actions.manage_user" success branch of device_check_permissions(), as opposed to every
+	 * other offboard test which always targets a device owned by userid=1 (the "manage_own" branch).
+	 *
+	 * @onBeforeOnce startBridgeAdapterMock
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_offboardManageOtherUser(): void {
+		$this->ensureCrossUserOffboardDevice();
+
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$offboard_response = $client->offboardDevice([
+			'uuid' => self::CROSS_USER_OFFBOARD_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_offboard()', true,
+			120, 1
+		);
+
+		$this->assertNotFalse($offboard_response, $client->getError() ?? '');
+
+		$this->assertAdapterRequest('device.deactivate', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::CROSS_USER_OFFBOARD_DEVICE_UUID;
+		});
+	}
+
+	public function testBridgeAdapter_offboardInvalidSession(): void {
+		[$client] = $this->getServerClientAndSid();
+
+		$offboard_response = $client->offboardDevice([
+			'uuid' => self::OFFBOARD_DEVICE_UUID
+		], self::INVALID_SESSION_ID);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_OFFBOARD_INVALID_SESSION, true, 120, 1);
+
+		$this->assertFalse($offboard_response);
+	}
+
+	public function testBridgeAdapter_offboardMissingUuid(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$offboard_response = $client->offboardDevice([], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_OFFBOARD_MISSING_UUID, true, 120, 1);
+
+		$this->assertFalse($offboard_response);
 	}
 
 	public function noConnectToConfigurationProvider(): array {
