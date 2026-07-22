@@ -326,6 +326,7 @@ class CCepRuleHelper {
 			self::OP_DECREASE_SEVERITY,
 			self::OP_SUPPRESS,
 			self::OP_COPY_FIRST,
+			self::OP_CLOSE_WINDOW,
 			self::OP_COPY_LAST,
 			self::OP_DISCARD,
 			self::OP_CLOSE => '',
