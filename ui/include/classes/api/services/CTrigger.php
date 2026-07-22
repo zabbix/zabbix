@@ -206,7 +206,7 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['maintenanceids'] !== null) {
 			zbx_value2array($options['maintenanceids']);
 
-			$sqlParts['join']['mt'] = ['table' => 'maintenance_triggers', 'using' => 'triggerid'];
+			$sqlParts['join']['mt'] = ['table' => 'maintenance_trigger', 'using' => 'triggerid'];
 			$sqlParts['where'][] = dbConditionInt('mt.maintenanceid', $options['maintenanceids']);
 
 			if ($options['groupCount']) {

@@ -455,10 +455,10 @@ insert into triggers (triggerid,expression,description,priority,comments) values
 insert into functions (functionid,itemid,triggerid,name,parameter) values (135005,132000,134005,'now','$,0');
 
 -- testMaintenance_Get
-INSERT INTO maintenance_triggers (maintenance_triggerid,maintenanceid,triggerid) VALUES (1,60006,134000);
-INSERT INTO maintenance_triggers (maintenance_triggerid,maintenanceid,triggerid) VALUES (2,60006,134001);
-INSERT INTO maintenance_eventnames (maintenance_eventnameid,maintenanceid,value,operator) VALUES (1,60006,'Event1',2);
-INSERT INTO maintenance_eventnames (maintenance_eventnameid,maintenanceid,value,operator) VALUES (2,60006,'Event2',3);
+INSERT INTO maintenance_trigger (maintenance_triggerid,maintenanceid,triggerid) VALUES (1,60006,134000);
+INSERT INTO maintenance_trigger (maintenance_triggerid,maintenanceid,triggerid) VALUES (2,60006,134001);
+INSERT INTO maintenance_eventname (maintenance_eventnameid,maintenanceid,value,operator) VALUES (1,60006,'Event1',2);
+INSERT INTO maintenance_eventname (maintenance_eventnameid,maintenanceid,value,operator) VALUES (2,60006,'Event2',3);
 
 insert into triggers (triggerid,expression,description,priority,flags,comments) values (134106,'{135106}=0','triggerstesterlld_t0',0,2,'');
 insert into functions (functionid,itemid,triggerid,name,parameter) values (135106,132004,134106,'now','$,0');

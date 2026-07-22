@@ -67,10 +67,10 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 		);
 		$timeperiod = CDBHelper::getRow('SELECT timeperiodid FROM timeperiods ORDER BY timeperiodid DESC');
 		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.zbx_dbstr($resourceid));
-		$trigger = CDBHelper::getRow('SELECT maintenance_triggerid FROM maintenance_triggers WHERE maintenanceid='.
+		$trigger = CDBHelper::getRow('SELECT maintenance_triggerid FROM maintenance_trigger WHERE maintenanceid='.
 				zbx_dbstr($resourceid)
 		);
-		$event_name = CDBHelper::getRow('SELECT maintenance_eventnameid FROM maintenance_eventnames WHERE maintenanceid='.
+		$event_name = CDBHelper::getRow('SELECT maintenance_eventnameid FROM maintenance_eventname WHERE maintenanceid='.
 				zbx_dbstr($resourceid)
 		);
 
@@ -152,10 +152,10 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.
 				zbx_dbstr(self::MAINTENANCEID)
 		);
-		$trigger = CDBHelper::getRow('SELECT maintenance_triggerid FROM maintenance_triggers WHERE maintenanceid='.
+		$trigger = CDBHelper::getRow('SELECT maintenance_triggerid FROM maintenance_trigger WHERE maintenanceid='.
 				zbx_dbstr(self::MAINTENANCEID)
 		);
-		$event_name = CDBHelper::getRow('SELECT maintenance_eventnameid FROM maintenance_eventnames WHERE maintenanceid='.
+		$event_name = CDBHelper::getRow('SELECT maintenance_eventnameid FROM maintenance_eventname WHERE maintenanceid='.
 				zbx_dbstr(self::MAINTENANCEID)
 		);
 

@@ -127,7 +127,7 @@ class CMaintenance extends CApiService {
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
-				' FROM maintenance_triggers mt'.
+				' FROM maintenance_trigger mt'.
 				' JOIN functions f ON mt.triggerid=f.triggerid'.
 				' JOIN items i ON f.itemid=i.itemid'.
 				' JOIN host_hgset hh ON i.hostid=hh.hostid'.
@@ -196,7 +196,7 @@ class CMaintenance extends CApiService {
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
-				' FROM maintenance_triggers mt'.
+				' FROM maintenance_trigger mt'.
 				' WHERE m.maintenanceid=mt.maintenanceid'.
 				' AND '.dbConditionId('mt.triggerid', $options['triggerids']).
 			')';
@@ -318,8 +318,8 @@ class CMaintenance extends CApiService {
 			]],
 			'event_names' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'maintenance_type', 'in' => MAINTENANCE_TYPE_NORMAL], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['operator', 'value']], 'fields' => [
-				'operator' =>				['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]), 'default' => DB::getDefault('maintenance_eventnames', 'operator')],
-				'value' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_eventnames', 'value')]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]), 'default' => DB::getDefault('maintenance_eventname', 'operator')],
+				'value' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_eventname', 'value')]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
@@ -490,8 +490,8 @@ class CMaintenance extends CApiService {
 			]],
 			'event_names' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'maintenance_type', 'in' => MAINTENANCE_TYPE_NORMAL], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['operator', 'value']], 'fields' => [
-				'operator' =>				['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]), 'default' => DB::getDefault('maintenance_eventnames', 'operator')],
-				'value' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_eventnames', 'value')]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]), 'default' => DB::getDefault('maintenance_eventname', 'operator')],
+				'value' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_eventname', 'value')]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
@@ -550,7 +550,7 @@ class CMaintenance extends CApiService {
 				$has_event_names = false;
 
 				if (!array_key_exists('triggers', $maintenance)) {
-					$has_triggers = (bool) DB::select('maintenance_triggers', [
+					$has_triggers = (bool) DB::select('maintenance_trigger', [
 						'output' => ['maintenance_triggerid'],
 						'filter' => ['maintenanceid' => $maintenance['maintenanceid']],
 						'limit' => 1
@@ -558,7 +558,7 @@ class CMaintenance extends CApiService {
 				}
 
 				if (!array_key_exists('event_names', $maintenance)) {
-					$has_event_names = (bool) DB::select('maintenance_eventnames', [
+					$has_event_names = (bool) DB::select('maintenance_eventname', [
 						'output' => ['maintenance_eventnameid'],
 						'filter' => ['maintenanceid' => $maintenance['maintenanceid']],
 						'limit' => 1
@@ -1079,7 +1079,7 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Update table "maintenance_triggers".
+	 * Update table "maintenance_trigger".
 	 *
 	 * @param array      $maintenances
 	 * @param array|null $db_maintenances
@@ -1120,11 +1120,11 @@ class CMaintenance extends CApiService {
 		unset($maintenance);
 
 		if ($del_maintenance_triggerids) {
-			DB::delete('maintenance_triggers', ['maintenance_triggerid' => $del_maintenance_triggerids]);
+			DB::delete('maintenance_trigger', ['maintenance_triggerid' => $del_maintenance_triggerids]);
 		}
 
 		if ($ins_maintenance_triggers) {
-			$maintenance_triggerids = DB::insertBatch('maintenance_triggers', $ins_maintenance_triggers);
+			$maintenance_triggerids = DB::insertBatch('maintenance_trigger', $ins_maintenance_triggers);
 		}
 
 		foreach ($maintenances as &$maintenance) {
@@ -1143,7 +1143,7 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Update table "maintenance_eventnames".
+	 * Update table "maintenance_eventname".
 	 *
 	 * @param array      $maintenances
 	 * @param array|null $db_maintenances
@@ -1184,11 +1184,11 @@ class CMaintenance extends CApiService {
 		unset($maintenance);
 
 		if ($del_maintenance_eventnameids) {
-			DB::delete('maintenance_eventnames', ['maintenance_eventnameid' => $del_maintenance_eventnameids]);
+			DB::delete('maintenance_eventname', ['maintenance_eventnameid' => $del_maintenance_eventnameids]);
 		}
 
 		if ($ins_event_names) {
-			$maintenance_eventnameids = DB::insert('maintenance_eventnames', $ins_event_names);
+			$maintenance_eventnameids = DB::insert('maintenance_eventname', $ins_event_names);
 		}
 
 		foreach ($maintenances as &$maintenance) {
@@ -1391,7 +1391,7 @@ class CMaintenance extends CApiService {
 			'output' => ['maintenance_triggerid', 'maintenanceid', 'triggerid'],
 			'filter' => ['maintenanceid' => $maintenanceids]
 		];
-		$db_triggers = DBselect(DB::makeSql('maintenance_triggers', $options));
+		$db_triggers = DBselect(DB::makeSql('maintenance_trigger', $options));
 
 		while ($db_trigger = DBfetch($db_triggers)) {
 			$db_maintenances[$db_trigger['maintenanceid']]['triggers'][$db_trigger['maintenance_triggerid']] = [
@@ -1423,7 +1423,7 @@ class CMaintenance extends CApiService {
 			'output' => ['maintenance_eventnameid', 'maintenanceid', 'value', 'operator'],
 			'filter' => ['maintenanceid' => $maintenanceids]
 		];
-		$db_event_names = DBselect(DB::makeSql('maintenance_eventnames', $options));
+		$db_event_names = DBselect(DB::makeSql('maintenance_eventname', $options));
 
 		while ($db_event_name = DBfetch($db_event_names)) {
 			$db_maintenances[$db_event_name['maintenanceid']]['event_names']
@@ -1541,7 +1541,7 @@ class CMaintenance extends CApiService {
 			return;
 		}
 
-		$maintenance_triggers = API::getApiService()->select('maintenance_triggers', [
+		$maintenance_triggers = API::getApiService()->select('maintenance_trigger', [
 			'output' => ['maintenanceid', 'triggerid'],
 			'filter' => ['maintenanceid' => array_keys($result)]
 		]);
@@ -1579,7 +1579,7 @@ class CMaintenance extends CApiService {
 			return;
 		}
 
-		$event_names = API::getApiService()->select('maintenance_eventnames', [
+		$event_names = API::getApiService()->select('maintenance_eventname', [
 			'output' => $this->outputExtend($options['selectEventNames'], ['maintenanceid']),
 			'filter' => ['maintenanceid' => array_keys($result)]
 		]);
