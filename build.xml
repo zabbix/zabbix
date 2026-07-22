@@ -642,7 +642,21 @@
 		</exec>
 	</target>
 
-	<target name="create-db-mysql" depends="drop-db-mysql">
+	<target name="detect-db-check-command">
+		<property environment="env"/>
+
+		<condition property="db-check-command" value="mysqlcheck">
+			<available file="mysqlcheck" filepath="${env.PATH}" type="file"/>
+		</condition>
+
+		<condition property="db-check-command" value="mariadb-check">
+			<available file="mariadb-check" filepath="${env.PATH}" type="file"/>
+		</condition>
+
+		<fail unless="db-check-command" message="Neither mysqlcheck nor mariadb-check was found in PATH."/>
+	</target>
+
+	<target name="create-db-mysql" depends="drop-db-mysql,detect-db-check-command">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
@@ -667,6 +681,14 @@
 		</exec>
 		<exec executable="mysql" input="database/mysql/data.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
+			<arg line="--host=${dbhost}"/>
+			<arg line="--port=${dbport}"/>
+			<arg line="--user=${dbuser}"/>
+			<arg line="${dbname}"/>
+		</exec>
+		<exec executable="${db-check-command}" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
+			<arg line="--analyze"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--port=${dbport}"/>
 			<arg line="--user=${dbuser}"/>
