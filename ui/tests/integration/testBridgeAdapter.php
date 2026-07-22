@@ -115,6 +115,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	private static ?string $push_mediatypeid = null;
 	private static ?int $push_mediatype_status = null;
 	private static ?string $real_notify_hostid = null;
+	private static ?string $db_extension = null;
 	private static ?string $cert_base_dir = null;
 	private static ?string $restricted_userid = null;
 	private static ?string $restricted_roleid = null;
@@ -847,6 +848,14 @@ class testBridgeAdapter extends CIntegrationTest {
 		fclose($socket);
 
 		return $port;
+	}
+
+	private static function getDBExtension(): ?string {
+		if (self::$db_extension === null) {
+			self::$db_extension = CDBHelper::getValue("SELECT value_str FROM settings WHERE name='db_extension'");
+		}
+
+		return self::$db_extension;
 	}
 
 	private static function generateCertificates(): string {
@@ -2264,8 +2273,13 @@ class testBridgeAdapter extends CIntegrationTest {
 
 		$this->executeHousekeeper(self::COMPONENT_SERVER);
 
+		// On TimescaleDB, the first housekeeping cycle of a freshly (re)started server process also
+		// synchronizes compression policies for history/trends/auditlog (per-table catalog queries and
+		// add/remove_compression_policy calls), which can push this past the plain-DB wait budget.
+		$iterations = (self::getDBExtension() === ZBX_DB_EXTENSION_TIMESCALEDB) ? 90 : 30;
+
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of housekeeping_dpop_jti_cache()', true,
-			30, 1
+			$iterations, 1
 		);
 
 		$this->assertSame(0, CDBHelper::getCount(
