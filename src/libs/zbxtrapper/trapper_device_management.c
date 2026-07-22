@@ -19,7 +19,6 @@
 #include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxcomms.h"
-#include "zbxcommshigh.h"
 #include "zbxcrypto.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
@@ -268,7 +267,8 @@ static const char	*trapper_device_bridge_adapter_error(const char *request, zbx_
 		}
 	}
 
-	THIS_SHOULD_NEVER_HAPPEN;
+	THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected bridge-adapter error mapping: request:\"%s\" error:%d", request,
+			error);
 
 	return "Cannot initialize mobile device, bridge-adapter returned an invalid response.";
 }
