@@ -113,7 +113,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 					]
 				],
 				'messages' => [
-					'uniq' => _('Checks should be unique.')
+					'uniq' => _('Check already exists.')
 				]
 			],
 			'type' => ['db dchecks.type', 'required',
@@ -260,7 +260,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 		if ($is_valid !== CFormValidator::SUCCESS) {
 			$response = [
 				'error' => [
-					'title' => _('Checks should be unique.'),
+					'title' => _('Check already exists.'),
 					'messages' => $this->getValidationError()
 				]
 			];
