@@ -29,8 +29,11 @@ class BridgeAdapterMock(BaseHTTPRequestHandler):
 
         self.server.write_request(body, raw_body)
 
-        response = self.server.build_response(body)
-        encoded = json.dumps(response, separators=(",", ":")).encode("utf-8")
+        if self.server.malformed_json:
+            encoded = b"{not valid json"
+        else:
+            response = self.server.build_response(body)
+            encoded = json.dumps(response, separators=(",", ":")).encode("utf-8")
 
         self.send_response(self.server.status_code)
         self.send_header("Content-Type", "application/json")
@@ -44,7 +47,8 @@ class BridgeAdapterMock(BaseHTTPRequestHandler):
 
 class AdapterServer(ThreadingHTTPServer):
     def __init__(self, address, log_file, status_code, notify_error, init_error, init_error_detail,
-            offboard_error_detail, ssl_context=None):
+            offboard_error_detail, malformed_json, missing_jsonrpc, invalid_jsonrpc_version, oversized_response,
+            incomplete_error, init_no_result, init_incomplete_result, ssl_context=None):
         super().__init__(address, BridgeAdapterMock)
         self.log_file = log_file
         self.status_code = status_code
@@ -52,6 +56,13 @@ class AdapterServer(ThreadingHTTPServer):
         self.init_error = init_error
         self.init_error_detail = init_error_detail
         self.offboard_error_detail = offboard_error_detail
+        self.malformed_json = malformed_json
+        self.missing_jsonrpc = missing_jsonrpc
+        self.invalid_jsonrpc_version = invalid_jsonrpc_version
+        self.oversized_response = oversized_response
+        self.incomplete_error = incomplete_error
+        self.init_no_result = init_no_result
+        self.init_incomplete_result = init_incomplete_result
         self.ssl_context = ssl_context
 
     def get_request(self):
@@ -73,8 +84,48 @@ class AdapterServer(ThreadingHTTPServer):
             log.write(json.dumps(record, separators=(",", ":")) + "\n")
 
     def build_response(self, body):
+        response = self._build_response_body(body)
+
+        if self.missing_jsonrpc:
+            response.pop("jsonrpc", None)
+        elif self.invalid_jsonrpc_version:
+            response["jsonrpc"] = "1.0"
+
+        if self.oversized_response:
+            result = response.setdefault("result", {})
+
+            if isinstance(result, dict):
+                result["padding"] = "x" * 4096
+
+        return response
+
+    def _build_response_body(self, body):
         request_id = body.get("id") if isinstance(body, dict) else None
         method = body.get("method") if isinstance(body, dict) else None
+
+        if self.incomplete_error:
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "error": {
+                    "code": "bridge.adapter.error"
+                }
+            }
+
+        if method == "device.init" and self.init_no_result:
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id
+            }
+
+        if method == "device.init" and self.init_incomplete_result:
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "result": {
+                    "enrollment_token": "mock-mobile-enrollment-token"
+                }
+            }
 
         if method == "device.notify" and self.notify_error:
             return {
@@ -173,6 +224,13 @@ def main():
     parser.add_argument("--init-error", action="store_true")
     parser.add_argument("--init-error-detail", action="store_true")
     parser.add_argument("--offboard-error-detail", action="store_true")
+    parser.add_argument("--malformed-json", action="store_true")
+    parser.add_argument("--missing-jsonrpc", action="store_true")
+    parser.add_argument("--invalid-jsonrpc-version", action="store_true")
+    parser.add_argument("--oversized-response", action="store_true")
+    parser.add_argument("--incomplete-error", action="store_true")
+    parser.add_argument("--init-no-result", action="store_true")
+    parser.add_argument("--init-incomplete-result", action="store_true")
     parser.add_argument("--tls", action="store_true")
     parser.add_argument("--mtls", action="store_true")
     parser.add_argument("--cert")
@@ -200,7 +258,10 @@ def main():
             ssl_context.load_verify_locations(cafile=args.ca)
 
     server = AdapterServer((args.host, args.port), args.log_file, args.status_code, args.notify_error,
-                           args.init_error, args.init_error_detail, args.offboard_error_detail, ssl_context)
+                           args.init_error, args.init_error_detail, args.offboard_error_detail,
+                           args.malformed_json, args.missing_jsonrpc, args.invalid_jsonrpc_version,
+                           args.oversized_response, args.incomplete_error, args.init_no_result,
+                           args.init_incomplete_result, ssl_context)
 
     open(args.log_file, "a", encoding="utf-8").close()
 

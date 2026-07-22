@@ -108,6 +108,38 @@ $form_grid = (new CFormGrid())
 		]))->addClass('js-field-sendto-list')
 	])
 	->addItem([
+		(new CLabel(_('Send to')))
+			->setAsteriskMark()
+			->addClass('js-field-sendto-devices'),
+		(new CFormField([
+			(new CRadioButtonList('sendto_active_devices', $data['form']['sendto_active_devices']))
+				->addValue(_('Active devices'), 1)
+				->addValue(_('Selected devices'), 0)
+				->setReadonly($data['provisioned'] == CUser::PROVISION_STATUS_YES)
+				->setModern()
+		]))->addClass('js-field-sendto-devices')
+	])
+	->addItem([
+		'',
+		(new CFormField([
+			(new CMultiSelect([
+				'name' => 'sendto_deviceuuids[]',
+				'object_name' => 'devices',
+				'readonly' => $data['provisioned'] == CUser::PROVISION_STATUS_YES,
+				'data' => $data['form']['sendto_device_data'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'devices',
+						'srcfld1' => 'uuid',
+						'dstfrm' => 'media-form',
+						'dstfld1' => 'sendto_deviceuuids_',
+						'userid' => $data['userid']
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))->addClass('js-field-sendto-devices')
+	])
+	->addItem([
 		(new CLabel(_('When active'), 'period'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('period', $data['form']['period'], false, DB::getFieldLength('media', 'period')))
@@ -134,17 +166,7 @@ $form_grid = (new CFormGrid())
 		)
 	]);
 
-$form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('
-			media_edit_popup.init('.json_encode([
-				'rules' => $data['js_validation_rules'],
-				'mediatypes' => $data['mediatypes'],
-				'sendto_list' => $data['form']['sendto_list']
-			]).');
-		'))->setOnDocumentReady()
-	);
+$form->addItem($form_grid);
 
 $output = [
 	'header' => $data['is_edit'] ? _('Media') : _('New media'),
@@ -157,7 +179,12 @@ $output = [
 			'action' => 'media_edit_popup.submit();'
 		]
 	],
-	'script_inline' => $this->readJsFile('popup.media.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('popup.media.edit.js.php').
+		'media_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'mediatypes' => $data['mediatypes'],
+			'sendto_list' => $data['form']['sendto_list']
+		]).');'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

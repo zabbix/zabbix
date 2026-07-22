@@ -21,6 +21,15 @@
 #define ZBX_BRIDGE_MESSAGE_LEN		256
 #define ZBX_BRIDGE_TIME_LEN		64
 
+#define ZBX_PUSH_BA_ERR_NOT_CONFIGURED	\
+	"Cannot deliver mobile device notification, bridge-adapter is not configured."
+#define ZBX_PUSH_BA_ERR_CONNECT	\
+	"Cannot deliver mobile device notification, cannot connect to bridge-adapter."
+#define ZBX_PUSH_BA_ERR_INVALID_RESPONSE	\
+	"Cannot deliver mobile device notification, bridge-adapter returned an invalid response."
+#define ZBX_PUSH_BA_ERR_RETURNED_ERROR	\
+	"Cannot deliver mobile device notification, bridge-adapter returned an error."
+
 #define ZBX_BRIDGE_ADAPTER_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION	1
 
 #define ZBX_DEVICE_STATUS_ACTIVATED	1

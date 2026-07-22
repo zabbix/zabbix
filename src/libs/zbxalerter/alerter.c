@@ -48,15 +48,6 @@
 
 #define	ALARM_ACTION_TIMEOUT	40
 
-#define ZBX_PUSH_BA_ERR_NOT_CONFIGURED	\
-	"Cannot deliver mobile device notification, bridge-adapter is not configured."
-#define ZBX_PUSH_BA_ERR_CONNECT	\
-	"Cannot deliver mobile device notification, cannot connect to bridge-adapter."
-#define ZBX_PUSH_BA_ERR_INVALID_RESPONSE	\
-	"Cannot deliver mobile device notification, bridge-adapter returned an invalid response."
-#define ZBX_PUSH_BA_ERR_RETURNED_ERROR	\
-	"Cannot deliver mobile device notification, bridge-adapter returned an error."
-
 ZBX_PTR_VECTOR_IMPL(am_source_stats_ptr, zbx_am_source_stats_t *)
 
 /******************************************************************************

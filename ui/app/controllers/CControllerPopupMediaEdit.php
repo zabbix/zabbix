@@ -66,6 +66,44 @@ class CControllerPopupMediaEdit extends CController {
 
 		CArrayHelper::sort($db_mediatypes, ['name']);
 
+		$form_data = [
+			'mediatypeid' => $this->getInput('mediatypeid', 0),
+			'sendto' => $this->getInput('sendto', DB::getDefault('media', 'sendto')),
+			'sendto_list' => [''],
+			'sendto_active_devices' => 1,
+			'sendto_device_data' => [],
+			'period' => $this->getInput('period', DB::getDefault('media', 'period')),
+			'severities' => $this->getInput('severities', $this->hasInput('edit')
+				? []
+				: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
+			),
+			'active' => $this->getInput('active', DB::getDefault('media', 'active'))
+		];
+
+		if (array_key_exists($form_data['mediatypeid'], $db_mediatypes)) {
+			if ($db_mediatypes[$form_data['mediatypeid']]['type'] == MEDIA_TYPE_EMAIL) {
+				$form_data['sendto_list'] = $this->getInput('sendto_list', ['']);
+			}
+			elseif ($db_mediatypes[$form_data['mediatypeid']]['type'] == MEDIA_TYPE_PUSH) {
+				$deviceuuids = $this->getInput('sendto_list', ['']);
+
+				if (count($deviceuuids) > 0 && !in_array('*', $deviceuuids)) {
+					$form_data['sendto_active_devices'] = 0;
+
+					$devices = API::Device()->get([
+						'output' => ['uuid', 'name'],
+						'userids' => $this->getInput('userid'),
+						'filter' => ['uuid' => $deviceuuids, 'status' => ZBX_DEVICE_STATUS_ACTIVATED]
+					]);
+
+					$devices = array_combine(array_column($devices, 'uuid'), $devices);
+					$devices = CArrayHelper::renameObjectsKeys($devices, ['uuid' => 'id']);
+					$form_data['sendto_device_data'] = $devices;
+				}
+			}
+		}
+
+
 		$data = [
 			'is_edit' => $this->hasInput('edit'),
 			'row_index' => $this->getInput('row_index'),
@@ -73,17 +111,7 @@ class CControllerPopupMediaEdit extends CController {
 			'mediaid' => $this->hasInput('mediaid') ? $this->getInput('mediaid') : null,
 			'provisioned' => $this->getInput('provisioned', CUser::PROVISION_STATUS_NO),
 			'mediatypes' => $db_mediatypes,
-			'form' => [
-				'mediatypeid' => $this->getInput('mediatypeid', 0),
-				'sendto' => $this->getInput('sendto', DB::getDefault('media', 'sendto')),
-				'sendto_list' => $this->getInput('sendto_list', ['']),
-				'period' => $this->getInput('period', DB::getDefault('media', 'period')),
-				'severities' => $this->getInput('severities', $this->hasInput('edit')
-					? []
-					: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
-				),
-				'active' => $this->getInput('active', DB::getDefault('media', 'active'))
-			],
+			'form' => $form_data,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],

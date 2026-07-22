@@ -32,7 +32,8 @@ const view = new class {
 
 	#initEvents() {
 		this.#form.addEventListener('click', e => {
-			if (e.target.classList.contains('js-device-delete')) {
+			if (e.target.classList.contains('js-device-delete')
+					&& window.confirm(this.#confirm_messages['user.device.delete'])) {
 				this.#delete(e.target, {deviceid: e.target.dataset.deviceid});
 			}
 		});
@@ -45,19 +46,47 @@ const view = new class {
 	}
 
 	#delete(target, data) {
-		if (window.confirm(this.#confirm_messages['user.device.delete'])) {
-			target.classList.add('is-loading');
-			data[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('user')) ?>;
+		target.classList.add('is-loading');
+		data[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('user')) ?>;
 
-			this.#post({action: 'user.device.delete'}, data)
-				.finally(() => {
-					target.classList.remove('is-loading');
-					target.blur();
-				});
-		}
+		this.#post({action: 'user.device.delete'}, data, () => this.#confirmForceDelete(target, data))
+			.finally(() => {
+				target.classList.remove('is-loading');
+				target.blur();
+			});
 	}
 
-	#post(urlparams, data) {
+	#confirmForceDelete(target, data) {
+		overlayDialogue({
+			title: <?= json_encode(_('Remove device?')) ?>,
+			content: document.createElement('span').innerText = <?= json_encode(
+				_('Device not found. Remove device from the database?')
+			) ?>,
+			buttons: [
+				{
+					title: <?= json_encode(_('Cancel')) ?>,
+					cancel: true,
+					class: ZBX_STYLE_BTN_ALT,
+					action: () => {
+						location.href = location.href;
+					}
+				},
+				{
+					title: <?= json_encode(_('Remove')) ?>,
+					focused: true,
+					action: () => {
+						data.force = 1;
+						this.#delete(target, data);
+					}
+				}
+			]
+		}, {
+			position: Overlay.prototype.POSITION_CENTER_TOP,
+			trigger_element: target
+		});
+	}
+
+	#post(urlparams, data, force_delete_callback) {
 		return fetch(zabbixUrl(urlparams), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -65,6 +94,12 @@ const view = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
+				if (!('force' in data) && 'only_local_device' in response && response.only_local_device) {
+					force_delete_callback();
+
+					return;
+				}
+
 				if ('error' in response) {
 					if ('title' in response.error) {
 						postMessageError(response.error.title);
@@ -77,10 +112,6 @@ const view = new class {
 
 					if ('messages' in response.success) {
 						postMessageDetails('success', response.success.messages);
-					}
-
-					if ('error_messages' in response.success) {
-						postMessageDetails('error', response.success.error_messages);
 					}
 				}
 

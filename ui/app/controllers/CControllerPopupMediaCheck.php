@@ -35,20 +35,21 @@ class CControllerPopupMediaCheck extends CController {
 			'sendto' => ['db media.sendto', 'required', 'not_empty',
 				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]]
 			],
-			'sendto_list' => [
-				['array', 'required', 'not_empty',
-					'field' => ['db media.sendto'
-						// TODO: uncomment with DEV-4644
-						// 'not_empty', 'use' => [CEmailValidator::class, []]
-					],
-					'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
+			'sendto_list' => ['array', 'required', 'not_empty',
+				'field' => ['db media.sendto'
+					// TODO: uncomment with DEV-4644
+					// 'not_empty', 'use' => [CEmailValidator::class, []]
 				],
-				['array', 'required',
-					'field' => ['db media.sendto'
-						// TODO: uncomment with DEV-4644
-						// 'use' => [CPushNotificationRecipientValidator::class]
-					],
-					'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
+				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
+			],
+			'sendto_active_devices' => ['boolean', 'required',
+				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
+			],
+			'sendto_deviceuuids' => ['array', 'required', 'not_empty',
+				'field' => ['db device.uuid', 'not_empty'],
+				'when' => [
+					['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]],
+					['sendto_active_devices', 'in' => [0]]
 				]
 			],
 			'period' => ['string', 'required', 'not_empty',
@@ -102,39 +103,34 @@ class CControllerPopupMediaCheck extends CController {
 	}
 
 	private function validateSendto(): bool {
-		if ($this->mediatype['type'] == MEDIA_TYPE_EMAIL || $this->mediatype['type'] == MEDIA_TYPE_PUSH) {
+		if ($this->mediatype['type'] == MEDIA_TYPE_EMAIL) {
 			$sendto_list = array_values(array_filter($this->getInput('sendto_list', [])));
 
-			if ($this->mediatype['type'] == MEDIA_TYPE_EMAIL) {
-				$email_validator = new CEmailValidator();
+			if (!$sendto_list) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto_emails', _('cannot be empty')));
 
-				foreach ($sendto_list as $email) {
-					if (!$email_validator->validate($email)) {
-						error($email_validator->getError());
-
-						return false;
-					}
-				}
+				return false;
 			}
-			elseif ($this->mediatype['type'] == MEDIA_TYPE_PUSH) {
-				if (count($sendto_list) === 0) {
-					$sendto_list[] = '*';
-				}
 
-				$push_notification_recipient_validator = new CPushNotificationRecipientValidator();
+			$email_validator = new CEmailValidator();
 
-				foreach ($sendto_list as $key => $uuid) {
-					if (!$push_notification_recipient_validator->validate($uuid)) {
-						error(_s('Invalid parameter "%1$s": %2$s.', 'sendto_list/'.($key + 1),
-							$push_notification_recipient_validator->getError()
-						));
+			foreach ($sendto_list as $email) {
+				if (!$email_validator->validate($email)) {
+					error($email_validator->getError());
 
-						return false;
-					}
+					return false;
 				}
 			}
 
 			$this->sendto_list = $sendto_list;
+		}
+		elseif ($this->mediatype['type'] == MEDIA_TYPE_PUSH) {
+			if ($this->getInput('sendto_active_devices', 0) == 1) {
+				$this->sendto_list = ['*'];
+			}
+			else {
+				$this->sendto_list = $this->getInput('sendto_deviceuuids', []);
+			}
 		}
 
 		return true;
