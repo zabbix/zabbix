@@ -241,7 +241,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		foreach ($ds_items as $itemid => $ds_item) {
 			if (array_key_exists($itemid, $db_items)) {
-				$data_set['color'] = '#' . $ds_item['color'];
+				$data_set['color'] = '#'.$ds_item['color'];
 				$data_set['type'] = $ds_item['type'];
 
 				$metrics[] = $db_items[$itemid] + ['options' => $data_set];
@@ -331,7 +331,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 		else {
-			$data_set['color'] = '#' . $data_set['color'];
+			$data_set['color'] = '#'.$data_set['color'];
 
 			foreach ($items as $item) {
 				$metrics[] = $item + ['options' => $data_set];
