@@ -2592,6 +2592,22 @@ HEREDOC;
 		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery unsupported');
 	}
 
+	private function getDiscoveredItemid(string $host, string $key): int {
+		$this->ensureItemidsResolved([['host' => $host, 'key' => $key]]);
+		return self::$itemid_cache[$host."\0".$key];
+	}
+
+	private function getTriggeridForKey(string $host, string $key): string {
+		$itemid = $this->getDiscoveredItemid($host, $key);
+		$response = $this->call('trigger.get', [
+			'itemids' => [$itemid],
+			'output' => ['triggerid']
+		]);
+		$this->assertCount(1, $response['result'],
+			'Expected exactly one trigger for item on key '.$key.', got: '.json_encode($response['result']));
+		return $response['result'][0]['triggerid'];
+	}
+
 	/**
 	 * Same as runOpenAndImmediateRecoveryTest but the whole burst lands on a single discovered item (and
 	 * its one trigger), cycling PROBLEM → recover (1, 0) a large number of times, to stress CEP with a long
@@ -2603,7 +2619,7 @@ HEREDOC;
 		// Drive a single discovered item (and its one trigger) so the whole burst lands on one event
 		// stream rather than being spread across every discovered item.
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
-		$triggerid = self::$discovered_triggerids[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
 
 		$this->captureEventBaseline([$triggerid]);
 
@@ -4628,7 +4644,7 @@ HEREDOC;
 		// Drive a single discovered item (and its one trigger) so the whole scenario lands on one event
 		// stream rather than being spread across every discovered item.
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
-		$triggerid = self::$discovered_triggerids[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
 		$all = [$triggerid];
 
 		// The one trigger must start in OK state.
@@ -4677,7 +4693,7 @@ HEREDOC;
 	private function runEventAssessmentTestGlobalCorrelationCloseOnUpUpdateBehavior(bool $restart): void {
 		// Drive a single discovered item (and its one trigger) so the whole scenario lands on one event stream.
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
-		$triggerid = self::$discovered_triggerids[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
 		$all = [$triggerid];
 
 		// The one trigger must start in OK state.
