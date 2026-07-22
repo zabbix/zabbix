@@ -15,10 +15,10 @@
 
 
 class CCepRuleHelper {
-	public const WINDOW_NONE =0;
-	public const WINDOW_SIMPLE =1;
+	public const WINDOW_NONE = 0;
+	public const WINDOW_SIMPLE = 1;
 	public const WINDOW_CAUSE_SYMPTOM = 2;
-	public const WINDOW_TAG_MATCH =3;
+	public const WINDOW_TAG_MATCH = 3;
 	public const WINDOW_PATTERN_MATCH = 4;
 
 	public const STATUS_ENABLED = 0;
