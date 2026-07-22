@@ -190,6 +190,7 @@ class testScriptManualInput extends CIntegrationTest {
 
 	/**
 	 * @dataProvider validRequestDataProvider
+	 * @configurationDataProvider serverConfigurationProvider
 	 *
 	 * @param array  $request_params   Parameters to the script.execute API call
 	 * @param string $expected_result  String matching a successful API call return value
@@ -204,6 +205,7 @@ class testScriptManualInput extends CIntegrationTest {
 
 	/**
 	 * @dataProvider invalidRequestDataProvider
+	 * @configurationDataProvider serverConfigurationProvider
 	 *
 	 * @param array  $request_params   Parameters to the script.execute API call
 	 * @param string $expected_result  String matching a failed API call error value
