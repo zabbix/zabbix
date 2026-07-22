@@ -61,6 +61,7 @@ class testScriptManualInput extends CIntegrationTest {
 			]
 		]);
 
+		$this->assertArrayHasKey('hostids', $response, 'host.create failed: ' . json_encode($response));
 		self::$hostid = $response['hostids'][0];
 
 		$initialized = true;
@@ -148,6 +149,7 @@ class testScriptManualInput extends CIntegrationTest {
 
 		$response = CDataHelper::call('script.create', $scripts);
 
+		$this->assertArrayHasKey('scriptids', $response, 'script.create failed: ' . json_encode($response));
 		self::$scriptids = $response['scriptids'];
 
 		$initialized = true;
