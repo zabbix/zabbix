@@ -87,6 +87,12 @@ class CDatatableBehavior extends CBehavior {
 	 */
 	public function assertDatatableData($data = [], $selector = null) {
 		$datatable = $this->getDatatable($selector)->waitUntilReady();
+
+		if ($data) {
+			// Rows are loaded asynchronously after the datatable reports ready, so wait for the expected count.
+			$datatable->waitUntilRowsCount(count($data));
+		}
+
 		$rows = $datatable->getRows();
 		if (!$data) {
 			$this->test->assertEquals(0, $rows->count());
@@ -162,6 +168,9 @@ class CDatatableBehavior extends CBehavior {
 		$table = $this->getDatatable($selector);
 
 		foreach ($header_settings as $column => $select_data) {
+			// Wait for the datatable to finish (re)loading so the header button reference does not go stale.
+			$table->waitUntilReady();
+
 			$button_selector = (in_array($column, ['Name', 'Time', 'Problem']))
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';

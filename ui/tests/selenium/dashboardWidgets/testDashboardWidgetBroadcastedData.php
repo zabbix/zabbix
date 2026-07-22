@@ -402,7 +402,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 
 			// Locate the graph and double-click on it in order to zoom out two times and to send feedback.
 			$tag = ($data['listener_type'] === 'svg graph') ? 'svg' : 'img';
-			$listener->query('tag', $tag)->one()->doubleClick();
+			$listener->query('tag', $tag)->waitUntilVisible()->one()->doubleClick();
 			$listener->waitUntilReady();
 
 			// Prepare the expected feedback, containing both formatted and unixtime "From" and "To" time periods.

@@ -2235,7 +2235,18 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				'context' => ['values' => 'Simple host with item for Item history widget']
 			]
 		]);
-		$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+
+		// Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
+		// while being clicked. Retry the click if that happens.
+		$add_button = $column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one();
+
+		try {
+			$add_button->click();
+		}
+		catch (ElementNotInteractableException $exception) {
+			$add_button->click();
+		}
+
 		$column_overlay->waitUntilNotVisible();
 		$form->waitUntilStalled();
 

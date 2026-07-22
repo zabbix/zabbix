@@ -91,7 +91,8 @@ class testFormTotpValidate extends testFormTotp {
 		// Validate a successful login or an expected error.
 		$this->page->waitUntilReady();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
-			// Successful login.
+			// Successful login. Wait for the redirect to the frontend to finish rendering before asserting.
+			$this->query('class:zi-sign-out')->waitUntilPresent();
 			$this->page->assertUserIsLoggedIn();
 			// Check that no error messages are displayed after logging in.
 			$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid(), 'Unexpected error on page.');
