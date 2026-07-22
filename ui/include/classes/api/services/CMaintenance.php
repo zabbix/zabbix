@@ -314,14 +314,14 @@ class CMaintenance extends CApiService {
 										['if' => ['field' => 'maintenance_type', 'in' => MAINTENANCE_TYPE_NORMAL], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['triggerid']], 'fields' => [
 				'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 										]],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
 			'event_names' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'maintenance_type', 'in' => MAINTENANCE_TYPE_NORMAL], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['operator', 'value']], 'fields' => [
 				'operator' =>				['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]), 'default' => DB::getDefault('maintenance_eventnames', 'operator')],
 				'value' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_eventnames', 'value')]
 										]],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
 			'timeperiods' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, CMaintenanceHelper::MAX_TIMEPERIOD]), 'default' => SEC_PER_HOUR],
