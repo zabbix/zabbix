@@ -229,6 +229,7 @@ void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault, const char *c
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **token)
 {
+	/* caller does not need to be aware of vault type */
 	if (NULL == zbx_vault_renew_token_cb)
 		return;
 
