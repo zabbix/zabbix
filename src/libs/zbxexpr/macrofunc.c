@@ -23,6 +23,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxcrypto.h"
+#include "zbxjson.h"
 
 #define ZBX_RULE_BUFF_LEN 512
 
@@ -678,6 +679,66 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: returns the result of a jsonpath query.                           *
+ *                                                                            *
+ * Parameters: params - [IN] function data                                    *
+ *             nparam - [IN] parameter count                                  *
+ *             out    - [IN/OUT] input/output value                           *
+ *                                                                            *
+ * Return value: SUCCEED - function was calculated successfully               *
+ *               FAIL    - function calculation failed                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	macrofunc_jsonpath(char **params, size_t nparam, char **out)
+{
+	char		*value = NULL;
+	zbx_jsonobj_t	obj;
+	const char	*json_str, *default_value = NULL;
+
+	if (1 > nparam || nparam > 2)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
+		return FAIL;
+	}
+
+	json_str = params[0];
+
+	if (2 == nparam)
+		default_value = params[1];
+
+	if (FAIL == zbx_jsonobj_open(*out, &obj))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to open JSON: %s", __func__, zbx_json_strerror());
+		return FAIL;
+	}
+
+	if (FAIL == zbx_jsonobj_query(&obj, json_str, &value))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() jsonpath query failed: %s", __func__, zbx_json_strerror());
+		return FAIL;
+	}
+
+	if (NULL == value)
+	{
+		if (NULL == default_value)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() jsonpath returned no value", __func__);
+			return FAIL;
+		}
+		else
+		{
+			value = zbx_strdup(NULL, default_value);
+		}
+	}
+
+	zbx_free(*out);
+	*out = value;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: calculates macro function value.                                  *
  *                                                                            *
  * Parameters: expression - [IN] expression containing macro function         *
@@ -729,6 +790,8 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 		macrofunc = macrofunc_htmldecode;
 	else if (ZBX_CONST_STRLEN("regrepl") == len && 0 == strncmp(ptr, "regrepl", len))
 		macrofunc = macrofunc_regrepl;
+	else if (ZBX_CONST_STRLEN("jsonpath") == len && 0 == strncmp(ptr, "jsonpath", len))
+		macrofunc = macrofunc_jsonpath;
 	else
 		goto out;
 
