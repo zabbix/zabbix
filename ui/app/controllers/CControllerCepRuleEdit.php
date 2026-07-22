@@ -105,7 +105,7 @@ class CControllerCepRuleEdit extends CController {
 		else {
 			$ceprules = [DB::getDefaults('cep_rule') + [
 				'filter' => [
-					'eval_formula' => DB::getDefault('cep_rule', 'eval_formula'),
+					'eval_formula' => '',
 					'evaltype' => DB::getDefault('cep_rule', 'evaltype'),
 					'conditions' => []
 				],
