@@ -726,7 +726,7 @@ Overlay.prototype.setProperties = function(properties) {
 			case 'doc_url':
 				this.unsetProperty(name);
 				this.$dialogue.$head.$header[0].insertAdjacentHTML('afterend', `
-					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${value}"></a>
+					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" aria-label="${t('Open Zabbix documentation in a new tab')}" href="${value}"></a>
 				`);
 				break;
 
