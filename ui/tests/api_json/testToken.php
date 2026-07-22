@@ -20,18 +20,16 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * @backup token
  *
  * @onBefore prepareTestData
- * @onAfter  cleanTestData
  */
 class testToken extends CAPITest {
 
 	protected static $unique_counter = 1;
 
 	public static function prepareTestData(): void {
-		CTestDataHelper::setUserRoleApiAccessAllowed(true);
-	}
-
-	public static function cleanTestData(): void {
-		CTestDataHelper::setUserRoleApiAccessAllowed(false);
+		CDataHelper::call('role.update', [
+			'roleid' => 1, // User role.
+			'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
+		]);
 	}
 
 	protected static function uniqueName(): string {

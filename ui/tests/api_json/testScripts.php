@@ -708,7 +708,8 @@ class testScripts extends CAPITest {
 		$roles_data = [
 			'admin' => [
 				'name' => 'API test role admin',
-				'type' => USER_TYPE_ZABBIX_ADMIN
+				'type' => USER_TYPE_ZABBIX_ADMIN,
+				'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
 			],
 			'user' => [
 				'name' => 'API test role user',

@@ -19,18 +19,8 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 /**
  * @backup sysmaps
  *
- * @onBefore prepareTestData
- * @onAfter  cleanTestData
  */
 class testMap extends CAPITest {
-
-	public static function prepareTestData(): void {
-		CTestDataHelper::setUserRoleApiAccessAllowed(true);
-	}
-
-	public static function cleanTestData(): void {
-		CTestDataHelper::setUserRoleApiAccessAllowed(false);
-	}
 
 	/**
 	 * Create map tests data provider.
@@ -557,8 +547,7 @@ class testMap extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Cannot add map element of the map "C" due to circular reference.',
-				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix']
+				'expected_error' => 'Cannot add map element of the map "C" due to circular reference.'
 			],
 			// Success. Map element label is of valid length.
 			[

@@ -1297,11 +1297,4 @@ class CTestDataHelper {
 			CDataHelper::call('user.update', $guest);
 		}
 	}
-
-	public static function setUserRoleApiAccessAllowed(bool $enabled): void {
-		CDataHelper::call('role.update', [
-			'roleid' => 1, // User role.
-			'rules' => ['api.access' => $enabled ? ZBX_ROLE_RULE_ENABLED : ZBX_ROLE_RULE_DISABLED]
-		]);
-	}
 }

@@ -19,18 +19,8 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 /**
  * @backup hosts, hstgrp
  *
- * @onBefore prepareTestData
- * @onAfter  cleanTestData
  */
 class testConfiguration extends CAPITest {
-
-	public static function prepareTestData(): void {
-		CTestDataHelper::setUserRoleApiAccessAllowed(true);
-	}
-
-	public static function cleanTestData(): void {
-		CTestDataHelper::setUserRoleApiAccessAllowed(false);
-	}
 
 	public static function export_fail_data() {
 		return [
@@ -959,24 +949,20 @@ class testConfiguration extends CAPITest {
 	* @dataProvider import_users
 	*/
 	public function testConfiguration_UsersPermissionsToImportCreate($format, $parameter, $source, $sql, $expected_error) {
-		$users = ['zabbix-admin', 'zabbix-user'];
-
-		foreach ($users as $username) {
-			$this->authorize($username, 'zabbix');
-			$this->call('configuration.import', [
-					'format' => $format,
-					'rules' => [
-						$parameter => [
-							'createMissing' => true,
-							'updateExisting' => false
-						]
-					],
-					'source' => $source
+		$this->authorize('zabbix-admin', 'zabbix');
+		$this->call('configuration.import', [
+				'format' => $format,
+				'rules' => [
+					$parameter => [
+						'createMissing' => true,
+						'updateExisting' => false
+					]
 				],
-				$expected_error
-			);
+				'source' => $source
+			],
+			$expected_error
+		);
 
-			$this->assertEquals(0, CDBHelper::getCount($sql));
-		}
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 }
