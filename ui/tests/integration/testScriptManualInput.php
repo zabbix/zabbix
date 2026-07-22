@@ -109,6 +109,7 @@ class testScriptManualInput extends CIntegrationTest {
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your mindmacro has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'execute_on' => ZBX_SCRIPT_EXECUTE_ON_PROXY,
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED
 			],
 			[
@@ -117,6 +118,7 @@ class testScriptManualInput extends CIntegrationTest {
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your {MANUALINPUT} has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'execute_on' => ZBX_SCRIPT_EXECUTE_ON_PROXY,
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 				'manualinput_validator' => '^[a-z]+$',
@@ -129,6 +131,7 @@ class testScriptManualInput extends CIntegrationTest {
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your {MANUALINPUT} has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'execute_on' => ZBX_SCRIPT_EXECUTE_ON_PROXY,
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 				'manualinput_validator' => 'macro,mind',
@@ -144,9 +147,18 @@ class testScriptManualInput extends CIntegrationTest {
 		return true;
 	}
 
-	public function prepareData(): void {
+	public function prepareTestData(): void {
+		static $initialized = false;
+
+		if ($initialized) {
+			return;
+		}
+
 		$this->createTestHostData();
 		$this->createTestScriptData();
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		$initialized = true;
 	}
 
 	/**
@@ -166,7 +178,7 @@ class testScriptManualInput extends CIntegrationTest {
 	public function serverConfigurationProvider(): array {
 		return [
 			self::COMPONENT_SERVER => [
-				'StartTrappers' => 1,
+				'StartTrappers' => 2,
 				'EnableGlobalScripts' => 1
 			]
 		];
@@ -193,6 +205,7 @@ class testScriptManualInput extends CIntegrationTest {
 	 * @param string $expected_result  String matching a successful API call return value
 	 */
 	public function testScriptManualInput_ValidRequests(int $script_index, string $manualinput, string $expected_result): void {
+		$this->prepareTestData();
 		$response = $this->call('script.execute', [
 			'hostid'      => self::$hostid,
 			'scriptid'    => self::$scriptids[$script_index],
@@ -208,6 +221,7 @@ class testScriptManualInput extends CIntegrationTest {
 	 * @param string $expected_result  String matching a failed API call error value
 	 */
 	public function testScriptManualInput_InvalidRequests(int $script_index, ?string $manualinput, string $expected_result): void {
+		$this->prepareTestData();
 		$request_params = [
 			'hostid'   => self::$hostid,
 			'scriptid' => self::$scriptids[$script_index]
