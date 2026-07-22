@@ -340,7 +340,9 @@ class CDevice extends CApiService {
 			'kty' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => 'EC'],
 			'kid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'x' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'y' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			'y' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'use' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+			'alg' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
 		]];
 	}
 
