@@ -117,12 +117,17 @@ class testBridgeAdapter extends CIntegrationTest {
 		$deviceid = DB::reserveIds('device', 2);
 		$device_not_linked_id = DB::reserveIds('device', 1);
 		$device_keyid = DB::reserveIds('device_key', 2);
-		$db_push_mediatype = DBfetch(DBselect(
-			'select mediatypeid,status from media_type where type='.MEDIA_TYPE_PUSH.' order by mediatypeid'
-		));
 
-		self::$push_mediatypeid = $db_push_mediatype['mediatypeid'];
-		self::$push_mediatype_status = (int) $db_push_mediatype['status'];
+		$response = $this->call('mediatype.get', [
+			'output' => ['mediatypeid', 'status'],
+			'filter' => ['type' => MEDIA_TYPE_PUSH],
+			'sortfield' => 'mediatypeid',
+			'limit' => 1
+		]);
+		$this->assertNotEmpty($response['result']);
+
+		self::$push_mediatypeid = $response['result'][0]['mediatypeid'];
+		self::$push_mediatype_status = (int) $response['result'][0]['status'];
 
 		$this->clearPreparedData();
 
@@ -269,6 +274,8 @@ class testBridgeAdapter extends CIntegrationTest {
 
 		self::deleteRealNotificationMedia();
 
+		// The "device" API is gated on the server having reported mobile devices as enabled, which only
+		// happens once the server component is started, so it cannot be used here.
 		$deviceids = array_keys(DB::select('device', [
 			'output' => [],
 			'filter' => ['uuid' => [self::NOTIFY_DEVICE_UUID, self::OFFBOARD_DEVICE_UUID,
@@ -411,9 +418,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		self::$triggerids = $response['result']['triggerids'];
 
-		$push_mediatypeid = CDBHelper::getValue(
-			'select mediatypeid from media_type where type='.MEDIA_TYPE_PUSH.' order by mediatypeid'
-		);
+		$push_mediatypeid = self::$push_mediatypeid;
 
 		$response = $this->call('action.create', [
 			'esc_period' => '1m',
@@ -477,9 +482,16 @@ class testBridgeAdapter extends CIntegrationTest {
 
 		// Create a dedicated acknowledger user (not admin/userid=1) so that admin is not excluded
 		// from update operation escalation targets due to being the acknowledge author.
-		$super_admin_roleid = CDBHelper::getValue(
-			'select min(roleid) from role where type='.USER_TYPE_SUPER_ADMIN
-		);
+		$response = $this->call('role.get', [
+			'output' => ['roleid'],
+			'filter' => ['type' => USER_TYPE_SUPER_ADMIN],
+			'sortfield' => 'roleid',
+			'sortorder' => ZBX_SORT_UP,
+			'limit' => 1
+		]);
+		$this->assertNotEmpty($response['result']);
+
+		$super_admin_roleid = $response['result'][0]['roleid'];
 
 		$response = $this->call('user.create', [
 			'username' => self::ACKNOWLEDGER_USER_NAME,
@@ -943,9 +955,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	public function testBridgeAdapter_notifyDisabledMobileDevices(): void {
 		[$client, $sid] = $this->getServerClientAndSid();
 
-		$mediatypeid = CDBHelper::getValue(
-			'select mediatypeid from media_type where type='.MEDIA_TYPE_PUSH.' order by mediatypeid'
-		);
+		$mediatypeid = self::$push_mediatypeid;
 
 		$result = $client->testMediaType([
 			'mediatypeid' => $mediatypeid,
@@ -984,8 +994,17 @@ class testBridgeAdapter extends CIntegrationTest {
 		});
 		$this->assertRealNotificationActionLog(false);
 
-		$eventid = CDBHelper::getValue('select eventid from events where objectid='.self::$triggerids[0].
-			' and value=1 order by eventid desc');
+		$response = $this->call('event.get', [
+			'output' => ['eventid'],
+			'objectids' => self::$triggerids[0],
+			'value' => TRIGGER_VALUE_TRUE,
+			'sortfield' => 'eventid',
+			'sortorder' => ZBX_SORT_DOWN,
+			'limit' => 1
+		]);
+		$this->assertNotEmpty($response['result']);
+
+		$eventid = $response['result'][0]['eventid'];
 
 		// Acknowledge as a different user so that admin (userid=1) is not excluded as the
 		// acknowledge author from the update operation escalation target list.
@@ -1181,9 +1200,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	public function testBridgeAdapter_notifyAdapterError(): void {
 		[$client, $sid] = $this->getServerClientAndSid();
 
-		$mediatypeid = CDBHelper::getValue(
-			'select mediatypeid from media_type where type='.MEDIA_TYPE_PUSH.' order by mediatypeid'
-		);
+		$mediatypeid = self::$push_mediatypeid;
 
 		$result = $client->testMediaType([
 			'mediatypeid' => $mediatypeid,
@@ -1208,9 +1225,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	public function testBridgeAdapter_notifyNoBridgeAdapterUrl(): void {
 		[$client, $sid] = $this->getServerClientAndSid();
 
-		$mediatypeid = CDBHelper::getValue(
-			'select mediatypeid from media_type where type='.MEDIA_TYPE_PUSH.' order by mediatypeid'
-		);
+		$mediatypeid = self::$push_mediatypeid;
 
 		$result = $client->testMediaType([
 			'mediatypeid' => $mediatypeid,
@@ -1358,9 +1373,7 @@ class testBridgeAdapter extends CIntegrationTest {
 				return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
 			});
 
-			$mediatypeid = CDBHelper::getValue(
-				'select mediatypeid from media_type where type='.MEDIA_TYPE_PUSH.' order by mediatypeid'
-			);
+			$mediatypeid = self::$push_mediatypeid;
 
 			$notify_result = $client->testMediaType([
 				'mediatypeid' => $mediatypeid,
@@ -1409,9 +1422,7 @@ class testBridgeAdapter extends CIntegrationTest {
 				return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
 			});
 
-			$mediatypeid = CDBHelper::getValue(
-				'select mediatypeid from media_type where type='.MEDIA_TYPE_PUSH.' order by mediatypeid'
-			);
+			$mediatypeid = self::$push_mediatypeid;
 
 			$notify_result = $client->testMediaType([
 				'mediatypeid' => $mediatypeid,
