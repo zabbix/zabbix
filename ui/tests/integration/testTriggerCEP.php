@@ -3591,6 +3591,22 @@ HEREDOC;
 	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
+	 * CONDITION_EVAL_TYPE_AND (every condition AND'd regardless of type) instead of
+	 * CONDITION_EVAL_TYPE_AND_OR. The rule's two conditions (new state="up" + service tag pair) are of
+	 * distinct types, so AND evaluates them identically to AND_OR while exercising the
+	 * CONDITION_EVAL_TYPE_AND formula-generation path on the close-on-up scenario.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpAnd$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpAnd() {
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_AND);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Same "close old down when new up" scenario as
+	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
 	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
 	 * CONDITION_EVAL_TYPE_AND_OR, exercising the custom expression evaluation path.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpExpression$)
