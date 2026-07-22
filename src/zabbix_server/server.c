@@ -399,6 +399,8 @@ static int	config_enable_global_scripts		= 1;
 static int	config_allow_software_update_check	= 1;
 static char	*config_sms_devices			= NULL;
 static char	*config_frontend_allowed_ip		= NULL;
+static char	*config_denyitemtypes			= NULL;
+ZBX_GET_CONFIG_VAR(zbx_uint32_t, config_denyitemtypes_mask, 0)
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -724,6 +726,8 @@ static void	zbx_set_defaults(void)
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERER])
 		config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER] = 1;
+
+	(void)zbx_parse_item_types(config_denyitemtypes, &config_denyitemtypes_mask, NULL);
 }
 
 /******************************************************************************
@@ -804,6 +808,12 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	}
 	zbx_free(address);
 
+	if (SUCCEED != zbx_parse_item_types(config_denyitemtypes, NULL, &ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"DenyItemTypes\" configuration parameter: %s", ch_error);
+		zbx_free(ch_error);
+		err = 1;
+	}
 #if !defined(HAVE_IPV6)
 	err |= (FAIL == zbx_check_cfg_feature_str("Fping6Location", zbx_config_fping6_location, "IPv6 support"));
 #endif
@@ -1228,8 +1238,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"SMSDevices",			&config_sms_devices,			ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"HistoryProvider",		&config_history_providers,		ZBX_CFG_TYPE_MULTISTRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"DenyItemTypes",		&config_denyitemtypes,			ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
@@ -2108,7 +2120,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	}
 
 	if (SUCCEED != zbx_init_configuration_cache(get_zbx_program_type, get_config_forks, config_conf_cache_size,
-			NULL, &error))
+			NULL, get_config_denyitemtypes_mask, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);

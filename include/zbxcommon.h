@@ -154,6 +154,29 @@ typedef enum
 }
 zbx_item_type_t;
 
+#define ZBX_ITEM_TYPE_NAME					\
+{								\
+	{"zabbix",		ITEM_TYPE_ZABBIX},		\
+	{"zabbix_active",	ITEM_TYPE_ZABBIX_ACTIVE},	\
+	{"trapper",		ITEM_TYPE_TRAPPER},		\
+	{"simple",		ITEM_TYPE_SIMPLE},		\
+	{"internal",		ITEM_TYPE_INTERNAL},		\
+	{"external",		ITEM_TYPE_EXTERNAL},		\
+	{"db_monitor",		ITEM_TYPE_DB_MONITOR},		\
+	{"ipmi",		ITEM_TYPE_IPMI},		\
+	{"ssh",			ITEM_TYPE_SSH},			\
+	{"telnet",		ITEM_TYPE_TELNET},		\
+	{"calculated",		ITEM_TYPE_CALCULATED},		\
+	{"jmx",			ITEM_TYPE_JMX},			\
+	{"snmptrap",		ITEM_TYPE_SNMPTRAP},		\
+	{"dependent",		ITEM_TYPE_DEPENDENT},		\
+	{"httpagent",		ITEM_TYPE_HTTPAGENT},		\
+	{"snmp",		ITEM_TYPE_SNMP},		\
+	{"script",		ITEM_TYPE_SCRIPT},		\
+	{"browser",		ITEM_TYPE_BROWSER},		\
+	{NULL,			0}				\
+}
+
 #define SNMP_BULK_DISABLED	0
 #define SNMP_BULK_ENABLED	1
 
@@ -458,6 +481,7 @@ typedef const char	*(*zbx_get_progname_f)(void);
 typedef int		(*zbx_get_config_forks_f)(unsigned char process_type);
 typedef const char	*(*zbx_get_config_str_f)(void);
 typedef int		(*zbx_get_config_int_f)(void);
+typedef zbx_uint32_t	(*zbx_get_denyitemtypes_mask_f)(void);
 typedef void		(*zbx_backtrace_f)(void);
 
 typedef enum

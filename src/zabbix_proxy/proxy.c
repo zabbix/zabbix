@@ -334,6 +334,8 @@ static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL
 static char	*config_socket_path	= NULL;
 static int	config_history_storage_pipelines	= 0;
 static char	*config_stats_allowed_ip	= NULL;
+static char	*config_denyitemtypes		= NULL;
+ZBX_GET_CONFIG_VAR(zbx_uint32_t, config_denyitemtypes_mask, 0)
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
 static int	config_vps_limit		= 0;
 static int	config_vps_overcommit_limit	= 0;
@@ -627,6 +629,8 @@ static void	zbx_set_defaults(void)
 		zabbix_log(LOG_LEVEL_WARNING, "NOTE: ServerPort parameter is deprecated"
 				", please specify port in Server parameter (e.g. 127.0.0.1:10052)");
 	}
+
+	(void)zbx_parse_item_types(config_denyitemtypes, &config_denyitemtypes_mask, NULL);
 }
 
 /******************************************************************************
@@ -693,6 +697,13 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (NULL != config_stats_allowed_ip && FAIL == zbx_validate_peer_list(config_stats_allowed_ip, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"StatsAllowedIP\" configuration parameter: %s", ch_error);
+		zbx_free(ch_error);
+		err = 1;
+	}
+
+	if (SUCCEED != zbx_parse_item_types(config_denyitemtypes, NULL, &ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"DenyItemTypes\" configuration parameter: %s", ch_error);
 		zbx_free(ch_error);
 		err = 1;
 	}
@@ -1090,6 +1101,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"LogRemoteCommands",		&zbx_config_log_remote_commands,	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"StatsAllowedIP",		&config_stats_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"DenyItemTypes",		&config_denyitemtypes,			ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"StartPreprocessors",		&config_forks[ZBX_PROCESS_TYPE_PREPROCESSOR],
 											ZBX_CFG_TYPE_INT,
@@ -1992,7 +2005,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	if (SUCCEED != zbx_init_configuration_cache(get_zbx_program_type, get_config_forks, config_conf_cache_size,
-			config_hostname, &error))
+			config_hostname, get_config_denyitemtypes_mask, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);

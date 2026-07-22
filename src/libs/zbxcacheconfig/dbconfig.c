@@ -217,8 +217,9 @@ void	zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
 	zbx_free(proxy_counter);
 }
 
-static zbx_get_program_type_f	get_program_type_cb = NULL;
-static zbx_get_config_forks_f	get_config_forks_cb = NULL;
+static zbx_get_program_type_f		get_program_type_cb = NULL;
+static zbx_get_config_forks_f		get_config_forks_cb = NULL;
+static zbx_get_denyitemtypes_mask_f	get_denyitemtypes_mask_cb = NULL;
 
 zbx_dc_config_t		*config = NULL;
 zbx_dc_config_private_t	config_private;
@@ -3661,6 +3662,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
 					ITEM_STATE_NOTSUPPORTED, "Nested LLD rule type is supported only for discovered"
 							" LLD rules or hosts.");
+		}
+
+		if (HOST_MONITORED_BY_SERVER == host->monitored_by &&
+				0 != (get_denyitemtypes_mask_cb() & (1u << item->type)))
+		{
+			zbx_timespec_t	ts = {(int)now, 0};
+
+			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
+					"Item type is denied by the \"DenyItemTypes\" configuration parameter.");
 		}
 
 		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
@@ -9024,7 +9034,8 @@ static void	config_unlock_shmem_on_oom(void)
  *                                                                            *
  ******************************************************************************/
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
-		zbx_uint64_t conf_cache_size, const char *hostname, char **error)
+		zbx_uint64_t conf_cache_size, const char *hostname, zbx_get_denyitemtypes_mask_f get_denyitemtypes_mask,
+		char **error)
 {
 	int	i, ret;
 
@@ -9032,6 +9043,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 
 	get_program_type_cb = get_program_type;
 	get_config_forks_cb = get_config_forks;
+	get_denyitemtypes_mask_cb = get_denyitemtypes_mask;
 
 	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto fail;
