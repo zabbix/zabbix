@@ -83,6 +83,9 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+
+		error_log('>>> autoreg prepareData RUNNING at ' . microtime(true));
+
 		$response = $this->call('host.get', []);
 		$hostids = [];
 		foreach ($response['result'] as $host) {

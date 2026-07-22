@@ -247,6 +247,8 @@ class testScriptManualInput extends CIntegrationTest {
 		$this->createTestHostData();
 		$this->createTestScriptData();
 
+		error_log('>>> invalidRequestDataProvider RUNNING at ' . microtime(true));
+
 		return [
 			/*
 			 * In general, there are only two scenarios in which a
@@ -286,6 +288,8 @@ class testScriptManualInput extends CIntegrationTest {
 	public function validRequestDataProvider(): array {
 		$this->createTestHostData();
 		$this->createTestScriptData();
+
+		error_log('>>> validRequestDataProvider RUNNING at ' . microtime(true));
 
 		return [
 			[
