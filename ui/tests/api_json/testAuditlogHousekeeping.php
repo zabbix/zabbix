@@ -67,6 +67,6 @@ class testAuditlogHousekeeping extends testAuditlogCommon {
 			'housekeeping.compress_older' => ['update', '788400000', '7d']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, 1, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, 1, self::RESOURCE_TYPE);
 	}
 }
