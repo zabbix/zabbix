@@ -66,6 +66,8 @@ window.media_edit_popup = new class {
 		});
 
 		this.#media_type.addEventListener('change', () => this.#updateForm());
+		this.#form.findFieldByName('sendto_active_devices').getField()
+			.addEventListener('change', () => this.#updateForm());
 
 		this.#updateForm();
 		this.#form.discoverAllFields();
@@ -76,28 +78,23 @@ window.media_edit_popup = new class {
 	#updateForm() {
 		const mediatypeid = this.#media_type.value;
 		const mediatype_type = mediatypeid in this.#mediatypes ? this.#mediatypes[mediatypeid].type : null;
-		const has_sendto_list = mediatype_type == <?= MEDIA_TYPE_EMAIL ?> || mediatype_type == <?= MEDIA_TYPE_PUSH ?>;
+		const visible_sendto_class = mediatype_type == <?= MEDIA_TYPE_EMAIL ?>
+			? 'js-field-sendto-list'
+			:  mediatype_type == <?= MEDIA_TYPE_PUSH ?> ? 'js-field-sendto-devices' : 'js-field-sendto';
 
 		if (mediatypeid in this.#mediatypes) {
 			document.getElementById('mediatype_type').setAttribute('value', this.#mediatypes[mediatypeid].type);
 		}
 
-		for (const field of this.#form_element.querySelectorAll('.js-field-sendto')) {
-			field.style.display = has_sendto_list ? 'none' : '';
+		const sendto_fields = this.#form_element
+			.querySelectorAll('.js-field-sendto, .js-field-sendto-list, .js-field-sendto-devices');
+
+		for (const field of sendto_fields) {
+			field.style.display = field.classList.contains(visible_sendto_class) ? '' : 'none';
 		}
 
-		for (const field of this.#form_element.querySelectorAll('.js-field-sendto-list')) {
-			field.style.display = has_sendto_list ? '' : 'none';
-		}
-
-		if (mediatype_type == <?= MEDIA_TYPE_PUSH ?>) {
-			this.#form_element.querySelector('label.js-field-sendto-list').classList
-				.remove(ZBX_STYLE_FIELD_LABEL_ASTERISK);
-		}
-		else {
-			this.#form_element.querySelector('label.js-field-sendto-list').classList
-				.add(ZBX_STYLE_FIELD_LABEL_ASTERISK);
-		}
+		$(this.#form.findFieldByName('sendto_deviceuuids').getField())
+			.multiSelect(this.#form.findFieldByName('sendto_active_devices').getValue() === '1' ? 'disable' : 'enable');
 
 		if (mediatypeid in this.#mediatypes) {
 			this.#media_type.querySelector('.focusable').classList.toggle('<?= ZBX_STYLE_COLOR_NEGATIVE ?>',

@@ -796,6 +796,34 @@ switch ($data['method']) {
 					$result[] = ['id' => (string) $nr, 'name' => $title];
 				}
 				break;
+
+			case 'devices':
+				$options = [
+					'output' => ['uuid', 'name'],
+					'filter' => ['status' => ZBX_DEVICE_STATUS_ACTIVATED],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				];
+
+				if (array_key_exists('userid', $data)) {
+					$options['userids'] = [$data['userid']];
+				}
+
+				$devices = API::Device()->get($options);
+
+				if ($devices) {
+					CArrayHelper::sort($devices, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$devices = array_slice($devices, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($devices, ['uuid' => 'id']);
+				}
+
+				break;
 		}
 		break;
 

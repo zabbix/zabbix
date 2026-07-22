@@ -253,7 +253,7 @@ class CMultiSelect extends CTag {
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
 					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros', 'exclude_provisioned',
-					'has_devices_access'
+					'has_devices_access', 'userid'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -283,6 +283,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('hostid', $parameters) && $parameters['hostid'] > 0) {
 					$popup_parameters['only_hostid'] = (string) $parameters['hostid'];
 					$autocomplete_parameters['hostid'] = (string) $parameters['hostid'];
+				}
+
+				if (array_key_exists('userid', $parameters) && $parameters['userid'] > 0) {
+					$popup_parameters['only_userid'] = (string) $parameters['userid'];
+					$autocomplete_parameters['userid'] = (string) $parameters['userid'];
 				}
 
 				if (array_key_exists('hide_host_filter', $parameters)) {
