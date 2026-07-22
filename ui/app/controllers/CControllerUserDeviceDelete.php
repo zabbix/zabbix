@@ -24,7 +24,8 @@ class CControllerUserDeviceDelete extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'deviceid' =>	'required|db device.deviceid'
+			'deviceid' =>	'required|db device.deviceid',
+			'force' =>		'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -53,6 +54,12 @@ class CControllerUserDeviceDelete extends CController {
 			return false;
 		}
 
+		if ($this->hasInput('force') &&
+				!($this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
+					&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES))) {
+			return false;
+		}
+
 		$filter = [
 			'deviceids' => [$this->getInput('deviceid')],
 			'output' => ['deviceid', 'uuid', 'userid']
@@ -74,9 +81,22 @@ class CControllerUserDeviceDelete extends CController {
 
 	protected function doAction(): void {
 		$result = false;
+		$only_local_device = false;
 
 		if ($this->device !== null) {
-			$result = API::Device()->offboard(['uuid' => $this->device['uuid']]);
+			try {
+				$result = API::Device()->offboard([
+					'uuid' => $this->device['uuid'],
+					'force' => $this->getInput('force', 0) == 1
+				]);
+			}
+			catch (Exception $e) {
+				error($e->getCode() .': '. $e->getMessage());
+
+				if ($e->getCode() == ZBX_API_ERROR_NO_EXTERNAL_ENTITY) {
+					$only_local_device = true;
+				}
+			}
 		}
 		else {
 			error(_('No permissions to referred object or it does not exist!'));
@@ -88,10 +108,13 @@ class CControllerUserDeviceDelete extends CController {
 				'action' => 'delete',
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			]]
-			: ['error' => [
-				'title' => _('Cannot remove device'),
-				'messages' => array_column(get_and_clear_messages(), 'message')
-			]];
+			: [
+				'error' => [
+					'title' => _('Cannot remove device'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				],
+				'only_local_device' => $only_local_device
+			];
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
