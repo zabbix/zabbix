@@ -3617,8 +3617,21 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		old_poller_type = item->poller_type;
 		old_nextcheck = item->nextcheck;
 
-		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
+		if (0 != (get_denyitemtypes_mask_cb() & (1u << item->type)))
 		{
+			zbx_timespec_t	ts = {(int)now, 0};
+
+			item->nextcheck = 0;
+			item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
+			item->poller_type = ZBX_NO_POLLER;
+
+			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
+					"Item type is denied by the \"DenyItemTypes\" configuration parameter.");
+		}
+		else if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
+		{
+			unsigned char	state = ITEM_STATE_NORMAL;
+
 			DCitem_poller_type_update(item, host, flags);
 
 			if (SUCCEED == zbx_is_counted_in_item_queue(item->type, item->key))
@@ -3641,10 +3654,18 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 					if (0 == host->proxyid)
 					{
 						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								ITEM_STATE_NOTSUPPORTED, error);
+								(state = ITEM_STATE_NOTSUPPORTED), error);
 					}
 					zbx_free(error);
 				}
+			}
+
+			if (ITEM_STATE_NOTSUPPORTED != state && 0 != (get_denyitemtypes_mask_cb() & (1u << old_type)))
+			{
+				AGENT_RESULT	r = {0};
+				zbx_timespec_t	ts = {(int)now, 0};
+
+				zbx_dc_add_history(item->itemid, item->value_type, 0, &r, &ts, state, NULL);
 			}
 		}
 		else
@@ -3659,18 +3680,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		{
 			zbx_timespec_t	ts = {(int)now, 0};
 
-			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-					ITEM_STATE_NOTSUPPORTED, "Nested LLD rule type is supported only for discovered"
-							" LLD rules or hosts.");
-		}
-
-		if (HOST_MONITORED_BY_SERVER == host->monitored_by &&
-				0 != (get_denyitemtypes_mask_cb() & (1u << item->type)))
-		{
-			zbx_timespec_t	ts = {(int)now, 0};
-
 			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
-					"Item type is denied by the \"DenyItemTypes\" configuration parameter.");
+					"Nested LLD rule type is supported only for discovered LLD rules or hosts.");
 		}
 
 		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
