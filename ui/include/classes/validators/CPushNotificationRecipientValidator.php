@@ -34,7 +34,7 @@ class CPushNotificationRecipientValidator extends CValidator {
 		$uuid_v7_validator = new CUuidV7Validator();
 
 		if (!$uuid_v7_validator->validate($value)) {
-			$this->setError(_s("a wildcard pattern '*' or a UUIDv7 is expected"));
+			$this->setError(_("a wildcard pattern '*' or a UUIDv7 is expected"));
 
 			return false;
 		}

@@ -681,7 +681,7 @@ class CApiInputValidator {
 					);
 				}
 				else {
-					$error = _s('value must be empty');
+					$error = _('value must be empty');
 				}
 
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path, $error);

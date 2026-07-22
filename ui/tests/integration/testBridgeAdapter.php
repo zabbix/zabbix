@@ -61,6 +61,8 @@ class testBridgeAdapter extends CIntegrationTest {
 		'Cannot remove mobile device, bridge-adapter returned an invalid response.';
 	private const DEVICE_OFFBOARD_ERROR_DEVICE_NOT_FOUND =
 		'Cannot unlink device. Please contact your system administrator.';
+	private const ERROR_MOBILE_DEVICES_DISABLED = 'Mobile devices are disabled.';
+	private const ERROR_PERMISSION_DENIED = 'Permission denied.';
 	private const LOG_MOBILE_DEVICES_DISABLED_INIT = 'cannot initialize device: mobile devices are disabled';
 	private const LOG_MOBILE_DEVICES_DISABLED_NOTIFY =
 		'cannot send device notification: mobile devices are disabled';
@@ -1148,6 +1150,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		);
 
 		$this->assertFalse($init_response);
+		$this->assertSame(self::ERROR_MOBILE_DEVICES_DISABLED, $client->getError());
 	}
 
 	/**
@@ -1192,6 +1195,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		);
 
 		$this->assertFalse($result);
+		$this->assertSame(self::ERROR_MOBILE_DEVICES_DISABLED, $client->getError());
 	}
 
 	/**
@@ -1332,6 +1336,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			true, 120, 1);
 
 		$this->assertFalse($offboard_response);
+		$this->assertSame(self::ERROR_MOBILE_DEVICES_DISABLED, $client->getError());
 	}
 
 	/**
@@ -1628,6 +1633,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		);
 
 		$this->assertFalse($init_response);
+		$this->assertSame(self::ERROR_PERMISSION_DENIED, $client->getError());
 
 		$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 	}
@@ -1655,6 +1661,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_INIT_PERMISSION_DENIED, true, 120, 1);
 
 		$this->assertFalse($init_response);
+		$this->assertSame(self::ERROR_PERMISSION_DENIED, $client->getError());
 
 		$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 	}
@@ -2084,6 +2091,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		);
 
 		$this->assertFalse($offboard_response);
+		$this->assertSame(self::ERROR_PERMISSION_DENIED, $client->getError());
 
 		$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 	}
