@@ -420,7 +420,7 @@ clean:
  * Purpose: POSTs a JSON-RPC 2.0 request over HTTP(S), optionally with mTLS,  *
  *          and returns the response body opened as JSON                      *
  *                                                                            *
- * Parameters: url               - [IN]                                       *
+ * Parameters: url               - [IN] non-empty, caller must validate       *
  *             ca_file           - [IN] optional, https:// only               *
  *             crl_file          - [IN] optional, https:// only               *
  *             cert_file         - [IN] optional, https:// only (mTLS)        *
@@ -456,14 +456,6 @@ int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl
 	int			ret = FAIL;
 
 	*body_data = NULL;
-
-	if (NULL == url || '\0' == *url)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to perform JSON-RPC request: URL is not configured");
-		*err_kind = ZBX_HTTP_JSONRPC_ERR_NOT_CONFIGURED;
-		goto out;
-	}
-
 	*err_kind = ZBX_HTTP_JSONRPC_ERR_CONNECT;
 
 	if (NULL == (curl = curl_easy_init()))

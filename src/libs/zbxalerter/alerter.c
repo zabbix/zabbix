@@ -561,6 +561,14 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
 	payload = zbx_strdup(NULL, params);
 
+	if (NULL == config_bridge_adapter_url || '\0' == *config_bridge_adapter_url)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: \"BridgeAdapterURL\""
+				" configuration parameter is not set");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_NOT_CONFIGURED);
+		goto out;
+	}
+
 	if (SUCCEED != zbx_http_post_json_rpc(config_bridge_adapter_url, config_bridge_adapter_ca_file,
 			config_bridge_adapter_crl_file, config_bridge_adapter_cert_file, config_bridge_adapter_key_file,
 			config_bridge_adapter_connect_to, payload, (long)ZBX_BRIDGE_ADAPTER_TIMEOUT, &body_data,
@@ -568,9 +576,6 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		switch (err_kind)
 		{
-			case ZBX_HTTP_JSONRPC_ERR_NOT_CONFIGURED:
-				error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_NOT_CONFIGURED);
-				break;
 			case ZBX_HTTP_JSONRPC_ERR_CONNECT:
 				error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 				break;
