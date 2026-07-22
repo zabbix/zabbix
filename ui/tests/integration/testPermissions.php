@@ -124,12 +124,15 @@ class testPermissions extends CIntegrationTest {
 		// Delete hosts
 		$response = $this->call('host.get', []);
 
-		$hostids = [];
-		foreach ($response['result'] as $host) {
-			$hostids[] = $host['hostid'];
+		if ($response['result']) {
+			$hostids = [];
+			foreach ($response['result'] as $host) {
+				$hostids[] = $host['hostid'];
+			}
+
+			$this->call('host.delete', $hostids);
 		}
 
-		$this->call('host.delete', $hostids);
 		$response = $this->call('host.get', []);
 		$this->assertCount(0, $response['result']);
 
