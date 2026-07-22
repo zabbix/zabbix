@@ -1032,7 +1032,7 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 	{
 		*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 		goto clean;
-	}	
+	}
 
 	char *json_name = (char *)zbx_malloc(NULL, sizeof(MAX_STRING_LEN));
 	char *json_value = (char *)zbx_malloc(NULL, sizeof(MAX_STRING_LEN));

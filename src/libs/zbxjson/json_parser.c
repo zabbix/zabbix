@@ -64,10 +64,10 @@ zbx_int64_t	json_error(const char *message, const char *ptr, char **error)
  ******************************************************************************/
 zbx_int64_t json_error_with_count(const char *message, int count, const char *ptr, char **error)
 {
-    char err_buf[MAX_STRING_LEN];
+    char	err_buf[MAX_STRING_LEN];
 
-    zbx_snprintf(err_buf, sizeof(err_buf), message, count);
-    return json_error(err_buf, ptr, error);
+	zbx_snprintf(err_buf, sizeof(err_buf), message, count);
+	return json_error(err_buf, ptr, error);
 }
 
 /******************************************************************************
@@ -351,7 +351,7 @@ zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, int depth, c
 	double		number;
 
 	if (ZBX_MAX_JSON_DEPTH < depth)
-		return json_error_with_count("JSON depth exceeds %d", ZBX_MAX_JSON_DEPTH, ptr, error);	
+		return json_error_with_count("JSON depth exceeds %d", ZBX_MAX_JSON_DEPTH, ptr, error);
 
 	depth++;
 
