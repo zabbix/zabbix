@@ -947,7 +947,7 @@ FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|hstgrp
 UNIQUE		|1		|maintenanceid,groupid
 INDEX		|2		|groupid
 
-TABLE|maintenance_triggers|maintenance_triggerid|ZBX_DATA
+TABLE|maintenance_trigger|maintenance_triggerid|ZBX_DATA
 FIELD		|maintenance_triggerid	|t_id	|	|NOT NULL	|0
 FIELD		|maintenanceid		|t_id	|	|NOT NULL	|0			|1|maintenances
 FIELD		|triggerid		|t_id	|	|NOT NULL	|0			|2|triggers
@@ -1745,7 +1745,7 @@ FIELD		|operator	|t_integer	|'2'	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|maintenanceid
 
-TABLE|maintenance_eventnames|maintenance_eventnameid|ZBX_DATA
+TABLE|maintenance_eventname|maintenance_eventnameid|ZBX_DATA
 FIELD		|maintenance_eventnameid|t_id		|	|NOT NULL	|0
 FIELD		|maintenanceid		|t_id		|	|NOT NULL	|0		|1|maintenances
 FIELD		|operator		|t_integer	|'2'	|NOT NULL	|0

@@ -865,7 +865,7 @@ static int	DBpatch_7050062(void)
 static int	DBpatch_7050063(void)
 {
 	const zbx_db_table_t	table =
-			{"maintenances_triggers", "maintenance_triggerid", 0,
+			{"maintenance_trigger", "maintenance_triggerid", 0,
 				{
 					{"maintenance_triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -883,7 +883,7 @@ static int	DBpatch_7050064(void)
 	const zbx_db_field_t	field =
 			{"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("maintenances_triggers", 1, &field);
+	return DBadd_foreign_key("maintenance_trigger", 1, &field);
 }
 
 static int	DBpatch_7050065(void)
@@ -891,17 +891,17 @@ static int	DBpatch_7050065(void)
 	const zbx_db_field_t	field =
 			{"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("maintenances_triggers", 2, &field);
+	return DBadd_foreign_key("maintenance_trigger", 2, &field);
 }
 
 static int	DBpatch_7050066(void)
 {
-	return DBcreate_index("maintenances_triggers", "maintenances_triggers_1", "maintenanceid,triggerid", 1);
+	return DBcreate_index("maintenance_trigger", "maintenance_trigger_1", "maintenanceid,triggerid", 1);
 }
 
 static int	DBpatch_7050067(void)
 {
-	return DBcreate_index("maintenances_triggers", "maintenances_triggers_2", "triggerid", 0);
+	return DBcreate_index("maintenance_trigger", "maintenance_trigger_2", "triggerid", 0);
 }
 
 static int	DBpatch_7050068(void)
