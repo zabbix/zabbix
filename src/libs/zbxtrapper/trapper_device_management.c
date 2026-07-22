@@ -19,7 +19,6 @@
 #include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxcomms.h"
-#include "zbxcommshigh.h"
 #include "zbxcrypto.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
