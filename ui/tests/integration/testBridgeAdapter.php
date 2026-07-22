@@ -40,10 +40,16 @@ class testBridgeAdapter extends CIntegrationTest {
 		'Cannot deliver notification, target device is not in Active state.';
 	private const PUSH_ERROR_NOT_CONFIGURED =
 		'Cannot deliver mobile device notification, bridge-adapter is not configured.';
+	private const PUSH_ERROR_CANNOT_CONNECT =
+		'Cannot deliver mobile device notification, cannot connect to bridge-adapter.';
+	private const PUSH_ERROR_INVALID_RESPONSE =
+		'Cannot deliver mobile device notification, bridge-adapter returned an invalid response.';
 	private const PUSH_ERROR_RETURNED_ERROR =
 		'Cannot deliver mobile device notification, bridge-adapter returned an error.';
 	private const DEVICE_INIT_ERROR_NOT_CONFIGURED =
 		'Cannot initialize mobile device, bridge-adapter is not configured.';
+	private const DEVICE_INIT_ERROR_INVALID_RESPONSE =
+		'Cannot initialize mobile device, bridge-adapter returned an invalid response.';
 	private const DEVICE_INIT_ERROR_RETURNED_ERROR =
 		'Cannot initialize mobile device, bridge-adapter returned an error.';
 	private const DEVICE_INIT_ERROR_DEVICE_LIMIT_EXCEEDED =
@@ -58,6 +64,17 @@ class testBridgeAdapter extends CIntegrationTest {
 		'cannot send device notification: mobile devices are disabled';
 	private const LOG_MOBILE_DEVICES_DISABLED_OFFBOARD = 'cannot offboard device: mobile devices are disabled';
 	private const LOG_BRIDGE_ADAPTER_URL_NOT_SET = '"BridgeAdapterURL" configuration parameter is not set';
+	private const LOG_ADAPTER_CONNECTION_REFUSED = 'failed to connect to bridge-adapter';
+	private const LOG_ADAPTER_HTTP_ERROR = 'bridge-adapter returned HTTP 500';
+	private const LOG_ADAPTER_MALFORMED_RESPONSE = 'invalid bridge-adapter response body';
+	private const LOG_ADAPTER_MISSING_JSONRPC_VERSION =
+		'missing JSON-RPC version in bridge-adapter response body';
+	private const LOG_ADAPTER_INVALID_JSONRPC_VERSION =
+		'invalid JSON-RPC version in bridge-adapter response body';
+	private const LOG_ADAPTER_OVERSIZED_RESPONSE_INIT =
+		'bridge-adapter returned too large response body for device.init request';
+	private const LOG_ADAPTER_OVERSIZED_RESPONSE_NOTIFY =
+		'bridge-adapter returned too large response body for device.notify request';
 	private const LOG_INIT_PERMISSION_DENIED = 'cannot initialize device: permission denied for userid';
 	private const LOG_OFFBOARD_PERMISSION_DENIED = 'cannot offboard device: permission denied for userid';
 	private const LOG_OFFBOARD_UNKNOWN_UUID = 'cannot offboard device: failed to resolve device owner by uuid';
@@ -587,6 +604,26 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::startBridgeAdapterMockInternal(['--offboard-error-detail']);
 	}
 
+	public static function startBridgeAdapterMockWithHttpError(): void {
+		self::startBridgeAdapterMockInternal(['--status-code', '500']);
+	}
+
+	public static function startBridgeAdapterMockWithMalformedJson(): void {
+		self::startBridgeAdapterMockInternal(['--malformed-json']);
+	}
+
+	public static function startBridgeAdapterMockWithMissingJsonRpcVersion(): void {
+		self::startBridgeAdapterMockInternal(['--missing-jsonrpc']);
+	}
+
+	public static function startBridgeAdapterMockWithInvalidJsonRpcVersion(): void {
+		self::startBridgeAdapterMockInternal(['--invalid-jsonrpc-version']);
+	}
+
+	public static function startBridgeAdapterMockWithOversizedResponse(): void {
+		self::startBridgeAdapterMockInternal(['--oversized-response']);
+	}
+
 	public static function startBridgeAdapterMockNoTls(): void {
 		self::startBridgeAdapterMockInternal([], false);
 	}
@@ -633,6 +670,22 @@ class testBridgeAdapter extends CIntegrationTest {
 		}
 
 		return self::$adapter_port;
+	}
+
+	/**
+	 * Reserves a port that nothing is listening on, to simulate a bridge-adapter that is unreachable.
+	 */
+	private static function getClosedPort(): int {
+		$socket = stream_socket_server('tcp://'.self::ADAPTER_HOST.':0', $error_code, $error_message);
+
+		if ($socket === false) {
+			throw new Exception('Cannot reserve a closed bridge-adapter port: '.$error_message);
+		}
+
+		$port = (int) substr(strrchr(stream_socket_get_name($socket, false), ':'), 1);
+		fclose($socket);
+
+		return $port;
 	}
 
 	private static function generateCertificates(): string {
@@ -1130,6 +1183,124 @@ class testBridgeAdapter extends CIntegrationTest {
 		});
 	}
 
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithHttpError
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initAdapterHttpError(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_HTTP_ERROR, true, 120, 1);
+
+		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.init', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithMalformedJson
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initAdapterMalformedResponse(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_MALFORMED_RESPONSE, true,
+			120, 1
+		);
+
+		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.init', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithMissingJsonRpcVersion
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initAdapterMissingJsonRpcVersion(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_MISSING_JSONRPC_VERSION, true,
+			120, 1
+		);
+
+		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.init', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithInvalidJsonRpcVersion
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initAdapterInvalidJsonRpcVersion(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_INVALID_JSONRPC_VERSION, true,
+			120, 1
+		);
+
+		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.init', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithOversizedResponse
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_initAdapterOversizedResponse(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_OVERSIZED_RESPONSE_INIT, true,
+			120, 1
+		);
+
+		$this->assertFalse($init_response);
+		$this->assertSame(self::DEVICE_INIT_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.init', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
+		});
+	}
+
 	public function mobileDevicesEnabledConfigurationProvider(): array {
 		return [
 			self::COMPONENT_SERVER => [
@@ -1217,6 +1388,172 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
 			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
 		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithHttpError
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_notifyAdapterHttpError(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$result = $client->testMediaType([
+			'mediatypeid' => self::$push_mediatypeid,
+			'sendto' => self::NOTIFY_DEVICE_UUID,
+			'subject' => 'Bridge adapter integration test',
+			'message' => 'Bridge adapter integration test message'
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_HTTP_ERROR, true, 120, 1);
+
+		$this->assertFalse($result);
+		$this->assertSame(self::PUSH_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithMalformedJson
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_notifyAdapterMalformedResponse(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$result = $client->testMediaType([
+			'mediatypeid' => self::$push_mediatypeid,
+			'sendto' => self::NOTIFY_DEVICE_UUID,
+			'subject' => 'Bridge adapter integration test',
+			'message' => 'Bridge adapter integration test message'
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_MALFORMED_RESPONSE, true,
+			120, 1
+		);
+
+		$this->assertFalse($result);
+		$this->assertSame(self::PUSH_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithMissingJsonRpcVersion
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_notifyAdapterMissingJsonRpcVersion(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$result = $client->testMediaType([
+			'mediatypeid' => self::$push_mediatypeid,
+			'sendto' => self::NOTIFY_DEVICE_UUID,
+			'subject' => 'Bridge adapter integration test',
+			'message' => 'Bridge adapter integration test message'
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_MISSING_JSONRPC_VERSION, true,
+			120, 1
+		);
+
+		$this->assertFalse($result);
+		$this->assertSame(self::PUSH_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithInvalidJsonRpcVersion
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_notifyAdapterInvalidJsonRpcVersion(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$result = $client->testMediaType([
+			'mediatypeid' => self::$push_mediatypeid,
+			'sendto' => self::NOTIFY_DEVICE_UUID,
+			'subject' => 'Bridge adapter integration test',
+			'message' => 'Bridge adapter integration test message'
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_INVALID_JSONRPC_VERSION, true,
+			120, 1
+		);
+
+		$this->assertFalse($result);
+		$this->assertSame(self::PUSH_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithOversizedResponse
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_notifyAdapterOversizedResponse(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$result = $client->testMediaType([
+			'mediatypeid' => self::$push_mediatypeid,
+			'sendto' => self::NOTIFY_DEVICE_UUID,
+			'subject' => 'Bridge adapter integration test',
+			'message' => 'Bridge adapter integration test message'
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_OVERSIZED_RESPONSE_NOTIFY, true,
+			120, 1
+		);
+
+		$this->assertFalse($result);
+		$this->assertSame(self::PUSH_ERROR_INVALID_RESPONSE, $client->getError());
+
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
+		});
+	}
+
+	public function notifyConnectionRefusedConfigurationProvider(): array {
+		$closed_port = self::getClosedPort();
+
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 4,
+				'LogFileSize' => 20,
+				'EnableMobileDevices' => 1,
+				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.$closed_port.'/rpc',
+				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.$closed_port,
+				'TLSCAFile' => null,
+				'TLSCertFile' => null,
+				'TLSKeyFile' => null
+			]
+		];
+	}
+
+	/**
+	 * @configurationDataProvider notifyConnectionRefusedConfigurationProvider
+	 */
+	public function testBridgeAdapter_notifyConnectionRefused(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$result = $client->testMediaType([
+			'mediatypeid' => self::$push_mediatypeid,
+			'sendto' => self::NOTIFY_DEVICE_UUID,
+			'subject' => 'Bridge adapter integration test',
+			'message' => 'Bridge adapter integration test message'
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_ADAPTER_CONNECTION_REFUSED, true,
+			120, 1
+		);
+
+		$this->assertFalse($result);
+		$this->assertSame(self::PUSH_ERROR_CANNOT_CONNECT, $client->getError());
 	}
 
 	/**
