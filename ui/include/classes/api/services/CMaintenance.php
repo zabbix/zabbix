@@ -199,7 +199,7 @@ class CMaintenance extends CApiService {
 				' FROM maintenance_triggers mt'.
 				' WHERE m.maintenanceid=mt.maintenanceid'.
 				' AND '.dbConditionId('mt.triggerid', $options['triggerids']).
-				')';
+			')';
 		}
 
 		// filter
@@ -318,8 +318,8 @@ class CMaintenance extends CApiService {
 			]],
 			'event_names' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'maintenance_type', 'in' => MAINTENANCE_TYPE_NORMAL], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['operator', 'value']], 'fields' => [
-				'operator' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]), 'default' => DB::getDefault('maintenance_eventnames', 'operator')],
-				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_eventnames', 'value')]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]), 'default' => DB::getDefault('maintenance_eventnames', 'operator')],
+				'value' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_eventnames', 'value')]
 										]],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
@@ -491,7 +491,7 @@ class CMaintenance extends CApiService {
 			'event_names' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'maintenance_type', 'in' => MAINTENANCE_TYPE_NORMAL], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['operator', 'value']], 'fields' => [
 				'operator' =>				['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]), 'default' => DB::getDefault('maintenance_eventnames', 'operator')],
-				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_eventnames', 'value')]
+				'value' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_eventnames', 'value')]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
@@ -1179,9 +1179,7 @@ class CMaintenance extends CApiService {
 			}
 			unset($event_name);
 
-			$del_maintenance_eventnameids = array_merge($del_maintenance_eventnameids,
-				array_keys($db_event_names)
-			);
+			$del_maintenance_eventnameids = array_merge($del_maintenance_eventnameids, array_keys($db_event_names));
 		}
 		unset($maintenance);
 

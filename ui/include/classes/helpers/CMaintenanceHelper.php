@@ -120,7 +120,13 @@ class CMaintenanceHelper {
 		return '';
 	}
 
-	public static function normalizeTimePeriod($period): int {
+	/**
+	 * Round maintenance time period down to whole minutes.
+	 *
+	 * @param string $period
+	 * @return int
+	 */
+	public static function normalizeTimePeriod(string $period): int {
 		$period = timeUnitToSeconds($period);
 
 		return $period - $period % SEC_PER_MIN;
