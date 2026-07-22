@@ -383,7 +383,7 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	}
 
 	ret = zbx_http_post_json_rpc(config_bridge_adapter_url, config_tls->ca_file, config_tls->crl_file,
-			config_tls->cert_file, config_tls->key_file, config_bridge_adapter_connect_to, payload,
+			config_tls->cert_file, config_tls->key_file, config_bridge_adapter_connect_to, payload, request,
 			(long)ZBX_BRIDGE_ADAPTER_TIMEOUT, body_data, jp_body, &err_kind);
 
 	if (SUCCEED != ret)
