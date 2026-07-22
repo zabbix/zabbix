@@ -109,7 +109,6 @@ class testScriptManualInput extends CIntegrationTest {
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your mindmacro has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
-				'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED
 			],
 			[
@@ -118,7 +117,6 @@ class testScriptManualInput extends CIntegrationTest {
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your {MANUALINPUT} has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
-				'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 				'manualinput_validator' => '^[a-z]+$',
@@ -131,7 +129,6 @@ class testScriptManualInput extends CIntegrationTest {
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your {MANUALINPUT} has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
-				'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 				'manualinput_validator' => 'macro,mind',
