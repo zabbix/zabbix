@@ -96,7 +96,7 @@ class CControllerCepRuleEdit extends CController {
 				'cep_ruleids' => $cepruleid,
 				'output' => ['cep_ruleid', 'name', 'description', 'window_type', 'status', 'stop', 'sortorder'],
 				'selectOperations' => ['sortorder', 'execute_when', 'type', 'evaltype', 'event_name', 'tag', 'new_tag',
-					'tag_value', 'severity', 'tags'],
+					'tag_value', 'severity', 'tags', 'suppress_until'],
 				'selectFilter' => ['eval_formula', 'evaltype', 'conditions'],
 				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host',
 					'group_by_tags', 'event_count_tag', 'tags']
@@ -147,6 +147,20 @@ class CControllerCepRuleEdit extends CController {
 		unset($ceprule['filter']['eval_formula']);
 
 		$ceprule['filter']['conditions'] = self::prepareFilterConditions($ceprule['filter']['conditions']);
+
+		if (array_key_exists('operations', $ceprule)) {
+			array_walk($ceprule['operations'], function(array &$operation) {
+
+				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS) {
+					if ($operation['suppress_until'] === DB::getDefault('cep_operation', 'suppress_until')) {
+						$operation['suppress_until'] = '';
+					}
+					else {
+						$operation['suppress_until'] = date(ZBX_DATE_TIME, $operation['suppress_until']);
+					}
+				}
+			});
+		}
 
 		return $ceprule;
 	}

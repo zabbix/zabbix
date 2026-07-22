@@ -134,6 +134,7 @@ window.ceprule_operation_edit_popup = new class {
 			this.#addTagRow(tag);
 		}
 
+		this.form_element.querySelector(`[name="type"]`).value = operation.type;
 		this.form_element.querySelector(`[name="execute_when"]`).value = operation.execute_when;
 		this.form_element.querySelector(`[name="window_type"]`).value = operation.window_type;
 		this.form_element.querySelector(`[name="sortorder"]`).value = operation.sortorder;
