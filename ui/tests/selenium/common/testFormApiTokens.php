@@ -137,7 +137,7 @@ class testFormApiTokens extends CWebTest {
 		$this->assertEquals('Make sure to copy the auth token as you won\'t be able to view it after the page is closed.',
 				$this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible()->getText()
 		);
-		$this->assertTrue($dialog->query('xpath:.//button[@title="Close"]')->one()->isClickable());
+		$this->assertTrue($dialog->query('xpath:.//button[@aria-label="Close modal window"]')->one()->isClickable());
 		$dialog->close();
 	}
 

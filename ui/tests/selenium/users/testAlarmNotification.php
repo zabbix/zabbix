@@ -294,6 +294,11 @@ class testAlarmNotification extends CWebTest {
 			}
 		}
 
+		// Check that clicking close button twice (simulating double-click) closes the dialog without producing an error.
+		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->click();
+		$alarm_dialog->waitUntilNotVisible();
+		$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid());
+
 		// Close problem and open Problem page.
 		CDBHelper::setTriggerProblem('Not_classified_trigger_4', TRIGGER_VALUE_FALSE);
 		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
