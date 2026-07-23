@@ -99,7 +99,17 @@ JAVASCRIPT;
 			'valuemapid' => 0,
 			'valuemap' => [],
 			'verify_host' => DB::getDefault('items', 'verify_host'),
-			'verify_peer' => DB::getDefault('items', 'verify_peer')
+			'verify_peer' => DB::getDefault('items', 'verify_peer'),
+			'time_shift' => DB::getDefault('items', 'time_shift'),
+			'lookback_limit' => DB::getDefault('items', 'lookback_limit'),
+			'granularity' => DB::getDefault('items', 'granularity'),
+			'signal_type' => APM_SIGNAL_TYPE_TRACES,
+			'metric_point_type' => APM_METRICS_POINT_SUM,
+			'columns' => [],
+			'aggregated_columns' => [],
+			'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+			'formula' => '',
+			'conditions' => []
 		];
 	}
 	/**
