@@ -1238,43 +1238,40 @@ class CUser extends CApiService {
 				$type = $db_media_types[$media['mediatypeid']]['type'];
 				$base_path = '/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto';
 
-				if ($type != MEDIA_TYPE_EMAIL && $type != MEDIA_TYPE_PUSH) {
-					if (count($media['sendto']) > 1) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Invalid parameter "%1$s": %2$s.', $base_path, _('a character string is expected'))
-						);
-					}
+				if ($type == MEDIA_TYPE_EMAIL || $type == MEDIA_TYPE_PUSH) {
+					foreach ($media['sendto'] as $i3 => $sendto) {
+						$path = $base_path.'/'.($i3 + 1);
 
-					continue;
-				}
-
-				foreach ($media['sendto'] as $i3 => $sendto) {
-					$path = $base_path.'/'.($i3 + 1);
-
-					if ($sendto === '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'))
-						);
-					}
-
-					if ($type == MEDIA_TYPE_EMAIL) {
-						if (!$email_validator->validate($sendto)) {
+						if ($sendto === '') {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid parameter "%1$s": %2$s.', $path, _('an email address is expected'))
+								_s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'))
 							);
 						}
 
-						continue;
-					}
+						if ($type == MEDIA_TYPE_EMAIL) {
+							if (!$email_validator->validate($sendto)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Invalid parameter "%1$s": %2$s.', $path, _('an email address is expected'))
+								);
+							}
 
-					// MEDIA_TYPE_PUSH
-					if (!$push_notification_recipient_validator->validate($sendto)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Invalid parameter "%1$s": %2$s.', $path,
-								$push_notification_recipient_validator->getError()
-							)
-						);
+							continue;
+						}
+
+						// MEDIA_TYPE_PUSH
+						if (!$push_notification_recipient_validator->validate($sendto)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Invalid parameter "%1$s": %2$s.', $path,
+									$push_notification_recipient_validator->getError()
+								)
+							);
+						}
 					}
+				}
+				elseif (count($media['sendto']) > 1) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', $base_path, _('a character string is expected'))
+					);
 				}
 
 				if (mb_strlen(implode("\n", $media['sendto'])) > $length) {
