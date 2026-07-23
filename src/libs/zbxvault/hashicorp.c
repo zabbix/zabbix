@@ -329,7 +329,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 	struct zbx_json_parse	jp, jp_data;
 	long			response_code;
 	int			status = FAIL;
-	static int		renewable, last_status = SUCCEED;
+	static int		renewable = 0, last_status = SUCCEED;
 	static double		next_try_after_error;
 	static double		next_renew;
 
