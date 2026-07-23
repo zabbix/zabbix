@@ -183,6 +183,9 @@ $form
 				'delete' => 'item.prototype.delete'
 			],
 			'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false]),
+			'telemetry_columns_config' => CTelemetryData::getColumnConfig(),
+			'telemetry_function_labels' => CTelemetryData::getFunctionLabels(),
+			'telemetry_operator_labels' => CTelemetryData::getOperatorLabels(),
 			'form_data' => $item,
 			'host' => $data['host'],
 			'inherited_timeouts' => $data['inherited_timeouts'],
