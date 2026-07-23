@@ -234,6 +234,7 @@ $translate_strings = [
 		'Awaiting data' => _('Awaiting data'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
+		'Edit' => _('Edit'),
 		'No refresh' => _('No refresh'),
 		'Paste' => _('Paste'),
 		'Refresh interval' => _('Refresh interval'),
