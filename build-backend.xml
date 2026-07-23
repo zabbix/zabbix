@@ -215,7 +215,7 @@
 		<property name="cmocka-2-agent-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-agent"/>
 		<property name="cmocka-3-server-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-server --with-mysql --with-libcurl"/>
 		<property name="cmocka-4-proxy-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-proxy --with-sqlite3 --with-libcurl"/>
-		<property name="cmocka-5-sanitizer" value="CONFIG_SITE='share/config.site.d/clang-debug-sanitize' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-iconv"/>
+		<property name="cmocka-5-sanitizer" value="CONFIG_SITE='share/config.site.d/clang-debug-sanitize' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --with-ssh2 --with-libxml2 --with-libmodbus --enable-ipv6 --with-mysql --with-net-snmp --with-iconv"/>
 
 	</target>
 
@@ -255,7 +255,7 @@
 		<exec executable="./bootstrap.sh" failonerror="on">
 			<arg line="tests"/>
 		</exec>
-		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql" conf-name="gen-test-coverage-report"/>
+		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-ssh2 --with-libxml2 --with-openipmi --with-openssl --with-libmodbus --with-libcurl" conf-name="gen-test-coverage-report"/>
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
 			<arg line="src"/>
