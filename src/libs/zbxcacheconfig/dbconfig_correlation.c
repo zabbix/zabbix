@@ -709,7 +709,7 @@ static void	correlation_config_sync_conditions(zbx_dbsync_t *sync)
 			corr_condition_release(cond_ref->condition);
 
 			/* sort the conditions later */
-			if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+			if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION != correlation->evaltype)
 				zbx_vector_correlation_ptr_append(&correlations, correlation);
 
 			correlation_ref_update(ref, correlation);
