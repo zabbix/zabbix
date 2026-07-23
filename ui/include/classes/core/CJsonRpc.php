@@ -85,9 +85,7 @@ class CJsonRpc {
 		}
 
 		$calls_data = [];
-
-		$authentication_required = false;
-
+		$calls_data_auth = [];
 		$api_method_names = [];
 
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
@@ -124,39 +122,44 @@ class CJsonRpc {
 				continue;
 			}
 
-			if (!$authentication_required
-					&& ($this->apiClient->requiresAuthentication($api, $method)
-						|| ($this->apiClient->supportsAuthentication($api, $method) && $auth['auth'] !== null))) {
-				$authentication_required = true;
-			}
-
-			$api_method_names[] = $call['method'];
-
-			$calls_data[] = [
+			$call_data = [
 				'api' => $request_api,
 				'method' => $request_method,
 				'params' => $call['params'],
 				'id' => array_key_exists('id', $call) ? $call['id'] : null
 			];
+
+			if ($this->apiClient->requiresAuthentication($api, $method) || $auth['auth'] !== null) {
+				$calls_data_auth[] =$call_data;
+			}
+			else {
+				$calls_data[] = $call_data;
+			}
+
+			$api_method_names[] = $call['method'];
 		}
 
-		$authenticate_response = null;
-
-		if ($authentication_required) {
+		if ($calls_data_auth) {
 			$authenticate_response = $this->apiClient->authenticate($auth, implode(',', $api_method_names));
-		}
 
-		if ($authenticate_response === null || $authenticate_response->errorCode === null) {
-			foreach ($calls_data as $call) {
-				$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
+			if ($authenticate_response->errorCode === null) {
+				foreach ($calls_data_auth as $call) {
+					$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
 
-				$this->processResult($call, $result);
+					$this->processResult($call, $result);
+				}
+			}
+			else {
+				foreach ($calls_data_auth as $call) {
+					$this->processResult($call, $authenticate_response);
+				}
 			}
 		}
-		else {
-			foreach ($calls_data as $call) {
-				$this->processResult($call, $authenticate_response);
-			}
+
+		foreach ($calls_data as $call) {
+			$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
+
+			$this->processResult($call, $result);
 		}
 
 		$response = new CHttpResponse();
