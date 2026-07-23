@@ -1991,7 +1991,7 @@ class testPageProblems extends CWebTest {
 	/**
 	 * @dataProvider getFilterForOperationalData
 	 */
-	public function testPageProblems_OperationalData($data){
+	public function testPageProblems_OperationalData($data) {
 		$this->page->login()->open(self::URL.'&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
 		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
