@@ -420,7 +420,37 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 		{
 			if (NULL != app_role_id && ZBX_HTTP_STATUS_CODE_FORBIDDEN == response_code)
 			{
-				char	*errmsg = NULL;
+				char	*out2 = NULL, *errmsg = NULL;
+				long	resp_code;
+
+				if (SUCCEED != zbx_vault_token_lookup_self(vault_url, *token, ssl_cert_file,
+						ssl_key_file, config_source_ip, config_ssl_ca_location,
+						config_ssl_cert_location, config_ssl_key_location, timeout,
+						&out2, &resp_code, &error))
+				{
+					/* HTTP request failed */
+					goto out;
+				}
+
+				if (ZBX_HTTP_STATUS_CODE_OK == resp_code)
+				{
+					error = zbx_strdup(error, "cannot renew token, token is valid,"
+							" could be problem with policy");
+					zbx_free(out2);
+					goto out;
+				}
+
+				if (ZBX_HTTP_STATUS_CODE_FORBIDDEN != resp_code)
+				{
+					error = zbx_dsprintf(error, "vault token lookup-self failed with"
+							" code \"%ld\"", resp_code);
+					zbx_free(out2);
+					goto out;
+				}
+
+				/* 'resp_code' is ZBX_HTTP_STATUS_CODE_FORBIDDEN */
+
+				zbx_free(out2);
 
 				if (SUCCEED == zbx_vault_app_role_login_hashicorp(vault_url, app_role_id,
 						app_secret_id, ssl_cert_file, ssl_key_file, config_source_ip,
@@ -435,7 +465,6 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 
 				error = zbx_dsprintf(error, "cannot re-login with AppRole method: %s", errmsg);
 				zbx_free(errmsg);
-
 				goto out;
 			}
 
