@@ -1399,6 +1399,7 @@ int	zbx_dc_um_shared_handle_reacquire(zbx_dc_um_shared_handle_t *old_handle, zbx
 zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_copy(zbx_dc_um_shared_handle_t *handle);
 void	zbx_dc_um_shared_handle_release(zbx_dc_um_shared_handle_t *handle);
 
+int	zbx_dc_get_host_proxyid_by_name(const char *host, zbx_uint64_t *proxyid);
 int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
 int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
 
