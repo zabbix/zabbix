@@ -1551,7 +1551,10 @@ void	cep_update_event_maintenances(zbx_cep_t *cep, const zbx_vector_event_mainte
 		if (NULL == h || h->eventid != events->values[i].eventid)
 		{
 			if (NULL != h)
+			{
 				cep_event_update_maintenances(h, &suppress, action);
+				zbx_vector_db_event_suppress_clear(&suppress);
+			}
 
 			if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, events->values[i].eventid)))
 				continue;
