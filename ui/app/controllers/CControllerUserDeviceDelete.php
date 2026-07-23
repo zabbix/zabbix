@@ -96,7 +96,7 @@ class CControllerUserDeviceDelete extends CController {
 				]);
 			}
 			catch (Exception $e) {
-				error($e->getCode() .': '. $e->getMessage());
+				error($e->getMessage());
 
 				if ($e->getCode() == ZBX_API_ERROR_NO_EXTERNAL_ENTITY) {
 					$only_local_device = true;
