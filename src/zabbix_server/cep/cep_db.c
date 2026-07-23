@@ -529,10 +529,11 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 {
 	zbx_dbconn_t			*db;
 	zbx_vector_trigger_diff_ptr_t	trigger_diffs;
+	int				ret;
 
 	zbx_vector_trigger_diff_ptr_create(&trigger_diffs);
 
-	for (int ret = ZBX_DB_DOWN; ret == ZBX_DB_DOWN;)
+	for (ret = ZBX_DB_DOWN; ret == ZBX_DB_DOWN;)
 	{
 		db = zbx_dbconn_pool_acquire_connection(dbpool);
 		zbx_dbconn_begin(db);
@@ -547,7 +548,9 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 		zbx_dbconn_pool_release_connection(dbpool, db);
 	}
 
-	zbx_dc_config_triggers_apply_changes(trigger_diffs.values, trigger_diffs.values_num);
+	if (ZBX_DB_OK == ret)
+		zbx_dc_config_triggers_apply_changes(trigger_diffs.values, trigger_diffs.values_num);
+
 	zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diffs, zbx_trigger_diff_free);
 	zbx_vector_trigger_diff_ptr_destroy(&trigger_diffs);
 }
