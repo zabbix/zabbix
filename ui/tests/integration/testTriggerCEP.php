@@ -1255,7 +1255,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * fires once "up" problems arrive.
 	 */
 	public function prepareDataGlobalCorrelationCloseOnUp($evaltype = CONDITION_EVAL_TYPE_AND_OR,
-			$extra_tag_via_webhook = false) {
+			$extra_tag_via_webhook = false, $recreate_correlation = false) {
 		// Switch item prototypes to text so the find() function can be used in expressions.
 		$this->call('itemprototype.update', [
 			'itemid' => self::$item_prototypeid,
@@ -1359,7 +1359,13 @@ class testTriggerCEP extends CIntegrationTest {
 			return true;
 		});
 
-		// Start from a clean correlation slate, then create the single "close old down when new up" rule.
+		// Create (or update in place) the single "close old down when new up" rule. When
+		// $recreate_correlation is set the existing CEP correlation rules are deleted first, so the rule is
+		// built from scratch with this test's evaltype rather than updated on top of the one a previous
+		// CloseOnUp variant left behind (which uses a different evaltype).
+		if ($recreate_correlation) {
+			$this->deleteCepCorrelations();
+		}
 
 		self::$correlationid = $this->upsertCorrelation(
 			$this->buildCloseOnUpCorrelationParams('CEP global event correlation up', $evaltype)
@@ -1369,6 +1375,25 @@ class testTriggerCEP extends CIntegrationTest {
 		if ($extra_tag_via_webhook) {
 			$this->createExtraTagWebhookAction();
 		}
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the "close old down when new up" scenario with the correlation created under
+	 * $baseline_evaltype and then updated in place to $target_evaltype, so the test exercises an evaltype
+	 * transition on an existing rule rather than a freshly created one. The baseline rule is recreated from
+	 * scratch first (so the starting evaltype is deterministic regardless of what a previous CloseOnUp
+	 * variant left behind), then correlation.update switches it to the target evaltype.
+	 */
+	public function prepareDataGlobalCorrelationCloseOnUpEvaltypeTransition($baseline_evaltype, $target_evaltype) {
+		$this->prepareDataGlobalCorrelationCloseOnUp($baseline_evaltype, false, true);
+
+		self::$correlationid = $this->upsertCorrelation(
+			$this->buildCloseOnUpCorrelationParams('CEP global event correlation up', $target_evaltype)
+		);
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -1757,6 +1782,13 @@ HEREDOC;
 	 * CLOSE_OLD closes the paired "down" problem and CLOSE_NEW closes the "up" problem itself. No old-event
 	 * state="down" condition is needed: correlation only matches open problems and every "up" closes itself
 	 * via CLOSE_NEW, so the only open problem sharing a given service number is always its "down".
+	 *
+	 * CONDITION_EVAL_TYPE_OR is a special case: OR-ing the new state="up" condition with the tag pair would
+	 * match every open problem (the state="up" condition alone is true for any "up" event), closing them all
+	 * at once instead of the paired one. The OR variant therefore keeps only the service tag pair; with a
+	 * single condition OR is equivalent to AND, so the 1:1 close-on-up pairing is preserved. The other
+	 * evaltypes AND the two conditions (AND_OR because they are of distinct types), giving identical
+	 * behaviour.
 	 */
 	private function buildCloseOnUpCorrelationParams(string $name, $evaltype): array {
 		$new_up = [
@@ -1778,6 +1810,12 @@ HEREDOC;
 				'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 				'formula' => 'A and B',
 				'conditions' => [$new_up, $tag_pair]
+			];
+		}
+		elseif ($evaltype == CONDITION_EVAL_TYPE_OR) {
+			$filter = [
+				'evaltype' => $evaltype,
+				'conditions' => [$tag_pair]
 			];
 		}
 		else {
@@ -3297,6 +3335,113 @@ HEREDOC;
 	}
 
 	/**
+	 * Single-item close-on-up (see testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItem) with
+	 * the correlation rule created from scratch under CONDITION_EVAL_TYPE_AND. Both conditions (new
+	 * state="up" + service tag pair) are AND'd, giving the same 1:1 close-on-up as AND_OR.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAnd$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAnd() {
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_AND, false, true);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
+	}
+
+	/**
+	 * Single-item close-on-up with the correlation rule created under CONDITION_EVAL_TYPE_AND_OR and then
+	 * updated in place to CONDITION_EVAL_TYPE_AND, exercising an evaltype transition on an existing rule.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndUpdate$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndUpdate() {
+		$this->prepareDataGlobalCorrelationCloseOnUpEvaltypeTransition(CONDITION_EVAL_TYPE_AND_OR,
+			CONDITION_EVAL_TYPE_AND);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
+	}
+
+	/**
+	 * Single-item close-on-up with the correlation rule created from scratch under
+	 * CONDITION_EVAL_TYPE_AND_OR (the two distinct-type conditions are AND'd), the recreate-from-scratch
+	 * counterpart of the default in-place testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItem.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndOr$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndOr() {
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_AND_OR, false, true);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
+	}
+
+	/**
+	 * Single-item close-on-up with the correlation rule created under CONDITION_EVAL_TYPE_AND and then
+	 * updated in place to CONDITION_EVAL_TYPE_AND_OR, exercising an evaltype transition on an existing rule.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndOrUpdate$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndOrUpdate() {
+		$this->prepareDataGlobalCorrelationCloseOnUpEvaltypeTransition(CONDITION_EVAL_TYPE_AND,
+			CONDITION_EVAL_TYPE_AND_OR);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
+	}
+
+	/**
+	 * Single-item close-on-up with the correlation rule created from scratch under
+	 * CONDITION_EVAL_TYPE_EXPRESSION (custom formula "A and B"), exercising the custom expression evaluation
+	 * path on a single event stream.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemExpression$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemExpression() {
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_EXPRESSION, false, true);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
+	}
+
+	/**
+	 * Single-item close-on-up with the correlation rule created under CONDITION_EVAL_TYPE_AND_OR and then
+	 * updated in place to CONDITION_EVAL_TYPE_EXPRESSION (custom formula "A and B"), exercising a transition
+	 * from a basic evaltype to a custom expression on an existing rule.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemExpressionUpdate$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemExpressionUpdate() {
+		$this->prepareDataGlobalCorrelationCloseOnUpEvaltypeTransition(CONDITION_EVAL_TYPE_AND_OR,
+			CONDITION_EVAL_TYPE_EXPRESSION);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
+	}
+
+	/**
+	 * Single-item close-on-up with the correlation rule created from scratch under CONDITION_EVAL_TYPE_OR.
+	 * OR-ing the new state="up" condition with the tag pair would match every open problem at once, so the
+	 * OR rule keeps only the service tag pair (see buildCloseOnUpCorrelationParams); with one condition OR
+	 * is equivalent to AND, preserving the 1:1 close-on-up pairing.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOr$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOr() {
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_OR, false, true);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
+	}
+
+	/**
+	 * Single-item close-on-up with the correlation rule created under CONDITION_EVAL_TYPE_AND_OR and then
+	 * updated in place to CONDITION_EVAL_TYPE_OR (single service tag pair condition), exercising an evaltype
+	 * transition that also drops a condition on an existing rule.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOrUpdate$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	/*public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOrUpdate() {
+		$this->prepareDataGlobalCorrelationCloseOnUpEvaltypeTransition(CONDITION_EVAL_TYPE_AND_OR,
+			CONDITION_EVAL_TYPE_OR);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
+	}*/
+
+	/**
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpFromSameTrigger$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -3610,12 +3755,14 @@ HEREDOC;
 	 * CONDITION_EVAL_TYPE_AND (every condition AND'd regardless of type) instead of
 	 * CONDITION_EVAL_TYPE_AND_OR. The rule's two conditions (new state="up" + service tag pair) are of
 	 * distinct types, so AND evaluates them identically to AND_OR while exercising the
-	 * CONDITION_EVAL_TYPE_AND formula-generation path on the close-on-up scenario.
+	 * CONDITION_EVAL_TYPE_AND formula-generation path on the close-on-up scenario. The correlation is
+	 * recreated from scratch (rather than updated in place) so its evaltype does not depend on whichever
+	 * AND_OR CloseOnUp variant ran before it.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpAnd$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpAnd() {
-		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_AND);
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_AND, false, true);
 		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
 		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
