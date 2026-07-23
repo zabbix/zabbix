@@ -210,6 +210,18 @@ static void	match_event_to_service_problem_tags(const zbx_cep_event_t *event,
 		zbx_service_t	*service = candidates.values[i];
 		int		j;
 
+		if (0 == (flags & ZBX_FLAG_SERVICE_RECALCULATE))
+		{
+			for (j = 0; j < service->service_problems.values_num; j++)
+			{
+				if (service->service_problems.values[j]->eventid == event->eventid)
+					break;
+				}
+
+			if (j < service->service_problems.values_num)
+				continue;
+		}
+
 		for (j = 0; j < service->service_problem_tags.values_num; j++)
 		{
 			zbx_service_problem_tag_t	*service_problem_tag = service->service_problem_tags.values[j];
