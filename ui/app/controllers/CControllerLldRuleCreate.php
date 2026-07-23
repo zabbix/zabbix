@@ -27,6 +27,18 @@ class CControllerLldRuleCreate extends CControllerLldRuleUpdateGeneral {
 		return [];
 	}
 
+	public static function getValidationRulesTypeField(): array {
+		return [
+			['db items.type', 'required', 'in' => self::getItemTypes()],
+			['db items.type', 'not_in' => [ITEM_TYPE_NESTED],
+				'when' => [
+					['context', 'in' => ['host']],
+					['host_discovered', 'in' => [0]]
+				]
+			]
+		];
+	}
+
 	public static function isPrototype(): bool {
 		return false;
 	}

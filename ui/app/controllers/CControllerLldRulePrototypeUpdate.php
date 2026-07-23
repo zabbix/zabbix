@@ -30,6 +30,12 @@ class CControllerLldRulePrototypeUpdate extends CControllerLldRuleUpdateGeneral 
 		];
 	}
 
+	public static function getValidationRulesTypeField(): array {
+		return [
+			['db items.type', 'required', 'in' => self::getItemTypes()]
+		];
+	}
+
 	public static function isPrototype(): bool {
 		return true;
 	}

@@ -198,6 +198,12 @@ class CControllerLldRuleEdit extends CController
 		$host = $this->getInput('context') === 'host' ? $this->host : $this->template;
 		$lldrule = $this->getLldRuleData($host);
 
+		$types = array_intersect_key(item_type2str(), array_flip(CControllerLldRuleUpdateGeneral::getItemTypes()));
+
+		if ($this->getInput('context') === 'host' && !($this->host['flags'] & ZBX_FLAG_DISCOVERY_CREATED)) {
+			$types = array_diff_key($types, array_flip([ITEM_TYPE_NESTED]));
+		}
+
 		$data = [
 			'itemid' => $lldrule['itemid'],
 			'host' => $host,
@@ -210,7 +216,7 @@ class CControllerLldRuleEdit extends CController
 			'can_edit_source_timeouts' => ($this->host && $this->host['proxyid'])
 				? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 				: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL),
-			'types' => array_intersect_key(item_type2str(), array_flip(CControllerLldRuleUpdateGeneral::getItemTypes())),
+			'types' => $types,
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
 			'js_test_validation_rules' => (new CFormValidator(
 				CControllerPopupItemTestEdit::getValidationRules(false)

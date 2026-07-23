@@ -35,6 +35,8 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 
 	abstract static function getFieldsValidationRulesAdditional(): array;
 
+	abstract static function getValidationRulesTypeField(): array;
+
 	abstract static function isPrototype(): bool;
 
 	public static function getItemTypes() {
@@ -51,8 +53,9 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'hostid' => ['db items.hostid', 'required'],
 			'templateid' => ['db items.templateid'],
 			'discovered' => ['boolean'],
+			'host_discovered' => ['boolean', 'required'],
 			'name' => ['db items.name', 'required', 'not_empty'],
-			'type' => ['db items.type', 'required', 'in' => self::getItemTypes()],
+			'type' => static::getValidationRulesTypeField(),
 			'key' => [
 				['db items.key_', 'required', 'not_empty',
 					'use' => [CItemKeyValidator::class, ['lldmacros' => static::isPrototype()]]

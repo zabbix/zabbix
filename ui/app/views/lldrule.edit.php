@@ -36,6 +36,7 @@ $form = (new CForm())
 	->addVar('itemid', $lldrule['itemid'])
 	->addVar('templateid', $lldrule['templateid'])
 	->addVar('discovered', $lldrule['discovered'] ? 1 : 0)
+	->addVar('host_discovered', $data['host']['flags'] & ZBX_FLAG_DISCOVERY_CREATED ? 1 : 0)
 	->addStyle('display: none;');
 
 // Enable form submitting on Enter.

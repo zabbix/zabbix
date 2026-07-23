@@ -31,6 +31,18 @@ class CControllerLldRuleUpdate extends CControllerLldRuleUpdateGeneral {
 		return false;
 	}
 
+	public static function getValidationRulesTypeField(): array {
+		return [
+			['db items.type', 'required', 'in' => self::getItemTypes()],
+			['db items.type', 'not_in' => [ITEM_TYPE_NESTED],
+				'when' => [
+					['context', 'in' => ['host']],
+					['host_discovered', 'in' => [0]]
+				]
+			]
+		];
+	}
+
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules());
 
