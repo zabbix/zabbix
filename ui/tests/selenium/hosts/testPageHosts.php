@@ -156,7 +156,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
 
-		$datatable = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$datatable = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 		$this->query('link', $name)->waitUntilVisible()->one()->scrollIntoView(50)->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$form->submit();
@@ -237,7 +237,7 @@ class testPageHosts extends CLegacyWebTest {
 		$form->fill($data['filter']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		if (array_key_exists('expected', $data)) {
 			// Using column Name check that only the expected Hosts are returned in the list.
@@ -258,7 +258,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButtonText('Disable');
@@ -283,7 +283,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		$this->zbxTestCheckboxSelect('hostids_'.$hostid);
 		$this->zbxTestClickButtonText('Disable');
@@ -307,7 +307,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		$this->zbxTestCheckboxSelect('hostids_'.$hostid);
 		$this->zbxTestClickButtonText('Enable');
@@ -327,7 +327,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
@@ -884,11 +884,13 @@ class testPageHosts extends CLegacyWebTest {
 
 		foreach (['Disabled' => HOST_STATUS_NOT_MONITORED, 'Enabled' => HOST_STATUS_MONITORED] as $status => $id) {
 			$host_row->invalidate();
-			$host_row->getColumn('Status')->scrollIntoView(50)->query('tag:a')->one()->click();
+			$status_link = $host_row->getColumn('Status')->query('tag:a')->one();
+			$status_link->scrollIntoView(50)->click();
 			$this->page->waitUntilReady();
-			$host_row->invalidate();
+			$status_link->waitUntilStalled();
 			$this->assertMessage(TEST_GOOD, 'Host '.strtolower($status));
-			$this->assertEquals($status, $host_row->getColumn('Status')->getText());
+			$status_link->invalidate();
+			$this->assertEquals($status, $status_link->getText());
 			$this->assertEquals($id, CDBHelper::getValue('SELECT status FROM hosts WHERE host='.zbx_dbstr('Enabled status')));
 			CMessageElement::find()->one()->close();
 		}
@@ -903,7 +905,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->getField('Name')->fill('Host for t');
 		$filter->submit();
 
-		$table_rows_count = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady()->getRows()->count();
+		$table_rows_count = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady()->getRows()->count();
 		$this->assertDatatableStats($table_rows_count);
 		$delete_button = $this->query('button:Delete')->one();
 

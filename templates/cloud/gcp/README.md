@@ -1037,6 +1037,196 @@ This template will be automatically connected to discovered entities with all th
 |----|-----------|----|-----------------------|
 |Requests rate: HTTP {#RESPONSE_CODE}|<p>Request rate for HTTP `{#RESPONSE_CODE}` responses.</p>|Dependent item|gcp.app.lb.request.count[{#RESPONSE_CODE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `2h`</p></li></ul>|
 
+# GCP Cost Monitoring by HTTP
+
+## Overview
+
+This template monitors Google Cloud Platform (GCP) billing costs using the BigQuery API via Zabbix.
+It works without any external scripts and uses the script items.
+
+The template retrieves cost data aggregated by service and project from Cloud Billing data exported to BigQuery.
+Two master items (monthly and daily) drive all dependent items and LLD discoveries, minimizing the number of BigQuery API calls.
+
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Google Cloud Platform
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Enable Cloud Billing export to BigQuery in the Google Cloud Console (needs to be done by someone with cost admin permissions).
+See [Export Cloud Billing data to BigQuery](https://cloud.google.com/billing/docs/how-to/export-data-bigquery).
+2. Create a service account in the GCP project that hosts the billing export dataset.
+More on [managing service accounts](https://cloud.google.com/iam/docs/creating-managing-service-accounts).
+3. Grant the service account the `BigQuery Data Viewer` role on the billing export dataset.
+4. Grant `bigquery.jobs.create` permission on the billing project to the service account.
+5. Create and download a JSON key for the service account.
+More on [service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+6. Link this template to a Zabbix host.
+7. Configure the macros: `{$GCP.CLIENT.EMAIL}`, `{$GCP.PRIVATE.KEY.ID}`, `{$GCP.PRIVATE.KEY}`, `{$GCP.COST.BIGQUERY.TABLE}`.
+
+**Notes**
+
+  - `{$GCP.COST.BIGQUERY.TABLE}` must be in the format `project_id.dataset_id.table_id` (no backticks).
+  - If this template is co-hosted with `GCP by HTTP`, the auth macros are shared — configure them once at the host level.
+  - To reduce BigQuery query costs, lower `{$GCP.COST.BILLING.MONTH}` (e.g. to `3`).
+
+More on metrics and used API methods:
+
+  - [BigQuery API](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query)
+  - [Cloud Billing export schema](https://cloud.google.com/billing/docs/how-to/bq-schema)
+
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$GCP.CLIENT.EMAIL}|<p>Service account client e-mail.</p>||
+|{$GCP.PRIVATE.KEY.ID}|<p>Service account private key ID.</p>||
+|{$GCP.PRIVATE.KEY}|<p>Service account private key data.</p>||
+|{$GCP.COST.BIGQUERY.TABLE}|<p>BigQuery billing export table path in the format: project_id.dataset_id.table_id.</p>||
+|{$GCP.BILLING.PROJECT.ID}|<p>GCP project ID where BigQuery jobs are created. If empty, the project from {$GCP.COST.BIGQUERY.TABLE} is used. Set this when the service account lacks bigquery.jobs.create on the billing export project.</p>||
+|{$GCP.COST.BILLING.MONTH}|<p>Number of months of historical data to retrieve from BigQuery. Maximum 24.</p>|`11`|
+|{$GCP.AUTH.FREQUENCY}|<p>The update interval for the GCP Cost Authorization item, which also equals to the access token regeneration request frequency.</p><p>The GCP Access Token is available for 1 hour (3600 seconds) after the generation request.</p>|`45m`|
+|{$GCP.COST.SERVICE.MATCHES}|<p>Filter to include discovered services by name.</p>|`.*`|
+|{$GCP.COST.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered services by name.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.COST.PROJECT.ID.MATCHES}|<p>Filter to include discovered projects by ID.</p>|`.*`|
+|{$GCP.COST.PROJECT.ID.NOT_MATCHES}|<p>Filter to exclude discovered projects by ID.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.COST.REGION.MATCHES}|<p>Filter to include discovered regions.</p>|`.*`|
+|{$GCP.COST.REGION.NOT_MATCHES}|<p>Filter to exclude discovered regions.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.COST.DAILY.MAX}|<p>Daily cost alert threshold.</p>|`1000`|
+|{$GCP.COST.MONTHLY.MAX}|<p>Monthly cost alert threshold.</p>|`10000`|
+|{$GCP.COST.SPIKE.FACTOR}|<p>Multiplier used to detect a cost spike. Daily cost exceeding avg * factor triggers an alert.</p>|`1.5`|
+|{$GCP.COST.WEEKLY.CHANGE.WARN}|<p>Week-over-week cost increase alert threshold (percentage).</p>|`20`|
+|{$GCP.COST.MONTHLY.CHANGE.WARN}|<p>Month-over-month cost increase alert threshold (percentage).</p>|`20`|
+|{$GCP.COST.PROJECT.MONTHLY.MAX}|<p>Per-project monthly cost alert threshold.</p>|`5000`|
+|{$GCP.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
+|{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined.</p><p>Returns a signed authorization token with 1 hour lifetime; it is required only once, and is used for all the dependent script items.</p><p>Check the template documentation for the details.</p>|Script|gcp.cost.authorization|
+|Authorization errors check|<p>A list of errors from authorization requests.</p>|Dependent item|gcp.cost.auth.err.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li></ul>|
+|Get monthly costs|<p>Get raw monthly cost data aggregated by service and project from the BigQuery billing export.</p>|Dependent item|gcp.get.monthly.costs<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get daily costs|<p>Get raw daily cost data for the last 31 days aggregated by service from the BigQuery billing export.</p>|Dependent item|gcp.get.daily.costs<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Billing currency|<p>Currency code reported by the BigQuery billing export (e.g. USD, EUR). Used as units on all billing summary items.</p>|Dependent item|gcp.cost.currency<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.currency`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `24h`</p></li></ul>|
+|Yesterday cost|<p>Total cost for the most recent complete billing day.</p>|Dependent item|gcp.cost.yesterday<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.daily_total`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Service count|<p>Number of GCP services with billing activity on the most recent complete day.</p>|Dependent item|gcp.cost.service.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.service_count`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Daily avg|<p>Average daily cost over the last 7 billing days.</p>|Calculated|gcp.cost.daily.avg|
+|Monthly avg|<p>Average daily cost over the last 30 days.</p>|Calculated|gcp.cost.monthly.avg|
+|Monthly cost change|<p>Month-over-month cost change as a percentage. Not set when there is no prior month data.</p>|Dependent item|gcp.cost.monthly.change.pct<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_change_pct`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Weekly cost change|<p>Week-over-week cost change as a percentage. Not set when there is no prior week data.</p>|Dependent item|gcp.cost.weekly.change.pct<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.weekly_delta_pct`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get monthly costs errors|<p>A list of errors from API requests.</p>|Dependent item|gcp.get.monthly.costs.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get daily costs errors|<p>A list of errors from API requests.</p>|Dependent item|gcp.get.daily.costs.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Monthly cost: Current month|<p>Monthly billing total for the current month.</p>|Dependent item|gcp.cost.monthly.summary.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Monthly cost: Previous month|<p>Monthly billing total for the previous month.</p>|Dependent item|gcp.cost.monthly.summary.previous<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Daily cost: Yesterday|<p>Billing total for yesterday.</p>|Dependent item|gcp.cost.daily.summary.yesterday<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Weekly cost: Current week|<p>Billing total for the current week.</p>|Dependent item|gcp.cost.weekly.summary.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Weekly cost: Previous week|<p>Billing total for the previous week.</p>|Dependent item|gcp.cost.weekly.summary.previous<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|GCP Cost: Authorization has failed|<p>GCP Cost: Authorization has failed.<br>Check the authorization parameters and GCP API availability from a network segment, where Zabbix-server/proxy is located.</p>|`length(last(/GCP Cost Monitoring by HTTP/gcp.cost.auth.err.check)) > 0`|Average||
+|GCP Cost: No billing data received|<p>No billing data has been received in the last 24 hours.</p>|`nodata(/GCP Cost Monitoring by HTTP/gcp.get.monthly.costs,24h)=1`|Info|**Manual close**: Yes|
+|GCP Cost: Daily cost exceeds threshold|<p>Total daily cost has exceeded the configured threshold.</p>|`min(/GCP Cost Monitoring by HTTP/gcp.cost.yesterday,1h)>{$GCP.COST.DAILY.MAX}`|Warning|**Manual close**: Yes|
+|GCP Cost: Cost spike detected|<p>Daily cost significantly exceeds the 7-day historical average.</p>|`last(/GCP Cost Monitoring by HTTP/gcp.cost.yesterday)>avg(/GCP Cost Monitoring by HTTP/gcp.cost.yesterday,7d)*{$GCP.COST.SPIKE.FACTOR}`|Average|**Manual close**: Yes|
+|GCP Cost: Monthly cost increased significantly|<p>The current month's total cost exceeds the prior month by more than the configured threshold.</p>|`min(/GCP Cost Monitoring by HTTP/gcp.cost.monthly.change.pct,1h)>{$GCP.COST.MONTHLY.CHANGE.WARN}`|Warning|**Manual close**: Yes|
+|GCP Cost: Weekly cost increased significantly|<p>The current week's total cost exceeds the prior week by more than the configured threshold.</p>|`min(/GCP Cost Monitoring by HTTP/gcp.cost.weekly.change.pct,1h)>{$GCP.COST.WEEKLY.CHANGE.WARN}`|Warning|**Manual close**: Yes|
+|GCP Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/GCP Cost Monitoring by HTTP/gcp.get.monthly.costs.errors))>0`|Average||
+|GCP Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/GCP Cost Monitoring by HTTP/gcp.get.daily.costs.errors))>0`|Average||
+|GCP Cost: Monthly cost exceeds threshold|<p>Monthly billing cost has exceeded the configured threshold.</p>|`min(/GCP Cost Monitoring by HTTP/gcp.cost.monthly.summary.current,1h)>{$GCP.COST.MONTHLY.MAX}`|Average|**Manual close**: Yes|
+
+### LLD rule GCP monthly costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP monthly costs discovery|<p>Discovery of total monthly costs per billing month.</p>|Dependent item|gcp.cost.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_costs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP monthly costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month ["{#GCP.COST.MONTH}"] total cost|<p>Total billing cost for month {#GCP.COST.MONTH}.</p>|Dependent item|gcp.cost.monthly["{#GCP.COST.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP monthly costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP monthly costs by service discovery|<p>Discovery of monthly costs by service and billing month.</p>|Dependent item|gcp.cost.service.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_service_costs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP monthly costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Service ["{#GCP.COST.SERVICE.NAME}"]: Month ["{#GCP.COST.MONTH}"] cost|<p>Monthly cost for service {#GCP.COST.SERVICE.NAME} in month {#GCP.COST.MONTH}.</p>|Dependent item|gcp.cost.service.monthly["{#GCP.COST.SERVICE.NAME}","{#GCP.COST.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP monthly costs by project discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP monthly costs by project discovery|<p>Discovery of monthly costs by project and billing month.</p>|Dependent item|gcp.cost.project.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_project_costs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP monthly costs by project discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Project ["{#GCP.COST.PROJECT.ID}"]: Month ["{#GCP.COST.MONTH}"] cost|<p>Monthly cost for project {#GCP.COST.PROJECT.ID} in month {#GCP.COST.MONTH}.</p>|Dependent item|gcp.cost.project.monthly["{#GCP.COST.PROJECT.ID}","{#GCP.COST.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Trigger prototypes for GCP monthly costs by project discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|GCP Cost: Project [{#GCP.COST.PROJECT.ID}]: Monthly cost exceeds threshold|<p>Monthly cost for project {#GCP.COST.PROJECT.ID} has exceeded the configured threshold.</p>|`min(/GCP Cost Monitoring by HTTP/gcp.cost.project.monthly["{#GCP.COST.PROJECT.ID}","{#GCP.COST.MONTH}"],1h)>{$GCP.COST.PROJECT.MONTHLY.MAX}`|Warning|**Manual close**: Yes|
+
+### LLD rule GCP daily costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP daily costs by service discovery|<p>Discovery of daily costs by service for the most recent complete billing day.</p>|Dependent item|gcp.cost.daily.service.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.daily_by_service`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP daily costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Service ["{#GCP.COST.SERVICE.NAME}"]: Daily cost|<p>Daily cost for service {#GCP.COST.SERVICE.NAME} for the most recent complete billing day.</p>|Dependent item|gcp.cost.daily.service["{#GCP.COST.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP monthly costs by region discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP monthly costs by region discovery|<p>Discovery of monthly costs by region and billing month.</p>|Dependent item|gcp.cost.region.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_region_costs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP monthly costs by region discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Region ["{#GCP.COST.REGION}"]: Month ["{#GCP.COST.MONTH}"] cost|<p>Monthly cost for region {#GCP.COST.REGION} in month {#GCP.COST.MONTH}.</p>|Dependent item|gcp.cost.region.monthly["{#GCP.COST.REGION}","{#GCP.COST.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP daily costs by region discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP daily costs by region discovery|<p>Discovery of daily costs by region for the most recent complete billing day.</p>|Dependent item|gcp.cost.daily.region.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.daily_by_region`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP daily costs by region discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Region ["{#GCP.COST.REGION}"]: Daily cost|<p>Daily cost for region {#GCP.COST.REGION} for the most recent complete billing day.</p>|Dependent item|gcp.cost.daily.region["{#GCP.COST.REGION}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
 ## Feedback
 
 Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)

@@ -14529,14 +14529,14 @@ zabbix_export:
                       name: show
                       value: '3'
                 - type: topitems
-                  name: 'Top daily compartments'
+                  name: 'Top average daily compartments'
                   'y': '11'
                   width: '24'
                   height: '4'
                   fields:
                     - type: INTEGER
                       name: columns.0.aggregate_function
-                      value: '5'
+                      value: '3'
                     - type: INTEGER
                       name: columns.0.display
                       value: '3'
@@ -14654,7 +14654,7 @@ zabbix_export:
                       name: th_show_arc
                       value: '1'
                 - type: topitems
-                  name: 'Top daily services'
+                  name: 'Top average daily services'
                   x: '24'
                   'y': '11'
                   width: '24'
@@ -14662,7 +14662,7 @@ zabbix_export:
                   fields:
                     - type: INTEGER
                       name: columns.0.aggregate_function
-                      value: '5'
+                      value: '3'
                     - type: INTEGER
                       name: columns.0.display
                       value: '3'
@@ -14877,7 +14877,7 @@ zabbix_export:
                   fields:
                     - type: INTEGER
                       name: columns.0.aggregate_function
-                      value: '5'
+                      value: '3'
                     - type: INTEGER
                       name: columns.0.display
                       value: '3'
@@ -14968,7 +14968,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -17828,7 +17828,6 @@ zabbix_export:
       dashboards:
         - uuid: 2790eee2393c4912b9dcacc835b122e1
           name: 'OCI Load Balancer: Overview'
-          auto_start: 'NO'
           pages:
             - name: Main
               widgets:
