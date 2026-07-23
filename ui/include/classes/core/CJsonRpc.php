@@ -125,9 +125,12 @@ class CJsonRpc {
 			$call_data = [
 				'api' => $request_api,
 				'method' => $request_method,
-				'params' => $call['params'],
-				'id' => array_key_exists('id', $call) ? $call['id'] : null
+				'params' => $call['params']
 			];
+
+			if (array_key_exists('id', $call)) {
+				$call_data += ['id' => $call['id']];
+			}
 
 			if ($this->apiClient->requiresAuthentication($api, $method) || $auth['auth'] !== null) {
 				$calls_data_auth[] =$call_data;
@@ -144,7 +147,8 @@ class CJsonRpc {
 
 			if ($authenticate_response->errorCode === null) {
 				foreach ($calls_data_auth as $call) {
-					$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
+					$result =
+						$this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
 
 					$this->processResult($call, $result);
 				}
@@ -230,7 +234,7 @@ class CJsonRpc {
 		}
 		else {
 			// Notifications (request object without an "id" member) MUST NOT be answered.
-			$this->_response[] = $call['id'] !== null
+			$this->_response[] = array_key_exists('id', $call)
 				? [
 					'jsonrpc' => self::VERSION,
 					'result' => $response->data,
