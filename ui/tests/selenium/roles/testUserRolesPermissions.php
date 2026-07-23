@@ -294,7 +294,7 @@ class testUserRolesPermissions extends CWebTest {
 					'list_link' => 'sysmaps.php',
 					'action_link' => 'zabbix.php?action=map.view&sysmapid=1',
 					'action' => 'Create and edit maps',
-					'check_links' => ['sysmap.php?sysmapid=1', 'sysmaps.php?form=Create+map']
+					'check_links' => ['sysmap.php?sysmapid=1', 'sysmaps.php?form=create']
 				]
 			],
 			// Dashboard creation/edit.
@@ -481,7 +481,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-			$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+			$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 			$row = $table->findRow('Problem', 'Test trigger with tag');
 			$row->getColumn('Update')->query('link:Update')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
@@ -605,7 +605,7 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			// Problem page.
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-			$problem_row = $this->query('id:problems')->asDatatable()->one()->waitUntilReady()->findRow('Problem', $problem);
+			$problem_row = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady()->findRow('Problem', $problem);
 			$this->assertEquals($action_status, $problem_row->getColumn('Update')->query('xpath:.//*[text()="Update"]')
 					->one()->isAttributePresent('href'));
 
@@ -1806,7 +1806,7 @@ class testUserRolesPermissions extends CWebTest {
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$table = $this->query('id:latest')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-latest')->asDatatable()->one()->waitUntilReady();
 
 		$selected_count = $this->query('class:selected-item-count')->one()->waitUntilVisible();
 		$select_all = $this->query('id:all_items')->asCheckbox()->one();

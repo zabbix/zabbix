@@ -1,5 +1,9 @@
 xmlseclibs.php
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+12, Dec 2026, 3.1.5
+Security:
+- Validate AES-GCM Authentication Tag (Sideni)
+
 08, Dec 2025, 3.1.4
 Security:
 - fix canonicalization bypass error (d0ge)

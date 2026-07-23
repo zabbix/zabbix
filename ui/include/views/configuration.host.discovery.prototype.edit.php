@@ -27,9 +27,18 @@ $html_page = (new CHtmlPage())
 	->setNavigation(getHostNavigation('lld_prototypes', $data['hostid'], $data['parent_discoveryid']));
 
 $url = (new CUrl('host_discovery_prototypes.php'))
-	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update')
 	->setArgument('context', $data['context'])
-	->getUrl();
+	->setArgument('parent_discoveryid', $data['parent_discoveryid']);
+
+if ($data['form'] !== 'create') {
+	$url->setArgument('itemid', $data['itemid']);
+}
+else {
+	$url->setArgument('hostid', $data['hostid']);
+}
+
+$url = $url->getUrl();
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
@@ -38,8 +47,7 @@ $form = (new CForm('post', $url))
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
-	->addVar('hostid', $data['hostid'])
-	->addVar('backurl', $data['backurl']);
+	->addVar('hostid', $data['hostid']);
 
 if (!empty($data['itemid'])) {
 	$form->addVar('itemid', $data['itemid']);
@@ -61,7 +69,7 @@ if ($data['is_discovered_prototype']) {
 	]);
 }
 
-if (!empty($data['templates'])) {
+if (!empty($data['templates']) && $data['form'] !== 'clone') {
 	$item_tab->addItem([
 		new CLabel(_('Parent discovery prototypes')),
 		new CFormField($data['templates'])
@@ -1094,7 +1102,7 @@ if ($data['form_refresh'] == 0) {
 }
 
 // Append buttons to form.
-if (!empty($data['itemid'])) {
+if ($data['form'] === 'update') {
 	$buttons = [(new CSubmit('clone', _('Clone')))->setEnabled(!$data['discovered_lld'])];
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 	$buttons[] = (new CButtonDelete(
@@ -1111,15 +1119,11 @@ if (!empty($data['itemid'])) {
 	);
 }
 else {
-	$cancel_button = $data['backurl'] !== null
-		? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
-		: new CButtonCancel(url_params(['parent_discoveryid', 'context']));
-
 	$form_actions = new CFormActions(
 		new CSubmit('add', _('Add')),
 		[
 			(new CSimpleButton(_('Test')))->setId('test_item'),
-			$cancel_button
+			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	);
 }
@@ -1134,6 +1138,8 @@ $html_page->addItem($form);
 require_once __DIR__.'/js/configuration.host.discovery.edit.js.php';
 
 $html_page->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	item_form.init('.json_encode([

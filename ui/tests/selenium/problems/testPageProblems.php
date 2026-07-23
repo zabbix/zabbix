@@ -430,7 +430,7 @@ class testPageProblems extends CWebTest {
 		);
 
 		// Check Problems table layout.
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$this->assertEquals(['Time', 'Severity', 'Host', 'Problem'], $table->getSortableHeaders()->asText());
 
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
@@ -1882,7 +1882,7 @@ class testPageProblems extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1');
 		$form = CFilterElement::find()->one()->getForm();
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 
 		if (array_key_exists('Tags', $data)) {
 			$form->fill(['id:evaltype_0' => $data['Tags']['Type']]);
@@ -2272,7 +2272,7 @@ class testPageProblems extends CWebTest {
 			$this->updateColumnList($data['update_colmuns']);
 		}
 
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$column = (array_key_exists('header_settings', $data)) ? 'Problem' : 'Operational data';
 		$problem_name = (array_key_exists('header_settings', $data) && $data['custom data'] !== '')
 			? $data['filter']['Problem'].' ('.$data['custom data'].')'
@@ -2331,7 +2331,7 @@ class testPageProblems extends CWebTest {
 
 		// Check table contents before filtering. Set false "Show timeline" because it makes table complicated.
 		$this->changeLayoutFromHeader(['Time' => ['Show timeline' => false]]);
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$start_rows_count = $table->getRows()->count();
 		$this->assertDatatableStats($start_rows_count);
 		$start_contents = $this->getDatatableColumnData('Problem');

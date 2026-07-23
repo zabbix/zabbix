@@ -174,7 +174,7 @@
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
-			this.#datatable = new CDataTable(document.getElementById('latest'), data_provider)
+			this.#datatable = new CDataTable(document.getElementById('datatable-latest'), data_provider)
 				.setColumns([
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host', 'maintenance', 'maintenanceid', 'maintenance_type', 'maintenance_status'])

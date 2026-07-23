@@ -206,7 +206,7 @@ $csrf_token = CCsrfTokenHelper::get('host');
 
 $form = (new CForm())->setName('hosts');
 $form->addItem([
-	(new CDataTable())->setId('hosts'),
+	(new CDataTable())->setId('datatable-hosts'),
 	(new CActionButtonList('action', 'hostids', [
 		'host.enable' => [
 			'content' => (new CSimpleButton(_('Enable')))
