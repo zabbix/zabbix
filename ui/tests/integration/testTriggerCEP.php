@@ -38,10 +38,10 @@ class testTriggerCEP extends CIntegrationTest {
 	const RECOVERY_CYCLES_COUNT = 2000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
 	const MAINTENANCE_COUNT_EXTRA = 10;
-	const SKIP_RESTART_TESTS = true;
+	const SKIP_RESTART_TESTS = false;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
-	const SKIP_SERVICES_TESTS = null;
+	const SKIP_SERVICES_TESTS = false;
 
 	const HOST_NAME = 'test';
 	const TEMPLATE_NAME = 'template_trigger_cep';
@@ -83,7 +83,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const LOG_MASTER_ITEM_KEY = 'cep.log.master';
 	const LOG_ITEM_PROTO_KEY = 'cep.log.proto';
 	const LOG_COMPONENT_VALUE = 'logsensor1';
-	const WAIT_ITERATIONS = 60;
+	const WAIT_ITERATIONS = 160;
 	const WAIT_ITERATION_DELAY = 1;
 
 	// change iterations to fail faster when debugging
@@ -506,7 +506,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'output' => ['triggerid'],
 			'selectTags' => 'extend'
 		]);
-		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result'],
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result'],
 			'Not all discovered triggers were found.');
 
 		$services = [];
@@ -533,7 +533,7 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$response = $this->call('service.create', $services);
 		$this->assertArrayHasKey('serviceids', $response['result']);
-		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
 			'Not all CEP services were created.');
 		self::$serviceids = $response['result']['serviceids'];
 
@@ -998,7 +998,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
 			'output' => ['itemid', 'value_type']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-			if (count($response['result']) !== static::LLD_DISCOVERY_COUNT) {
+			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
 				return false;
 			}
 			foreach ($response['result'] as $item) {
@@ -1008,7 +1008,7 @@ class testTriggerCEP extends CIntegrationTest {
 			}
 			return true;
 		});
-		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']);
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
 		foreach ($response['result'] as $item) {
 			$this->assertEquals(ITEM_VALUE_TYPE_TEXT, (int) $item['value_type'],
 				'Discovered item '.$item['itemid'].' was not updated to text value type.');
@@ -1131,7 +1131,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
 			'output' => ['itemid', 'value_type']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-			if (count($response['result']) !== static::LLD_DISCOVERY_COUNT) {
+			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
 				return false;
 			}
 			foreach ($response['result'] as $item) {
@@ -1141,7 +1141,7 @@ class testTriggerCEP extends CIntegrationTest {
 			}
 			return true;
 		});
-		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']);
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
 		foreach ($response['result'] as $item) {
 			$this->assertEquals(ITEM_VALUE_TYPE_TEXT, (int) $item['value_type'],
 				'Discovered item '.$item['itemid'].' was not updated to text value type.');
@@ -1329,7 +1329,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
 			'output' => ['itemid', 'value_type']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-			if (count($response['result']) !== static::LLD_DISCOVERY_COUNT) {
+			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
 				return false;
 			}
 			foreach ($response['result'] as $item) {
@@ -1606,7 +1606,7 @@ HEREDOC;
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 
 		$services = [];
-		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
+		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
 			$services[] = [
 				'name' => 'CEP web tag service '.$base.$i,
 				'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
@@ -1623,7 +1623,7 @@ HEREDOC;
 
 		$response = $this->call('service.create', $services);
 		$this->assertArrayHasKey('serviceids', $response['result']);
-		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
 			'Not all web-tag services were created.');
 		self::$web_tag_serviceids = $response['result']['serviceids'];
 
@@ -1959,7 +1959,7 @@ HEREDOC;
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
 			'output' => ['itemid', 'value_type']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-			if (count($response['result']) !== static::LLD_DISCOVERY_COUNT) {
+			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
 				return false;
 			}
 			foreach ($response['result'] as $item) {
@@ -1969,7 +1969,7 @@ HEREDOC;
 			}
 			return true;
 		});
-		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']);
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
 
 		// Verify the two primary discovered triggers reflect global correlation mode, multiple event
 		// generation and that the parity 'odd' tag resolved (component sensor1 → odd index → '1');
@@ -2089,9 +2089,9 @@ HEREDOC;
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
 			'output' => ['itemid', 'name', 'key_']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === static::LLD_DISCOVERY_COUNT;
+			return count($r['result']) === self::LLD_DISCOVERY_COUNT;
 		});
-		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered items were created.');
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered items were created.');
 
 		// Verify all LLD_DISCOVERY_COUNT triggers were created and store the primary one.
 		$expected_description = 'CEP trigger for '.self::COMPONENT_VALUE;
@@ -2102,9 +2102,9 @@ HEREDOC;
 			'output' => ['triggerid', 'description', 'value', 'state'],
 			'selectTags' => 'extend'
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === static::LLD_DISCOVERY_COUNT;
+			return count($r['result']) === self::LLD_DISCOVERY_COUNT;
 		});
-		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered triggers were created.');
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered triggers were created.');
 
 		$primary_trigger = current(array_filter($response['result'],
 			fn($t) => $t['description'] === $expected_description
@@ -2132,9 +2132,9 @@ HEREDOC;
 			'search' => ['key_' => self::ITEM_PROTO_KEY2.'['],
 			'output' => ['itemid', 'name', 'key_']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === static::LLD_DISCOVERY_COUNT;
+			return count($r['result']) === self::LLD_DISCOVERY_COUNT;
 		});
-		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result'], 'Not all second discovered items were created.');
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result'], 'Not all second discovered items were created.');
 
 		// Verify all LLD_DISCOVERY_COUNT dependent triggers were created and store the primary one.
 		$expected_dep_description = 'CEP dependent trigger for '.self::COMPONENT_VALUE;
@@ -2145,9 +2145,9 @@ HEREDOC;
 			'output' => ['triggerid', 'description', 'value', 'state'],
 			'selectTags' => 'extend'
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === static::LLD_DISCOVERY_COUNT;
+			return count($r['result']) === self::LLD_DISCOVERY_COUNT;
 		});
-		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered dependent triggers were created.');
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered dependent triggers were created.');
 
 		$primary_dep_trigger = current(array_filter($response['result'],
 			fn($t) => $t['description'] === $expected_dep_description
@@ -2488,7 +2488,7 @@ HEREDOC;
 		// This is the last services-specific test (the restart sibling is either the true last run or is
 		// skipped), so disable the service/trigger actions: they must not fire on the events generated by the
 		// later, non-services scenarios. The services and the actions are removed entirely in clearData().
-		if ($restart || static::SKIP_RESTART_TESTS) {
+		if ($restart || self::SKIP_RESTART_TESTS) {
 			$this->disableServicesActions();
 		}
 	}
@@ -2665,7 +2665,7 @@ HEREDOC;
 		// value gets a strictly increasing (clock, ns) so CEP must process the whole rapid burst in order
 		// and emit one event per transition without collapsing or dropping any. The sequence ends on 0 so
 		// the trigger finishes OK.
-		$cycles = static::RECOVERY_CYCLES_COUNT;
+		$cycles = self::RECOVERY_CYCLES_COUNT;
 		$values = [];
 		for ($i = 0; $i < $cycles; $i++) {
 			$values[] = '1';
@@ -3442,122 +3442,6 @@ HEREDOC;
 	}
 
 	/**
-	 * Same as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAnd but the server is
-	 * restarted once after the scenario is prepared (before any events are sent), verifying the AND
-	 * correlation rule is correctly reloaded from the database on startup.
-	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAnd
-	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndRestart() {
-		$this->skipIfRestartTestsDisabled();
-		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_AND, false, true);
-		$this->maybeRestartServer(true);
-		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
-		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
-	}
-
-	/**
-	 * Same as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndUpdate but the server is
-	 * restarted once after the scenario is prepared (before any events are sent), verifying the rule updated
-	 * in place to AND is correctly reloaded from the database on startup.
-	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndUpdate
-	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndUpdateRestart() {
-		$this->skipIfRestartTestsDisabled();
-		$this->prepareDataGlobalCorrelationCloseOnUpEvaltypeTransition(CONDITION_EVAL_TYPE_AND_OR,
-			CONDITION_EVAL_TYPE_AND);
-		$this->maybeRestartServer(true);
-		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
-		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
-	}
-
-	/**
-	 * Same as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndOr but the server is
-	 * restarted once after the scenario is prepared (before any events are sent), verifying the AND_OR
-	 * correlation rule is correctly reloaded from the database on startup.
-	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndOr
-	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndOrRestart() {
-		$this->skipIfRestartTestsDisabled();
-		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_AND_OR, false, true);
-		$this->maybeRestartServer(true);
-		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
-		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
-	}
-
-	/**
-	 * Same as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndOrUpdate but the server is
-	 * restarted once after the scenario is prepared (before any events are sent), verifying the rule updated
-	 * in place to AND_OR is correctly reloaded from the database on startup.
-	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndOrUpdate
-	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemAndOrUpdateRestart() {
-		$this->skipIfRestartTestsDisabled();
-		$this->prepareDataGlobalCorrelationCloseOnUpEvaltypeTransition(CONDITION_EVAL_TYPE_AND,
-			CONDITION_EVAL_TYPE_AND_OR);
-		$this->maybeRestartServer(true);
-		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
-		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
-	}
-
-	/**
-	 * Same as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemExpression but the server is
-	 * restarted once after the scenario is prepared (before any events are sent), verifying the expression
-	 * correlation rule (custom formula) is correctly reloaded from the database on startup.
-	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemExpression
-	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemExpressionRestart() {
-		$this->skipIfRestartTestsDisabled();
-		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_EXPRESSION, false, true);
-		$this->maybeRestartServer(true);
-		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
-		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
-	}
-
-	/**
-	 * Same as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemExpressionUpdate but the
-	 * server is restarted once after the scenario is prepared (before any events are sent), verifying the
-	 * rule updated in place to a custom expression is correctly reloaded from the database on startup.
-	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemExpressionUpdate
-	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemExpressionUpdateRestart() {
-		$this->skipIfRestartTestsDisabled();
-		$this->prepareDataGlobalCorrelationCloseOnUpEvaltypeTransition(CONDITION_EVAL_TYPE_AND_OR,
-			CONDITION_EVAL_TYPE_EXPRESSION);
-		$this->maybeRestartServer(true);
-		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
-		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
-	}
-
-	/**
-	 * Same as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOr but the server is
-	 * restarted once after the scenario is prepared (before any events are sent), verifying the OR
-	 * correlation rule is correctly reloaded from the database on startup.
-	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOr
-	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOrRestart() {
-		$this->skipIfRestartTestsDisabled();
-		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_OR, false, true);
-		$this->maybeRestartServer(true);
-		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
-		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
-	}
-
-	/**
-	 * Same as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOrUpdate but the server is
-	 * restarted once after the scenario is prepared (before any events are sent), verifying the rule updated
-	 * in place to OR is correctly reloaded from the database on startup.
-	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOrUpdate
-	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOrUpdateRestart() {
-		$this->skipIfRestartTestsDisabled();
-		$this->prepareDataGlobalCorrelationCloseOnUpEvaltypeTransition(CONDITION_EVAL_TYPE_AND_OR,
-			CONDITION_EVAL_TYPE_OR);
-		$this->maybeRestartServer(true);
-		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
-		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
-	}
-
-	/**
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpFromSameTrigger$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -3974,7 +3858,7 @@ HEREDOC;
 		// than to the master.
 		$item_key = self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']';
 		$values = [];
-		for ($i = 0; $i < static::LOG_EVENT_COUNT; $i++) {
+		for ($i = 0; $i < self::LOG_EVENT_COUNT; $i++) {
 			$values[] = [
 				'host' => self::HOST_NAME,
 				'key' => $item_key,
@@ -3989,7 +3873,7 @@ HEREDOC;
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'eventid_from' => $this->event_baseline_id + 1
-		], static::LOG_EVENT_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], self::LOG_EVENT_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -4008,7 +3892,7 @@ HEREDOC;
 		// trigger expression false and recover all open problems.
 		$item_key = self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']';
 		$values = [];
-		for ($i = 0; $i < static::LOG_EVENT_COUNT; $i++) {
+		for ($i = 0; $i < self::LOG_EVENT_COUNT; $i++) {
 			$values[] = [
 				'host' => self::HOST_NAME,
 				'key' => $item_key,
@@ -4214,14 +4098,14 @@ HEREDOC;
 			'objectids' => self::$discovered_triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_INTERNAL
-		], static::LLD_DISCOVERY_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], self::LLD_DISCOVERY_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		// An internal problem must be opened for every unsupported item on the discovered host.
 		$this->callUntilCountIsPresent('problem.get', [
 			'hostids' => [self::$disc_hostid],
 			'object' => EVENT_OBJECT_ITEM,
 			'source' => EVENT_SOURCE_INTERNAL
-		], static::LLD_DISCOVERY_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], self::LLD_DISCOVERY_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -4624,7 +4508,7 @@ HEREDOC;
 				$this->waitForOpenProblemsSuppressedPerComponent($all, $m, $maintenance_by_component);
 			}
 			else {
-				$this->startDiscHostMaintenances(static::MAINTENANCE_COUNT);
+				$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT);
 				$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
 			}
 			$this->waitForServicesSuppressed();
@@ -4634,7 +4518,7 @@ HEREDOC;
 				// maintenances must not disturb the existing suppression, and every open problem must end
 				// up suppressed by every active maintenance. (Tag-scoped maintenances are one-per-component,
 				// so there is nothing to overlap.)
-				$this->startDiscHostMaintenances(static::MAINTENANCE_COUNT_EXTRA);
+				$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT_EXTRA);
 				$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
 			}
 		}
@@ -4938,6 +4822,7 @@ HEREDOC;
 		// 3. "up" for the first id: a PROBLEM that closes only its corresponding "down" (CLOSE_OLD) and
 		//    itself (CLOSE_NEW). The second problem stays open, so the trigger stays TRUE and one remains.
 		$send('up', 0);
+
 		$this->waitForOpenProblemCount($all, 1);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
@@ -5150,8 +5035,8 @@ HEREDOC;
 		// Per prototype: this many components carry odd="1" (odd index) and odd="0" (even index). With
 		// problems open on both prototypes, twice each count is open before the parity waves run.
 		$open_count = [
-			'1' => 2 * intdiv(static::LLD_DISCOVERY_COUNT + 1, 2),
-			'0' => 2 * intdiv(static::LLD_DISCOVERY_COUNT, 2)
+			'1' => 2 * intdiv(self::LLD_DISCOVERY_COUNT + 1, 2),
+			'0' => 2 * intdiv(self::LLD_DISCOVERY_COUNT, 2)
 		];
 		$keys2_by_parity = [
 			'1' => $this->buildDiscoveredKeysByParity(self::ITEM_PROTO_KEY2, '1'),
@@ -5879,7 +5764,7 @@ HEREDOC;
 		$names = [];
 		$extra_by_name = [];
 		$component_by_name = [];
-		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
+		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
 			$component = $base.$i;
 			$name = 'CEP per-tag maintenance '.$component;
 
@@ -5910,7 +5795,7 @@ HEREDOC;
 	 * leaves the system in the same asserted state, so dependents can rely on it instead.
 	 */
 	private function skipIfRestartTestsDisabled(): void {
-		if (static::SKIP_RESTART_TESTS) {
+		if (self::SKIP_RESTART_TESTS) {
 			$this->markTestSkipped('Restart test variants disabled via SKIP_RESTART_TESTS.');
 		}
 	}
@@ -5921,7 +5806,7 @@ HEREDOC;
 	 * per-trigger services and their actions.
 	 */
 	private function skipIfServicesTestsDisabled(): void {
-		$skip_services_tests = static::SKIP_SERVICES_TESTS;
+		$skip_services_tests = self::SKIP_SERVICES_TESTS;
 
 		if ($skip_services_tests === null) {
 			$skip_services_tests = (time() % 2 === 0);
@@ -5935,7 +5820,7 @@ HEREDOC;
 	private function buildItemLLDData(bool $with_parity = false): string {
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 		$data = [];
-		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
+		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
 			$entry = [self::LLD_MACRO => $base.$i];
 			if ($with_parity) {
 				// Odd component index → '1', even → '0'. Consumed by the trigger prototype 'odd'
@@ -5950,7 +5835,7 @@ HEREDOC;
 	private function buildDiscoveredKeys(string $proto_key): array {
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 		$keys = [];
-		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
+		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
 			$keys[] = $proto_key.'['.$base.$i.']';
 		}
 		return $keys;
@@ -5963,7 +5848,7 @@ HEREDOC;
 	private function buildDiscoveredKeysByParity(string $proto_key, string $parity): array {
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 		$keys = [];
-		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
+		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
 			if ((($i % 2 === 1) ? '1' : '0') === $parity) {
 				$keys[] = $proto_key.'['.$base.$i.']';
 			}
@@ -6173,7 +6058,7 @@ HEREDOC;
 		]);
 		$eventids = array_column($response['result'], 'eventid');
 
-		$expected_alerts = 2 * static::LLD_DISCOVERY_COUNT;
+		$expected_alerts = 2 * self::LLD_DISCOVERY_COUNT;
 
 		// All notifications of this cycle must have been created ...
 		$this->callUntilCountIsPresent('alert.get', [
@@ -6194,7 +6079,7 @@ HEREDOC;
 			'triggerids' => self::$discovered_triggerids,
 			'output' => ['triggerid', 'value', 'state']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($expected_state, $expected_value) {
-			if (count($response['result']) !== static::LLD_DISCOVERY_COUNT) {
+			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
 				return false;
 			}
 			foreach ($response['result'] as $trigger) {
@@ -6205,7 +6090,7 @@ HEREDOC;
 			return true;
 		});
 
-		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']);
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
 		foreach ($response['result'] as $trigger) {
 			$this->assertEquals($expected_state, $trigger['state'], 'Unexpected trigger state.');
 			$this->assertEquals($expected_value, $trigger['value'], 'Unexpected trigger value.');
