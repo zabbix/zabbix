@@ -678,7 +678,7 @@ static void	correlation_config_sync_conditions(zbx_dbsync_t *sync)
 		cond_ref->condition = corr_condition_create(cond_ref->conditionid, type, row + 3);
 
 		/* sort the conditions later */
-		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION != correlation->evaltype)
 			zbx_vector_correlation_ptr_append(&correlations, correlation);
 
 		zbx_vector_corr_condition_ptr_append(&correlation->conditions,
