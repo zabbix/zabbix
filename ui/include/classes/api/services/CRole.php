@@ -816,54 +816,38 @@ class CRole extends CApiService {
 			return;
 		}
 
-		if (array_key_exists('devices.access', $rules)) {
-			$is_device_access_enabled = (bool) $rules['devices.access'];
-		}
-		elseif ($db_rules !== null) {
-			$is_device_access_enabled = (bool) $db_rules['devices.access'];
-		}
-		else {
-			$is_device_access_enabled = $type == USER_TYPE_SUPER_ADMIN;
-		}
-
 		$device_actions = array_column($rules['devices.actions'], null, 'name');
-
-		if ($db_rules !== null && $type == USER_TYPE_SUPER_ADMIN && !array_key_exists('manage_own', $device_actions)) {
-			$device_actions['manage_own'] = array_column($db_rules['devices.actions'], null, 'name')['manage_own'];
-		}
-
+		$db_device_actions = $db_rules !== null ? array_column($db_rules['devices.actions'], null, 'name') : [];
 		$all_device_actions = CRoleHelper::getDeviceActionsByUserType($type);
 
 		foreach ($device_actions as $action_name => $rule) {
-			$prefix = 'devices.actions.';
-
-			if (!in_array($prefix.$action_name, $all_device_actions)) {
+			if (!in_array('devices.actions.'.$action_name, $all_device_actions)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Device action "%2$s" is not available for user role "%1$s".', $name, $action_name)
 				);
 			}
+		}
 
-			if ($rule['status'] == ZBX_ROLE_RULE_DISABLED) {
-				continue;
-			}
+		if (array_key_exists('devices.access', $rules)) {
+			$device_access = $rules['devices.access'];
+		}
+		elseif ($db_rules !== null) {
+			$device_access = $db_rules['devices.access'];
+		}
+		else {
+			$device_access = ZBX_ROLE_RULE_DISABLED;
+		}
 
-			if (!$is_device_access_enabled) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot enable device action "%2$s" for user role "%1$s" because device access is disabled.',
-						$name, $action_name
-					)
-				);
-			}
+		$manage_own_devices = $device_actions['manage_own']['status']
+			?? $db_device_actions['manage_own']['status']
+			?? ZBX_ROLE_RULE_DISABLED;
 
-			if ($prefix.$action_name === CRoleHelper::DEVICES_ACTIONS_MANAGE_USER
-					&& array_key_exists('manage_own', $device_actions)
-					&& $device_actions['manage_own']['status'] == ZBX_ROLE_RULE_DISABLED) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot enable device action "%2$s" for user role "%1$s" because own device management is disabled.',
-						$name, $action_name
-					)
-				);
-			}
+		if ($device_access == ZBX_ROLE_RULE_DISABLED && $manage_own_devices == ZBX_ROLE_RULE_ENABLED) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot enable device action "%2$s" for user role "%1$s" because device access is disabled.',
+					$name, 'manage_own'
+				)
+			);
 		}
 	}
 
@@ -971,12 +955,6 @@ class CRole extends CApiService {
 
 		foreach ($roles as $roleid => $role) {
 			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
-
-			if ($type == USER_TYPE_SUPER_ADMIN) {
-				$default_rules['devices.access'] = ZBX_ROLE_RULE_ENABLED;
-				$default_rules['devices.actions.default_access'] = ZBX_ROLE_RULE_ENABLED;
-			}
-
 			$old_rules = $db_roles !== null ? $db_roles[$roleid]['rules'] : $default_rules;
 			$new_rules = array_key_exists('rules', $role) ? $role['rules'] + $old_rules : $old_rules;
 
@@ -1313,14 +1291,6 @@ class CRole extends CApiService {
 		$old_actions_rules = array_column($old_rules['devices.actions'], null, 'name');
 		$new_actions_rules = array_column($new_rules['devices.actions'], null, 'name');
 
-		if ($type == USER_TYPE_SUPER_ADMIN && array_key_exists('manage_own', $new_actions_rules)
-				&& $new_actions_rules['manage_own']['status'] == ZBX_ROLE_RULE_DISABLED) {
-			$new_actions_rules['manage_user'] = [
-				'name' => 'manage_user',
-				'status' => ZBX_ROLE_RULE_DISABLED
-			];
-		}
-
 		$compiled_rules = [];
 
 		$compiled_rules[] = [
@@ -1332,7 +1302,7 @@ class CRole extends CApiService {
 		foreach (CRoleHelper::getDeviceActionsByUserType($type) as $action_rule_name) {
 			$action_element = substr($action_rule_name, strlen('devices.actions.'));
 
-			if ($new_rules['devices.access'] == ZBX_ROLE_RULE_DISABLED) {
+			if ($new_rules['devices.access'] == ZBX_ROLE_RULE_DISABLED && $action_element === 'manage_own') {
 				$action_rule_status = ZBX_ROLE_RULE_DISABLED;
 			}
 			elseif (array_key_exists($action_element, $new_actions_rules)) {
