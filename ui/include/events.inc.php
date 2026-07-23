@@ -124,7 +124,7 @@ function make_event_details(array $event, array $allowed) {
 	if ($event['r_eventid'] != 0) {
 		if ($event['cep_ruleid'] != 0) {
 			$cep_rules = API::CepRule()->get([
-				'output' => ['name'],
+				'output' => ['cep_ruleid', 'name'],
 				'cep_ruleids' => [$event['cep_ruleid']]
 			]);
 
