@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2026 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -338,15 +338,15 @@ class CConfigurationExportBuilder {
 				'name' => $template['name'],
 				'description' => $template['description'],
 				'vendor' => $vendor,
-				'groups' => $this->formatGroups($template['templategroups']),
-				'items' => $this->formatItems($template['items'], $simple_triggers),
-				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
-				'httptests' => $this->formatHttpTests($template['httptests']),
-				'macros' => $this->formatMacros($template['macros']),
-				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
-				'dashboards' => $this->formatDashboards($template['dashboards']),
-				'tags' => $this->formatTags($template['tags']),
-				'valuemaps' => $this->formatValueMaps($template['valuemaps'])
+				'groups' => $this->formatGroups($template['templategroups'] ?? []),
+				'items' => $this->formatItems($template['items'] ?? [], $simple_triggers ?? []),
+				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules'] ?? []),
+				'httptests' => $this->formatHttpTests($template['httptests'] ?? []),
+				'macros' => $this->formatMacros($template['macros'] ?? []),
+				'templates' => $this->formatTemplateLinkage($template['parentTemplates'] ?? []),
+				'dashboards' => $this->formatDashboards($template['dashboards'] ?? []),
+				'tags' => $this->formatTags($template['tags'] ?? []),
+				'valuemaps' => $this->formatValueMaps($template['valuemaps'] ?? [])
 			];
 		}
 
@@ -379,17 +379,17 @@ class CConfigurationExportBuilder {
 				'ipmi_privilege' => $host['ipmi_privilege'],
 				'ipmi_username' => $host['ipmi_username'],
 				'ipmi_password' => $host['ipmi_password'],
-				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),
-				'groups' => $this->formatGroups($host['hostgroups']),
-				'interfaces' => $this->formatHostInterfaces($host['interfaces']),
-				'items' => $this->formatItems($host['items'], $simple_triggers),
-				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
-				'httptests' => $this->formatHttpTests($host['httptests']),
-				'macros' => $this->formatMacros($host['macros']),
+				'templates' => $this->formatTemplateLinkage($host['parentTemplates'] ?? []),
+				'groups' => $this->formatGroups($host['hostgroups'] ?? []),
+				'interfaces' => $this->formatHostInterfaces($host['interfaces'] ?? []),
+				'items' => $this->formatItems($host['items'] ?? [], $simple_triggers ?? []),
+				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules'] ?? []),
+				'httptests' => $this->formatHttpTests($host['httptests'] ?? []),
+				'macros' => $this->formatMacros($host['macros'] ?? []),
 				'inventory_mode' => $host['inventory_mode'],
-				'inventory' => $this->formatHostInventory($host['inventory']),
-				'tags' => $this->formatTags($host['tags']),
-				'valuemaps' => $this->formatValueMaps($host['valuemaps'])
+				'inventory' => $this->formatHostInventory($host['inventory'] ?? []),
+				'tags' => $this->formatTags($host['tags'] ?? []),
+				'valuemaps' => $this->formatValueMaps($host['valuemaps'] ?? [])
 			];
 		}
 
