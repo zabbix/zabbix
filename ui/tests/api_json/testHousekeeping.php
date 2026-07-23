@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @backup settings
+ * @backup config
  */
 class testHousekeeping extends CAPITest {
 
@@ -118,7 +118,7 @@ class testHousekeeping extends CAPITest {
 	}
 
 	public function testHousekeeping_SimpleUpdate() {
-		$sql = 'SELECT * FROM settings';
+		$sql = 'SELECT * FROM config';
 		$old_hash = CDBHelper::getHash($sql);
 		$updated_fields = $this->call('housekeeping.update', [])['result'];
 		$this->assertEquals([], $updated_fields);
