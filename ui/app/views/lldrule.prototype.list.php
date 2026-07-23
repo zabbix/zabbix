@@ -132,9 +132,9 @@ foreach ($data['discoveries'] as $discovery) {
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'popup')
 			->setArgument('popup', 'lldrule.prototype.edit')
-			->setArgument('itemid', $discovery['itemid'])
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('context', $data['context'])
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('itemid', $discovery['itemid'])
 	);
 
 	$status_disabled = $discovery['status'] == ITEM_STATUS_DISABLED;

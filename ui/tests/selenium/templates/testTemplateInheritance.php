@@ -112,7 +112,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$template.'&filter_set=1');
 		$this->zbxTestCheckHeader('Templates');
 
-		$this->query('id:templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Items')
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Items')
 				->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create item');
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -205,7 +205,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create a trigger
-		$this->query('id:templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Triggers')
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Triggers')
 				->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
@@ -251,7 +251,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create a graph
-		$this->query('id:templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Graphs')
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Graphs')
 				->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create graph');
 
@@ -309,7 +309,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create an LLD rule
-		$this->query('id:templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
 				->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create discovery rule');
 		$form = $this->query('id:lldrule-form')->waitUntilVisible()->asForm()->one();
@@ -361,7 +361,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create an item prototype
-		$this->query('id:templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
 				->waitUntilVisible()->one()->click();
 		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', 'testInheritanceDiscoveryRule')
 				->query('link:Item prototypes')->one()->click();
@@ -429,7 +429,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create an trigger prototype
-		$this->query('id:templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
 				->waitUntilVisible()->one()->click();
 		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', 'testInheritanceDiscoveryRule')
 				->query('link:Trigger prototypes')->one()->click();
@@ -490,7 +490,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create a graph
-		$this->query('id:templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
+		$this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady()->getRow(0)->query('link:Discovery')
 				->waitUntilVisible()->one()->click();
 		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', 'testInheritanceDiscoveryRule')
 				->query('link:Graph prototypes')->one()->click();

@@ -304,8 +304,8 @@ foreach ($data['discoveries'] as $discovery) {
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'popup')
 			->setArgument('popup', 'lldrule.edit')
-			->setArgument('itemid', $discovery['itemid'])
 			->setArgument('context', $data['context'])
+			->setArgument('itemid', $discovery['itemid'])
 	);
 
 	$status = (new CLink(itemIndicator($discovery['status'], $discovery['state'])))
@@ -463,6 +463,7 @@ $discoveryForm->addItem([
 $html_page
 	->addItem($discoveryForm)
 	->show();
+
 
 $confirm_messages = [
 	'lldrule.enable' => [_('Enable selected discovery rule?'), _('Enable selected discovery rules?')],
