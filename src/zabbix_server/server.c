@@ -375,7 +375,9 @@ static char	*config_webdriver_url = NULL;
 
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
-static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+static zbx_config_vault_t	zbx_config_vault = {.name = NULL, .url = NULL, .token = NULL, .tls_cert_file = NULL,
+						.tls_key_file = NULL, .db_path = NULL, .prefix = NULL,
+						.app_role_id = NULL, .app_secret_id = NULL};
 
 static zbx_db_config_t		*zbx_db_config = NULL;
 
