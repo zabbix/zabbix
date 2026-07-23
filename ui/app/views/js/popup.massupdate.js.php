@@ -339,16 +339,8 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 	let overlay = overlays_stack.end();
 
-	overlay.$dialogue[0].addEventListener('keydown', (event) => {
-		if (event.key === 'Escape') {
-			$(document).off('add.popup', processAddfromPopup);
-		}
-	});
-
-	overlay.$dialogue[0].querySelectorAll('.js-cancel, .btn-overlay-close').forEach(element => {
-		element.addEventListener('click', () => {
-			$(document).off('add.popup', processAddfromPopup);
-		});
+	overlay.$dialogue[0].addEventListener('dialogue.close', () => {
+		$(document).off('add.popup', processAddfromPopup);
 	});
 
 	$(document).on('add.popup', processAddfromPopup);
