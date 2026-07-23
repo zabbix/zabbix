@@ -83,7 +83,6 @@ int	zbx_http_req(const char *url, const char *header, long timeout, const char *
 /* JSON-RPC "error" member) is left for the caller to detect, since only the caller knows how to react */
 typedef enum
 {
-	ZBX_HTTP_JSONRPC_ERR_NOT_CONFIGURED,
 	ZBX_HTTP_JSONRPC_ERR_CONNECT,
 	ZBX_HTTP_JSONRPC_ERR_INVALID_RESPONSE
 }

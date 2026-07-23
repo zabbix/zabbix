@@ -273,12 +273,27 @@ static int	trapper_device_authorize(zbx_socket_t *sock, const struct zbx_json_pa
 #if defined(HAVE_LIBCURL)
 typedef enum
 {
-	ZBX_DEVICE_BA_ERR_NOT_CONFIGURED = ZBX_HTTP_JSONRPC_ERR_NOT_CONFIGURED,
-	ZBX_DEVICE_BA_ERR_CONNECT = ZBX_HTTP_JSONRPC_ERR_CONNECT,
-	ZBX_DEVICE_BA_ERR_INVALID_RESPONSE = ZBX_HTTP_JSONRPC_ERR_INVALID_RESPONSE,
+	ZBX_DEVICE_BA_ERR_NOT_CONFIGURED,
+	ZBX_DEVICE_BA_ERR_CONNECT,
+	ZBX_DEVICE_BA_ERR_INVALID_RESPONSE,
 	ZBX_DEVICE_BA_ERR_RETURNED_ERROR
 }
 zbx_device_ba_error_t;
+
+static zbx_device_ba_error_t	trapper_device_map_http_jsonrpc_error(zbx_http_jsonrpc_error_t error)
+{
+	switch (error)
+	{
+		case ZBX_HTTP_JSONRPC_ERR_CONNECT:
+			return ZBX_DEVICE_BA_ERR_CONNECT;
+		case ZBX_HTTP_JSONRPC_ERR_INVALID_RESPONSE:
+			return ZBX_DEVICE_BA_ERR_INVALID_RESPONSE;
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected HTTP JSON-RPC error: %d", error);
+
+	return ZBX_DEVICE_BA_ERR_INVALID_RESPONSE;
+}
 
 static int	trapper_device_bridge_adapter_error_info(const struct zbx_json_parse *jp_error, char **reason,
 		char **domain)
@@ -370,7 +385,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 		char **error)
 {
 	const zbx_config_tls_t		*config_tls = config_comms->config_tls;
-	zbx_http_jsonrpc_error_t	err_kind;
+	zbx_http_jsonrpc_error_t	http_error;
+	zbx_device_ba_error_t		device_error;
 	int				ret;
 
 	if (NULL == config_bridge_adapter_url || '\0' == *config_bridge_adapter_url)
@@ -384,11 +400,14 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 
 	ret = zbx_http_post_json_rpc(config_bridge_adapter_url, config_tls->ca_file, config_tls->crl_file,
 			config_tls->cert_file, config_tls->key_file, config_bridge_adapter_connect_to, payload, request,
-			"bridge-adapter", (long)ZBX_BRIDGE_ADAPTER_TIMEOUT, body_data, jp_body, &err_kind);
+			ZBX_BRIDGE_ADAPTER_SERVICE_NAME, (long)ZBX_BRIDGE_ADAPTER_TIMEOUT, body_data, jp_body,
+			&http_error);
 
 	if (SUCCEED != ret)
-		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
-				(zbx_device_ba_error_t)err_kind));
+	{
+		device_error = trapper_device_map_http_jsonrpc_error(http_error);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request, device_error));
+	}
 
 	return ret;
 }
