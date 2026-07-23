@@ -956,7 +956,6 @@ static int	DBpatch_7050064(void)
 	return SUCCEED;
 }
 
-
 #endif
 
 DBPATCH_START(7050)
