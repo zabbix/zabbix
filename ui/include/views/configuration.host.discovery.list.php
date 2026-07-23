@@ -119,7 +119,9 @@ zbx_subarray_push($filter_type_visibility, -1, 'filter_delay_row');
 zbx_subarray_push($filter_type_visibility, -1, 'filter_delay');
 
 $lld_types = item_type2str();
-unset($lld_types[ITEM_TYPE_HTTPTEST], $lld_types[ITEM_TYPE_CALCULATED], $lld_types[ITEM_TYPE_SNMPTRAP]);
+unset($lld_types[ITEM_TYPE_HTTPTEST], $lld_types[ITEM_TYPE_CALCULATED], $lld_types[ITEM_TYPE_SNMPTRAP],
+	$lld_types[ITEM_TYPE_TELEMETRY]
+);
 
 $type_select->addOptions(CSelect::createOptionsFromArray($lld_types));
 

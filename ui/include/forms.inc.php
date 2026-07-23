@@ -191,7 +191,9 @@ JAVASCRIPT;
 	// types, http items only for internal processes
 	$data['types'] = item_type2str();
 	unset($data['types'][ITEM_TYPE_HTTPTEST]);
-	unset($data['types'][ITEM_TYPE_CALCULATED], $data['types'][ITEM_TYPE_SNMPTRAP]);
+	unset($data['types'][ITEM_TYPE_CALCULATED], $data['types'][ITEM_TYPE_SNMPTRAP],
+		$data['types'][ITEM_TYPE_TELEMETRY]
+	);
 
 	// item
 	if (array_key_exists('itemid', $item)) {
