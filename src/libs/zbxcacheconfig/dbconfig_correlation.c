@@ -805,8 +805,9 @@ static void	correlation_conditon_dump(const zbx_corr_condition_t *cond, const ch
 
 static void	correlation_dump(const zbx_correlation_t *correlation)
 {
-	zabbix_log(LOG_LEVEL_TRACE, "  correlationid:" ZBX_FS_UI64 " name:%s operations:%x refcount:%u",
-			correlation->correlationid, correlation->name, correlation->operations, correlation->refcount);
+	zabbix_log(LOG_LEVEL_TRACE, "  correlationid:" ZBX_FS_UI64 " name:%s operations:%x evaltype:%u formula:%s"
+			" refcount:%u", correlation->correlationid, correlation->name, correlation->operations,
+			correlation->evaltype, correlation->formula, correlation->refcount);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  conditions:");
 
