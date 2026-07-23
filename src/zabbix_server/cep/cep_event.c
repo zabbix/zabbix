@@ -751,12 +751,14 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
  * Purpose: resolve macros in a string using an event context, restricted     *
  *          to a given macro search scope                                     *
  *                                                                            *
- * Parameters: ctx   - [IN/OUT] event context                                 *
- *             scope - [IN] macro token search scope                          *
- *             str   - [IN/OUT] string to resolve macros in                   *
+ * Parameters: ctx      - [IN/OUT] event context                              *
+ *             scope    - [IN] macro token search scope                       *
+ *             resolver - [IN] macro resolver function                        *
+ *             str      - [IN/OUT] string to resolve macros in                   *
  *                                                                            *
  ******************************************************************************/
-static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int scope, char **str)
+static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int scope,
+		zbx_macro_resolv_func_t resolver, char **str)
 {
 	zbx_db_event		*db_event;
 	zbx_dc_um_handle_t	*um_handle;
@@ -769,7 +771,7 @@ static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int s
 
 	um_handle = zbx_dc_open_user_macros();
 
-	zbx_substitute_macros_ext_search(scope, str, NULL, 0, zbx_macro_event_name_resolv, um_handle, db_event, NULL);
+	zbx_substitute_macros_ext_search(scope, str, NULL, 0, resolver, um_handle, db_event, NULL);
 
 	zbx_dc_close_user_macros(um_handle);
 }
@@ -784,8 +786,8 @@ static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int s
  ******************************************************************************/
 void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **str)
 {
-	return cep_event_context_resolve_macros(ctx,
-			ZBX_TOKEN_SEARCH_REFERENCES | ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, str);
+	return cep_event_context_resolve_macros(ctx, ZBX_TOKEN_SEARCH_REFERENCES | ZBX_TOKEN_SEARCH_EXPRESSION_MACRO,
+			zbx_macro_event_name_resolv, str);
 }
 
 /******************************************************************************
@@ -798,6 +800,6 @@ void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **
  ******************************************************************************/
 void	cep_event_context_resolve_tag_macros(zbx_cep_event_context_t *ctx, char **str)
 {
-	return cep_event_context_resolve_macros(ctx, 0, str);
+	return cep_event_context_resolve_macros(ctx, 0, zbx_macro_trigger_tag_resolv, str);
 }
 
