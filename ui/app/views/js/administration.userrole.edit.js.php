@@ -97,7 +97,7 @@
 			this.updateAccessUiElementsFieldsGroup(this.form.findFieldByName('type').getValue());
 		}
 
-		updateAccessUiElementsFieldsGroup(user_type, overwrite_checked = false) {
+		updateAccessUiElementsFieldsGroup(user_type) {
 			if (this.readonly) {
 				return;
 			}
@@ -167,12 +167,12 @@
 				CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS => USER_TYPE_ZABBIX_USER
 			], JSON_FORCE_OBJECT) ?>;
 
-			const access_min_default_checked = <?= json_encode([
-				CRoleHelper::DEVICES_ACCESS => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::DEVICES_ACTIONS_MANAGE_USER => USER_TYPE_SUPER_ADMIN,
-				CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS => USER_TYPE_SUPER_ADMIN
-			], JSON_FORCE_OBJECT) ?>;
+			const default_unchecked = <?= json_encode([
+				CRoleHelper::DEVICES_ACCESS,
+				CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN,
+				CRoleHelper::DEVICES_ACTIONS_MANAGE_USER,
+				CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS
+			]) ?>;
 
 			for (const [id, value] of Object.entries(access_min)) {
 				const checkbox = document.getElementById(id);
@@ -186,13 +186,8 @@
 					checkbox.checked = false;
 				}
 				else {
-					if (checkbox.readOnly || overwrite_checked) {
-						if (id in access_min_default_checked) {
-							checkbox.checked = user_type >= access_min_default_checked[id];
-						}
-						else if (checkbox.readOnly) {
-							checkbox.checked = true;
-						}
+					if (checkbox.readOnly) {
+						checkbox.checked = !default_unchecked.includes(id);
 					}
 					checkbox.readOnly = false;
 				}
@@ -203,12 +198,6 @@
 			if (this.form.findFieldByName('devices_access')?.getValue() == 0 && device_manage_own_checkbox) {
 				device_manage_own_checkbox.checked = false;
 				device_manage_own_checkbox.readOnly = true;
-			}
-
-			if (device_manage_own_checkbox && !device_manage_own_checkbox.checked) {
-				const device_manage_user_checkbox = document.getElementById('devices.actions.manage_user');
-				device_manage_user_checkbox.checked = false;
-				device_manage_user_checkbox.readOnly = true;
 			}
 
 			const access_max = <?= json_encode([
@@ -320,7 +309,7 @@
 		}
 
 		usertypeChange(e) {
-			this.updateAccessUiElementsFieldsGroup(e.target.value, true);
+			this.updateAccessUiElementsFieldsGroup(e.target.value);
 			this.updateApiMethodsMultiselect(e.target.value);
 			this.form.validateChanges(['ui', 'actions']);
 		}

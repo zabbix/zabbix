@@ -74,6 +74,11 @@ class CControllerUserDeviceDelete extends CController {
 
 		if ($devices) {
 			$this->device = reset($devices);
+
+			if ($this->device['userid'] == CWebUser::$data['userid']
+					&& !$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+				return false;
+			}
 		}
 
 		return true;
