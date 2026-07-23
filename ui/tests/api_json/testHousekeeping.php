@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  */
 class testHousekeeping extends CAPITest {
 
-	protected static $default_params = [
+	protected static $parameter_values = [
 		'hk_events_mode' => '1',
 		'hk_events_trigger' => '200d',
 		'hk_events_service' => '2d',
@@ -44,12 +44,16 @@ class testHousekeeping extends CAPITest {
 		'compress_older' => '788400000'
 	];
 
+	protected static $default_expected;
+
 	/**
-	 * Update every parameter to default.
+	 * Update all housekeeping parameters. The set values will be used as default values within this test.
 	 */
-	public function testHousekeeping_SetDefaultValues() {
-		$updatedFields = $this->call('housekeeping.update', self::$default_params)['result'];
-		$this->assertEquals(array_keys(self::$default_params), $updatedFields);
+	public function testHousekeeping_UpdateAllParameters() {
+		$responce = $this->call('housekeeping.update', self::$parameter_values);
+		$this->assertEquals(array_keys(self::$parameter_values), $responce['result']);
+
+		self::$default_expected = array_merge(self::$parameter_values, ['db_extension' => '']);
 	}
 
 	public function housekeepingGetData() {
@@ -83,40 +87,36 @@ class testHousekeeping extends CAPITest {
 	/**
 	 * Check the output returned by housekeeping.get method.
 	 *
-	 * @depends testHousekeeping_SetDefaultValues
+	 * @depends testHousekeeping_UpdateAllParameters
 	 *
 	 * @dataProvider housekeepingGetData
 	 */
 	public function testHousekeeping_Get($data) {
 		$response = $this->call('housekeeping.get', $data['parameters']);
-		$expected = (array_key_exists('expected', $data))
-			? $data['expected']
-			: array_merge(self::$default_params, ['db_extension' => '']);
+		$expected = (array_key_exists('expected', $data)) ? $data['expected'] : self::$default_expected;
 
 		$this->assertEquals($expected, $response['result']);
 	}
 
 	/**
-	 * Verify permissions for housekeeping API methods.
+	 * Verify permissions for housekeeping API methods for user with "User" and "Admin" roles.
+	 *
+	 * @depends testHousekeeping_UpdateAllParameters
 	 */
 	public function testHousekeeping_UserPermissions() {
-		$default_results = array_merge(self::$default_params, ['db_extension' => '']);
 		foreach (['zabbix-user', 'zabbix-admin'] as $user) {
-			// Users with role "User" and "Admin" must be able to get housekeeping parameters.
+			// Users with role "User" and "Admin" should be able to get housekeeping parameters.
 			$this->authorize($user, 'zabbix');
 			$response = $this->call('housekeeping.get', ['output' => 'extend']);
-			$this->assertEquals($default_results, $response['result']);
+			$this->assertEquals(self::$default_expected, $response['result']);
 
-			// Users with role "User" and "Admin" must NOT be able to update housekeeping parameters.
+			// Users with role "User" and "Admin" should NOT be able to update housekeeping parameters.
 			$this->call('housekeeping.update', ['hk_events_mode' => '1'],
 				'No permissions to call "housekeeping.update".'
 			);
 		}
 	}
 
-	/**
-	 * Update with empty parameters.
-	 */
 	public function testHousekeeping_SimpleUpdate() {
 		$sql = 'SELECT * FROM settings';
 		$old_hash = CDBHelper::getHash($sql);
@@ -126,8 +126,6 @@ class testHousekeeping extends CAPITest {
 	}
 
 	/**
-	 * Update housekeeping parameters with valid and invalid values.
-	 *
 	 * @dataProvider updateParamsProvider
 	 */
 	public function testHousekeeping_Update($data) {
@@ -138,6 +136,7 @@ class testHousekeeping extends CAPITest {
 
 		if ($data['expected'] === TEST_GOOD) {
 			$update_output = $this->call('housekeeping.get', ['output' => 'extend'])['result'];
+
 			foreach ($data['params'] as $key => $value) {
 				$this->assertEquals($value, $update_output[$key], 'Field mismatch: '.$key);
 			}
@@ -146,7 +145,7 @@ class testHousekeeping extends CAPITest {
 
 	public function updateParamsProvider() {
 		return [
-			// Partial update.
+			// Parameter hk_audit_mode minimum valid value (0 and 1 are valid values).
 			[
 				[
 					'expected' => TEST_GOOD,
