@@ -33,6 +33,7 @@
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxtrends.h"
+#include "zbxjson.h"
 
 #define ZBX_VALUEMAP_TYPE_MATCH			0
 #define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1
@@ -3006,6 +3007,7 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 	zbx_vector_history_record_t	values;
 	char				*pattern = NULL;
 	zbx_vector_var_t		*result = NULL;
+	zbx_jsonpath_t			jsonpath_tmp;
 	zbx_timespec_t			ts_end = *ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3064,7 +3066,16 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 		goto out;
 	}
 
-	result = (zbx_vector_var_t*)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
+	if (SUCCEED != zbx_jsonpath_compile(pattern, &jsonpath_tmp))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid jsonpath expression: %s", zbx_json_strerror());
+		*error = zbx_strdup(*error, "invalid jsonpath expression");
+		goto out;
+	}
+
+	zbx_jsonpath_clear(&jsonpath_tmp);
+
+	result = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
 	zbx_vector_var_create(result);
 
 	for (int i = 0; i < values.values_num; i++)
@@ -3081,25 +3092,21 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 		if (FAIL == zbx_jsonobj_open(json_str, &obj))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "failed to open JSON: %s", zbx_json_strerror());
-			*error = zbx_strdup(*error, "failed to open JSON");
-			goto out;
+			continue;
 		}
 
-		if (FAIL == zbx_jsonobj_query(&obj, pattern, &matches))
+		if (FAIL != zbx_jsonobj_query(&obj, pattern, &matches))
 		{
+			if (NULL != matches)
+			{
+				zbx_variant_t	elem;
+
+				zbx_variant_set_str(&elem, matches);
+				zbx_vector_var_append(result, elem);
+			}
+		}
+		else
 			zabbix_log(LOG_LEVEL_DEBUG, "jsonpath query failed: %s", zbx_json_strerror());
-			*error = zbx_strdup(*error, "jsonpath query failed");
-			zbx_jsonobj_clear(&obj);
-			goto out;
-		}
-
-		if (NULL != matches)
-		{
-			zbx_variant_t	elem;
-
-			zbx_variant_set_str(&elem, matches);
-			zbx_vector_var_append(result, elem);
-		}
 
 		zbx_jsonobj_clear(&obj);
 	}
