@@ -2982,6 +2982,148 @@ static int	evaluate_FIRSTCLOCK(zbx_variant_t *value, const zbx_dc_evaluate_item_
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate function 'jsonpath' for the item.                        *
+ *                                                                            *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] seconds/values, time shift (optional),       *
+ *                               pattern                                      *
+ *             ts         - [IN] starting timestamp                           *
+ *             selector   - [IN/OUT] history range selector                   *
+ *             error      - [OUT]                                             *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
+		const zbx_timespec_t *ts, zbx_history_selector_t *selector, char **error)
+{
+	int				ret = FAIL, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
+	char				*pattern = NULL;
+	zbx_vector_var_t		*result = NULL;
+	zbx_timespec_t			ts_end = *ts;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type
+			&& ITEM_VALUE_TYPE_LOG != item->value_type)
+	{
+		*error = zbx_strdup(*error, "invalid value type");
+		goto out;
+	}
+
+	if (2 != zbx_function_param_parse_count(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_history_selector(ts->sec, parameters, 1, selector) ||
+			ZBX_VALUE_NONE == selector->type)
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
+	if (NULL == value)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	switch (selector->type)
+	{
+		case ZBX_VALUE_SECONDS:
+			seconds = selector->value;
+			break;
+		case ZBX_VALUE_NVALUES:
+			nvalues = selector->value;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	ts_end.sec -= selector->timeshift;
+
+	if (SUCCEED != get_function_parameter_str(parameters, 2, &pattern))
+	{
+		*error = zbx_strdup(*error, "invalid third parameter");
+		goto out;
+	}
+
+	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+		goto out;
+	}
+
+	result = (zbx_vector_var_t*)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
+	zbx_vector_var_create(result);
+
+	for (int i = 0; i < values.values_num; i++)
+	{
+		const char	*json_str;
+		zbx_jsonobj_t	obj;
+		char		*matches = NULL;
+
+		if (ITEM_VALUE_TYPE_LOG == item->value_type)
+			json_str = values.values[i].value.log->value;
+		else
+			json_str = values.values[i].value.str;
+
+		if (FAIL == zbx_jsonobj_open(json_str, &obj))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "failed to open JSON: %s", zbx_json_strerror());
+			*error = zbx_strdup(*error, "failed to open JSON");
+			goto out;
+		}
+
+		if (FAIL == zbx_jsonobj_query(&obj, pattern, &matches))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "jsonpath query failed: %s", zbx_json_strerror());
+			*error = zbx_strdup(*error, "jsonpath query failed");
+			zbx_jsonobj_clear(&obj);
+			goto out;
+		}
+
+		if (NULL != matches)
+		{
+			zbx_variant_t	elem;
+
+			zbx_variant_set_str(&elem, matches);
+			zbx_vector_var_append(result, elem);
+		}
+
+		zbx_jsonobj_clear(&obj);
+	}
+
+	zbx_variant_set_vector(value, result);
+	result = NULL;
+
+	ret = SUCCEED;
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+	zbx_free(pattern);
+
+	if (NULL != result)
+	{
+		zbx_vector_var_clear_ext(result);
+		zbx_vector_var_destroy(result);
+		zbx_free(result);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 /* flags for evaluate_MONO() */
 #define MONOINC		0
 #define MONODEC		1
@@ -3945,6 +4087,10 @@ int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	else if (0 == strncmp(function, "firstclock", ZBX_CONST_STRLEN("firstclock")))
 	{
 		ret = evaluate_FIRSTCLOCK(value, item, parameter, ts, selector, error);
+	}
+	else if (0 == strncmp(function, "jsonpath", ZBX_CONST_STRLEN("jsonpath")))
+	{
+		ret = evaluate_JSONPATH(value, item, parameter, ts, selector, error);
 	}
 	else if (NULL != (ptr = strstr(function, "_foreach")) && ZBX_CONST_STRLEN("_foreach") == strlen(ptr))
 	{

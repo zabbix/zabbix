@@ -691,9 +691,10 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
  ******************************************************************************/
 static int	macrofunc_jsonpath(char **params, size_t nparam, char **out)
 {
+	int		ret = FAIL;
 	char		*value = NULL;
 	zbx_jsonobj_t	obj;
-	const char	*json_str, *default_value = NULL;
+	const char	*pattern, *default_value = NULL;
 
 	if (1 > nparam || nparam > 2)
 	{
@@ -701,7 +702,7 @@ static int	macrofunc_jsonpath(char **params, size_t nparam, char **out)
 		return FAIL;
 	}
 
-	json_str = params[0];
+	pattern = params[0];
 
 	if (2 == nparam)
 		default_value = params[1];
@@ -712,10 +713,10 @@ static int	macrofunc_jsonpath(char **params, size_t nparam, char **out)
 		return FAIL;
 	}
 
-	if (FAIL == zbx_jsonobj_query(&obj, json_str, &value))
+	if (FAIL == zbx_jsonobj_query(&obj, pattern, &value))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() jsonpath query failed: %s", __func__, zbx_json_strerror());
-		return FAIL;
+		goto clean;
 	}
 
 	if (NULL == value)
@@ -723,7 +724,7 @@ static int	macrofunc_jsonpath(char **params, size_t nparam, char **out)
 		if (NULL == default_value)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() jsonpath returned no value", __func__);
-			return FAIL;
+			goto clean;
 		}
 		else
 		{
@@ -734,7 +735,11 @@ static int	macrofunc_jsonpath(char **params, size_t nparam, char **out)
 	zbx_free(*out);
 	*out = value;
 
-	return SUCCEED;
+	ret = SUCCEED;
+clean:
+	zbx_jsonobj_clear(&obj);
+
+	return ret;
 }
 
 /******************************************************************************
