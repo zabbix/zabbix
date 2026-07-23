@@ -30,6 +30,7 @@ declare -A BASELINE_TIMES=(
   [testItemRate]=66
   [testHousekeepingConfSync]=60
   [testUserParametersReload]=47
+  [testHashicorpVault]=45
   [testEventsCauseAndSymptoms]=44
   [testTimescaleDb]=44
   [testHistoryValueDuplicates]=43
@@ -56,7 +57,6 @@ declare -A BASELINE_TIMES=(
   [testScriptItems]=10
   [testAutoregistration]=10
   [testUserMacrosWithContext]=10
-  [testHashicorpVault]=45
   [testGraphLinking]=8
   [testFunctions]=3
 )
