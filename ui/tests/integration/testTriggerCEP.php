@@ -3434,12 +3434,12 @@ HEREDOC;
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOrUpdate$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
-	/*public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOrUpdate() {
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItemOrUpdate() {
 		$this->prepareDataGlobalCorrelationCloseOnUpEvaltypeTransition(CONDITION_EVAL_TYPE_AND_OR,
 			CONDITION_EVAL_TYPE_OR);
 		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
 		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
-	}*/
+	}
 
 	/**
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpFromSameTrigger$)
