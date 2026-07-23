@@ -356,7 +356,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 		next_renew = 0;
 	}
 
-	if (0 == (unsigned long)next_renew)
+	if (0 == next_renew)
 	{
 		if (SUCCEED != zbx_vault_token_lookup_self(vault_url, *token, ssl_cert_file, ssl_key_file,
 				config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
