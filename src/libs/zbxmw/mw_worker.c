@@ -79,6 +79,8 @@ static void	*mw_worker_entry(void *a)
 	void *(*worker_entry)(void *) = args->worker_entry;
 	void			*ret;
 
+	atomic_fetch_or(&worker->state, MW_WORKER_STATE_STARTING);
+
 	zbx_init_thread_signal_handler(&jmp_ret);
 	if (0 != sigsetjmp(jmp_ret, 1))
 	{
@@ -131,8 +133,6 @@ int	mw_worker_start(zbx_mw_worker_t *worker, unsigned char process_type, void *(
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
 		goto out;
 	}
-
-	atomic_fetch_or(&worker->state, MW_WORKER_STATE_STARTING);
 
 	ret = SUCCEED;
 out:
