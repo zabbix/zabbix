@@ -648,6 +648,168 @@ $formgrid
 		))->setId('js-item-formula-field')
 	])
 	->addItem([
+		(new CLabel(_('Category'), 'signal_type'))->setId('js-item-signal-type-label'),
+		(new CFormField(
+			(new CSelect('signal_type'))
+				->setId('signal_type')
+				->setValue($item['signal_type'])
+				->addOptions(CSelect::createOptionsFromArray([
+					APM_SIGNAL_TYPE_TRACES => _('APM traces'),
+					APM_SIGNAL_TYPE_METRICS => _('APM metrics'),
+					APM_SIGNAL_TYPE_LOGS => _('APM logs')
+				]))
+				->setReadonly($readonly)
+		))->setId('js-item-signal-type-field')
+	])
+	->addItem([
+		(new CLabel(_('Metric points'), 'metric_point_type'))->setId('js-item-metric-point-type-label'),
+		(new CFormField(
+			(new CRadioButtonList('metric_point_type', (int) $item['metric_point_type']))
+				->addValue(_('Sum'), APM_METRICS_POINT_SUM)
+				->addValue(_('Gauge'), APM_METRICS_POINT_GAUGE)
+				->addValue(_('Histogram'), APM_METRICS_POINT_HISTOGRAM)
+				->addValue(_('Exponential histogram'), APM_METRICS_POINT_EXPHISTOGRAM)
+				->setModern()
+				->setReadonly($readonly)
+		))->setId('js-item-metric-point-type-field')
+	])
+	->addItem([
+		(new CLabel([
+			_('Columns'),
+			(new CSpan(makeErrorIcon(_('Complex columns require a key name.'))))
+				->addClass('js-columns-error')
+				->addClass(ZBX_STYLE_DISPLAY_NONE)
+		], 'columns-table'))->setId('js-item-columns-label'),
+		(new CFormField(
+			(new CDiv([
+				(new CTable())
+					->setId('columns-table')
+					->setHeader(['', _('Name'), '', ''])
+					->setFooter(new CRow(
+						(new CCol(
+							(new CButtonLink(_('Add')))->addClass('element-table-add')->setEnabled(!$readonly)
+						))->setColSpan(4)
+					)),
+				new CTemplateTag('column-row-tmpl',
+					(new CRow([
+						(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CSelect('columns[#{rowNum}][column]'))
+							->addClass('js-column')
+							->setValue('#{column}')
+							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+							->setReadonly($readonly),
+						(new CTextBox('columns[#{rowNum}][attribute_key]', '#{attribute_key}', $readonly))
+							->removeId()
+							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+							->setAttribute('placeholder', _('Key name'))
+							->addClass('js-attribute-key'),
+						(new CCol(
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove')->setEnabled(!$readonly)
+						))
+							->addClass(ZBX_STYLE_RIGHT)
+							->addStyle('width: 100%;')
+					]))->addClass('form_row')
+				)
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		))->setId('js-item-columns-field')
+	])
+	->addItem([
+		(new CLabel(_('Aggregated columns'), 'aggregated-columns-table'))
+			->setAsteriskMark()
+			->setId('js-item-aggregated-columns-label'),
+		(new CFormField(
+			(new CDiv([
+				(new CTable())
+					->setId('aggregated-columns-table')
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'aggregated_columns')
+					->setHeader([_('Function'), _('Alias'), _('Actions')])
+					->setFooter(new CRow(
+						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-aggregated-column')
+							->setEnabled(!$readonly)
+						))->setColSpan(3)
+					)),
+				new CTemplateTag('aggregated-column-row-tmpl',
+					(new CRow([
+						[
+							new CVar('aggregated_columns[#{row_index}][column]', '#{column}'),
+							new CVar('aggregated_columns[#{row_index}][function]', '#{function}'),
+							new CVar('aggregated_columns[#{row_index}][percentile]', '#{percentile}'),
+							new CVar('aggregated_columns[#{row_index}][alias]', '#{alias}'),
+							'#{function_label}'
+						],
+						'#{alias}',
+						(new CCol(new CHorList([
+							(new CButtonLink(_('Edit')))->addClass('js-edit-row')->setEnabled(!$readonly),
+							(new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)
+						])))
+					]))->addClass('form_row')->setAttribute('data-row_index', '#{row_index}')
+				)
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		))->setId('js-item-aggregated-columns-field')
+	])
+	->addItem([
+		(new CLabel(_('Type of calculation'), 'evaltype'))->setId('js-item-evaltype-label'),
+		(new CFormField([
+			(new CDiv(
+				(new CSelect('evaltype'))
+					->setId('evaltype')
+					->setValue((int) $item['evaltype'])
+					->addOptions(CSelect::createOptionsFromArray([
+						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+						CONDITION_EVAL_TYPE_AND => _('And'),
+						CONDITION_EVAL_TYPE_OR => _('Or'),
+						CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+					]))
+					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+					->setReadonly($readonly)
+			))->addClass(ZBX_STYLE_CELL),
+			(new CDiv(
+				(new CTextBox('formula', $item['formula'], $readonly))
+					->setId('formula')
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->addClass(ZBX_STYLE_MONOSPACE_FONT)
+					->setAttribute('placeholder', 'A or (B and C) ...')
+			))
+				->addClass(ZBX_STYLE_CELL)
+				->addClass(ZBX_STYLE_CELL_EXPRESSION)
+		]))->setId('js-item-evaltype-field')
+	])
+	->addItem([
+		(new CLabel(_('Conditions')))->setId('js-item-conditions-label'),
+		(new CFormField(
+			(new CDiv([
+				(new CTable())
+					->setId('conditions-table')
+					->setHeader([_('Label'), _('Name'), _('Action')])
+					->setFooter(new CRow(
+						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-condition')
+							->setEnabled(!$readonly)
+						))->setColSpan(3)
+					)),
+				new CTemplateTag('condition-row-tmpl',
+					(new CRow([
+						[
+							new CVar('conditions[#{row_index}][column]', '#{column}'),
+							new CVar('conditions[#{row_index}][attribute_key]', '#{attribute_key}'),
+							new CVar('conditions[#{row_index}][operator]', '#{operator}'),
+							new CVar('conditions[#{row_index}][value]', '#{value}'),
+							'#{formulaid}'
+						],
+						'#{name}',
+						(new CCol((new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)))
+					]))->addClass('form_row')->setAttribute('data-row_index', '#{row_index}')
+				)
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		))->setId('js-item-conditions-field')
+	])
+	->addItem([
 		(new CLabel(_('Units'), 'units'))->setId('js-item-units-label'),
 		(new CFormField(
 			(new CTextBox('units', $item['units'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -681,6 +843,50 @@ $formgrid
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('js-item-flex-intervals-field')
+	])
+	->addItem([
+		(new CLabel([
+			_('Time shift'),
+			makeHelpIcon(_('Shift the processing window back by a fixed amount.'))
+		], 'time_shift'))->setAsteriskMark()->setId('js-item-time-shift-label'),
+		(new CFormField(
+			(new CTextBox('time_shift', $item['time_shift'], $readonly))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		))->setId('js-item-time-shift-field')
+	])
+	->addItem([
+		(new CLabel([
+			_('Lookback limit'),
+			makeHelpIcon(
+				_('Limit processing window historical lookup when previous item updates are missing or too old.')
+			),
+			(new CSpan(makeWarningIcon(_('Data gaps are possible.'))))
+				->addClass('js-lookback-limit-hint')
+				->addClass(ZBX_STYLE_DISPLAY_NONE),
+			(new CSpan(makeWarningIcon(_('Should not be less than the aggregation size, data will be incomplete.'))))
+				->addClass('js-lookback-limit-error')
+				->addClass(ZBX_STYLE_DISPLAY_NONE)
+		], 'lookback_limit'))->setAsteriskMark()->setId('js-item-lookback-limit-label'),
+		(new CFormField(
+			(new CTextBox('lookback_limit', $item['lookback_limit'], $readonly))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		))->setId('js-item-lookback-limit-field')
+	])
+	->addItem([
+		(new CLabel([
+			_('Aggregation size'),
+			makeHelpIcon(_('Fixed duration of each aggregated bucket within the processing window.')),
+			(new CSpan(makeWarningIcon(_('Data will likely overlap.'))))
+				->addClass('js-granularity-hint')
+				->addClass(ZBX_STYLE_DISPLAY_NONE)
+		], 'granularity'))->setAsteriskMark()->setId('js-item-granularity-label'),
+		(new CFormField(
+			(new CTextBox('granularity', $item['granularity'], $readonly))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		))->setId('js-item-granularity-field')
 	]);
 
 /**

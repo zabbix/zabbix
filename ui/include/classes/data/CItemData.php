@@ -918,6 +918,35 @@ final class CItemData {
 				],
 				ITEM_TYPE_NESTED => [
 					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_TELEMETRY => [
+					'js-item-signal-type-label',
+					'js-item-signal-type-field',
+					'js-item-metric-point-type-label',
+					'js-item-metric-point-type-field',
+					'js-item-columns-label',
+					'js-item-columns-field',
+					'js-item-aggregated-columns-label',
+					'js-item-aggregated-columns-field',
+					'js-item-evaltype-label',
+					'js-item-evaltype-field',
+					'js-item-conditions-label',
+					'js-item-conditions-field',
+					'js-item-time-shift-label',
+					'js-item-time-shift-field',
+					'js-item-lookback-limit-label',
+					'js-item-lookback-limit-field',
+					'js-item-granularity-label',
+					'js-item-granularity-field',
+					'js-item-delay-label',
+					'js-item-delay-field',
+					'delay',
+					'js-item-flex-intervals-label',
+					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
 				]
 			],
 			// Ids to toggle when the field 'authtype' is changed.

@@ -94,7 +94,7 @@ class CControllerItemCreate extends CControllerItem {
 				ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
 				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY
 			]],
 			'key' => [
 				['db items.key_', 'required', 'not_empty', 'use' => [CItemKeyValidator::class, []]],
@@ -390,6 +390,99 @@ class CControllerItemCreate extends CControllerItem {
 					]],
 					'when' => ['type', 'in' => [ITEM_TYPE_TRAPPER]]
 				]
+			],
+			'time_shift' => ['db items.time_shift', 'required', 'not_empty',
+				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_DAY, 'usermacros' => true]],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+			],
+			'lookback_limit' => ['db items.lookback_limit', 'required', 'not_empty',
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 3 * SEC_PER_DAY, 'usermacros' => true]],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+			],
+			'granularity' => ['db items.granularity', 'required', 'not_empty',
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_DAY, 'usermacros' => true]],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+			],
+			'signal_type' => ['integer',
+				'in' => [APM_SIGNAL_TYPE_TRACES, APM_SIGNAL_TYPE_METRICS, APM_SIGNAL_TYPE_LOGS],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+			],
+			'metric_point_type' => ['integer',
+				'in' => [APM_METRICS_POINT_SUM, APM_METRICS_POINT_GAUGE, APM_METRICS_POINT_HISTOGRAM,
+					APM_METRICS_POINT_EXPHISTOGRAM
+				],
+				'when' => [
+					['type', 'in' => [ITEM_TYPE_TELEMETRY]],
+					['signal_type', 'in' => [APM_SIGNAL_TYPE_METRICS]]
+				]
+			],
+			'columns' => ['objects', 'uniq' => ['column', 'attribute_key'],
+				'messages' => ['uniq' => _('Column and key name combination is not unique.')],
+				'fields' => [
+					'column' => ['string', 'required', 'not_empty'],
+					'attribute_key' => ['string', 'required', 'not_empty',
+						'when' => ['column', 'in' => CTelemetryData::getComplexColumns()]
+					]
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+			],
+			'aggregated_columns' => ['objects', 'required', 'not_empty', 'uniq' => ['alias'],
+				'messages' => [
+					'required' => _('At least one aggregated column must be specified.'),
+					'not_empty' => _('At least one aggregated column must be specified.'),
+					'uniq' => _('Alias is not unique.')
+				],
+				'fields' => [
+					'function' => ['integer',
+						'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM,
+							AGGREGATE_PCTILE
+						]
+					],
+					'column' => ['string', 'required', 'not_empty',
+						'when' => ['function', 'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM,
+							AGGREGATE_PCTILE
+						]]
+					],
+					'percentile' => ['float', 'required', 'min' => 0, 'max' => 100,
+						'when' => ['function', 'in' => [AGGREGATE_PCTILE]]
+					],
+					'alias' => ['string', 'required', 'not_empty']
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+			],
+			'evaltype' => ['integer',
+				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
+					CONDITION_EVAL_TYPE_EXPRESSION
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+			],
+			'formula' => ['string', 'required', 'not_empty',
+				'when' => [
+					['type', 'in' => [ITEM_TYPE_TELEMETRY]],
+					['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
+				]
+			],
+			'conditions' => ['objects',
+				'fields' => [
+					'column' => ['string', 'required', 'not_empty'],
+					'attribute_key' => ['string', 'required', 'not_empty',
+						'when' => ['column', 'in' => CTelemetryData::getComplexColumns()]
+					],
+					'operator' => [
+						['integer', 'required', 'in' => CTelemetryData::getConditionOperators()['complex'],
+							'when' => ['column', 'in' => CTelemetryData::getComplexColumns()]
+						],
+						['integer', 'required', 'in' => CTelemetryData::getConditionOperators()['simple'],
+							'when' => ['column', 'not_in' => CTelemetryData::getComplexColumns()]
+						]
+					],
+					'value' => ['string', 'required', 'not_empty',
+						'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
+							CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
+						]]
+					]
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
 			],
 			'inventory_link' => ['db items.inventory_link', 'in' => array_keys([0 => null] + getHostInventories())],
 			'description' => ['db items.description'],

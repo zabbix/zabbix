@@ -317,7 +317,8 @@ class CControllerItemEdit extends CControllerItem {
 					'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',
 					'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 					'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file',
-					'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
+					'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'query', 'time_shift',
+					'lookback_limit', 'granularity'
 				],
 				'selectDiscoveryRule' => ['name', 'templateid'],
 				'selectInterfaces' => ['interfaceid', 'type', 'ip', 'dns', 'port', 'useip', 'main'],

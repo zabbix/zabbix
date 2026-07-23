@@ -97,7 +97,8 @@ function item_type2str($type = null) {
 		ITEM_TYPE_DEPENDENT => _('Dependent item'),
 		ITEM_TYPE_SCRIPT => _('Script'),
 		ITEM_TYPE_BROWSER => _('Browser'),
-		ITEM_TYPE_NESTED => _('Nested')
+		ITEM_TYPE_NESTED => _('Nested'),
+		ITEM_TYPE_TELEMETRY => _('Telemetry query')
 	];
 
 	if ($type === null) {
@@ -1668,7 +1669,8 @@ function checkNowAllowedTypes() {
 		ITEM_TYPE_HTTPAGENT,
 		ITEM_TYPE_SNMP,
 		ITEM_TYPE_SCRIPT,
-		ITEM_TYPE_BROWSER
+		ITEM_TYPE_BROWSER,
+		ITEM_TYPE_TELEMETRY
 	];
 }
 
@@ -2277,6 +2279,11 @@ function getTypeItemFieldNames(array $input): array {
 		case ITEM_TYPE_BROWSER:
 			return $input['templateid'] == 0
 				? ['parameters', 'params', 'timeout', 'delay']
+				: ['delay'];
+
+		case ITEM_TYPE_TELEMETRY:
+			return $input['templateid'] == 0
+				? ['query', 'time_shift', 'lookback_limit', 'granularity', 'timeout', 'delay']
 				: ['delay'];
 
 		case ITEM_TYPE_NESTED:
