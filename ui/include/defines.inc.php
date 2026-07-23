@@ -628,6 +628,18 @@ define('ITEM_TYPE_SNMP',			20);
 define('ITEM_TYPE_SCRIPT',			21);
 define('ITEM_TYPE_BROWSER',			22);
 define('ITEM_TYPE_NESTED',			23);
+define('ITEM_TYPE_TELEMETRY',		24);
+
+// Telemetry query item signal types.
+define('APM_SIGNAL_TYPE_TRACES',	0);
+define('APM_SIGNAL_TYPE_METRICS',	1);
+define('APM_SIGNAL_TYPE_LOGS',		2);
+
+// Telemetry query item metric point types.
+define('APM_METRICS_POINT_SUM',				0);
+define('APM_METRICS_POINT_GAUGE',			1);
+define('APM_METRICS_POINT_HISTOGRAM',		2);
+define('APM_METRICS_POINT_EXPHISTOGRAM',	3);
 
 define('SNMP_V1', 1);
 define('SNMP_V2C', 2);
@@ -1274,6 +1286,7 @@ define('AGGREGATE_COUNT',	4);
 define('AGGREGATE_SUM',		5);
 define('AGGREGATE_FIRST',	6);
 define('AGGREGATE_LAST',	7);
+define('AGGREGATE_PCTILE',	8);
 
 define('APPROXIMATION_MIN',	1);
 define('APPROXIMATION_AVG',	2);
