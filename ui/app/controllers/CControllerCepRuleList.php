@@ -124,7 +124,6 @@ class CControllerCepRuleList extends CController {
 				'limit' => $limit
 			]);
 
-
 			if ($result_cep === false) {
 				return []; // The get_prepared_messages function for layout.htmlpage will do the error handling.
 			}

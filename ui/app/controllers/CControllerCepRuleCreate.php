@@ -38,8 +38,9 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 				],
 				'conditions' => ['objects', 'fields' => [
 					'type' => ['integer', 'required', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
-						CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_SEVERITY, CCepRuleHelper::CONDITION_HOST,
-						CCepRuleHelper::CONDITION_HOST_GROUP, CCepRuleHelper::CONDITION_TIME_PERIOD
+						CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_SEVERITY,
+						CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP,
+						CCepRuleHelper::CONDITION_TIME_PERIOD
 					]],
 					'operator' => [
 						[
@@ -65,9 +66,10 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 					'event_name' => ['db cep_condition.event_name', 'required', 'not_empty',
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME]]
 					],
-					'tag_operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
-							CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS,
-							CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
+					'tag_operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL,
+							CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE,
+							CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_MORE_EQUAL,
+							CONDITION_OPERATOR_LESS_EQUAL
 						],
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
 					],
@@ -84,8 +86,10 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST_GROUP]]
 					],
 					'severity' => ['db cep_condition.severity', 'required',
-						'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
-							TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
+						'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION,
+							TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH,
+							TRIGGER_SEVERITY_DISASTER
+						],
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_SEVERITY]]
 					],
 					'time_period' => ['db cep_condition.time_period', 'required', 'not_empty',
@@ -128,8 +132,9 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 						]],
 						'when' => [
 							['capacity_enabled', 'in' => [1]],
-							['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-								CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH
+							['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+								CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+								CCepRuleHelper::WINDOW_PATTERN_MATCH
 							]]
 						]
 					],
