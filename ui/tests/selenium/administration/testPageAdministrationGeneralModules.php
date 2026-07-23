@@ -1325,7 +1325,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			? 'zabbix.php?action=host.dashboard.view&hostid='.self::$hostid.'&dashboardid='.self::$template_dashboardid
 			: 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
 		$this->page->open($url)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status);
 
 		// Open Kiosk mode and check widget display again.

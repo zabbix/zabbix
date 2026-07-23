@@ -644,6 +644,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->query('id:all_items')->asCheckbox()->one()->check();
 		$this->query('button', $action)->one()->click();
 		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
 		$string = ($table->getRows()->count() == 1) ? 'Discovery rule ' : 'Discovery rules ';
 		$this->assertEquals($string.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
 		CMessageElement::find()->one()->close();

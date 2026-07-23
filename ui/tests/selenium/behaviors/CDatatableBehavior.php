@@ -174,22 +174,18 @@ class CDatatableBehavior extends CBehavior {
 			$button_selector = (in_array($column, ['Name', 'Time', 'Problem']))
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
-			$button = $table->getHeaderByText($column)->query($button_selector)->one();
-
-			if (!$button->isClickable()) {
-				$table->scrollRightHorizontally();
-			}
+			$button = $table->getHeaderByText($column)->query($button_selector);
 
 			/**
 			 *  When the button is placed under the datatable-options button it is considered clickable.
 			 *  Additional scrolling is required in such cases.
 			 */
 			try {
-				$button->click();
+				$button->waitUntilClickable(3)->one()->click();
 			}
-			catch (ElementClickInterceptedException $exception) {
+			catch (Exception $exception) {
 				$table->scrollRightHorizontally();
-				$button->click();
+				$button->waitUntilClickable()->one()->click();
 			}
 
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
