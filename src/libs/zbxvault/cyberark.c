@@ -45,6 +45,8 @@ int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const 
 	*error = zbx_dsprintf(*error, "missing cURL library");
 	return FAIL;
 #else
+#define ZBX_HTTP_STATUS_CODE_OK	200
+
 	char			*out = NULL, *url;
 	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
@@ -66,7 +68,7 @@ int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const 
 		goto fail;
 	}
 
-	if (200 != response_code)
+	if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 	{
 		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\"", response_code);
 		goto fail;
