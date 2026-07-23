@@ -17,10 +17,9 @@
 #include "zbxmockutil.h"
 #include "../../../../src/libs/zbxsysinfo/agent/modbtype.h"
 #include "zbxstr.h"
-#include "modbus/modbus.h"
+#include <modbus.h>
 
-modbus_t	*__wrap_modbus_new_rtu(char *port, int baudrate,
-		unsigned char parity, unsigned char data_bits,
+modbus_t	*__wrap_modbus_new_rtu(char *port, int baudrate, unsigned char parity, unsigned char data_bits,
 		unsigned char stop_bits);
 modbus_t	*__wrap_modbus_new_tcp_pi(char *ip, char *port);
 void	__wrap_modbus_free(modbus_t *mdb_ctx);
