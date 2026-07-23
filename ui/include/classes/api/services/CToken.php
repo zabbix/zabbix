@@ -256,6 +256,7 @@ class CToken extends CApiService {
 				'SELECT t.userid,t.name'.
 				' FROM token t'.
 				' WHERE '.dbConditionId('t.userid', [$userid]).
+					' AND '.dbConditionInt('t.auth_scheme', [ZBX_AUTH_SCHEME_BEARER]).
 					' AND '.dbConditionString('t.name', $names),
 				1
 			));
