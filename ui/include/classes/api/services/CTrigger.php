@@ -210,7 +210,7 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['where'][] = dbConditionInt('mt.maintenanceid', $options['maintenanceids']);
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['maintenanceid'] = 'mt.maintenanceid';
+				$sqlParts['group']['mt'] = 'mt.maintenanceid';
 			}
 		}
 
