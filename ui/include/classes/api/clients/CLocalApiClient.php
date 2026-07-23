@@ -24,7 +24,7 @@ class CLocalApiClient extends CApiClient {
 	 *
 	 * @var CRegistryFactory
 	 */
-	public $serviceFactory;
+	protected $serviceFactory;
 
 	/**
 	 * Whether debug mode is enabled.
