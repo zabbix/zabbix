@@ -50,8 +50,8 @@ class testHousekeeping extends CAPITest {
 	 * Update all housekeeping parameters. The set values will be used as default values within this test.
 	 */
 	public function testHousekeeping_UpdateAllParameters() {
-		$responce = $this->call('housekeeping.update', self::$parameter_values);
-		$this->assertEquals(array_keys(self::$parameter_values), $responce['result']);
+		$response = $this->call('housekeeping.update', self::$parameter_values);
+		$this->assertEquals(array_keys(self::$parameter_values), $response['result']);
 
 		self::$default_expected = array_merge(self::$parameter_values, ['db_extension' => '']);
 	}
