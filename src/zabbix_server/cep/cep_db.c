@@ -519,6 +519,28 @@ static void	cep_db_write_trigger_rtdata(zbx_dbconn_t *db, const zbx_vector_mw_ta
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: mark open CEP events as committed to the database                 *
+ *                                                                            *
+ * Parameters: tasks - [IN] committed tasks                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_db_mark_committed(const zbx_vector_mw_task_ptr_t *tasks)
+{
+	for (int i = 0; i < tasks->values_num; i++)
+	{
+		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
+
+		if (CEP_EVENT_OPEN != task->event_op)
+			continue;
+
+
+		if (NULL != task->hevent)
+			cep_event_handle_set_committed(task->hevent);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: flush events created by tasks to database                         *
  *                                                                            *
  * Parameters: dbpool - [IN] database connection pool                         *
@@ -549,7 +571,10 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 	}
 
 	if (ZBX_DB_OK == ret)
+	{
+		cep_db_mark_committed(tasks);
 		zbx_dc_config_triggers_apply_changes(trigger_diffs.values, trigger_diffs.values_num);
+	}
 
 	zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diffs, zbx_trigger_diff_free);
 	zbx_vector_trigger_diff_ptr_destroy(&trigger_diffs);
