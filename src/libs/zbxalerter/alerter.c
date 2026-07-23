@@ -562,7 +562,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 
 	if (SUCCEED != zbx_http_post_json_rpc(config_bridge_adapter_url, config_bridge_adapter_ca_file,
 			config_bridge_adapter_crl_file, config_bridge_adapter_cert_file, config_bridge_adapter_key_file,
-			config_bridge_adapter_connect_to, payload, ZBX_PROTO_VALUE_DEVICE_NOTIFY,
+			config_bridge_adapter_connect_to, payload, ZBX_PROTO_VALUE_DEVICE_NOTIFY, "bridge-adapter",
 			(long)ZBX_BRIDGE_ADAPTER_TIMEOUT, &body_data, &jp_body, &err_kind))
 	{
 		switch (err_kind)

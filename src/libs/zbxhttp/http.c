@@ -428,6 +428,8 @@ clean:
  *             connect_to_value  - [IN] optional CURLOPT_CONNECT_TO value     *
  *             payload           - [IN] JSON-RPC request body                 *
  *             request           - [IN] method name, for log messages only    *
+ *             service_name      - [IN] name of the remote endpoint, for      *
+ *                                       log messages only                    *
  *             timeout           - [IN]                                       *
  *             body_data         - [OUT] raw response body, caller frees      *
  *             jp_body           - [OUT] response body opened as JSON         *
@@ -443,7 +445,8 @@ clean:
  ******************************************************************************/
 int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl_file, const char *cert_file,
 		const char *key_file, const char *connect_to_value, const char *payload, const char *request,
-		long timeout, char **body_data, struct zbx_json_parse *jp_body, zbx_http_jsonrpc_error_t *err_kind)
+		const char *service_name, long timeout, char **body_data, struct zbx_json_parse *jp_body,
+		zbx_http_jsonrpc_error_t *err_kind)
 {
 #define ZBX_HTTPS_SCHEME	"https://"
 
@@ -563,13 +566,13 @@ int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: %s", curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to %s: %s", service_name, curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to obtain bridge-adapter response code: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "failed to obtain %s response code: %s", service_name,
 				curl_easy_strerror(err));
 		*err_kind = ZBX_HTTP_JSONRPC_ERR_INVALID_RESPONSE;
 		goto out;
@@ -580,36 +583,37 @@ int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl
 	if (ZBX_MAX_RECV_2KB_DATA_SIZE < body.offset)
 	{
 		body.data[ZBX_MAX_RECV_2KB_DATA_SIZE] = '\0';
-		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned too large response body for %s request: size:"
-				ZBX_FS_SIZE_T " body:'%s'", request, (zbx_fs_size_t)body.offset, body.data);
+		zabbix_log(LOG_LEVEL_WARNING, "%s returned too large response body for %s request: size:"
+				ZBX_FS_SIZE_T " body:'%s'", service_name, request, (zbx_fs_size_t)body.offset,
+				body.data);
 		goto out;
 	}
 
 	if (200 > http_code || 300 <= http_code)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
+		zabbix_log(LOG_LEVEL_WARNING, "%s returned HTTP %ld: %s", service_name, http_code,
 				ZBX_NULL2EMPTY_STR(body.data));
 		goto out;
 	}
 
 	if (NULL == body.data || FAIL == zbx_json_open(body.data, jp_body))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "invalid %s response body: %s", service_name,
 				ZBX_NULL2EMPTY_STR(body.data));
 		goto out;
 	}
 
 	if (FAIL == zbx_json_value_by_name(jp_body, "jsonrpc", jsonrpc, sizeof(jsonrpc), NULL))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "missing JSON-RPC version in bridge-adapter response body: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "missing JSON-RPC version in %s response body: %s", service_name,
 				ZBX_NULL2EMPTY_STR(body.data));
 		goto out;
 	}
 
 	if (0 != strcmp(jsonrpc, "2.0"))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid JSON-RPC version in bridge-adapter response body: %s,"
-				" expected 2.0", jsonrpc);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid JSON-RPC version in %s response body: %s,"
+				" expected 2.0", service_name, jsonrpc);
 		goto out;
 	}
 

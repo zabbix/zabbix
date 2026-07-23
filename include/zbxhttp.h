@@ -93,7 +93,8 @@ struct zbx_json_parse;
 
 int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl_file, const char *cert_file,
 		const char *key_file, const char *connect_to_value, const char *payload, const char *request,
-		long timeout, char **body_data, struct zbx_json_parse *jp_body, zbx_http_jsonrpc_error_t *err_kind);
+		const char *service_name, long timeout, char **body_data, struct zbx_json_parse *jp_body,
+		zbx_http_jsonrpc_error_t *err_kind);
 
 #define HTTP_REQUEST_GET	0
 #define HTTP_REQUEST_POST	1
