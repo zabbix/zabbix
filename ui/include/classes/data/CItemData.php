@@ -585,6 +585,11 @@ final class CItemData {
 					'js-filter-delay-field',
 					'filter_delay'
 				],
+				ITEM_TYPE_TELEMETRY => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
 				ITEM_TYPE_TRAPPER => [],
 				ITEM_TYPE_ZABBIX => [
 					'js-filter-delay-label',
