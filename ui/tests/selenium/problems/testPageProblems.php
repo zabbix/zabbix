@@ -2255,7 +2255,7 @@ class testPageProblems extends CWebTest {
 	 *
 	 * @onAfter removeSavedLayout
 	 */
-	public function testPageProblems_OperationalData($data){
+	public function testPageProblems_OperationalData($data) {
 		$this->page->login()->open(self::URL.'&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
 
