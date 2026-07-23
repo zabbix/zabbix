@@ -263,13 +263,19 @@
 			<arg line="--output-file"/>
 			<arg line="tests_results/html/app.info"/>
 		</exec>
+		<exec executable="lcov" failonerror="on">
+			<arg line="--extract"/>
+			<arg line="tests_results/html/app.info"/>
+			<arg line="*/src/*"/>
+			<arg line="--output-file"/>
+			<arg line="tests_results/html/app_filtered.info"/>
+		</exec>
 		<exec executable="genhtml" failonerror="on">
 			<arg line="-p"/>
 			<arg line="${user.dir}"/>
 			<arg line="-o"/>
 			<arg line="tests_results/html"/>
-			<arg line="tests_results/html/app.info"/>
-		</exec>
+			<arg line="tests_results/html/app_filtered.info"/>
 		<antcall target="clean-tests"/>
 	</target>
 
