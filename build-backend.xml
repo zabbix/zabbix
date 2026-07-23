@@ -276,6 +276,7 @@
 			<arg line="-o"/>
 			<arg line="tests_results/html"/>
 			<arg line="tests_results/html/app_filtered.info"/>
+		</exec>
 		<antcall target="clean-tests"/>
 	</target>
 
