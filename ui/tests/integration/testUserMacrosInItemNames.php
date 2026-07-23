@@ -38,7 +38,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			[
 				'host' => self::HOSTNAME1,
 				'interfaces' => [],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_MONITORED
 			]
@@ -206,7 +205,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			[
 				'host' => self::HOSTNAME2,
 				'interfaces' => [],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_MONITORED,
 				'templates' => ['templateid' => $templateid]

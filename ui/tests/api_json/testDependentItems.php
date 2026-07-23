@@ -76,7 +76,6 @@ class testDependentItems extends CAPITest {
 			'hosts' => [
 				[
 					'host' => 'h.dep',
-					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'items' => [
 						['key_' => 'master.item'],
 						[
@@ -125,7 +124,6 @@ class testDependentItems extends CAPITest {
 				],
 				[
 					'host' => 'h.discovered.items',
-					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'items' => [
 						['key_' => 'master.for.discovered.item']
 					],
@@ -149,7 +147,6 @@ class testDependentItems extends CAPITest {
 				],
 				[
 					'host' => 'h.dep.other',
-					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'items' => [
 						['key_' => 'master.item.other']
 					],

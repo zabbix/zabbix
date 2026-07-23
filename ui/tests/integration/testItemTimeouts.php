@@ -50,7 +50,6 @@ class testItemTimeouts extends CIntegrationTest {
 					'dns' => '',
 					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
 				],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_MONITORED
 			],
@@ -64,7 +63,6 @@ class testItemTimeouts extends CIntegrationTest {
 					'dns' => '',
 					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT2, 'ListenPort')
 				],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_MONITORED
 			]
@@ -97,7 +95,6 @@ class testItemTimeouts extends CIntegrationTest {
 				'host' => self::HOSTNAME_SSH,
 				'interfaces' => [],
 				'groups' => [['groupid' => 4]],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'status' => HOST_STATUS_NOT_MONITORED
 			]
 		]);
@@ -123,7 +120,6 @@ class testItemTimeouts extends CIntegrationTest {
 						'securitylevel' => 0
 					]
 				],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_NOT_MONITORED
 			]
@@ -136,7 +132,6 @@ class testItemTimeouts extends CIntegrationTest {
 			[
 				'host' => self::HOSTNAME_SIMPLE,
 				'interfaces' => [],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_NOT_MONITORED
 			]

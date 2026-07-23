@@ -90,7 +90,6 @@ class testScripts extends CAPITest {
 			'plain_rw' => [
 				'host' => 'api_test_host_plain_rw',
 				'name' => 'API test host - plain, read-write',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['rw']
@@ -102,7 +101,6 @@ class testScripts extends CAPITest {
 			'plain_r' => [
 				'host' => 'api_test_host_plain_r',
 				'name' => 'API test host - plain, read',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['r']
@@ -114,7 +112,6 @@ class testScripts extends CAPITest {
 			'plain_d' => [
 				'host' => 'api_test_host_plain_d',
 				'name' => 'API test host - plain, deny',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['d']
@@ -126,7 +123,6 @@ class testScripts extends CAPITest {
 			'macros_rw_1' => [
 				'host' => 'api_test_host_macros_rw_1',
 				'name' => 'API test host - macros 1, read-write',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['rw']
@@ -142,7 +138,6 @@ class testScripts extends CAPITest {
 			'macros_r_2' => [
 				'host' => 'api_test_host_macros_r_2',
 				'name' => 'API test host - macros 2, read',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['r']
@@ -158,7 +153,6 @@ class testScripts extends CAPITest {
 			'macros_rw_3' => [
 				'host' => 'api_test_host_macros_rw_3',
 				'name' => 'API test host - macros 3, read-write',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['rw']
@@ -176,7 +170,6 @@ class testScripts extends CAPITest {
 			'interface_rw_1' => [
 				'host' => 'api_test_host_interface_rw_1',
 				'name' => 'API test host - interface (read-write) 1',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['rw']
@@ -196,7 +189,6 @@ class testScripts extends CAPITest {
 			'interface_rw_2' => [
 				'host' => 'api_test_host_interface_rw_2',
 				'name' => 'API test host - interface (read-write) 2',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['rw']
@@ -218,7 +210,6 @@ class testScripts extends CAPITest {
 			'inventory_rw_1' => [
 				'host' => 'api_test_host_inventory_rw_1',
 				'name' => 'API test host - inventory (read-write) 1',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['rw']
@@ -232,7 +223,6 @@ class testScripts extends CAPITest {
 			'inventory_rw_2' => [
 				'host' => 'api_test_host_inventory_rw_2',
 				'name' => 'API test host - inventory (read-write) 2',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['rw']
@@ -248,7 +238,6 @@ class testScripts extends CAPITest {
 			'inherit_a_rw' => [
 				'host' => 'api_test_host_inherit_a_rw',
 				'name' => 'API test host - inherit, A, read-write',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['inherit_a_rw']
@@ -258,7 +247,6 @@ class testScripts extends CAPITest {
 			'inherit_b_r' => [
 				'host' => 'api_test_host_inherit_b_r',
 				'name' => 'API test host - inherit, B, read',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['inherit_b_r']
@@ -268,7 +256,6 @@ class testScripts extends CAPITest {
 			'inherit_c_rw' => [
 				'host' => 'api_test_host_inherit_c_rw',
 				'name' => 'API test host - inherit, C, read-write',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['inherit_c_rw']
@@ -278,7 +265,6 @@ class testScripts extends CAPITest {
 			'inherit_d_rw' => [
 				'host' => 'api_test_host_inherit_d_rw',
 				'name' => 'API test host - inherit, D, read-write',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['inherit_d_rw']
@@ -290,7 +276,6 @@ class testScripts extends CAPITest {
 			'cause_d' => [
 				'host' => 'api_test_host_cause_d',
 				'name' => 'API test host - cause, deny',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['d']
@@ -300,7 +285,6 @@ class testScripts extends CAPITest {
 			'symptom_rw' => [
 				'host' => 'api_test_host_symptom_rw',
 				'name' => 'API test host - symptom, read-write',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids']['rw']

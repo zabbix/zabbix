@@ -34,7 +34,6 @@ class testBrowserMonitoring extends CIntegrationTest {
 		$response = $this->call('host.create', [
 			'host' => 'WebMonHost',
 			'name' => 'WebMonHost',
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'groups' => ['groupid' => 4]
 		]);
 		$this->assertArrayHasKey('hostids', $response['result']);

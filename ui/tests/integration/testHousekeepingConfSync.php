@@ -41,7 +41,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	public function prepareData() {
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME,
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'groups' => [['groupid' => 4]],
 			'status' => HOST_STATUS_MONITORED
 		]);

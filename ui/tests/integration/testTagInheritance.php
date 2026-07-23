@@ -302,7 +302,6 @@ class testTagInheritance extends CIntegrationTest {
 
 		$response = $this->call('host.create', [
 			'host' => self::HOST_NAME,
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'groups' => ['groupid' => 4], // Zabbix servers
 			'status' => HOST_STATUS_MONITORED,
 			'templates' => [['templateid' => end(self::$template_ids)]],

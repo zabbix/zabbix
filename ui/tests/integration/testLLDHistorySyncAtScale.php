@@ -130,7 +130,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME,
 			'interfaces' => [],
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'groups' => [['groupid' => $groupid]],
 			'status' => HOST_STATUS_MONITORED
 		]);

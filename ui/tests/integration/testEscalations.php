@@ -44,7 +44,6 @@ class testEscalations extends CIntegrationTest {
 		// Create host "testhost".
 		$response = $this->call('host.create', [
 			'host' => self::HOST_NAME,
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'groups' => ['groupid' => 4]
 		]);
 

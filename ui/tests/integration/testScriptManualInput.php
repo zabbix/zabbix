@@ -54,7 +54,6 @@ class testScriptManualInput extends CIntegrationTest {
 
 		$response = CDataHelper::call('host.create', [
 			'host' => 'Test Host',
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'groups' => [
 				[
 					'groupid' => self::$hostgroupid

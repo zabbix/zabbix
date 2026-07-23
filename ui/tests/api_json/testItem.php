@@ -757,7 +757,6 @@ class testItem extends CAPITest {
 					'hostid' => '50009',
 					'name' => 'Item with invalid item type',
 					'key_' => 'item_with_invalid_item_type',
-					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'interfaceid' => '50022',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => '100',
@@ -1023,7 +1022,6 @@ class testItem extends CAPITest {
 		$result = CDataHelper::createHosts([
 			[
 				'host' => 'testItem_Update',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'interfaces' => $interfaces,
 				'groups' => $groups,
 				'status' => HOST_STATUS_MONITORED,

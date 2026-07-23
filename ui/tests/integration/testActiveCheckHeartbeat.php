@@ -281,7 +281,6 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 				]
 			],
 			'groups' => [['groupid' => 4]],
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'status' => HOST_STATUS_MONITORED
 		]);
 
@@ -302,7 +301,6 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 				]
 			],
 			'groups' => [['groupid' => 4]],
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'status' => HOST_STATUS_MONITORED,
 			'tls_accept' => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => self::PSK_IDENTITY,
@@ -375,7 +373,6 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 				]
 			],
 			'groups' => [['groupid' => 4]],
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'status' => HOST_STATUS_MONITORED
 		]);
 
@@ -608,7 +605,6 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 				]
 			],
 			'groups' => [['groupid' => 4]],
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'status' => HOST_STATUS_MONITORED,
 			'tls_accept' => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => self::PSK_IDENTITY,
@@ -648,7 +644,6 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 					]
 				],
 				'groups' => [['groupid' => 4]],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'status' => HOST_STATUS_MONITORED
 			],
 			[
@@ -664,7 +659,6 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 					]
 				],
 				'groups' => [['groupid' => 4]],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'status' => HOST_STATUS_MONITORED,
 				'tls_accept' => HOST_ENCRYPTION_PSK,
 				'tls_psk_identity' => self::PSK_IDENTITY,
@@ -699,7 +693,6 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 				]
 			],
 			'groups' => [['groupid' => 4]],
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'status' => HOST_STATUS_MONITORED
 		]]);
 
@@ -734,7 +727,6 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 				]
 			],
 			'groups' => [['groupid' => 4]],
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'status' => HOST_STATUS_MONITORED,
 			'tls_accept' => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => self::PSK_IDENTITY,

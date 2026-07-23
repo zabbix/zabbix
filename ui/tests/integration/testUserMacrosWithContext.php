@@ -84,7 +84,6 @@ class testUserMacrosWithContext extends CIntegrationTest {
 					'dns' => '',
 					'port' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
 				],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]], // Zabbix servers
 				'status' => HOST_STATUS_MONITORED
 			]

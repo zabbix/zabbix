@@ -60,7 +60,6 @@ class testDataCollection extends CIntegrationTest {
 				'host' => 'agent',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
 					[
@@ -83,7 +82,6 @@ class testDataCollection extends CIntegrationTest {
 				'host' => 'custom_agent',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
 					[
@@ -548,7 +546,6 @@ class testDataCollection extends CIntegrationTest {
 					'dns' => '',
 					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
 				],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_MONITORED
 			]
@@ -640,7 +637,6 @@ class testDataCollection extends CIntegrationTest {
 					'dns' => '',
 					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
 				],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_MONITORED
 			]

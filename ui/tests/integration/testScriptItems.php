@@ -51,7 +51,6 @@ class testScriptItems extends CIntegrationTest {
 
 		$response = $this->call('host.create', [
 			'host' => self::HOST_NAME,
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'groups' => [
 				[
 					'groupid' => 4

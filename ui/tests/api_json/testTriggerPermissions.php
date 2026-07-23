@@ -51,7 +51,6 @@ class testTriggerPermissions extends CAPITest {
 			'hosts' => [
 				[
 					'host' => 'h1',
-					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						'groupid' => ':host_group:ug1(W)ug2(R)ug3(D)ug4(N)'
 					],
@@ -61,7 +60,6 @@ class testTriggerPermissions extends CAPITest {
 				],
 				[
 					'host' => 'mht.h1',
-					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						'groupid' => ':host_group:mht.hg1'
 					],
@@ -71,7 +69,6 @@ class testTriggerPermissions extends CAPITest {
 				],
 				[
 					'host' => 'mht.h2',
-					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						'groupid' => ':host_group:mht.hg2'
 					],
@@ -81,7 +78,6 @@ class testTriggerPermissions extends CAPITest {
 				],
 				[
 					'host' => 'mht.h3',
-					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						'groupid' => ':host_group:mht.hg3'
 					],
@@ -91,7 +87,6 @@ class testTriggerPermissions extends CAPITest {
 				],
 				[
 					'host' => 'mht.h4',
-					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						'groupid' => ':host_group:mht.hg4'
 					],

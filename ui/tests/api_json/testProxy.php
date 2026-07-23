@@ -314,7 +314,6 @@ class testProxy extends CAPITest {
 			'monitored_by_server_1' => [
 				'host' => 'host_monitored_by_server_1',
 				'name' => 'API test proxy - monitored by server 1',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids'][0]
@@ -324,7 +323,6 @@ class testProxy extends CAPITest {
 			'monitored_by_server_2' => [
 				'host' => 'host_monitored_by_server_2',
 				'name' => 'API test proxy - monitored by server 2',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids'][0]

@@ -84,7 +84,6 @@ class testTaskCreate extends CAPITest {
 			[
 				'host' => 'api_test_task_create_monitored',
 				'name' => 'API test task.create monitored',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -94,7 +93,6 @@ class testTaskCreate extends CAPITest {
 			[
 				'host' => 'api_test_task_create_not_monitored',
 				'name' => 'API test task.create not monitored',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -105,7 +103,6 @@ class testTaskCreate extends CAPITest {
 			[
 				'host' => 'api_test_task_create_execute_now',
 				'name' => 'API test task.create execute_now',
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => 50016 // "API group for hosts" with read-only access to zabbix-user & zabbix-admin.

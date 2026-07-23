@@ -49,7 +49,6 @@ class testValuemaps extends CIntegrationTest {
 					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
 				]
 			],
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'groups' => [
 				[
 					'groupid' => 4

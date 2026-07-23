@@ -107,7 +107,6 @@ class testUserParametersReload extends CIntegrationTest {
 						'port' => PHPUNIT_PORT_PREFIX.$port
 					]
 				],
-				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => 4

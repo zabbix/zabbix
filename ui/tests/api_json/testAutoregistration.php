@@ -39,7 +39,6 @@ class testAutoregistration extends CAPITest {
 		// dataProviderInvalidAutoregistrationWithHostEncryptionUpdate
 		$hosts[] = [
 			'host' => 'test.example.com',
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'groups' => [['groupid' => ':hostgroup:API autoregistration tests hosts group']],
 			'tls_accept' => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => 'hostidentity',
