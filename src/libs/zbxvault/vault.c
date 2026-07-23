@@ -17,7 +17,6 @@
 #include "cyberark.h"
 
 #include "zbxkvs.h"
-#include "zbxstr.h"
 #include "zbxjson.h"
 
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
