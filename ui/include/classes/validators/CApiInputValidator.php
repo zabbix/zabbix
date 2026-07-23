@@ -3187,6 +3187,8 @@ class CApiInputValidator {
 			return false;
 		}
 
+		$data = strtolower($data);
+
 		return true;
 	}
 
