@@ -424,6 +424,10 @@ class CProxyGroup extends CApiService {
 			$proxy_groupids[$proxy_group['proxy_groupid']] = true;
 		}
 
+		if (!$proxy_groupids) {
+			return;
+		}
+
 		$db_usrgrps = [];
 
 		$resource = DBselect(

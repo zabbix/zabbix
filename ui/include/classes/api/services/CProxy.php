@@ -342,7 +342,7 @@ class CProxy extends CApiService {
 		}
 
 		self::updateHosts($proxies, $db_proxies);
-		self::unlinkProxies($proxies);
+		self::unlinkProxies($proxies, $db_proxies);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_PROXY, $proxies, $db_proxies);
 
@@ -399,14 +399,24 @@ class CProxy extends CApiService {
 
 	/**
 	 * @param array $proxies
+	 * @param array|null $db_proxies
 	 */
-	private static function unlinkProxies(array $proxies): void {
+	private static function unlinkProxies(array $proxies, ?array $db_proxies = null): void {
 		$proxyids = [];
 
 		foreach ($proxies as $proxy) {
-			if ($proxy['proxy_groupid'] != 0) {
+			if ($db_proxies !== null) {
+				if ($db_proxies[$proxy['proxyid']]['proxy_groupid'] == 0 && $proxy['proxy_groupid'] != 0) {
+					$proxyids[$proxy['proxyid']] = true;
+				}
+			}
+			elseif ($proxy['proxy_groupid'] == 0) {
 				$proxyids[$proxy['proxyid']] = true;
 			}
+		}
+
+		if (!$proxyids) {
+			return;
 		}
 
 		$db_usrgrps = [];
