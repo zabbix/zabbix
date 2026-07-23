@@ -212,7 +212,7 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 		if (NULL == right)
 		{
 			*error = zbx_dsprintf(*error, "cannot find separator \"\\\" in path");
-			free(left);
+			zbx_free(left);
 			return FAIL;
 		}
 		url = zbx_dsprintf(NULL, "%s/v1/%s/data/%s", vault_url, left, right);
