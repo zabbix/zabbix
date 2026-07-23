@@ -137,6 +137,23 @@ zbx_service_manager_t;
 
 /*#define ZBX_AVAILABILITY_MANAGER_DELAY		1*/
 
+static zbx_services_diff_t	*get_or_create_services_diff(zbx_service_t *service, zbx_hashset_t *services_diffs,
+		int flags)
+{
+	zbx_services_diff_t	services_diff_local = {.serviceid = service->serviceid}, *services_diff;
+
+	if (NULL == (services_diff = zbx_hashset_search(services_diffs, &services_diff_local)))
+	{
+		zbx_vector_service_problem_ptr_create(&services_diff_local.service_problems);
+		zbx_vector_service_problem_ptr_create(&services_diff_local.service_problems_recovered);
+		services_diff_local.flags = flags;
+		services_diff = zbx_hashset_insert(services_diffs, &services_diff_local,
+				sizeof(services_diff_local));
+	}
+
+	return services_diff;
+}
+
 static void	match_event_to_service_problem_tags(const zbx_cep_event_t *event,
 		const zbx_hashset_t *service_problem_tags_index, zbx_hashset_t *services_diffs, int flags)
 {
@@ -193,15 +210,6 @@ static void	match_event_to_service_problem_tags(const zbx_cep_event_t *event,
 		zbx_service_t	*service = candidates.values[i];
 		int		j;
 
-		for (j = 0; j < service->service_problems.values_num; j++)
-		{
-			if (service->service_problems.values[j]->eventid == event->eventid)
-				break;
-		}
-
-		if (j < service->service_problems.values_num)
-			continue;
-
 		for (j = 0; j < service->service_problem_tags.values_num; j++)
 		{
 			zbx_service_problem_tag_t	*service_problem_tag = service->service_problem_tags.values[j];
@@ -212,17 +220,10 @@ static void	match_event_to_service_problem_tags(const zbx_cep_event_t *event,
 
 		if (j == service->service_problem_tags.values_num)
 		{
-			zbx_services_diff_t	services_diff_local = {.serviceid = service->serviceid}, *services_diff;
 			zbx_service_problem_t	*service_problem;
+			zbx_services_diff_t	*services_diff;
 
-			if (NULL == (services_diff = zbx_hashset_search(services_diffs, &services_diff_local)))
-			{
-				zbx_vector_service_problem_ptr_create(&services_diff_local.service_problems);
-				zbx_vector_service_problem_ptr_create(&services_diff_local.service_problems_recovered);
-				services_diff_local.flags = flags;
-				services_diff = zbx_hashset_insert(services_diffs, &services_diff_local,
-						sizeof(services_diff_local));
-			}
+			services_diff = get_or_create_services_diff(service, services_diffs, flags);
 
 			service_problem = zbx_malloc(NULL, sizeof(zbx_service_problem_t));
 			service_problem->eventid = event->eventid;
