@@ -3955,7 +3955,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Problems'),
 						'Name' => 'Problems widget with empty Show lines',
-						'Show lines' => ''
+						'Show lines' => 0
 					],
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
@@ -4266,7 +4266,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
 						'Name' => 'Top triggers widget with empty Trigger limit',
-						'Trigger limit' => ''
+						'Trigger limit' => 0
 					],
 					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
