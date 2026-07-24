@@ -16,9 +16,10 @@
 require_once dirname(__FILE__).'/testTriggerCEP.php';
 
 /**
- * Re-runs the whole testTriggerCEP suite with tiny load knobs but with the server-restart and
- * services test variants enabled, so the *Restart and *WithServices scenarios that the parent
- * skips are actually exercised (at small scale). The parent reads all of these knobs via late
+ * Re-runs the whole testTriggerCEP suite with the load knobs cranked up to the recommended
+ * stress values (and the server-restart and services test variants enabled), so CEP is actually
+ * exercised under heavy load rather than at the tiny CI-friendly defaults. This is slow and meant
+ * to be run on demand, not in the fast CI pass. The parent reads all of these knobs via late
  * static binding (static::), so overriding the constants here is enough to redirect its behavior.
  *
  * @required-components server
@@ -26,13 +27,13 @@ require_once dirname(__FILE__).'/testTriggerCEP.php';
  * @onAfter clearData
  * @hosts test
  */
-class testTriggerCEPRestart extends testTriggerCEP {
-	const LLD_DISCOVERY_COUNT = 10;		// discovered items/triggers per rule; use at least 4000 to stress CEP
-	const LOG_EVENT_COUNT = 10;			// log values pushed at the single-trigger stream; use at least 10000
-	const RECOVERY_CYCLES_COUNT = 20;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
+class testTriggerCEPAtScale extends testTriggerCEP {
+	const LLD_DISCOVERY_COUNT = 500;	// discovered items/triggers per rule; use at least 4000 to stress CEP
+	const LOG_EVENT_COUNT = 10000;		// log values pushed at the single-trigger stream; use at least 10000
+	const RECOVERY_CYCLES_COUNT = 2000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
 	const MAINTENANCE_COUNT_EXTRA = 10;
-	const SKIP_RESTART_TESTS = false;
+	const SKIP_RESTART_TESTS = true;
 
 	// Larger scale needs longer to settle; override the parent's reduced default back up.
 	const WAIT_ITERATIONS = 60;

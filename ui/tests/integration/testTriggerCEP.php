@@ -33,10 +33,10 @@ class testTriggerCEP extends CIntegrationTest {
 	// runs quickly in CI, and small values are also handy while debugging to reach a failure fast; when
 	// running locally to actually stress CEP, raise them to the recommended values noted below (or higher).
 	// Increasing them makes the tests slower but far more thorough.
-	const LLD_DISCOVERY_COUNT = 500;	// discovered items/triggers per rule; use at least 4000 to stress CEP
-	const LOG_EVENT_COUNT = 10000;		// log values pushed at the single-trigger stream; use at least 10000
-	const RECOVERY_CYCLES_COUNT = 2000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
-	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
+	const LLD_DISCOVERY_COUNT = 10;	// discovered items/triggers per rule; use at least 4000 to stress CEP
+	const LOG_EVENT_COUNT = 10;		// log values pushed at the single-trigger stream; use at least 10000
+	const RECOVERY_CYCLES_COUNT = 10;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
+	const MAINTENANCE_COUNT = 10;		// number of maintenances to create; change to any number
 	const MAINTENANCE_COUNT_EXTRA = 10;
 	const SKIP_RESTART_TESTS = true;
 
@@ -83,7 +83,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const LOG_MASTER_ITEM_KEY = 'cep.log.master';
 	const LOG_ITEM_PROTO_KEY = 'cep.log.proto';
 	const LOG_COMPONENT_VALUE = 'logsensor1';
-	const WAIT_ITERATIONS = 60;
+	const WAIT_ITERATIONS = 30;
 	const WAIT_ITERATION_DELAY = 1;
 
 	// change iterations to fail faster when debugging
