@@ -63,8 +63,6 @@ class CApiDpopHelper {
 
 		self::checkTokenLifeTime($payload, $check_time);
 
-		self::checkJti($payload);
-
 		$jwk = json_decode($kid_keys[$header['kid']], true);
 
 		$public_key_pem = self::createPemFromJwk($jwk);
@@ -83,6 +81,8 @@ class CApiDpopHelper {
 				'OpenSSL error: '.openssl_error_string()
 			);
 		}
+
+		self::checkJti($payload);
 	}
 
 	/**
@@ -242,7 +242,7 @@ class CApiDpopHelper {
 		return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 	}
 
-	public static function base64UrlDecode(string $data): string {
+	private static function base64UrlDecode(string $data): string {
 		$padding_length = 4 - strlen($data) % 4;
 
 		if ($padding_length < 4) {
