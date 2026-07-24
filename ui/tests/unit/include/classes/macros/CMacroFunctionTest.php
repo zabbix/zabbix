@@ -79,6 +79,14 @@ class CMacroFunctionTest extends TestCase {
 		return json_decode(file_get_contents(__DIR__.'/CMacroFunctionUppercase.json'), true);
 	}
 
+	public function dataProviderJsonpath(): array {
+		return json_decode(file_get_contents(__DIR__.'/CMacroFunctionJsonpath.json'), true);
+	}
+
+	public function dataProviderXmlxpath(): array {
+		return json_decode(file_get_contents(__DIR__.'/CMacroFunctionXmlxpath.json'), true);
+	}
+
 	/**
 	 * @dataProvider dataProviderRegsub
 	 * @dataProvider dataProviderFmtnum
@@ -92,6 +100,8 @@ class CMacroFunctionTest extends TestCase {
 	 * @dataProvider dataProviderHtmldecode
 	 * @dataProvider dataProviderLowercase
 	 * @dataProvider dataProviderUppercase
+	 * @dataProvider dataProviderJsonpath
+	 * @dataProvider dataProviderXmlxpath
 	 */
 	public function testResolveItemDescriptions(string $value, array $macrofunc, string $expected): void {
 		$this->assertSame($expected, CMacroFunction::calcMacrofunc($value, $macrofunc));
