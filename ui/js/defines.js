@@ -355,3 +355,5 @@ const EVENT_BACK_FORWARD = 'back_forward';
 
 const EVENT_CONTEXT_OVERLAY = 'overlay';
 const EVENT_UNMOUNT = 'unmount';
+
+const VALIDATE_USE_CHUNK_SIZE = 500;
