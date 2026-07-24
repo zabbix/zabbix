@@ -50,7 +50,7 @@ int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **
 
 void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **token);
+		const char *config_ssl_key_location, int force, char **token);
 
 int	zbx_vault_token_from_env_get(char **token, char **error);
 

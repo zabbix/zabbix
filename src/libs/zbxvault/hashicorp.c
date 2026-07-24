@@ -309,7 +309,7 @@ fail:
 void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role_id, const char *app_secret_id,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, long timeout, char **token)
+		const char *config_ssl_key_location, long timeout, int force, char **token)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(vault_url);
@@ -332,6 +332,12 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 	static int		renewable = 0, last_status = SUCCEED;
 	static double		next_try_after_error;
 	static double		next_renew;
+
+	if (1 == force)
+	{
+		last_status = SUCCEED;
+		next_try_after_error = 0;
+	}
 
 	if (SUCCEED != last_status && zbx_time() < next_try_after_error)
 		return;

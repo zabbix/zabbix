@@ -2605,7 +2605,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_vault_init(zbx_config_vault.name);
 
 		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, &zbx_config_vault.token);
+				config_ssl_cert_location, config_ssl_key_location, 0, &zbx_config_vault.token);
 	}
 
 	zbx_unblock_signals(&orig_mask);
@@ -2826,7 +2826,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_ipc_message_free(message);
 
 		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, &zbx_config_vault.token);
+				config_ssl_cert_location, config_ssl_key_location, 0, &zbx_config_vault.token);
 
 		if (0 != zbx_strcmp_null(old_token, zbx_config_vault.token) && NULL != zbx_config_vault.token)
 		{
@@ -2868,7 +2868,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 						zbx_free(zbx_config_vault.token);
 						zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip,
 								config_ssl_ca_location, config_ssl_cert_location,
-								config_ssl_key_location, &zbx_config_vault.token);
+								config_ssl_key_location, 1, &zbx_config_vault.token);
 					}
 
 					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay,
