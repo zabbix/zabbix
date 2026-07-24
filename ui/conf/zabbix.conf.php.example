@@ -108,3 +108,23 @@ $ZBX_SERVER_TLS['KEY_FILE'] = '';
 $ZBX_SERVER_TLS['CERT_FILE'] = '';
 $ZBX_SERVER_TLS['CERTIFICATE_ISSUER']  = '';
 $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] = '';
+
+// Uncomment and set to desired values to override APM database configuration.
+//$APM_DB['TYPE']		= 'CLICKHOUSE';
+//$APM_DB['SERVER']		= '';
+//$APM_DB['PORT']		= '0';
+//$APM_DB['DATABASE']		= '';
+//$APM_DB['USER']		= '';
+//$APM_DB['PASSWORD']		= '';
+//$APM_DB['API_KEY']		= '';
+
+// APM database schema name. Used for PostgreSQL.
+//$APM_DB['SCHEMA']		= '';
+
+// Used for TLS connection of APM database.
+//$APM_DB['ENCRYPTION']		= false;
+//$APM_DB['KEY_FILE']		= '';
+//$APM_DB['CERT_FILE']		= '';
+//$APM_DB['CA_FILE']		= '';
+//$APM_DB['VERIFY_PEER']	= true;
+//$APM_DB['VERIFY_HOST']	= true;

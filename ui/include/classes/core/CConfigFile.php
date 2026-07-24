@@ -100,6 +100,25 @@ class CConfigFile {
 			self::exception('DB database is not set.');
 		}
 
+		if (isset($APM_DB) && is_array($APM_DB)) {
+			$this->validateApmDbConfiguration($APM_DB);
+			$this->setApmDbDefaults();
+
+			$this->config['APM_DB']['TYPE'] = $APM_DB['TYPE'];
+			$this->config['APM_DB']['SERVER'] = $APM_DB['SERVER'];
+			$this->config['APM_DB']['DATABASE'] = $APM_DB['DATABASE'];
+
+			$keys = ['PORT', 'USER', 'PASSWORD', 'API_KEY', 'SCHEMA', 'ENCRYPTION', 'VERIFY_PEER', 'KEY_FILE',
+				'CERT_FILE', 'CA_FILE', 'VERIFY_HOST'
+			];
+
+			foreach ($keys as $key) {
+				if (array_key_exists($key, $APM_DB)) {
+					$this->config['APM_DB'][$key] = $APM_DB[$key];
+				}
+			}
+		}
+
 		$this->setDefaults();
 
 		$this->config['DB']['TYPE'] = $DB['TYPE'];
@@ -297,7 +316,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY_PROVIDERS, $SSO,
-			$ZBX_SERVER_TLS, $ZBX_FEATURE_FLAGS;
+			$ZBX_SERVER_TLS, $ZBX_FEATURE_FLAGS, $APM_DB;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -308,6 +327,8 @@ class CConfigFile {
 		$SSO = $this->config['SSO'];
 		$ZBX_FEATURE_FLAGS = $this->config['ZBX_FEATURE_FLAGS'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
+
+		$APM_DB = array_key_exists('APM_DB', $this->config) ? $this->config['APM_DB'] : [];
 	}
 
 	public function save() {
@@ -458,6 +479,26 @@ $ZBX_SERVER_TLS[\'KEY_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS'][
 $ZBX_SERVER_TLS[\'CERT_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERT_FILE'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CERTIFICATE_ISSUER\']  = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'], "'\\").'\';
+
+// Uncomment and set to desired values to override APM database configuration.
+//$APM_DB[\'TYPE\']		= \'CLICKHOUSE\';
+//$APM_DB[\'SERVER\']		= \'\';
+//$APM_DB[\'PORT\']		= \'0\';
+//$APM_DB[\'DATABASE\']		= \'\';
+//$APM_DB[\'USER\']		= \'\';
+//$APM_DB[\'PASSWORD\']		= \'\';
+//$APM_DB[\'API_KEY\']		= \'\';
+
+// APM database schema name. Used for PostgreSQL.
+//$APM_DB[\'SCHEMA\']		= \'\';
+
+// Used for TLS connection of APM database.
+//$APM_DB[\'ENCRYPTION\']		= false;
+//$APM_DB[\'KEY_FILE\']		= \'\';
+//$APM_DB[\'CERT_FILE\']		= \'\';
+//$APM_DB[\'CA_FILE\']		= \'\';
+//$APM_DB[\'VERIFY_PEER\']	= true;
+//$APM_DB[\'VERIFY_HOST\']	= true;
 ';
 	}
 
@@ -529,6 +570,22 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			'CERT_FILE' => '',
 			'CERTIFICATE_ISSUER' => '',
 			'CERTIFICATE_SUBJECT' => ''
+		];
+	}
+
+	protected function setApmDbDefaults(): void {
+		$this->config['APM_DB'] = [
+			'PORT' => '0',
+			'USER' => '',
+			'PASSWORD' => '',
+			'API_KEY' => '',
+			'SCHEMA' => '',
+			'ENCRYPTION' => false,
+			'VERIFY_PEER' => true,
+			'KEY_FILE' => '',
+			'CERT_FILE' => '',
+			'CA_FILE' => '',
+			'VERIFY_HOST' => true
 		];
 	}
 
@@ -627,5 +684,49 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		}
 
 		return array_values($providers);
+	}
+
+	/**
+	 * @param array $apm_db  APM database configuration
+	 * @throws ConfigFileException
+	 */
+	protected function validateApmDbConfiguration(array $apm_db): void {
+		if (!array_key_exists('TYPE', $apm_db) || $apm_db['TYPE'] == '') {
+			self::exception('APM DB type is not set.');
+		}
+
+		if (!array_key_exists($apm_db['TYPE'], ZBX_APM_DB_SUPPORTED_TYPES)) {
+			self::exception(
+				'Incorrect value "'.$apm_db['TYPE'].'" for APM DB type. Possible values '.
+				implode(', ', array_keys(ZBX_APM_DB_SUPPORTED_TYPES)).'.'
+			);
+		}
+
+		if (!array_key_exists('SERVER', $apm_db) || $apm_db['SERVER'] == '') {
+			self::exception('APM DB server is not set.');
+		}
+
+		if (!array_key_exists('DATABASE', $apm_db) || $apm_db['DATABASE'] == '') {
+			self::exception('APM DB database is not set.');
+		}
+
+		$has_user_name = array_key_exists('USER', $apm_db) && $apm_db['USER'] != '';
+		$has_password = array_key_exists('PASSWORD', $apm_db) && $apm_db['PASSWORD'] != '';
+		$has_api_key = array_key_exists('API_KEY', $apm_db) && $apm_db['API_KEY'] != '';
+
+		if (($has_user_name || $has_password) && $has_api_key) {
+			self::exception('APM DB username and password must be empty if API key is provided.');
+		}
+
+		if ($has_api_key && $apm_db['TYPE'] != ZBX_DB_ELASTICSEARCH) {
+			self::exception('APM DB API key is only allowed with '.ZBX_DB_ELASTICSEARCH.' database type.');
+		}
+
+		if ($apm_db['TYPE'] != ZBX_DB_ELASTICSEARCH && $apm_db['TYPE'] != ZBX_DB_CLICKHOUSE && !$has_api_key
+				&& !$has_user_name) {
+			self::exception(
+				'APM DB empty credentials are only allowed with '.ZBX_DB_ELASTICSEARCH.' or '.ZBX_DB_CLICKHOUSE.' database type.'
+			);
+		}
 	}
 }
