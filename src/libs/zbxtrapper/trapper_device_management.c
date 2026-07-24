@@ -290,7 +290,7 @@ static zbx_device_ba_error_t	trapper_device_map_http_jsonrpc_error(zbx_http_json
 			return ZBX_DEVICE_BA_ERR_INVALID_RESPONSE;
 	}
 
-	THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected HTTP JSON-RPC error: %d", error);
+	THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected HTTP JSON-RPC error: %d", (int)error);
 
 	return ZBX_DEVICE_BA_ERR_INVALID_RESPONSE;
 }
@@ -374,7 +374,7 @@ static const char	*trapper_device_bridge_adapter_error(const char *request, zbx_
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected bridge-adapter error mapping: request:\"%s\" error:%d", request,
-			error);
+			(int)error);
 
 	return "Cannot initialize mobile device, bridge-adapter returned an invalid response.";
 }
