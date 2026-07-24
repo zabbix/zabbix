@@ -33,7 +33,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
 		ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY
 	];
 
 	/**
@@ -83,7 +83,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected $items_support_proxy = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
 		ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-		ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+		ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY
 	];
 
 	/**
@@ -238,6 +238,18 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_lld_macros' => true
 		],
 		'http_password' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'time_shift' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'lookback_limit' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'granularity' => [
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		]
@@ -532,6 +544,13 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_BROWSER:
 				$data_item += CArrayHelper::getByKeys($input, ['key', 'parameters', 'browser_script', 'timeout']);
 				break;
+
+			case ITEM_TYPE_TELEMETRY_QUERY:
+				$data_item += CArrayHelper::getByKeys($input,
+					['key', 'timeout', 'time_shift', 'lookback_limit', 'granularity']
+				);
+				$data_item['query'] = json_encode(CItemGeneralHelper::composeTelemetryQuery($input, $for_server));
+				break;
 		}
 
 		if (in_array($this->item_type, $this->items_support_proxy)) {
@@ -675,7 +694,7 @@ abstract class CControllerPopupItemTest extends CController {
 			}
 		}
 
-		if (in_array($this->item_type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
+		if (in_array($this->item_type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY])) {
 			return $interface_data;
 		}
 

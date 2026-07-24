@@ -30,7 +30,8 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 				['db items.type',
 					'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
 						ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-						ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_IPMI
+						ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_IPMI,
+						ITEM_TYPE_TELEMETRY_QUERY
 					]
 				]
 			],
@@ -207,6 +208,29 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 					ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_JSON
 				]
 			],
+			'signal_type' => ['integer'],
+			'metric_point_type' => ['integer'],
+			'columns' => ['objects', 'fields' => [
+				'column' => ['string', 'required'],
+				'attribute_key' => ['string']
+			]],
+			'aggregated_columns' => ['objects', 'fields' => [
+				'function' => ['integer', 'required'],
+				'column' => ['string'],
+				'percentile' => ['string'],
+				'alias' => ['string', 'required']
+			]],
+			'conditions' => ['objects', 'fields' => [
+				'column' => ['string', 'required'],
+				'attribute_key' => ['string'],
+				'operator' => ['integer', 'required'],
+				'value' => ['string']
+			]],
+			'evaltype' => ['integer'],
+			'formula' => ['string'],
+			'time_shift' => ['string'],
+			'lookback_limit' => ['string'],
+			'granularity' => ['string'],
 			'verify_host' => ['boolean'],
 			'verify_peer' => ['boolean']
 		]];

@@ -42,7 +42,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'interfaceid'			=> 'db interface.interfaceid',
 			'ipmi_sensor'			=> 'string',
 			'itemid'				=> 'db items.itemid',
-			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED]),
+			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY, ITEM_TYPE_NESTED]),
 			'jmx_endpoint'			=> 'string',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
@@ -73,6 +73,16 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'url'					=> 'string',
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON]),
 			'valuemapid'			=> 'int32',
+			'signal_type'			=> 'int32',
+			'metric_point_type'		=> 'int32',
+			'columns'				=> 'array',
+			'aggregated_columns'	=> 'array',
+			'conditions'			=> 'array',
+			'evaltype'				=> 'int32',
+			'formula'				=> 'string',
+			'time_shift'			=> 'string',
+			'lookback_limit'		=> 'string',
+			'granularity'			=> 'string',
 			'verify_host'			=> 'in 0,1',
 			'verify_peer'			=> 'in 0,1'
 		];
@@ -106,7 +116,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
 				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_HTTPTEST, ITEM_TYPE_DEPENDENT,
-				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY
 			]],
 			'key' => ['db items.key_', 'required', 'not_empty', 'use' => [CItemKey::class, []], 'when' => [
 				['type', 'in' => self::$item_types_has_key_mandatory]
