@@ -6,12 +6,13 @@ This guide describes how to integrate your Zabbix 8.0 installation with Event-Dr
 
 1\. Make sure you have the webhook plugin loaded from the standard ansible collection (ansible.eda.webhook) and use ansible-rulebook v0.11.0 and higher.
 
-2\. Create a rulebook and specify a webhook from the standard eda collection (ansible.eda.webhook) as the event source. Specify listen address and port.
+2\. Create a rulebook and specify a webhook from the standard eda collection (ansible.eda.webhook) as the event source. Specify listen address, port and token.
 ```
 sources:
   - ansible.eda.webhook:
       host: 0.0.0.0
       port: 5001
+      token: example
 ```
 3\. Set necessary actions in the rules section. As an example you can use:
 ```
@@ -22,6 +23,7 @@ sources:
     - ansible.eda.webhook:
         host: 0.0.0.0
         port: 5001
+        token: example
   rules:
     - name: debug
       condition: event.payload is defined
@@ -68,13 +70,14 @@ To utilize the media type, you need to create a Zabbix user to represent Event-D
 4\. Configure the media type:
  - Set *Type* to *Event-Driven Ansible*.
  - In the *Send to* field, specify the IP address and destination port in the format `xxx.xxx.xxx.xxx:port`.
+ - In the *token* field, specify the token used for authentication.
  - Press Add to save the media type.
 
 [![](images/thumb.3.png?raw=true)](images/3.png)
 
 5\. Press Add in the User configuration form to save the user.
 
-> Note: Because each new rulebook requires a separate port, you have to create a separate user for each rulebook, specifying the ip:port.
+> Note: Because each new rulebook requires a separate port, you have to create a separate user for each rulebook, specifying the ip:port and token.
 
 6\. Use Event-Driven Ansible user in any [actions](https://www.zabbix.com/documentation/8.0/manual/config/notifications/action) of your choice.
 
