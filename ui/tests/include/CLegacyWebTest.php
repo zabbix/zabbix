@@ -59,7 +59,7 @@ class CLegacyWebTest extends CWebTest {
 		$this->page->open($url);
 	}
 
-	public function zbxTestLogin($url, $server_name = true) {
+	public function nozbxTestLogin($url, $server_name = true) {
 		global $ZBX_SERVER_NAME;
 
 		$this->page->login()->open($url);

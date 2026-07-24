@@ -76,10 +76,10 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestClickLinkText($name);
-		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckHeader('User groups');
-		$this->zbxTestCheckTitle('Configuration of user groups');
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User group updated');
+		$this->page->assertHeader('User groups');
+		$this->page->assertTitle('Configuration of user groups');
 		$this->zbxTestTextPresent($name);
 
 		$this->assertEquals($oldHashGroup, CDBHelper::getHash($sqlHashGroup));
@@ -223,6 +223,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->assertTableStats(0);
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableStats(0);
 	}

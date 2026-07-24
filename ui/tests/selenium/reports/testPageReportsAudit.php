@@ -509,7 +509,7 @@ class testPageReportsAudit extends CWebTest {
 
 		// If there is no result - "No data found" displayed in table.
 		if (CTestArrayHelper::get($data, 'no_data')) {
-			$this->assertEquals(['No data found.'], $table->getRows()->asText());
+			$this->assertEquals(['No data found.'], $this->getTable()->getRows()->asText());
 		}
 		else {
 			foreach ($data['fields'] as $column => $values) {

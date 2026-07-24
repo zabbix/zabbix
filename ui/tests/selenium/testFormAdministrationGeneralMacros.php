@@ -103,13 +103,14 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	}
 
 	private function saveGlobalMacros($confirmation = false) {
-		$this->zbxTestClick('update');
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		if ($confirmation) {
-			$this->zbxTestAcceptAlert();
+			$this->page->acceptAlert();
 		}
-			$this->zbxTestCheckHeader('Macros');
-			$this->zbxTestTextPresent('Macros');
-			$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Macros');
+		$this->zbxTestTextPresent('Macros');
+		$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);
 	}
 
 	private function calculateHash($conditions = null) {

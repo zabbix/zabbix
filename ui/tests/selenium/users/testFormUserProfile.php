@@ -135,6 +135,9 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		$this->zbxTestDropdownSelect('theme', 'Blue');
 		$this->zbxTestClickWait('update');
+		$this->page->waitUntilReady();
+		CDashboardElement::find()->waitUntilVisible()->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'User updated');
 		$this->zbxTestCheckHeader('Global view');
 
 		$row = DBfetch(DBselect("select theme from users where username='".PHPUNIT_LOGIN_NAME."'"));

@@ -459,8 +459,10 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Apply and submit the filter from data provider.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->query('class:list-table')->asTable()->one();
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		// Check (using module name) that only the expected filters are returned in the list.
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));

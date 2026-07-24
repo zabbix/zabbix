@@ -322,8 +322,9 @@ class testDashboardForm extends CWebTest {
 			$data['dashboard_properties']['Name'] = $data['dashboard_properties']['Name'].microtime();
 		}
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for update']);
-		$dashboard = CDashboardElement::find()->one();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for update'])
+				->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$dashboard->edit();
 		$dialog = $dashboard->editProperties();
 		$this->checkProperties($data, 'update', $dashboard, $dialog, $old_hash);

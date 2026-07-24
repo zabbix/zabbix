@@ -250,7 +250,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 		$this->zbxTestLogin('templates.php?page=2');
 		$this->filterAndOpenTemplate($this->template_clone);
-		$this->zbxTestClickWait('full_clone');
+		$this->query('button:Full clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');

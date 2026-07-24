@@ -722,7 +722,8 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'Access to specific services',
 						'User type' => 'Admin',
 						'Read-write access to services' => 'Service list',
-						'Read-only access to services' => 'Service list'
+						'Read-only access to services' => 'Service list',
+						'Default access to new actions' => false
 					],
 					'write_services' => [
 						'xpath:(//div[@class="multiselect-control"])[1]' => 'Update service',

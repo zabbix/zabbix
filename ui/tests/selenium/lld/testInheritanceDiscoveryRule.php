@@ -124,6 +124,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 		}
 
 		$this->zbxTestClickWait('add');
+		$this->page->waitUntilReady();
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of discovery rules');

@@ -351,6 +351,7 @@ class testAlarmNotification extends CWebTest {
 		}
 
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 		$this->page->waitUntilReady();
 		$form->invalidate();
 

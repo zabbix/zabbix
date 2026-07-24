@@ -202,7 +202,7 @@ class testPageItems extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 
 		// Item create button disabled and breadcrumbs not exist.
-		$this->assertFalse($this->query('button:Create item (select host first)')->one()->isEnabled());
+		$this->assertFalse($this->query('button:Create item (select host first)')->waitUntilPresent()->one()->isEnabled());
 		$this->assertTrue($this->query('class:filter-breadcrumb')->all()->isEmpty());
 		// Check results in table.
 		$table = $this->query('name:items')->one()->query('class:list-table')->asTable()->one();

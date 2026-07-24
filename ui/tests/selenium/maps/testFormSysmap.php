@@ -48,7 +48,7 @@ class testFormSysmap extends CLegacyWebTest {
 	}
 
 	public function testFormSysmap_Layout() {
-		$this->zbxTestLogin('sysmaps.php?form=Create+map');
+		$this->page->login()->open('sysmaps.php?form=Create+map')->waitUntilReady();
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestCheckHeader('Network maps');
 

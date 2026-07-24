@@ -570,6 +570,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Open host prototype inherited from template on host and check inherited macros.
 		$this->page->open('host_prototypes.php?form=update&context=host&parent_discoveryid='
 			.$host_lld_id.'&hostid='.$host_prototype_id);
+		$form = $this->query('name:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->assertMacros($macros);
 
