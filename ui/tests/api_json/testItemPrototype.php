@@ -13,13 +13,85 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+
+require_once __DIR__.'/traitItemTelemetryQueryTests.php';
+require_once __DIR__.'/../include/CAPITest.php';
+require_once __DIR__.'/../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
  * @backup items
+ * @onBefore prepareTestData
  */
 class testItemPrototype extends CAPITest {
+
+	use traitItemTelemetryQueryTests;
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryCreate
+	 */
+	public function testHostItemTelemetryQueryCreate(array $item, ?string $expected_error) {
+		static $i = 1;
+
+		$item += [
+			'hostid' => ':host:telemetry_query_host',
+			'ruleid' => ':lld_rule:host_lld_telemetry_query',
+			'name' => 'Telemetry query create '.$i,
+			'key_' => 'telemetry_query_host_create_'.$i.'[{#M}]',
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		];
+		$item['hostid'] = CTestDataHelper::getConvertedValueReference($item['hostid']);
+		$item['ruleid'] = CTestDataHelper::getConvertedValueReference($item['ruleid']);
+		$i++;
+
+		$this->call('itemprototype.create', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryCreate
+	 */
+	public function testTemplateItemTelemetryQueryCreate(array $item, ?string $expected_error) {
+		static $i = 1;
+
+		$item += [
+			'hostid' => ':template:telemetry_query_template',
+			'ruleid' => ':lld_rule:template_lld_telemetry_query',
+			'name' => 'Telemetry query create '.$i,
+			'key_' => 'telemetry_query_template_create_'.$i.'[{#M}]',
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		];
+		$item['hostid'] = CTestDataHelper::getConvertedValueReference($item['hostid']);
+		$item['ruleid'] = CTestDataHelper::getConvertedValueReference($item['ruleid']);
+		$i++;
+
+		$this->call('itemprototype.create', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryUpdate
+	 */
+	public function testHostItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item_prototype:host_item_prototype_telemetry_query[{#M}]'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('itemprototype.update', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryUpdate
+	 */
+	public function testTemplateItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item_prototype:template_item_prototype_telemetry_query[{#M}]'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('itemprototype.update', $item, $expected_error);
+	}
 
 	public static function getItemPrototypeCreateData() {
 		$valid_item_types = [
@@ -205,7 +277,7 @@ class testItemPrototype extends CAPITest {
 					ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT,
-					ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+					ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY
 				]).'.'
 			],
 			// Test update interval for mqtt key of the Agent item type.
@@ -404,5 +476,68 @@ class testItemPrototype extends CAPITest {
 				}
 			}
 		}
+	}
+
+	public function prepareTestData() {
+		CTestDataHelper::createObjects([
+			'template_groups' => [
+				['name' => 'telemetry_query_template_group']
+			],
+			'host_groups' => [
+				['name' => 'telemetry_query_host_group']
+			],
+			'templates' => [
+				[
+					'host' => 'telemetry_query_template',
+					'groups' => ['groupid' => ':template_group:telemetry_query_template_group'],
+					'lld_rules' => [
+						[
+							'name' => 'template lld',
+							'key_' => 'template_lld_telemetry_query',
+							'item_prototypes' => [
+								[
+									'name' => 'template item prototype',
+									'key_' => 'template_item_prototype_telemetry_query[{#M}]',
+									'type' => ITEM_TYPE_TELEMETRY_QUERY,
+									'value_type' => ITEM_VALUE_TYPE_UINT64,
+									'query' => [
+										'signal_type' => APM_SIGNAL_TYPE_TRACES,
+										'columns' => [],
+										'aggregated_columns' => [['alias' => 'Timestamp']],
+										'filter' => []
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			'hosts' => [
+				[
+					'host' => 'telemetry_query_host',
+					'groups' => ['groupid' => ':host_group:telemetry_query_host_group'],
+					'lld_rules' => [
+						[
+							'name' => 'host lld',
+							'key_' => 'host_lld_telemetry_query',
+							'item_prototypes' => [
+								[
+									'name' => 'host item prototype',
+									'key_' => 'host_item_prototype_telemetry_query[{#M}]',
+									'type' => ITEM_TYPE_TELEMETRY_QUERY,
+									'value_type' => ITEM_VALUE_TYPE_UINT64,
+									'query' => [
+										'signal_type' => APM_SIGNAL_TYPE_TRACES,
+										'columns' => [],
+										'aggregated_columns' => [['alias' => 'Timestamp']],
+										'filter' => []
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
 	}
 }

@@ -70,7 +70,7 @@ class testItem extends CAPITest {
 	 */
 	public function testHostItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
 		$item += [
-			'itemid' => ':item:host_item_telemetry_query',
+			'itemid' => ':item:host_item_telemetry_query'
 		];
 		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
 
