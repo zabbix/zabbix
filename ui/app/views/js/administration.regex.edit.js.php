@@ -286,7 +286,7 @@ window.regex_edit_popup = new class {
 			return;
 		}
 
-		this.#form.lock();
+		this.#overlay.setLoading();
 
 		document.getElementById('regular-expressions-table')
 			.querySelectorAll('.js-add, .js-remove')
@@ -297,8 +297,6 @@ window.regex_edit_popup = new class {
 		if (!this.#form_element.isConnected) {
 			return;
 		}
-
-		this.#form.unlock();
 
 		document.getElementById('regular-expressions-table')
 			.querySelectorAll('.js-add, .js-remove')
