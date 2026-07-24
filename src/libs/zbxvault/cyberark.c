@@ -94,5 +94,7 @@ fail:
 	zbx_free(out);
 
 	return ret;
+
+#undef ZBX_HTTP_STATUS_CODE_OK
 #endif
 }
