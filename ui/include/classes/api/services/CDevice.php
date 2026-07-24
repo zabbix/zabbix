@@ -333,9 +333,8 @@ class CDevice extends CApiService {
 		}
 
 		$db_device = DBfetch(DBselect(
-			'SELECT d.deviceid,d.userid,d.uuid,d.name,d.status,u.name AS username'.
+			'SELECT d.deviceid,d.userid,d.uuid,d.name,d.status'.
 			' FROM device d'.
-			' JOIN users u ON d.userid=u.userid'.
 			' WHERE '.dbConditionId('d.deviceid', [$db_enrollment_token['deviceid']])
 		));
 	}
