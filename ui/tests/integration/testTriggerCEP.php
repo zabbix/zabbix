@@ -41,7 +41,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const SKIP_RESTART_TESTS = false;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
-	const SKIP_SERVICES_TESTS = false;
+	const SKIP_SERVICES_TESTS = null;
 
 	const HOST_NAME = 'test';
 	const TEMPLATE_NAME = 'template_trigger_cep';
