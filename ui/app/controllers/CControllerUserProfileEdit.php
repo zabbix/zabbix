@@ -30,7 +30,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		$users = API::User()->get([
 			'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-				'rows_per_page', 'url', 'timezone', 'provisioned'
+				'default_maintenance_period', 'rows_per_page', 'url', 'timezone', 'provisioned'
 			],
 			'userids' => CWebUser::$data['userid'],
 			'editable' => true
@@ -65,6 +65,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'theme' => $this->user['theme'],
 			'autologin' => $this->user['autologin'],
 			'autologout' => $this->user['autologout'],
+			'default_maintenance_period' => $this->user['default_maintenance_period'],
 			'refresh' => $this->user['refresh'],
 			'rows_per_page' => $this->user['rows_per_page'],
 			'url' => $this->user['url'],

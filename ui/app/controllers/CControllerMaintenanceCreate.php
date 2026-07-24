@@ -76,11 +76,24 @@ class CControllerMaintenanceCreate extends CControllerMaintenanceUpdateGeneral {
 						'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_ONETIME]]]
 				]],
 			'hostids' => ['array', 'field' => ['db maintenances_hosts.hostid']],
+			'triggerids' => ['array', 'field' => ['db maintenance_trigger.triggerid']],
 			'groupids' => [
 				['array', 'field' => ['db maintenances_groups.groupid']],
 				['array', 'required', 'not_empty', 'field' => ['db maintenances_groups.groupid'],
-					'when' => ['hostids', 'empty'],
-					'messages' => ['not_empty' => _('At least one host group or host must be selected.')]]
+					'when' => [
+						['hostids', 'empty'],
+						['triggerids', 'empty']
+					],
+					'messages' => ['not_empty' => _('At least one host group, host or trigger must be selected.')]]
+			],
+			'event_names' => ['objects', 'uniq' => [['operator', 'value']],
+				'messages' => ['uniq' => _('Event name operator and value combination is not unique.')],
+				'fields' => [
+					'operator' => ['db maintenance_eventname.operator',
+						'in' => [MAINTENANCE_EVENT_NAME_OPERATOR_LIKE, MAINTENANCE_EVENT_NAME_OPERATOR_NOT_LIKE]],
+					'value' => ['db maintenance_eventname.value'],
+				],
+				'when' => ['maintenance_type', 'in' => [MAINTENANCE_TYPE_NORMAL]]
 			],
 			'tags_evaltype' => [
 				['db maintenances.tags_evaltype',
@@ -93,7 +106,7 @@ class CControllerMaintenanceCreate extends CControllerMaintenanceUpdateGeneral {
 				'messages' => ['uniq' => _('Tag name, operator and value combination is not unique.')],
 				'fields' => [
 					'operator' => ['db maintenance_tag.operator',
-						'in' => [MAINTENANCE_TAG_OPERATOR_LIKE, MAINTENANCE_TAG_OPERATOR_EQUAL]],
+						'in' => [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_NOT_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE, MAINTENANCE_TAG_OPERATOR_NOT_LIKE]],
 					'value' => ['db maintenance_tag.value'],
 					'tag' => [
 						['db maintenance_tag.tag'],
@@ -140,6 +153,7 @@ class CControllerMaintenanceCreate extends CControllerMaintenanceUpdateGeneral {
 			'active_till' => $this->parseActiveTime($this->getInput('active_till')),
 			'groups' => zbx_toObject($this->getInput('groupids', []), 'groupid'),
 			'hosts' => zbx_toObject($this->getInput('hostids', []), 'hostid'),
+			'triggers' => zbx_toObject($this->getInput('triggerids', []), 'triggerid'),
 			'timeperiods' => $this->processTimePeriods($this->getInput('timeperiods', []))
 		];
 

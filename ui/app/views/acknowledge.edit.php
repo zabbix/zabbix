@@ -148,6 +148,15 @@ else {
 	);
 }
 
+$maintenance_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'popup')
+	->setArgument('popup', 'maintenance.edit')
+	->setArgument('context', 'trigger');
+
+	foreach ($data['eventids'] as $eventid) {
+		$maintenance_url->setArgument('eventid', $eventid);
+	}
+
 $form_list
 	->addRow(
 		new CLabel([_('Convert to cause'),
@@ -162,6 +171,9 @@ $form_list
 			->addClass('js-operation-checkbox')
 			->setChecked($data['close_problem'])
 			->setEnabled($data['allowed_close'] && $data['problem_can_be_closed'])
+	)
+	->addRow('',
+		(new CLink(_n('Suppress trigger', 'Suppress triggers', $selected_events), $maintenance_url))
 	)
 	->addRow('',
 		(new CDiv(''))->setId('operations-count-error-container')

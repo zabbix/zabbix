@@ -28,7 +28,9 @@ class CControllerMaintenanceEdit extends CController {
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(['object', 'fields' => [
-			'maintenanceid' => ['db maintenances.maintenanceid']
+			'maintenanceid' => ['db maintenances.maintenanceid'],
+			'context' 		=> ['string'],
+			'eventid' 		=> ['integer'],
 		]]);
 
 		if (!$ret) {
@@ -56,6 +58,7 @@ class CControllerMaintenanceEdit extends CController {
 				'output' => ['maintenanceid', 'name', 'maintenance_type', 'description', 'active_since', 'active_till',
 					'tags_evaltype'
 				],
+				'selectEventNames' => ['operator', 'value'],
 				'selectTags' => ['tag', 'value', 'operator'],
 				'selectTimeperiods' => ['timeperiod_type', 'every', 'month', 'dayofweek', 'day', 'start_time', 'period',
 					'start_date'
@@ -98,6 +101,7 @@ class CControllerMaintenanceEdit extends CController {
 				'active_since' => date(ZBX_DATE_TIME, $this->maintenance['active_since']),
 				'active_till' => date(ZBX_DATE_TIME, $this->maintenance['active_till']),
 				'timeperiods' => $this->maintenance['timeperiods'],
+				'event_names' => $this->maintenance['event_names'],
 				'tags_evaltype' => $this->maintenance['tags_evaltype'],
 				'tags' => $this->maintenance['tags']
 					?: [['tag' => '', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => '']],
@@ -114,6 +118,7 @@ class CControllerMaintenanceEdit extends CController {
 				'active_since' => date(ZBX_DATE_TIME, strtotime('today')),
 				'active_till' => date(ZBX_DATE_TIME, strtotime('tomorrow')),
 				'timeperiods' => [],
+				'event_names' => [['operator' => MAINTENANCE_EVENT_NAME_OPERATOR_LIKE, 'value' => '']],
 				'tags_evaltype' => $defaults['tags_evaltype'],
 				'tags' => [['tag' => '', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => '']],
 				'description' => $defaults['description']
@@ -133,19 +138,111 @@ class CControllerMaintenanceEdit extends CController {
 				'editable' => true
 			]);
 
+			$db_triggers = API::Trigger()->get([
+				'output' => ['triggerid', 'description'],
+				'maintenanceids' => $data['maintenanceid'],
+				'editable' => true
+			]);
+
 			$data += [
 				'hosts_ms' => CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']),
-				'groups_ms' => CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id'])
+				'groups_ms' => CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']),
+				'triggers_ms' => CArrayHelper::renameObjectsKeys($db_triggers,
+					['triggerid' => 'id', 'description' => 'name'])
 			];
 
 			CArrayHelper::sort($data['hosts_ms'], ['name']);
 			CArrayHelper::sort($data['groups_ms'], ['name']);
+			CArrayHelper::sort($data['triggers_ms'], ['name']);
 		}
 		else {
 			$data += [
 				'hosts_ms' => [],
-				'groups_ms' => []
+				'groups_ms' => [],
+				'triggers_ms' => []
 			];
+
+			if ($this->hasInput('context') && $this->hasInput('eventid')) {
+				$db_events = API::Event()->get([
+					'output' => ['name', 'objectid'],
+					'selectTags' => ['tag', 'value'],
+					'eventids' => $this->getInput('eventid')
+				]);
+
+				if ($db_events) {
+					$data['name'] = CMaintenanceHelper::getNextIndexedName(_s('Ad-hoc: %1$s', $db_events[0]['name']));
+					$data['active_since'] = date(ZBX_DATE_TIME, strtotime('now'));
+					$data['active_till'] = date(ZBX_DATE_TIME, strtotime(
+						'now + '.secondsToPeriod(timeUnitToSeconds(CWebUser::$data['default_maintenance_period'])))
+					);
+					$data['timeperiods'][] = [
+						'timeperiod_type' => 0,
+						'every' => 1,
+						'month' => 0,
+						'dayofweek' => 0,
+						'day' => 0,
+						'start_time' => 0,
+						'period' => timeUnitToSeconds(CWebUser::$data['default_maintenance_period']),
+						'start_date' => strtotime('now'),
+						'formatted_type' => 'One time only',
+						'formatted_schedule' =>  date(ZBX_DATE_TIME, strtotime('now')),
+						'formatted_period' => CWebUser::$data['default_maintenance_period']
+					];
+
+					$db_triggers = API::Trigger()->get([
+						'output' => ['triggerid', 'description'],
+						'selectHosts' => ['hostid', 'name'],
+						'selectHostGroups' => ['groupid', 'name'],
+						'triggerids' => $db_events[0]['objectid']
+					]);
+
+					switch ($this->getInput('context')) {
+						case 'host':
+							$data['hosts_ms'] = $db_triggers
+								? CArrayHelper::renameObjectsKeys($db_triggers[0]['hosts'], ['hostid' => 'id'])
+								: [];
+							break;
+
+						case 'trigger':
+							$data['triggers_ms'] = $db_triggers
+								? CArrayHelper::renameObjectsKeys($db_triggers, ['triggerid' => 'id',
+								'description' => 'name'])
+								: [];
+							break;
+
+						case 'event_name':
+							$data['groups_ms'] = $db_triggers
+								? CArrayHelper::renameObjectsKeys($db_triggers[0]['hostgroups'], ['groupid' => 'id'])
+								: [];
+
+							CArrayHelper::sort($data['groups_ms'], ['name']);
+
+							$data['event_names'] = [[
+								'operator' => MAINTENANCE_EVENT_NAME_OPERATOR_LIKE,
+								'value' => $db_events[0]['name']
+							]];
+							break;
+
+						case 'event_tags':
+							$data['groups_ms'] = $db_triggers
+								? CArrayHelper::renameObjectsKeys($db_triggers[0]['hostgroups'], ['groupid' => 'id'])
+								: [];
+
+							CArrayHelper::sort($data['groups_ms'], ['name']);
+
+							if ($db_events[0]['tags']) {
+								CArrayHelper::sort($db_events[0]['tags'], ['tag', 'value']);
+								$data['tags'] = array_values($db_events[0]['tags']);
+
+								foreach ($data['tags'] as &$tag) {
+									$tag['operator'] = MAINTENANCE_TAG_OPERATOR_LIKE;
+								}
+								unset($tag);
+							}
+							break;
+					}
+				}
+			}
 		}
 
 		$data['allowed_edit'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);

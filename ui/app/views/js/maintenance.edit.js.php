@@ -27,7 +27,7 @@ window.maintenance_edit = new class {
 	 */
 	form;
 
-	init({rules, clone_rules, timeperiods, tags, allowed_edit}) {
+	init({rules, clone_rules, timeperiods, event_names, tags, allowed_edit}) {
 		this.overlay = overlays_stack.getById('maintenance.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.footer = this.overlay.$dialogue.$footer[0];
@@ -42,6 +42,7 @@ window.maintenance_edit = new class {
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		timeperiods.forEach((timeperiod, row_index) => this.#addTimePeriod({row_index, ...timeperiod}));
+		event_names.forEach((event_name, rowNum) => this.#addEventName({rowNum, ...event_name}));
 
 		// Setup Tags.
 		jQuery(document.getElementById('tags')).dynamicRows({
@@ -58,6 +59,16 @@ window.maintenance_edit = new class {
 				}
 				else if (e.target.classList.contains('js-edit')) {
 					this.#editTimePeriod(e.target.closest('tr'));
+				}
+				else if (e.target.classList.contains('js-remove')) {
+					e.target.closest('tr').remove();
+				}
+			});
+
+			document.getElementById('event_names').addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-add')) {
+					const rowNum = this.#getLastEventNameIndex() + 1;
+					this.#addEventName({'rowNum': rowNum, 'operator': <?= MAINTENANCE_EVENT_NAME_OPERATOR_LIKE ?>});
 				}
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
@@ -184,6 +195,26 @@ window.maintenance_edit = new class {
 		row.insertAdjacentHTML('afterend', template.evaluate(timeperiod));
 		row.remove();
 	}
+
+	#addEventName(event_names) {
+		const template = new Template(document.getElementById('event-names-row-tmpl').innerHTML);
+
+		this.form_element
+			.querySelector('#event_names tbody')
+			.insertAdjacentHTML('beforeend', template.evaluate(event_names));
+
+		this.form_element
+			.querySelector(`input[name="event_names[${event_names.rowNum}][operator]"][value="${event_names.operator}"]`)
+			.checked = true;
+	}
+
+	#getLastEventNameIndex = () => {
+		const inputs = document.querySelectorAll('#event_names input[name$="[operator]"]');
+
+		return inputs.length
+			? Number(inputs[inputs.length - 1].name.match(/\[(\d+)]/)[1])
+			: -1;
+	};
 
 	#clone() {
 		this.form_element.querySelector('[name=maintenanceid]').remove();

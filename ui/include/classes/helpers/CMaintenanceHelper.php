@@ -131,4 +131,28 @@ class CMaintenanceHelper {
 
 		return $period - $period % SEC_PER_MIN;
 	}
+
+	public static function getNextIndexedName(string $base_name): string {
+		$maintenances = API::Maintenance()->get([
+			'search' => [
+				'name' => $base_name
+			],
+			'searchByAny' => false,
+			'startSearch' => true,
+			'output' => ['name']
+		]);
+
+		$max_index = 0;
+
+		foreach ($maintenances as $maintenance) {
+			if (!preg_match('/^'.preg_quote($base_name, '/').'(\d+)?$/u', $maintenance['name'], $matches)) {
+				continue;
+			}
+
+			$index = (int) ($matches[1] ?? '1');
+			$max_index = max($max_index, $index);
+		}
+
+		return $max_index == 0 ? $base_name : $base_name.($max_index + 1);
+	}
 }
