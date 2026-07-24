@@ -237,7 +237,7 @@ $form_grid = (new CFormGrid())
 			->addItem([
 				(new CLabel(_('Concurrent sessions'), 'max_senders'))->setAsteriskMark(),
 				new CFormField(
-					(new CNumericBox('max_senders', $data['form']['max_senders'], 3, false, false, false))
+					(new CNumericBox('max_senders', $data['form']['max_senders'], 3, false, false))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
 				)
@@ -245,7 +245,7 @@ $form_grid = (new CFormGrid())
 			->addItem([
 				(new CLabel(_('Attempts'), 'max_attempts'))->setAsteriskMark(),
 				new CFormField(
-					(new CNumericBox('max_attempts', $data['form']['max_attempts'], 1, false, false, false))
+					(new CNumericBox('max_attempts', $data['form']['max_attempts'], 1, false, false))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
 				)
