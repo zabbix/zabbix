@@ -93,6 +93,8 @@ class CJsonRpc {
 				continue;
 			}
 
+			$api_method_names[] = $call['method'];
+
 			[$request_api, $request_method] = explode('.', $call['method']) + [1 => ''];
 
 			$api = strtolower($request_api);
@@ -138,8 +140,6 @@ class CJsonRpc {
 			else {
 				$calls_data[] = $call_data;
 			}
-
-			$api_method_names[] = $call['method'];
 		}
 
 		if ($calls_data_auth) {
