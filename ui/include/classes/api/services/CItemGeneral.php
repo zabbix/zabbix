@@ -388,8 +388,6 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY && array_key_exists('query', $item)) {
-				// When query.filter is not set validation rule 'default' will trigger error because of API_REQUIRED for query.filter.evaltype
-				$item['query'] += ['filter' => []];
 				$path = '/'.($i + 1);
 
 				if ($item['query']['filter']
