@@ -287,6 +287,7 @@ static void	event_queries_fetch(zbx_db_result_t result, zbx_vector_event_suppres
 			query->eventid = eventid;
 			ZBX_STR2UINT64(query->triggerid, row[1]);
 			ZBX_DBROW2UINT64(query->r_eventid, row[2]);
+			query->event_name = zbx_strdup(NULL, row[3]);
 			zbx_vector_uint64_create(&query->hostids);
 			zbx_vector_uint64_create(&query->functionids);
 			zbx_vector_tags_ptr_create(&query->tags);
@@ -294,12 +295,12 @@ static void	event_queries_fetch(zbx_db_result_t result, zbx_vector_event_suppres
 			zbx_vector_event_suppress_query_ptr_append(event_queries, query);
 		}
 
-		if (FAIL == zbx_db_is_null(row[3]))
+		if (FAIL == zbx_db_is_null(row[4]))
 		{
 			zbx_tag_t	*tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 
-			tag->tag = zbx_strdup(NULL, row[3]);
-			tag->value = zbx_strdup(NULL, row[4]);
+			tag->tag = zbx_strdup(NULL, row[4]);
+			tag->value = zbx_strdup(NULL, row[5]);
 			zbx_vector_tags_ptr_append(&query->tags, tag);
 		}
 	}
@@ -349,7 +350,7 @@ static void	db_get_query_events(zbx_vector_event_suppress_query_ptr_t *event_que
 	}
 
 	/* get open or recently closed problems */
-	result = zbx_db_select("select p.eventid,p.objectid,p.r_eventid,%s"
+	result = zbx_db_select("select p.eventid,p.objectid,p.r_eventid,p.name,%s"
 			" from problem p"
 			"%s"
 			" where p.source=%d"

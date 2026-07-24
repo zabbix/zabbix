@@ -1290,6 +1290,7 @@ typedef struct
 	zbx_uint64_t			eventid;		/* [IN] eventid */
 	zbx_uint64_t			r_eventid;		/* [-] recovery eventid */
 	zbx_uint64_t			triggerid;		/* [-] triggerid */
+	char				*event_name;
 	zbx_vector_uint64_t		hostids;		/* [-] associated hostids */
 	zbx_vector_uint64_t		functionids;		/* [IN] associated functionids */
 	zbx_vector_tags_ptr_t		tags;			/* [IN] event tags */
@@ -1422,9 +1423,11 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 #define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV	1
 #define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV	2
 
-/* maintenance tag operators */
-#define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
-#define ZBX_MAINTENANCE_TAG_OPERATOR_LIKE	2
+/* maintenance compare operators */
+#define ZBX_MAINTENANCE_OPERATOR_EQUAL		0
+#define ZBX_MAINTENANCE_OPERATOR_NOT_EQUAL	1
+#define ZBX_MAINTENANCE_OPERATOR_LIKE		2
+#define ZBX_MAINTENANCE_OPERATOR_NOT_LIKE	3
 
 /* maintenance tag evaluation types */
 /* SYNC WITH PHP!                   */
