@@ -34,6 +34,16 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield 'empty "query.filter"' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'filter' => []
+				] + $params['query']
+			],
+			null
+		];
+
 		yield 'duplicate "query.filter.conditions[].column"' => [
 			[
 				'query' => [
@@ -271,58 +281,15 @@ trait traitItemTelemetryQueryTests {
 		];
 	}
 
-	/**
-	 * @dataProvider dataProviderTelemetryQueryCreate
-	 */
-	public function testTelemetryQueryCreate(array $item, ?string $expected_error) {
-		static $i = 1;
-
-		$item += [
-			'hostid' => 50009,
-			'name' => 'Telemetry query create '.$i,
-			'key_' => 'telemetry_query_create_'.$i,
-			'type' => ITEM_TYPE_TELEMETRY_QUERY,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
-		];
-		$i++;
-
-		$this->call('item.create', $item, $expected_error);
-	}
-
 	public static function dataProviderTelemetryQueryUpdate() {
-		$item = [
-			'query' => ['aggregated_columns' => [['alias' => 'Timestamp']]]
-		];
-
-		yield 'no "query"' => [
-			$item,
+		yield 'only "time_shift" changes' => [
 			['time_shift' => '2s'],
 			null
 		];
 
 		yield '"query" empty array fail' => [
-			$item,
 			['query' => ''],
 			'Invalid parameter "/1/query": an array is expected.'
 		];
-	}
-
-	/**
-	 * @dataProvider dataProviderTelemetryQueryUpdate
-	 */
-	public function testTelemetryQueryUpdate(array $item, array $update_item, ?string $expected_error) {
-		static $i = 1;
-
-		$item += [
-			'hostid' => 50009,
-			'name' => 'Telemetry query update '.$i,
-			'key_' => 'telemetry_query_update_'.$i,
-			'type' => ITEM_TYPE_TELEMETRY_QUERY,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
-		];
-		$i++;
-		[$itemid] = $this->call('item.create', $item, null)['result']['itemids'];
-
-		$this->call('item.update', $update_item + ['itemid' => $itemid], $expected_error);
 	}
 }

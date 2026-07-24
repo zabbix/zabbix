@@ -17,6 +17,7 @@
 require_once __DIR__.'/traitItemTelemetryQueryTests.php';
 require_once __DIR__.'/../include/CAPITest.php';
 require_once __DIR__.'/../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
  * @backup items
@@ -25,6 +26,68 @@ require_once __DIR__.'/../include/helpers/CDataHelper.php';
 class testItem extends CAPITest {
 
 	use traitItemTelemetryQueryTests;
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryCreate
+	 */
+	public function testHostItemTelemetryQueryCreate(array $item, ?string $expected_error) {
+		static $i = 1;
+
+		$item += [
+			'hostid' => ':host:telemetry_query_host',
+			'name' => 'Telemetry query create '.$i,
+			'key_' => 'telemetry_query_host_create_'.$i,
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		];
+		$item['hostid'] = CTestDataHelper::getConvertedValueReference($item['hostid']);
+		$i++;
+
+		$this->call('item.create', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryCreate
+	 */
+	public function testTemplateItemTelemetryQueryCreate(array $item, ?string $expected_error) {
+		static $i = 1;
+
+		$item += [
+			'hostid' => ':template:telemetry_query_template',
+			'name' => 'Telemetry query create '.$i,
+			'key_' => 'telemetry_query_template_create_'.$i,
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		];
+		$item['hostid'] = CTestDataHelper::getConvertedValueReference($item['hostid']);
+		$i++;
+
+		$this->call('item.create', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryUpdate
+	 */
+	public function testHostItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item:host_item_telemetry_query',
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('item.update', $item, $expected_error);
+	}
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryUpdate
+	 */
+	public function testTemplateItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':item:template_item_telemetry_query'
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('item.update', $item, $expected_error);
+	}
 
 	protected static $items;
 
@@ -1065,6 +1128,55 @@ class testItem extends CAPITest {
 		]);
 
 		self::$items = $result['itemids'];
+
+		CTestDataHelper::createObjects([
+			'template_groups' => [
+				['name' => 'telemetry_query_template_group']
+			],
+			'host_groups' => [
+				['name' => 'telemetry_query_host_group']
+			],
+			'templates' => [
+				[
+					'host' => 'telemetry_query_template',
+					'groups' => ['groupid' => ':template_group:telemetry_query_template_group'],
+					'items' => [
+						[
+							'name' => 'template item',
+							'key_' => 'template_item_telemetry_query',
+							'type' => ITEM_TYPE_TELEMETRY_QUERY,
+							'value_type' => ITEM_VALUE_TYPE_UINT64,
+							'query' => [
+								'signal_type' => APM_SIGNAL_TYPE_TRACES,
+								'columns' => [],
+								'aggregated_columns' => [['alias' => 'Timestamp']],
+								'filter' => []
+							]
+						]
+					]
+				]
+			],
+			'hosts' => [
+				[
+					'host' => 'telemetry_query_host',
+					'groups' => ['groupid' => ':host_group:telemetry_query_host_group'],
+					'items' => [
+						[
+							'name' => 'host item',
+							'key_' => 'host_item_telemetry_query',
+							'type' => ITEM_TYPE_TELEMETRY_QUERY,
+							'value_type' => ITEM_VALUE_TYPE_UINT64,
+							'query' => [
+								'signal_type' => APM_SIGNAL_TYPE_TRACES,
+								'columns' => [],
+								'aggregated_columns' => [['alias' => 'Timestamp']],
+								'filter' => []
+							]
+						]
+					]
+				]
+			]
+		]);
 	}
 
 	public static function getItemUpdateData() {
