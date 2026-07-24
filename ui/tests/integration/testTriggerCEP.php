@@ -83,7 +83,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const LOG_MASTER_ITEM_KEY = 'cep.log.master';
 	const LOG_ITEM_PROTO_KEY = 'cep.log.proto';
 	const LOG_COMPONENT_VALUE = 'logsensor1';
-	const WAIT_ITERATIONS = 160;
+	const WAIT_ITERATIONS = 60;
 	const WAIT_ITERATION_DELAY = 1;
 
 	// change iterations to fail faster when debugging
@@ -2422,6 +2422,26 @@ HEREDOC;
 	}
 
 	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecoverySingleItem but also verifies the per-trigger service that
+	 * createServicesAndActions() already created for the driven trigger (matched to it only by that trigger's
+	 * own SERVICE_TAG tag). After the long rapid PROBLEM/recovery burst the service must have tracked every
+	 * cycle by the trigger tag and ended OK with no open service problem, and a final explicit open then
+	 * verifies the service manager matches the problem to the service purely by the trigger tag - it reaches
+	 * the trigger's DISASTER priority with exactly one open service problem (no duplicate cached during the
+	 * burst) - before following the close back to OK. Skipped entirely when the per-trigger services do not
+	 * exist (service tests skipped), as there would be nothing to verify by trigger tag.
+	 * (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_OpenAndImmediateRecoverySingleItemWithService)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoverySingleItemWithService() {
+		if (empty(self::$serviceids)) {
+			$this->markTestSkipped('No CEP services created (service tests skipped); nothing to match by trigger tag.');
+		}
+
+		$this->runOpenAndImmediateRecoverySingleItemTest(false, true);
+	}
+
+	/**
 	 * Like testTriggerCEP_OpenAndImmediateRecovery but the single batch is grouped by value ("waves")
 	 * instead of by key: every discovered item first gets 0 (the triggers are already OK, so this wave
 	 * must emit no events), then every item gets 1 (every trigger opens) and finally every item gets 0
@@ -2650,14 +2670,31 @@ HEREDOC;
 	 * Same as runOpenAndImmediateRecoveryTest but the whole burst lands on a single discovered item (and
 	 * its one trigger), cycling PROBLEM → recover (1, 0) a large number of times, to stress CEP with a long
 	 * rapid back-to-back burst on one event stream. When $restart is true, the server is restarted first.
+	 *
+	 * When $with_service is true the per-trigger service that createServicesAndActions() already created for
+	 * this trigger (matched to it only by the trigger's own SERVICE_TAG tag) is verified as well: after the
+	 * burst the service must have tracked every cycle by the trigger tag and ended OK with no open service
+	 * problem, and a final explicit open then verifies the service manager matches the problem to the service
+	 * purely by that trigger tag - it reaches the trigger's DISASTER priority with exactly one open service
+	 * problem (no duplicate cached during the burst) - before following the close back to OK. The service
+	 * checks are skipped when the per-trigger services do not exist (service tests skipped).
 	 */
-	private function runOpenAndImmediateRecoverySingleItemTest(bool $restart): void {
+	private function runOpenAndImmediateRecoverySingleItemTest(bool $restart, bool $with_service = false): void {
 		$this->maybeRestartServer($restart);
 
 		// Drive a single discovered item (and its one trigger) so the whole burst lands on one event
 		// stream rather than being spread across every discovered item.
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
 		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+
+		// When requested, reuse the per-trigger service createServicesAndActions() already created for this
+		// trigger (matched to it only by the trigger's own SERVICE_TAG tag). Null when those services do not
+		// exist (service tests skipped), in which case the service checks below are skipped.
+		$serviceid = $with_service ? $this->getServiceidForTrigger($triggerid) : null;
+
+		// Baseline the service's own events (source SERVICE) before the burst, so the post-burst count is a
+		// delta: the shared per-trigger service has accumulated events from earlier scenarios.
+		$service_event_baseline = ($serviceid !== null) ? $this->captureServiceEventBaseline($serviceid) : 0;
 
 		$this->captureEventBaseline([$triggerid]);
 
@@ -2706,6 +2743,119 @@ HEREDOC;
 		}
 
 		$this->waitForNoOpenProblems([$triggerid], 'open and immediate recovery single item');
+
+		if ($serviceid !== null) {
+			// The burst ended on a recovery, so the trigger is OK and the service - matched only by the
+			// trigger tag - must have followed every cycle and be OK too, with no open service problem left
+			// over from the long rapid burst.
+			$this->assertSingleServiceStatus($serviceid, ZBX_SEVERITY_OK, 0);
+
+			// The service is matched to every trigger problem by the trigger tag, so the burst must have
+			// driven exactly as many service events (one service PROBLEM per trigger PROBLEM, one service
+			// RESOLVED per trigger RESOLVED) as the trigger did - the same expected_events. More means the
+			// service manager cached a duplicated service problem; fewer means one was dropped or collapsed.
+			$this->waitForServiceEventCount($serviceid, $service_event_baseline, $expected_events);
+
+			// Now open one final problem and verify the service manager matches it to the service purely by
+			// the trigger tag: the service reaches the trigger's DISASTER priority with exactly one open
+			// service problem (a regression guard against a duplicated service problem being cached by the
+			// service manager during the long burst).
+			$this->dispatchSenderValues([['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '1']]);
+			$this->waitForOpenProblemCount([$triggerid], 1);
+			$this->assertSingleServiceStatus($serviceid, TRIGGER_SEVERITY_DISASTER, 1);
+
+			// Close it again: the service follows the recovery back to OK with no open service problem.
+			$this->dispatchSenderValues([['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0']]);
+			$this->assertSingleServiceStatus($serviceid, ZBX_SEVERITY_OK, 0);
+			$this->waitForNoOpenProblems([$triggerid],
+				'open and immediate recovery single item with service (final close)');
+		}
+	}
+
+	/**
+	 * Return the CEP service that createServicesAndActions() created for $triggerid (matched to it by the
+	 * trigger's own SERVICE_TAG tag), or null when the per-trigger services do not exist (service tests
+	 * skipped). The service is looked up by the trigger's SERVICE_TAG value, which is the same component
+	 * value the service's problem tag matches on (see getServiceIdsByComponent).
+	 */
+	private function getServiceidForTrigger(string $triggerid): ?string {
+		$service_by_component = $this->getServiceIdsByComponent();
+		if (empty($service_by_component)) {
+			return null;
+		}
+
+		$response = $this->call('trigger.get', [
+			'triggerids' => [$triggerid],
+			'output' => ['triggerid'],
+			'selectTags' => 'extend'
+		]);
+		$this->assertCount(1, $response['result'], 'Expected exactly one trigger '.$triggerid.'.');
+
+		$service_tag = current(array_filter($response['result'][0]['tags'],
+			fn($t) => $t['tag'] === self::SERVICE_TAG
+		));
+		$this->assertNotFalse($service_tag,
+			'Trigger '.$triggerid.' has no '.self::SERVICE_TAG.' tag.');
+
+		$this->assertArrayHasKey($service_tag['value'], $service_by_component,
+			'No CEP service matches trigger '.$triggerid.' by its '.self::SERVICE_TAG.' value '
+				.$service_tag['value'].'.');
+
+		return $service_by_component[$service_tag['value']];
+	}
+
+	/**
+	 * Capture the highest eventid currently recorded for the service $serviceid's own events (source
+	 * SERVICE), so a later count is a delta relative to this point. The per-trigger services are shared
+	 * across the suite, so a service has accumulated events from earlier scenarios.
+	 */
+	private function captureServiceEventBaseline(string $serviceid): int {
+		$response = $this->call('event.get', [
+			'objectids' => [$serviceid],
+			'object' => EVENT_OBJECT_SERVICE,
+			'source' => EVENT_SOURCE_SERVICE,
+			'sortfield' => 'eventid',
+			'sortorder' => 'DESC',
+			'limit' => 1,
+			'output' => ['eventid']
+		]);
+
+		return empty($response['result']) ? 0 : (int) $response['result'][0]['eventid'];
+	}
+
+	/**
+	 * Wait until exactly $expected service events (source SERVICE) have been recorded for $serviceid since
+	 * $baseline_id. The service is matched to every trigger problem by the trigger tag, so a burst that
+	 * flips the trigger $expected times must drive exactly $expected service events; more means the service
+	 * manager cached a duplicated service problem, fewer means one was dropped or collapsed.
+	 */
+	private function waitForServiceEventCount(string $serviceid, int $baseline_id, int $expected): void {
+		$this->callUntilCountIsPresent('event.get', [
+			'objectids' => [$serviceid],
+			'object' => EVENT_OBJECT_SERVICE,
+			'source' => EVENT_SOURCE_SERVICE,
+			'eventid_from' => $baseline_id + 1
+		], $expected, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Poll until the single service $serviceid reaches $expected_status (a ZBX_SEVERITY_* value, or
+	 * ZBX_SEVERITY_OK once recovered) and holds exactly $expected_open_problems open service problems. The
+	 * per-service problem count is a regression guard against the service manager adding the same event to a
+	 * service more than once. Mirrors assertServicesStatus() but scoped to one service.
+	 */
+	private function assertSingleServiceStatus(string $serviceid, int $expected_status,
+			int $expected_open_problems): void {
+		$this->callUntilCountIsPresent('service.get', [
+			'serviceids' => [$serviceid],
+			'filter' => ['status' => $expected_status]
+		], 1, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => [$serviceid],
+			'object' => EVENT_OBJECT_SERVICE,
+			'source' => EVENT_SOURCE_SERVICE
+		], $expected_open_problems, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
