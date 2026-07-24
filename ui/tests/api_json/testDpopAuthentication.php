@@ -15,8 +15,8 @@
 
 
 require_once __DIR__.'/../include/CAPITest.php';
+require_once __DIR__.'/../include/helpers/CTestDpopHelper.php';
 require_once __DIR__.'/../../include/classes/api/helpers/CApiTokenHelper.php';
-require_once __DIR__.'/../../include/classes/api/helpers/CApiDpopHelper.php';
 require_once __DIR__.'/../../include/classes/api/helpers/CApiSettingsHelper.php';
 
 /**
@@ -230,12 +230,12 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 
 		// Create device keys.
 		self::$data['keys']['identity']= self::makeJWK(self::$private_identity_key_pem);
-		self::$data['kids']['identity'] = CApiDpopHelper::base64UrlEncode(
+		self::$data['kids']['identity'] = CTestDpopHelper::base64UrlEncode(
 			hash('sha256', json_encode(self::$data['keys']['identity'], JSON_UNESCAPED_SLASHES), true)
 		);
 
 		self::$data['keys']['encryption']= self::makeJWK(self::$private_encryption_key_pem);
-		self::$data['kids']['encryption'] = CApiDpopHelper::base64UrlEncode(
+		self::$data['kids']['encryption'] = CTestDpopHelper::base64UrlEncode(
 			hash('sha256', json_encode(self::$data['keys']['encryption'], JSON_UNESCAPED_SLASHES), true)
 		);
 
@@ -294,8 +294,8 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 		return [
 			'kty' => 'EC',
 			'crv' => 'P-256',
-			'x' => CApiDpopHelper::base64UrlEncode($ec['x']),
-			'y' => CApiDpopHelper::base64UrlEncode($ec['y'])
+			'x' => CTestDpopHelper::base64UrlEncode($ec['x']),
+			'y' => CTestDpopHelper::base64UrlEncode($ec['y'])
 		];
 	}
 
@@ -716,14 +716,14 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 		if (array_key_exists('ath_token', $dpop_data)) {
 			$token = self::$data[$dpop_data['ath_token'][0]][$dpop_data['ath_token'][1]];
 
-			$payload['ath'] = CApiDpopHelper::base64UrlEncode(hash('sha256', $token, true));
+			$payload['ath'] = CTestDpopHelper::base64UrlEncode(hash('sha256', $token, true));
 		}
 
 		$private_key_pem = $dpop_data['private_key_pem'] === 'identity'
 			? self::$private_identity_key_pem
 			: self::$private_encryption_key_pem;
 
-		return CApiDpopHelper::makeJwt($head, $payload, $private_key_pem);
+		return CTestDpopHelper::makeJwt($head, $payload, $private_key_pem);
 	}
 
 	public static function cleanTestData(): void {
