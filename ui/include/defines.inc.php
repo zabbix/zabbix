@@ -628,7 +628,7 @@ define('ITEM_TYPE_SNMP',			20);
 define('ITEM_TYPE_SCRIPT',			21);
 define('ITEM_TYPE_BROWSER',			22);
 define('ITEM_TYPE_NESTED',			23);
-define('ITEM_TYPE_TELEMETRY',		24);
+define('ITEM_TYPE_TELEMETRY_QUERY',	24);
 
 // Telemetry query item signal types.
 define('APM_SIGNAL_TYPE_TRACES',	0);

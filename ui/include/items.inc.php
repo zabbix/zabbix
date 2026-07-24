@@ -98,7 +98,7 @@ function item_type2str($type = null) {
 		ITEM_TYPE_SCRIPT => _('Script'),
 		ITEM_TYPE_BROWSER => _('Browser'),
 		ITEM_TYPE_NESTED => _('Nested'),
-		ITEM_TYPE_TELEMETRY => _('Telemetry query')
+		ITEM_TYPE_TELEMETRY_QUERY => _('Telemetry query')
 	];
 
 	if ($type === null) {
@@ -1670,7 +1670,7 @@ function checkNowAllowedTypes() {
 		ITEM_TYPE_SNMP,
 		ITEM_TYPE_SCRIPT,
 		ITEM_TYPE_BROWSER,
-		ITEM_TYPE_TELEMETRY
+		ITEM_TYPE_TELEMETRY_QUERY
 	];
 }
 
@@ -2281,7 +2281,7 @@ function getTypeItemFieldNames(array $input): array {
 				? ['parameters', 'params', 'timeout', 'delay']
 				: ['delay'];
 
-		case ITEM_TYPE_TELEMETRY:
+		case ITEM_TYPE_TELEMETRY_QUERY:
 			return $input['templateid'] == 0
 				? ['query', 'time_shift', 'lookback_limit', 'granularity', 'timeout', 'delay']
 				: ['delay'];
@@ -2396,7 +2396,7 @@ function getInheritedTimeouts(string $proxyid): array {
 					ITEM_TYPE_SNMP => $db_proxy['timeout_snmp_agent'],
 					ITEM_TYPE_SCRIPT => $db_proxy['timeout_script'],
 					ITEM_TYPE_BROWSER => $db_proxy['timeout_browser'],
-					ITEM_TYPE_TELEMETRY => $db_proxy['timeout_telemetry_query']
+					ITEM_TYPE_TELEMETRY_QUERY => $db_proxy['timeout_telemetry_query']
 				]
 			];
 		}
@@ -2417,7 +2417,7 @@ function getInheritedTimeouts(string $proxyid): array {
 			ITEM_TYPE_SNMP => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SNMP_AGENT),
 			ITEM_TYPE_SCRIPT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
 			ITEM_TYPE_BROWSER => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER),
-			ITEM_TYPE_TELEMETRY => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELEMETRY_QUERY)
+			ITEM_TYPE_TELEMETRY_QUERY => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELEMETRY_QUERY)
 		]
 	];
 }

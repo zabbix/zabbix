@@ -192,7 +192,7 @@ JAVASCRIPT;
 	$data['types'] = item_type2str();
 	unset($data['types'][ITEM_TYPE_HTTPTEST]);
 	unset($data['types'][ITEM_TYPE_CALCULATED], $data['types'][ITEM_TYPE_SNMPTRAP],
-		$data['types'][ITEM_TYPE_TELEMETRY]
+		$data['types'][ITEM_TYPE_TELEMETRY_QUERY]
 	);
 
 	// item

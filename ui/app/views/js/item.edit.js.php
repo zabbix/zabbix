@@ -31,7 +31,7 @@ const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_SNMP = <?= ITEM_TYPE_SNMP ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
-const ITEM_TYPE_TELEMETRY = <?= ITEM_TYPE_TELEMETRY ?>;
+const ITEM_TYPE_TELEMETRY_QUERY = <?= ITEM_TYPE_TELEMETRY_QUERY ?>;
 const APM_SIGNAL_TYPE_METRICS = <?= APM_SIGNAL_TYPE_METRICS ?>;
 const CONDITION_EVAL_TYPE_EXPRESSION = <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
@@ -614,7 +614,7 @@ window.item_edit_form = new class {
 	}
 
 	#updateColumnsIndicator() {
-		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY) {
+		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY_QUERY) {
 			return;
 		}
 
@@ -736,7 +736,7 @@ window.item_edit_form = new class {
 	}
 
 	#initTelemetryRows() {
-		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY) {
+		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY_QUERY) {
 			return;
 		}
 
@@ -755,7 +755,7 @@ window.item_edit_form = new class {
 	}
 
 	#updateTelemetryVisibility() {
-		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY) {
+		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY_QUERY) {
 			return;
 		}
 
@@ -776,7 +776,7 @@ window.item_edit_form = new class {
 	}
 
 	#updateTelemetryIndicators() {
-		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY) {
+		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY_QUERY) {
 			return;
 		}
 

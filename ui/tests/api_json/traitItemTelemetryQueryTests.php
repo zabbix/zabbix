@@ -1,0 +1,328 @@
+<?php
+/*
+** Copyright (C) 2001-2026 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+
+/**
+ * Telemetry Query items tests.
+ * To prevent items table backup and restore class is defined as trait for testItem class.
+ */
+trait traitItemTelemetryQueryTests {
+
+	public static function dataProviderTelemetryQueryCreate() {
+		$params = [
+			'query' => ['aggregated_columns' => [['alias' => 'Timestamp']]]
+		];
+
+		yield 'user macro for "time_shift", "lookback_limit" and "granularity"' => [
+			[
+				'time_shift' => '{$M}',
+				'lookback_limit' => '{$M}',
+				'granularity' => '{$M}'
+			] + $params,
+			null
+		];
+
+		yield 'duplicate "query.filter.conditions[].column"' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A or B',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A'],
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'B']
+						]
+					]
+				] + $params['query']
+			],
+			null
+		];
+
+		yield '"query.columns[].attribute_key" for complex "query.columns[].column"' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_METRICS,
+					'metric_point_type' => APM_METRICS_POINT_SUM,
+					'columns' => [
+						['column' => 'Exemplars.FilteredAttributes', 'attribute_key' => 'attr1']
+					]
+				] + $params['query']
+			],
+			null
+		];
+
+		yield 'empty "query.columns[].attribute_key" for non complex "query.columns[].column"' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [
+						['column' => 'TraceId', 'attribute_key' => '']
+					]
+				] + $params['query']
+			],
+			null
+		];
+
+		yield '"query.aggregated_columns[].parameters" set to single value array' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [
+						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [10], 'alias' => 'time']
+					]
+				]
+			],
+			null
+		];
+
+		yield 'binary "value_type" fail' => [
+			[
+				'value_type' => ITEM_VALUE_TYPE_BINARY
+			] + $params,
+			'Invalid parameter "/1/value_type": value must be one of 0, 1, 2, 3, 4, 6.'
+		];
+
+		yield 'no "query" fail' => [
+			[],
+			'Invalid parameter "/1": the parameter "query" is missing.'
+		];
+
+		yield '"query" is string fail' => [
+			[
+				'query' => ''
+			],
+			'Invalid parameter "/1/query": an array is expected.'
+		];
+
+		yield 'no "query.aggregated_columns" fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [['column' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => [['column' => 'TraceId', 'value' => 'test']]
+					]
+				]
+			],
+			'Invalid parameter "/1/query": the parameter "aggregated_columns" is missing.'
+		];
+
+		yield '"evaltype" not expression and "query.filter.formula" fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'formula' => 'A or A',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A']
+						]
+					]
+				] + $params['query']
+			],
+			'Invalid parameter "/1/query/filter/formula": value must be empty.'
+		];
+
+		yield '"query.filter.formula" more conditions than "query.filter.conditions" fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A or B',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A']
+						]
+					]
+				] + $params['query']
+			],
+			'Invalid parameter "/1/query/filter/conditions": incorrect number of conditions.'
+		];
+
+		yield '"query.filter.formula" less conditions than "query.filter.conditions" fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A or A',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A'],
+							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'B']
+						]
+					]
+				] + $params['query']
+			],
+			'Invalid parameter "/1/query/filter/conditions": incorrect number of conditions.'
+		];
+
+		yield '"query.filter.formula" non existing conditions in "query.filter.conditions" fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A or D',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A'],
+							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'B']
+						]
+					]
+				] + $params['query']
+			],
+			'Invalid parameter "/1/query/filter/conditions/2/formulaid": an identifier is not defined in the formula.'
+		];
+
+		yield '"query.filter.conditions" not unique "formulaid" fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A or A',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A'],
+							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'A']
+						]
+					]
+				] + $params['query']
+			],
+			'Invalid parameter "/1/query/filter/conditions/2": value (formulaid)=(A) already exists.'
+		];
+
+		yield '"query.columns[].attribute_key" for non complex "query.columns[].column" fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [
+						['column' => 'Timestamp', 'attribute_key' => 'attr1']
+					]
+				] + $params['query']
+			],
+			'Invalid parameter "/1/query/columns/1/attribute_key": value must be empty.'
+		];
+
+		yield '"query.aggregated_columns[].parameters" set to single invalid value array fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [
+						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [200], 'alias' => 'time']
+					]
+				]
+			],
+			'Invalid parameter "/1/query/aggregated_columns/1/parameters/1": value must be one of 1-100.'
+		];
+
+		yield '"query.aggregated_columns[].parameters" set to multiple values array fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [
+						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [2, 10], 'alias' => 'time']
+					]
+				]
+			],
+			'Invalid parameter "/1/query/aggregated_columns/1/parameters": maximum number of array elements is 1.'
+		];
+
+		yield 'duplicates in "query.columns[].column" and "query.aggregated_columns[].alias" fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [
+						['column' => 'TraceId']
+					],
+					'aggregated_columns' => [
+						['function' => AGGREGATE_COUNT, 'alias' => 'TraceId']
+					]
+				]
+			],
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value (TraceId) already exists.'
+		];
+
+		yield 'duplicates in complex "query.columns[].column","query.columns[].attribute_key" and "query.aggregated_columns[].alias" fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [
+						['function' => AGGREGATE_COUNT, 'alias' => 'SpanAttributes.attr']
+					],
+					'columns' => [
+						['column' => 'SpanAttributes', 'attribute_key' => 'attr']
+					]
+				]
+			],
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value (SpanAttributes.attr) already exists.'
+		];
+	}
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryCreate
+	 */
+	public function testTelemetryQueryCreate(array $item, ?string $expected_error) {
+		static $i = 1;
+
+		$item += [
+			'hostid' => 50009,
+			'name' => 'Telemetry query create '.$i,
+			'key_' => 'telemetry_query_create_'.$i,
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		];
+		$i++;
+
+		$this->call('item.create', $item, $expected_error);
+	}
+
+	public static function dataProviderTelemetryQueryUpdate() {
+		$item = [
+			'query' => ['aggregated_columns' => [['alias' => 'Timestamp']]]
+		];
+
+		yield 'no "query"' => [
+			$item,
+			['time_shift' => '2s'],
+			null
+		];
+
+		yield '"query" empty array fail' => [
+			$item,
+			['query' => ''],
+			'Invalid parameter "/1/query": an array is expected.'
+		];
+	}
+
+	/**
+	 * @dataProvider dataProviderTelemetryQueryUpdate
+	 */
+	public function testTelemetryQueryUpdate(array $item, array $update_item, ?string $expected_error) {
+		static $i = 1;
+
+		$item += [
+			'hostid' => 50009,
+			'name' => 'Telemetry query update '.$i,
+			'key_' => 'telemetry_query_update_'.$i,
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		];
+		$i++;
+		[$itemid] = $this->call('item.create', $item, null)['result']['itemids'];
+
+		$this->call('item.update', $update_item + ['itemid' => $itemid], $expected_error);
+	}
+}

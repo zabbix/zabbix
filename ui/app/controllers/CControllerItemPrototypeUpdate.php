@@ -95,7 +95,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
 				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY
+				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_TELEMETRY_QUERY
 			]],
 			'key' => [
 				['db items.key_', 'required', 'not_empty', 'use' => [CItemKeyValidator::class, ['lldmacros' => true]]],
@@ -377,30 +377,30 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				'use' => [CTimeUnitValidator::class,
 					['min' => 0, 'max' => SEC_PER_DAY, 'usermacros' => true, 'lldmacros' => true]
 				],
-				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'lookback_limit' => ['db items.lookback_limit', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class,
 					['min' => 1, 'max' => 3 * SEC_PER_DAY, 'usermacros' => true, 'lldmacros' => true]
 				],
-				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'granularity' => ['db items.granularity', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class,
 					['min' => 1, 'max' => SEC_PER_DAY, 'usermacros' => true, 'lldmacros' => true]
 				],
-				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'signal_type' => ['integer',
 				'in' => [APM_SIGNAL_TYPE_TRACES, APM_SIGNAL_TYPE_METRICS, APM_SIGNAL_TYPE_LOGS],
-				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'metric_point_type' => ['integer',
 				'in' => [APM_METRICS_POINT_SUM, APM_METRICS_POINT_GAUGE, APM_METRICS_POINT_HISTOGRAM,
 					APM_METRICS_POINT_EXPHISTOGRAM
 				],
 				'when' => [
-					['type', 'in' => [ITEM_TYPE_TELEMETRY]],
+					['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]],
 					['signal_type', 'in' => [APM_SIGNAL_TYPE_METRICS]]
 				]
 			],
@@ -412,7 +412,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 						'when' => ['column', 'in' => CTelemetryData::getComplexColumns()]
 					]
 				],
-				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'aggregated_columns' => ['objects', 'required', 'not_empty', 'uniq' => ['alias'],
 				'messages' => [
@@ -436,17 +436,17 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 					],
 					'alias' => ['string', 'required', 'not_empty']
 				],
-				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'evaltype' => ['integer',
 				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
 					CONDITION_EVAL_TYPE_EXPRESSION
 				],
-				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'formula' => ['string', 'required', 'not_empty',
 				'when' => [
-					['type', 'in' => [ITEM_TYPE_TELEMETRY]],
+					['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]],
 					['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 				]
 			],
@@ -470,7 +470,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 						]]
 					]
 				],
-				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY]]
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'logtimefmt' => ['db items.logtimefmt'],
 			'valuemapid' => ['db items.valuemapid'],

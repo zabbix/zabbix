@@ -585,7 +585,7 @@ final class CItemData {
 					'js-filter-delay-field',
 					'filter_delay'
 				],
-				ITEM_TYPE_TELEMETRY => [
+				ITEM_TYPE_TELEMETRY_QUERY => [
 					'js-filter-delay-label',
 					'js-filter-delay-field',
 					'filter_delay'
@@ -924,7 +924,7 @@ final class CItemData {
 				ITEM_TYPE_NESTED => [
 					['id' => 'key', 'defaultValue' => '']
 				],
-				ITEM_TYPE_TELEMETRY => [
+				ITEM_TYPE_TELEMETRY_QUERY => [
 					'js-item-signal-type-label',
 					'js-item-signal-type-field',
 					'js-item-metric-point-type-label',

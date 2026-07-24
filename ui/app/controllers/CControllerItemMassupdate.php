@@ -453,7 +453,7 @@ class CControllerItemMassupdate extends CController {
 		$data['item_types'] = item_type2str();
 		unset($data['item_types'][ITEM_TYPE_HTTPTEST], $data['item_types'][ITEM_TYPE_SCRIPT],
 			$data['item_types'][ITEM_TYPE_BROWSER], $data['item_types'][ITEM_TYPE_NESTED],
-			$data['item_types'][ITEM_TYPE_TELEMETRY]
+			$data['item_types'][ITEM_TYPE_TELEMETRY_QUERY]
 		);
 
 		return new CControllerResponseData($data);

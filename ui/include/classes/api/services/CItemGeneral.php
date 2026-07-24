@@ -386,6 +386,27 @@ abstract class CItemGeneral extends CApiService {
 
 				$item['headers'] = $fields;
 			}
+
+			if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY && array_key_exists('query', $item)) {
+				// When query.filter is not set validation rule 'default' will trigger error because of API_REQUIRED for query.filter.evaltype
+				$item['query'] += ['filter' => []];
+				$path = '/'.($i + 1);
+
+				if ($item['query']['filter']
+						&& !CItemTypeTelemetryQuery::validateFilter($item, $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				if ($item['query']['aggregated_columns']
+						&& !CItemTypeTelemetryQuery::validateAggregatedColumns($item, $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				if (($item['query']['columns'] || $item['query']['aggregated_columns'])
+						&& !CItemTypeTelemetryQuery::validateColumnsAggregatedColumnsUnique($item, $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
 		}
 		unset($item);
 	}
@@ -2837,6 +2858,10 @@ abstract class CItemGeneral extends CApiService {
 		if (array_key_exists('headers', $item)) {
 			$item['headers'] = self::prepareHeadersForApi($item['headers'], $sortorder);
 		}
+
+		if (array_key_exists('query', $item)) {
+			$item['query'] = self::prepareTelemetryQueryForApi($item['query']);
+		}
 	}
 
 	private static function prepareQueryFieldsForApi(string $query_fields, bool $sortorder): array {
@@ -2877,6 +2902,32 @@ abstract class CItemGeneral extends CApiService {
 		return $headers;
 	}
 
+	private static function prepareTelemetryQueryForApi(string $query): array {
+		if ($query === '') {
+			return [];
+		}
+
+		$query = json_decode($query, true);
+
+		if (json_last_error() != JSON_ERROR_NONE) {
+			return [];
+		}
+
+		if ($query['filter'] && $query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			$i = 0;
+
+			foreach ($query['filter']['conditions'] as &$condition) {
+				$condition['formulaid'] = num2letter($i);
+				$i++;
+			}
+			unset($condition);
+
+			CConditionHelper::replaceConditionIds($query['filter']['formula'], $query['filter']['conditions']);
+		}
+
+		return $query;
+	}
+
 	protected static function prepareItemsForDb(array &$items): void {
 		foreach ($items as &$item) {
 			self::prepareItemForDb($item);
@@ -2913,6 +2964,10 @@ abstract class CItemGeneral extends CApiService {
 		if (array_key_exists('headers', $item)) {
 			$item['headers'] = self::prepareHeadersForDb($item['headers']);
 		}
+
+		if (array_key_exists('query', $item)) {
+			$item['query'] = self::prepareTelemetryQueryFieldForDb($item['query']);
+		}
 	}
 
 	private static function prepareQueryFieldsForDb(array $query_fields): string {
@@ -2931,6 +2986,19 @@ abstract class CItemGeneral extends CApiService {
 		unset($header);
 
 		return $headers ? implode("\r\n", $headers) : '';
+	}
+
+	private static function prepareTelemetryQueryFieldForDb(array $query): string {
+		if ($query['filter'] && $query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			CConditionHelper::replaceFormulaIds($query['filter']['formula'], $query['filter']['conditions']);
+
+			foreach ($query['filter']['conditions'] as &$condition) {
+				unset($condition['formulaid']);
+			}
+			unset($condition);
+		}
+
+		return json_encode($query, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 	}
 
 	public static function addInsTemplateCaches(array &$items): void {
