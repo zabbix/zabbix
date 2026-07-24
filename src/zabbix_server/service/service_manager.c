@@ -237,8 +237,8 @@ static void	match_event_to_service_problem_tags(const zbx_cep_event_t *event,
 
 			services_diff = get_or_create_services_diff(service, services_diffs, flags);
 
-			//if (FAIL == zbx_vector_service_problem_ptr_search(&services_diff->service_problems,
-			//		&service_problem_cmp, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+			if (FAIL == zbx_vector_service_problem_ptr_search(&services_diff->service_problems,
+					&service_problem_cmp, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 			{
 				service_problem = zbx_malloc(NULL, sizeof(zbx_service_problem_t));
 				service_problem->eventid = event->eventid;
