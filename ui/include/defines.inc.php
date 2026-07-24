@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',	7050064);
+define('ZABBIX_DB_VERSION',	7050066);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -2493,6 +2493,9 @@ define('ZBX_NODE_STATUS_ACTIVE',		3);
 
 // Datatable.
 define('ZBX_STYLE_DATATABLE', 'datatable');
+
+// Limit amount of validations per request in CControllerValidateUse
+define('VALIDATE_USE_CHUNK_SIZE', 500);
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');
