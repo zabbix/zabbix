@@ -21,45 +21,67 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * zbx_hc_is_itemid_cached_and_normal() in cachehistory.c). One host, one impersonated proxy (no
  * real proxy process is started - proxy.create() + sendAgentDataValues(..., $proxy) is enough to
  * exercise item->proxyid != 0 and the proxy nodata-suppression window; see
- * testLLDHistorySyncAtScale.php for the same technique), one item+trigger pair per scenario:
+ * testLLDHistorySyncAtScale.php for the same technique), one item+trigger pair per scenario. Each
+ * test asserts the CORRECT/expected behaviour, not "whatever currently happens" - most of them are
+ * expected to currently FAIL, since there is no fix yet for the gaps they cover:
  *
- *  - testNoData_UnsupportedFires:            unsupported item is treated as nodata, trigger fires.
- *  - testNoData_NoUnknownWithAndAfterConnectionLoss: no UNKNOWN while the proxy keeps talking
- *                                             normally, and none after a real gap + resume either.
- *  - testNoData_Discard:                     nodata() after only discarded (no-value) updates.
- *  - testNoData_LogMetadataOnly:              nodata() after only log metadata (no value) updates.
- *  - testNoData_ValuesFromPast:               nodata() when only past-clock values were received.
- *  - testNoData_UnsupportedFlapping:          literal reported case, nodata(...,30s), ~25s cadence.
+ *  - testNoData_UnsupportedFires:            PASSES - unsupported item is treated as nodata,
+ *                                             trigger fires. This is the one gap ZBX-27736 already
+ *                                             fixed (zbx_hc_is_itemid_cached_and_normal() excludes
+ *                                             ITEM_STATE_NOTSUPPORTED tail records).
+ *  - testNoData_NoUnknownWithAndAfterConnectionLoss: EXPECTED TO FAIL - trigger must never show
+ *                                             UNKNOWN, neither while the proxy keeps talking
+ *                                             normally nor after a real gap + resume.
+ *  - testNoData_Discard:                     EXPECTED TO FAIL - nodata() must fire after only
+ *                                             discarded (no-value) updates, same as with no
+ *                                             updates at all.
+ *  - testNoData_LogMetadataOnly:              EXPECTED TO FAIL - same, for log metadata-only
+ *                                             (lastlogsize/mtime, no value) updates.
+ *  - testNoData_ValuesFromPast:               EXPECTED TO FAIL - nodata() must fire when only
+ *                                             past-clock values were received (a real value, even
+ *                                             backdated, still leaves the history cache tail in
+ *                                             ITEM_STATE_NORMAL - same underlying check as above).
+ *  - testNoData_UnsupportedFlapping:          EXPECTED TO FAIL - literal reported case:
+ *                                             nodata(...,30s) with an item genuinely flapping
+ *                                             between a valid value and ITEM_STATE_NOTSUPPORTED
+ *                                             (not just staying unsupported) must fire and stay at
+ *                                             state NORMAL, never UNKNOWN.
  *  - testNoData_ConnectionLossSuppression:    no premature PROBLEM/UNKNOWN across a connection
  *                                             loss and restore, including right at resume.
+ *  - testNoData_ProxyGroupLogSkip_LazyStaysOpen: EXPECTED TO FAIL - see below.
+ *  - testNoData_ProxyGroupLogSkip_StrictCloses: PASSES - see below.
  *
- * testNoData_Discard and testNoData_LogMetadataOnly are expected to be unstable: metadata-only /
- * no-value records land in the history cache with state ITEM_STATE_NORMAL (see
- * hc_add_item_values()/hc_clone_history_data() in cachehistory.c), and
- * zbx_hc_is_itemid_cached_and_normal() has no way to tell them apart from a real value still
- * being transferred from the proxy, so nodata() can keep returning an evaluation error instead of
- * 1. Both markTestSkipped() rather than fail when that happens, matching the existing convention
- * in testLLDHistorySyncAtScale.php for the same known gap.
+ * All of the EXPECTED TO FAIL cases above trace back to the same root cause:
+ * zbx_hc_is_itemid_cached_and_normal() (cachehistory.c) only excludes ITEM_STATE_NOTSUPPORTED tail
+ * records from the "proxy transfer in progress" check - it treats every other kind of tail record
+ * (ZBX_DC_FLAG_NOVALUE metadata-only/discard records, or even a perfectly ordinary real value that
+ * just happens to be backdated) as indistinguishable from a real value still being transferred
+ * from the proxy, so nodata() keeps returning an evaluation error instead of ever resolving to 1.
+ * There is no fix for this yet.
  *
- * testNoData_ProxyGroupLogSkip at the end reproduces a specific reported case on top of the same
- * known gap: a host monitored by a proxy group, with an active-agent log item using
- * "skip" mode, and a trigger combining last()/length() with a lazy nodata() in an "and" expression.
- * Once a matching line has opened the problem and the log stops producing matches, the item keeps
- * sending metadata-only updates (lastlogsize/mtime, no value) as the agent keeps polling the file
- * position, and the problem never closes even though the proxies stay online throughout - matching
- * the mechanism above. Switching to nodata(...,"strict") bypasses that code path entirely and the
- * problem closes as soon as the window elapses. Unlike the other scenarios this one needs a real
- * proxy-group host assignment (host.get 'assigned_proxyid' must resolve to an actually online
- * group member - see pg_manager.c), so one proxy group member is a real, running component; the
- * second is a proxy.create()-only "phantom" that never comes online, present only so the group
- * configuration genuinely has two-or-more members as reported (min_online=1 keeps the group online
- * on the real member alone; the underlying bug does not depend on multi-proxy failover, only on
- * the item having a non-zero proxyid). The reported trigger uses nodata(item,20m); these tests use
- * a much shorter window (see PG_NODATA_WINDOW_SEC) - the window value does not affect the code
- * path under test, only how long the test has to wait. Step (3) in that test currently asserts
- * the BUGGY behaviour (problem stays open forever); once zbx_hc_is_itemid_cached_and_normal() is
- * fixed to also exclude ZBX_DC_FLAG_NOVALUE tail records, that assertion will start failing and
- * needs to be flipped to expect recovery (like step (4) already does for the "strict" case).
+ * The two testNoData_ProxyGroupLogSkip_* methods reproduce a specific reported case on top of the
+ * same gap: Zabbix server 7.0.28 with two or more active proxies in a proxy group, a host
+ * monitored by that group with an active-agent log item using "skip" mode, and a trigger
+ * combining last()/length() with nodata() in an "and" expression. One matching log line opens the
+ * problem; the log then stops producing matches, but the item keeps sending metadata-only updates
+ * (lastlogsize/mtime, no value) as the agent keeps polling the file position - matching the
+ * mechanism above. Correct/expected behaviour is that the problem closes once the window elapses,
+ * the same as testNoData_LogMetadataOnly; with the default (lazy) nodata() it does not, and stays
+ * open indefinitely even though the proxies stay online throughout - testNoData_ProxyGroupLogSkip_
+ * LazyStaysOpen asserts the closing behaviour and is expected to currently fail on exactly that.
+ * Switching to nodata(...,"strict") bypasses the affected code path entirely and the problem does
+ * close once the window elapses - testNoData_ProxyGroupLogSkip_StrictCloses asserts that and is
+ * expected to pass, proving the workaround. The two are separate, independent test methods (each
+ * redoes steps 1-2 itself) rather than one, so a failure in the lazy case can never prevent the
+ * strict case from being exercised and reported on its own. Unlike the other scenarios this one
+ * needs a real proxy-group host assignment (host.get 'assigned_proxyid' must resolve to an
+ * actually online group member - see pg_manager.c), so one proxy group member is a real, running
+ * component; the second is a proxy.create()-only "phantom" that never comes online, present only
+ * so the group configuration genuinely has two-or-more members as reported (min_online=1 keeps the
+ * group online on the real member alone; the underlying bug does not depend on multi-proxy
+ * failover, only on the item having a non-zero proxyid). The reported trigger uses
+ * nodata(item,20m); these tests use a much shorter window (see PG_NODATA_WINDOW_SEC) - the window
+ * value does not affect the code path under test, only how long the test has to wait.
  *
  * Deliberately does NOT use @suite-components-reuse: onAfterTestCase() only calls
  * stopComponent() when reuse is off (CIntegrationTest.php), and onBeforeTestCase() only flips
@@ -391,7 +413,8 @@ class testNoData extends CIntegrationTest {
 	 * UNKNOWN; phase 2, in the same test (no component restart in between - see class docblock
 	 * on why @depends across separate tests isn't used here), goes quiet past NET_DELAY_MAX to
 	 * trigger the proxy's lost-connection detection, then resumes normal traffic and verifies the
-	 * trigger never showed UNKNOWN across the whole sequence either.
+	 * trigger never showed UNKNOWN across the whole sequence either. Expected to currently FAIL -
+	 * there is no fix for this yet.
 	 */
 	public function testNoData_NoUnknownWithAndAfterConnectionLoss() {
 		$key = 'nodata.no.unknown';
@@ -429,8 +452,12 @@ class testNoData extends CIntegrationTest {
 	/**
 	 * "nodata with discard - check that nodata also works when there was discard." Modelled as
 	 * repeated no-value (ZBX_DC_FLAG_NOVALUE) submissions, the same shape a "Discard unchanged"
-	 * preprocessing step or a discarded duplicate produces server-side. Known unstable - see class
-	 * docblock.
+	 * preprocessing step or a discarded duplicate produces server-side. Correct/expected
+	 * behaviour: nodata() fires once the window has elapsed since the last real value, the same
+	 * as it would with no updates at all. Expected to currently FAIL - there is no fix for this
+	 * yet (see class docblock: NOVALUE-flagged tail records aren't excluded from
+	 * zbx_hc_is_itemid_cached_and_normal(), so they keep the "proxy transfer in progress" branch
+	 * active indefinitely).
 	 */
 	public function testNoData_Discard() {
 		$key = 'nodata.discard';
@@ -444,26 +471,26 @@ class testNoData extends CIntegrationTest {
 			sleep(4);
 		}
 
+		$trigger = null;
 		try {
 			$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE, 15);
+			$trigger = $this->getTrigger($key);
 		} catch (Exception $e) {
 			$trigger = $this->getTrigger($key);
-			$this->markTestSkipped('nodata() did not fire after discard-only updates (known unstable - see '.
-				'zbx_hc_is_itemid_cached_and_normal() in cachehistory.c). Trigger state: '.
-				json_encode($trigger));
-
-			return;
 		}
 
-		$trigger = $this->getTrigger($key);
-		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value']);
+		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value'],
+			'nodata() did not fire after discard-only updates. There is no fix for this yet; see '.
+			'zbx_hc_is_itemid_cached_and_normal() in cachehistory.c. Trigger state: '.json_encode($trigger));
 	}
 
 	/**
 	 * "nodata with only metadata with logitem - check that nodata also works when there was only
 	 * metadata with log and no actual value." Same shape as testNoData_Discard but with
 	 * lastlogsize/mtime present, matching a log item whose agent keeps polling but finds nothing
-	 * new to report. Known unstable - see class docblock.
+	 * new to report. Correct/expected behaviour: nodata() fires once the window has elapsed since
+	 * the last real value. Expected to currently FAIL - there is no fix for this yet (same
+	 * zbx_hc_is_itemid_cached_and_normal() gap as testNoData_Discard - see class docblock).
 	 */
 	public function testNoData_LogMetadataOnly() {
 		$key = 'nodata.logmeta';
@@ -479,40 +506,66 @@ class testNoData extends CIntegrationTest {
 			sleep(4);
 		}
 
+		$trigger = null;
 		try {
 			$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE, 15);
+			$trigger = $this->getTrigger($key);
 		} catch (Exception $e) {
 			$trigger = $this->getTrigger($key);
-			$this->markTestSkipped('nodata() did not fire after log-metadata-only updates (known unstable - see '.
-				'zbx_hc_is_itemid_cached_and_normal() in cachehistory.c). Trigger state: '.
-				json_encode($trigger));
-
-			return;
 		}
 
-		$trigger = $this->getTrigger($key);
-		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value']);
+		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value'],
+			'nodata() did not fire after log-metadata-only updates. There is no fix for this yet; see '.
+			'zbx_hc_is_itemid_cached_and_normal() in cachehistory.c. Trigger state: '.json_encode($trigger));
 	}
 
 	/**
 	 * "nodata with values from past - check that nodata works if only values from past are
 	 * received." A value old enough to fall outside the nodata() window must not be treated as
-	 * fresh data: nodata() must still fire.
+	 * fresh data: nodata() must still fire. Expected to currently FAIL - there is no fix for this
+	 * yet: a real value still counts as an ordinary (non-NOTSUPPORTED) tail record regardless of
+	 * its own clock, so zbx_hc_is_itemid_cached_and_normal() treats it the same as a value
+	 * genuinely still being transferred from the proxy and nodata() keeps erroring out instead of
+	 * resolving to 1 (see class docblock).
 	 */
 	public function testNoData_ValuesFromPast() {
 		$key = 'nodata.past';
 
-		$this->push($key, ['value' => 1, 'clock' => time() - 120]);
+		// This class doesn't use @suite-components-reuse (see class docblock), so the server
+		// restarts fresh for every test, and zbx_dc_get_data_expected_from() (dbconfig.c) resets to
+		// that restart's config-sync time for every host/item - the in-memory cache is rebuilt from
+		// scratch on every restart, so everything looks "just created" to it. evaluate_NODATA()
+		// refuses to fire while data_expected_from + period > now ("item does not have enough data
+		// after server start"), which is unrelated to the actual bug under test here. Keep
+		// resending the stale-clock value - each push forces a fresh trigger recalculation
+		// (cachehistory_server.c queues+locks triggers for any item that received new data,
+		// regardless of the value's clock) - so the wait covers both that startup grace window and
+		// however long the real bug takes to (fail to) resolve, rather than depending on a guess at
+		// either one.
+		$deadline = microtime(true) + 60;
+		$trigger = null;
+		while (microtime(true) < $deadline) {
+			$this->push($key, ['value' => 1, 'clock' => time() - 120]);
+			sleep(3);
 
-		$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE);
-		$trigger = $this->getTrigger($key);
-		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value']);
+			$trigger = $this->getTrigger($key);
+			if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
+				break;
+			}
+		}
+
+		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value'],
+			'nodata() never fired for past-only values. Trigger state: '.json_encode($trigger));
 	}
 
 	/**
-	 * Literal reported case: nodata(item,30s) with an item polled every ~25s that becomes
-	 * unsupported (e.g. a numeric item receiving a string) every few seconds. Verify the trigger
-	 * reaches PROBLEM and stays there without flapping back to UNKNOWN/OK on every toggle.
+	 * Literal reported case: nodata(item,30s) with an item polled every ~25s that genuinely
+	 * flaps between a valid value and unsupported (e.g. a numeric item receiving a string) every
+	 * few seconds - not merely staying unsupported throughout, which is the already-fixed case
+	 * (testNoData_UnsupportedFires). Verify the trigger reaches PROBLEM and never shows UNKNOWN
+	 * along the way. Expected to currently FAIL: every time a valid value reappears it leaves the
+	 * history cache tail in ITEM_STATE_NORMAL, which zbx_hc_is_itemid_cached_and_normal() cannot
+	 * tell apart from a real value still being transferred from the proxy - see class docblock.
 	 */
 	public function testNoData_UnsupportedFlapping() {
 		$key = 'nodata.flap.30.25';
@@ -526,19 +579,31 @@ class testNoData extends CIntegrationTest {
 		$toggle = true;
 		while (microtime(true) < $deadline) {
 			if ($toggle) {
-				$this->push($key, ['state' => ITEM_STATE_NOTSUPPORTED, 'value' => 'not a number']);
+				$this->push($key, ['value' => 1]); // briefly valid/supported again
 			}
 			else {
-				$this->push($key, ['state' => ITEM_STATE_NOTSUPPORTED, 'value' => 'still not a number']);
+				$this->push($key, ['state' => ITEM_STATE_NOTSUPPORTED, 'value' => 'not a number']);
 			}
+
+			$trigger = $this->getTrigger($key);
+			$this->assertNotEquals(TRIGGER_STATE_UNKNOWN, $trigger['state'],
+				'Trigger went UNKNOWN while flapping between supported and unsupported. Error: '.
+				$trigger['error']);
+
 			$toggle = !$toggle;
 			sleep(5);
 		}
+
+		// End on unsupported so nodata() has a real chance to resolve to 1 once the window elapses.
+		$this->push($key, ['state' => ITEM_STATE_NOTSUPPORTED, 'value' => 'not a number']);
 
 		$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE);
 		$trigger = $this->getTrigger($key);
 		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value']);
 		$this->assertEquals(TRIGGER_STATE_NORMAL, $trigger['state'], 'Error: '.$trigger['error']);
+
+		$after = $this->unknownEventCount();
+		$this->assertEquals($before, $after, 'Unknown trigger event count changed: '.$before.' -> '.$after);
 	}
 
 	/**
@@ -594,34 +659,55 @@ class testNoData extends CIntegrationTest {
 	}
 
 	/**
-	 * Proxy-group log-skip repro, as one test (no @depends / no component restart in between -
-	 * see class docblock): (1) proxy group comes online and the host is assigned to the real
-	 * proxy, (2) one matching log line opens the problem, (3) metadata-only heartbeats afterwards
-	 * do NOT close it even well past the nodata() window - documents the reported bug, (4)
-	 * switching to nodata(...,"strict") closes it once the window elapses - the reported
-	 * workaround.
+	 * Shared setup for both testNoData_ProxyGroupLogSkip_* methods, since each is fully
+	 * independent (no @depends, no shared component uptime - every test in this class restarts
+	 * server+proxy fresh, see class docblock) and so has to redo it: wait for the proxy group to
+	 * be online and the host assigned to the real proxy, make sure the real proxy has synced the
+	 * host/item, then send one matching log line and wait for the problem to open.
 	 */
-	public function testNoData_ProxyGroupLogSkip() {
-		// (1) proxy group online, host assigned to the real proxy.
+	/**
+	 * Set the proxy-group log-skip trigger's expression (lazy or "strict" nodata()) and wait for
+	 * the server to actually pick it up. Needed because the server for this test method already
+	 * finished its own fresh startup config sync (onBeforeTestCase() restarts it before the test
+	 * body runs - see class docblock) using whatever expression was in the DB at that point, which
+	 * may not be the one this test needs; trigger.update() alone only changes the DB row, not the
+	 * server's already-loaded in-memory config cache.
+	 */
+	private function setPgTriggerExpression(bool $strict): void {
+		$mode = $strict ? ',"strict"' : '';
+		$response = $this->call('trigger.update', [
+			'triggerid' => self::$pg_triggerid,
+			'expression' => 'length(last(/'.self::PG_HOSTNAME.'/'.self::PG_ITEM_KEY.'))>0 and '.
+				'nodata(/'.self::PG_HOSTNAME.'/'.self::PG_ITEM_KEY.','.self::PG_NODATA_WINDOW_SEC.'s'.$mode.')=0'
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_dc_sync_configuration()', true, 90, 1,
+				true);
+	}
+
+	private function pgLogSkipOpenProblem(): void {
 		$pg_logline = 'Proxy group "'.self::PG_NAME.'" changed state from \b[a-z]+\b to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1, true);
 
-		$assign_logline = 'assigned hostid '.self::$pg_hostid.' to proxyid '.self::$pg_proxyid;
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $assign_logline, true, 90, 1, true);
-
-		$response = $this->call('host.get', [
+		// Poll the API rather than wait for an "assigned hostid X to proxyid Y" log line here:
+		// the assignment already exists in the host_proxy table from a previous test's run (DB
+		// state persists across this class's per-test restarts, only in-memory state resets - see
+		// class docblock), and it's not certain pg_manager re-logs that exact line for an
+		// assignment that isn't actually changing, only that host.get eventually reflects it.
+		$this->callUntilDataIsPresent('host.get', [
 			'output' => ['hostid', 'assigned_proxyid'],
 			'hostids' => [self::$pg_hostid]
-		]);
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertEquals(self::$pg_proxyid, $response['result'][0]['assigned_proxyid']);
+		], 90, 1, function ($r) {
+			return $r['result'][0]['assigned_proxyid'] == self::$pg_proxyid;
+		});
 
 		// Make sure the real proxy actually knows about the host/item before we push data to it.
 		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, 'End of zbx_dc_sync_configuration()', true, 90, 1,
 				true);
 
-		// (2) one matching log line opens the problem.
 		$this->pushLogSkip('MATCH: something went wrong');
 
 		$this->callUntilDataIsPresent('trigger.get', [
@@ -633,43 +719,56 @@ class testNoData extends CIntegrationTest {
 
 		$trigger = $this->getPgTrigger();
 		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value']);
+	}
 
-		// (3) metadata-only heartbeats afterwards must NOT close the problem - known bug (see
-		// class docblock): this assertion documents the BUGGY behaviour and will need to be
-		// flipped to expect recovery once zbx_hc_is_itemid_cached_and_normal() is fixed to also
-		// exclude ZBX_DC_FLAG_NOVALUE tail records.
+	/**
+	 * Proxy-group log-skip repro with the default (lazy) nodata(): one matching log line opens
+	 * the problem, then the log stops producing matches but the item keeps sending metadata-only
+	 * updates (lastlogsize/mtime, no value) as the agent keeps polling the file position.
+	 * Correct/expected behaviour: the problem closes once the window elapses, same as with no
+	 * updates at all. Expected to currently FAIL: the problem stays open indefinitely instead,
+	 * even though the proxies stay online throughout - there is no fix for this yet (see class
+	 * docblock).
+	 */
+	public function testNoData_ProxyGroupLogSkip_LazyStaysOpen() {
+		// Make sure the trigger is using the lazy (non-"strict") expression, regardless of test
+		// execution order relative to testNoData_ProxyGroupLogSkip_StrictCloses.
+		$this->setPgTriggerExpression(false);
+
+		$this->pgLogSkipOpenProblem();
+
 		$deadline = microtime(true) + (2 * self::PG_NODATA_WINDOW_SEC);
-
+		$trigger = null;
 		while (microtime(true) < $deadline) {
 			$this->pushLogSkip(null);
 			sleep(self::PG_HEARTBEAT_INTERVAL_SEC);
 
 			$trigger = $this->getPgTrigger();
-			$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value'],
-				'Problem unexpectedly closed - if zbx_hc_is_itemid_cached_and_normal() was fixed to '.
-				'exclude ZBX_DC_FLAG_NOVALUE tail records, update this test to expect recovery instead.');
+			if ($trigger['value'] == TRIGGER_VALUE_FALSE) {
+				break;
+			}
 		}
 
-		// Known bug: still open well past 2x the nodata() window, while metadata-only updates
-		// kept flowing and the proxy stayed online throughout.
-		$trigger = $this->getPgTrigger();
-		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value']);
+		$this->assertEquals(TRIGGER_VALUE_FALSE, $trigger['value'],
+			'Problem did not close after the nodata() window elapsed with only metadata-only log '.
+			'updates (no real value), even though the proxy stayed online throughout. There is no '.
+			'fix for this yet; see zbx_hc_is_itemid_cached_and_normal() in cachehistory.c. '.
+			'Trigger state: '.json_encode($trigger));
+	}
 
-		// (4) switch to "strict" - the problem must now close once the window elapses.
-		$response = $this->call('trigger.update', [
-			'triggerid' => self::$pg_triggerid,
-			'expression' => 'length(last(/'.self::PG_HOSTNAME.'/'.self::PG_ITEM_KEY.'))>0 and '.
-				'nodata(/'.self::PG_HOSTNAME.'/'.self::PG_ITEM_KEY.','.self::PG_NODATA_WINDOW_SEC.'s,"strict")=0'
-		]);
-		$this->assertArrayHasKey('triggerids', $response['result']);
+	/**
+	 * Same repro as testNoData_ProxyGroupLogSkip_LazyStaysOpen, but with nodata(...,"strict")
+	 * instead of the default lazy mode - the reported workaround. Expected to PASS: "strict"
+	 * bypasses the affected code path entirely, so the problem closes once the window elapses.
+	 */
+	public function testNoData_ProxyGroupLogSkip_StrictCloses() {
+		$this->setPgTriggerExpression(true);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_dc_sync_configuration()', true, 90, 1,
-				true);
+		$this->pgLogSkipOpenProblem();
 
-		// Keep sending the same metadata-only heartbeats as before - "strict" mode should close
-		// the problem regardless, since it no longer treats the proxied item's cached tail state
-		// as "transfer in progress".
+		// Keep sending metadata-only heartbeats, same shape as the lazy case - "strict" mode
+		// should close the problem regardless, since it no longer treats the proxied item's
+		// cached tail state as "transfer in progress".
 		$this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$pg_triggerid],
 			'output' => ['value', 'state']
