@@ -506,7 +506,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'output' => ['triggerid'],
 			'selectTags' => 'extend'
 		]);
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result'],
+		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result'],
 			'Not all discovered triggers were found.');
 
 		$services = [];
@@ -533,7 +533,7 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$response = $this->call('service.create', $services);
 		$this->assertArrayHasKey('serviceids', $response['result']);
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
+		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
 			'Not all CEP services were created.');
 		self::$serviceids = $response['result']['serviceids'];
 
@@ -679,7 +679,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
 			'output' => ['triggerid', 'recovery_mode']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
@@ -729,7 +729,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
 			'output' => ['triggerid', 'recovery_mode']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
@@ -783,7 +783,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
 			'output' => ['triggerid', 'recovery_mode']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
@@ -835,7 +835,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
 			'output' => ['triggerid', 'type', 'recovery_mode']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
@@ -895,7 +895,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
 			'output' => ['triggerid', 'correlation_mode', 'correlation_tag', 'type']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
@@ -997,8 +997,8 @@ class testTriggerCEP extends CIntegrationTest {
 			'hostids' => [self::$disc_hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
 			'output' => ['itemid', 'value_type']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+			if (count($response['result']) !== static::LLD_DISCOVERY_COUNT) {
 				return false;
 			}
 			foreach ($response['result'] as $item) {
@@ -1008,7 +1008,7 @@ class testTriggerCEP extends CIntegrationTest {
 			}
 			return true;
 		});
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
+		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']);
 		foreach ($response['result'] as $item) {
 			$this->assertEquals(ITEM_VALUE_TYPE_TEXT, (int) $item['value_type'],
 				'Discovered item '.$item['itemid'].' was not updated to text value type.');
@@ -1018,7 +1018,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
 			'output' => ['triggerid', 'correlation_mode', 'correlation_tag', 'manual_close', 'type', 'expression']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
@@ -1130,8 +1130,8 @@ class testTriggerCEP extends CIntegrationTest {
 			'hostids' => [self::$disc_hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
 			'output' => ['itemid', 'value_type']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+			if (count($response['result']) !== static::LLD_DISCOVERY_COUNT) {
 				return false;
 			}
 			foreach ($response['result'] as $item) {
@@ -1141,7 +1141,7 @@ class testTriggerCEP extends CIntegrationTest {
 			}
 			return true;
 		});
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
+		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']);
 		foreach ($response['result'] as $item) {
 			$this->assertEquals(ITEM_VALUE_TYPE_TEXT, (int) $item['value_type'],
 				'Discovered item '.$item['itemid'].' was not updated to text value type.');
@@ -1151,7 +1151,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
 			'output' => ['triggerid', 'correlation_mode', 'type']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
@@ -1328,8 +1328,8 @@ class testTriggerCEP extends CIntegrationTest {
 			'hostids' => [self::$disc_hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
 			'output' => ['itemid', 'value_type']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+			if (count($response['result']) !== static::LLD_DISCOVERY_COUNT) {
 				return false;
 			}
 			foreach ($response['result'] as $item) {
@@ -1346,7 +1346,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
 			'output' => ['triggerid', 'correlation_mode', 'type'],
 			'tags' => [['tag' => 'state', 'operator' => TAG_OPERATOR_EXISTS]]
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
@@ -1606,7 +1606,7 @@ HEREDOC;
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 
 		$services = [];
-		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
+		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
 			$services[] = [
 				'name' => 'CEP web tag service '.$base.$i,
 				'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
@@ -1623,7 +1623,7 @@ HEREDOC;
 
 		$response = $this->call('service.create', $services);
 		$this->assertArrayHasKey('serviceids', $response['result']);
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
+		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
 			'Not all web-tag services were created.');
 		self::$web_tag_serviceids = $response['result']['serviceids'];
 
@@ -1958,8 +1958,8 @@ HEREDOC;
 			'hostids' => [self::$disc_hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
 			'output' => ['itemid', 'value_type']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+			if (count($response['result']) !== static::LLD_DISCOVERY_COUNT) {
 				return false;
 			}
 			foreach ($response['result'] as $item) {
@@ -1969,7 +1969,7 @@ HEREDOC;
 			}
 			return true;
 		});
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
+		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']);
 
 		// Verify the two primary discovered triggers reflect global correlation mode, multiple event
 		// generation and that the parity 'odd' tag resolved (component sensor1 → odd index → '1');
@@ -1978,7 +1978,7 @@ HEREDOC;
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
 			'output' => ['triggerid', 'correlation_mode', 'type'],
 			'selectTags' => 'extend'
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
@@ -2060,7 +2060,7 @@ HEREDOC;
 		$response = $this->callUntilDataIsPresent('host.get', [
 			'filter' => ['host' => self::HOST_DISC_VALUE],
 			'output' => ['hostid']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 		$this->assertCount(1, $response['result'], 'Discovered host was not created by host prototype.');
 		self::$disc_hostid = $response['result'][0]['hostid'];
 
@@ -2069,7 +2069,7 @@ HEREDOC;
 			'hostids' => [self::$disc_hostid],
 			'filter' => ['key_' => self::LLD_RULE_KEY],
 			'output' => ['itemid']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		// Reload config so the server is aware of the discovered host's inherited LLD rule.
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -2088,10 +2088,10 @@ HEREDOC;
 			'hostids' => [self::$disc_hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
 			'output' => ['itemid', 'name', 'key_']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === self::LLD_DISCOVERY_COUNT;
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === static::LLD_DISCOVERY_COUNT;
 		});
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered items were created.');
+		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered items were created.');
 
 		// Verify all LLD_DISCOVERY_COUNT triggers were created and store the primary one.
 		$expected_description = 'CEP trigger for '.self::COMPONENT_VALUE;
@@ -2101,10 +2101,10 @@ HEREDOC;
 			'search' => ['description' => 'CEP trigger for '],
 			'output' => ['triggerid', 'description', 'value', 'state'],
 			'selectTags' => 'extend'
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === self::LLD_DISCOVERY_COUNT;
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === static::LLD_DISCOVERY_COUNT;
 		});
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered triggers were created.');
+		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered triggers were created.');
 
 		$primary_trigger = current(array_filter($response['result'],
 			fn($t) => $t['description'] === $expected_description
@@ -2131,10 +2131,10 @@ HEREDOC;
 			'hostids' => [self::$disc_hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY2.'['],
 			'output' => ['itemid', 'name', 'key_']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === self::LLD_DISCOVERY_COUNT;
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === static::LLD_DISCOVERY_COUNT;
 		});
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result'], 'Not all second discovered items were created.');
+		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result'], 'Not all second discovered items were created.');
 
 		// Verify all LLD_DISCOVERY_COUNT dependent triggers were created and store the primary one.
 		$expected_dep_description = 'CEP dependent trigger for '.self::COMPONENT_VALUE;
@@ -2144,10 +2144,10 @@ HEREDOC;
 			'search' => ['description' => 'CEP dependent trigger for '],
 			'output' => ['triggerid', 'description', 'value', 'state'],
 			'selectTags' => 'extend'
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === self::LLD_DISCOVERY_COUNT;
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === static::LLD_DISCOVERY_COUNT;
 		});
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered dependent triggers were created.');
+		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result'], 'Not all discovered dependent triggers were created.');
 
 		$primary_dep_trigger = current(array_filter($response['result'],
 			fn($t) => $t['description'] === $expected_dep_description
@@ -2530,7 +2530,7 @@ HEREDOC;
 		// This is the last services-specific test (the restart sibling is either the true last run or is
 		// skipped), so disable the service/trigger actions: they must not fire on the events generated by the
 		// later, non-services scenarios. The services and the actions are removed entirely in clearData().
-		if ($restart || self::SKIP_RESTART_TESTS) {
+		if ($restart || static::SKIP_RESTART_TESTS) {
 			$this->disableServicesActions();
 		}
 	}
@@ -2724,7 +2724,7 @@ HEREDOC;
 		// value gets a strictly increasing (clock, ns) so CEP must process the whole rapid burst in order
 		// and emit one event per transition without collapsing or dropping any. The sequence ends on 0 so
 		// the trigger finishes OK.
-		$cycles = self::RECOVERY_CYCLES_COUNT;
+		$cycles = static::RECOVERY_CYCLES_COUNT;
 		$values = [];
 		for ($i = 0; $i < $cycles; $i++) {
 			$values[] = '1';
@@ -2857,7 +2857,7 @@ HEREDOC;
 			'object' => EVENT_OBJECT_SERVICE,
 			'source' => EVENT_SOURCE_SERVICE,
 			'eventid_from' => $baseline_id + 1
-		], $expected, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], $expected, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -2871,13 +2871,13 @@ HEREDOC;
 		$this->callUntilCountIsPresent('service.get', [
 			'serviceids' => [$serviceid],
 			'filter' => ['status' => $expected_status]
-		], 1, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], 1, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		$this->callUntilCountIsPresent('problem.get', [
 			'objectids' => [$serviceid],
 			'object' => EVENT_OBJECT_SERVICE,
 			'source' => EVENT_SOURCE_SERVICE
-		], $expected_open_problems, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], $expected_open_problems, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -4066,7 +4066,7 @@ HEREDOC;
 		// than to the master.
 		$item_key = self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']';
 		$values = [];
-		for ($i = 0; $i < self::LOG_EVENT_COUNT; $i++) {
+		for ($i = 0; $i < static::LOG_EVENT_COUNT; $i++) {
 			$values[] = [
 				'host' => self::HOST_NAME,
 				'key' => $item_key,
@@ -4081,7 +4081,7 @@ HEREDOC;
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'eventid_from' => $this->event_baseline_id + 1
-		], self::LOG_EVENT_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], static::LOG_EVENT_COUNT, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -4100,7 +4100,7 @@ HEREDOC;
 		// trigger expression false and recover all open problems.
 		$item_key = self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']';
 		$values = [];
-		for ($i = 0; $i < self::LOG_EVENT_COUNT; $i++) {
+		for ($i = 0; $i < static::LOG_EVENT_COUNT; $i++) {
 			$values[] = [
 				'host' => self::HOST_NAME,
 				'key' => $item_key,
@@ -4137,7 +4137,7 @@ HEREDOC;
 			'hostids' => [self::$hostid],
 			'filter' => ['key_' => $item_key],
 			'output' => ['itemid']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
 			return count($r['result']) === 1;
 		});
 
@@ -4146,7 +4146,7 @@ HEREDOC;
 			'hostids' => [self::$hostid],
 			'search' => ['description' => 'CEP log trigger for '],
 			'output' => ['triggerid', 'type']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
 			return count($r['result']) === 1;
 		});
 		$this->assertCount(1, $response['result'], 'Discovered log trigger was not created.');
@@ -4243,7 +4243,7 @@ HEREDOC;
 
 		$this->callUntilCountIsPresent('host.get', [
 			'hostids' => [self::$disc_hostid]
-		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], 0, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		self::$disc_hostid = null;
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -4306,14 +4306,14 @@ HEREDOC;
 			'objectids' => self::$discovered_triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_INTERNAL
-		], self::LLD_DISCOVERY_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], static::LLD_DISCOVERY_COUNT, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		// An internal problem must be opened for every unsupported item on the discovered host.
 		$this->callUntilCountIsPresent('problem.get', [
 			'hostids' => [self::$disc_hostid],
 			'object' => EVENT_OBJECT_ITEM,
 			'source' => EVENT_SOURCE_INTERNAL
-		], self::LLD_DISCOVERY_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], static::LLD_DISCOVERY_COUNT, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -4336,14 +4336,14 @@ HEREDOC;
 			'objectids' => self::$discovered_triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_INTERNAL
-		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], 0, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		// Every internal item-not-supported problem must be resolved once the items become supported.
 		$this->callUntilCountIsPresent('problem.get', [
 			'hostids' => [self::$disc_hostid],
 			'object' => EVENT_OBJECT_ITEM,
 			'source' => EVENT_SOURCE_INTERNAL
-		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], 0, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		// Every notification generated by this cycle must finish before the internal actions are disabled:
 		// disabling an action cancels its still-running escalations, so a recovery notification that is
@@ -4716,7 +4716,7 @@ HEREDOC;
 				$this->waitForOpenProblemsSuppressedPerComponent($all, $m, $maintenance_by_component);
 			}
 			else {
-				$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT);
+				$this->startDiscHostMaintenances(static::MAINTENANCE_COUNT);
 				$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
 			}
 			$this->waitForServicesSuppressed();
@@ -4726,7 +4726,7 @@ HEREDOC;
 				// maintenances must not disturb the existing suppression, and every open problem must end
 				// up suppressed by every active maintenance. (Tag-scoped maintenances are one-per-component,
 				// so there is nothing to overlap.)
-				$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT_EXTRA);
+				$this->startDiscHostMaintenances(static::MAINTENANCE_COUNT_EXTRA);
 				$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
 			}
 		}
@@ -5243,8 +5243,8 @@ HEREDOC;
 		// Per prototype: this many components carry odd="1" (odd index) and odd="0" (even index). With
 		// problems open on both prototypes, twice each count is open before the parity waves run.
 		$open_count = [
-			'1' => 2 * intdiv(self::LLD_DISCOVERY_COUNT + 1, 2),
-			'0' => 2 * intdiv(self::LLD_DISCOVERY_COUNT, 2)
+			'1' => 2 * intdiv(static::LLD_DISCOVERY_COUNT + 1, 2),
+			'0' => 2 * intdiv(static::LLD_DISCOVERY_COUNT, 2)
 		];
 		$keys2_by_parity = [
 			'1' => $this->buildDiscoveredKeysByParity(self::ITEM_PROTO_KEY2, '1'),
@@ -5316,7 +5316,7 @@ HEREDOC;
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'tags' => [['tag' => $tag, 'value' => $value, 'operator' => TAG_OPERATOR_EQUAL]]
-		], $expected, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], $expected, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -5577,7 +5577,7 @@ HEREDOC;
 		$this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => $parent_ids,
 			'output' => ['triggerid', 'value', 'state']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
 			function ($response) use ($parent_ids, $expected_value) {
 				$by_id = array_column($response['result'], null, 'triggerid');
 				foreach ($parent_ids as $tid) {
@@ -5657,7 +5657,7 @@ HEREDOC;
 		$this->callUntilDataIsPresent('triggerprototype.get', [
 			'triggerids' => [self::$trigger_prototypeid],
 			'output' => ['manual_close']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			return (int) $response['result'][0]['manual_close'] === ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED;
 		});
 		$this->call('triggerprototype.update', [
@@ -5667,7 +5667,7 @@ HEREDOC;
 		$this->callUntilDataIsPresent('triggerprototype.get', [
 			'triggerids' => [self::$dep_trigger_prototypeid],
 			'output' => ['manual_close']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			return (int) $response['result'][0]['manual_close'] === ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED;
 		});
 
@@ -5685,7 +5685,7 @@ HEREDOC;
 		$this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => $triggerids,
 			'output' => ['manual_close']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($triggerids) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($triggerids) {
 			if (count($response['result']) !== count($triggerids)) {
 				return false;
 			}
@@ -5721,7 +5721,7 @@ HEREDOC;
 
 			$this->callUntilCountIsPresent('trigger.get', [
 				'triggerids' => [self::$discovered_log_triggerid]
-			], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+			], 0, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 			self::$discovered_log_triggerid = null;
 			$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -5743,7 +5743,7 @@ HEREDOC;
 
 		$this->callUntilCountIsPresent('trigger.get', [
 			'triggerids' => $triggerids
-		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], 0, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		self::$discovered_triggerid = null;
 		self::$discovered_dep_triggerid = null;
@@ -5972,7 +5972,7 @@ HEREDOC;
 		$names = [];
 		$extra_by_name = [];
 		$component_by_name = [];
-		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
+		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
 			$component = $base.$i;
 			$name = 'CEP per-tag maintenance '.$component;
 
@@ -6003,7 +6003,7 @@ HEREDOC;
 	 * leaves the system in the same asserted state, so dependents can rely on it instead.
 	 */
 	private function skipIfRestartTestsDisabled(): void {
-		if (self::SKIP_RESTART_TESTS) {
+		if (static::SKIP_RESTART_TESTS) {
 			$this->markTestSkipped('Restart test variants disabled via SKIP_RESTART_TESTS.');
 		}
 	}
@@ -6014,7 +6014,7 @@ HEREDOC;
 	 * per-trigger services and their actions.
 	 */
 	private function skipIfServicesTestsDisabled(): void {
-		$skip_services_tests = self::SKIP_SERVICES_TESTS;
+		$skip_services_tests = static::SKIP_SERVICES_TESTS;
 
 		if ($skip_services_tests === null) {
 			$skip_services_tests = (time() % 2 === 0);
@@ -6028,7 +6028,7 @@ HEREDOC;
 	private function buildItemLLDData(bool $with_parity = false): string {
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 		$data = [];
-		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
+		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
 			$entry = [self::LLD_MACRO => $base.$i];
 			if ($with_parity) {
 				// Odd component index → '1', even → '0'. Consumed by the trigger prototype 'odd'
@@ -6043,7 +6043,7 @@ HEREDOC;
 	private function buildDiscoveredKeys(string $proto_key): array {
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 		$keys = [];
-		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
+		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
 			$keys[] = $proto_key.'['.$base.$i.']';
 		}
 		return $keys;
@@ -6056,7 +6056,7 @@ HEREDOC;
 	private function buildDiscoveredKeysByParity(string $proto_key, string $parity): array {
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 		$keys = [];
-		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
+		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
 			if ((($i % 2 === 1) ? '1' : '0') === $parity) {
 				$keys[] = $proto_key.'['.$base.$i.']';
 			}
@@ -6266,28 +6266,28 @@ HEREDOC;
 		]);
 		$eventids = array_column($response['result'], 'eventid');
 
-		$expected_alerts = 2 * self::LLD_DISCOVERY_COUNT;
+		$expected_alerts = 2 * static::LLD_DISCOVERY_COUNT;
 
 		// All notifications of this cycle must have been created ...
 		$this->callUntilCountIsPresent('alert.get', [
 			'eventsource' => EVENT_SOURCE_INTERNAL,
 			'eventids' => $eventids
-		], $expected_alerts, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], $expected_alerts, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		// ... and none may still be queued for delivery (NEW or NOT_SENT).
 		$this->callUntilCountIsPresent('alert.get', [
 			'eventsource' => EVENT_SOURCE_INTERNAL,
 			'eventids' => $eventids,
 			'filter' => ['status' => [ALERT_STATUS_NEW, ALERT_STATUS_NOT_SENT]]
-		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], 0, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	private function validateTriggerParams($expected_state, $expected_value) {
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => self::$discovered_triggerids,
 			'output' => ['triggerid', 'value', 'state']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($expected_state, $expected_value) {
-			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($expected_state, $expected_value) {
+			if (count($response['result']) !== static::LLD_DISCOVERY_COUNT) {
 				return false;
 			}
 			foreach ($response['result'] as $trigger) {
@@ -6298,7 +6298,7 @@ HEREDOC;
 			return true;
 		});
 
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
+		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']);
 		foreach ($response['result'] as $trigger) {
 			$this->assertEquals($expected_state, $trigger['state'], 'Unexpected trigger state.');
 			$this->assertEquals($expected_value, $trigger['value'], 'Unexpected trigger value.');
@@ -6337,7 +6337,7 @@ HEREDOC;
 			'sortfield' => 'eventid',
 			'sortorder' => 'DESC',
 			'output' => ['eventid', 'name', 'value', 'clock']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($expected_count) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($expected_count) {
 			return count($response['result']) === $expected_count;
 		});
 		return $response['result'];
@@ -6453,7 +6453,7 @@ HEREDOC;
 			'eventid_from' => $this->event_baseline_id + 1,
 			'filter' => ['value' => TRIGGER_VALUE_TRUE],
 			'tags' => [['tag' => $tag, 'operator' => TAG_OPERATOR_EXISTS]]
-		], $expected, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], $expected, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	private function getTriggers(array $triggerids): array {
@@ -6615,13 +6615,13 @@ HEREDOC;
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS
-		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], 0, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		// Wait for all triggers to return to OK.
 		$this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => $triggerids,
 			'output' => ['value', 'state']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($triggerids) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($triggerids) {
 			$expected = count($triggerids);
 
 			if (count($response['result']) !== $expected) {
@@ -6700,7 +6700,7 @@ HEREDOC;
 		$this->callUntilCountIsPresent('service.get', [
 			'serviceids' => $serviceids,
 			'filter' => ['status' => $expected_status]
-		], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], count($serviceids), static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		// One open service problem per service while in problem state; none after recovery. The poll
 		// fails if the open service problem count does not reach $expected_open_problems in time.
@@ -6708,7 +6708,7 @@ HEREDOC;
 			'objectids' => $serviceids,
 			'object' => EVENT_OBJECT_SERVICE,
 			'source' => EVENT_SOURCE_SERVICE
-		], $expected_open_problems, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], $expected_open_problems, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -6761,7 +6761,7 @@ HEREDOC;
 		$this->callUntilCountIsPresent('service.get', [
 			'serviceids' => $serviceids,
 			'filter' => ['status' => $expected_status]
-		], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], count($serviceids), static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -6779,7 +6779,7 @@ HEREDOC;
 			$this->callUntilCountIsPresent('service.get', [
 				'serviceids' => $serviceids,
 				'filter' => ['status' => $expected_status]
-			], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+			], count($serviceids), static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 		} catch (Exception $e) {
 			$response = $this->call('service.get', [
 				'serviceids' => $serviceids,
@@ -6805,7 +6805,7 @@ HEREDOC;
 			$this->callUntilCountIsPresent('service.get', [
 				'serviceids' => $serviceids,
 				'filter' => ['status' => -1]
-			], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+			], count($serviceids), static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 		} catch (Exception $e) {
 			$response = $this->call('service.get', [
 				'serviceids' => $serviceids,
@@ -6836,7 +6836,7 @@ HEREDOC;
 				TRIGGER_SEVERITY_HIGH,
 				TRIGGER_SEVERITY_DISASTER
 			]]
-		], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], count($serviceids), static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -6896,7 +6896,7 @@ HEREDOC;
 			$this->callUntilCountIsPresent('service.get', [
 				'serviceids' => $suppressed_ids,
 				'filter' => ['status' => -1]
-			], count($suppressed_ids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+			], count($suppressed_ids), static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 		}
 
 		if (!empty($unsuppressed_ids)) {
@@ -6910,7 +6910,7 @@ HEREDOC;
 					TRIGGER_SEVERITY_HIGH,
 					TRIGGER_SEVERITY_DISASTER
 				]]
-			], count($unsuppressed_ids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+			], count($unsuppressed_ids), static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 		}
 	}
 
