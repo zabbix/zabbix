@@ -245,9 +245,9 @@ class CDevice extends CApiService {
 		$this->validateOnboard($options, $db_device);
 
 		self::$userData = [
-			'userid' => $db_device['userid'],
+			'userid' => null,
 			'userip' => CWebUser::getIp(),
-			'username' => $db_device['username'],
+			'username' => 'System',
 			'uuid' => $db_device['uuid'],
 			'kid' => $options['mobile_encryption_key']['kid'],
 			'key' => json_encode($options['mobile_encryption_key'])
