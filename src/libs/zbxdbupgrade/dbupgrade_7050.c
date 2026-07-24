@@ -1022,6 +1022,27 @@ static int	DBpatch_7050077(void)
 	return ret;
 }
 
+static int	DBpatch_7050078(void)
+{
+	const zbx_db_field_t	field = {"apm_status", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_7050079(void)
+{
+	const zbx_db_field_t	field = {"apm_quota", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_7050080(void)
+{
+	const zbx_db_field_t	field = {"apm_attributes", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1106,5 +1127,8 @@ DBPATCH_ADD(7050074, 0, 1)
 DBPATCH_ADD(7050075, 0, 1)
 DBPATCH_ADD(7050076, 0, 1)
 DBPATCH_ADD(7050077, 0, 1)
+DBPATCH_ADD(7050078, 0, 1)
+DBPATCH_ADD(7050079, 0, 1)
+DBPATCH_ADD(7050080, 0, 1)
 
 DBPATCH_END()
