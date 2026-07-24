@@ -619,6 +619,11 @@ class testHistoryPush extends CIntegrationTest {
 	}
 
 	public function testHistoryPush_noPermission() {
+		CDataHelper::call('role.update', [
+			'roleid' => 1, // User role.
+			'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
+		]);
+
 		$response = $this->call('user.create', [
 			'username' => 'John',
 			'passwd' => 'Doe123123',

@@ -42,6 +42,11 @@ class testServiceRoles extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		CDataHelper::call('role.update', [
+			'roleid' => 1, // User role.
+			'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
+		]);
+
 		// Create host "test_service_roles"
 		$response = $this->call('host.create', [
 			[
