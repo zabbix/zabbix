@@ -2984,6 +2984,11 @@ static void	process_event_updates(zbx_service_manager_t *service_manager, zbx_ce
 
 				break;
 			case CEP_EVENT_OPEN:
+				match_event_to_service_problem_tags(event,
+						&service_manager->service_problem_tags_index,
+						&service_manager->service_diffs,
+						ZBX_FLAG_SERVICE_UPDATE);
+				break;
 			case CEP_EVENT_ADD_TAG:
 				if (TRIGGER_VALUE_PROBLEM == event->value)
 				{
@@ -3502,7 +3507,7 @@ void	*zbx_service_manager_thread(void *args)
 				if (NULL == events[i])
 					continue;
 
-				if (NULL != zbx_hashset_search(&update_events, &events[i]->eventid))
+				if (NULL != zbx_hashset_search(&update_events, &events[i]->origin.objectid))
 				{
 					process_event_updates(&service_manager, updates + offset, i - offset,
 						events + offset, unit_args->shared->dbpool);
@@ -3511,7 +3516,7 @@ void	*zbx_service_manager_thread(void *args)
 					offset = i;
 				}
 
-				zbx_hashset_insert(&update_events, &events[i]->eventid, sizeof(zbx_uint64_t));
+				zbx_hashset_insert(&update_events, &events[i]->origin.objectid, sizeof(zbx_uint64_t));
 			}
 
 			process_event_updates(&service_manager, updates + offset, updates_num - offset, events + offset,
