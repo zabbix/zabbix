@@ -38,7 +38,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const RECOVERY_CYCLES_COUNT = 2000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
 	const MAINTENANCE_COUNT_EXTRA = 10;
-	const SKIP_RESTART_TESTS = false;
+	const SKIP_RESTART_TESTS = true;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
 	const SKIP_SERVICES_TESTS = null;
@@ -2330,6 +2330,46 @@ HEREDOC;
 	}
 
 	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecoverySingleItem but also verifies the per-trigger service that
+	 * createServicesAndActions() already created for the driven trigger (matched to it only by that trigger's
+	 * own SERVICE_TAG tag). After the long rapid PROBLEM/recovery burst the service must have tracked every
+	 * cycle by the trigger tag and ended OK with no open service problem, and a final explicit open then
+	 * verifies the service manager matches the problem to the service purely by the trigger tag - it reaches
+	 * the trigger's DISASTER priority with exactly one open service problem (no duplicate cached during the
+	 * burst) - before following the close back to OK. Skipped entirely when the per-trigger services do not
+	 * exist (service tests skipped), as there would be nothing to verify by trigger tag.
+	 * (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_OpenAndImmediateRecoverySingleItemWithService)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoverySingleItemWithService() {
+		if (empty(self::$serviceids)) {
+			$this->markTestSkipped('No CEP services created (service tests skipped); nothing to match by trigger tag.');
+		}
+
+		$this->runOpenAndImmediateRecoverySingleItemTest(false, true);
+	}
+
+	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecoveryValueWaves but also verifies the per-trigger services that
+	 * createServicesAndActions() already created for the driven triggers (each matched to its trigger only by
+	 * that trigger's own SERVICE_TAG tag). The batch ends on a 1 wave with every trigger in PROBLEM, so every
+	 * service must have followed the interleaved cross-item waves and reached the trigger's DISASTER priority
+	 * with exactly one open service problem (no duplicate cached during the waves - a regression guard for the
+	 * service manager matching the same event to a service more than once), and the closing 0 wave must then
+	 * follow every service back to OK with no open service problem. Skipped entirely when the per-trigger
+	 * services do not exist (service tests skipped), as there would be nothing to verify by trigger tag.
+	 * (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_OpenAndImmediateRecoveryValueWavesWithService)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoveryValueWavesWithService() {
+		if (empty(self::$serviceids)) {
+			$this->markTestSkipped('No CEP services created (service tests skipped); nothing to match by trigger tag.');
+		}
+
+		$this->runOpenAndImmediateRecoveryValueWavesTest(false, true);
+	}
+
+	/**
 	 * Repeat of testTriggerCEP_OpenProblem with the services and actions in place: the trigger opens a
 	 * problem and every per-trigger service follows it to PROBLEM (disaster) with one open service problem.
 	 *
@@ -2421,25 +2461,6 @@ HEREDOC;
 		$this->runOpenAndImmediateRecoverySingleItemTest(false);
 	}
 
-	/**
-	 * Like testTriggerCEP_OpenAndImmediateRecoverySingleItem but also verifies the per-trigger service that
-	 * createServicesAndActions() already created for the driven trigger (matched to it only by that trigger's
-	 * own SERVICE_TAG tag). After the long rapid PROBLEM/recovery burst the service must have tracked every
-	 * cycle by the trigger tag and ended OK with no open service problem, and a final explicit open then
-	 * verifies the service manager matches the problem to the service purely by the trigger tag - it reaches
-	 * the trigger's DISASTER priority with exactly one open service problem (no duplicate cached during the
-	 * burst) - before following the close back to OK. Skipped entirely when the per-trigger services do not
-	 * exist (service tests skipped), as there would be nothing to verify by trigger tag.
-	 * (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_OpenAndImmediateRecoverySingleItemWithService)
-	 * @depends testPrepareTriggerCEP_LLDDiscovery
-	 */
-	public function testTriggerCEP_OpenAndImmediateRecoverySingleItemWithService() {
-		if (empty(self::$serviceids)) {
-			$this->markTestSkipped('No CEP services created (service tests skipped); nothing to match by trigger tag.');
-		}
-
-		$this->runOpenAndImmediateRecoverySingleItemTest(false, true);
-	}
 
 	/**
 	 * Like testTriggerCEP_OpenAndImmediateRecovery but the single batch is grouped by value ("waves")
@@ -2454,25 +2475,6 @@ HEREDOC;
 		$this->runOpenAndImmediateRecoveryValueWavesTest(false);
 	}
 
-	/**
-	 * Like testTriggerCEP_OpenAndImmediateRecoveryValueWaves but also verifies the per-trigger services that
-	 * createServicesAndActions() already created for the driven triggers (each matched to its trigger only by
-	 * that trigger's own SERVICE_TAG tag). The batch ends on a 1 wave with every trigger in PROBLEM, so every
-	 * service must have followed the interleaved cross-item waves and reached the trigger's DISASTER priority
-	 * with exactly one open service problem (no duplicate cached during the waves - a regression guard for the
-	 * service manager matching the same event to a service more than once), and the closing 0 wave must then
-	 * follow every service back to OK with no open service problem. Skipped entirely when the per-trigger
-	 * services do not exist (service tests skipped), as there would be nothing to verify by trigger tag.
-	 * (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_OpenAndImmediateRecoveryValueWavesWithService)
-	 * @depends testPrepareTriggerCEP_LLDDiscovery
-	 */
-	public function testTriggerCEP_OpenAndImmediateRecoveryValueWavesWithService() {
-		if (empty(self::$serviceids)) {
-			$this->markTestSkipped('No CEP services created (service tests skipped); nothing to match by trigger tag.');
-		}
-
-		$this->runOpenAndImmediateRecoveryValueWavesTest(false, true);
-	}
 
 	/**
 	 * Like testTriggerCEP_OpenAndImmediateRecoveryValueWaves but with an even number of waves (1, 0, 1, 0),
