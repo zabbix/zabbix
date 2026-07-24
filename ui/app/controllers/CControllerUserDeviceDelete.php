@@ -74,6 +74,11 @@ class CControllerUserDeviceDelete extends CController {
 
 		if ($devices) {
 			$this->device = reset($devices);
+
+			if ($this->device['userid'] == CWebUser::$data['userid']
+					&& !$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+				return false;
+			}
 		}
 
 		return true;
@@ -91,7 +96,7 @@ class CControllerUserDeviceDelete extends CController {
 				]);
 			}
 			catch (Exception $e) {
-				error($e->getCode() .': '. $e->getMessage());
+				error($e->getMessage());
 
 				if ($e->getCode() == ZBX_API_ERROR_NO_EXTERNAL_ENTITY) {
 					$only_local_device = true;

@@ -1098,7 +1098,7 @@ static int	DBpatch_7050085(void)
 	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int",
 			(char *)NULL);
 
-	result = zbx_db_select("select roleid,type from role");
+	result = zbx_db_select("select roleid from role");
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1106,7 +1106,7 @@ static int	DBpatch_7050085(void)
 		int		access;
 
 		ZBX_STR2UINT64(roleid, row[0]);
-		access = (USER_TYPE_SUPER_ADMIN == atoi(row[1])) ? 1 : 0;
+		access = (3 == roleid) ? 1 : 0; /* roleid=3 -> default role with type=USER_TYPE_SUPER_ADMIN */
 
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "devices.access", access);
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "devices.actions.default_access",

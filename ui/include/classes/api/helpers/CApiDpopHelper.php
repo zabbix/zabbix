@@ -14,9 +14,6 @@
 **/
 
 
-use Firebase\JWT\JWT;
-use Firebase\JWT\JWK;
-
 /**
  * Helper class containing methods for DPoP signature and JWK integrity verifications.
  */
@@ -25,14 +22,10 @@ class CApiDpopHelper {
 	private const TIME_SKEW = 2;
 	private const MAX_ALLOWED_IAT_AGE = 60;
 
-	private const USED_FIREBASE = false;
-
-	private const SIGNATURE_ALGORITHM = 'ES256';
-
-	private const ASN1_INTEGER 			 = 0x02;
+	protected const ASN1_INTEGER 		 = 0x02;
 	private const ASN1_BIT_STRING        = 0x03;
 	private const ASN1_OBJECT_IDENTIFIER = 0x06;
-	private const ASN1_SEQUENCE          = 0x30;
+	protected const ASN1_SEQUENCE        = 0x30;
 
 	private const OID_EC_PUBLIC_KEY = '1.2.840.10045.2.1';
 	private const OID_PRIME256V1    = '1.2.840.10045.3.1.7';
@@ -50,7 +43,7 @@ class CApiDpopHelper {
 
 		[$encoded_header, $encoded_payload, $encoded_signature] = $segments;
 
-		$header = json_decode(JWT::urlsafeB64Decode($encoded_header), true);
+		$header = json_decode(self::base64UrlDecode($encoded_header), true);
 
 		if (!is_array($header) || !$header) {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Invalid header encoding.');
@@ -58,7 +51,7 @@ class CApiDpopHelper {
 
 		self::checkKid($header, $kid_keys);
 
-		$payload = json_decode(JWT::urlsafeB64Decode($encoded_payload), true);
+		$payload = json_decode(self::base64UrlDecode($encoded_payload), true);
 
 		if (!is_array($payload) || !$payload) {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Invalid payload encoding.');
@@ -74,34 +67,21 @@ class CApiDpopHelper {
 
 		$jwk = json_decode($kid_keys[$header['kid']], true);
 
-		try {
-			if (self::USED_FIREBASE) {
-				JWT::$timestamp = $check_time;
-				JWT::$leeway = self::TIME_SKEW;
+		$public_key_pem = self::createPemFromJwk($jwk);
 
-				$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
+		$der_signature = self::jwtSignatureToDerEncode(self::base64UrlDecode($encoded_signature));
 
-				JWT::decode($dpop_token, $key);
-			}
-			else {
-				$public_key_pem = self::createPemFromJwk($jwk);
+		$result = openssl_verify($encoded_header.'.'.$encoded_payload, $der_signature, $public_key_pem,
+			OPENSSL_ALGO_SHA256
+		);
 
-				$der_signature = self::jwtSignatureToDerEncode(self::base64UrlDecode($encoded_signature));
-
-				$result = openssl_verify($encoded_header.'.'.$encoded_payload, $der_signature, $public_key_pem,
-					OPENSSL_ALGO_SHA256
-				);
-
-				if ($result == 0) {
-					throw new Exception('Signature verification failed.');
-				}
-				elseif ($result == -1) {
-					throw new Exception('OpenSSL error: '.openssl_error_string());
-				}
-			}
+		if ($result == 0) {
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Signature verification failed.');
 		}
-		catch (Exception $e) {
-			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), rtrim($e->getMessage(), '.').'.');
+		elseif ($result == -1) {
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'),
+				'OpenSSL error: '.openssl_error_string()
+			);
 		}
 	}
 
@@ -207,21 +187,7 @@ class CApiDpopHelper {
 	}
 
 	public static function checkJwkIntegrity(array $jwk): bool {
-		try {
-			if (self::USED_FIREBASE) {
-				$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
-
-				$public_key_pem = $key->getKeyMaterial();
-			}
-			else {
-				$public_key_pem = self::createPemFromJwk($jwk);
-			}
-
-			if (openssl_pkey_get_public($public_key_pem) === false) {
-				return false;
-			}
-		}
-		catch (Exception $e) {
+		if (openssl_pkey_get_public(self::createPemFromJwk($jwk)) === false) {
 			return false;
 		}
 
@@ -273,18 +239,10 @@ class CApiDpopHelper {
 	}
 
 	public static function base64UrlEncode(string $data): string {
-		if (self::USED_FIREBASE) {
-			return JWT::urlsafeB64Encode($data);
-		}
-
 		return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 	}
 
 	public static function base64UrlDecode(string $data): string {
-		if (self::USED_FIREBASE) {
-			return JWT::urlsafeB64Decode($data);
-		}
-
 		$padding_length = 4 - strlen($data) % 4;
 
 		if ($padding_length < 4) {
@@ -408,113 +366,5 @@ class CApiDpopHelper {
 		}
 
 		return chr(0x80 | strlen($bytes)).$bytes;
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	public static function makeJwt(array $head, array $payload, string $private_key_pem): string {
-		if (self::USED_FIREBASE) {
-			return JWT::encode($payload, $private_key_pem, self::SIGNATURE_ALGORITHM, null, $head);
-		}
-
-		$private_key = openssl_pkey_get_private($private_key_pem);
-
-		if ($private_key === false) {
-			throw new Exception('Invalid private key.');
-		}
-
-		$encoded_head = self::base64UrlEncode(json_encode($head, JSON_UNESCAPED_SLASHES));
-		$encoded_payload = self::base64UrlEncode(json_encode($payload, JSON_UNESCAPED_SLASHES));
-
-		$signing_data = $encoded_head.'.'.$encoded_payload;
-		$der_signature = '';
-
-		if (!openssl_sign($signing_data, $der_signature, $private_key, OPENSSL_ALGO_SHA256)) {
-			throw new Exception('OpenSSL signing failed.');
-		}
-
-		$jwt_signature = self::derToJwtSignatureDecode($der_signature);
-
-		return $signing_data.'.'.self::base64UrlEncode($jwt_signature);
-	}
-
-	/**
-	 * Convert ASN.1 DER encoded ECDSA signature into JWT ES256 raw signature format.
-	 *
-	 * @param string $der_signature
-	 *
-	 * @throws Exception
-	 * @return string
-	 */
-	private static function derToJwtSignatureDecode(string $der_signature): string {
-		$offset = 0;
-
-		if (ord($der_signature[$offset]) != self::ASN1_SEQUENCE) {
-			throw new Exception('Invalid SEQUENCE type value.');
-		}
-
-		$offset++;
-
-		// Skip sequence length.
-		self::parseAsn1LengthFromContent($der_signature, $offset);
-
-		if (ord($der_signature[$offset]) != self::ASN1_INTEGER) {
-			throw new Exception('Invalid INTEGER type value for R.');
-		}
-
-		$offset++;
-
-		$r_length = self::parseAsn1LengthFromContent($der_signature, $offset);
-
-		$r = substr($der_signature, $offset, $r_length);
-
-		$offset += $r_length;
-
-		if (ord($der_signature[$offset]) != self::ASN1_INTEGER) {
-			throw new Exception('Invalid INTEGER type value for S.');
-		}
-
-		$offset++;
-
-		$s_length = self::parseAsn1LengthFromContent($der_signature, $offset);
-
-		$s = substr($der_signature, $offset, $s_length);
-
-		// Remove optional ASN.1 sign padding.
-		$r = ltrim($r, chr(0));
-		$s = ltrim($s, chr(0));
-
-		// JWT ES256 requires fixed 32-byte values.
-		$r = str_pad($r, 32, chr(0), STR_PAD_LEFT);
-		$s = str_pad($s, 32, chr(0), STR_PAD_LEFT);
-
-		return $r.$s;
-	}
-
-	private static function parseAsn1LengthFromContent(string $data, int &$offset): int {
-		$length = ord($data[$offset]);
-
-		$offset++;
-
-		// DER short form lengths.
-		if (($length & 0x80) == 0) {
-			return $length;
-		}
-
-		// DER long form length.
-		// Lower 7 bits specify how many bytes encode the actual length value.
-		$num_bytes = $length & 0x7f;
-
-		$length = 0;
-
-		// Build big-endian integer from length bytes.
-		for ($i = 0; $i < $num_bytes; $i++) {
-			$length = ($length << 8) | ord($data[$offset]);
-
-			$offset++;
-		}
-
-		return $length;
 	}
 }

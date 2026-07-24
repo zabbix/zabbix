@@ -639,6 +639,7 @@ class CZabbixServer {
 	 * @param string $error['message']  Error message prepared by Zabbix server.
 	 * @param string $error['domain]    Error domain code propagated from Bridge adapter.
 	 * @param string $error['reason']   Error reason code propagated from Bridge adapter.
+	 *
 	 * @return string
 	 */
 	private function getDeviceRequestError(string $request, array $error): string {

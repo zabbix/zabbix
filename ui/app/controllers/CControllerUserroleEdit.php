@@ -426,11 +426,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'api.mode' => 'api.mode',
 			'actions' => array_fill_keys(CRoleHelper::getActionsByUserType($user_type), true),
 			'actions.default_access' => true,
-			'devices.access' => $user_type == USER_TYPE_SUPER_ADMIN ? ZBX_ROLE_RULE_ENABLED : ZBX_ROLE_RULE_DISABLED,
+			'devices.access' => ZBX_ROLE_RULE_DISABLED,
 			'devices.actions' => array_fill_keys(CRoleHelper::getDeviceActionsByUserType($user_type), false),
-			'devices.actions.default_access' => $user_type == USER_TYPE_SUPER_ADMIN
-				? ZBX_ROLE_RULE_ENABLED
-				: ZBX_ROLE_RULE_DISABLED
+			'devices.actions.default_access' => ZBX_ROLE_RULE_DISABLED
 		];
 	}
 
