@@ -2430,7 +2430,7 @@ HEREDOC;
 	 * the trigger's DISASTER priority with exactly one open service problem (no duplicate cached during the
 	 * burst) - before following the close back to OK. Skipped entirely when the per-trigger services do not
 	 * exist (service tests skipped), as there would be nothing to verify by trigger tag.
-	 * (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_OpenAndImmediateRecoverySingleItemWithService)
+	 * (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_OpenAndImmediateRecoverySingleItemWithService)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_OpenAndImmediateRecoverySingleItemWithService() {
@@ -2452,6 +2452,26 @@ HEREDOC;
 	 */
 	public function testTriggerCEP_OpenAndImmediateRecoveryValueWaves() {
 		$this->runOpenAndImmediateRecoveryValueWavesTest(false);
+	}
+
+	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecoveryValueWaves but also verifies the per-trigger services that
+	 * createServicesAndActions() already created for the driven triggers (each matched to its trigger only by
+	 * that trigger's own SERVICE_TAG tag). The batch ends on a 1 wave with every trigger in PROBLEM, so every
+	 * service must have followed the interleaved cross-item waves and reached the trigger's DISASTER priority
+	 * with exactly one open service problem (no duplicate cached during the waves - a regression guard for the
+	 * service manager matching the same event to a service more than once), and the closing 0 wave must then
+	 * follow every service back to OK with no open service problem. Skipped entirely when the per-trigger
+	 * services do not exist (service tests skipped), as there would be nothing to verify by trigger tag.
+	 * (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_OpenAndImmediateRecoveryValueWavesWithService)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoveryValueWavesWithService() {
+		if (empty(self::$serviceids)) {
+			$this->markTestSkipped('No CEP services created (service tests skipped); nothing to match by trigger tag.');
+		}
+
+		$this->runOpenAndImmediateRecoveryValueWavesTest(false, true);
 	}
 
 	/**
@@ -2867,14 +2887,28 @@ HEREDOC;
 	 * each trigger's transitions are separated by values for every other item, and CEP must still emit
 	 * exactly one event per transition and leave no open problems. When $restart is true, the server
 	 * is restarted first.
+	 *
+	 * When $with_service is true the per-trigger services createServicesAndActions() already created (each
+	 * matched to its trigger only by the trigger's own SERVICE_TAG tag) are verified as well: the batch ends
+	 * on a 1 wave with every trigger in PROBLEM, so every service must have followed the interleaved waves and
+	 * reached the trigger's DISASTER priority with exactly one open service problem (no duplicate cached during
+	 * the waves), and after the closing 0 wave every service must be back to OK with no open service problem.
+	 * One representative service is additionally checked to have recorded exactly one service event per trigger
+	 * transition (no service event collapsed or duplicated during the interleaved waves).
 	 */
-	private function runOpenAndImmediateRecoveryValueWavesTest(bool $restart): void {
+	private function runOpenAndImmediateRecoveryValueWavesTest(bool $restart, bool $with_service = false): void {
 		$this->maybeRestartServer($restart);
 
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$triggerids = self::$discovered_triggerids;
 
 		$this->captureEventBaseline($triggerids);
+
+		// When verifying services, pick one representative discovered trigger and baseline its service's own
+		// events (source SERVICE) before the waves, so the post-wave count is a delta: the shared per-trigger
+		// services have accumulated events from earlier scenarios.
+		$serviceid = $with_service ? $this->getServiceidForTrigger($triggerids[0]) : null;
+		$service_event_baseline = ($serviceid !== null) ? $this->captureServiceEventBaseline($serviceid) : 0;
 
 		$data = [];
 		foreach (['1', '0', '1'] as $value) {
@@ -2897,6 +2931,15 @@ HEREDOC;
 
 		// The batch ends on a 1 wave, so every trigger must be left in PROBLEM.
 		$this->assertAllTriggerValues($triggerids, TRIGGER_VALUE_TRUE, 'must be PROBLEM after the batch');
+
+		if ($with_service) {
+			// Every trigger is in PROBLEM, so every per-trigger service - matched to its trigger only by the
+			// trigger tag - must have followed the interleaved cross-item waves and reached the trigger's
+			// DISASTER priority with exactly one open service problem. More means the service manager cached a
+			// duplicated service problem during the waves; fewer means one was dropped or collapsed.
+			$this->assertServicesStatus(TRIGGER_SEVERITY_DISASTER, count(self::$serviceids));
+			$this->assertOneServiceProblemPerService();
+		}
 
 		// Send the closing 0 wave separately, after the batch has been fully processed, to recover
 		// the problems left open by the batch's final 1 wave.
@@ -2930,6 +2973,19 @@ HEREDOC;
 		}
 
 		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery value waves');
+
+		if ($with_service) {
+			// The closing 0 wave recovered every trigger, so every per-trigger service must have followed the
+			// recovery back to OK with no open service problem left over from the waves.
+			$this->assertServicesStatus(ZBX_SEVERITY_OK, 0);
+
+			// The representative service is matched to its one trigger by the trigger tag, so the four trigger
+			// events (PROBLEM, RESOLVED, PROBLEM, RESOLVED) must have driven exactly four service events on it -
+			// one service PROBLEM per trigger PROBLEM and one service RESOLVED per trigger RESOLVED. More means
+			// the service manager cached a duplicated service problem during the interleaved cross-item waves;
+			// fewer means one was dropped or collapsed.
+			$this->waitForServiceEventCount($serviceid, $service_event_baseline, $expected_events);
+		}
 	}
 
 	/**
