@@ -18,50 +18,74 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 /**
  * Dedicated coverage for nodata() behaviour on items monitored through a proxy, following up on
  * ZBX-27736 ("nodata trigger flickering into unknown state for unsupported items", fixed by
- * zbx_hc_is_itemid_cached_and_normal() in cachehistory.c). One host, one impersonated proxy (no
- * real proxy process is started - proxy.create() + sendAgentDataValues(..., $proxy) is enough to
- * exercise item->proxyid != 0 and the proxy nodata-suppression window; see
- * testLLDHistorySyncAtScale.php for the same technique), one item+trigger pair per scenario. Each
- * test asserts the CORRECT/expected behaviour, not "whatever currently happens" - most of them are
- * expected to currently FAIL, since there is no fix yet for the gaps they cover:
+ * zbx_hc_is_itemid_cached_and_normal() in cachehistory.c).
+ *
+ * THE RULE nodata(item, period) IS SUPPOSED TO IMPLEMENT: has the item recorded an actual value,
+ * with a clock timestamp inside the last `period` seconds? If no value satisfies that - for ANY
+ * reason - it must return 1. The only legitimate exception is a genuine, temporary ambiguity: the
+ * server can't yet tell whether the proxy is sitting on a real value it hasn't relayed yet.
+ * Applied to each scenario below:
+ *
+ *   - metadata-only log updates (lastlogsize/mtime, no matching line): nodata() MUST fire. No
+ *     value was ever recorded - a log item polling its file and finding nothing isn't "producing
+ *     data", it's exactly what nodata() exists to detect.
+ *   - history discarded by preprocessing (e.g. "Discard unchanged"): nodata() MUST fire, same
+ *     reasoning - preprocessing decided not to store a value, so there is no data regardless of
+ *     whether the agent/proxy is alive and polling.
+ *   - values with a past clock only: nodata() MUST fire. It is defined against the value's own
+ *     clock, not receipt time - a value clocked outside the window was never "recent", no matter
+ *     when it physically arrived at the server.
+ *   - item flapping supported <-> unsupported: nodata() must NOT fire while a valid value sits
+ *     inside the window, and MUST fire once nothing valid has landed for the full window - and
+ *     critically, the trigger must never bounce to UNKNOWN over this transition. There is no real
+ *     ambiguity here: the server knows with certainty whether a valid value landed in the window.
+ *   - genuine proxy connection loss: nodata() must be suppressed (neither firing 0 nor a spurious
+ *     close/open) until the gap resolves - this is the one case where the ambiguity is real, since
+ *     the proxy might be holding a real backlog the server hasn't seen yet. Once it reconnects and
+ *     either delivers the backlog or confirms there is nothing, nodata() must resolve promptly.
+ *
+ * The current bug is that zbx_hc_is_itemid_cached_and_normal() (cachehistory.c) conflates the
+ * first four "no real ambiguity, nodata() must fire" cases with the fifth "genuine ambiguity, hold
+ * off" case: it only excludes ITEM_STATE_NOTSUPPORTED tail records from the "proxy transfer in
+ * progress" check, and treats every other kind of tail record - a ZBX_DC_FLAG_NOVALUE
+ * metadata-only/discard record, or even a perfectly ordinary real value that just happens to be
+ * backdated or momentarily valid during flapping - as indistinguishable from a real value
+ * genuinely still being transferred from the proxy. So nodata() keeps returning an evaluation
+ * error instead of ever resolving to 1 for those first four cases. There is no fix for this yet.
+ *
+ * One host, one impersonated proxy (no real proxy process is started - proxy.create() +
+ * sendAgentDataValues(..., $proxy) is enough to exercise item->proxyid != 0 and the proxy
+ * nodata-suppression window; see testLLDHistorySyncAtScale.php for the same technique), one
+ * item+trigger pair per scenario. Each test asserts the CORRECT/expected behaviour from the table
+ * above, not "whatever currently happens":
  *
  *  - testNoData_UnsupportedFires:            PASSES - unsupported item is treated as nodata,
- *                                             trigger fires. This is the one gap ZBX-27736 already
- *                                             fixed (zbx_hc_is_itemid_cached_and_normal() excludes
- *                                             ITEM_STATE_NOTSUPPORTED tail records).
+ *                                             trigger fires. This is the one case ZBX-27736
+ *                                             already fixed (the ITEM_STATE_NOTSUPPORTED
+ *                                             exclusion above).
  *  - testNoData_NoUnknownWithAndAfterConnectionLoss: EXPECTED TO FAIL - trigger must never show
  *                                             UNKNOWN, neither while the proxy keeps talking
  *                                             normally nor after a real gap + resume.
- *  - testNoData_Discard:                     EXPECTED TO FAIL - nodata() must fire after only
- *                                             discarded (no-value) updates, same as with no
- *                                             updates at all.
- *  - testNoData_LogMetadataOnly:              EXPECTED TO FAIL - same, for log metadata-only
- *                                             (lastlogsize/mtime, no value) updates.
- *  - testNoData_ValuesFromPast:               EXPECTED TO FAIL - nodata() must fire when only
- *                                             past-clock values were received (a real value, even
- *                                             backdated, still leaves the history cache tail in
- *                                             ITEM_STATE_NORMAL - same underlying check as above).
- *  - testNoData_UnsupportedFlapping:          EXPECTED TO FAIL - literal reported case:
- *                                             nodata(...,30s) with an item genuinely flapping
- *                                             between a valid value and ITEM_STATE_NOTSUPPORTED
- *                                             (not just staying unsupported) must fire and stay at
- *                                             state NORMAL, never UNKNOWN.
- *  - testNoData_ConnectionLossSuppression:    no premature PROBLEM/UNKNOWN across a connection
- *                                             loss and restore, including right at resume.
+ *  - testNoData_Discard:                     EXPECTED TO FAIL - discard case from the table above.
+ *  - testNoData_LogMetadataOnly:              EXPECTED TO FAIL - metadata-only case from the table.
+ *  - testNoData_ValuesFromPast:               EXPECTED TO FAIL - past-clock-only case from the
+ *                                             table (a real value, even backdated, still leaves
+ *                                             the history cache tail in ITEM_STATE_NORMAL - same
+ *                                             underlying check as the other cases).
+ *  - testNoData_UnsupportedFlapping:          EXPECTED TO FAIL - literal reported case: flapping
+ *                                             case from the table, with nodata(...,30s) and an
+ *                                             item genuinely alternating between a valid value and
+ *                                             ITEM_STATE_NOTSUPPORTED (not just staying
+ *                                             unsupported, which is the already-fixed case above).
+ *  - testNoData_ConnectionLossSuppression:    connection-loss case from the table - no premature
+ *                                             PROBLEM/UNKNOWN across a connection loss and
+ *                                             restore, including right at resume.
  *  - testNoData_ProxyGroupLogSkip_LazyStaysOpen: EXPECTED TO FAIL - see below.
  *  - testNoData_ProxyGroupLogSkip_StrictCloses: PASSES - see below.
  *
- * All of the EXPECTED TO FAIL cases above trace back to the same root cause:
- * zbx_hc_is_itemid_cached_and_normal() (cachehistory.c) only excludes ITEM_STATE_NOTSUPPORTED tail
- * records from the "proxy transfer in progress" check - it treats every other kind of tail record
- * (ZBX_DC_FLAG_NOVALUE metadata-only/discard records, or even a perfectly ordinary real value that
- * just happens to be backdated) as indistinguishable from a real value still being transferred
- * from the proxy, so nodata() keeps returning an evaluation error instead of ever resolving to 1.
- * There is no fix for this yet.
- *
  * The two testNoData_ProxyGroupLogSkip_* methods reproduce a specific reported case on top of the
- * same gap: Zabbix server 7.0.28 with two or more active proxies in a proxy group, a host
- * monitored by that group with an active-agent log item using "skip" mode, and a trigger
+ * metadata-only gap above: Zabbix server 7.0.28 with two or more active proxies in a proxy group,
+ * a host monitored by that group with an active-agent log item using "skip" mode, and a trigger
  * combining last()/length() with nodata() in an "and" expression. One matching log line opens the
  * problem; the log then stops producing matches, but the item keeps sending metadata-only updates
  * (lastlogsize/mtime, no value) as the agent keeps polling the file position - matching the
