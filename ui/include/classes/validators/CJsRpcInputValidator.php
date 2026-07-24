@@ -413,7 +413,7 @@ class CJsRpcInputValidator {
 
 			case 'devices':
 				$rules = ['type' => API_OBJECT, 'fields' => $head_rules['fields'] + [
-						'userid' => ['type' => API_ID],
+						'userid' => ['type' => API_ID]
 					]];
 				break;
 
