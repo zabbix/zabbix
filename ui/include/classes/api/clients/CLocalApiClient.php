@@ -200,7 +200,8 @@ class CLocalApiClient extends CApiClient {
 		$user_data = $api_service::$userData;
 		$method_rules = $api_service::ACCESS_RULES[$method];
 
-		if (!in_array($user_data['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+		if (!array_key_exists('min_user_type', $method_rules)
+				|| !in_array($user_data['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 				|| $user_data['type'] < $method_rules['min_user_type']) {
 			return false;
 		}
