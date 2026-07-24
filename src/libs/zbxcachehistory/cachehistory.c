@@ -3601,7 +3601,7 @@ int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid)
 	return ret;
 }
 
-int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid)
+int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid, int period_start)
 {
 	int		ret = FAIL;
 	zbx_hc_item_t	*item;
@@ -3609,7 +3609,8 @@ int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid)
 	LOCK_CACHE;
 
 	if (NULL != (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid)) &&
-			NULL != item->tail && ITEM_STATE_NORMAL == item->tail->state)
+			NULL != item->tail && ITEM_STATE_NORMAL == item->tail->state &&
+			0 == (item->tail->flags & ZBX_DC_FLAG_NOVALUE) && item->tail->ts.sec >= period_start)
 	{
 			ret = SUCCEED;
 	}
