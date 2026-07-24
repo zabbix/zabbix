@@ -127,7 +127,14 @@ class testNoData extends CIntegrationTest {
 				'Hostname' => self::PG_PROXY_NAME,
 				'DebugLevel' => 4,
 				'LogFileSize' => 0,
-				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
+				// Not self::getConfigurationValue(COMPONENT_SERVER, 'ListenPort') here: this
+				// configurationProvider() is resolved via a class-level @configurationDataProvider,
+				// which processAnnotations('class') calls from onBeforeTestSuite() BEFORE
+				// self::$suite_configuration is populated with defaults (see
+				// getDefaultComponentConfiguration() a few lines later in that same method) - so
+				// that lookup would return null here. Reference the same expression the framework's
+				// own defaults use instead.
+				'Server' => '127.0.0.1:'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX
 			]
 		];
 	}
