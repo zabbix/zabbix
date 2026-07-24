@@ -1669,19 +1669,15 @@ class CRole extends CApiService {
 	private function getRelatedDeviceActionsRules(array $rules, array $output, int $type): array {
 		$result = [];
 
-		$default_access = $type == USER_TYPE_SUPER_ADMIN
-			? (string) ZBX_ROLE_RULE_ENABLED
-			: (string) ZBX_ROLE_RULE_DISABLED;
-
 		if (in_array('devices.access', $output, true)) {
 			$result['devices.access'] = array_key_exists('devices.access', $rules)
 				? $rules['devices.access']
-				: $default_access;
+				: (string) ZBX_ROLE_RULE_DISABLED;
 		}
 
 		$actions_default_access = array_key_exists('devices.actions.default_access', $rules)
 			? $rules['devices.actions.default_access']
-			: $default_access;
+			: (string) ZBX_ROLE_RULE_DISABLED;
 
 		if (in_array('devices.actions', $output, true)) {
 			$actions = array_fill_keys(CRoleHelper::getDeviceActionsByUserType($type), $actions_default_access);
