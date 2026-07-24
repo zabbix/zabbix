@@ -477,6 +477,87 @@ class CMacroFunction {
 	}
 
 	/**
+	 * Extracts a value from a JSON string using a JSONPath pattern.
+	 *
+	 * @param string $value       [IN] The input value, expected to be a JSON document.
+	 * @param array  $parameters  [IN] [0] JSONPath pattern, [1] optional default value.
+	 *
+	 * @return string
+	 */
+	private static function macrofuncJsonpath(string $value, array $parameters): string {
+		if (count($parameters) < 1 || count($parameters) > 2) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		try {
+			$matches = (new \Symfony\Component\JsonPath\JsonCrawler($value))->find($parameters[0]);
+		}
+		catch (\Symfony\Component\JsonPath\Exception\ExceptionInterface) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		return self::macrofuncPathResult($matches, $parameters);
+	}
+
+	/**
+	 * Extracts a value from an XML string using an XPath pattern.
+	 *
+	 * @param string $value       [IN] The input value, expected to be an XML document.
+	 * @param array  $parameters  [IN] [0] XPath pattern, [1] optional default value.
+	 *
+	 * @return string
+	 */
+	private static function macrofuncXmlxpath(string $value, array $parameters): string {
+		if (count($parameters) < 1 || count($parameters) > 2) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		$dom = new DOMDocument();
+		$use_internal_errors = libxml_use_internal_errors(true);
+
+		$nodes = $dom->loadXML($value) ? @(new DOMXPath($dom))->query($parameters[0]) : false;
+
+		libxml_clear_errors();
+		libxml_use_internal_errors($use_internal_errors);
+
+		if ($nodes === false) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		$matches = [];
+
+		foreach ($nodes as $node) {
+			$matches[] = (string) $node->nodeValue;
+		}
+
+		return self::macrofuncPathResult($matches, $parameters);
+	}
+
+	/**
+	 * Formats JSONPath/XPath query results for macro output.
+	 *
+	 * @param array $matches     [IN] Query result values.
+	 * @param array $parameters  [IN] Function parameters, [1] is the optional default value.
+	 *
+	 * @return string
+	 */
+	private static function macrofuncPathResult(array $matches, array $parameters): string {
+		if ($matches === []) {
+			return count($parameters) == 2 ? $parameters[1] : UNRESOLVED_MACRO_STRING;
+		}
+
+		if (count($matches) == 1) {
+			$match = reset($matches);
+
+			return is_string($match)
+				? $match
+				: json_encode($match, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		}
+
+		return json_encode(array_values($matches), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+	}
+
+	/**
 	 * Removes default empty parameter.
 	 *
 	 * @param array $parameters  [IN] The input value.
@@ -535,6 +616,12 @@ class CMacroFunction {
 
 			case 'uppercase':
 				return self::macrofuncUppercase($value, $macrofunc['parameters']);
+
+			case 'jsonpath':
+				return self::macrofuncJsonpath($value, $macrofunc['parameters']);
+
+			case 'xmlxpath':
+				return self::macrofuncXmlxpath($value, $macrofunc['parameters']);
 		}
 
 		return UNRESOLVED_MACRO_STRING;
