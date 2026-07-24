@@ -26,6 +26,11 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 	 */
 	private const MAINTENANCEID = 60002;
 
+	/**
+	 * Resource type Maintenance
+	 */
+	const RESOURCE_TYPE = 27;
+
 	public function testAuditlogMaintenance_Create() {
 		$create = $this->call('maintenance.create', [
 			[
@@ -105,7 +110,7 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			'maintenance.maintenanceid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogMaintenance_Update() {
@@ -194,11 +199,11 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 				=> ['add', $event_name['maintenance_eventnameid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::MAINTENANCEID);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::MAINTENANCEID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogMaintenance_Delete() {
 		$this->call('maintenance.delete', [self::MAINTENANCEID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'updated_maintenance', self::MAINTENANCEID);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'updated_maintenance', self::MAINTENANCEID, self::RESOURCE_TYPE);
 	}
 }

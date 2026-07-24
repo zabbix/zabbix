@@ -31,7 +31,7 @@ zabbix_export:
         2. Enter the admin token into the `API token` field.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -1158,7 +1158,6 @@ zabbix_export:
       dashboards:
         - uuid: ca4bba8a3a8f4ec1b9c5b50d6608eb69
           name: 'OpenAI Platform: General'
-          auto_start: 'NO'
           pages:
             - name: General
               widgets:

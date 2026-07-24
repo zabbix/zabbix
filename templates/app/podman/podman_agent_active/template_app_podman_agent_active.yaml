@@ -38,7 +38,7 @@ zabbix_export:
         This can pose a security risk if not properly configured.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -2336,7 +2336,6 @@ zabbix_export:
       dashboards:
         - uuid: 16f32dde50b74e04a5a184fdd724b056
           name: Podman
-          auto_start: 'NO'
           pages:
             - name: Overview
               widgets:

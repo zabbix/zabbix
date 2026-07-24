@@ -26,6 +26,11 @@ class testAuditlogToken extends testAuditlogCommon {
 	 */
 	private const TOKENID = 11;
 
+	/**
+	 * Resource type Token
+	 */
+	const RESOURCE_TYPE = 45;
+
 	public function testAuditlogToken_Create() {
 		$create = $this->call('token.create', [
 			[
@@ -48,7 +53,7 @@ class testAuditlogToken extends testAuditlogCommon {
 			'token.tokenid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogToken_Update() {
@@ -69,11 +74,11 @@ class testAuditlogToken extends testAuditlogCommon {
 			'token.status' => ['update', '1', '0']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::TOKENID);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::TOKENID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogToken_Delete() {
 		$this->call('token.delete', [self::TOKENID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated audit token', self::TOKENID);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Updated audit token', self::TOKENID, self::RESOURCE_TYPE);
 	}
 }

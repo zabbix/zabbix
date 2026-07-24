@@ -749,7 +749,7 @@ function stepAddHostInterface(): array {
 							(new CFormField([
 								(new CLabel([
 									_('Max repetition count'),
-									makeHelpIcon(_('Max repetition count is applicable to discovery and walk only.'))
+									makeHelpIcon(_('Max repetition count is applicable to walk only.'))
 								], 'interfaces[#{row_index}][details][max_repetitions]')),
 								new CNumericBox('interfaces[#{row_index}][details][max_repetitions]', 0, 10,
 									false, false, false
