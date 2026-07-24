@@ -24,8 +24,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * testLLDHistorySyncAtScale.php for the same technique), one item+trigger pair per scenario:
  *
  *  - testNoData_UnsupportedFires:            unsupported item is treated as nodata, trigger fires.
- *  - testNoData_NoUnknownWithoutConnectionLoss:  no UNKNOWN while the proxy keeps talking normally.
- *  - testNoData_NoUnknownAfterConnectionLossRestored: no UNKNOWN after a real gap + resume.
+ *  - testNoData_NoUnknownWithAndAfterConnectionLoss: no UNKNOWN while the proxy keeps talking
+ *                                             normally, and none after a real gap + resume either.
  *  - testNoData_Discard:                     nodata() after only discarded (no-value) updates.
  *  - testNoData_LogMetadataOnly:              nodata() after only log metadata (no value) updates.
  *  - testNoData_ValuesFromPast:               nodata() when only past-clock values were received.
@@ -41,8 +41,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * 1. Both markTestSkipped() rather than fail when that happens, matching the existing convention
  * in testLLDHistorySyncAtScale.php for the same known gap.
  *
- * The testNoData_ProxyGroupLogSkip_* methods at the end reproduce a specific reported case on top
- * of the same known gap: a host monitored by a proxy group, with an active-agent log item using
+ * testNoData_ProxyGroupLogSkip at the end reproduces a specific reported case on top of the same
+ * known gap: a host monitored by a proxy group, with an active-agent log item using
  * "skip" mode, and a trigger combining last()/length() with a lazy nodata() in an "and" expression.
  * Once a matching line has opened the problem and the log stops producing matches, the item keeps
  * sending metadata-only updates (lastlogsize/mtime, no value) as the agent keeps polling the file
@@ -56,14 +56,21 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * on the real member alone; the underlying bug does not depend on multi-proxy failover, only on
  * the item having a non-zero proxyid). The reported trigger uses nodata(item,20m); these tests use
  * a much shorter window (see PG_NODATA_WINDOW_SEC) - the window value does not affect the code
- * path under test, only how long the test has to wait. testNoData_ProxyGroupLogSkip_StaysOpen
- * currently asserts the BUGGY behaviour (problem stays open forever); once
- * zbx_hc_is_itemid_cached_and_normal() is fixed to also exclude ZBX_DC_FLAG_NOVALUE tail records,
- * that assertion will start failing and needs to be flipped to expect recovery (like
- * testNoData_ProxyGroupLogSkip_StrictCloses already does for the "strict" case).
+ * path under test, only how long the test has to wait. Step (3) in that test currently asserts
+ * the BUGGY behaviour (problem stays open forever); once zbx_hc_is_itemid_cached_and_normal() is
+ * fixed to also exclude ZBX_DC_FLAG_NOVALUE tail records, that assertion will start failing and
+ * needs to be flipped to expect recovery (like step (4) already does for the "strict" case).
+ *
+ * Deliberately does NOT use @suite-components-reuse: onAfterTestCase() only calls
+ * stopComponent() when reuse is off (CIntegrationTest.php), and onBeforeTestCase() only flips
+ * suite_components_running to true after startComponent() succeeds. With reuse on, a single
+ * failed/slow startup on any one test leaves components stopped-but-marked-not-running for the
+ * rest of the class, and every subsequent test retries a fresh start against the same
+ * still-occupied PID file/ports - cascading into "Is this process already running?" failures
+ * across the whole suite. Paying the per-test restart cost keeps a bad start from poisoning
+ * every other test in the class.
  *
  * @required-components server, proxy
- * @suite-components-reuse true
  * @configurationDataProvider configurationProvider
  * @onAfter clearData
  */
@@ -372,14 +379,19 @@ class testNoData extends CIntegrationTest {
 
 	/**
 	 * "not becoming unknown when there is no connection loss between Zabbix server and Zabbix
-	 * proxy". Keep sending values continuously (gaps well under NET_DELAY_MAX) and verify the
-	 * trigger never flips to UNKNOWN.
+	 * proxy and after there was connection loss and restored afterwards." Phase 1 sends values
+	 * continuously (gaps well under NET_DELAY_MAX) and verifies the trigger never flips to
+	 * UNKNOWN; phase 2, in the same test (no component restart in between - see class docblock
+	 * on why @depends across separate tests isn't used here), goes quiet past NET_DELAY_MAX to
+	 * trigger the proxy's lost-connection detection, then resumes normal traffic and verifies the
+	 * trigger never showed UNKNOWN across the whole sequence either.
 	 */
-	public function testNoData_NoUnknownWithoutConnectionLoss() {
+	public function testNoData_NoUnknownWithAndAfterConnectionLoss() {
 		$key = 'nodata.no.unknown';
 
 		$before = $this->unknownEventCount();
 
+		// Phase 1: steady traffic, no connection loss.
 		$deadline = microtime(true) + 20;
 		$i = 0;
 		while (microtime(true) < $deadline) {
@@ -391,22 +403,7 @@ class testNoData extends CIntegrationTest {
 				'Trigger went UNKNOWN with no connection loss. Error: '.$trigger['error']);
 		}
 
-		$after = $this->unknownEventCount();
-		$this->assertEquals($before, $after, 'Unknown trigger event count changed: '.$before.' -> '.$after);
-	}
-
-	/**
-	 * "...and after there was connection loss and restored afterwards." Same item, now go quiet
-	 * for longer than NET_DELAY_MAX to trigger the proxy's lost-connection detection, then resume
-	 * normal traffic and verify the trigger never showed UNKNOWN across the whole sequence.
-	 *
-	 * @depends testNoData_NoUnknownWithoutConnectionLoss
-	 */
-	public function testNoData_NoUnknownAfterConnectionLossRestored() {
-		$key = 'nodata.no.unknown';
-
-		$before = $this->unknownEventCount();
-
+		// Phase 2: simulated connection loss (gap > NET_DELAY_MAX) then resume.
 		sleep(self::CONNECTION_LOSS_GAP_SEC);
 
 		for ($i = 0; $i < 5; $i++) {
@@ -590,9 +587,15 @@ class testNoData extends CIntegrationTest {
 	}
 
 	/**
-	 * Verify the proxy group comes online and the host is assigned to the real proxy.
+	 * Proxy-group log-skip repro, as one test (no @depends / no component restart in between -
+	 * see class docblock): (1) proxy group comes online and the host is assigned to the real
+	 * proxy, (2) one matching log line opens the problem, (3) metadata-only heartbeats afterwards
+	 * do NOT close it even well past the nodata() window - documents the reported bug, (4)
+	 * switching to nodata(...,"strict") closes it once the window elapses - the reported
+	 * workaround.
 	 */
-	public function testNoData_ProxyGroupLogSkip_ProxyGroupOnline() {
+	public function testNoData_ProxyGroupLogSkip() {
+		// (1) proxy group online, host assigned to the real proxy.
 		$pg_logline = 'Proxy group "'.self::PG_NAME.'" changed state from \b[a-z]+\b to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1, true);
 
@@ -610,14 +613,8 @@ class testNoData extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, 'End of zbx_dc_sync_configuration()', true, 90, 1,
 				true);
-	}
 
-	/**
-	 * Send one matching log line and verify the problem opens.
-	 *
-	 * @depends testNoData_ProxyGroupLogSkip_ProxyGroupOnline
-	 */
-	public function testNoData_ProxyGroupLogSkip_ProblemOpens() {
+		// (2) one matching log line opens the problem.
 		$this->pushLogSkip('MATCH: something went wrong');
 
 		$this->callUntilDataIsPresent('trigger.get', [
@@ -629,17 +626,11 @@ class testNoData extends CIntegrationTest {
 
 		$trigger = $this->getPgTrigger();
 		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value']);
-	}
 
-	/**
-	 * Stop producing matching lines, but keep sending the metadata-only (lastlogsize/mtime, no
-	 * value) heartbeats a real "skip" mode active check keeps sending while polling the file for
-	 * new lines. Verify the problem does NOT close even once well past the nodata() window - this
-	 * documents the reported bug (see class docblock).
-	 *
-	 * @depends testNoData_ProxyGroupLogSkip_ProblemOpens
-	 */
-	public function testNoData_ProxyGroupLogSkip_StaysOpen() {
+		// (3) metadata-only heartbeats afterwards must NOT close the problem - known bug (see
+		// class docblock): this assertion documents the BUGGY behaviour and will need to be
+		// flipped to expect recovery once zbx_hc_is_itemid_cached_and_normal() is fixed to also
+		// exclude ZBX_DC_FLAG_NOVALUE tail records.
 		$deadline = microtime(true) + (2 * self::PG_NODATA_WINDOW_SEC);
 
 		while (microtime(true) < $deadline) {
@@ -656,15 +647,8 @@ class testNoData extends CIntegrationTest {
 		// kept flowing and the proxy stayed online throughout.
 		$trigger = $this->getPgTrigger();
 		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value']);
-	}
 
-	/**
-	 * Switch nodata() to "strict" and verify the problem now closes once the window has elapsed
-	 * since the last real value - matching the reported workaround.
-	 *
-	 * @depends testNoData_ProxyGroupLogSkip_StaysOpen
-	 */
-	public function testNoData_ProxyGroupLogSkip_StrictCloses() {
+		// (4) switch to "strict" - the problem must now close once the window elapses.
 		$response = $this->call('trigger.update', [
 			'triggerid' => self::$pg_triggerid,
 			'expression' => 'length(last(/'.self::PG_HOSTNAME.'/'.self::PG_ITEM_KEY.'))>0 and '.
