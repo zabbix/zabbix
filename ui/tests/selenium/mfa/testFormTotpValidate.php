@@ -117,7 +117,8 @@ class testFormTotpValidate extends testFormTotp {
 		$totp = CMfaTotpHelper::generateTotp(self::TOTP_SECRET_32);
 		$form = $this->query('class:signin-container')->waitUntilVisible()->asForm()->one();
 		$form->getField('id:verification_code')->fill($totp);
-		$form->query('button:Sign in')->one()->click();
+		// Wait for the sign-in form to close so the login redirect finishes before asserting the logged-in state.
+		$form->query('button:Sign in')->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$this->page->assertUserIsLoggedIn();
 
