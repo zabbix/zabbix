@@ -232,22 +232,27 @@ static void	match_event_to_service_problem_tags(const zbx_cep_event_t *event,
 
 		if (j == service->service_problem_tags.values_num)
 		{
-			zbx_service_problem_t	*service_problem;
+			zbx_service_problem_t	*service_problem, service_problem_cmp = {.eventid = event->eventid};
 			zbx_services_diff_t	*services_diff;
 
 			services_diff = get_or_create_services_diff(service, services_diffs, flags);
 
-			service_problem = zbx_malloc(NULL, sizeof(zbx_service_problem_t));
-			service_problem->eventid = event->eventid;
-			service_problem->service_problemid = 0;
-			service_problem->serviceid = services_diff->serviceid;
-			service_problem->severity = event->severity;
-			service_problem->ts.sec = event->clock;
-			service_problem->ts.ns = event->ns;
-			service_problem->suppress = (0 == event->suppress.values_num ? 0 : 1);
-			service_problem->suppress_mtime = 0;
+			if (FAIL == zbx_vector_service_problem_ptr_search(&services_diff->service_problems,
+					&service_problem_cmp, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+			{
+				service_problem = zbx_malloc(NULL, sizeof(zbx_service_problem_t));
+				service_problem->eventid = event->eventid;
+				service_problem->service_problemid = 0;
+				service_problem->serviceid = services_diff->serviceid;
+				service_problem->severity = event->severity;
+				service_problem->ts.sec = event->clock;
+				service_problem->ts.ns = event->ns;
+				service_problem->suppress = (0 == event->suppress.values_num ? 0 : 1);
+				service_problem->suppress_mtime = 0;
 
-			zbx_vector_service_problem_ptr_append(&services_diff->service_problems, service_problem);
+				zbx_vector_service_problem_ptr_append(&services_diff->service_problems,
+						service_problem);
+			}
 		}
 	}
 
