@@ -2498,6 +2498,9 @@ define('ZBX_NODE_STATUS_ACTIVE',		3);
 // Datatable.
 define('ZBX_STYLE_DATATABLE', 'datatable');
 
+// Limit amount of validations per request in CControllerValidateUse
+define('VALIDATE_USE_CHUNK_SIZE', 500);
+
 define('ZABBIX_MOBILE_VERSION',			1);
 
 define('ZBX_DEVICE_STATUS_NEW',			0);
