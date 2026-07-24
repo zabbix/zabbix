@@ -318,20 +318,26 @@ class CDevice extends CApiService {
 			));
 		}
 
-		$db_device = DBfetch(DBselect(
-			'SELECT d.deviceid,d.userid,d.uuid,d.name,d.status,u.name AS username'.
+		$db_enrollment_token = DBfetch(DBselect(
+			'SELECT det.deviceid'.
 			' FROM device_enrollment_token det'.
-			' JOIN device d ON det.deviceid=d.deviceid'.
-			' JOIN users u ON d.userid=u.userid'.
 			' WHERE '.dbConditionString('det.token', [CApiTokenHelper::hashToken($data['enrollment_token'])]).
-				' AND det.expires_at>'.time()
+				' AND det.expires_at>'.time().
+			' FOR UPDATE'
 		));
 
-		if (!$db_device) {
+		if (!$db_enrollment_token) {
 			self::exception(ZBX_API_ERROR_NO_ENTITY, _s('Invalid parameter "%1$s": %2$s.', '/enrollment_token',
-				_('referred object does not exist')
+				_('object does not exist')
 			));
 		}
+
+		$db_device = DBfetch(DBselect(
+			'SELECT d.deviceid,d.userid,d.uuid,d.name,d.status,u.name AS username'.
+			' FROM device d'.
+			' JOIN users u ON d.userid=u.userid'.
+			' WHERE '.dbConditionId('d.deviceid', [$db_enrollment_token['deviceid']])
+		));
 	}
 
 	private static function getJwkValidationRules(): array {
