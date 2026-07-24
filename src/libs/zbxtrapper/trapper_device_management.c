@@ -165,7 +165,7 @@ static int	device_get_userid_by_uuid(const char *uuid, zbx_uint64_t *target_user
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		ZBX_STR2UINT64(*target_userid, row[0]);
+		ZBX_DBROW2UINT64(*target_userid, row[0]);
 		ret = SUCCEED;
 	}
 
