@@ -233,10 +233,11 @@ class CControllerPopupTriggerExprCheck extends CController {
 				// Functions where item is wrapped in last() like func(last(/host/item)).
 				$last_functions = [
 					'abs', 'acos', 'ascii', 'asin', 'atan', 'atan2', 'between', 'bitand', 'bitlength', 'bitlshift',
-					'bitnot', 'bitor', 'bitrshift', 'bitxor', 'bytelength', 'cbrt', 'ceil', 'char', 'concat', 'cos',
+					'bitnot', 'bitor', 'bitrshift', 'bitxor', 'bytelength', 'cbrt', 'ceil', 'char', 'concat', 'contains',
+					'cos',
 					'cosh', 'cot', 'degrees', 'exp', 'expm1', 'floor', 'in', 'insert', 'jsonpath', 'left', 'length',
 					'log', 'log10', 'ltrim', 'mid', 'mod', 'power', 'radians', 'repeat', 'replace', 'right', 'round',
-					'rtrim', 'signum', 'sin', 'sinh', 'sqrt', 'tan', 'trim', 'truncate', 'xmlxpath'
+					'rtrim', 'signum', 'sin', 'sinh', 'sqrt', 'substring', 'tan', 'trim', 'truncate', 'xmlxpath'
 				];
 
 				if (in_array($function, $last_functions)) {
