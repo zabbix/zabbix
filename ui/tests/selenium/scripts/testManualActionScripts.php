@@ -2232,7 +2232,7 @@ class testManualActionScripts extends CWebTest {
 			$scope = (array_key_exists('host', $data)) ? 'host' : 'event';
 
 			if ($content === 'Latest data') {
-				$table = $this->query('id:latest')->asDatatable()->one()->waitUntilReady();
+				$table = $this->query('id:datatable-latest')->asDatatable()->one()->waitUntilReady();
 				$headers = $table->getHeaders();
 				CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['Hosts' => $data[$scope]]);
 				$this->query('button:Apply')->one()->waitUntilClickable()->click();

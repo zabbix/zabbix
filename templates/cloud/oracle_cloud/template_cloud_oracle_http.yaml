@@ -11658,7 +11658,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -14362,7 +14362,6 @@ zabbix_export:
       dashboards:
         - uuid: 2790eee2393c4912b9dcacc835b122e1
           name: 'OCI Load Balancer: Overview'
-          auto_start: 'NO'
           pages:
             - name: Main
               widgets:
