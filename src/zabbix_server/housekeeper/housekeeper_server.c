@@ -1319,8 +1319,8 @@ static int	housekeeping_delete_internal_events(int config_max_hk_delete)
 		size_t	sql_offset = 0;
 		int	events_num;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select eventid from events where source=%d",
-				EVENT_SOURCE_INTERNAL);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select eventid from events where source=%d"
+				" order by eventid", EVENT_SOURCE_INTERNAL);
 		result = zbx_db_select_n(sql, batch_size);
 
 		zbx_vector_uint64_clear(&eventids);

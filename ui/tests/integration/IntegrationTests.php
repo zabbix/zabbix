@@ -40,6 +40,8 @@ require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
 require_once dirname(__FILE__).'/testTriggerCEP.php';
+require_once dirname(__FILE__).'/testTriggerCEPAtScale.php';
+require_once dirname(__FILE__).'/testTriggerCEPRestart.php';
 /* require_once dirname(__FILE__).'/testTlsRequest.php'; */
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testActiveCheckHeartbeat.php';
@@ -141,6 +143,8 @@ class IntegrationTests {
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		$suite->addTestSuite('testTriggerCEP');
+		$suite->addTestSuite('testTriggerCEPAtScale');
+		$suite->addTestSuite('testTriggerCEPRestart');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testWebScenarioDynamicVariables');
 		return $suite;

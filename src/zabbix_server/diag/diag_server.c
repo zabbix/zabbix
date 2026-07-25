@@ -535,7 +535,7 @@ static int	diag_add_cep_info(const struct zbx_json_parse *jp, struct zbx_json *j
 		zbx_json_addfloat(json, "events_time", stats.events_time);
 		zbx_json_addint64(json, "tags_num", stats.tags_num);
 		zbx_json_addfloat(json, "tags_time", stats.tags_time);
-		zbx_json_addint64(json, "suppress_num", stats.tags_num);
+		zbx_json_addint64(json, "suppress_num", stats.suppress_num);
 		zbx_json_addfloat(json, "suppress_time", stats.suppress_time);
 		zbx_json_close(json);
 		zbx_json_close(json);

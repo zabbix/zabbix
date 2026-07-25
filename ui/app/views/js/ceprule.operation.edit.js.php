@@ -64,8 +64,6 @@ window.ceprule_operation_edit_popup = new class {
 			else if (e.target.classList.contains('js-tag-remove')) {
 				e.target.closest('tr').remove();
 			}
-
-			this.#togglePositionTags(window['ceprule-operation-execute-when'].value);
 		});
 	}
 
@@ -92,13 +90,6 @@ window.ceprule_operation_edit_popup = new class {
 		on_operator_change(Number(tag.operator));
 
 		return tag_row;
-	}
-
-	#togglePositionTags(value) {
-		const has_position_tags = value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>;
-
-		[...this.form_element.querySelectorAll('[is="z-cep-tagsuggest"]')]
-			.map(node => node.toggleAttribute('disable-position-tags', has_position_tags));
 	}
 
 	#setAvailableOperationOptions() {
@@ -143,6 +134,7 @@ window.ceprule_operation_edit_popup = new class {
 			this.#addTagRow(tag);
 		}
 
+		this.form_element.querySelector(`[name="type"]`).value = operation.type;
 		this.form_element.querySelector(`[name="execute_when"]`).value = operation.execute_when;
 		this.form_element.querySelector(`[name="window_type"]`).value = operation.window_type;
 		this.form_element.querySelector(`[name="sortorder"]`).value = operation.sortorder;
@@ -170,8 +162,6 @@ window.ceprule_operation_edit_popup = new class {
 		zselect.clearOptions();
 		zselect.addOptions(options);
 		zselect.init();
-
-		this.#togglePositionTags(window['ceprule-operation-execute-when'].value);
 	}
 
 	#handleOperationTypeChanged(value) {
@@ -253,7 +243,6 @@ window.ceprule_operation_edit_popup = new class {
 
 	#handleExecuteWhenChanged(value) {
 		this.#setAvailableOperationOptions();
-		this.#togglePositionTags(value);
 	}
 };
 
@@ -261,10 +250,7 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 	class ZCepTagsuggest extends HTMLInputElement {
 
 		/** @type {Array} */
-		#position_tags = ['$IS.FIRST', '$IS.LAST'];
-
-		/** @type {Array} */
-		#property_tags = ['$IS.COPIED', '$IS.SYMPTOM', '$STATUS.CODE'];
+		#property_tags = ['$IS.COPIED', '$IS.FIRST', '$IS.LAST', '$IS.OPEN', '$IS.SYMPTOM'];
 
 		/** @type {Function} */
 		#handler;
@@ -364,9 +350,8 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 
 			clearTimeout(this.#suggestions_debounce);
 
-			const position_tags = this.hasAttribute('disable-position-tags') ? [] : this.#position_tags;
 			const matcher = tag => tag.startsWith(value) && tag !== value;
-			const suggestions = [...position_tags, ...this.#property_tags].filter(matcher);
+			const suggestions = this.#property_tags.filter(matcher);
 			const show = () => this.#showSuggestions(suggestions, value.length);
 
 			suggestions.length

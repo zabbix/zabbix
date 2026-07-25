@@ -279,7 +279,7 @@ static void	cep_queue_push_next_event_task(zbx_cep_queue_t *queue, zbx_cep_task_
 					}
 	};
 	zbx_cep_task_group_t	*group;
-	int			pending_num;
+	int			pending_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:%d object:%d objectid:" ZBX_FS_UI64, __func__,
 			pending_local.origin.source, pending_local.origin.object, pending_local.origin.objectid);

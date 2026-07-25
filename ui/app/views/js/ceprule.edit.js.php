@@ -672,13 +672,14 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#buildOperationRow(operation) {
+		const operation_type = Number(operation.type);
 		const execute_when_str = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getOperationExecuteWhenStrings()
 		) ?>')[operation.execute_when];
 
 		const label_str = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getOperationLabelStrings()
-		) ?>')[operation.type];
+		) ?>')[operation_type];
 
 		const severity_names_json = '<?= json_encode([
 			TRIGGER_SEVERITY_NOT_CLASSIFIED => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_0)),
@@ -698,12 +699,12 @@ window.ceprule_edit_popup = new class {
 			<?= CCepRuleHelper::OP_COPY_LAST ?>,
 			<?= CCepRuleHelper::OP_DISCARD ?>,
 			<?= CCepRuleHelper::OP_CLOSE ?>
-		].includes(operation.type)) {
+		].includes(operation_type)) {
 			arguments_str = '';
 		}
 		else if ([
 			<?= CCepRuleHelper::OP_SUPPRESS ?>
-		].includes(operation.type)) {
+		].includes(operation_type)) {
 			arguments_str = operation.suppress_until
 				? <?= json_encode(_('until')) ?> + ' ' + operation.suppress_until
 				: <?= json_encode(_('Indefinately')) ?>;
@@ -712,23 +713,23 @@ window.ceprule_edit_popup = new class {
 			<?= CCepRuleHelper::OP_INCREASE_TAG_VALUE ?>,
 			<?= CCepRuleHelper::OP_DECREASE_TAG_VALUE ?>,
 			<?= CCepRuleHelper::OP_REMOVE_TAG ?>
-		].includes(operation.type)) {
+		].includes(operation_type)) {
 			arguments_str = operation.tag;
 		}
-		else if (operation.type == <?= CCepRuleHelper::OP_SET_NAME ?>) {
+		else if (operation_type == <?= CCepRuleHelper::OP_SET_NAME ?>) {
 			arguments_str = operation.event_name;
 		}
-		else if (operation.type == <?= CCepRuleHelper::OP_SET_SEVERITY ?>) {
+		else if (operation_type == <?= CCepRuleHelper::OP_SET_SEVERITY ?>) {
 			arguments_str = severity_names[operation.severity];
 		}
-		else if (operation.type == <?= CCepRuleHelper::OP_RENAME_TAG ?>) {
+		else if (operation_type == <?= CCepRuleHelper::OP_RENAME_TAG ?>) {
 			arguments_str = `${operation.tag}:${operation.new_tag}`;
 		}
 		else if ([
 			<?= CCepRuleHelper::OP_SET_TAG_VALUE ?>,
 			<?= CCepRuleHelper::OP_SET_TAG ?>,
 			<?= CCepRuleHelper::OP_ADD_TAG ?>
-		].includes(operation.type)) {
+		].includes(operation_type)) {
 			arguments_str = `${operation.tag}:${operation.tag_value}`;
 		}
 

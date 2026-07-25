@@ -15,10 +15,10 @@
 
 
 class CCepRuleHelper {
-	public const WINDOW_NONE =0;
-	public const WINDOW_SIMPLE =1;
+	public const WINDOW_NONE = 0;
+	public const WINDOW_SIMPLE = 1;
 	public const WINDOW_CAUSE_SYMPTOM = 2;
-	public const WINDOW_TAG_MATCH =3;
+	public const WINDOW_TAG_MATCH = 3;
 	public const WINDOW_PATTERN_MATCH = 4;
 
 	public const STATUS_ENABLED = 0;
@@ -268,7 +268,8 @@ class CCepRuleHelper {
 			self::WHEN_EVENT_OCCURRED => _('Event occured'),
 			self::WHEN_EVENT_EVICTED => _('Event evicted'),
 			self::WHEN_WINDOW_CLOSED => _('Window closed'),
-			self::WHEN_TAGS_CORRELATED => _('Tags correlated'),
+			/* self::WHEN_TAGS_CORRELATED => _('Tags correlated'), */
+			// TODO: Remove the WHEN_TAGS_CORRELATED completely - helper, API and form-rules.
 			self::WHEN_PATTERN_MATCHED => _('Event pattern matched')
 		];
 	}
@@ -325,6 +326,7 @@ class CCepRuleHelper {
 			self::OP_DECREASE_SEVERITY,
 			self::OP_SUPPRESS,
 			self::OP_COPY_FIRST,
+			self::OP_CLOSE_WINDOW,
 			self::OP_COPY_LAST,
 			self::OP_DISCARD,
 			self::OP_CLOSE => '',

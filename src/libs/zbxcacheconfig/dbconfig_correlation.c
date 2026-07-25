@@ -678,7 +678,7 @@ static void	correlation_config_sync_conditions(zbx_dbsync_t *sync)
 		cond_ref->condition = corr_condition_create(cond_ref->conditionid, type, row + 3);
 
 		/* sort the conditions later */
-		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION != correlation->evaltype)
 			zbx_vector_correlation_ptr_append(&correlations, correlation);
 
 		zbx_vector_corr_condition_ptr_append(&correlation->conditions,
@@ -709,7 +709,7 @@ static void	correlation_config_sync_conditions(zbx_dbsync_t *sync)
 			corr_condition_release(cond_ref->condition);
 
 			/* sort the conditions later */
-			if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+			if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION != correlation->evaltype)
 				zbx_vector_correlation_ptr_append(&correlations, correlation);
 
 			correlation_ref_update(ref, correlation);
@@ -805,8 +805,9 @@ static void	correlation_conditon_dump(const zbx_corr_condition_t *cond, const ch
 
 static void	correlation_dump(const zbx_correlation_t *correlation)
 {
-	zabbix_log(LOG_LEVEL_TRACE, "  correlationid:" ZBX_FS_UI64 " name:%s operations:%x refcount:%u",
-			correlation->correlationid, correlation->name, correlation->operations, correlation->refcount);
+	zabbix_log(LOG_LEVEL_TRACE, "  correlationid:" ZBX_FS_UI64 " name:%s operations:%x evaltype:%u formula:%s"
+			" refcount:%u", correlation->correlationid, correlation->name, correlation->operations,
+			correlation->evaltype, correlation->formula, correlation->refcount);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  conditions:");
 

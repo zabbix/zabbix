@@ -1527,6 +1527,12 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 		goto out;
 	}
 
+	if (0 != pipe(service->alert_pipe))
+	{
+		*error = zbx_dsprintf(*error, "Cannot create alert pipe: %s.", zbx_strerror(errno));
+		goto out;
+	}
+
 	service->path = zbx_strdup(NULL, socket_path);
 	zbx_vector_ipc_client_ptr_create(&service->clients);
 	zbx_queue_ptr_create(&service->clients_recv);
@@ -1538,7 +1544,6 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 
 	service->ev_timer = event_new(service->ev, -1, 0, ipc_service_timer_cb, service);
 
-	pipe(service->alert_pipe);
 	evutil_make_socket_nonblocking(service->alert_pipe[0]);
 	evutil_make_socket_nonblocking(service->alert_pipe[1]);
 

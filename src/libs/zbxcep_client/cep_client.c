@@ -464,7 +464,8 @@ static zbx_uint32_t	cep_deserialize_event(const unsigned char *data, zbx_db_even
 
 	if (EVENT_SOURCE_TRIGGERS == e->source)
 	{
-		int	deps_num, maintenances_num;
+		int			deps_num, maintenances_num;
+		zbx_db_event_suppress_t	suppress_local = {0};
 
 		e->trigger.triggerid = e->objectid;
 
@@ -500,8 +501,6 @@ static zbx_uint32_t	cep_deserialize_event(const unsigned char *data, zbx_db_even
 
 			for (int i = 0; i < maintenances_num; i++)
 			{
-				zbx_db_event_suppress_t	suppress_local;
-
 				ptr += zbx_deserialize_value(ptr, &suppress_local.maintenanceid);
 				ptr += zbx_deserialize_value(ptr, &suppress_local.until);
 				suppress_local.cep_ruleid = 0;
