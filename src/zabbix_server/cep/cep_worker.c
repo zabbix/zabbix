@@ -911,10 +911,42 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 
 	if (0 != sync_tasks.values_num)
 	{
+		zbx_vector_cep_event_update_t	updates;
+
 		zbx_vector_mw_task_ptr_sort(&sync_tasks, cep_task_sync_event_compare);
 		cep_db_sync_events(worker->dbpool, &sync_tasks);
 
-		/* TODO: make update notifications */
+		zbx_vector_cep_event_update_create(&updates);
+
+		for (int i = 0; i < sync_tasks.values_num; i++)
+		{
+			zbx_cep_task_sync_event_t	*sync = (zbx_cep_task_sync_event_t *)sync_tasks.values[i];
+			zbx_cep_event_update_t		update;
+
+			if (0 != (sync->flags & CEP_SYNC_EVENT_TAGS))
+			{
+				update.handle = zbx_cep_event_handle_addref(sync->hevent);
+				update.op = CEP_EVENT_UPDATE_TAGS;
+				zbx_vector_cep_event_update_append(&updates, update);
+			}
+			if (0 != (sync->flags & CEP_SYNC_EVENT_SUPPRESS))
+			{
+				update.handle = zbx_cep_event_handle_addref(sync->hevent);
+				update.op = CEP_EVENT_SUPPRESS;
+				zbx_vector_cep_event_update_append(&updates, update);
+			}
+			if (0 != (sync->flags & CEP_SYNC_EVENT_SEVERITY))
+			{
+				update.handle = zbx_cep_event_handle_addref(sync->hevent);
+				update.op = CEP_EVENT_UPDATE_SEVERITY;
+				zbx_vector_cep_event_update_append(&updates, update);
+			}
+		}
+
+		if (0 != updates.values_num)
+			cep_post_event_updates(updates.values, updates.values_num);
+
+		zbx_vector_cep_event_update_destroy(&updates);
 	}
 
 	if (0 != ack_tasks.values_num)
