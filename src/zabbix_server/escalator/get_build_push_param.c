@@ -139,7 +139,7 @@ static int	push_get_target_info_by_uuid(const char *uuid, zbx_uint64_t *target_u
 		ret = SUCCEED;
 
 		if (NULL != target_userid)
-			ZBX_STR2UINT64(*target_userid, row[0]);
+			ZBX_DBROW2UINT64(*target_userid, row[0]);
 
 		if (NULL != status)
 			*status = atoi(row[1]);
