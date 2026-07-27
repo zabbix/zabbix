@@ -202,26 +202,26 @@ class CControllerMaintenanceEdit extends CController {
 	 * @param array $data
 	 */
 	protected function applyProblemContextPreset(array $events, array &$data): void {
-		foreach ($events as $event) {
-			$data['name'] = CMaintenanceHelper::getNextIndexedName(_s('Ad-hoc: %1$s', $event['name']));
-			$data['active_since'] = date(ZBX_DATE_TIME, strtotime('now'));
-			$data['active_till'] = date(ZBX_DATE_TIME, strtotime('now + '.secondsToPeriod(
-				timeUnitToSeconds(CWebUser::$data['default_maintenance_period'])
-			)));
-			$data['timeperiods'][] = [
-				'timeperiod_type' => 0,
-				'every' => 1,
-				'month' => 0,
-				'dayofweek' => 0,
-				'day' => 0,
-				'start_time' => 0,
-				'period' => timeUnitToSeconds(CWebUser::$data['default_maintenance_period']),
-				'start_date' => strtotime('now'),
-				'formatted_type' => 'One time only',
-				'formatted_schedule' => date(ZBX_DATE_TIME, strtotime('now')),
-				'formatted_period' => CWebUser::$data['default_maintenance_period']
-			];
+		$data['name'] = CMaintenanceHelper::getNextIndexedName(_s('Ad-hoc: %1$s', $events[0]['name']));
+		$data['active_since'] = date(ZBX_DATE_TIME, strtotime('now'));
+		$data['active_till'] = date(ZBX_DATE_TIME, strtotime('now + '.secondsToPeriod(
+			timeUnitToSeconds(CWebUser::$data['default_maintenance_period'])
+		)));
+		$data['timeperiods'][] = [
+			'timeperiod_type' => 0,
+			'every' => 1,
+			'month' => 0,
+			'dayofweek' => 0,
+			'day' => 0,
+			'start_time' => 0,
+			'period' => timeUnitToSeconds(CWebUser::$data['default_maintenance_period']),
+			'start_date' => strtotime('now'),
+			'formatted_type' => 'One time only',
+			'formatted_schedule' => date(ZBX_DATE_TIME, strtotime('now')),
+			'formatted_period' => CWebUser::$data['default_maintenance_period']
+		];
 
+		foreach ($events as $event) {
 			$db_triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description'],
 				'triggerids' => $event['objectid'],
