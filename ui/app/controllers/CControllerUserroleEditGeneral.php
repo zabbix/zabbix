@@ -22,48 +22,36 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	/**
 	 * @throws APIException
 	 */
-	protected function getRulesInput(int $user_type, ?array $rules = null): array {
+	protected function getRulesInput(int $user_type): array {
 		return array_merge(
-			$this->getUiSectionRules($user_type, $rules),
-			$this->getServiceSectionRules($rules),
-			$this->getModuleSectionRules($rules),
-			$this->getApiSectionRules($rules),
-			$this->getActionSectionRules($user_type, $rules)
+			$this->getUiSectionRules($user_type),
+			$this->getServiceSectionRules(),
+			$this->getModuleSectionRules(),
+			$this->getApiSectionRules(),
+			$this->getActionSectionRules($user_type)
 		);
 	}
 
-	private function getUiSectionRules(int $user_type, ?array $rules = null): array {
+	private function getUiSectionRules(int $user_type): array {
 		return [
 			'ui' => array_map(
-				function (string $rule) use ($rules): array {
+				function (string $rule): array {
 					$field = str_replace('.', '_', $rule);
 
 					return [
 						'name' => str_replace('ui.', '', $rule),
-						'status' => $this->getInput($field, $rules === null
-							? ZBX_ROLE_RULE_ENABLED
-							: $rules['ui'][$rule]
-						)
+						'status' => $this->hasInput($field) ? $this->getInput($field) : ZBX_ROLE_RULE_ENABLED
 					];
 				},
 				CRoleHelper::getUiElementsByUserType($user_type)
 			),
-			'ui.default_access' => $this->getInput('ui_default_access', $rules === null
-				? ZBX_ROLE_RULE_ENABLED
-				: $rules['ui.default_access']
-			)
+			'ui.default_access' => $this->getInput('ui_default_access', ZBX_ROLE_RULE_ENABLED)
 		];
 	}
 
-	private function getServiceSectionRules(?array $rules = null): array {
-		$read_access = $this->getInput('service_read_access', $rules === null
-			? CRoleHelper::SERVICES_ACCESS_NONE
-			: $rules['service_read_access']
-		);
-		$write_access = $this->getInput('service_write_access', $rules === null
-			? CRoleHelper::SERVICES_ACCESS_NONE
-			: $rules['service_write_access']
-		);
+	private function getServiceSectionRules(): array {
+		$read_access = $this->getInput('service_read_access', CRoleHelper::SERVICES_ACCESS_NONE);
+		$write_access = $this->getInput('service_write_access', CRoleHelper::SERVICES_ACCESS_NONE);
 
 		return [
 			'services.read.mode' => $read_access == CRoleHelper::SERVICES_ACCESS_ALL
@@ -72,22 +60,13 @@ abstract class CControllerUserroleEditGeneral extends CController {
 			'services.read.list' => $read_access == CRoleHelper::SERVICES_ACCESS_LIST
 				? array_map(
 					static fn(string $serviceid): array => ['serviceid' => $serviceid],
-					$this->getInput('service_read_list', $rules === null
-						? []
-						: array_column($rules['service_read_list'], 'serviceid')
-					)
+					$this->getInput('service_read_list', [])
 				)
 				: [],
 			'services.read.tag' => $read_access == CRoleHelper::SERVICES_ACCESS_LIST
 				? [
-					'tag' => trim($this->getInput('service_read_tag_tag', $rules === null
-						? ''
-						: $rules['service_read_tag']['tag'])
-					),
-					'value' => trim($this->getInput('service_read_tag_value', $rules === null
-						? ''
-						: $rules['service_read_tag']['value'])
-					)
+					'tag' => trim($this->getInput('service_read_tag_tag', '')),
+					'value' => trim($this->getInput('service_read_tag_value', ''))
 				]
 				: ['tag' => '', 'value' => ''],
 			'services.write.mode' => $write_access == CRoleHelper::SERVICES_ACCESS_ALL
@@ -96,22 +75,13 @@ abstract class CControllerUserroleEditGeneral extends CController {
 			'services.write.list' => $write_access == CRoleHelper::SERVICES_ACCESS_LIST
 				? array_map(
 					static fn(string $serviceid): array => ['serviceid' => $serviceid],
-					$this->getInput('service_write_list', $rules === null
-						? []
-						: array_column($rules['service_write_list'], 'serviceid')
-					)
+					$this->getInput('service_write_list', [])
 				)
 				: [],
 			'services.write.tag' => $write_access == CRoleHelper::SERVICES_ACCESS_LIST
 				? [
-					'tag' => trim($this->getInput('service_write_tag_tag', $rules === null
-						? ''
-						: $rules['service_write_tag']['tag'])
-					),
-					'value' => trim($this->getInput('service_write_tag_value', $rules === null
-						? ''
-						: $rules['service_write_tag']['value'])
-					)
+					'tag' => trim($this->getInput('service_write_tag_tag', '')),
+					'value' => trim($this->getInput('service_write_tag_value', ''))
 				]
 				: ['tag' => '', 'value' => '']
 		];
@@ -120,13 +90,13 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	/**
 	 * @throws APIException
 	 */
-	private function getModuleSectionRules(?array $rules = null): array {
+	private function getModuleSectionRules(): array {
 		$db_modules = API::Module()->get([
 			'output' => [],
 			'preservekeys' => true
 		]);
 
-		$modules = $this->getInput('modules', $rules === null ? [] : $rules['modules']);
+		$modules = $this->getInput('modules', []);
 
 		return [
 			'modules' => array_map(
@@ -136,47 +106,32 @@ abstract class CControllerUserroleEditGeneral extends CController {
 				],
 				array_keys($db_modules)
 			),
-			'modules.default_access' => $this->getInput('modules_default_access', $rules === null
-				? ZBX_ROLE_RULE_ENABLED
-				: $rules['modules.default_access']
-			)
+			'modules.default_access' => $this->getInput('modules_default_access', ZBX_ROLE_RULE_ENABLED)
 		];
 	}
 
-	private function getApiSectionRules(?array $rules = null): array {
-		return [
-			'api' => $this->getInput('api_methods', $rules === null ? [] : array_column($rules['api'], 'name')),
-			'api.access' => $this->getInput('api_access', $rules === null
-				? ZBX_ROLE_RULE_ENABLED
-				: $rules['api.access']
-			),
-			'api.mode' => $this->getInput('api_mode', $rules === null
-				? ZBX_ROLE_RULE_API_MODE_DENY
-				: $rules['api.mode']
-			)
+	private function getApiSectionRules() : array {
+		return  [
+			'api' => $this->getInput('api_methods', []),
+			'api.access' => $this->getInput('api_access', ZBX_ROLE_RULE_ENABLED),
+			'api.mode' => $this->getInput('api_mode', ZBX_ROLE_RULE_API_MODE_DENY)
 		];
 	}
 
-	private function getActionSectionRules(int $user_type, ?array $rules = null): array {
+	private function getActionSectionRules(int $user_type): array {
 		return [
 			'actions' => array_map(
-				function (string $rule) use ($rules): array {
+				function (string $rule): array {
 					$field = str_replace('.', '_', $rule);
 
 					return [
 						'name' => str_replace('actions.', '', $rule),
-						'status' => $this->getInput($field, $rules === null
-							? ZBX_ROLE_RULE_ENABLED
-							: $rules['actions'][$rule]
-						)
+						'status' => $this->hasInput($field) ? $this->getInput($field) : ZBX_ROLE_RULE_ENABLED
 					];
 				},
 				CRoleHelper::getActionsByUserType($user_type)
 			),
-			'actions.default_access' => $this->getInput('actions_default_access', $rules === null
-				? ZBX_ROLE_RULE_ENABLED
-				: $rules['actions.default_access']
-			)
+			'actions.default_access' => $this->getInput('actions_default_access', ZBX_ROLE_RULE_ENABLED)
 		];
 	}
 }
