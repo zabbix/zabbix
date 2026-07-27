@@ -3615,16 +3615,6 @@ int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid, int period_start)
 			ret = SUCCEED;
 	}
 
-	zabbix_log(LOG_LEVEL_TRACE, "DEV4972TRACE %s() itemid:" ZBX_FS_UI64 " period_start:%d found_item:%d"
-			" tail_null:%d tail_state:%d tail_flags:%d tail_sec:%d values_num:%d ret:%d",
-			__func__, itemid, period_start, NULL != item,
-			(NULL == item || NULL == item->tail),
-			(NULL != item && NULL != item->tail) ? item->tail->state : -1,
-			(NULL != item && NULL != item->tail) ? item->tail->flags : -1,
-			(NULL != item && NULL != item->tail) ? item->tail->ts.sec : -1,
-			NULL != item ? item->values_num : -1,
-			ret);
-
 	UNLOCK_CACHE;
 
 	return ret;

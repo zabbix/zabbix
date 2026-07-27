@@ -1746,11 +1746,6 @@ static int	evaluate_NODATA(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_TRACE, "DEV4972TRACE %s() itemid:" ZBX_FS_UI64 " proxyid:" ZBX_FS_UI64 " lazy:%d"
-				" nodata_win.flags:%d arg1:%d period:%d ts.sec:%d period_start:%d",
-				__func__, item->itemid, item->proxyid, lazy, nodata_win.flags, arg1, period, ts.sec,
-				ts.sec - period);
-
 		if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE) || (0 != item->proxyid && 0 != lazy &&
 				SUCCEED == zbx_hc_is_itemid_cached_and_normal(item->itemid, ts.sec - period)))
 		{
