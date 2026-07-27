@@ -358,7 +358,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 				'alias'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]],
 			'filter'				=> ['type' => API_MULTIPLE, 'default' => [], 'rules' => [
-				['if' => static fn (array $data) => !($data['filter'] ?? []), 'type' => API_OBJECT, 'default' => [], 'fields' => [
+				['if' => static fn (array $data) => !($data['filter'] ?? []), 'type' => API_OBJECT, 'fields' => [
 					'evaltype'		=> ['type' => API_ANY, 'default' => CONDITION_EVAL_TYPE_AND_OR],
 					'formula'		=> ['type' => API_ANY, 'default' => ''],
 					'conditions'	=> ['type' => API_ANY, 'default' => []]

@@ -98,6 +98,18 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield 'serialized "query" longer than 64Kb fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [
+						['function' => AGGREGATE_COUNT, 'alias' => str_repeat('A', 65535)]
+					]
+				]
+			],
+			'Invalid parameter "/1/query": value is too long.'
+		];
+
 		yield 'binary "value_type" fail' => [
 			[
 				'value_type' => ITEM_VALUE_TYPE_BINARY

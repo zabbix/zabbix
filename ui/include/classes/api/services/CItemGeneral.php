@@ -390,6 +390,13 @@ abstract class CItemGeneral extends CApiService {
 			if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY && array_key_exists('query', $item)) {
 				$path = '/'.($i + 1);
 
+				if (strlen(self::prepareTelemetryQueryFieldForDb($item['query']))
+						> DB::getFieldLength('items', 'query')) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$path.'/query', _('value is too long')
+					));
+				}
+
 				if ($item['query']['filter']
 						&& !CItemTypeTelemetryQuery::validateFilter($item, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -2911,7 +2918,7 @@ abstract class CItemGeneral extends CApiService {
 			return [];
 		}
 
-		if ($query['filter'] && $query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 			$i = 0;
 
 			foreach ($query['filter']['conditions'] as &$condition) {
@@ -2987,7 +2994,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	private static function prepareTelemetryQueryFieldForDb(array $query): string {
-		if ($query['filter'] && $query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 			CConditionHelper::replaceFormulaIds($query['filter']['formula'], $query['filter']['conditions']);
 
 			foreach ($query['filter']['conditions'] as &$condition) {
@@ -2996,7 +3003,7 @@ abstract class CItemGeneral extends CApiService {
 			unset($condition);
 		}
 
-		return json_encode($query, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+		return json_encode($query, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 	}
 
 	public static function addInsTemplateCaches(array &$items): void {
