@@ -45,7 +45,7 @@ class CMaintenance extends CApiService {
 	 * @param bool         $options['searchByAny']             Match any search criterion instead of all criteria.
 	 * @param bool         $options['startSearch']             Match search patterns only at the beginning of fields.
 	 * @param bool         $options['excludeSearch']           Return maintenances that do not match search criteria.
-	 * @param bool         $options['searchWildcardsEnabled'] Enable wildcards in search criteria.
+	 * @param bool         $options['searchWildcardsEnabled']  Enable wildcards in search criteria.
 	 * @param array|string $options['output']                  Maintenance fields to return.
 	 * @param array|string $options['selectHostGroups']        Return a "hostgroups" property with host group data.
 	 * @param array|string $options['selectHosts']             Return a "hosts" property with host data.
