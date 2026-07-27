@@ -15588,6 +15588,12 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextchec
 
 			proxyid = 0;
 		}
+		else if (0 != (get_denyitemtypes_mask() & (1u << dc_item->type)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Item type is denied by the \"DenyItemTypes\""
+					" configuration parameter.");
+			proxyid = 0;
+		}
 		else if (HOST_MONITORED_BY_SERVER == dc_host->monitored_by ||
 				SUCCEED == zbx_is_item_processed_by_server(dc_item->type, dc_item->key))
 		{
