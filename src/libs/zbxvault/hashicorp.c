@@ -323,6 +323,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 	ZBX_UNUSED(config_ssl_cert_location);
 	ZBX_UNUSED(config_ssl_key_location);
 	ZBX_UNUSED(timeout);
+	ZBX_UNUSED(force);
 	ZBX_UNUSED(token);
 #else
 	char			*out = NULL, *error = NULL, header[MAX_STRING_LEN], *url = NULL, *value = NULL;
