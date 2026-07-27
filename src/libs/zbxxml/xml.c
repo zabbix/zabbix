@@ -872,9 +872,6 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 	xmlNode			*node;
 	struct zbx_json_parse	jp_data;
 
-	if (NULL == name || NULL == value)
-		return FAIL;
-
 	if (ZBX_MAX_JSON_DEPTH < deep)
 		return FAIL;
 
@@ -1034,13 +1031,10 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 		goto clean;
 	}
 
-	char *json_name = (char *)zbx_malloc(NULL, sizeof(MAX_STRING_LEN));
-	char *json_value = (char *)zbx_malloc(NULL, sizeof(MAX_STRING_LEN));
+	char json_name[MAX_STRING_LEN];
+	char json_value[MAX_STRING_LEN];
 
 	int json_ret = json_to_xmlnode(&jp, NULL, 0, doc, NULL, &attr, &attr_val, &text, json_name, json_value);
-
-	zbx_free(json_name);
-	zbx_free(json_value);
 
 	if (SUCCEED != json_ret)
 	{
