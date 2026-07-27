@@ -167,7 +167,8 @@ class testNoData extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'LogFileSize' => 0
+				'LogFileSize' => 0,
+				'StartDBSyncers' => 1
 			],
 			self::COMPONENT_PROXY => [
 				'Hostname' => self::PG_PROXY_NAME,
