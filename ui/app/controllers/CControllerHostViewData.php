@@ -18,7 +18,7 @@ class CControllerHostViewData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['hostid', 'data_actions', 'name', 'status', 'maintenance', 'maintenanceid',
 		'maintenance_type', 'maintenance_status', 'interface', 'availability', 'active_available', 'status',
-		'items_count', 'problems', 'graphs', 'dashboards', 'httpTests', 'tags'];
+		'items_count', 'problems', 'graphs', 'dashboards', 'httpTests', 'tags', 'custom_text'];
 
 	protected function init(): void {
 		parent::init();
@@ -32,7 +32,7 @@ class CControllerHostViewData extends CControllerDataTable {
 
 	protected function getData(): array {
 		$data_fields = $this->getDataFields();
-		$options = $this->getInput('options', []);
+		$options = $this->getInput('options');
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
 
@@ -47,6 +47,9 @@ class CControllerHostViewData extends CControllerDataTable {
 
 		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
 
+		$custom_text = $this->extractCustomText($options);
+		$this->flattenColumnOptions($options);
+
 		$hosts = API::Host()->get([
 			'output' => ['hostid', $sort_field],
 			'evaltype' => $filter['evaltype'],
@@ -55,7 +58,8 @@ class CControllerHostViewData extends CControllerDataTable {
 			'groupids' => $groupids,
 			'severities' => $filter['severities'] ?: null,
 			'withProblemsSuppressed' => $filter['severities']
-				? ($options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false)
+				? (array_key_exists('show_suppressed', $options)
+					&& $options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false)
 				: null,
 			'search' => [
 				'name' => $filter['name'] === '' ? null : $filter['name'],
@@ -129,7 +133,8 @@ class CControllerHostViewData extends CControllerDataTable {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => array_keys($triggers),
-			'suppressed' => $options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false,
+			'suppressed' => array_key_exists('show_suppressed', $options)
+				&& $options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false,
 			'symptom' => false
 		]);
 
@@ -285,6 +290,10 @@ class CControllerHostViewData extends CControllerDataTable {
 		}
 		unset($host);
 
+		if ($custom_text) {
+			$this->resolveCustomText($hosts, $custom_text);
+		}
+
 		$output = [
 			'filter_counters' => $this->getFilterCounters(),
 			'data_fields' => $data_fields,
@@ -331,19 +340,19 @@ class CControllerHostViewData extends CControllerDataTable {
 	/**
 	 * Get host list results count for passed filter.
 	 *
-	 * @param array  $filter                        Filter options.
-	 *        string $filter['name']                Filter hosts by name.
-	 *        array  $filter['groupids']            Filter hosts by host groups.
-	 *        string $filter['ip']                  Filter hosts by IP.
-	 *        string $filter['dns']	                Filter hosts by DNS.
-	 *        string $filter['port']                Filter hosts by port.
-	 *        string $filter['status']              Filter hosts by status.
-	 *        string $filter['evaltype']            Filter hosts by tags.
-	 *        string $filter['tags']                Filter hosts by tag names and values.
-	 *        string $filter['severities']          Filter problems on hosts by severities.
-	 *        string $filter['show_suppressed']     Filter suppressed problems.
-	 *        int    $filter['maintenance_status']  Filter hosts by maintenance.
-	 * @param array  $column_options                Column options.
+	 * @param array  $filter                            Filter options.
+	 *        string $filter['name']                    Filter hosts by name.
+	 *        array  $filter['groupids']                Filter hosts by host groups.
+	 *        string $filter['ip']                      Filter hosts by IP.
+	 *        string $filter['dns']	                    Filter hosts by DNS.
+	 *        string $filter['port']                    Filter hosts by port.
+	 *        string $filter['status']                  Filter hosts by status.
+	 *        string $filter['evaltype']                Filter hosts by tags.
+	 *        string $filter['tags']                    Filter hosts by tag names and values.
+	 *        string $filter['severities']              Filter problems on hosts by severities.
+	 *        int    $filter['maintenance_status']      Filter hosts by maintenance.
+	 * @param array  $column_options                    Column options.
+	 *        string $column_options['show_suppressed'] (optional) Show suppressed problems.
 	 *
 	 * @return int
 	 */
@@ -377,5 +386,15 @@ class CControllerHostViewData extends CControllerDataTable {
 			],
 			'limit' => (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		]);
+	}
+
+	protected function resolveCustomText(array &$hosts, array $custom_text): void {
+		$custom_text = CMacrosResolverHelper::resolveHostMacros($custom_text, array_keys($hosts));
+
+		foreach ($custom_text as $key => $values) {
+			foreach ($values as $hostid => $value) {
+				$hosts[$hostid]['custom_text'][$key] = $value;
+			}
+		}
 	}
 }

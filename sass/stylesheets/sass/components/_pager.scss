@@ -1,0 +1,88 @@
+.pager-container {
+	min-height: 24px;
+	position: relative;
+}
+
+.pager {
+	text-align: center;
+	background-color: $ui-bg-color;
+	margin-top: -1px;
+	padding: 4px 5px;
+	overflow: hidden;
+	position: relative;
+	border: 1px solid $ui-border-color;
+	border-top-color: $table-border-color;
+	border-bottom-left-radius: var(--surface-border-radius);
+	border-bottom-right-radius: var(--surface-border-radius);
+
+	a {
+		display: inline-block;
+		margin-left: -1px;
+		padding: 3px 11px;
+		background-color: $btn-form-bg-color;
+		border: 1px solid $form-border-color !important;
+		text-decoration: none;
+		color: $font-color;
+		outline: 0;
+
+		@if $ui-transitions {
+			transition: background-color $ui-controls-transition-duration ease-out;
+		}
+
+		&:hover {
+			color: $font-color;
+			background-color: $btn-form-hover-bg-color;
+		}
+
+		&:focus {
+			@include btn-hover-active($btn-color, $btn-bg-color);
+			z-index: 10;
+			position: relative;
+		}
+
+		&:active {
+			color: $font-color;
+			background-color: $btn-form-hover-bg-color;
+			z-index: 10;
+			position: relative;
+		}
+
+		&:first-of-type {
+			border-radius: var(--button-border-radius) 0 0 var(--button-border-radius);
+		}
+
+		&:last-of-type {
+			border-radius: 0 var(--button-border-radius) var(--button-border-radius) 0;
+		}
+
+		&.selected {
+			color: $font-selected-color;
+			background-color: $ui-bg-selected-color;
+			position: relative;
+			z-index: 1;
+
+			&:hover {
+				background-color: darken($ui-bg-selected-color, 4%);
+			}
+
+			&:focus {
+				@include btn-hover-active($btn-color, $btn-bg-color);
+				position: relative;
+			}
+
+			&:active {
+				background-color: darken($ui-bg-selected-color, 4%);
+				position: relative;
+			}
+		}
+
+		&:focus {
+			.arrow-right {
+				border-left-color: $font-selected-color;
+			}
+			.arrow-left {
+				border-right-color: $font-selected-color;
+			}
+		}
+	}
+}

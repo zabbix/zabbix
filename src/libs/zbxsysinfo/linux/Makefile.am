@@ -1,6 +1,18 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libfunclistsysinfo.a libspecsysinfo.a libzbxagent2specsysinfo.a libspechostnamesysinfo.a
+noinst_LIBRARIES = libfunclistsysinfo.a libspechostnamesysinfo.a
+
+if AGENT
+noinst_LIBRARIES += libspecsysinfo.a
+endif
+
+if TESTS
+noinst_LIBRARIES += libspecsysinfo.a
+endif
+
+if AGENT2
+noinst_LIBRARIES += libzbxagent2specsysinfo.a
+endif
 
 libfunclistsysinfo_a_SOURCES = \
 	linux.c

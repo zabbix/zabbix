@@ -34,13 +34,13 @@ class CForm {
 	#form = null;
 	#rules = null;
 	#validators = [];
-	#fields = {};
+	#fields = Object.create(null);
 	#tabs;
 	#listeners = {};
 	#validate_changes_call = null;
 	#validate_changes_timeout = null;
 	#mousedown_registered = false;
-	#general_errors = {};
+	#general_errors = Object.create(null);
 	#message_box = null;
 	#custom_validation = [];
 	#form_ready = false;
@@ -115,7 +115,7 @@ class CForm {
 	}
 
 	discoverAllFields() {
-		const fields = {};
+		const fields = Object.create(null);
 
 		for (const discovered_field of CForm.findAllFields(this.#form)) {
 			let field_instance = null;
@@ -169,8 +169,8 @@ class CForm {
 	}
 
 	getAllValues() {
-		let result = {};
-		let simple_fields = {};
+		let result = Object.create(null);
+		let simple_fields = Object.create(null);
 
 		for (const [key, field] of Object.entries(this.#fields)) {
 			field.cancelDelayedValidation();
@@ -180,7 +180,9 @@ class CForm {
 			}
 
 			if (typeof field.getExtraFields === 'function') {
-				simple_fields = {...simple_fields, ...field.getExtraFields()};
+				for (const [field_name, field_value] of Object.entries(field.getExtraFields())) {
+					simple_fields[field_name] = field_value;
+				}
 			}
 			else {
 				simple_fields[key] = field.getValueTrimmed();
@@ -318,13 +320,15 @@ class CForm {
 	 *
 	 * @param {Array} fields
 	 * @param {?Object} rules
+	 * @param {?Object} values
 	 *
 	 * @returns {Promise}
 	 */
-	validateFieldsForAction(fields, rules) {
+	validateFieldsForAction(fields, rules, values = null) {
 		const validator = new CFormValidator(rules ? rules : this.#rules);
+		const values_to_validate = values === null ? this.getAllValues() : values;
 
-		return validator.validateChanges(this.getAllValues(), fields)
+		return validator.validateChanges(values_to_validate, fields)
 			.then((result) => {
 				this.setErrors(validator.getErrors(), true);
 				this.renderErrors();
@@ -391,7 +395,7 @@ class CForm {
 	 * @returns {Object}
 	 */
 	convertRawErrors(raw_errors) {
-		const field_errors = {};
+		const field_errors = Object.create(null);
 
 		Object.values(this.#fields).forEach((field) => {
 			const field_name = field.getName();
@@ -421,7 +425,7 @@ class CForm {
 				return field_path === path || subfield_path.test(path);
 			}).forEach(([path, errors]) => {
 				if (!(field_name in field_errors)) {
-					field_errors[field_name] = {};
+					field_errors[field_name] = Object.create(null);
 				}
 
 				delete raw_errors[path];
@@ -449,9 +453,13 @@ class CForm {
 				}
 				else {
 					if (Array.isArray(field_errors[field_name])) {
-						field_errors[field_name] = field_errors[field_name].length
-							? {'': field_errors[field_name]}
-							: {};
+						const set_errors = Object.create(null);
+
+						if (field_errors[field_name].length) {
+							set_errors[''] = field_errors[field_name];
+						}
+
+						field_errors[field_name] = set_errors;
 					}
 
 					field_errors[field_name][subfield_name] = errors;
@@ -537,6 +545,38 @@ class CForm {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Function to disable fields in case they are not disabled. Must be paired with unlock.
+	 * Any field, that is disabled in such way will have attribute data-form-disabled.
+	 * Warning: Locked field values will act as disabled and won't return any values until unlocked.
+	 *
+	 * @param {?Array} field_names
+	 */
+	lock(field_names = null) {
+		const fields = field_names !== null
+			? field_names.map((name) => this.findFieldByName(name))
+			: Object.values(this.#fields);
+
+		for (const field of fields) {
+			field.lock();
+		}
+	}
+
+	/**
+	 * Function to enable fields which were disabled by lock function.
+	 *
+	 * @param {?Array} field_names
+	 */
+	unlock(field_names = null) {
+		const fields = field_names !== null
+			? field_names.map((name) => this.findFieldByName(name))
+			: Object.values(this.#fields);
+
+		for (const field of fields) {
+			field.unlock();
+		}
 	}
 
 	/**

@@ -181,7 +181,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				break;
 
 			case CWidgetFieldColumnsList::DATA_TEXT:
-				$master_entity_values = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns(
+				$master_entity_values = CMacrosResolverHelper::resolveHostMacros(
 					[$master_column_index => $master_column['text']], $hostids
 				)[$master_column_index];
 
@@ -386,7 +386,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		unset($column);
 
-		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $master_hostids);
+		$text_columns = CMacrosResolverHelper::resolveHostMacros($text_columns, $master_hostids);
 
 		$rows = [];
 

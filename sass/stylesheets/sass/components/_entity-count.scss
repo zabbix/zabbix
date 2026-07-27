@@ -5,7 +5,7 @@
 	line-height: 16px;
 	text-align: center;
 	background-color: $ui-bg-selected-color;
-	border-radius: 2px;
+	border-radius: var(--badge-border-radius);
 	overflow: hidden;
 	text-overflow: ellipsis;
 

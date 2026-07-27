@@ -858,10 +858,10 @@ class CEvent extends CApiService {
 			' WHERE '.dbConditionInt('e.eventid', array_keys($result))
 		), 'eventid');
 
+		$events = CMacrosResolverHelper::resolveEventOpdatas($events);
+
 		foreach ($result as $eventid => $event) {
-			$result[$eventid]['opdata'] = array_key_exists($eventid, $events) && $events[$eventid]['opdata'] !== ''
-				? CMacrosResolverHelper::resolveTriggerOpdata($events[$eventid], ['events' => true])
-				: '';
+			$result[$eventid]['opdata'] = $events[$eventid]['opdata'] ?? '';
 		}
 	}
 

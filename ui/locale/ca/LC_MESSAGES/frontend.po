@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-06-02 17:27+0000\n"
+"PO-Revision-Date: 2026-06-13 13:12+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -151,7 +151,7 @@ msgstr "Queden %1$s caràcters"
 #: app/views/administration.housekeeping.edit.php:166
 #, c-format
 msgid "%1$s data storage period"
-msgstr ""
+msgstr "%1$s període d'emmagatzematge de la informació"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -5124,12 +5124,12 @@ msgstr "Feu clic per veure o editar"
 
 #: app/views/administration.housekeeping.edit.php:165
 msgid "ClickHouse"
-msgstr ""
+msgstr "ClickHouse"
 
 #: include/classes/api/managers/history/CClickHouseStorage.php:118
 #, c-format
 msgid "ClickHouse error: %1$s."
-msgstr ""
+msgstr "Error de ClickHouse: %1$s."
 
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
@@ -8401,7 +8401,7 @@ msgstr "Valor efectiu"
 
 #: app/views/administration.housekeeping.edit.php:166
 msgid "Elasticsearch"
-msgstr ""
+msgstr "Elasticsearch"
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -11874,7 +11874,7 @@ msgstr "S'empra una funció incorrecta"
 #: include/classes/core/CConfigFile.php:579
 #, c-format
 msgid "Incorrect history storage configuration %1$s: %2$s."
-msgstr ""
+msgstr "Configuració d'emmagatzematge de l' historial incorrecte %1$s: %2$s."
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -15934,6 +15934,10 @@ msgstr "Següent"
 msgid "Next dashboard"
 msgstr "Tauler següent"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr "Mes vinent"
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15947,6 +15951,10 @@ msgstr "Següent pàgina"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Passa següent"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr "Any vinent"
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -16656,7 +16664,7 @@ msgstr "Sense enllaçar"
 #: include/classes/helpers/CItemHelper.php:386
 #: include/classes/helpers/CItemHelper.php:416
 msgid "Not stored"
-msgstr ""
+msgstr "No emmagatzemat"
 
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
@@ -22727,7 +22735,7 @@ msgstr "Aquesta configuració només s'aplica a les dades numèriques. Les dades
 
 #: app/views/administration.housekeeping.edit.php:145
 msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
-msgstr ""
+msgstr "Aquesta configuració no afecta els períodes d'emmagatzematge Elasticsearch i ClickHouse."
 
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
@@ -23130,7 +23138,7 @@ msgstr "Total"
 #: include/classes/debug/CProfiler.php:172
 #, c-format
 msgid "Total ClickHouse time: %1$s"
-msgstr ""
+msgstr "Temps de ClickHouse total: %1$s"
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -23206,6 +23214,10 @@ msgstr "Tracta com a 0"
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "Estadístiques de memòria cau de la funció de la tendència. Els paràmetres vàlids són: all, hits, fits, miss, pmisss, items, pitems i requests."
 
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162
 #: app/partials/monitoring.latest.view.html.php:74
@@ -23225,7 +23237,7 @@ msgstr "Tendències"
 #: app/partials/item.edit.item.tab.php:774
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
-msgstr ""
+msgstr "Les tendències no es calculen ni s'emmagatzemen per a elements l'historial dels quals es manté a Elasticsearch o ClickHouse."
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -27406,7 +27418,7 @@ msgstr "s'esperen coordenades geogràfiques (valors de latitud i longitud separa
 
 #: app/views/item.edit.php:224 app/views/item.edit.php:228
 msgid "global housekeeping settings"
-msgstr ""
+msgstr "configuració global de neteja"
 
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
@@ -27570,7 +27582,7 @@ msgstr "expressió incorrecta a partir de \"%1$s\""
 #: include/classes/core/CConfigFile.php:212
 #: include/classes/core/CConfigFile.php:220
 msgid "incorrect format"
-msgstr ""
+msgstr "format incorrecte"
 
 #: jsLoader.php:298
 msgid "incorrect item value type"

@@ -192,7 +192,7 @@ static int	rtc_process_validate_target(int proc_type, int proc_num, char **resul
  *                                                                            *
  * Comments: The function first attempts to deliver the control message via   *
  *           the RTC notification mechanism. If no process has been           *
- *           subscribed to this messaage, then it's delivered by a signal.    *
+ *           subscribed to this message, then it's delivered by a signal.     *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_control_process_by_pid(zbx_rtc_t *rtc, pid_t pid, zbx_uint32_t code, char **result)

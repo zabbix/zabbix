@@ -7,7 +7,9 @@ SUBDIRS = \
 	logfiles \
 	metrics
 
+if AGENT
 sbin_PROGRAMS = zabbix_agentd
+endif
 
 zabbix_agentd_SOURCES = zabbix_agentd.c
 

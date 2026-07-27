@@ -1584,7 +1584,9 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.discovery_open_cb = zbx_discovery_open_proxy,
 			.discovery_close_cb = zbx_discovery_close_proxy,
 			.discovery_find_host_cb = zbx_discovery_find_host_proxy,
+			.discovery_update_interface_cb = zbx_discovery_update_interface_proxy,
 			.discovery_update_host_cb = zbx_discovery_update_host_proxy,
+			.discovery_update_hosts_cb = zbx_discovery_update_hosts_proxy,
 			.discovery_update_service_cb = zbx_discovery_update_service_proxy,
 			.discovery_update_service_down_cb = zbx_discovery_update_service_down_proxy,
 			.discovery_update_drule_cb = zbx_discovery_update_drule_proxy

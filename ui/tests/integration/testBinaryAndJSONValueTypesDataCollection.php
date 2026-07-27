@@ -201,6 +201,12 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 					[[
 						'type' => ZBX_PREPROC_THROTTLE_VALUE
 					]]
+				],
+				[
+					'name' => 'BINARY_ITEM_TRAP',
+					'key_' => 'BINARY_ITEM_TRAP',
+					'type' => ITEM_TYPE_TRAPPER,
+					'value_type' => ITEM_VALUE_TYPE_TEXT
 				]
 		];
 
@@ -245,6 +251,14 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$dep_items_create_result = CDataHelper::createItems('item',
 			['agent' =>
 				[
+				[
+					'name' => 'BINARY_ITEM_BIN',
+					'key_' => 'BINARY_ITEM_BIN',
+					'type' => ITEM_TYPE_DEPENDENT,
+					'master_itemid' => self::$itemids['agent:BINARY_ITEM_TRAP'],
+					'value_type' => ITEM_VALUE_TYPE_BINARY,
+					'delay' => '0s'
+				],
 				[
 					'name' => 'BINARY_IMAGE',
 					'key_' => 'BINARY_IMAGE',
@@ -875,5 +889,40 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('result', $response);
 
 		$this->assertEquals(1, $response['result'][0]['value']);
+	}
+
+	/**
+	 * Test 1-byte heap overflow in MySQL during escaping
+	 *
+	 * @required-components server
+	 * @configurationDataProvider agentConfigurationProvider
+	 * @hosts agent
+	 */
+	public function testTrapper_BinaryItemMySQLEscape() {
+		global $DB;
+
+		if (ZBX_DB_MYSQL !== $DB['TYPE']) {
+			return;
+		}
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->sendSenderValue('agent', 'BINARY_ITEM_TRAP', 'AAAAAAAAAAAAAAAA');
+
+		// 'A' is the only base64 digit that decodes to null bytes (0x00); null bytes are escaped
+		// by MySQL to two bytes each (e.g. 'AAAA' -> 3x 0x00 -> 6 escaped bytes + null terminator),
+		// filling the escape buffer to capacity and exposing off-by-one allocations.
+		// Minimum triggering input is 'AAAA' (3 null bytes); any multiple of 4 'A's works.
+
+		$this->sendSenderValue('agent', 'BINARY_ITEM_TRAP', 'AAAAAAAAAAAAAAAA');
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids' => self::$itemids['agent:BINARY_ITEM_TRAP'],
+			'history' => ITEM_VALUE_TYPE_TEXT
+		]);
+
+		$this->assertArrayHasKey('result', $response);
+		$this->assertNotEmpty($response['result']);
+		$this->assertEquals('AAAAAAAAAAAAAAAA', $response['result'][0]['value']);
 	}
 }

@@ -6244,8 +6244,8 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
  *                                                                            *
  * Purpose: calculate nextcheck timestamp                                     *
  *                                                                            *
- * Parameters: seend - [IN] the seed                                          *
- *             delay - [IN] the delay in seconds                              *
+ * Parameters: seed  - [IN]                                                   *
+ *             delay - [IN] delay in seconds                                  *
  *             now   - [IN] current timestamp                                 *
  *                                                                            *
  * Return value: nextcheck value                                              *
@@ -17227,6 +17227,66 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
 	}
 
 	zbx_vector_dc_httptest_ptr_destroy(&httptests);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get drule values                                                  *
+ *                                                                            *
+ * Parameter: dc_drule - [IN/OUT] drule                                       *
+ *                                                                            *
+ * Return value: SUCCEED - drule exists                                       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_drule_get_values(zbx_dc_drule_t *dc_drule)
+{
+	int			ret = FAIL;
+	zbx_dc_drule_t		*drule;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &dc_drule->druleid)))
+	{
+		dc_drule->proxyid = drule->proxyid;
+		dc_drule->name = zbx_strdup(NULL, drule->name);
+		dc_drule->iprange = zbx_strdup(NULL, drule->iprange);
+		dc_drule->status = drule->status;
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve value of uniq if dcheck exists                           *
+ *                                                                            *
+ * Parameter: dcheckid - [IN] id of dcheck                                    *
+ *                uniq - [OUT] value of uniq                                  *
+ *                                                                            *
+ * Return value: SUCCEED - value of uniq retrieved                            *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_dcheck_get_uniq(const zbx_uint64_t dcheckid, unsigned char *uniq)
+{
+	int			ret = FAIL;
+	zbx_dc_dcheck_t		*dcheck;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	if (NULL != (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_search(&config->dchecks, &dcheckid)))
+	{
+		*uniq =  dcheck->uniq;
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	return ret;
 }
 
 /******************************************************************************

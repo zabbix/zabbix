@@ -51,7 +51,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
-		$table = $this->query('id:templates')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->submit();
@@ -472,7 +472,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('Template for');
 		$filter->submit();
-		$table = $this->query('id:templates')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady();
 
 		$table_rows_count = $table->getRows()->count();
 		$this->assertDatatableStats($table_rows_count);

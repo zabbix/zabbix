@@ -39,7 +39,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	const SENSOR_BASE = 'sensor';
 	const LLD_DISCOVERY_COUNT = 10000;
 	const TRIGGER_WARMUP_ITERATIONS = 60;
-	const LLD_ITERATIONS = 180;
+	const LLD_ITERATIONS = 300;
 
 	private static $hostid;
 	private static $proxyid;
@@ -1436,7 +1436,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 	/**
 	 * Send empty LLD discovery, run housekeeper and verify that all discovered
-	 * items, their history and trigger events are removed.
+	 * items, their history and trigger events are removed, also see DEV-4987.
 	 *
 	 * @depends testLLDHistorySyncAtScale_LLDDiscovery
 	 */
@@ -1455,7 +1455,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'.']
 		], 0, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
-		/* check that server succeessfuly removed large amount of items from cache */
+		/* check that server successfully removed large amount of items from cache */
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER, null, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 	}

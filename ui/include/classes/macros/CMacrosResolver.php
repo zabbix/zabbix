@@ -102,7 +102,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values, 'host');
 		// Interface macros, macro should be resolved to main agent interface.
 		$macro_values = self::getMainAgentInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		// Interface macros, macro should be resolved to interface with highest priority.
@@ -135,12 +135,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
 					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
-					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}'
-				],
-				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
-					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LOG.DATE}',
+					'{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
 			],
 			'references' => true,
@@ -148,7 +147,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'references' => [], 'log' => [], 'usermacros' => []];
+		$macros = ['host' => [], 'interface' => [], 'item_value' => [], 'references' => [], 'usermacros' => []];
 
 		$original_triggers = $triggers;
 		$triggers = self::resolveTriggerExpressions($triggers,
@@ -193,8 +192,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			// Get macro value.
 			$macro_values = self::getHostMacros($macros['host'], $macro_values);
 			$macro_values = self::getIpMacros($macros['interface'], $macro_values);
-			$macro_values = self::getItemMacros($macros['item'], $macro_values);
-			$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
+			$macro_values = self::getItemValueMacros($macros['item_value'], $macro_values);
 			$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
 		}
 
@@ -211,11 +209,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param array  $triggers
 	 * @param string $triggers[<triggerid>]['expression']
 	 * @param string $triggers[<triggerid>][<sources>]     See $options['sources'].
-	 * @param int    $triggers[<triggerid>]['clock']       (optional)
-	 * @param int    $triggers[<triggerid>]['ns']          (optional)
 	 * @param array  $options
-	 * @param bool   $options['events']                    Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
-	 * @param bool   $options['html']
 	 * @param array  $options['sources']                   An array of trigger field names: 'comments', 'opdata'.
 	 *
 	 * @return array
@@ -225,19 +219,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
 					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
-					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}'
-				],
-				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
-					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LOG.DATE}',
+					'{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
 			],
 			'usermacros' => true
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'log' => [], 'usermacros' => []];
+		$macros = ['host' => [], 'interface' => [], 'item_value' => [], 'usermacros' => []];
 
 		// Find macros.
 		foreach ($triggers as $triggerid => $trigger) {
@@ -269,49 +262,173 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = self::getHostMacros($macros['host'], $macro_values);
 		$macro_values = self::getIpMacros($macros['interface'], $macro_values);
-		$macro_values = self::getItemMacros($macros['item'], $macro_values, $triggers, $options);
-		$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
+		$macro_values = self::getItemValueMacros($macros['item_value'], $macro_values);
 		$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
+
+		foreach ($macro_values as $triggerid => $values) {
+			foreach ($options['sources'] as $source) {
+				$triggers[$triggerid][$source] = strtr($triggers[$triggerid][$source], $values);
+			}
+		}
+
+		return $triggers;
+	}
+
+	/**
+	 * Resolve macros based on events.
+	 *
+	 * @param array  $events
+	 * @param string $events[<eventid>]['triggerid']
+	 * @param string $events[<eventid>]['expression']
+	 * @param int    $events[<eventid>]['clock']
+	 * @param int    $events[<eventid>]['ns']
+	 * @param string $events[<eventid>][<sources>]     See $options['sources'].
+	 * @param array  $options
+	 * @param bool   $options['html']
+	 * @param array  $options['sources']               An array of trigger field names: 'comments', 'opdata'.
+	 * @param bool   $options['scope']                 'opdata', 'description, 'custom_text'
+	 *
+	 * @return array
+	 */
+	public static function resolveEventMacros(array $events, array $options) {
+		$types = match ($options['scope']) {
+			'opdata', 'description' => [
+				'macros_n' => [
+					'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+					'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+					'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+						'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
+						'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LOG.DATE}',
+						'{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+						'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+					]
+				],
+				'usermacros' => true
+			],
+			'custom_text' => [
+				'macros' => [
+					'trigger' => ['{TRIGGER.ID}', '{EVENT.ID}']
+				],
+				'macros_n' => [
+					'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}', '{HOST.DESCRIPTION}'],
+					'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+					'item' => ['{ITEM.DESCRIPTION}', '{ITEM.DESCRIPTION.ORIG}', '{ITEM.ID}', '{ITEM.KEY}',
+						'{ITEM.KEY.ORIG}', '{ITEM.NAME}', '{ITEM.NAME.ORIG}', '{ITEM.STATE}', '{ITEM.VALUETYPE}'
+					],
+					'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+						'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
+						'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LOG.DATE}',
+						'{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+						'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+					],
+					'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
+				],
+				'usermacros' => true
+			]
+		};
+
+		$macro_values = [];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_value' => [], 'inventory' => [],
+			'usermacros' => []
+		];
+
+		// Find macros.
+		foreach ($events as $eventid => $event) {
+			$functionids = self::findFunctions($event['expression']);
+
+			$texts = [];
+			foreach ($options['sources'] as $source) {
+				$texts[] = $event[$source];
+			}
+
+			$matched_macros = self::extractMacros($texts, $types);
+
+			if (array_key_exists('macros', $matched_macros)) {
+				foreach ($matched_macros['macros'] as $sub_type => $macro_data) {
+					foreach ($macro_data as $token => $data) {
+						$value = match ($data['macro']) {
+							'EVENT.ID' => $eventid,
+							'TRIGGER.ID' => $event['triggerid']
+						};
+						$macro_values[$eventid][$token] = array_key_exists('macrofunc', $data)
+							? CMacroFunction::calcMacrofunc($value, $data['macrofunc'])
+							: $value;
+					}
+				}
+			}
+
+			foreach ($matched_macros['macros_n'] as $sub_type => $macro_data) {
+				foreach ($macro_data as $token => $data) {
+					$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
+
+					if (array_key_exists($data['f_num'], $functionids)) {
+						$macros[$sub_type][$functionids[$data['f_num']]][$data['macro']][] =
+							['token' => $token] + array_intersect_key($data, ['macrofunc' => null]);
+					}
+				}
+			}
+
+			if ($matched_macros['usermacros']) {
+				$macros['usermacros'][$event['triggerid']] =
+					['hostids' => [], 'macros' => $matched_macros['usermacros']];
+			}
+		}
+
+		// Get macro values by triggerid.
+		$macro_values_by_triggerid = [];
+		$macro_values_by_triggerid = self::getHostMacros($macros['host'], $macro_values_by_triggerid);
+		$macro_values_by_triggerid = self::getHostInventoryMacros($macros['inventory'], $macro_values_by_triggerid);
+		$macro_values_by_triggerid = self::getIpMacros($macros['interface'], $macro_values_by_triggerid);
+		$macro_values_by_triggerid = self::getItemMacros($macros['item'], $macro_values_by_triggerid);
+		$macro_values_by_triggerid = self::getTriggerUserMacros($macros['usermacros'], $macro_values_by_triggerid);
+
+		foreach ($events as $eventid => $event) {
+			if (array_key_exists($event['triggerid'], $macro_values_by_triggerid)) {
+				$macro_values[$eventid] = $macro_values_by_triggerid[$event['triggerid']] +
+					($macro_values[$eventid] ?? []);
+			}
+		}
+		$macro_values = self::getEventItemValueMacros($macros['item_value'], $macro_values, $events, $options['html']);
 
 		if ($options['html']) {
 			$types = self::transformToPositionTypes($types);
 
 			// Replace macros to value.
-			foreach ($macro_values as $triggerid => $foo) {
-				$trigger = &$triggers[$triggerid];
+			foreach ($macro_values as $eventid => $foo) {
+				$event = &$events[$eventid];
 
 				foreach ($options['sources'] as $source) {
-					$matched_macros = self::getMacroPositions($trigger[$source], $types);
+					$matched_macros = self::getMacroPositions($event[$source], $types);
 
 					$macro_string = [];
 					$pos_left = 0;
 
 					foreach ($matched_macros as $pos => $macro) {
-						if (array_key_exists($macro, $macro_values[$triggerid])) {
+						if (array_key_exists($macro, $macro_values[$eventid])) {
 							if ($pos_left != $pos) {
-								$macro_string[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
+								$macro_string[] = substr($event[$source], $pos_left, $pos - $pos_left);
 							}
 
-							$macro_string[] = $macro_values[$triggerid][$macro];
+							$macro_string[] = $macro_values[$eventid][$macro];
 							$pos_left = $pos + strlen($macro);
 						}
 					}
-					$macro_string[] = substr($trigger[$source], $pos_left);
+					$macro_string[] = substr($event[$source], $pos_left);
 
-					$trigger[$source] = $macro_string;
+					$event[$source] = $macro_string;
 				}
 			}
-			unset($trigger);
+			unset($event);
 		}
 		else {
-			foreach ($macro_values as $triggerid => $values) {
+			foreach ($macro_values as $eventid => $values) {
 				foreach ($options['sources'] as $source) {
-					$triggers[$triggerid][$source] = strtr($triggers[$triggerid][$source], $values);
+					$events[$eventid][$source] = strtr($events[$eventid][$source], $values);
 				}
 			}
 		}
 
-		return $triggers;
+		return $events;
 	}
 
 	/**
@@ -336,19 +453,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
 					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
-					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}'
-				],
-				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
-					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LOG.DATE}',
+					'{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
 			],
 			'usermacros' => true
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'log' => [], 'usermacros' => []];
+		$macros = ['host' => [], 'interface' => [], 'item_value' => [], 'usermacros' => []];
 
 		$triggerid = $trigger['triggerid'];
 
@@ -386,8 +502,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = self::getHostMacros($macros['host'], $macro_values);
 		$macro_values = self::getIpMacros($macros['interface'], $macro_values);
-		$macro_values = self::getItemMacros($macros['item'], $macro_values);
-		$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
+		$macro_values = self::getItemValueMacros($macros['item_value'], $macro_values);
 		$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
 
 		$url = array_key_exists($triggerid, $macro_values)
@@ -1045,20 +1160,29 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve text-type column macros for top-hosts widget.
 	 *
-	 * @param array $columns
-	 * @param array $hostids
+	 * @param array  $columns
+	 * @param array  $hostids
+	 * @param string $options['context']  'host', 'template'
 	 *
 	 * @return array
 	 */
-	public static function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
-		$types = [
-			'macros' => [
-				'host' => ['{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
-				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
+	public static function resolveHostMacros(array $columns, array $hostids, array $options): array {
+		$types = match ($options['context']) {
+			'host' => [
+				'macros' => [
+					'host' => ['{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
+					'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+					'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
+				],
+				'usermacros' => true
 			],
-			'usermacros' => true
-		];
+			'template' => [
+				'macros' => [
+					'host' => ['{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}']
+				],
+				'usermacros' => true
+			]
+		};
 
 		$macro_values = [];
 		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'usermacros' => []];
@@ -1081,7 +1205,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values, $options['context']);
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
@@ -1516,7 +1640,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$macro_values = self::getMapMacros($macros['map'], $macro_values);
 		$macro_values = self::getAggrTriggerMacros($macros['triggers'], $macro_values, $selements);
-		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values, 'host');
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 
@@ -1904,7 +2028,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values, 'host');
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserDataMacros($macros['user_data'], $macro_values);
