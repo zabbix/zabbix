@@ -1076,7 +1076,7 @@ out:
  * Return value: SUCCEED on success, FAIL otherwise                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_cep_get_init_stats(zbx_cep_init_stats_t *stats, char **error)
+int	zbx_cep_get_diaginfo(zbx_cep_diaginfo_t *stats, char **error)
 {
 	zbx_ipc_socket_t	socket;
 	char			*errmsg = NULL;
@@ -1091,7 +1091,7 @@ int	zbx_cep_get_init_stats(zbx_cep_init_stats_t *stats, char **error)
 		return ret;
 	}
 
-	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_CEP_GET_INIT_STATS, NULL, 0))
+	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_CEP_GET_DIAGINFO, NULL, 0))
 	{
 		*error = zbx_strdup(NULL, "cannot send get init stats message to CEP service");
 		goto out;
@@ -1104,12 +1104,16 @@ int	zbx_cep_get_init_stats(zbx_cep_init_stats_t *stats, char **error)
 	}
 
 	ptr = response.data;
-	ptr += zbx_deserialize_value(ptr, &stats->events_num);
-	ptr += zbx_deserialize_value(ptr, &stats->events_time);
-	ptr += zbx_deserialize_value(ptr, &stats->tags_num);
-	ptr += zbx_deserialize_value(ptr, &stats->tags_time);
-	ptr += zbx_deserialize_value(ptr, &stats->suppress_num);
-	(void)zbx_deserialize_value(ptr, &stats->suppress_time);
+	ptr += zbx_deserialize_value(ptr, &stats->startup.events_num);
+	ptr += zbx_deserialize_value(ptr, &stats->startup.events_time);
+	ptr += zbx_deserialize_value(ptr, &stats->startup.tags_num);
+	ptr += zbx_deserialize_value(ptr, &stats->startup.tags_time);
+	ptr += zbx_deserialize_value(ptr, &stats->startup.suppress_num);
+	ptr += zbx_deserialize_value(ptr, &stats->startup.suppress_time);
+	ptr += zbx_deserialize_value(ptr, &stats->blocked_commit_num);
+	ptr += zbx_deserialize_value(ptr, &stats->commits_num);
+	ptr += zbx_deserialize_value(ptr, &stats->commit_task_num);
+	(void)zbx_deserialize_value(ptr, &stats->workers_num);
 
 	zbx_ipc_message_clean(&response);
 
