@@ -24,6 +24,7 @@
 #include "zbxjson.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
+#include "zbxvault.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -333,7 +334,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 	static double		next_try_after_error;
 	static double		next_renew;
 
-	if (1 == force)
+	if (ZBX_VAULT_RENEW_TOKEN_FORCE == force)
 	{
 		last_status = SUCCEED;
 		next_try_after_error = 0;

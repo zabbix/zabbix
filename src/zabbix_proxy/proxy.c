@@ -2045,7 +2045,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_vault_init(zbx_config_vault.name);
 
 		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, 0, &zbx_config_vault.token);
+				config_ssl_cert_location, config_ssl_key_location, ZBX_VAULT_RENEW_TOKEN_NORMAL,
+				&zbx_config_vault.token);
 
 		if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_db_config->dbuser,
 				&zbx_db_config->dbpassword, zbx_config_source_ip, config_ssl_ca_location,
@@ -2202,7 +2203,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 
 		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, 0, &zbx_config_vault.token);
+				config_ssl_cert_location, config_ssl_key_location, ZBX_VAULT_RENEW_TOKEN_NORMAL,
+				&zbx_config_vault.token);
 
 		if (0 != zbx_strcmp_null(old_token, zbx_config_vault.token) && NULL != zbx_config_vault.token)
 		{
