@@ -24,7 +24,7 @@ class APIException extends Exception {
 		parent::__construct($message, $code);
 	}
 
-	public function getDebugMessage(): ?string {
+	public function getDebugMessage(): string {
 		return $this->debug_info === '' ? $this->getMessage() : $this->getMessage().' '.$this->debug_info;
 	}
 }
