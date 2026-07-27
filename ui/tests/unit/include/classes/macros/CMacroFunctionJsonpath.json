@@ -53,7 +53,55 @@
             "function": "jsonpath",
             "parameters": ["$.services[?(@.name == \"pay\")].name"]
         },
-        "result": "pay"
+        "result": "[\"pay\"]"
+    },
+    {
+        "value": "{\"services\":[{\"name\":\"pay\"}]}",
+        "macrofunc": {
+            "function": "jsonpath",
+            "parameters": ["$.services[*].name"]
+        },
+        "result": "[\"pay\"]"
+    },
+    {
+        "value": "{\"active\":false}",
+        "macrofunc": {
+            "function": "jsonpath",
+            "parameters": ["$.active"]
+        },
+        "result": "false"
+    },
+    {
+        "value": "{\"value\":null}",
+        "macrofunc": {
+            "function": "jsonpath",
+            "parameters": ["$.value"]
+        },
+        "result": "null"
+    },
+    {
+        "value": "{\"cpu\":42.5}",
+        "macrofunc": {
+            "function": "jsonpath",
+            "parameters": ["$.cpu"]
+        },
+        "result": "42.5"
+    },
+    {
+        "value": "{\"path\":\"a/b\",\"city\":\"café\"}",
+        "macrofunc": {
+            "function": "jsonpath",
+            "parameters": ["$.path"]
+        },
+        "result": "a/b"
+    },
+    {
+        "value": "{\"path\":\"a/b\",\"city\":\"café\"}",
+        "macrofunc": {
+            "function": "jsonpath",
+            "parameters": ["$.city"]
+        },
+        "result": "café"
     },
     {
         "value": "{\"columns\":{\"pod\":\"pod-XX1\"}}",

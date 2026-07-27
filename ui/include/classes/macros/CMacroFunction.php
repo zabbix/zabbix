@@ -496,7 +496,30 @@ class CMacroFunction {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
-		return self::macrofuncPathResult($matches, $parameters);
+		if ($matches === []) {
+			return count($parameters) == 2 ? $parameters[1] : UNRESOLVED_MACRO_STRING;
+		}
+
+		if (self::isSingularJsonPath($parameters[0])) {
+			$match = reset($matches);
+
+			return is_string($match)
+				? $match
+				: json_encode($match, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		}
+
+		return json_encode(array_values($matches), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+	}
+
+	/**
+	 * Determines whether a JSONPath is a singular query.
+	 *
+	 * @param string $path  [IN] The JSONPath pattern.
+	 *
+	 * @return bool
+	 */
+	private static function isSingularJsonPath(string $path): bool {
+		return !preg_match('/\.\.|\[\s*\*\s*]|\.\*|\[[^]]*:[^]]*]|\[[^]]*,[^]]*]|\[\s*\?/', $path);
 	}
 
 	/**
@@ -515,46 +538,40 @@ class CMacroFunction {
 		$dom = new DOMDocument();
 		$use_internal_errors = libxml_use_internal_errors(true);
 
-		$nodes = $dom->loadXML($value) ? @(new DOMXPath($dom))->query($parameters[0]) : false;
+		if (!$dom->loadXML($value)) {
+			libxml_clear_errors();
+			libxml_use_internal_errors($use_internal_errors);
+
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		libxml_clear_errors();
+		$result = @(new DOMXPath($dom))->evaluate($parameters[0]);
+
+		$invalid_xpath = $result === false && libxml_get_errors() !== [];
 
 		libxml_clear_errors();
 		libxml_use_internal_errors($use_internal_errors);
 
-		if ($nodes === false) {
+		if ($invalid_xpath) {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
-		$matches = [];
+		if ($result instanceof DOMNodeList) {
+			if ($result->length == 0) {
+				return count($parameters) == 2 ? $parameters[1] : UNRESOLVED_MACRO_STRING;
+			}
 
-		foreach ($nodes as $node) {
-			$matches[] = (string) $node->nodeValue;
+			$output = '';
+
+			foreach ($result as $node) {
+				$output .= $dom->saveXML($node);
+			}
+
+			return $output;
 		}
 
-		return self::macrofuncPathResult($matches, $parameters);
-	}
-
-	/**
-	 * Formats JSONPath/XPath query results for macro output.
-	 *
-	 * @param array $matches     [IN] Query result values.
-	 * @param array $parameters  [IN] Function parameters, [1] is the optional default value.
-	 *
-	 * @return string
-	 */
-	private static function macrofuncPathResult(array $matches, array $parameters): string {
-		if ($matches === []) {
-			return count($parameters) == 2 ? $parameters[1] : UNRESOLVED_MACRO_STRING;
-		}
-
-		if (count($matches) == 1) {
-			$match = reset($matches);
-
-			return is_string($match)
-				? $match
-				: json_encode($match, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-		}
-
-		return json_encode(array_values($matches), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		return is_bool($result) ? (string) (int) $result : (string) $result;
 	}
 
 	/**
