@@ -1283,9 +1283,7 @@ class CUser extends CApiService {
 			$period = CMaintenanceHelper::normalizeTimePeriod($user['default_maintenance_period']);
 
 			if ($period !== timeUnitToSeconds($user['default_maintenance_period'])) {
-				$normalized_period = (string) $period;
-
-				$user['default_maintenance_period'] = $normalized_period;
+				$user['default_maintenance_period'] = $period.'s';
 			}
 		}
 		unset($user);
