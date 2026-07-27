@@ -106,12 +106,18 @@ class CDataCacheHelper {
 		}
 		else {
 			$file_name = self::getDataCacheFileName();
-			$tmp_file_name = $file_name.'.tmp.'.uniqid();
+			$tmp_file_name = tempnam(dirname($file_name), basename($file_name).'.tmp');
 
-			touch($tmp_file_name);
-			chmod($tmp_file_name, 0600);
-			file_put_contents($tmp_file_name, json_encode(self::$data));
-			rename($tmp_file_name, $file_name);
+			if ($tmp_file_name === false) {
+				throw new Exception(_('Unable to create a temporary data cache file.'));
+			}
+
+			if (file_put_contents($tmp_file_name, json_encode(self::$data)) === false
+					|| !rename($tmp_file_name, $file_name)) {
+				unlink($tmp_file_name);
+
+				throw new Exception(_s('Unable to write data cache file "%1$s".', $file_name));
+			}
 		}
 	}
 
