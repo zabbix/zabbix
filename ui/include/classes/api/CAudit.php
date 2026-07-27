@@ -272,6 +272,9 @@ class CAudit {
 			],
 			['paths' => ['connector.ssl_key_password']]
 		],
+		self::RESOURCE_DEVICE => [
+			'paths' => ['device.push_token', 'device.keys.key_']
+		],
 		self::RESOURCE_LLD_RULE => [
 			[
 				'paths' => ['discoveryrule.password'],
@@ -637,9 +640,7 @@ class CAudit {
 	 *
 	 * @var array
 	 */
-	private const SKIP_FIELDS = ['device.push_token', 'device.activated_at', 'token.creator_userid',
-		'token.created_at'
-	];
+	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at'];
 
 	/**
 	 * Array of abstract paths that contain blob fields.

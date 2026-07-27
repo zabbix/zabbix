@@ -255,10 +255,6 @@ class CDevice extends CApiService {
 
 		DB::delete('device_enrollment_token', ['deviceid' => $db_device['deviceid']]);
 
-		self::createDeviceKeys($db_device['deviceid'], $options['mobile_identity_key'],
-			$options['mobile_encryption_key']
-		);
-
 		$token = CApiTokenHelper::generateToken();
 		$tokens = [[
 			'name' => $db_device['uuid'],
@@ -283,7 +279,10 @@ class CDevice extends CApiService {
 			'name' => $options['name'],
 			'status' => ZBX_DEVICE_STATUS_ACTIVATED,
 			'push_token' => $options['push_token'],
-			'activated_at' => time()
+			'activated_at' => time(),
+			'keys' => self::createDeviceKeys($db_device['deviceid'], $options['mobile_identity_key'],
+				$options['mobile_encryption_key']
+			)
 		];
 
 		$db_devices = [$db_device['deviceid'] => array_intersect_key($db_device, $device)];
@@ -337,6 +336,8 @@ class CDevice extends CApiService {
 			' FROM device d'.
 			' WHERE '.dbConditionId('d.deviceid', [$db_enrollment_token['deviceid']])
 		));
+
+		$db_device['keys'] = [];
 	}
 
 	private static function getJwkValidationRules(): array {
@@ -352,12 +353,12 @@ class CDevice extends CApiService {
 	}
 
 	private static function createDeviceKeys(string $deviceid, array $mobile_identity_key,
-			array $mobile_encryption_key): void {
+			array $mobile_encryption_key): array {
 		$device_keyid = DB::reserveIds('device_key', 2);
 
 		$current_time = time();
 
-		$fields = [
+		$device_keys = [
 			[
 				'device_keyid' => $device_keyid,
 				'deviceid' => $deviceid,
@@ -378,7 +379,9 @@ class CDevice extends CApiService {
 			]
 		];
 
-		DB::insertBatch('device_key', $fields, false);
+		DB::insertBatch('device_key', $device_keys, false);
+
+		return $device_keys;
 	}
 
 	public static function updateForce(array $devices, array $db_devices): void {
