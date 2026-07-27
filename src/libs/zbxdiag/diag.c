@@ -855,32 +855,43 @@ static const char	*diag_log_cep_get_stat(struct zbx_json_parse *jp, const char *
  ******************************************************************************/
 static void	diag_log_cep(struct zbx_json_parse *jp, char **out, size_t *out_alloc, size_t *out_offset)
 {
-	struct zbx_json_parse	jp_startup;
+	struct zbx_json_parse	jp_startup, jp_stats;
+	char			*str = NULL;
+	size_t			str_alloc = 0, str_offset = 0;
+	char			buf[ZBX_MAX_DOUBLE_LEN + 1];
 
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "== CEP diagnostic information ==");
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, "startup", &jp_startup))
 	{
-		char	*str = NULL;
-		size_t	str_alloc = 0, str_offset = 0;
-		char	buf[ZBX_MAX_DOUBLE_LEN + 1];
-
 		zbx_strcpy_alloc(&str, &str_alloc, &str_offset, "loaded");
 		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, " %s events",
-			diag_log_cep_get_stat(&jp_startup, "events_num", buf, sizeof(buf)));
+				diag_log_cep_get_stat(&jp_startup, "events_num", buf, sizeof(buf)));
 		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, " in %ss",
-			diag_log_cep_get_stat(&jp_startup, "events_time", buf, sizeof(buf)));
+				diag_log_cep_get_stat(&jp_startup, "events_time", buf, sizeof(buf)));
 		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ", %s tags",
-			diag_log_cep_get_stat(&jp_startup, "tags_num", buf, sizeof(buf)));
+				diag_log_cep_get_stat(&jp_startup, "tags_num", buf, sizeof(buf)));
 		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, " in %ss",
-			diag_log_cep_get_stat(&jp_startup, "tags_time", buf, sizeof(buf)));
+				diag_log_cep_get_stat(&jp_startup, "tags_time", buf, sizeof(buf)));
 		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ", %s suppress data",
-			diag_log_cep_get_stat(&jp_startup, "suppress_num", buf, sizeof(buf)));
+				diag_log_cep_get_stat(&jp_startup, "suppress_num", buf, sizeof(buf)));
 		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, " in %ss",
-			diag_log_cep_get_stat(&jp_startup, "suppress_time", buf, sizeof(buf)));
+				diag_log_cep_get_stat(&jp_startup, "suppress_time", buf, sizeof(buf)));
 
 		zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "%s", str);
 		zbx_free(str);
+	}
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, "stats", &jp_stats))
+	{
+		zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "blocked commits:%s",
+				diag_log_cep_get_stat(&jp_stats, "blocked_commits", buf, sizeof(buf)));
+		zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "tasks ready to be committed:%s",
+				diag_log_cep_get_stat(&jp_stats, "commits_num", buf, sizeof(buf)));
+		zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "active commit tasks:%s",
+				diag_log_cep_get_stat(&jp_stats, "commit_task_num", buf, sizeof(buf)));
+		zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "active workers:%s",
+				diag_log_cep_get_stat(&jp_stats, "workers_num", buf, sizeof(buf)));
 	}
 
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "==");

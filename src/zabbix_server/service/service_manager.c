@@ -2780,12 +2780,10 @@ static void	recover_services_problem(zbx_service_manager_t *service_manager, zbx
 		for (int i = 0; i < service_problem_index->services.values_num; i++)
 		{
 			zbx_service_t		*service;
-			zbx_services_diff_t	service_diff_local, *service_diff;
+			zbx_services_diff_t	*service_diff;
 			zbx_service_problem_t	*service_problem;
 
 			service = service_problem_index->services.values[i];
-
-			service_diff_local.serviceid = service->serviceid;
 
 			service_diff = service_manager_get_or_create_services_diff(service_manager, service,
 					ZBX_FLAG_SERVICE_UPDATE);
@@ -2906,7 +2904,6 @@ static void	service_update_event_severity(zbx_service_manager_t *service_manager
 {
 	int			index;
 	zbx_service_problem_t	*service_problem, service_problem_cmp = {.eventid = eventid};
-	zbx_services_diff_t	services_diff_local;
 
 	if (FAIL == (index = zbx_vector_service_problem_ptr_search(&service->service_problems, &service_problem_cmp,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -2916,8 +2913,6 @@ static void	service_update_event_severity(zbx_service_manager_t *service_manager
 
 	service_problem = service->service_problems.values[index];
 	service_problem->severity = severity;
-
-	services_diff_local.serviceid = service->serviceid;
 
 	(void)service_manager_get_or_create_services_diff(service_manager, service, ZBX_FLAG_SERVICE_UPDATE);
 }
