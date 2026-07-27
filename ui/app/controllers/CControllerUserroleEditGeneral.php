@@ -40,7 +40,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 
 					return [
 						'name' => str_replace('ui.', '', $rule),
-						'status' => $this->hasInput($field) ? $this->getInput($field) : ZBX_ROLE_RULE_ENABLED
+						'status' => $this->getInput($field, ZBX_ROLE_RULE_ENABLED)
 					];
 				},
 				CRoleHelper::getUiElementsByUserType($user_type)
@@ -126,7 +126,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 
 					return [
 						'name' => str_replace('actions.', '', $rule),
-						'status' => $this->hasInput($field) ? $this->getInput($field) : ZBX_ROLE_RULE_ENABLED
+						'status' => $this->getInput($field, ZBX_ROLE_RULE_ENABLED)
 					];
 				},
 				CRoleHelper::getActionsByUserType($user_type)
