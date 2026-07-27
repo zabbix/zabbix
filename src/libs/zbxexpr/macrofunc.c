@@ -23,7 +23,12 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxcrypto.h"
+#include "zbxvariant.h"
 #include "zbxjson.h"
+
+#ifdef HAVE_LIBXML2
+#	include "zbxxml.h"
+#endif
 
 #define ZBX_RULE_BUFF_LEN 512
 
@@ -744,6 +749,84 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: returns the result of an xpath query.                             *
+ *                                                                            *
+ * Parameters: params - [IN] function data                                    *
+ *             nparam - [IN] parameter count                                  *
+ *             out    - [IN/OUT] input/output value                           *
+ *                                                                            *
+ * Return value: SUCCEED - function was calculated successfully               *
+ *               FAIL    - function calculation failed                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	macrofunc_xmlxpath(char **params, size_t nparam, char **out)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(params);
+	ZBX_UNUSED(nparam);
+	ZBX_UNUSED(out);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() Support for XML was not compiled in.", __func__);
+	return FAIL;
+#else
+	int		ret = FAIL;
+	zbx_variant_t	value;
+	int		is_empty;
+	char		*error = NULL;
+	const char	*pattern, *default_value = NULL;
+
+	if (1 > nparam || nparam > 2)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
+		return FAIL;
+	}
+
+	pattern = params[0];
+
+	if (2 == nparam)
+		default_value = params[1];
+
+	zbx_variant_set_str(&value, zbx_strdup(NULL, *out));
+
+	if (FAIL == zbx_query_xpath_contents(&value, pattern, &is_empty, &error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() XML xpath query failed: %s", __func__, ZBX_NULL2EMPTY_STR(error));
+		goto out;
+	}
+
+	if (SUCCEED == is_empty)
+	{
+		if (NULL == default_value)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() XML xpath returned empty nodeset", __func__);
+			goto out;
+		}
+		else
+		{
+			zbx_variant_clear(&value);
+			zbx_variant_set_str(&value, zbx_strdup(NULL, default_value));
+		}
+	}
+
+	if (SUCCEED != zbx_variant_convert(&value, ZBX_VARIANT_STR))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot convert XML xpath result to string", __func__);
+		goto out;
+	}
+
+	*out = zbx_strdup(*out, value.data.str);
+
+	ret = SUCCEED;
+out:
+	zbx_variant_clear(&value);
+	zbx_free(error);
+
+	return ret;
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: calculates macro function value.                                  *
  *                                                                            *
  * Parameters: expression - [IN] expression containing macro function         *
@@ -797,6 +880,8 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 		macrofunc = macrofunc_regrepl;
 	else if (ZBX_CONST_STRLEN("jsonpath") == len && 0 == strncmp(ptr, "jsonpath", len))
 		macrofunc = macrofunc_jsonpath;
+	else if (ZBX_CONST_STRLEN("xmlxpath") == len && 0 == strncmp(ptr, "xmlxpath", len))
+		macrofunc = macrofunc_xmlxpath;
 	else
 		goto out;
 

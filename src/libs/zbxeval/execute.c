@@ -1597,6 +1597,25 @@ static int	eval_execute_function_mid(const zbx_eval_context_t *ctx, const zbx_ev
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: evaluates substring() function (alias to mid())                   *
+ *                                                                            *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
+ *             output - [IN/OUT] output value stack                           *
+ *             error  - [OUT] error message in case of failure                *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_substring(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	return eval_execute_function_mid(ctx, token, output, error);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: evaluates trim(), rtrim(), ltrim() functions                      *
  *                                                                            *
  * Parameters: ctx    - [IN] evaluation context                               *
@@ -2948,6 +2967,62 @@ static int	eval_execute_function_xmlxpath(const zbx_eval_context_t *ctx, const z
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: evaluates contains() function                                     *
+ *                                                                            *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
+ *             output - [IN/OUT] output value stack                           *
+ *             error  - [OUT] error message in case of failure                *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_contains(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*haystack, *needle;
+	zbx_variant_t	value;
+
+	if (2 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	haystack = &output->values[output->values_num - token->opt];
+
+	if (SUCCEED != zbx_variant_convert(haystack, ZBX_VARIANT_STR))
+	{
+		*error = zbx_strdup(*error, "invalid first parameter");
+		return FAIL;
+	}
+
+	needle = &output->values[output->values_num - token->opt + 1];
+
+	if (SUCCEED != zbx_variant_convert(needle, ZBX_VARIANT_STR) || '\0' == *needle->data.str)
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		return FAIL;
+	}
+
+	if (NULL != strstr(haystack->data.str, needle->data.str))
+		zbx_variant_set_dbl(&value, 1);
+	else
+		zbx_variant_set_dbl(&value, 0);
+
+	eval_function_return(token->opt, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: evaluates common function                                         *
  *                                                                            *
  * Parameters: ctx    - [IN] evaluation context                               *
@@ -3017,6 +3092,8 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 		return eval_execute_function_right(ctx, token, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "mid", ZBX_CONST_STRLEN("mid")))
 		return eval_execute_function_mid(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "substring", ZBX_CONST_STRLEN("substring")))
+		return eval_execute_function_substring(ctx, token, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bitlength", ZBX_CONST_STRLEN("bitlength")))
 		return eval_execute_function_bitlength(ctx, token, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bytelength", ZBX_CONST_STRLEN("bytelength")))
@@ -3118,6 +3195,8 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 		return eval_execute_function_jsonpath(ctx, token, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "xmlxpath", ZBX_CONST_STRLEN("xmlxpath")))
 		return eval_execute_function_xmlxpath(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "contains", ZBX_CONST_STRLEN("contains")))
+		return eval_execute_function_contains(ctx, token, output, error);
 
 	if (NULL != ctx->eval_function_common_cb)
 		return eval_execute_cb_function(ctx, token, ctx->eval_function_common_cb, output, error);

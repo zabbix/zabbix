@@ -35,6 +35,10 @@
 #include "zbxtrends.h"
 #include "zbxjson.h"
 
+#ifdef HAVE_LIBXML2
+#	include "zbxxml.h"
+#endif
+
 #define ZBX_VALUEMAP_TYPE_MATCH			0
 #define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1
 #define ZBX_VALUEMAP_TYPE_LESS_OR_EQUAL		2
@@ -3060,12 +3064,6 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 		goto out;
 	}
 
-	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
-	{
-		*error = zbx_strdup(*error, "cannot get values from value cache");
-		goto out;
-	}
-
 	if (SUCCEED != zbx_jsonpath_compile(pattern, &jsonpath_tmp))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "invalid jsonpath expression: %s", zbx_json_strerror());
@@ -3074,6 +3072,12 @@ static int	evaluate_JSONPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 	}
 
 	zbx_jsonpath_clear(&jsonpath_tmp);
+
+	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+		goto out;
+	}
 
 	result = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
 	zbx_vector_var_create(result);
@@ -3129,6 +3133,157 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate function 'xmlxpath' for the item.                        *
+ *                                                                            *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] seconds/values, time shift (optional),       *
+ *                               pattern                                      *
+ *             ts         - [IN] starting timestamp                           *
+ *             selector   - [IN/OUT] history range selector                   *
+ *             error      - [OUT]                                             *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_XMLXPATH(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
+		const zbx_timespec_t *ts, zbx_history_selector_t *selector, char **error)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(item);
+	ZBX_UNUSED(parameters);
+	ZBX_UNUSED(ts);
+	ZBX_UNUSED(selector);
+
+	*error = zbx_strdup(*error, "Support for XML was not compiled in.");
+	return FAIL;
+#else
+	int				ret = FAIL, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
+	char				*pattern = NULL;
+	zbx_vector_var_t		*result = NULL;
+	zbx_timespec_t			ts_end = *ts;
+	char				error_buf[MAX_STRING_LEN] = "";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type
+			&& ITEM_VALUE_TYPE_LOG != item->value_type)
+	{
+		*error = zbx_strdup(*error, "invalid value type");
+		goto out;
+	}
+
+	if (2 != zbx_function_param_parse_count(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_history_selector(ts->sec, parameters, 1, selector) ||
+			ZBX_VALUE_NONE == selector->type)
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
+	if (NULL == value)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	switch (selector->type)
+	{
+		case ZBX_VALUE_SECONDS:
+			seconds = selector->value;
+			break;
+		case ZBX_VALUE_NVALUES:
+			nvalues = selector->value;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	ts_end.sec -= selector->timeshift;
+
+	if (SUCCEED != get_function_parameter_str(parameters, 2, &pattern))
+	{
+		*error = zbx_strdup(*error, "invalid third parameter");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_xml_xpath_check(pattern, error_buf, sizeof(error_buf)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid XML xpath expression: %s", error_buf);
+		*error = zbx_dsprintf(*error, "invalid XML xpath expression: %s", error_buf);
+		goto out;
+	}
+
+	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+		goto out;
+	}
+
+	result = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
+	zbx_vector_var_create(result);
+
+	for (int i = 0; i < values.values_num; i++)
+	{
+		zbx_variant_t	matches;
+		int		is_empty;
+		char		*error_query = NULL;
+
+		if (ITEM_VALUE_TYPE_LOG == item->value_type)
+			zbx_variant_set_str(&matches, zbx_strdup(NULL, values.values[i].value.log->value));
+		else
+			zbx_variant_set_str(&matches, zbx_strdup(NULL, values.values[i].value.str));
+
+		if (FAIL != zbx_query_xpath_contents(&matches, pattern, &is_empty, &error_query))
+		{
+			if (SUCCEED != is_empty)
+				zbx_vector_var_append(result, matches);
+			else
+				zbx_variant_clear(&matches);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "XML xpath query failed: %s", ZBX_NULL2EMPTY_STR(error_query));
+			zbx_variant_clear(&matches);
+		}
+
+		zbx_free(error_query);
+	}
+
+	zbx_variant_set_vector(value, result);
+	result = NULL;
+
+	ret = SUCCEED;
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+	zbx_free(pattern);
+
+	if (NULL != result)
+	{
+		zbx_vector_var_clear_ext(result);
+		zbx_vector_var_destroy(result);
+		zbx_free(result);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+#endif
 }
 
 /* flags for evaluate_MONO() */
@@ -4099,6 +4254,10 @@ int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	{
 		ret = evaluate_JSONPATH(value, item, parameter, ts, selector, error);
 	}
+	else if (0 == strncmp(function, "xmlxpath", ZBX_CONST_STRLEN("xmlxpath")))
+	{
+		ret = evaluate_XMLXPATH(value, item, parameter, ts, selector, error);
+	}
 	else if (NULL != (ptr = strstr(function, "_foreach")) && ZBX_CONST_STRLEN("_foreach") == strlen(ptr))
 	{
 		*error = zbx_dsprintf(*error, "single item query is not supported by \"%s\" function", function);
@@ -4147,7 +4306,7 @@ int	zbx_is_trigger_function(const char *name, size_t len)
 			"sumofsquares", "varpop", "varsamp", "ascii", "bitlength", "char", "concat", "insert", "lcase",
 			"left", "ltrim", "bytelength", "repeat", "replace", "right", "rtrim", "mid", "trim", "between",
 			"in", "bitor", "bitxor", "bitnot", "bitlshift", "bitrshift", "baselinewma", "baselinedev",
-			"jsonpath", "xmlxpath",
+			"jsonpath", "xmlxpath", "contains", "substring",
 			NULL};
 	char	**ptr;
 
