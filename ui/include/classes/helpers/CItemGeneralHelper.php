@@ -699,17 +699,22 @@ JAVASCRIPT;
 			unset($condition);
 		}
 
-		return [
+		$query = [
 			'signal_type' => (int) $input['signal_type'],
 			'metric_point_type' => (int) $input['metric_point_type'],
 			'columns' => $columns,
-			'aggregated_columns' => $aggregated_columns,
-			'filter' => [
+			'aggregated_columns' => $aggregated_columns
+		];
+
+		if ($for_server || $conditions) {
+			$query['filter'] = [
 				'evaltype' => $evaltype,
 				'formula' => $formula,
 				'conditions' => $conditions
-			]
-		];
+			];
+		}
+
+		return $query;
 	}
 
 	/**

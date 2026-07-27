@@ -97,9 +97,9 @@ window.item_edit_form = new class {
 			this.initItemPrototypeEvents();
 		}
 
-		this.updateFieldsVisibility();
-
 		this.#initTelemetryRows();
+
+		this.updateFieldsVisibility();
 
 		this.form.discoverAllFields();
 		this.initial_form_fields = this.#getFormFields();
@@ -318,6 +318,8 @@ window.item_edit_form = new class {
 			this.form_element.querySelector(`#${id}`).addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-remove-row')) {
 					e.target.closest('tr').remove();
+
+					this.updateFieldsVisibility();
 				}
 			});
 		}
@@ -698,7 +700,10 @@ window.item_edit_form = new class {
 			trigger_element: trigger
 		});
 
-		overlay.$dialogue[0].addEventListener('telemetry_condition.submit', (e) => this.#addConditionRow(e.detail));
+		overlay.$dialogue[0].addEventListener('telemetry_condition.submit', (e) => {
+			this.#addConditionRow(e.detail);
+			this.updateFieldsVisibility();
+		});
 	}
 
 	#addAggregatedColumnRow(data) {
@@ -760,7 +765,6 @@ window.item_edit_form = new class {
 		}
 
 		const is_metrics = parseInt(this.field.signal_type.value, 10) === APM_SIGNAL_TYPE_METRICS;
-		const is_custom_expression = parseInt(this.field.evaltype.value, 10) === CONDITION_EVAL_TYPE_EXPRESSION;
 		const switcher = globalAllObjForViewSwitcher['type'];
 
 		// "Metric points" is shown only for "APM metrics".
@@ -768,7 +772,21 @@ window.item_edit_form = new class {
 			id => switcher[is_metrics ? 'showObj' : 'hideObj']({id})
 		);
 
+		// "Type of calculation" is shown only when there is more than one condition.
+		const has_calculation = this.form_element
+			.querySelectorAll('#conditions-table tbody [data-row_index]').length > 1;
+
+		if (!has_calculation) {
+			this.field.evaltype.value = <?= CONDITION_EVAL_TYPE_AND_OR ?>;
+		}
+
+		['js-item-evaltype-label', 'js-item-evaltype-field'].forEach(
+			id => switcher[has_calculation ? 'showObj' : 'hideObj']({id})
+		);
+
 		// The formula field is shown only for the "Custom expression" calculation type.
+		const is_custom_expression = parseInt(this.field.evaltype.value, 10) === CONDITION_EVAL_TYPE_EXPRESSION;
+
 		this.field.formula.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !is_custom_expression);
 
 		this.#updateTelemetryIndicators();
