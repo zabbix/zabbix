@@ -3005,7 +3005,7 @@ static int	eval_execute_function_contains(const zbx_eval_context_t *ctx, const z
 
 	needle = &output->values[output->values_num - token->opt + 1];
 
-	if (SUCCEED != zbx_variant_convert(needle, ZBX_VARIANT_STR) || '\0' == *needle->data.str)
+	if (SUCCEED != zbx_variant_convert(needle, ZBX_VARIANT_STR))
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
 		return FAIL;
