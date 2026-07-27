@@ -15,10 +15,124 @@
 
 
 /**
- * Telemetry Query items tests.
- * To prevent items table backup and restore class is defined as trait for testItem class.
+ * Telemetry Query item and item prototype tests data.
  */
 trait traitItemTelemetryQueryTests {
+
+	public static function initItemTestsData() {
+		CTestDataHelper::createObjects([
+			'template_groups' => [
+				['name' => 'telemetry_query_template_group']
+			],
+			'host_groups' => [
+				['name' => 'telemetry_query_host_group']
+			],
+			'templates' => [
+				[
+					'host' => 'telemetry_query_template',
+					'groups' => ['groupid' => ':template_group:telemetry_query_template_group'],
+					'items' => [
+						[
+							'name' => 'template item',
+							'key_' => 'template_item_telemetry_query',
+							'type' => ITEM_TYPE_TELEMETRY_QUERY,
+							'value_type' => ITEM_VALUE_TYPE_UINT64,
+							'query' => [
+								'signal_type' => APM_SIGNAL_TYPE_TRACES,
+								'columns' => [],
+								'aggregated_columns' => [['alias' => 'Timestamp']],
+								'filter' => []
+							]
+						]
+					]
+				]
+			],
+			'hosts' => [
+				[
+					'host' => 'telemetry_query_host',
+					'groups' => ['groupid' => ':host_group:telemetry_query_host_group'],
+					'templates' => [['templateid' => ':template:telemetry_query_template']],
+					'items' => [
+						[
+							'name' => 'host item',
+							'key_' => 'host_item_telemetry_query',
+							'type' => ITEM_TYPE_TELEMETRY_QUERY,
+							'value_type' => ITEM_VALUE_TYPE_UINT64,
+							'query' => [
+								'signal_type' => APM_SIGNAL_TYPE_TRACES,
+								'columns' => [],
+								'aggregated_columns' => [['alias' => 'Timestamp']],
+								'filter' => []
+							]
+						]
+					]
+				]
+			]
+		]);
+	}
+
+	public static function initItemPrototypeTestsData() {
+		CTestDataHelper::createObjects([
+			'template_groups' => [
+				['name' => 'telemetry_query_template_group']
+			],
+			'host_groups' => [
+				['name' => 'telemetry_query_host_group']
+			],
+			'templates' => [
+				[
+					'host' => 'telemetry_query_template',
+					'groups' => ['groupid' => ':template_group:telemetry_query_template_group'],
+					'lld_rules' => [
+						[
+							'name' => 'template lld',
+							'key_' => 'template_lld_telemetry_query',
+							'item_prototypes' => [
+								[
+									'name' => 'template item prototype',
+									'key_' => 'template_item_prototype_telemetry_query[{#M}]',
+									'type' => ITEM_TYPE_TELEMETRY_QUERY,
+									'value_type' => ITEM_VALUE_TYPE_UINT64,
+									'query' => [
+										'signal_type' => APM_SIGNAL_TYPE_TRACES,
+										'columns' => [],
+										'aggregated_columns' => [['alias' => 'Timestamp']],
+										'filter' => []
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			'hosts' => [
+				[
+					'host' => 'telemetry_query_host',
+					'groups' => ['groupid' => ':host_group:telemetry_query_host_group'],
+					'lld_rules' => [
+						[
+							'name' => 'host lld',
+							'key_' => 'host_lld_telemetry_query',
+							'item_prototypes' => [
+								[
+									'name' => 'host item prototype',
+									'key_' => 'host_item_prototype_telemetry_query[{#M}]',
+									'type' => ITEM_TYPE_TELEMETRY_QUERY,
+									'value_type' => ITEM_VALUE_TYPE_UINT64,
+									'query' => [
+										'signal_type' => APM_SIGNAL_TYPE_TRACES,
+										'columns' => [],
+										'aggregated_columns' => [['alias' => 'Timestamp']],
+										'filter' => []
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
+	}
 
 	public static function dataProviderTelemetryQueryCreate() {
 		$params = [

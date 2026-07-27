@@ -27,6 +27,8 @@ class testItem extends CAPITest {
 
 	use traitItemTelemetryQueryTests;
 
+	protected static array $items;
+
 	/**
 	 * @dataProvider dataProviderTelemetryQueryCreate
 	 */
@@ -112,8 +114,6 @@ class testItem extends CAPITest {
 		$item['itemid'] = $inherited[$key];
 		$this->call('item.update', $item, $expected_error);
 	}
-
-	protected static $items;
 
 	public static function getItemCreateData() {
 		$valid_item_types = [
@@ -1152,56 +1152,7 @@ class testItem extends CAPITest {
 		]);
 
 		self::$items = $result['itemids'];
-
-		CTestDataHelper::createObjects([
-			'template_groups' => [
-				['name' => 'telemetry_query_template_group']
-			],
-			'host_groups' => [
-				['name' => 'telemetry_query_host_group']
-			],
-			'templates' => [
-				[
-					'host' => 'telemetry_query_template',
-					'groups' => ['groupid' => ':template_group:telemetry_query_template_group'],
-					'items' => [
-						[
-							'name' => 'template item',
-							'key_' => 'template_item_telemetry_query',
-							'type' => ITEM_TYPE_TELEMETRY_QUERY,
-							'value_type' => ITEM_VALUE_TYPE_UINT64,
-							'query' => [
-								'signal_type' => APM_SIGNAL_TYPE_TRACES,
-								'columns' => [],
-								'aggregated_columns' => [['alias' => 'Timestamp']],
-								'filter' => []
-							]
-						]
-					]
-				]
-			],
-			'hosts' => [
-				[
-					'host' => 'telemetry_query_host',
-					'groups' => ['groupid' => ':host_group:telemetry_query_host_group'],
-					'templates' => [['templateid' => ':template:telemetry_query_template']],
-					'items' => [
-						[
-							'name' => 'host item',
-							'key_' => 'host_item_telemetry_query',
-							'type' => ITEM_TYPE_TELEMETRY_QUERY,
-							'value_type' => ITEM_VALUE_TYPE_UINT64,
-							'query' => [
-								'signal_type' => APM_SIGNAL_TYPE_TRACES,
-								'columns' => [],
-								'aggregated_columns' => [['alias' => 'Timestamp']],
-								'filter' => []
-							]
-						]
-					]
-				]
-			]
-		]);
+		self::initItemTestsData();
 	}
 
 	public static function getItemUpdateData() {

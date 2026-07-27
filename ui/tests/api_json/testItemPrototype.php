@@ -479,65 +479,6 @@ class testItemPrototype extends CAPITest {
 	}
 
 	public function prepareTestData() {
-		CTestDataHelper::createObjects([
-			'template_groups' => [
-				['name' => 'telemetry_query_template_group']
-			],
-			'host_groups' => [
-				['name' => 'telemetry_query_host_group']
-			],
-			'templates' => [
-				[
-					'host' => 'telemetry_query_template',
-					'groups' => ['groupid' => ':template_group:telemetry_query_template_group'],
-					'lld_rules' => [
-						[
-							'name' => 'template lld',
-							'key_' => 'template_lld_telemetry_query',
-							'item_prototypes' => [
-								[
-									'name' => 'template item prototype',
-									'key_' => 'template_item_prototype_telemetry_query[{#M}]',
-									'type' => ITEM_TYPE_TELEMETRY_QUERY,
-									'value_type' => ITEM_VALUE_TYPE_UINT64,
-									'query' => [
-										'signal_type' => APM_SIGNAL_TYPE_TRACES,
-										'columns' => [],
-										'aggregated_columns' => [['alias' => 'Timestamp']],
-										'filter' => []
-									]
-								]
-							]
-						]
-					]
-				]
-			],
-			'hosts' => [
-				[
-					'host' => 'telemetry_query_host',
-					'groups' => ['groupid' => ':host_group:telemetry_query_host_group'],
-					'lld_rules' => [
-						[
-							'name' => 'host lld',
-							'key_' => 'host_lld_telemetry_query',
-							'item_prototypes' => [
-								[
-									'name' => 'host item prototype',
-									'key_' => 'host_item_prototype_telemetry_query[{#M}]',
-									'type' => ITEM_TYPE_TELEMETRY_QUERY,
-									'value_type' => ITEM_VALUE_TYPE_UINT64,
-									'query' => [
-										'signal_type' => APM_SIGNAL_TYPE_TRACES,
-										'columns' => [],
-										'aggregated_columns' => [['alias' => 'Timestamp']],
-										'filter' => []
-									]
-								]
-							]
-						]
-					]
-				]
-			]
-		]);
+		self::initItemPrototypeTestsData();
 	}
 }
