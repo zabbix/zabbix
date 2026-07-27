@@ -381,6 +381,11 @@ class CDevice extends CApiService {
 
 		DB::insertBatch('device_key', $device_keys, false);
 
+		foreach ($device_keys as &$device_key) {
+			unset($device_key['deviceid']);
+		}
+		unset($device_key);
+
 		return $device_keys;
 	}
 
