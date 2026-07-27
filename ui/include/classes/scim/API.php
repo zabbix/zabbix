@@ -46,7 +46,7 @@ class API {
 		$auth_header = $request->getParsedAuthHeader();
 
 		$auth = [
-			'type' => CJsonRpc::AUTH_TYPE_BEARER,
+			'type' => $auth_header['type'] === CJsonRpc::HEADER_AUTHENTICATE_BEARER ? CJsonRpc::AUTH_TYPE_BEARER : null,
 			'auth' => $auth_header['auth']
 		];
 
@@ -62,9 +62,17 @@ class API {
 			);
 		}
 
+		$requires_authentication = $client->requiresAuthentication($endpoint, $method);
+
+		if (!$requires_authentication && $auth['auth'] !== null) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS,
+				_s('The "%1$s.%2$s" method must be called without authorization header.', $endpoint, $method)
+			);
+		}
+
 		$authenticate_response = null;
 
-		if ($client->requiresAuthentication($endpoint, $method)) {
+		if ($requires_authentication) {
 			$authenticate_response = $client->authenticate($auth);
 		}
 

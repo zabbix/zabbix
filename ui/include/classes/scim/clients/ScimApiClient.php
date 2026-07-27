@@ -17,6 +17,7 @@
 namespace SCIM\clients;
 
 use CLocalApiClient;
+use CJsonRpc;
 use CUser;
 use CApiClientResponse;
 use Exception;
@@ -32,7 +33,7 @@ class ScimApiClient extends CLocalApiClient {
 		$response = new CApiClientResponse();
 
 		try {
-			if ($auth['auth'] === null) {
+			if ($auth['type'] != CJsonRpc::AUTH_TYPE_BEARER || $auth['auth'] === null) {
 				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 
