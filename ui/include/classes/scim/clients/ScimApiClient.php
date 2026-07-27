@@ -24,10 +24,6 @@ use APIException;
 
 class ScimApiClient extends CLocalApiClient {
 
-	public function isValidApi(string $api): bool {
-		return $this->serviceFactory->hasObject($api);
-	}
-
 	public function requiresAuthentication(string $api, string $method): bool {
 		return !($api === 'serviceproviderconfig' && $method === 'get');
 	}
