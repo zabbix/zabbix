@@ -458,11 +458,15 @@ class testFormUserPermissions extends CWebTest {
 		$this->assertTrue($this->query('xpath://em[text()="No enabled modules found."]')->one()->isDisplayed());
 		$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 		$this->query('button:Scan directory')->one()->click();
+		$this->page->waitUntilReady();
+		CMessageElement::find()->one()->close();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRows('Name', ['4th Module'])->select();
 		$this->query('button:Enable')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Module enabled');
+
 		$selector = 'xpath://h4[text()="Access to modules"]/../../following::li/div/div/span[text()=';
 		foreach ([true, false] as $enable_modules) {
 			$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user)->waitUntilReady();
