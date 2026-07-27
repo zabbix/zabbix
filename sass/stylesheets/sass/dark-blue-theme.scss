@@ -36,7 +36,7 @@ $font-selected-color: #f2f2f2;
 $font-alt-color: #737373;
 $body-bg-color: #0e1012;
 $overlay-bg-color: #000000;
-$overlay-border-color: #383838;
+$overlay-border-color: #003a7a;
 
 // Main menu
 $menu-main-color: #f2f2f2;
@@ -58,10 +58,10 @@ $menu-main-submenu-next-level-bg: #454545 !default;
 $menu-main-submenu-next-level-shadow: rgba(#2b2b2b, .35) !default;
 
 // UI
-$ui-bg-color: #2b2b2b;
-$ui-bg-selected-color: #4f4f4f;
+$ui-bg-color: #002247;
+$ui-bg-selected-color: #003a7a;
 $ui-hover-bg-color: #383838;
-$ui-border-color: #303030;
+$ui-border-color: #003a7a;
 $ui-placeholder-background-color: darken($ui-hover-bg-color, 15%);
 $ui-highlighted-parent-background-color: darken($ui-hover-bg-color, 10%);
 
@@ -69,31 +69,32 @@ $action-hover-color: #454545;
 $action-border-color: #383838;
 $action-shadow-color: rgba(0, 0, 0, .5);
 
-$table-border-color: #383838;
+$table-border-color: #003a7a;
 
 $ui-tab-bg-selected-color: #69808d;
 
 // Forms
 $form-font-color: #e1e3ed;
-$form-bg-color: #383838;
+$form-bg-color: #001f42;
 $form-dark-bg-color: #383838;
 $form-darker-bg-color: #202020;
 $form-border-color: #4f4f4f;
-$form-focus-border-color: #768d99;
+$form-focus-border-color: #3d98ff;
 $form-fields-group-border-color: #383838;
 $form-field-hint-color: #737373;
 $form-radio-selected-color: #69818d;
 $form-description-border-color: #69818d;
 
-$form-disabled-font-color: #525252;
-$form-disabled-bg-color: #2b2b2b;
-$form-disabled-border-color: #3d3d3d;
+$form-disabled-font-color: #626c75;
+$form-disabled-bg-color: #001f42;
+$form-disabled-border-color: #003a7a;
 
 $form-search-icon-color: #b1b1b1;
 
 $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #383838;
 
+$input-placeholder-color: #939ca4;
 $input-disabled-placeholder-color: #404040;
 
 $form-radio-list-checked-color: $action-hover-color;
@@ -111,19 +112,16 @@ $btn-alt-bg-color: transparent;
 
 $btn-form-hover-bg-color: #414141;
 
-$btn-disabled-color: #525252;
-$btn-disabled-bg-color: transparent;
-$btn-disabled-border-color: #3d3d3d;
+$btn-disabled-color: #626c75;
+$btn-disabled-bg-color: #001f42;
+$btn-disabled-border-color: #003a7a;
 
 $btn-back-map-background-color: rgba(0, 0, 0, .8);
 $btn-back-text-color: #ffffff;
 $btn-back-background-hover: #768d99;
 
 // Links
-$link-color: #4796c4;
-$link-hover-color: #4796c4;
-$link-active-color: #4796c4;
-$link-visited-color: #4796c4;
+$link-color: #3d98ff;
 
 // Icons
 $icon-color: #69808d;
