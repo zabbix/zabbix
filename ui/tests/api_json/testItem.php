@@ -89,6 +89,30 @@ class testItem extends CAPITest {
 		$this->call('item.update', $item, $expected_error);
 	}
 
+	/**
+	 * @dataProvider dataProviderHostInheritedTelemetryQueryUpdate
+	 */
+	public function testHostInheritedItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		static $inherited = [];
+
+		$hostid = CTestDataHelper::getConvertedValueReference($item['hostid']);
+		unset($item['hostid']);
+		$key = $hostid.'-'.$item['itemid'];
+
+		if (!array_key_exists($key, $inherited)) {
+			['result' => $result] = $this->call('item.get', [
+				'output' => ['itemid'],
+				'hostids' => $hostid,
+				'filter' => ['key_' => $item['itemid']],
+				'inherited' => true
+			]);
+			['itemid' => $inherited[$key]] = reset($result);
+		}
+
+		$item['itemid'] = $inherited[$key];
+		$this->call('item.update', $item, $expected_error);
+	}
+
 	protected static $items;
 
 	public static function getItemCreateData() {
@@ -1160,6 +1184,7 @@ class testItem extends CAPITest {
 				[
 					'host' => 'telemetry_query_host',
 					'groups' => ['groupid' => ':host_group:telemetry_query_host_group'],
+					'templates' => [['templateid' => ':template:telemetry_query_template']],
 					'items' => [
 						[
 							'name' => 'host item',

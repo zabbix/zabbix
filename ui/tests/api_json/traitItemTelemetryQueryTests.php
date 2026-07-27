@@ -304,4 +304,28 @@ trait traitItemTelemetryQueryTests {
 			'Invalid parameter "/1/query": an array is expected.'
 		];
 	}
+
+	public static function dataProviderHostInheritedTelemetryQueryUpdate() {
+		yield 'user macro for "time_shift", "lookback_limit" and "granularity"' => [
+			[
+				'itemid' => 'template_item_telemetry_query',
+				'hostid' => ':host:telemetry_query_host',
+				'time_shift' => '{$M}',
+				'lookback_limit' => '{$M}',
+				'granularity' => '{$M}'
+			],
+			null
+		];
+
+		yield '"query" fail' => [
+			[
+				'itemid' => 'template_item_telemetry_query',
+				'hostid' => ':host:telemetry_query_host',
+				'query' => [
+					'query' => ['aggregated_columns' => [['alias' => 'Timestamp']]]
+				]
+			],
+			'Invalid parameter "/1": cannot update readonly parameter "query" of inherited object.'
+		];
+	}
 }

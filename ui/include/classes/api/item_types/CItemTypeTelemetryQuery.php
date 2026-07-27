@@ -147,16 +147,24 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
-		// TODO
-		throw new Exception('Not implemented');
+		return [
+			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift')],
+			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
+			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity')],
+			'query'				=> ['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
+		];
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
-		// TODO
-		throw new Exception('Not implemented');
+		return [
+			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift')],
+			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
+			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity')],
+			'query'				=> ['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+		];
 	}
 
 	/**
