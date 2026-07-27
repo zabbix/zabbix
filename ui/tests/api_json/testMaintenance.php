@@ -662,7 +662,7 @@ class testMaintenance extends CAPITest {
 						['triggerid' => 134000]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "triggers".'
+				'expected_error' => 'Invalid parameter "/1/triggers": should be empty.'
 			],
 			// Success. Created maintenance with event name conditions.
 			[
@@ -712,7 +712,7 @@ class testMaintenance extends CAPITest {
 						['value' => 'Problem']
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "event_names".'
+				'expected_error' => 'Invalid parameter "/1/event_names": should be empty.'
 			],
 			// Fail. Empty groups.
 			[
