@@ -117,9 +117,9 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"ok_period",			ZBX_SETTING_TYPE_STR, 		0,			"5m"},
 	{"ok_unack_color",		ZBX_SETTING_TYPE_STR, 		0,			"009900"},
 	{"ok_unack_style",		ZBX_SETTING_TYPE_INT, 		0,			"1"},
-	{ZBX_SETTINGS_OTEL_ENABLED,	ZBX_SETTING_TYPE_INT,		ZBX_SERVER | ZBX_PROXY,	"0"},
-	{ZBX_SETTINGS_OTEL_QUOTA	,ZBX_SETTING_TYPE_INT,		ZBX_SERVER | ZBX_PROXY,	"0"},
-	{ZBX_SETTINGS_OTEL_ATTRIBUTES,	ZBX_SETTING_TYPE_STR,		ZBX_SERVER | ZBX_PROXY,	""},
+	{ZBX_SETTINGS_APM_STATUS,	ZBX_SETTING_TYPE_INT,		ZBX_SERVER,		"0"},
+	{ZBX_SETTINGS_APM_QUOTA	,	ZBX_SETTING_TYPE_INT,		ZBX_SERVER,		"0"},
+	{ZBX_SETTINGS_APM_ATTRIBUTES,	ZBX_SETTING_TYPE_STR,		ZBX_SERVER,		""},
 	{"passwd_check_rules",		ZBX_SETTING_TYPE_INT, 		0,			"8"},
 	{"passwd_min_length",		ZBX_SETTING_TYPE_INT, 		0,			"8"},
 	{"period_default",		ZBX_SETTING_TYPE_STR, 		0,			"1h"},
@@ -837,12 +837,13 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 	store_int_setting(values, "proxy_secrets_provider", defaults_log_level, &config->config->proxy_secrets_provider,
 			revision);
 
-	store_int_setting(values, ZBX_SETTINGS_OTEL_ENABLED, defaults_log_level, &dc_local()->otel_config.enabled,
+	store_int_setting(values, ZBX_SETTINGS_APM_STATUS, defaults_log_level, &dc_local()->apm_config.status,
 			revision);
-	store_uint64_setting(values, ZBX_SETTINGS_OTEL_QUOTA, defaults_log_level, &dc_local()->otel_config.quota,
+	store_uint64_setting(values, ZBX_SETTINGS_APM_QUOTA, defaults_log_level, &dc_local()->apm_config.quota,
 			revision);
-	store_str_setting_local(values, ZBX_SETTINGS_OTEL_ATTRIBUTES, defaults_log_level,
-			&dc_local()->otel_config.attributes, revision);
+	store_str_setting_local(values, ZBX_SETTINGS_APM_ATTRIBUTES, defaults_log_level,
+			&dc_local()->apm_config.attributes, revision);
+
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -881,5 +882,4 @@ void	dc_sync_settings(zbx_dbsync_t *sync, zbx_uint64_t revision, unsigned char p
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
 

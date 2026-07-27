@@ -182,19 +182,18 @@ void	*zbx_otel_manager_thread(void *args)
 	double					time_stat, time_flush, time_idle = 0, time_config;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	int					shutdown = 0, workers_num, activated = 0;
+	int					shutdown = 0, workers_num, apm_status = 1;
 	zbx_vector_mw_task_ptr_t		tasks;
-	zbx_dc_otel_config_t			cfg = {0};
 	zbx_uint64_t				cfg_revision = 0, quota;
+	zbx_dc_apm_config_t                    cfg = {0};
 
 	otel_args = (const zbx_thread_otel_manager_args_t *)unit_args->args.args;
 
-	zbx_dc_get_otel_config(&cfg, &cfg_revision);
-
+	zbx_dc_get_apm_config(&cfg, &cfg_revision);
 	quota = cfg.quota;
 
 	/* when disabled leave one worker running */
-	workers_num = (0 == cfg.enabled ? 1 : OTEL_WORKERS_DEFAULT);
+	workers_num = (0 == cfg.status ? 1 : OTEL_WORKERS_DEFAULT);
 
 	if (NULL == (manager = otel_manager_create(info, workers_num, cfg.quota, otel_args->exporter_options, &error)))
 	{
@@ -230,11 +229,11 @@ void	*zbx_otel_manager_thread(void *args)
 
 		if (CONFIG_INTERVAL < time_start - time_config)
 		{
-			zbx_dc_get_otel_config(&cfg, &cfg_revision);
+			zbx_dc_get_apm_config(&cfg, &cfg_revision);
 
-			if (activated != cfg.enabled)
+			if (apm_status != cfg.status)
 			{
-				if (1 == cfg.enabled)
+				if (0 == cfg.status)
 				{
 					if (FAIL == otel_manager_activate(manager, &error))
 					{
@@ -248,7 +247,7 @@ void	*zbx_otel_manager_thread(void *args)
 				{
 					otel_manager_deactivate(manager);
 				}
-				activated = cfg.enabled;
+				apm_status = cfg.status;
 			}
 
 			if (quota != cfg.quota)
@@ -318,7 +317,7 @@ void	*zbx_otel_manager_thread(void *args)
 	if (SUCCEED != ZBX_EXIT_STATUS())
 		zbx_rtc_unsubscribe_service(otel_args->config_timeout, ZBX_IPC_SERVICE_OTEL);
 
-	zbx_dc_otel_config_clear(&cfg);
+	zbx_dc_apm_config_clear(&cfg);
 
 	otel_manager_free(manager);
 	zbx_free(args);

@@ -480,6 +480,10 @@ typedef struct
 	time_t				last_version_error_time;
 
 	int				pending_history;
+
+	int				apm_status;
+	int				apm_quota;
+	char				*apm_attributes;
 }
 zbx_dc_proxy_t;
 
@@ -1048,6 +1052,8 @@ void	*zbx_dc_config_get_stats(int request);
 int	zbx_dc_config_get_last_sync_time(void);
 int	zbx_dc_config_get_proxypoller_hosts(zbx_dc_proxy_t *proxies, int max_hosts);
 int	zbx_dc_config_get_proxypoller_nextcheck(void);
+
+void	zbx_dc_proxy_clear(zbx_dc_proxy_t *proxy);
 
 #define ZBX_PROXY_CONFIG_NEXTCHECK	0x01
 #define ZBX_PROXY_DATA_NEXTCHECK	0x02
@@ -1700,20 +1706,20 @@ void	zbx_correlation_config_close(zbx_correlation_config_handle_t handle);
 zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correlation_config_handle_t handle);
 
 /* open telemetry settings */
-#define ZBX_SETTINGS_OTEL		"otel_"
-#define ZBX_SETTINGS_OTEL_ENABLED	ZBX_SETTINGS_OTEL "enabled"
-#define ZBX_SETTINGS_OTEL_QUOTA		ZBX_SETTINGS_OTEL "quota"
-#define ZBX_SETTINGS_OTEL_ATTRIBUTES	ZBX_SETTINGS_OTEL "attributes"
+#define ZBX_SETTINGS_APM		"apm_"
+#define ZBX_SETTINGS_APM_STATUS		ZBX_SETTINGS_APM "status"
+#define ZBX_SETTINGS_APM_QUOTA		ZBX_SETTINGS_APM "quota"
+#define ZBX_SETTINGS_APM_ATTRIBUTES	ZBX_SETTINGS_APM "attributes"
 
 typedef struct
 {
-	int		enabled;
-	zbx_uint64_t	quota;
-	char		*attributes;
+	int             status;
+	zbx_uint64_t    quota;
+	char            *attributes;
 }
-zbx_dc_otel_config_t;
+zbx_dc_apm_config_t;
 
-void	zbx_dc_get_otel_config(zbx_dc_otel_config_t *cfg, zbx_uint64_t *revision);
-void	zbx_dc_otel_config_clear(zbx_dc_otel_config_t *cfg);
+void   zbx_dc_get_apm_config(zbx_dc_apm_config_t *cfg, zbx_uint64_t *revision);
+void   zbx_dc_apm_config_clear(zbx_dc_apm_config_t *cfg);
 
 #endif

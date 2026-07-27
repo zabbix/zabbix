@@ -33,8 +33,7 @@ void	zbx_dc_config_local_init(void)
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	config_local->correlation_config = correlation_config_create();
-
-	memset(&config_local->otel_config, 0, sizeof(config_local->otel_config));
+	memset(&config_local->apm_config, 0, sizeof(config_local->apm_config));
 
 	atomic_fetch_add(&config_local_refcount, 1);
 }
@@ -66,8 +65,9 @@ void	zbx_dc_config_local_release(void)
 	zbx_hashset_destroy(&config_local->trigger_depends_links);
 	zbx_hashset_destroy(&config_local->item_tag_links);
 	correlation_config_destroy(config_local->correlation_config);
+	memset(&config_local->apm_config, 0, sizeof(config_local->apm_config));
 
-	zbx_dc_otel_config_clear(&config_local->otel_config);
+	zbx_dc_apm_config_clear(&config_local->apm_config);
 
 	zbx_free(config_local);
 }
@@ -93,8 +93,9 @@ int	zbx_dc_local_get_itservices_num(void)
 	return atomic_load(&dc_local()->itservices_num);
 }
 
-void	zbx_dc_otel_config_clear(zbx_dc_otel_config_t *cfg)
+void   zbx_dc_apm_config_clear(zbx_dc_apm_config_t *cfg)
 {
 	zbx_free(cfg->attributes);
 }
+
 

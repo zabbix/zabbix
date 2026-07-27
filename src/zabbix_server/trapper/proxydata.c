@@ -148,7 +148,7 @@ void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const stru
 {
 	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
 	char			*error = NULL, *version_str = NULL;
-	zbx_dc_proxy_t		proxy;
+	zbx_dc_proxy_t		proxy = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -237,6 +237,8 @@ out:
 
 	zbx_free(error);
 	zbx_free(version_str);
+
+	zbx_dc_proxy_clear(&proxy);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }

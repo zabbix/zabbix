@@ -537,6 +537,10 @@ typedef struct
 	zbx_config_item_type_timeouts_t	item_timeouts;
 
 	int				pending_history;
+
+	int				apm_status;
+	int				apm_quota;
+	const char			*apm_attributes;
 }
 ZBX_DC_PROXY;
 

@@ -14,11 +14,11 @@
 
 #include "proxypoller.h"
 
-#include "proxyconfigread/proxyconfigread.h"
-#include "trapper/trapper_server.h"
-#include "cachehistory/cachehistory_server.h"
-#include "discovery/discovery_server.h"
-#include "autoreg/autoreg_server.h"
+#include "zabbix_server/proxyconfigread/proxyconfigread.h"
+#include "zabbix_server/trapper/trapper_server.h"
+#include "zabbix_server/cachehistory/cachehistory_server.h"
+#include "zabbix_server/discovery/discovery_server.h"
+#include "zabbix_server/autoreg/autoreg_server.h"
 
 #include "zbxtimekeeper.h"
 #include "zbxdbwrap.h"
@@ -679,6 +679,8 @@ error:
 	}
 
 	zbx_dc_close_user_macros(um_handle);
+
+	zbx_dc_proxy_clear(&proxy);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

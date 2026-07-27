@@ -489,9 +489,29 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 		zbx_json_close(j);
 	}
 
+	zbx_json_addarray(j, NULL);
+	zbx_json_addstring(j, NULL, ZBX_SETTINGS_APM_STATUS, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(j, NULL, ZBX_SETTING_TYPE_INT);
+	zbx_json_addstring(j, NULL, "", ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(j, NULL, proxy->apm_status);
+	zbx_json_close(j);
+	zbx_json_addarray(j, NULL);
+	zbx_json_addstring(j, NULL, ZBX_SETTINGS_APM_QUOTA, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(j, NULL, ZBX_SETTING_TYPE_INT);
+	zbx_json_addstring(j, NULL, "", ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(j, NULL, proxy->apm_quota);
+	zbx_json_close(j);
+	zbx_json_addarray(j, NULL);
+	zbx_json_addstring(j, NULL, ZBX_SETTINGS_APM_ATTRIBUTES, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(j, NULL, ZBX_SETTING_TYPE_STR);
+	zbx_json_addstring(j, NULL, ZBX_NULL2EMPTY_STR(proxy->apm_attributes), ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(j, NULL, 0);
+	zbx_json_close(j);
+
 	zbx_json_close(j);
 	zbx_json_close(j);
 
+	zabbix_log(LOG_LEVEL_ERR, "[WDN] settings: %s", j->buffer);
 	ret = SUCCEED;
 out:
 	zbx_free(sql);
@@ -1636,7 +1656,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 {
 	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
-	zbx_dc_proxy_t			proxy;
+	zbx_dc_proxy_t			proxy = {0};
 	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel, version_int;
 	size_t				buffer_size, reserved = 0;
 	zbx_proxyconfig_status_t	status = ZBX_PROXYCONFIG_STATUS_DATA;
@@ -1715,6 +1735,7 @@ out:
 	zbx_free(error);
 	zbx_free(buffer);
 	zbx_free(version_str);
+	zbx_dc_proxy_clear(&proxy);
 #ifdef	HAVE_MALLOC_TRIM
 	/* avoid memory not being released back to the system if large proxy configuration is retrieved from database */
 	if (ZBX_PROXYCONFIG_STATUS_DATA == status)
