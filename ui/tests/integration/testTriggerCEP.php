@@ -4205,6 +4205,7 @@ HEREDOC;
 		// problem is open in the system at this point, so cached_events must drain back to zero.
 		$this->assertCepStatEquals('tasks', 'cached_events', 0);
 		$this->assertCepStatEquals('tasks', 'cached_objects', 0);
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'diaginfo=cep');
 	}
 
 	/**
