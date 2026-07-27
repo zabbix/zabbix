@@ -478,10 +478,19 @@ class testNoData extends CIntegrationTest {
 	 * repeated no-value (ZBX_DC_FLAG_NOVALUE) submissions, the same shape a "Discard unchanged"
 	 * preprocessing step or a discarded duplicate produces server-side. Correct/expected
 	 * behaviour: nodata() fires once the window has elapsed since the last real value, the same
-	 * as it would with no updates at all. Expected to currently FAIL - there is no fix for this
-	 * yet (see class docblock: NOVALUE-flagged tail records aren't excluded from
-	 * zbx_hc_is_itemid_cached_and_normal(), so they keep the "proxy transfer in progress" branch
-	 * active indefinitely).
+	 * as it would with no updates at all. PASSES.
+	 *
+	 * The wait below has to span ~90s, not just the nodata() window itself: nodata() is a
+	 * ZBX_FUNCTION_TYPE_TIMER function, rechecked periodically independent of new data
+	 * (dbconfig.c dc_update_function_timer()/ZBX_TRIGGER_TIMER_DELAY, 30s) - but the very FIRST
+	 * scheduling of that recheck after each server start is deliberately delayed by up to ~90s
+	 * ("reduce server startup load", dc_schedule_trigger_timers()'s SEC_PER_MIN offset plus
+	 * rounding). Since this class restarts the server fresh before every test (see class
+	 * docblock), that ~90s startup delay applies fresh to every test run, and NOVALUE-only
+	 * updates never trigger a data-driven recheck on their own (dbconfig.c
+	 * zbx_dc_config_lock_triggers_by_history_items() skips locking triggers for a NOVALUE tail) -
+	 * so the only way nodata() gets re-evaluated at all here is that one delayed periodic timer
+	 * firing, and the wait must outlast it.
 	 */
 	public function testNoData_Discard() {
 		$key = 'nodata.discard';
@@ -489,7 +498,7 @@ class testNoData extends CIntegrationTest {
 		$this->push($key, ['value' => 'first value']);
 		$this->waitForTriggerValue($key, TRIGGER_VALUE_FALSE);
 
-		$deadline = microtime(true) + 20;
+		$deadline = microtime(true) + 70;
 		while (microtime(true) < $deadline) {
 			$this->push($key); // no 'value' => ZBX_DC_FLAG_NOVALUE, models a discarded update
 			sleep(4);
@@ -497,15 +506,14 @@ class testNoData extends CIntegrationTest {
 
 		$trigger = null;
 		try {
-			$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE, 15);
+			$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE, 40);
 			$trigger = $this->getTrigger($key);
 		} catch (Exception $e) {
 			$trigger = $this->getTrigger($key);
 		}
 
 		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value'],
-			'nodata() did not fire after discard-only updates. There is no fix for this yet; see '.
-			'zbx_hc_is_itemid_cached_and_normal() in cachehistory.c. Trigger state: '.json_encode($trigger));
+			'nodata() did not fire after discard-only updates. Trigger state: '.json_encode($trigger));
 	}
 
 	/**
@@ -513,8 +521,9 @@ class testNoData extends CIntegrationTest {
 	 * metadata with log and no actual value." Same shape as testNoData_Discard but with
 	 * lastlogsize/mtime present, matching a log item whose agent keeps polling but finds nothing
 	 * new to report. Correct/expected behaviour: nodata() fires once the window has elapsed since
-	 * the last real value. Expected to currently FAIL - there is no fix for this yet (same
-	 * zbx_hc_is_itemid_cached_and_normal() gap as testNoData_Discard - see class docblock).
+	 * the last real value. See testNoData_Discard for why the wait below has to span past ~90s:
+	 * this class restarts the server fresh before every test, and the very first scheduling of
+	 * nodata()'s periodic recheck after each restart is deliberately delayed that long.
 	 */
 	public function testNoData_LogMetadataOnly() {
 		$key = 'nodata.logmeta';
@@ -524,7 +533,7 @@ class testNoData extends CIntegrationTest {
 		$this->push($key, ['value' => 'first log line', 'lastlogsize' => ++$lastlogsize, 'mtime' => $tm]);
 		$this->waitForTriggerValue($key, TRIGGER_VALUE_FALSE);
 
-		$deadline = microtime(true) + 20;
+		$deadline = microtime(true) + 70;
 		while (microtime(true) < $deadline) {
 			$this->push($key, ['lastlogsize' => ++$lastlogsize, 'mtime' => time()]); // metadata only
 			sleep(4);
@@ -532,15 +541,14 @@ class testNoData extends CIntegrationTest {
 
 		$trigger = null;
 		try {
-			$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE, 15);
+			$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE, 40);
 			$trigger = $this->getTrigger($key);
 		} catch (Exception $e) {
 			$trigger = $this->getTrigger($key);
 		}
 
 		$this->assertEquals(TRIGGER_VALUE_TRUE, $trigger['value'],
-			'nodata() did not fire after log-metadata-only updates. There is no fix for this yet; see '.
-			'zbx_hc_is_itemid_cached_and_normal() in cachehistory.c. Trigger state: '.json_encode($trigger));
+			'nodata() did not fire after log-metadata-only updates. Trigger state: '.json_encode($trigger));
 	}
 
 	/**
