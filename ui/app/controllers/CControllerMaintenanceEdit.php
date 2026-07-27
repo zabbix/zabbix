@@ -79,6 +79,9 @@ class CControllerMaintenanceEdit extends CController {
 
 	protected function doAction(): void {
 		if ($this->maintenance !== null) {
+			CArrayHelper::sort($this->maintenance['event_names'], ['value', 'operator']);
+			$this->maintenance['event_names'] = array_values($this->maintenance['event_names']);
+
 			CArrayHelper::sort($this->maintenance['tags'], ['tag', 'value', 'operator']);
 			$this->maintenance['tags'] = array_values($this->maintenance['tags']);
 
@@ -101,7 +104,8 @@ class CControllerMaintenanceEdit extends CController {
 				'active_since' => date(ZBX_DATE_TIME, $this->maintenance['active_since']),
 				'active_till' => date(ZBX_DATE_TIME, $this->maintenance['active_till']),
 				'timeperiods' => $this->maintenance['timeperiods'],
-				'event_names' => $this->maintenance['event_names'],
+				'event_names' => $this->maintenance['event_names']
+					?: [['operator' => MAINTENANCE_EVENT_NAME_OPERATOR_LIKE, 'value' => '']],
 				'tags_evaltype' => $this->maintenance['tags_evaltype'],
 				'tags' => $this->maintenance['tags']
 					?: [['tag' => '', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => '']],
