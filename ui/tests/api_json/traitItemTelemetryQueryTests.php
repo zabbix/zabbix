@@ -413,6 +413,32 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield 'only "query" field' => [
+			[
+				'name' => 'Telemetry query updated query',
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [
+						['column' => 'ScopeVersion'],
+						['column' => 'ScopeName']
+					],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A or B',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A'],
+							['column' => 'ScopeName', 'value' => 'test', 'formulaid' => 'B']
+						]
+					],
+					'aggregated_columns' => [
+						['column' => 'Duration', 'function' => AGGREGATE_MIN, 'alias' => 'duration'],
+						['alias' => 'Timestamp']
+					]
+				]
+			],
+			null
+		];
+
 		yield '"query" empty array fail' => [
 			['query' => ''],
 			'Invalid parameter "/1/query": an array is expected.'
