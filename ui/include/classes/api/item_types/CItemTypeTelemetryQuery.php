@@ -337,10 +337,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 			]]
 		];
 
-		/**
-		 * TODO: validation
-		 * - set 'length' for API_STRING_UTF8, API_COND_FORMULA rules
-		 */
 		return [
 			'signal_type'			=> ['type' => API_INT32, 'in' => implode(',', [APM_SIGNAL_TYPE_TRACES, APM_SIGNAL_TYPE_METRICS, APM_SIGNAL_TYPE_LOGS]), 'default' => APM_SIGNAL_TYPE_TRACES],
 			'metric_point_type'		=> ['type' => API_MULTIPLE, 'rules' => [
