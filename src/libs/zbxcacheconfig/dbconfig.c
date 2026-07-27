@@ -217,9 +217,14 @@ void	zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
 	zbx_free(proxy_counter);
 }
 
-static zbx_get_program_type_f		get_program_type_cb = NULL;
-static zbx_get_config_forks_f		get_config_forks_cb = NULL;
-static zbx_get_denyitemtypes_mask_f	get_denyitemtypes_mask_cb = NULL;
+static zbx_get_program_type_f	get_program_type_cb = NULL;
+static zbx_get_config_forks_f	get_config_forks_cb = NULL;
+
+static zbx_uint32_t	denyitemtypes_mask = 0;
+static zbx_uint32_t	get_denyitemtypes_mask(void)
+{
+	return denyitemtypes_mask;
+}
 
 zbx_dc_config_t		*config = NULL;
 zbx_dc_config_private_t	config_private;
@@ -3617,7 +3622,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		old_poller_type = item->poller_type;
 		old_nextcheck = item->nextcheck;
 
-		if (0 != (get_denyitemtypes_mask_cb() & (1u << item->type)))
+		if (0 != (get_denyitemtypes_mask() & (1u << item->type)))
 		{
 			zbx_timespec_t	ts = {(int)now, 0};
 
@@ -3660,7 +3665,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 				}
 			}
 
-			if (ITEM_STATE_NOTSUPPORTED != state && 0 != (get_denyitemtypes_mask_cb() & (1u << old_type)))
+			if (ITEM_STATE_NOTSUPPORTED != state && 0 != (get_denyitemtypes_mask() & (1u << old_type)))
 			{
 				AGENT_RESULT	r = {0};
 				zbx_timespec_t	ts = {(int)now, 0};
@@ -9045,7 +9050,7 @@ static void	config_unlock_shmem_on_oom(void)
  *                                                                            *
  ******************************************************************************/
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
-		zbx_uint64_t conf_cache_size, const char *hostname, zbx_get_denyitemtypes_mask_f get_denyitemtypes_mask,
+		zbx_uint64_t conf_cache_size, const char *hostname, zbx_uint32_t config_denyitemtypes_mask,
 		char **error)
 {
 	int	i, ret;
@@ -9054,7 +9059,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 
 	get_program_type_cb = get_program_type;
 	get_config_forks_cb = get_config_forks;
-	get_denyitemtypes_mask_cb = get_denyitemtypes_mask;
+	denyitemtypes_mask = config_denyitemtypes_mask;
 
 	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto fail;

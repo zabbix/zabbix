@@ -1250,7 +1250,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
-		zbx_ipc_async_socket_t *rtc)
+		zbx_uint32_t config_denyitemtypes_mask, zbx_ipc_async_socket_t *rtc)
 {
 	int	ret = SUCCEED;
 
@@ -1362,7 +1362,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 						config_java_gateway, config_java_gateway_port, config_externalscripts,
 						zbx_get_value_internal_ext_cb, config_ssh_key_location,
 						config_webdriver_url, config_comms->config_tls,
-						config_frontend_allowed_ip);
+						config_frontend_allowed_ip, config_denyitemtypes_mask);
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
@@ -1465,7 +1465,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
-		zbx_ipc_async_socket_t *rtc)
+		zbx_uint32_t config_denyitemtypes_mask, zbx_ipc_async_socket_t *rtc)
 {
 	if (FAIL == zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout))
 		return;
@@ -1475,7 +1475,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
 			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb,
-			config_frontend_allowed_ip, rtc);
+			config_frontend_allowed_ip, config_denyitemtypes_mask, rtc);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1572,6 +1572,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->trapper_process_request_func_cb,
 					trapper_args_in->autoreg_update_host_cb,
 					trapper_args_in->config_frontend_allowed_ip,
+					trapper_args_in->config_denyitemtypes_mask,
 					&rtc);
 			sec = zbx_time() - sec;
 

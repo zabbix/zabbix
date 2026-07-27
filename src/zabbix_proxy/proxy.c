@@ -334,13 +334,13 @@ static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL
 static char	*config_socket_path	= NULL;
 static int	config_history_storage_pipelines	= 0;
 static char	*config_stats_allowed_ip	= NULL;
-static char	*config_denyitemtypes		= NULL;
-ZBX_GET_CONFIG_VAR(zbx_uint32_t, config_denyitemtypes_mask, 0)
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
 static int	config_vps_limit		= 0;
 static int	config_vps_overcommit_limit	= 0;
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
+static char	*config_denyitemtypes	= NULL;
+static zbx_uint32_t	config_denyitemtypes_mask	= 0;
 
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
@@ -1526,7 +1526,8 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.config_externalscripts = config_externalscripts,
 			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_proxy,
 			.config_ssh_key_location = config_ssh_key_location,
-			.config_webdriver_url = config_webdriver_url
+			.config_webdriver_url = config_webdriver_url,
+			.config_denyitemtypes_mask = config_denyitemtypes_mask
 		};
 
 	zbx_thread_proxyconfig_args		proxyconfig_args =
@@ -1574,7 +1575,8 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.config_externalscripts = config_externalscripts,
 			.config_enable_global_scripts = zbx_config_enable_remote_commands,
 			.config_ssh_key_location = config_ssh_key_location,
-			.config_webdriver_url = config_webdriver_url
+			.config_webdriver_url = config_webdriver_url,
+			.config_denyitemtypes_mask = config_denyitemtypes_mask
 		};
 
 	zbx_thread_httppoller_args		httppoller_args =
@@ -1625,7 +1627,8 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.config_ssh_key_location = config_ssh_key_location,
 			.config_webdriver_url = config_webdriver_url,
 			.trapper_process_request_func_cb = trapper_process_request_proxy,
-			.autoreg_update_host_cb = zbx_autoreg_update_host_proxy
+			.autoreg_update_host_cb = zbx_autoreg_update_host_proxy,
+			.config_denyitemtypes_mask = config_denyitemtypes_mask
 		};
 
 	zbx_thread_proxy_housekeeper_args	housekeeper_args =
@@ -2005,7 +2008,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	if (SUCCEED != zbx_init_configuration_cache(get_zbx_program_type, get_config_forks, config_conf_cache_size,
-			config_hostname, get_config_denyitemtypes_mask, &error))
+			config_hostname, config_denyitemtypes_mask, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);

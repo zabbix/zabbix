@@ -481,7 +481,6 @@ typedef const char	*(*zbx_get_progname_f)(void);
 typedef int		(*zbx_get_config_forks_f)(unsigned char process_type);
 typedef const char	*(*zbx_get_config_str_f)(void);
 typedef int		(*zbx_get_config_int_f)(void);
-typedef zbx_uint32_t	(*zbx_get_denyitemtypes_mask_f)(void);
 typedef void		(*zbx_backtrace_f)(void);
 
 typedef enum

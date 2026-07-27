@@ -400,7 +400,7 @@ static int	config_allow_software_update_check	= 1;
 static char	*config_sms_devices			= NULL;
 static char	*config_frontend_allowed_ip		= NULL;
 static char	*config_denyitemtypes			= NULL;
-ZBX_GET_CONFIG_VAR(zbx_uint32_t, config_denyitemtypes_mask, 0)
+static zbx_uint32_t	config_denyitemtypes_mask	= 0;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -1655,7 +1655,8 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_externalscripts = config_externalscripts,
 			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_server,
 			.config_ssh_key_location = config_ssh_key_location,
-			.config_webdriver_url = config_webdriver_url
+			.config_webdriver_url = config_webdriver_url,
+			.config_denyitemtypes_mask = config_denyitemtypes_mask
 		};
 
 	zbx_thread_trapper_args		trapper_args =
@@ -1679,7 +1680,8 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_webdriver_url = config_webdriver_url,
 			.trapper_process_request_func_cb = zbx_trapper_process_request_server,
 			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
-			.config_frontend_allowed_ip = config_frontend_allowed_ip
+			.config_frontend_allowed_ip = config_frontend_allowed_ip,
+			.config_denyitemtypes_mask = config_denyitemtypes_mask
 		};
 
 	zbx_thread_escalator_args	escalator_args =
@@ -2120,7 +2122,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	}
 
 	if (SUCCEED != zbx_init_configuration_cache(get_zbx_program_type, get_config_forks, config_conf_cache_size,
-			NULL, get_config_denyitemtypes_mask, &error))
+			NULL, config_denyitemtypes_mask, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
