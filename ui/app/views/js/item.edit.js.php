@@ -653,7 +653,7 @@ window.item_edit_form = new class {
 			parameters.row_index = row_index;
 			parameters.column = row.querySelector(`[name="aggregated_columns[${row_index}][column]"]`).value;
 			parameters.function = row.querySelector(`[name="aggregated_columns[${row_index}][function]"]`).value;
-			parameters.percentile = row.querySelector(`[name="aggregated_columns[${row_index}][parameters][]"]`).value;
+			parameters.percentile = row.querySelector(`[name="aggregated_columns[${row_index}][percentile]"]`).value;
 			parameters.alias = row.querySelector(`[name="aggregated_columns[${row_index}][alias]"]`).value;
 		}
 		else {
