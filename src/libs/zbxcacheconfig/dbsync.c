@@ -4280,7 +4280,7 @@ int	zbx_dbsync_prepare_cep_window(zbx_dbsync_t *sync)
 				"group_by_host,group_by_tags,tags,event_count_tag"
 			" from cep_window");
 
-	dbsync_prepare(sync, 12, NULL);
+	dbsync_prepare(sync, 10, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
