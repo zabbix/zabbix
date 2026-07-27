@@ -156,8 +156,8 @@ zbx_item_type_t;
 
 #define ZBX_ITEM_TYPE_NAME					\
 {								\
-	{"zabbix",		ITEM_TYPE_ZABBIX},		\
-	{"zabbix_active",	ITEM_TYPE_ZABBIX_ACTIVE},	\
+	{"agent",		ITEM_TYPE_ZABBIX},		\
+	{"agent_active",	ITEM_TYPE_ZABBIX_ACTIVE},	\
 	{"trapper",		ITEM_TYPE_TRAPPER},		\
 	{"simple",		ITEM_TYPE_SIMPLE},		\
 	{"internal",		ITEM_TYPE_INTERNAL},		\

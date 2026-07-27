@@ -22,7 +22,7 @@ out:
 ---
 test case: 4. all valid types
 in:
-  itemtypes: zabbix,zabbix_active,trapper,simple,internal,external,db_monitor,ipmi,ssh,telnet,calculated,jmx,snmptrap,dependent,httpagent,snmp,script,browser
+  itemtypes: agent,agent_active,trapper,simple,internal,external,db_monitor,ipmi,ssh,telnet,calculated,jmx,snmptrap,dependent,httpagent,snmp,script,browser
 out:
   return: SUCCEED
   mask: 8387757

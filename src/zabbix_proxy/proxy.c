@@ -701,10 +701,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (SUCCEED != zbx_parse_item_types(config_denyitemtypes, NULL, &ch_error))
+	if (SUCCEED != zbx_parse_item_types(config_denyitemtypes, NULL, NULL))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"DenyItemTypes\" configuration parameter: %s", ch_error);
-		zbx_free(ch_error);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"DenyItemTypes\" configuration parameter: %s",
+				config_denyitemtypes);
 		err = 1;
 	}
 #if !defined(HAVE_IPV6)
