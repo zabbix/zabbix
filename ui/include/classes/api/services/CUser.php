@@ -4110,7 +4110,7 @@ class CUser extends CApiService {
 			$user['medias'][] = [
 				'mediatypeid' => $preferred_mediatypeid,
 				'sendto' => $sendto_all ? ['*'] : [$uuid],
-				'status' => MEDIA_STATUS_ACTIVE
+				'active' => MEDIA_STATUS_ACTIVE
 			];
 
 			$users[] = $user;
