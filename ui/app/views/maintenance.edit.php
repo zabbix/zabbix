@@ -76,15 +76,12 @@ $event_names = (new CTable())
 	->setId('event_names')
 	->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	->setHeader(new CRowHeader([_('Operator'), _('Name')]))
-	->addItem(
-		(new CTag('tfoot', true))
-			->addItem(
-				(new CCol(
-					(new CButtonLink(_('Add')))
-						->addClass('js-add')
-						->setEnabled($data['allowed_edit'])
-				))
-			)
+	->setFooter(
+		(new CCol(
+			(new CButtonLink(_('Add')))
+				->addClass('element-table-add')
+				->setEnabled($data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+		))
 	)
 	->setAttribute('data-field-type', 'set')
 	->setAttribute('data-field-name', 'event_names');
@@ -109,7 +106,7 @@ $event_names_template = (new CTemplateTag('event-names-row-tmpl'))
 			(new CCol(
 				(new CButton('event_names[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('js-remove')
+					->addClass('element-table-remove')
 			))->setWidth('100%')
 		]))->addClass('form_row')
 	)
@@ -162,6 +159,7 @@ $tag_template = (new CTemplateTag('tag-row-tmpl'))
 					MAINTENANCE_TAG_OPERATOR_NOT_EQUAL => _('Does not equals'),
 					MAINTENANCE_TAG_OPERATOR_NOT_LIKE => _('Does not contains')
 				]))
+				->setValue(MAINTENANCE_TAG_OPERATOR_LIKE)
 				->setAttribute('data-prevent-validation-on-change', 1)
 				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
 			(new CTextAreaFlexible('tags[#{rowNum}][value]', '#{value}'))

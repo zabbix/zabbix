@@ -153,8 +153,8 @@ $maintenance_url = (new CUrl('zabbix.php'))
 	->setArgument('popup', 'maintenance.edit')
 	->setArgument('context', 'trigger');
 
-	foreach ($data['eventids'] as $eventid) {
-		$maintenance_url->setArgument('eventid', $eventid);
+	foreach ($data['eventids'] as $key => $eventid) {
+		$maintenance_url->setArgument("eventids[{$key}]", $eventid);
 	}
 
 $form_list

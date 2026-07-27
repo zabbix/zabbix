@@ -956,7 +956,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 					action: 'popup',
 					popup: 'maintenance.edit',
 					context: item.context,
-					eventid: options.eventid
+					eventids: [options.eventid]
 				})
 			});
 		}

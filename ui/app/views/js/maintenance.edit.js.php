@@ -42,7 +42,13 @@ window.maintenance_edit = new class {
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		timeperiods.forEach((timeperiod, row_index) => this.#addTimePeriod({row_index, ...timeperiod}));
-		event_names.forEach((event_name, rowNum) => this.#addEventName({rowNum, ...event_name}));
+
+		// Setup Event Names.
+		jQuery(document.getElementById('event_names')).dynamicRows({
+			template: '#event-names-row-tmpl',
+			rows: event_names,
+			allow_empty: true
+		});
 
 		// Setup Tags.
 		jQuery(document.getElementById('tags')).dynamicRows({
@@ -59,16 +65,6 @@ window.maintenance_edit = new class {
 				}
 				else if (e.target.classList.contains('js-edit')) {
 					this.#editTimePeriod(e.target.closest('tr'));
-				}
-				else if (e.target.classList.contains('js-remove')) {
-					e.target.closest('tr').remove();
-				}
-			});
-
-			document.getElementById('event_names').addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-add')) {
-					const rowNum = this.#getLastEventNameIndex() + 1;
-					this.#addEventName({'rowNum': rowNum, 'operator': <?= MAINTENANCE_EVENT_NAME_OPERATOR_LIKE ?>});
 				}
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
@@ -103,38 +99,11 @@ window.maintenance_edit = new class {
 	}
 
 	#update() {
-		const tags_enabled = this.form_element
-			.querySelector('[name="maintenance_type"]:checked').value == <?= MAINTENANCE_TYPE_NORMAL ?>;
-		const tags_container = document.getElementById('tags');
+		const is_enabled = this.form_element
+		.querySelector('[name="maintenance_type"]:checked').value == <?= MAINTENANCE_TYPE_NORMAL ?>;
 
-		tags_container.querySelectorAll('[name$="[tag]"], [name$="[value]"]').forEach((text_input) => {
-			text_input.disabled = !tags_enabled;
-
-			const field = this.form.findFieldByName(text_input.name);
-
-			if (field && text_input.disabled) {
-				field.unsetErrors();
-			}
-		});
-
-		const tags_evaltypes = this.form_element.querySelectorAll('[name="tags_evaltype"]');
-		const tags_operators = tags_container.querySelectorAll('[name$="[operator]"]');
-
-		[...tags_evaltypes, ...tags_operators].forEach((radio_button) =>
-			radio_button.disabled = !tags_enabled || !this._allowed_edit
-		);
-
-		tags_container.querySelectorAll('.element-table-add, .element-table-remove').forEach((button) =>
-			button.disabled = !tags_enabled || !this._allowed_edit
-		);
-
-		tags_container.querySelectorAll('[name$="[tag]"]').forEach((tag_text_input) =>
-			tag_text_input.placeholder = tags_enabled ? <?= json_encode(_('tag')) ?> : ''
-		);
-
-		tags_container.querySelectorAll('[name$="[value]"]').forEach((value_text_input) =>
-			value_text_input.placeholder = tags_enabled ? <?= json_encode(_('value')) ?> : ''
-		);
+		this.#updateTags(is_enabled);
+		this.#updateEventNames(is_enabled);
 	}
 
 	#editTimePeriod(row = null) {
@@ -196,25 +165,66 @@ window.maintenance_edit = new class {
 		row.remove();
 	}
 
-	#addEventName(event_names) {
-		const template = new Template(document.getElementById('event-names-row-tmpl').innerHTML);
+	#updateTags(is_enabled) {
+		const tags_container = document.getElementById('tags');
 
-		this.form_element
-			.querySelector('#event_names tbody')
-			.insertAdjacentHTML('beforeend', template.evaluate(event_names));
+		tags_container.querySelectorAll('[name$="[tag]"], [name$="[value]"]').forEach((text_input) => {
+			text_input.disabled = !is_enabled;
 
-		this.form_element
-			.querySelector(`input[name="event_names[${event_names.rowNum}][operator]"][value="${event_names.operator}"]`)
-			.checked = true;
+			const field = this.form.findFieldByName(text_input.name);
+
+			if (field && text_input.disabled) {
+				field.unsetErrors();
+			}
+		});
+
+		const tags_evaltypes = this.form_element.querySelectorAll('[name="tags_evaltype"]');
+		const tags_operators = tags_container.querySelectorAll('[name$="[operator]"]');
+
+		[...tags_evaltypes, ...tags_operators].forEach((radio_button) =>
+			radio_button.disabled = !is_enabled || !this._allowed_edit
+		);
+
+		tags_container.querySelectorAll('.element-table-add, .element-table-remove').forEach((button) =>
+			button.disabled = !is_enabled || !this._allowed_edit
+		);
+
+		tags_container.querySelectorAll('[name$="[tag]"]').forEach((tag_text_input) =>
+			tag_text_input.placeholder = is_enabled ? <?= json_encode(_('tag')) ?> : ''
+		);
+
+		tags_container.querySelectorAll('[name$="[value]"]').forEach((value_text_input) =>
+			value_text_input.placeholder = is_enabled ? <?= json_encode(_('value')) ?> : ''
+		);
 	}
 
-	#getLastEventNameIndex = () => {
-		const inputs = document.querySelectorAll('#event_names input[name$="[operator]"]');
+	#updateEventNames(is_enabled) {
+		const event_names_container = document.getElementById('event_names');
 
-		return inputs.length
-			? Number(inputs[inputs.length - 1].name.match(/\[(\d+)]/)[1])
-			: -1;
-	};
+		event_names_container.querySelectorAll('[name$="[value]"]').forEach((text_input) => {
+			text_input.disabled = !is_enabled;
+		});
+
+		const event_names_operators = event_names_container.querySelectorAll('[name$="[operator]"]');
+
+		[...event_names_operators].forEach((radio_button) => {
+			radio_button.disabled = !is_enabled || !this._allowed_edit
+
+			const field = this.form.findFieldByName(radio_button.name);
+
+			if (field && radio_button.disabled) {
+				field.unsetErrors();
+			}
+		});
+
+		event_names_container.querySelectorAll('.element-table-add, .element-table-remove').forEach((button) =>
+			button.disabled = !is_enabled || !this._allowed_edit
+		);
+
+		event_names_container.querySelectorAll('[name$="[value]"]').forEach((value_text_input) =>
+			value_text_input.placeholder = is_enabled ? <?= json_encode(_('value')) ?> : ''
+		);
+	}
 
 	#clone() {
 		this.form_element.querySelector('[name=maintenanceid]').remove();
