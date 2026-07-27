@@ -40,53 +40,60 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Regular expressions');
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestCheckHeader('Regular expressions');
-		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
-
-		$this->zbxTestClickButtonText('New regular expression');
+		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions', 'Description']);
+		$this->zbxTestClickButtonText('Create regular expression');
 
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestCheckHeader('Regular expressions');
+		$this->zbxTestLaunchOverlayDialog('New regular expression');
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestTextPresent('Expressions');
+		$this->zbxTestTextPresent('Description');
+		$this->zbxTestTextPresent('Test expression');
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='name']", "maxlength", 128);
 
-		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='expressions_0_expression']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='expressions_0_expression']", "maxlength", 2048);
 
 		$this->zbxTestDropdownHasOptions('expressions_0_expression_type', [
-			'Character string included',
-			'Any character string included',
-			'Character string not included',
-			'Result is TRUE',
-			'Result is FALSE'
+			'Contains string',
+			'Contains any substring from list',
+			'Does not contain string',
+			'Matches regular expression',
+			'Does not match regular expression'
 			]);
+
+		$this->zbxTestAssertAttribute("//textarea[@id='description']", "maxlength", 65535);
+
+		$this->zbxTestAssertAttribute("//textarea[@id='test-string']", "maxlength", 65535);
 	}
 
 	public static function dataCreate() {
 
 		// result, r.name, r.test_string, e.expression, e.expression_type, e.exp_delimiter, e.case_sensitive
-		// type: 0-Character string included, 1-Any character string included, 2- Character string not included, 3-Result is TRUE, 4- Result is FALSE
+		// type: 0-Contains string, 1-Contains any substring from list, 2-Does not contain string,
+		// 3-Matches regular expression, 4-Does not match regular expression
 		return [
-			['TRUE', 'test_regexp1', 'first test string', 'first test string', 'Character string included', ',', 1],
-			['FALSE', 'test_regexp1_2', 'first test string', 'first test string2', 'Character string included', ',', 1],
-			['TRUE', 'test_regexp2', 'second test string', 'test string', 'Any character string included', '.', 0],
-			['FALSE', 'test_regexp2_2', 'second test string', 'second string', 'Any character string included', '.', 0],
-			['TRUE', 'test_regexp3', 'test', 'abcd test', 'Character string not included', '.', 0],
-			['FALSE', 'test_regexp3_2', 'test', 'test', 'Character string not included', '.', 0],
-			['TRUE', 'test_regexp4', 'abcd', 'abcd', 'Result is TRUE', '.', 0],
-			['FALSE', 'test_regexp4_2', 'abcd', 'qwerty', 'Result is TRUE', '.', 0],
-			['TRUE', 'test_regexp5', 'abcd', 'asdf', 'Result is FALSE', '.', 0],
-			['FALSE', 'test_regexp5_2', 'abcd', 'abcd', 'Result is FALSE', '.', 0]
+			['test_regexp1', 'first test string', 'first test string', 'Contains string', 1],
+			['test_regexp1_2', 'first test string', 'first test string2', 'Contains string', 1],
+			['test_regexp2', 'second test string', 'test string', 'Contains any substring from list', 0],
+			['test_regexp2_2', 'second test string', 'second string', 'Contains any substring from list', 0],
+			['test_regexp3', 'test', 'abcd test', 'Does not contain string', 0],
+			['test_regexp3_2', 'test', 'test', 'Does not contain string', 0],
+			['test_regexp4', 'abcd', 'abcd', 'Matches regular expression', 0],
+			['test_regexp4_2', 'abcd', 'qwerty', 'Matches regular expression', 0],
+			['test_regexp5', 'abcd', 'asdf', 'Does not match regular expression', 0],
+			['test_regexp5_2', 'abcd', 'abcd', 'Does not match regular expression', 0]
 		];
 	}
 
 	/**
 	 * @dataProvider dataCreate
 	 */
-	public function testFormAdministrationGeneralRegexp_Create($result, $name, $test_string, $expression, $expression_type, $exp_delimiter, $case_sensitive) {
+	public function testFormAdministrationGeneralRegexp_Create($name, $test_string, $expression, $expression_type, $case_sensitive) {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
-		$this->zbxTestClickButtonText('New regular expression');
+		$this->zbxTestClickButtonText('Create regular expression');
 
 		$form = $this->query('id:regexp-form')->waitUntilVisible()->asForm()->one();
 		$form->fill([
@@ -102,8 +109,6 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 			$this->zbxTestCheckboxSelect('expressions_0_case_sensitive', false);
 		}
 
-		$this->zbxTestTabSwitchById('tab_test', 'Test');
-		$this->query('xpath://textarea[@id="test-string"][@disabled]')->waitUntilNotPresent();
 		$this->zbxTestInputTypeWait('test-string', $test_string);
 		$this->zbxTestClickXpathWait('//button[contains(@class,"js-submit")]');
 		$this->assertMessage(TEST_GOOD, 'Regular expression added');
@@ -115,7 +120,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 	public function testFormAdministrationGeneralRegexp_AddExisting() {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
-		$this->zbxTestClickButtonText('New regular expression');
+		$this->zbxTestClickButtonText('Create regular expression');
 
 		$form = $this->query('id:regexp-form')->waitUntilVisible()->asForm()->one();
 		$fields = [
@@ -133,7 +138,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
 
-		$this->zbxTestClickButtonText('New regular expression');
+		$this->zbxTestClickButtonText('Create regular expression');
 		$form = $this->query('id:regexp-form')->waitUntilVisible()->asForm()->one();
 		$form->fill(['Name' => '1_regexp3'])->submit();
 
@@ -145,8 +150,11 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 
-		$this->zbxTestTabSwitchById('tab_test', 'Test');
-		$this->query('xpath://table[@id="test-result-table"]//span[@class="green"]')->waitUntilVisible()->one();
+		$this->zbxTestClickButtonText('Test');
+		$this->query('xpath://table[@id="regular-expressions-table"]//td[@class="js-expression-result nowrap green"]')
+				->waitUntilVisible()->one();
+		$this->zbxTestTextPresent('TRUE');
+		$this->query('xpath://div[@class="form-grid"]//span[@class="green"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('TRUE');
 	}
 
@@ -154,12 +162,14 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestTabSwitchById('tab_test', 'Test');
 
-		$this->query('xpath://textarea[@id="test-string"][@disabled]')->waitUntilNotPresent();
+		$this->query('id:regexp-form')->waitUntilVisible()->one();
 		$this->zbxTestInputType('test-string', 'abcdef');
-		$this->zbxTestClick('test-expression');
-		$this->query('xpath://table[@id="test-result-table"]//span[@class="red"]')->waitUntilVisible()->one();
+		$this->zbxTestClickButtonText('Test');
+		$this->query('xpath://table[@id="regular-expressions-table"]//td[@class="js-expression-result nowrap red"]')
+				->waitUntilVisible()->one();
+		$this->zbxTestTextPresent('FALSE');
+		$this->query('xpath://div[@class="form-grid"]//span[@class="red"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('FALSE');
 	}
 
@@ -181,6 +191,8 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
+
+		$this->query('id:regexp-form')->waitUntilVisible()->one();
 		$this->query('id:name')->one()->fill($this->regexp.'2');
 		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Regular expression updated');
@@ -194,7 +206,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkTextWait($this->regexp2);
 
-		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->zbxTestClickXpathWait('//button[contains(@class,"js-delete")]');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted');
 		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
@@ -212,7 +224,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestCheckboxSelect('all-regexes');
-		$this->zbxTestClickButton('regex.delete');
+		$this->zbxTestClickXpathWait('//button[contains(@id,"js-massdelete")]');
 
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckHeader('Regular expressions');
