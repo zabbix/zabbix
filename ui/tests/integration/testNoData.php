@@ -345,7 +345,14 @@ class testNoData extends CIntegrationTest {
 		return $response['result'][0];
 	}
 
-	private function waitForTriggerValue($key, $expected_value, $iterations = 30) {
+	/*
+	 * Default iterations covers at least one full history-syncer wake cycle plus margin: with
+	 * StartDBSyncers=1 and the artificial slowdown in dbsyncer.c (see class docblock reference to
+	 * the DEV4972 repro aid), a pushed value can sit unprocessed for up to that whole cycle before
+	 * the trigger reflects it - 30s (the old default) is no longer enough for even the very first,
+	 * otherwise-instant "push a baseline value, wait for it to land" step most tests start with.
+	 */
+	private function waitForTriggerValue($key, $expected_value, $iterations = 60) {
 		return $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$triggerids[$key]],
 			'output' => ['value', 'state']
@@ -665,7 +672,7 @@ class testNoData extends CIntegrationTest {
 		// End on unsupported so nodata() has a real chance to resolve to 1 once the window elapses -
 		// but keep polling at the same cadence instead of going silent (see docblock above).
 		$trigger = null;
-		$deadline = microtime(true) + 60;
+		$deadline = microtime(true) + 90;
 		while (microtime(true) < $deadline) {
 			$this->push($key, ['state' => ITEM_STATE_NOTSUPPORTED, 'value' => 'not a number']);
 			$trigger = $this->getTrigger($key);
@@ -791,10 +798,11 @@ class testNoData extends CIntegrationTest {
 
 		$this->pushLogSkip('MATCH: something went wrong');
 
+		// Same margin as waitForTriggerValue()'s default - see its comment.
 		$this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$pg_triggerid],
 			'output' => ['value', 'state']
-		], 30, 1, function ($r) {
+		], 60, 1, function ($r) {
 			return $r['result'][0]['value'] == TRIGGER_VALUE_TRUE;
 		});
 
