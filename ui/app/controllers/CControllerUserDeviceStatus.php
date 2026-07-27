@@ -46,7 +46,8 @@ class CControllerUserDeviceStatus extends CController {
 		}
 
 		return CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
-			|| CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER);
+			|| (CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
+				&& CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES));
 	}
 
 	protected function doAction() {
@@ -55,7 +56,8 @@ class CControllerUserDeviceStatus extends CController {
 			'filter' => ['uuid' => $this->getInput('uuid'), 'status' => ZBX_DEVICE_STATUS_ACTIVATED]
 		];
 
-		if (!CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+		if (!CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
+				|| !CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)) {
 			$options['userids'] = [CWebUser::$data['userid']];
 		}
 
