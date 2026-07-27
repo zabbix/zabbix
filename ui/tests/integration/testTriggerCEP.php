@@ -14,6 +14,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
+require_once dirname(__FILE__).'/../../include/classes/helpers/CCepRuleHelper.php';
 
 /**
  * Test suite to check if trigger CEP (Correlation Event Processing) works properly
@@ -71,6 +72,14 @@ class testTriggerCEP extends CIntegrationTest {
 	// the same webhook). The web-tag services (see createWebTagServices) match problems only on this tag,
 	// so they can go into problem state only via tags applied by the webhook, never via a trigger tag.
 	const WEB_COMPONENT_TAG = 'web_component';
+
+	// Name prefix shared by every CEP rule (ceprule API) these scenarios create. deleteCepRules() removes
+	// every rule whose name starts with it, so a rule left behind by an aborted test cannot keep closing
+	// the problems of the scenarios that run afterwards.
+	const CEP_RULE_NAME_PREFIX = 'CEP rule ';
+	// The single CEP rule used by the close-on-up complex event processing scenario, see
+	// buildCloseOnUpCepRuleParams().
+	const CEP_RULE_CLOSE_ON_UP = self::CEP_RULE_NAME_PREFIX.'tag correlation close on up';
 
 	// Separate template used to stress single-trigger event generation. The template (linked directly to
 	// the HOST_NAME host) carries a master log item plus an LLD rule with a dependent log item prototype.
@@ -130,6 +139,7 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $discovered_dep_triggerids = [];
 	private static $correlationid;
 	private static $correlationid2;
+	private static $cep_ruleid;
 	private static $disc_maintenanceids = [];
 	private static $serviceids = [];
 	private static $service_actionid;
@@ -1256,6 +1266,38 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function prepareDataGlobalCorrelationCloseOnUp($evaltype = CONDITION_EVAL_TYPE_AND_OR,
 			$extra_tag_via_webhook = false, $recreate_correlation = false) {
+		$this->prepareCloseOnUpTriggerPrototypes();
+
+		// Create (or update in place) the single "close old down when new up" rule. When
+		// $recreate_correlation is set the existing CEP correlation rules are deleted first, so the rule is
+		// built from scratch with this test's evaltype rather than updated on top of the one a previous
+		// CloseOnUp variant left behind (which uses a different evaltype).
+		if ($recreate_correlation) {
+			$this->deleteCepCorrelations();
+		}
+
+		self::$correlationid = $this->upsertCorrelation(
+			$this->buildCloseOnUpCorrelationParams('CEP global event correlation up', $evaltype)
+		);
+
+		// Optionally add an extra webhook-computed tag to every problem event.
+		if ($extra_tag_via_webhook) {
+			$this->createExtraTagWebhookAction();
+		}
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Reconfigure both trigger prototypes for the "close old down when new up" scenarios and resend LLD so
+	 * the discovered items and triggers are re-instantiated with that configuration. Shared by the global
+	 * event correlation variants (prepareDataGlobalCorrelationCloseOnUp) and by the complex event processing
+	 * variant (prepareDataCepWindowTagCorrelationCloseOnUp), which only differ in which rule engine closes
+	 * the problems afterwards.
+	 */
+	private function prepareCloseOnUpTriggerPrototypes(): void {
 		// Switch item prototypes to text so the find() function can be used in expressions.
 		$this->call('itemprototype.update', [
 			'itemid' => self::$item_prototypeid,
@@ -1358,23 +1400,26 @@ class testTriggerCEP extends CIntegrationTest {
 			}
 			return true;
 		});
+	}
 
-		// Create (or update in place) the single "close old down when new up" rule. When
-		// $recreate_correlation is set the existing CEP correlation rules are deleted first, so the rule is
-		// built from scratch with this test's evaltype rather than updated on top of the one a previous
-		// CloseOnUp variant left behind (which uses a different evaltype).
-		if ($recreate_correlation) {
-			$this->deleteCepCorrelations();
-		}
+	/**
+	 * Prepare the "close old down when new up" scenario driven by the new complex event processing (CEP rule)
+	 * functionality instead of a global event correlation rule. The trigger/item setup is exactly the one of
+	 * prepareDataGlobalCorrelationCloseOnUp (an "up_N" value is a PROBLEM event carrying state="up" and the
+	 * 'service' pairing tag); every global correlation rule is removed and the problems are closed by a single
+	 * CEP rule with a tag correlation time window instead, see buildCloseOnUpCepRuleParams(). The observable
+	 * behaviour is identical, so the scenario is driven by the very same runner
+	 * (runEventAssessmentTestGlobalCorrelationCloseOnUp).
+	 */
+	public function prepareDataCepWindowTagCorrelationCloseOnUp() {
+		$this->prepareCloseOnUpTriggerPrototypes();
 
-		self::$correlationid = $this->upsertCorrelation(
-			$this->buildCloseOnUpCorrelationParams('CEP global event correlation up', $evaltype)
-		);
+		// The CEP rule must be the only thing closing problems in this scenario: drop the global correlation
+		// rules a previous CloseOnUp variant left behind, otherwise they would close the same problems and
+		// the run would pass regardless of what the CEP rule does.
+		$this->deleteCepCorrelations();
 
-		// Optionally add an extra webhook-computed tag to every problem event.
-		if ($extra_tag_via_webhook) {
-			$this->createExtraTagWebhookAction();
-		}
+		self::$cep_ruleid = $this->upsertCepRule($this->buildCloseOnUpCepRuleParams(self::CEP_RULE_CLOSE_ON_UP));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -1666,6 +1711,29 @@ HEREDOC;
 	}
 
 	/**
+	 * Create the CEP rule described by $rule_params, or update it in place if one with the same name already
+	 * exists (prepareData* methods are re-run by every dependent test). Returns the CEP rule id so the caller
+	 * can track it for cleanup.
+	 */
+	private function upsertCepRule(array $rule_params): string {
+		$existing = $this->call('ceprule.get',
+			['filter' => ['name' => $rule_params['name']], 'output' => ['cep_ruleid']]
+		);
+		if ($existing['result']) {
+			$cep_ruleid = $existing['result'][0]['cep_ruleid'];
+			$this->call('ceprule.update', ['cep_ruleid' => $cep_ruleid] + $rule_params);
+		}
+		else {
+			$response = $this->call('ceprule.create', $rule_params);
+			$this->assertArrayHasKey('cep_ruleids', $response['result']);
+			$this->assertArrayHasKey(0, $response['result']['cep_ruleids']);
+			$cep_ruleid = $response['result']['cep_ruleids'][0];
+		}
+
+		return $cep_ruleid;
+	}
+
+	/**
 	 * Build a global event correlation rule that closes the problems of one parity. The new event must
 	 * carry odd=$parity, and the rule matches old events with service="down" on the same component (tag
 	 * pair), then closes both the old and the new problem.
@@ -1831,6 +1899,68 @@ HEREDOC;
 			'operations' => [
 				['type' => ZBX_CORR_OPERATION_CLOSE_OLD],
 				['type' => ZBX_CORR_OPERATION_CLOSE_NEW]
+			]
+		];
+	}
+
+	/**
+	 * Build the complex event processing (CEP) rule that drives the close-on-up scenario through a tag
+	 * correlation time window instead of a global event correlation rule (buildCloseOnUpCorrelationParams()).
+	 *
+	 * The rule matches the problem events of these scenarios only - its single filter condition requires the
+	 * 'state' tag, which only the close-on-up trigger prototypes add - and puts every matched event into a
+	 * "Tag correlation" (WINDOW_TAG_MATCH) window keyed on the 'service' tag, so a "down_N" event and the
+	 * "up_N" event pairing with it (even when the "up" is raised on another trigger) belong to the same
+	 * window. The window is one hour long with no capacity limit, so nothing is evicted during the run.
+	 *
+	 * The operations are:
+	 *   - Execute when "Event occurred": "Close window", with the operation condition state Equals "up";
+	 *   - Execute when "Window closed": "Close".
+	 *
+	 * The new event is already in the window when the close-window operation runs, so an event closes the
+	 * window it just entered and "Window closed" then closes every event that window held. The state="up"
+	 * operation condition is therefore what reproduces the close-on-up behaviour of the global correlation
+	 * rule: a "down_N" event only accumulates in the window of its 'service' id, and the "up_N" event closes
+	 * that window, closing both the paired "down_N" problem (like CLOSE_OLD) and itself (like CLOSE_NEW).
+	 * Without the condition every event would close the window it just entered, so every problem would be
+	 * closed the moment it opened.
+	 */
+	private function buildCloseOnUpCepRuleParams(string $name): array {
+		return [
+			'name' => $name,
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [
+					[
+						'type' => CCepRuleHelper::CONDITION_TAG,
+						'operator' => CONDITION_OPERATOR_EXISTS,
+						'tag' => 'state',
+						'tag_value' => ''
+					]
+				]
+			],
+			'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
+			'window' => [
+				'duration' => '1h',
+				'capacity' => 0,
+				'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+				'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+				'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+				'tags' => ['service']
+			],
+			'operations' => [
+				[
+					'sortorder' => 0,
+					'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+					'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'tags' => [['tag' => 'state', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'up']]
+				],
+				[
+					'sortorder' => 1,
+					'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
+					'type' => CCepRuleHelper::OP_CLOSE
+				]
 			]
 		];
 	}
@@ -2032,6 +2162,24 @@ HEREDOC;
 		}
 		self::$correlationid = null;
 		self::$correlationid2 = null;
+	}
+
+	/**
+	 * Delete every CEP rule (ceprule API) created by these scenarios - their names all start with
+	 * CEP_RULE_NAME_PREFIX - and reset the tracked CEP rule id. A leftover rule would keep closing the
+	 * problems of the scenarios that run afterwards, so this is also called from clearData() in case a test
+	 * aborted before its own teardown ran.
+	 */
+	private function deleteCepRules(): void {
+		$response = $this->call('ceprule.get', [
+			'output' => ['cep_ruleid'],
+			'search' => ['name' => self::CEP_RULE_NAME_PREFIX]
+		]);
+		$ids = array_column($response['result'], 'cep_ruleid');
+		if ($ids) {
+			$this->call('ceprule.delete', $ids);
+		}
+		self::$cep_ruleid = null;
 	}
 
 	/**
@@ -3526,6 +3674,38 @@ HEREDOC;
 		$this->prepareDataGlobalCorrelationCloseOnUp();
 		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
 		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * The complex event processing (CEP rule) counterpart of
+	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp: the exact same scenario - it runs the very same
+	 * four waves through the very same runner and asserts the same problem counts after each of them - but no
+	 * global event correlation rule is involved. The problems are closed by a single CEP rule with a "Tag
+	 * correlation" time window keyed on the 'service' tag and the operations
+	 *   - Execute when "Event occurred" -> "Close window" (on the "up" events only)
+	 *   - Execute when "Window closed"  -> "Close"
+	 * so a "down_N" problem stays open in the window of its 'service' id until the matching "up_N" event
+	 * closes that window, closing both of them - the CEP equivalent of CLOSE_OLD + CLOSE_NEW. See
+	 * buildCloseOnUpCepRuleParams().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUp$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUp() {
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+			$this->waitForNoOpenProblems($all);
+		}
+		finally {
+			// The CEP rule closes every problem carrying a 'state' tag, so it must not survive this test:
+			// the global correlation variants that run afterwards use the same trigger prototypes and would
+			// have their problems closed by this rule instead of by their correlation rule.
+			$this->deleteCepRules();
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+		}
 	}
 
 	/**
@@ -7164,6 +7344,17 @@ HEREDOC;
 			CDataHelper::call('correlation.delete', [self::$correlationid2]);
 			self::$correlationid2 = null;
 		}
+
+		// Remove the CEP rules (created by prepareDataCepWindowTagCorrelationCloseOnUp) in case a test aborted
+		// before its own teardown ran; a rule left behind would keep closing problems of later suites.
+		$cep_rules = CDataHelper::call('ceprule.get', [
+			'output' => ['cep_ruleid'],
+			'search' => ['name' => self::CEP_RULE_NAME_PREFIX]
+		]);
+		if (!empty($cep_rules)) {
+			CDataHelper::call('ceprule.delete', array_column($cep_rules, 'cep_ruleid'));
+		}
+		self::$cep_ruleid = null;
 
 		// stopDiscHostMaintenance() only pushes the maintenance out of its active window; delete it for real
 		// here (before its host) so it does not leak into later suites.
