@@ -95,6 +95,15 @@ static int	cep_window_ref_compare(const void *a1, const void *a2)
 	return 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: increment reference count of cep window                           *
+ *                                                                            *
+ * Parameters: window - [IN] cep window to add reference to                   *
+ *                                                                            *
+ * Return value: same window                                                  *
+ *                                                                            *
+ ******************************************************************************/
 zbx_cep_window_t	*cep_window_addref(zbx_cep_window_t *window)
 {
 	atomic_fetch_add(&window->refcount, 1);
@@ -102,6 +111,13 @@ zbx_cep_window_t	*cep_window_addref(zbx_cep_window_t *window)
 	return window;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release reference to cep window, freeing it when refcount hits 0  *
+ *                                                                            *
+ * Parameters: window - [IN] cep window to release                            *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_release(zbx_cep_window_t *window)
 {
 	zbx_cep_event_handle_t	h;
@@ -122,11 +138,35 @@ void	cep_window_release(zbx_cep_window_t *window)
 	zbx_free(window);
 }
 
-static int	cep_window_param_has_macro(const char *limit)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if window parameter might contain a user macro              *
+ *                                                                            *
+ * Parameters: param - [IN] window parameter value to check                   *
+ *                                                                            *
+ * Return value: SUCCEED - parameter might contain a macro                    *
+ *               FAIL    - parameter does not contain a macro                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_window_param_has_macro(const char *param)
 {
-	return (NULL == strstr(limit, "{$") ? FAIL : SUCCEED);
+	return (NULL == strstr(param, "{$") ? FAIL : SUCCEED);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolve and parse cep window duration and capacity limits         *
+ *                                                                            *
+ * Parameters: rule     - [IN] cep rule containing window limits              *
+ *             duration - [OUT] parsed window duration in seconds             *
+ *             capacity - [OUT] parsed window capacity                        *
+ *             error    - [OUT] error message if limits are invalid, can be   *
+ *                        NULL                                                *
+ *                                                                            *
+ * Return value: SUCCEED - limits were successfully resolved and parsed       *
+ *               FAIL    - duration or capacity is invalid                    *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_window_get_limits(const zbx_cep_rule_t *rule, int *duration, int *capacity, char **error)
 {
 	char		*duration_dyn = NULL, *capacity_dyn = NULL;
@@ -177,6 +217,17 @@ out:
 	return ret;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a new cep window with initial state for a rule             *
+ *                                                                            *
+ * Parameters: rule - [IN] cep rule the window is created for                 *
+ *             ref  - [IN] reference linking window back to its owner         *
+ *                                                                            *
+ * Return value: created cep window                                           *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule, zbx_cep_window_ref_t *ref)
 {
 	zbx_cep_window_t	*window;
@@ -224,6 +275,13 @@ static void	cep_window_unlock(zbx_cep_window_t *window)
 	pthread_mutex_unlock(&window->lock);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free resources held by a cep window reference                     *
+ *                                                                            *
+ * Parameters: a - [IN] cep window reference to clear                         *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_window_ref_clear(void *a)
 {
 	zbx_cep_window_ref_t	*ref = (zbx_cep_window_ref_t *)a;
@@ -234,6 +292,18 @@ static void	cep_window_ref_clear(void *a)
 	zbx_free(ref->tag_value);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: determine position of an event within a window by its index       *
+ *                                                                            *
+ * Parameters: index      - [IN] index of the event within the window         *
+ *             events_num - [IN] total number of events in the window         *
+ *                                                                            *
+ * Return value: CEP_POS_FIRST   - event is the first in the window           *
+ *               CEP_POS_LAST    - event is the last in the window            *
+ *               CEP_POS_UNKNOWN - event is neither first nor last            *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_event_pos_t	cep_window_event_pos(int index, int events_num)
 {
 	if (0 == index)
@@ -245,6 +315,17 @@ static zbx_cep_event_pos_t	cep_window_event_pos(int index, int events_num)
 	return CEP_POS_UNKNOWN;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: close cep window, executing window-closed ops for each event      *
+ *                                                                            *
+ * Parameters: rule   - [IN] cep rule owning the window                       *
+ *             window - [IN] cep window to close                              *
+ *             tasks  - [OUT] tasks generated by executed operations          *
+ *                                                                            *
+ * Return value: number of events that were in the window                     *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_window_close(const zbx_cep_rule_t *rule, zbx_cep_window_t *window, zbx_vector_mw_task_ptr_t *tasks)
 {
 	int	events_num = zbx_queue_ptr_values_num(&window->hevents);
@@ -295,6 +376,16 @@ static zbx_uint64_t	cep_window_get_nextcheck(const zbx_cep_window_t *window, con
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: attempt to add event to sliding window, triggering corresponding  *
+ *          operations if window is at capacity limit                         *
+ *                                                                            *
+ * Parameters: rule  - [IN] cep rule owning the window                        *
+ *             ctx   - [IN] event context to process                          *
+ *             tasks - [OUT] tasks generated by executed operations           *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
 		zbx_vector_mw_task_ptr_t *tasks)
 {
@@ -338,6 +429,8 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 	{
 		cep_window_lock(window);
 		cep_window_close(rule, window, tasks);
+		/* rescheduled window at current time so it can be removed if still empty */
+		atomic_store(&window->nextcheck, (zbx_uint64_t)time(NULL));
 		cep_window_unlock(window);
 	}
 
@@ -353,12 +446,26 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evict expired events from a cep sliding window and requeue it     *
+ *          for further processing                                            *
+ *                                                                            *
+ * Parameters: window - [IN] cep sliding window to process                    *
+ *             now    - [IN] current time used to evaluate event expiry       *
+ *             tasks  - [OUT] tasks generated by executed operations          *
+ *                                                                            *
+ * Comments: Empty windows are removed from the pool unless another worker    *
+ *           is concurrently adding an event to it.                           *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_sliding_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_rule_t		*rule;
 	int			pending_num, duration, capacity, limit_update;
 	char			*error = NULL;
 	zbx_cep_window_pool_t	*pool;
+	zbx_uint64_t		opmask = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
@@ -386,7 +493,6 @@ void	cep_window_sliding_process(zbx_cep_window_t *window, time_t now, zbx_vector
 	{
 		zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_queue_ptr_peek(&window->hevents);
 		zbx_cep_event_context_t	ctx = {.hevent = zbx_cep_event_handle_addref(h), .pos = CEP_POS_FIRST};
-		zbx_uint64_t		opmask = 0;
 
 		if (NULL != cep_event_context_get_event(&ctx))
 		{
@@ -432,8 +538,23 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	cep_window_set_event_tag(zbx_cep_window_t *window, zbx_cep_event_handle_t h, const char *tag, int value,
-		zbx_vector_mw_task_ptr_t *tasks)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set tag value on window's event                                   *
+ *                                                                            *
+ * Parameters: window - [IN] cep window associated with the event             *
+ *             h      - [IN] handle of event to set tag on                    *
+ *             tag    - [IN] tag name to set                                  *
+ *             value  - [IN] value to set for the tag                         *
+ *             tasks  - [OUT] tasks generated for syncing event and           *
+ *                      acknowledging the tag change                          *
+ *                                                                            *
+ * Comments: If the event already has a tag with this name that was not set   *
+ *           by cep, it is left unchanged rather than overwritten.            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_window_set_event_set_tag_value(zbx_cep_window_t *window, zbx_cep_event_handle_t h, const char *tag,
+		int value, zbx_vector_mw_task_ptr_t *tasks)
 {
 	int			index;
 	zbx_cep_event_t		*event;
@@ -463,7 +584,7 @@ static void	cep_window_set_event_tag(zbx_cep_window_t *window, zbx_cep_event_han
 	{
 		zbx_tag_t	tag_local;
 
-		cep_acknowledge_update_tag(&ack, ZBX_CEP_OP_ADD_TAG, NULL, NULL, tag, buf);
+		cep_acknowledge_update_tag(&ack, ZBX_CEP_OP_SET_TAG, NULL, NULL, tag, buf);
 
 		tag_local.tag = zbx_strdup(NULL, tag);
 		tag_local.value = zbx_strdup(NULL, buf);
@@ -473,7 +594,7 @@ static void	cep_window_set_event_tag(zbx_cep_window_t *window, zbx_cep_event_han
 	{
 		zbx_tag_t	*t = &event->tags.values[index];
 
-		cep_acknowledge_update_tag(&ack, ZBX_CEP_OP_INCREASE_TAG_VALUE, t->tag, t->value, NULL, buf);
+		cep_acknowledge_update_tag(&ack, ZBX_CEP_OP_SET_TAG, t->tag, t->value, NULL, buf);
 		t->value = zbx_strdup(t->value, buf);
 	}
 
@@ -493,6 +614,17 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set causal event id on window's event                             *
+ *                                                                            *
+ * Parameters: window - [IN] cep window associated with the event             *
+ *             ctx    - [IN] context of event to set cause on                 *
+ *             hcause - [IN] handle of the causal event                       *
+ *             tasks  - [OUT] task generated for acknowledging the cause      *
+ *                      change                                                *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_window_set_event_cause(zbx_cep_window_t *window, zbx_cep_event_context_t *ctx,
 		zbx_cep_event_handle_t hcause, zbx_vector_mw_task_ptr_t *tasks)
 {
@@ -512,6 +644,16 @@ static void	cep_window_set_event_cause(zbx_cep_window_t *window, zbx_cep_event_c
 	zbx_vector_mw_task_ptr_append(tasks, cep_create_task_acknowledge(&ack, window->ruleid, event->eventid));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: attempt to add event to cause-symptom window, triggering          *
+ *          corresponding operations if window is at capacity limit           *
+ *                                                                            *
+ * Parameters: rule  - [IN] cep rule owning the window                        *
+ *             ctx   - [IN] event context to process                          *
+ *             tasks - [OUT] tasks generated by executed operations           *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
 		zbx_vector_mw_task_ptr_t *tasks)
 {
@@ -557,7 +699,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 			if ('\0' != *rule->window->event_count_tag)
 			{
-				cep_window_set_event_tag(window, h, rule->window->event_count_tag,
+				cep_window_set_event_set_tag_value(window, h, rule->window->event_count_tag,
 						zbx_queue_ptr_values_num(&window->hevents), tasks);
 			}
 
@@ -575,6 +717,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 	if (0 != (opmask & CEP_FLAG(ZBX_CEP_OP_CLOSE_WINDOW)))
 	{
+		/* if the window is still empty until the next processing time, it will be removed */
 		cep_window_lock(window);
 		cep_window_close(rule, window, tasks);
 		cep_window_unlock(window);
@@ -592,6 +735,18 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: close cep causal window and reset it for the next time period     *
+ *                                                                            *
+ * Parameters: window - [IN] cep causal window to process                     *
+ *             now    - [IN] current time used as the new window start time   *
+ *             tasks  - [OUT] tasks generated by executed operations          *
+ *                                                                            *
+ * Comments: Windows that were already empty are removed from the pool,       *
+ *           unless another worker is concurrently adding an event to it.     *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_rule_t		*rule;
@@ -621,7 +776,7 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 		window->capacity = capacity;
 	}
 
-	events_num  = cep_window_close(rule, window, tasks);
+	events_num = cep_window_close(rule, window, tasks);
 
 	cep_window_pool_acquire(&pool);
 	if (0 != events_num || 0 != window->access_num)
@@ -647,6 +802,16 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: attempt to add event to parrent match window, triggering          *
+ *          corresponding operations if window is at capacity limit           *
+ *                                                                            *
+ * Parameters: rule  - [IN] cep rule owning the window                        *
+ *             ctx   - [IN] event context to process                          *
+ *             tasks - [OUT] tasks generated by executed operations           *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
 		zbx_vector_mw_task_ptr_t *tasks)
 {
@@ -693,6 +858,7 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 	{
 		cep_window_lock(window);
 		cep_window_close(rule, window, tasks);
+		atomic_store(&window->nextcheck, (zbx_uint64_t)time(NULL));
 		cep_window_unlock(window);
 	}
 
@@ -708,6 +874,19 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute cep window js script against window's events              *
+ *                                                                            *
+ * Parameters: window - [IN] cep window whose events are exposed to script    *
+ *             es     - [IN] embedded scripting engine to execute script      *
+ *             error  - [OUT] error message if script execution fails         *
+ *                                                                            *
+ * Return value: SUCCEED - script executed and returned true                  *
+ *               FAIL    - script execution failed or returned other than     *
+ *                         true                                               *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_window_js_process_script(zbx_cep_window_t *window, zbx_es_t *es, char **error)
 {
 	zbx_vector_cep_event_handle_t	hevents;
@@ -747,6 +926,20 @@ static int	cep_window_js_process_script(zbx_cep_window_t *window, zbx_es_t *es, 
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize scripting engine and lazily compile window's script    *
+ *                                                                            *
+ * Parameters: window - [IN/OUT] cep window whose script is compiled and      *
+ *                       cached                                               *
+ *             es     - [IN/OUT] embedded scripting engine to initialize      *
+ *             error  - [OUT] error message if preparation fails              *
+ *                                                                            *
+ * Return value: SUCCEED - scripting engine was initialized and script is     *
+ *                         ready for execution                                *
+ *               FAIL    - initialization or compilation failed               *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_window_js_prepare(zbx_cep_window_t *window, zbx_es_t *es, char **error)
 {
 	char	*errmsg = NULL;
@@ -783,6 +976,17 @@ static int	cep_window_js_prepare(zbx_cep_window_t *window, zbx_es_t *es, char **
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: run cep window js pattern-match script and execute resulting ops  *
+ *                                                                            *
+ * Parameters: window - [IN] cep window to evaluate and process               *
+ *             tasks  - [OUT] tasks generated by executed operations          *
+ *                                                                            *
+ * Comments: Windows with no pending events are removed from the pool unless  *
+ *           another worker is concurrently adding an event to it.            *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_js_process(zbx_cep_window_t *window, zbx_vector_mw_task_ptr_t *tasks)
 {
 	char			*error = NULL;
@@ -876,6 +1080,16 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dispatch cep window processing based on window type               *
+ *                                                                            *
+ * Parameters: window - [IN] cep window to process                            *
+ *             now    - [IN] current time, used by sliding and causal         *
+ *                      windows                                               *
+ *             tasks  - [OUT] tasks generated by executed operations          *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
 {
 	switch (window->type)
@@ -920,6 +1134,13 @@ static int	cep_window_compare_by_nextcheck(const void *a1, const void *a2)
 	return 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create cep window pool                                            *
+ *                                                                            *
+ * Return value: created cep window pool                                      *
+ *                                                                            *
+ ******************************************************************************/
 zbx_cep_window_pool_t	*cep_window_pool_create(void)
 {
 	zbx_cep_window_pool_t	*pool;
@@ -936,6 +1157,13 @@ zbx_cep_window_pool_t	*cep_window_pool_create(void)
 	return pool;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free cep window pool and release all windows held by it           *
+ *                                                                            *
+ * Parameters: a - [IN] cep window pool to destroy                            *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_pool_destroy(void *a)
 {
 	zbx_cep_window_pool_t	*pool = (zbx_cep_window_pool_t *)a;
@@ -958,6 +1186,21 @@ void	cep_window_pool_destroy(void *a)
 	zbx_free(pool);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get cep window for event's group-by key, creating one if none     *
+ *          exists yet                                                        *
+ *                                                                            *
+ * Parameters: pool  - [IN] cep window pool to search or insert into          *
+ *             rule  - [IN] cep rule the window is created for                *
+ *             ctx   - [IN] context of event used to resolve group-by         *
+ *                     attributes                                             *
+ *             error - [OUT] error message if window limits are invalid       *
+ *                                                                            *
+ * Return value: found or created cep window, with an added reference,        *
+ *               or NULL if window creation failed                            *
+ *                                                                            *
+ ******************************************************************************/
 zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *pool, const zbx_cep_rule_t *rule,
 		zbx_cep_event_context_t *ctx, char **error)
 {
@@ -1007,11 +1250,35 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 	return cep_window_addref(ref->window);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove cep window from pool                                       *
+ *                                                                            *
+ * Parameters: pool   - [IN] cep window pool to remove window from            *
+ *             window - [IN] cep window to remove                             *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_pool_remove_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window)
 {
 	zbx_hashset_remove_direct(&pool->windows, window->ref);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: collect cep windows due for processing at or before given time    *
+ *                                                                            *
+ * Parameters: pool    - [IN] cep window pool to collect windows from         *
+ *             now     - [IN] current time used to evaluate due windows       *
+ *             windows - [OUT] collected windows ready for processing         *
+ *                                                                            *
+ * Return value: number of windows collected                                  *
+ *                                                                            *
+ * Comments: Windows are pulled first from the tick queue, then from the      *
+ *           alarm queue, until either is exhausted or windows reaches its    *
+ *           allocated capacity. Windows marked as removed are released       *
+ *           instead of being collected.                                      *
+ *                                                                            *
+ ******************************************************************************/
 int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now, zbx_vector_cep_window_ptr_t *windows)
 {
 	zbx_cep_window_t	*window;
@@ -1069,13 +1336,24 @@ void	cep_window_pool_reset_rule(zbx_cep_window_pool_t *pool, zbx_uint64_t ruleid
 	{
 		if (ref->ruleid == ruleid)
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
 			ref->window->location = CEP_LOCATION_REMOVED;
 			zbx_hashset_remove_direct(&pool->windows, ref);
 		}
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove all cep windows belonging to a rule from the pool          *
+ *                                                                            *
+ * Parameters: pool   - [IN] cep window pool to remove windows from           *
+ *             ruleid - [IN] id of rule whose windows are removed             *
+ *                                                                            *
+ * Comments: Windows are marked as removed so any pending references to       *
+ *           them in the tick or alarm queues are discarded instead of        *
+ *           being processed.                                                 *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_pool_enqueue(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window)
 {
 	zbx_binary_heap_elem_t	elem;
@@ -1104,6 +1382,16 @@ void	cep_window_pool_enqueue(zbx_cep_window_pool_t *pool, zbx_cep_window_t *wind
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: save cep window pool's groups and their assigned events to        *
+ *          database                                                          *
+ *                                                                            *
+ * Parameters: pool   - [IN] cep window pool to save                          *
+ *             dbpool - [IN] database connection pool to acquire connection   *
+ *                      from                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_pool_save(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool)
 {
 	zbx_dbconn_t		*db;
@@ -1169,7 +1457,19 @@ typedef struct
 }
 zbx_cep_window_group_t;
 
-static void	cep_window_pool_load_groups(zbx_cep_window_pool_t *pool, zbx_dbconn_t *db, zbx_hashset_t *groups)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: load cep window pool's windows from database                      *
+ *                                                                            *
+ * Parameters: pool    - [IN/OUT] cep window pool to load windows into        *
+ *             db      - [IN] database connection to query                    *
+ *             windows - [OUT] map from database group id to loaded window    *
+ *                      for resolving group events afterward                  *
+ *                                                                            *
+ * Comments: Windows referencing a rule that no longer exists are skipped.    *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn_t *db, zbx_hashset_t *windows)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -1210,7 +1510,7 @@ static void	cep_window_pool_load_groups(zbx_cep_window_pool_t *pool, zbx_dbconn_
 		ZBX_STR2UINT64(group_local.groupid, row[0]);
 		group_local.window = ref->window;
 
-		zbx_hashset_insert(groups, &group_local, sizeof(group_local));
+		zbx_hashset_insert(windows, &group_local, sizeof(group_local));
 
 		zbx_cep_rule_release(rule);
 	}
@@ -1219,6 +1519,18 @@ static void	cep_window_pool_load_groups(zbx_cep_window_pool_t *pool, zbx_dbconn_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() windows:%d", __func__, pool->windows.num_data);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: load events into their cep windows from database                  *
+ *                                                                            *
+ * Parameters: groups - [IN] map from database group id to loaded window,     *
+ *                      used to attach events to their windows                *
+ *             db     - [IN] database connection to query                     *
+ *                                                                            *
+ * Comments: Rows referencing a group id not present in groups, or an         *
+ *           eventid with no corresponding event handle, are skipped.         *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db)
 {
 	zbx_db_result_t		result;
@@ -1261,6 +1573,16 @@ static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() events:" ZBX_FS_UI64, __func__, events_num);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: load cep window pool's widnows and pending events from database   *
+ *          and enqueue windows for processing                                *
+ *                                                                            *
+ * Parameters: pool   - [IN/OUT] cep window pool to load windows into         *
+ *             dbpool - [IN] database connection pool to acquire connection   *
+ *                      from                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool)
 {
 	zbx_dbconn_t		*db;
@@ -1284,7 +1606,7 @@ void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool
 
 		zbx_dbconn_begin(db);
 
-		cep_window_pool_load_groups(pool, db, &groups);
+		cep_window_pool_load_windows(pool, db, &groups);
 		cep_window_pool_load_events(&groups, db);
 
 		zbx_hashset_destroy(&groups);
@@ -1303,7 +1625,14 @@ void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool
 	zbx_dbconn_pool_release_connection(dbpool, db);
 }
 
-
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log cep window and its pending event ids at trace level           *
+ *                                                                            *
+ * Parameters: prefix - [IN] string prepended to each logged line             *
+ *             ref    - [IN] cep window reference to log                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *ref)
 {
 	zbx_queue_ptr_iter_t		iter;
@@ -1352,6 +1681,13 @@ static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log all cep windows in pool at trace level                        *
+ *                                                                            *
+ * Parameters: pool - [IN] cep window pool to log                             *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_window_pool_dump(zbx_cep_window_pool_t *pool)
 {
 	zbx_hashset_iter_t	iter;
