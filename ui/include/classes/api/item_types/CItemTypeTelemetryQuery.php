@@ -339,9 +339,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 
 		return [
 			'signal_type'			=> ['type' => API_INT32, 'in' => implode(',', [APM_SIGNAL_TYPE_TRACES, APM_SIGNAL_TYPE_METRICS, APM_SIGNAL_TYPE_LOGS]), 'default' => APM_SIGNAL_TYPE_TRACES],
-			'metric_point_type'		=> ['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'signal_type', 'in' => APM_SIGNAL_TYPE_METRICS], 'type' => API_INT32, 'in' => implode(',', [APM_METRICS_POINT_SUM, APM_METRICS_POINT_GAUGE, APM_METRICS_POINT_HISTOGRAM, APM_METRICS_POINT_EXPHISTOGRAM]), 'default' => APM_METRICS_POINT_SUM],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
+			'metric_point_type'		=> ['type' => API_MULTIPLE, 'default' => APM_METRICS_POINT_SUM, 'rules' => [
+											['if' => ['field' => 'signal_type', 'in' => APM_SIGNAL_TYPE_METRICS], 'type' => API_INT32, 'in' => implode(',', [APM_METRICS_POINT_SUM, APM_METRICS_POINT_GAUGE, APM_METRICS_POINT_HISTOGRAM, APM_METRICS_POINT_EXPHISTOGRAM])],
+											['else' => true, 'type' => API_INT32, 'in' => APM_METRICS_POINT_SUM]
 			]],
 			'columns'				=> ['type' => API_OBJECTS, 'default' => [], 'uniq' => [['column', 'attribute_key']], 'fields' => [
 				'column'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', $columns_column)],
