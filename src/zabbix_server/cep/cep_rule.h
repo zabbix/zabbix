@@ -21,7 +21,7 @@
 
 char	*cep_tag_value_shift(const char *value, int shift);
 
-#define CEP_FLAG(x)  (__UINT32_C(1) << (x))
+#define CEP_FLAG(x)  (__UINT64_C(1) << (x))
 
 #define CEP_OP_SET_NAME_MASK		(CEP_FLAG(ZBX_CEP_WHEN_EVENT_OCCURRED) | \
 					CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | CEP_FLAG(ZBX_CEP_WHEN_WINDOW_CLOSED))
