@@ -346,13 +346,17 @@ class testNoData extends CIntegrationTest {
 	}
 
 	/*
-	 * Default iterations covers at least one full history-syncer wake cycle plus margin: with
+	 * Default iterations covers at least one full history-syncer wake cycle plus real margin: with
 	 * StartDBSyncers=1 and the artificial slowdown in dbsyncer.c (see class docblock reference to
 	 * the DEV4972 repro aid), a pushed value can sit unprocessed for up to that whole cycle before
-	 * the trigger reflects it - 30s (the old default) is no longer enough for even the very first,
+	 * the trigger reflects it - 30s (the old default) is not enough for even the very first,
 	 * otherwise-instant "push a baseline value, wait for it to land" step most tests start with.
+	 * 60s (barely over one cycle) was ALSO not enough in practice - CI caught a real failure at
+	 * that budget (testNoData_ValuesFromPast), most likely phase misalignment or slower hardware
+	 * pushing a single cycle's actual wall-clock cost past 60s. Use enough margin to comfortably
+	 * cover slower/busier environments, not just the happy-path minimum.
 	 */
-	private function waitForTriggerValue($key, $expected_value, $iterations = 60) {
+	private function waitForTriggerValue($key, $expected_value, $iterations = 100) {
 		return $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$triggerids[$key]],
 			'output' => ['value', 'state']
