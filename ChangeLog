@@ -1,12 +1,19 @@
 Changes for 8.0.0rc1
 
 New features:
+.........T [ZBXNEXT-10639] added template GCP Cost monitoring by HTTP (kflorowski)
 .........T [ZBXNEXT-10328] added Percona by Zabbix agent template (mruszczyk)
 .........T [ZBXNEXT-10326] added MariaDB by Zabbix agent template (mruszczyk)
 .........T [ZBXNEXT-10320] added new metrics, expanded discovery rules for tables and improved dashboard in MySQL by Zabbix agent template (mruszczyk)
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-27875] fixed the display of the "Show templates" filter in the "Host wizard" form (Sasha)
+..F....... [ZBX-27961] fixed delete cancel confirmation in API tokens and proxy group edit forms (scernisenko)
+..F....... [ZBX-27825] fixed to set correct mode parameter for nodata function in trigger expression edit form (gberzina)
+..F....... [ZBX-27140] fixed overall hintbox positioning (dfofanovs)
+..F....... [ZBX-25815] removed mention of discovery from SNMP max_repetition help note (vskalbins)
+..F....... [ZBX-27941] fixed console error on Dashboard list page in Kiosk mode (scernisenko)
 .......PS. [ZBX-27975] fixed potential VMware collector crash caused by network connectivity issues to vCenter (MVekslers)
 .........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates. (abrosimovs)
 ..F....... [ZBX-26583] fixed incorrectly displayed templates after clearing search field in host wizard (aluchko, gklavins)
