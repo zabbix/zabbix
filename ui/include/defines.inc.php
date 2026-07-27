@@ -13,11 +13,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'8.0.0beta2');
+define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',	7050061);
+define('ZABBIX_DB_VERSION',	7050063);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -418,7 +418,7 @@ define('SNMP_BULK_DISABLED',	0);
 define('SNMP_BULK_ENABLED',		1);
 
 define('MAINTENANCE_STATUS_ACTIVE',		0);
-define('MAINTENANCE_STATUS_APPROACH',	1);
+define('MAINTENANCE_STATUS_UPCOMING',	1);
 define('MAINTENANCE_STATUS_EXPIRED',	2);
 
 define('HOST_GROUP_TYPE_HOST_GROUP', 		0);
@@ -2489,6 +2489,9 @@ define('ZBX_NODE_STATUS_ACTIVE',		3);
 
 // Datatable.
 define('ZBX_STYLE_DATATABLE', 'datatable');
+
+// Limit amount of validations per request in CControllerValidateUse
+define('VALIDATE_USE_CHUNK_SIZE', 500);
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');
