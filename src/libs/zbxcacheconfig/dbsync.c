@@ -3449,13 +3449,13 @@ int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares maintenance_eventname table row                         *
+ * Purpose: compares maintenance_eventname table row                          *
  *          with cached configuration data                                    *
  *                                                                            *
- * Parameter: maintenance_eventname - [IN] the cached maintenance tag         *
- *            dbrow                 - [IN] the database row                   *
+ * Parameter: maintenance_eventname - [IN] cached maintenance event name      *
+ *            dbrow                 - [IN]                                    *
  *                                                                            *
- * Return value: SUCCEED - the row matches configuration data                 *
+ * Return value: SUCCEED - row matches configuration data                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -3473,12 +3473,12 @@ static int	dbsync_compare_maintenance_eventname(const zbx_dc_maintenance_eventna
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares maintenance_eventname table                             *
+ * Purpose: compares maintenance_eventname table                              *
  *          with cached configuration data                                    *
  *                                                                            *
- * Parameter: sync - [OUT] the changeset                                      *
+ * Parameter: sync - [OUT] changeset                                          *
  *                                                                            *
- * Return value: SUCCEED - the changeset was successfully calculated          *
+ * Return value: SUCCEED - changeset was successfully calculated              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -3829,12 +3829,11 @@ int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares maintenance_trigger table                                *
- *          with cached configuration data                                    *
+ * Purpose: compares maintenance_trigger table with cached configuration data *
  *                                                                            *
- * Parameter: sync - [OUT] the changeset                                      *
+ * Parameter: sync - [OUT] changeset                                          *
  *                                                                            *
- * Return value: SUCCEED - the changeset was successfully calculated          *
+ * Return value: SUCCEED - changeset was successfully calculated              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: Sync rows contain following fields:                              *

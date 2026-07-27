@@ -44,6 +44,25 @@ void	zbx_host_maintenance_diff_free(zbx_host_maintenance_diff_t *hmd)
 	zbx_free(hmd);
 }
 
+static void	remove_maintenance_for_trigger(zbx_dc_maintenances_for_trigger_t *maintenances_for_trigger,
+		zbx_dc_maintenance_t	*maintenance)
+{
+	int	idx;
+
+	if (FAIL != (idx = zbx_vector_dc_maintenance_ptr_bsearch(&maintenances_for_trigger->maintenances, maintenance,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+	{
+		zbx_vector_dc_maintenance_ptr_remove(&maintenances_for_trigger->maintenances, idx);
+
+		if (0 == maintenances_for_trigger->maintenances.values_num)
+		{
+			zbx_vector_dc_maintenance_ptr_destroy(&maintenances_for_trigger->maintenances);
+			zbx_hashset_remove_direct(&get_dc_config()->maintenances_for_triggers,
+					maintenances_for_trigger);
+		}
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Updates maintenances in configuration cache                       *
@@ -114,7 +133,6 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		int					idx;
 		zbx_hashset_iter_t			iter;
 		zbx_dc_maintenances_for_trigger_t	*maintenances_for_trigger;
 
@@ -125,12 +143,7 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
 		while (NULL != (maintenances_for_trigger = (zbx_dc_maintenances_for_trigger_t *)zbx_hashset_iter_next(
 				&iter)))
 		{
-			if (FAIL != (idx = zbx_vector_dc_maintenance_ptr_bsearch(
-					&maintenances_for_trigger->maintenances, maintenance,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			{
-				zbx_vector_dc_maintenance_ptr_remove(&maintenances_for_trigger->maintenances, idx);
-			}
+			remove_maintenance_for_trigger(maintenances_for_trigger, maintenance);
 		}
 
 		zbx_vector_uint64_destroy(&maintenance->groupids);
@@ -270,11 +283,11 @@ void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Updates maintenance event names in configuration cache            *
+ * Purpose: updates maintenance event names in configuration cache            *
  *                                                                            *
- * Parameters: sync - [IN] the db synchronization data                        *
+ * Parameters: sync - [IN] db synchronization data                            *
  *                                                                            *
- * Comments: The result contains the following fields:                        *
+ * Comments: sync rows contain following fields:                              *
  *           0 - maintenance_eventnameid                                      *
  *           1 - maintenanceid                                                *
  *           2 - operator                                                     *
@@ -336,11 +349,11 @@ void	DCsync_maintenance_eventnames(zbx_dbsync_t *sync)
 		if (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
 				&maintenance_eventname->maintenanceid)))
 		{
-			idx = zbx_vector_dc_maintenance_eventname_ptr_search(&maintenance->eventnames,
-					maintenance_eventname, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-			if (FAIL != idx)
+			if (FAIL != (idx = zbx_vector_dc_maintenance_eventname_ptr_search(&maintenance->eventnames,
+					maintenance_eventname, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
 				zbx_vector_dc_maintenance_eventname_ptr_remove_noorder(&maintenance->eventnames, idx);
+			}
 		}
 
 		dc_strpool_release(maintenance_eventname->value);
@@ -618,11 +631,11 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Updates maintenance triggers in configuration cache               *
+ * Purpose: updates maintenance triggers in configuration cache               *
  *                                                                            *
  * Parameters: sync - [IN] db synchronization data                            *
  *                                                                            *
- * Comments: Sync rows contain following fields:                              *
+ * Comments: sync rows contain following fields:                              *
  *           0 - triggerid                                                    *
  *           1 - maintenanceid                                                *
  *                                                                            *
@@ -632,7 +645,7 @@ void	DCsync_maintenance_triggers(zbx_dbsync_t *sync)
 	char					**row;
 	zbx_uint64_t				rowid;
 	unsigned char				tag;
-	int					ret, index;
+	int					ret, idx;
 	zbx_uint64_t				triggerid, maintenanceid;
 	zbx_dc_maintenance_t			*maintenance;
 	zbx_dc_maintenances_for_trigger_t	*maintenances_for_trigger = NULL;
@@ -679,9 +692,9 @@ void	DCsync_maintenance_triggers(zbx_dbsync_t *sync)
 			continue;
 		}
 
-		index = zbx_vector_dc_maintenance_ptr_nearestindex(&maintenances_for_trigger->maintenances,
+		idx = zbx_vector_dc_maintenance_ptr_nearestindex(&maintenances_for_trigger->maintenances,
 				maintenance, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		zbx_vector_dc_maintenance_ptr_insert(&maintenances_for_trigger->maintenances, maintenance, index);
+		zbx_vector_dc_maintenance_ptr_insert(&maintenances_for_trigger->maintenances, maintenance, idx);
 	}
 
 	/* remove deleted maintenance triggers from cache */
@@ -699,13 +712,7 @@ void	DCsync_maintenance_triggers(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(temp_maintenance.maintenanceid, row[1]);
 
-		if (FAIL == (index = zbx_vector_dc_maintenance_ptr_bsearch(&maintenances_for_trigger->maintenances,
-				&temp_maintenance, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		{
-			continue;
-		}
-
-		zbx_vector_dc_maintenance_ptr_remove(&maintenances_for_trigger->maintenances, index);
+		remove_maintenance_for_trigger(maintenances_for_trigger, &temp_maintenance);
 	}
 
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
@@ -1676,10 +1683,10 @@ static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, co
  *                                                                            *
  * Purpose: check if event name must be processed by specified maintenance    *
  *                                                                            *
- * Parameters: maintenance - [IN] the maintenance                             *
- *             event_name  - [IN] event name to check                         *
+ * Parameters: maintenance - [IN]                                             *
+ *             event_name  - [IN]                                             *
  *                                                                            *
- * Return value: SUCCEED - the tags must be processed by the maintenance      *
+ * Return value: SUCCEED - event name must be processed by maintenance        *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
