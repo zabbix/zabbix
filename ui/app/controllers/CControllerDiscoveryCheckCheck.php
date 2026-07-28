@@ -144,7 +144,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 			'snmp_community' => ['db dchecks.snmp_community', 'required', 'not_empty',
 				'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c]]
 			],
-			'snmp_oid' => ['string', 'required',
+			'snmp_oid' => ['string', 'required', 'not_empty',
 				'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
 			],
 			'snmpv3_securityname' => ['db dchecks.snmpv3_securityname',
