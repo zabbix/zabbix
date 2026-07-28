@@ -93,8 +93,19 @@ window.media_edit_popup = new class {
 			field.style.display = field.classList.contains(visible_sendto_class) ? '' : 'none';
 		}
 
-		$(this.#form.findFieldByName('sendto_deviceuuids').getField())
-			.multiSelect(this.#form.findFieldByName('sendto_active_devices').getValue() === '1' ? 'disable' : 'enable');
+		const field_sendto_devices = this.#form.findFieldByName('sendto_deviceuuids').getField();
+
+		if (this.#form.findFieldByName('sendto_active_devices').getValue() === '1') {
+			$(field_sendto_devices).multiSelect('disable');
+			field_sendto_devices.closest('.js-field-sendto-devices').style.display = 'none';
+		}
+		else {
+			$(field_sendto_devices).multiSelect('enable');
+
+			if (visible_sendto_class === 'js-field-sendto-devices') {
+				field_sendto_devices.closest('.js-field-sendto-devices').style.display = '';
+			}
+		}
 
 		if (mediatypeid in this.#mediatypes) {
 			this.#media_type.querySelector('.focusable').classList.toggle('<?= ZBX_STYLE_COLOR_NEGATIVE ?>',
