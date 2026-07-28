@@ -87,24 +87,33 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_STATE_TAG = 'state_{{ITEM.VALUE}.regsub("^([a-z]+)", "\\1")}';
 	const CEP_STATE_TAG_UP = 'state_up';
 
-	// The six CEP rules of the windowless scenario, see buildWindowNoneAddTagCepRuleParams(): none of them has
-	// a window (WINDOW_NONE) and each one compares the 'service' tag value with a different operator, so which
-	// rules match an event is decided by its 'service' id alone. The operators come in three opposite pairs,
-	// so every event is matched by exactly one rule of every pair.
+	// The eight CEP rules of the windowless scenario, see buildWindowNoneAddTagCepRuleParams(): none of them
+	// has a window (WINDOW_NONE) and each one tests the 'service' id of the event with a different operator,
+	// so which rules match an event is decided by that id alone. The operators come in four opposite pairs, so
+	// every event is matched by exactly one rule of every pair.
 	const CEP_RULE_WINDOW_NONE_EQUAL = self::CEP_RULE_NAME_PREFIX.'window none service equals';
 	const CEP_RULE_WINDOW_NONE_NOT_EQUAL = self::CEP_RULE_NAME_PREFIX.'window none service not equals';
 	const CEP_RULE_WINDOW_NONE_LIKE = self::CEP_RULE_NAME_PREFIX.'window none service contains';
 	const CEP_RULE_WINDOW_NONE_NOT_LIKE = self::CEP_RULE_NAME_PREFIX.'window none service not contains';
 	const CEP_RULE_WINDOW_NONE_MORE_EQUAL = self::CEP_RULE_NAME_PREFIX.'window none service more equal';
 	const CEP_RULE_WINDOW_NONE_LESS_EQUAL = self::CEP_RULE_NAME_PREFIX.'window none service less equal';
-	// The 'service' tag values (the trailing number of the item value, see prepareCloseOnUpTriggerPrototypes)
-	// the rules compare against. The Equals and Contains pairs both match on "0"; the scenario also sends an
-	// id that contains it without being equal to it ("10"), which is what tells those two pairs apart. The
-	// numeric pair splits the same ids from either side - "is less than or equal 0" and "is more than or equal
-	// 1" - so it needs the id right above CEP_RULE_WINDOW_NONE_SERVICE as its second comparison value.
+	const CEP_RULE_WINDOW_NONE_EXISTS = self::CEP_RULE_NAME_PREFIX.'window none service exists';
+	const CEP_RULE_WINDOW_NONE_NOT_EXISTS = self::CEP_RULE_NAME_PREFIX.'window none service not exists';
+	// The 'service' ids (the trailing number of the item value, see prepareCloseOnUpTriggerPrototypes) the
+	// rules test against. The Equals, Contains and Exists pairs all work on "0"; the scenario also sends an id
+	// that contains it without being equal to it ("10"), which is what tells the Equals pair from the Contains
+	// pair. The numeric pair splits the same ids from either side - "is less than or equal 0" and "is more
+	// than or equal 1" - so it needs the id right above CEP_RULE_WINDOW_NONE_SERVICE as its second value.
 	const CEP_RULE_WINDOW_NONE_SERVICE = '0';
 	const CEP_RULE_WINDOW_NONE_SERVICE_NEXT = '1';
-	// The tag each of the six rules adds to the events it matched, and the value it adds it with, so every
+	// Extra trigger tag the windowless scenario adds to the prototypes, whose NAME (not value) carries the
+	// service id: like CEP_STATE_TAG the name contains {ITEM.VALUE} and is resolved at event time, so a
+	// "down_0" event gets a 'service_0' tag and a "down_10" event a 'service_10' one. Existence is a property
+	// of the tag name, so this is what the Exists / Does not exist pair tests for (CEP_SERVICE_TAG_PREFIX
+	// concatenated with the id gives the name a rule looks for).
+	const CEP_SERVICE_TAG_PREFIX = 'service_';
+	const CEP_SERVICE_TAG = self::CEP_SERVICE_TAG_PREFIX.'{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}';
+	// The tag each of the eight rules adds to the events it matched, and the value it adds it with, so every
 	// event names exactly the rules that matched it.
 	const CEP_RULE1_TAG = 'rule1';
 	const CEP_RULE2_TAG = 'rule2';
@@ -112,12 +121,16 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE4_TAG = 'rule4';
 	const CEP_RULE5_TAG = 'rule5';
 	const CEP_RULE6_TAG = 'rule6';
+	const CEP_RULE7_TAG = 'rule7';
+	const CEP_RULE8_TAG = 'rule8';
 	const CEP_RULE1_TAG_VALUE = 'service_equals';
 	const CEP_RULE2_TAG_VALUE = 'service_not_equals';
 	const CEP_RULE3_TAG_VALUE = 'service_contains';
 	const CEP_RULE4_TAG_VALUE = 'service_not_contains';
 	const CEP_RULE5_TAG_VALUE = 'service_more_equal';
 	const CEP_RULE6_TAG_VALUE = 'service_less_equal';
+	const CEP_RULE7_TAG_VALUE = 'service_exists';
+	const CEP_RULE8_TAG_VALUE = 'service_not_exists';
 
 	// Separate template used to stress single-trigger event generation. The template (linked directly to
 	// the HOST_NAME host) carries a master log item plus an LLD rule with a dependent log item prototype.
@@ -1551,25 +1564,34 @@ class testTriggerCEP extends CIntegrationTest {
 	 * Prepare the windowless complex event processing scenario. It reuses the close-on-up trigger prototypes
 	 * (prepareCloseOnUpTriggerPrototypes(), so every problem event carries a 'service' tag holding the
 	 * trailing number of the item value), but instead of the single tag correlation window rule of
-	 * prepareDataCepWindowTagCorrelationCloseOnUp() it creates six rules that have no window at all
-	 * (WINDOW_NONE) and only tag the events they match, one per 'service' tag value operator:
+	 * prepareDataCepWindowTagCorrelationCloseOnUp() it creates eight rules that have no window at all
+	 * (WINDOW_NONE) and only tag the events they match, one per 'service' operator:
 	 *   - CEP_RULE_WINDOW_NONE_EQUAL: 'service' Equals "0" -> add the CEP_RULE1_TAG tag;
 	 *   - CEP_RULE_WINDOW_NONE_NOT_EQUAL: 'service' Does not equal "0" -> add the CEP_RULE2_TAG tag;
 	 *   - CEP_RULE_WINDOW_NONE_LIKE: 'service' Contains "0" -> add the CEP_RULE3_TAG tag;
 	 *   - CEP_RULE_WINDOW_NONE_NOT_LIKE: 'service' Does not contain "0" -> add the CEP_RULE4_TAG tag;
 	 *   - CEP_RULE_WINDOW_NONE_MORE_EQUAL: 'service' Is more than or equal "1" -> add the CEP_RULE5_TAG tag;
-	 *   - CEP_RULE_WINDOW_NONE_LESS_EQUAL: 'service' Is less than or equal "0" -> add the CEP_RULE6_TAG tag.
+	 *   - CEP_RULE_WINDOW_NONE_LESS_EQUAL: 'service' Is less than or equal "0" -> add the CEP_RULE6_TAG tag;
+	 *   - CEP_RULE_WINDOW_NONE_EXISTS: tag 'service_0' Exists -> add the CEP_RULE7_TAG tag;
+	 *   - CEP_RULE_WINDOW_NONE_NOT_EXISTS: tag 'service_0' Does not exist -> add the CEP_RULE8_TAG tag.
 	 *
-	 * The rules form three opposite pairs, so every problem event is tagged by exactly one rule of each pair:
-	 * "down_0" by the Equals, the Contains and the Is less than or equal rule, "down_1" by the Does not equal,
-	 * the Does not contain and the Is more than or equal rule, and "down_10" - an id that contains "0" without
-	 * being equal to it - by the Does not equal, the Contains and the Is more than or equal rule.
+	 * The last pair tests a tag NAME rather than a value, so the prototypes additionally get the CEP_SERVICE_TAG
+	 * tag whose name resolves to 'service_<id>' at event time; only the "down_0" event therefore carries a
+	 * 'service_0' tag.
+	 *
+	 * The rules form four opposite pairs, so every problem event is tagged by exactly one rule of each pair:
+	 * "down_0" by the Equals, the Contains, the Is less than or equal and the Exists rule, "down_1" by the Does
+	 * not equal, the Does not contain, the Is more than or equal and the Does not exist rule, and "down_10" -
+	 * an id that contains "0" without being equal to it - by the Does not equal, the Contains, the Is more than
+	 * or equal and the Does not exist rule.
 	 *
 	 * None of the rules closes anything, which is the point of a windowless rule: the events keep flowing
 	 * through untouched apart from the tag.
 	 */
 	public function prepareDataCepWindowNoneTagOperations() {
-		$this->prepareCloseOnUpTriggerPrototypes();
+		// The extra tag carries the service id in its NAME, which is what the Exists / Does not exist pair
+		// tests for; its value is irrelevant.
+		$this->prepareCloseOnUpTriggerPrototypes([['tag' => self::CEP_SERVICE_TAG, 'value' => '']]);
 
 		// Nothing except the trigger expression may close these problems - the scenario asserts they all stay
 		// open - so drop both the global correlation rules and the window CEP rule a previous CloseOnUp
@@ -1600,6 +1622,14 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->upsertCepRule($this->buildWindowNoneAddTagCepRuleParams(self::CEP_RULE_WINDOW_NONE_LESS_EQUAL,
 			CONDITION_OPERATOR_LESS_EQUAL, self::CEP_RULE_WINDOW_NONE_SERVICE,
 			self::CEP_RULE6_TAG, self::CEP_RULE6_TAG_VALUE
+		));
+		$this->upsertCepRule($this->buildWindowNoneAddTagCepRuleParams(self::CEP_RULE_WINDOW_NONE_EXISTS,
+			CONDITION_OPERATOR_EXISTS, self::CEP_RULE_WINDOW_NONE_SERVICE,
+			self::CEP_RULE7_TAG, self::CEP_RULE7_TAG_VALUE
+		));
+		$this->upsertCepRule($this->buildWindowNoneAddTagCepRuleParams(self::CEP_RULE_WINDOW_NONE_NOT_EXISTS,
+			CONDITION_OPERATOR_NOT_EXISTS, self::CEP_RULE_WINDOW_NONE_SERVICE,
+			self::CEP_RULE8_TAG, self::CEP_RULE8_TAG_VALUE
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -2165,22 +2195,39 @@ HEREDOC;
 	 * (CONDITION_EVAL_TYPE_AND, so both apply even though both are tag conditions - under
 	 * CONDITION_EVAL_TYPE_AND_OR conditions of the same type would be OR-ed instead):
 	 *   - 'type' Equals "cep": restricts the rule to the events of the primary discovered trigger prototype.
-	 *     Without it the negative flavours ("Does not equal", "Does not contain") would also match every event
-	 *     that carries no 'service' tag at all (a value comparison against a missing tag is false, and the
-	 *     negation makes it true), i.e. the events of every other host and trigger in the suite;
-	 *   - 'service' $operator $service: one of CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
-	 *     CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL or
-	 *     CONDITION_OPERATOR_LESS_EQUAL, i.e. one rule per operator of the three opposite pairs the scenario
-	 *     builds. The string operators compare against a 'service' id, the numeric ones against a threshold,
-	 *     hence the separate $service argument.
+	 *     Without it the negative flavours ("Does not equal", "Does not contain", "Does not exist") would also
+	 *     match every event that has no 'service' tag at all (a comparison against a missing tag is false, and
+	 *     the negation makes it true), i.e. the events of every other host and trigger in the suite;
+	 *   - the 'service' id test itself, one rule per operator of the four opposite pairs the scenario builds.
+	 *     $service is the id the rule tests against - a comparison value for the value operators, part of the
+	 *     tag name for the existence ones - so the caller always passes a plain id.
 	 *
-	 * The tag value comparison is a CONDITION_TAG_VALUE condition, not CONDITION_TAG: CONDITION_TAG matches
-	 * on the tag NAME only (the server evaluates it as tag exists / does not exist and never looks at
-	 * tag_value), and the CEP rule form likewise converts a "Tag" condition with a value operator to
-	 * CONDITION_TAG_VALUE before handing it to the API.
+	 * How the id is tested depends on the operator, exactly like in the CEP rule form:
+	 *   - CONDITION_OPERATOR_EXISTS / CONDITION_OPERATOR_NOT_EXISTS test a tag NAME, so they get a
+	 *     CONDITION_TAG condition on the per-id 'service_<id>' tag (CEP_SERVICE_TAG resolves the id into the
+	 *     tag name at event time);
+	 *   - every other operator compares the value of the plain 'service' tag, so it gets a
+	 *     CONDITION_TAG_VALUE condition. CONDITION_TAG would not do: it matches on the tag name only (the
+	 *     server evaluates it as tag exists / does not exist and never looks at tag_value), which is why the
+	 *     form converts a "Tag" condition with a value operator to CONDITION_TAG_VALUE before handing it to
+	 *     the API.
 	 */
 	private function buildWindowNoneAddTagCepRuleParams(string $name, int $operator, string $service,
 			string $add_tag, string $add_tag_value): array {
+		$service_condition = in_array($operator, [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS])
+			? [
+				'type' => CCepRuleHelper::CONDITION_TAG,
+				'operator' => $operator,
+				'tag' => self::CEP_SERVICE_TAG_PREFIX.$service,
+				'tag_value' => ''
+			]
+			: [
+				'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
+				'operator' => $operator,
+				'tag' => 'service',
+				'tag_value' => $service
+			];
+
 		return [
 			'name' => $name,
 			'filter' => [
@@ -2192,12 +2239,7 @@ HEREDOC;
 						'tag' => 'type',
 						'tag_value' => 'cep'
 					],
-					[
-						'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
-						'operator' => $operator,
-						'tag' => 'service',
-						'tag_value' => $service
-					]
+					$service_condition
 				]
 			],
 			'window_type' => CCepRuleHelper::WINDOW_NONE,
@@ -4804,14 +4846,15 @@ HEREDOC;
 	}
 
 	/**
-	 * Complex event processing without a window (WINDOW_NONE): six windowless rules, forming three opposite
-	 * pairs of 'service' tag value conditions (Equals "0" / Does not equal "0", Contains "0" / Does not
-	 * contain "0" and Is less than or equal "0" / Is more than or equal "1"), tag the problem events of one
-	 * discovered trigger the moment they occur. Exactly one rule of every pair may match an event, so the
-	 * tagging follows the ids: "down_0" gets rule1 + rule3 + rule6, "down_1" gets rule2 + rule4 + rule5 and
-	 * "down_10" - an id containing "0" without being equal to it - gets rule2 + rule3 + rule5, none of them
-	 * tagged by any other rule. None of the rules closes anything, so all three problems stay open until the
-	 * trigger expression recovers them.
+	 * Complex event processing without a window (WINDOW_NONE): eight windowless rules, forming four opposite
+	 * pairs of conditions on the 'service' id of the event (Equals "0" / Does not equal "0", Contains "0" /
+	 * Does not contain "0", Is less than or equal "0" / Is more than or equal "1" and, on the per-id tag name,
+	 * 'service_0' Exists / Does not exist), tag the problem events of one discovered trigger the moment they
+	 * occur. Exactly one rule of every pair may match an event, so the tagging follows the ids: "down_0" gets
+	 * rule1 + rule3 + rule6 + rule7, "down_1" gets rule2 + rule4 + rule5 + rule8 and "down_10" - an id
+	 * containing "0" without being equal to it - gets rule2 + rule3 + rule5 + rule8, none of them tagged by
+	 * any other rule. None of the rules closes anything, so all three problems stay open until the trigger
+	 * expression recovers them.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowNone$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -5906,9 +5949,12 @@ HEREDOC;
 	 * Drive the windowless (WINDOW_NONE) CEP scenario on a single discovered item, so the whole flow lands on
 	 * one event stream. Three problems are opened on its one trigger, each with its own 'service' id, and each
 	 * id is matched by exactly one rule of every pair:
-	 *   - "down_0":  service "0"  -> Equals "0", Contains "0", <= "0"         -> tagged rule1, rule3, rule6;
-	 *   - "down_1":  service "1"  -> Not equals "0", Not contains "0", >= "1" -> tagged rule2, rule4, rule5;
-	 *   - "down_10": service "10" -> Not equals "0", Contains "0", >= "1"     -> tagged rule2, rule3, rule5.
+	 *   - "down_0":  service "0"  -> Equals "0", Contains "0", <= "0",
+	 *                                'service_0' exists                -> tagged rule1, rule3, rule6, rule7;
+	 *   - "down_1":  service "1"  -> Not equals "0", Not contains "0", >= "1",
+	 *                                no 'service_0' tag                -> tagged rule2, rule4, rule5, rule8;
+	 *   - "down_10": service "10" -> Not equals "0", Contains "0", >= "1",
+	 *                                no 'service_0' tag                -> tagged rule2, rule3, rule5, rule8.
 	 *
 	 * "down_10" is what makes the Contains pair more than a slower Equals pair: it contains "0" without being
 	 * equal to it, so the two string pairs must disagree on it (and, being numerically above the "1"
@@ -5938,24 +5984,29 @@ HEREDOC;
 
 		// The 'service' id of every problem the scenario opens, in the order they are sent, and the tags the
 		// rules matching that id must have added to its event: one rule of every opposite pair matches an id,
-		// so each event must end up with exactly three of the six rule tags.
+		// so each event must end up with exactly four of the eight rule tags.
 		$expected_tags = [
+			// The only id carrying a 'service_0' tag, so the only one the Exists rule may tag.
 			self::CEP_RULE_WINDOW_NONE_SERVICE => [
 				self::CEP_RULE1_TAG => self::CEP_RULE1_TAG_VALUE,
 				self::CEP_RULE3_TAG => self::CEP_RULE3_TAG_VALUE,
-				self::CEP_RULE6_TAG => self::CEP_RULE6_TAG_VALUE
+				self::CEP_RULE6_TAG => self::CEP_RULE6_TAG_VALUE,
+				self::CEP_RULE7_TAG => self::CEP_RULE7_TAG_VALUE
 			],
 			self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT => [
 				self::CEP_RULE2_TAG => self::CEP_RULE2_TAG_VALUE,
 				self::CEP_RULE4_TAG => self::CEP_RULE4_TAG_VALUE,
-				self::CEP_RULE5_TAG => self::CEP_RULE5_TAG_VALUE
+				self::CEP_RULE5_TAG => self::CEP_RULE5_TAG_VALUE,
+				self::CEP_RULE8_TAG => self::CEP_RULE8_TAG_VALUE
 			],
 			// Contains "0" without being equal to it, so the Contains rule matches it but the Equals rule does
-			// not - the case that tells the two string pairs apart.
+			// not - the case that tells the two string pairs apart. Its own tag is 'service_10', so the Exists
+			// rule (which looks for 'service_0') must not match it either.
 			'10' => [
 				self::CEP_RULE2_TAG => self::CEP_RULE2_TAG_VALUE,
 				self::CEP_RULE3_TAG => self::CEP_RULE3_TAG_VALUE,
-				self::CEP_RULE5_TAG => self::CEP_RULE5_TAG_VALUE
+				self::CEP_RULE5_TAG => self::CEP_RULE5_TAG_VALUE,
+				self::CEP_RULE8_TAG => self::CEP_RULE8_TAG_VALUE
 			]
 		];
 
@@ -5993,7 +6044,7 @@ HEREDOC;
 	 */
 	private function waitForCepWindowNoneTaggedEvents(int $triggerid, array $expected_by_service): void {
 		$rule_tags = [self::CEP_RULE1_TAG, self::CEP_RULE2_TAG, self::CEP_RULE3_TAG, self::CEP_RULE4_TAG,
-			self::CEP_RULE5_TAG, self::CEP_RULE6_TAG
+			self::CEP_RULE5_TAG, self::CEP_RULE6_TAG, self::CEP_RULE7_TAG, self::CEP_RULE8_TAG
 		];
 
 		$this->callUntilDataIsPresent('event.get', [
