@@ -1713,9 +1713,9 @@ zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correl
 
 typedef struct
 {
-	int             status;
-	zbx_uint64_t    quota;
-	char            *attributes;
+	int	status;
+	int	quota;
+	char	*attributes;
 }
 zbx_dc_apm_config_t;
 

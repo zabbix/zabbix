@@ -14,6 +14,8 @@
 
 #include "proxyconfigread.h"
 
+#include "zbxcacheconfig.h"
+#include "zbxcommon.h"
 #include "zbxdbwrap.h"
 #include "zbxdbhigh.h"
 #include "zbxkvs.h"
@@ -398,7 +400,7 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 
 		zbx_json_addstring(j, NULL, row[0], ZBX_JSON_TYPE_STRING);
 
-		for (int i = 0; 0 != table->fields[i].name; i++)
+		for (int i = 0; NULL != table->fields[i].name; i++)
 		{
 			if (0 == (table->fields[i].flags & ZBX_PROXY))
 				continue;
@@ -467,6 +469,22 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 
 				zbx_json_addstring(j, NULL, timeout_value, ZBX_JSON_TYPE_STRING);
 			}
+			else if (0 == strcmp(name, ZBX_SETTINGS_APM_STATUS) &&
+					0 == strcmp(table->fields[i].name, "value_int"))
+			{
+				zbx_json_addint64(j, NULL, proxy->apm_status);
+			}
+			else if (0 == strcmp(name, ZBX_SETTINGS_APM_QUOTA) &&
+					0 == strcmp(table->fields[i].name, "value_int"))
+			{
+				zbx_json_addint64(j, NULL, proxy->apm_quota);
+			}
+			else if (0 == strcmp(name, ZBX_SETTINGS_APM_ATTRIBUTES) &&
+					0 == strcmp(table->fields[i].name, "value_str"))
+			{
+				zbx_json_addstring(j, NULL, ZBX_NULL2EMPTY_STR(proxy->apm_attributes),
+						ZBX_JSON_TYPE_STRING);
+			}
 			else
 			{
 				switch (table->fields[i].type)
@@ -489,29 +507,9 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 		zbx_json_close(j);
 	}
 
-	zbx_json_addarray(j, NULL);
-	zbx_json_addstring(j, NULL, ZBX_SETTINGS_APM_STATUS, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(j, NULL, ZBX_SETTING_TYPE_INT);
-	zbx_json_addstring(j, NULL, "", ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(j, NULL, proxy->apm_status);
-	zbx_json_close(j);
-	zbx_json_addarray(j, NULL);
-	zbx_json_addstring(j, NULL, ZBX_SETTINGS_APM_QUOTA, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(j, NULL, ZBX_SETTING_TYPE_INT);
-	zbx_json_addstring(j, NULL, "", ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(j, NULL, proxy->apm_quota);
-	zbx_json_close(j);
-	zbx_json_addarray(j, NULL);
-	zbx_json_addstring(j, NULL, ZBX_SETTINGS_APM_ATTRIBUTES, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(j, NULL, ZBX_SETTING_TYPE_STR);
-	zbx_json_addstring(j, NULL, ZBX_NULL2EMPTY_STR(proxy->apm_attributes), ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(j, NULL, 0);
-	zbx_json_close(j);
-
 	zbx_json_close(j);
 	zbx_json_close(j);
 
-	zabbix_log(LOG_LEVEL_ERR, "[WDN] settings: %s", j->buffer);
 	ret = SUCCEED;
 out:
 	zbx_free(sql);

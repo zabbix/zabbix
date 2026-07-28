@@ -16,6 +16,8 @@
 
 #include "dbupgrade_common.h"
 
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
 #include "zbxdbschema.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
@@ -1031,16 +1033,35 @@ static int	DBpatch_7050078(void)
 
 static int	DBpatch_7050079(void)
 {
+	int	value = 1;
+
+	return zbx_db_settings_set_value(ZBX_SETTINGS_APM_STATUS, &value, ZBX_SETTING_TYPE_INT);
+}
+
+static int	DBpatch_7050080(void)
+{
 	const zbx_db_field_t	field = {"apm_quota", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_7050080(void)
+static int	DBpatch_7050081(void)
+{
+	int	value = 0;
+
+	return zbx_db_settings_set_value(ZBX_SETTINGS_APM_QUOTA, &value, ZBX_SETTING_TYPE_INT);
+}
+
+static int	DBpatch_7050082(void)
 {
 	const zbx_db_field_t	field = {"apm_attributes", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_7050083(void)
+{
+	return zbx_db_settings_set_value(ZBX_SETTINGS_APM_ATTRIBUTES, "", ZBX_SETTING_TYPE_STR);
 }
 
 #endif
@@ -1130,5 +1151,8 @@ DBPATCH_ADD(7050077, 0, 1)
 DBPATCH_ADD(7050078, 0, 1)
 DBPATCH_ADD(7050079, 0, 1)
 DBPATCH_ADD(7050080, 0, 1)
+DBPATCH_ADD(7050081, 0, 1)
+DBPATCH_ADD(7050082, 0, 1)
+DBPATCH_ADD(7050083, 0, 1)
 
 DBPATCH_END()
