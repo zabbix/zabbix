@@ -55,7 +55,7 @@ window.proxy_edit_popup = new class {
 		jQuery('#proxy_groupid').on('change', () => this._update());
 
 		for (const id of ['operating_mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate',
-				'custom_timeouts']) {
+				'custom_timeouts', 'apm_status', 'apm_quota_mode']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this._update());
@@ -161,6 +161,26 @@ window.proxy_edit_popup = new class {
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
 				'timeout_telnet_agent', 'timeout_script', 'timeout_browser']) {
 			document.getElementById(id).readOnly = !custom_timeouts_enabled;
+		}
+
+		const apm_status = this.form.findFieldByName('apm_status')?.getField()?.checked ?? false;
+
+		for (const field of this.dialogue.querySelectorAll('.js-apm-quota-mode, .js-apm-attributes')) {
+			field?.classList.toggle('display-none', !apm_status);
+		}
+
+		const fields = this.form.getAllValues();
+		const apm_quota_mode_unlimited = fields.apm_quota_mode == <?= PROXY_APM_QUOTA_UNLIMITED ?>;
+
+		if (apm_quota_mode_unlimited) {
+			const apm_quota = this.form.findFieldByName('apm_quota')?.getField();
+			if (apm_quota !== null) {
+				apm_quota.value = '0';
+			}
+		}
+
+		for (const field of this.dialogue.querySelectorAll('.js-apm-quota-custom')) {
+			field?.classList.toggle('display-none', apm_quota_mode_unlimited);
 		}
 	}
 

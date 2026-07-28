@@ -124,7 +124,9 @@ class TabIndicators {
 	 */
 	activateIndicators() {
 		for (const element of this.form.querySelectorAll('#' + this.tabs_id + ' a')) {
+			console.log(this.getIndicatorNameByElement(element));
 			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(element));
+			console.log(indicator_item);
 
 			if (indicator_item instanceof TabIndicatorItem) {
 				indicator_item
@@ -249,6 +251,8 @@ class TabIndicatorFactory {
 				return new PreprocessingTabIndicatorItem;
 			case 'ProxyEncryption':
 				return new ProxyEncryptionTabIndicatorItem;
+			case 'ProxyApm':
+				return new ProxyApmTabIndicatorItem;
 			case 'ProxyTimeouts':
 				return new ProxyTimeoutsTabIndicatorItem;
 			case 'Saml':
@@ -810,6 +814,25 @@ class ProxyEncryptionTabIndicatorItem extends TabIndicatorItem {
 				'#tls_connect input, #tls_accept_psk, #tls_accept_certificate')) {
 			_element.addEventListener('change', () => this.addAttributes(element));
 		}
+	}
+}
+
+class ProxyApmTabIndicatorItem extends TabIndicatorItem {
+
+	#apm_status;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+
+		this.#apm_status = document.querySelector('[name="apm_status"]');
+	}
+
+	getValue() {
+		return this.#apm_status?.checked ?? false;
+	}
+
+	initObserver(element) {
+		this.#apm_status?.addEventListener('change', () => this.addAttributes());
 	}
 }
 

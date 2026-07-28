@@ -238,6 +238,79 @@ $encryption_tab
 		))->addClass('js-tls-subject')
 	]);
 
+// APM tab.
+$apm_tab = (new CFormGrid())
+	->addItem(
+		new CFormField(
+			(new CTag('h4', true, _('Input')))->addClass('input-section-header')
+		)
+	)
+	->addItem([
+		(new CLabel([
+			_('Data collection enabled'),
+			makeHelpIcon(_('To enable OpenTelemetry data collection set up Proxy configuration file first.'))
+		], 'apm_status')),
+		new CFormField(
+			(new CCheckBox('apm_status'))
+				->setUncheckedValue('0')
+				->setChecked(false),
+		)
+	])
+	->addItem([
+		(new CLabel([_('Max messages per second')], 'apm_quota_mode'))
+			->setAsteriskMark()
+			->addClass('js-apm-quota-mode')
+			->addClass('display-none'),
+		(new CFormField([
+			(new CRadioButtonList('apm_quota_mode', PROXY_APM_QUOTA_UNLIMITED))
+				->addValue(_('Unlimited'), PROXY_APM_QUOTA_UNLIMITED)
+				->addValue(_('Custom'), PROXY_APM_QUOTA_CUSTOM)
+				->setModern(),
+			(new CDiv())
+				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+				->addClass('js-apm-quota-custom')
+				->addClass('display-none'),
+			(new CTextBox('apm_quota', '0'))
+				->setType('number')
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->addClass('js-apm-quota-custom')
+				->addClass('display-none'),
+		]))
+			->addClass('js-apm-quota-mode')
+			->addClass('display-none')
+			->addStyle('height: 24px;')
+	])
+	->addItem(
+		(new CFormField(
+			(new CTag('h4', true, _('Process')))->addClass('input-section-header')
+		))
+			->addClass('js-apm-attributes')
+			->addClass('display-none'),
+	)
+	->addItem([
+		(new CLabel([_('Add resource attributes')], 'apm_attributes'))
+			->addClass('js-apm-attributes')
+			->addClass('display-none'),
+		(new CFormField(
+			(new CDiv(new CPartial('proxy.apm.attributes', [
+				'source' => 'proxy',
+				'attributes' => [['name' => '', 'value' => '', 'type' => 1]],
+				'field_name' => 'apm_attributes',
+				'tabs_id' => 'proxy-tabs',
+				'attr_tab_id' => 'proxy-apm-tab',
+				'has_inline_validation' => true,
+				'attribute_types' => [
+					PROXY_APM_ATTR_TYPE_TRACES => _('Traces'),
+					PROXY_APM_ATTR_TYPE_METRICS => _('Metrics'),
+					PROXY_APM_ATTR_TYPE_LOGS => _('Logs')
+				]
+			])))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		))
+			->addClass('js-apm-attributes')
+			->addClass('display-none')
+	]);
+
 // Timeouts tab.
 $custom_timeouts_disabled = $data['form']['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED;
 $version_mismatch_hint = $data['version_mismatch']
@@ -377,6 +450,7 @@ $tabs = (new CTabView(['id' => 'proxy-tabs']))
 	->setSelected(0)
 	->addTab('proxy-tab', _('Proxy'), $proxy_tab)
 	->addTab('proxy-encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_PROXY_ENCRYPTION)
+	->addTab('proxy-apm-tab', _('APM'), $apm_tab, TAB_INDICATOR_PROXY_APM)
 	->addTab('proxy-timeouts-tab', _('Timeouts'), $timeouts_tab, TAB_INDICATOR_PROXY_TIMEOUTS);
 
 // Output.

@@ -108,6 +108,17 @@ class CControllerProxyUpdate extends CController {
 				['db proxy.tls_subject', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
 				['db proxy.tls_subject', 'when' => ['tls_accept_certificate', true]]
 			],
+			'apm_status' => ['required', 'boolean', 'in' => [0, 1]],
+			'apm_quota_mode' => ['required', 'integer', 'in' => [PROXY_APM_QUOTA_UNLIMITED, PROXY_APM_QUOTA_CUSTOM],
+				'when' => ['apm_status', 'in' => [1]]],
+			'apm_quota' => ['required', 'integer', 'not_empty', 'min' => 0, 'max' => ZBX_MAX_INT32,
+				'when' => [['apm_status', 'in' => [1]], ['apm_quota_mode', 'in' => [PROXY_APM_QUOTA_CUSTOM]]]],
+			'apm_attributes' => ['objects', 'uniq' => ['name'], 'fields' => [
+				'name' => ['required', 'string', 'not_empty'],
+				'value' => ['required', 'string'],
+				'type' => ['required', 'integer',
+					'in' => [PROXY_APM_ATTR_TYPE_TRACES, PROXY_APM_ATTR_TYPE_METRICS, PROXY_APM_ATTR_TYPE_LOGS]]
+			]],
 			'custom_timeouts' => ['db proxy.custom_timeouts',
 				'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]
 			],
