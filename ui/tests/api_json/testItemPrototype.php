@@ -39,6 +39,7 @@ class testItemPrototype extends CAPITest {
 			'name' => 'Telemetry query create '.$i,
 			'key_' => 'telemetry_query_host_create_'.$i.'[{#M}]',
 			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'delay' => '1m',
 			'value_type' => ITEM_VALUE_TYPE_UINT64
 		];
 		$item['hostid'] = CTestDataHelper::getConvertedValueReference($item['hostid']);
@@ -60,6 +61,7 @@ class testItemPrototype extends CAPITest {
 			'name' => 'Telemetry query create '.$i,
 			'key_' => 'telemetry_query_template_create_'.$i.'[{#M}]',
 			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'delay' => '1m',
 			'value_type' => ITEM_VALUE_TYPE_UINT64
 		];
 		$item['hostid'] = CTestDataHelper::getConvertedValueReference($item['hostid']);

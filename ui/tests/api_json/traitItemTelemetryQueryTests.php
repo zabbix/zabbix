@@ -36,6 +36,7 @@ trait traitItemTelemetryQueryTests {
 							'name' => 'template item',
 							'key_' => 'template_item_telemetry_query',
 							'type' => ITEM_TYPE_TELEMETRY_QUERY,
+							'delay' => '1m',
 							'value_type' => ITEM_VALUE_TYPE_UINT64,
 							'query' => [
 								'signal_type' => APM_SIGNAL_TYPE_TRACES,
@@ -57,6 +58,7 @@ trait traitItemTelemetryQueryTests {
 							'name' => 'host item',
 							'key_' => 'host_item_telemetry_query',
 							'type' => ITEM_TYPE_TELEMETRY_QUERY,
+							'delay' => '1m',
 							'value_type' => ITEM_VALUE_TYPE_UINT64,
 							'query' => [
 								'signal_type' => APM_SIGNAL_TYPE_TRACES,
@@ -92,6 +94,7 @@ trait traitItemTelemetryQueryTests {
 									'name' => 'template item prototype',
 									'key_' => 'template_item_prototype_telemetry_query[{#M}]',
 									'type' => ITEM_TYPE_TELEMETRY_QUERY,
+									'delay' => '1m',
 									'value_type' => ITEM_VALUE_TYPE_UINT64,
 									'query' => [
 										'signal_type' => APM_SIGNAL_TYPE_TRACES,
@@ -117,6 +120,7 @@ trait traitItemTelemetryQueryTests {
 								[
 									'name' => 'host item prototype',
 									'key_' => 'host_item_prototype_telemetry_query[{#M}]',
+									'delay' => '1m',
 									'type' => ITEM_TYPE_TELEMETRY_QUERY,
 									'value_type' => ITEM_VALUE_TYPE_UINT64,
 									'query' => [
@@ -413,6 +417,14 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield '"delay" and "timeout"' => [
+			[
+				'delay' => '3m',
+				'timeout' => '5s'
+			],
+			null
+		];
+
 		yield 'only "query" field' => [
 			[
 				'name' => 'Telemetry query updated query',
@@ -455,6 +467,20 @@ trait traitItemTelemetryQueryTests {
 				'granularity' => '{$M}'
 			],
 			null
+		];
+
+		yield '"delay" for inherited' => [
+			[
+				'delay' => '2m'
+			],
+			null
+		];
+
+		yield '"timeout" for inherited fail' => [
+			[
+				'timeout' => '10s'
+			],
+			'Invalid parameter "/1": cannot update readonly parameter "timeout" of inherited object.'
 		];
 
 		yield '"query" fail' => [
