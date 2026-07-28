@@ -145,7 +145,7 @@ class CMaintenanceHelper {
 		$max_index = 0;
 
 		foreach ($maintenances as $maintenance) {
-			if (!preg_match('/^'.preg_quote($base_name, '/').'(\d+)?$/u', $maintenance['name'], $matches)) {
+			if (!preg_match('/^'.preg_quote($base_name, '/').'(?: (\d+))?$/u', $maintenance['name'], $matches)) {
 				continue;
 			}
 
@@ -153,6 +153,6 @@ class CMaintenanceHelper {
 			$max_index = max($max_index, $index);
 		}
 
-		return $max_index == 0 ? $base_name : $base_name.($max_index + 1);
+		return $max_index == 0 ? $base_name : $base_name.' '.($max_index + 1);
 	}
 }
