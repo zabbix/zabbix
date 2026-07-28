@@ -5127,7 +5127,7 @@ zabbix_export:
       name: 'AWS Cost Explorer by HTTP'
       description: |
         The template gets AWS Cost Explorer metrics and uses the script item to make HTTP requests to the Cost Explorer API.
-        The Cost Explorer API can access the historical data over up to 12 months and the data for current month.
+        The Cost Explorer API can access the historical data over up to 12 months and the data for the current month.
         Don't forget to read the README.md for the correct setup of the template.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
@@ -5294,118 +5294,9 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.region_account_costs
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  try {
-                  
-                  	var output = [],
-                  		data,
-                  		region_block,
-                  		groups,
-                  		account_map,
-                  		account_id,
-                  		cost_obj,
-                  		amount,
-                  		currency,
-                  		parsed_amount,
-                  		a,
-                  		keys;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	region_block = null;
-                  
-                  	if (getField(data, 'region_account_costs.length', '.', 0) > 0) {
-                  		region_block = getField(data, 'region_account_costs.0', '.', null);
-                  	}
-                  	else if (Array.isArray(data) && Array.isArray(data[0]) && data[0][0]) {
-                  		region_block = data[0][0];
-                  	}
-                  	else if (Array.isArray(data) && getField(data[0], 'Groups', '.', null)) {
-                  		region_block = data[0];
-                  	}
-                  
-                  	if (!region_block || !getField(region_block, 'Groups', '.', null)) {
-                  		throw 'Groups not found in any known structure';
-                  	}
-                  
-                  	groups = getField(region_block, 'Groups', '.', null);
-                  	account_map = {};
-                  
-                  	for (var i = 0; i < groups.length; i++) {
-                  
-                  		account_id = getField(groups[i], 'Keys.1', '.', null);
-                  		cost_obj = getField(groups[i], 'Metrics.BlendedCost', '.', null);
-                  
-                  		if (!account_id || !cost_obj) {
-                  			continue;
-                  		}
-                  
-                  		amount = parseFloat(getField(cost_obj, 'Amount', '.', 0));
-                  
-                  		if (isNaN(amount)) {
-                  			amount = 0;
-                  		}
-                  
-                  		currency = getField(cost_obj, 'Unit', '.', 'USD');
-                  
-                  		if (!account_map[account_id]) {
-                  			account_map[account_id] = {
-                  				account_id: account_id,
-                  				total_amount: 0,
-                  				currency: currency
-                  			};
-                  		}
-                  
-                  		account_map[account_id].total_amount += amount;
-                  	}
-                  
-                  	for (var a in account_map) {
-                  		if (Object.prototype.hasOwnProperty.call(account_map, a)) {
-                  			output.push(account_map[a]);
-                  		}
-                  	}
-                  
-                  	return JSON.stringify(output);
-                  
-                  } catch (error) {
-                  
-                  	var msg = (error && error.toString)
-                  		? error.toString()
-                  		: String(error);
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Account parse ERROR ' + msg);
-                  
-                  	return JSON.stringify({ error: msg });
-                  }
+                - $.accounts
           master_item:
-            key: aws.get.monthly.costs
+            key: aws.region.account.yearly.cost.get
           tags:
             - tag: component
               value: raw
@@ -5420,150 +5311,11 @@ zabbix_export:
             - type: CHECK_NOT_SUPPORTED
               parameters:
                 - '-1'
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	var output = [],
-                  		data,
-                  		account_block,
-                  		block,
-                  		groups,
-                  		accounts_map,
-                  		keys,
-                  		region,
-                  		linked_account,
-                  		cost_obj,
-                  		amount,
-                  		currency,
-                  		cost,
-                  		result,
-                  		acc,
-                  		key;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	function getField(data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	}
-                  
-                  	data = JSON.parse(value);
-                  	account_block = null;
-                  
-                  	for (var i = 0; i < data.length; i++) {
-                  		if (getField(data[i], 'type', '.', null) === 'REGION_ACCOUNT') {
-                  			block = getField(data[i], 'data.0', '.', null);
-                  
-                  			if (block) {
-                  				account_block = block;
-                  				break;
-                  			}
-                  		}
-                  	}
-                  
-                  	if (!account_block || !getField(account_block, 'Groups', '.', null)) {
-                  		Zabbix.log(3, '[ AWS Billing ] Raw input: ' + JSON.stringify(data));
-                  		throw 'REGION_ACCOUNT data not found';
-                  	}
-                  
-                  	groups = getField(account_block, 'Groups', '.', null);
-                  	accounts_map = {};
-                  
-                  	for (var i = 0; i < groups.length; i++) {
-                  		keys = getField(groups[i], 'Keys', '.', null);
-                  
-                  		if (!Array.isArray(keys) || keys.length < 2) {
-                  			continue;
-                  		}
-                  
-                  		region = getField(keys, '0', '.', null);
-                  		linked_account = getField(keys, '1', '.', null);
-                  		cost_obj = getField(groups[i], 'Metrics.BlendedCost', '.', null);
-                  
-                  		if (!region || !linked_account || !cost_obj) {
-                  			continue;
-                  		}
-                  
-                  		amount = getField(cost_obj, 'Amount', '.', null);
-                  		currency = getField(cost_obj, 'Unit', '.', null);
-                  
-                  		if (amount === null || currency === null) {
-                  			continue;
-                  		}
-                  
-                  		cost = parseFloat(amount);
-                  
-                  		if (isNaN(cost)) {
-                  			continue;
-                  		}
-                  
-                  		if (!accounts_map[linked_account]) {
-                  			accounts_map[linked_account] = {
-                  				linked_account: linked_account,
-                  				total: 0,
-                  				currency: currency,
-                  				regions: []
-                  			};
-                  		}
-                  
-                  		accounts_map[linked_account].regions.push({
-                  			name: region
-                  		});
-                  
-                  		accounts_map[linked_account].total += cost;
-                  	}
-                  
-                  	result = [];
-                  
-                  	for (key in accounts_map) {
-                  		if (Object.prototype.hasOwnProperty.call(accounts_map, key)) {
-                  			acc = accounts_map[key];
-                  
-                  			acc.total = Number(acc.total.toFixed(6));
-                  
-                  			result.push({
-                  				linked_account: acc.linked_account,
-                  				total: acc.total,
-                  				currency: acc.currency
-                  			});
-                  		}
-                  	}
-                  
-                  	return JSON.stringify(result);
-                  
-                  } catch (error) {
-                  
-                  	var msg = (error && error.toString)
-                  		? error.toString()
-                  		: String(error);
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Parse ERROR: ' + msg);
-                  
-                  	return JSON.stringify({
-                  		error: msg
-                  	});
-                  }
+                - $.accounts
           master_item:
-            key: aws.get.daily.costs
+            key: aws.region.account.daily.cost.get
           tags:
             - tag: component
               value: raw
@@ -5575,6 +5327,10 @@ zabbix_export:
           units: '!USD'
           params: 'sum(last_foreach(//aws.monthly.cost[*]))'
           description: 'Total cost across all AWS billing months.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: billing
@@ -5583,86 +5339,17 @@ zabbix_export:
           type: DEPENDENT
           key: aws.current.month.get
           history: '0'
-          value_type: CHAR
+          value_type: TEXT
           description: 'Collects AWS current month data.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
                 - '-1'
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		costs,
-                  		result;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	costs = getField(data, 'monthly_costs', '.', []);
-                  
-                  	if (!Array.isArray(costs)) {
-                  		throw 'monthly_costs is not an array';
-                  	}
-                  
-                  	costs.sort(function (a, b) {
-                  		return getField(a, 'month', '.', '').localeCompare(getField(b, 'month', '.', ''));
-                  	});
-                  
-                  	result = [];
-                  
-                  	if (costs.length > 0) {
-                  		result.push({
-                  			type: 'current',
-                  			currency: 'USD',
-                  			amount: getField(costs[costs.length - 1], 'amount', '.', 0),
-                  			month: getField(costs[costs.length - 1], 'month', '.', '')
-                  		});
-                  	}
-                  
-                  	if (costs.length > 1) {
-                  		result.push({
-                  			type: 'previous',
-                  			currency: 'USD',
-                  			amount: getField(costs[costs.length - 2], 'amount', '.', 0),
-                  			month: getField(costs[costs.length - 2], 'month', '.', '')
-                  		});
-                  	}
-                  
-                  	return JSON.stringify(result);
-                  
-                  } catch (e) {
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Preprocessing failed: ' + e);
-                  	throw e;
-                  }
+                - $.monthly_comparison
           master_item:
-            key: aws.get.monthly.costs
+            key: aws.month.total.cost.get
           tags:
             - tag: component
               value: raw
@@ -5673,7 +5360,11 @@ zabbix_export:
           value_type: FLOAT
           units: '!USD'
           params: 'avg(//aws.daily.service.total.cost,1w)'
-          description: 'AWS service weekly average cost.'
+          description: 'AWS service daily average cost.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: billing
@@ -5684,100 +5375,217 @@ zabbix_export:
           units: '!services'
           description: 'Total AWS service daily count.'
           preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.daily_service_count
+          master_item:
+            key: aws.daily.service.data.cost.get
+          tags:
+            - tag: component
+              value: billing
+        - uuid: 5e1f7947834f425fbbc1d5e6d3308700
+          name: 'Get daily service cost data'
+          type: DEPENDENT
+          key: aws.daily.service.data.cost.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects AWS service daily data.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.type=="SERVICE")].data.first()'
             - type: JAVASCRIPT
               parameters:
                 - |
-                  try {
+                  var getField = function (data, path, separator, default_value) {
+                  	if (typeof separator === 'undefined') {
+                  		separator = '.';
+                  	}
+                  	var steps = path.split(separator);
+                  	for (var step_index = 0; step_index < steps.length; step_index++) {
+                  		var step = steps[step_index];
+                  		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+                  			if (typeof default_value === 'undefined') {
+                  				throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
+                  			}
+                  			return default_value;
+                  		}
                   
+                  		data = data[step];
+                  	}
+                  
+                  	return data;
+                  };
+                  
+                  try {
                   	var data,
                   		service_block,
                   		groups,
+                  		category_keywords,
+                  		category_count,
+                  		categories,
+                  		services,
                   		services_map,
-                  		service_count,
-                  		block,
-                  		keys,
+                  		daily_service_count,
+                  		top_services,
+                  		service_data,
                   		service_name,
-                  		item_type;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
+                  		service_lower,
+                  		category_name,
+                  		category,
+                  		keywords,
+                  		metrics,
+                  		cost,
+                  		total_cost,
+                  		currency,
+                  		service_keys,
+                  		data_index,
+                  		group_index,
+                  		keyword_index,
+                  		result;
                   
                   	data = JSON.parse(value);
                   
-                  	if (!Array.isArray(data) || !data.length) {
-                  		throw 'Daily cost data not found or invalid format';
-                  	}
+                  	service_block = data;
                   
-                  	service_block = null;
+                  	category_keywords = {
+                  		security: ['guardduty','inspector','macie','security hub','shield','waf','firewall manager','network firewall','kms','key management','secrets manager','iam','identity','cognito','cloudhsm','certificate manager','detective','security lake','artifact','audit manager','verified permissions'],
+                  		networking: ['vpc','virtual private cloud','route 53','route53','cloudfront','api gateway','elastic load balancing','load balancer','direct connect','vpn','site-to-site vpn','transit gateway','privatelink','global accelerator','app mesh','vpc lattice'],
+                  		containers: ['eks','elastic kubernetes service','kubernetes','ecs','elastic container service','ecr','elastic container registry','fargate','app2container','openshift','red hat openshift'],
+                  		compute: ['ec2','elastic compute cloud','lambda','batch','lightsail','elastic beanstalk','app runner','outposts','wavelength','vmware cloud','auto scaling'],
+                  		storage: ['s3','simple storage service','ebs','elastic block store','efs','elastic file system','fsx','glacier','storage gateway','backup','elastic disaster recovery','file cache'],
+                  		database: ['rds','relational database service','aurora','dynamodb','elasticache','documentdb','neptune','timestream','keyspaces','memorydb'],
+                  		analytics: ['athena','emr','kinesis','firehose','glue','lake formation','datazone','redshift','opensearch','finspace','quicksight','msk','data pipeline','cloudsearch'],
+                  		integration: ['step functions','eventbridge','mq','sns','sqs','appflow','airflow'],
+                  		business: ['pinpoint','ses','workmail','workdocs','chime','connect','appfabric'],
+                  		ml_ai: ['sagemaker','bedrock','rekognition','lex','polly','translate','comprehend','forecast','fraud detector','kendra','personalize','textract','transcribe'],
+                  		developer_tools: ['codebuild','codepipeline','codecommit','codeartifact','cloud9','cloudshell','x-ray','codedeploy','codeguru'],
+                  		management: ['cloudformation','cloudwatch','cloudtrail','config','systems manager','ssm','grafana','prometheus','control tower','organizations'],
+                  		migration: ['dms','migration hub','datasync','transfer family'],
+                  		media: ['mediaconvert','medialive','mediapackage','mediastore','mediatailor','ivs'],
+                  		iot: ['iot core','greengrass','sitewise','twinmaker'],
+                  		frontend: ['amplify','appsync','device farm'],
+                  		financial: ['cost explorer','billing','budgets','savings plans']
+                  	};
                   
-                  	for (var i = 0; i < data.length; i++) {
-                  
-                  		item_type = getField(data[i], 'type', '.', null);
-                  
-                  		if (item_type === 'SERVICE') {
-                  
-                  			block = getField(data[i], 'data.0', '.', null);
-                  
-                  			if (block) {
-                  				service_block = block;
-                  				break;
-                  			}
-                  		}
-                  	}
-                  
-                  	groups = getField(service_block, 'Groups', '.', null);
-                  
-                  	if (!groups || !Array.isArray(groups)) {
-                  		throw 'SERVICE data not found or invalid structure';
-                  	}
-                  
+                  	category_count = {};
+                  	services = [];
                   	services_map = {};
+                  	total_cost = 0;
+                  	currency = null;
                   
-                  	for (var j = 0; j < groups.length; j++) {
+                  	for (data_index = 0; data_index < service_block.length; data_index++) {
+                  		groups = getField(service_block[data_index], 'Groups', '.', []);
                   
-                  		keys = getField(groups[j], 'Keys', '.', null);
-                  
-                  		if (!Array.isArray(keys) || keys.length < 1) {
+                  		if (!Array.isArray(groups)) {
                   			continue;
                   		}
                   
-                  		service_name = getField(keys, '0', '.', null);
+                  		for (group_index = 0; group_index < groups.length; group_index++) {
+                  			service_data = groups[group_index];
                   
-                  		if (service_name) {
+                  			service_keys = getField(service_data, 'Keys', '.', []);
+                  
+                  			if (!Array.isArray(service_keys) || service_keys.length < 1) {
+                  				continue;
+                  			}
+                  
+                  			service_name = getField(service_keys, '0', '.', '');
+                  
+                  			if (!service_name) {
+                  				continue;
+                  			}
+                  
                   			services_map[service_name] = true;
+                  
+                  			metrics = getField(service_data, 'Metrics.BlendedCost', '.', null);
+                  
+                  			if (!metrics) {
+                  				continue;
+                  			}
+                  
+                  			cost = parseFloat(getField(metrics, 'Amount', '.', 0));
+                  
+                  			if (isNaN(cost)) {
+                  				cost = 0;
+                  			}
+                  
+                  			if (!currency) {
+                  				currency = getField(metrics, 'Unit', '.', null);
+                  			}
+                  
+                  			total_cost += cost;
+                  
+                  			services.push({
+                  				service: service_name,
+                  				cost: cost
+                  			});
+                  
+                  			category = 'other';
+                  
+                  			service_lower = service_name.toLowerCase();
+                  
+                  			for (category_name in category_keywords) {
+                  				keywords = category_keywords[category_name];
+                  
+                  				for (keyword_index = 0; keyword_index < keywords.length; keyword_index++) {
+                  					if (service_lower.indexOf(keywords[keyword_index]) !== -1) {
+                  						category = category_name;
+                  						break;
+                  					}
+                  				}
+                  
+                  				if (category !== 'other') {
+                  					break;
+                  				}
+                  			}
+                  
+                  			if (!category_count[category]) {
+                  				category_count[category] = 0;
+                  			}
+                  
+                  			category_count[category]++;
                   		}
                   	}
                   
-                  	service_count = Object.keys(services_map).length;
+                  	categories = [];
                   
-                  	Zabbix.log(4, '[ AWS Billing ] Unique service count: ' + service_count);
+                  	for (category_name in category_count) {
+                  		if (Object.prototype.hasOwnProperty.call(category_count, category_name)) {
+                  			categories.push({
+                  				service: category_name,
+                  				count: category_count[category_name]
+                  			});
+                  		}
+                  	}
                   
-                  	return service_count;
+                  	services.sort(function (a, b) {
+                  		return b.cost - a.cost;
+                  	});
                   
-                  } catch (error) {
+                  	top_services = services.slice(0, 3);
                   
-                  	Zabbix.log(3, '[ AWS Billing ] Service count ERROR: ' + error);
+                  	for (group_index = 0; group_index < top_services.length; group_index++) {
+                  		top_services[group_index].percent = total_cost > 0
+                  			? parseFloat(((top_services[group_index].cost / total_cost) * 100).toFixed(2))
+                  			: 0;
+                  
+                  		top_services[group_index].currency = currency;
+                  	}
+                  
+                  	daily_service_count = Object.keys(services_map).length;
+                  
+                  	result = {
+                  		categories: categories,
+                  		top_services: top_services,
+                  		daily_service_count: daily_service_count
+                  	};
+                  
+                  	return JSON.stringify(result);
+                  
+                  }
+                  catch (error) {
+                  	Zabbix.log(3, '[ AWS Billing ] Service processing ERROR: ' + error);
                   
                   	return JSON.stringify({ error: error.toString() });
                   }
@@ -5794,6 +5602,10 @@ zabbix_export:
           units: '!USD'
           params: 'sum(last_foreach(//aws.account.daily.total.cost[*]))'
           description: 'AWS daily service total cost.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: billing
@@ -5823,157 +5635,11 @@ zabbix_export:
               frontend - application frontend, mobile, and API interface services
               financial - billing, cost management, and financial optimization services
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		service_block,
-                  		rows,
-                  		category_count,
-                  		j,
-                  		row,
-                  		service,
-                  		category,
-                  		categories,
-                  		keywords,
-                  		result,
-                  		category_name,
-                  		rules;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	function normalize(s) {
-                  		return (s || '')
-                  			.toLowerCase()
-                  			.replace(/\s+/g, ' ')
-                  			.trim();
-                  	}
-                  
-                  	data = JSON.parse(value);
-                  
-                  	service_block = null;
-                  
-                  	for (var i = 0; i < data.length; i++) {
-                  
-                  		if (getField(data[i], 'type', '.', null) === 'SERVICE') {
-                  
-                  			service_block = getField(data[i], 'data', '.', null);
-                  
-                  			if (service_block) {
-                  				break;
-                  			}
-                  		}
-                  	}
-                  
-                  	if (!service_block || !service_block[0] || !getField(service_block[0], 'Groups', '.', null)) {
-                  		throw 'SERVICE data not found';
-                  	}
-                  
-                  	rows = getField(service_block[0], 'Groups', '.', null);
-                  
-                  	rules = {
-                  		security: ['guardduty','inspector','macie','security hub','shield','waf','firewall manager','network firewall','kms','key management','secrets manager','iam','identity','cognito','cloudhsm','certificate manager','detective','security lake','artifact','audit manager','verified permissions'],
-                  		networking: ['vpc','virtual private cloud','route 53','route53','cloudfront','api gateway','elastic load balancing','load balancer','direct connect','vpn','site-to-site vpn','transit gateway','privatelink','global accelerator','app mesh','vpc lattice'],
-                  		containers: ['eks','elastic kubernetes service','kubernetes','ecs','elastic container service','ecr','elastic container registry','fargate','app2container','openshift','red hat openshift'],
-                  		compute: ['ec2','elastic compute cloud','lambda','batch','lightsail','elastic beanstalk','app runner','outposts','wavelength','vmware cloud','auto scaling'],
-                  		storage: ['s3','simple storage service','ebs','elastic block store','efs','elastic file system','fsx','glacier','storage gateway','backup','elastic disaster recovery','file cache'],
-                  		database: ['rds','relational database service','aurora','dynamodb','elasticache','documentdb','neptune','timestream','keyspaces','memorydb'],
-                  		analytics: ['athena','emr','kinesis','firehose','glue','lake formation','datazone','redshift','opensearch','finspace','quicksight','msk','data pipeline','cloudsearch'],
-                  		integration: ['step functions','eventbridge','mq','sns','sqs','appflow','airflow'],
-                  		business: ['pinpoint','ses','workmail','workdocs','chime','connect','appfabric'],
-                  		ml_ai: ['sagemaker','bedrock','rekognition','lex','polly','translate','comprehend','forecast','fraud detector','kendra','personalize','textract','transcribe'],
-                  		developer_tools: ['codebuild','codepipeline','codecommit','codeartifact','cloud9','cloudshell','x-ray','codedeploy','codeguru'],
-                  		management: ['cloudformation','cloudwatch','cloudtrail','config','systems manager','ssm','grafana','prometheus','control tower','organizations'],
-                  		migration: ['dms','migration hub','datasync','transfer family'],
-                  		media: ['mediaconvert','medialive','mediapackage','mediastore','mediatailor','ivs'],
-                  		iot: ['iot core','greengrass','sitewise','twinmaker'],
-                  		frontend: ['amplify','appsync','device farm'],
-                  		financial: ['cost explorer','billing','budgets','savings plans']
-                  	};
-                  
-                  	function getCategory(service) {
-                  		var s = normalize(service);
-                  
-                  		for (category in rules) {
-                  			keywords = rules[category];
-                  
-                  			for (j = 0; j < keywords.length; j++) {
-                  				if (s.indexOf(keywords[j]) !== -1) {
-                  					return category;
-                  				}
-                  			}
-                  		}
-                  
-                  		return 'other';
-                  	}
-                  
-                  	category_count = {};
-                  	result = [];
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  
-                  		if (!getField(rows[i], 'Keys', '.', null) || !Array.isArray(getField(rows[i], 'Keys', '.', null))) {
-                  			continue;
-                  		}
-                  
-                  		service = getField(rows[i], 'Keys.0', '.', null);
-                  
-                  		if (!service) {
-                  			continue;
-                  		}
-                  
-                  		category = getCategory(service);
-                  
-                  		if (!category_count[category]) {
-                  			category_count[category] = 0;
-                  		}
-                  
-                  		category_count[category]++;
-                  	}
-                  
-                  	for (category_name in category_count) {
-                  		if (Object.prototype.hasOwnProperty.call(category_count, category_name)) {
-                  			result.push({
-                  				service: category_name,
-                  				count: category_count[category_name]
-                  			});
-                  		}
-                  	}
-                  
-                  	return JSON.stringify(result);
-                  
-                  } catch (error) {
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Service category ERROR: ' + error);
-                  
-                  	return JSON.stringify({ error: error.toString() });
-                  }
+                - $.categories
           master_item:
-            key: aws.get.daily.costs
+            key: aws.daily.service.data.cost.get
           tags:
             - tag: component
               value: raw
@@ -5985,82 +5651,11 @@ zabbix_export:
           units: '!USD'
           description: 'First quarter total cost.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		monthly,
-                  		q1months,
-                  		total,
-                  		item,
-                  		month,
-                  		amount;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	monthly = getField(data, 'monthly_costs', '.', []);
-                  
-                  	if (!Array.isArray(monthly)) {
-                  		throw 'monthly_costs not found or invalid format';
-                  	}
-                  
-                  	q1months = ['01', '02', '03'];
-                  	total = 0;
-                  
-                  	for (var i = 0; i < monthly.length; i++) {
-                  
-                  		item = monthly[i];
-                  
-                  		month = getField(item, 'month', '.', '');
-                  		amount = parseFloat(getField(item, 'amount', '.', 0));
-                  
-                  		if (isNaN(amount)) {
-                  			amount = 0;
-                  		}
-                  
-                  		month = (month || '').split('-')[1];
-                  
-                  		if (q1months.indexOf(month) !== -1) {
-                  			total += amount;
-                  		}
-                  	}
-                  
-                  	return total.toFixed(2);
-                  
-                  } catch (e) {
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Q1 calculation failed: ' + e);
-                  
-                  	throw e;
-                  }
+                - $.q1
           master_item:
-            key: aws.get.monthly.costs
+            key: aws.month.total.cost.get
           tags:
             - tag: component
               value: billing
@@ -6072,82 +5667,11 @@ zabbix_export:
           units: '!USD'
           description: 'Fourth quarter total cost.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		monthly,
-                  		q4months,
-                  		total,
-                  		item,
-                  		month,
-                  		amount;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	monthly = getField(data, 'monthly_costs', '.', []);
-                  
-                  	if (!Array.isArray(monthly)) {
-                  		throw 'monthly_costs not found or invalid format';
-                  	}
-                  
-                  	q4months = ['10', '11', '12'];
-                  	total = 0;
-                  
-                  	for (var i = 0; i < monthly.length; i++) {
-                  
-                  		item = monthly[i];
-                  
-                  		month = getField(item, 'month', '.', '');
-                  		amount = parseFloat(getField(item, 'amount', '.', 0));
-                  
-                  		if (isNaN(amount)) {
-                  			amount = 0;
-                  		}
-                  
-                  		month = (month || '').split('-')[1];
-                  
-                  		if (q4months.indexOf(month) !== -1) {
-                  			total += amount;
-                  		}
-                  	}
-                  
-                  	return total.toFixed(2);
-                  
-                  } catch (e) {
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Q4 calculation failed: ' + e);
-                  
-                  	throw e;
-                  }
+                - $.q4
           master_item:
-            key: aws.get.monthly.costs
+            key: aws.month.total.cost.get
           tags:
             - tag: component
               value: billing
@@ -6359,7 +5883,7 @@ zabbix_export:
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('X-Amz-Target: ' + target);
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base' || AWS.params.auth_type === 'assume_role_metadata' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            		if (AWS.params.auth_type === 'role_base' || AWS.params.auth_type === 'assume_role_metadata' || (AWS.params.auth_type === 'assume_role' && !params.includes('AssumeRole'))) {
             			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
             		}
             
@@ -6402,28 +5926,27 @@ zabbix_export:
             
             	},
             
-            getCostByRegionAndAccount: function () {
-            	var body_raw_cost = {
-            		'TimePeriod': {
-            			'Start': AWS.params.start_time,
-            			'End': AWS.params.end_date
-            		},
-            		'Granularity': 'DAILY',
-            		'GroupBy': [
-            			{
-            				'Type': 'DIMENSION',
-            				'Key': 'REGION'
+            	getCostByRegionAndAccount: function () {
+            		var body_raw_cost = {
+            			'TimePeriod': {
+            				'Start': AWS.params.start_time,
+            				'End': AWS.params.end_date
             			},
-            			{
-            				'Type': 'DIMENSION',
-            				'Key': 'LINKED_ACCOUNT'
-            			}
-            		],
-            		'Metrics': ['BlendedCost']
-            	};
+            			'Granularity': 'DAILY',
+            			'GroupBy': [
+            				{
+            					'Type': 'DIMENSION',
+            					'Key': 'REGION'
+            				},
+            				{
+            					'Type': 'DIMENSION',
+            					'Key': 'LINKED_ACCOUNT'
+            				}
+            			],
+            			'Metrics': ['BlendedCost']
+            		};
             
             		return AWS.getField(AWS.request('POST', AWS.params.region, 'ce', '', body_raw_cost, 'AWSInsightsIndexService.GetCostAndUsage'), 'ResultsByTime');
-            
             	}
             
             
@@ -6432,22 +5955,8 @@ zabbix_export:
             try {
             	AWS.setParams(JSON.parse(value));
             
-            	var service = null;
-            	var region = null;
-            
-            	try {
-            		service = AWS.getCostAndUsage();
-            	}
-            	catch (e) {
-            		Zabbix.log(3, '[ AWS Billing ] SERVICE ERROR: ' + e);
-            	}
-            
-            	try {
+            	var service = AWS.getCostAndUsage(),
             		region = AWS.getCostByRegionAndAccount();
-            	}
-            	catch (e) {
-            		Zabbix.log(3, '[ AWS Billing ] REGION ERROR: ' + e);
-            	}
             
             	return JSON.stringify([
             		{ type: 'SERVICE', data: service },
@@ -6455,8 +5964,10 @@ zabbix_export:
             	]);
             }
             catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
             	Zabbix.log(3, '[ AWS Billing ] ERROR: ' + error);
-            	return JSON.stringify({ error: String(error) });
+            
+            	return JSON.stringify({ 'error': error });
             }
           description: 'Get raw data on the daily costs by service.'
           preprocessing:
@@ -6693,7 +6204,7 @@ zabbix_export:
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('X-Amz-Target: ' + target);
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base' || AWS.params.auth_type === 'assume_role_metadata' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            		if (AWS.params.auth_type === 'role_base' || AWS.params.auth_type === 'assume_role_metadata' || (AWS.params.auth_type === 'assume_role' && !params.includes('AssumeRole'))) {
             			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
             		}
             
@@ -6784,9 +6295,9 @@ zabbix_export:
             			'Metrics': ['BlendedCost']
             		};
             
-            			return AWS.getField(AWS.request('POST', AWS.params.region, 'ce', '', body_raw_cost, 'AWSInsightsIndexService.GetCostAndUsage'), 'ResultsByTime');
+            		return AWS.getField(AWS.request('POST', AWS.params.region, 'ce', '', body_raw_cost, 'AWSInsightsIndexService.GetCostAndUsage'), 'ResultsByTime');
             
-            		}
+            	}
             
             
             
@@ -6840,6 +6351,159 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: 0b706d46e6914510b86c9353e54b292e
+          name: 'Get AWS month total cost'
+          type: DEPENDENT
+          key: aws.month.total.cost.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects AWS billing data with monthly comparison and quarterly cost aggregation.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var getField = function (data, path, separator, default_value) {
+                  	if (typeof separator === 'undefined') {
+                  		separator = '.';
+                  	}
+                  	var steps = path.split(separator);
+                  	for (var step_index = 0; step_index < steps.length; step_index++) {
+                  		var step = steps[step_index];
+                  		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+                  			if (typeof default_value === 'undefined') {
+                  				throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
+                  			}
+                  			return default_value;
+                  		}
+                  
+                  		data = data[step];
+                  	}
+                  
+                  	return data;
+                  };
+                  
+                  try {
+                  	var data,
+                  		monthly_costs,
+                  		quarterly_costs,
+                  		monthly_comparison,
+                  		monthly_item,
+                  		current,
+                  		previous,
+                  		monthly_costs_sorted,
+                  		month_value,
+                  		amount_value,
+                  		quarter,
+                  		step_index;
+                  
+                  	data = JSON.parse(value);
+                  
+                  	if (typeof data.error !== 'undefined') {
+                  		throw data.error;
+                  	}
+                  
+                  	monthly_costs = getField(data, 'monthly_costs', '.', null);
+                  
+                  	if (!Array.isArray(monthly_costs)) {
+                  		throw 'monthly_costs not found or invalid format';
+                  	}
+                  
+                  	monthly_costs_sorted = monthly_costs.slice();
+                  
+                  	monthly_costs_sorted.sort(function (a, b) {
+                  
+                  		return getField(a, 'month', '.', '').localeCompare(getField(b, 'month', '.', ''));
+                  	});
+                  
+                  	quarterly_costs = {
+                  		q1: 0,
+                  		q2: 0,
+                  		q3: 0,
+                  		q4: 0
+                  	};
+                  
+                  	for (step_index = 0; step_index < monthly_costs.length; step_index++) {
+                  
+                  		monthly_item = monthly_costs[step_index];
+                  		quarter = undefined;
+                  
+                  		month_value = getField(monthly_item, 'month', '.', '').split('-')[1];
+                  		amount_value = parseFloat(getField(monthly_item, 'amount', '.', 0));
+                  
+                  		if (isNaN(amount_value)) {
+                  			amount_value = 0;
+                  		}
+                  
+                  		if (month_value === '01' || month_value === '02' || month_value === '03') {
+                  
+                  			quarter = 'q1';
+                  
+                  		} else if (month_value === '04' || month_value === '05' || month_value === '06') {
+                  
+                  			quarter = 'q2';
+                  
+                  		} else if (month_value === '07' || month_value === '08' || month_value === '09') {
+                  
+                  			quarter = 'q3';
+                  
+                  		} else if (month_value === '10' || month_value === '11' || month_value === '12') {
+                  
+                  			quarter = 'q4';
+                  		}
+                  
+                  		if (typeof quarter !== 'undefined') {
+                  
+                  			quarterly_costs[quarter] += amount_value;
+                  		}
+                  	}
+                  
+                  	monthly_comparison = [];
+                  
+                  	if (monthly_costs_sorted.length > 0) {
+                  
+                  		current = monthly_costs_sorted[monthly_costs_sorted.length - 1];
+                  
+                  		monthly_comparison.push({
+                  			type: 'current',
+                  			currency: getField(current, 'unit', '.', null),
+                  			amount: getField(current, 'amount', '.', 0),
+                  			month: getField(current, 'month', '.', '')
+                  		});
+                  	}
+                  
+                  	if (monthly_costs_sorted.length > 1) {
+                  
+                  		previous = monthly_costs_sorted[monthly_costs_sorted.length - 2];
+                  
+                  		monthly_comparison.push({
+                  			type: 'previous',
+                  			currency: getField(previous, 'unit', '.', null),
+                  			amount: getField(previous, 'amount', '.', 0),
+                  			month: getField(previous, 'month', '.', '')
+                  		});
+                  	}
+                  
+                  	return JSON.stringify({
+                  		q1: quarterly_costs.q1,
+                  		q2: quarterly_costs.q2,
+                  		q3: quarterly_costs.q3,
+                  		q4: quarterly_costs.q4,
+                  		monthly_comparison: monthly_comparison
+                  	});
+                  }
+                  catch (error) {
+                  	Zabbix.log(3, '[ AWS Billing ] Quarterly calculation ERROR: ' + error);
+                  
+                  	return JSON.stringify({ error: error.toString() });
+                  }
+          master_item:
+            key: aws.get.monthly.costs
+          tags:
+            - tag: component
+              value: raw
         - uuid: e7ea3321aefd4dde9d774cbd56134c0a
           name: 'AWS monthly average cost'
           type: CALCULATED
@@ -6848,6 +6512,10 @@ zabbix_export:
           units: '!USD'
           params: 'avg(last_foreach(//aws.monthly.cost[*]))'
           description: 'AWS service monthly average cost.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: billing
@@ -6859,6 +6527,10 @@ zabbix_export:
           units: '!USD'
           params: 'last(//aws.month.comparison.current.cost["current"]) - last(//aws.month.comparison.current.cost["previous"])'
           description: 'Calculates AWS current monthly budget delta compared to previous month.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: calculate
@@ -6870,6 +6542,10 @@ zabbix_export:
           units: '!USD'
           params: 'max(0, last(//aws.month.comparison.current.cost["current"]) - last(//aws.month.comparison.current.cost["previous"]))'
           description: 'Calculates AWS current monthly delta compared to previous month.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: calculate
@@ -6881,6 +6557,10 @@ zabbix_export:
           units: '!%'
           params: 'max(0, (last(//aws.month.comparison.current.cost["current"]) - last(//aws.month.comparison.current.cost["previous"])) / last(//aws.month.comparison.current.cost["previous"]) * 100)'
           description: 'Calculates AWS current monthly delta, in percent, compared to previous month.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: calculate
@@ -6910,63 +6590,484 @@ zabbix_export:
               frontend - application frontend, mobile, and API interface services
               financial - billing, cost management, and financial optimization services
           preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.category_totals
+          master_item:
+            key: aws.yearly.service.data.cost.get
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 13000f4f090a403cb9ad63e80b7f450d
+          name: 'AWS Q1 delta'
+          type: CALCULATED
+          key: aws.q1.delta.cost
+          value_type: FLOAT
+          units: '!USD'
+          params: 'last(//aws.second.quarter.cost) - last(//aws.first.quarter.cost)'
+          description: 'Difference in cost between `Q2` and `Q1`.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: billing
+        - uuid: 4213f245540e495f86909b373f9e85ff
+          name: 'AWS Q2 delta'
+          type: CALCULATED
+          key: aws.q2.delta.cost
+          value_type: FLOAT
+          units: '!USD'
+          params: 'last(//aws.third.quarter.cost) - last(//aws.second.quarter.cost)'
+          description: 'Difference in cost between `Q3` and `Q2`.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: billing
+        - uuid: 053d69a30ef74b3bb137b4ef28c01ccb
+          name: 'AWS Q3 delta'
+          type: CALCULATED
+          key: aws.q3.delta.cost
+          value_type: FLOAT
+          units: '!USD'
+          params: 'last(//aws.fourth.quarter.cost) - last(//aws.third.quarter.cost)'
+          description: 'Difference in cost between `Q4` and `Q3`.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: billing
+        - uuid: 46493869521b4ce6a4a9bf061b9ee1a2
+          name: 'AWS quarterly trend cost'
+          type: CALCULATED
+          key: aws.quarterly.trend.cost
+          value_type: FLOAT
+          units: '!USD'
+          params: '(last(//aws.q1.delta.cost) + last(//aws.q2.delta.cost) + last(//aws.q3.delta.cost)) / 3'
+          description: 'Average quarterly cost change across the year based on `Q1`, `Q2` and `Q3` deltas. Shows whether spending is steadily increasing, decreasing, or staying stable over time.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: billing
+        - uuid: 4a81c34cb7b74736912be93a8cb1dd6c
+          name: 'Get region and account daily costs'
+          type: DEPENDENT
+          key: aws.region.account.daily.cost.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects region and account daily cost data.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.type == "REGION_ACCOUNT")].data[0].Groups'
             - type: JAVASCRIPT
               parameters:
                 - |
-                  try {
+                  var getField = function (data, path, separator, default_value) {
+                  	if (typeof separator === 'undefined') {
+                  		separator = '.';
+                  	}
+                  	var steps = path.split(separator);
+                  	for (var step_index = 0; step_index < steps.length; step_index++) {
+                  		var step = steps[step_index];
+                  		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+                  			if (typeof default_value === 'undefined') {
+                  				throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
+                  			}
+                  			return default_value;
+                  		}
                   
+                  		data = data[step];
+                  	}
+                  
+                  	return data;
+                  };
+                  
+                  try {
+                  	var data,
+                  		groups,
+                  		account_costs,
+                  		region_costs,
+                  		accounts,
+                  		regions,
+                  		group_keys,
+                  		region_name,
+                  		account_id,
+                  		blended_cost,
+                  		amount_value,
+                  		currency,
+                  		parsed_amount,
+                  		step_index;
+                  
+                  	data = JSON.parse(value);
+                  
+                  	groups = data[0];
+                  
+                  	account_costs = {};
+                  	region_costs = {};
+                  
+                  	for (step_index = 0; step_index < groups.length; step_index++) {
+                  
+                  		group_keys = getField(groups[step_index], 'Keys', '.', null);
+                  
+                  		if (!Array.isArray(group_keys) || group_keys.length < 2) {
+                  			continue;
+                  		}
+                  
+                  		region_name = group_keys[0];
+                  		account_id = group_keys[1];
+                  
+                  		blended_cost = getField(groups[step_index], 'Metrics.BlendedCost', '.', null);
+                  
+                  		amount_value = getField(blended_cost, 'Amount', '.', null);
+                  		currency = getField(blended_cost, 'Unit', '.', null);
+                  
+                  		parsed_amount = parseFloat(amount_value);
+                  
+                  		if (isNaN(parsed_amount)) {
+                  			continue;
+                  		}
+                  
+                  		if (!account_costs[account_id]) {
+                  			account_costs[account_id] = {
+                  				linked_account: account_id,
+                  				total: 0,
+                  				currency: currency
+                  			};
+                  		}
+                  
+                  		account_costs[account_id].total += parsed_amount;
+                  
+                  		if (!region_costs[region_name]) {
+                  			region_costs[region_name] = {
+                  				region: region_name,
+                  				total_cost: 0,
+                  				currency: currency
+                  			};
+                  		}
+                  
+                  		region_costs[region_name].total_cost += parsed_amount;
+                  	}
+                  
+                  	accounts = Object.keys(account_costs).map(function (account_key) {
+                  		return account_costs[account_key];
+                  	});
+                  
+                  	regions = Object.keys(region_costs).map(function (region_key) {
+                  		return region_costs[region_key];
+                  	});
+                  
+                  	return JSON.stringify({
+                  		accounts: accounts,
+                  		regions: regions
+                  	});
+                  }
+                  catch (error) {
+                  	Zabbix.log(3, '[ AWS Billing ] Parse ERROR: ' + error);
+                  
+                  	return JSON.stringify({ error: error.toString() });
+                  }
+          master_item:
+            key: aws.get.daily.costs
+          tags:
+            - tag: component
+              value: raw
+        - uuid: f81ba614152844c5ae682198f027089b
+          name: 'Get region and account yearly costs'
+          type: DEPENDENT
+          key: aws.region.account.yearly.cost.get
+          history: '0'
+          value_type: TEXT
+          description: 'Get region and account yearly costs.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var getField = function (data, path, separator, default_value) {
+                  	if (typeof separator === 'undefined') {
+                  		separator = '.';
+                  	}
+                  	var steps = path.split(separator);
+                  	for (var step_index = 0; step_index < steps.length; step_index++) {
+                  		var step = steps[step_index];
+                  		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+                  			if (typeof default_value === 'undefined') {
+                  				throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
+                  			}
+                  			return default_value;
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  };
+                  
+                  try {
+                  	var data,
+                  		groups,
+                  		monthly_groups,
+                  		account_costs,
+                  		region_costs,
+                  		accounts,
+                  		regions,
+                  		group_keys,
+                  		region_name,
+                  		account_id,
+                  		blended_cost,
+                  		amount_value,
+                  		currency,
+                  		parsed_amount,
+                  		step_index,
+                  		month_index;
+                  
+                  	data = JSON.parse(value);
+                  
+                  	monthly_groups = getField(data, 'region_account_costs', '.', []);
+                  
+                  	account_costs = {};
+                  	region_costs = {};
+                  
+                  	for (month_index = 0; month_index < monthly_groups.length; month_index++) {
+                  		groups = getField(monthly_groups[month_index], 'Groups', '.', []);
+                  
+                  		for (step_index = 0; step_index < groups.length; step_index++) {
+                  			group_keys = getField(groups[step_index], 'Keys', '.', null);
+                  
+                  			if (!Array.isArray(group_keys) || group_keys.length < 2) {
+                  				continue;
+                  			}
+                  
+                  			region_name = group_keys[0];
+                  			account_id = group_keys[1];
+                  
+                  			blended_cost = getField(groups[step_index], 'Metrics.BlendedCost', '.', null);
+                  
+                  			if (!blended_cost) {
+                  				continue;
+                  			}
+                  
+                  			amount_value = getField(blended_cost, 'Amount', '.', null);
+                  			currency = getField(blended_cost, 'Unit', '.', null);
+                  
+                  			parsed_amount = parseFloat(amount_value);
+                  
+                  			if (isNaN(parsed_amount)) {
+                  				continue;
+                  			}
+                  
+                  			if (!account_costs[account_id]) {
+                  				account_costs[account_id] = {
+                  					account_id: account_id,
+                  					total_amount: 0,
+                  					currency: currency
+                  				};
+                  			}
+                  
+                  			account_costs[account_id].total_amount += parsed_amount;
+                  
+                  			if (!region_costs[region_name]) {
+                  				region_costs[region_name] = {
+                  					region: region_name,
+                  					total_cost: 0,
+                  					currency: currency
+                  				};
+                  			}
+                  
+                  			region_costs[region_name].total_cost += parsed_amount;
+                  		}
+                  	}
+                  
+                  	accounts = Object.keys(account_costs).map(function (account_key) {
+                  		return account_costs[account_key];
+                  	});
+                  
+                  	regions = Object.keys(region_costs).map(function (region_key) {
+                  		return region_costs[region_key];
+                  	});
+                  
+                  	return JSON.stringify({
+                  		accounts: accounts,
+                  		regions: regions
+                  	});
+                  
+                  }
+                  catch (error) {
+                  	Zabbix.log(3, '[ AWS Billing ] Parse ERROR: ' + error);
+                  
+                  	return JSON.stringify({ error: error.toString() });
+                  }
+          master_item:
+            key: aws.get.monthly.costs
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 3b81b5080c5849d599d6ba5da559c78b
+          name: 'Get region daily costs'
+          type: DEPENDENT
+          key: aws.region.daily.costs.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects AWS daily cost by region (BlendedCost).'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+            - type: JSONPATH
+              parameters:
+                - $.regions
+          master_item:
+            key: aws.region.account.daily.cost.get
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 89d0149b7c844aecb494c2e640bda4ae
+          name: 'Get region yearly costs'
+          type: DEPENDENT
+          key: aws.region.yearly.costs.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects region yearly costs.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.regions
+          master_item:
+            key: aws.region.account.yearly.cost.get
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 21edf0cc3655447fa024d59a388f8268
+          name: 'AWS Q2 cost'
+          type: DEPENDENT
+          key: aws.second.quarter.cost
+          value_type: FLOAT
+          units: '!USD'
+          description: 'Second quarter total cost.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.q2
+          master_item:
+            key: aws.month.total.cost.get
+          tags:
+            - tag: component
+              value: billing
+        - uuid: 17816f3560ee43d48a390db3804e85a1
+          name: 'Get services yearly stats'
+          type: DEPENDENT
+          key: aws.services.yearly.cost.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects total yearly cost for AWS services.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.service_totals
+          master_item:
+            key: aws.yearly.service.data.cost.get
+          tags:
+            - tag: component
+              value: raw
+        - uuid: e95fa15a04604162b574a83f6f8b9d64
+          name: 'AWS Q3 cost'
+          type: DEPENDENT
+          key: aws.third.quarter.cost
+          value_type: FLOAT
+          units: '!USD'
+          description: 'Third quarter total cost.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.q3
+          master_item:
+            key: aws.month.total.cost.get
+          tags:
+            - tag: component
+              value: billing
+        - uuid: 72e39451e3e143af94029260ca9d5449
+          name: 'Get top daily service'
+          type: DEPENDENT
+          key: aws.top.daily.service.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects AWS daily top cost services (BlendedCost).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.top_services
+          master_item:
+            key: aws.daily.service.data.cost.get
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 96696532921c4abaa836217d783efb5f
+          name: 'Get yearly service cost data'
+          type: DEPENDENT
+          key: aws.yearly.service.data.cost.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects AWS service yearly data.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var getField = function (data, path, separator, default_value) {
+                  	if (typeof separator === 'undefined') {
+                  		separator = '.';
+                  	}
+                  	var steps = path.split(separator);
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+                  			if (typeof default_value === 'undefined') {
+                  				throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
+                  			}
+                  			return default_value;
+                  		}
+                  
+                  		data = data[step];
+                  	}
+                  
+                  	return data;
+                  };
+                  
+                  try {
                   	var data,
                   		rows,
                   		category_totals,
-                  		rules,
+                  		service_totals,
+                  		category_keywords,
+                  		result,
+                  		row_index,
+                  		rule_index,
+                  		category_key,
+                  		service_key,
+                  		row,
                   		service,
-                  		category,
                   		amount,
                   		currency,
-                  		result,
-                  		row,
-                  		category_key;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var normalize = function (s) {
-                  		return (s || '')
-                  			.toLowerCase()
-                  			.replace(/\s+/g, ' ')
-                  			.trim();
-                  	};
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
+                  		category,
+                  		service_lower;
                   
                   	data = JSON.parse(value);
                   
                   	rows = getField(data, 'monthly_service_costs', '.', []);
                   
-                  	if (!Array.isArray(rows) || !rows.length) {
-                  		throw 'SERVICE data not found';
-                  	}
+                  	category_totals = {};
+                  	service_totals = {};
                   
-                  	rules = {
+                  	category_keywords = {
                   		security: ['guardduty','inspector','macie','security hub','shield','waf','firewall manager','network firewall','kms','key management','secrets manager','iam','identity','cognito','cloudhsm','certificate manager','detective','security lake','artifact','audit manager','verified permissions'],
                   		networking: ['vpc','virtual private cloud','route 53','route53','cloudfront','api gateway','elastic load balancing','load balancer','direct connect','vpn','site-to-site vpn','transit gateway','privatelink','global accelerator','app mesh','vpc lattice'],
                   		containers: ['eks','elastic kubernetes service','kubernetes','ecs','elastic container service','ecr','elastic container registry','fargate','app2container','openshift','red hat openshift'],
@@ -6980,559 +7081,21 @@ zabbix_export:
                   		developer_tools: ['codebuild','codepipeline','codecommit','codeartifact','cloud9','cloudshell','x-ray','codedeploy','codeguru'],
                   		management: ['cloudformation','cloudwatch','cloudtrail','config','systems manager','ssm','grafana','prometheus','control tower','organizations'],
                   		migration: ['dms','migration hub','datasync','transfer family'],
-                  		media: ['mediaconvert','medialive','mediapackage','mediastore','mediatailor','ivs'],
+                  		media: ['mediaconvert','mediastore','mediapackage','medialive','mediatailor','ivs'],
                   		iot: ['iot core','greengrass','sitewise','twinmaker'],
                   		frontend: ['amplify','appsync','device farm'],
                   		financial: ['cost explorer','billing','budgets','savings plans']
                   	};
                   
-                  	function getCategory(service) {
-                  
-                  		var normalized_service = normalize(service),
-                  			category_name,
-                  			keywords,
-                  			j;
-                  
-                  		for (category_name in rules) {
-                  
-                  			keywords = rules[category_name];
-                  
-                  			for (j = 0; j < keywords.length; j++) {
-                  				if (normalized_service.indexOf(keywords[j]) !== -1) {
-                  					return category_name;
-                  				}
-                  			}
-                  		}
-                  
-                  		return 'other';
-                  	}
-                  
-                  	category_totals = {};
-                  	result = [];
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  
-                  		row = rows[i];
-                  
-                  		if (!getField(row, 'Keys', '.', null) || !Array.isArray(getField(row, 'Keys', '.', null))) {
-                  			continue;
-                  		}
-                  
-                  		service = getField(row, 'Keys.0', '.', null);
-                  
-                  		if (!service) {
-                  			continue;
-                  		}
-                  
-                  		category = getCategory(service);
-                  
-                  		amount = parseFloat(
-                  			getField(row, 'Metrics.BlendedCost.Amount', '.', 0)
-                  		);
-                  
-                  		if (isNaN(amount)) {
-                  			amount = 0;
-                  		}
-                  
-                  		currency = getField(row, 'Metrics.BlendedCost.Unit', '.', 'USD');
-                  
-                  		if (!category_totals[category]) {
-                  			category_totals[category] = {
-                  				service: category,
-                  				total_amount: 0,
-                  				currency: currency,
-                  				count: 0
-                  			};
-                  		}
-                  
-                  		category_totals[category].total_amount += amount;
-                  		category_totals[category].count++;
-                  	}
-                  
-                  	for (category_key in category_totals) {
-                  
-                  		if (Object.prototype.hasOwnProperty.call(category_totals, category_key)) {
-                  			result.push(category_totals[category_key]);
-                  		}
-                  	}
-                  
-                  	return JSON.stringify(result);
-                  
-                  } catch (error) {
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Monthly service category ERROR: ' + error);
-                  
-                  	return JSON.stringify({ error: error.toString() });
-                  }
-          master_item:
-            key: aws.get.monthly.costs
-          tags:
-            - tag: component
-              value: raw
-        - uuid: 13000f4f090a403cb9ad63e80b7f450d
-          name: 'AWS Q1 delta'
-          type: CALCULATED
-          key: aws.q1.delta.cost
-          value_type: FLOAT
-          units: '!USD'
-          params: 'last(//aws.second.quarter.cost) - last(//aws.first.quarter.cost)'
-          description: 'Difference in cost between `Q2` and `Q1`.'
-          tags:
-            - tag: component
-              value: billing
-        - uuid: 4213f245540e495f86909b373f9e85ff
-          name: 'AWS Q2 delta'
-          type: CALCULATED
-          key: aws.q2.delta.cost
-          value_type: FLOAT
-          units: '!USD'
-          params: 'last(//aws.third.quarter.cost) - last(//aws.second.quarter.cost)'
-          description: 'Difference in cost between `Q3` and `Q2`.'
-          tags:
-            - tag: component
-              value: billing
-        - uuid: 053d69a30ef74b3bb137b4ef28c01ccb
-          name: 'AWS Q3 delta'
-          type: CALCULATED
-          key: aws.q3.delta.cost
-          value_type: FLOAT
-          units: '!USD'
-          params: 'last(//aws.fourth.quarter.cost) - last(//aws.third.quarter.cost)'
-          description: 'Difference in cost between `Q4` and `Q3`.'
-          tags:
-            - tag: component
-              value: billing
-        - uuid: 46493869521b4ce6a4a9bf061b9ee1a2
-          name: 'AWS quarterly trend cost'
-          type: CALCULATED
-          key: aws.quarterly.trend.cost
-          value_type: FLOAT
-          units: '!USD'
-          params: '(last(//aws.q1.delta.cost) + last(//aws.q2.delta.cost) + last(//aws.q3.delta.cost)) / 3'
-          description: 'Average quarterly cost change across the year based on `Q1`, `Q2` and `Q3` deltas. Shows whether spending is steadily increasing, decreasing, or staying stable over time.'
-          tags:
-            - tag: component
-              value: billing
-        - uuid: 3b81b5080c5849d599d6ba5da559c78b
-          name: 'Get region daily costs'
-          type: DEPENDENT
-          key: aws.region.daily.costs.get
-          history: '0'
-          value_type: TEXT
-          description: 'Collects AWS daily cost by region (BlendedCost).'
-          preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '-1'
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  try {
-                  
-                  	var output,
-                  		data,
-                  		region_block,
-                  		groups,
-                  		region_map,
-                  		keys,
-                  		region,
-                  		account,
-                  		cost_obj,
-                  		amount,
-                  		currency,
-                  		parsed_amount,
-                  		r,
-                  		block,
-                  		item_type;
-                  
-                  	output = [];
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
+                  	result = {
+                  		category_totals: [],
+                  		service_totals: []
                   	};
                   
-                  	data = JSON.parse(value);
+                  	for (row_index = 0; row_index < rows.length; row_index++) {
+                  		row = rows[row_index];
                   
-                  	region_block = null;
-                  
-                  	for (var i = 0; i < data.length; i++) {
-                  
-                  		item_type = getField(data[i], 'type', '.', null);
-                  
-                  		if (item_type === "REGION_ACCOUNT") {
-                  
-                  			block = getField(data[i], 'data.0', '.', null);
-                  
-                  			if (block) {
-                  				region_block = block;
-                  				break;
-                  			}
-                  		}
-                  	}
-                  
-                  	if (!region_block || !getField(region_block, 'Groups', '.', null)) {
-                  		throw 'REGION_ACCOUNT data not found';
-                  	}
-                  
-                  	groups = getField(region_block, 'Groups', '.', null);
-                  	region_map = {};
-                  
-                  	for (var i = 0; i < groups.length; i++) {
-                  
-                  		keys = getField(groups[i], 'Keys', '.', null);
-                  
-                  		if (!Array.isArray(keys) || keys.length < 2) {
-                  			continue;
-                  		}
-                  
-                  		region = getField(keys, '0', '.', null);
-                  		account = getField(keys, '1', '.', null);
-                  
-                  		if (!region || !account) {
-                  			continue;
-                  		}
-                  
-                  		cost_obj = getField(groups[i], 'Metrics.BlendedCost', '.', null);
-                  
-                  		if (!cost_obj) {
-                  			continue;
-                  		}
-                  
-                  		amount = getField(cost_obj, 'Amount', '.', null);
-                  		currency = getField(cost_obj, 'Unit', '.', null);
-                  
-                  		if (amount === null || currency === null) {
-                  			continue;
-                  		}
-                  
-                  		parsed_amount = parseFloat(amount);
-                  
-                  		if (isNaN(parsed_amount)) {
-                  			parsed_amount = 0;
-                  		}
-                  
-                  		if (!region_map[region]) {
-                  			region_map[region] = {
-                  				region: region,
-                  				total_cost: 0,
-                  				currency: currency
-                  			};
-                  		}
-                  
-                  		region_map[region].total_cost += parsed_amount;
-                  	}
-                  
-                  	for (r in region_map) {
-                  
-                  		if (Object.prototype.hasOwnProperty.call(region_map, r)) {
-                  			output.push(region_map[r]);
-                  		}
-                  	}
-                  
-                  	return JSON.stringify(output);
-                  
-                  } catch (error) {
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Region parse ERROR ' + error);
-                  
-                  	return JSON.stringify({ error: error.toString() });
-                  }
-          master_item:
-            key: aws.get.daily.costs
-          tags:
-            - tag: component
-              value: raw
-        - uuid: 89d0149b7c844aecb494c2e640bda4ae
-          name: 'Get region yearly costs'
-          type: DEPENDENT
-          key: aws.region.yearly.costs.get
-          history: '0'
-          value_type: TEXT
-          description: 'Collects region monthly costs.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.region_account_costs
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  try {
-                  
-                  	var output,
-                  		data,
-                  		region_block,
-                  		groups,
-                  		region_map,
-                  		region,
-                  		cost_obj,
-                  		amount,
-                  		r;
-                  
-                  	output = [];
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	region_block = null;
-                  
-                  	if (getField(data, 'region_account_costs.length', '.', 0) > 0) {
-                  		region_block = getField(data, 'region_account_costs.0', '.', null);
-                  	}
-                  	else if (Array.isArray(data) && Array.isArray(data[0]) && data[0][0]) {
-                  		region_block = data[0][0];
-                  	}
-                  	else if (Array.isArray(data) && getField(data[0], 'Groups', '.', null)) {
-                  		region_block = data[0];
-                  	}
-                  
-                  	if (!region_block || !getField(region_block, 'Groups', '.', null)) {
-                  		throw 'Groups not found in any known structure';
-                  	}
-                  
-                  	groups = getField(region_block, 'Groups', '.', null);
-                  	region_map = {};
-                  
-                  	for (var i = 0; i < groups.length; i++) {
-                  
-                  		region = getField(groups[i], 'Keys.0', '.', null);
-                  		cost_obj = getField(groups[i], 'Metrics.BlendedCost', '.', null);
-                  
-                  		if (!region || !cost_obj) {
-                  			continue;
-                  		}
-                  
-                  		amount = parseFloat(getField(cost_obj, 'Amount', '.', 0));
-                  
-                  		if (isNaN(amount)) {
-                  			amount = 0;
-                  		}
-                  
-                  		if (!region_map[region]) {
-                  			region_map[region] = {
-                  				region: region,
-                  				total_amount: 0,
-                  				currency: getField(cost_obj, 'Unit', '.', 'USD')
-                  			};
-                  		}
-                  
-                  		region_map[region].total_amount += amount;
-                  	}
-                  
-                  	for (r in region_map) {
-                  		if (Object.prototype.hasOwnProperty.call(region_map, r)) {
-                  			output.push(region_map[r]);
-                  		}
-                  	}
-                  
-                  	return JSON.stringify(output);
-                  
-                  } catch (error) {
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Region parse ERROR ' + error);
-                  
-                  	return JSON.stringify({ error: error.toString() });
-                  }
-          master_item:
-            key: aws.get.monthly.costs
-          tags:
-            - tag: component
-              value: raw
-        - uuid: 21edf0cc3655447fa024d59a388f8268
-          name: 'AWS Q2 cost'
-          type: DEPENDENT
-          key: aws.second.quarter.cost
-          value_type: FLOAT
-          units: '!USD'
-          description: 'Second quarter total cost.'
-          preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		monthly,
-                  		q2months,
-                  		total,
-                  		item,
-                  		month,
-                  		amount;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	monthly = getField(data, 'monthly_costs', '.', []);
-                  
-                  	if (!Array.isArray(monthly)) {
-                  		throw 'monthly_costs not found or invalid format';
-                  	}
-                  
-                  	q2months = ['04', '05', '06'];
-                  	total = 0;
-                  
-                  	for (var i = 0; i < monthly.length; i++) {
-                  
-                  		item = monthly[i];
-                  
-                  		month = getField(item, 'month', '.', '');
-                  		amount = parseFloat(getField(item, 'amount', '.', 0));
-                  
-                  		if (isNaN(amount)) {
-                  			amount = 0;
-                  		}
-                  
-                  		month = (month || '').split('-')[1];
-                  
-                  		if (q2months.indexOf(month) !== -1) {
-                  			total += amount;
-                  		}
-                  	}
-                  
-                  	return total.toFixed(2);
-                  
-                  } catch (e) {
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Q2 calculation failed: ' + e);
-                  
-                  	throw e;
-                  }
-          master_item:
-            key: aws.get.monthly.costs
-          tags:
-            - tag: component
-              value: billing
-        - uuid: 17816f3560ee43d48a390db3804e85a1
-          name: 'Get services yearly stats'
-          type: DEPENDENT
-          key: aws.services.yearly.cost.get
-          history: '0'
-          value_type: TEXT
-          description: 'Collects total yearly cost for AWS services.'
-          preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		rows,
-                  		totals,
-                  		result,
-                  		service,
-                  		amount,
-                  		currency,
-                  		totals_key,
-                  		row;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'monthly_service_costs', '.', []);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		rows = [];
-                  	}
-                  
-                  	totals = {};
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  
-                  		row = rows[i];
-                  
-                  		if (!getField(row, 'Keys', '.', null) || !Array.isArray(getField(row, 'Keys', '.', null))) {
-                  			continue;
-                  		}
-                  
-                  		service = getField(row, 'Keys.0', '.', '');
+                  		service = getField(row, 'Keys.0');
                   
                   		if (!service) {
                   			continue;
@@ -7546,267 +7109,70 @@ zabbix_export:
                   			amount = 0;
                   		}
                   
-                  		currency = getField(row, 'Metrics.BlendedCost.Unit', '.', 'USD');
+                  		currency = getField(row, 'Metrics.BlendedCost.Unit');
                   
-                  		if (!totals[service]) {
-                  			totals[service] = {
+                  		category = 'other';
+                  
+                  		service_lower = service.toLowerCase();
+                  
+                  		for (category_key in category_keywords) {
+                  			for (rule_index = 0; rule_index < category_keywords[category_key].length; rule_index++) {
+                  				if (service_lower.indexOf(category_keywords[category_key][rule_index]) !== -1) {
+                  					category = category_key;
+                  					break;
+                  				}
+                  			}
+                  
+                  			if (category !== 'other') {
+                  				break;
+                  			}
+                  		}
+                  
+                  		if (!category_totals[category]) {
+                  			category_totals[category] = {
+                  				service: category,
+                  				total_amount: 0,
+                  				currency: currency,
+                  				count: 0
+                  			};
+                  		}
+                  
+                  		category_totals[category].total_amount += amount;
+                  		category_totals[category].count++;
+                  
+                  		if (!service_totals[service]) {
+                  			service_totals[service] = {
                   				service: service,
                   				total_amount: 0,
                   				currency: currency
                   			};
                   		}
                   
-                  		totals[service].total_amount += amount;
+                  		service_totals[service].total_amount += amount;
                   	}
                   
-                  	result = [];
+                  	Object.keys(category_totals).forEach(function (category_key) {
+                  		category_totals[category_key].total_amount = Math.round(category_totals[category_key].total_amount * 100) / 100;
                   
-                  	for (totals_key in totals) {
-                  		if (Object.prototype.hasOwnProperty.call(totals, totals_key)) {
-                  			result.push(totals[totals_key]);
-                  		}
-                  	}
+                  		result.category_totals.push(category_totals[category_key]);
+                  	});
+                  
+                  	Object.keys(service_totals).forEach(function (service_key) {
+                  		service_totals[service_key].total_amount = Math.round(service_totals[service_key].total_amount * 100) / 100;
+                  
+                  		result.service_totals.push(service_totals[service_key]);
+                  	});
                   
                   	return JSON.stringify(result);
                   
-                  } catch (error) {
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Service totals ERROR: ' + error);
+                  }
+                  catch (error) {
+                  	Zabbix.log(3, '[ AWS Billing ] Service processing ERROR: ' + error);
                   
                   	return JSON.stringify({ error: error.toString() });
                   }
           master_item:
             key: aws.get.monthly.costs
-          tags:
-            - tag: component
-              value: raw
-        - uuid: e95fa15a04604162b574a83f6f8b9d64
-          name: 'AWS Q3 cost'
-          type: DEPENDENT
-          key: aws.third.quarter.cost
-          value_type: FLOAT
-          units: '!USD'
-          description: 'Third quarter total cost.'
-          preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		monthly,
-                  		q3months,
-                  		total,
-                  		item,
-                  		month,
-                  		amount;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	monthly = getField(data, 'monthly_costs', '.', []);
-                  
-                  	if (!Array.isArray(monthly)) {
-                  		throw 'monthly_costs not found or invalid format';
-                  	}
-                  
-                  	q3months = ['07', '08', '09'];
-                  	total = 0;
-                  
-                  	for (var i = 0; i < monthly.length; i++) {
-                  
-                  		item = monthly[i];
-                  
-                  		month = getField(item, 'month', '.', '');
-                  		amount = parseFloat(getField(item, 'amount', '.', 0));
-                  
-                  		if (isNaN(amount)) {
-                  			amount = 0;
-                  		}
-                  
-                  		month = (month || '').split('-')[1];
-                  
-                  		if (q3months.indexOf(month) !== -1) {
-                  			total += amount;
-                  		}
-                  	}
-                  
-                  	return total.toFixed(2);
-                  
-                  } catch (e) {
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Q3 calculation failed: ' + e);
-                  
-                  	throw e;
-                  }
-          master_item:
-            key: aws.get.monthly.costs
-          tags:
-            - tag: component
-              value: billing
-        - uuid: 72e39451e3e143af94029260ca9d5449
-          name: 'Get top daily service'
-          type: DEPENDENT
-          key: aws.top.daily.service.get
-          history: '0'
-          value_type: CHAR
-          description: 'Collects AWS daily top cost services (BlendedCost).'
-          preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		service_block,
-                  		services,
-                  		total,
-                  		currency,
-                  		day,
-                  		service_data,
-                  		metrics,
-                  		cost,
-                  		top,
-                  		j;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	service_block = null;
-                  
-                  	for (var i = 0; i < data.length; i++) {
-                  
-                  		if (getField(data[i], 'type', '.', null) === 'SERVICE') {
-                  
-                  			service_block = getField(data[i], 'data', '.', null);
-                  			break;
-                  		}
-                  	}
-                  
-                  	if (!Array.isArray(service_block)) {
-                  		throw 'SERVICE data not found';
-                  	}
-                  
-                  	services = [];
-                  	total = 0;
-                  	currency = null;
-                  
-                  	for (var i = 0; i < service_block.length; i++) {
-                  
-                  		day = service_block[i];
-                  
-                  		if (!getField(day, 'Groups', '.', null) || !Array.isArray(getField(day, 'Groups', '.', null))) {
-                  			continue;
-                  		}
-                  
-                  		for (j = 0; j < day.Groups.length; j++) {
-                  
-                  			service_data = day.Groups[j];
-                  
-                  			if (!service_data) {
-                  				continue;
-                  			}
-                  
-                  			metrics = getField(service_data, 'Metrics.BlendedCost', '.', null);
-                  
-                  			if (!metrics) {
-                  				continue;
-                  			}
-                  
-                  			if (!getField(service_data, 'Keys', '.', null) || !Array.isArray(getField(service_data, 'Keys', '.', null))) {
-                  				continue;
-                  			}
-                  
-                  			cost = parseFloat(getField(metrics, 'Amount', '.', 0));
-                  
-                  			if (isNaN(cost)) {
-                  				cost = 0;
-                  			}
-                  
-                  			if (!currency) {
-                  				currency = getField(metrics, 'Unit', '.', null);
-                  			}
-                  
-                  			total += cost;
-                  
-                  			services.push({
-                  				service: getField(service_data, 'Keys.0', '.', ''),
-                  				cost: cost
-                  			});
-                  		}
-                  	}
-                  
-                  	services.sort(function (a, b) {
-                  		return b.cost - a.cost;
-                  	});
-                  
-                  	top = services.slice(0, 3);
-                  
-                  	for (j = 0; j < top.length; j++) {
-                  
-                  		top[j].percent = total > 0
-                  			? parseFloat(((top[j].cost / total) * 100).toFixed(2))
-                  			: 0;
-                  
-                  		top[j].currency = currency;
-                  	}
-                  
-                  	return JSON.stringify(top);
-                  
-                  } catch (error) {
-                  
-                  	Zabbix.log(3, '[ AWS Billing ] Top services ERROR: ' + error);
-                  
-                  	return JSON.stringify({ error: error.toString() });
-                  }
-          master_item:
-            key: aws.get.daily.costs
           tags:
             - tag: component
               value: raw
@@ -8352,7 +7718,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.total_amount
+                    - $.total_cost
               master_item:
                 key: 'aws.region.yearly.processed.get["{#AWS.REGION}"]'
               tags:
@@ -8366,7 +7732,7 @@ zabbix_export:
               key: 'aws.region.yearly.processed.get["{#AWS.REGION}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects yearly preprocessed data for `{#AWS.REGION}` AWS account.'
+              description: 'Collects yearly preprocessed data for `{#AWS.REGION}` AWS region.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -8432,7 +7798,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'aws.service.type.yearly.total.count["{#AWS.SERVICE.TYPE}"]'
               units: '!services'
-              description: 'Collects yearly total cost for AWS `{#AWS.SERVICE.TYPE}` service type.'
+              description: 'Collects yearly total count for AWS `{#AWS.SERVICE.TYPE}` service.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -8504,7 +7870,7 @@ zabbix_export:
           name: 'AWS top service daily cost discovery'
           type: DEPENDENT
           key: aws.top.service.daily.cost.discovery
-          description: 'Discovers most top daily service and bill.'
+          description: 'Discovers top daily service and bill.'
           item_prototypes:
             - uuid: 79c424e060df42e78b82c67ab18f5ede
               name: 'Top service [{#AWS.SERVICE.NAME}]: cost, in percent'
@@ -8512,7 +7878,7 @@ zabbix_export:
               key: 'aws.top.daily.service.cost.percent["{#AWS.SERVICE.NAME}"]'
               value_type: FLOAT
               units: '!%'
-              description: 'Collects most top daily cost for `{#AWS.SERVICE.NAME}` AWS service.'
+              description: 'Collects top daily percent for `{#AWS.SERVICE.NAME}` AWS service.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -8528,7 +7894,7 @@ zabbix_export:
               key: 'aws.top.daily.service.cost["{#AWS.SERVICE.NAME}"]'
               value_type: FLOAT
               units: '!{#AWS.BILLING.UNIT}'
-              description: 'Collects most top daily cost for `{#AWS.SERVICE.NAME}` AWS service.'
+              description: 'Collects top daily cost for `{#AWS.SERVICE.NAME}` AWS service.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -8570,7 +7936,7 @@ zabbix_export:
               key: 'aws.top.daily.service.preprocessed.get["{#AWS.SERVICE.NAME}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects most top daily data for `{#AWS.SERVICE.NAME}` AWS service.'
+              description: 'Collects top daily data for `{#AWS.SERVICE.NAME}` AWS service.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -8664,7 +8030,7 @@ zabbix_export:
                 text: 'Role-based access'
         - macro: '{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable discovered billing service by name.'
+          description: 'Filter to include discoverable billing services by name.'
           config:
             type: TEXT
             priority: '21'
@@ -8682,7 +8048,7 @@ zabbix_export:
             description: 'A regex pattern to exclude services from discovery.'
         - macro: '{$AWS.BILLING.MONTH}'
           value: '11'
-          description: 'Months to get historical data from AWS Cost Explore API, no more than 12 months.'
+          description: 'Months to get historical data from AWS Cost Explorer API, no more than 12 months.'
           config:
             type: TEXT
             priority: '20'
