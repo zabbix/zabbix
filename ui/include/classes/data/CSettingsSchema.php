@@ -106,7 +106,7 @@ final class CSettingsSchema {
 		],
 		'device_link_timeout' => [
 			'column' => 'value_str',
-			'default' => '30s',
+			'default' => '60s',
 			'length' => 32
 		],
 		'disabled_usrgrpid' => [
