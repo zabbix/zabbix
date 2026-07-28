@@ -14,7 +14,8 @@ PARAM_LIBS = \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS) \
 	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
-	$(JSON_DEPS)
+	$(JSON_DEPS) \
+	$(EXPR_DEPS)
 
 
 

@@ -19,7 +19,6 @@
 #include "zbxregexp.h"
 #include "zbxvariant.h"
 #include "zbxnum.h"
-#include "zbxexpr.h"
 #include "jsonobj.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"

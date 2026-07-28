@@ -6,6 +6,7 @@ noinst_PROGRAMS = \
 
 HTTPPOLLER_LIBS = \
 	$(XML_DEPS) \
+	$(EXPR_DEPS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
