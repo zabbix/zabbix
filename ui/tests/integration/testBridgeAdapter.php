@@ -38,6 +38,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const PUSH_ALERT_ERROR_DEVICE_UNKNOWN = 'Cannot deliver alert, device id is not known.';
 	private const PUSH_ALERT_ERROR_DEVICE_NOT_ACTIVE =
 		'Cannot deliver notification, target device is not in Active state.';
+	private const PUSH_TEST_ERROR_DEVICE_NOT_FOUND = 'Cannot find enabled device for push media type test.';
 	private const PUSH_ERROR_NOT_CONFIGURED =
 		'Cannot deliver mobile device notification, bridge-adapter is not configured.';
 	private const PUSH_ERROR_CANNOT_CONNECT =
@@ -1170,6 +1171,58 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
 
 		$this->assertNotFalse($result, $client->getError() ?? '');
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMock
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_notifyMultipleDevices(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$result = $client->testMediaType([
+			'mediatypeid' => self::$push_mediatypeid,
+			'sendto' => self::NOTIFY_DEVICE_UUID.','.self::OFFBOARD_DEVICE_UUID,
+			'subject' => 'Bridge adapter integration test',
+			'message' => 'Bridge adapter integration test message'
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
+
+		$this->assertNotFalse($result, $client->getError() ?? '');
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
+		});
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return $request['body']['params']['to']['device_id'] === self::OFFBOARD_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMock
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_notifyMultipleDevicesPartialFailure(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$result = $client->testMediaType([
+			'mediatypeid' => self::$push_mediatypeid,
+			'sendto' => self::NOTIFY_DEVICE_UUID.','.self::UNKNOWN_DEVICE_UUID,
+			'subject' => 'Bridge adapter integration test',
+			'message' => 'Bridge adapter integration test message'
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
+
+		$this->assertFalse($result);
+		$this->assertSame(self::UNKNOWN_DEVICE_UUID.': '.self::PUSH_TEST_ERROR_DEVICE_NOT_FOUND,
+			$client->getError()
+		);
+
 		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
 			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
 		});
