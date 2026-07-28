@@ -1418,11 +1418,16 @@ class testTriggerCEP extends CIntegrationTest {
 	 * behaviour is identical, so the scenario is driven by the very same runner
 	 * (runEventAssessmentTestGlobalCorrelationCloseOnUp).
 	 *
-	 * $tag_exists_condition selects how the close-window operation singles out the "up" events: with a tag
-	 * value comparison (state Equals "up") or with a plain tag-exists condition, which additionally needs the
-	 * state-carrying CEP_STATE_TAG tag name on both prototypes.
+	 * $tag_exists_condition selects how the close-window operation singles out the "up" events: with a plain
+	 * tag-exists condition, which additionally needs the state-carrying CEP_STATE_TAG tag name on both
+	 * prototypes, or with a tag value comparison (state Equals "up").
+	 *
+	 * $extra_tag_via_webhook adds the same two tagging webhook media types the global correlation variant sets
+	 * up (see createExtraTagWebhookAction), so the CEP flavours of the JS scenarios can assert that tags
+	 * returned by a media type land on the events they were generated for.
 	 */
-	public function prepareDataCepWindowTagCorrelationCloseOnUp(bool $tag_exists_condition = true) {
+	public function prepareDataCepWindowTagCorrelationCloseOnUp(bool $tag_exists_condition = true,
+			bool $extra_tag_via_webhook = false) {
 		$this->prepareCloseOnUpTriggerPrototypes($tag_exists_condition
 			? [['tag' => self::CEP_STATE_TAG, 'value' => '']]
 			: []
@@ -1436,6 +1441,11 @@ class testTriggerCEP extends CIntegrationTest {
 		self::$cep_ruleid = $this->upsertCepRule(
 			$this->buildCloseOnUpCepRuleParams(self::CEP_RULE_CLOSE_ON_UP, $tag_exists_condition)
 		);
+
+		// Optionally add an extra webhook-computed tag to every problem event.
+		if ($extra_tag_via_webhook) {
+			$this->createExtraTagWebhookAction();
+		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -2205,6 +2215,17 @@ HEREDOC;
 			$this->call('ceprule.delete', $ids);
 		}
 		self::$cep_ruleid = null;
+	}
+
+	/**
+	 * Teardown every CEP window scenario must run, even when it failed: the CEP rule closes every problem
+	 * carrying a 'state' tag, so it must not survive the test - the global correlation variants that run
+	 * afterwards use the same trigger prototypes and would have their problems closed by this rule instead of
+	 * by their correlation rule. The configuration cache is reloaded so the server drops the rule right away.
+	 */
+	private function cleanupCepRules(): void {
+		$this->deleteCepRules();
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}
 
 	/**
@@ -4176,11 +4197,7 @@ HEREDOC;
 			$this->waitForNoOpenProblems($all);
 		}
 		finally {
-			// The CEP rule closes every problem carrying a 'state' tag, so it must not survive this test:
-			// the global correlation variants that run afterwards use the same trigger prototypes and would
-			// have their problems closed by this rule instead of by their correlation rule.
-			$this->deleteCepRules();
-			$this->reloadConfigurationCacheAndWaitForLogLine();
+			$this->cleanupCepRules();
 		}
 	}
 
@@ -4204,8 +4221,7 @@ HEREDOC;
 			$this->waitForNoOpenProblems($all);
 		}
 		finally {
-			$this->deleteCepRules();
-			$this->reloadConfigurationCacheAndWaitForLogLine();
+			$this->cleanupCepRules();
 		}
 	}
 
@@ -4228,11 +4244,346 @@ HEREDOC;
 			$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
 		}
 		finally {
-			// The CEP rule closes every problem carrying a 'state' tag, so it must not survive this test:
-			// the global correlation variants that run afterwards use the same trigger prototypes and would
-			// have their problems closed by this rule instead of by their correlation rule.
-			$this->deleteCepRules();
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The CEP counterpart of testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpFromSameTrigger: the same
+	 * CEP tag correlation close-on-up scenario, but every "up_N" value is sent to the item whose trigger opened
+	 * "down_N" instead of the next one, so the closing "up" PROBLEM event is raised on the same trigger. The
+	 * window is keyed purely on the 'service' tag value, so the pairing must hold either way.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpFromSameTrigger$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpFromSameTrigger() {
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, false, false, false);
+			$this->waitForNoOpenProblems($all);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The CEP counterpart of testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpJS: the same CEP tag
+	 * correlation close-on-up scenario (the window still pairs on the 'service' trigger tag), but two
+	 * independent webhook media types with process_tags enabled additionally add a WEB_SERVICE_TAG and a
+	 * WEB_SERVICE_TAG2 tag to every problem event from JavaScript, each driven by its own trigger action on
+	 * the discovered CEP triggers. After the scenario the test asserts that every problem event carries both
+	 * tags, verifying that tags returned by separate media types are all applied to the events they were
+	 * generated for.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJS$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJS() {
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp(true, true);
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		// Every one of the four waves opens a problem event per trigger and all of them are tagged, so 4 tagged
+		// problem events per trigger (key). Unlike the global correlation flavour - where CLOSE_NEW disables the
+		// actions of the problem it closes, so the two "up" waves never escalate and only the "down" problems
+		// end up tagged - a CEP rule closing an event leaves its actions enabled (only the correlation paths
+		// set CEP_ACTION_DISABLED, see cep_worker.c), so the "up" problems escalate and get tagged as well.
+		$m = count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY))
+			+ count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2));
+
+		try {
+			// Bound the event.get verification below to events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+			$this->waitForNoOpenProblems($all);
+
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 4 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 4 * $m);
+		}
+		finally {
+			$this->removeExtraTagWebhookAction();
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The CEP counterpart of testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpJSAfterEachWave: same
+	 * tag-application scenario as testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJS, but the
+	 * WEB_SERVICE_TAG assertion runs after every wave instead of only in the final state, verifying that the
+	 * tags returned by the media type are applied to the problem events as they open and are not disturbed by
+	 * the later waves. A CEP rule closing an event leaves its actions enabled, so the "up" problems escalate
+	 * and get tagged too and the count grows by $m per wave: $m, 2 * $m, 3 * $m, 4 * $m
+	 * ($up_events_tagged = true).
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJSAfterEachWave$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJSAfterEachWave() {
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp(true, true);
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		try {
+			// Bound the event.get verification inside the run to events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			// Pass $check_tags = true so the run asserts the WEB_SERVICE_TAG tag count after every wave, and
+			// $up_events_tagged = true so those counts expect the "up" problems to be tagged as well.
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, true, false, true, false, false,
+				true
+			);
+			$this->waitForNoOpenProblems($all);
+		}
+		finally {
+			$this->removeExtraTagWebhookAction();
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The CEP counterpart of testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpJSServices: same
+	 * tag-application scenario as testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJS, but the
+	 * webhook-applied tags drive services into problem state instead of only being asserted on the events. One
+	 * service per discovered component is created whose only problem tag matches the webhook-applied
+	 * WEB_COMPONENT_TAG tag, so a service can go into problem state only after the escalation ran the tagging
+	 * webhook. The run asserts the services start OK, turn DISASTER once the webhook tags the open problems
+	 * (and stay DISASTER through waves 2 and 3), drop to WARNING once the still-open problems are manually
+	 * downgraded after wave 3 and recover to OK once the CEP rule closes every problem in wave 4.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJSServices$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJSServices() {
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp(true, true);
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		try {
+			// Bound the event.get verification inside the run to events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			$this->createWebTagServices();
+
+			// $check_tags sequences each wave on the webhook having tagged the events ($up_events_tagged = true:
+			// the CEP-closed "up" problems are tagged too); $check_web_services asserts the service state
+			// transitions driven by those webhook-applied tags.
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, true, false, true, true, false,
+				true
+			);
+			$this->waitForNoOpenProblems($all);
+		}
+		finally {
+			$this->removeWebTagServices();
+			$this->removeExtraTagWebhookAction();
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The CEP counterpart of testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpRestart: same scenario as
+	 * testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUp but the server component is stopped and
+	 * restarted between each step, so the CEP windows must be restored from the database with their collected
+	 * events and still close the paired problems afterwards.
+	 *
+	 * @depends testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUp
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true);
+			$this->waitForNoOpenProblems($all);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The CEP counterpart of testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSeverity: same CEP tag
+	 * correlation close-on-up scenario, but once every problem is open (at the trigger's DISASTER priority, so
+	 * each per-trigger service is at DISASTER too) the open problems are manually downgraded to WARNING via
+	 * event.acknowledge. When services exist the test also verifies the service manager follows the manual
+	 * severity change: every service drops from DISASTER to WARNING, then recovers to OK once the "up" values
+	 * close the problems through the CEP window.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpSeverity$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpSeverity() {
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSeverity(false);
+			$this->waitForNoOpenProblems($all);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The CEP counterpart of testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst: the
+	 * discovered host only enters data-collection maintenance after the first wave of problems is already open,
+	 * so the already-open problems must be suppressed retroactively and every problem opened afterwards (while
+	 * maintenance is active) suppressed at creation time too, while the CEP rule still closes them all, leaving
+	 * nothing open.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpMaintenanceAfterFirst$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpMaintenanceAfterFirst() {
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true);
+			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		}
+		finally {
+			$this->cleanupCepRules();
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// Moving the maintenance out of its active window only changes the configuration; the timer process
+			// still has to take the host out of maintenance and clear the suppression of the events opened during
+			// the run (their event_suppress rows persist even after the problems were closed). Wait until nothing
+			// on the discovered host is suppressed any more, so the next test starts with the host fully out of
+			// maintenance and cannot observe stale suppression.
+			$this->callUntilCountIsPresent('event.get', [
+				'hostids' => [self::$disc_hostid],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'suppressed' => true
+			], 0, 120, self::WAIT_ITERATION_DELAY);
+		}
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpMaintenanceAfterFirst but
+	 * the server component is stopped and restarted between each step.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpMaintenanceAfterFirstRestart$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpMaintenanceAfterFirstRestart() {
+		$this->skipIfRestartTestsDisabled();
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true);
+			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		}
+		finally {
+			$this->cleanupCepRules();
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// See testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpMaintenanceAfterFirst: wait
+			// until the timer has taken the host out of maintenance and cleared every suppression.
+			$this->callUntilCountIsPresent('event.get', [
+				'hostids' => [self::$disc_hostid],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'suppressed' => true
+			], 0, 120, self::WAIT_ITERATION_DELAY);
+		}
+	}
+
+	/**
+	 * The CEP counterpart of testTriggerCEP_SuppressUnsuppressProblems: verifies that problems and services are
+	 * suppressed during maintenance and no longer suppressed after the maintenance is stopped. The stopped
+	 * maintenances are then resumed one at a time out of creation order (middle, first, last) - suppression must
+	 * return after the first resume and survive the overlapping ones - and finally stopped again, after which
+	 * suppression must clear once more. The problems are closed by the CEP rule rather than by global
+	 * correlation.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagSuppressUnsuppressProblems$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagSuppressUnsuppressProblems() {
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true, false, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+
+			// Clean up: ensure maintenance is stopped
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+		}
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_CepWindowTagSuppressUnsuppressProblems, but the server component is
+	 * stopped and restarted between each step.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagSuppressUnsuppressProblemsRestart$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagSuppressUnsuppressProblemsRestart() {
+		$this->skipIfRestartTestsDisabled();
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true, false, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+
+			// Clean up: ensure maintenance is stopped
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+		}
+	}
+
+	/**
+	 * The CEP counterpart of testTriggerCEP_SuppressUnsuppressProblemsPerTag: same scenario as
+	 * testTriggerCEP_CepWindowTagSuppressUnsuppressProblems, but instead of host-wide maintenances that
+	 * suppress every problem, one maintenance is created per discovered component, each scoped to that
+	 * component through a 'component' problem-tag filter. Every open problem must then be suppressed by exactly
+	 * the single maintenance whose tag matches it (and by no other). Stopping the maintenances clears the
+	 * suppression, resuming brings it back per matching tag, and the CEP rule still closes the problems
+	 * normally.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagSuppressUnsuppressProblemsPerTag$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagSuppressUnsuppressProblemsPerTag() {
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
+		try {
+			// maintenance_after_first=true, stop_maintenance_and_verify_suppression=true,
+			// maintenance_by_tag=true
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true, false, true, true, false, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+
+			// Clean up: ensure maintenance is stopped
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+		}
+	}
+
+	/**
+	 * Same "per problem tag" scenario as testTriggerCEP_CepWindowTagSuppressUnsuppressProblemsPerTag, but the
+	 * server component is stopped and restarted between each step.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagSuppressUnsuppressProblemsPerTagRestart$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagSuppressUnsuppressProblemsPerTagRestart() {
+		$this->skipIfRestartTestsDisabled();
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
+		try {
+			// Same as testTriggerCEP_CepWindowTagSuppressUnsuppressProblemsPerTag but with restart=true.
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true, false, true, true, false, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+
+			// Clean up: ensure maintenance is stopped
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
 	}
 
@@ -4924,13 +5275,22 @@ HEREDOC;
 	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart,
 			bool $maintenance_after_first = false, bool $check_tags = false,
 			bool $stop_maintenance_and_verify_suppression = false, bool $up_from_other_trigger = true,
-			bool $check_web_services = false, bool $maintenance_by_tag = false): void {
+			bool $check_web_services = false, bool $maintenance_by_tag = false,
+			bool $up_events_tagged = false): void {
 		$keys = array_merge(
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
 		);
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
 		$m = count($keys);
+
+		// How many problem events are expected to carry the webhook-applied tags once $wave waves have been
+		// sent. With $up_events_tagged every problem event is tagged by the escalation that runs the tagging
+		// webhook, so the count is simply the number of problems opened so far ($wave * $m). Otherwise only the
+		// two "down" waves are ever tagged: a global correlation CLOSE_NEW disables the actions of the problem
+		// it closes (see the CEP_ACTION_DISABLED handling in cep_worker.c), so those "up" problems never
+		// escalate - unlike the ones a CEP rule closes, whose actions stay enabled.
+		$tagged_after_wave = fn(int $wave) => ($up_events_tagged ? $wave : min($wave, 2)) * $m;
 
 		// Build one sender value per key with a unique id: value "<prefix>_<offset + key index>". A
 		// non-zero $shift sends the value carrying id N at the item $shift positions over, so the event
@@ -4994,8 +5354,8 @@ HEREDOC;
 
 		// Wave 1 is fully open ($m problems), so $m problem events are tagged by both webhooks.
 		if ($check_tags) {
-			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, $m);
-			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, $tagged_after_wave(1));
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, $tagged_after_wave(1));
 		}
 
 		// Wave 1 covered every key, so the webhook has tagged an open problem of every component with
@@ -5192,8 +5552,8 @@ HEREDOC;
 		// Both "down" waves are now open (2 * $m problems), so 2 * $m problem events are tagged by both
 		// webhooks.
 		if ($check_tags) {
-			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
-			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 2 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, $tagged_after_wave(2));
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, $tagged_after_wave(2));
 		}
 
 		// Wave 2 keeps every component with open webhook-tagged problems, so the services stay DISASTER.
@@ -5211,11 +5571,12 @@ HEREDOC;
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
-		// Wave 3 closed $m problems, but the "up" events are closed on creation and never tagged, and the
-		// down problems keep their tags, so the tagged count is unchanged at 2 * $m for both webhooks.
+		// Wave 3 closed $m problems and the down problems keep their tags, so the tagged count only grows by
+		// this wave's own "up" problem events - by $m when they are tagged too, by nothing when correlation
+		// closed them with their actions disabled.
 		if ($check_tags) {
-			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
-			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 2 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, $tagged_after_wave(3));
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, $tagged_after_wave(3));
 		}
 
 		// Wave 2's webhook-tagged problems are still open on every component, so the services stay DISASTER.
@@ -5235,11 +5596,11 @@ HEREDOC;
 		$this->dispatchSenderValues($values('up', $m, $up_shift));
 		$this->waitForNoOpenProblems($all);
 
-		// Wave 4 closed the rest; nothing stays open, but the tagged count still reflects every down
-		// problem ever opened: 2 * $m for both webhooks.
+		// Wave 4 closed the rest; nothing stays open, but the tagged count still reflects every problem event
+		// that was ever tagged: every "down" problem, plus the "up" problems when they escalate too.
 		if ($check_tags) {
-			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
-			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 2 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, $tagged_after_wave(4));
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, $tagged_after_wave(4));
 		}
 
 		// No webhook-tagged problem stays open, so every web-tag service recovers to OK.
