@@ -1303,19 +1303,12 @@ class testTriggerCEP extends CIntegrationTest {
 	 * variant (prepareDataCepWindowTagCorrelationCloseOnUp), which only differ in which rule engine closes
 	 * the problems afterwards. $extra_tags are appended to the tags of both prototypes, letting the
 	 * tag-exists flavour of the CEP variant add the state-carrying tag name it matches on (CEP_STATE_TAG).
+	 *
+	 * Does nothing when the discovered triggers already carry this exact configuration, which is the common
+	 * case: the CloseOnUp scenarios share it and every dependent test re-runs its prepareData* method, so
+	 * re-sending LLD would only cost another full discovery cycle.
 	 */
 	private function prepareCloseOnUpTriggerPrototypes(array $extra_tags = []): void {
-		// Switch item prototypes to text so the find() function can be used in expressions.
-		$this->call('itemprototype.update', [
-			'itemid' => self::$item_prototypeid,
-			'value_type' => ITEM_VALUE_TYPE_TEXT
-		]);
-
-		$this->call('itemprototype.update', [
-			'itemid' => self::$dep_item_prototypeid,
-			'value_type' => ITEM_VALUE_TYPE_TEXT
-		]);
-
 		// Both prototypes: find(regexp,"down|up") so "up" is a PROBLEM (not a recovery) + multiple event
 		// generation + global correlation, plus a 'state' tag ("down"/"up") and a 'service' tag (the
 		// trailing number) that pairs an "up_N" problem with its "down_N" problem.
@@ -1330,6 +1323,25 @@ class testTriggerCEP extends CIntegrationTest {
 			['tag' => 'state', 'value' => '{{ITEM.VALUE}.regsub("^([a-z]+)", "\\1")}'],
 			['tag' => 'service', 'value' => '{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}']
 		], $extra_tags);
+
+		// Nothing to re-discover when a discovered trigger already has this configuration. The tag names are
+		// what tell the flavours apart, so they must match exactly: $extra_tags present when they are needed
+		// and absent when they are not - a CEP_STATE_TAG left behind by the tag-exists flavour would
+		// otherwise let the tag-value flavour reuse triggers carrying a tag its condition must not see.
+		if ($this->hasCloseOnUpDiscoveredTrigger(array_merge(['type'], array_column($common_tags, 'tag')))) {
+			return;
+		}
+
+		// Switch item prototypes to text so the find() function can be used in expressions.
+		$this->call('itemprototype.update', [
+			'itemid' => self::$item_prototypeid,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
+		]);
+
+		$this->call('itemprototype.update', [
+			'itemid' => self::$dep_item_prototypeid,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
+		]);
 
 		$this->call('triggerprototype.update', [
 			'triggerid' => self::$trigger_prototypeid,
@@ -1424,6 +1436,40 @@ class testTriggerCEP extends CIntegrationTest {
 				)
 			], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 		}
+	}
+
+	/**
+	 * Whether at least one of the two primary discovered triggers is already configured the way
+	 * prepareCloseOnUpTriggerPrototypes() would configure it: no trigger-level correlation, multiple event
+	 * generation and exactly $tag_names as its tag names.
+	 *
+	 * One trigger is enough - the tags of every discovered trigger come from the same two prototypes and are
+	 * written by the same LLD pass. The tag names alone identify the scenario: 'state' is written by no other
+	 * prepareData* method, and the only call that writes it also switches the item prototypes to text value
+	 * type, so a match implies the discovered items are text as well.
+	 */
+	private function hasCloseOnUpDiscoveredTrigger(array $tag_names): bool {
+		$response = $this->call('trigger.get', [
+			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
+			'output' => ['triggerid', 'correlation_mode', 'type'],
+			'selectTags' => 'extend'
+		]);
+
+		foreach ($response['result'] as $trigger) {
+			if ((int) $trigger['correlation_mode'] !== ZBX_TRIGGER_CORRELATION_NONE
+					|| (int) $trigger['type'] !== TRIGGER_MULT_EVENT_ENABLED) {
+				continue;
+			}
+
+			$trigger_tag_names = array_column($trigger['tags'], 'tag');
+
+			// No expected tag name missing and no unexpected one present.
+			if (!array_diff($tag_names, $trigger_tag_names) && !array_diff($trigger_tag_names, $tag_names)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
