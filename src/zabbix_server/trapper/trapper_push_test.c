@@ -14,12 +14,12 @@
 
 #include "trapper_push_test.h"
 
-#include "zbxdbhigh.h"
 #include "zbxalerter.h"
 #include "zbxipcservice.h"
 #include "zbxcrypto.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
+#include "zbxalgo.h"
 #include "zbx_bridge_adapter_constants.h"
 
 static char	*trapper_build_push_notify_json(const char *device_id, const char *push_token,
