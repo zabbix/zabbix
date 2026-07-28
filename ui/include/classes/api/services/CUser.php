@@ -4151,6 +4151,7 @@ class CUser extends CApiService {
 		]);
 
 		$users = [];
+		$media_keys_to_unset = [];
 
 		foreach ($db_users as &$db_user) {
 			$user = $db_user;
@@ -4161,7 +4162,7 @@ class CUser extends CApiService {
 
 				if (array_key_exists($user_media['mediatypeid'], $db_user_media_types)) {
 					if ($db_devices_count == 1) {
-						unset($user['medias'][$key]);
+						$media_keys_to_unset[$key] = true;
 
 						continue;
 					}
@@ -4169,11 +4170,13 @@ class CUser extends CApiService {
 					$user_media['sendto'] = array_diff($user_media['sendto'], [$uuid]);
 
 					if (!$user_media['sendto']) {
-						unset($user['medias'][$key]);
+						$media_keys_to_unset[$key] = true;
 					}
 				}
 			}
 			unset($user_media);
+
+			$user['medias'] = array_diff_key($user['medias'], $media_keys_to_unset);
 
 			$users[] = $user;
 
