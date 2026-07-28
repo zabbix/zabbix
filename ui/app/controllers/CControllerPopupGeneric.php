@@ -550,7 +550,7 @@ class CControllerPopupGeneric extends CController {
 				]
 			],
 			'devices' => [
-				'title' => _('Added devices'),
+				'title' => _('Active devices'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'uuid',
 				'form' => [
