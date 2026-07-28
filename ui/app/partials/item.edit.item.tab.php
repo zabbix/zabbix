@@ -684,6 +684,8 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('columns-table')
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'columns')
 					->setHeader(['', _('Name'), '', ''])
 					->setFooter(new CRow(
 						(new CCol(
@@ -785,6 +787,8 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('conditions-table')
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'conditions')
 					->setHeader([_('Label'), _('Name'), _('Action')])
 					->setFooter(new CRow(
 						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-condition')
