@@ -87,12 +87,16 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_STATE_TAG = 'state_{{ITEM.VALUE}.regsub("^([a-z]+)", "\\1")}';
 	const CEP_STATE_TAG_UP = 'state_up';
 
-	// The twelve CEP rules of the windowless scenario, see getWindowNoneRules(): none of them has a window
-	// (WINDOW_NONE) and each one tests the 'service' id of the event with a different operator, so which rules
-	// match an event is decided by that id alone. The operators come in six opposite pairs, so every event is
-	// matched by exactly one rule of every pair. Eight rules test the id through the event tags and four
-	// through the event name; each one is named after - and tags the events it matched with - the operator it
-	// applies, so a tagged event names the rules that matched it.
+	// The sixteen CEP rules of the windowless scenario, see getWindowNoneRules(): none of them has a window
+	// (WINDOW_NONE) and each one applies a different operator, so which rules match an event is fully
+	// determined by the event itself. Each rule is named after - and tags the events it matched with - the
+	// operator it applies, so a tagged event names the rules that matched it.
+	//
+	// Twelve rules test the 'service' id of the event (eight through the event tags, four through the event
+	// name) with operators coming in opposite pairs, so every event is matched by exactly one rule of every
+	// pair. The remaining four test the event severity, which is the same DISASTER for every event of these
+	// prototypes: three of them hold for every event and the fourth - "does not equal disaster" - for none,
+	// which is what pins down that a rule whose filter does not match never tags anything.
 	const CEP_TAG_SERVICE_EQUALS = 'service_equals';
 	const CEP_TAG_SERVICE_NOT_EQUALS = 'service_not_equals';
 	const CEP_TAG_SERVICE_CONTAINS = 'service_contains';
@@ -105,6 +109,10 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_TAG_EVENT_NAME_NOT_EQUALS = 'event_name_not_equals';
 	const CEP_TAG_EVENT_NAME_CONTAINS = 'event_name_contains';
 	const CEP_TAG_EVENT_NAME_NOT_CONTAINS = 'event_name_not_contains';
+	const CEP_TAG_SEVERITY_EQUALS = 'severity_equals';
+	const CEP_TAG_SEVERITY_NOT_EQUALS = 'severity_not_equals';
+	const CEP_TAG_SEVERITY_MORE_EQUAL = 'severity_more_equal';
+	const CEP_TAG_SEVERITY_LESS_EQUAL = 'severity_less_equal';
 	// The 'service' ids (the trailing number of the item value, see prepareCloseOnUpTriggerPrototypes) the
 	// rules test against. The Equals, Contains and Exists pairs all work on "0"; the scenario also sends an id
 	// that contains it without being equal to it ("10"), which is what tells the Equals pair from the Contains
@@ -1574,19 +1582,28 @@ class testTriggerCEP extends CIntegrationTest {
 	 *   - "event_name_equals": event name Equals "CEP trigger sensor1 down_1";
 	 *   - "event_name_not_equals": event name Does not equal that name;
 	 *   - "event_name_contains": event name Contains "down_1";
-	 *   - "event_name_not_contains": event name Does not contain "down_1".
+	 *   - "event_name_not_contains": event name Does not contain "down_1";
+	 *   - "severity_equals": severity Equals Disaster;
+	 *   - "severity_not_equals": severity Does not equal Disaster;
+	 *   - "severity_more_equal": severity Is more than or equal High;
+	 *   - "severity_less_equal": severity Is less than or equal Disaster.
 	 *
 	 * The Exists pair tests a tag NAME rather than a value, so the prototypes additionally get the
 	 * CEP_SERVICE_TAG tag whose name resolves to 'service_<id>' at event time; only the "down_0" event
 	 * therefore carries a 'service_0' tag.
 	 *
-	 * The rules form six opposite pairs, so every problem event is tagged by exactly one rule of each pair:
-	 * "down_0" by the Equals, the Contains, the Is less than or equal, the Exists, the name Does not equal and
-	 * the name Does not contain rule; "down_1" by the Does not equal, the Does not contain, the Is more than or
-	 * equal, the Does not exist, the name Equals and the name Contains rule; and "down_10" - an id that
-	 * contains "0" without being equal to it, and whose name contains "down_1" without being equal to the
+	 * The twelve id rules form six opposite pairs, so every problem event is tagged by exactly one rule of each
+	 * pair: "down_0" by the Equals, the Contains, the Is less than or equal, the Exists, the name Does not
+	 * equal and the name Does not contain rule; "down_1" by the Does not equal, the Does not contain, the Is
+	 * more than or equal, the Does not exist, the name Equals and the name Contains rule; and "down_10" - an id
+	 * that contains "0" without being equal to it, and whose name contains "down_1" without being equal to the
 	 * "down_1" name - by the Does not equal, the Contains, the Is more than or equal, the Does not exist, the
 	 * name Does not equal and the name Contains rule.
+	 *
+	 * The four severity rules do not tell the ids apart, since every event of these prototypes has the same
+	 * DISASTER severity: "severity_equals", "severity_more_equal" and "severity_less_equal" hold for all three
+	 * events and "severity_not_equals" for none of them, so they check the two ends of the range - a condition
+	 * that always matches tags everything, its negation nothing.
 	 *
 	 * None of the rules closes anything, which is the point of a windowless rule: the events keep flowing
 	 * through untouched apart from the tag.
@@ -2256,6 +2273,20 @@ HEREDOC;
 	}
 
 	/**
+	 * Build the filter condition a windowless rule uses to test the event SEVERITY. Unlike the id conditions
+	 * this one does not tell the events of the scenario apart - every trigger prototype of the suite has
+	 * DISASTER priority - so it is either true for all of them or for none, which is exactly what the severity
+	 * rules are there to check.
+	 */
+	private function buildWindowNoneSeverityCondition(int $operator, int $severity): array {
+		return [
+			'type' => CCepRuleHelper::CONDITION_SEVERITY,
+			'operator' => $operator,
+			'severity' => $severity
+		];
+	}
+
+	/**
 	 * The rule set of the windowless scenario: one rule per operator, keyed by the tag it adds to the events
 	 * it matched, holding that rule's filter condition and the operand it tests against. The operand doubles
 	 * as the value of the added tag, so a tagged event states both which rule matched it and with which
@@ -2265,10 +2296,11 @@ HEREDOC;
 	 * from it and waitForCepWindowNoneTaggedEvents() takes both the expected tag values and the list of tags
 	 * no non-matching rule may have added from the very same table.
 	 *
-	 * The operators come in six opposite pairs - four testing the 'service' id through the event tags, two
-	 * testing it through the event name, which ends with the item value - so every event is matched by exactly
+	 * Twelve of the operators come in opposite pairs testing the 'service' id - four pairs through the event
+	 * tags, two through the event name, which ends with the item value - so every event is matched by exactly
 	 * one rule of every pair. The name conditions mirror the tag ones: Equals compares the whole event name of
-	 * the "down_1" event, Contains only the "down_1" item value inside it.
+	 * the "down_1" event, Contains only the "down_1" item value inside it. The remaining four test the event
+	 * severity, which is the same for every event of these prototypes, so they do not tell the ids apart.
 	 */
 	private function getWindowNoneRules(): array {
 		$service = self::CEP_RULE_WINDOW_NONE_SERVICE;
@@ -2313,6 +2345,24 @@ HEREDOC;
 			],
 			self::CEP_TAG_EVENT_NAME_NOT_CONTAINS => [
 				$this->buildWindowNoneEventNameCondition(CONDITION_OPERATOR_NOT_LIKE, $value_next), $value_next
+			],
+			// Every event of these prototypes has DISASTER severity, so the first, third and fourth rule match
+			// all of them and the second one - the negation of a condition that always holds - must match none.
+			self::CEP_TAG_SEVERITY_EQUALS => [
+				$this->buildWindowNoneSeverityCondition(CONDITION_OPERATOR_EQUAL, TRIGGER_SEVERITY_DISASTER),
+				(string) TRIGGER_SEVERITY_DISASTER
+			],
+			self::CEP_TAG_SEVERITY_NOT_EQUALS => [
+				$this->buildWindowNoneSeverityCondition(CONDITION_OPERATOR_NOT_EQUAL, TRIGGER_SEVERITY_DISASTER),
+				(string) TRIGGER_SEVERITY_DISASTER
+			],
+			self::CEP_TAG_SEVERITY_MORE_EQUAL => [
+				$this->buildWindowNoneSeverityCondition(CONDITION_OPERATOR_MORE_EQUAL, TRIGGER_SEVERITY_HIGH),
+				(string) TRIGGER_SEVERITY_HIGH
+			],
+			self::CEP_TAG_SEVERITY_LESS_EQUAL => [
+				$this->buildWindowNoneSeverityCondition(CONDITION_OPERATOR_LESS_EQUAL, TRIGGER_SEVERITY_DISASTER),
+				(string) TRIGGER_SEVERITY_DISASTER
 			]
 		];
 	}
@@ -4905,20 +4955,25 @@ HEREDOC;
 	}
 
 	/**
-	 * Complex event processing without a window (WINDOW_NONE): twelve windowless rules, forming six opposite
-	 * pairs of conditions on the 'service' id of the event, tag the problem events of one discovered trigger
-	 * the moment they occur. Four pairs work on the event tags (Equals "0" / Does not equal "0", Contains "0" /
-	 * Does not contain "0", Is less than or equal "0" / Is more than or equal "1" and, on the per-id tag name,
-	 * 'service_0' Exists / Does not exist) and two on the event name, which ends with the item value (Equals /
-	 * Does not equal the whole "down_1" event name, Contains / Does not contain "down_1").
+	 * Complex event processing without a window (WINDOW_NONE): sixteen windowless rules tag the problem events
+	 * of one discovered trigger the moment they occur, each with a tag named after the operator it applies
+	 * ("service_equals", "event_name_contains", ...).
 	 *
-	 * Every rule tags the events it matched with a tag named after its operator ("service_equals",
-	 * "event_name_contains", ...), and exactly one rule of every pair may match an event, so the tagging
+	 * Twelve of them form six opposite pairs of conditions on the 'service' id of the event - four on the
+	 * event tags (Equals "0" / Does not equal "0", Contains "0" / Does not contain "0", Is less than or equal
+	 * "0" / Is more than or equal "1" and, on the per-id tag name, 'service_0' Exists / Does not exist) and two
+	 * on the event name, which ends with the item value (Equals / Does not equal the whole "down_1" event name,
+	 * Contains / Does not contain "down_1"). Exactly one rule of every pair may match an event, so the tagging
 	 * follows the ids: "down_0" gets service_equals + service_contains + service_less_equal + service_exists +
 	 * event_name_not_equals + event_name_not_contains, "down_1" gets the opposite half of every pair, and
 	 * "down_10" - the id that contains the others' values without being equal to them - gets
-	 * service_not_equals + service_contains + service_more_equal + service_not_exists +
-	 * event_name_not_equals + event_name_contains. No event may carry the tag of any other rule. None of the
+	 * service_not_equals + service_contains + service_more_equal + service_not_exists + event_name_not_equals +
+	 * event_name_contains.
+	 *
+	 * The remaining four test the event severity, which is DISASTER for every event here: severity_equals
+	 * (Equals Disaster), severity_more_equal (Is more than or equal High) and severity_less_equal (Is less than
+	 * or equal Disaster) must therefore tag all three events, while severity_not_equals (Does not equal
+	 * Disaster) must tag none - no event may carry the tag of any rule that does not match it. None of the
 	 * rules closes anything, so all three problems stay open until the trigger expression recovers them.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowNone$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
@@ -6013,13 +6068,16 @@ HEREDOC;
 	/**
 	 * Drive the windowless (WINDOW_NONE) CEP scenario on a single discovered item, so the whole flow lands on
 	 * one event stream. Three problems are opened on its one trigger, each with its own 'service' id, and each
-	 * id is matched by exactly one rule of every pair, so it ends up carrying the tags naming those rules:
+	 * id is matched by exactly one rule of every id pair, so it ends up carrying the tags naming those rules
+	 * plus the three severity tags every event of this DISASTER trigger gets:
 	 *   - "down_0":  service "0"  -> service_equals, service_contains, service_less_equal, service_exists,
 	 *                                event_name_not_equals, event_name_not_contains;
 	 *   - "down_1":  service "1"  -> service_not_equals, service_not_contains, service_more_equal,
 	 *                                service_not_exists, event_name_equals, event_name_contains;
 	 *   - "down_10": service "10" -> service_not_equals, service_contains, service_more_equal,
-	 *                                service_not_exists, event_name_not_equals, event_name_contains.
+	 *                                service_not_exists, event_name_not_equals, event_name_contains;
+	 *   - all three              -> severity_equals, severity_more_equal, severity_less_equal, and never
+	 *                                severity_not_equals.
 	 *
 	 * "down_10" is what makes the Contains pairs more than slower Equals pairs: its id contains "0" without
 	 * being equal to it and its event name contains the "down_1" item value without being equal to the
@@ -6048,43 +6106,53 @@ HEREDOC;
 			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
 		]);
 
+		// Every event has DISASTER severity, so the three severity conditions that hold must tag all of them -
+		// and CEP_TAG_SEVERITY_NOT_EQUALS, which holds for none, must appear nowhere (a rule tag that is not
+		// listed as expected fails the check).
+		$severity_tags = [
+			self::CEP_TAG_SEVERITY_EQUALS,
+			self::CEP_TAG_SEVERITY_MORE_EQUAL,
+			self::CEP_TAG_SEVERITY_LESS_EQUAL
+		];
+
 		// The 'service' id of every problem the scenario opens, in the order they are sent, and the rules that
-		// must have tagged its event (every rule tags with its own name): one rule of every opposite pair
-		// matches an id, so each event must end up with exactly six of the twelve rule tags.
+		// must have tagged its event (every rule tags with its own name): one rule of every opposite id pair
+		// matches an id, plus the three severity rules, so each event must end up with exactly nine of the
+		// sixteen rule tags.
 		$expected_tags = [
 			// The only id carrying a 'service_0' tag, so the only one the Exists rule may tag. Its event name
 			// is neither equal to nor contains the "down_1" one, so both negative name rules match it.
-			self::CEP_RULE_WINDOW_NONE_SERVICE => [
+			self::CEP_RULE_WINDOW_NONE_SERVICE => array_merge([
 				self::CEP_TAG_SERVICE_EQUALS,
 				self::CEP_TAG_SERVICE_CONTAINS,
 				self::CEP_TAG_SERVICE_LESS_EQUAL,
 				self::CEP_TAG_SERVICE_EXISTS,
 				self::CEP_TAG_EVENT_NAME_NOT_EQUALS,
 				self::CEP_TAG_EVENT_NAME_NOT_CONTAINS
-			],
+			], $severity_tags),
 			// The id whose full event name the name Equals rule was built from, so it is the only one matched
 			// by both positive name rules.
-			self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT => [
+			self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT => array_merge([
 				self::CEP_TAG_SERVICE_NOT_EQUALS,
 				self::CEP_TAG_SERVICE_NOT_CONTAINS,
 				self::CEP_TAG_SERVICE_MORE_EQUAL,
 				self::CEP_TAG_SERVICE_NOT_EXISTS,
 				self::CEP_TAG_EVENT_NAME_EQUALS,
 				self::CEP_TAG_EVENT_NAME_CONTAINS
-			],
+			], $severity_tags),
 			// Contains "0" without being equal to it, so the Contains rule matches it but the Equals rule does
 			// not - the case that tells the two string pairs apart. Its own tag is 'service_10', so the Exists
 			// rule (which looks for 'service_0') must not match it either, and its event name ends with
 			// "down_10", which contains the "down_1" value without being equal to the "down_1" event name -
 			// the same split, on the name side.
-			'10' => [
+			'10' => array_merge([
 				self::CEP_TAG_SERVICE_NOT_EQUALS,
 				self::CEP_TAG_SERVICE_CONTAINS,
 				self::CEP_TAG_SERVICE_MORE_EQUAL,
 				self::CEP_TAG_SERVICE_NOT_EXISTS,
 				self::CEP_TAG_EVENT_NAME_NOT_EQUALS,
 				self::CEP_TAG_EVENT_NAME_CONTAINS
-			]
+			], $severity_tags)
 		];
 
 		// Each value opens one more problem (multiple event generation) that no rule ever closes, so the open
