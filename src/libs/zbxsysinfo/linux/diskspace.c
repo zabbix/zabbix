@@ -212,7 +212,7 @@ static int	zbx_vector_mpoint_ptr_search_fsname(const zbx_vector_mpoint_ptr_t *ve
 
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			line[MAX_STRING_LEN], *p, *mntopts, *error;
+	char			*mode, *mountpoint, line[MAX_STRING_LEN], *p, *mntopts, *error;
 	FILE			*f;
 	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
 	double			pfree, pused, ipfree, ipused;
@@ -220,10 +220,96 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_mpoint_ptr_t	mpoints;
 	zbx_mpoint_t		*mpoint;
 	zbx_fsname_t		fsname;
-	int			ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL, mode_short = 0;
 
-	ZBX_UNUSED(request);
+	/* validate parameter count */
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
 
+	/* parse parameters */
+	mode = get_rparam(request, 0);
+	mountpoint = get_rparam(request, 1);
+
+	/* validate mode */
+	if (NULL != mode && '\0' != *mode)
+	{
+		if (0 == strcmp(mode, "short"))
+			mode_short = 1;
+		else if (0 != strcmp(mode, "full"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
+	/* NULL or empty mode defaults to "full" */
+	/* empty mountpoint means no filter */
+	if (NULL != mountpoint && '\0' == *mountpoint)
+		mountpoint = NULL;
+
+	/* process short mode */
+	if (1 == mode_short)
+	{
+		if (NULL == (f = fopen("/proc/mounts", "r")))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/mounts: %s", zbx_strerror(errno)));
+			return SYSINFO_RET_FAIL;
+		}
+
+		zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+		while (NULL != fgets(line, sizeof(line), f))
+		{
+			if (NULL == (p = strchr(line, ' ')))
+				continue;
+
+			fsname.mpoint = ++p;
+
+			if (NULL == (p = strchr(fsname.mpoint, ' ')))
+				continue;
+
+			*p = '\0';
+
+			fsname.type = ++p;
+
+			if (NULL == (p = strchr(fsname.type, ' ')))
+				continue;
+
+			*p = '\0';
+
+			mntopts = ++p;
+
+			if (NULL == (p = strchr(mntopts, ' ')))
+				continue;
+
+			*p = '\0';
+
+			/* apply mountpoint filter */
+			if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+				continue;
+
+			zbx_json_addobject(&j, NULL);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname.mpoint, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, fsname.type, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntopts, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&j);
+		}
+
+		zbx_fclose(f);
+
+		zbx_json_close(&j);
+
+		SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+		zbx_json_free(&j);
+
+		return SYSINFO_RET_OK;
+	}
+
+	/* process full mode */
 	if (NULL == (f = fopen("/proc/mounts", "r")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/mounts: %s", zbx_strerror(errno)));
@@ -258,11 +344,16 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		*p = '\0';
 
+		/* apply mountpoint filter */
+		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+			continue;
+
 		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused, &error))
 		{
 			zbx_free(error);
 			continue;
 		}
+
 		if (SYSINFO_RET_OK != get_fs_inode_stat(fsname.mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused,
 				"pused", &error))
 		{
@@ -294,6 +385,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/mounts: %s", zbx_strerror(errno)));
 		goto out;
 	}
+
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	while (NULL != fgets(line, sizeof(line), f))
@@ -316,6 +408,10 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 			continue;
 
 		*p = '\0';
+
+		/* apply mountpoint filter */
+		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+			continue;
 
 		if (FAIL != (idx = zbx_vector_mpoint_ptr_search_fsname(&mpoints, &fsname)))
 		{
