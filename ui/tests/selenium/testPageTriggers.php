@@ -467,8 +467,10 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid.'&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable($this->selector);
 		$form->getField('Tags')->query('id:filter_tags_0_tag')->one()->fill('Tag1234');
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn([], 'Name', $this->selector);
 

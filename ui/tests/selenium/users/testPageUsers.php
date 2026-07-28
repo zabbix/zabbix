@@ -97,9 +97,11 @@ class testPageUsers extends CLegacyWebTest {
 
 	public function testPageUsers_FilterByAlias() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 		$this->zbxTestInputTypeOverwrite('filter_username', $this->userAlias);
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $this->userAlias);
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}

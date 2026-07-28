@@ -535,10 +535,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'&filter_type=-1&filter_delay=&filter_lifetime=&filter_snmp_oid='.
 				'&filter_state=-1&filter_status=-1&filter_set=1&context='.$context);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$table = $this->query($this->selector)->asTable()->one();
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
-		$table = $this->query($this->selector)->asTable()->one();
 
 		if (array_key_exists('expected', $data)) {
 			$this->assertTableDataColumn($data['expected'], 'Name', $this->selector);

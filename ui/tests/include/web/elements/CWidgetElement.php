@@ -22,6 +22,8 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
+use Facebook\WebDriver\Exception\ElementClickInterceptedException;
+
 /**
  * Dashboard widget element.
  */
@@ -85,9 +87,20 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
-		$button = $this->query('xpath:.//button[@class="btn-widget-edit"]')->waitUntilPresent()->one();
+		// Hover first: in edit mode this re-renders the header, so query the button afterwards to avoid staleness.
 		$this->hoverMouse();
-		$button->hoverMouse()->click();
+		$button = $this->query('xpath:.//button[@class="btn-widget-edit"]')->waitUntilPresent()->one();
+		$button->hoverMouse();
+
+		// Hovering a widget in edit mode adds resize handles that can overlap the edit button and intercept the click.
+		// If that happens, scroll the widget into view to remove the overlap, then click again.
+		try {
+			$button->click();
+		}
+		catch (ElementClickInterceptedException $exception) {
+			$this->scrollIntoView();
+			$button->click();
+		}
 
 		return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()
 				->asForm()->one();
