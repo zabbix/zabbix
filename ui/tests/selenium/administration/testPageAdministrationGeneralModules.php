@@ -1334,6 +1334,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->page->waitUntilReady();
 		$dashboard->waitUntilReady();
 
+		// Kiosk mode hides the dashboard controls; wait for them to be restored before editing.
+		$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilVisible();
+
 		// Open dashboard in edit mode or open dashboard on template and check widget display again.
 		if (array_key_exists('template', $module)) {
 			$this->page->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$template_dashboardid)

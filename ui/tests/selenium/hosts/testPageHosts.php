@@ -462,6 +462,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->getField('IP')->fill($this->HostIp);
 		$filter->getField('Port')->fill($this->HostPort);
 		$filter->submit();
+		$this->page->waitUntilReady();
 		$this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		$this->zbxTestTextPresent($this->HostName);
 		$this->assertDatatableStats(1);

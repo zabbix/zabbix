@@ -96,8 +96,9 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
-		$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
+		// Hover first: in edit mode this re-renders the header, so query the button afterwards to avoid staleness.
 		$this->hoverMouse();
+		$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
 		$button->hoverMouse();
 
 		// Hovering a widget in edit mode adds resize handles, and the top resize border (ui-resizable-border-n) can
