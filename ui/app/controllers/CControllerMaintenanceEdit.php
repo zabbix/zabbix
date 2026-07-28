@@ -207,7 +207,7 @@ class CControllerMaintenanceEdit extends CController {
 		$data['active_till'] = date(ZBX_DATE_TIME, strtotime('now + '.secondsToPeriod(
 			timeUnitToSeconds(CWebUser::$data['default_maintenance_period'])
 		)));
-		$data['timeperiods'][] = [
+		$tmeperiod = [
 			'timeperiod_type' => 0,
 			'every' => 1,
 			'month' => 0,
@@ -217,9 +217,10 @@ class CControllerMaintenanceEdit extends CController {
 			'period' => timeUnitToSeconds(CWebUser::$data['default_maintenance_period']),
 			'start_date' => strtotime('now'),
 			'formatted_type' => 'One time only',
-			'formatted_schedule' => date(ZBX_DATE_TIME, strtotime('now')),
-			'formatted_period' => CWebUser::$data['default_maintenance_period']
+			'formatted_period' => zbx_date2age(0, timeUnitToSeconds(CWebUser::$data['default_maintenance_period']))
 		];
+		$data['timeperiods'][] = $tmeperiod
+			+ ['formatted_schedule' => CMaintenanceHelper::getTimePeriodSchedule($tmeperiod)];
 
 		foreach ($events as $event) {
 			$db_triggers = API::Trigger()->get([

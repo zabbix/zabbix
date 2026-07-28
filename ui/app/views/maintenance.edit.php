@@ -156,8 +156,8 @@ $tag_template = (new CTemplateTag('tag-row-tmpl'))
 				->addOptions(CSelect::createOptionsFromArray([
 					MAINTENANCE_TAG_OPERATOR_EQUAL => _('Equals'),
 					MAINTENANCE_TAG_OPERATOR_LIKE => _('Contains'),
-					MAINTENANCE_TAG_OPERATOR_NOT_EQUAL => _('Does not equals'),
-					MAINTENANCE_TAG_OPERATOR_NOT_LIKE => _('Does not contains')
+					MAINTENANCE_TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+					MAINTENANCE_TAG_OPERATOR_NOT_LIKE => _('Does not contain')
 				]))
 				->setValue(MAINTENANCE_TAG_OPERATOR_LIKE)
 				->setAttribute('data-prevent-validation-on-change', 1)
