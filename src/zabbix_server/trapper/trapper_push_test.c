@@ -100,6 +100,35 @@ static void	trapper_push_device_free(zbx_push_device_t *device)
 	zbx_free(device);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sends test push notification(s) for push media type test          *
+ *                                                                            *
+ * Parameters: sendto              - [IN] comma/newline separated list of     *
+ *                                        target device UUIDs                 *
+ *             subject             - [IN]                                     *
+ *             message             - [IN]                                     *
+ *             mediatypeid         - [IN]                                     *
+ *             type                - [IN] media type (MEDIA_TYPE_PUSH)        *
+ *             row                 - [IN] media type configuration db row     *
+ *             smtp_port           - [IN]                                     *
+ *             smtp_security       - [IN]                                     *
+ *             smtp_verify_peer    - [IN]                                     *
+ *             smtp_verify_host    - [IN]                                     *
+ *             smtp_authentication - [IN]                                     *
+ *             message_format      - [IN] unused for push media type,         *
+ *                                        passed through to alerter as-is     *
+ *             error               - [OUT] error message(s), one per failed   *
+ *                                         device when testing multiple       *
+ *                                         devices                            *
+ *             debug               - [OUT] debug info of the last processed   *
+ *                                         device, optional                   *
+ *                                                                            *
+ * Return value: SUCCEED - all requested devices were notified successfully   *
+ *               FAIL    - no device UUIDs were specified, or delivery        *
+ *                         failed for at least one device                     *
+ *                                                                            *
+ ******************************************************************************/
 int	trapper_process_push_test(const char *sendto, const char *subject, const char *message,
 		zbx_uint64_t mediatypeid, unsigned char type, const zbx_db_row_t row, unsigned short smtp_port,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,

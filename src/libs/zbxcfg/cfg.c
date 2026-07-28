@@ -1046,6 +1046,22 @@ int	zbx_cfg_validate_bridge_adapter_url(const char *url, char **error)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepares CURLOPT_CONNECT_TO value that redirects the              *
+ *          BridgeAdapterURL host:port to BridgeAdapterConnectTo              *
+ *                                                                            *
+ * Parameters: url             - [IN] BridgeAdapterURL value, must not be     *
+ *                                    NULL                                    *
+ *             connect_to      - [IN] BridgeAdapterConnectTo value            *
+ *             curl_connect_to - [OUT] allocated "host:port:connect-to"       *
+ *                                     string in curl CONNECT_TO format       *
+ *             error           - [OUT] error message, must not be NULL        *
+ *                                                                            *
+ * Return value: SUCCEED - value prepared successfully                        *
+ *               FAIL    - url or connect_to is invalid                       *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_cfg_prepare_bridge_adapter_connect_to(const char *url, const char *connect_to, char **curl_connect_to,
 		char **error)
 {

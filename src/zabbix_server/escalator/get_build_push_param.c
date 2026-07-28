@@ -80,6 +80,13 @@ static int	push_target_exists(const zbx_vector_push_target_t *targets, const cha
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees push alert and its resources                                *
+ *                                                                            *
+ * Parameters: alert - [IN]                                                   *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_push_alert_free(zbx_push_alert_t *alert)
 {
 	if (NULL == alert)
@@ -318,6 +325,28 @@ static void	add_hostids_array(struct zbx_json *json, const char *input)
 	zbx_json_close(json);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: builds push notification alerts for all devices resolved from     *
+ *          the "sendto" recipient list                                       *
+ *                                                                            *
+ * Parameters: event         - [IN]                                           *
+ *             r_event       - [IN] recovery event (optional, can be NULL)    *
+ *             actionid      - [IN]                                           *
+ *             userid        - [IN]                                           *
+ *             sendto        - [IN] comma/newline separated list of device    *
+ *                                  UUIDs or "*" for all user's devices       *
+ *             subject       - [IN]                                           *
+ *             message       - [IN]                                           *
+ *             ack           - [IN] (optional, can be NULL)                   *
+ *             service_alarm - [IN] (optional, can be NULL)                   *
+ *             service       - [IN] (optional, can be NULL)                   *
+ *             alerts        - [OUT] resulting push alerts, one per           *
+ *                                   resolved device, plus failed alerts      *
+ *                                   for invalid/unknown recipients           *
+ *             tz            - [IN] user timezone                             *
+ *                                                                            *
+ ******************************************************************************/
 void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_event,
 		zbx_uint64_t actionid, zbx_uint64_t userid, const char *sendto, const char *subject,
 		const char *message, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
