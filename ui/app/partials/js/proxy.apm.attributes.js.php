@@ -41,7 +41,7 @@ $attribute = [
 			const $panel = event.type === 'tabscreate' ? ui.panel : ui.newPanel;
 
 			if ($panel.is('#<?= $data['attr_tab_id'] ?>')) {
-				$('#<?= $data['tabs_id'] ?>').off('tabscreate.tags-tab tabsactivate.tags-tab', tabsEventHandler);
+				$('#<?= $data['tabs_id'] ?>').off('tabscreate.apm-tab tabsactivate.apm-tab', tabsEventHandler);
 				bindAttrTableEvents($panel);
 			}
 		};
@@ -56,7 +56,7 @@ $attribute = [
 			bindAttrTableEvents(apm_tab);
 		}
 		else {
-			$('#<?= $data['tabs_id'] ?>').on('tabscreate.tags-tab tabsactivate.tags-tab', tabsEventHandler);
+			$('#<?= $data['tabs_id'] ?>').on('tabscreate.apm-tab tabsactivate.apm-tab', tabsEventHandler);
 		}
 	});
 </script>
