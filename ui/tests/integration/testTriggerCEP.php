@@ -87,18 +87,19 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_STATE_TAG = 'state_{{ITEM.VALUE}.regsub("^([a-z]+)", "\\1")}';
 	const CEP_STATE_TAG_UP = 'state_up';
 
-	// The twenty-four CEP rules of the windowless scenario, see getWindowNoneRules(): none of them has a window
+	// The twenty-six CEP rules of the windowless scenario, see getWindowNoneRules(): none of them has a window
 	// (WINDOW_NONE) and each one applies a different operator, so which rules match an event is fully
 	// determined by the event itself. Each rule is named after - and tags the events it matched with - the
 	// operator it applies, so a tagged event names the rules that matched it.
 	//
 	// Twelve rules test the 'service' id of the event (eight through the event tags, four through the event
 	// name) with operators coming in opposite pairs, so every event is matched by exactly one rule of every
-	// pair. The other twelve do not tell the events apart - they test the severity, the same DISASTER for
-	// every event of these prototypes, the host, the same discovered host for all of them, and its host group
-	// - so each one either holds for every event or for none: five of them tag all three events and seven
-	// ("severity_not_equals" plus the non-Equals host and host group rules) must tag nothing, which is what
-	// pins down that a rule whose filter does not match never tags anything.
+	// pair. The other fourteen do not tell the events apart - they test the severity, the same DISASTER for
+	// every event of these prototypes, the host, the same discovered host for all of them, its host group, and
+	// the all-the-time period - so each one either holds for every event or for none: six of them tag all
+	// three events and eight ("severity_not_equals", the non-Equals host and host group rules and
+	// "time_period_not_in") must tag nothing, which is what pins down that a rule whose filter does not match
+	// never tags anything.
 	const CEP_TAG_SERVICE_EQUALS = 'service_equals';
 	const CEP_TAG_SERVICE_NOT_EQUALS = 'service_not_equals';
 	const CEP_TAG_SERVICE_CONTAINS = 'service_contains';
@@ -123,6 +124,11 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_TAG_HOST_GROUP_NOT_EQUALS = 'host_group_not_equals';
 	const CEP_TAG_HOST_GROUP_CONTAINS = 'host_group_contains';
 	const CEP_TAG_HOST_GROUP_NOT_CONTAINS = 'host_group_not_contains';
+	const CEP_TAG_TIME_PERIOD_IN = 'time_period_in';
+	const CEP_TAG_TIME_PERIOD_NOT_IN = 'time_period_not_in';
+	// The time period the last rule pair tests against: all the time, so whenever the scenario happens to run
+	// the "In" rule matches every event and the "Not in" rule none of them.
+	const CEP_RULE_WINDOW_NONE_TIME_PERIOD = '1-7,00:00-24:00';
 	// Suffix making a host or host group name that cannot match: appended to the real name it is no longer a
 	// substring of it, so the "contains" flavours - the only ones a real name would satisfy - come out false
 	// too and "equals" stays the single matching rule of the four (see getWindowNoneRules()).
@@ -1613,7 +1619,9 @@ class testTriggerCEP extends CIntegrationTest {
 	 *   - "host_group_equals": host group Equals the discovered host's group;
 	 *   - "host_group_not_equals": host group Does not equal that group;
 	 *   - "host_group_contains": host group Contains a name that group does not contain;
-	 *   - "host_group_not_contains": host group Does not contain that group's own name.
+	 *   - "host_group_not_contains": host group Does not contain that group's own name;
+	 *   - "time_period_in": event time In "1-7,00:00-24:00";
+	 *   - "time_period_not_in": event time Not in "1-7,00:00-24:00".
 	 *
 	 * The Exists pair tests a tag NAME rather than a value, so the prototypes additionally get the
 	 * CEP_SERVICE_TAG tag whose name resolves to 'service_<id>' at event time; only the "down_0" event
@@ -1627,11 +1635,12 @@ class testTriggerCEP extends CIntegrationTest {
 	 * "down_1" name - by the Does not equal, the Contains, the Is more than or equal, the Does not exist, the
 	 * name Does not equal and the name Contains rule.
 	 *
-	 * The severity, host and host group rules do not tell the ids apart - every event of these prototypes has
-	 * the same DISASTER severity and comes from the same discovered host, which is in a single host group - so
-	 * each of them holds either for all three events or for none, which checks the two ends of the range:
-	 * "severity_equals", "severity_more_equal", "severity_less_equal", "host_equals" and "host_group_equals"
-	 * must tag everything, while "severity_not_equals" and the non-Equals host and host group rules must tag
+	 * The severity, host, host group and time period rules do not tell the ids apart - every event of these
+	 * prototypes has the same DISASTER severity, comes from the same discovered host, which is in a single host
+	 * group, and occurs inside a period covering all the time - so each of them holds either for all three
+	 * events or for none, which checks the two ends of the range: "severity_equals", "severity_more_equal",
+	 * "severity_less_equal", "host_equals", "host_group_equals" and "time_period_in" must tag everything,
+	 * while "severity_not_equals", the non-Equals host and host group rules and "time_period_not_in" must tag
 	 * nothing.
 	 *
 	 * None of the rules closes anything, which is the point of a windowless rule: the events keep flowing
@@ -2342,6 +2351,19 @@ HEREDOC;
 	}
 
 	/**
+	 * Build the filter condition a windowless rule uses to test when the event occurred. The scenario tests
+	 * against the all-the-time period, so - like the severity, host and host group conditions - it holds
+	 * either for every event or, negated, for none, no matter when the suite is run.
+	 */
+	private function buildWindowNoneTimePeriodCondition(int $operator, string $time_period): array {
+		return [
+			'type' => CCepRuleHelper::CONDITION_TIME_PERIOD,
+			'operator' => $operator,
+			'time_period' => $time_period
+		];
+	}
+
+	/**
 	 * The name of the host group the discovered host belongs to, resolved from the host itself rather than
 	 * hardcoded so the host group rules always test against the group the host prototype actually put it in.
 	 * The negative flavours require the host to be in that one group only (they must hold for none of its
@@ -2385,6 +2407,7 @@ HEREDOC;
 		$value_next = self::CEP_RULE_WINDOW_NONE_VALUE_NEXT;
 		$host_group = $this->getDiscHostGroupName();
 		$host_group_absent = $host_group.self::CEP_RULE_WINDOW_NONE_ABSENT_SUFFIX;
+		$time_period = self::CEP_RULE_WINDOW_NONE_TIME_PERIOD;
 
 		return [
 			self::CEP_TAG_SERVICE_EQUALS => [
@@ -2476,6 +2499,14 @@ HEREDOC;
 			],
 			self::CEP_TAG_HOST_GROUP_NOT_CONTAINS => [
 				$this->buildWindowNoneHostGroupCondition(CONDITION_OPERATOR_NOT_LIKE, $host_group), $host_group
+			],
+			// The period covers every moment, so the first rule matches whenever the scenario runs and the
+			// second one - "not in all the time" - can never match.
+			self::CEP_TAG_TIME_PERIOD_IN => [
+				$this->buildWindowNoneTimePeriodCondition(CONDITION_OPERATOR_IN, $time_period), $time_period
+			],
+			self::CEP_TAG_TIME_PERIOD_NOT_IN => [
+				$this->buildWindowNoneTimePeriodCondition(CONDITION_OPERATOR_NOT_IN, $time_period), $time_period
 			]
 		];
 	}
@@ -5068,7 +5099,7 @@ HEREDOC;
 	}
 
 	/**
-	 * Complex event processing without a window (WINDOW_NONE): twenty-four windowless rules tag the problem
+	 * Complex event processing without a window (WINDOW_NONE): twenty-six windowless rules tag the problem
 	 * events of one discovered trigger the moment they occur, each with a tag named after the operator it
 	 * applies ("service_equals", "event_name_contains", ...).
 	 *
@@ -5083,14 +5114,15 @@ HEREDOC;
 	 * service_not_equals + service_contains + service_more_equal + service_not_exists + event_name_not_equals +
 	 * event_name_contains.
 	 *
-	 * The remaining twelve test the event severity (DISASTER for every event here), the event host (the one
-	 * discovered host) and its host group, so they cannot tell the events apart: severity_equals (Equals
-	 * Disaster), severity_more_equal (Is more than or equal High), severity_less_equal (Is less than or equal
-	 * Disaster), host_equals and host_group_equals must therefore tag all three events, while
-	 * severity_not_equals and the non-Equals host and host group rules (Does not equal the name, Contains a
-	 * name it does not contain, Does not contain its own name) must tag none - no event may carry the tag of
-	 * any rule that does not match it. None of the rules closes anything, so all three problems stay open
-	 * until the trigger expression recovers them.
+	 * The remaining fourteen test the event severity (DISASTER for every event here), the event host (the one
+	 * discovered host), its host group and the time the event occurred, so they cannot tell the events apart:
+	 * severity_equals (Equals Disaster), severity_more_equal (Is more than or equal High), severity_less_equal
+	 * (Is less than or equal Disaster), host_equals, host_group_equals and time_period_in (In a period
+	 * covering all the time) must therefore tag all three events, while severity_not_equals, the non-Equals
+	 * host and host group rules (Does not equal the name, Contains a name it does not contain, Does not
+	 * contain its own name) and time_period_not_in must tag none - no event may carry the tag of any rule that
+	 * does not match it. None of the rules closes anything, so all three problems stay open until the trigger
+	 * expression recovers them.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowNone$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -6185,7 +6217,7 @@ HEREDOC;
 	 * Drive the windowless (WINDOW_NONE) CEP scenario on a single discovered item, so the whole flow lands on
 	 * one event stream. Three problems are opened on its one trigger, each with its own 'service' id, and each
 	 * id is matched by exactly one rule of every id pair, so it ends up carrying the tags naming those rules
-	 * plus the five tags of the rules that hold for every event of this DISASTER trigger on the discovered
+	 * plus the six tags of the rules that hold for every event of this DISASTER trigger on the discovered
 	 * host:
 	 *   - "down_0":  service "0"  -> service_equals, service_contains, service_less_equal, service_exists,
 	 *                                event_name_not_equals, event_name_not_contains;
@@ -6194,8 +6226,8 @@ HEREDOC;
 	 *   - "down_10": service "10" -> service_not_equals, service_contains, service_more_equal,
 	 *                                service_not_exists, event_name_not_equals, event_name_contains;
 	 *   - all three              -> severity_equals, severity_more_equal, severity_less_equal, host_equals,
-	 *                                host_group_equals, and never severity_not_equals nor any of the
-	 *                                non-Equals host / host group rules.
+	 *                                host_group_equals, time_period_in, and never severity_not_equals,
+	 *                                time_period_not_in nor any of the non-Equals host / host group rules.
 	 *
 	 * "down_10" is what makes the Contains pairs more than slower Equals pairs: its id contains "0" without
 	 * being equal to it and its event name contains the "down_1" item value without being equal to the
@@ -6224,23 +6256,25 @@ HEREDOC;
 			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
 		]);
 
-		// The severity, host and host group rules cannot tell the events apart - all three have DISASTER
-		// severity and come from the same discovered host in its one host group - so the five conditions that
-		// hold must tag every event. The other seven (severity_not_equals and the non-Equals host and host
-		// group rules) hold for no event at all and must therefore appear nowhere: a rule tag that is not
-		// listed as expected fails the check.
+		// The severity, host, host group and time period rules cannot tell the events apart - all three have
+		// DISASTER severity, come from the same discovered host in its one host group and occur inside the
+		// all-the-time period - so the six conditions that hold must tag every event. The other eight
+		// (severity_not_equals, the non-Equals host and host group rules and time_period_not_in) hold for no
+		// event at all and must therefore appear nowhere: a rule tag that is not listed as expected fails the
+		// check.
 		$common_rule_tags = [
 			self::CEP_TAG_SEVERITY_EQUALS,
 			self::CEP_TAG_SEVERITY_MORE_EQUAL,
 			self::CEP_TAG_SEVERITY_LESS_EQUAL,
 			self::CEP_TAG_HOST_EQUALS,
-			self::CEP_TAG_HOST_GROUP_EQUALS
+			self::CEP_TAG_HOST_GROUP_EQUALS,
+			self::CEP_TAG_TIME_PERIOD_IN
 		];
 
 		// The 'service' id of every problem the scenario opens, in the order they are sent, and the rules that
 		// must have tagged its event (every rule tags with its own name): one rule of every opposite id pair
-		// matches an id, plus the five rules that match every event, so each event must end up with exactly
-		// eleven of the twenty-four rule tags.
+		// matches an id, plus the six rules that match every event, so each event must end up with exactly
+		// twelve of the twenty-six rule tags.
 		$expected_tags = [
 			// The only id carrying a 'service_0' tag, so the only one the Exists rule may tag. Its event name
 			// is neither equal to nor contains the "down_1" one, so both negative name rules match it.
