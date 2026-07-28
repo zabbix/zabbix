@@ -1329,12 +1329,15 @@ int	get_cpus(zbx_vector_uint64_pair_t *vector)
 
 		cpu = &pcpus->cpu[idx];
 
-		if (ZBX_MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count - 1))
-			index -= ZBX_MAX_COLLECTOR_HISTORY;
-
 		pair.first = cpu->cpu_num;
-		if (index >= cpu->h_first && index < cpu->h_first + cpu->h_count)
+
+		if (0 < cpu->h_count)
+		{
+			if (ZBX_MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count - 1))
+				index -= ZBX_MAX_COLLECTOR_HISTORY;
+
 			pair.second = get_cpu_status(cpu->h_status[index]);
+		}
 		else
 			pair.second = ZBX_CPU_STATUS_UNKNOWN;
 #else
