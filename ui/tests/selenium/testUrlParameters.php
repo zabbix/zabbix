@@ -687,9 +687,13 @@ class testUrlParameters extends CLegacyWebTest {
 							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={template_lld_prototypeid}'.
 									'&context=template',
 							'text_not_present' => 'Discovery prototype',
-							'access_denied' => true,
+							'fatal_error' => true,
 							'text_present' => [
-								'You are logged in as "Admin". You have no permissions to access this page.'
+								'Controller: popup',
+								'action: popup',
+								'context: template',
+								'itemid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						// Context = host, validate itemid.
@@ -846,9 +850,13 @@ class testUrlParameters extends CLegacyWebTest {
 							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={host_lld_prototypeid}'.
 									'&context=host',
 							'text_not_present' => 'Discovery prototype',
-							'access_denied' => true,
+							'fatal_error' => true,
 							'text_present' => [
-								'You are logged in as "Admin". You have no permissions to access this page.'
+								'Controller: popup',
+								'action: popup',
+								'context: host',
+								'itemid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						]
 					]
