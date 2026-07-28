@@ -199,8 +199,7 @@ class CDatatableBehavior extends CBehavior {
 			}
 
 			// Press Escape key to close the popup.
-			// TODO: replace ENTER key with ESCAPE key when ZBX-27830 will be fixed.
-			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
 			$this->test->query('class:datatable-options-popup')->waitUntilNotVisible();
 		}
 	}
