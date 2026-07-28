@@ -34,7 +34,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	char		sql[512];	/* do not forget to adjust size if SQLs change */
+	char		sql[1024];	/* do not forget to adjust size if SQLs change */
 	size_t		offset;
 	int		ret = SUCCEED;
 
@@ -47,7 +47,13 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by,hp.proxyid");
+			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by");
+
+	if (EVENT_SOURCE_AUTOREGISTRATION == event->source)
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",p.proxyid");
+	else
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",hp.proxyid");
+
 	switch (event->source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
@@ -85,13 +91,17 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 			break;
 		case EVENT_SOURCE_AUTOREGISTRATION:
 			zbx_snprintf(sql + offset, sizeof(sql) - offset,
-					" from autoreg_host a,hosts h"
-					" left join host_proxy hp on h.hostid=hp.hostid"
-					" where " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
-						" and a.host=h.host"
+					" from hosts h"
+					" join autoreg_host a on a.host=h.host"
+					" left join proxy p on p.proxyid=a.proxyid"
+					" where ((h.monitored_by=%d"
+						" and p.proxy_groupid=h.proxy_groupid)"
+						" or (h.monitored_by<>%d"
+						" and " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid") "))"
 						" and h.status=%d"
 						" and h.flags&%d=0"
 						" and a.autoreg_hostid=" ZBX_FS_UI64,
+					HOST_MONITORED_BY_PROXY_GROUP, HOST_MONITORED_BY_PROXY_GROUP,
 					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid);
 			break;
 		default:
@@ -450,7 +460,6 @@ void	zbx_event_db_get_history(const zbx_db_event *event, char **replace_to,
 		zbx_db_acknowledge	ack;
 
 		ack.clock = atoi(row[0]);
-		ZBX_STR2UINT64(ack.userid, row[1]);
 		ack.message = row[2];
 		ack.acknowledgeid = 0;
 		ack.action = atoi(row[3]);
@@ -458,10 +467,20 @@ void	zbx_event_db_get_history(const zbx_db_event *event, char **replace_to,
 		ack.new_severity = atoi(row[5]);
 		ack.suppress_until = atoi(row[6]);
 
-		if (SUCCEED == zbx_check_user_permissions(&ack.userid, recipient_userid))
-			user_name = zbx_user_string(ack.userid);
+		if (SUCCEED == zbx_db_is_null(row[1]))
+		{
+			ack.userid = ZBX_MAX_UINT64;
+			user_name = "";
+		}
 		else
-			user_name = "Inaccessible user";
+		{
+			ZBX_STR2UINT64(ack.userid, row[1]);
+
+			if (SUCCEED == zbx_check_user_permissions(&ack.userid, recipient_userid))
+				user_name = zbx_user_string(ack.userid);
+			else
+				user_name = "Inaccessible user";
+		}
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"%s %s \"%s\"\n",
@@ -470,11 +489,12 @@ void	zbx_event_db_get_history(const zbx_db_event *event, char **replace_to,
 				user_name);
 
 		if (SUCCEED == zbx_problem_get_actions(&ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
-					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
-					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_SEVERITY |
+					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_CLOSE |
+					ZBX_PROBLEM_UPDATE_SEVERITY |
 					ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS |
-					ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
-					tz, &actions))
+					ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM |
+					ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS |
+					ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS, tz, &actions))
 		{
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Actions: %s.\n", actions);
 			zbx_free(actions);

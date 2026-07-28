@@ -327,4 +327,26 @@ trait CastableTrait {
 	public function asFieldset($options = []) {
 		return $this->cast(CFieldsetElement::class, $options);
 	}
+
+	/**
+	 * Cast object to TextareaFlexible element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CTextareaFlexibleElement
+	 */
+	public function asTextareaFlexible($options = []) {
+		return $this->cast(CTextareaFlexibleElement::class, $options);
+	}
+
+	/**
+	 * Cast object to Datatable element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CDatatableElement
+	 */
+	public function asDatatable($options = []) {
+		return $this->cast(CDatatableElement::class, $options);
+	}
 }

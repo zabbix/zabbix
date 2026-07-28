@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 	"unicode"
 
@@ -41,9 +42,28 @@ type UserParameterPlugin struct {
 	unsafeUserParameters int
 	userParameterDir     string
 	executor             zbxcmd.Executor
+	executorInitMu       sync.Mutex
 }
 
 var userParameter UserParameterPlugin
+
+func specialCharsNotAllowedMessage() string {
+	parts := make([]string, 0, len(notAllowedCharacters))
+
+	for i := range len(notAllowedCharacters) {
+		c := notAllowedCharacters[i]
+
+		if !unicode.IsPrint(rune(c)) {
+			parts = append(parts, fmt.Sprintf("0x%02x", c))
+
+			continue
+		}
+
+		parts = append(parts, string(c))
+	}
+
+	return strings.Join(parts, ", ")
+}
 
 func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 	var b bytes.Buffer
@@ -74,11 +94,10 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 					param := params[s[i]-'0'-1]
 					if p.unsafeUserParameters == 0 {
 						if j := strings.IndexAny(param, notAllowedCharacters); j != -1 {
-							if unicode.IsPrint(rune(param[j])) {
-								return "", fmt.Errorf("Character \"%c\" is not allowed", param[j])
-							}
-
-							return "", fmt.Errorf("Character 0x%02x is not allowed", param[j])
+							return "", errs.Errorf(
+								"Special characters \"%s\" are not allowed in the "+
+									"parameters.",
+								specialCharsNotAllowedMessage())
 						}
 					}
 					b.WriteString(param)
@@ -119,11 +138,9 @@ func (p *UserParameterPlugin) Export(
 
 	// Needed so the executor is initialized once, this should be done in configure, but then Zabbix agent 2
 	// will not start if there are issues with finding cmd.exe on windows, and that will break backwards compatibility.
-	if p.executor == nil {
-		p.executor, err = zbxcmd.InitExecutor()
-		if err != nil {
-			return nil, errs.Wrap(err, "command init failed")
-		}
+	err = p.initExecutor()
+	if err != nil {
+		return nil, err
 	}
 
 	stdoutStderr, err := p.executor.Execute(
@@ -223,4 +240,22 @@ func InitUserParameterPlugin(
 	userParameter.userParameterDir = userParameterDir
 
 	return keys, nil
+}
+
+func (p *UserParameterPlugin) initExecutor() error {
+	p.executorInitMu.Lock()
+	defer p.executorInitMu.Unlock()
+
+	if p.executor != nil {
+		return nil
+	}
+
+	executor, err := zbxcmd.InitExecutor()
+	if err != nil {
+		return errs.Wrap(err, "command init failed")
+	}
+
+	p.executor = executor
+
+	return nil
 }

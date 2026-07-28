@@ -36,7 +36,6 @@ $filter = (new CFilter())
 				new CFormField(
 					(new CTextBox('filter_name', $data['filter']['name']))
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-						->setAttribute('autofocus', 'autofocus')
 				)
 			]),
 		(new CFormGrid())
@@ -189,6 +188,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 
 			$hosts[] = $data['user']['can_edit_hosts']
 				? (new CLink($host['name'], $host_url))
+					->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_LINK : null)
 					->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
 				: (new CSpan($host['name']))
 					->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null);

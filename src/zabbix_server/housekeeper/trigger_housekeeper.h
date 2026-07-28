@@ -15,7 +15,9 @@
 #ifndef ZABBIX_TRIGGER_HOUSEKEEPER_H
 #define ZABBIX_TRIGGER_HOUSEKEEPER_H
 
+#include "zbxtypes.h"
+
 void	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, int events_mode, int *more,
-		int *deleted_events, int *deleted_problems);
+		zbx_int64_t *deleted_events, zbx_int64_t *deleted_problems);
 
 #endif

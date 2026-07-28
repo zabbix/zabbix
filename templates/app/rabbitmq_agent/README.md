@@ -51,8 +51,8 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/8.0/manual
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$RABBITMQ.API.USER}||`zbx_monitor`|
-|{$RABBITMQ.API.PASSWORD}||`zabbix`|
+|{$RABBITMQ.API.USER}|<p>RabbitMQ API username.</p>|`zbx_monitor`|
+|{$RABBITMQ.API.PASSWORD}|<p>RabbitMQ API password.</p>|`zabbix`|
 |{$RABBITMQ.API.CLUSTER_HOST}|<p>The hostname or IP of the API endpoint for the RabbitMQ cluster.</p>|`127.0.0.1`|
 |{$RABBITMQ.API.PORT}|<p>The port of the RabbitMQ API endpoint.</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>The request scheme, which may be HTTP or HTTPS.</p>|`http`|
@@ -100,7 +100,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/8.0/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.cluster.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Health Check 3.8.10+ discovery
 
@@ -193,8 +193,8 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/8.0/manual
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$RABBITMQ.API.USER}||`zbx_monitor`|
-|{$RABBITMQ.API.PASSWORD}||`zabbix`|
+|{$RABBITMQ.API.USER}|<p>RabbitMQ API username.</p>|`zbx_monitor`|
+|{$RABBITMQ.API.PASSWORD}|<p>RabbitMQ API password.</p>|`zabbix`|
 |{$RABBITMQ.CLUSTER.NAME}|<p>The name of the RabbitMQ cluster.</p>|`rabbit`|
 |{$RABBITMQ.API.PORT}|<p>The port of the RabbitMQ API endpoint.</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>The request scheme, which may be HTTP or HTTPS.</p>|`http`|

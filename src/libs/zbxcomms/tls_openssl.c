@@ -107,7 +107,7 @@ static void	zbx_openssl_thread_setup(void)
 	if (NULL == (crypto_mutexes = zbx_malloc(crypto_mutexes, num_locks * sizeof(tls_mutex_t))))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate mutexes for OpenSSL library");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() creating %d mutexes", __func__, num_locks);
@@ -120,7 +120,7 @@ static void	zbx_openssl_thread_setup(void)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot create mutex #%d for OpenSSL library: %s", i, error);
 			zbx_free(error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -776,7 +776,7 @@ static void	zbx_tls_library_init(zbx_tls_status_t status)
 	if (1 != zbx_openssl_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize OpenSSL library");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 	tls_status = status;
@@ -918,7 +918,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize PRNG");
 		zbx_tls_free();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	/* set protocol version to TLS 1.2 */
@@ -1448,7 +1448,7 @@ out1:
 	zabbix_log(LOG_LEVEL_CRIT, "%s", error);
 	zbx_free(error);
 	zbx_tls_free();
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 
 #undef ZBX_CIPHERS_CERT_ECDHE
 #undef ZBX_CIPHERS_CERT
@@ -1819,14 +1819,14 @@ out1:
  *                                                                            *
  * Parameters:                                                                *
  *     s          - [IN] socket with opened connection                        *
- *     error      - [OUT] dynamically allocated memory with error message     *
- *     tls_accept - [IN] type of connection to accept. Can be be either       *
+ *     tls_accept - [IN] type of connection to accept. Can be either          *
  *                       ZBX_TCP_SEC_TLS_CERT or ZBX_TCP_SEC_TLS_PSK, or      *
  *                       a bitwise 'OR' of both.                              *
+ *     error      - [OUT] dynamically allocated memory with error message     *
  *                                                                            *
  * Return value:                                                              *
- *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
- *     FAIL - an error occurred                                               *
+ *     SUCCEED    - successful TLS handshake with a valid certificate or PSK  *
+ *     FAIL       - an error occurred                                         *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)

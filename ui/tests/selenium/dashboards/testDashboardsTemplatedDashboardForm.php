@@ -2740,8 +2740,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				[
 					'dashboard_properties' => [
 						'Name' => '!@#$%^&*()_+=-09[]{};:\'"',
-						'Default page display period' => '10 seconds',
-						'Start slideshow automatically' => true
+						'Default slideshow interval' => '10 seconds',
+						'Start slideshow' => true
 					]
 				]
 			],
@@ -2749,7 +2749,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				[
 					'dashboard_properties' => [
 						'Name' => '    Trailing & leading spaces    ',
-						'Start slideshow automatically' => false
+						'Start slideshow' => false
 					],
 					'trim' => 'Name'
 				]
@@ -2758,7 +2758,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				[
 					'dashboard_properties' => [
 						'Name' => '⭐️😀⭐️ Smiley Dashboard ⭐️😀⭐️',
-						'Default page display period' => '1 hour'
+						'Default slideshow interval' => '1 hour'
 					]
 				]
 			]
@@ -2823,8 +2823,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		$old_hash = CDBHelper::getHash(self::WIDGET_SQL);
 		$fields = [
 			'Name' => 'Cancel dashboard update',
-			'Default page display period' => '10 minutes',
-			'Start slideshow automatically' => false
+			'Default slideshow interval' => '10 minutes',
+			'Start slideshow' => false
 		];
 
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
@@ -4551,7 +4551,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
-						'Name' => 'Selected more than 731 day for graph filter.',
+						'Name' => 'Selected more than 2 years for graph filter.',
 						'Item' => self::TEMPLATE_ITEM
 					],
 					'swap_expected' => [
@@ -4565,8 +4565,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'id:sparkline_time_period_to' => 'now'
 					],
 					'page' => '2nd page',
+					'days_count' => true,
 					'error_message' => [
-						'Maximum time period to display is 731 days.'
+						'Maximum time period to display is {days} days.'
 					]
 				]
 			],
@@ -4922,8 +4923,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		if ($title === 'Dashboard properties') {
 			$parameters = [
 				'Name' => 'New dashboard',
-				'Default page display period' => '30 seconds',
-				'Start slideshow automatically' => true
+				'Default slideshow interval' => '30 seconds',
+				'Start slideshow' => false
 			];
 			$buttons = ['Apply', 'Cancel'];
 			$display_periods = ['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'];
@@ -4948,7 +4949,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		}
 
 		if ($title === 'Dashboard properties') {
-			$this->assertEquals($display_periods, $form->getField('Default page display period')->getOptions()->asText());
+			$this->assertEquals($display_periods, $form->getField('Default slideshow interval')->getOptions()->asText());
 		}
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
@@ -5017,7 +5018,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				$form->checkValue($reference_data);
 			}
 
-			// Count of days mentioned in error depends ot presence of leap year february in selected period.
+			// If required, define max days count in error since it depends on leap year presence in desired period.
 			if (CTestArrayHelper::get($data, 'days_count')) {
 				$data['error_message'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['error_message']);
 			}

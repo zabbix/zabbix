@@ -363,6 +363,7 @@ class CTemplateGroup extends CApiService {
 		$this->validateDelete($groupids, $db_groups);
 
 		API::Template()->unlinkGroups($groupids);
+		self::deleteUnusedHgSetGroups($groupids);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
@@ -453,6 +454,14 @@ class CTemplateGroup extends CApiService {
 		if (count($db_groups) != count($groupids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+	}
+
+	/**
+	 * Deletes hgset groups of template group sets that have no templates linked to them.
+	 * This may happen during parallel deletion of templates which have the same template group set.
+	 */
+	private static function deleteUnusedHgSetGroups(array $groupids): void {
+		DB::delete('hgset_group', ['groupid' => $groupids]);
 	}
 
 	/**

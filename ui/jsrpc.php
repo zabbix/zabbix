@@ -45,6 +45,10 @@ if (!is_array($data) || !isset($data['method'])
 	fatal_error('Wrong RPC call to JS RPC!');
 }
 
+if (!CJsRpcInputValidator::validate($data)) {
+	fatal_error('Wrong RPC call to JS RPC!');
+}
+
 $result = [];
 $limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
@@ -588,10 +592,6 @@ switch ($data['method']) {
 				break;
 
 			case 'valuemap_names':
-				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
-					break;
-				}
-
 				$hostids = $data['hostids'];
 
 				if (array_key_exists('with_inherited', $data)) {
@@ -611,10 +611,6 @@ switch ($data['method']) {
 
 			case 'valuemaps':
 			case 'template_valuemaps':
-				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
-					break;
-				}
-
 				if ($data['context'] === 'host') {
 					$hosts = API::Host()->get([
 						'output' => ['name'],
@@ -924,6 +920,22 @@ switch ($data['method']) {
 		}
 		break;
 
+	case 'item_prototype_value_type.get':
+		$result = '';
+
+		if (array_key_exists('itemid', $data) && is_scalar($data['itemid'])) {
+			$items = API::ItemPrototype()->get([
+				'output' => ['value_type'],
+				'itemids' => $data['itemid'],
+				'webitems' => true
+			]);
+
+			if ($items) {
+				$result = $items[0]['value_type'];
+			}
+		}
+		break;
+
 	case 'get_scripts_by_hosts':
 		$result = [];
 
@@ -986,11 +998,7 @@ switch ($data['method']) {
 				];
 			}
 		}
-
 		break;
-
-	default:
-		fatal_error('Wrong RPC call to JS RPC!');
 }
 
 if ($requestType == PAGE_TYPE_JSON) {

@@ -630,6 +630,270 @@ static int	DBpatch_7050050(void)
 	return DBadd_foreign_key("dservices", 2, &field);
 }
 
+static int	DBpatch_7050051(void)
+{
+	int			ret = SUCCEED;
+	zbx_db_insert_t		db_insert;
+	zbx_db_row_t		row;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_result_t	result = zbx_db_select("select i.itemid,t.tag,t.value from httptest_tag t"
+		" join ("
+			"select hsi.itemid,hs.httptestid from httpstepitem hsi"
+			" join httpstep hs on hs.httpstepid=hsi.httpstepid"
+			" union"
+			" select hti.itemid,hti.httptestid from httptestitem hti"
+		") as i"
+		" on i.httptestid=t.httptestid"
+		" where not exists ("
+			"select null from item_tag it"
+			" where it.itemid=i.itemid and it.tag=t.tag"
+		")");
+
+	if (NULL == result)
+		return FAIL;
+
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	itemid;
+
+		ZBX_DBROW2UINT64(itemid, row[0]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), itemid, row[1], row[2]);
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "itemtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_7050052(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select("select profileid,value_str from profiles"
+			" where idx='web.messages' and source='triggers.severities'");
+
+	while (NULL != (row = zbx_db_fetch(result)) && SUCCEED == ret)
+	{
+		const char	*p = row[1];
+		int		count, i, valid = 1;
+		struct zbx_json	json;
+
+		/* Validate and parse PHP serialized array header: a:N:{ */
+		if ('a' != *p || ':' != *(p + 1))
+			continue;
+
+		p += 2;
+
+		count = *p++ - '0';
+		if (6 < count || ':' != *p || '{' != *(p + 1))
+			continue;
+
+		p += 2;
+
+		zbx_json_initarray(&json, 64);
+
+		for (i = 0; i < count; i++)
+		{
+			int	key;
+
+			/* Parse key: i:N; */
+			if ('i' != *p || ':' != *(p + 1) || '0' > *(p + 2) || *(p + 2) > '5' || ';' != *(p + 3))
+			{
+				valid = 0;
+				break;
+			}
+
+			key = *(p + 2) - '0';
+			p += 4;
+
+			/* Skip value: i:N; or s:"N"; */
+			while ('\0' != *p && ';' != *p)
+				p++;
+
+			if (';' != *p)
+			{
+				valid = 0;
+				break;
+			}
+			p++;
+
+			zbx_json_addint64(&json, NULL, (zbx_int64_t)key);
+		}
+
+		if (1 == valid && '}' == *p)
+		{
+			char	*value_str_esc = zbx_db_dyn_escape_string(json.buffer);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update profiles set value_str='%s' where profileid=%s;\n",
+					value_str_esc, row[0]);
+			zbx_free(value_str_esc);
+
+			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		zbx_json_free(&json);
+	}
+
+	zbx_db_free_result(result);
+
+	if (SUCCEED == ret && ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		ret = FAIL;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_7050053(void)
+{
+	zbx_db_result_t	result;
+	const char	*macro = "{$TRAPPER.ALLOWED_HOSTS}";
+	int		ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (NULL == (result = zbx_db_select("select macro from globalmacro where macro='%s'", macro)))
+		return FAIL;
+
+	if (NULL == zbx_db_fetch(result))
+	{
+		if (ZBX_DB_OK > zbx_db_execute("insert into globalmacro (globalmacroid,macro,value,description)"
+				" values (" ZBX_FS_UI64 ",'%s','127.0.0.1,::1','')", zbx_db_get_maxid("globalmacro"),
+				macro))
+		{
+			ret = FAIL;
+		}
+	}
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_7050054(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 2  - ITEM_TYPE_TRAPPER   */
+	/* 19 - ITEM_TYPE_HTTPAGENT */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update items"
+				" set trapper_hosts='0.0.0.0/0,::/0'"
+				" where (type=2 or (type=19 and allow_traps=1))"
+					" and trapper_hosts=''"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050055(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update settings set value_str='' where name='session_key'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050056(void)
+{
+	const zbx_db_field_t	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("acknowledges", &field);
+}
+
+static int	DBpatch_7050057(void)
+{
+	const zbx_db_field_t	field = {"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_7050058(void)
+{
+	return DBdrop_foreign_key("acknowledges", 1);
+}
+
+static int	DBpatch_7050059(void)
+{
+	return DBdrop_foreign_key("event_suppress", 2);
+}
+
+static int	DBpatch_7050060(void)
+{
+	return SUCCEED;
+}
+
+static int	DBpatch_7050061(void)
+{
+	const zbx_db_field_t	field = {"auto_start", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("dashboard", &field);
+}
+
+static int	DBpatch_7050062(void)
+{
+#define ZBX_COLORPALETTE_LIGHT	"1A7C11,F63100,2774A4,A54F10,FC6EA3,6C59DC,AC8C14,611F27,F230E0,5CCD18,BB2A02,"	\
+				"5A2B57,89ABF8,7EC25C,274482,2B5429,8048B4,FD5434,790E1F,87AC4D,E89DF4"
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= zbx_db_execute(
+			"insert into graph_theme"
+			" values (5,'blue-classic-theme','FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33',"
+				"'E33734','429E47','E33734','EBEBEB','" ZBX_COLORPALETTE_LIGHT "')"))
+	{
+		return SUCCEED;
+	}
+#undef ZBX_COLORPALETTE_LIGHT
+
+	return FAIL;
+}
+
+static int	DBpatch_7050063(void)
+{
+#define ZBX_COLORPALETTE_DARK	"199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,"	\
+				"AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4"
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= zbx_db_execute(
+			"insert into graph_theme"
+			" values (6,'dark-classic-theme','2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2',"
+				"'E45959','59DB8F','E45959','333333','" ZBX_COLORPALETTE_DARK "')"))
+	{
+		return SUCCEED;
+	}
+#undef ZBX_COLORPALETTE_DARK
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -687,5 +951,18 @@ DBPATCH_ADD(7050047, 0, 1)
 DBPATCH_ADD(7050048, 0, 1)
 DBPATCH_ADD(7050049, 0, 1)
 DBPATCH_ADD(7050050, 0, 1)
+DBPATCH_ADD(7050051, 0, 1)
+DBPATCH_ADD(7050052, 0, 1)
+DBPATCH_ADD(7050053, 0, 1)
+DBPATCH_ADD(7050054, 0, 1)
+DBPATCH_ADD(7050055, 0, 1)
+DBPATCH_ADD(7050056, 0, 1)
+DBPATCH_ADD(7050057, 0, 1)
+DBPATCH_ADD(7050058, 0, 1)
+DBPATCH_ADD(7050059, 0, 1)
+DBPATCH_ADD(7050060, 0, 1)
+DBPATCH_ADD(7050061, 0, 1)
+DBPATCH_ADD(7050062, 0, 1)
+DBPATCH_ADD(7050063, 0, 1)
 
 DBPATCH_END()

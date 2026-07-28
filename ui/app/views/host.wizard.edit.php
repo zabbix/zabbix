@@ -409,7 +409,7 @@ function stepInstallAgent($agent_script_data): array {
 									(new CTag('h6', true, [_('Verify Zabbix server, proxy, or cluster address')]))
 										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER),
 									(new CFormField([
-										new CTextBox('agent_script_server_host'),
+										new CTextAreaFlexible('agent_script_server_host'),
 										(new CDiv(
 											_('Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
@@ -463,9 +463,9 @@ function stepInstallAgent($agent_script_data): array {
 									]))->addClass(ZBX_STYLE_FORMATED_GROUP),
 									(new CFormField([
 										new CLabel(_('Pre-shared key identity')),
-										(new CTextBox('tls_psk_identity', '', false,
-											DB::getFieldLength('hosts', 'tls_psk_identity')
-										))->setAriaRequired(),
+										(new CTextAreaFlexible('tls_psk_identity', ''))
+											->setMaxlength(DB::getFieldLength('hosts', 'tls_psk_identity'))
+											->setAriaRequired(),
 										(new CDiv(
 											_('Enter a unique name that Zabbix components will use to recognize the pre-shared key.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT),
@@ -749,7 +749,7 @@ function stepAddHostInterface(): array {
 							(new CFormField([
 								(new CLabel([
 									_('Max repetition count'),
-									makeHelpIcon(_('Max repetition count is applicable to discovery and walk only.'))
+									makeHelpIcon(_('Max repetition count is applicable to walk only.'))
 								], 'interfaces[#{row_index}][details][max_repetitions]')),
 								new CNumericBox('interfaces[#{row_index}][details][max_repetitions]', 0, 10,
 									false, false, false

@@ -1068,9 +1068,9 @@ int	zbx_calculate_sleeptime(int nextcheck, int max_sleeptime)
 
 char	*zbx_age2str(time_t age)
 {
-	size_t		offset = 0;
-	int		days, hours, minutes, seconds;
-	static char	buffer[32];
+	size_t				offset = 0;
+	int				days, hours, minutes, seconds;
+	static ZBX_THREAD_LOCAL char	buffer[32];
 
 	days = (int)((double)age / SEC_PER_DAY);
 	hours = (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
@@ -1091,8 +1091,8 @@ char	*zbx_age2str(time_t age)
 
 char	*zbx_date2str(time_t date, const char *tz)
 {
-	static char	buffer[11];
-	struct tm	*tm;
+	static ZBX_THREAD_LOCAL char	buffer[11];
+	struct tm			*tm;
 
 	tm = zbx_localtime(&date, tz);
 	zbx_snprintf(buffer, sizeof(buffer), "%.4d.%.2d.%.2d",
@@ -1105,8 +1105,8 @@ char	*zbx_date2str(time_t date, const char *tz)
 
 char	*zbx_time2str(time_t time, const char *tz)
 {
-	static char	buffer[9];
-	struct tm	*tm;
+	static ZBX_THREAD_LOCAL char	buffer[9];
+	struct tm			*tm;
 
 	tm = zbx_localtime(&time, tz);
 	zbx_snprintf(buffer, sizeof(buffer), "%.2d:%.2d:%.2d",

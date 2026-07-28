@@ -19,7 +19,8 @@ namespace Widgets\SvgGraph\Actions;
 use CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CNumberParser,
-	CParser;
+	CParser,
+	CRangeTimeParser;
 
 use Widgets\SvgGraph\Includes\{
 	CSvgGraphHelper,
@@ -29,9 +30,10 @@ use Widgets\SvgGraph\Includes\{
 class WidgetView extends CControllerDashboardWidgetView {
 
 	private const GRAPH_WIDTH_MIN = 1;
-	private const GRAPH_WIDTH_MAX = 65535;
+	private const GRAPH_WIDTH_MAX = 8000;
+
 	private const GRAPH_HEIGHT_MIN = 1;
-	private const GRAPH_HEIGHT_MAX = 65535;
+	private const GRAPH_HEIGHT_MAX = 4500;
 
 	protected function init(): void {
 		parent::init();
@@ -93,8 +95,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'percentile_right_value' => $percentile_right_value
 			],
 			'time_period' => [
-				'time_from' => $this->fields_values['time_period']['from_ts'],
-				'time_to' => $this->fields_values['time_period']['to_ts']
+				'time_from' => null,
+				'time_to' => null
 			],
 			'axes' => [
 				'show_left_y_axis' => $this->fields_values['lefty'] == SVG_GRAPH_AXIS_ON,
@@ -136,6 +138,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 				? $this->fields_values['override_hostid'][0]
 				: ''
 		];
+
+		$range_time_parser = new CRangeTimeParser();
+
+		$range_time_parser->parse($this->fields_values['time_period']['from']);
+		$graph_data['time_period']['time_from'] = $range_time_parser->getDateTime(true)->getTimestamp();
+
+		$range_time_parser->parse($this->fields_values['time_period']['to']);
+		$graph_data['time_period']['time_to'] = $range_time_parser->getDateTime(false)->getTimestamp();
 
 		$svg_options = CSvgGraphHelper::get($graph_data, $width, $height);
 		if ($svg_options['errors']) {

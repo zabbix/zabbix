@@ -112,7 +112,7 @@ else {
 					$formatted_value = getFormattedValue($column, $column_config);
 
 					$hintbox_value = $column['item']['value_type'] == ITEM_VALUE_TYPE_JSON
-						? (new CTrim($column['value'], ZBX_HINTBOX_CONTENT_LIMIT)) : $column['value'];
+						? (new CTrim($column['value'], ZBX_HINTBOX_HTML_LIMIT)) : $column['value'];
 
 					if ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 						if ($column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY

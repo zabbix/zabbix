@@ -96,7 +96,7 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 					}
 				})
 				.bind("afteradd.dynamicRows", function(event, options) {
-					const container = jQuery(".overlay-dialogue-body");
+					const container = jQuery(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`);
 
 					container.scrollTop(Math.max(container.scrollTop(),
 						widget_form.getForm().scrollHeight - container.height()
@@ -154,6 +154,9 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 			'axisy' => _('Y-axis'),
 			'axisy'.GRAPH_YAXIS_SIDE_LEFT => _('Left'),
 			'axisy'.GRAPH_YAXIS_SIDE_RIGHT => _('Right'),
+			'invert_values' => _('Invert values'),
+			'invert_values'.SVG_GRAPH_INVERT_VALUES_OFF => _('Off'),
+			'invert_values'.SVG_GRAPH_INVERT_VALUES_ON => _('On'),
 			'timeshift' => _('Time shift')
 		];
 	}
@@ -228,6 +231,9 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 
 						['name' => _('Y-axis').'/'._('Left'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_LEFT]],
 						['name' => _('Y-axis').'/'._('Right'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_RIGHT]],
+
+						['name' => _('Invert values').'/'._('Off'), 'callback' => 'addOverride', 'args' => ['invert_values', SVG_GRAPH_INVERT_VALUES_OFF]],
+						['name' => _('Invert values').'/'._('On'), 'callback' => 'addOverride', 'args' => ['invert_values', SVG_GRAPH_INVERT_VALUES_ON]],
 
 						['name' => _('Time shift'), 'callback' => 'addOverride', 'args' => ['timeshift']]
 					]

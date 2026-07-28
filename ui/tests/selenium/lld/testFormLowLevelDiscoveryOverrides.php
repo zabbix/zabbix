@@ -2130,7 +2130,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	private function setFiltersTableMapping($filters_table) {
 		$mapping = $filters_table->detectFieldMapping(['Label', 'Macro', '', 'Regular expression', 'Action']);
 		$mapping['Regular expression']['name'] = 'value';
-		$mapping['Regular expression']['selector'] = 'xpath:./div/input';
+		$mapping['Regular expression']['selector'] = 'xpath:./div/z-textarea-flexible';
 
 		return $mapping;
 	}

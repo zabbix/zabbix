@@ -19,11 +19,8 @@
  */
 abstract class CControllerHost extends CController {
 
-	// Filter idx prefix.
-	const FILTER_IDX = 'web.monitoring.hosts';
-
 	// Filter fields default values.
-	const FILTER_FIELDS_DEFAULT = [
+	public const FILTER_FIELDS_DEFAULT = [
 		'name' => '',
 		'groupids' => [],
 		'ip' => '',
@@ -35,26 +32,27 @@ abstract class CControllerHost extends CController {
 		'severities' => [],
 		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
 		'maintenance_status' => HOST_MAINTENANCE_STATUS_ON,
-		'page' => null,
-		'sort' => 'name',
-		'sortorder' => ZBX_SORT_UP
+		'page' => null
 	];
+
+	public const DEFAULT_SORT = 'name';
+	public const DEFAULT_SORTORDER = ZBX_SORT_UP;
 
 	/**
 	 * Get host list results count for passed filter.
 	 *
 	 * @param array  $filter                        Filter options.
-	 * @param string $filter['name']                Filter hosts by name.
-	 * @param array  $filter['groupids']            Filter hosts by host groups.
-	 * @param string $filter['ip']                  Filter hosts by IP.
-	 * @param string $filter['dns']	                Filter hosts by DNS.
-	 * @param string $filter['port']                Filter hosts by port.
-	 * @param string $filter['status']              Filter hosts by status.
-	 * @param string $filter['evaltype']            Filter hosts by tags.
-	 * @param string $filter['tags']                Filter hosts by tag names and values.
-	 * @param string $filter['severities']          Filter problems on hosts by severities.
-	 * @param string $filter['show_suppressed']     Filter suppressed problems.
-	 * @param int    $filter['maintenance_status']  Filter hosts by maintenance.
+	 *        string $filter['name']                Filter hosts by name.
+	 *        array  $filter['groupids']            Filter hosts by host groups.
+	 *        string $filter['ip']                  Filter hosts by IP.
+	 *        string $filter['dns']	                Filter hosts by DNS.
+	 *        string $filter['port']                Filter hosts by port.
+	 *        string $filter['status']              Filter hosts by status.
+	 *        string $filter['evaltype']            Filter hosts by tags.
+	 *        string $filter['tags']                Filter hosts by tag names and values.
+	 *        string $filter['severities']          Filter problems on hosts by severities.
+	 *        string $filter['show_suppressed']     Filter suppressed problems.
+	 *        int    $filter['maintenance_status']  Filter hosts by maintenance.
 	 *
 	 * @return int
 	 */
@@ -67,9 +65,9 @@ abstract class CControllerHost extends CController {
 			'tags' => $filter['tags'] ?: null,
 			'inheritedTags' => true,
 			'groupids' => $groupids,
-			'severities' => $filter['severities'] ? $filter['severities'] : null,
+			'severities' => $filter['severities'] ?: null,
 			'withProblemsSuppressed' => $filter['severities']
-				? (($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
+				? ($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false)
 				: null,
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name'],
@@ -91,20 +89,20 @@ abstract class CControllerHost extends CController {
 	 * Prepares the host list based on the given filter and sorting options.
 	 *
 	 * @param array  $filter                        Filter options.
-	 * @param string $filter['name']                Filter hosts by name.
-	 * @param array  $filter['groupids']            Filter hosts by host groups.
-	 * @param string $filter['ip']                  Filter hosts by IP.
-	 * @param string $filter['dns']	                Filter hosts by DNS.
-	 * @param string $filter['port']                Filter hosts by port.
-	 * @param string $filter['status']              Filter hosts by status.
-	 * @param string $filter['evaltype']            Filter hosts by tags.
-	 * @param string $filter['tags']                Filter hosts by tag names and values.
-	 * @param string $filter['severities']          Filter problems on hosts by severities.
-	 * @param string $filter['show_suppressed']     Filter suppressed problems.
-	 * @param int    $filter['maintenance_status']  Filter hosts by maintenance.
-	 * @param int    $filter['page']                Page number.
-	 * @param string $filter['sort']                Sorting field.
-	 * @param string $filter['sortorder']           Sorting order.
+	 *        string $filter['name']                Filter hosts by name.
+	 *        array  $filter['groupids']            Filter hosts by host groups.
+	 *        string $filter['ip']                  Filter hosts by IP.
+	 *        string $filter['dns']	                Filter hosts by DNS.
+	 *        string $filter['port']                Filter hosts by port.
+	 *        string $filter['status']              Filter hosts by status.
+	 *        string $filter['evaltype']            Filter hosts by tags.
+	 *        string $filter['tags']                Filter hosts by tag names and values.
+	 *        string $filter['severities']          Filter problems on hosts by severities.
+	 *        string $filter['show_suppressed']     Filter suppressed problems.
+	 *        int    $filter['maintenance_status']  Filter hosts by maintenance.
+	 *        int    $filter['page']                Page number.
+	 *        string $filter['sort']                Sorting field.
+	 *        string $filter['sortorder']           Sorting order.
 	 *
 	 * @return array
 	 */
@@ -326,7 +324,7 @@ abstract class CControllerHost extends CController {
 	 *
 	 * @return array
 	 */
-	protected static function sanitizeFilter(array $filter): array {
+	public static function sanitizeFilter(array $filter): array {
 		if ($filter['groupids']) {
 			$groups = API::HostGroup()->get([
 				'output' => [],

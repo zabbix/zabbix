@@ -17,17 +17,27 @@
  * Automatic checkbox range selection
  */
 var chkbxRange = {
-	startbox:			null,	// start checkbox obj
-	chkboxes:			{},		// ckbx list
-	prefix:				null,	// prefix for session storage variable name
-	pageGoName:			null,	// which checkboxes should be counted by Go button and saved to session storage
-	sessionStorageName:	null,
-	event_handlers:     null,
+	startbox:					null,	// start checkbox obj
+	chkboxes:					{},		// ckbx list
+	prefix:						null,	// prefix for session storage variable name
+	pageGoName:					null,	// which checkboxes should be counted by Go button and saved to session storage
+	selected_ids_storage_name:	null,
+	search_params_storage_name: null,
+	event_handlers:				null,
+	selector:					null,
+	row_selector:				null,
+	thead_selector:				null,
 
-	init: function() {
-		var path = new Curl();
-		var filename = basename(path.getPath(), '.php');
-		this.sessionStorageName = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
+	init: function({selector = '.list-table tbody', row_selector = 'tr', thead_selector = 'thead'} = {}) {
+		this.selector = selector;
+		this.row_selector = row_selector;
+		this.thead_selector = thead_selector;
+
+		const path = new Curl();
+		const filename = basename(path.getPath(), '.php');
+
+		this.selected_ids_storage_name = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
+		this.search_params_storage_name = 'sp_' + filename + (this.prefix ? '_' + this.prefix : '');
 		// Erase old checkboxes.
 		this.chkboxes = {};
 		this.startbox = null;
@@ -35,30 +45,21 @@ var chkbxRange = {
 		this.resetOtherPage();
 
 		// initialize checkboxes
-		var chkboxes = jQuery('.list-table tbody input[type=checkbox]:not(:disabled)');
-		if (chkboxes.length > 0) {
-			for (var i = 0; i < chkboxes.length; i++) {
-				this.implement(chkboxes[i]);
-			}
-		}
+		const checkboxes = Array.from(
+			document.querySelectorAll(
+				`${this.selector} ${this.row_selector} .${ZBX_STYLE_CHECKBOX_RADIO}:not(:disabled)`)
+		);
+
+		checkboxes.forEach(checkbox => this.implement(checkbox));
 
 		// load selected checkboxes from session storage or cache
 		if (this.pageGoName != null) {
-			const selected_ids = this.getSelectedIds();
+			const object_ids = new Set(Object.keys(this.getSelectedIds()));
 
-			// check if checkboxes should be selected from session storage
-			if (!jQuery.isEmptyObject(selected_ids)) {
-				var objectIds = Object.keys(selected_ids);
-			}
-			// no checkboxes selected, check browser cache if checkboxes are still checked and update state
-			else {
-				var checkedFromCache = jQuery('main .list-table tbody input[type=checkbox]:checked:not(:disabled)');
-				var objectIds = jQuery.map(checkedFromCache, jQuery.proxy(function(checkbox) {
-					return this.getObjectIdFromName(checkbox.name);
-				}, this));
-			}
+			checkboxes.filter(checkbox => checkbox.checked)
+				.forEach(checkbox => object_ids.add(this.getObjectIdFromName(checkbox.name)));
 
-			this.checkObjects(this.pageGoName, objectIds, true);
+			this.checkObjects(this.pageGoName, [...object_ids], true);
 			this.update(this.pageGoName);
 		}
 
@@ -79,7 +80,7 @@ var chkbxRange = {
 			return;
 		}
 
-		var objName = this.getObjectFromName(obj.name);
+		const objName = this.getObjectFromName(obj.name);
 
 		if (typeof(this.chkboxes[objName]) === 'undefined') {
 			this.chkboxes[objName] = [];
@@ -89,7 +90,7 @@ var chkbxRange = {
 		addListener(obj, 'click', this.handleClick.bindAsEventListener(this), false);
 
 		if (objName == this.pageGoName) {
-			var objId = jQuery(obj).val();
+			const objId = jQuery(obj).val();
 			if (isset(objId, this.getSelectedIds())) {
 				obj.checked = true;
 			}
@@ -97,7 +98,7 @@ var chkbxRange = {
 	},
 
 	getSelectedIds() {
-		const session_selected_ids = sessionStorage.getItem(this.sessionStorageName);
+		const session_selected_ids = sessionStorage.getItem(this.selected_ids_storage_name);
 
 		return session_selected_ids === null ? {} : JSON.parse(session_selected_ids);
 	},
@@ -108,12 +109,12 @@ var chkbxRange = {
 	 * @param e
 	 */
 	handleClick: function(e) {
-		var checkbox = e.target;
+		const checkbox = e.target;
 
 		PageRefresh.restart();
 
-		var object = this.getObjectFromName(checkbox.name);
-		var objectId = this.getObjectIdFromName(checkbox.name);
+		const object = this.getObjectFromName(checkbox.name);
+		const objectId = this.getObjectIdFromName(checkbox.name);
 
 		// range selection
 		if ((e.ctrlKey || e.shiftKey) && this.startbox != null) {
@@ -148,7 +149,7 @@ var chkbxRange = {
 	 * @returns {string}
 	 */
 	getObjectIdFromName: function(name) {
-		var id = name.split('[')[1];
+		let id = name.split('[')[1];
 		id = id.substring(0, id.lastIndexOf(']'));
 
 		return id;
@@ -157,7 +158,7 @@ var chkbxRange = {
 	/**
 	 * Returns the checkboxes in an object group.
 	 *
-	 * @param string object
+	 * @param {string} object
 	 *
 	 * @returns {Array}
 	 */
@@ -168,36 +169,111 @@ var chkbxRange = {
 	/**
 	 * Toggle all checkboxes of the given objects.
 	 *
-	 * Checks all of the checkboxes that belong to these objects and highlights the table row.
+	 * Checks all the checkboxes that belong to these objects and highlights the table row.
 	 *
-	 * @param {string}   object
-	 * @param {Array}    objectIds     array of objects IDs as integers
-	 * @param {boolean}  checked
+	 * @param {string}		object
+	 * @param {string[]}	object_ids	array of objects IDs.
+	 * @param {boolean}		checked
 	 */
-	checkObjects: function(object, objectIds, checked) {
+	checkObjects: function(object, object_ids, checked) {
+		const checkboxes = {};
+		this.getObjectCheckboxes(object).forEach(checkbox => {
+			const object_id = this.getObjectIdFromName(checkbox.name);
+
+			checkboxes[object_id] = checkbox;
+		});
+
 		const selected_ids = this.getSelectedIds();
 
-		jQuery.each(this.getObjectCheckboxes(object), jQuery.proxy(function(i, checkbox) {
-			var objectId = this.getObjectIdFromName(checkbox.name);
-
-			if (objectIds.indexOf(objectId) > -1) {
+		Object.entries(checkboxes).forEach(([object_id, checkbox]) => {
+			if (object_ids.includes(object_id)) {
 				checkbox.checked = checked;
 
-				jQuery(checkbox).closest('tr').toggleClass('row-selected', checked);
-				// Remove class attribute if it's empty.
-				jQuery(checkbox).closest('tr').filter('*[class=""]').removeAttr('class');
+				const row = checkbox.closest(this.row_selector);
 
 				if (checked) {
-					const actions = document.getElementById(object + '_' + objectId).getAttribute('data-actions');
-					selected_ids[objectId] = (actions === null) ? '' : actions;
+					row.classList.add('row-selected');
+
+					const actions = document.getElementById(object + '_' + object_id).getAttribute('data-actions');
+					selected_ids[object_id] = (actions === null) ? '' : actions;
 				}
 				else {
-					delete selected_ids[objectId];
+					row.classList.remove('row-selected');
+
+					// Remove class attribute if it's empty.
+					if (row.className.trim().length === 0) {
+						row.removeAttribute('class');
+					}
+
+					delete selected_ids[object_id];
 				}
 			}
-		}, this));
+		});
 
-		this.saveSessionStorage(object, selected_ids);
+		const search_params = this.getSearchParams();
+
+		ZABBIX.EventHub.subscribe({
+			require: {
+				context: EVENT_CONTEXT_PAGE_NAVIGATION,
+				event: EVENT_BACK_FORWARD
+			},
+			callback: () => this.handleBackForwardNavigation(search_params, checkboxes, object_ids, selected_ids)
+		});
+
+		this.saveSearchParams(object, search_params);
+		this.saveSelectedIds(object, selected_ids);
+	},
+
+	/**
+	 * Handle back/forward navigation by resetting the state of selected checkboxes.
+	 *
+	 * @param {URLSearchParams}						search_params	current search params.
+	 * @param {Record<string, HTMLInputElement>}	checkboxes		map of object IDs and checkbox elements.
+	 * @param {string[]}   							object_ids		array of objects IDs.
+	 * @param {string[]} 							selected_ids	currently selected object IDs.
+	 */
+	handleBackForwardNavigation: function(search_params, checkboxes, object_ids, selected_ids) {
+		if (this.hasSearchParamChanged(this.getPreviousSearchParams(), search_params, 'page')) {
+			return;
+		}
+
+		for (const object_id of object_ids) {
+			if (checkboxes[object_id] === undefined) {
+				delete selected_ids[object_id];
+			}
+		}
+	},
+
+	/**
+	 * Get the current page's URL search parameters.
+	 *
+	 * @returns {URLSearchParams}
+	 */
+	getSearchParams: function() {
+		return new URLSearchParams(window.location.search);
+	},
+
+	/**
+	 * Retrieve the previously saved search parameters from SessionStorage.
+	 *
+	 * @returns {URLSearchParams}
+	 */
+	getPreviousSearchParams: function() {
+		const search_params = JSON.parse(sessionStorage.getItem(this.search_params_storage_name)) || {};
+
+		return new URLSearchParams(search_params);
+	},
+
+	/**
+	 * Check if a specific search parameter has changed between two URLSearchParams objects.
+	 *
+	 * @param {URLSearchParams}	first_params	first search parameters to compare.
+	 * @param {URLSearchParams}	second_params	second search parameters to compare.
+	 * @param {string}			param			name of the search parameter to check.
+	 * @returns {boolean}
+	 */
+	hasSearchParamChanged: function (first_params, second_params, param) {
+		return first_params.get(param) !== second_params.get(param);
 	},
 
 	/**
@@ -206,33 +282,34 @@ var chkbxRange = {
 	 * @param {string} object
 	 * @param {object} startCheckbox
 	 * @param {object} endCheckbox
-	 * @param {bool} checked
+	 * @param {boolean} checked
 	 */
 	checkObjectRange: function(object, startCheckbox, endCheckbox, checked) {
-		var checkboxes = this.getObjectCheckboxes(object);
+		const checkboxes = this.getObjectCheckboxes(object);
 
-		var startCheckboxIndex = checkboxes.indexOf(startCheckbox);
-		var endCheckboxIndex = checkboxes.indexOf(endCheckbox);
-		var start = Math.min(startCheckboxIndex, endCheckboxIndex);
-		var end = Math.max(startCheckboxIndex, endCheckboxIndex);
+		const startCheckboxIndex = checkboxes.indexOf(startCheckbox);
+		const endCheckboxIndex = checkboxes.indexOf(endCheckbox);
+		const start = Math.min(startCheckboxIndex, endCheckboxIndex);
+		const end = Math.max(startCheckboxIndex, endCheckboxIndex);
 
-		var objectIds = [];
-		for (var i = start; i <= end; i++) {
+		const objectIds = [];
+		for (let i = start; i <= end; i++) {
 			objectIds.push(this.getObjectIdFromName(checkboxes[i].name));
 		}
+
 		this.checkObjects(object, objectIds, checked);
 	},
 
 	/**
-	 * Toggle all of the checkboxes belonging to the given object group.
+	 * Toggle all the checkboxes belonging to the given object group.
 	 *
 	 * @param {string} object
 	 *
 	 * @param {boolean} checked
 	 */
 	checkObjectAll: function(object, checked) {
-		// main checkbox exists and is clickable, but other checkboxes may not exist and object may be empty
-		var objectIds = jQuery.map(this.getObjectCheckboxes(object), jQuery.proxy(function(checkbox) {
+		// the main checkbox exists and is clickable, but other checkboxes may not exist and an object may be empty
+		const objectIds = jQuery.map(this.getObjectCheckboxes(object), jQuery.proxy(function(checkbox) {
 			return this.getObjectIdFromName(checkbox.name);
 		}, this));
 
@@ -245,7 +322,7 @@ var chkbxRange = {
 	 * @param {string} object
 	 */
 	update: function(object) {
-		// update main checkbox state
+		// update the main checkbox state
 		this.updateMainCheckbox(object);
 
 		if (this.pageGoName == object) {
@@ -257,7 +334,6 @@ var chkbxRange = {
 	 * Update the state of the "Go" controls.
 	 */
 	updateGoButton: function() {
-		const object = this.pageGoName;
 		let selected_count = 0;
 		let actions = [];
 
@@ -280,11 +356,11 @@ var chkbxRange = {
 			});
 
 		// Replace the selected count text.
-		const selected_count_span = document.getElementById('selected_count');
+		const selected_count_span = document.querySelector(`.${ZBX_STYLE_SELECTED_ITEM_COUNT}`);
 		selected_count_span.innerHTML = selected_count + ' ' + selected_count_span.innerHTML.split(' ')[1];
 
 		document.querySelectorAll('#action_buttons button').forEach((button) => {
-			// In case button is not permanently disabled by view, enable it depending on attributes and count.
+			// In case the view does not permanently disable the button, enable it depending on attributes and count.
 			if (!button.dataset.disabled) {
 				// First disabled the button and then check if it can be enabled.
 				button.disabled = true;
@@ -294,7 +370,7 @@ var chkbxRange = {
 					for (const [action, count] of Object.entries(actions)) {
 						// Checkbox data-actions attribute must match the button attribute.
 						if (button.dataset.required === action) {
-							// Check if there is a minimum amount of checkboxes required to be selected.
+							// Check if there is a minimum number of checkboxes required to be selected.
 							if (button.dataset.requiredCount) {
 								button.disabled = (count < button.dataset.requiredCount);
 							}
@@ -305,7 +381,7 @@ var chkbxRange = {
 					}
 				}
 				else {
-					// No special attributes required, enable the button depending only on selected count.
+					// No special attributes required, enable the button depending only on the selected count.
 					button.disabled = (selected_count == 0);
 				}
 			}
@@ -313,20 +389,17 @@ var chkbxRange = {
 	},
 
 	/**
-	 * Select main checkbox if all other checkboxes are selected.
+	 * Select the main checkbox if all other checkboxes are selected.
 	 *
 	 * @param {string} object
 	 */
 	updateMainCheckbox: function(object) {
-		const checkbox_list = this.getObjectCheckboxes(object);
-		const $main_checkbox = $(checkbox_list)
-			.parents('table')
-			.find('thead input[type=checkbox]');
-
-		if ($main_checkbox.length == 0) {
+		const main_checkbox = document.querySelector(`${this.thead_selector} .${ZBX_STYLE_CHECKBOX_RADIO}`);
+		if (main_checkbox === null) {
 			return;
 		}
 
+		const checkbox_list = this.getObjectCheckboxes(object);
 		const count_available = checkbox_list.length;
 
 		if (count_available > 0) {
@@ -338,7 +411,25 @@ var chkbxRange = {
 				}
 			});
 
-			$main_checkbox[0].checked = (checked.length == count_available);
+			main_checkbox.checked = (checked.length == count_available);
+		}
+	},
+
+	/**
+	 * Save the state of the search params belonging to the given object group in SessionStorage.
+	 *
+	 * @param {string}			object
+	 * @param {URLSearchParams}	search_params
+	 */
+	saveSearchParams: function(object, search_params) {
+		if (search_params.size > 0) {
+			if (this.pageGoName == object) {
+				const entries = Object.fromEntries(search_params.entries());
+
+				sessionStorage.setItem(this.search_params_storage_name, JSON.stringify(entries));
+			}
+		} else {
+			sessionStorage.removeItem(this.search_params_storage_name);
 		}
 	},
 
@@ -348,31 +439,32 @@ var chkbxRange = {
 	 * @param {string} object
 	 * @param {Object} selected_ids  key/value pairs of selected ids.
 	 */
-	saveSessionStorage: function(object, selected_ids) {
+	saveSelectedIds: function(object, selected_ids) {
 		if (Object.keys(selected_ids).length > 0) {
 			if (this.pageGoName == object) {
-				sessionStorage.setItem(this.sessionStorageName, JSON.stringify(selected_ids));
+				sessionStorage.setItem(this.selected_ids_storage_name, JSON.stringify(selected_ids));
 			}
 		}
 		else {
-			sessionStorage.removeItem(this.sessionStorageName);
+			sessionStorage.removeItem(this.selected_ids_storage_name);
 		}
 	},
 
 	clearSelectedOnFilterChange: function() {
-		sessionStorage.removeItem(this.sessionStorageName);
+		sessionStorage.removeItem(this.search_params_storage_name);
+		sessionStorage.removeItem(this.selected_ids_storage_name);
 	},
 
 	/**
 	 * Reset all selections on other pages.
 	 */
 	resetOtherPage: function() {
-		var key_;
+		let key_;
 
-		for (var i = 0; i < sessionStorage.length; i++) {
+		for (let i = 0; i < sessionStorage.length; i++) {
 			key_ = sessionStorage.key(i);
 
-			if (key_.substring(0, 3) === 'cb_' && key_ != this.sessionStorageName) {
+			if (key_.substring(0, 3) === 'cb_' && key_ != this.selected_ids_storage_name) {
 				sessionStorage.removeItem(key_);
 			}
 		}
@@ -381,7 +473,7 @@ var chkbxRange = {
 	submitFooterButton: function(e) {
 		const checked_count = Object.keys(this.getSelectedIds()).length;
 
-		var footerButton = jQuery(e.target),
+		const footerButton = jQuery(e.target),
 			form = footerButton.closest('form'),
 			confirmText = checked_count > 1
 				? footerButton.attr('confirm_plural')

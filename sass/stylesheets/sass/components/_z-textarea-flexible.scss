@@ -1,7 +1,8 @@
 z-textarea-flexible {
-	display: inline-block;
+	display: inline-grid;
 
 	textarea {
+		display: block !important;
 		width: 100%;
 		height: 24px;
 		overflow: hidden;
@@ -9,6 +10,7 @@ z-textarea-flexible {
 		line-height: 14px;
 		white-space: break-spaces;
 		word-break: break-word;
+		border-radius: var(--input-border-radius);
 
 		@extend %form-input-style;
 		@extend %webkit-scrollbar;
