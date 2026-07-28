@@ -1445,7 +1445,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			struct zbx_json_parse	jp;
 			char			*info = NULL;
 
-			zbx_timespec(&av.ts);
 			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 			zbx_json_addobject(&json, NULL);
@@ -1459,8 +1458,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			if (0 != av.lastlogsize)
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, av.lastlogsize);
 
-			if ('\0' != *source)
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, source, ZBX_JSON_TYPE_STRING);
+			if (NULL != av.source && '\0' != *av.source)
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, av.source, ZBX_JSON_TYPE_STRING);
 
 			if (0 != av.severity)
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_SEVERITY, (zbx_uint64_t)av.severity);
