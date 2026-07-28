@@ -208,26 +208,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 					ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_JSON
 				]
 			],
-			'signal_type' => ['integer'],
-			'metric_point_type' => ['integer'],
-			'columns' => ['objects', 'fields' => [
-				'column' => ['string', 'required'],
-				'attribute_key' => ['string']
-			]],
-			'aggregated_columns' => ['objects', 'fields' => [
-				'function' => ['integer', 'required'],
-				'column' => ['string'],
-				'percentile' => ['string'],
-				'alias' => ['string', 'required']
-			]],
-			'conditions' => ['objects', 'fields' => [
-				'column' => ['string', 'required'],
-				'attribute_key' => ['string'],
-				'operator' => ['integer', 'required'],
-				'value' => ['string']
-			]],
-			'evaltype' => ['integer'],
-			'formula' => ['string'],
+			'query' => ['string'],
 			'time_shift' => ['string'],
 			'lookback_limit' => ['string'],
 			'granularity' => ['string'],

@@ -549,7 +549,9 @@ abstract class CControllerPopupItemTest extends CController {
 				$data_item += CArrayHelper::getByKeys($input,
 					['key', 'timeout', 'time_shift', 'lookback_limit', 'granularity']
 				);
-				$data_item['query'] = json_encode(CItemGeneralHelper::composeTelemetryQuery($input, $for_server));
+				$data_item['query'] = array_key_exists('query', $input)
+					? $input['query']
+					: json_encode(CItemGeneralHelper::composeTelemetryQuery($input, true));
 				break;
 		}
 
