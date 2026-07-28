@@ -503,27 +503,16 @@ class CFormValidator {
 		return {when_fields_data, api_uniq_rules, use_checks};
 	}
 
-	/**
-	 * Call API request to validate all api based validations.
-	 *
-	 * @param {Array} validations
-	 *
-	 * @returns {Promise}
-	 */
-	#validateApiExists(validations) {
-		const url = new URL('zabbix.php', location.href);
-
-		url.searchParams.set('action', 'validate.api.exists');
-
-		return fetch(url.href, {
+	#post(action, data) {
+		return fetch(zabbixUrl({action}), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({validations}),
+			body: JSON.stringify(data),
 		})
 			.then(response => response.json())
 			.then(response => {
 				if ('error' in response) {
-					console.error('validate.api.exists error', response.error);
+					console.error(`${action} error`, response.error);
 					throw new Error();
 				}
 
@@ -532,6 +521,17 @@ class CFormValidator {
 			.catch(() => {
 				return {result: false};
 			});
+	}
+
+	/**
+	 * Call API request to validate all api based validations.
+	 *
+	 * @param {Array} validations
+	 *
+	 * @returns {Promise}
+	 */
+	#validateApiExists(validations) {
+		return this.#post('validate.api.exists', {validations});
 	}
 
 	/**
@@ -583,6 +583,36 @@ class CFormValidator {
 	}
 
 	/**
+	 * Call request to check provided use validations on fields.
+	 * Provided validations are split by VALIDATE_USE_CHUNK_SIZE per request.
+	 *
+	 * @param {Array} use_validations
+	 *
+	 * @returns {Promise}
+	 */
+	#validateUse(use_validations) {
+		const requests = [];
+		const result = {result: true, errors: []};
+
+		for (let offset = 0; offset < use_validations.length; offset += VALIDATE_USE_CHUNK_SIZE) {
+			const validations = use_validations.slice(offset, offset + VALIDATE_USE_CHUNK_SIZE);
+
+			requests.push(
+				this.#post('validate.use', {validations})
+					.then(response => {
+						result.result = result.result && response.result;
+
+						if (response.result === false && response.errors) {
+							result.errors = result.errors.concat(response.errors);
+						}
+					})
+			);
+		}
+
+		return Promise.all(requests).then(() => result);
+	}
+
+	/**
 	 * Function to perform delayed "use" checks that involves server-side parsers and validators.
 	 *
 	 * @returns {Promise}
@@ -599,60 +629,35 @@ class CFormValidator {
 			return are_all_fields_valid;
 		});
 
-		return new Promise((resolve) => {
-			if (delayed_checks.length) {
-				let requests = [];
-				let id = 0;
-				let result_all = true;
+		const use_validations = delayed_checks.map((check) => {
+			const use_validation = {
+				field: check.path,
+				value: check.value,
+				class: check.rules.use[0],
+				options: check.rules.use[1]
+			};
 
-				for (const check of delayed_checks) {
-					requests.push(new Promise((resolve) => {
-						const curl = new Curl('zabbix.php');
-						curl.setArgument('action', 'validate');
-
-						return fetch(curl.getUrl(), {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							credentials: 'same-origin',
-							body: JSON.stringify({
-								use: check.rules.use,
-								value: check.value,
-								jsonrpc: '2.0',
-								id: ++id
-							}),
-						})
-							.then((response) => response.json())
-							.then((response) => {
-								if ('result' in response && response.result !== '') {
-									check.error_msg = this.#getMessage(check.rules, 'use', response.result);
-								}
-
-								resolve();
-							})
-							.catch(() => {
-								result_all = false;
-								resolve();
-							});
-					}));
-				}
-
-				Promise.all(requests).then(() => {
-					delayed_checks.forEach((check) => {
-						if ('error_msg' in check) {
-							this.#addError(check.path, check.error_msg, CFormValidator.ERROR_LEVEL_DELAYED);
-							result_all = false;
-						}
-					});
-
-					resolve(result_all);
-				});
+			if ('messages' in check.rules && 'use' in check.rules.messages) {
+				use_validation.error_msg = check.rules.messages.use;
 			}
-			else {
-				resolve(true);
-			}
+
+			return use_validation;
 		});
+
+		if (use_validations.length) {
+			return this.#validateUse(use_validations)
+				.then(result => {
+					if (result.result === false && result.errors) {
+						result.errors.forEach((error) => {
+							this.#addError(error.field, error.message, CFormValidator.ERROR_LEVEL_DELAYED);
+						});
+					}
+
+					return result.result;
+				});
+		}
+
+		return Promise.resolve(true);
 	}
 
 	/**

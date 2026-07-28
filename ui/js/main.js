@@ -300,9 +300,7 @@ const hintBox = {
 				hintBox.hideHint($target[0], false);
 			}
 
-			if ($target[0].dataset.hintboxHtml) {
-				hintBox.showHintStart(e, $target, delay);
-			}
+			hintBox.showHintStart(e, $target, delay);
 		};
 
 		const cancelHintboxGeneration = () => {
@@ -717,34 +715,32 @@ const hintBox = {
 			css.width = Math.ceil(parseFloat(hint_computed_style.width));
 
 			// Event coordinates relative to host.
-			if (target.event_x === undefined) {
-				let client_x, client_y;
+			let client_x, client_y;
 
-				if (e.clientX !== undefined) {
-					client_x = e.clientX;
-					client_y = e.clientY;
-				}
-				else {
-					const $target = jQuery(target);
-					const offset = $target.offset();
-
-					client_x = offset.left;
-					client_y = offset.top + $target.height() / 2;
-				}
-
-				target.event_x = client_x - host_rect.left + host_x_min;
-				target.event_y = client_y - host_rect.top + host_y_min;
+			if (e.clientX !== undefined) {
+				client_x = e.clientX;
+				client_y = e.clientY;
 			}
+			else {
+				const $target = jQuery(target);
+				const offset = $target.offset();
+
+				client_x = offset.left;
+				client_y = offset.top + $target.height() / 2;
+			}
+
+			const event_x = client_x - host_rect.left + host_x_min;
+			const event_y = client_y - host_rect.top + host_y_min;
 
 			let hint_fits_vertically = true;
 
 			// Hint fits under event.
-			if (target.event_y + EVENT_OFFSET + SCREEN_Y_PADDING + hint_rect.height <= host_y_max) {
-				css.top = target.event_y + EVENT_OFFSET;
+			if (event_y + EVENT_OFFSET + SCREEN_Y_PADDING + hint_rect.height <= host_y_max) {
+				css.top = event_y + EVENT_OFFSET;
 			}
 			// Hint fits above event.
-			else if (target.event_y - EVENT_OFFSET - SCREEN_Y_PADDING - hint_rect.height >= host_y_min) {
-				css.top = target.event_y - EVENT_OFFSET - hint_rect.height;
+			else if (event_y - EVENT_OFFSET - SCREEN_Y_PADDING - hint_rect.height >= host_y_min) {
+				css.top = event_y - EVENT_OFFSET - hint_rect.height;
 			}
 			// Hint fits neither under nor above event - then show it in the biggest part of the screen.
 			else {
@@ -757,28 +753,28 @@ const hintBox = {
 			}
 
 			// Hint fits right of the event.
-			if (target.event_x + EVENT_OFFSET + css.width <= host_x_max) {
-				css.left = target.event_x + EVENT_OFFSET;
+			if (event_x + EVENT_OFFSET + css.width <= host_x_max) {
+				css.left = event_x + EVENT_OFFSET;
 			}
 			// Hint fits left of the event.
-			else if (target.event_x - EVENT_OFFSET - css.width >= host_x_min) {
-				css.left = target.event_x - css.width - EVENT_OFFSET;
+			else if (event_x - EVENT_OFFSET - css.width >= host_x_min) {
+				css.left = event_x - css.width - EVENT_OFFSET;
 			}
 			// Hint fits neither right nor left of the event.
 			else {
 				if (hint_fits_vertically) {
-					css.left = host_client_width / 2 > target.event_x
-						? Math.min(target.event_x + EVENT_OFFSET, host_x_max - css.width)
-						: Math.max(target.event_x - EVENT_OFFSET - css.width, host_x_min);
+					css.left = host_client_width / 2 > event_x
+						? Math.min(event_x + EVENT_OFFSET, host_x_max - css.width)
+						: Math.max(event_x - EVENT_OFFSET - css.width, host_x_min);
 				}
 				else {
-					if (host_client_width / 2 > target.event_x) {
-						css.width = Math.min(css.width, host_x_max - target.event_x - EVENT_OFFSET);
-						css.left = target.event_x + EVENT_OFFSET;
+					if (host_client_width / 2 > event_x) {
+						css.width = Math.min(css.width, host_x_max - event_x - EVENT_OFFSET);
+						css.left = event_x + EVENT_OFFSET;
 					}
 					else {
-						css.width = Math.min(css.width, target.event_x - EVENT_OFFSET - host_x_min);
-						css.left = target.event_x - EVENT_OFFSET - css.width;
+						css.width = Math.min(css.width, event_x - EVENT_OFFSET - host_x_min);
+						css.left = event_x - EVENT_OFFSET - css.width;
 					}
 				}
 			}
@@ -805,9 +801,6 @@ const hintBox = {
 	},
 
 	deleteHint: function(target, do_focus_target = true) {
-		delete target.event_x;
-		delete target.event_y;
-
 		if (target.isStatic) {
 			target.dispatchEvent(new CustomEvent('onDeleteStaticHint'));
 		}
