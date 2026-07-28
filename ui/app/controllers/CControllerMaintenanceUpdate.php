@@ -92,7 +92,7 @@ class CControllerMaintenanceUpdate extends CControllerMaintenanceUpdateGeneral {
 				'fields' => [
 					'operator' => ['db maintenance_eventname.operator',
 						'in' => [MAINTENANCE_EVENT_NAME_OPERATOR_LIKE, MAINTENANCE_EVENT_NAME_OPERATOR_NOT_LIKE]],
-					'value' => ['db maintenance_eventname.value'],
+					'value' => ['db maintenance_eventname.value']
 				],
 				'when' => ['maintenance_type', 'in' => [MAINTENANCE_TYPE_NORMAL]]
 			],

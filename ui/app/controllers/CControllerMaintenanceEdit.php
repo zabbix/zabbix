@@ -30,7 +30,7 @@ class CControllerMaintenanceEdit extends CController {
 		$ret = $this->validateInput(['object', 'fields' => [
 			'maintenanceid' => ['db maintenances.maintenanceid'],
 			'context' 		=> ['string'],
-			'eventids' 		=> ['array'],
+			'eventids' 		=> ['array']
 		]]);
 
 		if (!$ret) {
