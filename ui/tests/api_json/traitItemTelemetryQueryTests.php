@@ -458,10 +458,8 @@ trait traitItemTelemetryQueryTests {
 	}
 
 	public static function dataProviderHostInheritedTelemetryQueryUpdate() {
-		yield 'user macro for "time_shift", "lookback_limit" and "granularity"' => [
+		yield 'user macro in "time_shift", "lookback_limit" and "granularity" for inherited' => [
 			[
-				'itemid' => 'template_item_telemetry_query',
-				'hostid' => ':host:telemetry_query_host',
 				'time_shift' => '{$M}',
 				'lookback_limit' => '{$M}',
 				'granularity' => '{$M}'
@@ -483,10 +481,8 @@ trait traitItemTelemetryQueryTests {
 			'Invalid parameter "/1": cannot update readonly parameter "timeout" of inherited object.'
 		];
 
-		yield '"query" fail' => [
+		yield '"query" for inherited fail' => [
 			[
-				'itemid' => 'template_item_telemetry_query',
-				'hostid' => ':host:telemetry_query_host',
 				'query' => [
 					'query' => ['aggregated_columns' => [['alias' => 'Timestamp']]]
 				]

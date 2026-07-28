@@ -30,7 +30,7 @@ class testItemPrototype extends CAPITest {
 	/**
 	 * @dataProvider dataProviderTelemetryQueryCreate
 	 */
-	public function testHostItemTelemetryQueryCreate(array $item, ?string $expected_error) {
+	public function testHostItemPrototypeTelemetryQueryCreate(array $item, ?string $expected_error) {
 		static $i = 1;
 
 		$item += [
@@ -52,7 +52,7 @@ class testItemPrototype extends CAPITest {
 	/**
 	 * @dataProvider dataProviderTelemetryQueryCreate
 	 */
-	public function testTemplateItemTelemetryQueryCreate(array $item, ?string $expected_error) {
+	public function testTemplateItemPrototypeTelemetryQueryCreate(array $item, ?string $expected_error) {
 		static $i = 1;
 
 		$item += [
@@ -74,7 +74,7 @@ class testItemPrototype extends CAPITest {
 	/**
 	 * @dataProvider dataProviderTelemetryQueryUpdate
 	 */
-	public function testHostItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
+	public function testHostItemPrototypeTelemetryQueryUpdate(array $item, ?string $expected_error) {
 		$item += [
 			'itemid' => ':item_prototype:host_item_prototype_telemetry_query[{#M}]'
 		];
@@ -86,7 +86,7 @@ class testItemPrototype extends CAPITest {
 	/**
 	 * @dataProvider dataProviderTelemetryQueryUpdate
 	 */
-	public function testTemplateItemTelemetryQueryUpdate(array $item, ?string $expected_error) {
+	public function testTemplateItemPrototypeTelemetryQueryUpdate(array $item, ?string $expected_error) {
 		$item += [
 			'itemid' => ':item_prototype:template_item_prototype_telemetry_query[{#M}]'
 		];
