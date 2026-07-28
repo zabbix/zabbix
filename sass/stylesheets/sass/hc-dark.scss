@@ -1208,6 +1208,7 @@ td.inactive-bg {
 			&.high-bg,
 			&.disaster-bg {
 				border-bottom-color: $ui-border-color;
+				color: #ffffff;
 				padding-left: 42px;
 			}
 		}
@@ -1246,8 +1247,6 @@ td.inactive-bg {
 		&.average-bg,
 		&.high-bg,
 		&.disaster-bg {
-			color: #ffffff;
-
 			&::after {
 				background-position: center 0;
 				background-size: 22px;

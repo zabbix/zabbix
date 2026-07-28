@@ -10335,6 +10335,7 @@ td.inactive-bg {
 
 .datatable .datatable-body .cell.cell-data.na-bg, .datatable .datatable-body .cell.cell-data.info-bg, .datatable .datatable-body .cell.cell-data.warning-bg, .datatable .datatable-body .cell.cell-data.average-bg, .datatable .datatable-body .cell.cell-data.high-bg, .datatable .datatable-body .cell.cell-data.disaster-bg {
   border-bottom-color: #9f9f9f;
+  color: #000000;
   padding-left: 42px; }
 .datatable .datatable-body .row.row-selected .cell.cell-data {
   border-bottom-color: #9f9f9f; }
@@ -10344,8 +10345,6 @@ td.inactive-bg {
   background-color: #f4f4f4 !important; }
   .datatable .datatable-body .row:not(.row-disabled):hover .cell.cell-data.na-bg, .datatable .datatable-body .row:not(.row-disabled):hover .cell.cell-data.info-bg, .datatable .datatable-body .row:not(.row-disabled):hover .cell.cell-data.warning-bg, .datatable .datatable-body .row:not(.row-disabled):hover .cell.cell-data.average-bg, .datatable .datatable-body .row:not(.row-disabled):hover .cell.cell-data.high-bg, .datatable .datatable-body .row:not(.row-disabled):hover .cell.cell-data.disaster-bg {
     background-color: #f4f4f4 !important; }
-.datatable.compact-view .datatable-body .cell.cell-data.na-bg, .datatable.compact-view .datatable-body .cell.cell-data.info-bg, .datatable.compact-view .datatable-body .cell.cell-data.warning-bg, .datatable.compact-view .datatable-body .cell.cell-data.average-bg, .datatable.compact-view .datatable-body .cell.cell-data.high-bg, .datatable.compact-view .datatable-body .cell.cell-data.disaster-bg {
-  color: #000000; }
-  .datatable.compact-view .datatable-body .cell.cell-data.na-bg::after, .datatable.compact-view .datatable-body .cell.cell-data.info-bg::after, .datatable.compact-view .datatable-body .cell.cell-data.warning-bg::after, .datatable.compact-view .datatable-body .cell.cell-data.average-bg::after, .datatable.compact-view .datatable-body .cell.cell-data.high-bg::after, .datatable.compact-view .datatable-body .cell.cell-data.disaster-bg::after {
-    background-position: center 0;
-    background-size: 22px; }
+.datatable.compact-view .datatable-body .cell.cell-data.na-bg::after, .datatable.compact-view .datatable-body .cell.cell-data.info-bg::after, .datatable.compact-view .datatable-body .cell.cell-data.warning-bg::after, .datatable.compact-view .datatable-body .cell.cell-data.average-bg::after, .datatable.compact-view .datatable-body .cell.cell-data.high-bg::after, .datatable.compact-view .datatable-body .cell.cell-data.disaster-bg::after {
+  background-position: center 0;
+  background-size: 22px; }
