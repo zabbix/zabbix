@@ -1253,6 +1253,94 @@ out:
   result: SUCCEED
   value: 'abbix'
 ---
+test case: Expression 'substring("Zabbix", 3, 2)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'substring("Zabbix", 3, 2)'
+out:
+  result: SUCCEED
+  value: 'bb'
+---
+test case: Expression 'substring("Zabbix", 3, 10)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'substring("Zabbix", 3, 10)'
+out:
+  result: SUCCEED
+  value: 'bbix'
+---
+test case: Expression 'substring("Заббикс", 3, 10)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'substring("Заббикс", 3, 10)'
+out:
+  result: SUCCEED
+  value: 'ббикс'
+---
+test case: Expression 'substring("Заббикс", 3, 2)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'substring("Заббикс", 3, 2)'
+out:
+  result: SUCCEED
+  value: 'бб'
+---
+test case: Expression 'substring("Zabbix", 3, 0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'substring("Zabbix", 3, 0)'
+out:
+  result: SUCCEED
+  value: ''
+---
+test case: Expression 'substring("Zabbix", 0, 0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'substring("Zabbix", 0, 0)'
+out:
+  error: 'Cannot evaluate expression: invalid function second argument at "substring("Zabbix", 0, 0)"'
+  result: FAIL
+---
+test case: Expression 'substring("Zabbix", 33, 1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'substring("Zabbix", 33, 1)'
+out:
+  error: 'Cannot evaluate expression: invalid function second argument at "substring("Zabbix", 33, 1)"'
+  result: FAIL
+---
+test case: Expression 'substring("Zabbix", 2, 3)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'substring("Zabbix", 2, 3)'
+out:
+  result: SUCCEED
+  value: 'abb'
+---
+test case: Expression 'substring("Zabbix", 2, 4)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'substring("Zabbix", 2, 4)'
+out:
+  result: SUCCEED
+  value: 'abbi'
+---
+test case: Expression 'substring("Zabbix", 2, 5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'substring("Zabbix", 2, 5)'
+out:
+  result: SUCCEED
+  value: 'abbix'
+---
+test case: Expression 'substring("Zabbix", 2, 6)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'substring("Zabbix", 2, 6)'
+out:
+  result: SUCCEED
+  value: 'abbix'
+---
 test case: Expression 'right("Zabbix", 2)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
@@ -2443,5 +2531,229 @@ in:
   expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "/response/error/status/text()")'
 out:
   error: 'XML xpath returned empty nodeset'
+  result: FAIL
+---
+test case: Expression 'contains("Zabbix", "")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "")'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'contains("", "")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("", "")'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'contains("", "a")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("", "a")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("", "asd")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("", "asd")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Zabbix", "a")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "a")'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'contains("Zabbix", "A")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "A")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Zabbix", "Z")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "Z")'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'contains("Zabbix", "z")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "z")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Zabbix", "Zabbix")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "Zabbix")'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'contains("Zabbix", "zabbix")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "zabbix")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Zabbix", "ZABBIX")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "ZABBIX")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Zabbix", "Zabbixasd")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "Zabbixasd")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Zabbix", "Zabbix ")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "Zabbix ")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Zabbix", " Zabbix")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", " Zabbix")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Zabbix", "bix")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "bix")'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'contains("Zabbix", "bid")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "bid")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Заббикс", "Заббикс")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Заббикс", "Заббикс")'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'contains("Заббикс", "абби")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Заббикс", "абби")'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'contains("Заббикс", "аббс")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Заббикс", "аббс")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Заббикс", "Заб")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Заббикс", "Заб")'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'contains("Заббикс", "заб")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Заббикс", "заб")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Заббикс", "зАб")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Заббикс", "зАб")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Заббикс", "икс")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Заббикс", "икс")'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'contains("Заббикс", "икд")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Заббикс", "икд")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("aaaaab", "aaab")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("aaaaab", "aaab")'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'contains("aaaaab", "aaac")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("aaaaab", "aaac")'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'contains("Zabbix")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix")'
+out:
+  error: 'Cannot evaluate expression: invalid number of arguments for function at "contains("Zabbix")"'
+  result: FAIL
+---
+test case: Expression 'contains("Zabbix", "bix", "ix")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'contains("Zabbix", "bix", "ix")'
+out:
+  error: 'Cannot evaluate expression: invalid number of arguments for function at "contains("Zabbix", "bix", "ix")"'
   result: FAIL
 ...
