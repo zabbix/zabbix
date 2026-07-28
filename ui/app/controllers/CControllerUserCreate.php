@@ -83,8 +83,8 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'default_maintenance_period' => ['db users.default_maintenance_period', 'not_empty',
 				'use' => [CTimeUnitValidator::class, [
 					'min' => 5 * SEC_PER_MIN,
-					'max' => CMaintenanceHelper::MAX_TIMEPERIOD]
-				]
+					'max' => CMaintenanceHelper::MAX_TIMEPERIOD
+				]]
 			],
 			'refresh' => ['db users.refresh', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]]
