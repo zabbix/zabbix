@@ -171,12 +171,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		if (!ZBX_IS_RUNNING())
 			zbx_log_sync_history_cache_progress();
 
-		/* DEV4972 TEMP: hardcoded artificial slowdown of history cache draining, to make the      */
-		/* timing window where a not-yet-flushed history cache tail entry is visible to readers   */
-		/* (e.g. zbx_hc_is_itemid_cached_and_normal()) reliably reproducible, instead of depending */
-		/* on incidental timing luck. Remove before shipping - this is a throwaway repro aid.      */
-		usleep(40000000);
-
 		/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 		zbx_block_signals(&orig_mask);
 
