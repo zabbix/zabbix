@@ -320,10 +320,7 @@ class CProvisioning {
 			}
 			elseif (!$match) {
 				$regex = preg_quote($provision_group['name'], '/');
-				$regex = str_replace('\\*', '.*', $regex);
-				$prefix = (str_starts_with($provision_group['name'], '*')) ? '' : '^';
-				$suffix = (str_ends_with($provision_group['name'], '*')) ? '' : '$';
-				$regex = '/'.$prefix.$regex.$suffix.'/';
+				$regex = '/^'.str_replace('\\*', '.*', $regex).'$/';
 				$match = false;
 
 				foreach ($group_names as $group_name) {
