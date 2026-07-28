@@ -198,8 +198,8 @@ class CDatatableBehavior extends CBehavior {
 				$table->waitUntilReady()->invalidate();
 			}
 
-			// Press Escape key to close the popup.
-			CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
+			// Press Enter key to close the popup.
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
 			$this->test->query('class:datatable-options-popup')->waitUntilNotVisible();
 		}
 	}
