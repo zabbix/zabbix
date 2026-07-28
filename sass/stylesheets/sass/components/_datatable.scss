@@ -101,10 +101,13 @@
 
 					& + label span {
 						vertical-align: middle;
+						flex-shrink: 0;
+						margin: 2px 4px 2px 2px;
 					}
 				}
 
 				label {
+					align-items: center;
 					display: flex;
 					overflow: hidden;
 

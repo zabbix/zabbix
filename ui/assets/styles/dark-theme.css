@@ -2551,8 +2551,11 @@ button {
           left: 18px;
           margin-top: 0; }
           .datatable .datatable-options .datatable-options-list .datatable-options-list-item .checkbox-radio + label span {
-            vertical-align: middle; }
+            vertical-align: middle;
+            flex-shrink: 0;
+            margin: 2px 4px 2px 2px; }
         .datatable .datatable-options .datatable-options-list .datatable-options-list-item label {
+          align-items: center;
           display: flex;
           overflow: hidden; }
           .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label {
