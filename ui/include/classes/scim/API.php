@@ -45,13 +45,10 @@ class API {
 
 		$auth_header = $request->getParsedAuthHeader();
 
-		$auth = [
-			'type' => $auth_header['type'] !== null
-					&& strcasecmp($auth_header['type'], CJsonRpc::HEADER_AUTHENTICATE_BEARER) == 0
-				? CJsonRpc::AUTH_TYPE_BEARER
-				: null,
-			'auth' => $auth_header['auth']
-		];
+		$auth = $auth_header['type'] !== null
+				&& strcasecmp($auth_header['type'], CJsonRpc::HEADER_AUTHENTICATE_BEARER) == 0
+			? ['type' => CJsonRpc::AUTH_TYPE_BEARER, 'auth' => $auth_header['auth']]
+			: ['type' => CJsonRpc::AUTH_TYPE_COOKIE, 'auth' => null];
 
 		if (!$client->isValidApi($endpoint)) {
 			throw new APIException(ZBX_API_ERROR_NO_METHOD,
