@@ -419,6 +419,10 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_free_result(result2);
 			}
 
+			/*
+			 * A DOWN discovery service may locate an existing host, but it must not be used to create a
+			 * new monitored host.
+			 */
 			if (0 == hostid && DOBJECT_STATUS_UP == atoi(row[17]))
 			{
 				zbx_db_result_t		result3;
