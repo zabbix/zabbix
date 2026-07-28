@@ -13,6 +13,7 @@
 **/
 
 #include "zbxexpr.h"
+#include "zbxstr.h"
 
 #include "zbx_expression_constants.h"
 

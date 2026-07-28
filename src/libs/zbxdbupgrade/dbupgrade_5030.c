@@ -27,7 +27,6 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxdbschema.h"
-#include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
 #include "zbx_trigger_constants.h"
