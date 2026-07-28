@@ -66,7 +66,7 @@ class CDataTableOptionsPopupMonitoringHostProblems extends CDataTableOptionsPopu
 	onInit() {
 		super.onInit();
 
-		const column_options = this.getColumnConfig().getColumnOptions();
+		const column_options = this.getColumn().getColumnOptions();
 
 		const input = this.getField('show_suppressed');
 		input.checked = column_options.show_suppressed == 1;
@@ -74,11 +74,11 @@ class CDataTableOptionsPopupMonitoringHostProblems extends CDataTableOptionsPopu
 			e.stopPropagation();
 
 			const column_options = {
-				...this.getColumnConfig().getColumnOptions(),
+				...this.getColumn().getColumnOptions(),
 				show_suppressed: e.target.checked ? 1 : 0
 			};
 
-			this.getColumnConfig().setColumnOptions(column_options);
+			this.getColumn().setColumnOptions(column_options);
 
 			this.getDataTable().updateUserConfig();
 

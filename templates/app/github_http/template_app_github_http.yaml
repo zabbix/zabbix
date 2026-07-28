@@ -3316,7 +3316,7 @@ zabbix_export:
         Note: Update intervals and timeouts for script items can be changed individually via `Data update interval` and `API timeout` host wizard configuration fields with context. Depending on the repository being monitored, it can be adjusted if needed (if you are exceeding rate limits, you can increase update intervals for some script items to stay within per hour request limits). But be aware that it may also affect the triggers (check whether the item is used in triggers and adjust thresholds and/or evaluation periods if needed).
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -6072,7 +6072,6 @@ zabbix_export:
       dashboards:
         - uuid: 09870c778f4740da8430b1383225b2c6
           name: 'Repository overview'
-          auto_start: 'NO'
           pages:
             - name: 'Repository statistics'
               widgets:

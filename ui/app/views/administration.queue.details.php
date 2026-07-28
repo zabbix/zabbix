@@ -71,9 +71,9 @@ $html_page->addItem($table);
 if ($data['total_count'] != 0) {
 	$html_page->addItem(
 		(new CDiv())
-			->addClass(ZBX_STYLE_TABLE_PAGING)
+			->addClass(ZBX_STYLE_PAGER)
 			->addItem((new CDiv())
-				->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				->addClass(ZBX_STYLE_PAGER_CONTAINER)
 				->addItem((new CDiv())
 					->addClass(ZBX_STYLE_TABLE_STATS)
 					->addItem(_s('Displaying %1$s of %2$s found', $table->getNumRows(), $data['total_count']))

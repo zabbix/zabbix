@@ -84,8 +84,8 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]]
 			],
 			'rows_per_page' => ['db users.rows_per_page', 'required', 'min' => 1, 'max' => 999999],
-			'url' => ['db users.url'
-				// 'use' => [CHtmlUrlValidator::class, ['allow_user_macro' => false]]
+			'url' => ['db users.url',
+				'use' => [CUrlValidator::class, ['schemes' => CSettingsHelper::getAllowedUriSchemes()]]
 			],
 			'roleid' => ['db users.roleid', 'required']
 		]];

@@ -757,6 +757,65 @@ int	zbx_db_update_software_update_checkid(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: checks serverid value in settings table and generates new         *
+ *          serverid if it is not present                                     *
+ *                                                                            *
+ * Return value: SUCCEED - valid serverid either exists or was created        *
+ *               FAIL    - no valid serverid exists and could not create one  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_check_serverid(void)
+{
+	zbx_db_result_t	result;
+	int		ret = SUCCEED;
+
+	if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table "
+				"on the first try");
+		ret = FAIL;
+		goto out;
+	}
+
+	if (NULL == zbx_db_fetch(result))
+	{
+		char	*uuid7 = zbx_gen_uuid7_hyphenated();
+
+		if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
+				"('serverid',1,'%s',0)", uuid7))
+		{
+			/* INSERT may fail if a concurrent HA node has already inserted the   */
+			/* serverid row. Re-verify the row exists before treating this as     */
+			/* fatal.                                                             */
+			zbx_db_free_result(result);
+
+			if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table "
+						"after trying to insert");
+				zbx_free(uuid7);
+				ret = FAIL;
+				goto out;
+			}
+
+			if (NULL == zbx_db_fetch(result))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot insert serverid into settings table");
+				ret = FAIL;
+			}
+		}
+
+		zbx_free(uuid7);
+	}
+
+	zbx_db_free_result(result);
+out:
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: set settings value in database                                    *
  *                                                                            *
  * Parameters: name  - [IN] setting name                                      *

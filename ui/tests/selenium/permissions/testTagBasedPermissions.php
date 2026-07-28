@@ -461,7 +461,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen(self::URL);
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$this->zbxTestTextNotPresent($data['trigger_names']);
 		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isDisplayed());
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
@@ -571,7 +571,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen(self::URL);
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$this->zbxTestTextPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$countTriggers.' of '.$countTriggers.' found');
 
@@ -677,7 +677,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen(self::URL);
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$this->zbxTestTextPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$countTriggers.' of '.$countTriggers.' found');
 

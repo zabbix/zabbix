@@ -1075,7 +1075,7 @@ $(function() {
 	ntf_node.style.top = pos_top + 'px';
 	ntf_node.style[side] = pos_side + 'px';
 
-	$(ntf_node).draggable({handle: '>.overlay-dialogue-header',
+	$(ntf_node).draggable({handle: `>.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER}`,
 		start: function(event, ui) {
 			ui.helper.data('containment', {
 				min_top: -main.offsetTop,

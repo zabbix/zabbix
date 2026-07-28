@@ -257,7 +257,10 @@ func setHostname() error {
 		return fmt.Errorf("cannot initialize logger: %s", err)
 	}
 
-	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+	if err := keyaccess.LoadRules(
+		agent.Options.AllowKey, agent.Options.DenyKey,
+		agent.Options.AllowKeyRegexp, agent.Options.DenyKeyRegexp,
+	); err != nil {
 		return fmt.Errorf("failed to load key access rules: %s", err)
 	}
 

@@ -112,9 +112,11 @@ $available_js = [
 	'class.options-popup.monitoring.problems.problem.js' => 'datatable/options-popup/',
 	'class.options-popup.monitoring.host.problems.js' => 'datatable/options-popup/',
 	'class.options-popup.monitoring.latest.name.js' => 'datatable/options-popup/',
+	'class.options-popup.custom-text.js' => 'datatable/options-popup/',
 	'class.column.js' => 'datatable/column/',
 	'class.column.tags.js' => 'datatable/column/',
 	'class.column.tagvalue.js' => 'datatable/column/',
+	'class.column.custom-text.js' => 'datatable/column/',
 	'class.datatable.js' => 'datatable/',
 	'class.message.js' => '',
 	'class.pager.js' => '',
@@ -299,6 +301,10 @@ $translate_strings = [
 	'class.options-popup.tagvalue.js' => [
 		'Tag name' => _('Tag name')
 	],
+	'class.options-popup.custom-text.js' => [
+		'Custom text' => _('Custom text'),
+		'Text, macros, or combined' => _('Text, macros, or combined')
+	],
 	'class.options-popup.table-options.js' => [
 		'Table options' => _('Table options'),
 		'Column list' => _('Column list'),
@@ -409,7 +415,11 @@ $translate_strings = [
 		'S_THURSDAY_SHORT_BIG' => _x('T', 'Thursday short'),
 		'S_FRIDAY_SHORT_BIG' => _x('F', 'Friday short'),
 		'S_SATURDAY_SHORT_BIG' => _x('S', 'Saturday short'),
-		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short')
+		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short'),
+		'Previous year' => _('Previous year'),
+		'Next year' => _('Next year'),
+		'Previous month' => _('Previous month'),
+		'Next month' => _('Next month')
 	],
 	'class.linkform.js' => [
 		'S_CANNOT_BE_EMPTY' => _('cannot be empty'),
@@ -720,9 +730,11 @@ if (empty($_GET['files'])) {
 		'class.options-popup.monitoring.problems.problem.js',
 		'class.options-popup.monitoring.host.problems.js',
 		'class.options-popup.monitoring.latest.name.js',
+		'class.options-popup.custom-text.js',
 		'class.column.js',
 		'class.column.tags.js',
 		'class.column.tagvalue.js',
+		'class.column.custom-text.js',
 		'class.datatable.js',
 		'class.pager.js',
 		'class.state.js',

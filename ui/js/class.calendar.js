@@ -127,7 +127,7 @@ calendar.prototype = {
 	calendarDocumentClickHandler: function(e) {
 		var $target = jQuery(e.target);
 
-		if (!$target.is(this.trigger_elmnt) && !$target.closest('.overlay-dialogue.calendar').length) {
+		if (!$target.is(this.trigger_elmnt) && !$target.closest(`.${ZBX_STYLE_OVERLAY_DIALOGUE}.calendar`).length) {
 			this.clndrhide();
 		}
 	},
@@ -592,7 +592,7 @@ calendar.prototype = {
 	 */
 	calendarcreate: function() {
 		this.clndr_calendar = document.createElement('div');
-		this.clndr_calendar.className = 'overlay-dialogue calendar';
+		this.clndr_calendar.className = `${ZBX_STYLE_OVERLAY_DIALOGUE} calendar`;
 		this.clndr_calendar.setAttribute('aria-label', t('S_CALENDAR'));
 		this.clndr_calendar.setAttribute('role', 'application');
 		this.clndr_calendar.style.display = 'none';

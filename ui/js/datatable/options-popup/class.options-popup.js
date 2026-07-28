@@ -81,6 +81,11 @@ class CDataTableOptionsPopup {
 	/**
 	 * @type {boolean}
 	 */
+	#force_load_on_close = false;
+
+	/**
+	 * @type {boolean}
+	 */
 	#mouse_down_inside = false;
 
 	/**
@@ -125,7 +130,7 @@ class CDataTableOptionsPopup {
 	/**
 	 * @returns {CDataTableColumn}
 	 */
-	getColumnConfig() {
+	getColumn() {
 		return this.#column;
 	}
 
@@ -163,6 +168,20 @@ class CDataTableOptionsPopup {
 	 */
 	getField(name) {
 		return this.#fields[name] || null;
+	}
+
+	/**
+	 * @returns {boolean}
+	 */
+	isForceLoadOnClose() {
+		return this.#force_load_on_close;
+	}
+
+	/**
+	 * @param {boolean} force_load
+	 */
+	setForceLoadOnClose(force_load) {
+		this.#force_load_on_close = force_load;
 	}
 
 	/**
@@ -257,10 +276,11 @@ class CDataTableOptionsPopup {
 			form_label.textContent = t('Column name');
 
 			const form_input = document.createElement('input');
-			form_input.classList.add(ZBX_STYLE_FORM_FIELD);
+			form_input.setAttribute('id', `column_name_${column_index}`);
 			form_input.setAttribute('type', 'text');
 			form_input.setAttribute('maxlength', CDataTableOptionsPopup.COLUMN_NAME_MAXLENGTH.toString());
 			form_input.setAttribute('data-field-type', 'text-box');
+			form_input.classList.add(ZBX_STYLE_FORM_FIELD);
 			form_input.value = this.#column.getName();
 			form_input.addEventListener('input', e => {
 				const name = e.target.value.substring(0, CDataTableOptionsPopup.COLUMN_NAME_MAXLENGTH);

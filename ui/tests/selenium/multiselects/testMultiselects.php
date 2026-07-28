@@ -54,13 +54,6 @@ class testMultiselects extends CWebTest {
 		$element->type($string);
 		$this->query('class', $class)->waitUntilVisible();
 
-		// Unstable screenshots on Jenkins. Added border radius 0 for buttons in host form.
-		if ($query === 'host-form') {
-			$this->page->getDriver()->executeScript('document.querySelectorAll(\'button[class="btn-grey multiselect-button"]\')'.
-					'.forEach(function (e){ e.style.borderRadius = 0; });'
-			);
-		}
-
 		$this->assertScreenshotExcept($element->parents('class', (($query === 'host-form') ? 'form-grid' : 'cell'))
 				->one(), [$element], $string
 		);

@@ -129,7 +129,7 @@ class testDashboardsHostDashboardPage extends CWebTest {
 		$this->assertEquals(['Page 1', 'Page 2'], $dashboard_navigation->query('xpath:.//li[@class="sortable-item"]')->all()->asText());
 
 		// Check Slideshow button.
-		foreach (['Stop', 'Start'] as $status) {
+		foreach (['Start', 'Stop'] as $status) {
 			$this->assertTrue($dashboard_navigation->query('xpath:.//button/span[text()="'.$status.' slideshow"]')->one()->isDisplayed());
 			$dashboard_navigation->query('xpath:.//button['.CXPathHelper::fromClass('btn-dashboard-toggle-slideshow').']')->one()->click();
 		}
@@ -160,14 +160,14 @@ class testDashboardsHostDashboardPage extends CWebTest {
 		}
 
 		// Check Dashboard page controls.
-		foreach (['Previous page', 'Stop slideshow', 'Next page'] as $button) {
+		foreach (['Previous page', 'Start slideshow', 'Next page'] as $button) {
 			$this->assertTrue($this->query('xpath://button[@title="'.$button.'"]')->exists());
 		}
 
 		// Check Slideshow button.
 		$dashboard_controls = $this->query('class:dashboard-kioskmode-controls')->one();
 
-		foreach (['Stop', 'Start'] as $status) {
+		foreach (['Start', 'Stop'] as $status) {
 			$this->assertTrue($dashboard_controls->query('xpath:.//button[@title="'.$status.' slideshow"]')->one()->isDisplayed());
 			$dashboard_controls->query('xpath:.//button['.
 					CXPathHelper::fromClass('btn-dashboard-kioskmode-toggle-slideshow').']')->one()->click();

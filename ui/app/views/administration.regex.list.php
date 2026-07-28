@@ -39,6 +39,7 @@ $html_page = (new CHtmlPage())
 $form = (new CForm())->setName('regularExpressionsForm');
 
 $table = (new CTableInfo())
+	->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all-regexes'))->onClick("checkAll('".$form->getName()."', 'all-regexes', 'regexpids');")

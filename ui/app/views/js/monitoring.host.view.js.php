@@ -134,7 +134,7 @@
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
-			this.#datatable = new CDataTable(document.getElementById('hosts'), data_provider)
+			this.#datatable = new CDataTable(document.getElementById('datatable-hosts'), data_provider)
 				.setColumns([
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setFields(['hostid', 'name', 'status', 'maintenance', 'maintenanceid', 'maintenance_type',
@@ -171,7 +171,8 @@
 						.setRenderer('dashboards'),
 					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
 						.setFields(['hostid', 'httpTests'])
-						.setRenderer('web')
+						.setRenderer('web'),
+					new CDataTableColumnCustomText('custom_text', <?= json_encode(_('Custom text')); ?>)
 				])
 				.setPage(page)
 				.setFilter(filter)
