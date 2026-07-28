@@ -46,7 +46,8 @@ class API {
 		$auth_header = $request->getParsedAuthHeader();
 
 		$auth = [
-			'type' => strcasecmp($auth_header['type'], CJsonRpc::HEADER_AUTHENTICATE_BEARER) == 0
+			'type' => $auth_header['type'] !== null
+					&& strcasecmp($auth_header['type'], CJsonRpc::HEADER_AUTHENTICATE_BEARER) == 0
 				? CJsonRpc::AUTH_TYPE_BEARER
 				: null,
 			'auth' => $auth_header['auth']

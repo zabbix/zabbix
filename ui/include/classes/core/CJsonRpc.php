@@ -68,11 +68,12 @@ class CJsonRpc {
 
 		$auth_header = $request->getParsedAuthHeader();
 
-		if (strcasecmp($auth_header['type'], self::HEADER_AUTHENTICATE_BEARER) == 0) {
+		if ($auth_header['type'] !== null && strcasecmp($auth_header['type'], self::HEADER_AUTHENTICATE_BEARER) == 0) {
 			$auth['type'] = self::AUTH_TYPE_BEARER;
 			$auth['auth'] = $auth_header['auth'];
 		}
-		elseif (strcasecmp($auth_header['type'], self::HEADER_AUTHENTICATE_DPOP) == 0) {
+		elseif ($auth_header['type'] !== null
+				&& strcasecmp($auth_header['type'], self::HEADER_AUTHENTICATE_DPOP) == 0) {
 			$auth['type'] = self::AUTH_TYPE_DPOP;
 			$auth['auth'] = $auth_header['auth'];
 			$auth['sign'] = (string) $request->header(self::HEADER_AUTHENTICATE_DPOP);
