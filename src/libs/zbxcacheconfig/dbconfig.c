@@ -15581,17 +15581,18 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextchec
 
 			proxyid = 0;
 		}
+		else if (0 != (get_denyitemtypes_mask() & (1u << dc_item->type)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot perform check now for item \"%s\" on host \"%s\""
+					": item type is denied by the \"DenyItemTypes\" configuration parameter.",
+					dc_item->key, dc_host->host);
+			proxyid = 0;
+		}
 		else if (ZBX_JAN_2038 == dc_item->nextcheck)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for item \"%s\" on host \"%s\""
 					": item configuration error", dc_item->key, dc_host->host);
 
-			proxyid = 0;
-		}
-		else if (0 != (get_denyitemtypes_mask() & (1u << dc_item->type)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Item type is denied by the \"DenyItemTypes\""
-					" configuration parameter.");
 			proxyid = 0;
 		}
 		else if (HOST_MONITORED_BY_SERVER == dc_host->monitored_by ||
