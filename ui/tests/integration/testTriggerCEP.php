@@ -1407,6 +1407,23 @@ class testTriggerCEP extends CIntegrationTest {
 			}
 			return true;
 		});
+
+		// The wait above filters on the 'state' tag, which the prototypes already carried before this update,
+		// so it cannot tell whether $extra_tags have landed on the discovered triggers yet. Wait for them
+		// separately: trigger.get AND-s tag filters of distinct names, so a single trigger coming back means
+		// every extra tag was applied (the tag names still hold the unresolved {ITEM.VALUE}, which is
+		// substituted at event time, not at discovery time). One trigger is enough - the tags of every
+		// discovered trigger come from the same two prototypes and are written by the same LLD pass.
+		if ($extra_tags) {
+			$this->callUntilDataIsPresent('trigger.get', [
+				'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
+				'output' => ['triggerid'],
+				'tags' => array_map(
+					fn(array $tag) => ['tag' => $tag['tag'], 'operator' => TAG_OPERATOR_EXISTS],
+					$extra_tags
+				)
+			], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		}
 	}
 
 	/**
