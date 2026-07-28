@@ -23,6 +23,7 @@
 #include "zbxcrypto.h"
 #include "zbxexpr.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 #include "zbxparam.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
