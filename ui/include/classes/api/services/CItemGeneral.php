@@ -1546,7 +1546,13 @@ abstract class CItemGeneral extends CApiService {
 
 			// SSH item type specific fields.
 			'publickey' => DB::getDefault('items', 'publickey'),
-			'privatekey' => DB::getDefault('items', 'privatekey')
+			'privatekey' => DB::getDefault('items', 'privatekey'),
+
+			// Telemetry query
+			'time_shift' => DB::getDefault('items', 'time_shift'),
+			'lookback_limit' => DB::getDefault('items', 'lookback_limit'),
+			'granularity' => DB::getDefault('items', 'granularity'),
+			'query' => []
 		];
 
 		$value_type_field_defaults = [
@@ -2971,7 +2977,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if (array_key_exists('query', $item)) {
-			$item['query'] = self::prepareTelemetryQueryFieldForDb($item['query']);
+			$item['query'] = $item['query'] ? self::prepareTelemetryQueryFieldForDb($item['query']) : '';
 		}
 	}
 

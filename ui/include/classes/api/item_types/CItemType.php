@@ -52,7 +52,10 @@ abstract class CItemType {
 		'snmp_oid',
 
 		// SSH item type specific fields.
-		'publickey', 'privatekey'
+		'publickey', 'privatekey',
+
+		// Telemetry query
+		'time_shift', 'lookback_limit', 'granularity', 'query'
 	];
 
 	/**
