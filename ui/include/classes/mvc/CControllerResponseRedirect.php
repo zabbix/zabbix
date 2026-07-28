@@ -71,7 +71,7 @@ class CControllerResponseRedirect extends CControllerResponse {
 
 		$script =
 			'<script>'.
-			'document.addEventListener("DOMContentLoaded", () => document.forms["auto-submit"].submit());'.
+				'document.addEventListener("DOMContentLoaded", () => document.forms["auto-submit"].submit());'.
 			'</script>';
 
 		return $form->toString().$script;
