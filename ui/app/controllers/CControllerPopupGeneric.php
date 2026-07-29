@@ -1056,7 +1056,7 @@ class CControllerPopupGeneric extends CController {
 
 			$filter['users'] = [
 				'multiple' => false,
-				'name' => 'popup_template',
+				'name' => 'popup_user',
 				'object_name' => $src_name,
 				'data' => array_values($users),
 				'selectedLimit' => 1,
@@ -1066,7 +1066,7 @@ class CControllerPopupGeneric extends CController {
 						'srctbl' => $src_name,
 						'srcfld1' => 'userid',
 						'srcfld2' => 'fullname',
-						'dstfld1' => 'popup_template'
+						'dstfld1' => 'popup_user'
 					]
 				],
 				'add_post_js' => false
