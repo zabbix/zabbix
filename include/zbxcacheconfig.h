@@ -1783,10 +1783,17 @@ typedef struct
 }
 zbx_cep_args_time_period_t;
 
+typedef struct
+{
+	int	value;
+}
+zbx_cep_args_boolean_t;
+
 typedef union
 {
 	zbx_cep_args_tag_name_t		tag_name;
 	zbx_cep_args_tag_value_t	tag_value;
+	zbx_cep_args_boolean_t		state;
 }
 zbx_cep_op_condition_args_t;
 

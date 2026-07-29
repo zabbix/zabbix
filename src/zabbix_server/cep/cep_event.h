@@ -71,7 +71,6 @@ zbx_cep_event_t *cep_event_context_get_event(zbx_cep_event_context_t *ctx);
 zbx_cep_event_t *cep_event_context_get_mutable_event(zbx_cep_event_context_t *ctx);
 zbx_db_event *cep_event_context_get_db_event(zbx_cep_event_context_t *ctx);
 zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx);
-const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, const char *tag);
 void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **str);
 void	cep_event_context_resolve_tag_macros(zbx_cep_event_context_t *ctx, char **str);
 

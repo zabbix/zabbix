@@ -1535,6 +1535,14 @@ static void	cep_sync_operation_conditions(zbx_cep_config_t *cep_config, zbx_dbsy
 			case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 				ZBX_DBROW2STR(op_condition->args.tag_value.tag, row[4]);
 				ZBX_DBROW2STR(op_condition->args.tag_value.value, row[5]);
+				break;
+			case ZBX_CONDITION_TYPE_EVENT_OPEN:
+			case ZBX_CONDITION_TYPE_EVENT_FIRST:
+			case ZBX_CONDITION_TYPE_EVENT_LAST:
+			case ZBX_CONDITION_TYPE_EVENT_SYMPTOM:
+			case ZBX_CONDITION_TYPE_EVENT_COPIED:
+				op_condition->args.state.value = atoi(row[5]);
+				break;
 		}
 	}
 

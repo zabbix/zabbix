@@ -686,68 +686,6 @@ zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the value of a builtin tag for an event context               *
- *                                                                            *
- * Parameters: ctx - [IN/OUT] event context                                   *
- *             tag - [IN] builtin tag name                                    *
- *                                                                            *
- * Return value: the tag value, or NULL if the tag name is not recognized or  *
- *               the value could not be resolved                              *
- *                                                                            *
- ******************************************************************************/
-const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, const char *tag)
-{
-#define CEP_TAG_IS_COPIED	"$IS.COPIED"
-#define CEP_TAG_IS_FIRST	"$IS.FIRST"
-#define CEP_TAG_IS_LAST		"$IS.LAST"
-#define CEP_TAG_IS_SYMPTOM	"$IS.SYMPTOM"
-#define CEP_TAG_IS_OPEN		"$IS.OPEN"
-#define CEP_VALUE_TRUE		"true"
-#define CEP_VALUE_FALSE		"false"
-#define CEP_VALUE_UNKNOWN	"unknown"
-
-	zbx_cep_event_t	*event;
-
-	if (0 == strcmp(CEP_TAG_IS_COPIED, tag))
-	{
-		if (NULL != (event = cep_event_context_get_event(ctx)))
-			return (event->flags == ZBX_EVENT_COPIED ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
-	}
-	else if(0 == strcmp(CEP_TAG_IS_FIRST, tag))
-	{
-		return (ctx->pos == CEP_POS_FIRST ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
-	}
-	else if(0 == strcmp(CEP_TAG_IS_LAST, tag))
-	{
-		return (ctx->pos == CEP_POS_LAST ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
-	}
-	else if(0 == strcmp(CEP_TAG_IS_SYMPTOM, tag))
-	{
-		if (NULL != (event = cep_event_context_get_event(ctx)) && 0 != event->cause_eventid)
-			return CEP_VALUE_TRUE;
-
-		return CEP_VALUE_FALSE;
-	}
-	else if(0 == strcmp(CEP_TAG_IS_OPEN, tag))
-	{
-		if (NULL != (event = cep_event_context_get_event(ctx)))
-			return (NULL == event->r_event ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
-	}
-
-	return NULL;
-
-	#undef CEP_VALUE_UNKNOWN
-	#undef CEP_VALUE_FALSE
-	#undef CEP_VALUE_TRUE
-	#undef CEP_TAG_IS_OPEN
-	#undef CEP_TAG_IS_SYMPTOM
-	#undef CEP_TAG_IS_LAST
-	#undef CEP_TAG_IS_FIRST
-	#undef CEP_TAG_IS_COPIED
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: resolve macros in a string using an event context, restricted     *
  *          to a given macro search scope                                     *
  *                                                                            *

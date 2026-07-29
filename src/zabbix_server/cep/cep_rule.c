@@ -121,25 +121,15 @@ static int	cep_operation_condition_eval_tag_value(const zbx_cep_op_condition_t *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tag:%s value:%s", __func__, args->tag, args->value);
 
-	if ('$' == *args->tag)
+	zbx_cep_event_t	*event = cep_event_context_get_event(ctx);
+
+	for (int i = 0; i < event->tags.values_num && 0 == ret; i++)
 	{
-		const char	*value = cep_event_context_get_builtin_tag(ctx, args->tag);
+		if (0 != strcmp(args->tag, event->tags.values[i].tag))
+			continue;
 
-		if (NULL != value)
-			ret = cep_condition_eval_value(condition->operator, args->value, value);
-	}
-	else
-	{
-		zbx_cep_event_t	*event = cep_event_context_get_event(ctx);
-
-		for (int i = 0; i < event->tags.values_num && 0 == ret; i++)
-		{
-			if (0 != strcmp(args->tag, event->tags.values[i].tag))
-				continue;
-
-			ret = cep_condition_eval_value(condition->operator, args->value,
-				event->tags.values[i].value);
-		}
+		ret = cep_condition_eval_value(condition->operator, args->value,
+			event->tags.values[i].value);
 	}
 
 	switch (condition->operator)
@@ -155,6 +145,50 @@ static int	cep_operation_condition_eval_tag_value(const zbx_cep_op_condition_t *
 	return ret;
 }
 
+static int	cep_operation_condition_eval_state(const zbx_cep_op_condition_t *condition, int state)
+{
+	int	ret = (state == condition->args.state.value ? 1 : 0);
+
+	if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+		ret = !ret;
+
+	return ret;
+}
+
+static int	cep_operation_condition_eval_open(const zbx_cep_op_condition_t *condition,
+		zbx_cep_event_context_t *ctx)
+{
+	zbx_cep_event_t	*event;
+
+	if (NULL == (event = cep_event_context_get_event(ctx)))
+		return 0;
+
+	return cep_operation_condition_eval_state(condition, (NULL == event->r_event));
+}
+
+static int	cep_operation_condition_eval_symptom(const zbx_cep_op_condition_t *condition,
+		zbx_cep_event_context_t *ctx)
+{
+	zbx_cep_event_t	*event;
+
+	if (NULL == (event = cep_event_context_get_event(ctx)))
+		return 0;
+
+	return cep_operation_condition_eval_state(condition, (0 != event->cause_eventid));
+}
+
+static int	cep_operation_condition_eval_copied(const zbx_cep_op_condition_t *condition,
+		zbx_cep_event_context_t *ctx)
+{
+	zbx_cep_event_t	*event;
+
+	if (NULL == (event = cep_event_context_get_event(ctx)))
+		return 0;
+
+	return cep_operation_condition_eval_state(condition, (ZBX_EVENT_COPIED == event->flags));
+}
+
+
 static int	cep_operation_condition_eval(const zbx_cep_op_condition_t *condition, zbx_cep_event_context_t *ctx)
 {
 	switch (condition->type)
@@ -163,11 +197,22 @@ static int	cep_operation_condition_eval(const zbx_cep_op_condition_t *condition,
 			return cep_operation_condition_eval_tag(condition, ctx);
 		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 			return cep_operation_condition_eval_tag_value(condition, ctx);
+		case ZBX_CONDITION_TYPE_EVENT_OPEN:
+			return cep_operation_condition_eval_open(condition, ctx);
+		case ZBX_CONDITION_TYPE_EVENT_FIRST:
+			return cep_operation_condition_eval_state(condition, (CEP_POS_FIRST == ctx->pos));
+		case ZBX_CONDITION_TYPE_EVENT_LAST:
+			return cep_operation_condition_eval_state(condition, (CEP_POS_LAST == ctx->pos));
+		case ZBX_CONDITION_TYPE_EVENT_SYMPTOM:
+			return cep_operation_condition_eval_symptom(condition, ctx);
+		case ZBX_CONDITION_TYPE_EVENT_COPIED:
+			return cep_operation_condition_eval_copied(condition, ctx);
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported operation condition type %d", condition->type);
 			return 0;
 	}
 }
+
 
 static int	cep_operation_condition_match_key(const zbx_cep_op_condition_t *oc1, const zbx_cep_op_condition_t *oc2)
 {
