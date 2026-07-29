@@ -411,12 +411,7 @@ class testFormUserMedia extends CWebTest {
 			}
 		}
 		else {
-			if (is_array($data['error_message'])) {
-				$this->assertInlineError($media_form, $data['error_message']);
-			}
-			else {
-				$this->assertMessage(TEST_BAD, null, $data['error_message']);
-			}
+			$this->assertInlineError($media_form, $data['error_message']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
 		}
 	}
@@ -438,12 +433,7 @@ class testFormUserMedia extends CWebTest {
 			$this->checkMediaConfiguration($data, $original_period, true);
 		}
 		else {
-			if (is_array($data['error_message'])) {
-				$this->assertInlineError($media_form, $data['error_message']);
-			}
-			else {
-				$this->assertMessage(TEST_BAD, null, $data['error_message']);
-			}
+			$this->assertInlineError($media_form, $data['error_message']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
 		}
 	}
