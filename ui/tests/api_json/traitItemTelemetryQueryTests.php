@@ -42,7 +42,10 @@ trait traitItemTelemetryQueryTests {
 								'signal_type' => APM_SIGNAL_TYPE_TRACES,
 								'columns' => [],
 								'aggregated_columns' => [['alias' => 'Timestamp']],
-								'filter' => []
+								'filter' => [
+									'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+									'conditions' => []
+								]
 							]
 						]
 					]
@@ -64,7 +67,10 @@ trait traitItemTelemetryQueryTests {
 								'signal_type' => APM_SIGNAL_TYPE_TRACES,
 								'columns' => [],
 								'aggregated_columns' => [['alias' => 'Timestamp']],
-								'filter' => []
+								'filter' => [
+									'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+									'conditions' => []
+								]
 							]
 						]
 					]
@@ -100,7 +106,10 @@ trait traitItemTelemetryQueryTests {
 										'signal_type' => APM_SIGNAL_TYPE_TRACES,
 										'columns' => [],
 										'aggregated_columns' => [['alias' => 'Timestamp']],
-										'filter' => []
+										'filter' => [
+											'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+											'conditions' => []
+										]
 									]
 								]
 							]
@@ -127,7 +136,10 @@ trait traitItemTelemetryQueryTests {
 										'signal_type' => APM_SIGNAL_TYPE_TRACES,
 										'columns' => [],
 										'aggregated_columns' => [['alias' => 'Timestamp']],
-										'filter' => []
+										'filter' => [
+											'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+											'conditions' => []
+										]
 									]
 								]
 							]
@@ -139,25 +151,15 @@ trait traitItemTelemetryQueryTests {
 	}
 
 	public static function dataProviderTelemetryQueryCreate() {
-		$params = [
-			'query' => ['aggregated_columns' => [['alias' => 'Timestamp']]]
-		];
-
 		yield 'user macro for "time_shift", "lookback_limit" and "granularity"' => [
 			[
 				'time_shift' => '{$M}',
 				'lookback_limit' => '{$M}',
-				'granularity' => '{$M}'
-			] + $params,
-			null
-		];
-
-		yield 'empty "query.filter"' => [
-			[
+				'granularity' => '{$M}',
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'filter' => []
-				] + $params['query']
+					'aggregated_columns' => [['alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
 			],
 			null
 		];
@@ -166,6 +168,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A or B',
@@ -174,7 +177,7 @@ trait traitItemTelemetryQueryTests {
 							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'B']
 						]
 					]
-				] + $params['query']
+				]
 			],
 			null
 		];
@@ -186,8 +189,10 @@ trait traitItemTelemetryQueryTests {
 					'metric_point_type' => APM_METRICS_POINT_SUM,
 					'columns' => [
 						['column' => 'Exemplars.FilteredAttributes', 'attribute_key' => 'attr1']
-					]
-				] + $params['query']
+					],
+					'aggregated_columns' => [['alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
 			],
 			null
 		];
@@ -198,8 +203,10 @@ trait traitItemTelemetryQueryTests {
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
 					'columns' => [
 						['column' => 'TraceId', 'attribute_key' => '']
-					]
-				] + $params['query']
+					],
+					'aggregated_columns' => [['alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
 			],
 			null
 		];
@@ -210,7 +217,8 @@ trait traitItemTelemetryQueryTests {
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
 					'aggregated_columns' => [
 						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [10], 'alias' => 'time']
-					]
+					],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
 			],
 			null
@@ -222,7 +230,8 @@ trait traitItemTelemetryQueryTests {
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
 					'aggregated_columns' => [
 						['function' => AGGREGATE_COUNT, 'alias' => str_repeat('A', 65535)]
-					]
+					],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
 			],
 			'Invalid parameter "/1/query": value is too long.'
@@ -230,8 +239,12 @@ trait traitItemTelemetryQueryTests {
 
 		yield 'binary "value_type" fail' => [
 			[
-				'value_type' => ITEM_VALUE_TYPE_BINARY
-			] + $params,
+				'value_type' => ITEM_VALUE_TYPE_BINARY,
+				'query' => [
+					'aggregated_columns' => [['alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
 			'Invalid parameter "/1/value_type": value must be one of 0, 1, 2, 3, 4, 6.'
 		];
 
@@ -252,19 +265,27 @@ trait traitItemTelemetryQueryTests {
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
 					'columns' => [['column' => 'Timestamp']],
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [['column' => 'TraceId', 'value' => 'test']]
-					]
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
 			],
 			'Invalid parameter "/1/query": the parameter "aggregated_columns" is missing.'
+		];
+
+		yield 'undefined "query.filter" fail' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [['alias' => 'Timestamp']]
+				]
+			],
+			'Invalid parameter "/1/query": the parameter "filter" is missing.'
 		];
 
 		yield '"evaltype" not expression and "query.filter.formula" fail' => [
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'formula' => 'A or A',
@@ -272,7 +293,7 @@ trait traitItemTelemetryQueryTests {
 							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A']
 						]
 					]
-				] + $params['query']
+				]
 			],
 			'Invalid parameter "/1/query/filter/formula": value must be empty.'
 		];
@@ -281,6 +302,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A or B',
@@ -288,7 +310,7 @@ trait traitItemTelemetryQueryTests {
 							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A']
 						]
 					]
-				] + $params['query']
+				]
 			],
 			'Invalid parameter "/1/query/filter/conditions": incorrect number of conditions.'
 		];
@@ -297,6 +319,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A or A',
@@ -305,7 +328,7 @@ trait traitItemTelemetryQueryTests {
 							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'B']
 						]
 					]
-				] + $params['query']
+				]
 			],
 			'Invalid parameter "/1/query/filter/conditions": incorrect number of conditions.'
 		];
@@ -314,6 +337,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A or D',
@@ -322,7 +346,7 @@ trait traitItemTelemetryQueryTests {
 							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'B']
 						]
 					]
-				] + $params['query']
+				]
 			],
 			'Invalid parameter "/1/query/filter/conditions/2/formulaid": an identifier is not defined in the formula.'
 		];
@@ -331,6 +355,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A or A',
@@ -339,7 +364,7 @@ trait traitItemTelemetryQueryTests {
 							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'A']
 						]
 					]
-				] + $params['query']
+				]
 			],
 			'Invalid parameter "/1/query/filter/conditions/2": value (formulaid)=(A) already exists.'
 		];
@@ -348,10 +373,12 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [['alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []],
 					'columns' => [
 						['column' => 'Timestamp', 'attribute_key' => 'attr1']
 					]
-				] + $params['query']
+				]
 			],
 			'Invalid parameter "/1/query/columns/1/attribute_key": value must be empty.'
 		];
@@ -362,7 +389,8 @@ trait traitItemTelemetryQueryTests {
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
 					'aggregated_columns' => [
 						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [200], 'alias' => 'time']
-					]
+					],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
 			],
 			'Invalid parameter "/1/query/aggregated_columns/1/parameters/1": value must be one of 1-100.'
@@ -374,7 +402,8 @@ trait traitItemTelemetryQueryTests {
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
 					'aggregated_columns' => [
 						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [2, 10], 'alias' => 'time']
-					]
+					],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
 			],
 			'Invalid parameter "/1/query/aggregated_columns/1/parameters": maximum number of array elements is 1.'
@@ -389,7 +418,8 @@ trait traitItemTelemetryQueryTests {
 					],
 					'aggregated_columns' => [
 						['function' => AGGREGATE_COUNT, 'alias' => 'TraceId']
-					]
+					],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
 			],
 			'Invalid parameter "/1/query/aggregated_columns/1/alias": value (TraceId) already exists.'
@@ -399,12 +429,13 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [
+						['column' => 'SpanAttributes', 'attribute_key' => 'attr']
+					],
 					'aggregated_columns' => [
 						['function' => AGGREGATE_COUNT, 'alias' => 'SpanAttributes.attr']
 					],
-					'columns' => [
-						['column' => 'SpanAttributes', 'attribute_key' => 'attr']
-					]
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
 			],
 			'Invalid parameter "/1/query/aggregated_columns/1/alias": value (SpanAttributes.attr) already exists.'
@@ -451,7 +482,7 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
-		yield '"query" empty array fail' => [
+		yield '"query" empty fail' => [
 			['query' => ''],
 			'Invalid parameter "/1/query": an array is expected.'
 		];
@@ -484,7 +515,10 @@ trait traitItemTelemetryQueryTests {
 		yield '"query" for inherited fail' => [
 			[
 				'query' => [
-					'query' => ['aggregated_columns' => [['alias' => 'Timestamp']]]
+					'query' => [
+						'aggregated_columns' => [['alias' => 'Timestamp']],
+						'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+					]
 				]
 			],
 			'Invalid parameter "/1": cannot update readonly parameter "query" of inherited object.'

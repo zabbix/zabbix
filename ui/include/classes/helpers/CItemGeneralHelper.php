@@ -750,7 +750,9 @@ JAVASCRIPT;
 			'columns' => $query['columns'],
 			'aggregated_columns' => $aggregated_columns,
 			'evaltype' => $query['filter']['evaltype'],
-			'formula' => $query['filter']['formula'],
+			'formula' => $query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+				? $query['filter']['formula']
+				: '',
 			'conditions' => $conditions
 		];
 	}

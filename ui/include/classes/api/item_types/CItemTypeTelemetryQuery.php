@@ -369,24 +369,17 @@ class CItemTypeTelemetryQuery extends CItemType {
 				]],
 				'alias'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]],
-			'filter'				=> ['type' => API_MULTIPLE, 'default' => [], 'rules' => [
-				['if' => static fn (array $data) => !($data['filter'] ?? []), 'type' => API_OBJECT, 'fields' => [
-					'evaltype'		=> ['type' => API_ANY, 'default' => CONDITION_EVAL_TYPE_AND_OR],
-					'formula'		=> ['type' => API_ANY, 'default' => ''],
-					'conditions'	=> ['type' => API_ANY, 'default' => []]
+			'filter'				=> ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+				'evaltype'		=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
+				'formula'		=> ['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'unset' => true]
 				]],
-				['else' => true, 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' =>[
-					'evaltype'		=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
-					'formula'		=> ['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
-					]],
-					'conditions'	=>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
-												'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
-											] + $condition_fields],
-											['else' => true, 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => $condition_fields]
-					]]
+				'conditions'	=>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
+											'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
+										] + $condition_fields],
+										['else' => true, 'type' => API_OBJECTS, 'fields' => $condition_fields]
 				]]
 			]]
 		];
