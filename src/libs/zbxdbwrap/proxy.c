@@ -2473,7 +2473,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, con
 		{
 			*host_metadata = '\0';
 		}
-		else if (MAX_BUFFER_LEN <= host_metadata_alloc)
+		else if (MAX_BUFFER_LEN <= strlen(host_metadata))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot process auto registration for host \"%s\":"
 					" host metadata is too long", host);
