@@ -1679,15 +1679,21 @@ class testTriggerCEP extends CIntegrationTest {
 	 * One more rule, CEP_RULE_WINDOW_NONE_TAG_OPS, is created beside those. It has no condition of its own, so
 	 * every problem event of the scenario goes through it, and instead of a single "add tag" it runs every tag
 	 * operation a windowless rule can perform - add, set, set value, increase, decrease, rename and remove -
-	 * in one operation list, see getWindowNoneTagOperationCases().
+	 * in one operation list, see getWindowNoneTagOperationCases(). Some of those operations work on tags the
+	 * operation list adds first, the others on tags the trigger prototypes carry for exactly that purpose.
 	 *
 	 * None of the rules closes anything, which is the point of a windowless rule: the events keep flowing
 	 * through untouched apart from the tags.
 	 */
 	public function prepareDataCepWindowNoneTagOperations() {
-		// The extra tag carries the service id in its NAME, which is what the Exists / Does not exist pair
-		// tests for; its value is irrelevant.
-		$this->prepareCloseOnUpTriggerPrototypes([['tag' => self::CEP_SERVICE_TAG, 'value' => '']]);
+		// The first extra tag carries the service id in its NAME, which is what the Exists / Does not exist
+		// pair tests for; its value is irrelevant. The rest are the tags the tag operation rule modifies,
+		// renames and removes, so those operations are exercised on tags the trigger itself generated and not
+		// only on tags an earlier operation of the same rule added.
+		$this->prepareCloseOnUpTriggerPrototypes(array_merge(
+			[['tag' => self::CEP_SERVICE_TAG, 'value' => '']],
+			$this->getWindowNoneTagOperationTriggerTags()
+		));
 
 		// Nothing except the trigger expression may close these problems - the scenario asserts they all stay
 		// open - so drop both the global correlation rules and the window CEP rule a previous CloseOnUp
@@ -2655,9 +2661,10 @@ HEREDOC;
 
 	/**
 	 * The tag operations of the windowless scenario, as a list of independent cases. Every case holds the
-	 * operations it needs and the tag state they must leave on the event, so what an operation does and what
-	 * it is expected to produce stay side by side; each case works on tag names of its own, so the cases
-	 * cannot influence one another.
+	 * operations it needs, the trigger prototype tags they work on (if any) and the tag state they must leave
+	 * on the event, so what an operation does and what it is expected to produce stay side by side; each case
+	 * works on tag names of its own, so the cases cannot influence one another. The 'trigger_tags' of the
+	 * cases are collected by getWindowNoneTagOperationTriggerTags() and added to both trigger prototypes.
 	 *
 	 * All of them run in one CEP rule (see CEP_RULE_WINDOW_NONE_TAG_OPS): the operations of a rule execute in
 	 * sortorder, so flattening the cases in order gives a deterministic sequence, and the rule's filter is
@@ -2672,6 +2679,10 @@ HEREDOC;
 	 *     increment, hence "10" turning into "11" and "9"), and leave a non-numeric value untouched;
 	 *   - "rename tag" moves the value to another tag name, leaving no tag under the old one;
 	 *   - "remove tag" drops a tag.
+	 *
+	 * The first cases build the tag they act on with an operation of their own; the last ones act on tags the
+	 * trigger put on the event, which is what the operations are for in practice - overwriting, renaming and
+	 * dropping the tags an event arrives with.
 	 */
 	private function getWindowNoneTagOperationCases(): array {
 		return [
@@ -2746,8 +2757,66 @@ HEREDOC;
 					[CCepRuleHelper::OP_REMOVE_TAG, ['tag' => 'op_remove']]
 				],
 				'expected' => ['op_remove' => null]
+			],
+			// The cases below work on tags the trigger itself put on the event rather than on tags an earlier
+			// operation of this very rule added, so the operations are checked against tags that already exist
+			// when the event reaches CEP. Their 'trigger_tags' are added to the trigger prototypes by
+			// prepareDataCepWindowNoneTagOperations().
+			[
+				'trigger_tags' => [['tag' => 'op_trigger_set', 'value' => 'from_trigger']],
+				'operations' => [
+					[CCepRuleHelper::OP_SET_TAG, ['tag' => 'op_trigger_set', 'tag_value' => 'from_rule']]
+				],
+				'expected' => ['op_trigger_set' => 'from_rule']
+			],
+			[
+				'trigger_tags' => [['tag' => 'op_trigger_value', 'value' => 'from_trigger']],
+				'operations' => [
+					[CCepRuleHelper::OP_SET_TAG_VALUE, ['tag' => 'op_trigger_value', 'tag_value' => 'from_rule']]
+				],
+				'expected' => ['op_trigger_value' => 'from_rule']
+			],
+			[
+				'trigger_tags' => [['tag' => 'op_trigger_counter', 'value' => '10']],
+				'operations' => [
+					[CCepRuleHelper::OP_INCREASE_TAG_VALUE, ['tag' => 'op_trigger_counter']]
+				],
+				'expected' => ['op_trigger_counter' => '11']
+			],
+			[
+				'trigger_tags' => [['tag' => 'op_trigger_rename', 'value' => 'kept']],
+				'operations' => [
+					[CCepRuleHelper::OP_RENAME_TAG, ['tag' => 'op_trigger_rename',
+						'new_tag' => 'op_trigger_renamed'
+					]]
+				],
+				'expected' => ['op_trigger_rename' => null, 'op_trigger_renamed' => 'kept']
+			],
+			[
+				'trigger_tags' => [['tag' => 'op_trigger_remove', 'value' => 'gone']],
+				'operations' => [
+					[CCepRuleHelper::OP_REMOVE_TAG, ['tag' => 'op_trigger_remove']]
+				],
+				'expected' => ['op_trigger_remove' => null]
 			]
 		];
+	}
+
+	/**
+	 * The extra trigger prototype tags the tag operation cases need: the tags their operations modify, remove
+	 * or rename on events that already carry them when CEP sees them, as opposed to the tags an operation of
+	 * the rule itself adds first.
+	 */
+	private function getWindowNoneTagOperationTriggerTags(): array {
+		$tags = [];
+
+		foreach ($this->getWindowNoneTagOperationCases() as $case) {
+			if (array_key_exists('trigger_tags', $case)) {
+				$tags = array_merge($tags, $case['trigger_tags']);
+			}
+		}
+
+		return $tags;
 	}
 
 	/**
@@ -5408,8 +5477,10 @@ HEREDOC;
 	 * The extra rule matches every event of the scenario and, instead of adding one tag, runs the whole tag
 	 * operation set on it: "add tag", "set tag" on a free and on a taken name, "set tag value" on an existing
 	 * tag and on a name no tag has, "increase" and "decrease tag value" on a numeric and on a non-numeric
-	 * value, "rename tag" and "remove tag". Every event must end up with exactly the tag state those
-	 * operations produce, down to the tags they must have left behind renamed or removed. None of the rules
+	 * value, "rename tag" and "remove tag". Half of them work on tags the rule adds itself, the other half on
+	 * tags the trigger generated - the discovered triggers carry a few extra tags for that. Every event must
+	 * end up with exactly the tag state those operations produce, down to the tags they must have left behind
+	 * renamed or removed. None of the rules
 	 * closes anything, so all three problems stay open until the trigger expression recovers them.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowNone$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
@@ -5419,6 +5490,7 @@ HEREDOC;
 
 		try {
 			$this->runEventAssessmentTestCepWindowNone();
+			sleep(60);
 		}
 		finally {
 			$this->cleanupCepRules();
