@@ -84,6 +84,7 @@ static char	*trapper_build_push_notify_json(const char *device_id, const char *p
 typedef struct
 {
 	char	*uuid;
+	char	*name;
 	char	*push_token;
 	char	*mobile_encryption_key;
 }
@@ -95,6 +96,7 @@ ZBX_PTR_VECTOR_IMPL(push_device_ptr, zbx_push_device_t *)
 static void	trapper_push_device_free(zbx_push_device_t *device)
 {
 	zbx_free(device->uuid);
+	zbx_free(device->name);
 	zbx_free(device->push_token);
 	zbx_free(device->mobile_encryption_key);
 	zbx_free(device);
@@ -165,7 +167,7 @@ int	trapper_process_push_test(const char *sendto, const char *subject, const cha
 
 	/* one batched lookup for every requested device, instead of one query per device */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select d.uuid,d.push_token,dk.key_"
+			"select d.uuid,d.name,d.push_token,dk.key_"
 			" from device d"
 			" left join device_key dk on dk.deviceid=d.deviceid and dk.active=%d and dk.scope=%d"
 			" where d.status=%d and",
@@ -194,15 +196,16 @@ int	trapper_process_push_test(const char *sendto, const char *subject, const cha
 
 		device = (zbx_push_device_t *)zbx_malloc(NULL, sizeof(zbx_push_device_t));
 		device->uuid = zbx_strdup(NULL, db_row[0]);
-		device->push_token = zbx_strdup(NULL, db_row[1]);
-		device->mobile_encryption_key = (NULL != db_row[2] ? zbx_strdup(NULL, db_row[2]) : NULL);
+		device->name = zbx_strdup(NULL, db_row[1]);
+		device->push_token = zbx_strdup(NULL, db_row[2]);
+		device->mobile_encryption_key = (NULL != db_row[3] ? zbx_strdup(NULL, db_row[3]) : NULL);
 		zbx_vector_push_device_ptr_append(&found_devices, device);
 	}
 	zbx_db_free_result(result);
 
 	for (i = 0; i < uuids.values_num; i++)
 	{
-		const char	*uuid = uuids.values[i];
+		const char	*uuid = uuids.values[i], *name = NULL;
 		char		*params = NULL, *item_error = NULL, *item_value = NULL, *item_debug = NULL,
 				*recipient = NULL;
 		unsigned char	*data = NULL, *response = NULL;
@@ -215,6 +218,7 @@ int	trapper_process_push_test(const char *sendto, const char *subject, const cha
 
 			if (0 == strcmp(device->uuid, uuid))
 			{
+				name = device->name;
 				params = trapper_build_push_notify_json(device->uuid, device->push_token,
 						device->mobile_encryption_key, subject, message);
 				break;
@@ -251,8 +255,16 @@ int	trapper_process_push_test(const char *sendto, const char *subject, const cha
 
 			if (1 < uuids.values_num)
 			{
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s: %s", uuid,
-						ZBX_NULL2EMPTY_STR(item_error));
+				if (NULL != name)
+				{
+					zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s (%s): %s", uuid,
+							name, ZBX_NULL2EMPTY_STR(item_error));
+				}
+				else
+				{
+					zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s: %s", uuid,
+							ZBX_NULL2EMPTY_STR(item_error));
+				}
 			}
 			else
 				zbx_strcpy_alloc(error, &error_alloc, &error_offset, ZBX_NULL2EMPTY_STR(item_error));

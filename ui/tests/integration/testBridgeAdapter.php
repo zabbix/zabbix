@@ -28,7 +28,9 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const ADAPTER_SCRIPT = __DIR__.'/data/bridge_adapter_mock.py';
 	private const INIT_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000101';
 	private const NOTIFY_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000102';
+	private const NOTIFY_DEVICE_NAME = 'Bridge adapter integration notification device';
 	private const OFFBOARD_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000103';
+	private const OFFBOARD_DEVICE_NAME = 'Bridge adapter integration offboard device';
 	private const UNKNOWN_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000104';
 	private const REAL_NOTIFY_HOST = 'bridge_adapter_real_notification_host';
 	private const REAL_NOTIFY_ITEM_KEY = 'bridge.adapter.real.notify';
@@ -197,7 +199,7 @@ class testBridgeAdapter extends CIntegrationTest {
 				'deviceid' => $deviceid,
 				'userid' => 1,
 				'uuid' => self::NOTIFY_DEVICE_UUID,
-				'name' => 'Bridge adapter integration notification device',
+				'name' => self::NOTIFY_DEVICE_NAME,
 				'status' => ZBX_DEVICE_STATUS_ACTIVATED,
 				'push_token' => 'bridge-adapter-integration-push-token',
 				'activated_at' => $current_time
@@ -206,7 +208,7 @@ class testBridgeAdapter extends CIntegrationTest {
 				'deviceid' => bcadd($deviceid, 1, 0),
 				'userid' => 1,
 				'uuid' => self::OFFBOARD_DEVICE_UUID,
-				'name' => 'Bridge adapter integration offboard device',
+				'name' => self::OFFBOARD_DEVICE_NAME,
 				'status' => ZBX_DEVICE_STATUS_ACTIVATED,
 				'push_token' => 'bridge-adapter-integration-offboard-push-token',
 				'activated_at' => $current_time
@@ -1219,12 +1221,46 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
 
 		$this->assertFalse($result);
+		// The unknown UUID never matched a device row, so no name is known for it - error falls back to the UUID.
 		$this->assertSame(self::UNKNOWN_DEVICE_UUID.': '.self::PUSH_TEST_ERROR_DEVICE_NOT_FOUND,
 			$client->getError()
 		);
 
 		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
 			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMockWithNotifyError
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_notifyMultipleDevicesFailureIncludesDeviceName(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$result = $client->testMediaType([
+			'mediatypeid' => self::$push_mediatypeid,
+			'sendto' => self::NOTIFY_DEVICE_UUID.','.self::OFFBOARD_DEVICE_UUID,
+			'subject' => 'Bridge adapter integration test',
+			'message' => 'Bridge adapter integration test message'
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
+
+		$this->assertFalse($result);
+		// Both devices are known (found in the device table), so their names are appended alongside the UUID.
+		$this->assertSame(
+			self::NOTIFY_DEVICE_UUID.' ('.self::NOTIFY_DEVICE_NAME.'): '.self::PUSH_ERROR_RETURNED_ERROR."\n".
+			self::OFFBOARD_DEVICE_UUID.' ('.self::OFFBOARD_DEVICE_NAME.'): '.self::PUSH_ERROR_RETURNED_ERROR,
+			$client->getError()
+		);
+
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
+		});
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return $request['body']['params']['to']['device_id'] === self::OFFBOARD_DEVICE_UUID;
 		});
 	}
 
