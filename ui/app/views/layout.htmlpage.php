@@ -76,8 +76,6 @@ function local_showSidebar(array $data): void {
 }
 
 function local_showContent(array $data): void {
-	local_showBanner($data);
-
 	$messages = get_prepared_messages(['with_current_messages' => true]);
 
 	echo unpack_object($messages);
@@ -85,33 +83,6 @@ function local_showContent(array $data): void {
 	echo $data['main_block'];
 
 	echo makeServerStatusOutput()->toString();
-}
-
-function local_showFooter(array $data): void {
-	echo (new CPartial('layout.htmlpage.footer', [
-		'user' => [
-			'username' => CWebUser::$data['username'],
-			'debug_mode' => CWebUser::$data['debug_mode']
-		],
-		'web_layout_mode' => $data['web_layout_mode']
-	]))->getOutput();
-}
-
-function local_showBanner(array $data): void {
-	global $ZBX_FEATURE_FLAGS;
-
-	if (!$ZBX_FEATURE_FLAGS['banners_enabled'] || $data['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE) {
-		return;
-	}
-
-	$data['user']['lang'] = CWebUser::$data['lang'];
-
-	$active_banner = CBannerHelper::getActiveBanner($data);
-
-	if ($active_banner) {
-		echo (new CPartial('layout.htmlpage.banner', $data + ['banner' => $active_banner]))
-			->getOutput();
-	}
 }
 
 local_showDocumentHead($data);

@@ -211,6 +211,29 @@ class CHtmlPage {
 			$divs[] = (new CDiv($this->controls))->addClass(self::ZBX_STYLE_HEADER_CONTROLS);
 		}
 
-		return (new CTag('header', true, $divs))->addClass(self::ZBX_STYLE_HEADER_TITLE);
+		return (new CTag('header', true, [
+			$this->createBanner(),
+			(new CDiv($divs))->addClass(self::ZBX_STYLE_HEADER_TITLE)
+		]));
+	}
+
+	private function createBanner(): ?CPartial {
+		global $ZBX_FEATURE_FLAGS;
+
+		if (!$ZBX_FEATURE_FLAGS['banners_enabled'] || $this->web_layout_mode == ZBX_LAYOUT_KIOSKMODE) {
+			return null;
+		}
+
+		$data = [
+			'user' => [
+				'lang' => CWebUser::$data['lang']
+			]
+		];
+
+		$active_banner = CBannerHelper::getActiveBanner($data);
+
+		return $active_banner
+			? new CPartial('layout.htmlpage.banner', $data + ['banner' => $active_banner])
+			: null;
 	}
 }

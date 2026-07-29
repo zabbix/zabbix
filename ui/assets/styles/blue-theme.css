@@ -3,6 +3,7 @@
   --font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif;
   --font-stack-mono: "Courier New", Courier, monospace;
   --font-body-size: 75%;
+  --banner-size: 0;
   --header-size: 45px;
   --min-content-size: 1200px;
   --badge-border-radius: 2px;
@@ -910,10 +911,6 @@ output {
     margin-top: 0; }
 
 header {
-  display: flex;
-  align-items: center;
-  height: var(--header-size);
-  padding: 0 10px;
   background: #ffffff;
   border-bottom: 1px solid #dfe4e7;
   box-shadow: 0 -6px 6px 4px rgba(118, 141, 153, 0.5); }
@@ -932,6 +929,11 @@ header {
     padding: 2px; }
     header .header-doc-link + .header-controls {
       margin-left: 0; }
+  header .header-title {
+    display: flex;
+    align-items: center;
+    height: var(--header-size);
+    padding: 0 10px; }
   header .header-controls {
     flex-shrink: 0;
     margin: 0 -2px 0 auto;

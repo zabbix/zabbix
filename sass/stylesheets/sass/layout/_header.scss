@@ -1,8 +1,4 @@
 header {
-	display: flex;
-	align-items: center;
-	height: var(--header-size);
-	padding: 0 10px;
 	background: $header-bg-color;
 	border-bottom: 1px solid $ui-border-color;
 	box-shadow: 0 -6px 6px 4px $action-shadow-color;
@@ -28,6 +24,13 @@ header {
 		& + .header-controls {
 			margin-left: 0;
 		}
+	}
+
+	.header-title {
+		display: flex;
+		align-items: center;
+		height: var(--header-size);
+		padding: 0 10px;
 	}
 
 	.header-controls {
