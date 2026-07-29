@@ -7344,101 +7344,11 @@ zabbix_export:
           value_type: TEXT
           description: 'Collects Azure daily account data.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		rows,
-                  		result,
-                  		row,
-                  		subscription_id,
-                  		currency,
-                  		total_cost;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  
-                  		var parts = path.split(separator);
-                  		var current = data;
-                  
-                  		var i;
-                  
-                  		for (i = 0; i < parts.length; i++) {
-                  
-                  			if (current === null || current === undefined) {
-                  				return default_value;
-                  			}
-                  
-                  			current = current[parts[i]];
-                  		}
-                  
-                  		return (current === undefined || current === null)
-                  			? default_value
-                  			: current;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'accounts_regions.accounts', '.', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		rows = getField(data, 'accounts', '.', null);
-                  	}
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'accounts not found';
-                  	}
-                  
-                  	result = [];
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  
-                  		row = rows[i];
-                  
-                  		subscription_id =
-                  			getField(row, 'SubscriptionId', '.', null) ||
-                  			getField(row, 'subscription_id', '.', null);
-                  
-                  		currency =
-                  			getField(row, 'Currency', '.', null) ||
-                  			getField(row, 'currency', '.', null);
-                  
-                  		total_cost =
-                  			getField(row, 'TotalDailyCost', '.', null);
-                  
-                  		if (total_cost === null) {
-                  			total_cost = getField(row, 'total_cost', '.', 0);
-                  		}
-                  
-                  		if (isNaN(Number(total_cost))) {
-                  			total_cost = 0;
-                  		}
-                  
-                  		result.push({
-                  			subscription_id: subscription_id || 'unknown',
-                  			currency: currency || 'UNKNOWN',
-                  			total_cost: Number(total_cost).toFixed(2)
-                  		});
-                  	}
-                  
-                  	return JSON.stringify(result);
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return JSON.stringify([]);
-                  }
+                - $.accounts
           master_item:
-            key: azure.get.daily.costs
+            key: azure.region.subscription.daily.get
           tags:
             - tag: component
               value: raw
@@ -7450,6 +7360,10 @@ zabbix_export:
           units: '!EUR'
           params: last(//azure.first.quarter.cost)+last(//azure.second.quarter.cost)+last(//azure.third.quarter.cost)+last(//azure.fourth.quarter.cost)
           description: 'Azure total annual cost.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: cost
@@ -7461,6 +7375,10 @@ zabbix_export:
           units: '!EUR'
           params: 'avg(//azure.daily.total.cost,1w)'
           description: 'Azure daily average cost in one week.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: cost
@@ -7471,73 +7389,11 @@ zabbix_export:
           units: '!services'
           description: 'Azure daily service count.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		rows,
-                  		services,
-                  		service_name;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  
-                  		var parts = path.split(separator);
-                  		var current = data;
-                  
-                  		var i;
-                  
-                  		for (i = 0; i < parts.length; i++) {
-                  
-                  			if (current === null || current === undefined) {
-                  				return default_value;
-                  			}
-                  
-                  			current = current[parts[i]];
-                  		}
-                  
-                  		return (current === undefined || current === null)
-                  			? default_value
-                  			: current;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'cost.data', '.', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'Invalid input data.';
-                  	}
-                  
-                  	services = {};
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  
-                  		service_name = getField(rows[i], 'ServiceName', '.', null);
-                  
-                  		if (service_name) {
-                  			services[service_name] = true;
-                  		}
-                  	}
-                  
-                  	return Object.keys(services).length;
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return 0;
-                  }
+                - $.service_count_daily
           master_item:
-            key: azure.get.daily.costs
+            key: azure.service.daily.total.get
           tags:
             - tag: component
               value: cost
@@ -7549,128 +7405,11 @@ zabbix_export:
           value_type: TEXT
           description: 'Azure daily top service data.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		rows,
-                  		map,
-                  		total_cost,
-                  		result,
-                  		row,
-                  		service,
-                  		cost,
-                  		currency,
-                  		key,
-                  		rows_array,
-                  		top3;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  
-                  		var parts = path.split(separator);
-                  		var current = data;
-                  		var i;
-                  
-                  		for (i = 0; i < parts.length; i++) {
-                  
-                  			if (current === null || current === undefined) {
-                  				return default_value;
-                  			}
-                  
-                  			current = current[parts[i]];
-                  		}
-                  
-                  		return (current === undefined || current === null)
-                  			? default_value
-                  			: current;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'cost.data', '.', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'Invalid input data.';
-                  	}
-                  
-                  	map = {};
-                  	total_cost = 0;
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  
-                  		row = rows[i];
-                  
-                  		service = getField(row, 'ServiceName', '.', 'Unknown');
-                  
-                  		cost = parseFloat(getField(row, 'PreTaxCost', '.', 0));
-                  
-                  		if (isNaN(cost)) {
-                  			cost = 0;
-                  		}
-                  
-                  		currency = getField(row, 'Currency', '.', 'N/A');
-                  
-                  		total_cost += cost;
-                  
-                  		if (!map[service]) {
-                  			map[service] = {
-                  				service: service,
-                  				currency: currency,
-                  				cost: 0
-                  			};
-                  		}
-                  
-                  		map[service].cost += cost;
-                  	}
-                  
-                  	if (total_cost === 0) {
-                  		return JSON.stringify([]);
-                  	}
-                  
-                  	rows_array = [];
-                  
-                  	for (key in map) {
-                  
-                  		if (Object.prototype.hasOwnProperty.call(map, key)) {
-                  			rows_array.push(map[key]);
-                  		}
-                  	}
-                  
-                  	rows_array.sort(function (a, b) {
-                  		return b.cost - a.cost;
-                  	});
-                  
-                  	top3 = [];
-                  
-                  	for (i = 0; i < 3 && i < rows_array.length; i++) {
-                  
-                  		top3.push({
-                  			service: rows_array[i].service,
-                  			currency: rows_array[i].currency,
-                  			total_cost: rows_array[i].cost,
-                  			percent: parseFloat(((rows_array[i].cost / total_cost) * 100).toFixed(2))
-                  		});
-                  	}
-                  
-                  	return JSON.stringify(top3);
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return JSON.stringify([]);
-                  }
+                - $.top_services
           master_item:
-            key: azure.get.daily.costs
+            key: azure.service.daily.total.get
           tags:
             - tag: component
               value: raw
@@ -7682,79 +7421,11 @@ zabbix_export:
           units: '!EUR'
           description: 'Azure daily total cost.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		rows,
-                  		total,
-                  		row,
-                  		cost_value;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  
-                  		var parts = path.split(separator);
-                  		var current = data;
-                  		var i;
-                  
-                  		for (i = 0; i < parts.length; i++) {
-                  
-                  			if (current === null || current === undefined) {
-                  				return default_value;
-                  			}
-                  
-                  			current = current[parts[i]];
-                  		}
-                  
-                  		return (current === undefined || current === null)
-                  			? default_value
-                  			: current;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'cost.data', '.', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'Invalid input data.';
-                  	}
-                  
-                  	total = 0;
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  
-                  		row = rows[i];
-                  
-                  		cost_value = getField(row, 'PreTaxCost', '.', 0);
-                  
-                  		cost_value = Number(cost_value);
-                  
-                  		if (isNaN(cost_value)) {
-                  			cost_value = 0;
-                  		}
-                  
-                  		total += cost_value;
-                  	}
-                  
-                  	return total;
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return 0;
-                  }
+                - $.total_cost
           master_item:
-            key: azure.get.daily.costs
+            key: azure.service.daily.total.get
           tags:
             - tag: component
               value: cost
@@ -7766,98 +7437,11 @@ zabbix_export:
           units: '!EUR'
           description: 'Total Q1 cost.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	function getField(obj, path, default_value) {
-                  		try {
-                  			var parts = path.split('.'),
-                  				current = obj,
-                  				idx;
-                  
-                  			for (idx = 0; idx < parts.length; idx++) {
-                  
-                  				if (current === null || current === undefined) {
-                  					return default_value;
-                  				}
-                  
-                  				current = current[parts[idx]];
-                  			}
-                  
-                  			return (current === undefined || current === null)
-                  				? default_value
-                  				: current;
-                  
-                  		} catch (e) {
-                  			return default_value;
-                  		}
-                  	}
-                  
-                  	var data,
-                  		rows,
-                  		total,
-                  		loop_i,
-                  		row,
-                  		billing_month,
-                  		month,
-                  		cost;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'monthCost.data', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'monthCost.data not found';
-                  	}
-                  
-                  	total = 0;
-                  
-                  	for (loop_i = 0; loop_i < rows.length; loop_i++) {
-                  
-                  		row = rows[loop_i];
-                  
-                  		billing_month = getField(row, 'BillingMonth', null);
-                  
-                  		if (!billing_month) {
-                  			continue;
-                  		}
-                  
-                  		billing_month = String(billing_month).split('-');
-                  
-                  		if (billing_month.length < 2) {
-                  			continue;
-                  		}
-                  
-                  		month = parseInt(billing_month[1], 10);
-                  
-                  		if (month >= 1 && month <= 3) {
-                  
-                  			cost = parseFloat(getField(row, 'PreTaxCost', 0));
-                  
-                  			if (isNaN(cost)) {
-                  				cost = 0;
-                  			}
-                  
-                  			total += cost;
-                  		}
-                  	}
-                  
-                  	return total;
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return 0;
-                  }
+                - $.q1
           master_item:
-            key: azure.get.monthly.costs
+            key: azure.month.cost.total.get
           tags:
             - tag: component
               value: cost
@@ -7869,98 +7453,11 @@ zabbix_export:
           units: '!EUR'
           description: 'Total Q4 cost.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	function getField(obj, path, default_value) {
-                  		try {
-                  			var parts = path.split('.'),
-                  				current = obj,
-                  				idx;
-                  
-                  			for (idx = 0; idx < parts.length; idx++) {
-                  
-                  				if (current === null || current === undefined) {
-                  					return default_value;
-                  				}
-                  
-                  				current = current[parts[idx]];
-                  			}
-                  
-                  			return (current === undefined || current === null)
-                  				? default_value
-                  				: current;
-                  
-                  		} catch (e) {
-                  			return default_value;
-                  		}
-                  	}
-                  
-                  	var data,
-                  		rows,
-                  		total,
-                  		loop_i,
-                  		row,
-                  		billing_month,
-                  		month,
-                  		cost;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'monthCost.data', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'monthCost.data not found';
-                  	}
-                  
-                  	total = 0;
-                  
-                  	for (loop_i = 0; loop_i < rows.length; loop_i++) {
-                  
-                  		row = rows[loop_i];
-                  
-                  		billing_month = getField(row, 'BillingMonth', null);
-                  
-                  		if (!billing_month) {
-                  			continue;
-                  		}
-                  
-                  		billing_month = String(billing_month).split('-');
-                  
-                  		if (billing_month.length < 2) {
-                  			continue;
-                  		}
-                  
-                  		month = parseInt(billing_month[1], 10);
-                  
-                  		if (month >= 10 && month <= 12) {
-                  
-                  			cost = parseFloat(getField(row, 'PreTaxCost', 0));
-                  
-                  			if (isNaN(cost)) {
-                  				cost = 0;
-                  			}
-                  
-                  			total += cost;
-                  		}
-                  	}
-                  
-                  	return total;
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return 0;
-                  }
+                - $.q4
           master_item:
-            key: azure.get.monthly.costs
+            key: azure.month.cost.total.get
           tags:
             - tag: component
               value: cost
@@ -8058,13 +7555,20 @@ zabbix_export:
             		}
             	},
             
-            	getField: function (data, path) {
-            		var steps = path.split('.');
+            	getField: function (data, path, separator, default_value) {
+            		if (typeof separator === 'undefined') {
+            			separator = '.';
+            		}
+            		var steps = path.split(separator);
             		for (var i = 0; i < steps.length; i++) {
             			var step = steps[i];
-            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-            				throw 'Required field was not found: ' + path;
+            			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+            				if (typeof default_value === 'undefined') {
+            					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
+            				}
+            				return default_value;
             			}
+            
             			data = data[step];
             		}
             
@@ -8179,14 +7683,14 @@ zabbix_export:
             				row_data[col.name] = row[i];
             			});
             
-            			var cost = +row_data.PreTaxCost,
-            				region = row_data.ResourceLocation,
-            				account = row_data.SubscriptionId;
+            		var cost = +AzureCost.getField(row_data, 'PreTaxCost', '.', 0),
+            			region = AzureCost.getField(row_data, 'ResourceLocation', '.', null),
+            			account = AzureCost.getField(row_data, 'SubscriptionId', '.', null);
             
             			if (region) {
             				region_map[region] = region_map[region] || {
             					ResourceLocation: region,
-            					Currency: row_data.Currency,
+            					Currency: AzureCost.getField(row_data, 'Currency', '.', null),
             					TotalDailyCost: 0
             				};
             
@@ -8196,7 +7700,7 @@ zabbix_export:
             			if (account) {
             				account_map[account] = account_map[account] || {
             					SubscriptionId: account,
-            					Currency: row_data.Currency,
+            					Currency: AzureCost.getField(row_data, 'Currency', '.', null),
             					TotalDailyCost: 0
             				};
             
@@ -8505,6 +8009,159 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: availability
+        - uuid: 43f2848c40be4585a26a78153edee9b5
+          name: 'Get total months'
+          type: DEPENDENT
+          key: azure.month.cost.total.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects Azure monthly costs data.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var getField = function (data, path, separator, default_value) {
+                  	if (typeof separator === 'undefined') {
+                  		separator = '.';
+                  	}
+                  	var steps = path.split(separator);
+                  	for (var step_index = 0; step_index < steps.length; step_index++) {
+                  		var step = steps[step_index];
+                  		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+                  			if (typeof default_value === 'undefined') {
+                  				throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
+                  			}
+                  			return default_value;
+                  		}
+                  
+                  		data = data[step];
+                  	}
+                  
+                  	return data;
+                  };
+                  
+                  try {
+                  	var data,
+                  		rows,
+                  		quarterly_costs,
+                  		month_map,
+                  		currency,
+                  		currency_value,
+                  		loop_index,
+                  		row,
+                  		billing_month,
+                  		month,
+                  		month_key,
+                  		cost,
+                  		months,
+                  		current_month,
+                  		previous_month,
+                  		monthly_comparison;
+                  
+                  	data = JSON.parse(value);
+                  
+                  	if (typeof data.error !== 'undefined') {
+                  		throw data.error;
+                  	}
+                  
+                  	rows = getField(data, 'monthCost.data', '.', null);
+                  
+                  	if (!Array.isArray(rows)) {
+                  		throw 'monthCost.data not found';
+                  	}
+                  
+                  	quarterly_costs = {
+                  		q1: 0,
+                  		q2: 0,
+                  		q3: 0,
+                  		q4: 0
+                  	};
+                  
+                  	month_map = {};
+                  	currency = null;
+                  
+                  	for (loop_index = 0; loop_index < rows.length; loop_index++) {
+                  		row = rows[loop_index];
+                  
+                  		billing_month = String(getField(row, 'BillingMonth', '.', ''));
+                  
+                  		month_key = billing_month.slice(0, 7);
+                  
+                  		month = parseInt(month_key.split('-')[1], 10);
+                  
+                  		cost = parseFloat(getField(row, 'PreTaxCost', '.', 0));
+                  
+                  		if (isNaN(cost)) {
+                  			cost = 0;
+                  		}
+                  
+                  		currency_value = getField(row, 'Currency', '.', null);
+                  
+                  		if (currency === null && currency_value !== null) {
+                  			currency = currency_value;
+                  		}
+                  
+                  		month_map[month_key] = (month_map[month_key] || 0) + cost;
+                  
+                  		if (month >= 1 && month <= 3) {
+                  			quarterly_costs.q1 += cost;
+                  		} else if (month >= 4 && month <= 6) {
+                  			quarterly_costs.q2 += cost;
+                  		} else if (month >= 7 && month <= 9) {
+                  			quarterly_costs.q3 += cost;
+                  		} else if (month >= 10 && month <= 12) {
+                  			quarterly_costs.q4 += cost;
+                  		}
+                  	}
+                  
+                  	months = Object.keys(month_map).sort();
+                  
+                  	current_month = months.length
+                  		? months[months.length - 1]
+                  		: null;
+                  
+                  	previous_month = months.length > 1
+                  		? months[months.length - 2]
+                  		: null;
+                  
+                  	monthly_comparison = [];
+                  
+                  	if (previous_month) {
+                  		monthly_comparison.push({
+                  			type: 'previous',
+                  			currency: currency,
+                  			month: previous_month,
+                  			total_cost: month_map[previous_month]
+                  		});
+                  	}
+                  
+                  	if (current_month) {
+                  		monthly_comparison.push({
+                  			type: 'current',
+                  			currency: currency,
+                  			month: current_month,
+                  			total_cost: month_map[current_month]
+                  		});
+                  	}
+                  
+                  	return JSON.stringify({
+                  		q1: quarterly_costs.q1,
+                  		q2: quarterly_costs.q2,
+                  		q3: quarterly_costs.q3,
+                  		q4: quarterly_costs.q4,
+                  		monthly_comparison: monthly_comparison
+                  	});
+                  }
+                  catch (error) {
+                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
+                  
+                  	return JSON.stringify({ error: error.toString() });
+                  }
+          master_item:
+            key: azure.get.monthly.costs
+          tags:
+            - tag: component
+              value: raw
         - uuid: fa5da26d0ccd4f61afc7f47250a21ebd
           name: 'Azure monthly average cost'
           type: CALCULATED
@@ -8513,6 +8170,10 @@ zabbix_export:
           units: '!EUR'
           params: 'avg(last_foreach(//azure.monthly.cost[*]))'
           description: 'Azure monthly average cost.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: cost
@@ -8524,144 +8185,11 @@ zabbix_export:
           value_type: TEXT
           description: 'Azure monthly compare costs.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  function getField(obj, path, default_value) {
-                  	try {
-                  		var parts = path.split('.'),
-                  			current = obj,
-                  			i;
-                  
-                  		for (i = 0; i < parts.length; i++) {
-                  
-                  			if (current === null || current === undefined) {
-                  				return default_value;
-                  			}
-                  
-                  			current = current[parts[i]];
-                  		}
-                  
-                  		return (current === undefined || current === null)
-                  			? default_value
-                  			: current;
-                  
-                  	} catch (e) {
-                  		return default_value;
-                  	}
-                  }
-                  
-                  var data,
-                  	rows,
-                  	currency,
-                  	month_map,
-                  	months,
-                  	current_month_str,
-                  	previous_month_str,
-                  	current_month,
-                  	previous_month,
-                  	row,
-                  	cost,
-                  	month_raw,
-                  	month;
-                  
-                  try {
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'serviceCost.data', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		rows = getField(data, 'serviceCost', null);
-                  	}
-                  
-                  	if (!Array.isArray(rows)) {
-                  		rows = getField(data, 'data', null);
-                  	}
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'Invalid input data: cannot find serviceCost array';
-                  	}
-                  
-                  	currency = 'EUR';
-                  	month_map = {};
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  
-                  		row = rows[i];
-                  
-                  		if (!row) {
-                  			continue;
-                  		}
-                  
-                  		cost = parseFloat(row.PreTaxCost);
-                  
-                  		if (isNaN(cost)) {
-                  			cost = 0;
-                  		}
-                  
-                  		month_raw = row.BillingMonth;
-                  
-                  		month = '';
-                  
-                  		if (typeof month_raw === 'string') {
-                  
-                  			if (month_raw.indexOf('-') !== -1 && month_raw.length >= 7) {
-                  				month = month_raw.slice(0, 7);
-                  			}
-                  			else if (month_raw.length === 6) {
-                  				month = month_raw.slice(0, 4) + '-' + month_raw.slice(4, 6);
-                  			}
-                  		}
-                  
-                  		if (!month) {
-                  			continue;
-                  		}
-                  
-                  		if (row.Currency) {
-                  			currency = row.Currency;
-                  		}
-                  
-                  		month_map[month] = (month_map[month] || 0) + cost;
-                  	}
-                  
-                  	months = Object.keys(month_map).sort();
-                  
-                  	current_month_str = months.length ? months[months.length - 1] : null;
-                  	previous_month_str = months.length > 1 ? months[months.length - 2] : null;
-                  
-                  	current_month = {
-                  		type: 'current',
-                  		currency: currency,
-                  		month_date: current_month_str,
-                  		total_cost: current_month_str
-                  			? parseFloat(month_map[current_month_str].toFixed(2))
-                  			: 0
-                  	};
-                  
-                  	previous_month = {
-                  		type: 'previous',
-                  		currency: currency,
-                  		month_date: previous_month_str,
-                  		total_cost: previous_month_str
-                  			? parseFloat(month_map[previous_month_str].toFixed(2))
-                  			: 0
-                  	};
-                  
-                  	return JSON.stringify([previous_month, current_month]);
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return JSON.stringify({error: error});
-                  }
+                - $.monthly_comparison
           master_item:
-            key: azure.get.monthly.costs
+            key: azure.month.cost.total.get
           tags:
             - tag: component
               value: raw
@@ -8673,6 +8201,10 @@ zabbix_export:
           units: '!EUR'
           params: 'max(0, last(//azure.monthly.compare.type.cost["current"]) - last(//azure.monthly.compare.type.cost["previous"]))'
           description: 'Calculates Azure current monthly delta compared to previous month.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: calculate
@@ -8684,6 +8216,10 @@ zabbix_export:
           units: '!EUR'
           params: 'last(//azure.monthly.compare.type.cost["current"]) - last(//azure.monthly.compare.type.cost["previous"])'
           description: 'Calculates Azure current monthly budget delta compared to previous month.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: calculate
@@ -8695,6 +8231,10 @@ zabbix_export:
           units: '!%'
           params: 'max(0, (last(//azure.monthly.compare.type.cost["current"]) - last(//azure.monthly.compare.type.cost["previous"])) / last(//azure.monthly.compare.type.cost["previous"]) * 100)'
           description: 'Calculates Azure current monthly delta, in percent, compared to previous month.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: calculate
@@ -8706,6 +8246,10 @@ zabbix_export:
           units: '!EUR'
           params: 'last(//azure.second.quarter.cost) - last(//azure.first.quarter.cost)'
           description: 'Difference in cost between `Q2` and `Q1`.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: cost
@@ -8717,6 +8261,10 @@ zabbix_export:
           units: '!EUR'
           params: 'last(//azure.third.quarter.cost) - last(//azure.second.quarter.cost)'
           description: 'Difference in cost between `Q3` and `Q2`.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: cost
@@ -8728,6 +8276,10 @@ zabbix_export:
           units: '!EUR'
           params: 'last(//azure.fourth.quarter.cost) - last(//azure.third.quarter.cost)'
           description: 'Difference in cost between `Q4` and `Q3`.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: cost
@@ -8739,87 +8291,245 @@ zabbix_export:
           units: '!EUR'
           params: '(last(//azure.q1.delta.cost) + last(//azure.q2.delta.cost) + last(//azure.q3.delta.cost)) / 3'
           description: 'Average quarterly cost change across the year based on `Q1`, `Q2` and `Q3` deltas. Shows whether spending is steadily increasing, decreasing, or staying stable over time.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: cost
-        - uuid: 90a639eaf53e4ffb9ddcdc69af3c99e0
-          name: 'Get region yearly cost'
+        - uuid: e22419cf9d4d4c4aa9e9bc05a381d805
+          name: 'Get region and subscription daily data'
           type: DEPENDENT
-          key: azure.region.yearly.get
+          key: azure.region.subscription.daily.get
           history: '0'
           value_type: TEXT
-          description: 'Collects data for each region cost within a yearly gap.'
+          description: 'Collects Azure region and subscription daily costs data.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  try {
-                  
-                  	function getField(obj, path, default_value) {
-                  		try {
-                  			var parts = path.split('.'),
-                  				current = obj,
-                  				i;
-                  
-                  			for (i = 0; i < parts.length; i++) {
-                  
-                  				if (current === null || current === undefined) {
-                  					return default_value;
-                  				}
-                  
-                  				current = current[parts[i]];
+                  var getField = function (data, path, separator, default_value) {
+                  	if (typeof separator === 'undefined') {
+                  		separator = '.';
+                  	}
+                  	var steps = path.split(separator);
+                  	for (var step_index = 0; step_index < steps.length; step_index++) {
+                  		var step = steps[step_index];
+                  		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+                  			if (typeof default_value === 'undefined') {
+                  				throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
                   			}
-                  
-                  			return (current === undefined || current === null)
-                  				? default_value
-                  				: current;
-                  
-                  		} catch (e) {
                   			return default_value;
                   		}
+                  
+                  		data = data[step];
                   	}
                   
+                  	return data;
+                  };
+                  
+                  try {
                   	var data,
-                  		rows,
+                  		region_rows,
+                  		account_rows,
                   		regions_map,
-                  		result,
+                  		accounts_map,
+                  		regions,
+                  		accounts,
                   		row,
                   		region,
+                  		subscription_id,
                   		currency,
                   		cost,
-                  		key;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
+                  		key,
+                  		region_index,
+                  		account_index,
+                  		result;
                   
                   	data = JSON.parse(value);
                   
-                  	rows = getField(data, 'resourceLocationCost.data', null);
+                  	region_rows = getField(data, 'accounts_regions.regions', '.', null);
                   
-                  	if (!Array.isArray(rows)) {
-                  		throw 'resourceLocationCost.data not found';
+                  	if (!Array.isArray(region_rows)) {
+                  		region_rows = getField(data, 'regions', '.', null);
+                  	}
+                  
+                  	account_rows = getField(data, 'accounts_regions.accounts', '.', null);
+                  
+                  	if (!Array.isArray(account_rows)) {
+                  		account_rows = getField(data, 'accounts', '.', null);
                   	}
                   
                   	regions_map = {};
                   
-                  	for (var i = 0; i < rows.length; i++) {
+                  	for (region_index = 0; region_index < region_rows.length; region_index++) {
                   
-                  		row = rows[i];
+                  		row = region_rows[region_index];
+                  		region = getField(row, 'ResourceLocation', '.', null);
+                  		currency = getField(row, 'Currency', '.', '');
+                  		cost = parseFloat(getField(row, 'TotalDailyCost', '.', 0));
                   
-                  		if (!row) {
-                  			continue;
+                  		if (isNaN(cost)) {
+                  			cost = 0;
                   		}
                   
-                  		region = row.ResourceLocation;
+                  		if (!regions_map[region]) {
+                  
+                  			regions_map[region] = {
+                  				region: region,
+                  				currency: currency,
+                  				total_cost: 0
+                  			};
+                  		}
+                  
+                  		regions_map[region].total_cost += cost;
+                  	}
+                  
+                  	regions = [];
+                  
+                  	for (key in regions_map) {
+                  
+                  		if (Object.prototype.hasOwnProperty.call(regions_map, key)) {
+                  
+                  			regions.push({
+                  				region: regions_map[key].region,
+                  				currency: regions_map[key].currency || 'UNKNOWN',
+                  				total_cost: String(regions_map[key].total_cost)
+                  			});
+                  		}
+                  	}
+                  
+                  	accounts_map = {};
+                  
+                  	for (account_index = 0; account_index < account_rows.length; account_index++) {
+                  
+                  		row = account_rows[account_index];
+                  		subscription_id = getField(row, 'SubscriptionId', '.', null);
+                  		currency = getField(row, 'Currency', '.', '');
+                  		cost = parseFloat(getField(row, 'TotalDailyCost', '.', 0));
+                  
+                  		if (isNaN(cost)) {
+                  			cost = 0;
+                  		}
+                  
+                  		if (!accounts_map[subscription_id]) {
+                  
+                  			accounts_map[subscription_id] = {
+                  				subscription_id: subscription_id,
+                  				currency: currency,
+                  				total_cost: 0
+                  			};
+                  		}
+                  
+                  		accounts_map[subscription_id].total_cost += cost;
+                  	}
+                  
+                  	accounts = [];
+                  
+                  	for (key in accounts_map) {
+                  
+                  		if (Object.prototype.hasOwnProperty.call(accounts_map, key)) {
+                  
+                  			accounts.push({
+                  				subscription_id: accounts_map[key].subscription_id,
+                  				currency: accounts_map[key].currency || 'UNKNOWN',
+                  				total_cost: String(accounts_map[key].total_cost)
+                  			});
+                  		}
+                  	}
+                  
+                  	result = {
+                  		regions: regions,
+                  		accounts: accounts
+                  	};
+                  
+                  	return JSON.stringify(result);
+                  
+                  }
+                  catch (error) {
+                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
+                  
+                  	return JSON.stringify({ error: error.toString()});
+                  }
+          master_item:
+            key: azure.get.daily.costs
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 61c7dcf719f14b6699d5c6d1144f8641
+          name: 'Get region and subscription yearly data'
+          type: DEPENDENT
+          key: azure.region.subscription.yearly.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects Azure region and account yearly costs data.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var getField = function (data, path, separator, default_value) {
+                  	if (typeof separator === 'undefined') {
+                  		separator = '.';
+                  	}
+                  	var steps = path.split(separator);
+                  	for (var step_index = 0; step_index < steps.length; step_index++) {
+                  		var step = steps[step_index];
+                  		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+                  			if (typeof default_value === 'undefined') {
+                  				throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
+                  			}
+                  			return default_value;
+                  		}
+                  
+                  		data = data[step];
+                  	}
+                  
+                  	return data;
+                  };
+                  
+                  try {
+                  	var data,
+                  		region_rows,
+                  		subscription_rows,
+                  		regions_map,
+                  		subscriptions_map,
+                  		regions,
+                  		subscriptions,
+                  		row,
+                  		region,
+                  		subscription_id,
+                  		currency,
+                  		cost,
+                  		key,
+                  		region_index,
+                  		subscription_index,
+                  		result;
+                  
+                  	data = JSON.parse(value);
+                  
+                  	if (typeof data.error !== 'undefined') {
+                  		throw data.error;
+                  	}
+                  
+                  	region_rows = getField(data, 'resourceLocationCost.data', '.', []);
+                  
+                  	subscription_rows = getField(data, 'monthCost.data', '.', []);
+                  
+                  	regions_map = {};
+                  
+                  	for (region_index = 0; region_index < region_rows.length; region_index++) {
+                  		row = region_rows[region_index];
+                  
+                  		region = getField(row, 'ResourceLocation', '.', null);
                   
                   		if (!region) {
                   			continue;
                   		}
                   
-                  		currency = row.Currency || '';
+                  		currency = getField(row, 'Currency', '.', '');
                   
-                  		cost = parseFloat(row.PreTaxCost);
+                  		cost = parseFloat(getField(row, 'PreTaxCost', '.', 0));
                   
                   		if (isNaN(cost)) {
                   			cost = 0;
@@ -8836,13 +8546,11 @@ zabbix_export:
                   		regions_map[region].total_cost += cost;
                   	}
                   
-                  	result = [];
+                  	regions = [];
                   
                   	for (key in regions_map) {
-                  
                   		if (Object.prototype.hasOwnProperty.call(regions_map, key)) {
-                  
-                  			result.push({
+                  			regions.push({
                   				region: regions_map[key].region,
                   				currency: regions_map[key].currency,
                   				total_cost: String(regions_map[key].total_cost)
@@ -8850,16 +8558,78 @@ zabbix_export:
                   		}
                   	}
                   
-                  	return JSON.stringify(result);
+                  	subscriptions_map = {};
                   
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
+                  	for (subscription_index = 0; subscription_index < subscription_rows.length; subscription_index++) {
+                  		row = subscription_rows[subscription_index];
+                  
+                  		subscription_id = getField(row, 'SubscriptionId', '.', null);
+                  
+                  		if (!subscription_id) {
+                  			continue;
+                  		}
+                  
+                  		currency = getField(row, 'Currency', '.', '');
+                  
+                  		cost = parseFloat(getField(row, 'PreTaxCost', '.', 0));
+                  
+                  		if (isNaN(cost)) {
+                  			cost = 0;
+                  		}
+                  
+                  		if (!subscriptions_map[subscription_id]) {
+                  			subscriptions_map[subscription_id] = {
+                  				subscription_id: subscription_id,
+                  				currency: currency,
+                  				total_cost: 0
+                  			};
+                  		}
+                  
+                  		subscriptions_map[subscription_id].total_cost += cost;
+                  	}
+                  
+                  	subscriptions = [];
+                  
+                  	for (key in subscriptions_map) {
+                  		if (Object.prototype.hasOwnProperty.call(subscriptions_map, key)) {
+                  			subscriptions.push({
+                  				subscription_id: subscriptions_map[key].subscription_id,
+                  				currency: subscriptions_map[key].currency,
+                  				total_cost: String(subscriptions_map[key].total_cost)
+                  			});
+                  		}
+                  	}
+                  
+                  	result = {
+                  		regions: regions,
+                  		subscriptions: subscriptions
+                  	};
+                  
+                  	return JSON.stringify(result);
+                  }
+                  catch (error) {
                   	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
                   
-                  	return JSON.stringify({error: error});
+                  	return JSON.stringify({ error: error.toString() });
                   }
           master_item:
             key: azure.get.monthly.costs
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 90a639eaf53e4ffb9ddcdc69af3c99e0
+          name: 'Get region yearly cost'
+          type: DEPENDENT
+          key: azure.region.yearly.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects data for each region cost within a yearly gap.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.regions
+          master_item:
+            key: azure.region.subscription.yearly.get
           tags:
             - tag: component
               value: raw
@@ -8871,97 +8641,11 @@ zabbix_export:
           value_type: TEXT
           description: 'Collects Azure daily regions data.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		rows,
-                  		result,
-                  		row,
-                  		region,
-                  		currency,
-                  		total_cost;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'accounts_regions.regions', '.', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		rows = getField(data, 'regions', '.', null);
-                  	}
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'regions not found';
-                  	}
-                  
-                  	result = [];
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  
-                  		row = rows[i];
-                  
-                  		region =
-                  			getField(row, 'ResourceLocation', '.', null) ||
-                  			getField(row, 'region', '.', null);
-                  
-                  		currency =
-                  			getField(row, 'Currency', '.', null) ||
-                  			getField(row, 'currency', '.', null);
-                  
-                  		total_cost =
-                  			getField(row, 'TotalDailyCost', '.', null);
-                  
-                  		if (total_cost === null) {
-                  			total_cost = getField(row, 'total_cost', '.', 0);
-                  		}
-                  
-                  		if (isNaN(Number(total_cost))) {
-                  			total_cost = 0;
-                  		}
-                  
-                  		result.push({
-                  			region: region || 'unknown',
-                  			currency: currency || 'UNKNOWN',
-                  			total_cost: Number(total_cost).toFixed(2)
-                  		});
-                  	}
-                  
-                  	return JSON.stringify(result);
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return JSON.stringify([]);
-                  }
+                - $.regions
           master_item:
-            key: azure.get.daily.costs
+            key: azure.region.subscription.daily.get
           tags:
             - tag: component
               value: raw
@@ -8973,98 +8657,11 @@ zabbix_export:
           units: '!EUR'
           description: 'Total Q2 cost.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	function getField(obj, path, default_value) {
-                  		try {
-                  			var parts = path.split('.'),
-                  				current = obj,
-                  				idx;
-                  
-                  			for (idx = 0; idx < parts.length; idx++) {
-                  
-                  				if (current === null || current === undefined) {
-                  					return default_value;
-                  				}
-                  
-                  				current = current[parts[idx]];
-                  			}
-                  
-                  			return (current === undefined || current === null)
-                  				? default_value
-                  				: current;
-                  
-                  		} catch (e) {
-                  			return default_value;
-                  		}
-                  	}
-                  
-                  	var data,
-                  		rows,
-                  		total,
-                  		loop_i,
-                  		row,
-                  		billing_month,
-                  		month,
-                  		cost;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'monthCost.data', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'monthCost.data not found';
-                  	}
-                  
-                  	total = 0;
-                  
-                  	for (loop_i = 0; loop_i < rows.length; loop_i++) {
-                  
-                  		row = rows[loop_i];
-                  
-                  		billing_month = getField(row, 'BillingMonth', null);
-                  
-                  		if (!billing_month) {
-                  			continue;
-                  		}
-                  
-                  		billing_month = String(billing_month).split('-');
-                  
-                  		if (billing_month.length < 2) {
-                  			continue;
-                  		}
-                  
-                  		month = parseInt(billing_month[1], 10);
-                  
-                  		if (month >= 4 && month <= 6) {
-                  
-                  			cost = parseFloat(getField(row, 'PreTaxCost', 0));
-                  
-                  			if (isNaN(cost)) {
-                  				cost = 0;
-                  			}
-                  
-                  			total += cost;
-                  		}
-                  	}
-                  
-                  	return total;
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return 0;
-                  }
+                - $.q2
           master_item:
-            key: azure.get.monthly.costs
+            key: azure.month.cost.total.get
           tags:
             - tag: component
               value: cost
@@ -9076,123 +8673,291 @@ zabbix_export:
           value_type: TEXT
           description: 'Collects Azure daily service data.'
           preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.services
+          master_item:
+            key: azure.service.daily.total.get
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 91ea463673194b2f8719544231f49d57
+          name: 'Get service daily data'
+          type: DEPENDENT
+          key: azure.service.daily.total.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects Azure service daily costs data.'
+          preprocessing:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  try {
+                  var getField = function (data, path, separator, default_value) {
+                  	if (typeof separator === 'undefined') {
+                  		separator = '.';
+                  	}
+                  	var steps = path.split(separator);
+                  	for (var step_index = 0; step_index < steps.length; step_index++) {
+                  		var step = steps[step_index];
+                  		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+                  			if (typeof default_value === 'undefined') {
+                  				throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
+                  			}
+                  			return default_value;
+                  		}
                   
-                  	var data,
-                  		rows,
-                  		aggregated,
-                  		result,
-                  		row,
-                  		service,
-                  		currency,
-                  		cost,
-                  		key,
-                  		service_source,
-                  		cost_source;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
+                  		data = data[step];
                   	}
                   
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var parts = path.split(separator);
-                  		var current = data;
-                  		var p;
+                  	return data;
+                  };
                   
-                  		for (p = 0; p < parts.length; p++) {
+                  try {
+                  	var data,
+                  		result,
+                  		service_cost,
+                  		category_cost,
+                  		total_cost,
+                  		top_services,
+                  		service_count_daily,
+                  		row,
+                  		rows,
+                  		service,
+                  		service_name,
+                  		service_map,
+                  		category_map,
+                  		category_cache,
+                  		cost,
+                  		currency,
+                  		key,
+                  		category_mapping,
+                  		matched,
+                  		category_keywords,
+                  		category_name,
+                  		service_index,
+                  		keyword_index;
                   
-                  			if (current === null || current === undefined) {
-                  				return default_value;
-                  			}
+                  	var normalize = function (value) {
+                  		return (value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+                  	};
                   
-                  			current = current[parts[p]];
-                  		}
-                  
-                  		return (current === undefined || current === null)
-                  			? default_value
-                  			: current;
+                  	category_mapping = {
+                  		ai_ml: ['openai','machine learning','ai','foundry','vision','speech','translator','bot','databricks','language','video indexer','custom vision','metrics advisor','personalizer','immersive reader','phi','document intelligence','anomaly','model'],
+                  		analytics: ['synapse','fabric','power bi','data explorer','data factory','stream','analysis','hdinsight','event hubs','data lake'],
+                  		compute: ['vm','virtual machine','app service','function','batch','scale set','compute','dedicated host'],
+                  		containers: ['aks','kubernetes','container','aci','container apps','open shift','registry'],
+                  		databases: ['sql','cosmos','postgres','mysql','redis','cassandra','database','documentdb','horizon'],
+                  		storage: ['storage','blob','disk','files','backup','netapp','elastic san','queue','archive'],
+                  		networking: ['network','vpn','firewall','dns','front door','gateway','load balancer','vnet','expressroute','traffic manager'],
+                  		security: ['defender','sentinel','key vault','security','waf','entra','attestation','hsm'],
+                  		dev_tools: ['devops','pipelines','repos','boards','artifacts','visual studio','github','copilot','dev box'],
+                  		identity: ['active directory','identity','domain services','external id'],
+                  		integration: ['api management','logic apps','service bus','event grid','web pubsub','integration'],
+                  		iot: ['iot','digital twins','event hub','stream analytics','maps'],
+                  		mgmt: ['monitor','policy','lighthouse','advisor','cost','resource','blueprint','automation','chaos'],
+                  		media: ['cdn','media','stream'],
+                  		migration: ['migrate','site recovery','data box','storage mover'],
+                  		mixed_reality: ['mixed reality','planetary'],
+                  		mobile: ['notification hubs','communication services','signalr'],
+                  		hybrid: ['arc','stack','hybrid','multicloud'],
+                  		web: ['static web','web app'],
+                  		vdi: ['virtual desktop','lab services']
                   	};
                   
                   	data = JSON.parse(value);
                   
-                  	rows = getField(data, 'cost.data', '.', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		rows = getField(data, 'data', '.', null);
+                  	if (typeof data.error !== 'undefined') {
+                  		throw data.error;
                   	}
                   
+                  	rows = getField(data, 'cost.data', '.', []);
+                  
                   	if (!Array.isArray(rows)) {
-                  		throw 'cost data not found';
+                  		throw 'cost.data not found';
                   	}
                   
-                  	aggregated = {};
+                  	service_map = {};
+                  	category_map = {};
+                  	category_cache = {};
+                  	service_count_daily = {};
+                  	total_cost = 0;
                   
-                  	for (var i = 0; i < rows.length; i++) {
+                  	for (service_index = 0; service_index < rows.length; service_index++) {
                   
-                  		row = rows[i];
+                  		row = rows[service_index];
                   
-                  		service_source =
-                  			getField(row, 'ServiceName', '.', null) ||
-                  			getField(row, 'service_name', '.', null) ||
-                  			'unknown';
-                  
-                  		currency =
-                  			getField(row, 'Currency', '.', null) ||
-                  			getField(row, 'currency', '.', null) ||
-                  			'UNKNOWN';
-                  
-                  		cost_source =
-                  			getField(row, 'PreTaxCost', '.', null);
-                  
-                  		if (cost_source === null) {
-                  			cost_source = getField(row, 'total_cost', '.', 0);
+                  		if (!row) {
+                  			continue;
                   		}
                   
-                  		cost = Number(cost_source);
+                  		service_name = getField(row, 'ServiceName', '.', null);
+                  
+                  		if (!service_name) {
+                  
+                  			service_name = getField(row, 'MeterSubcategory', '.', null);
+                  		}
+                  
+                  		if (!service_name) {
+                  
+                  			service_name = getField(row, 'Meter', '.', null);
+                  		}
+                  
+                  		if (!service_name) {
+                  
+                  			service_name = 'unknown';
+                  		}
+                  
+                  		cost = parseFloat(getField(row, 'PreTaxCost', '.', 0));
                   
                   		if (isNaN(cost)) {
                   			cost = 0;
                   		}
                   
-                  		service = service_source;
+                  		service = normalize(service_name);
                   
-                  		if (!aggregated[service]) {
-                  			aggregated[service] = {
-                  				service_name: service,
+                  		if (!service) {
+                  			continue;
+                  		}
+                  
+                  		total_cost += cost;
+                  
+                  		currency = getField(row, 'Currency', '.', 'UNKNOWN');
+                  
+                  		service_count_daily[service_name] = true;
+                  
+                  		if (!service_map[service_name]) {
+                  
+                  			service_map[service_name] = {
+                  
+                  				service: service_name,
                   				currency: currency,
                   				total_cost: 0
+                  
                   			};
                   		}
                   
-                  		aggregated[service].total_cost += cost;
+                  		service_map[service_name].total_cost += cost;
+                  
+                  		if (category_cache[service]) {
+                  
+                  			matched = category_cache[service];
+                  
+                  		} else {
+                  
+                  			matched = 'other';
+                  
+                  			for (category_name in category_mapping) {
+                  
+                  				if (Object.prototype.hasOwnProperty.call(category_mapping, category_name)) {
+                  
+                  					category_keywords = category_mapping[category_name];
+                  
+                  					for (keyword_index = 0; keyword_index < category_keywords.length; keyword_index++) {
+                  
+                  						if (service.indexOf(category_keywords[keyword_index]) !== -1) {
+                  
+                  							matched = category_name;
+                  							break;
+                  						}
+                  					}
+                  				}
+                  
+                  				if (matched !== 'other') {
+                  					break;
+                  				}
+                  			}
+                  
+                  			category_cache[service] = matched;
+                  		}
+                  
+                  		if (!category_map[matched]) {
+                  
+                  			category_map[matched] = {
+                  
+                  				category: matched,
+                  				currency: currency,
+                  				total_cost: 0,
+                  				services: {}
+                  
+                  			};
+                  		}
+                  
+                  		category_map[matched].total_cost += cost;
+                  		category_map[matched].services[service_name] = true;
                   	}
                   
-                  	result = [];
+                  	service_count_daily = Object.keys(service_count_daily).length;
                   
-                  	for (key in aggregated) {
+                  	service_cost = [];
                   
-                  		if (Object.prototype.hasOwnProperty.call(aggregated, key)) {
+                  	for (key in service_map) {
                   
-                  			aggregated[key].total_cost =
-                  				aggregated[key].total_cost.toFixed(6);
+                  		if (Object.prototype.hasOwnProperty.call(service_map, key)) {
                   
-                  			result.push(aggregated[key]);
+                  			service_cost.push(service_map[key]);
                   		}
                   	}
                   
+                  	category_cost = [];
+                  
+                  	for (key in category_map) {
+                  
+                  		if (Object.prototype.hasOwnProperty.call(category_map, key)) {
+                  
+                  			category_cost.push({
+                  
+                  				category: category_map[key].category,
+                  				currency: category_map[key].currency,
+                  				total_cost: category_map[key].total_cost,
+                  				service_count: String(Object.keys(category_map[key].services).length)
+                  
+                  			});
+                  		}
+                  	}
+                  
+                  	service_cost.sort(function (first_service, second_service) {
+                  
+                  		return second_service.total_cost - first_service.total_cost;
+                  
+                  	});
+                  
+                  	category_cost.sort(function (first_category, second_category) {
+                  
+                  		return second_category.total_cost - first_category.total_cost;
+                  
+                  	});
+                  
+                  	top_services = [];
+                  
+                  	for (service_index = 0; service_index < 3 && service_index < service_cost.length; service_index++) {
+                  
+                  		top_services.push({
+                  
+                  			service: service_cost[service_index].service,
+                  			currency: service_cost[service_index].currency,
+                  			total_cost: service_cost[service_index].total_cost,
+                  			percent: parseFloat(((service_cost[service_index].total_cost / total_cost) * 100).toFixed(2))
+                  
+                  		});
+                  	}
+                  
+                  	result = {
+                  
+                  		services: service_cost,
+                  		categories: category_cost,
+                  		top_services: top_services,
+                  		total_cost: String(total_cost),
+                  		service_count_daily: String(service_count_daily)
+                  
+                  	};
+                  
                   	return JSON.stringify(result);
                   
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
+                  }
+                  catch (error) {
                   	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
                   
-                  	return JSON.stringify([]);
+                  	return JSON.stringify({ error: error.toString()});
                   }
           master_item:
             key: azure.get.daily.costs
@@ -9228,173 +8993,11 @@ zabbix_export:
             web - `web` hosting and `application` hosting services
             vdi - `virtual desktop` and `remote workspace` services
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	var data,
-                  		rows,
-                  		totals,
-                  		counts,
-                  		result,
-                  		service,
-                  		cost,
-                  		group,
-                  		arr,
-                  		currency,
-                  		service_source,
-                  		cost_source,
-                  		row;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	var normalize = function (s) {
-                  		return (s || '').toLowerCase().replace(/\s+/g, ' ').trim();
-                  	};
-                  
-                  	var getField = function (data, path, separator, default_value) {
-                  		if (typeof separator === 'undefined') {
-                  			separator = '.';
-                  		}
-                  		var steps = path.split(separator);
-                  		for (var i = 0; i < steps.length; i++) {
-                  			var step = steps[i];
-                  			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
-                  				if (typeof default_value === 'undefined') {
-                  					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
-                  				}
-                  				return default_value;
-                  			}
-                  
-                  			data = data[step];
-                  		}
-                  
-                  		return data;
-                  	};
-                  
-                  	var rules = {
-                  		ai_ml: ['openai','machine learning','ai','foundry','vision','speech','translator','bot','databricks','language','video indexer','custom vision','metrics advisor','personalizer','immersive reader','phi','document intelligence','anomaly','model'],
-                  		analytics: ['synapse','fabric','power bi','data explorer','data factory','stream','analysis','hdinsight','event hubs','data lake'],
-                  		compute: ['vm','virtual machine','app service','function','batch','scale set','compute','dedicated host'],
-                  		containers: ['aks','kubernetes','container','aci','container apps','open shift','registry'],
-                  		databases: ['sql','cosmos','postgres','mysql','redis','cassandra','database','documentdb','horizon'],
-                  		storage: ['storage','blob','disk','files','backup','netapp','elastic san','queue','archive'],
-                  		networking: ['network','vpn','firewall','dns','front door','gateway','load balancer','vnet','expressroute','traffic manager'],
-                  		security: ['defender','sentinel','key vault','security','waf','entra','attestation','hsm'],
-                  		dev_tools: ['devops','pipelines','repos','boards','artifacts','visual studio','github','copilot','dev box'],
-                  		identity: ['entra','active directory','identity','domain services','external id'],
-                  		integration: ['api management','logic apps','service bus','event grid','web pubsub','integration'],
-                  		iot: ['iot','digital twins','event hub','stream analytics','maps'],
-                  		mgmt: ['monitor','policy','lighthouse','advisor','cost','resource','blueprint','automation','chaos'],
-                  		media: ['cdn','media','stream'],
-                  		migration: ['migrate','site recovery','data box','storage mover'],
-                  		mixed_reality: ['mixed reality','planetary'],
-                  		mobile: ['notification hubs','communication services','signalr'],
-                  		hybrid: ['arc','stack','hybrid','multicloud','expressroute'],
-                  		web: ['app service','static web','web app','signalr','front door'],
-                  		vdi: ['virtual desktop','dev box','lab services']
-                  	};
-                  
-                  	data = (typeof value === 'string')
-                  		? JSON.parse(value)
-                  		: value;
-                  
-                  	rows = getField(data, 'cost.data', '.', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		rows = getField(data, 'data', '.', null);
-                  	}
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'data not found';
-                  	}
-                  
-                  	totals = {};
-                  	counts = {};
-                  	result = [];
-                  	currency = null;
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  
-                  		row = rows[i];
-                  
-                  		if (!currency) {
-                  			currency = getField(row, 'Currency', '.', null);
-                  		}
-                  
-                  		service_source =
-                  			getField(row, 'ServiceName', '.', null) ||
-                  			getField(row, 'MeterSubcategory', '.', null) ||
-                  			getField(row, 'Meter', '.', null) ||
-                  			getField(row, 'ResourceLocation', '.', null);
-                  
-                  		cost_source =
-                  			getField(row, 'PreTaxCost', '.', null);
-                  
-                  		if (cost_source === null) {
-                  			cost_source = getField(row, 'totalCost', '.', null);
-                  		}
-                  
-                  		if (cost_source === null) {
-                  			cost_source = getField(row, 'TotalDailyCost', '.', 0);
-                  		}
-                  
-                  		service = normalize(service_source);
-                  		cost = parseFloat(cost_source);
-                  
-                  		if (!service || isNaN(cost)) {
-                  			continue;
-                  		}
-                  
-                  		group = 'other';
-                  
-                  		for (var k in rules) {
-                  
-                  			arr = rules[k];
-                  
-                  			for (var j = 0; j < arr.length; j++) {
-                  
-                  				if (service.indexOf(arr[j]) !== -1) {
-                  					group = k;
-                  					break;
-                  				}
-                  			}
-                  
-                  			if (group !== 'other') {
-                  				break;
-                  			}
-                  		}
-                  
-                  		totals[group] = (totals[group] || 0) + cost;
-                  		(counts[group] = counts[group] || {})[service] = true;
-                  	}
-                  
-                  	for (var k in totals) {
-                  
-                  		if (Object.prototype.hasOwnProperty.call(totals, k)) {
-                  
-                  			result.push({
-                  				category: k,
-                  				total_cost: String(totals[k].toFixed(2)),
-                  				service_count: String(Object.keys(counts[k]).length),
-                  				currency: currency || 'UNKNOWN'
-                  			});
-                  		}
-                  	}
-                  
-                  	return JSON.stringify(result);
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return JSON.stringify({error: error});
-                  }
+                - $.categories
           master_item:
-            key: azure.get.daily.costs
+            key: azure.service.daily.total.get
           tags:
             - tag: component
               value: raw
@@ -9427,128 +9030,11 @@ zabbix_export:
             web - `web` hosting and `application` hosting services
             vdi - `virtual desktop` and `remote workspace` services
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	function getField(obj, path, default_value) {
-                  		var parts = path.split('.');
-                  		var current = obj;
-                  
-                  		for (var i = 0; i < parts.length; i++) {
-                  
-                  			if (current === null || current === undefined) {
-                  				return default_value;
-                  			}
-                  
-                  			current = current[parts[i]];
-                  		}
-                  
-                  		return (current === undefined || current === null)
-                  			? default_value
-                  			: current;
-                  	}
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  	var data = JSON.parse(value);
-                  	var rows = getField(data, 'serviceCost.data', null);
-                  	if (!Array.isArray(rows)) {
-                  		throw 'serviceCost.data not found';
-                  	}
-                  
-                  
-                  	var rules = {
-                  		ai_ml:['openai','machine learning','ai','foundry','vision','speech','translator','bot','databricks','language','video indexer','custom vision','metrics advisor','personalizer','immersive reader','phi','document intelligence','anomaly','model'],
-                  		analytics:['synapse','fabric','power bi','data explorer','data factory','stream','analysis','hdinsight','event hubs','data lake'],
-                  		compute:['vm','virtual machine','app service','function','batch','scale set','compute','dedicated host'],
-                  		containers:['aks','kubernetes','container','aci','container apps','open shift','registry'],
-                  		databases:['sql','cosmos','postgres','mysql','redis','cassandra','database','documentdb','horizon'],
-                  		storage:['storage','blob','disk','files','backup','netapp','elastic san','queue','archive'],
-                  		networking:['network','vpn','firewall','dns','front door','gateway','load balancer','vnet','expressroute','traffic manager'],
-                  		security:['defender','sentinel','key vault','security','waf','entra','attestation','hsm'],
-                  		dev_tools:['devops','pipelines','repos','boards','artifacts','visual studio','github','copilot','dev box'],
-                  		identity:['entra','active directory','identity','domain services','external id'],
-                  		integration:['api management','logic apps','service bus','event grid','web pubsub','integration'],
-                  		iot:['iot','digital twins','event hub','stream analytics','maps'],
-                  		mgmt:['monitor','policy','lighthouse','advisor','cost','resource','blueprint','automation','chaos'],
-                  		media:['cdn','media','stream'],
-                  		migration:['migrate','site recovery','data box','storage mover'],
-                  		mixed_reality:['mixed reality','planetary'],
-                  		mobile:['notification hubs','communication services','signalr'],
-                  		hybrid:['arc','stack','hybrid','multicloud','expressroute'],
-                  		web:['app service','static web','web app','signalr','front door'],
-                  		vdi:['virtual desktop','dev box','lab services']
-                  	};
-                  
-                  	var category_cache = {};
-                  	function getCategory(service) {
-                  		if (category_cache[service]) {
-                  			return category_cache[service];
-                  		}
-                  		var s = service.toLowerCase();
-                  		for (var category in rules) {
-                  			var words = rules[category];
-                  			for (var i = 0; i < words.length; i++) {
-                  				if (s.indexOf(words[i]) !== -1) {
-                  					category_cache[service] = category;
-                  					return category;
-                  				}
-                  			}
-                  		}
-                  
-                  
-                  		category_cache[service] = 'other';
-                  		return 'other';
-                  	}
-                  
-                  
-                  	var totals = {};
-                  	var counts = {};
-                  	var currency = 'UNKNOWN';
-                  
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  		var row = rows[i];
-                  		if (!row || !row.ServiceName) {
-                  			continue;
-                  		}
-                  		if (row.Currency) {
-                  			currency = row.Currency;
-                  		}
-                  		var service = row.ServiceName;
-                  		var cost = parseFloat(row.PreTaxCost);
-                  		if (isNaN(cost)) {
-                  			continue;
-                  		}
-                  		var category = getCategory(service);
-                  		totals[category] = (totals[category] || 0) + cost;
-                  		if (!counts[category]) {
-                  			counts[category] = {};
-                  		}
-                  		counts[category][service] = true;
-                  	}
-                  	var result = [];
-                  	for (var key in totals) {
-                  		result.push({
-                  			category:key,
-                  			total_cost:totals[key].toFixed(2),
-                  			service_count:String(Object.keys(counts[key]).length),
-                  			currency:currency
-                  		});
-                  	}
-                  
-                  	return JSON.stringify(result);
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return JSON.stringify({error: error});
-                  }
+                - $.type
           master_item:
-            key: azure.get.monthly.costs
+            key: azure.service.yearly.total.get
           tags:
             - tag: component
               value: raw
@@ -9560,113 +9046,215 @@ zabbix_export:
           value_type: TEXT
           description: 'Collects data for each service cost within a yearly gap.'
           preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.services
+          master_item:
+            key: azure.service.yearly.total.get
+          tags:
+            - tag: component
+              value: raw
+        - uuid: d6c7086cd9f44ff0a9c769dcb01cd842
+          name: 'Get service yearly data'
+          type: DEPENDENT
+          key: azure.service.yearly.total.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects Azure service yearly costs data.'
+          preprocessing:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  try {
-                  
-                  	function getField(obj, path, default_value) {
-                  		try {
-                  			var parts = path.split('.'),
-                  				current = obj,
-                  				i;
-                  
-                  			for (i = 0; i < parts.length; i++) {
-                  
-                  				if (current === null || current === undefined) {
-                  					return default_value;
-                  				}
-                  
-                  				current = current[parts[i]];
+                  var getField = function (data, path, separator, default_value) {
+                  	if (typeof separator === 'undefined') {
+                  		separator = '.';
+                  	}
+                  	var steps = path.split(separator);
+                  	for (var step_index = 0; step_index < steps.length; step_index++) {
+                  		var step = steps[step_index];
+                  		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+                  			if (typeof default_value === 'undefined') {
+                  				throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
                   			}
-                  
-                  			return (current === undefined || current === null)
-                  				? default_value
-                  				: current;
-                  
-                  		} catch (e) {
                   			return default_value;
                   		}
+                  
+                  		data = data[step];
                   	}
                   
-                  	var data,
+                  	return data;
+                  };
+                  
+                  try {
+                  	var category_mapping,
+                  		category_cache,
+                  		data,
                   		rows,
-                  		services_map,
-                  		result,
+                  		category_totals,
+                  		category_services,
+                  		service_totals,
+                  		currency,
+                  		loop_index,
                   		row,
                   		service,
-                  		currency,
                   		cost,
-                  		key;
+                  		category,
+                  		key,
+                  		result;
                   
-                  	if (!value) {
-                  		throw 'Empty input value';
+                  	category_mapping = {
+                  		ai_ml:['openai','machine learning','ai','foundry','vision','speech','translator','bot','databricks','language','video indexer','custom vision','metrics advisor','personalizer','immersive reader','phi','document intelligence','anomaly','model'],
+                  		analytics:['synapse','fabric','power bi','data explorer','data factory','stream','analysis','hdinsight','event hubs','data lake'],
+                  		compute:['vm','virtual machine','app service','function','batch','scale set','compute','dedicated host'],
+                  		containers:['aks','kubernetes','container','aci','container apps','open shift','registry'],
+                  		databases:['sql','cosmos','postgres','mysql','redis','cassandra','database','documentdb','horizon'],
+                  		storage:['storage','blob','disk','files','backup','netapp','elastic san','queue','archive'],
+                  		networking:['network','vpn','firewall','dns','front door','gateway','load balancer','vnet','expressroute','traffic manager'],
+                  		security:['defender','sentinel','key vault','security','waf','entra','attestation','hsm'],
+                  		dev_tools:['devops','pipelines','repos','boards','artifacts','visual studio','github','copilot','dev box'],
+                  		identity:['active directory','identity','domain services','external id'],
+                  		integration:['api management','logic apps','service bus','event grid','web pubsub','integration'],
+                  		iot:['iot','digital twins','event hub','stream analytics','maps'],
+                  		mgmt:['monitor','policy','lighthouse','advisor','cost','resource','blueprint','automation','chaos'],
+                  		media:['cdn','media','stream'],
+                  		migration:['migrate','site recovery','data box','storage mover'],
+                  		mixed_reality:['mixed reality','planetary'],
+                  		mobile:['notification hubs','communication services','signalr'],
+                  		hybrid:['arc','stack','hybrid','multicloud'],
+                  		web:['static web','web app'],
+                  		vdi:['virtual desktop','lab services']
+                  	};
+                  
+                  	category_cache = {};
+                  
+                  	function getCategory(service) {
+                  
+                  		var service_name,
+                  			category,
+                  			keywords,
+                  			keyword_index;
+                  
+                  		if (category_cache[service]) {
+                  			return category_cache[service];
+                  		}
+                  
+                  		service_name = service.toLowerCase();
+                  
+                  		for (category in category_mapping) {
+                  
+                  			keywords = category_mapping[category];
+                  
+                  			for (keyword_index = 0; keyword_index < keywords.length; keyword_index++) {
+                  
+                  				if (service_name.indexOf(keywords[keyword_index]) !== -1) {
+                  
+                  					category_cache[service] = category;
+                  
+                  					return category;
+                  				}
+                  			}
+                  		}
+                  
+                  		category_cache[service] = 'other';
+                  
+                  		return 'other';
                   	}
                   
                   	data = JSON.parse(value);
                   
-                  	rows = getField(data, 'serviceCost.data', null);
+                  	if (typeof data.error !== 'undefined') {
+                  		throw data.error;
+                  	}
+                  
+                  	rows = getField(data, 'serviceCost.data', '.', null);
                   
                   	if (!Array.isArray(rows)) {
                   		throw 'serviceCost.data not found';
                   	}
                   
-                  	services_map = {};
+                  	category_totals = {};
+                  	category_services = {};
+                  	service_totals = {};
+                  	currency = null;
                   
-                  	for (var i = 0; i < rows.length; i++) {
+                  	for (loop_index = 0; loop_index < rows.length; loop_index++) {
                   
-                  		row = rows[i];
+                  		row = rows[loop_index];
                   
                   		if (!row) {
                   			continue;
                   		}
                   
-                  		service = row.ServiceName;
+                  		service = getField(row, 'ServiceName', '.', null);
                   
                   		if (!service) {
                   			continue;
                   		}
                   
-                  		currency = row.Currency || '';
-                  
-                  		cost = parseFloat(row.PreTaxCost);
+                  		cost = parseFloat(getField(row, 'PreTaxCost', '.', 0));
                   
                   		if (isNaN(cost)) {
                   			cost = 0;
                   		}
                   
-                  		if (!services_map[service]) {
-                  			services_map[service] = {
-                  				service: service,
-                  				currency: currency,
-                  				total_cost: 0
-                  			};
+                  		if (currency === null) {
+                  			currency = getField(row, 'Currency', '.', null);
                   		}
                   
-                  		services_map[service].total_cost += cost;
+                  		category = getCategory(service);
+                  
+                  		category_totals[category] = (category_totals[category] || 0) + cost;
+                  
+                  		if (!category_services[category]) {
+                  			category_services[category] = {};
+                  		}
+                  
+                  		category_services[category][service] = true;
+                  
+                  		service_totals[service] = (service_totals[service] || 0) + cost;
                   	}
                   
-                  	result = [];
+                  	result = {
+                  		type: [],
+                  		services: []
+                  	};
                   
-                  	for (key in services_map) {
+                  	for (key in category_totals) {
                   
-                  		if (Object.prototype.hasOwnProperty.call(services_map, key)) {
+                  		if (Object.prototype.hasOwnProperty.call(category_totals, key)) {
                   
-                  			result.push({
-                  				service: services_map[key].service,
-                  				currency: services_map[key].currency,
-                  				total_cost: String(services_map[key].total_cost)
+                  			result.type.push({
+                  
+                  				category: key,
+                  				total_cost: category_totals[key],
+                  				service_count: String(Object.keys(category_services[key]).length),
+                  				currency: currency
+                  
+                  			});
+                  		}
+                  	}
+                  
+                  	for (key in service_totals) {
+                  
+                  		if (Object.prototype.hasOwnProperty.call(service_totals, key)) {
+                  
+                  			result.services.push({
+                  
+                  				service: key,
+                  				total_cost: service_totals[key],
+                  				currency: currency
+                  
                   			});
                   		}
                   	}
                   
                   	return JSON.stringify(result);
                   
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
+                  }
+                  catch (error) {
                   	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
                   
-                  	return JSON.stringify({error: error});
+                  	return JSON.stringify({ error: error.toString() });
                   }
           master_item:
             key: azure.get.monthly.costs
@@ -9681,112 +9269,11 @@ zabbix_export:
           value_type: TEXT
           description: 'Collects data for Azure subscription cost within a yearly gap.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	function getField(obj, path, default_value) {
-                  		try {
-                  			var parts = path.split('.'),
-                  				current = obj,
-                  				i;
-                  
-                  			for (i = 0; i < parts.length; i++) {
-                  
-                  				if (current === null || current === undefined) {
-                  					return default_value;
-                  				}
-                  
-                  				current = current[parts[i]];
-                  			}
-                  
-                  			return (current === undefined || current === null)
-                  				? default_value
-                  				: current;
-                  
-                  		} catch (e) {
-                  			return default_value;
-                  		}
-                  	}
-                  
-                  	var data,
-                  		rows,
-                  		accounts_map,
-                  		result,
-                  		row,
-                  		account_id,
-                  		currency,
-                  		cost,
-                  		key;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'monthCost.data', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'monthCost.data not found';
-                  	}
-                  
-                  	accounts_map = {};
-                  
-                  	for (var i = 0; i < rows.length; i++) {
-                  
-                  		row = rows[i];
-                  
-                  		account_id = getField(row, 'SubscriptionId', null);
-                  
-                  		if (!account_id) {
-                  			continue;
-                  		}
-                  
-                  		currency = getField(row, 'Currency', '');
-                  
-                  		cost = parseFloat(getField(row, 'PreTaxCost', 0));
-                  
-                  		if (isNaN(cost)) {
-                  			cost = 0;
-                  		}
-                  
-                  		if (!accounts_map[account_id]) {
-                  			accounts_map[account_id] = {
-                  				subscription_id: account_id,
-                  				currency: currency,
-                  				total_cost: 0
-                  			};
-                  		}
-                  
-                  		accounts_map[account_id].total_cost += cost;
-                  	}
-                  
-                  	result = [];
-                  
-                  	for (key in accounts_map) {
-                  
-                  		if (Object.prototype.hasOwnProperty.call(accounts_map, key)) {
-                  
-                  			result.push({
-                  				subscription_id: accounts_map[key].subscription_id,
-                  				currency: accounts_map[key].currency,
-                  				total_cost: String(accounts_map[key].total_cost)
-                  			});
-                  		}
-                  	}
-                  
-                  	return JSON.stringify(result);
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return JSON.stringify({error: error});
-                  }
+                - $.subscriptions
           master_item:
-            key: azure.get.monthly.costs
+            key: azure.region.subscription.yearly.get
           tags:
             - tag: component
               value: raw
@@ -9798,98 +9285,11 @@ zabbix_export:
           units: '!EUR'
           description: 'Total Q3 cost.'
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  try {
-                  
-                  	function getField(obj, path, default_value) {
-                  		try {
-                  			var parts = path.split('.'),
-                  				current = obj,
-                  				idx;
-                  
-                  			for (idx = 0; idx < parts.length; idx++) {
-                  
-                  				if (current === null || current === undefined) {
-                  					return default_value;
-                  				}
-                  
-                  				current = current[parts[idx]];
-                  			}
-                  
-                  			return (current === undefined || current === null)
-                  				? default_value
-                  				: current;
-                  
-                  		} catch (e) {
-                  			return default_value;
-                  		}
-                  	}
-                  
-                  	var data,
-                  		rows,
-                  		total,
-                  		loop_i,
-                  		row,
-                  		billing_month,
-                  		month,
-                  		cost;
-                  
-                  	if (!value) {
-                  		throw 'Empty input value';
-                  	}
-                  
-                  	data = JSON.parse(value);
-                  
-                  	rows = getField(data, 'monthCost.data', null);
-                  
-                  	if (!Array.isArray(rows)) {
-                  		throw 'monthCost.data not found';
-                  	}
-                  
-                  	total = 0;
-                  
-                  	for (loop_i = 0; loop_i < rows.length; loop_i++) {
-                  
-                  		row = rows[loop_i];
-                  
-                  		billing_month = getField(row, 'BillingMonth', null);
-                  
-                  		if (!billing_month) {
-                  			continue;
-                  		}
-                  
-                  		billing_month = String(billing_month).split('-');
-                  
-                  		if (billing_month.length < 2) {
-                  			continue;
-                  		}
-                  
-                  		month = parseInt(billing_month[1], 10);
-                  
-                  		if (month >= 7 && month <= 9) {
-                  
-                  			cost = parseFloat(getField(row, 'PreTaxCost', 0));
-                  
-                  			if (isNaN(cost)) {
-                  				cost = 0;
-                  			}
-                  
-                  			total += cost;
-                  		}
-                  	}
-                  
-                  	return total;
-                  
-                  } catch (error) {
-                  	error += (String(error).endsWith('.')) ? '' : '.';
-                  	Zabbix.log(3, '[ Azure Billing ] ERROR: ' + error);
-                  
-                  	return 0;
-                  }
+                - $.q3
           master_item:
-            key: azure.get.monthly.costs
+            key: azure.month.cost.total.get
           tags:
             - tag: component
               value: cost
@@ -9953,7 +9353,7 @@ zabbix_export:
                   event_name: 'Azure subscription [{#AZURE.SUBSCRIPTION.ID}]: Daily cost >= {$AZURE.ACCOUNT.COST.DAILY.WARN}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Azure `{#AZURE.SUBSCRIPTION.ID}` subscription daily cost is above warning threshold `{$AZURE.ACCOUNT.COST.DAILY.WARN}`. Please, monitor account spending and investigate cost increase trends.'
+                  description: 'Azure `{#AZURE.SUBSCRIPTION.ID}` subscription daily cost is above warning threshold `{$AZURE.ACCOUNT.COST.DAILY.WARN}`. Please monitor account spending and investigate cost increase trends.'
                   dependencies:
                     - name: 'Azure account daily cost high'
                       expression: 'last(/Azure Cost Management by HTTP/azure.daily.account.cost["{#AZURE.SUBSCRIPTION.ID}"]) >= {$AZURE.ACCOUNT.COST.DAILY.HIGH}'
@@ -10026,7 +9426,7 @@ zabbix_export:
                   event_name: 'Azure region [{#AZURE.REGION.NAME}]: Daily cost >= {$AZURE.REGION.COST.DAILY.WARN}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Azure `{#AZURE.REGION.NAME}` region daily cost is above warning threshold `{$AZURE.REGION.COST.DAILY.WARN}`. Please, monitor region spending and investigate cost increase trends.'
+                  description: 'Azure `{#AZURE.REGION.NAME}` region daily cost is above warning threshold `{$AZURE.REGION.COST.DAILY.WARN}`. Please monitor region spending and investigate cost increase trends.'
                   dependencies:
                     - name: 'Azure region daily cost high'
                       expression: 'last(/Azure Cost Management by HTTP/azure.daily.region.cost["{#AZURE.REGION.NAME}"]) >= {$AZURE.REGION.COST.DAILY.HIGH}'
@@ -10056,7 +9456,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[?(@.service_name=="{#AZURE.SERVICE.NAME}")].first()'
+                    - '$[?(@.service=="{#AZURE.SERVICE.NAME}")].first()'
               master_item:
                 key: azure.service.daily.get
               tags:
@@ -10099,7 +9499,7 @@ zabbix_export:
                   event_name: 'Azure service [{#AZURE.SERVICE.NAME}]: Daily cost >= {$AZURE.SERVICE.COST.DAILY.WARN}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Azure service daily cost is above warning threshold `{$AZURE.SERVICE.COST.DAILY.WARN}`. Please, monitor service usage and investigate cost increase trends.'
+                  description: 'Azure service daily cost is above warning threshold `{$AZURE.SERVICE.COST.DAILY.WARN}`. Please monitor service usage and investigate cost increase trends.'
                   dependencies:
                     - name: 'Azure service daily cost high'
                       expression: 'last(/Azure Cost Management by HTTP/azure.daily.service.cost["{#AZURE.SERVICE.NAME}"]) >= {$AZURE.SERVICE.COST.DAILY.HIGH}'
@@ -10112,7 +9512,7 @@ zabbix_export:
             - lld_macro: '{#AZURE.BILLING.UNIT}'
               path: $.currency
             - lld_macro: '{#AZURE.SERVICE.NAME}'
-              path: $.service_name
+              path: $.service
         - uuid: 80d5e949c6164ef78ea2c915df8cf479
           name: 'Azure daily service type costs discovery'
           type: DEPENDENT
@@ -10298,7 +9698,7 @@ zabbix_export:
                   event_name: 'Azure top service [{#AZURE.SERVICE.NAME}]: Service cost >= {$AZURE.SERVICE.COST.TOP.WARN}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Azure top service `{#AZURE.SERVICE.NAME}` cost is above warning threshold `{$AZURE.SERVICE.COST.TOP.WARN}`. Please, monitor service usage and investigate cost increase trends.'
+                  description: 'Azure top service `{#AZURE.SERVICE.NAME}` cost is above warning threshold `{$AZURE.SERVICE.COST.TOP.WARN}`. Please monitor service usage and investigate cost increase trends.'
                   dependencies:
                     - name: 'Azure top daily service cost high'
                       expression: 'last(/Azure Cost Management by HTTP/azure.daily.top.service.cost["{#AZURE.SERVICE.NAME}"]) >= {$AZURE.SERVICE.COST.TOP.HIGH}'
@@ -10352,7 +9752,7 @@ zabbix_export:
           name: 'Azure monthly compare discovery'
           type: DEPENDENT
           key: azure.monthly.compare.discovery
-          description: 'Collects monthly compare data that compare current to previous months.'
+          description: 'Collects monthly compare data that compares current to previous months.'
           item_prototypes:
             - uuid: 51053e3b0de749ffba9d86a6b7fcb365
               name: 'Month [{#AZURE.MONTH.DATE}]: Type [{#AZURE.MONTH.TYPE}]: Total cost'
@@ -10396,7 +9796,7 @@ zabbix_export:
             - lld_macro: '{#AZURE.BILLING.UNIT}'
               path: $.currency
             - lld_macro: '{#AZURE.MONTH.DATE}'
-              path: $.month_date
+              path: $.month
             - lld_macro: '{#AZURE.MONTH.TYPE}'
               path: $.type
         - uuid: 9c65b60a8e1840dd81367aefe6b0de18
@@ -10431,10 +9831,8 @@ zabbix_export:
                   event_name: 'Month [{#AZURE.BILLING.MONTH}]: Monthly cost >= 100% of budget'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'Azure `{#AZURE.BILLING.MONTH}` month blended cost has reached or exceeded the full budget `{$AZURE.BUDGET.MONTH}`. Immediate cost control actions are recommended.'
+                  description: 'Azure `{#AZURE.BILLING.MONTH}` month cost has reached or exceeded the full budget `{$AZURE.BUDGET.MONTH}`. Immediate cost control actions are recommended.'
                   tags:
-                    - tag: cost
-                      value: budget
                     - tag: scope
                       value: monthly-cost
                 - uuid: c2a073875cf24d86a27734523228ab20
@@ -10443,13 +9841,11 @@ zabbix_export:
                   event_name: 'Month [{#AZURE.BILLING.MONTH}]: Monthly cost >= 80% of budget'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Azure `{#AZURE.BILLING.MONTH}` month blended cost has reached 80% of the defined budget `{$AZURE.BUDGET.MONTH}`. Please, monitor spending to avoid budget overrun.'
+                  description: 'Azure `{#AZURE.BILLING.MONTH}` month cost has reached 80% of the defined budget `{$AZURE.BUDGET.MONTH}`. Please monitor spending to avoid budget overrun.'
                   dependencies:
                     - name: 'Azure monthly billing budget exceeded 100%'
                       expression: 'last(/Azure Cost Management by HTTP/azure.monthly.cost["{#AZURE.BILLING.MONTH}"]) >= {$AZURE.BUDGET.MONTH}'
                   tags:
-                    - tag: cost
-                      value: budget
                     - tag: scope
                       value: monthly-cost
                 - uuid: 3dd0a9aa364e495db9612629b9240d53
@@ -10458,7 +9854,7 @@ zabbix_export:
                   event_name: 'Month [{#AZURE.BILLING.MONTH}]: Monthly cost >= {$AZURE.BILLING.MONTH.HIGH}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'Azure `{#AZURE.BILLING.MONTH}` month blended cost has exceeded high threshold `{$AZURE.BILLING.MONTH.HIGH}`. Immediate cost investigation is recommended.'
+                  description: 'Azure `{#AZURE.BILLING.MONTH}` month cost has exceeded high threshold `{$AZURE.BILLING.MONTH.HIGH}`. Immediate cost investigation is recommended.'
                   tags:
                     - tag: scope
                       value: monthly-cost
@@ -10468,7 +9864,7 @@ zabbix_export:
                   event_name: 'Month [{#AZURE.BILLING.MONTH}]: Monthly cost >= {$AZURE.BILLING.MONTH.WARN}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Azure `{#AZURE.BILLING.MONTH}` month blended cost is above warning threshold `{$AZURE.BILLING.MONTH.WARN}`. Please, monitor cost trends and investigate recent usage increases.'
+                  description: 'Azure `{#AZURE.BILLING.MONTH}` month cost is above warning threshold `{$AZURE.BILLING.MONTH.WARN}`. Please monitor cost trends and investigate recent usage increases.'
                   dependencies:
                     - name: 'Azure monthly billing high'
                       expression: 'last(/Azure Cost Management by HTTP/azure.monthly.cost["{#AZURE.BILLING.MONTH}"]) >= {$AZURE.BILLING.MONTH.HIGH}'
@@ -10995,7 +10391,7 @@ zabbix_export:
             type: TEXT
             priority: '22'
             section_name: Filters
-            label: 'Exclude locations filter'
+            label: 'Exclude resource groups filter'
             description: 'Regex string to exclude discovered resource groups by name.'
         - macro: '{$AZURE.LLD.FILTER.RESOURCE.LOCATION.MATCHES}'
           value: '.*'
@@ -11302,6 +10698,9 @@ zabbix_export:
                     - type: INTEGER
                       name: ds.1.width
                       value: '3'
+                    - type: INTEGER
+                      name: ds.2.approximation
+                      value: '7'
                     - type: STRING
                       name: ds.2.color.0
                       value: D40000
