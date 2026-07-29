@@ -150,6 +150,19 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_NONE_EVENT_OPS = self::CEP_RULE_NAME_PREFIX.'window none event operations';
 	// The name the event operations rule gives every event it processes.
 	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME = 'CEP window none event operations';
+	// The windowed flavours of the scenario (see prepareDataCepWindowOperations()) run the very same
+	// operations from a rule that has a window instead of none, grouped by the 'service' tag, so every id gets
+	// a window of its own. They cannot reuse the operator coverage rules above, because how many windowed
+	// rules may process one event depends on the window type - which is what the second rule of each flavour,
+	// identical to the first except that it only adds a tag, is there to show:
+	//   - a simple window is not exclusive, so both rules are processed and the tag is added;
+	//   - a tag correlation window is, so only the first rule is processed and the tag is never added.
+	const CEP_TAG_WINDOW_SECOND = 'window_second';
+	const CEP_TAG_WINDOW_SECOND_VALUE = 'second';
+	// How long the windows of those flavours stay open. Closing one changes nothing for the scenario (no
+	// operation runs when a window closes or an event is evicted, and the problems stay open either way), so
+	// the duration only has to be long enough that the events of one id share a window.
+	const CEP_RULE_WINDOW_OPS_DURATION = '3s';
 	// How long the suppress operation of that rule suppresses the events for, counted from the moment the
 	// rules are created. It has to outlast the configuration cache reload plus the three waves of values the
 	// scenario sends and their verification, because the operation stores an absolute deadline and does
@@ -1764,6 +1777,79 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Prepare the simple window flavour of the windowless scenario, see prepareDataCepWindowOperations().
+	 */
+	public function prepareDataCepWindowSimpleOperations() {
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple');
+	}
+
+	/**
+	 * Prepare the tag correlation window flavour of the windowless scenario, see
+	 * prepareDataCepWindowOperations().
+	 */
+	public function prepareDataCepWindowTagOperations() {
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH, 'tag');
+	}
+
+	/**
+	 * Prepare a windowed flavour of the scenario above: the very same operations, applied by a rule that has a
+	 * $window_type window instead of none. The trigger prototypes are set up exactly as for the windowless
+	 * flavour (so the events carry the same tags), and the operations are the same tag and event operations,
+	 * this time all in one rule whose window groups the events by their 'service' tag - every id the scenario
+	 * sends therefore lands in a window of its own. The rules of the flavour are named after $name_infix, and
+	 * nothing closes a window or a problem, so as in the windowless flavour every problem stays open.
+	 *
+	 * The operator coverage rules of getWindowNoneRules() are deliberately not recreated with a window,
+	 * because how many windowed rules may process one event depends on the window type. That difference is
+	 * asserted instead: a second rule of the same window type matches the same events and does nothing but add
+	 * the CEP_TAG_WINDOW_SECOND tag, and whether an event ends up carrying it tells the two apart.
+	 *   - a simple window is not exclusive, so both rules are processed and every event gets the tag;
+	 *   - a tag correlation window is one of the window types of which only the FIRST matching rule is
+	 *     processed for an event, so the operations rule (the lower sortorder, hence the one that is
+	 *     processed) uses up the slot and no event ever gets the tag. A matrix of tag correlation rules could
+	 *     therefore never tag one event more than once, which is why the operator rules stay windowless.
+	 */
+	private function prepareDataCepWindowOperations(int $window_type, string $name_infix) {
+		$this->prepareCloseOnUpTriggerPrototypes(array_merge(
+			[['tag' => self::CEP_SERVICE_TAG, 'value' => '']],
+			$this->getWindowNoneTagOperationTriggerTags()
+		));
+
+		// As in the windowless flavour, nothing except the trigger expression may close these problems.
+		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
+
+		$window = $this->buildWindowOperationsWindow();
+		$name = self::CEP_RULE_NAME_PREFIX.'window '.$name_infix.' ';
+
+		// Both operation sets in one rule: with a window there is no second rule to run them from.
+		$operations = $this->buildWindowNoneOperations(array_merge(
+			$this->getWindowNoneTagOperationOperations(),
+			$this->getWindowNoneEventOperationCase()['operations']
+		));
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name.'operations', [], $operations,
+			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
+		));
+
+		// The second rule of the same window type, matching the same events: whether it gets its turn is what
+		// the flavours differ in. The higher sortorder makes it the second one either way.
+		$second_operations = $this->buildWindowNoneOperations([
+			[CCepRuleHelper::OP_ADD_TAG, ['tag' => self::CEP_TAG_WINDOW_SECOND,
+				'tag_value' => self::CEP_TAG_WINDOW_SECOND_VALUE
+			]]
+		]);
+
+		$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams($name.'second', [],
+			$second_operations, CONDITION_EVAL_TYPE_AND, '', $window_type, $window
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
 	 * Prepare the "close old down when new up" scenario with the correlation created under
 	 * $baseline_evaltype and then updated in place to $target_evaltype, so the test exercises an evaltype
 	 * transition on an existing rule rather than a freshly created one. The baseline rule is recreated from
@@ -2336,7 +2422,8 @@ HEREDOC;
 	 * 'service' tag.
 	 */
 	private function buildWindowNoneCepRuleParams(string $name, array $match_conditions, array $operations,
-			int $evaltype = CONDITION_EVAL_TYPE_AND, string $formula = ''): array {
+			int $evaltype = CONDITION_EVAL_TYPE_AND, string $formula = '', ?int $window_type = null,
+			array $window = []): array {
 		// A single condition may be passed as is, without wrapping it in a list.
 		$conditions = array_key_exists('type', $match_conditions) ? [$match_conditions] : $match_conditions;
 
@@ -2357,11 +2444,26 @@ HEREDOC;
 				'formula' => $formula,
 				'conditions' => $conditions
 			],
-			'window_type' => CCepRuleHelper::WINDOW_NONE,
+			'window_type' => $window_type === null ? CCepRuleHelper::WINDOW_NONE : $window_type,
 			// Every rule must be evaluated for every event, so none of them may stop the processing of the
 			// rules after it.
 			'stop' => CCepRuleHelper::EXECUTION_CONTINUE,
 			'operations' => $operations
+		] + ($window_type === null ? [] : ['window' => $window]);
+	}
+
+	/**
+	 * The window the windowed flavours of the scenario give their rules, the same for both window types:
+	 * grouped by the 'service' tag, so every id the scenario sends gets a window of its own.
+	 */
+	private function buildWindowOperationsWindow(): array {
+		return [
+			'duration' => self::CEP_RULE_WINDOW_OPS_DURATION,
+			'capacity' => 0,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => ['service']
 		];
 	}
 
@@ -2863,13 +2965,22 @@ HEREDOC;
 	 * the server executes them in.
 	 */
 	private function getWindowNoneTagOperations(): array {
+		return $this->buildWindowNoneOperations($this->getWindowNoneTagOperationOperations());
+	}
+
+	/**
+	 * The [operation type, operation parameters] pairs of every getWindowNoneTagOperationCases() case, in the
+	 * order the cases list them and not yet numbered - the windowed flavour of the scenario appends the event
+	 * operations to them before numbering, since it runs both sets from one rule.
+	 */
+	private function getWindowNoneTagOperationOperations(): array {
 		$operations = [];
 
 		foreach ($this->getWindowNoneTagOperationCases() as $case) {
 			$operations = array_merge($operations, $case['operations']);
 		}
 
-		return $this->buildWindowNoneOperations($operations);
+		return $operations;
 	}
 
 	/**
@@ -5615,6 +5726,52 @@ HEREDOC;
 	}
 
 	/**
+	 * The same operations as testTriggerCEP_CepWindowNone, applied by a rule that has a simple window instead
+	 * of none: the events are grouped into a window per 'service' id and must come out with exactly the same
+	 * tags, event name, severity and suppression the windowless rule produces, showing the operations behave
+	 * the same with a window in front of them. Nothing closes a window or a problem, so all three problems
+	 * stay open until the trigger expression recovers them.
+	 *
+	 * A simple window is not exclusive, so a second rule with one is processed for the same event as well: the
+	 * second rule of this flavour must have added its tag to every event - the opposite of what
+	 * testTriggerCEP_CepWindowTagOperations asserts for a tag correlation window.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleOperations$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleOperations() {
+		$this->prepareDataCepWindowSimpleOperations();
+
+		try {
+			$this->runEventAssessmentTestCepWindowOperations(true);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same as testTriggerCEP_CepWindowSimpleOperations, with a tag correlation window instead of a simple
+	 * one: the operations must again leave exactly the state the windowless flavour produces.
+	 *
+	 * The window type is what the two differ in: only the first matching rule with a tag correlation window is
+	 * processed for an event, so here the second rule never gets its turn and no event may carry its tag. That
+	 * is also why the operator coverage rules are not recreated with a window - a matrix of tag correlation
+	 * rules could never tag one event more than once.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagOperations$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagOperations() {
+		$this->prepareDataCepWindowTagOperations();
+
+		try {
+			$this->runEventAssessmentTestCepWindowOperations(false);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
 	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
@@ -6840,6 +6997,66 @@ HEREDOC;
 	}
 
 	/**
+	 * Drive a windowed flavour of the scenario on the same single discovered item and the same three 'service'
+	 * ids, so every id opens one problem that lands in a window of its own (the rule groups by that tag). No
+	 * rule closes a window or a problem, so all three stay open, and every event must come out with exactly
+	 * the tag, name, severity and suppression state the operations of the windowed rule produce - the same
+	 * state the windowless flavour produces from the same operations.
+	 *
+	 * $second_rule_applies says what must have become of the second rule of the flavour, the one adding
+	 * CEP_TAG_WINDOW_SECOND: with a window type that is not exclusive it is processed as well and every event
+	 * carries that tag, with an exclusive one it never gets its turn and no event may carry it.
+	 */
+	private function runEventAssessmentTestCepWindowOperations(bool $second_rule_applies): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the windowed operations test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		// The tag list per id names the operator coverage rules that must have tagged the event, and this
+		// flavour creates none of them - hence an empty list for every id, meaning none of those tags may be
+		// on the event. The tags the operations themselves add are not listed here: they are the same on every
+		// event and waitForCepWindowNoneTaggedEvents() checks them from getWindowNoneTagOperationResults(),
+		// exactly as in the windowless flavour. The second window rule's tag is the one thing the flavours
+		// disagree on: it must be on every event, or on none of them.
+		$second_result = [
+			self::CEP_TAG_WINDOW_SECOND => $second_rule_applies ? self::CEP_TAG_WINDOW_SECOND_VALUE : null
+		];
+
+		$expected_tags = [];
+		$problem_count = 0;
+
+		foreach ([self::CEP_RULE_WINDOW_NONE_SERVICE, self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT,
+				self::CEP_RULE_WINDOW_NONE_SERVICE_LAST] as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, ++$problem_count);
+			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+			$expected_tags[$service] = [];
+			$this->waitForCepWindowNoneTaggedEvents($triggerid, $expected_tags, $second_result);
+		}
+
+		$this->waitForCepWindowNoneUnsuppressed($triggerid);
+
+		// As in the windowless flavour, a value matching neither "down" nor "up" recovers the trigger and
+		// closes every problem left open.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the windowed operations recovery value');
+	}
+
+	/**
 	 * Wait until none of the events the windowless scenario generated is suppressed any more. The suppress
 	 * operation suppressed every one of them until getWindowNoneSuppressUntil(), which the assertions of
 	 * waitForCepWindowNoneTaggedEvents() confirmed; here the other half is checked - the suppression is
@@ -6872,6 +7089,11 @@ HEREDOC;
 	 * other rule tag - the tag of a rule whose condition the event does not satisfy - fails the check, so
 	 * "tagged by service_equals" always means "tagged by service_equals only".
 	 *
+	 * The windowed flavours of the scenario reuse this too: they create none of the operator rules, so they
+	 * pass an empty tag list for every id (none of those tags may be on the event) and state what must have
+	 * become of the second window rule's tag in $extra_results, which extends the operation expectations with
+	 * the same tag => value or null (must be absent) meaning.
+	 *
 	 * Every event is additionally checked against the tag state the operations of the tag operation rule must
 	 * have left on it (getWindowNoneTagOperationResults(), the same expectations for every event, including
 	 * the tags that must not be there at all) and against the name, severity and suppression the event
@@ -6881,11 +7103,12 @@ HEREDOC;
 	 * a description of the first event that does not match, which callUntilDataIsPresent() surfaces in the
 	 * failure message.
 	 */
-	private function waitForCepWindowNoneTaggedEvents(int $triggerid, array $expected_by_service): void {
+	private function waitForCepWindowNoneTaggedEvents(int $triggerid, array $expected_by_service,
+			array $extra_results = []): void {
 		// tag => the value the rule adds it with, for every rule of the scenario.
 		$rule_values = array_map(fn($rule) => $rule[1], $this->getWindowNoneRules());
 		// tag => the value the tag operations must have left on every event, or null if the tag must be gone.
-		$operation_results = $this->getWindowNoneTagOperationResults();
+		$operation_results = array_merge($this->getWindowNoneTagOperationResults(), $extra_results);
 		// The name, severity and suppression the event operations must have left on every event.
 		$event_results = $this->getWindowNoneEventOperationCase()['expected'];
 
