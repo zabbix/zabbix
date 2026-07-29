@@ -718,8 +718,6 @@ static void	zbx_set_defaults(void)
 	if (NULL == zbx_config_vault.url)
 		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, ZBX_VAULT_DEFAULT_URL);
 
-	zbx_rtrim(zbx_config_vault.url, "/");
-
 	if (0 != config_forks[ZBX_PROCESS_TYPE_REPORTWRITER])
 		config_forks[ZBX_PROCESS_TYPE_REPORTMANAGER] = 1;
 
