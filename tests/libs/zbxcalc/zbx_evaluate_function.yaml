@@ -6018,4 +6018,435 @@ in:
 out:
   return: SUCCEED
   value: 1.7976931348623158e+308
+---
+test case: Evaluate jsonpath(10m,"$.val") different data types and missing fields
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '{"val":"str"}'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: '{"val":2}'
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: '{"val":null}'
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: '{}'
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: '{"val":{"a":2}}'
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+    - value: '{"val":""}'
+      ts: 2017-01-10 10:06:00.000000000 +00:00
+    - value: '{"val":[]}'
+      ts: 2017-01-10 10:07:00.000000000 +00:00
+    - value: '{"val":[123,"asdf",{},[[]],"\""]}'
+      ts: 2017-01-10 10:08:00.000000000 +00:00
+    - value: '{"missing":"asdf"}'
+      ts: 2017-01-10 10:09:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: jsonpath
+  params: '10m,"$.val"'
+out:
+  return: SUCCEED
+  value: ['[123,"asdf",{},[[]],"\""]', '[]', '', '{"a":2}', 'null', '2', 'str']
+---
+test case: Evaluate jsonpath(5m,"$.val") single history value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '{"val":"str"}'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: jsonpath
+  params: '5m,"$.val"'
+out:
+  return: SUCCEED
+  value: ['str']
+---
+test case: Evaluate jsonpath(5m,"$.val") no history values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data: []
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: jsonpath
+  params: '5m,"$.val"'
+out:
+  return: SUCCEED
+  value: []
+---
+test case: Evaluate jsonpath(5m,"$.val") empty result for every history value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '{"missing":"str"}'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: jsonpath
+  params: '5m,"$.val"'
+out:
+  return: SUCCEED
+  value: []
+---
+test case: Evaluate jsonpath(5m,"$.val") invalid json
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '{"val":"str"}'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 'invalid JSON'
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: jsonpath
+  params: '5m,"$.val"'
+out:
+  return: SUCCEED
+  value: ['str']
+---
+test case: Evaluate jsonpath(5m,"$.val") only invalid json
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: 'invalid JSON'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 'another invalid JSON'
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: jsonpath
+  params: '5m,"$.val"'
+out:
+  return: SUCCEED
+  value: []
+---
+test case: Evaluate jsonpath(5m,"invalid jsonpath") invalid jsonpath
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '{"val":"str"}'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: jsonpath
+  params: '5m,"invalid jsonpath"'
+out:
+  return: FAIL
+---
+test case: Evaluate jsonpath(5m,"$.val.sum()") failed jsonpath query
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '{"val":"str"}'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: jsonpath
+  params: '5m,"$.val.sum()"'
+out:
+  return: SUCCEED
+  value: []
+---
+test case: Evaluate jsonpath(5m,"$.val") log data type
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: '{"val":"str"}'
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 1484035200
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: jsonpath
+  params: '5m,"$.val"'
+out:
+  return: SUCCEED
+  value: ['str']
+---
+test case: Evaluate jsonpath(5m,"$.val") str data type
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: '{"val":"str"}'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: jsonpath
+  params: '5m,"$.val"'
+out:
+  return: SUCCEED
+  value: ['str']
+---
+test case: Evaluate xmlxpath(15m,"/root/val")
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '<root><val>str</val></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: '<root><val>2</val></root>'
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: '<root><val type="asdf"/></root>'
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: '<root/>'
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: '<root><val><a>2</a></val></root>'
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+    - value: '<root><val></val></root>'
+      ts: 2017-01-10 10:06:00.000000000 +00:00
+    - value: '<root><val type="array"/></root>'
+      ts: 2017-01-10 10:07:00.000000000 +00:00
+    - value: '<root><val><item>123</item><item>asdf</item><item/><item><item/></item><item>&quot;</item></val></root>'
+      ts: 2017-01-10 10:08:00.000000000 +00:00
+    - value: '<root><missing>asdf</missing></root>'
+      ts: 2017-01-10 10:09:00.000000000 +00:00
+    - value: '<root><val/></root>'
+      ts: 2017-01-10 10:10:00.000000000 +00:00
+  time: 2017-01-10 10:15:00.000000000 +00:00
+  function: xmlxpath
+  params: '15m,"/root/val"'
+out:
+  return: SUCCEED
+  value:
+    - '<val/>'
+    - '<val><item>123</item><item>asdf</item><item/><item><item/></item><item>"</item></val>'
+    - '<val type="array"/>'
+    - '<val/>'
+    - '<val><a>2</a></val>'
+    - '<val type="asdf"/>'
+    - '<val>2</val>'
+    - '<val>str</val>'
+---
+test case: Evaluate xmlxpath(5m,"/root/val") single history value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '<root><val>str</val></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"/root/val"'
+out:
+  return: SUCCEED
+  value: ['<val>str</val>']
+---
+test case: Evaluate xmlxpath(5m,"/root/val") no history values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data: []
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"/root/val"'
+out:
+  return: SUCCEED
+  value: []
+---
+test case: Evaluate xmlxpath(5m,"/root/val") empty result for every history value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '<root><missing>str</missing></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"/root/val"'
+out:
+  return: SUCCEED
+  value: []
+---
+test case: Evaluate xmlxpath(5m,"/root/val") invalid xml
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '<root><val>str</val></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 'invalid XML'
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"/root/val"'
+out:
+  return: SUCCEED
+  value: ['<val>str</val>']
+---
+test case: Evaluate xmlxpath(5m,"/root/val") only invalid xml
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: 'invalid XML'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 'another invalid XML'
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"/root/val"'
+out:
+  return: SUCCEED
+  value: []
+---
+test case: Evaluate xmlxpath(5m,"invalid xpath") invalid xpath
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '<root><val>str</val></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"invalid xpath"'
+out:
+  return: FAIL
+---
+test case: Evaluate xmlxpath(5m,"/root/val") log data type
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: '<root><val>str</val></root>'
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 1484035200
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"/root/val"'
+out:
+  return: SUCCEED
+  value: ['<val>str</val>']
+---
+test case: Evaluate xmlxpath(5m,"/root/val") str data type
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: '<root><val>str</val></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"/root/val"'
+out:
+  return: SUCCEED
+  value: ['<val>str</val>']
+---
+test case: Evaluate xmlxpath(5m,"/root/val") nodeset
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '<root><val>one</val><val>two</val><val><nested>three</nested></val></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"/root/val"'
+out:
+  return: SUCCEED
+  value: ['<val>one</val><val>two</val><val><nested>three</nested></val>']
+---
+test case: Evaluate xmlxpath(5m,"/root/val/text()") text()
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '<root><val>str</val></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"/root/val/text()"'
+out:
+  return: SUCCEED
+  value: ['str']
+---
+test case: Evaluate xmlxpath(5m,"string(/root/val)") string(...)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '<root><val>str</val></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"string(/root/val)"'
+out:
+  return: SUCCEED
+  value: ['str']
+---
+test case: Evaluate xmlxpath(5m,"count(/root/val)") count(...)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '<root><val>str</val></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: '<root></root>'
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"count(/root/val)"'
+out:
+  return: SUCCEED
+  value: ['0', '1']
+---
+test case: Evaluate xmlxpath(5m,"sum(/root/val)") failed sum(...)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '<root><val>str</val></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"sum(/root/val)"'
+out:
+  return: SUCCEED
+  value: []
+---
+test case: Evaluate xmlxpath(5m,"boolean(/root/val)") boolean(...)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: '<root><val>str</val></root>'
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: '<root></root>'
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: xmlxpath
+  params: '5m,"boolean(/root/val)"'
+out:
+  return: SUCCEED
+  value: ['0', '1']
 ...
