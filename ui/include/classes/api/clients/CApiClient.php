@@ -22,14 +22,14 @@ abstract class CApiClient {
 	/**
 	 * Call the given API service method and return the response.
 	 *
-	 * @param string $api
-	 * @param string $method
-	 * @param array  $params
-	 * @param int    $auth_type  CJsonRpc::AUTH_TYPE_BEARER, CJsonRpc::AUTH_TYPE_COOKIE, CJsonRpc::AUTH_TYPE_DPOP
+	 * @param string   $api
+	 * @param string   $method
+	 * @param array    $params
+	 * @param int|null $auth_type  CJsonRpc::AUTH_TYPE_BEARER, CJsonRpc::AUTH_TYPE_COOKIE, CJsonRpc::AUTH_TYPE_DPOP
 	 *
 	 * @return CApiClientResponse
 	 */
-	abstract public function callMethod(string $api, string $method, array $params, int $auth_type);
+	abstract public function callMethod(string $api, string $method, array $params, ?int $auth_type);
 
 	abstract public function getUserData(): ?array;
 }
