@@ -21,7 +21,6 @@ class CFrontendActionValidatorTest extends TestCase {
 	public function dataProvider(): array {
 		return [
 			// Legacy action controllers.
-			['auditacts.php',																		null],
 			['browserwarning.php',																	null],
 			['chart.php',																			null],
 			['chart2.php',																			null],
@@ -32,7 +31,6 @@ class CFrontendActionValidatorTest extends TestCase {
 			['history.php',																			null],
 			['host_discovery.php',																	null],
 			['host_discovery_prototypes.php',														null],
-			['host_prototypes.php',																	null],
 			['hostinventories.php',																	null],
 			['hostinventoriesoverview.php',															null],
 			['httpconf.php',																		null],
