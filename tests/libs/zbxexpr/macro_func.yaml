@@ -414,98 +414,98 @@ out:
 
 
 ---
-test case: 'jsonpath("$.val") "{\"val\":\"str\"}"'
+test case: 'jsonpath("$.val") {"val":"str"}'
 in:
   function: jsonpath
   params: '"$.val"'
-  data: "{\"val\":\"str\"}"
+  data: '{"val":"str"}'
 
 out:
   value: 'str'
   return: SUCCEED
 
 ---
-test case: 'jsonpath("$.val", "default") "{\"val1\":\"str\"}"'
+test case: 'jsonpath("$.val", "default") {"val1":"str"}'
 in:
   function: jsonpath
   params: '"$.val", "default"'
-  data: "{\"val1\":\"str\"}"
+  data: '{"val1":"str"}'
 
 out:
   value: 'default'
   return: SUCCEED
 
 ---
-test case: 'jsonpath("$.val") "{\"val\":\"\"}"'
+test case: 'jsonpath("$.val") {"val":""}'
 in:
   function: jsonpath
   params: '"$.val"'
-  data: "{\"val\":\"\"}"
+  data: '{"val":""}'
 
 out:
   value: ''
   return: SUCCEED
 
 ---
-test case: 'jsonpath("$.val") "{}"'
+test case: 'jsonpath("$.val") {}'
 in:
   function: jsonpath
   params: '"$.val"'
-  data: "{}"
+  data: '{}'
 
 out:
   return: FAIL
 
 ---
-test case: 'xmlxpath("/response/error/status/text()", "unknown status") "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>"'
+test case: 'xmlxpath("/response/error/status/text()", "unknown status") <?xml version="1.0" encoding="UTF-8"?><response><error><status></status></error></response>'
 in:
   function: xmlxpath
   params: '"/response/error/status/text()", "unknown status"'
-  data: "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>"
+  data: '<?xml version="1.0" encoding="UTF-8"?><response><error><status></status></error></response>'
 
 out:
   value: 'unknown status'
   return: SUCCEED
 
 ---
-test case: 'xmlxpath("/response/error/status", "unknown status") "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>"'
+test case: 'xmlxpath("/response/error/status", "unknown status") <?xml version="1.0" encoding="UTF-8"?><response><error><status></status></error></response>'
 in:
   function: xmlxpath
   params: '"/response/error/status", "unknown status"'
-  data: "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>"
+  data: '<?xml version="1.0" encoding="UTF-8"?><response><error><status></status></error></response>'
 
 out:
   value: '<status/>'
   return: SUCCEED
 
 ---
-test case: 'xmlxpath("/response/error/status/text()") "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status>abc</status></error></response>"'
+test case: 'xmlxpath("/response/error/status/text()") <?xml version="1.0" encoding="UTF-8"?><response><error><status>abc</status></error></response>'
 in:
   function: xmlxpath
   params: '"/response/error/status/text()"'
-  data: "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status>abc</status></error></response>"
+  data: '<?xml version="1.0" encoding="UTF-8"?><response><error><status>abc</status></error></response>'
 
 out:
   value: 'abc'
   return: SUCCEED
 
 ---
-test case: 'xmlxpath("string(/response/error/status)", "unknown status") "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>"'
+test case: 'xmlxpath("string(/response/error/status)", "unknown status") <?xml version="1.0" encoding="UTF-8"?><response><error><status></status></error></response>'
 in:
   function: xmlxpath
   params: '"string(/response/error/status)", "unknown status"'
-  data: "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>"
+  data: '<?xml version="1.0" encoding="UTF-8"?><response><error><status></status></error></response>'
 
 out:
   value: ''
   return: SUCCEED
 
 ---
-test case: 'xmlxpath("/response/error/status/text()") "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>"'
+test case: 'xmlxpath("/response/error/status/text()") <?xml version="1.0" encoding="UTF-8"?><response><error><status></status></error></response>'
 in:
   function: xmlxpath
   params: '"/response/error/status/text()"'
-  data: "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>"
+  data: '<?xml version="1.0" encoding="UTF-8"?><response><error><status></status></error></response>'
 
 out:
   return: FAIL
