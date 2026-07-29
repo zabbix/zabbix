@@ -38,6 +38,23 @@
 					right: 0;
 					padding: 0;
 				}
+
+				.flex-wrapper {
+					column-gap: 0;
+
+					.link-action {
+						@extend %overflow-ellipsis;
+					}
+				}
+
+				.tags-wrapper {
+					flex-wrap: nowrap;
+
+					.tag {
+						@extend %overflow-ellipsis;
+						min-width: 24px;
+					}
+				}
 			}
 
 			.row-spacer {

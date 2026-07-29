@@ -266,7 +266,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 					? makeTriggerDependencies($data['dependencies'][$trigger['triggerid']])
 					: []
 			))
-				->addClass(ZBX_STYLE_NOWRAP)
+				->addClass($options['compact_view'] == 1 ? ZBX_STYLE_FLEX_WRAPPER : ZBX_STYLE_NOWRAP)
 				->addItem(
 					(new CLinkAction($problem['name']))
 						->addClass(ZBX_STYLE_WORDBREAK)
