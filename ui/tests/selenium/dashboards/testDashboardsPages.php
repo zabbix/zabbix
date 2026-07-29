@@ -380,7 +380,7 @@ class testDashboardsPages extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Simple name',
-						'Page display period' => '10 seconds'
+						'Slideshow interval' => '10 seconds'
 					]
 				]
 			],
@@ -389,7 +389,7 @@ class testDashboardsPages extends CWebTest {
 				[
 					'fields' => [
 						'Name' => '#!@#$%^&*()_+',
-						'Page display period' => '30 seconds'
+						'Slideshow interval' => '30 seconds'
 					]
 				]
 			],
@@ -398,7 +398,7 @@ class testDashboardsPages extends CWebTest {
 				[
 					'fields' => [
 						'Name' => '      trimmed name      ',
-						'Page display period' => '1 minute'
+						'Slideshow interval' => '1 minute'
 					],
 					'trim' => true
 				]
@@ -408,7 +408,7 @@ class testDashboardsPages extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'long_name_here_long_name_here_long_name_here_long_name_here_long_name_here',
-						'Page display period' => '2 minutes'
+						'Slideshow interval' => '2 minutes'
 					]
 				]
 			],
@@ -417,7 +417,7 @@ class testDashboardsPages extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'first_page_creation',
-						'Page display period' => '10 minutes'
+						'Slideshow interval' => '10 minutes'
 					],
 					'duplicate' => true
 				]
@@ -427,7 +427,7 @@ class testDashboardsPages extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'кириллица',
-						'Page display period' => '30 minutes'
+						'Slideshow interval' => '30 minutes'
 					]
 				]
 			],
@@ -436,7 +436,7 @@ class testDashboardsPages extends CWebTest {
 				[
 					'fields' => [
 						'Name' => '♥♥♥♥♥♥♥',
-						'Page display period' => '1 hour'
+						'Slideshow interval' => '1 hour'
 					]
 				]
 			]
@@ -485,7 +485,7 @@ class testDashboardsPages extends CWebTest {
 		$this->selectPageAction($title, 'Properties', $index);
 		COverlayDialogElement::find()->waitUntilReady()->one();
 		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
-		$page_form->checkValue(['Name' => $title, 'Page display period' => $data['fields']['Page display period']]);
+		$page_form->checkValue(['Name' => $title, 'Slideshow interval' => $data['fields']['Slideshow interval']]);
 	}
 
 	/**
@@ -660,7 +660,7 @@ class testDashboardsPages extends CWebTest {
 		foreach (['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'] as $default) {
 			$this->query('id:dashboard-config')->one()->click();
 			$properties = COverlayDialogElement::find()->waitUntilReady()->one();
-			$properties->query('name:dashboard_properties_form')->asForm()->one()->fill(['Default page display period' => $default]);
+			$properties->query('name:dashboard_properties_form')->asForm()->one()->fill(['Default slideshow interval' => $default]);
 			$properties->query('button:Apply')->one()->click();
 			$properties->ensureNotPresent();
 			$dashboard->waitUntilReady();
@@ -670,7 +670,7 @@ class testDashboardsPages extends CWebTest {
 				$this->selectPageAction('Page 1', 'Properties');
 				$page_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 				$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()
-						->checkValue(['Page display period' => 'Default ('.$default.')']);
+						->checkValue(['Slideshow interval' => 'Default ('.$default.')']);
 				$page_dialog->close(true);
 
 				if ($save_dashboard) {
@@ -731,7 +731,7 @@ class testDashboardsPages extends CWebTest {
 		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
 		$this->assertEquals('255', $page_form->query('id:name')->one()->getAttribute('maxlength'));
 		$this->assertEquals('Dashboard page properties', $page_dialog->getTitle());
-		$this->assertEquals(['Name', 'Page display period'], $page_form->getLabels()->asText());
+		$this->assertEquals(['Name', 'Slideshow interval'], $page_form->getLabels()->asText());
 		$this->assertEquals(['Default (30 seconds)', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes',
 				'30 minutes', '1 hour'], $page_form->query('name:display_period')->asDropdown()->one()->getOptions()->asText()
 		);

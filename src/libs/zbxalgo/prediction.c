@@ -18,7 +18,6 @@
 
 #define ZBX_MATH_EPSILON	(1e-6)
 
-#define ZBX_IS_NAN(x)	((x) != (x))
 #define ZBX_VALID_MATRIX(m)		(0 < (m)->rows && 0 < (m)->columns && NULL != (m)->elements)
 #define ZBX_MATRIX_EL(m, row, col)	((m)->elements[(row) * (m)->columns + (col)])
 #define ZBX_MATRIX_ROW(m, row)		((m)->elements + (row) * (m)->columns)
@@ -420,6 +419,16 @@ static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, int k, zbx
 	if (SUCCEED != (res = zbx_least_squares(independent, dependent, coefficients)))
 		goto out;
 
+	/* Reject regressions that produced Inf/NaN coefficients. */
+	for (int i = 0; i < coefficients->rows * coefficients->columns; i++)
+	{
+		if (0 == isfinite(coefficients->elements[i]))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): regression produced non-finite coefficient", __func__);
+			res = FAIL;
+			goto out;
+		}
+	}
 out:
 	zbx_matrix_free(independent);
 	zbx_matrix_free(dependent);
@@ -970,7 +979,7 @@ static void	zbx_log_expression(double now, zbx_fit_t fit, int k, zbx_matrix_t *c
 double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fit_t fit, unsigned k, zbx_mode_t mode)
 {
 	zbx_matrix_t	*coefficients = NULL;
-	double		left, right, result;
+	double		result;
 	int		res;
 
 	if (1 == n)
@@ -993,7 +1002,43 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 	zbx_matrix_struct_alloc(&coefficients);
 
 	if (SUCCEED != (res = zbx_regression(t, x, n, fit, k, coefficients)))
+	{
+		/* When regression fails due to overflow with extreme values, fall back to a  */
+		/* linear 2-point estimate for linear and logarithmic fits in value mode.     */
+		if ((FIT_LINEAR == fit || FIT_LOGARITHMIC == fit) && MODE_VALUE == mode)
+		{
+			int	i_min_t, i_max_t;
+			double	delta_t;
+
+			/* The value cache may return data in either ascending or descending */
+			/* time order. Find indices of min and max timestamp.                */
+
+			if (t[0] < t[n-1])
+			{
+				i_min_t = 0;
+				i_max_t = n - 1;
+			}
+			else if (t[0] > t[n-1])
+			{
+				i_min_t = n - 1;
+				i_max_t = 0;
+			}
+			else
+				i_min_t = i_max_t = 0;
+
+			if (0.0 < (delta_t = t[i_max_t] - t[i_min_t]))
+			{
+				double	slope = (x[i_max_t] - x[i_min_t]) / delta_t;
+
+				result = x[i_max_t] + slope * (now + time - t[i_max_t]);
+
+				/* NaN and +/-Inf in 'result' are handled below, on return */
+				res = SUCCEED;
+			}
+		}
+
 		goto out;
+	}
 
 	zbx_log_expression(now, fit, (int)k, coefficients);
 
@@ -1025,6 +1070,8 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 
 	if (FIT_LINEAR == fit || FIT_EXPONENTIAL == fit || FIT_LOGARITHMIC == fit || FIT_POWER == fit)
 	{
+		double	left, right;
+
 		/* fit is monotone, therefore maximum and minimum are either at now or at now + time */
 		if (SUCCEED != zbx_calculate_value(now, coefficients, fit, &left) ||
 				SUCCEED != zbx_calculate_value(now + time, coefficients, fit, &right))
@@ -1114,7 +1161,7 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
-	else if (ZBX_IS_NAN(result))
+	else if (0 != isnan(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
@@ -1144,7 +1191,82 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 	zbx_matrix_struct_alloc(&coefficients);
 
 	if (SUCCEED != (res = zbx_regression(t, x, n, fit, k, coefficients)))
+	{
+		/* When regression fails due to overflow with extreme values, fall back to a linear */
+		/* 2-point slope estimate using the oldest and newest data points.                  */
+
+		if (FIT_LINEAR == fit || FIT_LOGARITHMIC == fit)
+		{
+			int	i_min_t, i_max_t;
+			double	delta_t;
+
+			/* The value cache may return data in either ascending or descending */
+			/* time order. Find indices of min and max timestamp.                */
+
+			if (t[0] < t[n-1])
+			{
+				i_min_t = 0;
+				i_max_t = n - 1;
+			}
+			else if (t[0] > t[n-1])
+			{
+				i_min_t = n - 1;
+				i_max_t = 0;
+			}
+			else
+				i_min_t = i_max_t = 0;
+
+			if (0.0 < (delta_t = t[i_max_t] - t[i_min_t]))
+			{
+				double	slope = (x[i_max_t] - x[i_min_t]) / delta_t;
+
+				if (0 == isfinite(slope))
+				{
+					/* Slope overflowed — use trend direction and newest value to decide. */
+					result = (x[i_max_t] > x[i_min_t]) ?
+							((x[i_max_t] >= threshold) ? DBL_MAX : 0.0) :
+							((x[i_max_t] <= threshold) ? DBL_MAX : 0.0);
+				}
+				else
+				{
+					double	val_now = x[i_max_t] + slope * (now - t[i_max_t]);
+
+					if (0 != isnan(val_now))
+						goto out;
+
+					if (0 != isfinite(val_now))
+					{
+						if (val_now > threshold)
+						{
+							if (0.0 > slope)
+								result = (threshold - val_now) / slope;
+							else
+								result = DBL_MAX;
+						}
+						else if (val_now < threshold)
+						{
+							if (0.0 < slope)
+								result = (threshold - val_now) / slope;
+							else
+								result = DBL_MAX;
+						}
+						else
+							result = 0.0;
+					}
+					else if (INFINITY == val_now || (-INFINITY) == val_now)
+					{
+						result = DBL_MAX;
+					}
+					else
+						result = ZBX_MATH_ERROR;
+				}
+
+				res = SUCCEED;
+			}
+		}
+
 		goto out;
+	}
 
 	zbx_log_expression(now, fit, (int)k, coefficients);
 
@@ -1189,14 +1311,14 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
-	else if (0.0 > result || DBL_MAX < result)
-	{
-		result = DBL_MAX;
-	}
-	else if (ZBX_IS_NAN(result))
+	else if (0 != isnan(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
+	}
+	else if (0.0 > result || DBL_MAX < result)
+	{
+		result = DBL_MAX;
 	}
 
 	zbx_matrix_free(coefficients);

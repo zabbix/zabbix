@@ -499,9 +499,11 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog->getFooter()->query('button:Add')->one()->click();
+		$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 
 		if (array_key_exists('error_inline', $data)) {
+			$dialog->waitUntilTextPresent(array_values($data['error_inline'])[0]);
+
 			$this->assertInlineError($dialog->waitUntilReady()->asForm(), $data['error_inline']);
 		}
 		else {

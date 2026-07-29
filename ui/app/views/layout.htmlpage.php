@@ -59,6 +59,12 @@ function local_showDocumentHead(array $data): void {
 	]))->getOutput();
 }
 
+function local_showSkipToMainContentLink(): void {
+	echo (new CLink(_('Skip to main content'), '#'.CHtmlPage::PAGE_TITLE_ID))
+		->addClass(ZBX_STYLE_BTN)
+		->addClass('skip-link');
+}
+
 function local_showSidebar(array $data): void {
 	global $ZBX_SERVER_NAME;
 
@@ -70,6 +76,8 @@ function local_showSidebar(array $data): void {
 }
 
 function local_showContent(array $data): void {
+	local_showBanner($data);
+
 	$messages = get_prepared_messages(['with_current_messages' => true]);
 
 	echo unpack_object($messages);
@@ -89,9 +97,30 @@ function local_showFooter(array $data): void {
 	]))->getOutput();
 }
 
+function local_showBanner(array $data): void {
+	global $ZBX_FEATURE_FLAGS;
+
+	if (!$ZBX_FEATURE_FLAGS['banners_enabled'] || $data['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE) {
+		return;
+	}
+
+	$data['user']['lang'] = CWebUser::$data['lang'];
+
+	$active_banner = CBannerHelper::getActiveBanner($data);
+
+	if ($active_banner) {
+		echo (new CPartial('layout.htmlpage.banner', $data + ['banner' => $active_banner]))
+			->getOutput();
+	}
+}
+
 local_showDocumentHead($data);
 
 echo '<body>';
+
+if ($data['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE) {
+	local_showSkipToMainContentLink();
+}
 
 local_showSidebar($data);
 

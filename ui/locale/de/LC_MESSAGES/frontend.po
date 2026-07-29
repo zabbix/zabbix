@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-01-04 14:20+0000\n"
-"Last-Translator: Joachim <joachim.schwender@web.de>\n"
+"PO-Revision-Date: 2026-06-24 10:53+0000\n"
+"Last-Translator: Udo <zabbix@inet-hamburg.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -1505,7 +1505,7 @@ msgstr "Ein LLD-Regelprototyp mit dem Schlüssel \"%1$s\" existiert bereits auf 
 #: include/classes/api/services/CItemGeneral.php:1912
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr "Ein LLD-Regelprototyp mit dem Schlüssel \"%1$s\" existiert bereits auf der Vorlage \"%2$s\"."
+msgstr "Ein LLD-Regelprototyp mit dem Schlüssel \"%1$s\" existiert bereits in der Vorlage \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1781
 #, c-format
@@ -1813,7 +1813,7 @@ msgstr "Mindestens ein Verschlüsselungslevel muss ausgewählt werden."
 #: app/controllers/CControllerSlaCreate.php:53
 #: app/controllers/CControllerSlaUpdate.php:54
 msgid "At least one entry should be selected."
-msgstr "Mindestens ein Eintrag sollte ausgewählt werden."
+msgstr "Mindestens ein Eintrag muss ausgewählt werden."
 
 #: app/controllers/CControllerRegExCreate.php:54
 #: app/controllers/CControllerRegExUpdate.php:55
@@ -1841,7 +1841,7 @@ msgstr "Mindestens ein Monat muss ausgewählt werden."
 
 #: include/classes/helpers/CItemGeneralHelper.php:411
 msgid "At least one of \"min\" or \"max\" parameters should be specified."
-msgstr "Mindestens einer der Parameter \"min\" oder \"max\" sollte angegeben werden."
+msgstr "Mindestens einer der Parameter \"min\" oder \"max\" muss angegeben werden."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
@@ -2336,7 +2336,7 @@ msgstr "Beide Passwörter müssen gleich sein."
 #: app/controllers/CControllerItemPrototypeUpdate.php:257
 #: app/controllers/CControllerItemUpdate.php:256
 msgid "Both username and password should be either present or empty."
-msgstr "Benutzername und Passwort sollten entweder beide vorhanden oder beide leer sein."
+msgstr "Benutzername und Passwort müssen entweder beide vorhanden oder beide leer sein."
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -2786,7 +2786,7 @@ msgstr "LLD-Regelprototyp mit Schlüssel \"%1$s\" kann nicht ohne seinen Master-
 #: include/classes/helpers/CItemGeneralHelper.php:1003
 #, c-format
 msgid "Cannot copy LLD rule with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr "LLD-Regel mit Schlüssel \"%1$s\" kann nicht ohne seinen Master-Datenpunkt mit Schlüssel \"%2$s\" kopiert werden."
+msgstr "LLD-Regel mit Schlüssel \"%1$s\" kann nicht ohne ihren Master-Datenpunkt mit Schlüssel \"%2$s\" kopiert werden."
 
 #: app/controllers/CControllerCopyCreate.php:183
 msgid "Cannot copy graph"
@@ -3014,25 +3014,25 @@ msgstr "Erkennungsregel \"%1$s\" kann nicht gelöscht werden: %2$s."
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
 msgid_plural "Cannot delete event correlations"
-msgstr[0] "Ereigniskorrelationen können nicht gelöscht werden"
+msgstr[0] "Ereigniskorrelation kann nicht gelöscht werden"
 msgstr[1] "Ereigniskorrelationen können nicht gelöscht werden"
 
 #: graphs.php:281 graphs.php:338
 msgid "Cannot delete graph"
 msgid_plural "Cannot delete graphs"
-msgstr[0] "Diagramme können nicht gelöscht werden"
+msgstr[0] "Diagramm kann nicht gelöscht werden"
 msgstr[1] "Diagramme können nicht gelöscht werden"
 
 #: graphs.php:273 graphs.php:317
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
-msgstr[0] "Diagrammprototypen können nicht gelöscht werden"
+msgstr[0] "Diagrammprototyp kann nicht gelöscht werden"
 msgstr[1] "Diagrammprototypen können nicht gelöscht werden"
 
 #: app/controllers/CControllerHostMassDelete.php:76
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
-msgstr[0] "Hosts können nicht gelöscht werden"
+msgstr[0] "Host kann nicht gelöscht werden"
 msgstr[1] "Hosts können nicht gelöscht werden"
 
 #: include/classes/api/services/CHost.php:1631
@@ -3073,7 +3073,7 @@ msgstr "Hostgruppen können nicht gelöscht werden"
 #: host_prototypes.php:319
 msgid "Cannot delete host prototype"
 msgid_plural "Cannot delete host prototypes"
-msgstr[0] "Host-Prototypen können nicht gelöscht werden"
+msgstr[0] "Host-Prototyp kann nicht gelöscht werden"
 msgstr[1] "Host-Prototypen können nicht gelöscht werden"
 
 #: host_prototypes.php:139
@@ -3114,7 +3114,7 @@ msgstr[1] "Kann Datenpunktprototyp nicht löschen"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] "Wartungszeiträume können nicht gelöscht werden"
+msgstr[0] "Wartungszeitraum kann nicht gelöscht werden"
 msgstr[1] "Wartungszeiträume können nicht gelöscht werden"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
@@ -3150,7 +3150,7 @@ msgstr[1] "Kann Proxy nicht löschen"
 #: app/controllers/CControllerProxyGroupDelete.php:78
 msgid "Cannot delete proxy group"
 msgid_plural "Cannot delete proxy groups"
-msgstr[0] "Proxy-Gruppen können nicht gelöscht werden"
+msgstr[0] "Proxy-Gruppe kann nicht gelöscht werden"
 msgstr[1] "Proxy-Gruppen können nicht gelöscht werden"
 
 #: app/controllers/CControllerProxyGroupDelete.php:39
@@ -3200,7 +3200,7 @@ msgstr "Der Dienst \"%1$s\" kann nicht gelöscht werden: %2$s."
 #: app/controllers/CControllerTemplateDelete.php:143
 msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
-msgstr[0] "Vorlagen können nicht gelöscht werden"
+msgstr[0] "Vorlage kann nicht gelöscht werden"
 msgstr[1] "Vorlagen können nicht gelöscht werden"
 
 #: include/classes/api/services/CTemplate.php:805
@@ -3295,7 +3295,7 @@ msgstr[1] "Kann Benutzerrollen nicht löschen"
 #: httpconf.php:178 httpconf.php:418
 msgid "Cannot delete web scenario"
 msgid_plural "Cannot delete web scenarios"
-msgstr[0] "Webszenarien können nicht gelöscht werden"
+msgstr[0] "Webszenario kann nicht gelöscht werden"
 msgstr[1] "Webszenarien können nicht gelöscht werden"
 
 #: app/controllers/CControllerTokenDisable.php:66
@@ -3319,13 +3319,13 @@ msgstr[1] "Kann Aktionen nicht deaktivieren"
 #: app/controllers/CControllerConnectorDisable.php:77
 msgid "Cannot disable connector"
 msgid_plural "Cannot disable connectors"
-msgstr[0] "Konnektoren können nicht deaktiviert werden"
+msgstr[0] "Konnektor kann nicht deaktiviert werden"
 msgstr[1] "Konnektoren können nicht deaktiviert werden"
 
 #: host_discovery_prototypes.php:586
 msgid "Cannot disable discovery prototype"
 msgid_plural "Cannot disable discovery prototypes"
-msgstr[0] "Erkennungsprototypen können nicht deaktiviert werden"
+msgstr[0] "Erkennungsprototyp kann nicht deaktiviert werden"
 msgstr[1] "Erkennungsprototypen können nicht deaktiviert werden"
 
 #: app/controllers/CControllerDiscoveryDisable.php:76 host_discovery.php:584
@@ -3337,7 +3337,7 @@ msgstr[1] "Kann Suchlaufregeln nicht deaktivieren"
 #: app/controllers/CControllerCorrelationDisable.php:76
 msgid "Cannot disable event correlation"
 msgid_plural "Cannot disable event correlations"
-msgstr[0] "Ereigniskorrelationen können nicht deaktiviert werden"
+msgstr[0] "Ereigniskorrelation kann nicht deaktiviert werden"
 msgstr[1] "Ereigniskorrelationen können nicht deaktiviert werden"
 
 #: app/controllers/CControllerHostGroupDisable.php:91
@@ -3363,7 +3363,7 @@ msgstr[1] "Kann Medientypen nicht deaktivieren"
 #: app/controllers/CControllerModuleDisable.php:75
 msgid "Cannot disable module"
 msgid_plural "Cannot disable modules"
-msgstr[0] "Module können nicht deaktiviert werden"
+msgstr[0] "Modul kann nicht deaktiviert werden"
 msgstr[1] "Module können nicht deaktiviert werden"
 
 #: app/controllers/CControllerScheduledReportDisable.php:78
@@ -3415,7 +3415,7 @@ msgstr[1] "Kann Aktionen nicht aktivieren"
 #: app/controllers/CControllerConnectorEnable.php:77
 msgid "Cannot enable connector"
 msgid_plural "Cannot enable connectors"
-msgstr[0] "Konnektoren können nicht aktiviert werden"
+msgstr[0] "Konnektor kann nicht aktiviert werden"
 msgstr[1] "Konnektoren können nicht aktiviert werden"
 
 #: host_discovery_prototypes.php:585
@@ -3504,7 +3504,7 @@ msgstr "Kann Macros nicht auflösen."
 #: include/classes/import/CConfigurationImport.php:1159
 #, c-format
 msgid "Cannot find \"parent_discovery_rule\" with key \"%1$s\" used for LLD rule prototype with key \"%2$s\" on \"%3$s\"."
-msgstr "\"parent_discovery_rule\" mit Schlüssel \"%1$s\", verwendet für den LLD-Regelprototyp mit Schlüssel \"%2$s\" auf \"%3$s\", kann nicht gefunden werden."
+msgstr "\"parent_discovery_rule\" mit Schlüssel \"%1$s\", verwendet für LLD-Regelprototyp mit Schlüssel \"%2$s\" auf \"%3$s\", kann nicht gefunden werden."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
@@ -3549,12 +3549,12 @@ msgstr "Kann Hostgruppe \"%1$s\" nicht finden für Hostprototyp \"%2$s\" der Suc
 #: include/classes/import/CConfigurationImport.php:1326
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr "Host-Gruppe \"%1$s\" für den Host-Prototyp \"%2$s\" des Erkennungsregelprototyps \"%3$s\" auf \"%4$s\" kann nicht gefunden werden."
+msgstr "Hostgruppe \"%1$s\" für Hostprototyp \"%2$s\" des Erkennungsregelprototyps \"%3$s\" auf \"%4$s\" kann nicht gefunden werden."
 
 #: include/classes/import/importers/CDashboardImporterGeneral.php:57
 #, c-format
 msgid "Cannot find host group \"%1$s\" used in dashboard \"%2$s\"."
-msgstr "Host-Gruppe \"%1$s\", die im Dashboard \"%2$s\" verwendet wird, kann nicht gefunden werden."
+msgstr "Hostgruppe \"%1$s\", verwendet im Dashboard \"%2$s\", kann nicht gefunden werden."
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -3599,7 +3599,7 @@ msgstr "Die Schnittstelle \"%1$s\", die für den Datenpunktprototyp \"%2$s\" der
 #: include/classes/import/CConfigurationImport.php:1220
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr "Schnittstelle \"%1$s\", die für den Datenpunktprototyp \"%2$s\" des Erkennungsregelprototyps \"%3$s\" auf \"%4$s\" verwendet wird, kann nicht gefunden werden."
+msgstr "Schnittstelle \"%1$s\", verwendet für Datenpunktprototyp \"%2$s\" des Erkennungsregelprototyps \"%3$s\" auf \"%4$s\", kann nicht gefunden werden."
 
 #: include/classes/import/CConfigurationImport.php:1852
 #, c-format
@@ -3614,7 +3614,7 @@ msgstr "Kann Datenpunkt \"%1$s\" nicht finden. Genutzt auf \"%2$s\" als Y-Achsen
 #: include/classes/import/CConfigurationImport.php:1515
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr "Datenpunkt \"%1$s\" auf \"%2$s\", der als MAX-Wert der Y-Achse für den Graphprototyp \"%3$s\" des Erkennungsregelprototyps \"%4$s\" auf \"%5$s\" verwendet wird, kann nicht gefunden werden."
+msgstr "Datenpunkt \"%1$s\" auf \"%2$s\", verwendet als MAX-Wert der Y-Achse für Graphprototyp \"%3$s\" des Erkennungsregelprototyps \"%4$s\" auf \"%5$s\", kann nicht gefunden werden."
 
 #: include/classes/import/CConfigurationImport.php:1834
 #, c-format
@@ -3629,12 +3629,12 @@ msgstr "Kann Datenpunkt \"%1$s\" nicht finden. Genutzt auf \"%2$s\" als Y-Achsen
 #: include/classes/import/CConfigurationImport.php:1490
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr "Datenpunkt \"%1$s\" auf \"%2$s\", der als MIN-Wert der Y-Achse für den Graphprototyp \"%3$s\" des Erkennungsregelprototyps \"%4$s\" auf \"%5$s\" verwendet wird, kann nicht gefunden werden."
+msgstr "Datenpunkt \"%1$s\" auf \"%2$s\", verwendet als MIN-Wert der Y-Achse für Graphprototyp \"%3$s\" des Erkennungsregelprototyps \"%4$s\" auf \"%5$s\", kann nicht gefunden werden."
 
 #: include/classes/import/importers/CMapImporter.php:244
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in a link of map \"%3$s\"."
-msgstr "Datenpunkt \"%1$s\" auf \"%2$s\", der in einer Verknüpfung der Karte \"%3$s\" verwendet wird, kann nicht gefunden werden."
+msgstr "Datenpunkt \"%1$s\" auf \"%2$s\", verwendet in einer Verknüpfung der Karte \"%3$s\", kann nicht gefunden werden."
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -3649,7 +3649,7 @@ msgstr "Keine Wertezuordnung \"%1$s\" auf \"%2$s\" gefunden, für Datenpunktvorl
 #: include/classes/import/CConfigurationImport.php:1540
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr "Datenpunkt \"%1$s\" auf \"%2$s\", der im Graphprototyp \"%3$s\" des Erkennungsregelprototyps \"%4$s\" auf \"%5$s\" verwendet wird, kann nicht gefunden werden."
+msgstr "Datenpunkt \"%1$s\" auf \"%2$s\", verwendet im Graphprototyp \"%3$s\" des Erkennungsregelprototyps \"%4$s\" auf \"%5$s\", kann nicht gefunden werden."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:166
 #, c-format
@@ -3659,7 +3659,7 @@ msgstr "Datenpunkt \"%1$s\", das in der Übersichtsseite \"%2$s\" verwendet wird
 #: include/classes/import/importers/CTemplateDashboardImporter.php:193
 #, c-format
 msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
-msgstr "Karte \"%1$s\", die im Dashboard \"%2$s\" verwendet wird, kann nicht gefunden werden."
+msgstr "Karte \"%1$s\", verwendet im Dashboard \"%2$s\", kann nicht gefunden werden."
 
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
@@ -3684,7 +3684,7 @@ msgstr "Kann Hostgruppe \"%1$s\" nicht finden für Hostprototyp \"%2$s\" der Suc
 #: include/classes/import/CConfigurationImport.php:1353
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr "Vorlage \"%1$s\" für den Host-Prototyp \"%2$s\" des Erkennungsregelprototyps \"%3$s\" auf \"%4$s\" kann nicht gefunden werden."
+msgstr "Vorlage \"%1$s\" für Hostprototyp \"%2$s\" des Erkennungsregelprototyps \"%3$s\" auf \"%4$s\" kann nicht gefunden werden."
 
 #: include/classes/import/CConfigurationImport.php:1182
 #, c-format
@@ -3719,7 +3719,7 @@ msgstr "Keine Wertezuordnung \"%1$s\" gefunden, für Datenpunktvorlage \"%2$s\" 
 #: include/classes/import/CConfigurationImport.php:1243
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr "Wertzuordnung \"%1$s\", die für den Datenpunktprototyp \"%2$s\" des Erkennungsregelprototyps \"%3$s\" auf \"%4$s\" verwendet wird, kann nicht gefunden werden."
+msgstr "Wertzuordnung \"%1$s\", verwendet für Datenpunktprototyp \"%2$s\" des Erkennungsregelprototyps \"%3$s\" auf \"%4$s\", kann nicht gefunden werden."
 
 #: app/views/oauth.authorize.php:33
 msgid "Cannot get authentication tokens"
@@ -3754,32 +3754,32 @@ msgstr[1] "Kann Vorlage nicht importieren \"%1$s\", verknüpfte Vorlagen \"%2$s\
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "LDD-Regeln mit Schlüssel \"%1$s\" aus den Vorlagen \"%2$s\" und \"%3$s\" können nicht vererbt werden, da der Schlüssel auf dem Host \"%4$s\" eindeutig sein muss."
+msgstr "LDD-Regeln mit Schlüssel \"%1$s\" aus den Vorlagen \"%2$s\" und \"%3$s\" können nicht vererbt werden, weil der Schlüssel auf Host \"%4$s\" eindeutig sein muss."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "LDD-Regeln mit Schlüssel \"%1$s\" aus den Vorlagen \"%2$s\" und \"%3$s\" können nicht vererbt werden, da der Schlüssel auf der Vorlage \"%4$s\" eindeutig sein muss."
+msgstr "LDD-Regeln mit Schlüssel \"%1$s\" aus den Vorlagen \"%2$s\" und \"%3$s\" können nicht vererbt werden, weil der Schlüssel auf Vorlage \"%4$s\" eindeutig sein muss."
 
 #: include/classes/api/services/CItemGeneral.php:1000
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr "LLD-Regelprototyp mit Schlüssel \"%1$s\" aus der Vorlage \"%2$s\" und der LLD-Regel \"%3$s\" kann nicht auf den Host \"%4$s\" vererbt werden, da ein LLD-Regelprototyp mit demselben Schlüssel bereits zur LLD-Regel \"%5$s\" gehört."
+msgstr "LLD-Regelprototyp mit Schlüssel \"%1$s\" aus Vorlage \"%2$s\" und LLD-Regel \"%3$s\" kann nicht auf Host \"%4$s\" vererbt werden, weil ein LLD-Regelprototyp mit demselben Schlüssel bereits zur LLD-Regel \"%5$s\" gehört."
 
 #: include/classes/api/services/CItemGeneral.php:1001
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr "LLD-Regelprototyp mit Schlüssel \"%1$s\" aus der Vorlage \"%2$s\" und der LLD-Regel \"%3$s\" kann nicht auf die Vorlage \"%4$s\" vererbt werden, da ein LLD-Regelprototyp mit demselben Schlüssel bereits zur LLD-Regel \"%5$s\" gehört."
+msgstr "LLD-Regelprototyp mit Schlüssel \"%1$s\" aus Vorlage \"%2$s\" und LLD-Regel \"%3$s\" kann nicht auf Vorlage \"%4$s\" vererbt werden, weil ein LLD-Regelprototyp mit demselben Schlüssel bereits zur LLD-Regel \"%5$s\" gehört."
 
 #: include/classes/api/services/CItemGeneral.php:926
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule prototype with the same key already exists."
-msgstr "LLD-Regelprototyp mit Schlüssel \"%1$s\" aus der Vorlage \"%2$s\" kann nicht auf den Host \"%3$s\" vererbt werden, da bereits ein entdeckter LLD-Regelprototyp mit demselben Schlüssel existiert."
+msgstr "LLD-Regelprototyp mit Schlüssel \"%1$s\" aus Vorlage \"%2$s\" kann nicht auf Host \"%3$s\" vererbt werden, weil bereits ein entdeckter LLD-Regelprototyp mit demselben Schlüssel existiert."
 
 #: include/classes/api/services/CItemGeneral.php:1358
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr "LLD-Regelprototyp mit Schlüssel \"%1$s\" aus der Vorlage \"%2$s\" kann nicht auf den Host \"%3$s\" vererbt werden, da eine Host-Schnittstelle vom Typ \"%4$s\" erforderlich ist."
+msgstr "LLD-Regelprototyp mit Schlüssel \"%1$s\" aus Vorlage \"%2$s\" kann nicht auf Host \"%3$s\" vererbt werden, weil eine Hostschnittstelle vom Typ \"%4$s\" erforderlich ist."
 
 #: include/classes/api/services/CItemGeneral.php:969
 #, c-format
@@ -4019,7 +4019,7 @@ msgstr "Datenpunkt mit Schlüssel \"%1$s\" der Vorlage \"%2$s\" kann nicht an Ho
 #: include/classes/api/services/CItemGeneral.php:868
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr "Datenpunkt mit Schlüssel \"%1$s\" der Vorlage \"%2$s\" kann nicht an Host \"%3$s\" vererbt werden, weil bereits ein Datenpunkt mit demselben Schlüssel von Vorlage \"%4$s\" vererbt wird."
+msgstr "Datenpunkt mit Schlüssel \"%1$s\" der Vorlage \"%2$s\" kann nicht an Host \"%3$s\" vererbt werden, weil ein Datenpunkt mit demselben Schlüssel bereits von Vorlage \"%4$s\" vererbt wird."
 
 #: include/classes/api/services/CItem.php:1519
 #, c-format
@@ -4049,7 +4049,7 @@ msgstr "Datenpunkt mit Schlüssel \"%1$s\" der Vorlage \"%2$s\" kann nicht an Vo
 #: include/classes/api/services/CItemGeneral.php:869
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr "Datenpunkt mit Schlüssel \"%1$s\" der Vorlage \"%2$s\" kann nicht an Vorlage \"%3$s\" vererbt werden, weil bereits ein Datenpunkt mit demselben Schlüssel von Vorlage \"%4$s\" vererbt wird."
+msgstr "Datenpunkt mit Schlüssel \"%1$s\" der Vorlage \"%2$s\" kann nicht an Vorlage \"%3$s\" vererbt werden, weil ein Datenpunkt mit demselben Schlüssel bereits von Vorlage \"%4$s\" vererbt wird."
 
 #: include/classes/api/services/CItem.php:1518
 #, c-format
@@ -4078,7 +4078,7 @@ msgstr "Kann Vorlage nicht verbinden"
 #: include/classes/api/services/CHostBase.php:806
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr "Vorlage \"%1$s\" kann nicht mit Host \"%2$s\" verknüpft werden, weil sie über Vorlage \"%3$s\" zweimal verknüpft würde."
+msgstr "Vorlage \"%1$s\" kann nicht mit Host \"%2$s\" verknüpft werden, weil sie über Vorlage \"%3$s\" doppelt verknüpft würde."
 
 #: include/classes/api/services/CHostBase.php:872
 #, c-format
@@ -4088,7 +4088,7 @@ msgstr "Vorlage „%1$s“ kann nicht mit Host „%2$s“ verknüpft werden, da 
 #: include/classes/api/services/CHostBase.php:803
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr "Vorlage \"%1$s\" kann nicht mit Host-Prototyp \"%2$s\" verknüpft werden, weil sie über Vorlage \"%3$s\" zweimal verknüpft würde."
+msgstr "Vorlage \"%1$s\" kann nicht mit Host-Prototyp \"%2$s\" verknüpft werden, weil sie über Vorlage \"%3$s\" doppelt verknüpft würde."
 
 #: include/classes/api/services/CHostBase.php:869
 #, c-format
@@ -4114,7 +4114,7 @@ msgstr "Vorlage „%1$s“ kann nicht mit Vorlage „%2$s“ verknüpft werden, 
 #: include/classes/api/services/CHostBase.php:976
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
-msgstr "Vorlage \"%1$s\" kann nicht mit Vorlage \"%2$s\" verknüpft werden, weil sie mit Host \"%3$s\" zweimal verknüpft würde."
+msgstr "Vorlage \"%1$s\" kann nicht mit Vorlage \"%2$s\" verknüpft werden, weil sie mit Host \"%3$s\" doppelt verknüpft würde."
 
 #: include/classes/api/services/CHostBase.php:973
 #, c-format
@@ -4129,7 +4129,7 @@ msgstr "Vorlage \"%1$s\" kann nicht mit Vorlage \"%2$s\" verknüpft werden, weil
 #: include/classes/api/services/CHostBase.php:800
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr "Vorlage \"%1$s\" kann nicht mit Vorlage \"%2$s\" verknüpft werden, weil sie über Vorlage \"%3$s\" zweimal verknüpft wäre."
+msgstr "Vorlage \"%1$s\" kann nicht mit Vorlage \"%2$s\" verknüpft werden, weil sie sonst über Vorlage \"%3$s\" zweimal verknüpft wäre."
 
 #: include/classes/api/services/CHostBase.php:1003
 #, c-format
@@ -4330,37 +4330,37 @@ msgstr "Zeichensatz kann nicht festgelegt werden."
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr "Abhängigkeit für LLD-Regel mit Schlüssel \"%1$s\" vom Master-Datenpunkt mit Schlüssel \"%2$s\" auf dem Host \"%3$s\" kann nicht festgelegt werden: %4$s."
+msgstr "Abhängigkeit für LLD-Regel mit Schlüssel \"%1$s\" vom Master-Datenpunkt mit Schlüssel \"%2$s\" auf dem Host \"%3$s\" kann nicht gesetzt werden: %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2477
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr "Abhängigkeit für LLD-Regel mit Schlüssel \"%1$s\" vom Master-Datenpunkt mit Schlüssel \"%2$s\" auf der Vorlage \"%3$s\" kann nicht festgelegt werden: %4$s."
+msgstr "Abhängigkeit für LLD-Regel mit Schlüssel \"%1$s\" vom Master-Datenpunkt mit Schlüssel \"%2$s\" auf der Vorlage \"%3$s\" kann nicht gesetzt werden: %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2472
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr "Abhängigkeit für Datenpunktprototyp mit Schlüssel \"%1$s\" vom Master-Datenpunktprototyp mit Schlüssel \"%2$s\" auf dem Host \"%3$s\" kann nicht festgelegt werden: %4$s."
+msgstr "Abhängigkeit für Datenpunktprototyp mit Schlüssel \"%1$s\" vom Master-Datenpunktprototyp mit Schlüssel \"%2$s\" auf dem Host \"%3$s\" kann nicht gesetzt werden: %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2471
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr "Abhängigkeit für Datenpunktprototyp mit Schlüssel \"%1$s\" vom Master-Datenpunktprototyp mit Schlüssel \"%2$s\" auf der Vorlage \"%3$s\" kann nicht festgelegt werden: %4$s."
+msgstr "Abhängigkeit für Datenpunktprototyp mit Schlüssel \"%1$s\" vom Master-Datenpunktprototyp mit Schlüssel \"%2$s\" auf der Vorlage \"%3$s\" kann nicht gesetzt werden: %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2467
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr "Abhängigkeit für Datenpunktprototyp mit Schlüssel \"%1$s\" vom Master-Datenpunkt mit Schlüssel \"%2$s\" auf dem Host \"%3$s\" kann nicht festgelegt werden: %4$s."
+msgstr "Abhängigkeit für Datenpunktprototyp mit Schlüssel \"%1$s\" vom Master-Datenpunkt mit Schlüssel \"%2$s\" auf dem Host \"%3$s\" kann nicht gesetzt werden: %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2466
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr "Abhängigkeit für Datenpunktprototyp mit Schlüssel \"%1$s\" vom Master-Datenpunkt mit Schlüssel \"%2$s\" auf der Vorlage \"%3$s\" kann nicht festgelegt werden: %4$s."
+msgstr "Abhängigkeit für Datenpunktprototyp mit Schlüssel \"%1$s\" vom Master-Datenpunkt mit Schlüssel \"%2$s\" auf der Vorlage \"%3$s\" kann nicht gesetzt werden: %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2461
 #, c-format
 msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr "Abhängigkeit für Datenpunkt mit Schlüssel \"%1$s\" vom Master-Datenpunkt mit Schlüssel \"%2$s\" auf dem Host \"%3$s\" kann nicht festgelegt werden: %4$s."
+msgstr "Abhängigkeit für Datenpunkt mit Schlüssel \"%1$s\" vom Master-Datenpunkt mit Schlüssel \"%2$s\" auf dem Host \"%3$s\" kann nicht gesetzt werden: %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2460
 #, c-format
@@ -4464,7 +4464,7 @@ msgstr "\"%1$s\" kann für vorlagebasierten Auslöser-Prototyp \"%2$s\" nicht ak
 #: include/classes/api/helpers/CApiSettingsHelper.php:94
 #, c-format
 msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
-msgstr "Parameter \"%1$s\" kann nicht aktualisiert werden, da er derzeit schreibgeschützt ist. Ziehen Sie ein Upgrade von Zabbix in Betracht, um diese Einschränkung zu entfernen."
+msgstr "Parameter \"%1$s\" kann nicht aktualisiert werden, da er derzeit schreibgeschützt ist. Erwägen Sie ein Upgrade von Zabbix, um diese Einschränkung zu entfernen."
 
 #: include/classes/api/services/CHost.php:2344
 #, c-format
@@ -4872,7 +4872,7 @@ msgstr "SP-Zertifikat ändern"
 
 #: app/views/administration.authentication.edit.php:342
 msgid "Change SP private key"
-msgstr "SP-Privatschlüssel ändern"
+msgstr "SP-privaten Schlüssel ändern"
 
 #: app/views/mfa.edit.php:128
 msgid "Change client secret"
@@ -4915,7 +4915,7 @@ msgstr "Typ ändern"
 
 #: app/views/js/administration.authentication.edit.js.php:409
 msgid "Changing the authentication method will reset all sessions, except the current one."
-msgstr "Durch das Ändern der Authentifizierungsmethode werden alle Sitzungen außer der aktuellen zurückgesetzt."
+msgstr "Das Ändern der Authentifizierungsmethode setzt alle Sitzungen außer der aktuellen zurück."
 
 #: app/partials/configuration.filter.items.php:144
 #: app/views/popup.massupdate.item.php:149 include/items.inc.php:127
@@ -5009,7 +5009,7 @@ msgstr "Prüft, ob die Datei existiert. Rückgabe 0 - nicht gefunden; 1 - Datei 
 
 #: include/classes/data/CItemData.php:1115
 msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr "Prüft, ob der Host per ICMP-Ping mit Wiederholungen erreichbar ist. 0 - ICMP-Ping fehlgeschlagen. 1 - ICMP-Ping erfolgreich."
+msgstr "Prüft, ob der Host per ICMP-Ping mit Wiederholungsversuchen erreichbar ist. 0 - ICMP-Ping fehlgeschlagen. 1 - ICMP-Ping erfolgreich."
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -5123,7 +5123,7 @@ msgstr "Klicken Sie auf Fertigstellen, um den Host-Assistenten zu schließen."
 #: app/views/js/host.wizard.edit.js.php:770
 #, c-format
 msgid "Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s)."
-msgstr "Klicken Sie auf Fertigstellen, um zum Abschnitt „Neueste Daten“ zu wechseln und die aktuellsten Daten für Ihren Host (%1$s) anzuzeigen."
+msgstr "Klicken Sie auf Fertigstellen, um zum Abschnitt „Neueste Daten“ zu wechseln und die neuesten Daten für Ihren Host (%1$s) anzuzeigen."
 
 #: jsLoader.php:157
 msgid "Click and drag to desired size."
@@ -5349,7 +5349,7 @@ msgstr "Kommunikation"
 
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
-msgstr "Die Kommunikation zwischen Zabbix Agent und Server/Proxy wird mit einer eindeutigen benutzerdefinierten Identität für vorinstallierte Schlüssel und einem damit verknüpften geheimen vorinstallierten Schlüssel gesichert."
+msgstr "Die Kommunikation zwischen Zabbix Agent und Server/Proxy wird mit einer eindeutigen benutzerdefinierten Kennung für vorinstallierte Schlüssel und einem damit verknüpften geheimen vorinstallierten Schlüssel gesichert."
 
 #: app/views/host.wizard.edit.php:414
 msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
@@ -5899,7 +5899,7 @@ msgstr "In Ursache umwandeln"
 
 #: app/views/popup.acknowledge.edit.php:136
 msgid "Converts a symptom event back to cause event"
-msgstr "Wandelt ein Symptom-Ereignis zurück in ein Ursache-Ereignis um"
+msgstr "Wandelt ein Symptomereignis zurück in ein Ursacheereignis um"
 
 #: include/views/js/monitoring.sysmaps.js.php:297
 #: include/views/js/monitoring.sysmaps.js.php:433
@@ -6474,7 +6474,7 @@ msgstr "Dänisch (da_DK)"
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
-msgstr "Düster"
+msgstr "Dunkel"
 
 #: include/classes/core/ZBase.php:378
 msgid "Dark (classic)"
@@ -6602,7 +6602,7 @@ msgstr "Daten werden vom Zabbix Agent erfasst, einer leichtgewichtigen Softwarek
 
 #: app/views/js/host.wizard.edit.js.php:90
 msgid "Data is collected by Zabbix server or proxy using standard protocols (e.g., SNMP, ICMP) or remote access methods (e.g., SSH)."
-msgstr "Daten werden vom Zabbix-Server oder Proxy mithilfe von Standardprotokollen (z. B. SNMP, ICMP) oder Fernzugriffsmethoden (z. B. SSH) erfasst."
+msgstr "Daten werden vom Zabbix Server oder Proxy mithilfe von Standardprotokollen (z. B. SNMP, ICMP) oder Fernzugriffsmethoden (z. B. SSH) erfasst."
 
 #: app/views/js/webscenario.step.edit.js.php:297
 msgid "Data is not properly encoded."
@@ -6626,12 +6626,12 @@ msgstr "Datensatz"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:304
 msgid "Data set aggregation"
-msgstr "Aggregation des Datensatzes"
+msgstr "Datensatzaggregation"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:325
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:449
 msgid "Data set label"
-msgstr "Datensatzbezeichnung"
+msgstr "Beschriftung"
 
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
@@ -7409,19 +7409,19 @@ msgstr "Gelöscht"
 
 #: include/actions.inc.php:143
 msgid "Deleted host"
-msgstr "Host gelöscht"
+msgstr "Gelöschter Host"
 
 #: include/actions.inc.php:125
 msgid "Deleted host group"
-msgstr "Host-Gruppe gelöscht"
+msgstr "Gelöschte Host-Gruppe"
 
 #: include/actions.inc.php:710
 msgid "Deleted host group(s)"
-msgstr "Host-Gruppe(n) gelöscht"
+msgstr "Gelöschte Host-Gruppe(n)"
 
 #: include/actions.inc.php:134
 msgid "Deleted trigger"
-msgstr "Auslöser gelöscht"
+msgstr "Gelöschter Auslöser"
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -7900,7 +7900,7 @@ msgstr "Suchlaufaktionen"
 
 #: app/views/configuration.discovery.edit.php:52
 msgid "Discovery by"
-msgstr "Erkennung durch"
+msgstr "Discovery durch"
 
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
@@ -7937,11 +7937,11 @@ msgstr "Erkennung von VMware-Datastores, \"url\" - VMware-Service-URL. Gibt JSON
 
 #: include/classes/data/CItemData.php:1953
 msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr "Erkennung von VMware-Hypervisor-Datastores, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors. Gibt JSON zurück"
+msgstr "Erkennung von VMware-Hypervisor-Datastores, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung. Gibt JSON zurück"
 
 #: include/classes/data/CItemData.php:2107
 msgid "Discovery of VMware hypervisor network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr "Erkennung von VMware-Hypervisor-Netzwerkschnittstellen, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors. Gibt JSON zurück"
+msgstr "Erkennung von VMware-Hypervisor-Netzwerkschnittstellen, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung. Gibt JSON zurück"
 
 #: include/classes/data/CItemData.php:1995
 msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
@@ -7949,15 +7949,15 @@ msgstr "Erkennung von VMware-Hypervisoren, \"url\" - VMware-Service-URL. Gibt JS
 
 #: include/classes/data/CItemData.php:2541
 msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr "Erkennung von VMware-Datenträgergeräten virtueller Maschinen, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine. Gibt JSON zurück"
+msgstr "Erkennung von VMware-Datenträgergeräten virtueller Maschinen, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Kennung der virtuellen Maschine. Gibt JSON zurück"
 
 #: include/classes/data/CItemData.php:2562
 msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr "Erkennung von Dateisystemen virtueller VMware-Maschinen, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine. Gibt JSON zurück"
+msgstr "Erkennung von VMware-Dateisystemen virtueller Maschinen, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Kennung der virtuellen Maschine. Gibt JSON zurück"
 
 #: include/classes/data/CItemData.php:2408
 msgid "Discovery of VMware virtual machine network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr "Erkennung von Netzwerkschnittstellen virtueller VMware-Maschinen, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine. Gibt JSON zurück"
+msgstr "Erkennung von VMware-Netzwerkschnittstellen virtueller Maschinen, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Kennung der virtuellen Maschine. Gibt JSON zurück"
 
 #: include/classes/data/CItemData.php:2310
 msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
@@ -8123,7 +8123,7 @@ msgstr "Protokollzeit anzeigen"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
-msgstr "Min./Durchschn./Max. anzeigen"
+msgstr "Zeige Min/Avg/Max"
 
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
@@ -8610,7 +8610,7 @@ msgstr "Remote-JMX-Monitoring aktivieren"
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
-msgstr "Ausgewählten API-Token aktivieren?"
+msgstr "Ausgewähltes API-Token aktivieren?"
 
 #: app/views/administration.token.list.php:206
 #: app/views/administration.user.token.list.php:159
@@ -8831,11 +8831,11 @@ msgstr "Englisch (en_US)"
 
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
-msgstr "Geben Sie eine nicht geheime Kennungszeichenfolge für den vorinstallierten Schlüssel ein. Vermeiden Sie die Angabe sensibler Daten."
+msgstr "Geben Sie eine nicht geheime Identitätszeichenfolge für den vorinstallierten Schlüssel ein. Vermeiden Sie die Angabe sensibler Daten."
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
-msgstr "Geben Sie einen eindeutigen Namen ein, den Zabbix-Komponenten zur Erkennung des Pre-Shared Key verwenden."
+msgstr "Geben Sie einen eindeutigen Namen ein, den Zabbix-Komponenten zur Erkennung des vorinstallierten Schlüssels verwenden."
 
 #: include/classes/setup/CSetupWizard.php:612
 msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
@@ -8843,7 +8843,7 @@ msgstr "Geben Sie einen oder mehrere Werte als host:port oder [host]:port (IPv6)
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
-msgstr "Geben Sie die IP-/DNS-Adresse und den Port des auf Ihrem Überwachungsziel installierten Zabbix Agent ein."
+msgstr "Geben Sie die IP-/DNS-Adresse und den Port des auf Ihrem Überwachungsziel installierten Zabbix Agenten ein."
 
 #: app/views/host.wizard.edit.php:771
 msgid "Enter the IP/DNS address and port of your IPMI-enabled monitoring target."
@@ -8855,7 +8855,7 @@ msgstr "Geben Sie die IP-/DNS-Adresse und den Port Ihres JMX-fähigen Überwachu
 
 #: app/views/host.wizard.edit.php:412
 msgid "Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration."
-msgstr "Geben Sie die IP-/DNS-Adresse und den Port Ihres Zabbix Server, Proxy oder Ihrer Cluster-Konfiguration ein."
+msgstr "Geben Sie die IP-/DNS-Adresse und den Port Ihres Zabbix Server-, Proxy- oder Cluster-Setups ein."
 
 #: app/views/host.wizard.edit.php:642
 msgid "Enter the IP/DNS address, port, and authentication details of your SNMP-enabled monitoring target."
@@ -9269,7 +9269,7 @@ msgstr "Ausdruckstyp"
 #: app/controllers/CControllerRegExCreate.php:53
 #: app/controllers/CControllerRegExUpdate.php:54
 msgid "Expression type and expression combination is not unique."
-msgstr "Die Kombination aus Ausdruckstyp und Ausdruck ist nicht eindeutig."
+msgstr "Ausdruckstyp und Ausdruckskombination sind nicht eindeutig."
 
 #: app/views/popup.testtriggerexpr.php:29
 msgid "Expression variable elements"
@@ -9372,7 +9372,7 @@ msgstr "Die Dashboard-Freigabe konnte nicht aktualisiert werden."
 
 #: jsLoader.php:128
 msgid "Failed to update time selector."
-msgstr "Zeitselektor konnte nicht aktualisiert werden."
+msgstr "Zeitwahl konnte nicht aktualisiert werden."
 
 #: jsLoader.php:143
 msgid "Failed to update widget properties."
@@ -9545,7 +9545,7 @@ msgstr "Dateiprüfsumme, berechnet mit dem UNIX-Algorithmus cksum. Liefert Ganzz
 
 #: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
 msgid "File format is unsupported."
-msgstr "Das Dateiformat wird nicht unterstützt."
+msgstr "Dateiformat wird nicht unterstützt."
 
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
@@ -9630,7 +9630,7 @@ msgstr "Filtern"
 
 #: app/views/mediatype.list.php:76
 msgid "Filter actions by the scope of media type usage:"
-msgstr "Aktionen nach dem Geltungsbereich der Medientypverwendung filtern:"
+msgstr "Aktionen nach dem Umfang der Medientypverwendung filtern:"
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -9837,11 +9837,11 @@ msgstr "Allgemein"
 
 #: app/views/host.wizard.edit.php:417
 msgid "Generate a secret pre-shared key hexadecimal string."
-msgstr "Einen geheimen vorinstallierten Schlüssel als hexadezimale Zeichenfolge generieren."
+msgstr "Einen geheimen vorinstallierten Schlüssel als hexadezimale Zeichenfolge erzeugen."
 
 #: app/views/host.wizard.edit.php:411
 msgid "Generate new"
-msgstr "Neu generieren"
+msgstr "Neu erzeugen"
 
 #: app/partials/scheduledreport.subscription.php:34
 #: app/views/popup.scheduledreport.subscription.php:98
@@ -10260,7 +10260,7 @@ msgstr "Gruppen-Prototyp kann nicht auf einer per Suchlauf entdeckten Host-Grupp
 #: app/controllers/CControllerHostPrototypeCreate.php:55
 #: app/controllers/CControllerHostPrototypeUpdate.php:58
 msgid "Group prototype is not unique."
-msgstr "Gruppenprototyp ist nicht eindeutig."
+msgstr "Gruppen-Prototyp ist nicht eindeutig."
 
 #: include/views/configuration.host.prototype.edit.php:204
 msgid "Group prototypes"
@@ -10448,7 +10448,7 @@ msgstr "Kontrastreich dunkel"
 
 #: include/classes/core/ZBase.php:382
 msgid "High-contrast light"
-msgstr "Konotrastreich hell"
+msgstr "Kontrastreich hell"
 
 #: app/partials/monitoring.problem.filter.php:312
 msgid "Highlight whole row"
@@ -11082,7 +11082,7 @@ msgstr "Hosts"
 
 #: app/views/host.wizard.edit.php:278
 msgid "Hosts are organized into host groups for easier management and access control."
-msgstr "Hosts sind zur einfacheren Verwaltung und Zugriffskontrolle in Host-Gruppen organisiert."
+msgstr "Hosts werden zur einfacheren Verwaltung und Zugriffskontrolle in Host-Gruppen organisiert."
 
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
@@ -11112,7 +11112,7 @@ msgstr "Verwaltung"
 #: include/views/configuration.item.edit.php:1084
 #: include/views/configuration.item.prototype.edit.php:952
 msgid "However, if \"Check for not supported value\" steps are configured, they are always placed and executed first (with \"any error\" being the last of them)."
-msgstr "Wenn jedoch Schritte für „Prüfung auf nicht unterstützten Wert“ konfiguriert sind, werden sie immer zuerst platziert und ausgeführt (wobei „beliebiger Fehler“ der letzte davon ist)."
+msgstr "Wenn jedoch Schritte vom Typ \"Auf nicht unterstützten Wert prüfen\" konfiguriert sind, werden diese immer zuerst platziert und ausgeführt (wobei \"beliebiger Fehler\" der letzte davon ist)."
 
 #: include/locales.inc.php:47
 msgid "Hungarian (hu_HU)"
@@ -11832,7 +11832,7 @@ msgstr "Falscher Massenwert für die Schnittstelle."
 
 #: include/classes/validators/CHostGroupNameValidator.php:36
 msgid "Incorrect characters used for host group name."
-msgstr "Ungültige Zeichen im Hostgruppen-Namen verwendet."
+msgstr "Unzulässige Zeichen im Hostgruppennamen verwendet."
 
 #: include/classes/api/services/CHost.php:1029
 #: include/classes/api/services/CHost.php:2052
@@ -11844,17 +11844,17 @@ msgstr "Falsche Zeichen für den Hostnamen \"%1$s\" verwendet."
 #: app/controllers/CControllerHostCreate.php:39
 #: app/controllers/CControllerHostUpdate.php:42
 msgid "Incorrect characters used for host name."
-msgstr "Ungültige Zeichen im Hostnamen verwendet."
+msgstr "Unzulässige Zeichen im Hostnamen verwendet."
 
 #: app/controllers/CControllerProxyCreate.php:34
 #: app/controllers/CControllerProxyUpdate.php:30
 msgid "Incorrect characters used for proxy name."
-msgstr "Ungültige Zeichen im Proxy-Namen verwendet."
+msgstr "Unzulässige Zeichen im Proxy-Namen verwendet."
 
 #: app/controllers/CControllerTemplateCreate.php:35
 #: app/controllers/CControllerTemplateUpdate.php:36
 msgid "Incorrect characters used for template name."
-msgstr "Ungültige Zeichen im Vorlagen-Namen verwendet."
+msgstr "Unzulässige Zeichen im Vorlagennamen verwendet."
 
 #: include/classes/core/CConfigFile.php:215
 #: include/classes/core/CConfigFile.php:411
@@ -11905,7 +11905,7 @@ msgstr "Unzulässige Funktion verwendet"
 #: include/classes/core/CConfigFile.php:579
 #, c-format
 msgid "Incorrect history storage configuration %1$s: %2$s."
-msgstr "Falsche Konfiguration des Verlaufsspeichers %1$s: %2$s."
+msgstr "Falsche Konfiguration der Verlaufsspeicherung %1$s: %2$s."
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -12459,7 +12459,7 @@ msgstr "Geerbte und Host-Tags"
 
 #: jsLoader.php:262
 msgid "Inherited and item prototype tag"
-msgstr "Geerbtes und Datenpunktprototyp-Tag"
+msgstr "Geerbtes und Datenpunkt-Prototyp-Tag"
 
 #: include/classes/helpers/CTagHelper.php:231
 msgid "Inherited and item tag"
@@ -12487,7 +12487,7 @@ msgstr "Geerbte und Vorlagen-Tags"
 
 #: jsLoader.php:264
 msgid "Inherited and trigger prototype tag"
-msgstr "Geerbtes und Auslöserprototyp-Tag"
+msgstr "Geerbtes und Auslöser-Prototyp-Tag"
 
 #: include/classes/helpers/CTagHelper.php:232
 msgid "Inherited and trigger tag"
@@ -12549,11 +12549,11 @@ msgstr "Zabbix Agent installieren"
 
 #: app/views/host.wizard.edit.php:512 app/views/host.wizard.edit.php:535
 msgid "Install Zabbix agent 2 and its plugins on your monitoring target by following the installation instructions below."
-msgstr "Installieren Sie Zabbix Agent 2 und seine Plugins auf Ihrem Überwachungsziel, indem Sie die unten stehenden Installationsanweisungen befolgen."
+msgstr "Installieren Sie Zabbix Agent 2 und seine Plugins auf Ihrem Überwachungsziel, indem Sie den untenstehenden Installationsanweisungen folgen."
 
 #: app/views/host.wizard.edit.php:551 app/views/host.wizard.edit.php:574
 msgid "Install Zabbix agent and its plugins on your monitoring target by following the installation instructions below."
-msgstr "Installieren Sie Zabbix Agent und seine Plugins auf Ihrem Überwachungsziel, indem Sie die unten stehenden Installationsanweisungen befolgen."
+msgstr "Installieren Sie den Zabbix Agent und seine Plugins auf Ihrem Überwachungsziel, indem Sie die folgenden Installationsanweisungen befolgen."
 
 #: setup.php:163
 msgid "Installation"
@@ -12837,7 +12837,7 @@ msgstr "Ungültiger Schlüssel \"%1$s\": %2$s."
 #: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
 #: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
 msgid "Invalid media type mapping configuration."
-msgstr "Ungültige Konfiguration der Medientyp-Zuordnung."
+msgstr "Ungültige Medientyp-Zuordnungskonfiguration."
 
 #: include/classes/core/CJsonRpc.php:216
 msgid "Invalid method parameters."
@@ -13193,7 +13193,7 @@ msgstr "Ungültige Marker \"%1$s\": %2$s."
 #: app/controllers/CControllerTemplateGroupCreate.php:31
 #: app/controllers/CControllerTemplateGroupUpdate.php:32
 msgid "Invalid template group name."
-msgstr "Ungültiger Name der Vorlagengruppe."
+msgstr "Ungültiger Vorlagengruppenname."
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -13203,7 +13203,7 @@ msgstr "Ungültige Zeitspanne."
 #: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
 #: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
 msgid "Invalid user group mapping configuration."
-msgstr "Ungültige Konfiguration der Benutzergruppen-Zuordnung."
+msgstr "Ungültige Benutzergruppen-Zuordnungskonfiguration."
 
 #: include/classes/validators/CApiInputValidator.php:3323
 #, c-format
@@ -13356,7 +13356,7 @@ msgstr "Liste von Datenpunkten"
 
 #: widgets/tophosts/views/column.edit.php:123
 msgid "Item name"
-msgstr "Datenpunkt-Name"
+msgstr "Datenpunktname"
 
 #: widgets/itemnavigator/Widget.php:29
 msgid "Item navigator"
@@ -13407,7 +13407,7 @@ msgstr[1] "Datenpunkt-Prototyp gelöscht"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Item prototype edit"
-msgstr "Datenpunkt-Prototyp bearbeiten"
+msgstr "Datenpunktprototyp bearbeiten"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -13687,7 +13687,7 @@ msgstr "LDAP-Authentifizierung"
 
 #: app/views/usergroup.edit.php:109
 msgid "LDAP authentication is disabled system-wide."
-msgstr "LDAP-Authentifizierung ist systemweit deaktiviert."
+msgstr "Die LDAP-Authentifizierung ist systemweit deaktiviert."
 
 #: include/classes/api/services/CUser.php:1526
 msgid "LDAP authentication is disabled."
@@ -13971,7 +13971,7 @@ msgstr "Limit"
 
 #: widgets/topitems/views/widget.edit.php:95
 msgid "Limit applies to each \"Item pattern\" separately"
-msgstr "Limit gilt für jedes \"Datenpunkt-Muster\" separat"
+msgstr "Das Limit gilt für jedes \"Datenpunkt-Muster\" separat"
 
 #: app/views/administration.gui.edit.php:93
 msgid "Limit for search and filter results"
@@ -14088,7 +14088,7 @@ msgstr "Liste der Zabbix-Proxys mit Name, Modus, Verschlüsselung, Komprimierung
 
 #: include/classes/data/CItemData.php:2935
 msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
-msgstr "Liste der Konfigurationsdaten und Echtzeitdaten von Zabbix-Proxy-Gruppen. Die Konfigurationsdaten umfassen den Namen der Proxy-Gruppe, die Failover-Verzögerung und die Mindestanzahl an Online-Proxys, die erforderlich ist, damit die Gruppe online ist. Die Echtzeitdaten umfassen die Anzahl der Online-Proxys, den Prozentsatz der Online-Proxys und den Status der Proxy-Gruppe (unbekannt, offline, wiederherstellend, online, degradierend). Dieser Datenpunkt gibt keine gruppenlosen Proxys zurück. Gibt JSON zurück."
+msgstr "Liste der Konfigurationsdaten und Echtzeitdaten von Zabbix-Proxy-Gruppen. Die Konfigurationsdaten umfassen den Namen der Proxy-Gruppe, die Failover-Verzögerung und die Mindestanzahl an Online-Proxys, die erforderlich ist, damit die Gruppe online ist. Die Echtzeitdaten umfassen die Anzahl der Online-Proxys, den Prozentsatz der Online-Proxys und den Status der Proxy-Gruppe (unbekannt, offline, Wiederherstellung, online, degradierend). Dieser Datenpunkt gibt keine gruppenlosen Proxys zurück. Gibt JSON zurück."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -14100,7 +14100,7 @@ msgstr "Liste der Blockgeräte mit detaillierten Informationen. Gibt JSON zurüc
 
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
-msgstr "Zeichenliste"
+msgstr "Liste der Zeichen"
 
 #: include/classes/data/CItemData.php:1359
 msgid "List of detected CPUs/CPU cores. Returns JSON"
@@ -14209,7 +14209,7 @@ msgstr "Log"
 
 #: app/views/administration.audit.settings.edit.php:50
 msgid "Log changes by low-level discovery, network discovery and autoregistration"
-msgstr "Änderungen durch Low-Level-Discovery, Netzwerkerkennung und Autoregistrierung protokollieren"
+msgstr "Änderungen durch Low-Level-Discovery, Netzwerkerkennung und automatische Registrierung protokollieren"
 
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
@@ -14610,11 +14610,11 @@ msgstr "Karten Aktualisierung fehlgeschlagen."
 
 #: app/views/popup.ldap.edit.php:259
 msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr "LDAP-Medienattribute des Benutzers (z. B. E-Mail) Zabbix-Benutzermedien für das Senden von Benachrichtigungen zuordnen."
+msgstr "LDAP-Medienattribute des Benutzers (z. B. E-Mail) auf Zabbix-Benutzermedien für das Senden von Benachrichtigungen abbilden."
 
 #: app/views/administration.authentication.edit.php:512
 msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr "SAML-Medienattribute des Benutzers (z. B. E-Mail) Zabbix-Benutzermedien für das Senden von Benachrichtigungen zuordnen."
+msgstr "SAML-Medienattribute des Benutzers (z. B. E-Mail) auf Zabbix-Benutzermedien für das Senden von Benachrichtigungen abbilden."
 
 #: include/classes/api/services/CDashboardGeneral.php:600
 #, c-format
@@ -14927,7 +14927,7 @@ msgstr "Medientyp-Zuordnung"
 
 #: app/views/administration.timeouts.edit.php:158
 msgid "Media type test"
-msgstr "Medientyp-Test"
+msgstr "Medientyp testen"
 
 #: app/controllers/CControllerMediatypeTestSend.php:50
 #: app/controllers/CControllerMediatypeTestSend.php:174
@@ -14965,11 +14965,11 @@ msgstr "Medientypen"
 
 #: app/views/popup.media.php:75
 msgid "Media types disabled by Administration."
-msgstr "Medientypen wurden in Administration deaktiviert."
+msgstr "Medientypen durch Administration deaktiviert."
 
 #: app/views/popup.media.php:78
 msgid "Media types disabled in Alerts."
-msgstr "Medientypen wurden in Warnungen deaktiviert."
+msgstr "Medientypen in Warnungen deaktiviert."
 
 #: include/classes/api/services/CMediatype.php:873
 #, c-format
@@ -14978,7 +14978,7 @@ msgstr "Von der Aktion \"%1$s\" verwendete Medientypen."
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:444
 msgid "Medium"
-msgstr "Mittel"
+msgstr "Medium"
 
 #: app/views/usergroup.list.php:78
 msgid "Members"
@@ -15194,7 +15194,7 @@ msgstr[1] "Anzuzeigende Mindestzeit ist %1$s Minutne."
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:82
 #, c-format
 msgid "Minimum value of \"Maintenance period length\" is %1$d minutes."
-msgstr "Der Mindestwert von \"Maintenance period length\" beträgt %1$d Minuten."
+msgstr "Der Mindestwert für \"Länge des Wartungszeitraums\" beträgt %1$d Minuten."
 
 #: app/views/maintenance.timeperiod.edit.php:202
 msgid "Minute"
@@ -15394,11 +15394,11 @@ msgstr "Mozilla Firefox"
 
 #: app/views/administration.user.list.php:320
 msgid "Multi-factor TOTP secret will be deleted."
-msgstr "Multi-Faktor-TOTP-Geheimnis wird gelöscht."
+msgstr "Das TOTP-Geheimnis für die Mehrfaktor-Authentifizierung wird gelöscht."
 
 #: app/views/administration.user.list.php:321
 msgid "Multi-factor TOTP secrets will be deleted."
-msgstr "Multi-Faktor-TOTP-Geheimnisse werden gelöscht."
+msgstr "Die TOTP-Geheimnisse für die Mehrfaktor-Authentifizierung werden gelöscht."
 
 #: app/controllers/CControllerAuditLogList.php:236
 #: app/views/usergroup.edit.php:139 app/views/usergroup.edit.php:169
@@ -15407,7 +15407,7 @@ msgstr "Multi-Faktor-Authentifizierung"
 
 #: app/views/usergroup.edit.php:111
 msgid "Multi-factor authentication is disabled system-wide."
-msgstr "Die Multi-Faktor-Authentifizierung ist systemweit deaktiviert."
+msgstr "Multi-Faktor-Authentifizierung ist systemweit deaktiviert."
 
 #: app/partials/trigger.edit.trigger.tab.php:240
 msgid "Multiple"
@@ -15429,7 +15429,7 @@ msgstr "Muss größer als \"%1$s\" sein."
 
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
-msgstr "Muss ausgewählt sein."
+msgstr "Muss ausgewählt werden."
 
 #: app/partials/administration.system.info.php:254
 #, c-format
@@ -15696,7 +15696,7 @@ msgstr "Namensraum"
 
 #: app/views/popup.usergroupmapping.edit.php:77
 msgid "Naming requirements:"
-msgstr "Namensanforderungen:"
+msgstr "Anforderungen an die Benennung:"
 
 #: widgets/geomap/Widget.php:52
 msgid "Navigate to default view"
@@ -15750,7 +15750,7 @@ msgstr "Netzwerk-Timeouts für die UI"
 
 #: include/classes/data/CItemData.php:2429
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
-msgstr "Netzwerkauslastung (kombinierte Sende- und Empfangsraten) während des Intervalls, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"instance\" - Netzwerkinterface-Instanz"
+msgstr "Netzwerkauslastung (kombinierte Sende- und Empfangsraten) während des Intervalls, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"instance\" - Instanz der Netzwerkschnittstelle"
 
 #: app/views/administration.proxy.list.php:192 include/func.inc.php:196
 msgid "Never"
@@ -15844,7 +15844,7 @@ msgstr "Neues Diagramm"
 
 #: app/views/graph.prototype.edit.php:131
 msgid "New graph prototype"
-msgstr "Neuer Graph-Prototyp"
+msgstr "Neuer Diagrammprototyp"
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
@@ -15865,7 +15865,7 @@ msgstr "Neuer Datenpunkt"
 
 #: app/views/item.prototype.edit.php:191
 msgid "New item prototype"
-msgstr "Neuer Datenpunkt-Prototyp"
+msgstr "Neuer Datenpunktprototyp"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
@@ -16258,7 +16258,7 @@ msgstr "Keine Berechtigung zum Importieren von Discovery-Regeln."
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr "Keine Berechtigung zum Importieren von Diagrammen."
+msgstr "Keine Berechtigung zum Importieren von Graphen."
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
@@ -16663,7 +16663,7 @@ msgstr "Es ist nicht erlaubt, das Thema für den Benutzer \"Gast\" festzulegen."
 #: include/classes/api/services/CUser.php:469
 #, c-format
 msgid "Not allowed to update field \"%1$s\" for provisioned user."
-msgstr "Es ist nicht erlaubt, das Feld \"%1$s\" für den bereitgestellten Benutzer zu aktualisieren."
+msgstr "Feld \"%1$s\" für bereitgestellten Benutzer darf nicht aktualisiert werden."
 
 #: include/classes/api/clients/CLocalApiClient.php:174
 #: include/classes/api/services/CUser.php:1769
@@ -16766,7 +16766,7 @@ msgstr "November"
 
 #: include/forms.inc.php:437 include/views/js/item.preprocessing.js.php:96
 msgid "Number"
-msgstr "Nummer"
+msgstr "Anzahl"
 
 #: include/classes/data/CItemData.php:1383
 msgid "Number of CPUs. Returns integer"
@@ -16820,7 +16820,7 @@ msgstr "Anzahl der überwachten Hosts"
 
 #: include/classes/data/CItemData.php:2891
 msgid "Number of online proxies. Returns integer."
-msgstr "Anzahl der online Proxys. Gibt integer zurück."
+msgstr "Anzahl der online verfügbaren Proxys. Gibt integer zurück."
 
 #: include/classes/data/CItemData.php:1101
 msgid "Number of out-of-window collisions. Returns integer"
@@ -17085,17 +17085,17 @@ msgstr "Einer"
 #: app/controllers/CControllerItem.php:166
 #: app/controllers/CControllerItemPrototype.php:168
 msgid "One \"Change\" step allowed per item."
-msgstr "Pro Datenpunkt ist ein Schritt \"Ändern\" zulässig."
+msgstr "Pro Datenpunkt ist ein Schritt vom Typ \"Änderung\" zulässig."
 
 #: app/controllers/CControllerItem.php:182
 #: app/controllers/CControllerItemPrototype.php:184
 msgid "One \"Prometheus\" step allowed per item."
-msgstr "Pro Datenpunkt ist ein Schritt \"Prometheus\" zulässig."
+msgstr "Pro Datenpunkt ist ein „Prometheus“-Schritt zulässig."
 
 #: app/controllers/CControllerItem.php:174
 #: app/controllers/CControllerItemPrototype.php:176
 msgid "One \"Throttling\" step allowed per item."
-msgstr "Pro Datenpunkt ist ein Schritt \"Drosselung\" zulässig."
+msgstr "Pro Datenpunkt ist ein „Throttling“-Schritt zulässig."
 
 #: app/views/maintenance.timeperiod.edit.php:79
 #: include/classes/helpers/CMaintenanceHelper.php:29
@@ -17117,13 +17117,13 @@ msgstr "Online-Proxys"
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr "Nur Benutzer mit den Rechten Super admin oder Admin können den Parameter \"%1$s\" aktualisieren."
+msgstr "Nur Benutzer mit den Rollen Super admin oder Admin können den Parameter \"%1$s\" aktualisieren."
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr "Nur Benutzer mit den Rechten Super admin können den Parameter \"%1$s\" aktualisieren."
+msgstr "Nur Benutzer mit der Rolle Super admin können den Parameter \"%1$s\" aktualisieren."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -17976,11 +17976,11 @@ msgstr "Prozentsatz"
 
 #: include/classes/data/CItemData.php:2401
 msgid "Percentage of host physical memory that has been consumed, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "Prozentsatz des verbrauchten physischen Host-Speichers, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
+msgstr "Prozentsatz des verbrauchten physischen Speichers des Hosts, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
 
 #: include/classes/data/CItemData.php:2898
 msgid "Percentage of online proxies. Returns float."
-msgstr "Prozentsatz der online befindlichen Proxys. Gibt float zurück."
+msgstr "Prozentsatz der Online-Proxys. Gibt float zurück."
 
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
@@ -18110,7 +18110,7 @@ msgstr "Bitte aktivieren Sie die Richtlinie \"allow_url_fopen\"."
 
 #: include/views/mfa.login.php:62
 msgid "Please scan and get your verification code displayed in your authenticator app."
-msgstr "Bitte scannen Sie und rufen Sie den in Ihrer Authenticator-App angezeigten Verifizierungscode ab."
+msgstr "Bitte scannen Sie und rufen Sie Ihren Bestätigungscode ab, der in Ihrer Authenticator-App angezeigt wird."
 
 #: jsLoader.php:261
 msgid "Please select two elements"
@@ -18206,7 +18206,7 @@ msgstr "Beitragstyp"
 
 #: include/classes/data/CItemData.php:2142
 msgid "Power usage , \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"max\" - Maximum allowed power usage"
-msgstr "Stromverbrauch, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"max\" - maximal zulässiger Stromverbrauch"
+msgstr "Stromverbrauch , \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"max\" - maximal zulässiger Stromverbrauch"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:893
 msgid "Power value"
@@ -18219,11 +18219,11 @@ msgstr "Zusammenfassung vor Installation"
 
 #: app/views/host.wizard.edit.php:405
 msgid "Pre-shared key"
-msgstr "Vorinstallierter Schlüssel"
+msgstr "Vorab geteilter Schlüssel"
 
 #: app/views/host.wizard.edit.php:394
 msgid "Pre-shared key identity"
-msgstr "Identität des vorinstallierten Schlüssels"
+msgstr "Identität des vorab geteilten Schlüssels"
 
 #: app/views/popup.triggerexpr.php:132
 msgid "Prediction functions"
@@ -18342,7 +18342,7 @@ msgstr "Anzeigename für Primärkontakt"
 #: widgets/honeycomb/includes/WidgetForm.php:148
 #: widgets/honeycomb/views/widget.edit.php:84
 msgid "Primary label"
-msgstr "Primäre Bezeichnung"
+msgstr "Primäre Beschriftung"
 
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
@@ -18426,7 +18426,7 @@ msgstr "Problemausdruck"
 #: widgets/problemhosts/Widget.php:29
 #: widgets/svggraph/includes/WidgetForm.php:386
 msgid "Problem hosts"
-msgstr "Problem Hosts"
+msgstr "Problem-Hosts"
 
 #: app/views/js/popup.action.edit.js.php:289 include/actions.inc.php:365
 msgid "Problem is not suppressed"
@@ -18709,7 +18709,7 @@ msgstr "Proxy geändert"
 #: app/views/administration.proxy.list.php:114
 #, c-format
 msgid "Proxy version is not supported by server version %1$s."
-msgstr "Proxy-Version wird von Server-Version %1$s nicht unterstützt."
+msgstr "Proxy-Version wird von der Server-Version %1$s nicht unterstützt."
 
 #: app/views/administration.proxy.list.php:107
 #, c-format
@@ -19429,7 +19429,7 @@ msgstr "Geforderte Zeichenkette"
 
 #: app/views/administration.proxy.list.php:93
 msgid "Required vps"
-msgstr "Erforderliche VPS"
+msgstr "Erforderliche vps"
 
 #: app/views/popup.service.edit.php:278 app/views/popup.services.php:50
 #: include/classes/html/CFilter.php:217 include/classes/html/CTabFilter.php:103
@@ -19542,7 +19542,7 @@ msgstr "Antwortzeit"
 #: include/classes/server/CZabbixServer.php:507
 #, c-format
 msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr "Antwortzeitüberschreitung von %1$s beim Verbinden mit dem Zabbix-Server \"%2$s\"."
+msgstr "Antwort-Timeout von %1$s beim Verbinden mit Zabbix-Server \"%2$s\" überschritten."
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -19583,7 +19583,7 @@ msgstr "Ergebnis ist WAHR"
 #: app/controllers/CControllerPopupItemTestSend.php:456
 #, c-format
 msgid "Result is truncated due to its size (%1$s)."
-msgstr "Das Ergebnis wurde aufgrund seiner Größe (%1$s) gekürzt."
+msgstr "Das Ergebnis wurde aufgrund seiner Größe (%1$s) abgeschnitten."
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -19643,7 +19643,7 @@ msgstr "Gibt ein JSON-Objekt mit den internen Metriken des Zabbix-Servers oder -
 
 #: include/classes/data/CItemData.php:2797
 msgid "Returns a JSON object containing database connection pool configuration and statistics."
-msgstr "Gibt ein JSON-Objekt zurück, das die Konfiguration und Statistiken des Datenbank-Verbindungspools enthält."
+msgstr "Gibt ein JSON-Objekt zurück, das die Konfiguration und Statistiken des Datenbankverbindungspools enthält."
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
@@ -20160,7 +20160,7 @@ msgstr "Skalierung"
 
 #: widgets/gauge/includes/WidgetForm.php:288
 msgid "Scale size"
-msgstr "Skalierungsgröße"
+msgstr "Skalengröße"
 
 #: app/views/module.list.php:45
 msgid "Scan directory"
@@ -20410,7 +20410,7 @@ msgstr "Anzeigename für Zweitkontakt"
 #: widgets/honeycomb/includes/WidgetForm.php:195
 #: widgets/honeycomb/views/widget.edit.php:98
 msgid "Secondary label"
-msgstr "Sekundäre Bezeichnung"
+msgstr "Sekundäre Beschriftung"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
@@ -20458,7 +20458,7 @@ msgstr "Wählen Sie SLA aus, um den SLA-Bericht anzuzeigen."
 
 #: app/views/host.wizard.edit.php:137 app/views/js/host.wizard.edit.js.php:1116
 msgid "Select a template"
-msgstr "Eine Vorlage auswählen"
+msgstr "Vorlage auswählen"
 
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
@@ -20469,15 +20469,15 @@ msgstr "Wähle Prototyp"
 
 #: app/views/oauth.edit.php:171
 msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
-msgstr "Abrufmethode auswählen: automatisch über eine Umleitungsseite oder manuell, falls der automatische Abruf fehlschlägt."
+msgstr "Abrufmethode auswählen: automatisch über eine Weiterleitungsseite oder manuell, falls der automatische Abruf fehlschlägt."
 
 #: app/views/host.wizard.edit.php:447
 msgid "Select the OS distribution"
-msgstr "Die Betriebssystemdistribution auswählen"
+msgstr "Betriebssystemdistribution auswählen"
 
 #: app/views/host.wizard.edit.php:424
 msgid "Select the OS of your monitoring target"
-msgstr "Das Betriebssystem Ihres Überwachungsziels auswählen"
+msgstr "Betriebssystem Ihres Überwachungsziels auswählen"
 
 #: app/views/administration.script.edit.php:283
 #: include/views/monitoring.history.php:185
@@ -21028,7 +21028,7 @@ msgstr "Zeilen anzeigen"
 
 #: include/views/monitoring.sysmap.edit.php:274
 msgid "Show link labels"
-msgstr "Link-Beschriftungen anzeigen"
+msgstr "Verknüpfungsbeschriftungen anzeigen"
 
 #: include/views/monitoring.sysmap.edit.php:267
 msgid "Show map element labels"
@@ -21058,7 +21058,7 @@ msgstr "Zeiträume anzeigen"
 
 #: widgets/svggraph/includes/WidgetForm.php:377
 msgid "Show problems"
-msgstr "Ziege Probleme"
+msgstr "Zeige Probleme"
 
 # Passive Form besser lesbar im Dropdown-Feld
 #: include/views/monitoring.history.php:168
@@ -21236,7 +21236,7 @@ msgstr "Einzeilig"
 
 #: widgets/itemhistory/views/column.edit.php:140
 msgid "Single line - result will be displayed in a single line and truncated to specified length."
-msgstr "Einzeilig – das Ergebnis wird in einer einzelnen Zeile angezeigt und auf die angegebene Länge gekürzt."
+msgstr "Einzeilig - das Ergebnis wird in einer einzelnen Zeile angezeigt und auf die angegebene Länge gekürzt."
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -21303,7 +21303,7 @@ msgstr "Die Größe der vom Zabbix-Server \"%1$s\" empfangenen Antwort überschr
 
 #: app/views/host.wizard.edit.php:355
 msgid "Skip OS selection if you already have Zabbix agent installed."
-msgstr "Betriebssystemauswahl überspringen, wenn Sie den Zabbix Agent bereits installiert haben."
+msgstr "Überspringen Sie die Betriebssystemauswahl, wenn Sie den Zabbix Agent bereits installiert haben."
 
 #: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
@@ -21356,7 +21356,7 @@ msgstr "Informationen zur Software-Architektur. Rückgabe String"
 
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
-msgstr "Letzte Prüfung auf Softwareaktualisierung"
+msgstr "Zuletzt auf Software-Updates geprüft"
 
 #: jsLoader.php:556
 msgid "Solid color"
@@ -21433,7 +21433,7 @@ msgstr "Gebe die Filterbedingung an um die Werte zu sehen."
 
 #: app/views/host.wizard.edit.php:365
 msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
-msgstr "Durch die Angabe neuer oder vorhandener Host-Gruppen wird der Host diesen Gruppen hinzugefügt, ohne ihn aus aktuellen Gruppen zu entfernen."
+msgstr "Wenn Sie neue oder vorhandene Host-Gruppen angeben, wird der Host diesen Gruppen hinzugefügt, ohne ihn aus aktuellen Gruppen zu entfernen."
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21531,7 +21531,7 @@ msgstr "Status"
 
 #: include/classes/data/CItemData.php:2912
 msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
-msgstr "Status der Proxy-Gruppe. Gibt eine Ganzzahl zurück: 0 - unbekannt; 1 - offline; 2 - Wiederherstellung; 3 - online; 4 - degradierend."
+msgstr "Status der Proxy-Gruppe. Gibt integer zurück: 0 - unbekannt; 1 - offline; 2 - Wiederherstellung; 3 - online; 4 - Verschlechterung."
 
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
@@ -22018,7 +22018,7 @@ msgstr "TOTP"
 #: app/controllers/CControllerUserResetTotp.php:77
 #, c-format
 msgid "TOTP secret for user \"%1$s\" has been reset."
-msgstr "Das TOTP-Geheimnis für Benutzer \"%1$s\" wurde zurückgesetzt."
+msgstr "Das TOTP-Geheimnis für den Benutzer \"%1$s\" wurde zurückgesetzt."
 
 #: app/controllers/CControllerUserResetTotp.php:81
 msgid "TOTP secret reset successful."
@@ -22071,7 +22071,7 @@ msgstr "Marker-Filter"
 #: app/controllers/CControllerConnectorCreate.php:120
 #: app/controllers/CControllerConnectorUpdate.php:121
 msgid "Tag filter name, operator and value combination is not unique."
-msgstr "Die Kombination aus Name, Operator und Wert des Tag-Filters ist nicht eindeutig."
+msgstr "Die Kombination aus Tag-Filtername, Operator und Wert ist nicht eindeutig."
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
@@ -22510,13 +22510,13 @@ msgstr "Die Methode \"%1$s.%2$s\" muss ohne den Parameter \"auth\" aufgerufen we
 #: include/html.inc.php:775
 #, c-format
 msgid "The %1$s is not discovered anymore and %2$s, %3$s."
-msgstr "Der %1$s wird nicht mehr entdeckt und %2$s, %3$s."
+msgstr "Der %1$s wird nicht mehr erkannt und %2$s, %3$s."
 
 #: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 #, c-format
 msgid "The %1$s is not discovered anymore and %2$s."
-msgstr "Der %1$s wird nicht mehr entdeckt und %2$s."
+msgstr "Der %1$s wird nicht mehr erkannt und %2$s."
 
 #: app/views/host.wizard.edit.php:101
 msgid "The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix."
@@ -22569,7 +22569,7 @@ msgstr "Die geklonte Vorlage enthält benutzerdefinierte Makros mit dem Typ \"Ge
 
 #: include/classes/api/services/CHost.php:1433
 msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
-msgstr "Das Feld \"monitored_by\" muss angegeben werden, wenn Proxy oder Proxy-Gruppe für die Host-Überwachung geändert werden."
+msgstr "Das Feld \"monitored_by\" muss angegeben werden, wenn der Proxy oder die Proxy-Gruppe für die Host-Überwachung geändert wird."
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
@@ -22586,7 +22586,7 @@ msgstr "Das Diagramm wird nicht mehr erkannt und wird mit dem nächsten Suchlauf
 
 #: app/controllers/CControllerHostEdit.php:306 host_prototypes.php:197
 msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
-msgstr "Der zu klonende Host gehört zu einer Host-Gruppe, für die Sie keine Schreibrechte haben. Die nicht beschreibbare Gruppe wurde aus dem neuen Host entfernt."
+msgstr "Der zu klonende Host gehört zu einer Host-Gruppe, für die Sie keine Schreibberechtigung haben. Die nicht beschreibbare Gruppe wurde aus dem neuen Host entfernt."
 
 #: include/html.inc.php:670
 #, c-format
@@ -22641,7 +22641,7 @@ msgstr "Die maximale Zoomstufe ist \"%1$s\"."
 #: include/classes/api/services/CDiscoveryRule.php:962
 #, c-format
 msgid "The nested LLD rule with key \"%1$s\" of the template \"%2$s\" cannot be inherited to non-discovered host \"%3$s\"."
-msgstr "Die verschachtelte LLD-Regel mit dem Schlüssel \"%1$s\" der Vorlage \"%2$s\" kann nicht auf den nicht entdeckten Host \"%3$s\" vererbt werden."
+msgstr "Die verschachtelte LLD-Regel mit dem Schlüssel \"%1$s\" der Vorlage \"%2$s\" kann nicht an den nicht entdeckten Host \"%3$s\" vererbt werden."
 
 #: include/classes/data/CItemData.php:1281
 msgid "The number of processes. Returns integer"
@@ -22676,7 +22676,7 @@ msgstr "Die von Ihnen ausgewählte Vorlage (%1$s) muss mit einem Host verknüpft
 #: app/views/host.wizard.edit.php:353
 #, c-format
 msgid "The template you selected (%1$s) requires Zabbix agent to be installed and running on your monitoring target."
-msgstr "Die von Ihnen ausgewählte Vorlage (%1$s) erfordert, dass der Zabbix Agent auf Ihrem Überwachungsziel installiert ist und ausgeführt wird."
+msgstr "Die von Ihnen ausgewählte Vorlage (%1$s) erfordert, dass der Zabbix-Agent auf Ihrem Überwachungsziel installiert ist und ausgeführt wird."
 
 #: app/views/host.wizard.edit.php:899
 #, c-format
@@ -22707,7 +22707,7 @@ msgstr "Der Wert stimmt nicht mit dem vorhandenen Wert auf dem ausgewählten Hos
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
-msgstr "Der Wert sollte größer als das Aktualisierungsintervall der LLD-Regel sein."
+msgstr "Der Wert muss größer als das Aktualisierungsintervall der LLD-Regel sein."
 
 #: include/classes/api/services/CUser.php:3482
 msgid "The verification code was incorrect, please try again."
@@ -22820,7 +22820,7 @@ msgstr "Diese Art von Informationen stimmt möglicherweise nicht mit dem Schlüs
 
 #: app/views/administration.user.edit.php:61
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
-msgstr "Dieser Benutzer wird durch IdP bereitgestellt. Manuelle Änderungen an bereitgestellten Feldern sind nicht zulässig."
+msgstr "Dieser Benutzer wurde durch IdP bereitgestellt. Manuelle Änderungen an bereitgestellten Feldern sind nicht zulässig."
 
 #: include/classes/validators/CFormValidator.php:1442
 #: include/classes/validators/CFormValidator.php:1482 jsLoader.php:430
@@ -23080,12 +23080,12 @@ msgstr "Zeitüberschreitungen"
 
 #: app/views/popup.proxy.edit.php:186
 msgid "Timeouts are disabled because the proxy and server versions do not match."
-msgstr "Zeitüberschreitungen sind deaktiviert, da die Proxy- und Server-Versionen nicht übereinstimmen."
+msgstr "Zeitüberschreitungen sind deaktiviert, weil die Proxy- und Server-Versionen nicht übereinstimmen."
 
 #: app/views/administration.timeouts.edit.php:42
 #: app/views/popup.proxy.edit.php:191
 msgid "Timeouts for item types"
-msgstr "Zeitüberschreitungen für Datenpunkttypen"
+msgstr "Zeitüberschreitungen für Datenpunkt-Typen"
 
 #: include/classes/screens/CScreenHistory.php:265
 #: include/classes/screens/CScreenHistory.php:397
@@ -23272,6 +23272,10 @@ msgstr "Als 0 behandeln"
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "Trendfunktions-Cache-Statistiken. Gültige Parameter sind: alle, Hits, Phits, Misses, PMisses, Items, Pitems und Requests."
 
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr "Statistiken des Trendfunktions-Caches. Gültige Parameter sind: all, hits, phits, misses, pmisses, items, pitems, paccessed und requests."
+
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162
 #: app/partials/monitoring.latest.view.html.php:74
@@ -23291,7 +23295,7 @@ msgstr "Trends"
 #: app/partials/item.edit.item.tab.php:774
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
-msgstr "Trends werden für Datenpunkte, deren Verlauf in Elasticsearch oder ClickHouse gespeichert wird, weder berechnet noch gespeichert."
+msgstr "Trends werden für Datenpunkte, deren Verlauf in Elasticsearch oder ClickHouse gespeichert wird, nicht berechnet oder gespeichert."
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -23318,32 +23322,32 @@ msgstr "Der Auslöser \"%1$s\" gehört zu Vorlagen mit unterschiedlichen Verknü
 #: include/classes/api/services/CTriggerGeneral.php:2811
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" des Hosts \"%3$s\" abhängen, da Abhängigkeiten von Auslösern aus einer untergeordneten Vorlage oder einem Host nicht zulässig sind."
+msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" des Hosts \"%3$s\" abhängen, weil Abhängigkeiten von Auslösern aus einer untergeordneten Vorlage oder einem Host nicht zulässig sind."
 
 #: include/classes/api/services/CTriggerGeneral.php:2810
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" der Vorlage \"%3$s\" abhängen, da Abhängigkeiten von Auslösern aus einer untergeordneten Vorlage oder einem Host nicht zulässig sind."
+msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" der Vorlage \"%3$s\" abhängen, weil Abhängigkeiten von Auslösern aus einer untergeordneten Vorlage oder einem Host nicht zulässig sind."
 
 #: include/classes/api/services/CTriggerGeneral.php:2704
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" der Vorlage \"%3$s\" abhängen, da Abhängigkeiten von Auslösern aus der übergeordneten Vorlage nicht zulässig sind."
+msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" der Vorlage \"%3$s\" abhängen, weil Abhängigkeiten von Auslösern aus der übergeordneten Vorlage nicht zulässig sind."
 
 #: include/classes/api/services/CTriggerGeneral.php:2437
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" abhängen, da eine zirkuläre Verknüpfung (%3$s) für den Host \"%4$s\" entstehen würde."
+msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" abhängen, weil für den Host \"%4$s\" eine zirkuläre Verknüpfung (%3$s) entstehen würde."
 
 #: include/classes/api/services/CTriggerGeneral.php:2432
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" abhängen, da eine zirkuläre Verknüpfung (%3$s) für die Vorlage \"%4$s\" entstehen würde."
+msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" abhängen, da sonst eine zirkuläre Verknüpfung (%3$s) für die Vorlage \"%4$s\" entstehen würde."
 
 #: include/classes/api/services/CTriggerGeneral.php:2448
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" abhängen, da eine zirkuläre Verknüpfung (%3$s) entstehen würde."
+msgstr "Auslöser \"%1$s\" kann nicht vom Auslöser \"%2$s\" abhängen, da sonst eine zirkuläre Verknüpfung (%3$s) entstehen würde."
 
 #: include/classes/api/services/CTriggerGeneral.php:2555
 #, c-format
@@ -23516,22 +23520,22 @@ msgstr "Auslöserprototyp \"%1$s\" kann nicht vom Auslöser \"%2$s\" abhängen, 
 #: include/classes/api/services/CTriggerGeneral.php:2438
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr "Auslöserprototyp \"%1$s\" kann nicht vom Auslöserprototyp \"%2$s\" abhängen, da eine zirkuläre Verknüpfung (%3$s) für den Host \"%4$s\" entstehen würde."
+msgstr "Auslöserprototyp \"%1$s\" kann nicht vom Auslöserprototyp \"%2$s\" abhängen, da sonst eine zirkuläre Verknüpfung (%3$s) für den Host \"%4$s\" entstehen würde."
 
 #: include/classes/api/services/CTriggerGeneral.php:2433
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr "Auslöserprototyp \"%1$s\" kann nicht vom Auslöserprototyp \"%2$s\" abhängen, da eine zirkuläre Verknüpfung (%3$s) für die Vorlage \"%4$s\" entstehen würde."
+msgstr "Auslöserprototyp \"%1$s\" kann nicht vom Auslöserprototyp \"%2$s\" abhängen, da sonst eine zirkuläre Verknüpfung (%3$s) für die Vorlage \"%4$s\" entstehen würde."
 
 #: include/classes/api/services/CTriggerGeneral.php:2449
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr "Auslöserprototyp \"%1$s\" kann nicht vom Auslöserprototyp \"%2$s\" abhängen, da eine zirkuläre Verknüpfung (%3$s) entstehen würde."
+msgstr "Auslöserprototyp \"%1$s\" kann nicht vom Auslöserprototyp \"%2$s\" abhängen, da sonst eine zirkuläre Verknüpfung (%3$s) entstehen würde."
 
 #: include/classes/api/services/CTriggerGeneral.php:1451
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
-msgstr "Auslöser-Prototyp \"%1$s\" kann nicht vom Auslöser-Prototyp \"%2$s\" abhängen, da Abhängigkeiten von Auslöser-Prototypen aus einer anderen LLD-Regel nicht erlaubt sind."
+msgstr "Auslöserprototyp \"%1$s\" kann nicht vom Auslöserprototyp \"%2$s\" abhängen, da Abhängigkeiten von Auslöserprototypen aus einer anderen LLD-Regel nicht zulässig sind."
 
 #: include/classes/api/services/CTriggerGeneral.php:2134
 #, c-format
@@ -23560,7 +23564,7 @@ msgstr[1] "Auslöser-Prototypen gelöscht"
 
 #: app/controllers/CControllerPopup.php:62
 msgid "Trigger prototype edit"
-msgstr "Auslöser-Prototyp bearbeiten"
+msgstr "Auslöserprototyp bearbeiten"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -23899,7 +23903,7 @@ msgstr "Konfiguration kann nicht ausgewählt werden."
 
 #: include/classes/helpers/CUploadFile.php:57
 msgid "Unable to upload file because \"file_uploads\" is disabled."
-msgstr "Datei konnte nicht hochgeladen werden, da \"file_uploads\" deaktiviert ist."
+msgstr "Datei kann nicht hochgeladen werden, weil \"file_uploads\" deaktiviert ist."
 
 #: app/views/popup.acknowledge.edit.php:126
 msgid "Unacknowledge"
@@ -23961,7 +23965,7 @@ msgstr "Problemquittierung rückgängig machen."
 
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
-msgstr "Unerwarteter HTTP-Antwort-Statuscode."
+msgstr "Unerwarteter HTTP-Antwortstatuscode."
 
 #: app/views/mediatype.edit.php:166
 msgid "Unexpected access token update time."
@@ -24229,7 +24233,7 @@ msgstr "Nicht unterdrückt"
 
 #: include/actions.inc.php:2257
 msgid "Unsuppressed by maintenance"
-msgstr "Nicht mehr durch Wartung unterdrückt"
+msgstr "Unterdrückung durch Wartung aufgehoben"
 
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
@@ -24642,7 +24646,7 @@ msgstr "Benutzergruppenzuordnung"
 
 #: app/views/popup.ldap.edit.php:200
 msgid "User group membership attribute"
-msgstr "Attribut für Benutzergruppenmitgliedschaft"
+msgstr "Attribut für Mitgliedschaft in Benutzergruppen"
 
 #: include/classes/api/services/CMap.php:784
 #: include/classes/api/services/CMap.php:1252
@@ -24850,11 +24854,11 @@ msgstr "Benutzername und Passwort"
 
 #: include/classes/vaults/CVaultCyberArk.php:112
 msgid "Username and password must be stored in Vault secret keys \"UserName\" and \"Content\"."
-msgstr "Benutzername und Passwort müssen in den Vault-Geheimnisschlüsseln \"UserName\" und \"Content\" gespeichert werden."
+msgstr "Benutzername und Passwort müssen in Vault-Geheimnisschlüsseln \"UserName\" und \"Content\" gespeichert werden."
 
 #: include/classes/vaults/CVaultHashiCorp.php:101
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
-msgstr "Benutzername und Passwort müssen in den Vault-Geheimnisschlüsseln \"username\" und \"password\" gespeichert werden."
+msgstr "Benutzername und Passwort müssen in Vault-Geheimnisschlüsseln \"username\" und \"password\" gespeichert werden."
 
 #: app/views/administration.authentication.edit.php:323
 msgid "Username attribute"
@@ -24889,7 +24893,7 @@ msgstr "VMware Distributed Virtual Switch, \"url\" - VMware-Service-URL. Gibt JS
 
 #: include/classes/data/CItemData.php:1883
 msgid "VMware FetchDVPorts wrapper, \"url\" - VMware service URL, \"uuid\" - VMware DVSwitch global unique identifier, \"filter\" - vmware data object DistributedVirtualSwitchPortCriteria, \"mode\"- state(default)/full. Returns JSON"
-msgstr "VMware FetchDVPorts-Wrapper, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware DVSwitch, \"filter\" - VMware-Datenobjekt DistributedVirtualSwitchPortCriteria, \"mode\"- state(default)/full. Gibt JSON zurück"
+msgstr "VMware FetchDVPorts-Wrapper, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware DVSwitch, \"filter\" - VMware-Datenobjekt DistributedVirtualSwitchPortCriteria, \"mode\"- state(Standard)/full. Gibt JSON zurück"
 
 #: include/classes/data/CItemData.php:2834
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
@@ -24913,7 +24917,7 @@ msgstr "VMware-Cluster-Status, \"url\" - VMware-Service-URL, \"name\" - VMware-C
 
 #: include/classes/data/CItemData.php:1785
 msgid "VMware cluster tags array, \"url\" - VMware service URL, \"id\" - VMware cluster id"
-msgstr "VMware-Cluster-Tag-Array, \"url\" - VMware-Service-URL, \"id\" - VMware-Cluster-ID"
+msgstr "VMware-Cluster-Tags-Array, \"url\" - VMware-Service-URL, \"id\" - VMware-Cluster-ID"
 
 #: include/classes/data/CItemData.php:1855
 msgid "VMware datacenter alarms data, returns JSON, \"url\" - VMware service URL, \"id\" - VMware datacenter id"
@@ -24921,7 +24925,7 @@ msgstr "VMware-Datacenter-Alarmdaten, gibt JSON zurück, \"url\" - VMware-Servic
 
 #: include/classes/data/CItemData.php:1869
 msgid "VMware datacenter tags array, \"url\" - VMware service URL, \"id\" - VMware datacenter id. Returns JSON"
-msgstr "VMware-Datacenter-Tag-Array, \"url\" - VMware-Service-URL, \"id\" - VMware-Datacenter-ID. Gibt JSON zurück"
+msgstr "VMware-Datacenter-Tags-Array, \"url\" - VMware-Service-URL, \"id\" - VMware-Datacenter-ID. Gibt JSON zurück"
 
 #: include/classes/data/CItemData.php:1862
 msgid "VMware datacenters and their IDs, \"url\" - VMware service URL. Returns JSON"
@@ -24933,7 +24937,7 @@ msgstr "VMware-Datastore-Alarmdaten, gibt JSON zurück, \"url\" - VMware-Service
 
 #: include/classes/data/CItemData.php:1981
 msgid "VMware datastore capacity statistics in bytes or in percentage from total, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - total(default)/free/pfree/uncommitted. Returns integer for bytes; float for percentage"
-msgstr "VMware-Datastore-Kapazitätsstatistiken in Byte oder in Prozent der Gesamtkapazität, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"datastore\" - Datastore-Name, \"mode\" - total(Standard)/free/pfree/uncommitted. Gibt integer für Byte zurück; float für Prozentwerte"
+msgstr "VMware-Datastore-Kapazitätsstatistik in Byte oder in Prozent der Gesamtkapazität, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"datastore\" - Datastore-Name, \"mode\" - total(Standard)/free/pfree/uncommitted. Gibt integer für Byte zurück; float für Prozent"
 
 #: include/classes/data/CItemData.php:1834
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -24941,27 +24945,27 @@ msgstr "Kapazitätsstatistik des VMware-Datenspeichers in Byte oder als Prozents
 
 #: include/classes/data/CItemData.php:1806
 msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
-msgstr "VMware-Datastore-Hypervisorliste, \"url\" - VMware-Service-URL, \"datastore\" - Datastore-Name"
+msgstr "VMware-Datenspeicher-Hypervisorliste, \"url\" - VMware-Service-URL, \"datastore\" - Datenspeichername"
 
 #: include/classes/data/CItemData.php:1813
 msgid "VMware datastore performance counter, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier, \"path\" - performance counter path, \"instance\" - datastore perfcounter instance from vmware.hv.diskinfo.get"
-msgstr "VMware-Datastore-Performance-Zähler, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Datastores, \"path\" - Pfad des Performance-Zählers, \"instance\" - Datastore-Perfcounter-Instanz aus vmware.hv.diskinfo.get"
+msgstr "VMware-Datenspeicher-Performancezähler, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Datenspeicherkennung, \"path\" - Pfad des Performancezählers, \"instance\" - Datenspeicher-Perfcounter-Instanz aus vmware.hv.diskinfo.get"
 
 #: include/classes/data/CItemData.php:1820
 msgid "VMware datastore property, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier, \"prop\" - property path"
-msgstr "VMware-Datastore-Eigenschaft, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Datastores, \"prop\" - Eigenschaftspfad"
+msgstr "VMware-Datenspeicher-Eigenschaft, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Datenspeicherkennung, \"prop\" - Eigenschaftspfad"
 
 #: include/classes/data/CItemData.php:1827
 msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
-msgstr "VMware-Datastore-Lesestatistiken, \"url\" - VMware-Service-URL, \"datastore\" - Datastore-Name, \"mode\"- latency/maxlatency - Durchschnitt oder Maximum"
+msgstr "VMware-Datenspeicher-Lesestatistik, \"url\" - VMware-Service-URL, \"datastore\" - Datenspeichername, \"mode\"- latency/maxlatency - Durchschnitt oder Maximum"
 
 #: include/classes/data/CItemData.php:1841
 msgid "VMware datastore tags array, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier. Returns JSON"
-msgstr "VMware-Datastore-Tag-Array, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Datastores. Gibt JSON zurück"
+msgstr "VMware-Datenspeicher-Tag-Array, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Datenspeicherkennung. Gibt JSON zurück"
 
 #: include/classes/data/CItemData.php:1848
 msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
-msgstr "VMware-Datastore-Schreibstatistiken, \"url\" - VMware-Service-URL, \"datastore\" - Datastore-Name, \"mode\"- latency/maxlatency - Durchschnitt oder Maximum"
+msgstr "VMware-Datenspeicher-Schreibstatistik, \"url\" - VMware-Service-URL, \"datastore\" - Datenspeichername, \"mode\"- latency/maxlatency - Durchschnitt oder Maximum"
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
@@ -24973,51 +24977,51 @@ msgstr "VMware-Ereignisprotokoll, \"url\" - VMware-Service-URL, \"mode\"- all (S
 
 #: include/classes/data/CItemData.php:2072
 msgid "VMware hypervisor BIOS UUID, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-BIOS-UUID, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "VMware-Hypervisor-BIOS-UUID, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung"
 
 #: include/classes/data/CItemData.php:2163
 msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr "VMware-Hypervisor-HW-Herstellerstatussensoren, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors. Gibt JSON zurück"
+msgstr "VMware-Hypervisor-HW-Anbieterstatussensoren, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung. Gibt JSON zurück"
 
 #: include/classes/data/CItemData.php:1904
 msgid "VMware hypervisor alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Alarmdaten, gibt JSON zurück, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "VMware-Hypervisor-Alarmdaten, gibt JSON zurück, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung"
 
 #: include/classes/data/CItemData.php:2093
 msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "Größe des ausgelagerten Speichers des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "VMware-Hypervisor-Ballooned-Memory-Größe, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung"
 
 #: include/classes/data/CItemData.php:1911
 msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Clustername, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "VMware-Hypervisor-Clustername, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung"
 
 #: include/classes/data/CItemData.php:1918
 msgid "VMware hypervisor connection state, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Verbindungsstatus, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "VMware-Hypervisor-Verbindungsstatus, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung"
 
 #: include/classes/data/CItemData.php:1946
 msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
-msgstr "VMware-Hypervisor-Rechenzentrumsname, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors. Gibt string zurück"
+msgstr "VMware-Hypervisor-Rechenzentrumsname, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung. Gibt Zeichenfolge zurück"
 
 #: include/classes/data/CItemData.php:1974
 msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\"- latency"
-msgstr "VMware-Hypervisor-Datastore-Lesestatistiken, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"datastore\" - Datastore-Name, \"mode\"- latency"
+msgstr "VMware-Hypervisor-Datenspeicher-Lesestatistik, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung, \"datastore\" - Datenspeichername, \"mode\"- latency"
 
 #: include/classes/data/CItemData.php:1988
 msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\"- latency"
-msgstr "VMware-Hypervisor-Datastore-Schreibstatistiken, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"datastore\" - Datastore-Name, \"mode\"- latency"
+msgstr "VMware-Hypervisor-Datenspeicher-Schreibstatistik, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung, \"datastore\" - Datenspeichername, \"mode\"- latency"
 
 #: include/classes/data/CItemData.php:1960
 msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Datastore-Liste, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "VMware-Hypervisor-Datenspeicherliste, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung"
 
 #: include/classes/data/CItemData.php:2156
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
-msgstr "VMware-Hypervisor-Gesamtstatussensor für den Integritätszustand, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors. Gibt 0 - grau; 1 - grün; 2 - gelb; 3 - rot zurück"
+msgstr "VMware-Hypervisor-Gesamtstatussensor für den Integritätszustand, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung. Gibt 0 - grau; 1 - grün; 2 - gelb; 3 - rot zurück"
 
 #: include/classes/data/CItemData.php:2237
 msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr "VMware-Hypervisor-Wartungsstatus, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors. Gibt 0 zurück - nicht in Wartung; 1 - in Wartung"
+msgstr "VMware-Hypervisor-Wartungsstatus, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige VMware-Hypervisor-Kennung. Gibt 0 - nicht in Wartung; 1 - in Wartung zurück"
 
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
@@ -25029,159 +25033,159 @@ msgstr "VMware-Hypervisor-Name, \"url\" - VMware-Service-URL, \"uuid\" - global 
 
 #: include/classes/data/CItemData.php:2114
 msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\"- bps"
-msgstr "VMware-Hypervisor-Netzwerk-Eingangsstatistik, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"mode\"- bps"
+msgstr "Eingangsstatistik des VMware-Hypervisor-Netzwerks, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"mode\"- bps"
 
 #: include/classes/data/CItemData.php:2121
 msgid "VMware hypervisor network interface speed, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, <ifname> - interface name"
-msgstr "VMware-Hypervisor-Netzwerkschnittstellengeschwindigkeit, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, <ifname> - Schnittstellenname"
+msgstr "Geschwindigkeit der VMware-Hypervisor-Netzwerkschnittstelle, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, <ifname> - Schnittstellenname"
 
 #: include/classes/data/CItemData.php:2128
 msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\"- bps"
-msgstr "VMware-Hypervisor-Netzwerk-Ausgangsstatistik, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"mode\"- bps"
+msgstr "Ausgangsstatistik des VMware-Hypervisor-Netzwerks, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"mode\"- bps"
 
 #: include/classes/data/CItemData.php:2135
 msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr "VMware-Hypervisor-Performance-Zähler, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"path\" - Pfad des Performance-Zählers, \"instance\" - Instanz des Performance-Zählers"
+msgstr "Leistungszähler des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"path\" - Leistungszählerpfad, \"instance\" - Leistungszählerinstanz"
 
 #: include/classes/data/CItemData.php:2016
 msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Prozessorfrequenz, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "Prozessorfrequenz des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
 
 #: include/classes/data/CItemData.php:2023
 msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Prozessormodell, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "Prozessormodell des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
 
 #: include/classes/data/CItemData.php:1932
 msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Prozessorauslastung in Hz, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "Prozessorauslastung des VMware-Hypervisors in Hz, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
 
 #: include/classes/data/CItemData.php:2149
 msgid "VMware hypervisor property , \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"prop\" - property path"
-msgstr "VMware-Hypervisor-Eigenschaft , \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"prop\" - Eigenschaftspfad"
+msgstr "Eigenschaft des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors, \"prop\" - Eigenschaftspfad"
 
 #: include/classes/data/CItemData.php:2058
 msgid "VMware hypervisor sensors value, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr "Wert der VMware-Hypervisor-Sensoren, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors. Gibt JSON zurück"
+msgstr "Sensorwert des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors. Gibt JSON zurück"
 
 #: include/classes/data/CItemData.php:2065
 msgid "VMware hypervisor serialnumber, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Seriennummer, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "Seriennummer des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
 
 #: include/classes/data/CItemData.php:2170
 msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Status, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "Status des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
 
 #: include/classes/data/CItemData.php:2177
 msgid "VMware hypervisor tags array, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr "VMware-Hypervisor-Tag-Array, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors. Gibt JSON zurück"
+msgstr "Tag-Array des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors. Gibt JSON zurück"
 
 #: include/classes/data/CItemData.php:2044
 msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Gesamtspeichergröße, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "Gesamte Speichergröße des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
 
 #: include/classes/data/CItemData.php:2184
 msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Betriebszeit, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "Betriebszeit des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
 
 #: include/classes/data/CItemData.php:2100
 msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Größe des verwendeten Speichers, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "Verwendete Speichergröße des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
 
 #: include/classes/data/CItemData.php:2079
 msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Herstellername, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "Herstellername des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
 
 #: include/classes/data/CItemData.php:2191
 msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr "VMware-Hypervisor-Version, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
+msgstr "Version des VMware-Hypervisors, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung des VMware-Hypervisors"
 
 #: include/classes/data/CItemData.php:1897
 msgid "VMware service full name, \"url\" - VMware service URL"
-msgstr "Vollständiger Name des VMware-Dienstes, \"url\" - VMware-Dienst-URL"
+msgstr "Vollständiger Name des VMware-Service, \"url\" - VMware-Service-URL"
 
 #: include/classes/data/CItemData.php:2219
 msgid "VMware service version, \"url\" - VMware service URL"
-msgstr "Version des VMware-Dienstes, \"url\" - VMware-Dienst-URL"
+msgstr "VMware-Service-Version, \"url\" - VMware-Service-URL"
 
 #: include/classes/data/CItemData.php:1743
 msgid "VMware virtual center alarms data, returns JSON, \"url\" - VMware service URL"
-msgstr "Alarmdaten des virtuellen VMware-Centers, gibt JSON zurück, \"url\" - VMware-Dienst-URL"
+msgstr "Alarmdaten des virtuellen VMware-Centers, gibt JSON zurück, \"url\" - VMware-Service-URL"
 
 #: include/classes/data/CItemData.php:2226
 msgid "VMware virtual machine alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "Alarmdaten der virtuellen VMware-Maschine, gibt JSON zurück, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
+msgstr "Alarmdaten der virtuellen VMware-Maschine, gibt JSON zurück, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
 
 #: include/classes/data/CItemData.php:2338
 msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "Größe des aufgeblähten Speichers der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
+msgstr "Größe des aufgeblähten Speichers der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
 
 #: include/classes/data/CItemData.php:2471
 msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "Belegter Speicherplatz der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
+msgstr "Zugewiesener Speicherplatz der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
 
 #: include/classes/data/CItemData.php:2345
 msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "Größe des komprimierten Speichers der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
+msgstr "Größe des komprimierten Speichers der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
 
 #: include/classes/data/CItemData.php:2233
 msgid "VMware virtual machine custom attribute value, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"name\" - custom attribute name"
-msgstr "Wert des benutzerdefinierten Attributs der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"name\" - Name des benutzerdefinierten Attributs"
+msgstr "Wert des benutzerdefinierten Attributs der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"name\" - Name des benutzerdefinierten Attributs"
 
 #: include/classes/data/CItemData.php:2303
 msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns string"
-msgstr "Name des Rechenzentrums der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine. Gibt string zurück"
+msgstr "Name des Rechenzentrums der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine. Gibt string zurück"
 
 #: include/classes/data/CItemData.php:2548
 msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\"- bps/ops - bytes/operations per second"
-msgstr "Lesestatistiken des Festplattengeräts der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"instance\" - Instanz des Festplattengeräts, \"mode\"- bps/ops - Bytes/Operationen pro Sekunde"
+msgstr "Lesestatistiken des Festplattengeräts der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"instance\" - Festplattengeräteinstanz, \"mode\"- bps/ops - Bytes/Operationen pro Sekunde"
 
 #: include/classes/data/CItemData.php:2555
 msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\"- bps/ops - bytes/operations per second"
-msgstr "Schreibstatistiken des Festplattengeräts der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"instance\" - Instanz des Festplattengeräts, \"mode\"- bps/ops - Bytes/Operationen pro Sekunde"
+msgstr "Schreibstatistiken des Festplattengeräts der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"instance\" - Festplattengeräteinstanz, \"mode\"- bps/ops - Bytes/Operationen pro Sekunde"
 
 #: include/classes/data/CItemData.php:2247
 msgid "VMware virtual machine disk requires consolidation, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "Festplatte der virtuellen VMware-Maschine erfordert Konsolidierung, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
+msgstr "Festplatte der virtuellen VMware-Maschine erfordert Konsolidierung, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
 
 #: include/classes/data/CItemData.php:2569
 msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\"- total/free/used/pfree/pused"
-msgstr "Dateisystemstatistiken der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"fsname\" - Dateisystemname, \"mode\"- total/free/used/pfree/pused"
+msgstr "Dateisystemstatistiken der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"fsname\" - Dateisystemname, \"mode\"- total/free/used/pfree/pused"
 
 #: include/classes/data/CItemData.php:2380
 msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "Gast-Speicherauslastung der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
+msgstr "Gast-Speichernutzung der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
 
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "Host-Speicherauslastung der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
+msgstr "Host-Speichernutzung der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
 
 #: include/classes/data/CItemData.php:2482
 msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr "Wartungsstatus des Hypervisors der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine. Gibt 0 zurück - nicht in Wartung; 1 - in Wartung"
+msgstr "Wartungsstatus des Hypervisors der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine. Gibt 0 zurück - nicht in Wartung; 1 - in Wartung"
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "Name des Hypervisors der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
+msgstr "Name des Hypervisors der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
 
 #: include/classes/data/CItemData.php:2240
 msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "Name der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
+msgstr "Name der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
 
 #: include/classes/data/CItemData.php:2415
 msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
-msgstr "Eingangsstatistiken der Netzwerkschnittstelle der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"instance\" - Instanz der Netzwerkschnittstelle, \"mode\"- bps/pps - Bytes/Pakete pro Sekunde"
+msgstr "Eingabestatistiken der Netzwerkschnittstelle der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"instance\" - Netzwerkschnittstelleninstanz, \"mode\"- bps/pps - Bytes/Pakete pro Sekunde"
 
 #: include/classes/data/CItemData.php:2422
 msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
-msgstr "Ausgangsstatistiken der Netzwerkschnittstelle der virtuellen VMware-Maschine, \"url\" - VMware-Dienst-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"instance\" - Instanz der Netzwerkschnittstelle, \"mode\"- bps/pps - Bytes/Pakete pro Sekunde"
+msgstr "Ausgabestatistiken der Netzwerkschnittstelle der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"instance\" - Netzwerkschnittstelleninstanz, \"mode\"- bps/pps - Bytes/Pakete pro Sekunde"
 
 #: include/classes/data/CItemData.php:2436
 msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr "VMware-Leistungszähler der virtuellen Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"path\" - Leistungszählerpfad, \"instance\" - Leistungszählerinstanz"
+msgstr "Leistungszähler der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"path\" - Leistungszählerpfad, \"instance\" - Leistungszählerinstanz"
 
 #: include/classes/data/CItemData.php:2443
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr "VMware-Energiezustand der virtuellen Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
+msgstr "VMware-Status der Stromversorgung der virtuellen Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine"
 
 #: include/classes/data/CItemData.php:2498
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -25225,7 +25229,7 @@ msgstr "Tag-Array der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, 
 
 #: include/classes/data/CItemData.php:2527
 msgid "VMware virtual machine tools state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"mode\"- version or status"
-msgstr "Tools-Status der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"mode\"- Version oder Status"
+msgstr "Status der Tools der virtuellen VMware-Maschine, \"url\" - VMware-Service-URL, \"uuid\" - global eindeutige Kennung der virtuellen VMware-Maschine, \"mode\"- Version oder Status"
 
 #: include/classes/data/CItemData.php:2394
 msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -25357,11 +25361,11 @@ msgstr "Wert \"%1$s\" ist zu lang für Feld \"%2$s\" - %3$d Zeichen. Die erlaubt
 #: widgets/gauge/includes/WidgetForm.php:243
 #: widgets/gauge/views/widget.edit.php:189
 msgid "Value arc"
-msgstr "Wertbogen"
+msgstr "Wertebogen"
 
 #: include/classes/data/CItemData.php:2820
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
-msgstr "Effektivität des Wert-Caches. Gültige Parameter sind: requests, hits und misses."
+msgstr "Effektivität des Wertespeichers. Gültige Parameter sind: requests, hits und misses."
 
 #: include/classes/data/CItemData.php:2813
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
@@ -25426,7 +25430,7 @@ msgstr "Wert muss kleiner als %1$s sein."
 
 #: include/classes/data/CItemData.php:1078
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
-msgstr "Wert des MQTT-Themas. Das Format der zurückgegebenen Daten hängt vom Inhalt des Themas ab. Wenn Platzhalter verwendet werden, werden Themenwerte als JSON zurückgegeben"
+msgstr "Wert des MQTT-Themas. Das Format der zurückgegebenen Daten hängt vom Inhalt des Themas ab. Wenn Platzhalter verwendet werden, werden Themenwerte als JSON zurückgegeben."
 
 #: include/classes/data/CItemData.php:1233
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
@@ -25504,7 +25508,7 @@ msgstr "Vault-Zertifikate"
 #: include/classes/vaults/CVaultCyberArk.php:98
 #: include/classes/vaults/CVaultHashiCorp.php:85 include/config.inc.php:53
 msgid "Vault connection failed."
-msgstr "Verbindung zu Vault fehlgeschlagen."
+msgstr "Vault-Verbindung fehlgeschlagen."
 
 #: include/classes/setup/CSetupWizard.php:609
 #: include/classes/setup/CSetupWizard.php:640
@@ -25524,7 +25528,7 @@ msgstr "Geheimnis-Tresor"
 #: include/classes/setup/CSetupWizard.php:591
 #: include/classes/setup/CSetupWizard.php:795
 msgid "Vault secret path"
-msgstr "Pfad zum Vault-Geheimnis"
+msgstr "Vault-Geheimpfad"
 
 #: include/classes/setup/CSetupWizard.php:607
 #: include/classes/setup/CSetupWizard.php:811
@@ -25550,7 +25554,7 @@ msgstr "Bestätigungscode"
 
 #: app/views/host.wizard.edit.php:407
 msgid "Verify Zabbix server, proxy, or cluster address"
-msgstr "Adresse des Zabbix-Servers, Proxys oder Clusters verifizieren"
+msgstr "Zabbix-Server-, Proxy- oder Cluster-Adresse verifizieren"
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -25612,7 +25616,7 @@ msgstr "Zugehörige Berichte anzeigen"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "Virtuelle Speichergröße in Byte oder als Prozentsatz der Gesamtgröße. Gibt integer für Byte zurück; float für Prozentsatz"
+msgstr "Virtuelle Speichergröße in Byte oder in Prozent der Gesamtgröße. Gibt integer für Byte zurück; float für Prozent"
 
 #: app/partials/configuration.host.edit.html.php:102
 #: app/views/configuration.discovery.edit.php:168
@@ -25962,7 +25966,7 @@ msgstr "Falsche Felder für Host \"%1$s\"."
 
 #: include/classes/api/services/CMapElement.php:310
 msgid "Wrong fields for map link."
-msgstr "Falsche Felder für Kartenlink."
+msgstr "Falsche Felder für Kartenverknüpfung."
 
 #: include/classes/api/services/CMapElement.php:74
 #: include/classes/api/services/CMap.php:977
@@ -26106,7 +26110,7 @@ msgstr "Y-m-d H:i:s"
 
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
-msgstr "J-m-T"
+msgstr "Y-n-d"
 
 #: include/views/js/monitoring.sysmaps.js.php:448
 msgid "Y1"
@@ -26216,7 +26220,7 @@ msgstr "Sie sind angemeldet als \"%1$s\"."
 
 #: app/views/mfa.edit.php:46
 msgid "You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server."
-msgstr "Sie können einige der MFA-Methoden nicht auswählen, weil die PHP-CURL-Erweiterung auf dem Webserver nicht installiert ist."
+msgstr "Sie können einige der MFA-Methoden nicht auswählen, da die PHP-CURL-Erweiterung auf dem Webserver nicht installiert ist."
 
 #: app/views/administration.gui.edit.php:69
 #: app/views/administration.user.edit.php:272
@@ -26231,7 +26235,7 @@ msgstr "Du bist nicht eingeloggt"
 
 #: app/views/host.wizard.edit.php:103
 msgid "You can always access Host Wizard from Data collection > Hosts."
-msgstr "Sie können jederzeit über Datensammlung > Hosts auf den Host-Assistenten zugreifen."
+msgstr "Sie können den Host-Assistenten jederzeit über Datensammlung > Hosts aufrufen."
 
 #: app/views/popup.generic.php:74
 msgid "You cannot switch hosts for current selection."
@@ -26322,11 +26326,11 @@ msgstr "Zabbix Agent (passive Prüfungen)"
 
 #: app/views/js/host.wizard.edit.js.php:91
 msgid "Zabbix agent initiates connections to Zabbix server or proxy to send data. Recommended for monitoring targets behind a firewall."
-msgstr "Der Zabbix Agent initiiert Verbindungen zum Zabbix-Server oder Proxy, um Daten zu senden. Empfohlen für die Überwachung von Zielen hinter einer Firewall."
+msgstr "Der Zabbix Agent initiiert Verbindungen zum Zabbix Server oder Proxy, um Daten zu senden. Empfohlen für Überwachungsziele hinter einer Firewall."
 
 #: app/views/host.wizard.edit.php:422
 msgid "Zabbix agent must be able to connect to the specified address or list of addresses."
-msgstr "Der Zabbix Agent muss in der Lage sein, eine Verbindung zur angegebenen Adresse oder Adressliste herzustellen."
+msgstr "Der Zabbix Agent muss eine Verbindung zur angegebenen Adresse oder Adressliste herstellen können."
 
 #: app/views/host.wizard.edit.php:863
 msgid "Zabbix documentation"
@@ -26354,7 +26358,7 @@ msgstr "Zabbix-Anmeldeformular"
 
 #: app/views/administration.script.edit.php:115
 msgid "Zabbix proxy or server"
-msgstr "Zabbix-Proxy oder -Server"
+msgstr "Zabbix Proxy oder Server"
 
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
@@ -26367,8 +26371,8 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
-"Zabbix-Server \"%1$s\" kann nicht erreicht werden. Mögliche Gründe:\n"
-"1. Falsche \"NodeAddress\" oder \"ListenPort\" in der \"zabbix_server.conf\" oder Überschreibung der Server-IP/des DNS in der \"zabbix.conf.php\";\n"
+"Zabbix Server \"%1$s\" kann nicht erreicht werden. Mögliche Gründe:\n"
+"1. Falsche \"NodeAddress\" oder \"ListenPort\" in \"zabbix_server.conf\" oder Überschreibung von Server-IP/DNS in \"zabbix.conf.php\";\n"
 "2. Falsche Netzwerkkonfiguration.\n"
 
 #: app/views/administration.script.edit.php:115
@@ -26377,11 +26381,11 @@ msgstr "Zabbix Server (Proxy)"
 
 #: app/views/administration.miscconfig.edit.php:112
 msgid "Zabbix server and proxy"
-msgstr "Zabbix-Server und -Proxy"
+msgstr "Zabbix Server und Proxy"
 
 #: app/views/administration.miscconfig.edit.php:107
 msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
-msgstr "Zabbix-Server und -Proxy: Geheimnisse werden sowohl vom Zabbix-Server als auch von Proxys aus Vault abgerufen, sodass sie Makros unabhängig auflösen können."
+msgstr "Zabbix Server und Proxy: Geheimnisse werden von beiden, Zabbix Server und Proxys, aus Vault abgerufen, sodass sie Makros unabhängig auflösen können."
 
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
@@ -26398,7 +26402,7 @@ msgstr "Name des Zabbix-Servers"
 
 #: app/views/js/host.wizard.edit.js.php:92
 msgid "Zabbix server or proxy initiates connections to Zabbix agent to request data. Recommended for networks without a firewall or with open firewall ports."
-msgstr "Der Zabbix-Server oder Proxy initiiert Verbindungen zum Zabbix Agent, um Daten anzufordern. Empfohlen für Netzwerke ohne Firewall oder mit offenen Firewall-Ports."
+msgstr "Zabbix Server oder Proxy initiiert Verbindungen zum Zabbix Agent, um Daten anzufordern. Empfohlen für Netzwerke ohne Firewall oder mit offenen Firewall-Ports."
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
@@ -26406,7 +26410,7 @@ msgstr "Zabbix Serverversion"
 
 #: app/views/administration.miscconfig.edit.php:105
 msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
-msgstr "Zabbix-Server: Geheimnisse werden vom Zabbix-Server aus Vault abgerufen und bei Bedarf an Proxys weitergeleitet."
+msgstr "Zabbix Server: Geheimnisse werden vom Zabbix Server aus Vault abgerufen und bei Bedarf an Proxys weitergeleitet."
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -26470,7 +26474,7 @@ msgstr "Zeichenfolge erwartet"
 
 #: include/classes/validators/CApiInputValidator.php:980
 msgid "a character string, integer or floating point value is expected"
-msgstr "eine Zeichenfolge, Ganzzahl oder Gleitkommazahl wird erwartet"
+msgstr "eine Zeichenkette, Ganzzahl oder Gleitkommazahl wird erwartet"
 
 #: include/classes/validators/CApiInputValidator.php:3019
 msgid "a date in YYYY-MM-DD format is expected"
@@ -26544,7 +26548,7 @@ msgstr "ein Sonderzeichen"
 #: app/views/administration.miscconfig.edit.php:133
 #, c-format
 msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
-msgstr "eine Zeichenfolge aus durch Leerzeichen getrennten Hostnamen wird erwartet; das Hinzufügen von %1$s zur Liste ermöglicht die Anzeige der Seite in einem Frame mit derselben Herkunft wie die Seite selbst"
+msgstr "eine Zeichenkette aus durch Leerzeichen getrennten Hostnamen wird erwartet; das Hinzufügen von %1$s zur Liste ermöglicht die Anzeige der Seite in einem Frame mit derselben Herkunft wie die Seite selbst"
 
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
@@ -26796,15 +26800,15 @@ msgstr "asin() - Der Arkussinus eines Wertes als Winkel, ausgedrückt in Radiant
 
 #: jsLoader.php:300
 msgid "at least 1 link highlight is required"
-msgstr "mindestens 1 Link-Hervorhebung ist erforderlich"
+msgstr "mindestens 1 Hervorhebung für Verknüpfungen ist erforderlich"
 
 #: jsLoader.php:301
 msgid "at least 1 link threshold is required"
-msgstr "mindestens 1 Link-Schwellenwert ist erforderlich"
+msgstr "mindestens 1 Schwellenwert für Verknüpfungen ist erforderlich"
 
 #: jsLoader.php:299
 msgid "at least 1 link trigger is required"
-msgstr "mindestens 1 Link-Auslöser ist erforderlich"
+msgstr "mindestens 1 Auslöser für Verknüpfungen ist erforderlich"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:83
@@ -26916,11 +26920,11 @@ msgstr "Blinkt"
 
 #: include/classes/api/services/CMediatype.php:680
 msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
-msgstr "sowohl \"access_token\" als auch \"access_expires_in\" müssen angegeben werden, wenn das Zugriffstoken als gültig markiert wird"
+msgstr "Sowohl \"access_token\" als auch \"access_expires_in\" müssen angegeben werden, wenn das Zugriffstoken als gültig markiert wird"
 
 #: include/classes/api/services/CMediatype.php:695
 msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
-msgstr "sowohl \"access_token\" als auch \"access_expires_in\" sollten entweder vorhanden oder nicht vorhanden sein"
+msgstr "Sowohl \"access_token\" als auch \"access_expires_in\" sollten entweder vorhanden sein oder fehlen"
 
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
@@ -26928,7 +26932,7 @@ msgstr "sowohl Benutzername als auch Passwort sollten entweder vorhanden oder le
 
 #: include/classes/api/services/CTemplate.php:589
 msgid "both vendor_name and vendor_version should be either present or empty"
-msgstr "sowohl vendor_name als auch vendor_version sollten entweder vorhanden oder leer sein"
+msgstr "Sowohl vendor_name als auch vendor_version sollten entweder vorhanden oder leer sein"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
@@ -26949,7 +26953,7 @@ msgstr "kann verwendet werden, um \"@2x\" zur URL hinzuzufügen, um Retina-Kache
 
 #: include/classes/api/services/CItemGeneral.php:2624
 msgid "cannot be a value map ID from another host or template"
-msgstr "kann keine Wertzuordnungs-ID von einem anderen Host oder einer anderen Vorlage sein"
+msgstr "kann keine Wertemapping-ID von einem anderen Host oder einer anderen Vorlage sein"
 
 #: include/classes/api/services/CItemGeneral.php:2179
 msgid "cannot be an item ID from another host or template"
@@ -27184,7 +27188,7 @@ msgstr "Farbe"
 #: include/classes/validators/CTimeRangesValidator.php:33
 #: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:22
 msgid "comma separated list of time periods is expected"
-msgstr "durch Kommas getrennte Liste von Zeiträumen wird erwartet"
+msgstr "durch Kommas getrennte Liste von Zeiträumen erwartet"
 
 #: app/controllers/CControllerSlaCreateUpdate.php:35
 msgid "comma separated list of time periods is expected for scheduled week days"
@@ -27415,7 +27419,7 @@ msgstr "exp() - Eulersche Zahl mit einer Potenz eines Wertes"
 
 #: jsLoader.php:294
 msgid "expecting hexadecimal color code (6 symbols)"
-msgstr "Hexadezimaler Farbcode erwartet (6 Zeichen)"
+msgstr "hexadezimaler Farbcode erwartet (6 Zeichen)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
@@ -27486,7 +27490,7 @@ msgstr "globale Housekeeping-Einstellungen"
 
 #: include/classes/api/services/CScript.php:726
 msgid "global script execution on Zabbix server is disabled by server configuration"
-msgstr "die globale Skriptausführung auf dem Zabbix-Server ist durch die Serverkonfiguration deaktiviert"
+msgstr "globale Skriptausführung auf dem Zabbix Server ist durch die Serverkonfiguration deaktiviert"
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
@@ -27573,7 +27577,7 @@ msgstr "Host-Auslöser-ID wird erwartet"
 
 #: app/views/host.wizard.edit.php:134
 msgid "how to update them"
-msgstr "wie sie aktualisiert werden können"
+msgstr "wie sie aktualisiert werden"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -27610,7 +27614,7 @@ msgstr "einschließlich Untergruppen"
 #: include/classes/parsers/CIPRangeParser.php:148
 #, c-format
 msgid "incorrect address starting from \"%1$s\""
-msgstr "falsche Adresse beginnend mit \"%1$s\""
+msgstr "ungültige Adresse ab \"%1$s\""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
@@ -27779,7 +27783,7 @@ msgstr "ungültiger sechster Parameter in Funktion „%1$s“"
 
 #: include/classes/validators/CApiInputValidator.php:3458
 msgid "invalid template group name"
-msgstr "ungültiger Vorlagen-Gruppenname"
+msgstr "ungültiger Vorlagengruppenname"
 
 #: include/classes/validators/CHistFunctionValidator.php:65
 #, c-format
@@ -27971,7 +27975,7 @@ msgstr "mad() - Mediane absolute Abweichung"
 
 #: include/classes/parsers/CVaultSecretParser.php:179
 msgid "mandatory key is missing"
-msgstr "erforderlicher Schlüssel fehlt"
+msgstr "Pflichtschlüssel fehlt"
 
 #: include/classes/parsers/CVaultSecretParser.php:176
 #, c-format
@@ -28152,7 +28156,7 @@ msgstr "darf nicht den Namen, Nachnamen oder Benutzernamen des Benutzers enthalt
 
 #: include/translateDefines.inc.php:41
 msgid "n-d"
-msgstr "n. v."
+msgstr "k. A."
 
 #: include/translateDefines.inc.php:39
 msgid "n-d h:i A"
@@ -28305,11 +28309,11 @@ msgstr "Objekt existiert nicht oder gehört zu einem anderen Objekt"
 #: include/classes/api/services/CTemplate.php:986
 #: include/classes/api/services/CTemplate.php:1066
 msgid "object does not exist, or you have no permissions to it"
-msgstr "Objekt existiert nicht oder Sie haben keine Berechtigungen dafür"
+msgstr "Objekt existiert nicht oder Sie haben keine Berechtigung darauf"
 
 #: include/classes/api/services/CUser.php:823
 msgid "object of TOTP type is expected"
-msgstr "Objekt vom Typ TOTP wird erwartet"
+msgstr "Objekt vom Typ TOTP erwartet"
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"
@@ -28444,7 +28448,7 @@ msgstr "Lese- und Schreibzugriff auf den untergeordneten Dienst „%1$s“ ist e
 #: include/classes/api/services/CService.php:467
 #, c-format
 msgid "read-write access to the child service \"%1$s\" must be retained"
-msgstr "Lese-/Schreibzugriff auf den untergeordneten Service \"%1$s\" muss beibehalten werden"
+msgstr "Lese-/Schreibzugriff auf den untergeordneten Service \"%1$s\" muss erhalten bleiben"
 
 #: include/classes/api/services/CService.php:454
 #: include/classes/api/services/CService.php:2339
@@ -28798,7 +28802,7 @@ msgstr "timeleft() – Zeit bis zum Erreichen des Schwellwerts, geschätzt basie
 
 #: include/classes/api/services/CProxy.php:835
 msgid "timeouts are disabled because the proxy and server versions do not match"
-msgstr "Zeitüberschreitungen sind deaktiviert, da die Versionen von Proxy und Server nicht übereinstimmen"
+msgstr "Zeitüberschreitungen sind deaktiviert, da die Proxy- und Server-Versionen nicht übereinstimmen"
 
 #: include/views/configuration.item.edit.php:643
 #: include/views/configuration.item.prototype.edit.php:614
@@ -28846,7 +28850,7 @@ msgstr "Auslöser erlaubt manuelle Schließung nicht"
 
 #: include/classes/validators/CExpressionValidator.php:116
 msgid "trigger expression must contain at least one /host/key reference"
-msgstr "Auslöser-Ausdruck muss mindestens eine /host/key-Referenz enthalten"
+msgstr "Auslöserausdruck muss mindestens eine /host/key-Referenz enthalten"
 
 #: include/classes/api/services/CTriggerGeneral.php:2141
 msgid "trigger prototype cannot be moved to another template or host"

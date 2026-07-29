@@ -29,7 +29,7 @@ class CWidgetElement extends CElement {
 	 */
 	public function getRefreshInterval() {
 		$this->getHeader()->hoverMouse();
-		$this->query('xpath:.//button[contains(@class, "js-widget-action")]')->waitUntilPresent()->one()->click(true);
+		$this->query('xpath:.//button[contains(@class, "js-widget-action")]')->waitUntilPresent()->one()->forceClick();
 		$menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$aria_label = explode(', ', $menu->getSelected()->getAttribute('aria-label'), 3);
 
@@ -44,7 +44,7 @@ class CWidgetElement extends CElement {
 	public function getTimeInterval() {
 		$this->getHeader()->hoverMouse();
 		$this->query('xpath:.//li[@class="widget-info-button"]/button')->waitUntilPresent()->one()->click(true);
-		$hintbox = $this->query('xpath://div[contains(@class, "overlay-dialogue hintbox wordbreak")]')->one()->waitUntilVisible();
+		$hintbox = $this->query('xpath://div[contains(@class, "overlay-dialogue hintbox wordbreak")]')->waitUntilVisible()->one();
 		$hint_text = $hintbox->getText();
 
 		return $hint_text;

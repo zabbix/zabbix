@@ -753,7 +753,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => 'last(/'.self::HOST.'/Unsigned,#1)<5',
 					'url' => 'javascript:alert(123);',
 					'inline_errors' => [
-						'Menu entry URL' => 'Unacceptable URL.'
+						'Menu entry URL' => 'Unacceptable URL scheme.'
 					]
 				]
 			],

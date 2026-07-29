@@ -153,4 +153,21 @@ class CZabbixClient extends CZabbixServer {
 			'host' => $host
 		]);
 	}
+
+	/**
+	 * Send active check heartbeat for a host.
+	 *
+	 * @param string $host            host name
+	 * @param mixed  $heartbeat_freq  heartbeat frequency value (sent as-is to allow invalid values in tests)
+	 * @param array  $extra           optional extra fields merged into the request (e.g. padding for large-packet tests)
+	 *
+	 * @return array|false    server response or false on connection error
+	 */
+	public function sendHeartbeat($host, $heartbeat_freq, array $extra = []) {
+		return parent::request(array_merge([
+			'request' => 'active check heartbeat',
+			'host' => $host,
+			'heartbeat_freq' => $heartbeat_freq
+		], $extra));
+	}
 }

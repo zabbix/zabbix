@@ -34,7 +34,9 @@ if (array_key_exists('problems', $data)) {
 	}
 
 	if ($data['trigger']['url'] !== '') {
-		$trigger_url = CHtmlUrlValidator::validate($data['trigger']['url'], ['allow_user_macro' => false])
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
+		$trigger_url = $url_validator->validate($data['trigger']['url'])
 			? $data['trigger']['url']
 			: 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $data['trigger']['url'])).');';
 
