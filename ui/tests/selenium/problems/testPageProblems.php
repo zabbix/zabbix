@@ -2260,7 +2260,7 @@ class testPageProblems extends CWebTest {
 		$form = CFilterElement::find()->one()->getForm();
 
 		$form->fill($data['filter'])->submit();
-		$this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 
 		// Set operational data in Problem column.
 		if (array_key_exists('header_settings', $data)) {
