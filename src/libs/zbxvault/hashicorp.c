@@ -253,7 +253,8 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 			{
 				case ZBX_HTTP_STATUS_CODE_OK:
 					*error = zbx_strdup(*error, "cannot get secrets, token is valid,"
-							" could be problem with policy");
+							" could be problem with policy or configuration"
+							" parameter 'VaultPrefix' value");
 					break;
 				case ZBX_HTTP_STATUS_CODE_FORBIDDEN:
 					if (NULL != vault_ret)
