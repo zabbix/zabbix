@@ -256,10 +256,22 @@ class CControllerProblemViewData extends CControllerDataTable {
 				}
 				else {
 					$opdata = (new CSpan($events[$problem['eventid']]['opdata']))->addClass('opdata');
+
+					if ($options['compact_view'] == 0) {
+						$opdata->addClass(ZBX_STYLE_WORDBREAK);
+					}
 				}
 			}
 
-			$problem['opdata'] = $opdata?->toString(false);
+			if ($options['compact_view'] == 1) {
+				$problem['opdata'] = (new CDiv())
+					->addClass(ZBX_STYLE_FLEX_WRAPPER)
+					->addItem($opdata)
+					->toString(false);
+			}
+			else {
+				$problem['opdata'] = $opdata?->toString(false);
+			}
 
 			$problem_link_wrapper = (new CDiv(
 				array_key_exists($trigger['triggerid'], $data['dependencies'])

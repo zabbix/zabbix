@@ -42,7 +42,7 @@
 				.flex-wrapper {
 					column-gap: 0;
 
-					.link-action {
+					& > .link-action {
 						@extend %overflow-ellipsis;
 					}
 				}
@@ -54,6 +54,10 @@
 						@extend %overflow-ellipsis;
 						min-width: 24px;
 					}
+				}
+
+				.opdata {
+					@extend %overflow-ellipsis;
 				}
 			}
 
