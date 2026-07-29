@@ -149,6 +149,8 @@ class CControllerUsergroupEdit extends CController {
 			]), ['proxyid' => 'id'])
 			: [];
 
+		CArrayHelper::sort($data['ms_proxy'], ['name']);
+
 		$data['ms_proxy_group'] = $this->hasInput('usrgrpid')
 			? CArrayHelper::renameObjectsKeys(API::ProxyGroup()->get([
 				'output' => ['proxy_groupid', 'name'],
@@ -156,6 +158,7 @@ class CControllerUsergroupEdit extends CController {
 			]), ['proxy_groupid' => 'id'])
 			: [];
 
+		CArrayHelper::sort($data['ms_proxy_group'], ['name']);
 		CArrayHelper::sort($data['tag_filters'], ['name']);
 
 		$tag_filters_badges = $data['tag_filters'];

@@ -411,10 +411,12 @@ if ($data['roleid']) {
 		)
 		->addRow(_('Proxies'),
 			(new CDiv($data['proxies_list']))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('rules-status-container')
 		)
 		->addRow(_('Proxy Groups'),
 			(new CDiv($data['proxy_groups_list']))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('rules-status-container')
 		)
 		->addInfo(_('Permissions can be assigned for user groups only.'));

@@ -272,11 +272,13 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 					'proxy_groupids' => 0,
 					'limit' => $limit
 				]);
+				CArrayHelper::sort($db_proxies, ['name']);
 
 				$db_proxy_groups = API::ProxyGroup()->get([
 					'output' => ['proxy_groupid', 'name'],
 					'limit' => $limit
 				]);
+				CArrayHelper::sort($db_proxy_groups, ['name']);
 
 				$data['proxies_list'] = CProxyHelper::getProxiesHtml($db_proxies, $data['groups']);
 				$data['proxy_groups_list'] = CProxyHelper::getProxyGroupsHtml($db_proxy_groups, $data['groups']);
