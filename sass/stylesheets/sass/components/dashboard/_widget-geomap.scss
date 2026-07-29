@@ -68,9 +68,14 @@ div.dashboard-widget-geomap {
 		}
 	}
 
+	.leaflet-touch .leaflet-bar {
+		border-radius: var(--button-border-radius);
+		overflow: clip;
+	}
+
 	.leaflet-marker-icon:focus {
 		box-shadow: 0 0 0 2px $btn-focus-outline-color;
-		border-radius: 2px;
+		//border-radius: 2px;
 		outline: none;
 	}
 

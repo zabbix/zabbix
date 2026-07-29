@@ -53,6 +53,7 @@ class CHtmlPageHeader {
 	 * JS files list.
 	 */
 	protected array $js_files = [];
+	protected array $js_module_files = [];
 
 	public function __construct(string $title, string $lang) {
 		$this->title = $title;
@@ -101,6 +102,15 @@ class CHtmlPageHeader {
 	 */
 	public function addJsFile(string $js_file): self {
 		$this->js_files[$js_file] = $js_file;
+
+		return $this;
+	}
+
+	/**
+	 * Add path to js file with type module file to render in page head.
+	 */
+	public function addModuleJsFile(string $js_file): self {
+		$this->js_module_files[$js_file] = $js_file;
 
 		return $this;
 	}
@@ -175,6 +185,16 @@ class CHtmlPageHeader {
 			}
 
 			echo (new CTag('script', true))->setAttribute('src', $path);
+		}
+
+		foreach ($this->js_module_files as $path) {
+			if (parse_url($path, PHP_URL_QUERY) === null) {
+				$path .= '?'.(int) filemtime($path);
+			}
+
+			echo (new CTag('script', true))
+				->setAttribute('src', $path)
+				->setAttribute('type', 'module');
 		}
 
 		echo '</head>'."\n";

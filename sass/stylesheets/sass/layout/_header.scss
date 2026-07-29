@@ -1,10 +1,11 @@
 header {
 	display: flex;
 	align-items: center;
-	height: 45px;
+	height: var(--header-size);
 	padding: 0 10px;
 	background: $header-bg-color;
 	border-bottom: 1px solid $ui-border-color;
+	box-shadow: 0 -6px 6px 4px $action-shadow-color;
 
 	> div {
 		overflow: hidden;

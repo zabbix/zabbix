@@ -745,6 +745,7 @@ class ZBase {
 					'action' => $router->getAction()
 				],
 				'main_block' => '',
+				'side_block' => null,
 				'javascript' => [
 					'files' => []
 				],
@@ -769,6 +770,7 @@ class ZBase {
 
 				$layout_data = array_replace($layout_data_defaults, [
 					'main_block' => $this->view->getOutput(),
+					'side_block' => $this->view->getSideDrawer(),
 					'javascript' => [
 						'files' => $this->view->getJsFiles()
 					],

@@ -82,6 +82,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/z-color-picker";
 @import "components/z-select";
 @import "components/z-sparkline";
+@import "components/z-split-view";
 @import "components/z-textarea-flexible";
 
 @import "components/dashboard/widget-field-sparkline";
@@ -617,14 +618,16 @@ form {
 }
 
 .filter-forms {
-	margin: 0 auto;
-	text-align: center;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 0 40px;
+	padding-bottom: 5px;
 	white-space: nowrap;
 	background-color: $ui-bg-color;
 
 	.cell {
 		text-align: left;
-		padding: 0 20px 5px;
 
 		&:first-child {
 			padding-left: 0;

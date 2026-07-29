@@ -7,7 +7,9 @@
 :root {
   --font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif;
   --font-stack-mono: "Courier New", Courier, monospace;
-  --font-body-size: 75%; }
+  --font-body-size: 75%;
+  --header-size: 45px;
+  --min-content-size: 1200px; }
 
 [lang="zh"] {
   --font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans KR", "Noto Sans SC", "Noto Sans JP", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif; }
@@ -860,40 +862,41 @@ svg a {
 
 html,
 body {
-  height: 100vh; }
+  block-size: 100dvh; }
 
 body {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas: "sidebar header" "sidebar content";
+  margin: 0;
   overflow: hidden; }
+  body > z-split-view {
+    --min-content-size: 768px; }
+    body > z-split-view .side-drawer {
+      position: sticky;
+      inset-block-start: 0; }
+  body > z-split-view,
+  body > .wrapper {
+    grid-area: content;
+    overflow-x: hidden;
+    overflow-y: auto; }
 
-aside,
-.wrapper {
-  box-sizing: border-box; }
+header {
+  grid-area: header;
+  position: relative;
+  box-sizing: border-box;
+  z-index: 15; }
 
-.wrapper {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  overflow: auto;
-  position: relative; }
-  .wrapper > [class^="msg-"] + [class^="msg-"] {
-    margin-top: 0; }
-  .wrapper > .debug-output {
-    flex-shrink: 0; }
-  .wrapper > output {
-    min-width: 1200px; }
-
-header,
-footer {
-  flex-shrink: 0;
-  min-width: 1200px; }
+aside {
+  grid-area: sidebar; }
+  aside.is-compact ~ header, aside.is-compact ~ z-split-view, aside.is-compact ~ .wrapper {
+    margin-left: 48px; }
 
 main {
-  position: relative;
-  min-width: 1200px;
+  box-sizing: border-box;
+  min-inline-size: var(--min-content-size);
   padding: 10px; }
-  main > .container:not(:first-of-type) {
-    margin-top: 10px; }
 
 footer {
   margin-top: auto; }
@@ -901,16 +904,19 @@ footer {
 output {
   display: block; }
 
-.container {
-  background: #2b2b2b; }
+.wrapper {
+  position: relative; }
+  .wrapper > [class^="msg-"] + [class^="msg-"] {
+    margin-top: 0; }
 
 header {
   display: flex;
   align-items: center;
-  height: 45px;
+  height: var(--header-size);
   padding: 0 10px;
   background: #2b2b2b;
-  border-bottom: 1px solid #303030; }
+  border-bottom: 1px solid #303030;
+  box-shadow: 0 -6px 6px 4px rgba(0, 0, 0, 0.5); }
   header > div {
     overflow: hidden; }
   header h1 {
@@ -1092,8 +1098,6 @@ footer {
     top: 0;
     bottom: 0;
     box-shadow: 2px 0 6px rgba(0, 0, 0, 0.5); }
-  .sidebar.is-compact + .wrapper {
-    margin-left: 48px; }
   .sidebar.is-compact .button-compact,
   .sidebar.is-compact .button-show {
     display: none; }
@@ -1133,7 +1137,7 @@ footer {
     display: none; }
   .sidebar.is-hidden.focus-off {
     display: none; }
-  .sidebar.is-hidden + .wrapper .sidebar-nav-toggle {
+  .sidebar.is-hidden ~ header .sidebar-nav-toggle {
     display: block; }
   .sidebar.is-hidden:not(.is-opened) {
     transform: translate3d(-110%, 0, 0); }
@@ -5348,6 +5352,111 @@ z-sparkline {
     bottom: 0;
     left: 0; }
 
+z-split-view {
+  --split-view-divider-size: 1px;
+  --split-view-divider-color: #303030;
+  --split-view-divider-bg-color: #2b2b2b;
+  --split-view-handle-size: 56px;
+  --split-view-handle-hit-area-size: 16px;
+  --split-view-handle-current-position: clamp(var(--split-view-handle-min-position, 0%), var(--split-view-handle-position, 50%), var(--split-view-handle-max-position, 100%));
+  position: relative;
+  display: grid;
+  align-items: stretch; }
+  z-split-view z-split-view-pane,
+  z-split-view z-split-view-handle {
+    box-sizing: border-box;
+    display: block;
+    min-inline-size: 0;
+    min-block-size: 0; }
+  z-split-view z-split-view-handle {
+    position: sticky;
+    z-index: 2; }
+    z-split-view z-split-view-handle .z-split-view-handle-control {
+      position: absolute;
+      pointer-events: auto;
+      touch-action: none;
+      user-select: none;
+      outline: 0; }
+      z-split-view z-split-view-handle .z-split-view-handle-control::before, z-split-view z-split-view-handle .z-split-view-handle-control::after {
+        content: '';
+        position: absolute;
+        inset-block-start: 50%;
+        inset-inline-start: 50%;
+        box-sizing: border-box;
+        transform: translate(-50%, -50%);
+        transition: background-color 0.2s ease-out, border-color 0.2s ease-out; }
+      z-split-view z-split-view-handle .z-split-view-handle-control::before {
+        background-color: var(--split-view-divider-color); }
+      z-split-view z-split-view-handle .z-split-view-handle-control::after {
+        background: var(--split-view-divider-bg-color);
+        border: 1px solid var(--split-view-divider-color);
+        border-radius: 4px; }
+      z-split-view z-split-view-handle .z-split-view-handle-control:hover {
+        --split-view-divider-color: #0275b8; }
+  z-split-view:not([vertical]) {
+    grid-template-columns: minmax(0, var(--split-view-handle-current-position)) minmax(0, 1fr); }
+    z-split-view:not([vertical]) > z-split-view-pane:nth-of-type(1) {
+      grid-column: 1;
+      grid-row: 1; }
+    z-split-view:not([vertical]) > z-split-view-pane:nth-of-type(2) {
+      grid-column: 2;
+      grid-row: 1; }
+    z-split-view:not([vertical]) > z-split-view-handle {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      inset-block-start: 0;
+      block-size: 0; }
+      z-split-view:not([vertical]) > z-split-view-handle .z-split-view-handle-control {
+        inset-inline-start: var(--split-view-handle-current-position);
+        inline-size: var(--split-view-handle-hit-area-size);
+        transform: translateX(-50%);
+        cursor: col-resize; }
+        z-split-view:not([vertical]) > z-split-view-handle .z-split-view-handle-control::before {
+          block-size: 100%;
+          inline-size: var(--split-view-divider-size); }
+        z-split-view:not([vertical]) > z-split-view-handle .z-split-view-handle-control::after {
+          block-size: var(--split-view-handle-size);
+          max-block-size: calc(100% - 10px);
+          inline-size: 5px; }
+  z-split-view[vertical] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, var(--split-view-handle-current-position)) minmax(0, 1fr);
+    inset-inline-start: 0;
+    block-size: 100%;
+    overflow-y: hidden; }
+    z-split-view[vertical] > z-split-view-pane {
+      overflow-x: hidden;
+      overflow-y: auto; }
+      z-split-view[vertical] > z-split-view-pane:nth-of-type(1) {
+        grid-column: 1;
+        grid-row: 1; }
+      z-split-view[vertical] > z-split-view-pane:nth-of-type(2) {
+        grid-column: 1;
+        grid-row: 2; }
+    z-split-view[vertical] > z-split-view-handle {
+      grid-column: 1;
+      grid-row: 1 / -1;
+      align-self: stretch;
+      inline-size: 0; }
+      z-split-view[vertical] > z-split-view-handle .z-split-view-handle-control {
+        inset-block-start: var(--split-view-handle-current-position);
+        block-size: var(--split-view-handle-hit-area-size);
+        transform: translateY(-50%);
+        cursor: row-resize; }
+        z-split-view[vertical] > z-split-view-handle .z-split-view-handle-control::before {
+          inline-size: 100%;
+          block-size: var(--split-view-divider-size); }
+        z-split-view[vertical] > z-split-view-handle .z-split-view-handle-control::after {
+          inline-size: var(--split-view-handle-size);
+          max-inline-size: calc(100% - 10px);
+          block-size: 5px; }
+  z-split-view[resizing] {
+    --split-view-divider-color: #0275b8; }
+    z-split-view[resizing]:not([vertical]) {
+      cursor: col-resize; }
+    z-split-view[resizing][vertical] {
+      cursor: row-resize; }
+
 z-textarea-flexible {
   display: inline-grid; }
   z-textarea-flexible textarea {
@@ -5506,9 +5615,11 @@ div.dashboard-widget-geomap {
       width: 30px; }
     div.dashboard-widget-geomap .marker-cluster span {
       line-height: 30px; }
+  div.dashboard-widget-geomap .leaflet-touch .leaflet-bar {
+    border-radius: var(--button-border-radius);
+    overflow: clip; }
   div.dashboard-widget-geomap .leaflet-marker-icon:focus {
     box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
-    border-radius: 2px;
     outline: none; }
   div.dashboard-widget-geomap .leaflet-control .navigate-home-button,
   div.dashboard-widget-geomap .leaflet-control .geomap-filter-button {
@@ -7594,13 +7705,15 @@ form.is-loading {
       border-bottom-width: 1px; }
 
 .filter-forms {
-  margin: 0 auto;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0 40px;
+  padding-bottom: 5px;
   white-space: nowrap;
   background-color: #2b2b2b; }
   .filter-forms .cell {
-    text-align: left;
-    padding: 0 20px 5px; }
+    text-align: left; }
     .filter-forms .cell:first-child {
       padding-left: 0; }
     .filter-forms .cell:last-child {
