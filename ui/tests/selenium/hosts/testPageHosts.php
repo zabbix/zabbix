@@ -84,9 +84,9 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->getField('Host groups')->select($this->HostGroup);
 		$filter->submit();
 		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
+		$this->query('xpath://div[@class="datatable-body"]//a[text()="Simple form test host"]')->waitUntilPresent();
 
 		$this->zbxTestTextPresent($this->HostName);
-		$this->zbxTestTextPresent('Simple form test host');
 		$this->zbxTestTextNotPresent('Empty host');
 
 		// Check display of proxy and proxy group multiselects based on value of Monitored by field.
@@ -348,7 +348,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->getField('Name')->fill($this->HostName);
 		$filter->submit();
 		$datatable->waitUntilReady();
-		$this->zbxTestTextPresent($this->HostName);
+		$this->query('xpath://div[@class="datatable-body"]//a[text()="'.$this->HostName.'"]')->waitUntilPresent();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
@@ -360,6 +360,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->fill(['Templates' => ['values' =>'Template for web scenario testing', 'context' => 'Templates']]);
 		$filter->submit();
 		$table->waitUntilReady();
+		$table->waitUntilRowsCount(1);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementPresentXpath('//div[@class="datatable-body"]//a[text()="Simple form test host"]');
 		$this->assertDatatableStats(1);
@@ -427,6 +428,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->submit();
 		$this->page->waitUntilReady();
 		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
+		$table->waitUntilRowsCount(count($data['expected']));
 
 		$this->assertDatatableStats(count($data['expected']));
 		$this->assertEquals(array_keys($data['expected']), $this->getDatatableColumnData('Name'));
@@ -463,7 +465,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->getField('Port')->fill($this->HostPort);
 		$filter->submit();
 		$this->page->waitUntilReady();
-		$this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
+		$this->query('class:datatable')->asDatatable()->one()->waitUntilReady()->waitUntilRowsCount(1);
 		$this->zbxTestTextPresent($this->HostName);
 		$this->assertDatatableStats(1);
 	}
