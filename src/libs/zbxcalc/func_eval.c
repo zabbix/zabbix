@@ -2991,7 +2991,8 @@ static int	evaluate_FIRSTCLOCK(zbx_variant_t *value, const zbx_dc_evaluate_item_
  *                                                                            *
  * Purpose: evaluate function 'jsonpath' for the item.                        *
  *                                                                            *
- * Parameters: value      - [OUT] result                                      *
+ * Parameters: value      - [OUT] result, values are stored in descending     *
+ *                                time order (from latest to oldest)          *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] seconds/values, time shift (optional),       *
  *                               pattern                                      *
