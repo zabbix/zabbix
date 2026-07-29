@@ -380,22 +380,22 @@ static int	cep_operation_event_execute_suppress_event(zbx_uint64_t ruleid, const
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
 
-	if (0 != op->args.suppress.until && time(NULL) >= (time_t)op->args.suppress.until)
-		goto out;
-
 	if (NULL == *event)
 		*event = cep_event_context_get_mutable_event(ctx);
 
 	if (NULL != *event)
 	{
-		zbx_db_event_suppress_t	suppress_local = {.cep_ruleid = ruleid, .until = op->args.suppress.until};
+		zbx_db_event_suppress_t	suppress_local = {.cep_ruleid = ruleid, .until = op->args.suppress.duration};
+
+		if (0 != suppress_local.until)
+			suppress_local.until += (int)time(NULL);
 
 		cep_acknowledge_update(ack, op->type);
 		cep_event_add_suppress(*event, &suppress_local, 1);
 		ctx->sync_flags |= CEP_SYNC_EVENT_SUPPRESS;
 		ret = SUCCEED;
 	}
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

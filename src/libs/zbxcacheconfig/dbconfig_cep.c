@@ -24,6 +24,7 @@
 #include "zbxlog.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
+#include "zbxtime.h"
 
 ZBX_PTR_VECTOR_IMPL(cep_rule_ptr, zbx_cep_rule_t *)
 ZBX_VECTOR_IMPL(cep_condition, zbx_cep_condition_t)
@@ -1375,7 +1376,11 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 				ZBX_DBROW2STR(operation->args.remove_tag.tag, row[6]);
 				break;
 			case ZBX_CEP_OP_SUPPRESS:
-				operation->args.suppress.until = atoi(row[10]);
+				if (FAIL == zbx_is_time_suffix(row[10], &operation->args.suppress.duration,
+						ZBX_LENGTH_UNLIMITED))
+				{
+					operation->args.suppress.duration = 0;
+				}
 				break;
 		}
 	}

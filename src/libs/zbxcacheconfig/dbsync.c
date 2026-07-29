@@ -4308,7 +4308,7 @@ int	zbx_dbsync_prepare_cep_operation(zbx_dbsync_t *sync)
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select cep_operationid,cep_ruleid,type,execute_when,evaltype,event_name,tag,new_tag,"
-				"tag_value,severity,suppress_until,sortorder"
+				"tag_value,severity,suppress_duration,sortorder"
 			" from cep_operation");
 
 	dbsync_prepare(sync, 12, NULL);

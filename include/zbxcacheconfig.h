@@ -1773,7 +1773,7 @@ zbx_cep_args_severity_t;
 
 typedef struct
 {
-	int	until;
+	int	duration;
 }
 zbx_cep_args_suppress_t;
 
