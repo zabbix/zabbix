@@ -16,6 +16,8 @@
 
 namespace Widgets\Problems\Includes;
 
+use CWebUser;
+
 use Zabbix\Widgets\{
 	CWidgetField,
 	CWidgetForm
@@ -155,7 +157,10 @@ class WidgetForm extends CWidgetForm {
 					)
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('highlight_row', _('Highlight whole row')))->setDefault(ZBX_HIGHLIGHT_OFF)
+				!in_array(CWebUser::$data['theme'], ['hc-light', 'hc-dark'])
+					? (new CWidgetFieldCheckBox('highlight_row', _('Highlight whole row')))
+						->setDefault(ZBX_HIGHLIGHT_OFF)
+					: null
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
