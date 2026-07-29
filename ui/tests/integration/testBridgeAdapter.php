@@ -1251,8 +1251,8 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->assertFalse($result);
 		// Both devices are known (found in the device table), so their names are appended alongside the UUID.
 		$this->assertSame(
-			self::NOTIFY_DEVICE_UUID.' ('.self::NOTIFY_DEVICE_NAME.'): '.self::PUSH_ERROR_RETURNED_ERROR."\n".
-			self::OFFBOARD_DEVICE_UUID.' ('.self::OFFBOARD_DEVICE_NAME.'): '.self::PUSH_ERROR_RETURNED_ERROR,
+			self::NOTIFY_DEVICE_NAME.' ('.self::NOTIFY_DEVICE_UUID.'): '.self::PUSH_ERROR_RETURNED_ERROR."\n".
+			self::OFFBOARD_DEVICE_NAME.' ('.self::OFFBOARD_DEVICE_UUID.'): '.self::PUSH_ERROR_RETURNED_ERROR,
 			$client->getError()
 		);
 

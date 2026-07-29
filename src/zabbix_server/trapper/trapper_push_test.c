@@ -257,8 +257,8 @@ int	trapper_process_push_test(const char *sendto, const char *subject, const cha
 			{
 				if (NULL != name)
 				{
-					zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s (%s): %s", uuid,
-							name, ZBX_NULL2EMPTY_STR(item_error));
+					zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s (%s): %s", name,
+							uuid, ZBX_NULL2EMPTY_STR(item_error));
 				}
 				else
 				{
