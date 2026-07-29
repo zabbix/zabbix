@@ -87,7 +87,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_STATE_TAG = 'state_{{ITEM.VALUE}.regsub("^([a-z]+)", "\\1")}';
 	const CEP_STATE_TAG_UP = 'state_up';
 
-	// The twenty-six CEP rules of the windowless scenario, see getWindowNoneRules(): none of them has a window
+	// The thirty CEP rules of the windowless scenario, see getWindowNoneRules(): none of them has a window
 	// (WINDOW_NONE) and each one applies a different operator, so which rules match an event is fully
 	// determined by the event itself. Each rule is named after - and tags the events it matched with - the
 	// operator it applies, so a tagged event names the rules that matched it.
@@ -126,6 +126,19 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_TAG_HOST_GROUP_NOT_CONTAINS = 'host_group_not_contains';
 	const CEP_TAG_TIME_PERIOD_IN = 'time_period_in';
 	const CEP_TAG_TIME_PERIOD_NOT_IN = 'time_period_not_in';
+	// The last four rules are the only ones whose filter combines several conditions of its own, one per
+	// filter evaltype, so every way of evaluating a condition set is covered as well: everything AND-ed
+	// (CONDITION_EVAL_TYPE_AND), everything OR-ed (CONDITION_EVAL_TYPE_OR), same type OR-ed / distinct types
+	// AND-ed (CONDITION_EVAL_TYPE_AND_OR) and a custom expression (CONDITION_EVAL_TYPE_EXPRESSION). Each one
+	// selects a set of ids the same conditions under another evaltype would not, so an evaltype evaluated as
+	// another one shows up as the wrong events being tagged.
+	const CEP_TAG_SERVICE_AND = 'service_and';
+	const CEP_TAG_SERVICE_OR = 'service_or';
+	const CEP_TAG_SERVICE_AND_OR = 'service_and_or';
+	const CEP_TAG_SERVICE_EXPRESSION = 'service_expression';
+	// The custom expression of the fourth combining rule (CONDITION_EVAL_TYPE_EXPRESSION), grouping its
+	// conditions in a way none of the other three evaltypes can express.
+	const CEP_RULE_WINDOW_NONE_FORMULA = 'A and (B or C)';
 	// The time period the last rule pair tests against: all the time, so whenever the scenario happens to run
 	// the "In" rule matches every event and the "Not in" rule none of them.
 	const CEP_RULE_WINDOW_NONE_TIME_PERIOD = '1-7,00:00-24:00';
@@ -141,6 +154,10 @@ class testTriggerCEP extends CIntegrationTest {
 	// than or equal 1" - so it needs the id right above CEP_RULE_WINDOW_NONE_SERVICE as its second value.
 	const CEP_RULE_WINDOW_NONE_SERVICE = '0';
 	const CEP_RULE_WINDOW_NONE_SERVICE_NEXT = '1';
+	// The third id the scenario sends: it contains CEP_RULE_WINDOW_NONE_SERVICE without being equal to it and
+	// starts with CEP_RULE_WINDOW_NONE_SERVICE_NEXT, which is what tells the Equals pairs from the Contains
+	// ones, and it is numerically above both.
+	const CEP_RULE_WINDOW_NONE_SERVICE_LAST = '10';
 	// Extra trigger tag the windowless scenario adds to the prototypes, whose NAME (not value) carries the
 	// service id: like CEP_STATE_TAG the name contains {ITEM.VALUE} and is resolved at event time, so a
 	// "down_0" event gets a 'service_0' tag and a "down_10" event a 'service_10' one. Existence is a property
@@ -154,6 +171,7 @@ class testTriggerCEP extends CIntegrationTest {
 	// compares with, while the Contains pair only looks for the item value inside the name. The two pairs
 	// therefore disagree on "down_10", whose name contains "down_1" without being equal to that name.
 	const CEP_RULE_WINDOW_NONE_VALUE_NEXT = 'down_'.self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT;
+	const CEP_RULE_WINDOW_NONE_VALUE_LAST = 'down_'.self::CEP_RULE_WINDOW_NONE_SERVICE_LAST;
 	const CEP_RULE_WINDOW_NONE_EVENT_NAME = 'CEP trigger '.self::COMPONENT_VALUE.' '
 		.self::CEP_RULE_WINDOW_NONE_VALUE_NEXT;
 
@@ -1621,7 +1639,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 *   - "host_group_contains": host group Contains a name that group does not contain;
 	 *   - "host_group_not_contains": host group Does not contain that group's own name;
 	 *   - "time_period_in": event time In "1-7,00:00-24:00";
-	 *   - "time_period_not_in": event time Not in "1-7,00:00-24:00".
+	 *   - "time_period_not_in": event time Not in "1-7,00:00-24:00";
+	 *   - "service_and": 'service' Contains "0" AND Does not equal "0" (CONDITION_EVAL_TYPE_AND);
+	 *   - "service_or": 'service' Equals "0" OR event name Contains "down_10" (CONDITION_EVAL_TYPE_OR);
+	 *   - "service_and_or": ('service' Equals "0" OR Equals "1") AND severity Equals Disaster
+	 *     (CONDITION_EVAL_TYPE_AND_OR);
+	 *   - "service_expression": severity Equals Disaster AND ('service' Equals "0" OR event name Contains
+	 *     "down_10"), written as the custom expression "A and (B or C)" (CONDITION_EVAL_TYPE_EXPRESSION).
 	 *
 	 * The Exists pair tests a tag NAME rather than a value, so the prototypes additionally get the
 	 * CEP_SERVICE_TAG tag whose name resolves to 'service_<id>' at event time; only the "down_0" event
@@ -1643,6 +1667,12 @@ class testTriggerCEP extends CIntegrationTest {
 	 * while "severity_not_equals", the non-Equals host and host group rules and "time_period_not_in" must tag
 	 * nothing.
 	 *
+	 * The last four are the only rules whose filter holds more than one condition of its own, one per
+	 * evaltype, and each of them picks a set of ids no other evaltype would produce from the same conditions:
+	 * "service_and" tags "down_10" only, "service_or" tags "down_0" and "down_10", "service_and_or" tags
+	 * "down_0" and "down_1", and "service_expression" tags "down_0" and "down_10" through a grouping - OR-ing
+	 * two conditions of distinct types, then AND-ing a third - that no other evaltype can express.
+	 *
 	 * None of the rules closes anything, which is the point of a windowless rule: the events keep flowing
 	 * through untouched apart from the tag.
 	 */
@@ -1657,9 +1687,16 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->deleteCepCorrelations();
 		$this->deleteCepRules();
 
-		foreach ($this->getWindowNoneRules() as $tag => [$condition, $operand]) {
+		foreach ($this->getWindowNoneRules() as $tag => $rule) {
+			[$conditions, $operand] = $rule;
+			// Only the rules combining conditions of their own carry an evaltype (and, for the custom
+			// expression one, a formula); the rest are single conditions AND-ed with the guard
+			// buildWindowNoneAddTagCepRuleParams() adds.
+			$evaltype = isset($rule[2]) ? $rule[2] : CONDITION_EVAL_TYPE_AND;
+			$formula = isset($rule[3]) ? $rule[3] : '';
+
 			$this->upsertCepRule($this->buildWindowNoneAddTagCepRuleParams(
-				self::CEP_RULE_NAME_PREFIX.'window none '.$tag, $condition, $tag, $operand
+				self::CEP_RULE_NAME_PREFIX.'window none '.$tag, $conditions, $tag, $operand, $evaltype, $formula
 			));
 		}
 
@@ -2222,32 +2259,44 @@ HEREDOC;
 	 * (WHEN_EVENT_OCCURRED is the only execution point a windowless rule has). No window is opened and no
 	 * problem is closed, so the matched events are left open and merely tagged.
 	 *
-	 * The filter picks the events of the close-on-up scenario with two conditions AND-ed together
-	 * (CONDITION_EVAL_TYPE_AND, so both apply even when both are tag conditions - under
-	 * CONDITION_EVAL_TYPE_AND_OR conditions of the same type would be OR-ed instead):
-	 *   - 'type' Equals "cep": restricts the rule to the events of the primary discovered trigger prototype.
-	 *     Without it the negative flavours ("Does not equal", "Does not contain", "Does not exist") would also
-	 *     match every event that has no 'service' tag at all (a comparison against a missing tag is false, and
-	 *     the negation makes it true), i.e. the events of every other host and trigger in the suite;
-	 *   - $match_condition, the test that singles out the ids this rule tags. The scenario builds one rule per
-	 *     operator, with the condition coming from buildWindowNoneServiceCondition() (testing the event tags)
-	 *     or buildWindowNoneEventNameCondition() (testing the event name).
+	 * $match_conditions is either a single filter condition or a list of them, singling out the events this
+	 * rule tags: the scenario builds one rule per operator with a condition from
+	 * buildWindowNoneServiceCondition() (testing the event tags), buildWindowNoneEventNameCondition() (the
+	 * event name), buildWindowNoneSeverityCondition(), buildWindowNoneHostCondition(),
+	 * buildWindowNoneHostGroupCondition() or buildWindowNoneTimePeriodCondition(), plus three rules combining
+	 * several of them under a specific $evaltype.
+	 *
+	 * With the default CONDITION_EVAL_TYPE_AND the filter additionally gets a 'type' Equals "cep" condition,
+	 * restricting the rule to the events of the primary discovered trigger prototype - without it the negative
+	 * flavours ("Does not equal", "Does not contain", "Does not exist") would also match every event that has
+	 * no 'service' tag at all (a comparison against a missing tag is false, and the negation makes it true),
+	 * i.e. the events of every other host and trigger in the suite. Under any other evaltype that guard would
+	 * change what the rule means - it would be OR-ed with the conditions under CONDITION_EVAL_TYPE_OR, and
+	 * joined with the same-type ones into their OR group under CONDITION_EVAL_TYPE_AND_OR - so it is left out
+	 * and those rules restrict themselves instead, by only ever matching an event that carries the scenario's
+	 * 'service' tag.
 	 */
-	private function buildWindowNoneAddTagCepRuleParams(string $name, array $match_condition, string $add_tag,
-			string $add_tag_value): array {
+	private function buildWindowNoneAddTagCepRuleParams(string $name, array $match_conditions, string $add_tag,
+			string $add_tag_value, int $evaltype = CONDITION_EVAL_TYPE_AND, string $formula = ''): array {
+		// A single condition may be passed as is, without wrapping it in a list.
+		$conditions = array_key_exists('type', $match_conditions) ? [$match_conditions] : $match_conditions;
+
+		if ($evaltype == CONDITION_EVAL_TYPE_AND) {
+			array_unshift($conditions, [
+				'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
+				'operator' => CONDITION_OPERATOR_EQUAL,
+				'tag' => 'type',
+				'tag_value' => 'cep'
+			]);
+		}
+
 		return [
 			'name' => $name,
 			'filter' => [
-				'evaltype' => CONDITION_EVAL_TYPE_AND,
-				'conditions' => [
-					[
-						'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'tag' => 'type',
-						'tag_value' => 'cep'
-					],
-					$match_condition
-				]
+				'evaltype' => $evaltype,
+				// Only a custom expression has a formula; every other evaltype must leave it at its default.
+				'formula' => $formula,
+				'conditions' => $conditions
 			],
 			'window_type' => CCepRuleHelper::WINDOW_NONE,
 			// Every rule must be evaluated for every event, so none of them may stop the processing of the
@@ -2397,14 +2446,21 @@ HEREDOC;
 	 * Twelve of the operators come in opposite pairs testing the 'service' id - four pairs through the event
 	 * tags, two through the event name, which ends with the item value - so every event is matched by exactly
 	 * one rule of every pair. The name conditions mirror the tag ones: Equals compares the whole event name of
-	 * the "down_1" event, Contains only the "down_1" item value inside it. The remaining four test the event
-	 * severity, which is the same for every event of these prototypes, so they do not tell the ids apart.
+	 * the "down_1" event, Contains only the "down_1" item value inside it. The next fourteen test the event
+	 * severity, host, host group and time, none of which differs between the events of these prototypes, so
+	 * they do not tell the ids apart - they hold for all of them or for none.
+	 *
+	 * The last four entries carry a third element, the evaltype their conditions are combined under, and the
+	 * custom expression one a fourth, its formula; the rest are single conditions and default to
+	 * CONDITION_EVAL_TYPE_AND.
 	 */
 	private function getWindowNoneRules(): array {
 		$service = self::CEP_RULE_WINDOW_NONE_SERVICE;
 		$service_next = self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT;
+		$service_last = self::CEP_RULE_WINDOW_NONE_SERVICE_LAST;
 		$event_name = self::CEP_RULE_WINDOW_NONE_EVENT_NAME;
 		$value_next = self::CEP_RULE_WINDOW_NONE_VALUE_NEXT;
+		$value_last = self::CEP_RULE_WINDOW_NONE_VALUE_LAST;
 		$host_group = $this->getDiscHostGroupName();
 		$host_group_absent = $host_group.self::CEP_RULE_WINDOW_NONE_ABSENT_SUFFIX;
 		$time_period = self::CEP_RULE_WINDOW_NONE_TIME_PERIOD;
@@ -2507,6 +2563,65 @@ HEREDOC;
 			],
 			self::CEP_TAG_TIME_PERIOD_NOT_IN => [
 				$this->buildWindowNoneTimePeriodCondition(CONDITION_OPERATOR_NOT_IN, $time_period), $time_period
+			],
+			// The three rules combining conditions of their own, one per evaltype. Each one picks a different
+			// set of ids, and picks it only because its conditions are combined the way its evaltype says:
+			//   - AND: "contains 0" holds for "0" and "10", "does not equal 0" for "1" and "10", so only "10"
+			//     satisfies both. Under AND_OR (both conditions are of the same type, hence OR-ed) all three
+			//     ids would be tagged.
+			//   - OR: neither half holds for "1" - its id is not "0" and its event name does not contain
+			//     "down_10" - while "0" satisfies the first and "10" the second. Under AND or AND_OR the two
+			//     conditions are of distinct types and would be AND-ed, tagging nothing.
+			//   - AND_OR: the two same-type id conditions are OR-ed into one group ("0" or "1") and the
+			//     severity condition, being of another type, is AND-ed with it. Under AND nothing would match
+			//     ("0" and "1" cannot both hold), under OR every event would ("severity equals disaster"
+			//     alone is enough).
+			// The OR and AND_OR rules get no 'type' Equals "cep" guard - it would be OR-ed in and change what
+			// they mean - and need none: every branch of theirs is a positive comparison against the 'service'
+			// tag or the event name, which no event outside this scenario satisfies. The AND rule keeps the
+			// guard like the single-condition rules, since AND-ing one more condition changes nothing.
+			self::CEP_TAG_SERVICE_AND => [
+				[
+					$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_LIKE, $service),
+					$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_NOT_EQUAL, $service)
+				],
+				$service,
+				CONDITION_EVAL_TYPE_AND
+			],
+			self::CEP_TAG_SERVICE_OR => [
+				[
+					$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_EQUAL, $service),
+					$this->buildWindowNoneEventNameCondition(CONDITION_OPERATOR_LIKE, $value_last)
+				],
+				$service.','.$service_last,
+				CONDITION_EVAL_TYPE_OR
+			],
+			self::CEP_TAG_SERVICE_AND_OR => [
+				[
+					$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_EQUAL, $service),
+					$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_EQUAL, $service_next),
+					$this->buildWindowNoneSeverityCondition(CONDITION_OPERATOR_EQUAL, TRIGGER_SEVERITY_DISASTER)
+				],
+				$service.','.$service_next,
+				CONDITION_EVAL_TYPE_AND_OR
+			],
+			// The fourth combining rule groups its conditions with the custom expression "A and (B or C)",
+			// which none of the other evaltypes can express: it OR-s two conditions of DISTINCT types (the id
+			// "0" and the "down_10" event name) and AND-s the severity with the result, so it tags "0" and
+			// "10". AND_OR would AND all three (three distinct types, so no OR group at all) and tag nothing,
+			// plain AND the same, plain OR would tag every event through the severity condition alone.
+			self::CEP_TAG_SERVICE_EXPRESSION => [
+				[
+					['formulaid' => 'A'] + $this->buildWindowNoneSeverityCondition(CONDITION_OPERATOR_EQUAL,
+						TRIGGER_SEVERITY_DISASTER),
+					['formulaid' => 'B'] + $this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_EQUAL,
+						$service),
+					['formulaid' => 'C'] + $this->buildWindowNoneEventNameCondition(CONDITION_OPERATOR_LIKE,
+						$value_last)
+				],
+				$service.','.$service_last,
+				CONDITION_EVAL_TYPE_EXPRESSION,
+				self::CEP_RULE_WINDOW_NONE_FORMULA
 			]
 		];
 	}
@@ -5099,7 +5214,7 @@ HEREDOC;
 	}
 
 	/**
-	 * Complex event processing without a window (WINDOW_NONE): twenty-six windowless rules tag the problem
+	 * Complex event processing without a window (WINDOW_NONE): thirty windowless rules tag the problem
 	 * events of one discovered trigger the moment they occur, each with a tag named after the operator it
 	 * applies ("service_equals", "event_name_contains", ...).
 	 *
@@ -5121,7 +5236,14 @@ HEREDOC;
 	 * covering all the time) must therefore tag all three events, while severity_not_equals, the non-Equals
 	 * host and host group rules (Does not equal the name, Contains a name it does not contain, Does not
 	 * contain its own name) and time_period_not_in must tag none - no event may carry the tag of any rule that
-	 * does not match it. None of the rules closes anything, so all three problems stay open until the trigger
+	 * does not match it.
+	 *
+	 * The last four rules are the ones whose filter combines several conditions, one rule per evaltype, so the
+	 * way a condition set is evaluated is covered too: service_and (everything AND-ed) tags "down_10" only,
+	 * service_or (everything OR-ed) tags "down_0" and "down_10", service_and_or (same type OR-ed, distinct
+	 * types AND-ed) tags "down_0" and "down_1", and service_expression (the custom expression "A and (B or
+	 * C)") tags "down_0" and "down_10" - every one of them a set the same conditions under another evaltype
+	 * would not produce. None of the rules closes anything, so all three problems stay open until the trigger
 	 * expression recovers them.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowNone$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
@@ -6227,7 +6349,10 @@ HEREDOC;
 	 *                                service_not_exists, event_name_not_equals, event_name_contains;
 	 *   - all three              -> severity_equals, severity_more_equal, severity_less_equal, host_equals,
 	 *                                host_group_equals, time_period_in, and never severity_not_equals,
-	 *                                time_period_not_in nor any of the non-Equals host / host group rules.
+	 *                                time_period_not_in nor any of the non-Equals host / host group rules;
+	 *   - the evaltype rules     -> service_and on "down_10", service_or on "down_0" and "down_10",
+	 *                                service_and_or on "down_0" and "down_1", service_expression on "down_0"
+	 *                                and "down_10".
 	 *
 	 * "down_10" is what makes the Contains pairs more than slower Equals pairs: its id contains "0" without
 	 * being equal to it and its event name contains the "down_1" item value without being equal to the
@@ -6272,9 +6397,9 @@ HEREDOC;
 		];
 
 		// The 'service' id of every problem the scenario opens, in the order they are sent, and the rules that
-		// must have tagged its event (every rule tags with its own name): one rule of every opposite id pair
-		// matches an id, plus the six rules that match every event, so each event must end up with exactly
-		// twelve of the twenty-six rule tags.
+		// must have tagged its event (every rule tags with its own name): one rule of every opposite id pair,
+		// the six rules that match every event, and whichever of the three evaltype rules selects this id. No
+		// other rule tag may be on the event.
 		$expected_tags = [
 			// The only id carrying a 'service_0' tag, so the only one the Exists rule may tag. Its event name
 			// is neither equal to nor contains the "down_1" one, so both negative name rules match it.
@@ -6284,7 +6409,12 @@ HEREDOC;
 				self::CEP_TAG_SERVICE_LESS_EQUAL,
 				self::CEP_TAG_SERVICE_EXISTS,
 				self::CEP_TAG_EVENT_NAME_NOT_EQUALS,
-				self::CEP_TAG_EVENT_NAME_NOT_CONTAINS
+				self::CEP_TAG_EVENT_NAME_NOT_CONTAINS,
+				// Its id is the first branch of the OR rule, the first half of the AND_OR rule's OR group and
+				// the "B" of the custom expression, but it does not satisfy both halves of the AND rule.
+				self::CEP_TAG_SERVICE_OR,
+				self::CEP_TAG_SERVICE_AND_OR,
+				self::CEP_TAG_SERVICE_EXPRESSION
 			], $common_rule_tags),
 			// The id whose full event name the name Equals rule was built from, so it is the only one matched
 			// by both positive name rules.
@@ -6294,20 +6424,30 @@ HEREDOC;
 				self::CEP_TAG_SERVICE_MORE_EQUAL,
 				self::CEP_TAG_SERVICE_NOT_EXISTS,
 				self::CEP_TAG_EVENT_NAME_EQUALS,
-				self::CEP_TAG_EVENT_NAME_CONTAINS
+				self::CEP_TAG_EVENT_NAME_CONTAINS,
+				// The second half of the AND_OR rule's OR group. It is in neither branch of the OR rule nor of
+				// the custom expression's "B or C": its id is not "0" and its event name does not contain
+				// "down_10".
+				self::CEP_TAG_SERVICE_AND_OR
 			], $common_rule_tags),
 			// Contains "0" without being equal to it, so the Contains rule matches it but the Equals rule does
 			// not - the case that tells the two string pairs apart. Its own tag is 'service_10', so the Exists
 			// rule (which looks for 'service_0') must not match it either, and its event name ends with
 			// "down_10", which contains the "down_1" value without being equal to the "down_1" event name -
 			// the same split, on the name side.
-			'10' => array_merge([
+			self::CEP_RULE_WINDOW_NONE_SERVICE_LAST => array_merge([
 				self::CEP_TAG_SERVICE_NOT_EQUALS,
 				self::CEP_TAG_SERVICE_CONTAINS,
 				self::CEP_TAG_SERVICE_MORE_EQUAL,
 				self::CEP_TAG_SERVICE_NOT_EXISTS,
 				self::CEP_TAG_EVENT_NAME_NOT_EQUALS,
-				self::CEP_TAG_EVENT_NAME_CONTAINS
+				self::CEP_TAG_EVENT_NAME_CONTAINS,
+				// The only id satisfying both conditions of the AND rule; the second branch of the OR rule and
+				// the "C" of the custom expression match it through its event name. Its id is in neither half
+				// of the AND_OR rule's OR group.
+				self::CEP_TAG_SERVICE_AND,
+				self::CEP_TAG_SERVICE_OR,
+				self::CEP_TAG_SERVICE_EXPRESSION
 			], $common_rule_tags)
 		];
 
