@@ -262,8 +262,8 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['name'],
 		(new CUrl('host_discovery.php'))
 			->setArgument('form', 'update')
-			->setArgument('itemid', $discovery['itemid'])
 			->setArgument('context', $data['context'])
+			->setArgument('itemid', $discovery['itemid'])
 	);
 
 	// status
@@ -408,6 +408,8 @@ $discoveryForm->addItem([
 $html_page
 	->addItem($discoveryForm)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	view.init('.json_encode([
