@@ -89,16 +89,19 @@ class CControllerPopupMediaEdit extends CController {
 
 				if (count($deviceuuids) > 0 && !in_array('*', $deviceuuids)) {
 					$form_data['sendto_active_devices'] = 0;
+					$form_data['sendto_device_data'] = [];
 
-					$devices = API::Device()->get([
-						'output' => ['uuid', 'name'],
-						'userids' => $this->getInput('userid'),
-						'filter' => ['uuid' => $deviceuuids, 'status' => ZBX_DEVICE_STATUS_ACTIVATED]
-					]);
+					if (CSettingsHelper::isMobileDevicesEnabled()) {
+						$devices = API::Device()->get([
+							'output' => ['uuid', 'name'],
+							'userids' => $this->getInput('userid'),
+							'filter' => ['uuid' => $deviceuuids, 'status' => ZBX_DEVICE_STATUS_ACTIVATED]
+						]);
 
-					$devices = array_combine(array_column($devices, 'uuid'), $devices);
-					$devices = CArrayHelper::renameObjectsKeys($devices, ['uuid' => 'id']);
-					$form_data['sendto_device_data'] = $devices;
+						$devices = array_combine(array_column($devices, 'uuid'), $devices);
+						$devices = CArrayHelper::renameObjectsKeys($devices, ['uuid' => 'id']);
+						$form_data['sendto_device_data'] = $devices;
+					}
 				}
 			}
 		}
