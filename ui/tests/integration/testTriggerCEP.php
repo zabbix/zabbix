@@ -5490,7 +5490,6 @@ HEREDOC;
 
 		try {
 			$this->runEventAssessmentTestCepWindowNone();
-			sleep(60);
 		}
 		finally {
 			$this->cleanupCepRules();
