@@ -62,10 +62,10 @@ class testUserGroup extends CAPITest {
 
 		$proxy_groups = CDataHelper::call('proxygroup.create', [
 			[
-				'name' => 'Test proxy group 1',
+				'name' => 'Test proxy group 1'
 			],
 			[
-				'name' => 'Test proxy group 2',
+				'name' => 'Test proxy group 2'
 			]
 		]);
 

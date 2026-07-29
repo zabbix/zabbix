@@ -91,7 +91,7 @@ class testDRule extends CAPITest {
 			'user_groups' => [
 				[
 					'name' => 'perm.users.enabled',
-					'users_status' => GROUP_STATUS_ENABLED,
+					'users_status' => GROUP_STATUS_ENABLED
 				],
 				[
 					'name' => 'user with inaccessible proxy',
@@ -363,7 +363,7 @@ class testDRule extends CAPITest {
 			'Delete discovery rule with inaccessible proxy' => [
 				'drule' => [':drule:drule.with.inaccessible.proxy'],
 				'expected_error' => 'No permissions to referred object or it does not exist!',
-				'login' => ['user' => 'admin.with.inaccessible.proxy', 'password' => 'zabbix!password'],
+				'login' => ['user' => 'admin.with.inaccessible.proxy', 'password' => 'zabbix!password']
 			]
 		];
 	}
