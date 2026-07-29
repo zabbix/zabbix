@@ -1373,6 +1373,7 @@ void	cep_window_pool_enqueue(zbx_cep_window_pool_t *pool, zbx_cep_window_t *wind
 	{
 		case ZBX_CEP_WINDOW_SIMPLE:
 		case ZBX_CEP_WINDOW_CAUSAL:
+		case ZBX_CEP_WINDOW_CORRELATION:
 			elem.data = cep_window_addref(window);
 			zbx_binary_heap_insert(&pool->alarm_queue, &elem);
 			break;
