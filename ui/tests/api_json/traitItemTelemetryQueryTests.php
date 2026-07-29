@@ -164,6 +164,23 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield 'duplicates in "query.aggregated_columns[].column" when "query.aggregated_columns[].alias" are unique' => [
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [
+						['column' => 'Timestamp']
+					],
+					'aggregated_columns' => [
+						['column' => 'Timestamp', 'function' => AGGREGATE_MAX, 'alias' => 'time_max'],
+						['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'time_min']
+					],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			null
+		];
+
 		yield 'duplicate "query.filter.conditions[].column"' => [
 			[
 				'query' => [

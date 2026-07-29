@@ -239,8 +239,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	/**
 	 * Validate value is unique in columns:
 	 * - "query.columns[].column" (or "query.columns[].column" and "query.columns[].attribute_key" for complex column)
-	 * - "query.aggregated_columns[].column"
-	 * - "query.aggregated_columns[].alias"
+	 * - "query.aggregated_columns[].alias" if it is not empty, "query.aggregated_columns[].column" otherwise
 	 *
 	 * @param array       $item   Telemetry item to validate.
 	 * @param string      $path   Path in validation message.
@@ -267,35 +266,31 @@ class CItemTypeTelemetryQuery extends CItemType {
 		}
 
 		foreach ($item['query']['aggregated_columns'] as $i => $column) {
-			$uniq_value = $column['column'];
+			if ($column['alias'] !== '') {
+				if (array_key_exists($column['alias'], $uniq)) {
+					$error = _s('Invalid parameter "%1$s": %2$s.',
+						$path.'/query/aggregated_columns/'.($i + 1).'/alias',
+						_s('value %1$s already exists', '('.$column['alias'].')')
+					);
 
-			if ($uniq_value !== '' && array_key_exists($uniq_value, $uniq)) {
+					return false;
+				}
+
+				$uniq[$column['alias']] = true;
+
+				continue;
+			}
+
+			if (array_key_exists($column['column'], $uniq)) {
 				$error = _s('Invalid parameter "%1$s": %2$s.',
 					$path.'/query/aggregated_columns/'.($i + 1).'/column',
-					_s('value %1$s already exists', '('.$uniq_value.')')
+					_s('value %1$s already exists', '('.$column['column'].')')
 				);
 
 				return false;
 			}
-			elseif ($uniq_value !== '') {
-				$uniq[$uniq_value] = true;
-			}
 
-			$uniq_value = $column['alias'];
-
-			if ($uniq_value !== '' && array_key_exists($uniq_value, $uniq)) {
-				$error = _s('Invalid parameter "%1$s": %2$s.',
-					$path.'/query/aggregated_columns/'.($i + 1).'/alias',
-					_s('value %1$s already exists', '('.$uniq_value.')')
-				);
-
-				return false;
-			}
-			elseif ($uniq_value !== '') {
-				$uniq[$uniq_value] = true;
-			}
-
-			$uniq[$uniq_value] = true;
+			$uniq[$column['column']] = true;
 		}
 
 		return true;
@@ -361,11 +356,11 @@ class CItemTypeTelemetryQuery extends CItemType {
 				'function'				=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_PCTILE]), 'default' => AGGREGATE_COUNT],
 				'column'				=> ['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PCTILE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $aggregated_column)],
-												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'unset' => true]
 				]],
 				'parameters'			=> ['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'function', 'in' => AGGREGATE_PCTILE], 'type' => API_INTS32, 'in' => '1:100', 'flags' => API_REQUIRED | API_NOT_EMPTY],
-												['else' => true, 'type' => API_OBJECTS, 'length' => 0, 'default' => []]
+												['else' => true, 'type' => API_OBJECTS, 'length' => 0, 'unset' => true]
 				]],
 				'alias'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]],

@@ -388,20 +388,20 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY && array_key_exists('query', $item)) {
+				/** @var CItemTypeTelemetryQuery $item_type */
 				$path = '/'.($i + 1);
 
-				if ($item['query']['filter']
-						&& !CItemTypeTelemetryQuery::validateFilter($item, $path, $error)) {
+				if (($item['query']['columns'] || $item['query']['aggregated_columns'])
+						&& !$item_type::validateColumnsAggregatedColumnsUnique($item, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
 				if ($item['query']['aggregated_columns']
-						&& !CItemTypeTelemetryQuery::validateAggregatedColumns($item, $path, $error)) {
+						&& !$item_type::validateAggregatedColumns($item, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
-				if (($item['query']['columns'] || $item['query']['aggregated_columns'])
-						&& !CItemTypeTelemetryQuery::validateColumnsAggregatedColumnsUnique($item, $path, $error)) {
+				if ($item['query']['filter'] && !$item_type::validateFilter($item, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
@@ -3008,6 +3008,14 @@ abstract class CItemGeneral extends CApiService {
 			}
 			unset($condition);
 		}
+
+		foreach ($query['aggregated_columns'] as &$column) {
+			if ($column['function'] == AGGREGATE_PCTILE) {
+				// Server expects "query.aggregated_columns[].parameters" to be stored as array of strings.
+				$column['parameters'] = array_map('strval', $column['parameters']);
+			}
+		}
+		unset($column);
 
 		return json_encode($query, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 	}
