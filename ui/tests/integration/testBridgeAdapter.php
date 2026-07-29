@@ -37,7 +37,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const REAL_NOTIFY_SUBJECT = 'Bridge adapter real notification';
 	private const REAL_NOTIFY_MESSAGE = 'Bridge adapter real notification message';
 	private const MEDIA_SEVERITY_ALL = 63;
-	private const PUSH_ALERT_ERROR_DEVICE_UNKNOWN = 'Cannot deliver alert, device id is not known.';
+	private const PUSH_ALERT_ERROR_DEVICE_UNKNOWN = 'Cannot deliver notification, device id is not known.';
 	private const PUSH_ALERT_ERROR_DEVICE_NOT_ACTIVE =
 		'Cannot deliver notification, target device is not in Active state.';
 	private const PUSH_TEST_ERROR_DEVICE_NOT_FOUND = 'Cannot find enabled device for push media type test.';

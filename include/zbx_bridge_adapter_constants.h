@@ -31,6 +31,15 @@
 #define ZBX_PUSH_BA_ERR_RETURNED_ERROR	\
 	"Cannot deliver mobile device notification, bridge-adapter returned an error."
 
+#define ZBX_PUSH_ALERT_ERR_INVALID_UUID	\
+	"Cannot deliver notification, recipient is not a valid device ID."
+#define ZBX_PUSH_ALERT_ERR_DEVICE_UNKNOWN	\
+	"Cannot deliver notification, device id is not known."
+#define ZBX_PUSH_ALERT_ERR_DEVICE_NOT_ACTIVE	\
+	"Cannot deliver notification, target device is not in Active state."
+#define ZBX_PUSH_TEST_ERR_DEVICE_NOT_FOUND	\
+	"Cannot find enabled device for push media type test."
+
 #define ZBX_BRIDGE_ADAPTER_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION	1
 
 #define ZBX_DEVICE_STATUS_ACTIVATED	1

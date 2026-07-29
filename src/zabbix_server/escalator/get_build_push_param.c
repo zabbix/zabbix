@@ -226,9 +226,6 @@ static void	push_add_all_user_targets(zbx_uint64_t userid, zbx_vector_push_targe
 static void	push_collect_targets(zbx_uint64_t userid, const char *sendto, zbx_vector_push_target_t *targets,
 		zbx_vector_push_alert_t *alerts)
 {
-#define ZBX_PUSH_ALERT_ERROR_INVALID_UUID	"Cannot deliver alert, recipient is not a valid device ID."
-#define ZBX_PUSH_ALERT_ERROR_DEVICE_UNKNOWN	"Cannot deliver alert, device id is not known."
-#define ZBX_PUSH_ALERT_ERROR_DEVICE_NOT_ACTIVE	"Cannot deliver notification, target device is not in Active state."
 	char	*copy, *token, *saveptr;
 
 	if (NULL == sendto || '\0' == *sendto)
@@ -254,7 +251,7 @@ static void	push_collect_targets(zbx_uint64_t userid, const char *sendto, zbx_ve
 
 		if (SUCCEED != push_uuid_is_valid(token))
 		{
-			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERROR_INVALID_UUID);
+			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERR_INVALID_UUID);
 			continue;
 		}
 
@@ -262,19 +259,19 @@ static void	push_collect_targets(zbx_uint64_t userid, const char *sendto, zbx_ve
 
 		if (SUCCEED != push_get_target_info_by_uuid(token, &target_userid, &target_status))
 		{
-			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERROR_DEVICE_UNKNOWN);
+			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERR_DEVICE_UNKNOWN);
 			continue;
 		}
 
 		if (userid != target_userid)
 		{
-			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERROR_DEVICE_UNKNOWN);
+			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERR_DEVICE_UNKNOWN);
 			continue;
 		}
 
 		if (ZBX_DEVICE_STATUS_ACTIVATED != target_status)
 		{
-			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERROR_DEVICE_NOT_ACTIVE);
+			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERR_DEVICE_NOT_ACTIVE);
 			continue;
 		}
 
@@ -293,9 +290,6 @@ static void	push_collect_targets(zbx_uint64_t userid, const char *sendto, zbx_ve
 	}
 
 	zbx_free(copy);
-#undef ZBX_PUSH_ALERT_ERROR_INVALID_UUID
-#undef ZBX_PUSH_ALERT_ERROR_DEVICE_UNKNOWN
-#undef ZBX_PUSH_ALERT_ERROR_DEVICE_NOT_ACTIVE
 }
 
 static void	add_hostids_array(struct zbx_json *json, const char *input)

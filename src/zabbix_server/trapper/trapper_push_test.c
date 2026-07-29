@@ -244,7 +244,7 @@ int	trapper_process_push_test(const char *sendto, const char *subject, const cha
 			zbx_free(data);
 		}
 		else
-			item_error = zbx_strdup(NULL, "Cannot find enabled device for push media type test.");
+			item_error = zbx_strdup(NULL, ZBX_PUSH_TEST_ERR_DEVICE_NOT_FOUND);
 
 		if (SUCCEED != item_errcode)
 		{
