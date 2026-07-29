@@ -40,6 +40,13 @@ class testTriggerCEP extends CIntegrationTest {
 	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
 	const MAINTENANCE_COUNT_EXTRA = 10;
 	const SKIP_RESTART_TESTS = true;
+	// The windowless CEP scenario suppresses its events for a while and can then wait for that suppression to
+	// run out again (see waitForCepWindowNoneUnsuppressed()). That wait is the slowest part of the scenario by
+	// far - the suppression period plus the once-a-minute timer pass that clears expired suppressions - so it
+	// is skipped by default; set to false to check the suppression is lifted as well. Skipping it costs
+	// nothing else: the events are still asserted to be suppressed while the suppression holds, and deleting
+	// the CEP rules in the teardown takes their suppressions with them.
+	const SKIP_UNSUPPRESS_WAIT = true;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
 	const SKIP_SERVICES_TESTS = null;
@@ -136,9 +143,23 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_TAG_SERVICE_OR = 'service_or';
 	const CEP_TAG_SERVICE_AND_OR = 'service_and_or';
 	const CEP_TAG_SERVICE_EXPRESSION = 'service_expression';
-	// One more rule beside those, matching every problem event of the scenario, whose operations run through
-	// every tag operation a windowless rule can perform (see getWindowNoneTagOperationCases()).
+	// Two more rules beside those, both matching every problem event of the scenario: one running through
+	// every tag operation a windowless rule can perform (see getWindowNoneTagOperationCases()), the other
+	// through the operations changing the event itself (see getWindowNoneEventOperationCase()).
 	const CEP_RULE_WINDOW_NONE_TAG_OPS = self::CEP_RULE_NAME_PREFIX.'window none tag operations';
+	const CEP_RULE_WINDOW_NONE_EVENT_OPS = self::CEP_RULE_NAME_PREFIX.'window none event operations';
+	// The name the event operations rule gives every event it processes.
+	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME = 'CEP window none event operations';
+	// How long the suppress operation of that rule suppresses the events for, counted from the moment the
+	// rules are created. It has to outlast the configuration cache reload plus the three waves of values the
+	// scenario sends and their verification, because the operation stores an absolute deadline and does
+	// nothing at all once that deadline has passed - a window too short would leave the later events
+	// unsuppressed depending on how fast the machine is. Everything after the deadline is waited for, so the
+	// window is kept as short as it can safely be.
+	const CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD = 60;
+	// Expired suppressions are removed by the timer, which does that pass once a minute, so clearing them
+	// takes up to a minute longer than the suppression itself.
+	const CEP_RULE_WINDOW_NONE_UNSUPPRESS_ITERATIONS = 180;
 	// The custom expression of the fourth combining rule (CONDITION_EVAL_TYPE_EXPRESSION), grouping its
 	// conditions in a way none of the other three evaltypes can express.
 	const CEP_RULE_WINDOW_NONE_FORMULA = 'A and (B or C)';
@@ -290,6 +311,10 @@ class testTriggerCEP extends CIntegrationTest {
 	// Name of the host group the discovered host belongs to, resolved on first use by
 	// getDiscHostGroupName() for the host group rules of the windowless CEP scenario.
 	private $disc_hostgroup_name = null;
+
+	// Absolute deadline the suppress operation of the windowless scenario suppresses its events until,
+	// resolved on first use by getWindowNoneSuppressUntil() so the rule and the assertions share it.
+	private $window_none_suppress_until = null;
 
 	/**
 	 * @inheritdoc
@@ -1676,11 +1701,16 @@ class testTriggerCEP extends CIntegrationTest {
 	 * "down_0" and "down_1", and "service_expression" tags "down_0" and "down_10" through a grouping - OR-ing
 	 * two conditions of distinct types, then AND-ing a third - that no other evaltype can express.
 	 *
-	 * One more rule, CEP_RULE_WINDOW_NONE_TAG_OPS, is created beside those. It has no condition of its own, so
-	 * every problem event of the scenario goes through it, and instead of a single "add tag" it runs every tag
-	 * operation a windowless rule can perform - add, set, set value, increase, decrease, rename and remove -
-	 * in one operation list, see getWindowNoneTagOperationCases(). Some of those operations work on tags the
-	 * operation list adds first, the others on tags the trigger prototypes carry for exactly that purpose.
+	 * Two more rules are created beside those, neither with a condition of its own, so every problem event of
+	 * the scenario goes through both:
+	 *   - CEP_RULE_WINDOW_NONE_TAG_OPS runs every tag operation a windowless rule can perform - add, set, set
+	 *     value, increase, decrease, rename and remove - in one operation list, see
+	 *     getWindowNoneTagOperationCases(). Some of those operations work on tags the operation list adds
+	 *     first, the others on tags the trigger prototypes carry for exactly that purpose;
+	 *   - CEP_RULE_WINDOW_NONE_EVENT_OPS runs the operations changing the event itself - set name, set
+	 *     severity, increase and decrease severity, suppress - see getWindowNoneEventOperationCase(). It is
+	 *     the only rule with a non-zero sortorder, so it runs after all the others: it rewrites the event name
+	 *     and severity the rules above have conditions on.
 	 *
 	 * None of the rules closes anything, which is the point of a windowless rule: the events keep flowing
 	 * through untouched apart from the tags.
@@ -1714,10 +1744,18 @@ class testTriggerCEP extends CIntegrationTest {
 			));
 		}
 
-		// The one rule with more than a single operation: no condition of its own (so every problem event of
-		// the scenario goes through it) and every tag operation a windowless rule can perform.
+		// The two rules with more than a single operation: no condition of their own (so every problem event
+		// of the scenario goes through them) and every tag operation a windowless rule can perform, then
+		// every operation changing the event itself.
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_NONE_TAG_OPS, [],
 			$this->getWindowNoneTagOperations()
+		));
+
+		// This one changes the event name and severity, which the rules above have conditions on, so it must
+		// be evaluated after all of them: rules run in sortorder and every other rule leaves it at 0.
+		$event_operations = $this->getWindowNoneEventOperationCase()['operations'];
+		$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams(
+			self::CEP_RULE_WINDOW_NONE_EVENT_OPS, [], $this->buildWindowNoneOperations($event_operations)
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -2828,16 +2866,89 @@ HEREDOC;
 		$operations = [];
 
 		foreach ($this->getWindowNoneTagOperationCases() as $case) {
-			foreach ($case['operations'] as [$type, $params]) {
-				$operations[] = [
-					'sortorder' => count($operations),
-					'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-					'type' => $type
-				] + $params;
-			}
+			$operations = array_merge($operations, $case['operations']);
 		}
 
-		return $operations;
+		return $this->buildWindowNoneOperations($operations);
+	}
+
+	/**
+	 * The operations changing the event itself rather than its tags, with the state they must leave on every
+	 * problem event of the scenario. They all run in one rule (CEP_RULE_WINDOW_NONE_EVENT_OPS) whose filter is
+	 * just the 'type' Equals "cep" guard, in the order listed:
+	 *   - "set name" replaces the event name;
+	 *   - "set severity" puts the event at Information, then two "increase severity" and one "decrease
+	 *     severity" shift it by one step each, leaving Warning. The severity is asserted after the whole
+	 *     chain, and since the three shifts do not cancel out, an operation that did nothing would leave a
+	 *     different severity behind;
+	 *   - "suppress" suppresses the event until getWindowNoneSuppressUntil().
+	 *
+	 * The rule runs last (see prepareDataCepWindowNoneTagOperations()): it changes the event name and severity,
+	 * which the event name and severity rules of getWindowNoneRules() have conditions on, so it must not run
+	 * before them.
+	 *
+	 * The two remaining operations a windowless rule could perform at this point are left out on purpose:
+	 * "discard" would drop the event before it is ever stored, and "close" would close the problem this
+	 * scenario needs to stay open (the CEP window scenarios cover closing).
+	 *
+	 * The suppression is not indefinite: it runs out CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD seconds after the
+	 * rules were created, so both halves of it can be checked - the events are suppressed first, and the
+	 * suppression is gone once the deadline has passed. Only the first half is checked by default; the wait
+	 * for the second one is the slowest step of the scenario and SKIP_UNSUPPRESS_WAIT leaves it out (see
+	 * waitForCepWindowNoneUnsuppressed()).
+	 *
+	 * Either way the suppressions cannot outlive the test: event_suppress.cep_ruleid is an ON DELETE CASCADE
+	 * foreign key, so deleting the CEP rules in the teardown removes them - a manual unsuppress could not, it
+	 * only clears rows with no cep_ruleid.
+	 */
+	/**
+	 * The moment the suppression the event operations apply runs out, resolved once and reused, so the rule
+	 * that suppresses until it and the wait that expects it to be over agree on the same deadline.
+	 */
+	private function getWindowNoneSuppressUntil(): int {
+		if ($this->window_none_suppress_until === null) {
+			$this->window_none_suppress_until = time() + self::CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD;
+		}
+
+		return $this->window_none_suppress_until;
+	}
+
+	private function getWindowNoneEventOperationCase(): array {
+		return [
+			'operations' => [
+				[CCepRuleHelper::OP_SET_NAME, ['event_name' => self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME]],
+				[CCepRuleHelper::OP_SET_SEVERITY, ['severity' => TRIGGER_SEVERITY_INFORMATION]],
+				[CCepRuleHelper::OP_INCREASE_SEVERITY, []],
+				[CCepRuleHelper::OP_INCREASE_SEVERITY, []],
+				[CCepRuleHelper::OP_DECREASE_SEVERITY, []],
+				[CCepRuleHelper::OP_SUPPRESS, ['suppress_until' => $this->getWindowNoneSuppressUntil()]]
+			],
+			'expected' => [
+				'name' => self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME,
+				// Information +1 +1 -1.
+				'severity' => TRIGGER_SEVERITY_WARNING,
+				'suppressed' => true
+			]
+		];
+	}
+
+	/**
+	 * Turn a list of [operation type, operation parameters] pairs into the operation list of a windowless
+	 * rule: every operation executes when the event occurs and is numbered in the order it is listed, which is
+	 * the order the server executes them in (operations of a rule run in sortorder).
+	 */
+	private function buildWindowNoneOperations(array $operations): array {
+		$result = [];
+
+		foreach ($operations as [$type, $params]) {
+			$result[] = [
+				'sortorder' => count($result),
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => $type
+			] + $params;
+		}
+
+		return $result;
 	}
 
 	/**
@@ -5474,13 +5585,20 @@ HEREDOC;
 	 * C)") tags "down_0" and "down_10" - every one of them a set the same conditions under another evaltype
 	 * would not produce.
 	 *
-	 * The extra rule matches every event of the scenario and, instead of adding one tag, runs the whole tag
-	 * operation set on it: "add tag", "set tag" on a free and on a taken name, "set tag value" on an existing
+	 * The last two rules match every event of the scenario. Instead of adding one tag, one of them runs the
+	 * whole tag operation set on it: "add tag", "set tag" on a free and on a taken name, "set tag value" on an existing
 	 * tag and on a name no tag has, "increase" and "decrease tag value" on a numeric and on a non-numeric
 	 * value, "rename tag" and "remove tag". Half of them work on tags the rule adds itself, the other half on
 	 * tags the trigger generated - the discovered triggers carry a few extra tags for that. Every event must
 	 * end up with exactly the tag state those operations produce, down to the tags they must have left behind
-	 * renamed or removed. None of the rules
+	 * renamed or removed.
+	 *
+	 * The other one runs the operations that change the event itself: "set name", then "set severity" to
+	 * Information followed by two "increase severity" and one "decrease severity" (so the shifts cannot cancel
+	 * out and every event must end up at Warning), then "suppress" until a deadline shortly ahead. Every event
+	 * must be suppressed while it holds, and - when the scenario is run with SKIP_UNSUPPRESS_WAIT turned off -
+	 * unsuppressed again once it has passed. The two operations that would contradict the scenario are left
+	 * out: "discard" would drop the event and "close" would close the problem this test needs to stay open. None of the rules
 	 * closes anything, so all three problems stay open until the trigger expression recovers them.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowNone$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
@@ -6590,8 +6708,12 @@ HEREDOC;
 	 *   - the evaltype rules     -> service_and on "down_10", service_or on "down_0" and "down_10",
 	 *                                service_and_or on "down_0" and "down_1", service_expression on "down_0"
 	 *                                and "down_10";
-	 *   - all three              -> the tag state the tag operation rule leaves behind, the same on every
-	 *                                event (see getWindowNoneTagOperationCases()).
+	 *   - all three              -> the tag state the tag operation rule leaves behind, and the name,
+	 *                                severity and suppression the event operation rule leaves behind, the same
+	 *                                on every event (see getWindowNoneTagOperationCases() and
+	 *                                getWindowNoneEventOperationCase()). The suppression is temporary, so
+	 *                                unless SKIP_UNSUPPRESS_WAIT says otherwise it is then waited out and the
+	 *                                timer must clear it from every event again.
 	 *
 	 * "down_10" is what makes the Contains pairs more than slower Equals pairs: its id contains "0" without
 	 * being equal to it and its event name contains the "down_1" item value without being equal to the
@@ -6705,11 +6827,41 @@ HEREDOC;
 			$this->waitForCepWindowNoneTaggedEvents($triggerid, $expected_so_far);
 		}
 
+		// Every event checked above was suppressed by the event operations. That suppression is time limited,
+		// so once its deadline has passed the timer must take it off all of them again - unless the wait for
+		// that is skipped, which it is by default (SKIP_UNSUPPRESS_WAIT).
+		$this->waitForCepWindowNoneUnsuppressed($triggerid);
+
 		// A value matching neither "down" nor "up" turns the trigger expression false, which recovers the
 		// trigger and closes every problem this scenario left open.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 		$this->waitForNoOpenProblems($all, 'After the windowless CEP scenario recovery value');
+	}
+
+	/**
+	 * Wait until none of the events the windowless scenario generated is suppressed any more. The suppress
+	 * operation suppressed every one of them until getWindowNoneSuppressUntil(), which the assertions of
+	 * waitForCepWindowNoneTaggedEvents() confirmed; here the other half is checked - the suppression is
+	 * temporary and must be gone once its deadline has passed.
+	 *
+	 * The wait is a long one: it has to cover the rest of the suppression period plus the timer pass that
+	 * removes expired event_suppress records, which happens once a minute. That is why SKIP_UNSUPPRESS_WAIT
+	 * leaves it out by default - the suppressions of a skipped wait are removed with the CEP rules in the
+	 * teardown instead.
+	 */
+	private function waitForCepWindowNoneUnsuppressed(int $triggerid): void {
+		if (static::SKIP_UNSUPPRESS_WAIT) {
+			return;
+		}
+
+		$this->callUntilCountIsPresent('event.get', [
+			'objectids' => [$triggerid],
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'suppressed' => true
+		], 0, self::CEP_RULE_WINDOW_NONE_UNSUPPRESS_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -6722,7 +6874,8 @@ HEREDOC;
 	 *
 	 * Every event is additionally checked against the tag state the operations of the tag operation rule must
 	 * have left on it (getWindowNoneTagOperationResults(), the same expectations for every event, including
-	 * the tags that must not be there at all).
+	 * the tags that must not be there at all) and against the name, severity and suppression the event
+	 * operation rule must have given it (getWindowNoneEventOperationCase()).
 	 *
 	 * The tags are applied asynchronously after the event is created, hence the polling; the callback returns
 	 * a description of the first event that does not match, which callUntilDataIsPresent() surfaces in the
@@ -6733,6 +6886,8 @@ HEREDOC;
 		$rule_values = array_map(fn($rule) => $rule[1], $this->getWindowNoneRules());
 		// tag => the value the tag operations must have left on every event, or null if the tag must be gone.
 		$operation_results = $this->getWindowNoneTagOperationResults();
+		// The name, severity and suppression the event operations must have left on every event.
+		$event_results = $this->getWindowNoneEventOperationCase()['expected'];
 
 		$this->callUntilDataIsPresent('event.get', [
 			'objectids' => [$triggerid],
@@ -6740,10 +6895,10 @@ HEREDOC;
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'eventid_from' => $this->event_baseline_id + 1,
 			'filter' => ['value' => TRIGGER_VALUE_TRUE],
-			'output' => ['eventid', 'name'],
+			'output' => ['eventid', 'name', 'severity', 'suppressed'],
 			'selectTags' => 'extend'
 		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($expected_by_service, $rule_values, $operation_results) {
+			function ($response) use ($expected_by_service, $rule_values, $operation_results, $event_results) {
 				if (count($response['result']) !== count($expected_by_service)) {
 					return 'expected '.count($expected_by_service).' problem event(s), got '
 						.count($response['result']);
@@ -6781,6 +6936,22 @@ HEREDOC;
 						if (!in_array($rule_tag, $expected_tags) && array_key_exists($rule_tag, $tags)) {
 							return $info.': unexpected "'.$rule_tag.'" tag added by a non-matching rule';
 						}
+					}
+
+					// The event operations leave the same name, severity and suppression on every event.
+					if ($event['name'] !== $event_results['name']) {
+						return 'event '.$event['eventid'].': name "'.$event['name'].'", expected "'
+							.$event_results['name'].'" from the event operations';
+					}
+
+					if ((int) $event['severity'] !== $event_results['severity']) {
+						return $info.': severity '.$event['severity'].', expected '
+							.$event_results['severity'].' from the event operations';
+					}
+
+					if (((int) $event['suppressed'] === 1) !== $event_results['suppressed']) {
+						return $info.': suppressed '.$event['suppressed'].', expected '
+							.($event_results['suppressed'] ? 1 : 0).' from the event operations';
 					}
 
 					// The tag operations leave the same state on every event of the scenario.
