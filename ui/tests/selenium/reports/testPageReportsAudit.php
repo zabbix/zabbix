@@ -501,8 +501,8 @@ class testPageReportsAudit extends CWebTest {
 	public function testPageReportsAudit_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->query('class:list-table')->asTable()->one();
 		$form->query('button:Reset')->one()->click();
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		$form->fill($data['fields'])->submit();
 		$table->waitUntilReloaded();

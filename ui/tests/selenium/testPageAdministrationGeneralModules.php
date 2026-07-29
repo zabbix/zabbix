@@ -80,7 +80,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		];
 		// Open modules page and check header.
 		$this->page->login()->open('zabbix.php?action=module.list');
-		$this->assertEquals('Modules', $this->query('tag:h1')->one()->getText());
+		$this->assertEquals('Modules', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
 
 		// Check status of buttons on the modules page.
 		foreach (['Scan directory' => true, 'Enable' => false, 'Disable' => false] as $button => $enabled) {

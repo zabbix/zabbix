@@ -657,7 +657,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	 */
 	private function setHttpConfiguration($data) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$this->assertEquals('Authentication', $this->query('tag:h1')->one()->getText());
+		$this->assertEquals('Authentication', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
 		$this->page->assertTitle('Configuration of authentication');
 
 		// Fill fields in 'HTTP settings' tab.

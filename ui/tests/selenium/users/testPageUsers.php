@@ -37,7 +37,9 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Users');
 
 		$this->zbxTestDropdownHasOptions('filter_usrgrpid', ['All', 'Disabled', 'Enabled debug mode', 'Guests', 'No access to the frontend', 'Zabbix administrators']);
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'Zabbix administrators');
+		$table->waitUntilReloaded();
 		$this->zbxTestTextNotPresent('guest');
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $this->userAlias);
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[3]", $this->userName);
@@ -81,7 +83,7 @@ class testPageUsers extends CLegacyWebTest {
 		$sqlHashMedia = 'select * from media where userid='.$userid.' order by mediaid';
 		$oldHashMedia = CDBHelper::getHash($sqlHashMedia);
 
-		$this->page->login()->open('zabbix.php?action=user.list')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=user.list&filter_rst=1')->waitUntilReady();
 		$this->zbxTestCheckTitle('Configuration of users');
 
 		$this->query('link', $alias)->waitUntilClickable()->one()->click();
@@ -96,9 +98,8 @@ class testPageUsers extends CLegacyWebTest {
 	}
 
 	public function testPageUsers_FilterByAlias() {
-		$this->zbxTestLogin('zabbix.php?action=user.list');
+		$this->zbxTestLogin('zabbix.php?action=user.list&filter_rst=1');
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 		$this->zbxTestInputTypeOverwrite('filter_username', $this->userAlias);
 		$this->zbxTestClickButtonText('Apply');
 		$table->waitUntilReloaded();
@@ -107,15 +108,15 @@ class testPageUsers extends CLegacyWebTest {
 	}
 
 	public function testPageUsers_FilterNone() {
-		$this->zbxTestLogin('zabbix.php?action=user.list');
+		$this->zbxTestLogin('zabbix.php?action=user.list&filter_rst=1');
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 		$this->zbxTestInputTypeOverwrite('filter_username', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
 		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
 		$this->zbxTestInputTypeOverwrite('filter_username', '%');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
 	}
 
