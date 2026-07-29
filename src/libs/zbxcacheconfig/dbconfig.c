@@ -3622,7 +3622,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		old_poller_type = item->poller_type;
 		old_nextcheck = item->nextcheck;
 
-		if (0 != (get_denyitemtypes_mask() & (1u << item->type)))
+		if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), item->type))
 		{
 			zbx_timespec_t	ts = {(int)now, 0};
 
@@ -3665,7 +3665,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 				}
 			}
 
-			if (ITEM_STATE_NOTSUPPORTED != state && 0 != (get_denyitemtypes_mask() & (1u << old_type)))
+			if (ITEM_STATE_NOTSUPPORTED != state &&
+					0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), old_type))
 			{
 				AGENT_RESULT	r = {0};
 				zbx_timespec_t	ts = {(int)now, 0};
@@ -10466,8 +10467,11 @@ int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 		zbx_hashset_iter_reset(&dc_host->items, &iter);
 		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 		{
-			if (ITEM_TYPE_ZABBIX_ACTIVE == ref->item->type)
+			if (ITEM_TYPE_ZABBIX_ACTIVE == ref->item->type &&
+					0 == ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), ref->item->type))
+			{
 				num++;
+			}
 		}
 	}
 
@@ -10492,6 +10496,9 @@ void	zbx_dc_config_get_active_items_by_hostid(zbx_dc_item_t *items, zbx_uint64_t
 		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 		{
 			if (ITEM_TYPE_ZABBIX_ACTIVE != ref->item->type)
+				continue;
+
+			if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), ref->item->type))
 				continue;
 
 			DCget_item(&items[j], ref->item);
@@ -15581,7 +15588,7 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextchec
 
 			proxyid = 0;
 		}
-		else if (0 != (get_denyitemtypes_mask() & (1u << dc_item->type)))
+		else if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), dc_item->type))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot perform check now for item \"%s\" on host \"%s\""
 					": item type is denied by the \"DenyItemTypes\" configuration parameter.",

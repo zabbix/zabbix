@@ -177,6 +177,8 @@ zbx_item_type_t;
 	{NULL,			0}				\
 }
 
+#define ZBX_ITEM_TYPE_DENIED(mask, type)	((mask) & (1u << (type)))
+
 #define SNMP_BULK_DISABLED	0
 #define SNMP_BULK_ENABLED	1
 

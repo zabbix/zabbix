@@ -1371,7 +1371,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		}
 		else if (SUCCEED != trapper_process_request_cb(value, sock, &jp, ts, config_comms, config_vault,
 				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks,
-				config_comms->config_tls, config_frontend_allowed_ip, rtc))
+				config_comms->config_tls, config_frontend_allowed_ip, config_denyitemtypes_mask, rtc))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);

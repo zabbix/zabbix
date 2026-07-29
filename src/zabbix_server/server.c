@@ -1710,7 +1710,8 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_ssl_key_location = config_ssl_key_location,
 			.events_cbs = &events_cbs,
 			.proxyconfig_frequency = config_proxyconfig_frequency,
-			.proxydata_frequency = config_proxydata_frequency
+			.proxydata_frequency = config_proxydata_frequency,
+			.config_denyitemtypes_mask = get_config_denyitemtypes_mask()
 		};
 
 	zbx_thread_httppoller_args	httppoller_args =
