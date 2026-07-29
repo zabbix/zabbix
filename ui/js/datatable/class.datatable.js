@@ -307,6 +307,7 @@ class CDataTable {
 		checked: false,
 		onRender: () => {},
 		onChange: () => {},
+		onSave: () => {},
 		isChanged: function () {
 			return this.checked;
 		},

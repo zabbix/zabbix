@@ -24,6 +24,8 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 
 	#sortable = null;
 
+	#options = {};
+
 	getTemplate() {
 		const template = document.createElement('div');
 		const options = this.getDataTable().getOptions();
@@ -44,7 +46,10 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 				input.setAttribute('data-field-type', 'checkbox');
 				input.value = '1';
 				input.checked = option.checked;
-				input.addEventListener('change', event => option.onChange(event, option));
+				input.addEventListener('change', event => {
+					option.onChange(event, option);
+					option.onSave();
+				});
 
 				const label = document.createElement('div');
 				label.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM_LABEL);
@@ -106,6 +111,10 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 	onInit() {
 		super.onInit();
 
+		for (const [id, option] of Object.entries(this.getDataTable().getOptions())) {
+			this.#options[id] = option;
+		}
+
 		this.getElement().classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_TABLE);
 	}
 
@@ -123,6 +132,20 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 
 				this.getDataTable().dispatchEvent(CDataTable.EVENT_COLUMNS_SORT, { items, index, index_to });
 			});
+	}
+
+	onReset() {
+		for (const option of Object.values(this.#options)) {
+			const event = {
+				target: {
+					checked: option.checked
+				}
+			};
+
+			option.onChange(event, option);
+		}
+
+		super.onReset();
 	}
 
 	#createSortableItem(column) {

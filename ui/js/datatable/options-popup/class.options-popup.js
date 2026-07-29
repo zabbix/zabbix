@@ -337,6 +337,10 @@ class CDataTableOptionsPopup {
 
 		this.#column.setColumnOptions(this.#data);
 
+		this.getDataTable()
+			.updateUserConfig()
+			.dispatchEvent(CDataTable.EVENT_INIT);
+
 		this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE, {reset: true, column_index});
 		this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 	}

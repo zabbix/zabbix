@@ -156,8 +156,9 @@
 							this.#datatable.getColumnById(id)?.setShowOptionsPopup(!e.target.checked);
 						}
 
-						this.#datatable.updateOption(option.id, { checked: e.target.checked });
-
+						this.#datatable.updateOption(option.id, {checked: e.target.checked});
+					},
+					onSave: () => {
 						this.#datatable.dispatchEvent(CDataTable.EVENT_INIT);
 						this.#datatable.dispatchEvent(CDataTable.EVENT_SAVE);
 					}
@@ -168,9 +169,10 @@
 						this.#datatable.getElement().classList.toggle('has-highlighted-rows', option.checked);
 					},
 					onChange: (e, option) => {
-						this.#datatable
-							.updateOption(option.id, { checked: e.target.checked })
-							.getData()
+						this.#datatable.updateOption(option.id, {checked: e.target.checked});
+					},
+					onSave: () => {
+						this.#datatable.getData()
 							.then(response => {
 								this.#datatable.dispatchEvent(CDataTable.EVENT_RENDER, {response});
 								this.#datatable.dispatchEvent(CDataTable.EVENT_SAVE);
