@@ -1869,8 +1869,9 @@ zbx_cep_rule_window_t;
 typedef struct
 {
 	zbx_uint64_t		ruleid;
-	int			evaltype;
+	char			*name;
 	char			*formula;
+	int			evaltype;
 	int			status;
 	int			stop;
 	int			sortorder;

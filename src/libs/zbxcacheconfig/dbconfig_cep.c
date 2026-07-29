@@ -320,6 +320,7 @@ void	zbx_cep_rule_release(zbx_cep_rule_t *rule)
 		cep_window_free(rule->window);
 
 	zbx_free(rule->formula);
+	zbx_free(rule->name);
 
 	zbx_free(rule);
 }
@@ -548,7 +549,8 @@ static int	cep_rule_compare_by_sortorder(const void *a1, const void *a2)
 	const zbx_cep_rule_t	*r1 = *(const zbx_cep_rule_t * const *)a1;
 	const zbx_cep_rule_t	*r2 = *(const zbx_cep_rule_t * const *)a2;
 
-	return r1->sortorder - r2->sortorder;
+	ZBX_RETURN_IF_NOT_EQUAL(r1->sortorder, r2->sortorder);
+	return strcmp(r1->name, r2->name);
 }
 
 /******************************************************************************
@@ -914,6 +916,9 @@ static void	cep_sync_rules(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx
 
 		if (NULL == rule->formula || 0 != strcmp(rule->formula, row[1]))
 			rule->formula = zbx_strdup(rule->formula, row[1]);
+
+		if (NULL == rule->name || 0 != strcmp(rule->name, row[6]))
+			rule->name = zbx_strdup(rule->name, row[6]);
 
 		rule->evaltype = atoi(row[2]);
 		rule->status = atoi(row[3]);
