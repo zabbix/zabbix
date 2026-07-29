@@ -1980,19 +1980,23 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'devices':
-				$options = [
-					'output' => ['uuid', 'name'],
-					'filter' => ['status' => ZBX_DEVICE_STATUS_ACTIVATED]
-				];
+				$records = [];
 
-				if ($this->userids) {
-					$options['userids'] = $this->userids;
+				if (CSettingsHelper::isMobileDevicesEnabled()) {
+					$options = [
+						'output' => ['uuid', 'name'],
+						'filter' => ['status' => ZBX_DEVICE_STATUS_ACTIVATED]
+					];
+
+					if ($this->userids) {
+						$options['userids'] = $this->userids;
+					}
+
+					$devices = API::Device()->get($options);
+					$records = array_combine(array_column($devices, 'uuid'), $devices);
+					CArrayHelper::sort($records, ['name']);
+					$records = CArrayHelper::renameObjectsKeys($records, ['uuid' => 'id']);
 				}
-
-				$devices = API::Device()->get($options);
-				$records = array_combine(array_column($devices, 'uuid'), $devices);
-				CArrayHelper::sort($records, ['name']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['uuid' => 'id']);
 				break;
 		}
 
