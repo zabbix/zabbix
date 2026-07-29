@@ -87,7 +87,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_STATE_TAG = 'state_{{ITEM.VALUE}.regsub("^([a-z]+)", "\\1")}';
 	const CEP_STATE_TAG_UP = 'state_up';
 
-	// The thirty CEP rules of the windowless scenario, see getWindowNoneRules(): none of them has a window
+	// The thirty operator coverage rules of the windowless scenario, see getWindowNoneRules(): none of them has a window
 	// (WINDOW_NONE) and each one applies a different operator, so which rules match an event is fully
 	// determined by the event itself. Each rule is named after - and tags the events it matched with - the
 	// operator it applies, so a tagged event names the rules that matched it.
@@ -136,6 +136,9 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_TAG_SERVICE_OR = 'service_or';
 	const CEP_TAG_SERVICE_AND_OR = 'service_and_or';
 	const CEP_TAG_SERVICE_EXPRESSION = 'service_expression';
+	// One more rule beside those, matching every problem event of the scenario, whose operations run through
+	// every tag operation a windowless rule can perform (see getWindowNoneTagOperationCases()).
+	const CEP_RULE_WINDOW_NONE_TAG_OPS = self::CEP_RULE_NAME_PREFIX.'window none tag operations';
 	// The custom expression of the fourth combining rule (CONDITION_EVAL_TYPE_EXPRESSION), grouping its
 	// conditions in a way none of the other three evaltypes can express.
 	const CEP_RULE_WINDOW_NONE_FORMULA = 'A and (B or C)';
@@ -1611,9 +1614,9 @@ class testTriggerCEP extends CIntegrationTest {
 	 * Prepare the windowless complex event processing scenario. It reuses the close-on-up trigger prototypes
 	 * (prepareCloseOnUpTriggerPrototypes(), so every problem event carries a 'service' tag holding the
 	 * trailing number of the item value), but instead of the single tag correlation window rule of
-	 * prepareDataCepWindowTagCorrelationCloseOnUp() it creates the twelve rules of getWindowNoneRules(), which
-	 * have no window at all (WINDOW_NONE) and only tag the events they match, one rule per operator. Every rule
-	 * is named after the tag it adds, which in turn is named after its operator, so the rule set reads as:
+	 * prepareDataCepWindowTagCorrelationCloseOnUp() it creates the rules of getWindowNoneRules(), which have no
+	 * window at all (WINDOW_NONE) and only tag the events they match, one rule per operator. Every rule is
+	 * named after the tag it adds, which in turn is named after its operator, so the rule set reads as:
 	 *   - "service_equals": 'service' Equals "0";
 	 *   - "service_not_equals": 'service' Does not equal "0";
 	 *   - "service_contains": 'service' Contains "0";
@@ -1673,8 +1676,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * "down_0" and "down_1", and "service_expression" tags "down_0" and "down_10" through a grouping - OR-ing
 	 * two conditions of distinct types, then AND-ing a third - that no other evaltype can express.
 	 *
+	 * One more rule, CEP_RULE_WINDOW_NONE_TAG_OPS, is created beside those. It has no condition of its own, so
+	 * every problem event of the scenario goes through it, and instead of a single "add tag" it runs every tag
+	 * operation a windowless rule can perform - add, set, set value, increase, decrease, rename and remove -
+	 * in one operation list, see getWindowNoneTagOperationCases().
+	 *
 	 * None of the rules closes anything, which is the point of a windowless rule: the events keep flowing
-	 * through untouched apart from the tag.
+	 * through untouched apart from the tags.
 	 */
 	public function prepareDataCepWindowNoneTagOperations() {
 		// The extra tag carries the service id in its NAME, which is what the Exists / Does not exist pair
@@ -1699,6 +1707,12 @@ class testTriggerCEP extends CIntegrationTest {
 				self::CEP_RULE_NAME_PREFIX.'window none '.$tag, $conditions, $tag, $operand, $evaltype, $formula
 			));
 		}
+
+		// The one rule with more than a single operation: no condition of its own (so every problem event of
+		// the scenario goes through it) and every tag operation a windowless rule can perform.
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_NONE_TAG_OPS, [],
+			$this->getWindowNoneTagOperations()
+		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -2254,17 +2268,18 @@ HEREDOC;
 	}
 
 	/**
-	 * Build a complex event processing (CEP) rule without a window (WINDOW_NONE): the only thing it does is
-	 * add the $add_tag:$add_tag_value tag to every event matching its filter, right when the event occurs
-	 * (WHEN_EVENT_OCCURRED is the only execution point a windowless rule has). No window is opened and no
-	 * problem is closed, so the matched events are left open and merely tagged.
+	 * Build a complex event processing (CEP) rule without a window (WINDOW_NONE): $operations are applied to
+	 * every event matching its filter, right when the event occurs (WHEN_EVENT_OCCURRED is the only execution
+	 * point a windowless rule has). No window is opened and no problem is closed, so the matched events are
+	 * left open and only modified by the operations.
 	 *
-	 * $match_conditions is either a single filter condition or a list of them, singling out the events this
-	 * rule tags: the scenario builds one rule per operator with a condition from
-	 * buildWindowNoneServiceCondition() (testing the event tags), buildWindowNoneEventNameCondition() (the
-	 * event name), buildWindowNoneSeverityCondition(), buildWindowNoneHostCondition(),
-	 * buildWindowNoneHostGroupCondition() or buildWindowNoneTimePeriodCondition(), plus three rules combining
-	 * several of them under a specific $evaltype.
+	 * $match_conditions is either a single filter condition, a list of them or an empty list (matching every
+	 * event of the scenario), singling out the events this rule acts on: the scenario builds one rule per
+	 * operator with a condition from buildWindowNoneServiceCondition() (testing the event tags),
+	 * buildWindowNoneEventNameCondition() (the event name), buildWindowNoneSeverityCondition(),
+	 * buildWindowNoneHostCondition(), buildWindowNoneHostGroupCondition() or
+	 * buildWindowNoneTimePeriodCondition(), plus four rules combining several of them under a specific
+	 * $evaltype.
 	 *
 	 * With the default CONDITION_EVAL_TYPE_AND the filter additionally gets a 'type' Equals "cep" condition,
 	 * restricting the rule to the events of the primary discovered trigger prototype - without it the negative
@@ -2276,8 +2291,8 @@ HEREDOC;
 	 * and those rules restrict themselves instead, by only ever matching an event that carries the scenario's
 	 * 'service' tag.
 	 */
-	private function buildWindowNoneAddTagCepRuleParams(string $name, array $match_conditions, string $add_tag,
-			string $add_tag_value, int $evaltype = CONDITION_EVAL_TYPE_AND, string $formula = ''): array {
+	private function buildWindowNoneCepRuleParams(string $name, array $match_conditions, array $operations,
+			int $evaltype = CONDITION_EVAL_TYPE_AND, string $formula = ''): array {
 		// A single condition may be passed as is, without wrapping it in a list.
 		$conditions = array_key_exists('type', $match_conditions) ? [$match_conditions] : $match_conditions;
 
@@ -2302,16 +2317,28 @@ HEREDOC;
 			// Every rule must be evaluated for every event, so none of them may stop the processing of the
 			// rules after it.
 			'stop' => CCepRuleHelper::EXECUTION_CONTINUE,
-			'operations' => [
-				[
-					'sortorder' => 0,
-					'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-					'type' => CCepRuleHelper::OP_ADD_TAG,
-					'tag' => $add_tag,
-					'tag_value' => $add_tag_value
-				]
+			'operations' => $operations
+		];
+	}
+
+	/**
+	 * Build a windowless rule whose single operation adds the $add_tag:$add_tag_value tag to every event its
+	 * filter matches. This is the shape of every rule of the operator coverage set (see getWindowNoneRules()):
+	 * the tag names the rule that matched, the value the operand it tested against.
+	 */
+	private function buildWindowNoneAddTagCepRuleParams(string $name, array $match_conditions, string $add_tag,
+			string $add_tag_value, int $evaltype = CONDITION_EVAL_TYPE_AND, string $formula = ''): array {
+		$operations = [
+			[
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_ADD_TAG,
+				'tag' => $add_tag,
+				'tag_value' => $add_tag_value
 			]
 		];
+
+		return $this->buildWindowNoneCepRuleParams($name, $match_conditions, $operations, $evaltype, $formula);
 	}
 
 	/**
@@ -2624,6 +2651,138 @@ HEREDOC;
 				self::CEP_RULE_WINDOW_NONE_FORMULA
 			]
 		];
+	}
+
+	/**
+	 * The tag operations of the windowless scenario, as a list of independent cases. Every case holds the
+	 * operations it needs and the tag state they must leave on the event, so what an operation does and what
+	 * it is expected to produce stay side by side; each case works on tag names of its own, so the cases
+	 * cannot influence one another.
+	 *
+	 * All of them run in one CEP rule (see CEP_RULE_WINDOW_NONE_TAG_OPS): the operations of a rule execute in
+	 * sortorder, so flattening the cases in order gives a deterministic sequence, and the rule's filter is
+	 * just the 'type' Equals "cep" guard, so every problem event of the scenario goes through all of them.
+	 *
+	 * The cases cover every tag operation a windowless rule can perform, including the cases where the server
+	 * must leave the event alone:
+	 *   - "add tag" adds a tag;
+	 *   - "set tag" adds one when the name is free and overwrites the value when it is taken;
+	 *   - "set tag value" only updates an existing tag - on a name no tag has it must do nothing;
+	 *   - "increase" / "decrease tag value" shift a numeric value by one (the operation's value is not an
+	 *     increment, hence "10" turning into "11" and "9"), and leave a non-numeric value untouched;
+	 *   - "rename tag" moves the value to another tag name, leaving no tag under the old one;
+	 *   - "remove tag" drops a tag.
+	 */
+	private function getWindowNoneTagOperationCases(): array {
+		return [
+			[
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_add', 'tag_value' => 'added']]
+				],
+				'expected' => ['op_add' => 'added']
+			],
+			[
+				// The tag name is free, so "set tag" adds it.
+				'operations' => [
+					[CCepRuleHelper::OP_SET_TAG, ['tag' => 'op_set', 'tag_value' => 'created']]
+				],
+				'expected' => ['op_set' => 'created']
+			],
+			[
+				// The tag already exists, so "set tag" overwrites its value instead of adding a second one.
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_set_existing', 'tag_value' => 'before']],
+					[CCepRuleHelper::OP_SET_TAG, ['tag' => 'op_set_existing', 'tag_value' => 'after']]
+				],
+				'expected' => ['op_set_existing' => 'after']
+			],
+			[
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_set_value', 'tag_value' => 'before']],
+					[CCepRuleHelper::OP_SET_TAG_VALUE, ['tag' => 'op_set_value', 'tag_value' => 'after']]
+				],
+				'expected' => ['op_set_value' => 'after']
+			],
+			[
+				// "set tag value" updates an existing tag only, so with no tag of that name it must not add
+				// one - unlike "set tag" above.
+				'operations' => [
+					[CCepRuleHelper::OP_SET_TAG_VALUE, ['tag' => 'op_set_value_missing', 'tag_value' => 'after']]
+				],
+				'expected' => ['op_set_value_missing' => null]
+			],
+			[
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_increase', 'tag_value' => '10']],
+					[CCepRuleHelper::OP_INCREASE_TAG_VALUE, ['tag' => 'op_increase']]
+				],
+				'expected' => ['op_increase' => '11']
+			],
+			[
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_decrease', 'tag_value' => '10']],
+					[CCepRuleHelper::OP_DECREASE_TAG_VALUE, ['tag' => 'op_decrease']]
+				],
+				'expected' => ['op_decrease' => '9']
+			],
+			[
+				// A value that is not a number cannot be shifted, so the tag keeps it.
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_increase_text', 'tag_value' => 'text']],
+					[CCepRuleHelper::OP_INCREASE_TAG_VALUE, ['tag' => 'op_increase_text']]
+				],
+				'expected' => ['op_increase_text' => 'text']
+			],
+			[
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_rename', 'tag_value' => 'kept']],
+					[CCepRuleHelper::OP_RENAME_TAG, ['tag' => 'op_rename', 'new_tag' => 'op_renamed']]
+				],
+				'expected' => ['op_rename' => null, 'op_renamed' => 'kept']
+			],
+			[
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_remove', 'tag_value' => 'gone']],
+					[CCepRuleHelper::OP_REMOVE_TAG, ['tag' => 'op_remove']]
+				],
+				'expected' => ['op_remove' => null]
+			]
+		];
+	}
+
+	/**
+	 * The operations of every getWindowNoneTagOperationCases() case, flattened into the operation list of the
+	 * single rule that performs them. They are numbered in the order the cases list them, which is the order
+	 * the server executes them in.
+	 */
+	private function getWindowNoneTagOperations(): array {
+		$operations = [];
+
+		foreach ($this->getWindowNoneTagOperationCases() as $case) {
+			foreach ($case['operations'] as [$type, $params]) {
+				$operations[] = [
+					'sortorder' => count($operations),
+					'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+					'type' => $type
+				] + $params;
+			}
+		}
+
+		return $operations;
+	}
+
+	/**
+	 * The tag state getWindowNoneTagOperationCases() must leave on every problem event of the scenario, as a
+	 * tag => value map in which a null value means the tag must not be on the event at all.
+	 */
+	private function getWindowNoneTagOperationResults(): array {
+		$expected = [];
+
+		foreach ($this->getWindowNoneTagOperationCases() as $case) {
+			$expected += $case['expected'];
+		}
+
+		return $expected;
 	}
 
 	/**
@@ -5214,9 +5373,10 @@ HEREDOC;
 	}
 
 	/**
-	 * Complex event processing without a window (WINDOW_NONE): thirty windowless rules tag the problem
-	 * events of one discovered trigger the moment they occur, each with a tag named after the operator it
-	 * applies ("service_equals", "event_name_contains", ...).
+	 * Complex event processing without a window (WINDOW_NONE): thirty windowless rules tag the problem events
+	 * of one discovered trigger the moment they occur, each with a tag named after the operator it applies
+	 * ("service_equals", "event_name_contains", ...), and one more rule runs every tag operation over those
+	 * same events.
 	 *
 	 * Twelve of them form six opposite pairs of conditions on the 'service' id of the event - four on the
 	 * event tags (Equals "0" / Does not equal "0", Contains "0" / Does not contain "0", Is less than or equal
@@ -5243,8 +5403,14 @@ HEREDOC;
 	 * service_or (everything OR-ed) tags "down_0" and "down_10", service_and_or (same type OR-ed, distinct
 	 * types AND-ed) tags "down_0" and "down_1", and service_expression (the custom expression "A and (B or
 	 * C)") tags "down_0" and "down_10" - every one of them a set the same conditions under another evaltype
-	 * would not produce. None of the rules closes anything, so all three problems stay open until the trigger
-	 * expression recovers them.
+	 * would not produce.
+	 *
+	 * The extra rule matches every event of the scenario and, instead of adding one tag, runs the whole tag
+	 * operation set on it: "add tag", "set tag" on a free and on a taken name, "set tag value" on an existing
+	 * tag and on a name no tag has, "increase" and "decrease tag value" on a numeric and on a non-numeric
+	 * value, "rename tag" and "remove tag". Every event must end up with exactly the tag state those
+	 * operations produce, down to the tags they must have left behind renamed or removed. None of the rules
+	 * closes anything, so all three problems stay open until the trigger expression recovers them.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowNone$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -6352,7 +6518,9 @@ HEREDOC;
 	 *                                time_period_not_in nor any of the non-Equals host / host group rules;
 	 *   - the evaltype rules     -> service_and on "down_10", service_or on "down_0" and "down_10",
 	 *                                service_and_or on "down_0" and "down_1", service_expression on "down_0"
-	 *                                and "down_10".
+	 *                                and "down_10";
+	 *   - all three              -> the tag state the tag operation rule leaves behind, the same on every
+	 *                                event (see getWindowNoneTagOperationCases()).
 	 *
 	 * "down_10" is what makes the Contains pairs more than slower Equals pairs: its id contains "0" without
 	 * being equal to it and its event name contains the "down_1" item value without being equal to the
@@ -6398,8 +6566,9 @@ HEREDOC;
 
 		// The 'service' id of every problem the scenario opens, in the order they are sent, and the rules that
 		// must have tagged its event (every rule tags with its own name): one rule of every opposite id pair,
-		// the six rules that match every event, and whichever of the three evaltype rules selects this id. No
-		// other rule tag may be on the event.
+		// the six rules that match every event, and whichever of the four evaltype rules selects this id. No
+		// other rule tag may be on the event. The tag operation rule is not listed here - it leaves the same
+		// state on every event, which waitForCepWindowNoneTaggedEvents() checks from its own definition.
 		$expected_tags = [
 			// The only id carrying a 'service_0' tag, so the only one the Exists rule may tag. Its event name
 			// is neither equal to nor contains the "down_1" one, so both negative name rules match it.
@@ -6480,6 +6649,10 @@ HEREDOC;
 	 * other rule tag - the tag of a rule whose condition the event does not satisfy - fails the check, so
 	 * "tagged by service_equals" always means "tagged by service_equals only".
 	 *
+	 * Every event is additionally checked against the tag state the operations of the tag operation rule must
+	 * have left on it (getWindowNoneTagOperationResults(), the same expectations for every event, including
+	 * the tags that must not be there at all).
+	 *
 	 * The tags are applied asynchronously after the event is created, hence the polling; the callback returns
 	 * a description of the first event that does not match, which callUntilDataIsPresent() surfaces in the
 	 * failure message.
@@ -6487,6 +6660,8 @@ HEREDOC;
 	private function waitForCepWindowNoneTaggedEvents(int $triggerid, array $expected_by_service): void {
 		// tag => the value the rule adds it with, for every rule of the scenario.
 		$rule_values = array_map(fn($rule) => $rule[1], $this->getWindowNoneRules());
+		// tag => the value the tag operations must have left on every event, or null if the tag must be gone.
+		$operation_results = $this->getWindowNoneTagOperationResults();
 
 		$this->callUntilDataIsPresent('event.get', [
 			'objectids' => [$triggerid],
@@ -6497,7 +6672,7 @@ HEREDOC;
 			'output' => ['eventid', 'name'],
 			'selectTags' => 'extend'
 		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($expected_by_service, $rule_values) {
+			function ($response) use ($expected_by_service, $rule_values, $operation_results) {
 				if (count($response['result']) !== count($expected_by_service)) {
 					return 'expected '.count($expected_by_service).' problem event(s), got '
 						.count($response['result']);
@@ -6534,6 +6709,23 @@ HEREDOC;
 					foreach (array_keys($rule_values) as $rule_tag) {
 						if (!in_array($rule_tag, $expected_tags) && array_key_exists($rule_tag, $tags)) {
 							return $info.': unexpected "'.$rule_tag.'" tag added by a non-matching rule';
+						}
+					}
+
+					// The tag operations leave the same state on every event of the scenario.
+					foreach ($operation_results as $tag => $value) {
+						if ($value === null) {
+							if (array_key_exists($tag, $tags)) {
+								return $info.': "'.$tag.'" tag still present, the operations must have left'
+									.' no tag of that name';
+							}
+						}
+						elseif (!array_key_exists($tag, $tags)) {
+							return $info.': missing "'.$tag.'" tag left by the tag operations';
+						}
+						elseif ($tags[$tag] !== $value) {
+							return $info.': "'.$tag.'" tag value "'.$tags[$tag].'" left by the tag operations,'
+								.' expected "'.$value.'"';
 						}
 					}
 				}
