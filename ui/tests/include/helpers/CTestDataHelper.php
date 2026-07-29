@@ -32,14 +32,16 @@ class CTestDataHelper {
 	 * @param array $objects
 	 */
 	public static function createObjects(array $objects): void {
-		$objects += array_fill_keys(['template_groups', 'host_groups', 'templates', 'proxies', 'hosts', 'triggers',
-			'trigger_prototypes', 'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions', 'media_type'
+		$objects += array_fill_keys(['template_groups', 'host_groups', 'templates', 'proxies', 'proxy_groups', 'hosts',
+			'triggers', 'trigger_prototypes', 'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions',
+			'media_type'
 		], []);
 
 		try {
 			self::createTemplateGroups($objects['template_groups']);
 			self::createHostGroups($objects['host_groups']);
 			self::createTemplates($objects['templates']);
+			self::createProxyGroups($objects['proxy_groups']);
 			self::createProxies($objects['proxies']);
 			self::createHosts($objects['hosts']);
 			self::createTriggers($objects['triggers']);
@@ -99,6 +101,8 @@ class CTestDataHelper {
 		}
 		unset($proxy);
 
+		self::convertPropertyReference($proxies, 'proxy_groupid');
+
 		$result = CDataHelper::call('proxy.create', $proxies);
 
 		foreach ($proxies as $proxy) {
@@ -115,6 +119,18 @@ class CTestDataHelper {
 		$proxy += ['operating_mode' => PROXY_OPERATING_MODE_ACTIVE];
 
 		return $proxy;
+	}
+
+	private static function createProxyGroups(array $proxy_groups): void {
+		if (!$proxy_groups) {
+			return;
+		}
+
+		$result = CDataHelper::call('proxygroup.create', $proxy_groups);
+
+		foreach ($proxy_groups as $proxy_group) {
+			self::$objectids['proxy_group'][$proxy_group['name']] = array_shift($result['proxy_groupids']);
+		}
 	}
 
 	/**
@@ -255,6 +271,7 @@ class CTestDataHelper {
 		self::convertPropertyReference($hosts, 'hostid');
 		self::convertPropertyReference($hosts, 'groups.groupid');
 		self::convertPropertyReference($hosts, 'templates.templateid');
+		self::convertPropertyReference($hosts, 'proxy_groupid');
 		self::convertPropertyReference($hosts, 'proxyid');
 	}
 
@@ -840,6 +857,8 @@ class CTestDataHelper {
 		self::convertPropertyReference($user_groups, 'usrgrpid');
 		self::convertPropertyReference($user_groups, 'templategroup_rights.id');
 		self::convertPropertyReference($user_groups, 'hostgroup_rights.id');
+		self::convertPropertyReference($user_groups, 'proxy_groups.proxy_groupid');
+		self::convertPropertyReference($user_groups, 'proxies.proxyid');
 		self::convertPropertyReference($user_groups, 'users.usrgrpid');
 	}
 
@@ -977,6 +996,7 @@ class CTestDataHelper {
 		self::convertPropertyReference($actions, 'operations.opcommand_hst.hostid');
 		self::convertPropertyReference($actions, 'operations.opgroup.groupid');
 		self::convertPropertyReference($actions, 'operations.optemplate.templateid');
+		self::convertPropertyReference($actions, 'filter.conditions.value');
 	}
 
 	public static function createMediatypes(array $mediatypes): void {
@@ -1197,6 +1217,10 @@ class CTestDataHelper {
 
 		if (array_key_exists('proxy', self::$objectids)) {
 			CDataHelper::call('proxy.delete', array_values(self::$objectids['proxy']));
+		}
+
+		if (array_key_exists('proxy_group', self::$objectids)) {
+			CDataHelper::call('proxygroup.delete', array_values(self::$objectids['proxy_group']));
 		}
 
 		if (array_key_exists('template_group', self::$objectids)) {

@@ -37,6 +37,16 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 	const RESOURCE_TYPE_GROUP = 11;
 
 	/**
+	 * Resource type Proxy ID
+	 */
+	private const PROXYID = 1;
+
+	/**
+	 * Resource type Proxy group ID
+	 */
+	private const PROXY_GROUPID = 1;
+
+	/**
 	 * Resource type User group
 	 */
 	const RESOURCE_TYPE_USER = 0;
@@ -51,12 +61,23 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 				],
 				'users' => [
 					'userid' => self::USERID
+				],
+				'proxy_mode' => 1,
+				'proxies' => [
+					'proxyid' => self::PROXYID
+				],
+				'proxy_groups' => [
+					'proxy_groupid' => self::PROXY_GROUPID
 				]
 			]
 		]);
 
 		$resourceid = $create['result']['usrgrpids'][0];
 		$rights = CDBHelper::getRow('SELECT rightid FROM rights WHERE groupid='.zbx_dbstr($resourceid));
+		$proxy = CDBHelper::getRow('SELECT proxyid FROM usrgrp_proxy WHERE usrgrpid='.zbx_dbstr($resourceid));
+		$usrgrp_proxy = CDBHelper::getRow('SELECT usrgrp_proxyid FROM usrgrp_proxy WHERE usrgrpid='.zbx_dbstr($resourceid));
+		$proxy_group = CDBHelper::getRow('SELECT proxy_groupid FROM usrgrp_proxy_group WHERE usrgrpid='.zbx_dbstr($resourceid));
+		$usrgrp_proxy_group = CDBHelper::getRow('SELECT usrgrp_proxy_groupid FROM usrgrp_proxy_group WHERE usrgrpid='.zbx_dbstr($resourceid));
 		$id = CDBHelper::getRow('SELECT id FROM users_groups WHERE usrgrpid='.zbx_dbstr($resourceid));
 
 		$this->assertNotFalse($id, 'User group record expected');
@@ -66,6 +87,13 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 			'usergroup.hostgroup_rights['.$rights['rightid'].']' => ['add'],
 			'usergroup.hostgroup_rights['.$rights['rightid'].'].id' => ['add', '2'],
 			'usergroup.hostgroup_rights['.$rights['rightid'].'].rightid' => ['add', $rights['rightid']],
+			'usergroup.proxy_mode' => ['add', '1'],
+			'usergroup.proxies['.$proxy['proxyid'].']' => ['add'],
+			'usergroup.proxies['.$proxy['proxyid'].'].proxyid' => ['add', '1'],
+			'usergroup.proxies['.$proxy['proxyid'].'].usrgrp_proxyid' => ['add', $usrgrp_proxy['usrgrp_proxyid']],
+			'usergroup.proxy_groups['.$proxy_group['proxy_groupid'].']' => ['add'],
+			'usergroup.proxy_groups['.$proxy_group['proxy_groupid'].'].proxy_groupid' => ['add', '1'],
+			'usergroup.proxy_groups['.$proxy_group['proxy_groupid'].'].usrgrp_proxy_groupid' => ['add', $usrgrp_proxy_group['usrgrp_proxy_groupid']],
 			'usergroup.usrgrpid' => ['add', $resourceid]
 		]);
 
@@ -86,14 +114,16 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 				'usrgrpid' => self::USRGRPID,
 				'users_status' => 1,
 				'debug_mode' => 1,
-				'name' => 'Updated user group name'
+				'name' => 'Updated user group name',
+				'proxy_group_mode' => 1
 			]
 		]);
 
 		$updated = json_encode([
 			'usergroup.users_status' => ['update', '1', '0'],
 			'usergroup.debug_mode' => ['update', '1', '0'],
-			'usergroup.name' => ['update', 'Updated user group name', 'No access to the frontend']
+			'usergroup.name' => ['update', 'Updated user group name', 'No access to the frontend'],
+			'usergroup.proxy_group_mode' => ['update', '1', '0']
 		]);
 
 		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::USRGRPID, self::RESOURCE_TYPE_GROUP);
