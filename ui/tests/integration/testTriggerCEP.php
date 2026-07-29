@@ -1792,6 +1792,22 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Prepare the simple window flavour that applies its operations when the window closes rather than when
+	 * the event occurs, see prepareDataCepWindowOperations().
+	 */
+	public function prepareDataCepWindowSimpleCloseOperations() {
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple close', true);
+	}
+
+	/**
+	 * Prepare the tag correlation window flavour that applies its operations when the window closes rather
+	 * than when the event occurs, see prepareDataCepWindowOperations().
+	 */
+	public function prepareDataCepWindowTagCloseOperations() {
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH, 'tag close', true);
+	}
+
+	/**
 	 * Prepare a windowed flavour of the scenario above: the very same operations, applied by a rule that has a
 	 * $window_type window instead of none. The trigger prototypes are set up exactly as for the windowless
 	 * flavour (so the events carry the same tags), and the operations are the same tag and event operations,
@@ -1809,7 +1825,8 @@ class testTriggerCEP extends CIntegrationTest {
 	 *     processed) uses up the slot and no event ever gets the tag. A matrix of tag correlation rules could
 	 *     therefore never tag one event more than once, which is why the operator rules stay windowless.
 	 */
-	private function prepareDataCepWindowOperations(int $window_type, string $name_infix) {
+	private function prepareDataCepWindowOperations(int $window_type, string $name_infix,
+			bool $on_window_close = false) {
 		$this->prepareCloseOnUpTriggerPrototypes(array_merge(
 			[['tag' => self::CEP_SERVICE_TAG, 'value' => '']],
 			$this->getWindowNoneTagOperationTriggerTags()
@@ -1819,18 +1836,39 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->deleteCepCorrelations();
 		$this->deleteCepRules();
 
-		$window = $this->buildWindowOperationsWindow();
+		$window = $this->buildWindowOperationsWindow(!$on_window_close);
 		$name = self::CEP_RULE_NAME_PREFIX.'window '.$name_infix.' ';
 
 		// Both operation sets in one rule: with a window there is no second rule to run them from.
-		$operations = $this->buildWindowNoneOperations(array_merge(
+		$operation_pairs = array_merge(
 			$this->getWindowNoneTagOperationOperations(),
 			$this->getWindowNoneEventOperationCase()['operations']
-		));
+		);
+
+		if ($on_window_close) {
+			// Nothing closes a window on its own when its duration runs out - the events that stayed in it
+			// longer than that are evicted instead - so the rule turns the first of those evictions into a
+			// close, and every other operation of it runs on what the window still holds at that point.
+			$operations = array_merge(
+				$this->buildWindowNoneOperations([[CCepRuleHelper::OP_CLOSE_WINDOW, []]],
+					CCepRuleHelper::WHEN_EVENT_EVICTED
+				),
+				$this->buildWindowNoneOperations($operation_pairs, CCepRuleHelper::WHEN_WINDOW_CLOSED)
+			);
+		}
+		else {
+			$operations = $this->buildWindowNoneOperations($operation_pairs);
+		}
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name.'operations', [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
 		));
+
+		if ($on_window_close) {
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			return true;
+		}
 
 		// The second rule of the same window type, matching the same events: whether it gets its turn is what
 		// the flavours differ in. The higher sortorder makes it the second one either way.
@@ -2453,18 +2491,21 @@ HEREDOC;
 	}
 
 	/**
-	 * The window the windowed flavours of the scenario give their rules, the same for both window types:
-	 * grouped by the 'service' tag, so every id the scenario sends gets a window of its own.
+	 * The window the windowed flavours of the scenario give their rules, the same for both window types.
+	 *
+	 * $group_by_service puts every 'service' id in a window of its own, which is what the flavours acting when
+	 * the event occurs use. The flavours acting when the window closes group by nothing instead, so all their
+	 * events share one window: closing a window applies its operations to the events still in it, and a window
+	 * holding a single event would have nothing left to apply them to once that event triggered the close.
 	 */
-	private function buildWindowOperationsWindow(): array {
+	private function buildWindowOperationsWindow(bool $group_by_service = true): array {
 		return [
 			'duration' => self::CEP_RULE_WINDOW_OPS_DURATION,
 			'capacity' => 0,
 			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
 			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
-			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
-			'tags' => ['service']
-		];
+			'group_by_tags' => $group_by_service ? CCepRuleHelper::GROUP_BY_YES : CCepRuleHelper::GROUP_BY_NO
+		] + ($group_by_service ? ['tags' => ['service']] : []);
 	}
 
 	/**
@@ -3044,17 +3085,18 @@ HEREDOC;
 	}
 
 	/**
-	 * Turn a list of [operation type, operation parameters] pairs into the operation list of a windowless
-	 * rule: every operation executes when the event occurs and is numbered in the order it is listed, which is
-	 * the order the server executes them in (operations of a rule run in sortorder).
+	 * Turn a list of [operation type, operation parameters] pairs into the operation list of a rule: every
+	 * operation executes at $execute_when and is numbered in the order it is listed, which is the order the
+	 * server executes them in (operations of a rule run in sortorder).
 	 */
-	private function buildWindowNoneOperations(array $operations): array {
+	private function buildWindowNoneOperations(array $operations,
+			int $execute_when = CCepRuleHelper::WHEN_EVENT_OCCURRED): array {
 		$result = [];
 
 		foreach ($operations as [$type, $params]) {
 			$result[] = [
 				'sortorder' => count($result),
-				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'execute_when' => $execute_when,
 				'type' => $type
 			] + $params;
 		}
@@ -5772,6 +5814,43 @@ HEREDOC;
 	}
 
 	/**
+	 * The same operations as testTriggerCEP_CepWindowSimpleOperations, but applied when the window closes
+	 * instead of when the event occurs. A window is not closed by its duration running out on its own - the
+	 * events that outstayed it are evicted - so the rule turns the first eviction into a close, and the
+	 * operations then run on the events the window still holds. All three ids therefore share one window, and
+	 * exactly one event must come out untouched: the one that was evicted to trigger the close.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseOperations$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseOperations() {
+		$this->prepareDataCepWindowSimpleCloseOperations();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseOperations();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same as testTriggerCEP_CepWindowSimpleCloseOperations with a tag correlation window: its events must
+	 * end up in the same state, showing the window close operations do not depend on the window type.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseOperations$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseOperations() {
+		$this->prepareDataCepWindowTagCloseOperations();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseOperations();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
 	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
@@ -7054,6 +7133,159 @@ HEREDOC;
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 		$this->waitForNoOpenProblems($all, 'After the windowed operations recovery value');
+	}
+
+	/**
+	 * Drive a windowed flavour whose operations run when the window closes. All three ids share one window
+	 * here, so once its duration has run out the event that has been in it longest is evicted - which is what
+	 * the rule turns into a close - and the operations are applied to the events the window still holds.
+	 *
+	 * Exactly one of the three events must therefore come out untouched (the evicted one, which only triggered
+	 * the close) and the other two with the full operation state. Which one is evicted is not asserted: the
+	 * events are seconds apart, but nothing guarantees the order the CEP workers put them in the window, so
+	 * the check only requires the split to be one and two.
+	 */
+	private function runEventAssessmentTestCepWindowCloseOperations(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the window close operations test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$problem_count = 0;
+
+		foreach ([self::CEP_RULE_WINDOW_NONE_SERVICE, self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT,
+				self::CEP_RULE_WINDOW_NONE_SERVICE_LAST] as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, ++$problem_count);
+			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		}
+
+		// Nothing has been applied to the events yet - the operations only run once the window closes, which
+		// takes until its duration has run out.
+		$this->waitForCepWindowCloseOperations($triggerid);
+
+		$this->waitForCepWindowNoneUnsuppressed($triggerid);
+
+		// As in the other flavours, a value matching neither "down" nor "up" recovers the trigger and closes
+		// every problem left open.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the window close operations recovery value');
+	}
+
+	/**
+	 * Wait until the operations of a window close flavour have been applied: of the three problem events, two
+	 * must carry the state the operations produce - the same state every event of the other flavours ends up
+	 * with - and one must be exactly as the trigger generated it, because it was evicted to close the window
+	 * and left the window before the operations ran.
+	 *
+	 * The untouched state is derived from the operation expectations: every tag an operation would have added
+	 * must be missing, and every tag the operation would have changed, renamed or removed must still hold the
+	 * value the trigger gave it.
+	 */
+	private function waitForCepWindowCloseOperations(int $triggerid): void {
+		$operated = $this->getWindowNoneTagOperationResults();
+		$event_results = $this->getWindowNoneEventOperationCase()['expected'];
+		$trigger_values = array_column($this->getWindowNoneTagOperationTriggerTags(), 'value', 'tag');
+
+		$untouched = [];
+		foreach ($operated as $tag => $value) {
+			$untouched[$tag] = array_key_exists($tag, $trigger_values) ? $trigger_values[$tag] : null;
+		}
+
+		$this->callUntilDataIsPresent('event.get', [
+			'objectids' => [$triggerid],
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'filter' => ['value' => TRIGGER_VALUE_TRUE],
+			'output' => ['eventid', 'name', 'severity', 'suppressed'],
+			'selectTags' => 'extend'
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+			function ($response) use ($operated, $untouched, $event_results) {
+				if (count($response['result']) !== 3) {
+					return 'expected 3 problem event(s), got '.count($response['result']);
+				}
+
+				$untouched_num = 0;
+
+				foreach ($response['result'] as $event) {
+					$tags = array_column($event['tags'], 'value', 'tag');
+					$info = 'event '.$event['eventid'].' ('.$event['name'].') tags '.json_encode($event['tags']);
+
+					if (!array_key_exists('service', $tags)) {
+						return $info.': no "service" tag';
+					}
+
+					// An event the operations ran on is renamed; one they did not is still named by the
+					// trigger, after the item value it was generated from.
+					$is_untouched = $event['name'] !== $event_results['name'];
+
+					if ($is_untouched) {
+						$untouched_num++;
+
+						$expected_name = 'CEP trigger '.self::COMPONENT_VALUE.' down_'.$tags['service'];
+
+						if ($event['name'] !== $expected_name) {
+							return $info.': name "'.$event['name'].'", expected either the name the'
+								.' operations set or the trigger\'s own "'.$expected_name.'"';
+						}
+
+						if ((int) $event['severity'] !== TRIGGER_SEVERITY_DISASTER) {
+							return $info.': severity '.$event['severity'].', expected the trigger\'s '
+								.TRIGGER_SEVERITY_DISASTER.' on an event the operations did not run on';
+						}
+
+						if ((int) $event['suppressed'] === 1) {
+							return $info.': suppressed, but the operations did not run on this event';
+						}
+					}
+					else {
+						if ((int) $event['severity'] !== $event_results['severity']) {
+							return $info.': severity '.$event['severity'].', expected '
+								.$event_results['severity'].' from the event operations';
+						}
+
+						if (((int) $event['suppressed'] === 1) !== $event_results['suppressed']) {
+							return $info.': suppressed '.$event['suppressed'].', expected '
+								.($event_results['suppressed'] ? 1 : 0).' from the event operations';
+						}
+					}
+
+					foreach ($is_untouched ? $untouched : $operated as $tag => $value) {
+						if ($value === null) {
+							if (array_key_exists($tag, $tags)) {
+								return $info.': unexpected "'.$tag.'" tag';
+							}
+						}
+						elseif (!array_key_exists($tag, $tags)) {
+							return $info.': missing "'.$tag.'" tag';
+						}
+						elseif ($tags[$tag] !== $value) {
+							return $info.': "'.$tag.'" tag value "'.$tags[$tag].'", expected "'.$value.'"';
+						}
+					}
+				}
+
+				if ($untouched_num !== 1) {
+					return 'expected exactly one event to have been evicted without the operations running on'
+						.' it, got '.$untouched_num;
+				}
+
+				return true;
+			}
+		);
 	}
 
 	/**
