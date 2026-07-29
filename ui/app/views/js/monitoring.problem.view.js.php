@@ -95,7 +95,7 @@
 				filter.to = this.#global_timerange.to;
 			}
 
-			this.#datatable = new CDataTable(document.getElementById('problems'), data_provider)
+			this.#datatable = new CDataTable(document.getElementById('datatable-problems'), data_provider)
 				.setColumns([
 					new CDataTableColumn('time', <?= json_encode(_('Time')); ?>)
 						.setColumnOptions({
@@ -470,7 +470,7 @@
 					table_stats.textContent = paging;
 
 					const paging_container = document.createElement('div');
-					paging_container.classList.add(ZBX_STYLE_PAGING_BTN_CONTAINER);
+					paging_container.classList.add(ZBX_STYLE_PAGER_CONTAINER);
 					paging_container.appendChild(table_stats);
 
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
