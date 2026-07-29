@@ -304,8 +304,8 @@ abstract class CController {
 	/**
 	 * Validate input using CFormValidator.
 	 *
-	 * @param array    $validation_rules  Validation rules.
-	 * @param bool     $global_errors     Add validation errors as global errors.
+	 * @param array $validation_rules  Validation rules.
+	 * @param bool  $global_errors     Add validation errors as global errors.
 	 *
 	 * @return bool
 	 */
