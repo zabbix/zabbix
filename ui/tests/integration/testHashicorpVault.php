@@ -282,8 +282,9 @@ class testHashicorpVault extends CIntegrationTest {
 		], self::VAULT_ROOT_TOKEN);
 		self::$static_token = $token['body']['auth']['client_token'];
 
-		// Host and trapper item used to prove that the server (started with Vault-sourced DB
-		// credentials) actually has a working configuration cache and database connection.
+		// Create a host and trapper item. They will be used only to prove that the server was
+		// successfully started with Vault-sourced DB credentials and is accepting the trapper item.
+		// The trapper item is not related to testing of vault secret macro resolution.
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME,
 			'interfaces' => [],
@@ -316,10 +317,8 @@ class testHashicorpVault extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('hostmacroids', $response['result']);
 
-		// A script item that surfaces the macro's resolved value as its own history value: the macro
-		// is substituted into "parameters" before the script runs, exposed to it as the JSON-encoded
-		// "value" variable. This is the only externally observable side effect of the macro actually
-		// having been resolved, since the API never returns the resolved value of a Vault macro.
+		// Create a script item that shows the macro's resolved secret value in the script's parameters.
+		// Polling item history will allow to test is it resolved to expected value.
 		$response = $this->call('item.create', [
 			'hostid' => self::$hostid,
 			'name' => self::VAULT_MACRO_ITEM_KEY,
@@ -370,6 +369,9 @@ class testHashicorpVault extends CIntegrationTest {
 	 * @configurationDataProvider tokenAuthenticationConfigurationProvider
 	 */
 	public function testHashicorpVault_tokenAuthentication() {
+		// tokenAuthenticationConfigurationProvider() function prepared server configuration
+		// where DB credentials are obtained from vault with VaultToken. So, if server starts
+		// and accepts a trapper item the test passes.
 		$this->assertServerIsOperational();
 	}
 
@@ -421,6 +423,9 @@ class testHashicorpVault extends CIntegrationTest {
 	 * @configurationDataProvider appRoleAuthenticationConfigurationProvider
 	 */
 	public function testHashicorpVault_appRoleAuthentication() {
+		// appRoleAuthenticationConfigurationProvider() function prepared server configuration
+		// where DB credentials are obtained from vault with VaultAppRoleID/VaultAppSecretID.
+		// So, if server starts and accepts a trapper item the test passes.
 		$this->assertServerIsOperational();
 	}
 
@@ -429,6 +434,8 @@ class testHashicorpVault extends CIntegrationTest {
 	 * @configurationDataProvider appRoleAuthenticationConfigurationProvider
 	 */
 	public function testHashicorpVault_appRoleReLoginAfterTokenRevocation() {
+		// appRoleAuthenticationConfigurationProvider() function prepared server configuration
+		// where DB credentials are obtained from vault with VaultAppRoleID/VaultAppSecretID.
 		// Confirm the server is up and running with the token obtained on the initial AppRole login.
 		$this->assertServerIsOperational();
 
@@ -458,6 +465,9 @@ class testHashicorpVault extends CIntegrationTest {
 		// be able to serve requests.
 		$this->assertServerIsOperational();
 	}
+
+	// Tests with various invalid configurations. The server is expected to start and
+	// immediately stop with error logged.
 
 	public function testHashicorpVault_missingTokenAndAppRoleId() {
 		$this->startServerAndExpectVaultError([
