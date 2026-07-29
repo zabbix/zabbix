@@ -73,6 +73,7 @@ EXPR_DEPS = \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(XML_DEPS) \
 	$(JSON_DEPS) \
+	$(VARIANT_DEPS) \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
