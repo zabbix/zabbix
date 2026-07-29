@@ -588,8 +588,7 @@ static void	cep_manager_unblock_commit_task(zbx_cep_manager_t *manager, zbx_cep_
  *                                                                            *
  * Return value: SUCCEED - task was queued for commit or blocked pending      *
  *                         dependencies                                       *
- *               FAIL - task was not queued, either because it is a remote    *
- *                      or commit task, or event blocking failed              *
+ *               FAIL - task was not queued for commit                        *
  *                                                                            *
  ******************************************************************************/
 static int	cep_manager_commit_task(zbx_cep_manager_t *manager, zbx_mw_task_t *task)
@@ -624,6 +623,8 @@ static int	cep_manager_commit_task(zbx_cep_manager_t *manager, zbx_mw_task_t *ta
 			break;
 		case CEP_TASK_RULE_ERROR:
 			break;
+		case CEP_TASK_WINDOW:
+			return FAIL;
 	}
 
 	if (0 == ((zbx_cep_task_t *)task)->blockers)
