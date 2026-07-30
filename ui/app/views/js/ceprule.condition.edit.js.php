@@ -153,4 +153,12 @@ window.ceprule_condition_edit_popup = new class {
 			field.querySelector('input').disabled = !is_visible;
 		});
 	}
+
+	submit() {
+		const fields = this.form.getAllValues();
+
+		return new Promise((resolve, reject) => this.form.validateSubmit(fields)
+			.then(result => result && resolve(fields) || reject(fields))
+		);
+	}
 };

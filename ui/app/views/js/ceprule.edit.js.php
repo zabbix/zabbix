@@ -520,28 +520,16 @@ window.ceprule_edit_popup = new class {
 				{
 					title: is_new ? t('Add') : t('Update'),
 					isSubmit: true,
-					action: (overlay) => {
-						const form = ceprule_condition_edit_popup.form;
-						const fields = form.getAllValues();
-
-						form.validateSubmit(fields)
-							.then((result) => {
-								if (!result) {
-									overlay.unsetLoading();
-									return;
-								}
-
-								overlayDialogueDestroy(overlay.dialogueid);
-
-								is_new && this.#addConditionRow(fields) || this.#editConditionRow(fields);
-								is_new && (this.#condition_row_index++);
-
-								this.form.discoverAllFields();
-								this.form_element.dispatchEvent(new Event('filter.change'));
-							});
-
-						return false;
-					}
+					action: overlay => ceprule_condition_edit_popup.submit()
+						.then(fields => {
+							is_new && this.#addConditionRow(fields) || this.#editConditionRow(fields);
+							is_new && (this.#condition_row_index++);
+							this.form.discoverAllFields();
+							this.form_element.dispatchEvent(new Event('filter.change'));
+						})
+						.then(() => overlayDialogueDestroy(overlay.dialogueid))
+						.catch(() => overlay.unsetLoading())
+						&& false
 				},
 				{
 					title: t('Cancel'),
