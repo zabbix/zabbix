@@ -165,6 +165,11 @@ class testTriggerCEP extends CIntegrationTest {
 	// How long the windows of those flavours stay open. The evicted flavours wait for it to run out before
 	// their operations run, so it is kept short.
 	const CEP_RULE_WINDOW_OPS_DURATION = '3s';
+	// The event pattern match flavour (see prepareDataCepWindowPattern()) is driven by a script instead: the
+	// window runs it over its events once a second and, when it reports a match, the operations of the rule
+	// are applied to the events the window holds. The only operations that execution point allows are the two
+	// that copy an event, so the match is observed through the copies appearing.
+	const CEP_RULE_WINDOW_PATTERN_EVENTS = 3;
 	// The cause and symptom flavour (see prepareDataCepWindowCauseSymptom()) needs neither: its window does its
 	// work as the events arrive, ranking the first event of a group as the cause of the ones that follow. The
 	// count of those is kept in a tag of the cause event, which only this window type has.
@@ -1896,6 +1901,71 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams($name.'second', [],
 			$second_operations, CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, $window
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the event pattern match flavour: a window that hands its events to a script once a second and
+	 * acts when the script reports a match.
+	 *
+	 * The script matches as soon as the window holds CEP_RULE_WINDOW_PATTERN_EVENTS events that the rule did
+	 * not create itself. That last part matters: the operations of this execution point copy an event, and a
+	 * copy is an event of its own that the rule matches again and that lands in the same window - without the
+	 * guard the pattern would match again, copy again, and never stop. The copies are recognised by the
+	 * is_copied property the script sees on them.
+	 *
+	 * The operations are "copy first" and "copy last", the only ones besides discarding that a pattern match
+	 * may perform. They run for every event of the window but each one acts only on the event at its end of
+	 * it, so a match leaves two new events behind: a copy of the oldest and a copy of the newest.
+	 *
+	 * The window groups by the 'component' tag, so all the events of the driven trigger form one group, and it
+	 * outlasts the test with no capacity limit so nothing is evicted while the pattern is being collected.
+	 */
+	public function prepareDataCepWindowPattern() {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// Only the copies may change what is open; nothing else may close a problem.
+		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
+
+		$events_num = self::CEP_RULE_WINDOW_PATTERN_EVENTS;
+		$script = <<<HEREDOC
+var events = cep_get_events(), originals = 0, copies = 0;
+
+for (var i = 0; i < events.length; i++) {
+	if (events[i].is_copied) {
+		copies++;
+	}
+	else {
+		originals++;
+	}
+}
+
+return (originals >= $events_num && copies === 0) ? 'true' : 'false';
+HEREDOC;
+
+		$window = [
+			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
+			'capacity' => 0,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => ['component'],
+			'script' => $script
+		];
+
+		$operations = $this->buildWindowNoneOperations([
+			[CCepRuleHelper::OP_COPY_FIRST, []],
+			[CCepRuleHelper::OP_COPY_LAST, []]
+		], CCepRuleHelper::WHEN_PATTERN_MATCHED);
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(
+			self::CEP_RULE_NAME_PREFIX.'window pattern match', [], $operations, CONDITION_EVAL_TYPE_AND, '',
+			CCepRuleHelper::WINDOW_PATTERN_MATCH, $window
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -6140,6 +6210,30 @@ HEREDOC;
 	}
 
 	/**
+	 * Event pattern match: the window runs a script over its events once a second, and when the script reports
+	 * a match the rule copies the oldest and the newest event of the window. Three values are sent into one
+	 * group, so the match produces two more problems - copies carrying the tags of the events they were made
+	 * from - which is how the match is observed, since copying is one of only two things this execution point
+	 * can do.
+	 *
+	 * The copies enter the same window, so the script counts them apart from the events it was sent: without
+	 * that the pattern would match its own output over and over. The totals staying at five is what shows it
+	 * does not.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternMatch$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternMatch() {
+		$this->prepareDataCepWindowPattern();
+
+		try {
+			$this->runEventAssessmentTestCepWindowPattern();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * A simple window that overflows instead of expiring: it has room for one event and lasts longer than the
 	 * test, so every event after the first one is evicted the moment it arrives, and the rule closes what it
 	 * evicts. The "up" value at the end also closes the window, which closes the one problem the window was
@@ -7952,6 +8046,66 @@ HEREDOC;
 
 			return true;
 		});
+	}
+
+	/**
+	 * Drive the event pattern match flavour. The three values fill one window; as soon as the script sees that
+	 * many events it reports a match and the rule copies the oldest and the newest of them, so two more
+	 * problems appear without any value having been sent for them.
+	 *
+	 * A copy carries the tags of the event it was made from, which is what identifies it: the id of the first
+	 * value and the id of the last one end up with two problem events each, the id in between with one. The
+	 * copies land in the same window, and the script counts them separately for exactly that reason - the
+	 * pattern must not match a second time, so the totals have to stay where they are.
+	 */
+	private function runEventAssessmentTestCepWindowPattern(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the event pattern match test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$first = self::CEP_RULE_WINDOW_NONE_SERVICE;
+		$middle = self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT;
+		$last = self::CEP_RULE_WINDOW_NONE_SERVICE_LAST;
+
+		// The pattern needs this many events, so nothing may be copied before the last of them arrives.
+		$this->assertEquals(3, self::CEP_RULE_WINDOW_PATTERN_EVENTS,
+			'The pattern script and this scenario must agree on how many events make a match.');
+
+		$open = 0;
+
+		foreach ([$first, $middle, $last] as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, ++$open);
+			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		}
+
+		// The match copies the oldest and the newest event of the window, so those two ids have two problem
+		// events each while the one in between still has the single one it was sent for.
+		$this->waitForProblemEventCountByTag($all, 'service', $first, 2);
+		$this->waitForProblemEventCountByTag($all, 'service', $last, 2);
+		$this->waitForProblemEventCountByTag($all, 'service', $middle, 1);
+
+		// Five problems in total, and they stay five: the copies are in the window too, and the script must
+		// not take them for a new pattern.
+		$this->waitForOpenProblemCount($all, $open + 2);
+		$this->waitForAllTriggerEventCounts($all, $open + 2);
+
+		// Nothing in this flavour closes a problem, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the event pattern match recovery value');
 	}
 
 	/**
