@@ -43,16 +43,14 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions', 'Description']);
 		$this->zbxTestClickButtonText('Create regular expression');
 
-		$this->zbxTestCheckTitle('Configuration of regular expressions');
-		$this->zbxTestCheckHeader('Regular expressions');
-		$this->zbxTestLaunchOverlayDialog('New regular expression');
-		$this->zbxTestTextPresent('Name');
-		$this->zbxTestTextPresent('Expressions');
-		$this->zbxTestTextPresent('Description');
-		$this->zbxTestTextPresent('Test expression');
-		$this->zbxTestAssertElementPresentId('name');
-		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='name']", "maxlength", 128);
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
+		$this->assertEquals('New regular expression', $dialog->getTitle());
+		$this->assertEquals(['Name', 'Expressions', 'Description', 'Test expression'],
+				$form->getLabels(CElementFilter::VISIBLE)->asText()
+		);
 
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='name']", "maxlength", 128);
 		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='expressions_0_expression']", "maxlength", 2048);
 
 		$this->zbxTestDropdownHasOptions('expressions_0_expression_type', [
@@ -64,7 +62,6 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 			]);
 
 		$this->zbxTestAssertAttribute("//textarea[@id='description']", "maxlength", 65535);
-
 		$this->zbxTestAssertAttribute("//textarea[@id='test-string']", "maxlength", 65535);
 	}
 
@@ -150,12 +147,11 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 
-		$this->zbxTestClickButtonText('Test');
-		$this->query('xpath://table[@id="regular-expressions-table"]//td[@class="js-expression-result nowrap green"]')
-				->waitUntilVisible()->one();
-		$this->zbxTestTextPresent('TRUE');
-		$this->query('xpath://div[@class="form-grid"]//span[@class="green"]')->waitUntilVisible()->one();
-		$this->zbxTestTextPresent('TRUE');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->query('button:Test')->one()->click();
+		$this->assertEquals('TRUE', $dialog->query('xpath://table[@id="regular-expressions-table"]'.
+				'//td[@class="js-expression-result nowrap green"]')->waitUntilVisible()->one()->getText());
+		$this->assertEquals('TRUE', $dialog->asForm()->getField('Combined result')->getText());
 	}
 
 	public function testFormAdministrationGeneralRegexp_TestFalse() {
@@ -163,14 +159,13 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 
-		$this->query('id:regexp-form')->waitUntilVisible()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->query('id:regexp-form')->waitUntilVisible()->one();
 		$this->zbxTestInputType('test-string', 'abcdef');
-		$this->zbxTestClickButtonText('Test');
-		$this->query('xpath://table[@id="regular-expressions-table"]//td[@class="js-expression-result nowrap red"]')
-				->waitUntilVisible()->one();
-		$this->zbxTestTextPresent('FALSE');
-		$this->query('xpath://div[@class="form-grid"]//span[@class="red"]')->waitUntilVisible()->one();
-		$this->zbxTestTextPresent('FALSE');
+		$dialog->query('button:Test')->one()->click();
+		$this->assertEquals('FALSE', $dialog->query('xpath://table[@id="regular-expressions-table"]'.
+				'//td[@class="js-expression-result nowrap red"]')->waitUntilVisible()->one()->getText());
+		$this->assertEquals('FALSE', $dialog->asForm()->getField('Combined result')->getText());
 	}
 
 	public function testFormAdministrationGeneralRegexp_Clone() {
@@ -184,7 +179,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->assertMessage(TEST_GOOD, 'Regular expression added');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->cloned_regexp).' AND r.regexpid=e.regexpid';
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Cloned regular expression does not exist in the DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Cloned regular expression does not exist in the DB');
 	}
 
 	public function testFormAdministrationGeneralRegexp_Update() {
@@ -192,13 +187,13 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 
-		$this->query('id:regexp-form')->waitUntilVisible()->one();
-		$this->query('id:name')->one()->fill($this->regexp.'2');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->asForm()->fill(['Name' => $this->regexp.'2']);
 		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Regular expression updated');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->regexp.'2').' AND r.regexpid=e.regexpid';
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Regexp name has not been changed in the DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Regexp name has not been changed in the DB');
 	}
 
 	public function testFormAdministrationGeneralRegexp_Delete() {
@@ -206,18 +201,19 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkTextWait($this->regexp2);
 
-		$this->zbxTestClickXpathWait('//button[contains(@class,"js-delete")]');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted');
 		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
 
 		$sql = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($this->regexp2);
-		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Regexp has not been deleted from the DB');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.regexpid=e.regexpid and r.name='.zbx_dbstr($this->regexp2);
 
 		// this check will fail as at this moment expressions are not deleted when deleting related regexp
-		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Regexp expressions has not been deleted from the DB');
 	}
 
 	public function testFormAdministrationGeneralRegexp_DeleteAll() {
@@ -231,9 +227,9 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Regular expressions deleted');
 
 		$sql = 'SELECT * FROM regexps';
-		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Regexp has not been deleted from the DB');
 
 		$sql = 'SELECT * FROM expressions';
-		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Regexp expressions has not been deleted from the DB');
 	}
 }
