@@ -83,7 +83,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'Name' => ['maxlength' => 255],
 			'Type' => ['value' => 'Zabbix agent', 'options' => ['Zabbix agent', 'Zabbix agent (active)', 'Simple check',
 				'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check', 'Database monitor', 'HTTP agent',
-				'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'Script', 'Browser', 'Nested']
+				'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'Script', 'Browser']
 			],
 			'Key' => ['maxlength' => 2048],
 			'URL' => ['maxlength' => 2048],
@@ -161,6 +161,9 @@ class testLowLevelDiscovery extends CWebTest {
 
 		if (static::$context === 'template') {
 			unset($fields['Host interface']);
+
+			// LLD rule type "Nested" is available only on LLD rules in templates and discovered hosts.
+			$fields['Type']['options'] = array_merge($fields['Type']['options'], ['Nested']);
 		}
 
 		$this->checkFieldsParameters($fields);
