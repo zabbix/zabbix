@@ -81,8 +81,10 @@ class CDashboardElement extends CElement {
 			$widget = $query->asWidget()->one($should_exist);
 		}
 		catch (NoSuchElementException $exception) {
-			// A Clock widget without a custom name shows its time type (Local/Server/Host time) as the header, which
-			// can flicker while it loads, so the lookup by header text can miss it. Wait for it again and retry.
+			/*
+			 * A Clock widget without a custom name shows its time type (Local/Server/Host time) as the header,
+			 * which can flicker while it loads, so the lookup by header text can miss it. Wait for it and retry.
+			 */
 			$query->waitUntilPresent();
 			$widget = $query->asWidget()->one($should_exist);
 		}
