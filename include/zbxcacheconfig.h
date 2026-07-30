@@ -1290,7 +1290,7 @@ typedef struct
 	zbx_uint64_t			eventid;		/* [IN] eventid */
 	zbx_uint64_t			r_eventid;		/* [-] recovery eventid */
 	zbx_uint64_t			triggerid;		/* [-] triggerid */
-	char				*event_name;
+	char				*event_name;		/* [IN] event/problem name */
 	zbx_vector_uint64_t		hostids;		/* [-] associated hostids */
 	zbx_vector_uint64_t		functionids;		/* [IN] associated functionids */
 	zbx_vector_tags_ptr_t		tags;			/* [IN] event tags */

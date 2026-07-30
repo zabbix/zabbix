@@ -419,7 +419,7 @@ static void	db_get_query_events(zbx_vector_event_suppress_query_ptr_t *event_que
 			size_t	sql_alloc = 0, sql_offset = 0;
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select e.eventid,e.objectid,er.r_eventid,%s"
+					"select e.eventid,e.objectid,er.r_eventid,e.name,%s"
 					" from events e"
 					" left join event_recovery er"
 						" on e.eventid=er.eventid"

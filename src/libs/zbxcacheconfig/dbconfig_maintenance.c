@@ -44,13 +44,23 @@ void	zbx_host_maintenance_diff_free(zbx_host_maintenance_diff_t *hmd)
 	zbx_free(hmd);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Removes maintenance from maintences vector for specific trigger.  *
+ *          Removes entry from maintenances_for_triggers configuration cache  *
+ *          if last maintenance was removed from vector.                      *
+ *                                                                            *
+ * Parameter: maintenances_for_trigger - [IN]                                 *
+ *            maintenance              - [IN]                                 *
+ *                                                                            *
+ ******************************************************************************/
 static void	remove_maintenance_for_trigger(zbx_dc_maintenances_for_trigger_t *maintenances_for_trigger,
 		zbx_dc_maintenance_t	*maintenance)
 {
 	int	idx;
 
 	if (FAIL != (idx = zbx_vector_dc_maintenance_ptr_bsearch(&maintenances_for_trigger->maintenances, maintenance,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
 		zbx_vector_dc_maintenance_ptr_remove(&maintenances_for_trigger->maintenances, idx);
 
@@ -140,6 +150,7 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
 			continue;
 
 		zbx_hashset_iter_reset(&config->maintenances_for_triggers, &iter);
+
 		while (NULL != (maintenances_for_trigger = (zbx_dc_maintenances_for_trigger_t *)zbx_hashset_iter_next(
 				&iter)))
 		{
@@ -318,6 +329,7 @@ void	DCsync_maintenance_eventnames(zbx_dbsync_t *sync)
 			break;
 
 		ZBX_STR2UINT64(maintenanceid, row[1]);
+
 		if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
 				&maintenanceid)))
 		{
@@ -663,6 +675,14 @@ void	DCsync_maintenance_triggers(zbx_dbsync_t *sync)
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
 
+		ZBX_STR2UINT64(maintenanceid, row[1]);
+
+		if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
+				&maintenanceid)))
+		{
+			continue;
+		}
+
 		ZBX_STR2UINT64(triggerid, row[0]);
 
 		if (NULL == maintenances_for_trigger || maintenances_for_trigger->triggerid != triggerid)
@@ -682,14 +702,6 @@ void	DCsync_maintenance_triggers(zbx_dbsync_t *sync)
 					config->maintenances.mem_malloc_func, config->maintenances.mem_realloc_func,
 					config->maintenances.mem_free_func);
 			}
-		}
-
-		ZBX_STR2UINT64(maintenanceid, row[1]);
-
-		if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
-				&maintenanceid)))
-		{
-			continue;
 		}
 
 		idx = zbx_vector_dc_maintenance_ptr_nearestindex(&maintenances_for_trigger->maintenances,

@@ -3855,7 +3855,7 @@ int	zbx_dbsync_compare_maintenance_triggers(zbx_dbsync_t *sync)
 	zbx_dcsync_sql_start(sync);
 
 	if (NULL == (result = zbx_db_select(
-			"select triggerid, maintenanceid"
+			"select triggerid,maintenanceid"
 			" from maintenance_trigger"
 			" order by triggerid")))
 	{
