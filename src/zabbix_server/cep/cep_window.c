@@ -801,7 +801,7 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
+#include "zbxlog.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: attempt to add event to parrent match window, triggering          *
@@ -819,7 +819,7 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 	zbx_cep_window_t	*window;
 	char			*error = NULL;
 	zbx_uint64_t		opmask = 0;
-
+zbx_set_log_level(LOG_LEVEL_DEBUG);
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
 	cep_window_pool_acquire(&pool);
@@ -872,6 +872,7 @@ out:
 	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zbx_set_log_level(LOG_LEVEL_WARNING);
 }
 
 /******************************************************************************
@@ -975,7 +976,7 @@ static int	cep_window_js_prepare(zbx_cep_window_t *window, zbx_es_t *es, char **
 
 	return SUCCEED;
 }
-
+#include "zbxlog.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: run cep window js pattern-match script and execute resulting ops  *
@@ -995,7 +996,7 @@ void	cep_window_js_process(zbx_cep_window_t *window, zbx_vector_mw_task_ptr_t *t
 	zbx_cep_rule_t		*rule;
 	int			ret, limit_update, duration, capacity;
 	zbx_uint64_t		opmask = 0;
-
+zbx_set_log_level(LOG_LEVEL_DEBUG);
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
 	zbx_es_init(&es);
@@ -1078,6 +1079,7 @@ out:
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zbx_set_log_level(LOG_LEVEL_WARNING);
 }
 
 /******************************************************************************

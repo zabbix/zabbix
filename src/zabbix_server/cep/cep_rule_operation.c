@@ -890,7 +890,7 @@ static int	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_
 
 	return ret;
 }
-
+#include "zbxlog.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: execute a valid operation on a matching event                     *
@@ -917,7 +917,7 @@ static int	cep_operation_event_execute(const zbx_cep_operation_t *op, int execut
 		zbx_cep_event_t **event)
 {
 	int	ret = FAIL;
-
+	zbx_set_log_level(LOG_LEVEL_DEBUG);
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64 " type:%d", __func__, op->operationid, op->type);
 
 	if (SUCCEED != cep_operation_match_event(op, ctx))
@@ -1004,7 +1004,7 @@ static int	cep_operation_event_execute(const zbx_cep_operation_t *op, int execut
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
+zbx_set_log_level(LOG_LEVEL_WARNING);
 	return ret;
 }
 
@@ -1035,6 +1035,7 @@ zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_
 
 	for (int i = 0; i < rule->operations.values_num; i++)
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "rule->operations.values[i].execute_when:%d when %d", rule->operations.values[i].execute_when, execute_when);
 		if (rule->operations.values[i].execute_when == execute_when)
 		{
 			if (SUCCEED == cep_operation_event_execute(&rule->operations.values[i], execute_when,

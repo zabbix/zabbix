@@ -169,6 +169,13 @@ class testTriggerCEP extends CIntegrationTest {
 	// window runs it over its events once a second and, when it reports a match, the operations of the rule
 	// are applied to the events the window holds. The only operations that execution point allows are the two
 	// that copy an event, so the match is observed through the copies appearing.
+	// The service scenario (see prepareDataCepServiceTag()): a service that is in problem for as long as an
+	// event carries CEP_SERVICE_TAG_NAME, a tag no trigger produces and only the CEP rule adds and takes away
+	// again. The service status therefore follows the tag rather than the problem.
+	const CEP_SERVICE_TAG_NAME = 'cep_service_status';
+	const CEP_SERVICE_TAG_VALUE = 'problem';
+	const CEP_SERVICE_NAME = 'CEP tag driven service';
+	const CEP_RULE_SERVICE_TAG = self::CEP_RULE_NAME_PREFIX.'window service tag';
 	const CEP_RULE_WINDOW_PATTERN = self::CEP_RULE_NAME_PREFIX.'window pattern match';
 	const CEP_RULE_WINDOW_PATTERN_EVENTS = 3;
 	// The cause and symptom flavour (see prepareDataCepWindowCauseSymptom()) needs neither: its window does its
@@ -299,6 +306,8 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $tag_mediatypeid2;
 	private static $tag_actionid2;
 	private static $web_tag_serviceids = [];
+	// The service of the tag driven service scenario, see prepareDataCepServiceTag().
+	private static $cep_tag_serviceid = null;
 	private static $sessionid = null;
 
 	// Highest internal-source eventid that exists before the current *Unknown cycle starts generating its
@@ -1907,6 +1916,78 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		return true;
+	}
+
+	/**
+	 * Prepare the tag driven service scenario: a service that is in problem exactly while an event carries a
+	 * tag, and a windowed rule that puts that tag on an event and takes it off again later.
+	 *
+	 * The service matches its problems on CEP_SERVICE_TAG_NAME, which no trigger of the suite produces - only
+	 * the rule does, when the event occurs - so the service can only be brought into problem by the rule. The
+	 * same rule removes the tag again when the window evicts the event, which happens once the window duration
+	 * has run out, and the service has to follow that too. The problem itself stays open the whole time, so
+	 * the service status can only be following the tag.
+	 *
+	 * The window groups by the 'service' tag, so the one event of the scenario has a window to itself.
+	 */
+	public function prepareDataCepServiceTag() {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// Only this rule may touch the problems and the tag the service watches.
+		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
+		$this->deleteCepTagService();
+
+		$response = $this->call('service.create', [
+			'name' => self::CEP_SERVICE_NAME,
+			'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
+			'sortorder' => 0,
+			'problem_tags' => [
+				[
+					'tag' => self::CEP_SERVICE_TAG_NAME,
+					'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL,
+					'value' => self::CEP_SERVICE_TAG_VALUE
+				]
+			]
+		]);
+		$this->assertArrayHasKey('serviceids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['serviceids']);
+		self::$cep_tag_serviceid = $response['result']['serviceids'][0];
+
+		$operations = [
+			[
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_ADD_TAG,
+				'tag' => self::CEP_SERVICE_TAG_NAME,
+				'tag_value' => self::CEP_SERVICE_TAG_VALUE
+			],
+			[
+				'sortorder' => 1,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+				'type' => CCepRuleHelper::OP_REMOVE_TAG,
+				'tag' => self::CEP_SERVICE_TAG_NAME
+			]
+		];
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_SERVICE_TAG, [], $operations,
+			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE, $this->buildWindowOperationsWindow()
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Delete the service of the tag driven service scenario so it does not react to the problems of the tests
+	 * that run afterwards. Guarded, so it is safe in a finally block even if the scenario never got that far.
+	 */
+	private function deleteCepTagService(): void {
+		if (self::$cep_tag_serviceid !== null) {
+			$this->call('service.delete', [self::$cep_tag_serviceid]);
+			self::$cep_tag_serviceid = null;
+		}
 	}
 
 	/**
@@ -6264,6 +6345,29 @@ HEREDOC;
 	}
 
 	/**
+	 * A service driven by a tag a CEP rule maintains: the service matches its problems on a tag no trigger
+	 * produces, the rule adds that tag as the event occurs and removes it again when the window evicts the
+	 * event, and the service has to follow both.
+	 *
+	 * The problem stays open from beginning to end, so the service going into problem and back to OK can only
+	 * be the tag being added and taken away - which is also what makes this different from every other service
+	 * scenario in the suite, where the services follow the problems themselves.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepServiceTag$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepServiceTag() {
+		$this->prepareDataCepServiceTag();
+
+		try {
+			$this->runEventAssessmentTestCepServiceTag();
+		}
+		finally {
+			$this->cleanupCepRules();
+			$this->deleteCepTagService();
+		}
+	}
+
+	/**
 	 * Event pattern match: the window runs a script over its events once a second, and when the script reports
 	 * a match the rule copies the oldest and the newest event of the window. Three values are sent into one
 	 * group, so the match produces two more problems - copies carrying the tags of the events they were made
@@ -8178,6 +8282,84 @@ HEREDOC;
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 		$this->waitForNoOpenProblems($all, 'After the event pattern match recovery value');
+	}
+
+	/**
+	 * Drive the tag driven service scenario. One value opens one problem, and everything that happens to the
+	 * service after that is the doing of the rule:
+	 *
+	 *   1. the service starts in OK - no event carries the tag it watches;
+	 *   2. the problem opens and the rule tags it as the event occurs, so the service goes into problem at the
+	 *      severity of that problem;
+	 *   3. the window duration runs out, the event is evicted and the rule takes the tag away again, so the
+	 *      service returns to OK - while the problem is still open, which is what shows the service was
+	 *      following the tag and not the problem.
+	 */
+	private function runEventAssessmentTestCepServiceTag(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the tag driven service test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		// 1. Nothing carries the tag yet.
+		$this->waitForCepTagServiceStatus(ZBX_SEVERITY_OK);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		// 2. The problem opens and is tagged as it occurs, which is what the service matches on.
+		$send('down_'.self::CEP_RULE_WINDOW_NONE_SERVICE);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForProblemEventsTagged($all, self::CEP_SERVICE_TAG_NAME, 1);
+		$this->waitForCepTagServiceStatus(TRIGGER_SEVERITY_DISASTER);
+
+		// 3. Once the window duration has run out the event is evicted and the tag is removed with it.
+		$this->waitForProblemEventsTagged($all, self::CEP_SERVICE_TAG_NAME, 0);
+		$this->waitForCepTagServiceStatus(ZBX_SEVERITY_OK);
+
+		// The problem was never closed - only the tag went away, and the service followed it.
+		$this->waitForOpenProblemCount($all, 1);
+
+		// Nothing in this scenario closes a problem, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the tag driven service recovery value');
+	}
+
+	/**
+	 * Wait until the service of the tag driven service scenario reaches $expected_status, reporting the status
+	 * it actually has if it does not.
+	 */
+	private function waitForCepTagServiceStatus(int $expected_status): void {
+		$this->assertNotEmpty(self::$cep_tag_serviceid,
+			'The tag driven service must be created before waiting for its status.'
+		);
+
+		try {
+			$this->callUntilCountIsPresent('service.get', [
+				'serviceids' => [self::$cep_tag_serviceid],
+				'filter' => ['status' => $expected_status]
+			], 1, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		}
+		catch (Exception $e) {
+			$response = $this->call('service.get', [
+				'serviceids' => [self::$cep_tag_serviceid],
+				'output' => ['serviceid', 'status']
+			]);
+
+			throw new Exception('Expected the tag driven service to have status '.$expected_status.', got '
+				.json_encode($response['result']).'. '.$e->getMessage()
+			);
+		}
 	}
 
 	/**
@@ -10489,6 +10671,12 @@ HEREDOC;
 		if (!empty(self::$web_tag_serviceids)) {
 			CDataHelper::call('service.delete', self::$web_tag_serviceids);
 			self::$web_tag_serviceids = [];
+		}
+
+		// The same for the service of the tag driven service scenario.
+		if (self::$cep_tag_serviceid !== null) {
+			CDataHelper::call('service.delete', [self::$cep_tag_serviceid]);
+			self::$cep_tag_serviceid = null;
 		}
 
 		if (!empty(self::$correlationid)) {
