@@ -158,9 +158,9 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 	$name[] = new CLink($httpTest['name'],
 		(new CUrl('httpconf.php'))
 			->setArgument('form', 'update')
+			->setArgument('context', $data['context'])
 			->setArgument('hostid', $httpTest['hostid'])
 			->setArgument('httptestid', $httpTestId)
-			->setArgument('context', $data['context'])
 	);
 
 	if ($data['context'] === 'host') {
@@ -209,7 +209,6 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 					: 'httptest.massdisable'
 				)
 				->setArgument('context', $data['context'])
-				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addCsrfToken($csrf_token)
@@ -261,6 +260,8 @@ $httpForm->addItem([$httpTable, new CActionButtonList('action', 'group_httptesti
 $html_page
 	->addItem($httpForm)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	view.init('.json_encode([
