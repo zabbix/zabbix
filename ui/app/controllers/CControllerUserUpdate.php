@@ -56,9 +56,8 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 					],
 					[
 						'array', 'required', 'not_empty',
-						'field' => ['db media.sendto', 'required'
-							// TODO: uncomment with DEV-4644
-							// 'use' => [CPushNotificationRecipientValidator::class]
+						'field' => ['db media.sendto', 'required',
+							'use' => [CPushNotificationRecipientValidator::class]
 						],
 						'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
 					]
