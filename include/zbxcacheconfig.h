@@ -340,8 +340,12 @@ typedef union
 }
 zbx_dc_poller_item_t;
 
+#define ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP	__UINT64_C(0x0001)
+#define ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS		__UINT64_C(0x0002)
+
 typedef struct
 {
+	zbx_uint64_t	upd_flags;
 	time_t		lasttimestamp;
 	zbx_timespec_t	min_free_ts;
 }
@@ -1069,8 +1073,8 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 		unsigned int connection_type, int now);
 void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 
-int			zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type);
-zbx_dc_cached_data_t	zbx_dc_config_get_default_cached_data(void);
+int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type);
+void	zbx_dc_config_cached_data_init(zbx_dc_cached_data_t *cached_data);
 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1

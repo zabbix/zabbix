@@ -143,7 +143,7 @@ void	zbx_async_manager_queue_get(zbx_async_manager_t *manager, zbx_vector_poller
 }
 
 void	zbx_async_manager_requeue(zbx_async_manager_t *manager, zbx_uint64_t itemid, int errcode, int lastclock,
-		zbx_dc_cached_data_t *cached_data)
+		const zbx_dc_cached_data_t *cached_data)
 {
 	async_task_queue_lock(&manager->queue);
 
@@ -156,8 +156,12 @@ void	zbx_async_manager_requeue(zbx_async_manager_t *manager, zbx_uint64_t itemid
 		if (NULL != cached_data)
 			zbx_vector_dc_cached_data_append(&manager->queue.cached_datas, *cached_data);
 		else
-			zbx_vector_dc_cached_data_append(&manager->queue.cached_datas,
-					zbx_dc_config_get_default_cached_data());
+		{
+			zbx_dc_cached_data_t	default_cached_data;
+
+			zbx_dc_config_cached_data_init(&default_cached_data);
+			zbx_vector_dc_cached_data_append(&manager->queue.cached_datas, default_cached_data);
+		}
 	}
 
 	async_task_queue_unlock(&manager->queue);

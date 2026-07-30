@@ -12190,15 +12190,9 @@ int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type)
 	return (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type ? SUCCEED : FAIL);
 }
 
-zbx_dc_cached_data_t	zbx_dc_config_get_default_cached_data(void)
+void	zbx_dc_config_cached_data_init(zbx_dc_cached_data_t *cached_data)
 {
-	zbx_dc_cached_data_t	ret;
-
-	ret.lasttimestamp = 0;
-	ret.min_free_ts.sec = 0;
-	ret.min_free_ts.ns = 0;
-
-	return ret;
+	memset(cached_data, 0, sizeof(zbx_dc_cached_data_t));
 }
 
 #ifdef HAVE_OPENIPMI
@@ -12410,15 +12404,14 @@ unlock:
 	return items_num;
 }
 
-static void	dc_set_cached_data(ZBX_DC_ITEM *dc_item, int errcode, const zbx_dc_cached_data_t *cached_data)
+static void	dc_set_cached_data(ZBX_DC_ITEM *dc_item, const zbx_dc_cached_data_t *cached_data)
 {
-	if (SUCCEED != errcode)
-		return;
-
 	if (ITEM_TYPE_TELEMETRY_QUERY == dc_item->type)
 	{
-		dc_item->itemtype.tqitem->lasttimestamp = cached_data->lasttimestamp;
-		dc_item->itemtype.tqitem->min_free_ts = cached_data->min_free_ts;
+		if (0 != (cached_data->upd_flags & ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP))
+			dc_item->itemtype.tqitem->lasttimestamp = cached_data->lasttimestamp;
+		if (0 != (cached_data->upd_flags & ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS))
+			dc_item->itemtype.tqitem->min_free_ts = cached_data->min_free_ts;
 	}
 }
 
@@ -12456,7 +12449,7 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
 
 		if (NULL != cached_datas)
-			dc_set_cached_data(dc_item, errcodes[i], &cached_datas[i]);
+			dc_set_cached_data(dc_item, &cached_datas[i]);
 
 		switch (errcodes[i])
 		{

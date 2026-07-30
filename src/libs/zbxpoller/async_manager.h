@@ -55,7 +55,7 @@ void			zbx_async_manager_queue_sync(zbx_async_manager_t *manager);
 void			zbx_async_manager_queue_get(zbx_async_manager_t *manager,
 					zbx_vector_poller_item_t *poller_items);
 void			zbx_async_manager_requeue(zbx_async_manager_t *manager, zbx_uint64_t itemid, int errcode,
-					int lastclock, zbx_dc_cached_data_t *cached_data);
+					int lastclock, const zbx_dc_cached_data_t *cached_data);
 void			zbx_async_manager_requeue_flush(zbx_async_manager_t *manager);
 void			zbx_async_manager_interfaces_flush(zbx_async_manager_t *manager, zbx_hashset_t *interfaces);
 void			zbx_interface_status_clean_wrapper(void *data);

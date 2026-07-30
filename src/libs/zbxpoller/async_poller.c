@@ -229,10 +229,12 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	zbx_telemetry_query_context	*telemetry_query_context;
 	zbx_dc_tq_item_context_t	*item_context;
 	zbx_timespec_t			timespec;
-	zbx_timespec_t			min_free_ts;
+	zbx_timespec_t			next_value_ts;
 	zbx_poller_config_t		*poller_config;
 	CURLcode			err_info;
 	zbx_dc_cached_data_t		cached_data;
+
+	zbx_dc_config_cached_data_init(&cached_data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -257,10 +259,10 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 			timespec.ns < item_context->min_free_ts.ns))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): min_free_ts > timespec, using min_free_ts", __func__);
-		min_free_ts = item_context->min_free_ts;
+		next_value_ts = item_context->min_free_ts;
 	}
 	else
-		min_free_ts = timespec;
+		next_value_ts = timespec;
 
 	if (SUCCEED == zbx_http_handle_response(easy_handle, &telemetry_query_context->http_context, err,
 			&response_code, &http_resp, &error) &&
@@ -309,12 +311,12 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
 						item_context->flags, item_context->preprocessing, &result,
-						&min_free_ts, ITEM_STATE_NORMAL, NULL);
+						&next_value_ts, ITEM_STATE_NORMAL, NULL);
 
 				zbx_free_agent_result(&result);
 
-				min_free_ts.ns++;
-				zbx_timespec_normalize(&min_free_ts);
+				next_value_ts.ns++;
+				zbx_timespec_normalize(&next_value_ts);
 			}
 
 			if (0 == values.values_num)
@@ -334,6 +336,11 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 				zbx_free_agent_result(&result);
 			}
 
+			cached_data.upd_flags |= ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP;
+			cached_data.lasttimestamp = item_context->newlasttimestamp;
+			cached_data.upd_flags |= ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS;
+			cached_data.min_free_ts = next_value_ts;
+
 			/* no need to clean */
 			zbx_vector_str_destroy(&values);
 		}
@@ -342,14 +349,13 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 			zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
 					item_context->preprocessing, NULL,
 					&timespec, ITEM_STATE_NOTSUPPORTED, error);
+
+			/* leave cached_data the same if check is not successful, lasttimestamp does not change */
 		}
 	}
 
 	zbx_free(error);
 	zbx_free(http_resp);
-
-	cached_data.lasttimestamp = item_context->newlasttimestamp;
-	cached_data.min_free_ts = min_free_ts;
 
 	zbx_async_manager_requeue(poller_config->manager, telemetry_query_context->item_context.itemid, SUCCEED,
 			timespec.sec, &cached_data);
