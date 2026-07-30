@@ -1826,9 +1826,30 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Prepare the simple window flavour of the capacity scenario that groups by the 'service' tag, so every id
+	 * gets a window of its own and fits into it, see prepareDataCepWindowCapacityOperations().
+	 */
+	public function prepareDataCepWindowSimpleCapacityPerService() {
+		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			'simple capacity service', true
+		);
+	}
+
+	/**
+	 * Prepare the tag correlation window flavour of the capacity scenario that groups by the 'service' tag, so
+	 * every id gets a window of its own and fits into it, see prepareDataCepWindowCapacityOperations().
+	 */
+	public function prepareDataCepWindowTagCapacityPerService() {
+		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+			'tag capacity service', true
+		);
+	}
+
+	/**
 	 * Prepare a windowed flavour whose window overflows instead of expiring: it holds a single event
 	 * (CEP_RULE_WINDOW_CAPACITY) and lasts longer than the whole test (CEP_RULE_WINDOW_CAPACITY_DURATION), and
-	 * it groups by nothing, so every event of the scenario competes for that one place.
+	 * it groups by a tag all the events of the driven trigger share, so they all end up in that one window and
+	 * compete for its single place.
 	 *
 	 * An event arriving at a window that has no place left is not added to it - it is evicted right away, and
 	 * the operations of the rule decide what happens to it. The one rule this flavour creates does:
@@ -1843,7 +1864,8 @@ class testTriggerCEP extends CIntegrationTest {
 	 * runEventAssessmentTestCepWindowCapacity(). Nothing here depends on the duration: the evictions are
 	 * caused by the capacity alone, when the event arrives.
 	 */
-	private function prepareDataCepWindowCapacityOperations(int $window_type, string $name_infix) {
+	private function prepareDataCepWindowCapacityOperations(int $window_type, string $name_infix,
+			bool $group_by_service = false) {
 		// The same prototypes as the other windowed flavours, so switching between them does not re-discover
 		// the triggers; the one that matters here is CEP_STATE_TAG, whose resolved name tells the close window
 		// operation which event is an "up" one.
@@ -1853,12 +1875,20 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->deleteCepCorrelations();
 		$this->deleteCepRules();
 
+		// By default grouped by the 'component' tag, which every event of the driven trigger carries with the
+		// same value: they all compete for the one place of a single window, and the grouping a tag
+		// correlation window is there for is exercised rather than left switched off.
+		//
+		// $group_by_service groups by the 'service' tag instead, which differs per id, so every id gets a
+		// window of its own and its "down" event fits into it - nothing is evicted until the "up" of that id
+		// arrives and finds the place taken.
 		$window = [
 			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
 			'capacity' => self::CEP_RULE_WINDOW_CAPACITY,
 			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
 			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
-			'group_by_tags' => CCepRuleHelper::GROUP_BY_NO
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => [$group_by_service ? 'service' : 'component']
 		];
 
 		$operations = [
@@ -5977,6 +6007,42 @@ HEREDOC;
 	}
 
 	/**
+	 * The same capacity rule as testTriggerCEP_CepWindowSimpleCapacity, but its simple window groups by the
+	 * 'service' tag: every id gets a window of its own, so this time every "down" fits and all three problems
+	 * stay open. The "up" of an id then finds that id's window occupied, so it is evicted, closed, and closes
+	 * the window along with the "down" problem it held - see runEventAssessmentTestCepWindowCapacityPerService().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCapacityPerService$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCapacityPerService() {
+		$this->prepareDataCepWindowSimpleCapacityPerService();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCapacityPerService();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same as testTriggerCEP_CepWindowSimpleCapacityPerService with a tag correlation window: grouping by
+	 * a tag that differs per event must give every id a window of its own for both window types.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCapacityPerService$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCapacityPerService() {
+		$this->prepareDataCepWindowTagCapacityPerService();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCapacityPerService();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
 	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
@@ -7366,12 +7432,68 @@ HEREDOC;
 		}
 
 		// 3. The "up" event does not fit either, so it is closed too, and it closes the window - and with it
-		//    the problem the window was holding all along.
+		//    the problem the window was holding all along. Nothing is left open, and closing the last problem
+		//    of a trigger is what puts the trigger itself back to OK, so no recovery value is needed here:
+		//    the rule alone has to bring both the problems and the trigger back.
 		$send('up_'.$first);
 		$this->waitForNoOpenProblems($all, 'After the window capacity close on up');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+	}
 
-		// The trigger stays in problem state until its expression turns false.
-		$send('0');
+	/**
+	 * Drive the capacity flavour that groups by the 'service' tag: every id gets a window of its own, so this
+	 * time every "down" event fits and no problem is closed while they are being opened.
+	 *
+	 *   1. "down_0", "down_1" and "down_10" each find their own window empty and take its one place, so all
+	 *      three problems stay open;
+	 *   2. the "up" of an id finds that id's window occupied by its "down", so it does not fit: it is evicted
+	 *      and closed, and being an "up" event it closes the window too, which closes the "down" problem the
+	 *      window held. Both problems of that id are gone, the ids not sent an "up" yet are untouched.
+	 *
+	 * After the "up" of every id nothing is left open, and closing the last problem of a trigger is what puts
+	 * the trigger itself back to OK, so no recovery value is needed.
+	 */
+	private function runEventAssessmentTestCepWindowCapacityPerService(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the per service window capacity test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$services = [self::CEP_RULE_WINDOW_NONE_SERVICE, self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT,
+			self::CEP_RULE_WINDOW_NONE_SERVICE_LAST
+		];
+
+		// 1. Every id has a window of its own, so every "down" fits and every problem stays open.
+		$open = 0;
+
+		foreach ($services as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, ++$open);
+			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+			$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
+		}
+
+		// 2. The "up" of an id does not fit into that id's window: it is closed as it is evicted and closes
+		//    the window, which closes the "down" problem the window was holding. Only that id is affected.
+		foreach ($services as $service) {
+			$send('up_'.$service);
+			$this->waitForOpenProblemCountByTag($all, 'service', $service, 0);
+			$this->waitForOpenProblemCount($all, --$open);
+		}
+
+		// Nothing is left open, and the rule alone has to bring the trigger back to OK as well.
+		$this->waitForNoOpenProblems($all, 'After the per service window capacity close on up');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 	}
 
