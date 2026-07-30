@@ -168,6 +168,8 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 		input.addEventListener('change', e => {
 			const visible = e.target.checked;
 
+			e.target.focus();
+
 			this.getDataTable().dispatchEvent(CDataTable.EVENT_COLUMN_TOGGLE, {column_index, visible},
 				{cancelable: true});
 		});
