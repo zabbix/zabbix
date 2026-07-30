@@ -69,9 +69,9 @@ class testDashboardFavoriteGraphsWidget extends CWebTest {
 			// Add graph to favorite.
 			$this->page->waitUntilReady();
 			$button = $this->query('xpath://button[@id="addrm_fav"]')->waitUntilVisible()->one();
-			$this->assertEquals('Add to favorites', $button->getAttribute('title'));
+			$this->assertEquals('Add graph to Favorite graphs widget', $button->getAttribute('aria-label'));
 			$button->waitUntilClickable()->click();
-			$button->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
+			$button->waitUntilAttributesPresent(['aria-label' => 'Remove graph from the Favorite graphs widget']);
 			$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
 			$this->query('button:Reset')->waitUntilClickable()->one()->click();
 			$table->waitUntilReloaded();

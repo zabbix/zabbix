@@ -20,6 +20,7 @@ AGENT_GOLDFLAGS += -X main.applicationName=zabbix_agent2
 
 WEBSERVICE_GOLDFLAGS = ${GOLDFLAGS}
 WEBSERVICE_GOLDFLAGS += -X main.applicationName=zabbix_web_service
+WEBSERVICE_GOLDFLAGS += -X main.confDefault=${WEBSERVICE_CONFIG_FILE}
 
 if HAVE_PCRE
 AGENT_GOTAGS = pcre
