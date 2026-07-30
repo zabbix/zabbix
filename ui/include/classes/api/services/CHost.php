@@ -1585,7 +1585,8 @@ class CHost extends CHostGeneral {
 	protected function validateCreate(array &$hosts) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
 			'monitored_by' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => static fn(): bool => !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING), 'type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+									['if' => static fn(array $data): bool => $data['monitored_by'] == ZBX_MONITORED_BY_SERVER && !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING), 'type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+									['if' => static fn(): bool => !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING), 'type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
 									['else' => true, 'type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP]), 'default' => DB::getDefault('hosts', 'monitored_by')]
 			]],
 			'proxyid' =>		['type' => API_MULTIPLE, 'rules' => [
