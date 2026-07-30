@@ -399,7 +399,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// #7 TODO: move "Schedule", days and period fields to the end of the fields array when DEV-4776 is merged.
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1125,6 +1125,11 @@ class testFormServicesSla extends CWebTest {
 
 				return;
 			}
+		}
+
+		// An additional submit is required for #7 case. This validation is triggered only on form submission.
+		if (array_key_exists('inline_errors', $data) && in_array('At least one entry should be selected.', $data['inline_errors'])) {
+			$form->submit();
 		}
 
 		if (array_key_exists('inline_errors', $data)) {
