@@ -169,6 +169,7 @@ class testTriggerCEP extends CIntegrationTest {
 	// window runs it over its events once a second and, when it reports a match, the operations of the rule
 	// are applied to the events the window holds. The only operations that execution point allows are the two
 	// that copy an event, so the match is observed through the copies appearing.
+	const CEP_RULE_WINDOW_PATTERN = self::CEP_RULE_NAME_PREFIX.'window pattern match';
 	const CEP_RULE_WINDOW_PATTERN_EVENTS = 3;
 	// The cause and symptom flavour (see prepareDataCepWindowCauseSymptom()) needs neither: its window does its
 	// work as the events arrive, ranking the first event of a group as the cause of the ones that follow. The
@@ -1912,6 +1913,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * Prepare the event pattern match flavour: a window that hands its events to a script once a second and
 	 * acts when the script reports a match.
 	 *
+	 * Besides deciding when to match, the script verifies what the window hands it: every event it is given
+	 * must have an eventid, the severity of the trigger, a sane timestamp, the boolean lifecycle fields, a
+	 * 'type' tag of "cep" and a name that agrees with its own 'service' tag. Anything else throws, which both
+	 * fails the script and stops it from ever matching, and the server keeps that message on the rule where
+	 * the scenario reports it from. Checking the fields inside the script is the only way to see them as the
+	 * window sees them.
+	 *
 	 * The script matches as soon as the window holds CEP_RULE_WINDOW_PATTERN_EVENTS events that the rule did
 	 * not create itself. That last part matters: the operations of this execution point copy an event, and a
 	 * copy is an event of its own that the rule matches again and that lands in the same window - without the
@@ -1933,15 +1941,62 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->deleteCepRules();
 
 		$events_num = self::CEP_RULE_WINDOW_PATTERN_EVENTS;
+		$name_prefix = 'CEP trigger '.self::COMPONENT_VALUE.' down_';
+		$severity = TRIGGER_SEVERITY_DISASTER;
+
+		// Besides counting the events the script checks what the window handed it, so the fields an event is
+		// exposed with are verified inside the server rather than through the API afterwards. A field that is
+		// not what it should be throws, which fails the script, and the rule keeps that message - see
+		// getCepRuleError(), which the scenario reports if the match never happens.
+		//
+		// The lifecycle fields are only checked for their type, not their value: the script keeps running
+		// after the scenario has recovered the problems, and an event that is no longer open would then throw
+		// for no good reason.
 		$script = <<<HEREDOC
 var events = cep_get_events(), originals = 0, copies = 0;
 
 for (var i = 0; i < events.length; i++) {
-	if (events[i].is_copied) {
+	var event = events[i], service = null, type = null;
+
+	if (event.is_copied) {
 		copies++;
+		continue;
 	}
-	else {
-		originals++;
+
+	originals++;
+
+	if (!(event.eventid > 0)) {
+		throw 'event at ' + i + ' has no eventid';
+	}
+
+	if (event.severity !== $severity) {
+		throw 'event ' + event.eventid + ' severity ' + event.severity + ', expected $severity';
+	}
+
+	if (!(event.clock > 0) || !(event.ns >= 0)) {
+		throw 'event ' + event.eventid + ' clock ' + event.clock + '.' + event.ns;
+	}
+
+	if (typeof event.is_open !== 'boolean' || event.is_suppressed !== false || event.is_symptom !== false) {
+		throw 'event ' + event.eventid + ' is_open ' + event.is_open + ', is_suppressed ' +
+				event.is_suppressed + ', is_symptom ' + event.is_symptom;
+	}
+
+	for (var j = 0; j < event.tags.length; j++) {
+		if (event.tags[j].tag === 'service') {
+			service = event.tags[j].value;
+		}
+		else if (event.tags[j].tag === 'type') {
+			type = event.tags[j].value;
+		}
+	}
+
+	if (type !== 'cep') {
+		throw 'event ' + event.eventid + ' type tag ' + type + ', expected cep';
+	}
+
+	if (event.name !== '$name_prefix' + service) {
+		throw 'event ' + event.eventid + ' name "' + event.name + '" does not match its service tag ' + service;
 	}
 }
 
@@ -1963,9 +2018,8 @@ HEREDOC;
 			[CCepRuleHelper::OP_COPY_LAST, []]
 		], CCepRuleHelper::WHEN_PATTERN_MATCHED);
 
-		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(
-			self::CEP_RULE_NAME_PREFIX.'window pattern match', [], $operations, CONDITION_EVAL_TYPE_AND, '',
-			CCepRuleHelper::WINDOW_PATTERN_MATCH, $window
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_PATTERN, [], $operations,
+			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_PATTERN_MATCH, $window
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -6219,6 +6273,10 @@ HEREDOC;
 	 * The copies enter the same window, so the script counts them apart from the events it was sent: without
 	 * that the pattern would match its own output over and over. The totals staying at five is what shows it
 	 * does not.
+	 *
+	 * The script doubles as an assertion on the event fields the window exposes to it - name, severity,
+	 * timestamp, tags and the lifecycle flags - by refusing to match anything it does not recognise. A match
+	 * therefore means both that the pattern was found and that every event it was found in looked right.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternMatch$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -8092,10 +8150,24 @@ HEREDOC;
 		}
 
 		// The match copies the oldest and the newest event of the window, so those two ids have two problem
-		// events each while the one in between still has the single one it was sent for.
-		$this->waitForProblemEventCountByTag($all, 'service', $first, 2);
-		$this->waitForProblemEventCountByTag($all, 'service', $last, 2);
-		$this->waitForProblemEventCountByTag($all, 'service', $middle, 1);
+		// events each while the one in between still has the single one it was sent for. The script rejects an
+		// event whose fields are not what it expects by throwing, which also stops it from ever reporting a
+		// match, so that message is what has to be reported here rather than the copies simply never showing
+		// up.
+		try {
+			$this->waitForProblemEventCountByTag($all, 'service', $first, 2);
+			$this->waitForProblemEventCountByTag($all, 'service', $last, 2);
+			$this->waitForProblemEventCountByTag($all, 'service', $middle, 1);
+		}
+		catch (Throwable $e) {
+			$error = $this->getCepRuleError(self::CEP_RULE_WINDOW_PATTERN);
+
+			$this->assertSame('', $error, 'The pattern match script rejected what the window handed it: '
+				.$error
+			);
+
+			throw $e;
+		}
 
 		// Five problems in total, and they stay five: the copies are in the window too, and the script must
 		// not take them for a new pattern.
@@ -8528,6 +8600,19 @@ HEREDOC;
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'tags' => [['tag' => $tag, 'value' => $value, 'operator' => TAG_OPERATOR_EQUAL]]
 		], $expected, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * The error a CEP rule last failed with, as the server recorded it - an empty string while the rule is
+	 * healthy. A window script that throws ends up here, which is the only place its message can be read from.
+	 */
+	private function getCepRuleError(string $name): string {
+		$response = $this->call('ceprule.get', [
+			'filter' => ['name' => $name],
+			'output' => ['error']
+		]);
+
+		return $response['result'] ? $response['result'][0]['error'] : '';
 	}
 
 	/**
