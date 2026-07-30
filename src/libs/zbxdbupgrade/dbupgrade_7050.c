@@ -889,6 +889,17 @@ static int	DBpatch_7050066(void)
 	return DBadd_field("items", &field);
 }
 
+static int	DBpatch_7050067(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str)"
+			" values ('timeout_telemetry_query', %d, '3s')", ZBX_SETTING_TYPE_STR))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -962,5 +973,6 @@ DBPATCH_ADD(7050063, 0, 1)
 DBPATCH_ADD(7050064, 0, 1)
 DBPATCH_ADD(7050065, 0, 1)
 DBPATCH_ADD(7050066, 0, 1)
+DBPATCH_ADD(7050067, 0, 1)
 
 DBPATCH_END()
