@@ -241,11 +241,39 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct zbx_json		j;
 	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
 	double			pfree, pused, ipfree, ipused;
-	char			*error;
+	char			*mode, *mountpoint, *error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
-	int			ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL, mode_short = 0;
 	zbx_fsname_t		fsname;
+
+	/* validate parameter count */
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	/* parse parameters */
+	mode = get_rparam(request, 0);
+	mountpoint = get_rparam(request, 1);
+
+	/* validate mode */
+	if (NULL != mode && '\0' != *mode)
+	{
+		if (0 == strcmp(mode, "short"))
+			mode_short = 1;
+		else if (0 != strcmp(mode, "full"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
+	/* NULL or empty mode defaults to "full" */
+	/* empty mountpoint means no filter */
+	if (NULL != mountpoint && '\0' == *mountpoint)
+		mountpoint = NULL;
 
 	/* opening the mounted filesystems file */
 	if (NULL == (f = fopen("/etc/mnttab", "r")))
@@ -254,6 +282,39 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
+	/* process short mode */
+	if (1 == mode_short)
+	{
+		zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+		/* fill mnttab structure from file */
+		while (-1 != getmntent(f, &mt))
+		{
+			fsname.mpoint = mt.mnt_mountp;
+
+			/* apply mountpoint filter */
+			if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+				continue;
+
+			zbx_json_addobject(&j, NULL);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname.mpoint, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mt.mnt_fstype, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mt.mnt_mntopts, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&j);
+		}
+
+		zbx_fclose(f);
+
+		zbx_json_close(&j);
+
+		SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+		zbx_json_free(&j);
+
+		return SYSINFO_RET_OK;
+	}
+
+	/* process full mode */
 	zbx_vector_ptr_create(&mntpoints);
 
 	/* fill mnttab structure from file */
@@ -261,11 +322,16 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		fsname.mpoint = mt.mnt_mountp;
 
+		/* apply mountpoint filter */
+		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+			continue;
+
 		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused,&error))
 		{
 			zbx_free(error);
 			continue;
 		}
+
 		if (SYSINFO_RET_OK != get_fs_inode_stat(fsname.mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused,
 				"pused", &error))
 		{
@@ -290,6 +356,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 	}
+
 	zbx_fclose(f);
 
 	if (NULL == (f = fopen("/etc/mnttab", "r")))
@@ -307,6 +374,10 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		fsname.mpoint = mt.mnt_mountp;
 		fsname.type = mt.mnt_fstype;
+
+		/* apply mountpoint filter */
+		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+			continue;
 
 		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, &fsname, zbx_fsname_compare)))
 		{
@@ -332,6 +403,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_close(&j);
 		}
 	}
+
 	zbx_fclose(f);
 
 	zbx_json_close(&j);
