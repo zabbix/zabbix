@@ -338,8 +338,12 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 			cached_data.upd_flags |= ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP;
 			cached_data.lasttimestamp = item_context->newlasttimestamp;
-			cached_data.upd_flags |= ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS;
-			cached_data.min_free_ts = next_value_ts;
+
+			if (0 != values.values_num)
+			{
+				cached_data.upd_flags |= ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS;
+				cached_data.min_free_ts = next_value_ts;
+			}
 
 			/* no need to clean */
 			zbx_vector_str_destroy(&values);
