@@ -281,10 +281,9 @@ window.ceprule_edit_popup = new class {
 			.find(node => node.checked);
 		const type = Number(input.value);
 
-		// TODO: why are these fields initally in changed state although no interaction yet?
-		if (this.form.findFieldByName('window[group_by_host]')._changed
-				|| this.form.findFieldByName('window[group_by_host_group]')._changed
-				|| this.form.findFieldByName('window[group_by_tags]')._changed) {
+		if (this.form.findFieldByName('window[group_by_host]').hasChanged()
+				|| this.form.findFieldByName('window[group_by_host_group]').hasChanged()
+				|| this.form.findFieldByName('window[group_by_tags]').hasChanged()) {
 			this.form.validateChanges(['window[group_by_tags]']);
 		}
 
