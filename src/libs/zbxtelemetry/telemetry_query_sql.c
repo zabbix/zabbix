@@ -567,8 +567,8 @@ static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, const
 
 		if (conditions_sorted.values_num - 1 == i)
 			zbx_snprintf_alloc(&str, &alloc, &offset, ")");
-		else if (0 != tq_condition_ptr_compare_by_column_and_key((void *)cond,
-				(void *)conditions_sorted.values[i + 1]))
+		else if (0 != tq_condition_ptr_compare_by_column_and_key((void *)&cond,
+				(void *)&conditions_sorted.values[i + 1]))
 			zbx_snprintf_alloc(&str, &alloc, &offset, ")AND(");
 		else
 			zbx_snprintf_alloc(&str, &alloc, &offset, " OR ");

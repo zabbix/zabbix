@@ -327,7 +327,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->jmx_endpoint_orig = NULL;
 		item->jmx_endpoint = zbx_strdup(NULL, row[28]);
 
-		ZBX_DBROW2UINT64(item->master_itemid_orig, row[80]);
+		ZBX_DBROW2UINT64(item->master_itemid_orig, row[84]);
 		ZBX_DBROW2UINT64(item->master_itemid, row[29]);
 
 		item->timeout_orig = NULL;
