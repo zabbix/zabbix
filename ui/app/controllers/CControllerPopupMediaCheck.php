@@ -36,10 +36,7 @@ class CControllerPopupMediaCheck extends CController {
 				'when' => ['mediatype_type', 'not_in' => [MEDIA_TYPE_EMAIL]]
 			],
 			'sendto_emails' => ['array', 'required', 'not_empty',
-				'field' => ['string'
-					// TODO: uncomment with DEV-4644
-					// 'not_empty', 'use' => [CEmailValidator::class, []]
-				],
+				'field' => ['string', 'not_empty', 'use' => [CEmailValidator::class]],
 				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
 			],
 			'period' => ['string', 'required', 'not_empty',
