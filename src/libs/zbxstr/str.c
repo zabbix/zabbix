@@ -387,7 +387,7 @@ int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charli
  * Parameters: list      - [IN/OUT] list of delimited values                  *
  *             delimiter - [IN]                                               *
  *             token     - [IN/OUT] start of the current token                *
- *             token_len - [OUT] length of the current token                  *
+ *             token_len - [IN/OUT] length of the current token               *
  *                                                                            *
  * Return value: SUCCEED - a token was returned                               *
  *               FAIL    - end of list, no more tokens                        *
