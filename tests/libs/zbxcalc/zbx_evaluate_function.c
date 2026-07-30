@@ -186,6 +186,14 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_update_epsilon_to_float_precision();
 
+	function = zbx_mock_get_parameter_string("in.function");
+	params = zbx_mock_get_parameter_string("in.params");
+
+#ifndef HAVE_LIBXML2
+	if (0 == strcmp(function, "xmlxpath"))
+		skip();
+#endif
+
 	err = zbx_vc_init(get_zbx_config_value_cache_size(), &error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
 
@@ -200,9 +208,6 @@ void	zbx_mock_test_entry(void **state)
 	ds_item = zbx_vcmock_ds_first_item();
 	item.itemid = ds_item->itemid;
 	item.value_type = ds_item->value_type;
-
-	function = zbx_mock_get_parameter_string("in.function");
-	params = zbx_mock_get_parameter_string("in.params");
 
 	handle = zbx_mock_get_parameter_handle("in");
 	zbx_vcmock_set_time(handle, "time");
