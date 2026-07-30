@@ -103,6 +103,9 @@ window.user_device_create_popup = new class {
 			useCanvas: true,
 			draw_integer: true
 		});
+
+		qr_code_div.dataset.ref = url;
+		qr_code_div.removeAttribute('title');
 	}
 
 	#updateCountdownMessage() {

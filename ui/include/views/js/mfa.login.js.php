@@ -33,6 +33,9 @@
 				useCanvas: true,
 				draw_integer: true
 			});
+
+			qr_code_div.dataset.ref = qr_code_url;
+			qr_code_div.removeAttribute('title');
 		}
 	}
 </script>
