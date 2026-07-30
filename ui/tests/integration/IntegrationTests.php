@@ -72,6 +72,7 @@ require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 require_once dirname(__FILE__).'/testLLDProxyHistorySyncAtScale.php';
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
+require_once dirname(__FILE__).'/testBridgeAdapter.php';
 require_once dirname(__FILE__).'/testHashicorpVault.php';
 
 use PHPUnit\Framework\TestSuite;
@@ -142,6 +143,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testWebScenarioDynamicVariables');
+		$suite->addTestSuite('testBridgeAdapter');
 		$suite->addTestSuite('testHashicorpVault');
 		return $suite;
 	}
