@@ -501,6 +501,9 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	{
 		if (SUCCEED != cep_event_process_rules(hconfig, &rules, &rules_num, &event_ctx, tasks))
 		{
+			cep_cache_acquire(&cep);
+			cep_origin_pending_event_done(cep, &event->origin);
+			cep_cache_release(&cep);
 			zbx_cep_event_release(event);
 			goto out;
 		}

@@ -441,6 +441,27 @@ int	cep_origin_problem(const zbx_cep_origin_t *origin)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: decrement pending event count for cep object and remove it if    *
+ *          empty                                                            *
+ *                                                                            *
+ * Parameters: cep    - [IN] cep service                                     *
+ *             origin - [IN] cep object origin                               *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_origin_pending_event_done(zbx_cep_t *cep, zbx_cep_origin_t *origin)
+{
+	zbx_cep_object_t	*obj;
+
+	if (NULL == (obj = cep_get_object(cep, origin)))
+		return;
+
+	obj->pending_events_num--;
+	if (0 == obj->events.values_num && 0 == obj->pending_events_num)
+		zbx_hashset_remove_direct(&cep->objects, obj);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: load open problems from database into cache                       *
  *                                                                            *
  * Parameters: cache - [IN/OUT] cache context                                 *
@@ -1177,7 +1198,7 @@ static int	cep_event_match_tag(const zbx_cep_event_t *event, const char *tag, co
  *             obj - [IN] cep object to update                                *
  *                                                                            *
  ******************************************************************************/
-static void cep_object_pending_event_done(zbx_cep_t *cep, zbx_cep_object_t *obj)
+static void	cep_object_pending_event_done(zbx_cep_t *cep, zbx_cep_object_t *obj)
 {
 	obj->pending_events_num--;
 	if (0 == obj->events.values_num && 0 == obj->pending_events_num)
