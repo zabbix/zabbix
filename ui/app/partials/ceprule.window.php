@@ -109,9 +109,8 @@ echo (new CObject())
 
 	->addItem((new CLabel(_('Event count tag'), 'ceprule-window-counttag'))->setAsteriskMark())
 	->addItem((new CFormField())
-		->addItem((new CRadioButtonList(
-			name: 'window[event_count_tag_enabled]',
-			value: ($data['window']['event_count_tag'] !== '') ? '1' : '0'
+		->addItem((new CRadioButtonList('window[event_count_tag_enabled]',
+			($data['window']['event_count_tag'] !== '') ? '1' : '0'
 		))
 			->setId('ceprule-window-counttag-toggle')
 			->addValue('No', '0')
