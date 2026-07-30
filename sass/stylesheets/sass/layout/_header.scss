@@ -1,4 +1,5 @@
 header {
+	height: var(--header-size);
 	background: $header-bg-color;
 	border-bottom: 1px solid $ui-border-color;
 	box-shadow: 0 -6px 6px 4px $action-shadow-color;
@@ -29,7 +30,7 @@ header {
 	.header-title {
 		display: flex;
 		align-items: center;
-		height: var(--header-size);
+		height: 100%;
 		padding: 0 10px;
 	}
 
