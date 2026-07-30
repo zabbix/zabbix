@@ -185,6 +185,7 @@ $available_js = [
 	'setup.js' => 'pages/',
 	// fields
 	'class.field.js' => 'fields/',
+	'class.field.collection.js' => 'fields/',
 	'class.field.array.js' => 'fields/',
 	'class.field.checkbox.js' => 'fields/',
 	'class.field.file.js' => 'fields/',
@@ -740,6 +741,7 @@ if (empty($_GET['files'])) {
 		'class.state.js',
 		'class.message.js',
 		'class.field.js',
+		'class.field.collection.js',
 		'class.field.array.js',
 		'class.field.checkbox.js',
 		'class.field.file.js',

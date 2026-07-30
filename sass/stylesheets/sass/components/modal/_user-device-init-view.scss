@@ -1,0 +1,16 @@
+#user-device-init-form {
+	.hidden {
+		display: none;
+	}
+
+	.qr-code-container {
+		width: 300px;
+		margin: 0 auto;
+		text-align: center;
+		white-space: wrap;
+	}
+
+	.qr-code-expiration {
+		margin-top: 10px;
+	}
+}
