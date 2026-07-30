@@ -955,73 +955,77 @@ int	zbx_parse_item_types(const char *itemtypes, zbx_uint32_t *itemtype_mask, cha
 	zbx_item_type_name_t;
 
 	const zbx_item_type_name_t	item_type_names[] = ZBX_ITEM_TYPE_NAME;
-	int				ret = SUCCEED;
+	const char			*token, *list = itemtypes;
+	size_t				len, token_len;
 	zbx_uint32_t			mask = 0;
-	size_t				len;
+	int				ret = SUCCEED;
 
-	if (NULL != itemtypes && 0 != (len = strlen(itemtypes)) && ',' == itemtypes[len - 1])
+	if (NULL == itemtypes)
+	{
+		if (NULL != itemtype_mask)
+			*itemtype_mask = mask;
+
+		return SUCCEED;
+	}
+
+	if (0 != (len = strlen(itemtypes)) && ',' == itemtypes[len - 1])
 	{
 		if (NULL != error)
 			*error = zbx_dsprintf(NULL, "empty item type value");
 
-		ret = FAIL;
+		return FAIL;
 	}
-	else if (NULL != itemtypes)
+
+	while (SUCCEED == zbx_str_list_next(&list, ',', &token, &token_len))
 	{
-		const char	*token, *list = itemtypes;
-		size_t		token_len;
+		int		i;
+		zbx_uint32_t	bit;
 
-		while (SUCCEED == zbx_str_list_next(&list, ',', &token, &token_len))
+		if (0 == token_len)
 		{
-			int		i;
-			zbx_uint32_t	bit;
+			if (NULL != error)
+				*error = zbx_dsprintf(NULL, "empty item type value");
 
-			if (0 == token_len)
-			{
-				if (NULL != error)
-					*error = zbx_dsprintf(NULL, "empty item type value");
-
-				ret = FAIL;
-				break;
-			}
-
-			for (i = 0; NULL != item_type_names[i].name; i++)
-			{
-				if (strlen(item_type_names[i].name) == token_len &&
-						0 == strncmp(token, item_type_names[i].name, token_len))
-				{
-					break;
-				}
-			}
-
-			if (NULL == item_type_names[i].name)
-			{
-				if (NULL != error)
-				{
-					*error = zbx_dsprintf(NULL, "unknown item type \"%.*s\"", (int)token_len,
-							token);
-				}
-
-				ret = FAIL;
-				break;
-			}
-
-			bit = (zbx_uint32_t)(1u << item_type_names[i].type);
-
-			if (0 != (mask & bit))
-			{
-				if (NULL != error)
-				{
-					*error = zbx_dsprintf(NULL, "duplicate item type \"%.*s\"", (int)token_len,
-							token);
-				}
-
-				ret = FAIL;
-				break;
-			}
-
-			mask |= bit;
+			ret = FAIL;
+			break;
 		}
+
+		for (i = 0; NULL != item_type_names[i].name; i++)
+		{
+			if (strlen(item_type_names[i].name) == token_len &&
+					0 == strncmp(token, item_type_names[i].name, token_len))
+			{
+				break;
+			}
+		}
+
+		if (NULL == item_type_names[i].name)
+		{
+			if (NULL != error)
+			{
+				*error = zbx_dsprintf(NULL, "unknown item type \"%.*s\"", (int)token_len,
+						token);
+			}
+
+			ret = FAIL;
+			break;
+		}
+
+		bit = (zbx_uint32_t)(1u << item_type_names[i].type);
+
+		if (0 != (mask & bit))
+		{
+			if (NULL != error)
+			{
+				*error = zbx_dsprintf(NULL, "duplicate item type \"%.*s\"", (int)token_len,
+						token);
+			}
+
+			ret = FAIL;
+			break;
+		}
+
+		mask |= bit;
 	}
 
 	if (SUCCEED == ret && NULL != itemtype_mask)
