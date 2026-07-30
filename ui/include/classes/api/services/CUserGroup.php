@@ -686,7 +686,7 @@ class CUserGroup extends CApiService {
 				));
 			}
 
-			if ($db_proxies[$proxyid]['proxy_groupid'] != '0') {
+			if ($db_proxies[$proxyid]['proxy_groupid'] != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i1 + 1).'/proxies/'.($i2 + 1).'/proxyid',
 					_('access to this proxy is managed by its proxy group')
