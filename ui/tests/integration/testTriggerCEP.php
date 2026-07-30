@@ -157,6 +157,9 @@ class testTriggerCEP extends CIntegrationTest {
 	// identical to the first except that it only adds a tag, is there to show:
 	//   - a simple window is not exclusive, so both rules are processed and the tag is added;
 	//   - a tag correlation window is, so only the first rule is processed and the tag is never added.
+	// The rule of the discard scenario (see prepareDataCepDiscardUp()): it drops the "up" events before they
+	// are ever stored, so they leave no trace at all - not a closed problem, not an event.
+	const CEP_RULE_DISCARD_UP = self::CEP_RULE_NAME_PREFIX.'window none discard up';
 	const CEP_TAG_WINDOW_SECOND = 'window_second';
 	const CEP_TAG_WINDOW_SECOND_VALUE = 'second';
 	// How long the windows of those flavours stay open. The evicted flavours wait for it to run out before
@@ -756,7 +759,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'eventsource' => EVENT_SOURCE_TRIGGERS,
 			'status' => ACTION_STATUS_ENABLED,
 			'esc_period' => '1h',
-			'pause_suppressed' => 0,
+			'pause_suppressed' => 1,
 			'filter' => [
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 				'conditions' => [
@@ -1810,6 +1813,39 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Prepare the discard scenario: one windowless rule whose only operation drops the events it matches, so
+	 * they never reach the database.
+	 *
+	 * Discard is the one operation that has to be applied before anything is stored, and the server does
+	 * exactly that - it is looked for while the rules are matched, before the event is added, and only among
+	 * the operations that execute when the event occurs. An event it matches is therefore not closed or
+	 * suppressed but simply gone: no problem, no event, and no trigger value change either.
+	 *
+	 * The operation only matches the "up" events, by a tag exists condition on CEP_STATE_TAG_UP, so the test
+	 * can tell a discarded event from a kept one within the same scenario: the "down" values must still open
+	 * their problems as usual.
+	 */
+	public function prepareDataCepDiscardUp() {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
+
+		$operations = $this->buildWindowNoneOperations([
+			[CCepRuleHelper::OP_DISCARD, [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+			]]
+		]);
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_DISCARD_UP, [], $operations));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
 	 * Prepare the simple window flavour of the capacity scenario, see
 	 * prepareDataCepWindowCapacityOperations().
 	 */
@@ -1846,6 +1882,17 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Prepare the per service capacity scenario whose rule additionally discards the "up" events, so the
+	 * operation that would close the window and the operation that drops the event compete for the same
+	 * event, see prepareDataCepWindowCapacityOperations().
+	 */
+	public function prepareDataCepWindowCapacityDiscardUp() {
+		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			'capacity discard', true, true
+		);
+	}
+
+	/**
 	 * Prepare a windowed flavour whose window overflows instead of expiring: it holds a single event
 	 * (CEP_RULE_WINDOW_CAPACITY) and lasts longer than the whole test (CEP_RULE_WINDOW_CAPACITY_DURATION), and
 	 * it groups by a tag all the events of the driven trigger share, so they all end up in that one window and
@@ -1867,7 +1914,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * caused by the capacity alone, when the event arrives.
 	 */
 	private function prepareDataCepWindowCapacityOperations(int $window_type, string $name_infix,
-			bool $group_by_service = false) {
+			bool $group_by_service = false, bool $discard_up = false) {
 		// The same prototypes as the other windowed flavours, so switching between them does not re-discover
 		// the triggers; the one that matters here is CEP_STATE_TAG, whose resolved name tells the close window
 		// operation which event is an "up" one.
@@ -1920,6 +1967,19 @@ class testTriggerCEP extends CIntegrationTest {
 				'type' => CCepRuleHelper::OP_CLOSE
 			]
 		];
+
+		if ($discard_up) {
+			// Discarding is decided while the rules are matched, before the event is stored and long before
+			// any window sees it, so this operation short circuits everything the operations above would have
+			// done to an "up" event: it is not evicted, it does not close the window, and it leaves no trace.
+			array_unshift($operations, [
+				'sortorder' => -1,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_DISCARD,
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+			]);
+		}
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(
 			self::CEP_RULE_NAME_PREFIX.'window '.$name_infix, [], $operations, CONDITION_EVAL_TYPE_AND, '',
@@ -5977,6 +6037,28 @@ HEREDOC;
 	}
 
 	/**
+	 * Discarding: a windowless rule whose only operation drops the "up" events as they occur, so they leave no
+	 * trace at all - unlike a close, which leaves a closed problem behind, and unlike a suppress, which leaves
+	 * a suppressed one. The "down" values around it must still open their problems, so the rule is shown to
+	 * drop exactly what its condition selects.
+	 *
+	 * No window is involved on purpose: discarding is decided while the rules are matched, before the event is
+	 * stored or handed to any window, so a window could not change the outcome.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepDiscardOnUp$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepDiscardOnUp() {
+		$this->prepareDataCepDiscardUp();
+
+		try {
+			$this->runEventAssessmentTestCepDiscard();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * A simple window that overflows instead of expiring: it has room for one event and lasts longer than the
 	 * test, so every event after the first one is evicted the moment it arrives, and the rule closes what it
 	 * evicts. The "up" value at the end also closes the window, which closes the one problem the window was
@@ -6044,6 +6126,31 @@ HEREDOC;
 
 		try {
 			$this->runEventAssessmentTestCepWindowCapacityPerService();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same per service capacity rule as testTriggerCEP_CepWindowSimpleCapacityPerService, with one
+	 * operation added: the "up" events are discarded as they occur. The same event is therefore both the one
+	 * that would be evicted for not fitting into its window - closing that window and the problem it holds -
+	 * and the one that is dropped.
+	 *
+	 * Dropping it wins, because it is decided before the event is stored and before any window sees it: no
+	 * "up" event exists afterwards, nothing was evicted or suppressed on its account, no window was closed and
+	 * all three "down" problems are still open, so only the trigger expression can recover them. The "down"
+	 * values the discard does not match are still evicted, suppressed and closed as before, which shows the
+	 * rest of the rule kept working.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCapacityDiscardOnUp$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCapacityDiscardOnUp() {
+		$this->prepareDataCepWindowCapacityDiscardUp();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCapacityDiscard();
 		}
 		finally {
 			$this->cleanupCepRules();
@@ -7535,6 +7642,125 @@ HEREDOC;
 		// Nothing is left open, and the rule alone has to bring the trigger back to OK as well.
 		$this->waitForNoOpenProblems($all, 'After the per service window capacity close on up');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+	}
+
+	/**
+	 * Drive the discard scenario. Discarding is the absence of everything, so the check is built around a
+	 * later event: an event that is going to be stored appears in order after the discarded one, so once the
+	 * event of the second "down" is there, the "up" in between would have shown up too if it had been kept.
+	 *
+	 *   1. "down_0" is not matched by the discard condition and opens its problem as usual;
+	 *   2. "up_0" is matched, so it must leave nothing behind - no problem of its own, and no problem closed
+	 *      either, which is what tells a discard apart from a close;
+	 *   3. "down_1" is kept again and opens the second problem, which is the point the counts are checked at:
+	 *      exactly two events exist since the baseline and none of them came from an "up" value.
+	 */
+	private function runEventAssessmentTestCepDiscard(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the discard test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		// 1. Kept: the problem opens and the trigger goes to problem state.
+		$send('down_'.self::CEP_RULE_WINDOW_NONE_SERVICE);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// 2. Discarded: nothing may come of it. It is a problem value like any other, so without the rule it
+		//    would open a second problem.
+		$send('up_'.self::CEP_RULE_WINDOW_NONE_SERVICE);
+
+		// 3. Kept again: waiting for this one to be counted is what makes the check above safe, since the
+		//    discarded event would have been stored before it.
+		$send('down_'.self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT);
+		$this->waitForOpenProblemCount($all, 2);
+
+		// Two values were kept and one was discarded, so only two events exist - and none of them is an "up"
+		// one, which only a discarded event can achieve: a closed or suppressed event would still be there.
+		$this->waitForAllTriggerEventCounts($all, 2);
+		$this->waitForProblemEventsTagged($all, self::CEP_STATE_TAG_UP, 0);
+
+		// The problems the rule did not touch recover the usual way.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the discard scenario recovery value');
+	}
+
+	/**
+	 * Drive the per service capacity scenario whose rule also discards the "up" events, so that the same event
+	 * is the one the window would evict and close on, and the one the discard drops.
+	 *
+	 * The discard settles it: it is looked for while the rules are matched, before the event is stored and
+	 * before it is handed to any window, so an "up" event never gets as far as the window it does not fit
+	 * into. Nothing is evicted, nothing is suppressed, the window is not closed - and the "down" problem it
+	 * holds stays open, unlike in runEventAssessmentTestCepWindowCapacityPerService() where the same rule
+	 * without the discard closes it.
+	 */
+	private function runEventAssessmentTestCepWindowCapacityDiscard(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the capacity discard test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$services = [self::CEP_RULE_WINDOW_NONE_SERVICE, self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT,
+			self::CEP_RULE_WINDOW_NONE_SERVICE_LAST
+		];
+
+		// 1. As without the discard: every id has a window of its own, so every "down" fits and stays open.
+		$open = 0;
+
+		foreach ($services as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, ++$open);
+			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+			$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
+		}
+
+		// 2. Every "up" is dropped before it reaches its window, so none of them evicts anything, closes a
+		//    window or closes the "down" problem that window holds.
+		foreach ($services as $service) {
+			$send('up_'.$service);
+		}
+
+		// A kept event is what makes the check safe: once its problem is there, any "up" that had been stored
+		// would be there too. The id it uses is one whose window is full, so it is evicted, suppressed and
+		// closed - which is the operations of the rule still working for the events the discard does not
+		// match.
+		$send('down_'.self::CEP_RULE_WINDOW_NONE_SERVICE);
+		$this->waitForProblemEventCountByTag($all, 'service', self::CEP_RULE_WINDOW_NONE_SERVICE, 2);
+		$this->waitForSuppressedEventCount($triggerid, 1);
+
+		// The three "down" problems are still open and no "up" event exists at all.
+		$this->waitForOpenProblemCount($all, $open);
+		$this->waitForProblemEventsTagged($all, self::CEP_STATE_TAG_UP, 0);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// Nothing closed them, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the capacity discard recovery value');
 	}
 
 	/**
