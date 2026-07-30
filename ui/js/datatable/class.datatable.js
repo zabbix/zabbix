@@ -1166,6 +1166,8 @@ class CDataTable {
 		this.updateUserConfig()
 			.getData()
 			.then(response => {
+				this.#options_popup_updated = true;
+
 				this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
 				this.dispatchEvent(CDataTable.EVENT_SAVE);
 			});
