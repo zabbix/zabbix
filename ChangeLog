@@ -1,12 +1,19 @@
 Changes for 8.0.0rc1
 
 New features:
+.........T [ZBXNEXT-10639] added template GCP Cost monitoring by HTTP (kflorowski)
 .........T [ZBXNEXT-10328] added Percona by Zabbix agent template (mruszczyk)
 .........T [ZBXNEXT-10326] added MariaDB by Zabbix agent template (mruszczyk)
 .........T [ZBXNEXT-10320] added new metrics, expanded discovery rules for tables and improved dashboard in MySQL by Zabbix agent template (mruszczyk)
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-27875] fixed the display of the "Show templates" filter in the "Host wizard" form (Sasha)
+..F....... [ZBX-27961] fixed delete cancel confirmation in API tokens and proxy group edit forms (scernisenko)
+..F....... [ZBX-27825] fixed to set correct mode parameter for nodata function in trigger expression edit form (gberzina)
+..F....... [ZBX-27140] fixed overall hintbox positioning (dfofanovs)
+..F....... [ZBX-25815] removed mention of discovery from SNMP max_repetition help note (vskalbins)
+..F....... [ZBX-27941] fixed console error on Dashboard list page in Kiosk mode (scernisenko)
 .......PS. [ZBX-27975] fixed potential VMware collector crash caused by network connectivity issues to vCenter (MVekslers)
 .........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates. (abrosimovs)
 ..F....... [ZBX-26583] fixed incorrectly displayed templates after clearing search field in host wizard (aluchko, gklavins)
@@ -425,6 +432,18 @@ Bug fixes:
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
 A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 .......PS. [ZBX-27638] prohibited to modify or override global system JavaScript objects via user script for preprocessing subsystem and zabbix_js (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.14rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.4.13
+
+7.4.13rc1 was released as 7.4.13 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.4.13rc1
@@ -1941,6 +1960,18 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.30rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.29
+
+7.0.29rc1 was released as 7.0.29 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.29rc1
@@ -6091,6 +6122,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.49rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.48
+
+6.0.48rc1 was released as 6.0.48 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.48rc1

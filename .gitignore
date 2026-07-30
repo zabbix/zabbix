@@ -144,6 +144,8 @@ tests/libs/zbxalgo/zbx_mode_code
 tests/libs/zbxalgo/zbx_int128
 tests/libs/zbxalgo/zbx_vector
 tests/libs/zbxcfg/parse_cfg_file
+tests/libs/zbxcfg/zbx_cfg_prepare_bridge_adapter_connect_to
+tests/libs/zbxcfg/zbx_cfg_validate_bridge_adapter_url
 tests/libs/zbxcommon/init_library_common
 tests/libs/zbxcommon/zbx_calloc
 tests/libs/zbxcommon/zbx_malloc
