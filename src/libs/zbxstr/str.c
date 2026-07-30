@@ -386,7 +386,7 @@ int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charli
  *                                                                            *
  * Parameters: list      - [IN/OUT] list of delimited values                  *
  *             delimiter - [IN]                                               *
- *             token     - [OUT] start of the current token                   *
+ *             token     - [IN/OUT] start of the current token                *
  *             token_len - [OUT] length of the current token                  *
  *                                                                            *
  * Return value: SUCCEED - a token was returned                               *
@@ -394,6 +394,7 @@ int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charli
  *                                                                            *
  * Comments: where 'list' on input - position to continue iterating from      *
  *           (initially the start of the list);                               *
+ *           Initializing token to NULL indicates the first iteration         *
  *           on output - advanced past the returned token, ready for the      *
  *           next call                                                        *
  *                                                                            *
@@ -403,7 +404,15 @@ int	zbx_str_list_next(const char **list, const char delimiter, const char **toke
 	const char	*end;
 
 	if ('\0' == **list)
-		return FAIL;
+	{
+		if (NULL == *token || delimiter != (*token)[*token_len])
+			return FAIL;
+
+		*token = *list;
+		*token_len = 0;
+
+		return SUCCEED;
+	}
 
 	*token = *list;
 

@@ -955,8 +955,8 @@ int	zbx_parse_item_types(const char *itemtypes, zbx_uint32_t *itemtype_mask, cha
 	zbx_item_type_name_t;
 
 	const zbx_item_type_name_t	item_type_names[] = ZBX_ITEM_TYPE_NAME;
-	const char			*token, *list = itemtypes;
-	size_t				len, token_len;
+	const char			*token = NULL, *list = itemtypes;
+	size_t				token_len;
 	zbx_uint32_t			mask = 0;
 	int				ret = SUCCEED;
 
@@ -966,14 +966,6 @@ int	zbx_parse_item_types(const char *itemtypes, zbx_uint32_t *itemtype_mask, cha
 			*itemtype_mask = mask;
 
 		return SUCCEED;
-	}
-
-	if (0 != (len = strlen(itemtypes)) && ',' == itemtypes[len - 1])
-	{
-		if (NULL != error)
-			*error = zbx_dsprintf(NULL, "empty item type value");
-
-		return FAIL;
 	}
 
 	while (SUCCEED == zbx_str_list_next(&list, ',', &token, &token_len))

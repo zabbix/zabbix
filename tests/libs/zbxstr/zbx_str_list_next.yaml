@@ -20,12 +20,12 @@ in:
 out:
   tokens: []
 ---
-test case: 4. trailing delimiter does not produce a final empty token
+test case: 4. trailing delimiter does produce a final empty token
 in:
   list: "a,b,"
   delimiter: ','
 out:
-  tokens: [a, b]
+  tokens: [a, b,'']
 ---
 test case: 5. leading delimiter produces a leading empty token
 in:
@@ -46,7 +46,7 @@ in:
   list: ","
   delimiter: ','
 out:
-  tokens: ['']
+  tokens: ['','']
 ---
 test case: 8. different delimiter character
 in:

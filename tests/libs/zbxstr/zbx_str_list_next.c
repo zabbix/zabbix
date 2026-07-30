@@ -24,7 +24,7 @@ void	zbx_mock_test_entry(void **state)
 	const char		*list = zbx_mock_get_parameter_string("in.list");
 	char			delimiter = *zbx_mock_get_parameter_string("in.delimiter");
 	zbx_vector_str_t	exp_tokens, act_tokens;
-	const char		*token;
+	const char		*token = NULL;
 	size_t			token_len;
 	int			i;
 
