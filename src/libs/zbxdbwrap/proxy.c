@@ -655,7 +655,7 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 	AGENT_RESULT	result;
 	zbx_log_t	*log;
 
-	if (0 != (get_denyitemtypes_mask_cb() & (1u << item->type)))
+	if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask_cb(), item->type))
 		return FAIL;
 
 	if (ITEM_STATUS_ACTIVE != item->status)

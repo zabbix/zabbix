@@ -1035,7 +1035,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
 		const char *config_webdriver_url, zbx_uint32_t config_denyitemtypes_mask)
 {
-	if (0 != (config_denyitemtypes_mask & (1u << items[0].type)))
+	if (0 != ZBX_ITEM_TYPE_DENIED(config_denyitemtypes_mask , items[0].type))
 	{
 		for (int i = 0; i < num; i++)
 		{
