@@ -21,7 +21,7 @@
 
 window.drule_edit_popup = new class {
 
-	init({druleid, dchecks, drule}) {
+	init({druleid, dchecks, drule, can_select_server_for_discovery_by}) {
 		this.overlay = overlays_stack.getById('discovery.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -29,6 +29,7 @@ window.drule_edit_popup = new class {
 		this.druleid = druleid;
 		this.dchecks = dchecks;
 		this.drule = drule;
+		this.can_select_server_for_discovery_by = can_select_server_for_discovery_by;
 		this.dcheckid = getUniqueId();
 		this.available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
@@ -350,6 +351,25 @@ window.drule_edit_popup = new class {
 
 	clone({title, buttons}) {
 		this.druleid = null;
+
+		if (!this.can_select_server_for_discovery_by) {
+			const discovery_by_server = this.form.querySelector(
+				'[name="discovery_by"][value="<?= ZBX_MONITORED_BY_SERVER ?>"]'
+			);
+
+			if (!discovery_by_server.checked) {
+				return;
+			}
+
+			const discovery_by_proxy = this.form.querySelector(
+				'[name="discovery_by"][value="<?= ZBX_MONITORED_BY_PROXY ?>"]'
+			);
+
+			discovery_by_proxy.checked = true;
+			discovery_by_proxy.removeAttribute('readonly');
+
+			this.#updateForm();
+		}
 
 		// Remove all warning icons and enable all Remove buttons in Checks table.
 		const table = document.getElementById('dcheckList');

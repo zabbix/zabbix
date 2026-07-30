@@ -233,7 +233,8 @@ $form
 			drule_edit_popup.init('.json_encode([
 				'druleid' => $data['drule']['druleid'],
 				'dchecks' => array_values($data['drule']['dchecks']),
-				'drule' => $data['drule']
+				'drule' => $data['drule'],
+				'can_select_server_for_discovery_by' => $data['host']['can_select_server_for_discovery_by']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);
