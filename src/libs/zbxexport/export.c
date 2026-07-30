@@ -56,7 +56,10 @@ int	zbx_validate_export_type(const char *export_type, zbx_uint32_t *export_mask)
 	if (NULL != export_type)
 	{
 		const char	*token, *list = export_type;
-		size_t		token_len;
+		size_t		len, token_len;
+
+		if (0 != (len = strlen(export_type)) && ',' == export_type[len - 1])
+			return FAIL;
 
 		mask = 0;
 
