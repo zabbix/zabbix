@@ -995,31 +995,16 @@ static int	DBpatch_7050077(void)
 
 static int	DBpatch_7050078(void)
 {
-	zbx_db_result_t result;
-	zbx_db_row_t	row;
-	int				ret = SUCCEED;
-
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	result = zbx_db_select("select role_ruleid from role_rule where name='ui.configuration.event_correlation'");
-
-	while (NULL != (row = zbx_db_fetch(result)))
+	if (ZBX_DB_OK > zbx_db_execute("update role_rule set name='ui.configuration.ceprules'"
+			" where name='ui.configuration.event_correlation'"))
 	{
-		zbx_uint64_t	role_ruleid;
-		ZBX_STR2UINT64(role_ruleid, row[0]);
-
-		if (ZBX_DB_OK > zbx_db_execute(
-			"update role_rule set name='ui.configuration.ceprules' where role_ruleid=" ZBX_FS_UI64,
-			role_ruleid))
-		{
-			ret = FAIL;
-			break;
-		}
+		return FAIL;
 	}
-	zbx_db_free_result(result);
 
-	return ret;
+	return SUCCEED;
 }
 
 #endif
