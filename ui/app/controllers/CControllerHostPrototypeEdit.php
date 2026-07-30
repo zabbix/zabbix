@@ -366,16 +366,21 @@ class CControllerHostPrototypeEdit extends CController {
 		$data['ms_proxy_group'] = [];
 
 		if ($data['parent_host']['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
-			$data['ms_proxy'] = CArrayHelper::renameObjectsKeys(API::Proxy()->get([
-				'output' => ['proxyid', 'name'],
-				'proxyids' => $data['parent_host']['proxyid']
-			]), ['proxyid' => 'id']);
+			$data['ms_proxy'] = [CProxyHelper::resolveProxyOption($data['parent_host']['proxyid'])];
 		}
 		elseif ($data['parent_host']['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-			$data['ms_proxy_group'] = CArrayHelper::renameObjectsKeys(API::ProxyGroup()->get([
+			$proxy_groups = API::ProxyGroup()->get([
 				'output' => ['proxy_groupid', 'name'],
 				'proxy_groupids' => $data['parent_host']['proxy_groupid']
-			]), ['proxy_groupid' => 'id']);
+			]);
+
+			$data['ms_proxy_group'] = $proxy_groups
+				? CArrayHelper::renameObjectsKeys($proxy_groups, ['proxy_groupid', 'id'])
+				: [[
+					'id' => $data['parent_host']['proxy_groupid'],
+					'name' => _('Inaccessible proxy'),
+					'inaccessible' => true
+				]];
 		}
 
 		self::extendLinkedTemplates($data);
