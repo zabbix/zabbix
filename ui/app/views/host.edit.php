@@ -287,12 +287,8 @@ $host_tab
 			(new CRadioButtonList('monitored_by', (int) $data['host']['monitored_by']))
 				->addValue(_('Server'), ZBX_MONITORED_BY_SERVER, null, null,
 					!$data['user']['can_select_server_for_monitoring'])
-				->addValue(_('Proxy'), $data['has_inaccessible_proxy_group']
-					? ZBX_MONITORED_BY_PROXY_GROUP
-					: ZBX_MONITORED_BY_PROXY)
-				->addValue(_('Proxy group'), $data['has_inaccessible_proxy_group']
-					? ZBX_MONITORED_BY_PROXY
-					: ZBX_MONITORED_BY_PROXY_GROUP)
+				->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
+				->addValue(_('Proxy group'), ZBX_MONITORED_BY_PROXY_GROUP)
 				->setReadonly($host_is_discovered || !$data['user']['can_edit_monitoring_by'])
 				->setModern()
 		)

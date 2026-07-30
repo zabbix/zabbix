@@ -187,7 +187,6 @@ class CControllerHostEdit extends CController {
 			'is_psk_edit' => $this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk'),
 			'show_inherited_tags' => $this->getInput('show_inherited_tags', 0),
 			'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
-			'has_inaccessible_proxy_group' => false,
 			'warnings' => [],
 			'user' => [
 				'debug_mode' => $this->getDebugMode(),
@@ -354,8 +353,6 @@ class CControllerHostEdit extends CController {
 						'inaccessible' => true
 					]
 				];
-
-				$data['has_inaccessible_proxy_group'] = true;
 			}
 
 			if ($data['host']['assigned_proxyid'] != 0) {
