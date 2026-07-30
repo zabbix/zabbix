@@ -416,10 +416,10 @@ zabbix_export:
                   value: notice
         - uuid: f59d6794a6b94e93aced78a688507677
           name: 'Get filesystems'
-          key: vfs.fs.get
+          key: 'vfs.fs.get[short]'
           history: '0'
           value_type: TEXT
-          description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
+          description: 'The `vfs.fs.get[short]` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
           tags:
             - tag: component
               value: raw
@@ -1222,7 +1222,7 @@ zabbix_export:
                   parameters:
                     - '$.[?(@.fsname==''{#FSNAME}'')].first()'
               master_item:
-                key: vfs.fs.get
+                key: 'vfs.fs.get[full,{#FSNAME}]'
               tags:
                 - tag: component
                   value: raw
@@ -1272,7 +1272,7 @@ zabbix_export:
                     host: 'Windows by Zabbix agent'
                     key: 'vfs.fs.dependent.size[{#FSNAME},free]'
           master_item:
-            key: vfs.fs.get
+            key: 'vfs.fs.get[short]'
           lld_macro_paths:
             - lld_macro: '{#FSDRIVETYPE}'
               path: $.fsdrivetype
