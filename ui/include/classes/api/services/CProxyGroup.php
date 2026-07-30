@@ -68,10 +68,8 @@ class CProxyGroup extends CApiService {
 		}
 
 		// editable + PERMISSION CHECK
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if ($options['editable']) {
-				return $options['countOutput'] ? '0' : [];
-			}
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions'] && $options['editable']) {
+			return $options['countOutput'] ? '0' : [];
 		}
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
@@ -105,7 +103,7 @@ class CProxyGroup extends CApiService {
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
-		// editable
+		// PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$sql_parts['where'][] = CApiUserGroupHelper::getProxyGroupPermissionsCondition('pg');
 		}
@@ -378,7 +376,7 @@ class CProxyGroup extends CApiService {
 			'proxy_groupids' => $proxy_groupids
 		]);
 
-		self::unlinkProxyGroups($proxy_groups);
+		self::unlinkFromUserGroups($proxy_groups);
 
 		DB::delete('proxy_group', ['proxy_groupid' => $proxy_groupids]);
 
@@ -414,10 +412,7 @@ class CProxyGroup extends CApiService {
 		self::checkUsedInHosts($db_proxy_groups);
 	}
 
-	/**
-	 * @param array $proxy_groups
-	 */
-	private static function unlinkProxyGroups(array $proxy_groups): void {
+	private static function unlinkFromUserGroups(array $proxy_groups): void {
 		$proxy_groupids = [];
 
 		foreach ($proxy_groups as $proxy_group) {

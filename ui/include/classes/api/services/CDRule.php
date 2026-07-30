@@ -319,7 +319,7 @@ class CDRule extends CApiService {
 			foreach ($proxyids as $i => $proxyid) {
 				if (!array_key_exists($proxyid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i + 1).'/proxyid',_("object does not exist, or you have no permissions to it")
+						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
 					));
 				}
 			}
@@ -487,7 +487,7 @@ class CDRule extends CApiService {
 			foreach ($proxyids as $i => $proxyid) {
 				if (!array_key_exists($proxyid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i + 1).'/proxyid',_("object does not exist, or you have no permissions to it")
+						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
 					));
 				}
 			}

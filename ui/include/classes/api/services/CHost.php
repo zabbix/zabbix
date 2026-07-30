@@ -2213,7 +2213,7 @@ class CHost extends CHostGeneral {
 				$field = array_key_exists($host['hostid'], $monitored_by_upd) ? 'monitored_by' : 'proxyid';
 				$path = '/'.($i + 1).'/'.$field;
 
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.', $path,
 					_('parameter is readonly while you do not have permission to current proxy')
 				));
 			}
@@ -2223,7 +2223,7 @@ class CHost extends CHostGeneral {
 				$field = array_key_exists($host['hostid'], $monitored_by_upd) ? 'monitored_by' : 'proxy_groupid';
 				$path = '/'.($i + 1).'/'.$field;
 
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.', $path,
 					_('parameter is readonly while you do not have permission to current proxy group')
 				));
 			}

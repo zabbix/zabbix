@@ -650,14 +650,7 @@ class CUserGroup extends CApiService {
 		}
 	}
 
-	/**
-	 * Check for valid proxies.
-	 *
-	 * @param array  $usrgrps
-	 *
-	 * @throws APIException
-	 */
-	private function checkProxies(array $usrgrps) {
+	private function checkProxies(array $usrgrps): void {
 		$proxy_indexes = [];
 
 		foreach ($usrgrps as $i1 => $usrgrp) {
@@ -702,14 +695,7 @@ class CUserGroup extends CApiService {
 		}
 	}
 
-	/**
-	 * Check for valid proxy groups.
-	 *
-	 * @param array  $usrgrps
-	 *
-	 * @throws APIException
-	 */
-	private function checkProxyGroups(array $usrgrps) {
+	private function checkProxyGroups(array $usrgrps): void {
 		$proxy_groups_indexes = [];
 
 		foreach ($usrgrps as $i1 => $usrgrp) {
@@ -1325,10 +1311,6 @@ class CUserGroup extends CApiService {
 		}
 	}
 
-	/**
-	 * @param array      $usrgrps
-	 * @param null|array $db_usrgrps
-	 */
 	private static function updateProxies(array &$usrgrps, ?array $db_usrgrps = null): void {
 		$ins_changed_proxies = [];
 		$del_changed_proxies = [];
@@ -1341,7 +1323,7 @@ class CUserGroup extends CApiService {
 			if ($db_usrgrps !== null
 					&& array_key_exists($usrgrp['usrgrpid'], $db_usrgrps)
 					&& array_key_exists('proxies', $db_usrgrps[$usrgrp['usrgrpid']])) {
-				$db_proxies = array_column($db_usrgrps[$usrgrp['usrgrpid']]['proxies'],null,'proxyid');
+				$db_proxies = array_column($db_usrgrps[$usrgrp['usrgrpid']]['proxies'], null, 'proxyid');
 			}
 			else {
 				$db_proxies = [];
@@ -1390,10 +1372,6 @@ class CUserGroup extends CApiService {
 		unset($usrgrp);
 	}
 
-	/**
-	 * @param array      $usrgrps
-	 * @param null|array $db_usrgrps
-	 */
 	private static function updateProxyGroups(array &$usrgrps, ?array $db_usrgrps = null): void {
 		$ins_changed_proxy_groups = [];
 		$del_changed_proxy_groups = [];
@@ -1406,7 +1384,9 @@ class CUserGroup extends CApiService {
 			if ($db_usrgrps !== null
 					&& array_key_exists($usrgrp['usrgrpid'], $db_usrgrps)
 					&& array_key_exists('proxy_groups', $db_usrgrps[$usrgrp['usrgrpid']])) {
-				$db_proxy_groups = array_column($db_usrgrps[$usrgrp['usrgrpid']]['proxy_groups'],null,'proxy_groupid');
+				$db_proxy_groups = array_column(
+					$db_usrgrps[$usrgrp['usrgrpid']]['proxy_groups'], null, 'proxy_groupid'
+				);
 			}
 			else {
 				$db_proxy_groups = [];
@@ -1822,7 +1802,8 @@ class CUserGroup extends CApiService {
 	 */
 	private static function addAffectedObjects(array $usrgrps, array &$db_usrgrps): void {
 		$usrgrpids = ['hostgroup_rights' => [], 'templategroup_rights' => [], 'tag_filters' => [], 'users' => [],
-			'proxies' => [], 'proxy_groups' => []];
+			'proxies' => [], 'proxy_groups' => []
+		];
 
 		foreach ($usrgrps as $usrgrp) {
 			if (array_key_exists('hostgroup_rights', $usrgrp)) {

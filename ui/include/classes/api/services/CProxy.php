@@ -86,10 +86,8 @@ class CProxy extends CApiService {
 		}
 
 		// editable + PERMISSION CHECK
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if ($options['editable']) {
-				return $options['countOutput'] ? '0' : [];
-			}
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions'] && $options['editable']) {
+			return $options['countOutput'] ? '0' : [];
 		}
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
@@ -123,7 +121,7 @@ class CProxy extends CApiService {
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
-		// editable
+		// PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$sql_parts['where'][] = CApiUserGroupHelper::getProxyPermissionsCondition('p');
 		}
@@ -342,7 +340,7 @@ class CProxy extends CApiService {
 		}
 
 		self::updateHosts($proxies, $db_proxies);
-		self::unlinkProxies($proxies, $db_proxies);
+		self::unlinkFromUserGroups($proxies, $db_proxies);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_PROXY, $proxies, $db_proxies);
 
@@ -397,11 +395,7 @@ class CProxy extends CApiService {
 		}
 	}
 
-	/**
-	 * @param array $proxies
-	 * @param array|null $db_proxies
-	 */
-	private static function unlinkProxies(array $proxies, ?array $db_proxies = null): void {
+	private static function unlinkFromUserGroups(array $proxies, ?array $db_proxies = null): void {
 		$proxyids = [];
 
 		foreach ($proxies as $proxy) {
@@ -507,7 +501,7 @@ class CProxy extends CApiService {
 			'proxyids' => $proxyids
 		]);
 
-		self::unlinkProxies($proxies);
+		self::unlinkFromUserGroups($proxies);
 
 		DB::delete('host_proxy', ['proxyid' => $proxyids]);
 		DB::delete('proxy', ['proxyid' => $proxyids]);
