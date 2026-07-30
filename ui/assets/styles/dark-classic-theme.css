@@ -3112,6 +3112,8 @@ button {
   border: 1px solid #303030;
   border-radius: var(--surface-border-radius) 0 var(--surface-border-radius) var(--surface-border-radius); }
   .filter-container .table {
+    display: flex;
+    gap: 0 40px;
     border-bottom: 1px solid #383838; }
   .filter-container .filter-forms {
     padding: 0 10px; }
@@ -3129,7 +3131,6 @@ button {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 0 40px;
   padding-bottom: 5px;
   white-space: nowrap;
   background-color: #2b2b2b; }

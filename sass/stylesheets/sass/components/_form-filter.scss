@@ -42,6 +42,8 @@
 	border-radius: var(--surface-border-radius) 0 var(--surface-border-radius) var(--surface-border-radius);
 
 	.table {
+		display: flex;
+		gap: 0 40px;
 		border-bottom: 1px solid $table-border-color;
 	}
 
@@ -69,7 +71,6 @@
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
-	gap: 0 40px;
 	padding-bottom: 5px;
 	white-space: nowrap;
 	background-color: $ui-bg-color;
