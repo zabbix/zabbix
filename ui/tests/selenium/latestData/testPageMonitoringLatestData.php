@@ -643,10 +643,11 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		foreach ($data['subfilter'] as $header => $values) {
 			foreach ($values as $value) {
+				$table = $this->query('id:latest')->asTable()->one();
 				$this->query('xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
 						CXPathHelper::escapeQuotes($value).']')->waitUntilClickable()->one()->click();
 				$this->page->waitUntilReady();
-				$this->query('id:latest')->asDatatable()->one()->waitUntilReady();
+				$table->waitUntilReloaded();
 			}
 		}
 
