@@ -624,6 +624,7 @@ static int	cep_manager_commit_task(zbx_cep_manager_t *manager, zbx_mw_task_t *ta
 		case CEP_TASK_RULE_ERROR:
 			break;
 		case CEP_TASK_WINDOW:
+		case CEP_TASK_RULE_RESET:
 			return FAIL;
 	}
 
