@@ -7446,7 +7446,9 @@ HEREDOC;
 	 *
 	 *   1. "down_0", "down_1" and "down_10" each find their own window empty and take its one place, so all
 	 *      three problems stay open;
-	 *   2. the "up" of an id finds that id's window occupied by its "down", so it does not fit: it is evicted
+	 *   2. a second "down_0" goes to the window of that id, which now has no place left, so it does not fit
+	 *      and is closed as it is evicted - the capacity limits inside a group as well, and it is one;
+	 *   3. the "up" of an id finds that id's window occupied by its "down", so it does not fit: it is evicted
 	 *      and closed, and being an "up" event it closes the window too, which closes the "down" problem the
 	 *      window held. Both problems of that id are gone, the ids not sent an "up" yet are untouched.
 	 *
@@ -7470,21 +7472,33 @@ HEREDOC;
 			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
 		]);
 
-		$services = [self::CEP_RULE_WINDOW_NONE_SERVICE, self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT,
-			self::CEP_RULE_WINDOW_NONE_SERVICE_LAST
-		];
+		$first = self::CEP_RULE_WINDOW_NONE_SERVICE;
+		$services = [$first, self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT, self::CEP_RULE_WINDOW_NONE_SERVICE_LAST];
 
-		// 1. Every id has a window of its own, so every "down" fits and every problem stays open.
-		$open = 0;
+		// 1. The first id finds its window empty and takes its one place.
+		$send('down_'.$first);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForOpenProblemCountByTag($all, 'service', $first, 1);
 
-		foreach ($services as $service) {
+		// 2. A second value with the same id goes to that same window, which has no place left, so this one
+		//    does not fit: the id ends up with two problem events of which only the first one - the one the
+		//    window holds - is still open. The capacity limits inside a group as well, and it is one.
+		$send('down_'.$first);
+		$this->waitForProblemEventCountByTag($all, 'service', $first, 2);
+		$this->waitForOpenProblemCountByTag($all, 'service', $first, 1);
+		$this->waitForOpenProblemCount($all, 1);
+
+		// 3. The other ids have windows of their own, so their "down" fits too and every problem stays open.
+		$open = 1;
+
+		foreach ([self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT, self::CEP_RULE_WINDOW_NONE_SERVICE_LAST] as $service) {
 			$send('down_'.$service);
 			$this->waitForOpenProblemCount($all, ++$open);
-			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 			$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
 		}
 
-		// 2. The "up" of an id does not fit into that id's window: it is closed as it is evicted and closes
+		// 4. The "up" of an id does not fit into that id's window: it is closed as it is evicted and closes
 		//    the window, which closes the "down" problem the window was holding. Only that id is affected.
 		foreach ($services as $service) {
 			$send('up_'.$service);
@@ -7915,6 +7929,23 @@ HEREDOC;
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
+			'tags' => [['tag' => $tag, 'value' => $value, 'operator' => TAG_OPERATOR_EQUAL]]
+		], $expected, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Poll event.get until exactly $expected problem events since the scenario baseline carry the $tag tag
+	 * with the $value value. Unlike waitForOpenProblemCountByTag() this counts the problems that were opened,
+	 * whether they are still open or have been closed since.
+	 */
+	private function waitForProblemEventCountByTag(array $triggerids, string $tag, string $value,
+			int $expected): void {
+		$this->callUntilCountIsPresent('event.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'filter' => ['value' => TRIGGER_VALUE_TRUE],
 			'tags' => [['tag' => $tag, 'value' => $value, 'operator' => TAG_OPERATOR_EQUAL]]
 		], $expected, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
