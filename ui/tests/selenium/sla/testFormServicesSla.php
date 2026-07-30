@@ -1127,12 +1127,11 @@ class testFormServicesSla extends CWebTest {
 			}
 		}
 
-		// An additional submit is required for #7 case. This validation is triggered only on form submission.
-		if (array_key_exists('inline_errors', $data) && in_array('At least one entry should be selected.', $data['inline_errors'])) {
-			$form->submit();
-		}
-
 		if (array_key_exists('inline_errors', $data)) {
+			// An additional submit is required for #7 case. This validation is triggered only on form submission.
+			if (in_array('At least one entry should be selected.', $data['inline_errors'])) {
+				$form->submit();
+			}
 			$this->page->removeFocus();
 			$selector = (array_keys($data['inline_errors'])[0]);
 			$field = (strpos($selector, ':') === false) ? $form->getField($selector) : $form->query($selector)->one();
