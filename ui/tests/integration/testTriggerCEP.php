@@ -165,6 +165,10 @@ class testTriggerCEP extends CIntegrationTest {
 	// How long the windows of those flavours stay open. The evicted flavours wait for it to run out before
 	// their operations run, so it is kept short.
 	const CEP_RULE_WINDOW_OPS_DURATION = '3s';
+	// The cause and symptom flavour (see prepareDataCepWindowCauseSymptom()) needs neither: its window does its
+	// work as the events arrive, ranking the first event of a group as the cause of the ones that follow. The
+	// count of those is kept in a tag of the cause event, which only this window type has.
+	const CEP_TAG_SYMPTOM_COUNT = 'symptom_count';
 	// The capacity flavours (see prepareDataCepWindowCapacityOperations()) let the window overflow instead: it
 	// holds a single event and outlasts the whole test, so every event after the first one is evicted for not
 	// fitting rather than for having been in the window too long.
@@ -1839,6 +1843,60 @@ class testTriggerCEP extends CIntegrationTest {
 		]);
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_DISCARD_UP, [], $operations));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the cause and symptom grouping flavour. This window type needs no operations at all: it ranks
+	 * the events of a group itself as they arrive - the first event of the group is the cause, and every event
+	 * that arrives while it is still in the window becomes a symptom of it, pointing at it through its
+	 * cause_eventid. The number of events the group has collected is written to the CEP_TAG_SYMPTOM_COUNT tag
+	 * of the cause event, a tag only this window type maintains.
+	 *
+	 * The window groups by the 'component' tag, which every event of the driven trigger carries with the same
+	 * value, so all of them form one group; it lasts longer than the test and has no capacity limit, so
+	 * nothing is evicted and the group is never reset while the events are being sent.
+	 *
+	 * A second rule of the same window type is created beside it, matching the same events and doing nothing
+	 * but adding a tag. A cause and symptom window is one of the exclusive window types, so only the first
+	 * matching rule of that kind is processed for an event and that tag must never appear - the same property
+	 * the tag correlation flavour checks.
+	 */
+	public function prepareDataCepWindowCauseSymptom() {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// Nothing may close these problems: the scenario asserts all of them stay open, ranked but untouched.
+		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
+
+		$window = [
+			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
+			'capacity' => 0,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => ['component'],
+			'event_count_tag' => self::CEP_TAG_SYMPTOM_COUNT
+		];
+
+		$name = self::CEP_RULE_NAME_PREFIX.'window cause ';
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name.'symptom', [], [],
+			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, $window
+		));
+
+		$second_operations = $this->buildWindowNoneOperations([
+			[CCepRuleHelper::OP_ADD_TAG, ['tag' => self::CEP_TAG_WINDOW_SECOND,
+				'tag_value' => self::CEP_TAG_WINDOW_SECOND_VALUE
+			]]
+		]);
+
+		$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams($name.'second', [],
+			$second_operations, CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, $window
+		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -6059,6 +6117,29 @@ HEREDOC;
 	}
 
 	/**
+	 * Cause and symptom grouping: the window ranks the events of a group itself, without a single operation.
+	 * All three values go into one group, so the first problem becomes the cause and the two after it become
+	 * its symptoms, each pointing at it through its cause_eventid, while the cause counts them in a tag of its
+	 * own. Nothing closes anything, so all three problems stay open and only the trigger expression recovers
+	 * them.
+	 *
+	 * As with a tag correlation window, only the first matching rule of this window type is processed for an
+	 * event: a second rule that would only add a tag must leave no trace.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptom$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptom() {
+		$this->prepareDataCepWindowCauseSymptom();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCauseSymptom();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * A simple window that overflows instead of expiring: it has room for one event and lasts longer than the
 	 * test, so every event after the first one is evicted the moment it arrives, and the rule closes what it
 	 * evicts. The "up" value at the end also closes the window, which closes the one problem the window was
@@ -7761,6 +7842,116 @@ HEREDOC;
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 		$this->waitForNoOpenProblems($all, 'After the capacity discard recovery value');
+	}
+
+	/**
+	 * Drive the cause and symptom grouping flavour: every value goes into the same group, so the problem of
+	 * the first one becomes the cause and each of the following ones becomes a symptom of it as it arrives.
+	 * Nothing closes anything, so all three problems stay open, ranked but otherwise untouched, and the
+	 * ranking is re-checked after every value - a symptom is expected to point at the cause the moment its
+	 * problem exists, not only at the end.
+	 */
+	private function runEventAssessmentTestCepWindowCauseSymptom(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the cause and symptom test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$open = 0;
+
+		foreach ([self::CEP_RULE_WINDOW_NONE_SERVICE, self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT,
+				self::CEP_RULE_WINDOW_NONE_SERVICE_LAST] as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, ++$open);
+			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+			// The first value only opens the cause; every one after it adds a symptom to it.
+			$this->waitForCepCauseSymptomEvents($triggerid, $open - 1);
+		}
+
+		// Nothing in this flavour closes a problem, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the cause and symptom recovery value');
+	}
+
+	/**
+	 * Wait until the events generated since the scenario baseline are ranked as one cause with $symptom_count
+	 * symptoms: the oldest of them must be the cause - no cause of its own - every other one must point at it
+	 * through its cause_eventid, and the cause must carry the CEP_TAG_SYMPTOM_COUNT tag stating how many
+	 * events the group has collected beside it.
+	 *
+	 * No event may carry the tag of the second rule: a cause and symptom window is exclusive, so that rule
+	 * never gets its turn.
+	 */
+	private function waitForCepCauseSymptomEvents(int $triggerid, int $symptom_count): void {
+		$this->callUntilDataIsPresent('event.get', [
+			'objectids' => [$triggerid],
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'filter' => ['value' => TRIGGER_VALUE_TRUE],
+			'output' => ['eventid', 'name', 'cause_eventid'],
+			'selectTags' => 'extend',
+			'sortfield' => 'eventid',
+			'sortorder' => 'ASC'
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($symptom_count) {
+			if (count($response['result']) !== $symptom_count + 1) {
+				return 'expected '.($symptom_count + 1).' problem event(s), got '.count($response['result']);
+			}
+
+			$cause = $response['result'][0];
+			$tags = array_column($cause['tags'], 'value', 'tag');
+			$info = 'cause event '.$cause['eventid'].' ('.$cause['name'].')';
+
+			if ((int) $cause['cause_eventid'] !== 0) {
+				return $info.': has cause '.$cause['cause_eventid'].', the oldest event of the group is'
+					.' the cause and must have none';
+			}
+
+			// The tag is only written once the group has more than the cause in it.
+			if ($symptom_count != 0) {
+				if (!array_key_exists(self::CEP_TAG_SYMPTOM_COUNT, $tags)) {
+					return $info.': missing "'.self::CEP_TAG_SYMPTOM_COUNT.'" tag';
+				}
+
+				if ((int) $tags[self::CEP_TAG_SYMPTOM_COUNT] !== $symptom_count) {
+					return $info.': "'.self::CEP_TAG_SYMPTOM_COUNT.'" tag value "'
+						.$tags[self::CEP_TAG_SYMPTOM_COUNT].'", expected '.$symptom_count;
+				}
+			}
+
+			foreach ($response['result'] as $event) {
+				$event_tags = array_column($event['tags'], 'value', 'tag');
+
+				if (array_key_exists(self::CEP_TAG_WINDOW_SECOND, $event_tags)) {
+					return 'event '.$event['eventid'].': unexpected "'.self::CEP_TAG_WINDOW_SECOND
+						.'" tag, the second rule of an exclusive window type must not be processed';
+				}
+
+				if ($event['eventid'] === $cause['eventid']) {
+					continue;
+				}
+
+				if ($event['cause_eventid'] !== $cause['eventid']) {
+					return 'event '.$event['eventid'].' ('.$event['name'].'): cause '
+						.$event['cause_eventid'].', expected the cause of the group '.$cause['eventid'];
+				}
+			}
+
+			return true;
+		});
 	}
 
 	/**
