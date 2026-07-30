@@ -885,7 +885,8 @@ class testPageHosts extends CLegacyWebTest {
 	 * Test the Enable and Disable link in the Host list.
 	 */
 	public function testPageHosts_EnableDisableLink() {
-		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		// Reset the filter (filter_rst=1) so a filter left over from a previous test does not hide the host.
+		$this->page->login()->open('zabbix.php?action=host.list&filter_rst=1')->waitUntilReady();
 		$host_row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Enabled status');
 
 		foreach (['Disabled' => HOST_STATUS_NOT_MONITORED, 'Enabled' => HOST_STATUS_MONITORED] as $status => $id) {

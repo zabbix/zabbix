@@ -241,6 +241,9 @@ class testDashboardCopyWidgets extends CWebTest {
 			$copied_widget = $dashboard->waitUntilReady()->getWidget($widget_name);
 		}
 
+		// The widget can briefly re-render with an empty header after copy; wait for the name before asserting.
+		$copied_widget->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or'.
+				' contains(@class, "dashboard-grid-iterator-header")]/h4')->waitUntilTextPresent($widget_name);
 		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
 		$copied_fields = $copied_widget->edit()->getFields()->filter(CElementFilter::VISIBLE);
 
