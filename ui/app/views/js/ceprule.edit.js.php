@@ -203,6 +203,7 @@ window.ceprule_edit_popup = new class {
 				const row = e.target.closest('tr');
 				row.nextElementSibling.remove();
 				row.remove();
+				this.#renumberOperationRows();
 				this.form.discoverAllFields();
 			}
 		});
@@ -239,6 +240,9 @@ window.ceprule_edit_popup = new class {
 		new CSortable(window['ceprule-operations-table'].querySelector('tbody'), {
 			selector_span: ':not(.error-container-row)',
 			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
+		}).on(CSortable.EVENT_SORT, () => {
+			this.#renumberOperationRows();
+			this.form.discoverAllFields();
 		});
 
 		// Confirm / cancel dialog.
@@ -409,15 +413,6 @@ window.ceprule_edit_popup = new class {
 		fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>;
 		fields._cep_rule_reset = force_sumbit ? 1 : 0;
 
-		// Correct the sortorder.
-		const operations = {};
-		[...window['ceprule-operations-table'].querySelectorAll('[data-sortorder]')]
-			.map((row, index) => {
-				operations[index + 1] = {...fields.operations[row.dataset.sortorder], sortorder: index + 1};
-			});
-
-		fields.operations = operations;
-
 		this.#removePopupMessages();
 		this.form.validateSubmit(fields)
 			.then((result) => {
@@ -568,8 +563,10 @@ window.ceprule_edit_popup = new class {
 		const is_new = operation === undefined;
 
 		if (is_new) {
+			const operations = this.form.findFieldByName('operations').getValue();
+
 			operation = {
-				sortorder: 1 + Math.max(0, ...Object.keys(this.form.findFieldByName('operations').getValue())),
+				sortorder: 1 + Math.max(0, ...Object.values(operations).map(({sortorder}) => sortorder)),
 				evaltype: '<?= CONDITION_EVAL_TYPE_AND_OR ?>',
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
@@ -822,6 +819,20 @@ window.ceprule_edit_popup = new class {
 			description_html: description_template.evaluate(description_view),
 			...condition
 		});
+	}
+
+	#renumberOperationRows() {
+		window['ceprule-operations-table'].querySelectorAll('[data-sortorder]')
+			.forEach(function(row, index) {
+				row.dataset.sortorder = index;
+				row.querySelectorAll('[data-field-type="hidden"]').forEach(function(input) {
+					input.name = input.name.replace( /^operations\[\d+\]/, `operations[${index}]`);
+
+					if (input.name === `operations[${index}][sortorder]`) {
+						input.value = index;
+					}
+				});
+			});
 	}
 
 	#removePopupMessages() {
