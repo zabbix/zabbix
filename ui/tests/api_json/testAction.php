@@ -552,9 +552,20 @@ class testAction extends CAPITest {
 		$result = $this->call('action.create', $actions, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['actionids'] as $actionid) {
+			$actionids = $result['result']['actionids'];
+
+			foreach ($actionids as $actionid) {
 				$this->assertEquals(
 					1, CDBHelper::getCount('SELECT NULL FROM actions WHERE actionid='.zbx_dbstr($actionid))
+				);
+			}
+
+			// Clean up created actions to avoid permission conflicts.
+			$this->call('action.delete', $actionids, null);
+
+			foreach ($actionids as $actionid) {
+				$this->assertEquals(
+					0, CDBHelper::getCount('SELECT NULL FROM actions WHERE actionid='.zbx_dbstr($actionid))
 				);
 			}
 		}
