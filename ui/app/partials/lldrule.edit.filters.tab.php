@@ -88,7 +88,7 @@ $formgrid
 						],
 						(new CTextAreaFlexible('conditions[#{rowNum}][macro]', '#{macro}'))
 							->setAttribute('placeholder', '{#MACRO}')
-							->addClass('macro')
+							->addClass('js-macro')
 							->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 							->setMaxlength(DB::getFieldLength('item_condition', 'macro'))
 							->setReadonly($readonly)

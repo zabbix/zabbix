@@ -45,13 +45,14 @@ var LldRuleEditLldFiltersTab = class {
 				this.#toggleTypeOfCalculation();
 				this.#updateExpression();
 			})
-			.on('change', '.macro', () => {
+			.on('change', '.js-macro', () => {
 				this.#updateExpression();
 			})
 			.on('afteradd.dynamicRows', (event) => {
 				[...event.currentTarget.querySelectorAll('.js-operator')]
 					.pop()
 					.addEventListener('change', (e) => this.#toggleConditionValue(e.currentTarget));
+				this.#initMacroFields();
 			})
 			.ready(() => {
 				this.#toggleTypeOfCalculation();
@@ -67,6 +68,7 @@ var LldRuleEditLldFiltersTab = class {
 		);
 
 		this.#updateExpression();
+		this.#initMacroFields();
 	}
 
 	#toggleTypeOfCalculation() {
@@ -104,12 +106,24 @@ var LldRuleEditLldFiltersTab = class {
 		this.#container.querySelectorAll('.js-lld-filters .form_row').forEach(row => {
 			conditions.push({
 				id: row.querySelector('[name$="[formulaid]"').value,
-				type: row.querySelector('.macro').value
+				type: row.querySelector('.js-macro').value
 			});
 		});
 
 		this.#container.querySelector('.js-expression').innerText = getConditionFormula(conditions,
 			parseInt(this.#container.querySelector('.js-evaltype').value)
 		);
+	}
+
+	#initMacroFields() {
+		this.#container.querySelectorAll('.js-macro:not(.initialized-field)').forEach(textarea => {
+			const $textarea = $(textarea);
+
+			$textarea.on('change keydown', (e) => {
+				if (e.type === 'change' || e.which === 13) {
+					$(textarea).val($(textarea).val().toUpperCase());
+				}
+			});
+		});
 	}
 };
