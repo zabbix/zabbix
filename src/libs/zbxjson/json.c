@@ -1339,3 +1339,30 @@ struct zbx_json	*zbx_json_clone(const struct zbx_json *src)
 
 	return dst;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: returns raw JSON value by definite json path                      *
+ *                                                                            *
+ * Parameters: jp   - [IN] parsed JSON document                               *
+ *             path - [IN] definite JSON path                                 *
+ *                                                                            *
+ * Return value: allocated raw JSON value or NULL if path cannot be opened    *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_json_raw_value_by_path_dyn(const struct zbx_json_parse *jp, const char *path)
+{
+	struct zbx_json_parse	jp_value;
+	char			*value;
+	size_t			value_len;
+
+	if (SUCCEED != zbx_json_open_path(jp, path, &jp_value))
+		return NULL;
+
+	value_len = (size_t)(jp_value.end - jp_value.start + 1);
+	value = (char *)zbx_malloc(NULL, value_len + 1);
+	memcpy(value, jp_value.start, value_len);
+	value[value_len] = '\0';
+
+	return value;
+}
