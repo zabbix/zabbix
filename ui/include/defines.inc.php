@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',	7050063);
+define('ZABBIX_DB_VERSION',	7050087);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -913,6 +913,7 @@ define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);
 define('MEDIA_TYPE_WEBHOOK',	4);
+define('MEDIA_TYPE_PUSH',		5);
 
 define('SMTP_SECURITY_NONE',		0);
 define('SMTP_SECURITY_STARTTLS',	1);
@@ -1202,10 +1203,10 @@ define('ZBX_EVENT_HISTORY_MANUAL_UPDATE',	2);
 define('ZBX_EVENT_HISTORY_ALERT',			3);
 define('ZBX_EVENT_HISTORY_MAINTENANCE',		4);
 
-define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
-define('ZBX_TM_TASK_ACKNOWLEDGE',	4);
-define('ZBX_TM_TASK_CHECK_NOW',		6);
-define('ZBX_TM_TASK_DATA',			7);
+define('ZBX_TM_TASK_CLOSE_PROBLEM', 	1);
+define('ZBX_TM_TASK_ACKNOWLEDGE',		4);
+define('ZBX_TM_TASK_CHECK_NOW',			6);
+define('ZBX_TM_TASK_DATA',				7);
 
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);
@@ -1640,6 +1641,7 @@ define('API_NUMBER',				71);
 define('API_SELEMENTID',			72);
 define('API_SSL_CERTIFICATE',		73);
 define('API_SSL_PRIVATE_KEY',		74);
+define('API_UUID_V7',				75);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1674,6 +1676,7 @@ define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_DB',			112);
 define('ZBX_API_ERROR_PARAMETERS',	100);
 define('ZBX_API_ERROR_NO_ENTITY',	101);
+define('ZBX_API_ERROR_NO_EXTERNAL_ENTITY',	102);
 define('ZBX_API_ERROR_PERMISSIONS',	120);
 define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
@@ -1685,10 +1688,11 @@ define('API_ERR_DISCOVERED', 1);
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
+define('ZBX_AUTH_SCHEME_BEARER',	0);
+define('ZBX_AUTH_SCHEME_DPOP',		1);
+
 define('ZBX_AUTH_TOKEN_ENABLED', 0);
 define('ZBX_AUTH_TOKEN_DISABLED', 1);
-
-define('ZBX_API_HEADER_AUTHENTICATE_PREFIX', 'Bearer ');
 
 define('ZBX_JAN_2038', 2145916800);
 
@@ -2496,6 +2500,15 @@ define('ZBX_STYLE_DATATABLE', 'datatable');
 
 // Limit amount of validations per request in CControllerValidateUse
 define('VALIDATE_USE_CHUNK_SIZE', 500);
+
+define('ZABBIX_MOBILE_VERSION',			1);
+
+define('ZBX_DEVICE_STATUS_NEW',			0);
+define('ZBX_DEVICE_STATUS_ACTIVATED',	1);
+define('ZBX_DEVICE_STATUS_ORPHANED',	2);
+
+define('MOBILE_KEY_SCOPE_IDENTITY',		0);
+define('MOBILE_KEY_SCOPE_ENCRYPTION',	1);
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');

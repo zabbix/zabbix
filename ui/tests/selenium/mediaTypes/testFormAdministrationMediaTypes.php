@@ -161,7 +161,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->assertEquals(['Media type', 'Message templates', 'Options'], $form->getTabs());
 
 		// Check available media type types.
-		$this->assertEquals(['Email', 'SMS', 'Script', 'Webhook'], $form->getField('Type')->getOptions()->asText());
+		$this->assertEquals(['Email', 'Push', 'SMS', 'Script', 'Webhook'], $form->getField('Type')->getOptions()->asText());
 
 		// Check common fields in Media type and Options tabs. Message templates are covered in separate test.
 		$tabs = [
