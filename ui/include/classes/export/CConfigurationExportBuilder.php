@@ -1249,7 +1249,11 @@ class CConfigurationExportBuilder {
 				'ssl_key_password' => $item['ssl_key_password'],
 				'tags' => $this->formatTags($item['tags']),
 				'verify_peer' => $item['verify_peer'],
-				'verify_host' => $item['verify_host']
+				'verify_host' => $item['verify_host'],
+				'time_shift' => $item['time_shift'],
+				'lookback_limit' => $item['lookback_limit'],
+				'granularity' => $item['granularity'],
+				'query' => $item['query']
 			];
 
 			$master_item = ($item['type'] == ITEM_TYPE_DEPENDENT) ? ['key' => $item['master_item']['key_']] : [];
