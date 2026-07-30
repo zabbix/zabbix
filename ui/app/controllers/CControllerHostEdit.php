@@ -187,6 +187,7 @@ class CControllerHostEdit extends CController {
 			'is_psk_edit' => $this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk'),
 			'show_inherited_tags' => $this->getInput('show_inherited_tags', 0),
 			'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
+			'has_inaccessible_proxy_group' => false,
 			'warnings' => [],
 			'user' => [
 				'debug_mode' => $this->getDebugMode(),
@@ -319,13 +320,18 @@ class CControllerHostEdit extends CController {
 		$data['host']['assigned_proxy_name'] = '';
 		$data['host']['assigned_proxy_inaccessible'] = false;
 
-		if ($this->host['hostid'] && $data['host']['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
-			$proxyid = $data['host']['proxyid'];
+		$is_clone = $clone_hostid !== null;
 
-			$proxy = CProxyHelper::resolveProxyOption((int) $proxyid);
-			$data['ms_proxy'] = [$proxy];
+		if ($data['host']['monitored_by'] == ZBX_MONITORED_BY_PROXY && (int) $data['host']['proxyid'] !== 0) {
+			$proxy = CProxyHelper::resolveProxyOption((int) $data['host']['proxyid']);
 
-			$data['user']['can_edit_monitoring_by'] = !$proxy['inaccessible'];
+			if ($is_clone && $proxy['inaccessible']) {
+				$data['user']['can_edit_monitoring_by'] = true;
+			}
+			else {
+				$data['ms_proxy'] = [$proxy];
+				$data['user']['can_edit_monitoring_by'] = !$proxy['inaccessible'];
+			}
 		}
 		elseif ($data['host']['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
 			$data['user']['can_edit_monitoring_by'] = true;
@@ -339,16 +345,17 @@ class CControllerHostEdit extends CController {
 			if ($proxy_groups) {
 				$data['ms_proxy_group'] = CArrayHelper::renameObjectsKeys($proxy_groups, ['proxy_groupid' => 'id']);
 			}
-			else {
-				$data['host']['monitored_by'] = ZBX_MONITORED_BY_PROXY;
+			elseif (!$is_clone) {
 				$data['user']['can_edit_monitoring_by'] = false;
-				$data['ms_proxy'] = [
+				$data['ms_proxy_group'] = [
 					[
 						'id' => $proxy_groupid,
 						'name' => _('Inaccessible proxy'),
 						'inaccessible' => true
 					]
 				];
+
+				$data['has_inaccessible_proxy_group'] = true;
 			}
 
 			if ($data['host']['assigned_proxyid'] != 0) {
