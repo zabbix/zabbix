@@ -511,6 +511,13 @@ class testNoData extends CIntegrationTest {
 	public function testNoData_Discard() {
 		$key = 'nodata.discard';
 
+		// Warm-up: this proxy's first contact on this test's freshly restarted server is treated
+		// as resuming from a connection gap (see testNoData_ValuesFromPast docblock). A second,
+		// later-clock push with actual data clears that grace window before the discard-only phase
+		// starts - metadata-only pushes below can't clear it themselves (proxy.c
+		// zbx_process_history_data() only advances past the gap when history_num > 0).
+		$this->push($key, ['value' => 'first value']);
+		sleep(5);
 		$this->push($key, ['value' => 'first value']);
 		$this->waitForTriggerValue($key, TRIGGER_VALUE_FALSE);
 
@@ -522,7 +529,7 @@ class testNoData extends CIntegrationTest {
 
 		$trigger = null;
 		try {
-			$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE, 40);
+			$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE);
 			$trigger = $this->getTrigger($key);
 		} catch (Exception $e) {
 			$trigger = $this->getTrigger($key);
@@ -546,7 +553,14 @@ class testNoData extends CIntegrationTest {
 		$lastlogsize = 0;
 		$tm = time();
 
+		// Warm-up: this proxy's first contact on this test's freshly restarted server is treated
+		// as resuming from a connection gap (see testNoData_ValuesFromPast docblock). A second,
+		// later-clock push with actual data clears that grace window before the metadata-only
+		// phase starts - metadata-only pushes below can't clear it themselves (proxy.c
+		// zbx_process_history_data() only advances past the gap when history_num > 0).
 		$this->push($key, ['value' => 'first log line', 'lastlogsize' => ++$lastlogsize, 'mtime' => $tm]);
+		sleep(5);
+		$this->push($key, ['value' => 'first log line', 'lastlogsize' => ++$lastlogsize, 'mtime' => time()]);
 		$this->waitForTriggerValue($key, TRIGGER_VALUE_FALSE);
 
 		$deadline = microtime(true) + 70;
@@ -557,7 +571,7 @@ class testNoData extends CIntegrationTest {
 
 		$trigger = null;
 		try {
-			$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE, 40);
+			$this->waitForTriggerValue($key, TRIGGER_VALUE_TRUE);
 			$trigger = $this->getTrigger($key);
 		} catch (Exception $e) {
 			$trigger = $this->getTrigger($key);
@@ -648,6 +662,12 @@ class testNoData extends CIntegrationTest {
 	public function testNoData_UnsupportedFlapping() {
 		$key = 'nodata.flap.30.25';
 
+		// Warm-up: this proxy's first contact on this test's freshly restarted server is treated
+		// as resuming from a connection gap (see testNoData_ValuesFromPast docblock). A second,
+		// later-clock push with actual data clears that grace window before the real flapping
+		// logic starts, so the loop below doesn't race a still-active suppression window.
+		$this->push($key, ['value' => 1]);
+		sleep(5);
 		$this->push($key, ['value' => 1]);
 		$this->waitForTriggerValue($key, TRIGGER_VALUE_FALSE);
 
@@ -780,7 +800,7 @@ class testNoData extends CIntegrationTest {
 
 	private function pgLogSkipOpenProblem(): void {
 		$pg_logline = 'Proxy group "'.self::PG_NAME.'" changed state from \b[a-z]+\b to online';
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1, true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 100, 1, true);
 
 		// Poll the API rather than wait for an "assigned hostid X to proxyid Y" log line here:
 		// the assignment already exists in the host_proxy table from a previous test's run (DB

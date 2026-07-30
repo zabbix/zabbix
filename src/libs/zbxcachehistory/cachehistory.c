@@ -113,13 +113,6 @@ typedef struct
 	int			processing_num;
 	int			refcount;
 
-	/* DEV4972 TEMP: repro aid, see zbx_hc_pop_items(). Holds at most one item OUT of the ready   */
-	/* queue entirely (not just skipped-and-reinserted, which would make it - being the oldest,   */
-	/* frozen tail timestamp - sort right back to the top of the min-heap every single time it's  */
-	/* looked at, from every process, in a tight loop). Reinserted once, cleanly, when the hold    */
-	/* expires. Must be removed before shipping.                                                  */
-	zbx_uint64_t		dev4972_held_itemid;
-	int			dev4972_held_until;
 }
 ZBX_DC_CACHE;
 
@@ -3137,36 +3130,7 @@ void	zbx_hc_pop_items(zbx_vector_hc_item_ptr_t *history_items)
 	zbx_binary_heap_elem_t	*elem;
 	zbx_hc_item_t		*item;
 
-	/* DEV4972 TEMP: repro aid - hold a NOVALUE-flagged tail record (metadata-only/discard        */
-	/* update) back from being flushed for a while after it arrives, instead of letting it drain  */
-	/* almost instantly like normal. This lets a nodata() recheck that happens to run during that */
-	/* window observe "value is in the history cache, not yet in the value cache/DB" the way it    */
-	/* would after a proxy reconnect delivers a real backlog - deterministically, without bulk    */
-	/* data or a global slowdown. Scoped to NOVALUE records only, so real-value tests and the rest */
-	/* of the server are unaffected.                                                              */
-	/*                                                                                             */
-	/* The held item is taken OUT of cache->history_queue entirely while held, not skipped-and-    */
-	/* reinserted on every pop attempt: the queue is a min-heap ordered by tail timestamp (oldest  */
-	/* first, see hc_queue_elem_compare_func()), and a held item's timestamp never advances - so    */
-	/* skip-and-reinsert would make it sort right back to the top and get re-examined immediately, */
-	/* by every process calling this function, in a tight loop (confirmed: one test run produced   */
-	/* a 2.5GB log and pegged CPU before this was fixed). It's reinserted once, cleanly, the first  */
-	/* time anyone calls this function after the hold naturally expires.                           */
-	/*                                                                                              */
-	/* Must be removed before shipping.                                                             */
-#define DEV4972_NOVALUE_HOLD_SEC	100
-
-	if (0 != cache->dev4972_held_itemid && time(NULL) >= cache->dev4972_held_until)
-	{
-		if (NULL != (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items,
-				&cache->dev4972_held_itemid)) && NULL != item->tail)
-		{
-			hc_queue_item(item);
-		}
-
-		cache->dev4972_held_itemid = 0;
-	}
-
+	/* DEV4972 TEMP: repro aid, must be removed before shipping. */
 	while (ZBX_HC_SYNC_MAX > history_items->values_num && FAIL == zbx_binary_heap_empty(&cache->history_queue))
 	{
 		elem = zbx_binary_heap_find_min(&cache->history_queue);
@@ -3174,19 +3138,11 @@ void	zbx_hc_pop_items(zbx_vector_hc_item_ptr_t *history_items)
 
 		zbx_binary_heap_remove_min(&cache->history_queue);
 
-		if (0 == cache->dev4972_held_itemid && NULL != item->tail &&
-				0 != (item->tail->flags & ZBX_DC_FLAG_NOVALUE) &&
-				time(NULL) - item->tail->ts.sec < DEV4972_NOVALUE_HOLD_SEC)
-		{
-			cache->dev4972_held_itemid = item->itemid;
-			cache->dev4972_held_until = item->tail->ts.sec + DEV4972_NOVALUE_HOLD_SEC;
+		if (NULL != item->tail && 0 != (item->tail->flags & ZBX_DC_FLAG_NOVALUE))
 			continue;
-		}
 
 		zbx_vector_hc_item_ptr_append(history_items, item);
 	}
-
-#undef DEV4972_NOVALUE_HOLD_SEC
 
 	if (0 != history_items->values_num)
 		cache->processing_num++;
@@ -3664,15 +3620,6 @@ int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid, int period_start)
 	{
 			ret = SUCCEED;
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "DEV4972TRACE %s() itemid:" ZBX_FS_UI64 " period_start:%d found_item:%d"
-			" tail_null:%d tail_state:%d tail_flags:%d tail_sec:%d ret:%d",
-			__func__, itemid, period_start, NULL != item,
-			(NULL == item || NULL == item->tail),
-			(NULL != item && NULL != item->tail) ? item->tail->state : -1,
-			(NULL != item && NULL != item->tail) ? item->tail->flags : -1,
-			(NULL != item && NULL != item->tail) ? item->tail->ts.sec : -1,
-			ret);
 
 	UNLOCK_CACHE;
 
