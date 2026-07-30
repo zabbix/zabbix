@@ -18,8 +18,12 @@ class CJsonRpc {
 
 	const VERSION = '2.0';
 
-	public const AUTH_TYPE_HEADER = 2;
+	public const AUTH_TYPE_BEARER = 2;
 	public const AUTH_TYPE_COOKIE = 3;
+	public const AUTH_TYPE_DPOP = 4;
+
+	public const HEADER_AUTHENTICATE_BEARER = 'Bearer';
+	public const HEADER_AUTHENTICATE_DPOP = 'DPoP';
 
 	/**
 	 * API client to use for making requests.
@@ -40,7 +44,10 @@ class CJsonRpc {
 	 * @param string $data
 	 */
 	public function __construct(CApiClient $apiClient, $data) {
+		global $NO_AUTH_DEBUG_MODE;
+
 		$this->apiClient = $apiClient;
+		$this->apiClient->debug = $NO_AUTH_DEBUG_MODE;
 
 		$this->initErrors();
 
@@ -48,63 +55,144 @@ class CJsonRpc {
 		$this->_jsonDecoded = json_decode($data, true);
 	}
 
-	/**
-	 * Executes API requests.
-	 *
-	 * @param CHttpRequest $request
-	 *
-	 * @return string JSON encoded value
-	 */
-	public function execute(CHttpRequest $request) {
+	public function execute(CHttpRequest $request): CHttpResponse {
 		if (json_last_error()) {
 			$this->jsonError([], '-32700', null, null, true);
-			return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
+			return new CHttpResponse(json_encode($this->_response[0], JSON_UNESCAPED_SLASHES));
 		}
 
 		if (!is_array($this->_jsonDecoded) || $this->_jsonDecoded === []) {
 			$this->jsonError([], '-32600', null, null, true);
-			return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
+			return new CHttpResponse(json_encode($this->_response[0], JSON_UNESCAPED_SLASHES));
 		}
+
+		$auth_header = $request->getParsedAuthHeader();
+
+		if ($auth_header['type'] !== null && strcasecmp($auth_header['type'], self::HEADER_AUTHENTICATE_BEARER) == 0) {
+			$auth['type'] = self::AUTH_TYPE_BEARER;
+			$auth['auth'] = $auth_header['auth'];
+		}
+		elseif ($auth_header['type'] !== null
+				&& strcasecmp($auth_header['type'], self::HEADER_AUTHENTICATE_DPOP) == 0) {
+			$auth['type'] = self::AUTH_TYPE_DPOP;
+			$auth['auth'] = $auth_header['auth'];
+			$auth['sign'] = (string) $request->header(self::HEADER_AUTHENTICATE_DPOP);
+		}
+		else {
+			$session = new CEncryptedCookieSession();
+
+			$auth['type'] = self::AUTH_TYPE_COOKIE;
+			$auth['auth'] = $session->extractSessionId();
+		}
+
+		$calls_data = [];
+		$calls_data_auth = [];
+		$api_method_names = [];
 
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
 			if (!$this->validate($call)) {
 				continue;
 			}
 
-			list($api, $method) = explode('.', $call['method']) + [1 => ''];
+			$api_method_names[] = $call['method'];
 
-			$header = $request->getAuthBearerValue();
-			if ($header != null) {
-				$auth = [
-					'type' => self::AUTH_TYPE_HEADER,
-					'auth' => $header
-				];
+			[$request_api, $request_method] = explode('.', $call['method']) + [1 => ''];
+
+			$api = strtolower($request_api);
+			$method = strtolower($request_method);
+
+			if (!$this->apiClient->isValidApi($api)) {
+				$this->jsonError($call, '-32601', _s('Incorrect API "%1$s".', $request_api));
+
+				continue;
+			}
+
+			if (!$this->apiClient->isValidMethod($api, $method)) {
+				$this->jsonError($call, '-32601', _s('Incorrect method "%1$s.%2$s".', $request_api, $request_method));
+
+				continue;
+			}
+
+			if ($auth['type'] !== CJsonRpc::AUTH_TYPE_COOKIE
+					&& !$this->apiClient->requiresAuthentication($api, $method)
+					&& !$this->apiClient->supportsAuthentication($api, $method)) {
+				$this->jsonError($call, '-32602',
+					_s('The "%1$s.%2$s" method must be called without authorization header.', $request_api,
+						$request_method
+					)
+				);
+
+				continue;
+			}
+
+			$call_data = [
+				'api' => $request_api,
+				'method' => $request_method,
+				'params' => $call['params']
+			];
+
+			if (array_key_exists('id', $call)) {
+				$call_data += ['id' => $call['id']];
+			}
+
+			if ($this->apiClient->requiresAuthentication($api, $method) || $auth['auth'] !== null) {
+				$calls_data_auth[] =$call_data;
 			}
 			else {
-				$session = new CEncryptedCookieSession();
-
-				$auth = [
-					'type' => self::AUTH_TYPE_COOKIE,
-					'auth' => $session->extractSessionId()
-				];
+				$calls_data[] = $call_data;
 			}
+		}
 
-			$result = $this->apiClient->callMethod($api, $method, $call['params'], $auth);
+		if ($calls_data_auth) {
+			$authenticate_response = $this->apiClient->authenticate($auth, implode(',', $api_method_names));
+
+			if ($authenticate_response->errorCode === null) {
+				foreach ($calls_data_auth as $call) {
+					$result =
+						$this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
+
+					$this->processResult($call, $result);
+				}
+			}
+			else {
+				foreach ($calls_data_auth as $call) {
+					$this->processResult($call, $authenticate_response);
+				}
+			}
+		}
+
+		foreach ($calls_data as $call) {
+			$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth['type']);
 
 			$this->processResult($call, $result);
 		}
 
+		$response = new CHttpResponse();
+
+		$user_data = $this->apiClient->getUserData();
+
+		if ($request->isHpkeHeadersRequested() && $user_data !== null && array_key_exists('uuid', $user_data)) {
+			$response->headers[] = 'X-Recipient-ID: '.$user_data['uuid'];
+			$response->headers[] = 'X-HPKE-Recipient-KID: '.$user_data['kid'];
+			$response->headers[] = 'X-HPKE-Recipient-Pub: '.$user_data['key'];
+		}
+
 		if ($this->_response === array_fill(0, count($this->_response), null)) {
-			return '';
+			return $response;
 		}
 
 		if (is_array($this->_jsonDecoded)
 				&& array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1)) {
 			// Return response as encoded batch if $this->_jsonDecoded is associative array.
-			return json_encode(array_values(array_filter($this->_response)), JSON_UNESCAPED_SLASHES);
+			$response->body = json_encode(array_values(array_filter($this->_response)), JSON_UNESCAPED_SLASHES);
+		}
+		else {
+			$response->body = ($this->_response[0] !== null)
+				? json_encode($this->_response[0], JSON_UNESCAPED_SLASHES)
+				: '';
 		}
 
-		return ($this->_response[0] !== null) ? json_encode($this->_response[0], JSON_UNESCAPED_SLASHES) : '';
+		return $response;
 	}
 
 	public function validate(&$call) {
@@ -236,7 +324,9 @@ class CJsonRpc {
 			ZBX_API_ERROR_NO_AUTH => '-32602',
 			ZBX_API_ERROR_PERMISSIONS => '-32500',
 			ZBX_API_ERROR_INTERNAL => '-32500',
-			ZBX_API_ERROR_DB => '-32500'
+			ZBX_API_ERROR_DB => '-32500',
+			ZBX_API_ERROR_NO_ENTITY => '-32500',
+			ZBX_API_ERROR_NO_EXTERNAL_ENTITY => '-32500'
 		];
 	}
 }

@@ -401,6 +401,12 @@ static char	*config_sms_devices			= NULL;
 static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
+/* bridge adapter config */
+static int	config_enable_mobile_devices		= 0;
+static char	*config_bridge_adapter_url = NULL;
+static char	*config_bridge_adapter_connect_to = NULL;
+static char	*config_bridge_adapter_curl_connect_to = NULL;
+
 struct zbx_db_version_info_t	db_version_info;
 
 static int	server_has_started = 0;
@@ -925,6 +931,30 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		}
 	}
 
+	if (NULL != config_bridge_adapter_connect_to &&
+			(NULL == config_bridge_adapter_url || '\0' == *config_bridge_adapter_url))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"BridgeAdapterURL\" configuration parameter must be specified"
+				" when \"BridgeAdapterConnectTo\" is set.");
+		err = 1;
+	}
+	else if (NULL != config_bridge_adapter_url && '\0' != *config_bridge_adapter_url &&
+			SUCCEED != zbx_cfg_validate_bridge_adapter_url(config_bridge_adapter_url, &ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s", ch_error);
+		zbx_free(ch_error);
+		err = 1;
+	}
+	else if (NULL != config_bridge_adapter_connect_to &&
+			SUCCEED != zbx_cfg_prepare_bridge_adapter_connect_to(config_bridge_adapter_url,
+					config_bridge_adapter_connect_to, &config_bridge_adapter_curl_connect_to,
+					&ch_error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s", ch_error);
+		zbx_free(ch_error);
+		err = 1;
+	}
+
 	if (0 != err)
 		zbx_exit(EXIT_FAILURE);
 }
@@ -1230,6 +1260,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
 			ZBX_CONF_PARM_OPT,	0,			0},
 		{"HistoryProvider",		&config_history_providers,		ZBX_CFG_TYPE_MULTISTRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"EnableMobileDevices",		&config_enable_mobile_devices,		ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			1},
+		{"BridgeAdapterURL",		&config_bridge_adapter_url,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"BridgeAdapterConnectTo",	&config_bridge_adapter_connect_to,	ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
@@ -1592,6 +1628,11 @@ static void	zbx_db_save_server_status(void)
 			ZBX_JSON_TYPE_INT);
 	zbx_json_addstring(&json, "allow_software_update_check",
 			(1 == config_allow_software_update_check ? "true" : "false"), ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(&json, "enable_mobile_devices",
+			(1 == config_enable_mobile_devices ? "true" : "false"), ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(&json, "bridge_adapter_configured",
+			(NULL != config_bridge_adapter_url && '\0' != *config_bridge_adapter_url ? "true" : "false"),
+			ZBX_JSON_TYPE_INT);
 
 	zbx_json_close(&json);
 
@@ -1667,7 +1708,9 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_webdriver_url = config_webdriver_url,
 			.trapper_process_request_func_cb = zbx_trapper_process_request_server,
 			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
-			.config_frontend_allowed_ip = config_frontend_allowed_ip
+			.config_frontend_allowed_ip = config_frontend_allowed_ip,
+			.config_bridge_adapter_url = config_bridge_adapter_url,
+			.config_bridge_adapter_connect_to = config_bridge_adapter_curl_connect_to
 		};
 
 	zbx_thread_escalator_args	escalator_args =
@@ -1772,7 +1815,13 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 		{
 			.config_source_ip = zbx_config_source_ip,
 			.config_ssl_ca_location = config_ssl_ca_location,
-			.config_sms_devices = config_sms_devices
+			.config_sms_devices = config_sms_devices,
+			.config_bridge_adapter_url = config_bridge_adapter_url,
+			.config_bridge_adapter_ca_file = zbx_config_tls->ca_file,
+			.config_bridge_adapter_crl_file = zbx_config_tls->crl_file,
+			.config_bridge_adapter_cert_file = zbx_config_tls->cert_file,
+			.config_bridge_adapter_key_file = zbx_config_tls->key_file,
+			.config_bridge_adapter_connect_to = config_bridge_adapter_curl_connect_to
 		};
 
 	zbx_thread_pinger_args		pinger_args =
