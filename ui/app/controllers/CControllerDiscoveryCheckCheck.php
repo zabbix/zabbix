@@ -45,7 +45,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 							'use' => [CPortRangeParser::class],
 							'when' => ['type',
 								'in' => [SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_IMAP, SVC_LDAP, SVC_NNTP, SVC_POP, SVC_SMTP,
-									SVC_SSH, SVC_TCP, SVC_TELNET, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_AGENT
+									SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_SSH, SVC_TCP, SVC_TELNET, SVC_AGENT
 								]
 							],
 							'messages' => [
@@ -134,7 +134,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 					'use' => [CPortRangeParser::class],
 					'when' => ['type',
 						'in' => [SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_IMAP, SVC_LDAP, SVC_NNTP, SVC_POP, SVC_SMTP,
-							SVC_SSH, SVC_TCP, SVC_TELNET, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_AGENT
+							SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_SSH, SVC_TCP, SVC_TELNET, SVC_AGENT
 						]
 					],
 					'messages' => [

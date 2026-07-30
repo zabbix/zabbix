@@ -66,7 +66,7 @@ class CControllerDiscoveryUpdate extends CController {
 							'use' => [CPortRangeParser::class],
 							'when' => ['type',
 								'in' => [SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_IMAP, SVC_LDAP, SVC_NNTP, SVC_POP, SVC_SMTP,
-									SVC_SSH, SVC_TCP, SVC_TELNET, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_AGENT
+									SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_SSH, SVC_TCP, SVC_TELNET, SVC_AGENT
 								]
 							],
 							'messages' => [
@@ -149,8 +149,8 @@ class CControllerDiscoveryUpdate extends CController {
 						],
 						['db dchecks.host_source', 'not_in' => [ZBX_DISCOVERY_VALUE],
 							'when' => ['type',
-								'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP,
-									SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_ICMPPING, SVC_HTTPS, SVC_TELNET
+								'in' => [SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_ICMPPING, SVC_IMAP, SVC_LDAP, SVC_NNTP,
+									SVC_POP, SVC_SMTP, SVC_SSH, SVC_TCP, SVC_TELNET
 								]
 							]
 						]
@@ -161,8 +161,8 @@ class CControllerDiscoveryUpdate extends CController {
 						],
 						['db dchecks.name_source', 'not_in' => [ZBX_DISCOVERY_VALUE],
 							'when' => ['type',
-								'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP,
-									SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_ICMPPING, SVC_HTTPS, SVC_TELNET
+								'in' => [SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_ICMPPING, SVC_IMAP, SVC_LDAP, SVC_NNTP,
+									SVC_POP, SVC_SMTP, SVC_SSH, SVC_TCP, SVC_TELNET
 								]
 							]
 						]
