@@ -734,6 +734,8 @@ void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_
 	zbx_vector_uint64_pair_sort(&event_recovery, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	db = zbx_dbconn_pool_acquire_connection(dbpool);
+
+	do
 	{
 		zbx_vector_escalation_new_ptr_clear_ext(&escalations, zbx_escalation_new_ptr_free);
 
