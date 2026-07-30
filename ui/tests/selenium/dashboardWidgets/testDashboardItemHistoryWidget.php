@@ -2065,9 +2065,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					$column_overlay_form->query('xpath:.//label[text()="Display" or text()="Show thumbnail"]')->waitUntilVisible();
 					$add_button->click();
 				}
-				catch (ElementNotInteractableException $exception) {
-					$add_button->click();
-				}
 
 				if (array_key_exists('column_error', $data)) {
 					break;
