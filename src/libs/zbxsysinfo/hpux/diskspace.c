@@ -239,12 +239,81 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		itotal, inot_used, iused;
 	double			pfree, pused;
 	double			ipfree, ipused;
-	char 			*error;
+	char			*mode, *mountpoint, *error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
 	zbx_fsname_t		fsname;
-	int			ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL, mode_short = 0;
 
+	/* validate parameter count */
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	/* parse parameters */
+	mode = get_rparam(request, 0);
+	mountpoint = get_rparam(request, 1);
+
+	/* validate mode */
+	if (NULL != mode && '\0' != *mode)
+	{
+		if (0 == strcmp(mode, "short"))
+			mode_short = 1;
+		else if (0 != strcmp(mode, "full"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
+	/* NULL or empty mode defaults to "full" */
+	/* empty mountpoint means no filter */
+	if (NULL != mountpoint && '\0' == *mountpoint)
+		mountpoint = NULL;
+
+	/* process short mode */
+	if (1 == mode_short)
+	{
+		/* opening the mounted filesystems file */
+		if (NULL == (f = setmntent(MNT_MNTTAB, "r")))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",
+					zbx_strerror(errno)));
+			return SYSINFO_RET_FAIL;
+		}
+
+		zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+		/* fill mnttab structure from file */
+		while (NULL != (mt = getmntent(f)))
+		{
+			fsname.mpoint = mt->mnt_dir;
+
+			/* apply mountpoint filter */
+			if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+				continue;
+
+			zbx_json_addobject(&j, NULL);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname.mpoint, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mt->mnt_type, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mt->mnt_opts, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&j);
+		}
+
+		endmntent(f);
+
+		zbx_json_close(&j);
+
+		SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+		zbx_json_free(&j);
+
+		return SYSINFO_RET_OK;
+	}
+
+	/* process full mode */
 	/* opening the mounted filesystems file */
 	if (NULL == (f = setmntent(MNT_MNTTAB, "r")))
 	{
@@ -259,11 +328,16 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		fsname.mpoint = mt->mnt_dir;
 
+		/* apply mountpoint filter */
+		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+			continue;
+
 		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused, &error))
 		{
 			zbx_free(error);
 			continue;
 		}
+
 		if (SYSINFO_RET_OK != get_fs_inode_stat(fsname.mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused,
 				"pused", &error))
 		{
@@ -305,6 +379,10 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		fsname.mpoint = mt->mnt_dir;
 		fsname.type = mt->mnt_type;
+
+		/* apply mountpoint filter */
+		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+			continue;
 
 		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, &fsname, zbx_fsname_compare)))
 		{
