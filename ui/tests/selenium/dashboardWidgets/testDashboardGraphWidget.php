@@ -290,15 +290,7 @@ class testDashboardGraphWidget extends testWidgets {
 		foreach ($tabs as $tab) {
 			$form->selectTab($tab);
 			if ($tab === 'Overrides') {
-				$button = $form->query('button:Add new override')->one()->click();
-				// Remove border radius from button element.
-				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$button]);
-			}
-
-			// TODO: unstable screenshot on Jenkins. Remove border radius from Aggregate field segment.
-			if ($tab === 'Data set') {
-				$segment = $form->getField('Aggregate')->query('xpath:.//label[text()="Data set"]')->one();
-				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$segment]);
+				$form->query('button:Add new override')->one()->click();
 			}
 
 			$this->page->removeFocus();

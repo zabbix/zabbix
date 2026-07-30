@@ -445,6 +445,13 @@ if (count($data['steps']) > 0) {
 		$step_params = $step['type'] == ZBX_PREPROC_SCRIPT
 			? [$step['params'], ''] : explode("\n", $step['params']);
 
+		if ($step['type'] == ZBX_PREPROC_PROMETHEUS_PATTERN) {
+			if ($step_params[1] == ZBX_PREPROC_PROMETHEUS_FUNCTION) {
+				$step_params[1] = $step_params[2];
+				$step_params[2] = '';
+			}
+		}
+
 		if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
 			foreach ($step_params as $j => $param_value) {
 				$form->addItem(
