@@ -212,7 +212,8 @@ class CControllerDiscoveryCheckCheck extends CController {
 			],
 			'allow_redirect' => ['db dchecks.allow_redirect', 'in' => [0, 1],
 				'when' => ['type', 'in' => [SVC_ICMPPING]]
-			]
+			],
+			'uniq' => ['integer', 'in' => [0]],
 		]];
 	}
 
@@ -261,7 +262,8 @@ class CControllerDiscoveryCheckCheck extends CController {
 	 */
 	protected function doAction(): void {
 		$data = array_merge([
-			'type' => self::DEFAULT_TYPE
+			'type' => self::DEFAULT_TYPE,
+			'uniq' => 0
 		], $this->getInputAll());
 
 		if (in_array($data['type'], [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3])) {
