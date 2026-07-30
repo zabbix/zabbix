@@ -1853,6 +1853,8 @@ class testTriggerCEP extends CIntegrationTest {
 	 *
 	 * An event arriving at a window that has no place left is not added to it - it is evicted right away, and
 	 * the operations of the rule decide what happens to it. The one rule this flavour creates does:
+	 *   - "suppress" when an event is evicted, so an event that did not fit is marked as suppressed and not
+	 *     only closed - the two operations are applied to the same event, in this order;
 	 *   - "close" when an event is evicted: an event that did not fit is closed immediately;
 	 *   - "close window" when an event is evicted, restricted to the "up" events by its condition - a tag
 	 *     exists condition on CEP_STATE_TAG_UP, a tag only an "up" event carries because its name is resolved
@@ -1895,10 +1897,16 @@ class testTriggerCEP extends CIntegrationTest {
 			[
 				'sortorder' => 0,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
-				'type' => CCepRuleHelper::OP_CLOSE
+				'type' => CCepRuleHelper::OP_SUPPRESS,
+				'suppress_until' => $this->getWindowNoneSuppressUntil()
 			],
 			[
 				'sortorder' => 1,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+				'type' => CCepRuleHelper::OP_CLOSE
+			],
+			[
+				'sortorder' => 2,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
 				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -1907,7 +1915,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
 			],
 			[
-				'sortorder' => 2,
+				'sortorder' => 3,
 				'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
 				'type' => CCepRuleHelper::OP_CLOSE
 			]
@@ -7387,11 +7395,12 @@ HEREDOC;
 	 * is evicted the moment it arrives, and the rule closes what it evicts.
 	 *
 	 *   1. "down_0" finds the window empty and takes its one place; its problem stays open;
-	 *   2. "down_1" does not fit, so it is evicted and closed straight away - the only problem still open is
-	 *      the one of "down_0", which never left the window;
-	 *   3. "down_10" is closed the same way;
-	 *   4. "up_0" does not fit either, so it is closed as well, and being an "up" event it additionally closes
-	 *      the window it could not enter - which closes the problem of "down_0" that the window held.
+	 *   2. "down_1" does not fit, so it is suppressed and closed straight away - the only problem still open
+	 *      is the one of "down_0", which never left the window;
+	 *   3. "down_10" is handled the same way;
+	 *   4. "up_0" does not fit either, so it is suppressed and closed as well, and being an "up" event it
+	 *      additionally closes the window it could not enter - which closes the problem of "down_0" that the
+	 *      window held, without suppressing it.
 	 *
 	 * Nothing is open afterwards. The trigger itself is still in problem state (its expression is unchanged),
 	 * so a value matching neither "down" nor "up" is sent at the end to bring it back to OK for the tests
@@ -7422,22 +7431,29 @@ HEREDOC;
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 		$this->waitForOpenProblemCountByTag($all, 'service', $first, 1);
 
-		// 2. Every further "down" opens a problem that does not fit into the window and is closed as it is
-		//    evicted, so the count returns to the one problem the window holds.
+		// 2. Every further "down" opens a problem that does not fit into the window and is suppressed and
+		//    closed as it is evicted, so the count returns to the one problem the window holds.
+		$evicted = 0;
+
 		foreach ([self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT, self::CEP_RULE_WINDOW_NONE_SERVICE_LAST] as $service) {
 			$send('down_'.$service);
 			$this->waitForOpenProblemCountByTag($all, 'service', $service, 0);
 			$this->waitForOpenProblemCount($all, 1);
 			$this->waitForOpenProblemCountByTag($all, 'service', $first, 1);
+			$this->waitForSuppressedEventCount($triggerid, ++$evicted);
 		}
 
-		// 3. The "up" event does not fit either, so it is closed too, and it closes the window - and with it
-		//    the problem the window was holding all along. Nothing is left open, and closing the last problem
-		//    of a trigger is what puts the trigger itself back to OK, so no recovery value is needed here:
-		//    the rule alone has to bring both the problems and the trigger back.
+		// 3. The "up" event does not fit either, so it is suppressed and closed too, and it closes the window
+		//    - and with it the problem the window was holding all along. Nothing is left open, and closing the
+		//    last problem of a trigger is what puts the trigger itself back to OK, so no recovery value is
+		//    needed here: the rule alone has to bring both the problems and the trigger back.
 		$send('up_'.$first);
 		$this->waitForNoOpenProblems($all, 'After the window capacity close on up');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+
+		// Only the evicted events were suppressed; the one the window held was closed with the window, which
+		// suppresses nothing.
+		$this->waitForSuppressedEventCount($triggerid, ++$evicted);
 	}
 
 	/**
@@ -7447,10 +7463,15 @@ HEREDOC;
 	 *   1. "down_0", "down_1" and "down_10" each find their own window empty and take its one place, so all
 	 *      three problems stay open;
 	 *   2. a second "down_0" goes to the window of that id, which now has no place left, so it does not fit
-	 *      and is closed as it is evicted - the capacity limits inside a group as well, and it is one;
-	 *   3. the "up" of an id finds that id's window occupied by its "down", so it does not fit: it is evicted
-	 *      and closed, and being an "up" event it closes the window too, which closes the "down" problem the
-	 *      window held. Both problems of that id are gone, the ids not sent an "up" yet are untouched.
+	 *      and is suppressed and closed as it is evicted - the capacity limits inside a group as well, and it
+	 *      is one;
+	 *   3. the "up" of an id finds that id's window occupied by its "down", so it does not fit: it is
+	 *      suppressed and closed, and being an "up" event it closes the window too, which closes the "down"
+	 *      problem the window held. Both problems of that id are gone, the ids not sent an "up" yet are
+	 *      untouched.
+	 *
+	 * Only the events that did not fit are suppressed - the ones the windows held are closed with their window
+	 * and stay unsuppressed - so the number of suppressed events counts the evictions.
 	 *
 	 * After the "up" of every id nothing is left open, and closing the last problem of a trigger is what puts
 	 * the trigger itself back to OK, so no recovery value is needed.
@@ -7489,6 +7510,10 @@ HEREDOC;
 		$this->waitForOpenProblemCountByTag($all, 'service', $first, 1);
 		$this->waitForOpenProblemCount($all, 1);
 
+		// The evicted problem is the one that was suppressed, the one in the window is not.
+		$evicted = 1;
+		$this->waitForSuppressedEventCount($triggerid, $evicted);
+
 		// 3. The other ids have windows of their own, so their "down" fits too and every problem stays open.
 		$open = 1;
 
@@ -7504,6 +7529,7 @@ HEREDOC;
 			$send('up_'.$service);
 			$this->waitForOpenProblemCountByTag($all, 'service', $service, 0);
 			$this->waitForOpenProblemCount($all, --$open);
+			$this->waitForSuppressedEventCount($triggerid, ++$evicted);
 		}
 
 		// Nothing is left open, and the rule alone has to bring the trigger back to OK as well.
@@ -7930,6 +7956,21 @@ HEREDOC;
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'tags' => [['tag' => $tag, 'value' => $value, 'operator' => TAG_OPERATOR_EQUAL]]
+		], $expected, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Poll event.get until exactly $expected of the events generated since the scenario baseline are
+	 * suppressed. The capacity flavours suppress every event they evict, so this counts the evictions that
+	 * happened so far.
+	 */
+	private function waitForSuppressedEventCount(int $triggerid, int $expected): void {
+		$this->callUntilCountIsPresent('event.get', [
+			'objectids' => [$triggerid],
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'suppressed' => true
 		], $expected, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
