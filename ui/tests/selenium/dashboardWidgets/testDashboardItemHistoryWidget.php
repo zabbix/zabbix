@@ -2048,11 +2048,21 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					}
 				}
 
-				// Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
-				// while being clicked. Retry the click if that happens.
+				/*
+				 *  Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
+				 *  while being clicked. Retry the click if that happens.
+				 */
 				$add_button = $column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one();
 
 				try {
+					$add_button->click();
+				}
+				catch (ElementNotInteractableException $exception) {
+					/*
+					 * To avoid misclicking on other element, wait for "Show thumbnail" (for binary item) or "Display"
+					 * (for other item types) label to be visible in configuration form before pressing the add button.
+					 */
+					$column_overlay_form->query('xpath:.//label[text()="Display" or text()="Show thumbnail"]')->waitUntilVisible();
 					$add_button->click();
 				}
 				catch (ElementNotInteractableException $exception) {
@@ -2229,21 +2239,25 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 		$form->getFieldContainer('Items')->query('button:Add')->waitUntilClickable()->one()->click();
 		$column_overlay = COverlayDialogElement::get('New column');
-		$column_overlay->asForm()->fill([
+		$column_form = $column_overlay->asForm();
+		$column_form->fill([
 			'Item' => [
 				'values' => 'Test Item history',
 				'context' => ['values' => 'Simple host with item for Item history widget']
 			]
 		]);
 
-		// Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
-		// while being clicked. Retry the click if that happens.
+		/*
+		 * Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
+		 * while being clicked. Retry the click if that happens.
+		 */
 		$add_button = $column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one();
 
 		try {
 			$add_button->click();
 		}
 		catch (ElementNotInteractableException $exception) {
+			$column_form->getField('Display')->waitUntilVisible();
 			$add_button->click();
 		}
 

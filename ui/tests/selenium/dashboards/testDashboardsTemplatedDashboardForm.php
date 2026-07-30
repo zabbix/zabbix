@@ -4788,8 +4788,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 			$column_overlay->asForm()->fill($data['Column']);
 
-			// Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
-			// while being clicked. Retry the click if that happens.
+			/*
+			 * Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
+			 * while being clicked. Retry the click if that happens.
+			 */
 			$add_button = $column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one();
 
 			try {

@@ -571,8 +571,10 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 			$this->fillOperationsTab($data, $form);
 		}
 
-		// Changing the media type re-renders the form and can shift the footer button while it is being clicked.
-		// Retry the click if that happens.
+		/*
+		 * Changing the media type re-renders the form and can shift the footer button while it is being clicked.
+		 * Retry the click if that happens.
+		 */
 		$submit = $overlay->getFooter()->query('button', CTestArrayHelper::get($data, 'update', false) ? 'Update' : 'Add')
 				->one();
 		try {

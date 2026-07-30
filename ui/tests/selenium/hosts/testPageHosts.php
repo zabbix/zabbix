@@ -89,6 +89,8 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextNotPresent('Empty host');
 
+		$count = (int) CDataHelper::call('host.get', ['countOutput' => true, 'groupids' => 4]);
+		$table->waitUntilRowsCount($count);
 		// Check display of proxy and proxy group multiselects based on value of Monitored by field.
 		$id_mapping = [
 			'Any' => ['filter_proxyids_' => false, 'filter_proxy_groupids_' => false],

@@ -225,11 +225,11 @@ class CDatatableBehavior extends CBehavior {
 			 *  Additional scrolling is required in such cases.
 			 */
 			try {
-				$button->click();
+				$button->waitUntilClickable(3)->click();
 			}
 			catch (ElementClickInterceptedException $exception) {
 				$table->scrollRightHorizontally();
-				$button->click();
+				$button->waitUntilClickable()->click();
 			}
 
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
