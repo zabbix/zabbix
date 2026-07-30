@@ -45,10 +45,7 @@ class CInputGroupElement extends CElement {
 	 */
 	public function changeInputType($new_type) {
 		return $this->query('xpath:.//button['.CXPathHelper::fromClass('btn-dropdown-toggle').']')
-				->asPopupButton()
-				->one()
-				->getMenu()
-				->select($new_type);
+				->asPopupButton()->one()->getMenu()->waitUntilReady()->select($new_type);
 	}
 
 	/**

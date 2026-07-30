@@ -96,15 +96,19 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
-		// Query the button first: it reloads the widget if the dashboard re-rendered (the mouse actions below would
-		// throw on a stale widget instead of reloading it).
+		/*
+		 * Query the button first: it reloads the widget if the dashboard re-rendered (the mouse actions below would
+		 * throw on a stale widget instead of reloading it).
+		 */
 		$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
 		$this->hoverMouse();
 		$button->hoverMouse();
 
-		// Hovering a widget in edit mode adds resize handles, and the top resize border (ui-resizable-border-n) can
-		// overlap the edit button and intercept the click. If that happens, re-query the button (the widget may have
-		// re-rendered), scroll it into view to clear the overlap, then click again.
+		/*
+		 * Hovering a widget in edit mode adds resize handles, and the top resize border (ui-resizable-border-n) can
+		 * overlap the edit button and intercept the click. If that happens, re-query the button (the widget may have
+		 * re-rendered), scroll it into view to clear the overlap, then click again.
+		 */
 		try {
 			$button->click();
 		}

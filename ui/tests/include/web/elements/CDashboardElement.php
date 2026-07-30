@@ -81,8 +81,10 @@ class CDashboardElement extends CElement {
 			$widget = $query->asWidget()->one($should_exist);
 		}
 		catch (NoSuchElementException $exception) {
-			// While a widget loads, its header shows the widget type instead of the name, so the name can flicker away
-			// between waiting for it and retrieving it. Wait for the name again and retry.
+			/*
+			 * While a widget loads, its header shows the widget type instead of the name, so the name can flicker away
+			 * between waiting for it and retrieving it. Wait for the name again and retry.
+			 */
 			$query->waitUntilPresent();
 			$widget = $query->asWidget()->one($should_exist);
 		}
