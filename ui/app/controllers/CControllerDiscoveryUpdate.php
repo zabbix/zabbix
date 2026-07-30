@@ -236,6 +236,10 @@ class CControllerDiscoveryUpdate extends CController {
 			if (str_starts_with($check['dcheckid'], 'new')) {
 				unset($drule['dchecks'][$key]['dcheckid']);
 			}
+
+			if (!in_array($check['type'], [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_AGENT])) {
+				$drule['dchecks'][$key]['uniq'] = 0;
+			}
 		}
 
 		unset($drule['discovery_by']);
