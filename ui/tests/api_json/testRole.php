@@ -474,7 +474,7 @@ class testRole extends CAPITest {
 			$actual[$db_role['name']] = $db_role['rules'];
 		}
 
-		$this->assertEquals($actual, $expected);
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
