@@ -126,12 +126,26 @@ static std::string	any_value_to_string(const opentelemetry::proto::common::v1::A
 	}
 }
 
+static int	attributes_contain(
+		const google::protobuf::RepeatedPtrField<opentelemetry::proto::common::v1::KeyValue> &attrs,
+		const char *key)
+{
+	for (const auto &kv : attrs)
+	{
+		if (kv.key() == key)
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 static char 	*attrs_to_json_ex(
 		const google::protobuf::RepeatedPtrField<opentelemetry::proto::common::v1::KeyValue> &attrs,
 		const char *resource_attrs)
 {
-	struct zbx_json	j;
-	char		*out;
+	struct zbx_json		j;
+	char			*out;
+	struct zbx_json_parse	jp;
 
 	zbx_json_init(&j, 1024);
 
@@ -140,8 +154,18 @@ static char 	*attrs_to_json_ex(
 		zbx_json_addstring(&j, kv.key().c_str(), any_value_to_string(kv.value()).c_str(), ZBX_JSON_TYPE_STRING);
 	}
 
-	if (NULL != resource_attrs)
-		zbx_json_addraw(&j, NULL, resource_attrs);
+	if (NULL != resource_attrs && SUCCEED == zbx_json_open(resource_attrs, &jp))
+	{
+		char			name[MAX_STRING_LEN];
+		const char		*p = NULL;
+		struct zbx_json_parse	jp_attr;
+
+		while (NULL != (p = zbx_json_pair_next_raw(&jp, p, name, sizeof(name), &jp_attr)))
+		{
+			if (SUCCEED != attributes_contain(attrs, name))
+				zbx_json_addraw_len(&j, NULL, jp_attr.start, jp_attr.end - jp_attr.start + 1);
+		}
+	}
 
 	out = zbx_strdup(NULL, j.buffer);
 	zbx_json_free(&j);

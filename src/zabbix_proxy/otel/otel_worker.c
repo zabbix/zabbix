@@ -39,11 +39,11 @@ static void	otel_worker_get_section_attributes(const struct zbx_json_parse *jp, 
 	if (FAIL == zbx_json_brackets_by_name(jp, section, &jp_attrs))
 		return;
 
-	size_t	len = jp_attrs.end - jp_attrs.start;
+	size_t	len = jp_attrs.end - jp_attrs.start + 1;
 
-	*attrs = (char *)zbx_malloc(NULL, len);
-	memcpy(*attrs, jp_attrs.start + 1, len - 1);
-	(*attrs)[len - 1] = '\0';
+	*attrs = (char *)zbx_malloc(NULL, len + 1);
+	memcpy(*attrs, jp_attrs.start, len);
+	(*attrs)[len] = '\0';
 }
 
 static void	otel_worker_get_attributes(const char *attributes, char **metrics, char **logs, char **traces)
