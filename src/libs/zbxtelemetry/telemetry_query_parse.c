@@ -494,7 +494,7 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char
 {
 	/* in case of an error the query is cleaned by the calling function */
 	int				ret = FAIL;
-	static ZBX_THREAD_LOCAL char	buf[ZBX_ITEM_QUERY_LEN];
+	static ZBX_THREAD_LOCAL char	buf[ZBX_ITEM_QUERY_LEN_MAX];
 	size_t				buf_size = sizeof(buf);
 	const char			*p = NULL;
 

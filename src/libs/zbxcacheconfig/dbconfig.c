@@ -10141,7 +10141,6 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 		*dst_item->snmpv3_contextname_orig = '\0';
 		dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
 		dst_item->snmp_max_repetitions = 0;
-		dst_item->timeout = 0;
 	}
 
 	dst_item->snmp_community = NULL;
@@ -10200,7 +10199,6 @@ static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC
 	zbx_strscpy(dst_item->password_orig, src_item->itemtype.httpitem->password);
 	dst_item->posts = zbx_strdup(NULL, src_item->itemtype.httpitem->posts);
 
-	dst_item->timeout = 0;
 	dst_item->url = NULL;
 	dst_item->query_fields = NULL;
 	dst_item->status_codes = NULL;
@@ -10249,8 +10247,6 @@ static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, 
 	dst_item->telemetry_query = NULL;
 	dst_item->lasttimestamp = src_item->itemtype.tqitem->lasttimestamp;
 	dst_item->min_free_ts = src_item->itemtype.tqitem->min_free_ts;
-
-	dst_item->timeout = 0;
 }
 
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)

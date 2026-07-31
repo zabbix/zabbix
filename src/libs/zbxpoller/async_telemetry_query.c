@@ -178,7 +178,7 @@ int	zbx_async_check_telemetry_query(zbx_dc_telemetry_query_item_t *item, AGENT_R
 
 	zabbix_log(LOG_LEVEL_DEBUG,
 			"%s(): lasttimestamp: " ZBX_FS_TIME_T ", lastlogsize: " ZBX_FS_UI64 ", max: " ZBX_FS_TIME_T,
-			__func__, item->lasttimestamp, item->lastlogsize, lasttimestamp);
+			__func__, (zbx_fs_time_t)item->lasttimestamp, item->lastlogsize, (zbx_fs_time_t)lasttimestamp);
 
 	if (0 == poller_config->apm_db_config->have_local_config)
 	{

@@ -118,7 +118,7 @@ static void	tq_get_timestamp_filter_bounds_unshifted(int lookback_limit, int gra
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): lasttimestamp (" ZBX_FS_TIME_T ") is larger than now ("
 				ZBX_FS_TIME_T "), setting lasttimestamp to now",
-				__func__, lasttimestamp, now);
+				__func__, (zbx_fs_time_t)lasttimestamp, (zbx_fs_time_t)now);
 		lasttimestamp = now;
 	}
 

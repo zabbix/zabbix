@@ -691,7 +691,8 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 	zbx_snprintf_alloc(sql, &alloc, &offset, "SELECT ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
 			"intDiv((toUnixTimestamp(\"%s\")-" ZBX_FS_TIME_T "), %d)*%d+" ZBX_FS_TIME_T " AS rounded_time,",
-			ts_col, timestamp_filter_lower_bound, granularity, granularity, timestamp_filter_lower_bound);
+			ts_col, (zbx_fs_time_t)timestamp_filter_lower_bound, granularity, granularity,
+			(zbx_fs_time_t)timestamp_filter_lower_bound);
 
 	if (SUCCEED == query_has_columns)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "%s,", columns_to_select);
@@ -705,7 +706,8 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 	zbx_snprintf_alloc(sql, &alloc, &offset,
 			"\"%s\">=toDateTime(" ZBX_FS_TIME_T ") "
 			"AND \"%s\"<toDateTime(" ZBX_FS_TIME_T ") ",
-			ts_col, timestamp_filter_lower_bound, ts_col, timestamp_filter_upper_bound);
+			ts_col, (zbx_fs_time_t)timestamp_filter_lower_bound, ts_col,
+			(zbx_fs_time_t)timestamp_filter_upper_bound);
 	if (SUCCEED == query_has_conditions)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "AND (%s) ", conditions);
 

@@ -147,11 +147,11 @@ static int	parse_apm_provider(zbx_apm_db_config_t *apm_db_config, const char *co
 	}
 
 	if (ZBX_CONST_STRLEN(APM_PROVIDER_NAME_CLICKHOUSE) == (size_t)(p2 - p) &&
-			0 == strncmp(p, "clickhouse", p2 - p))
+			0 == strncmp(p, APM_PROVIDER_NAME_CLICKHOUSE, p2 - p))
 		apm_db_config->db_type = ZBX_APM_DB_TYPE_CLICKHOUSE;
 	else
 	{
-		*error = zbx_dsprintf(NULL, "invalid database type in TelemetryProvider: \"%s\"", config_apm_provider);
+		*error = zbx_dsprintf(NULL, "invalid database type in TelemetryProvider: \"%.*s\"", (int)(p2 - p), p);
 		goto out;
 	}
 

@@ -344,9 +344,6 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 				cached_data.upd_flags |= ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS;
 				cached_data.min_free_ts = next_value_ts;
 			}
-
-			/* no need to clean */
-			zbx_vector_str_destroy(&values);
 		}
 		else
 		{
@@ -356,6 +353,12 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 			/* leave cached_data the same if check is not successful, lasttimestamp does not change */
 		}
+	}
+
+	if (SUCCEED == status)
+	{
+		zbx_vector_str_clear_ext(&values, zbx_str_free);
+		zbx_vector_str_destroy(&values);
 	}
 
 	zbx_free(error);
