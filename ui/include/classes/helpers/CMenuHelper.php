@@ -223,6 +223,7 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS) ||
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS))
 				? (new CMenuItem(_('Actions')))
+					->setId('main-menu-actions')
 					->setSubMenu(new CMenu(array_filter([
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS)
 							? (new CMenuItem(_('Trigger actions')))
@@ -338,6 +339,7 @@ class CMenuHelper {
 		$submenu_administration = [
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
+					->setId('main-menu-general')
 					->setSubMenu(new CMenu(array_filter([
 						(new CMenuItem(_('GUI')))
 							->setAction('gui.edit'),
@@ -394,6 +396,7 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_QUEUE)
 				? (new CMenuItem(_('Queue')))
+					->setId('main-menu-queue')
 					->setSubMenu(new CMenu([
 						(new CMenuItem(_('Queue overview')))
 							->setAction('queue.overview'),
