@@ -29,7 +29,7 @@ $tags = (new CMultiSelect([
 
 zbx_add_post_js($tags->getPostJS());
 
-echo (new CObject())
+(new CObject())
 	->addItem((new CLabel(_('Time window'), 'ceprule-window-type'))
 		->addItem(makeHelpIcon([
 			_("None - there will be no time window specific processing.").PHP_EOL,
@@ -133,4 +133,6 @@ echo (new CObject())
 		->addStyle('width: '.ZBX_TEXTAREA_BIG_WIDTH.'px')
 		->setAttribute('data-name', 'window[script]')
 		->setAttribute('data-field-type', 'multiline')
-	));
+	))
+
+	->show();

@@ -19,7 +19,7 @@
  * @var array    $data
  */
 
-echo (new CObject())
+(new CObject())
 	->addItem(new CLabel(_('Type of calculation'), 'ceprule-filter-evaltype-select'))
 	->addItem(new CFormField([
 		(new CDiv(
@@ -63,4 +63,5 @@ echo (new CObject())
 				)
 			)
 		)
-	);
+	)
+	->show();

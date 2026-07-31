@@ -131,7 +131,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SET_SEVERITY]
 			]],
-			'suppress_until' => ['string',
+			'suppress_until' => ['string', 'required', 'not_empty',
 				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
 			],

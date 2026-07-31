@@ -206,6 +206,7 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 					'usermacros' => false, 'lldmacros' => false
 				]]
 			],
+			'sortorder' => ['db cep_rule.sortorder', 'required', 'min' => 1, 'max' => ZBX_MAX_INT32],
 			'description' => ['db cep_rule.description'],
 			'status' => ['db cep_rule.status', 'required',
 				'in' => [CCepRuleHelper::STATUS_ENABLED, CCepRuleHelper::STATUS_DISABLED]

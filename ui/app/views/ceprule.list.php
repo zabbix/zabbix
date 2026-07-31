@@ -120,7 +120,6 @@ foreach ($data['ceprules'] as $ceprule) {
 		if ($is_legacy) {
 			$operations[] = CCorrelationHelper::getOperationTypes()[$operation['type']];
 			$operations[] = BR();
-			continue;
 		}
 		else {
 			$operations[] = CCepRuleHelper::getOperationDescription($operation);
