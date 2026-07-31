@@ -226,6 +226,21 @@ evaluate_function_LDADD += @SERVER_LIBS@
 evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_baseline_get_data \
 	-Wl,--wrap=zbx_recalc_time_period \
+	-Wl,--wrap=zbx_dc_get_proxy_nodata_win \
+	-Wl,--wrap=zbx_vps_monitor_add_collected \
+	-Wl,--wrap=fopen \
+	-Wl,--wrap=fclose \
+	-Wl,--wrap=fgets \
+	-Wl,--wrap=open \
+	-Wl,--wrap=lseek \
+	-Wl,--wrap=close \
+	-Wl,--wrap=stat \
+	-Wl,--wrap=fstat \
+	-Wl,--wrap=__xstat \
+	-Wl,--wrap=__fxstat \
+	-Wl,--wrap=connect \
+	-Wl,--wrap=poll \
+	-Wl,--wrap=read \
 	$(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 evaluate_stl_SOURCES = \
