@@ -176,6 +176,19 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_SERVICE_TAG_VALUE = 'problem';
 	const CEP_SERVICE_NAME = 'CEP tag driven service';
 	const CEP_RULE_SERVICE_TAG = self::CEP_RULE_NAME_PREFIX.'window service tag';
+	// The copy scenario (see prepareDataCepWindowCopy()): a simple window that copies an event when it is
+	// evicted. A copy is a full event of its own, so it matches the same rule, lands in the same window and is
+	// evicted in turn - which would copy it again, and again. CEP_TAG_IS_COPIED is the built in tag telling a
+	// copy apart from what the trigger sent, and the condition on it is the only thing that ends the chain.
+	const CEP_RULE_WINDOW_COPY = self::CEP_RULE_NAME_PREFIX.'window simple copy';
+	const CEP_TAG_IS_COPIED = '$IS.COPIED';
+	// The runaway copy scenario (see prepareDataCepWindowPatternCopyAlways()): a pattern whose script always
+	// reports a match. Its window is examined once a second and nothing ever leaves it, so the copy operation
+	// runs again on every examination - the rule keeps producing events for as long as it exists. The scenario
+	// waits for this many problem events of one id before stopping it, which is more than the single copy a
+	// pattern that matches once would leave behind.
+	const CEP_RULE_WINDOW_COPY_ALWAYS = self::CEP_RULE_NAME_PREFIX.'window pattern copy always';
+	const CEP_RULE_WINDOW_COPY_ALWAYS_MIN = 4;
 	const CEP_RULE_WINDOW_PATTERN = self::CEP_RULE_NAME_PREFIX.'window pattern match';
 	const CEP_RULE_WINDOW_PATTERN_EVENTS = 3;
 	// The cause and symptom flavour (see prepareDataCepWindowCauseSymptom()) needs neither: its window does its
@@ -1991,8 +2004,95 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * Prepare the event pattern match flavour: a window that hands its events to a script once a second and
-	 * acts when the script reports a match.
+	 * Prepare the copy scenario: a simple window whose only operation copies an event when the window evicts
+	 * it, which happens once the window duration has run out.
+	 *
+	 * The copy is a new event with the name, severity and tags of the one it was made from, so it matches the
+	 * same rule and goes into the same window, where it will be evicted in its turn. Copying it again would
+	 * produce another copy, and that one another - the rule would keep making events out of its own output for
+	 * as long as the trigger has a problem. The operation is therefore conditioned on the built in
+	 * CEP_TAG_IS_COPIED tag being "false", which only holds for events the trigger produced, so exactly one
+	 * copy is made of each of them and nothing is made of the copies.
+	 *
+	 * The window groups by the 'service' tag, so each id is copied independently of the others.
+	 */
+	public function prepareDataCepWindowCopy() {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// Only this rule may add events; nothing may close a problem.
+		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
+
+		// An event evicted because the window duration ran out is presented as the first event of the window,
+		// so "copy first" is the operation that acts on it - "copy last" would never fire here.
+		$operations = [
+			[
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+				'type' => CCepRuleHelper::OP_COPY_FIRST,
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'tags' => [['tag' => self::CEP_TAG_IS_COPIED, 'operator' => TAG_OPERATOR_EQUAL,
+					'value' => 'false'
+				]]
+			]
+		];
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_COPY, [], $operations,
+			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE, $this->buildWindowOperationsWindow()
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the runaway copy scenario: a pattern window whose script matches whenever the window holds
+	 * anything at all, with "copy first" as its operation.
+	 *
+	 * A pattern window is examined by the server once a second - never when an event arrives, only when the
+	 * window comes due - and its events are not consumed by a match, so an always matching script runs the
+	 * operations again at every examination. Each of those copies the oldest event of
+	 * the window into a new event, which is itself matched by the rule and added to the same window - so the
+	 * copies keep coming, one per examination, for as long as the rule exists. That is what
+	 * runEventAssessmentTestCepWindowPatternCopyAlways() waits for and then puts a stop to by removing the
+	 * rule; prepareDataCepWindowPattern() shows the other side of it, where the script refuses to match its
+	 * own output and exactly one copy is made.
+	 */
+	public function prepareDataCepWindowPatternCopyAlways() {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// Only this rule may add events; nothing may close a problem.
+		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
+
+		$window = [
+			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
+			'capacity' => 0,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => ['service'],
+			'script' => "return cep_get_events().length > 0 ? 'true' : 'false';"
+		];
+
+		$operations = $this->buildWindowNoneOperations([[CCepRuleHelper::OP_COPY_FIRST, []]],
+			CCepRuleHelper::WHEN_PATTERN_MATCHED
+		);
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_COPY_ALWAYS, [],
+			$operations, CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_PATTERN_MATCH, $window
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the event pattern match flavour: a window that hands its events to a script and acts when the
+	 * script reports a match. The script is run when the window comes due, once a second, and not when an
+	 * event arrives - so a match follows the value that completes the pattern, it does not accompany it.
 	 *
 	 * Besides deciding when to match, the script verifies what the window hands it: every event it is given
 	 * must have an eventid, the severity of the trigger, a sane timestamp, the boolean lifecycle fields, a
@@ -6368,6 +6468,52 @@ HEREDOC;
 	}
 
 	/**
+	 * Copying an event: a simple window whose only operation copies an event when it is evicted, so a single
+	 * value ends up with two problems - the one it opened and the copy the window made of it when its duration
+	 * ran out.
+	 *
+	 * A copy is an event like any other, so it matches the same rule and enters the same window: copying it
+	 * again would produce a copy of the copy, and so on without end. The operation is conditioned on the built
+	 * in "$IS.COPIED" tag for that reason, and the test checks the chain stops - each id keeps exactly two
+	 * events even after its copy has been through the window itself.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCopy$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCopy() {
+		$this->prepareDataCepWindowCopy();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCopy();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same copy operation as testTriggerCEP_CepWindowPatternMatch, from a pattern whose script always
+	 * reports a match: the window is examined once a second and a match does not consume it, so the rule
+	 * copies its oldest event again at every examination and the copies never stop coming.
+	 *
+	 * This is the behaviour the other pattern test avoids by refusing to match its own output, and the reason
+	 * such a script needs to. The test waits for the copies to pile up well past the single one a
+	 * match-once script produces, then deletes the rule - recovering the trigger would not help, since the
+	 * copies are problem events and would simply reopen it.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCopyAlways$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCopyAlways() {
+		$this->prepareDataCepWindowPatternCopyAlways();
+
+		try {
+			$this->runEventAssessmentTestCepWindowPatternCopyAlways();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * Event pattern match: the window runs a script over its events once a second, and when the script reports
 	 * a match the rule copies the oldest and the newest event of the window. Three values are sent into one
 	 * group, so the match produces two more problems - copies carrying the tags of the events they were made
@@ -8360,6 +8506,131 @@ HEREDOC;
 				.json_encode($response['result']).'. '.$e->getMessage()
 			);
 		}
+	}
+
+	/**
+	 * Drive the copy scenario. One value opens one problem; once the window duration has run out the event is
+	 * evicted and copied, so that id ends up with two problem events although only one value was ever sent for
+	 * it. The copy then goes through the same window, and the point of the scenario is that it comes out the
+	 * other side unchanged - it is not copied again.
+	 *
+	 * The second id is what makes that check safe: waiting for its copy takes another window duration, by
+	 * which time the copy of the first id has been evicted as well, so if copies were being copied the first
+	 * id would have more than two events by then.
+	 */
+	private function runEventAssessmentTestCepWindowCopy(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the copy test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$first = self::CEP_RULE_WINDOW_NONE_SERVICE;
+		$second = self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT;
+
+		// 1. One value, one problem - and then a second problem for the same id that no value was sent for,
+		//    the copy made when the window evicted the first one.
+		$send('down_'.$first);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForProblemEventCountByTag($all, 'service', $first, 2);
+
+		// 2. The same for another id, which also gives the copy of the first one time to be evicted.
+		$send('down_'.$second);
+		$this->waitForProblemEventCountByTag($all, 'service', $second, 2);
+
+		// 3. Two events per id and no more: the copies went through the window without being copied again.
+		$this->waitForProblemEventCountByTag($all, 'service', $first, 2);
+		$this->waitForOpenProblemCount($all, 4);
+		$this->waitForAllTriggerEventCounts($all, 4);
+
+		// Nothing in this scenario closes a problem, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the copy scenario recovery value');
+	}// burst
+
+	/**
+	 * Drive the runaway copy scenario: one value, and then a copy of it every time the pattern window is
+	 * examined, because the script always reports a match and a match does not consume the window.
+	 *
+	 * The scenario waits until the one id has clearly more problem events than the single copy a pattern that
+	 * matches once would leave behind, then removes the rule - which is the only thing that stops the copying,
+	 * since a recovery would only be answered by more copies. Only after that can the problems be recovered
+	 * for good.
+	 */
+	private function runEventAssessmentTestCepWindowPatternCopyAlways(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the runaway copy test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$first = self::CEP_RULE_WINDOW_NONE_SERVICE;
+
+		// One value, one problem - and from then on a copy of it at every examination of the window.
+		$send('down_'.$first);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// The count is only ever checked for being large enough: it grows while it is being read, so pinning
+		// it to an exact number would be a race.
+		$this->waitForProblemEventCountByTagAtLeast($all, 'service', $first,
+			self::CEP_RULE_WINDOW_COPY_ALWAYS_MIN
+		);
+	
+		// Removing the rule is what ends it. Recovering the trigger first would not: the copies are problem
+		// events, so they would reopen the trigger as fast as it was recovered.
+		$this->cleanupCepRules();
+
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the runaway copy scenario recovery value');
+	}
+
+	/**
+	 * Poll event.get until at least $expected problem events since the scenario baseline carry the $tag tag
+	 * with the $value value. Unlike waitForProblemEventCountByTag() this does not pin the count down, which a
+	 * scenario still producing events cannot do.
+	 */
+	private function waitForProblemEventCountByTagAtLeast(array $triggerids, string $tag, string $value,
+			int $expected): void {
+		$this->callUntilDataIsPresent('event.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'filter' => ['value' => TRIGGER_VALUE_TRUE],
+			'tags' => [['tag' => $tag, 'value' => $value, 'operator' => TAG_OPERATOR_EQUAL]],
+			'output' => ['eventid']
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($expected) {
+			if (count($response['result']) < $expected) {
+				return 'only '.count($response['result']).' problem event(s) so far, expected at least '
+					.$expected;
+			}
+
+			return true;
+		});
 	}
 
 	/**
