@@ -2442,6 +2442,7 @@ button {
     min-height: initial;
     padding: 2px 8px; }
     .datatable.compact-view .datatable-body .cell.cell-data .symptoms {
+      margin-top: 0;
       height: calc(var(--datatable-compact-row-height) - 4px); }
       .datatable.compact-view .datatable-body .cell.cell-data .symptoms .btn-icon {
         height: calc(var(--datatable-compact-row-height) - 6px); }
@@ -2455,6 +2456,8 @@ button {
       flex-wrap: nowrap; }
       .datatable.compact-view .datatable-body .cell.cell-data .tags-wrapper .tag {
         min-width: 24px; }
+    .datatable.compact-view .datatable-body .cell.cell-data.cell-checkbox .flex-wrapper {
+      column-gap: 5px; }
   .datatable.compact-view .datatable-body .row-spacer {
     height: calc(var(--datatable-compact-row-height) + 1px);
     min-height: initial; }

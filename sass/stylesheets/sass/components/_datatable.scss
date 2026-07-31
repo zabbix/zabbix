@@ -26,6 +26,7 @@
 				padding: 2px 8px;
 
 				.symptoms {
+					margin-top: 0;
 					height: calc(var(--datatable-compact-row-height) - 4px);
 
 					.btn-icon {
@@ -58,6 +59,10 @@
 
 				.opdata {
 					@extend %overflow-ellipsis;
+				}
+
+				&.cell-checkbox .flex-wrapper {
+					column-gap: 5px;
 				}
 			}
 
