@@ -189,6 +189,16 @@ static int	cep_operation_condition_eval_copied(const zbx_cep_op_condition_t *con
 	return cep_operation_condition_eval_state(condition, (ZBX_EVENT_COPIED == event->flags));
 }
 
+static int	cep_operation_condition_eval_suppressed(const zbx_cep_op_condition_t *condition,
+	zbx_cep_event_context_t *ctx)
+{
+	zbx_cep_event_t	*event;
+
+	if (NULL == (event = cep_event_context_get_event(ctx)))
+		return 0;
+
+	return cep_operation_condition_eval_state(condition, (0 != event->suppress.values_num));
+}
 
 static int	cep_operation_condition_eval(const zbx_cep_op_condition_t *condition, zbx_cep_event_context_t *ctx)
 {
@@ -208,6 +218,8 @@ static int	cep_operation_condition_eval(const zbx_cep_op_condition_t *condition,
 			return cep_operation_condition_eval_symptom(condition, ctx);
 		case ZBX_CONDITION_TYPE_EVENT_COPIED:
 			return cep_operation_condition_eval_copied(condition, ctx);
+		case ZBX_CONDITION_TYPE_EVENT_SUPPRESSED:
+			return cep_operation_condition_eval_suppressed(condition, ctx);
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported operation condition type %d", condition->type);
 			return 0;
