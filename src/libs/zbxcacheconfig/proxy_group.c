@@ -683,3 +683,32 @@ zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid)
 
 	return proxy_groupid;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolve effective proxyid for host name from host_proxy cache     *
+ *                                                                            *
+ * Parameters: host    - [IN] host name                                       *
+ *             proxyid - [OUT] effective proxyid                              *
+ *                                                                            *
+ * Return value: SUCCEED - proxy assignment found, FAIL - otherwise           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_host_proxyid_by_name(const char *host, zbx_uint64_t *proxyid)
+{
+	int				ret = FAIL;
+	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host};
+
+	RDLOCK_CACHE;
+
+	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index,
+			&hpi_local)))
+	{
+		*proxyid = hpi->host_proxy->proxyid;
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}

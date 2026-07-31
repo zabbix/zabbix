@@ -1940,6 +1940,37 @@ select {
 		}
 	}
 
+	&.hintbox {
+		display: flex;
+		flex-direction: column;
+		box-sizing: border-box;
+		overflow: hidden;
+		padding-top: 20px;
+
+		&.hintbox-position-fixed {
+			position: fixed;
+		}
+
+		&:not(.hintbox-static) {
+			pointer-events: none;
+		}
+
+		&.hintbox-static {
+			padding-top: 0;
+
+			.hintbox-header {
+				height: 20px;
+			}
+		}
+
+		.hintbox-container {
+			overflow: auto;
+			padding-bottom: 1px; // for table correct size
+
+			@extend %webkit-scrollbar;
+		}
+	}
+
 	.hintbox-raw-data {
 		white-space: pre-wrap;
 	}
@@ -2332,18 +2363,7 @@ select {
 	font-size: 12px;
 	line-height: 18px;
 	white-space: nowrap;
-	min-width: 145px;
-
-	.table-paging {
-		min-height: 18px;
-		padding: 0 0 2px;
-		border: 0;
-		top: 2px;
-
-		.paging-btn-container {
-			min-height: inherit;
-		}
-	}
+	min-width: 160px;
 
 	.list-table tbody tr:last-child td {
 		border-bottom-style: none;
@@ -2351,15 +2371,17 @@ select {
 	}
 
 	li {
-		padding-left: 23px;
+		display: flex;
+		width: fit-content;
+		align-items: center;
 
 		.svg-graph-hintbox-item-color,
 		.svg-graph-hintbox-trigger-color {
-			margin: 3px 10px 3px -20px;
-			width: 10px;
+			display: inline-block;
+			min-width: 10px;
 			height: 10px;
-			float: left;
-			display: block;
+			margin-left: 3px;
+			margin-right: 10px;
 		}
 
 		.svg-graph-hintbox-trigger-color {
@@ -2369,6 +2391,14 @@ select {
 
 	.header {
 		margin: 0 0 10px 3px;
+	}
+}
+
+.svg-hintbox-footer {
+	&.table-stats {
+		position: relative;
+		padding: 5px 0 0 0;
+		text-align: right;
 	}
 }
 
