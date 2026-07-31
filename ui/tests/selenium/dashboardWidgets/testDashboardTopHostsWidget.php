@@ -352,7 +352,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					$warning_button->click();
 
 					// Check hintbox text.
-					$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+					$hint_dialog = $this->query('css:div.overlay-dialogue.wordbreak')->one()->waitUntilVisible();
 					$this->assertEquals($hint_text, $hint_dialog->getText());
 
 					// Close the hintbox.
@@ -390,7 +390,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		);
 
 		$thresholds_icon->click();
-		$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+		$hint_dialog = $this->query('css:div.overlay-dialogue.wordbreak	')->one()->waitUntilVisible();
 		$this->assertEquals('This setting applies only to numeric data.', $hint_dialog->getText());
 		$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint_dialog->waitUntilNotPresent();
@@ -5662,7 +5662,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			foreach ($data['check_maintenance'] as $host => $hint_text) {
 				$this->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($host).
 						']/..//button[contains(@class,"wrench")]')->waitUntilClickable()->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+				$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent();
 				$this->assertEquals($hint_text, $hint->one()->getText());
 				$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint->waitUntilNotPresent();

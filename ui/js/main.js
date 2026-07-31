@@ -249,8 +249,9 @@ var jqBlink = {
 /*
  * HintBox class.
  */
-var hintBox = {
+const hintBox = {
 
+	animation_frame_id: null,
 	show_hint_timer: null,
 
 	/**
@@ -287,32 +288,58 @@ var hintBox = {
 	displayHint: function(e, $target, delay = 0) {
 		clearTimeout(hintBox.show_hint_timer);
 
+		const showHint = () => {
+			if (!$target[0].isStatic) {
+				hintBox.hideHint($target[0], false);
+			}
+
+			hintBox.showHintStart(e, $target, delay);
+		};
+
+		const cancelHintboxGeneration = () => {
+			if (this.animation_frame_id !== null) {
+				cancelAnimationFrame(this.animation_frame_id);
+
+				this.animation_frame_id = null;
+			}
+		}
+
 		switch (e.handleObj.origType) {
 			case 'mouseenter':
-				hintBox.showHintStart(e, $target, delay);
-				break;
-
 			case 'mousemove':
-				if (!$target[0].hintBoxItem) {
-					hintBox.showHintStart(e, $target, delay);
+				if (delay > 0) {
+					showHint();
+
+					break;
 				}
-				else if ($target.data('hintbox-track-mouse') === 1 && !$target[0].isStatic) {
-					hintBox.positionElement(e, $target, $target[0].hintBoxItem);
+
+				if (this.animation_frame_id === null) {
+					this.animation_frame_id = requestAnimationFrame(() => {
+						showHint();
+
+						this.animation_frame_id = null;
+					});
 				}
 				break;
 
 			case 'mouseleave':
+				cancelHintboxGeneration();
+
 				hintBox.hideHint($target[0], false);
 				$target.blur();
 				break;
 
 			case 'keydown':
 			case 'click':
-				if ($target.data('hintbox-static') === 1) {
-					hintBox.showStaticHint(e, $target[0], $target.data('hintbox-class'), false,
-						$target.data('hintbox-style')
-					);
+				cancelHintboxGeneration();
+
+				if ($target.data('hintbox-static') !== 1) {
+					break;
 				}
+
+				hintBox.showStaticHint(e, $target[0], $target.data('hintbox-class'), false,
+					$target.data('hintbox-style')
+				);
 				break;
 		}
 	},
@@ -387,7 +414,9 @@ var hintBox = {
 			$preloader.remove();
 
 			if (target.hintBoxItem !== undefined) {
-				box.append(hintbox_contents);
+				const hintbox_container = box[0].querySelector('.hintbox-container');
+
+				hintbox_container.innerHTML = hintbox_contents;
 
 				// Reset hintbox position.
 				box.css({
@@ -402,13 +431,20 @@ var hintBox = {
 		});
 	},
 
-	createBox: function(e, target, hintText, className, isStatic, styles, appendTo, reposition_on_resize = true) {
-		var hintboxid = hintBox.getUniqueId();
-		var box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue wordbreak');
-		var appendTo = appendTo || '.wrapper';
+	createBox: function(e, target, hintText, className, isStatic, styles, appendTo = '.wrapper',
+						reposition_on_resize = true, footer = null) {
+		const hintboxid = hintBox.getUniqueId();
+		const box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue hintbox wordbreak');
+
+		for (let element = target; element && element !== document.body; element = element.parentElement) {
+			if (getComputedStyle(element).position === 'fixed') {
+				box.addClass('hintbox-position-fixed');
+				break;
+			}
+		}
 
 		if (!isStatic) {
-			id = 'hintbox-'+hintboxid;
+			const id = 'hintbox-'+hintboxid;
 			$(target).attr('aria-describedby', id);
 			box.attr('id', id);
 			box.attr('role', 'tooltip');
@@ -417,10 +453,10 @@ var hintBox = {
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
 
-			var style_list = styles.split(';');
+			const style_list = styles.split(';');
 
-			for (var i = 0; i < style_list.length; i++) {
-				var style_props = style_list[i].split(':');
+			for (let i = 0; i < style_list.length; i++) {
+				const style_props = style_list[i].split(':');
 
 				if (style_props[1]) {
 					box.css(style_props[0].trim(), style_props[1].trim());
@@ -428,35 +464,53 @@ var hintBox = {
 			}
 		}
 
+		const hintbox_container = document.createElement('div');
+		hintbox_container.classList.add('hintbox-container');
+
 		if (typeof hintText === 'string') {
 			hintText = hintText.replace(/\n/g, '<br />');
+			hintbox_container.innerHTML = hintText;
+		}
+		else {
+			hintbox_container.append(hintText);
 		}
 
 		if (!empty(className)) {
-			box.append(jQuery('<div>').addClass(className).html(hintText));
+			hintbox_container.classList.add(...className.split(' '));
 		}
-		else {
-			box.html(hintText);
-		}
+
+		box.append(hintbox_container);
 
 		if (isStatic) {
 			target.hintboxid = hintboxid;
 			jQuery(target).attr('data-expanded', 'true');
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
-			var close_link = jQuery('<button>', {
-					'class': 'btn-overlay-close',
-					'title': t('S_CLOSE')
-				}
-			)
-				.click(function() {
-					hintBox.hideHint(target, true);
-				});
-			box.prepend(close_link);
+			box.addClass('hintbox-static');
+
+			const hintbox_header = document.createElement('div');
+			hintbox_header.classList.add('hintbox-header');
+
+			const close_link = document.createElement('button');
+			close_link.setAttribute('title', t('S_CLOSE'));
+			close_link.classList.add('btn-overlay-close');
+			close_link.addEventListener('click', e => {
+				e.stopPropagation();
+
+				hintBox.hideHint(target, true);
+			});
+
+			hintbox_header.prepend(close_link);
+
+			box.prepend(hintbox_header);
 		}
 
 		if (target.dataset?.hintboxPreload !== '' && target.dataset?.hintboxContents === '') {
 			hintBox.preloadHint(e, target, box);
+		}
+
+		if (footer !== null) {
+			box.append(footer);
 		}
 
 		jQuery(appendTo).append(box);
@@ -590,13 +644,18 @@ var hintBox = {
 	},
 
 	positionElement: function(e, target, $elem) {
+		const EVENT_OFFSET = 10;
+		const SCREEN_Y_PADDING = 10;
+
 		const hint = $elem[0];
-		const host = hint.offsetParent;
+		const host = hint.classList.contains('hintbox-position-fixed')
+			? document.body
+			: hint.offsetParent;
+
 		const host_rect = host.getBoundingClientRect();
-		const event_offset = 10;
+
 		const css = {
 			width: null,
-			height: null,
 			top: null,
 			left: null
 		};
@@ -636,6 +695,11 @@ var hintBox = {
 			const host_y_min = host.scrollTop;
 			const host_y_max = Math.min(host.scrollHeight, host_rect.height - scrollbar_horizontal_height + host_y_min);
 
+			// Max width needs to be set before getting the rect and computed style, to check if the hint content has
+			// a scroll bar and calculate the correct height.
+			hint.style.maxWidth = `${host_client_width}px`;
+			hint.style.maxHeight = `${host_client_height - 20}px`;
+
 			// Hint size.
 			const hint_rect = hint.getBoundingClientRect();
 			const hint_computed_style = getComputedStyle(hint);
@@ -645,43 +709,70 @@ var hintBox = {
 				if positioned further than the width of window when horizontal scrolling is active.
 			*/
 			css.width = Math.ceil(parseFloat(hint_computed_style.width));
-			css.height = Math.ceil(parseFloat(hint_computed_style.height));
 
 			// Event coordinates relative to host.
-			if (target.event_x === undefined) {
-				let client_x, client_y;
+			let client_x, client_y;
 
-				if (e.clientX !== undefined) {
-					client_x = e.clientX;
-					client_y = e.clientY;
-				}
-				else {
-					const $target = jQuery(target);
-					const offset = $target.offset();
+			if (e.clientX !== undefined) {
+				client_x = e.clientX;
+				client_y = e.clientY;
+			}
+			else {
+				const $target = jQuery(target);
+				const offset = $target.offset();
 
-					client_x = offset.left;
-					client_y = offset.top + $target.height() / 2;
-				}
-
-				target.event_x = client_x - host_rect.left + host_x_min;
-				target.event_y = client_y - host_rect.top + host_y_min;
+				client_x = offset.left;
+				client_y = offset.top + $target.height() / 2;
 			}
 
-			css.left = target.event_x + event_offset + hint_rect.width <= host_x_max
-				? target.event_x + event_offset
-				: host_x_max - hint_rect.width;
+			const event_x = client_x - host_rect.left + host_x_min;
+			const event_y = client_y - host_rect.top + host_y_min;
+
+			let hint_fits_vertically = true;
 
 			// Hint fits under event.
-			if (target.event_y + event_offset + hint_rect.height <= host_y_max) {
-				css.top = target.event_y + event_offset;
+			if (event_y + EVENT_OFFSET + SCREEN_Y_PADDING + hint_rect.height <= host_y_max) {
+				css.top = event_y + EVENT_OFFSET;
 			}
 			// Hint fits above event.
-			else if (target.event_y - event_offset - hint_rect.height >= host_y_min) {
-				css.top = target.event_y - event_offset - hint_rect.height;
+			else if (event_y - EVENT_OFFSET - SCREEN_Y_PADDING - hint_rect.height >= host_y_min) {
+				css.top = event_y - EVENT_OFFSET - hint_rect.height;
 			}
-			// Hint fits neither under nor above event - then show it under event.
+			// Hint fits neither under nor above event - then show it in the biggest part of the screen.
 			else {
-				css.top = target.event_y + event_offset;
+				css.top = Math.ceil(window.innerHeight / 2 - e.clientY > 0
+					? host_y_max - hint_rect.height - SCREEN_Y_PADDING
+					: host_y_min + SCREEN_Y_PADDING
+				);
+
+				hint_fits_vertically = false;
+			}
+
+			// Hint fits right of the event.
+			if (event_x + EVENT_OFFSET + css.width <= host_x_max) {
+				css.left = event_x + EVENT_OFFSET;
+			}
+			// Hint fits left of the event.
+			else if (event_x - EVENT_OFFSET - css.width >= host_x_min) {
+				css.left = event_x - css.width - EVENT_OFFSET;
+			}
+			// Hint fits neither right nor left of the event.
+			else {
+				if (hint_fits_vertically) {
+					css.left = host_client_width / 2 > event_x
+						? Math.min(event_x + EVENT_OFFSET, host_x_max - css.width)
+						: Math.max(event_x - EVENT_OFFSET - css.width, host_x_min);
+				}
+				else {
+					if (host_client_width / 2 > event_x) {
+						css.width = Math.min(css.width, host_x_max - event_x - EVENT_OFFSET);
+						css.left = event_x + EVENT_OFFSET;
+					}
+					else {
+						css.width = Math.min(css.width, event_x - EVENT_OFFSET - host_x_min);
+						css.left = event_x - EVENT_OFFSET - css.width;
+					}
+				}
 			}
 
 			// Assign css rules to hint.
@@ -706,9 +797,6 @@ var hintBox = {
 	},
 
 	deleteHint: function(target, do_focus_target = true) {
-		delete target.event_x;
-		delete target.event_y;
-
 		if (typeof target.hintboxid !== 'undefined') {
 			jQuery(target).removeAttr('data-expanded');
 			removeFromOverlaysStack(target.hintboxid, do_focus_target);
