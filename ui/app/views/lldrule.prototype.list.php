@@ -165,8 +165,8 @@ foreach ($data['discoveries'] as $discovery) {
 	$checkbox = new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']);
 
 	if (in_array($discovery['type'], checkNowAllowedTypes())
-		&& $discovery['status'] == ITEM_STATUS_ACTIVE
-		&& $discovery['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
+			&& $discovery['status'] == ITEM_STATUS_ACTIVE
+			&& $discovery['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
 		$checkbox->setAttribute('data-actions', 'execute');
 	}
 
