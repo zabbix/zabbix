@@ -6244,8 +6244,8 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
  *                                                                            *
  * Purpose: calculate nextcheck timestamp                                     *
  *                                                                            *
- * Parameters: seend - [IN] the seed                                          *
- *             delay - [IN] the delay in seconds                              *
+ * Parameters: seed  - [IN]                                                   *
+ *             delay - [IN] delay in seconds                                  *
  *             now   - [IN] current timestamp                                 *
  *                                                                            *
  * Return value: nextcheck value                                              *
@@ -14335,6 +14335,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER))
 		cfg->proxy_secrets_provider = config->config->proxy_secrets_provider;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES))
+		cfg->enable_mobile_devices = config->config->enable_mobile_devices;
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
