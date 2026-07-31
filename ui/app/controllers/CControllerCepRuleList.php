@@ -110,7 +110,7 @@ class CControllerCepRuleList extends CController {
 			]);
 
 			if ($result_legacy === false) {
-				return []; // The get_prepared_messages function for layout.htmlpage will do the error handling.
+				return [];
 			}
 		}
 
@@ -125,7 +125,7 @@ class CControllerCepRuleList extends CController {
 			]);
 
 			if ($result_cep === false) {
-				return []; // The get_prepared_messages function for layout.htmlpage will do the error handling.
+				return [];
 			}
 		}
 

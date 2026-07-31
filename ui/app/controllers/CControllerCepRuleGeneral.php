@@ -84,8 +84,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 	}
 
 	protected static function getOperationValidationFields(): array {
-		// Note: the correct fix is needed to be done in IV-core client side (BE has no issues) -
-		// when "objects" has no "fields" in rules definition it currently deteles "fields" instead of merging.
 		return [
 			'execute_when' => array_map(fn(int $window_type) => ['db cep_operation.execute_when', 'required',
 				'in' => CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$window_type],
