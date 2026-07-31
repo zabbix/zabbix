@@ -123,10 +123,12 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getCreateValidationRules(array $item): array {
+		$api_allow_lld_macro = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ? API_ALLOW_LLD_MACRO : 0;
+
 		return [
-			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift'), 'default' => DB::getDefault('items', 'time_shift')],
-			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit'), 'default' => DB::getDefault('items', 'lookback_limit')],
-			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity'), 'default' => DB::getDefault('items', 'granularity')],
+			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift'), 'default' => DB::getDefault('items', 'time_shift')],
+			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit'), 'default' => DB::getDefault('items', 'lookback_limit')],
+			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity'), 'default' => DB::getDefault('items', 'granularity')],
 			'query'				=> ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => self::getQueryFieldValidationRules($item)],
 			'timeout'			=> self::getCreateFieldRule('timeout', $item),
 			'delay'				=> self::getCreateFieldRule('delay', $item)
@@ -137,10 +139,12 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRules(array $db_item): array {
+		$api_allow_lld_macro = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ? API_ALLOW_LLD_MACRO : 0;
+
 		return [
-			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift')],
-			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
-			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity')],
+			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift')],
+			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
+			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity')],
 			'query'				=> ['type' => API_OBJECT, 'fields' => self::getQueryFieldValidationRules($db_item)],
 			'timeout'			=> self::getUpdateFieldRule('timeout', $db_item),
 			'delay'				=> self::getUpdateFieldRule('delay', $db_item)
@@ -151,10 +155,12 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
+		$api_allow_lld_macro = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ? API_ALLOW_LLD_MACRO : 0;
+
 		return [
-			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift')],
-			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
-			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity')],
+			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift')],
+			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
+			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity')],
 			'query'				=> ['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'timeout'			=> self::getUpdateFieldRuleInherited('timeout', $db_item),
 			'delay'				=> self::getUpdateFieldRuleInherited('delay', $db_item)

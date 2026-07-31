@@ -28,6 +28,7 @@ class testItemPrototype extends CAPITest {
 	use traitItemTelemetryQueryTests;
 
 	/**
+	 * @dataProvider dataProviderItemPrototypeTelemetryQueryCreate
 	 * @dataProvider dataProviderTelemetryQueryCreate
 	 */
 	public function testHostItemPrototypeTelemetryQueryCreate(array $item, ?string $expected_error) {
@@ -50,6 +51,7 @@ class testItemPrototype extends CAPITest {
 	}
 
 	/**
+	 * @dataProvider dataProviderItemPrototypeTelemetryQueryCreate
 	 * @dataProvider dataProviderTelemetryQueryCreate
 	 */
 	public function testTemplateItemPrototypeTelemetryQueryCreate(array $item, ?string $expected_error) {
@@ -72,6 +74,7 @@ class testItemPrototype extends CAPITest {
 	}
 
 	/**
+	 * @dataProvider dataProviderItemPrototypeTelemetryQueryUpdate
 	 * @dataProvider dataProviderTelemetryQueryUpdate
 	 */
 	public function testHostItemPrototypeTelemetryQueryUpdate(array $item, ?string $expected_error) {
@@ -84,6 +87,7 @@ class testItemPrototype extends CAPITest {
 	}
 
 	/**
+	 * @dataProvider dataProviderItemPrototypeTelemetryQueryUpdate
 	 * @dataProvider dataProviderTelemetryQueryUpdate
 	 */
 	public function testTemplateItemPrototypeTelemetryQueryUpdate(array $item, ?string $expected_error) {

@@ -150,6 +150,21 @@ trait traitItemTelemetryQueryTests {
 		]);
 	}
 
+	public static function dataProviderItemPrototypeTelemetryQueryCreate() {
+		yield 'lld macro for "time_shift", "lookback_limit" and "granularity"' => [
+			[
+				'time_shift' => '{#M}',
+				'lookback_limit' => '{#M}',
+				'granularity' => '{#M}',
+				'query' => [
+					'aggregated_columns' => [['alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			null
+		];
+	}
+
 	public static function dataProviderTelemetryQueryCreate() {
 		yield 'user macro for "time_shift", "lookback_limit" and "granularity"' => [
 			[
@@ -459,9 +474,24 @@ trait traitItemTelemetryQueryTests {
 		];
 	}
 
+	public static function dataProviderItemPrototypeTelemetryQueryUpdate() {
+		yield 'lld macro for "time_shift", "lookback_limit" and "granularity"' => [
+			[
+				'time_shift' => '{#M}',
+				'lookback_limit' => '{#M}',
+				'granularity' => '{#M}'
+			],
+			null
+		];
+	}
+
 	public static function dataProviderTelemetryQueryUpdate() {
-		yield 'only "time_shift" changes' => [
-			['time_shift' => '2s'],
+		yield '"time_shift", "lookback_limit" and "granularity"' => [
+			[
+				'time_shift' => '2s',
+				'lookback_limit' => '2s',
+				'granularity' => '2s'
+			],
 			null
 		];
 
