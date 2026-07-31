@@ -1163,21 +1163,21 @@ static int	DBpatch_7050087(void)
 	return DBcreate_index("device", "device_2", "uuid", 1);
 }
 
-static int	DBpatch_7050064(void)
+static int	DBpatch_7050088(void)
 {
 	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("regexps", &field);
 }
 
-static int	DBpatch_7050065(void)
+static int	DBpatch_7050089(void)
 {
 	const zbx_db_field_t	field = {"expression", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("expressions", &field, NULL);
 }
 
-static int	DBpatch_7050066(void)
+static int	DBpatch_7050090(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
