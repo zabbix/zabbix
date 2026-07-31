@@ -146,8 +146,6 @@ class testTriggerCEP extends CIntegrationTest {
 	// Two more rules beside those, both matching every problem event of the scenario: one running through
 	// every tag operation a windowless rule can perform (see getWindowNoneTagOperationCases()), the other
 	// through the operations changing the event itself (see getWindowNoneEventOperationCase()).
-	const CEP_RULE_WINDOW_NONE_TAG_OPS = self::CEP_RULE_NAME_PREFIX.'window none tag operations';
-	const CEP_RULE_WINDOW_NONE_EVENT_OPS = self::CEP_RULE_NAME_PREFIX.'window none event operations';
 	// The name the event operations rule gives every event it processes.
 	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME = 'CEP window none event operations';
 	// The windowed flavours of the scenario (see prepareDataCepWindowOperations()) run the very same
@@ -1756,19 +1754,25 @@ class testTriggerCEP extends CIntegrationTest {
 	 *
 	 * Two more rules are created beside those, neither with a condition of its own, so every problem event of
 	 * the scenario goes through both:
-	 *   - CEP_RULE_WINDOW_NONE_TAG_OPS runs every tag operation a windowless rule can perform - add, set, set
+	 *   - the "tag operations" rule runs every tag operation a windowless rule can perform - add, set, set
 	 *     value, increase, decrease, rename and remove - in one operation list, see
 	 *     getWindowNoneTagOperationCases(). Some of those operations work on tags the operation list adds
 	 *     first, the others on tags the trigger prototypes carry for exactly that purpose;
-	 *   - CEP_RULE_WINDOW_NONE_EVENT_OPS runs the operations changing the event itself - set name, set
+	 *   - the "event operations" rule runs the operations changing the event itself - set name, set
 	 *     severity, increase and decrease severity, suppress - see getWindowNoneEventOperationCase(). It is
 	 *     the only rule with a non-zero sortorder, so it runs after all the others: it rewrites the event name
 	 *     and severity the rules above have conditions on.
 	 *
 	 * None of the rules closes anything, which is the point of a windowless rule: the events keep flowing
 	 * through untouched apart from the tags.
+	 *
+	 * $window_type gives every rule of the set a window of that type instead of none, and $name_infix names
+	 * them after the flavour so the two can exist side by side. The rule set behaves the same either way as
+	 * long as the window type is not an exclusive one - see testTriggerCEP_CepWindowSimple(), which runs it
+	 * with a simple window and expects exactly what the windowless run produces.
 	 */
-	public function prepareDataCepWindowNoneTagOperations() {
+	public function prepareDataCepWindowNoneTagOperations(?int $window_type = null,
+			string $name_infix = 'none') {
 		// The first extra tag carries the service id in its NAME, which is what the Exists / Does not exist
 		// pair tests for; its value is irrelevant. The rest are the tags the tag operation rule modifies,
 		// renames and removes, so those operations are exercised on tags the trigger itself generated and not
@@ -1781,6 +1785,11 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->deleteCepCorrelations();
 		$this->deleteCepRules();
 
+		// The rules of a flavour are named after it, and the ones of a flavour that gives them a window all
+		// get the same one, grouped by the 'service' tag.
+		$prefix = self::CEP_RULE_NAME_PREFIX.'window '.$name_infix.' ';
+		$window = $window_type === null ? [] : $this->buildWindowOperationsWindow();
+
 		foreach ($this->getWindowNoneRules() as $tag => $rule) {
 			[$conditions, $operand] = $rule;
 			// Only the rules combining conditions of their own carry an evaltype (and, for the custom
@@ -1789,23 +1798,24 @@ class testTriggerCEP extends CIntegrationTest {
 			$evaltype = isset($rule[2]) ? $rule[2] : CONDITION_EVAL_TYPE_AND;
 			$formula = isset($rule[3]) ? $rule[3] : '';
 
-			$this->upsertCepRule($this->buildWindowNoneAddTagCepRuleParams(
-				self::CEP_RULE_NAME_PREFIX.'window none '.$tag, $conditions, $tag, $operand, $evaltype, $formula
+			$this->upsertCepRule($this->buildWindowNoneAddTagCepRuleParams($prefix.$tag, $conditions, $tag,
+				$operand, $evaltype, $formula, $window_type, $window
 			));
 		}
 
 		// The two rules with more than a single operation: no condition of their own (so every problem event
 		// of the scenario goes through them) and every tag operation a windowless rule can perform, then
 		// every operation changing the event itself.
-		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_NONE_TAG_OPS, [],
-			$this->getWindowNoneTagOperations()
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($prefix.'tag operations', [],
+			$this->getWindowNoneTagOperations(), CONDITION_EVAL_TYPE_AND, '', $window_type, $window
 		));
 
 		// This one changes the event name and severity, which the rules above have conditions on, so it must
 		// be evaluated after all of them: rules run in sortorder and every other rule leaves it at 0.
 		$event_operations = $this->getWindowNoneEventOperationCase()['operations'];
-		$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams(
-			self::CEP_RULE_WINDOW_NONE_EVENT_OPS, [], $this->buildWindowNoneOperations($event_operations)
+		$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams($prefix.'event operations',
+			[], $this->buildWindowNoneOperations($event_operations), CONDITION_EVAL_TYPE_AND, '', $window_type,
+			$window
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -3045,7 +3055,8 @@ HEREDOC;
 	 * the tag names the rule that matched, the value the operand it tested against.
 	 */
 	private function buildWindowNoneAddTagCepRuleParams(string $name, array $match_conditions, string $add_tag,
-			string $add_tag_value, int $evaltype = CONDITION_EVAL_TYPE_AND, string $formula = ''): array {
+			string $add_tag_value, int $evaltype = CONDITION_EVAL_TYPE_AND, string $formula = '',
+			?int $window_type = null, array $window = []): array {
 		$operations = [
 			[
 				'sortorder' => 0,
@@ -3056,7 +3067,9 @@ HEREDOC;
 			]
 		];
 
-		return $this->buildWindowNoneCepRuleParams($name, $match_conditions, $operations, $evaltype, $formula);
+		return $this->buildWindowNoneCepRuleParams($name, $match_conditions, $operations, $evaltype, $formula,
+			$window_type, $window
+		);
 	}
 
 	/**
@@ -3378,7 +3391,7 @@ HEREDOC;
 	 * works on tag names of its own, so the cases cannot influence one another. The 'trigger_tags' of the
 	 * cases are collected by getWindowNoneTagOperationTriggerTags() and added to both trigger prototypes.
 	 *
-	 * All of them run in one CEP rule (see CEP_RULE_WINDOW_NONE_TAG_OPS): the operations of a rule execute in
+	 * All of them run in one CEP rule, the "tag operations" one: the operations of a rule execute in
 	 * sortorder, so flattening the cases in order gives a deterministic sequence, and the rule's filter is
 	 * just the 'type' Equals "cep" guard, so every problem event of the scenario goes through all of them.
 	 *
@@ -3575,7 +3588,7 @@ HEREDOC;
 
 	/**
 	 * The operations changing the event itself rather than its tags, with the state they must leave on every
-	 * problem event of the scenario. They all run in one rule (CEP_RULE_WINDOW_NONE_EVENT_OPS) whose filter is
+	 * problem event of the scenario. They all run in one rule, the "event operations" one, whose filter is
 	 * just the 'type' Equals "cep" guard, in the order listed:
 	 *   - "set name" replaces the event name;
 	 *   - "set severity" puts the event at Information, then two "increase severity" and one "decrease
@@ -6307,6 +6320,30 @@ HEREDOC;
 	 */
 	public function testTriggerCEP_CepWindowNone() {
 		$this->prepareDataCepWindowNoneTagOperations();
+
+		try {
+			$this->runEventAssessmentTestCepWindowNone();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The whole rule set of testTriggerCEP_CepWindowNone once more, with every one of its rules given a simple
+	 * window: the same operator coverage, the same tag and event operations, the same three values and the
+	 * same expected outcome - only now each rule collects its events into a window of its own while it works.
+	 *
+	 * That the outcome may not change is the point. A simple window is not one of the exclusive window types,
+	 * so every rule still gets to process every event, and none of these rules acts on its window - they have
+	 * no operation at eviction or at window close - so the windows fill up and are never heard from. If the
+	 * events came out tagged differently from the windowless run, a window would be doing something to the
+	 * events it holds that it should not.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimple$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimple() {
+		$this->prepareDataCepWindowNoneTagOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple all');
 
 		try {
 			$this->runEventAssessmentTestCepWindowNone();
