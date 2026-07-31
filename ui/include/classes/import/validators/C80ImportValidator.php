@@ -3895,7 +3895,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 			'columns' => 				['type' => XML_INDEXED_ARRAY, 'prefix' => 'column', 'rules' => [
 				'column' =>					['type' => XML_ARRAY, 'rules' => [
 					'column' =>					['type' => XML_STRING | XML_REQUIRED],
-					'attribute_key' =>			['type' => XML_STRING]
+					'attribute_key' =>			['type' => XML_STRING, 'default' => '']
 				]]
 			]],
 			'aggregated_columns' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'aggregated_column', 'rules' => [
@@ -3903,7 +3903,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 					'function' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AGGREGATE_COUNT, 'in' => $aggregated_function],
 					'column' =>					['type' => XML_MULTIPLE, 'rules' => [
 						['if' => ['tag' => 'function', 'in' => $aggregated_column_function], 'type' => XML_STRING],
-						['else' => true, 'type' => XML_IGNORE_TAG]
+						['else' => true, 'type' => XML_STRING, 'default' => '']
 					]],
 					'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
 						['if' => ['tag' => 'function', 'in' => [CXmlConstantValue::AGGREGATE_PERCENTILE => CXmlConstantName::PERCENTILE]], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
@@ -3918,7 +3918,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 				'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $filter_evaltype],
 				'formula' =>				['type' => XML_MULTIPLE, 'rules' => [
 												['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING | XML_REQUIRED],
-												['else' => true, 'type' => XML_IGNORE_TAG]
+												['else' => true, 'type' => XML_STRING, 'default' => '']
 				]],
 				'conditions' =>			['type' => XML_MULTIPLE, 'rules' => [
 					['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [

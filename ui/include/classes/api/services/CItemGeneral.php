@@ -310,9 +310,13 @@ abstract class CItemGeneral extends CApiService {
 					$item += array_intersect_key($db_item, array_flip(['snmp_oid']));
 				}
 
-				if ($item['type'] === ITEM_TYPE_SSH && $item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
+				if ($item['type'] == ITEM_TYPE_SSH && $item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
 						&& $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY) {
 					$item += array_intersect_key($db_item, array_flip(['publickey', 'privatekey']));
+				}
+
+				if ($db_item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+					$db_item['query'] = self::prepareTelemetryQueryForApi($db_item['query']);
 				}
 
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRules($db_item);

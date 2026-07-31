@@ -25,6 +25,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 */
 	public const FIELD_NAMES = ['time_shift', 'lookback_limit', 'granularity', 'query'];
 
+	// Column names require "attribute_key" to be set.
 	public const COMPLEX_COLUMN_NAME = [
 		'SpanAttributes', 'Events.Attributes', 'LogAttributes', 'ResourceAttributes', 'ScopeAttributes', 'Attributes',
 		'Exemplars.FilteredAttributes'
@@ -34,7 +35,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	public const APM_TRACES_COLUMNS_COLUMN = [
 		'Timestamp', 'TraceId', 'SpanId', 'ParentSpanId', 'TraceState', 'SpanName', 'SpanKind', 'ServiceName',
 		'ResourceAttributes', 'SpanAttributes', 'ScopeName', 'ScopeVersion', 'Duration', 'StatusCode',
-		'StatusMessage', 'Events.Name', 'Events.Attributes'
+		'StatusMessage'
 	];
 	public const APM_TRACES_AGGREGATED_COLUMN = [
 		'Timestamp', 'Duration'
@@ -54,8 +55,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 		'Timestamp', 'SeverityNumber'
 	];
 	public const APM_LOGS_CONDITIONS_COLUMN = [
-		'TraceId', 'SpanId', 'TraceFlags', 'SeverityText', 'ServiceName', 'Body', 'ResourceSchemaUrl', 'ScopeSchemaUrl',
-		'ScopeName', 'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes', 'LogAttributes', 'EventName'
+		'TraceId', 'SpanId', 'SeverityText', 'ServiceName', 'Body', 'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName',
+		'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes', 'LogAttributes', 'EventName'
 	];
 
 	// APM_SIGNAL_TYPE_METRICS column names
@@ -63,25 +64,23 @@ class CItemTypeTelemetryQuery extends CItemType {
 		APM_METRICS_POINT_SUM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
 			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
-			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags', 'Exemplars.FilteredAttributes',
-			'AggregationTemporality', 'IsMonotonic'
+			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags', 'AggregationTemporality', 'IsMonotonic'
 		],
 		APM_METRICS_POINT_GAUGE => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
 			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription',
-			'MetricUnit', 'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags', 'Exemplars.FilteredAttributes'
+			'MetricUnit', 'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags'
 		],
 		APM_METRICS_POINT_HISTOGRAM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
 			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
-			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Exemplars.FilteredAttributes', 'Flags',
-			'Min', 'Max', 'AggregationTemporality'
+			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Flags', 'Min', 'Max', 'AggregationTemporality'
 		],
 		APM_METRICS_POINT_EXPHISTOGRAM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
 			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
 			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Scale', 'ZeroCount', 'PositiveOffset',
-			'NegativeOffset', 'Exemplars.FilteredAttributes', 'Flags', 'Min', 'Max', 'AggregationTemporality'
+			'NegativeOffset', 'Flags', 'Min', 'Max', 'AggregationTemporality'
 		]
 	];
 	public const APM_METRICS_AGGREGATED_COLUMN = [
@@ -362,7 +361,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 				'function'				=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_PCTILE]), 'default' => AGGREGATE_COUNT],
 				'column'				=> ['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PCTILE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $aggregated_column)],
-												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'unset' => true]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 				]],
 				'parameters'			=> ['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'function', 'in' => AGGREGATE_PCTILE], 'type' => API_INTS32, 'in' => '1:100', 'flags' => API_REQUIRED | API_NOT_EMPTY],
@@ -374,7 +373,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 				'evaltype'		=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
 				'formula'		=> ['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'unset' => true]
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 				]],
 				'conditions'	=>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [

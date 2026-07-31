@@ -220,7 +220,7 @@ trait traitItemTelemetryQueryTests {
 					'signal_type' => APM_SIGNAL_TYPE_METRICS,
 					'metric_point_type' => APM_METRICS_POINT_SUM,
 					'columns' => [
-						['column' => 'Exemplars.FilteredAttributes', 'attribute_key' => 'attr1']
+						['column' => 'ResourceAttributes', 'attribute_key' => 'attr1']
 					],
 					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
