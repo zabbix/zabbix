@@ -210,6 +210,42 @@ static int	zbx_vector_mpoint_ptr_search_fsname(const zbx_vector_mpoint_ptr_t *ve
 	return FAIL;
 }
 
+static int	parse_proc_mounts_line(char *line, zbx_fsname_t *fsname, char **mntopts)
+{
+	char	*p;
+
+	if (NULL == (p = strchr(line, ' ')))
+		return FAIL;
+
+	fsname->mpoint = ++p;
+
+	if (NULL == (p = strchr(fsname->mpoint, ' ')))
+		return FAIL;
+
+	*p = '\0';
+
+	fsname->type = ++p;
+
+	if (NULL == (p = strchr(fsname->type, ' ')))
+		return FAIL;
+
+	*p = '\0';
+
+	*mntopts = ++p;
+
+	if (NULL == (p = strchr(*mntopts, ' ')))
+		return FAIL;
+
+	*p = '\0';
+
+	return SUCCEED;
+}
+
+static int	match_mountpoint(const char *current, const char *requested)
+{
+	return (NULL == requested || 0 == strcmp(current, requested)) ? SUCCEED : FAIL;
+}
+
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*mode, *mountpoint, line[MAX_STRING_LEN], *p, *mntopts, *error;
@@ -245,7 +281,6 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	/* NULL or empty mode defaults to "full" */
 	/* empty mountpoint means no filter */
 	if (NULL != mountpoint && '\0' == *mountpoint)
 		mountpoint = NULL;
@@ -263,32 +298,11 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		while (NULL != fgets(line, sizeof(line), f))
 		{
-			if (NULL == (p = strchr(line, ' ')))
+			if (FAIL == parse_proc_mounts_line(line, &fsname, &mntopts))
 				continue;
-
-			fsname.mpoint = ++p;
-
-			if (NULL == (p = strchr(fsname.mpoint, ' ')))
-				continue;
-
-			*p = '\0';
-
-			fsname.type = ++p;
-
-			if (NULL == (p = strchr(fsname.type, ' ')))
-				continue;
-
-			*p = '\0';
-
-			mntopts = ++p;
-
-			if (NULL == (p = strchr(mntopts, ' ')))
-				continue;
-
-			*p = '\0';
 
 			/* apply mountpoint filter */
-			if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+			if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 				continue;
 
 			zbx_json_addobject(&j, NULL);
@@ -320,32 +334,11 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
-		if (NULL == (p = strchr(line, ' ')))
+		if (FAIL == parse_proc_mounts_line(line, &fsname, &mntopts))
 			continue;
-
-		fsname.mpoint = ++p;
-
-		if (NULL == (p = strchr(fsname.mpoint, ' ')))
-			continue;
-
-		*p = '\0';
-
-		fsname.type = ++p;
-
-		if (NULL == (p = strchr(fsname.type, ' ')))
-			continue;
-
-		*p = '\0';
-
-		mntopts = ++p;
-
-		if (NULL == (p = strchr(mntopts, ' ')))
-			continue;
-
-		*p = '\0';
 
 		/* apply mountpoint filter */
-		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 			continue;
 
 		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused, &error))
@@ -392,25 +385,11 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		int idx;
 
-		if (NULL == (p = strchr(line, ' ')))
+		if (FAIL == parse_proc_mounts_line(line, &fsname, &mntopts))
 			continue;
-
-		fsname.mpoint = ++p;
-
-		if (NULL == (p = strchr(fsname.mpoint, ' ')))
-			continue;
-
-		*p = '\0';
-
-		fsname.type = ++p;
-
-		if (NULL == (p = strchr(fsname.type, ' ')))
-			continue;
-
-		*p = '\0';
 
 		/* apply mountpoint filter */
-		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 			continue;
 
 		if (FAIL != (idx = zbx_vector_mpoint_ptr_search_fsname(&mpoints, &fsname)))
