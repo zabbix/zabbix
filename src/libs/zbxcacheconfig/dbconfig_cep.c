@@ -1343,7 +1343,7 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 			operation->type = operation_type;
 		}
 
-		operation->execute_when = MIN(atoi(row[3]),3);
+		operation->execute_when = atoi(row[3]);
 		operation->evaltype = atoi(row[4]);
 		operation->sortorder = atoi(row[11]);
 
