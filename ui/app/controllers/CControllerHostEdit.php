@@ -322,7 +322,7 @@ class CControllerHostEdit extends CController {
 		$is_clone = $clone_hostid !== null;
 
 		if ($data['host']['monitored_by'] == ZBX_MONITORED_BY_PROXY && (int) $data['host']['proxyid'] !== 0) {
-			$proxy = CProxyHelper::resolveProxyOption((int) $data['host']['proxyid']);
+			$proxy = CProxyHelper::resolveProxyOption($data['host']['proxyid']);
 
 			if ($is_clone && $proxy['inaccessible']) {
 				$data['user']['can_edit_monitoring_by'] = true;
@@ -356,7 +356,7 @@ class CControllerHostEdit extends CController {
 			}
 
 			if ($data['host']['assigned_proxyid'] != 0) {
-				$proxy = CProxyHelper::resolveProxyOption((int) $data['host']['assigned_proxyid']);
+				$proxy = CProxyHelper::resolveProxyOption($data['host']['assigned_proxyid']);
 
 				$data['host']['assigned_proxy_name'] = $proxy['name'];
 				$data['host']['assigned_proxy_inaccessible'] = $proxy['inaccessible'];

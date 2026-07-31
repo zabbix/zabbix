@@ -19,11 +19,11 @@ class CProxyHelper {
 	/**
 	 * Resolves proxy data.
 	 *
-	 * @param int $proxyid
+	 * @param string $proxyid
 	 * @return array
 	 */
-	public static function resolveProxyOption(int $proxyid): array {
-		if ($proxyid === 0) {
+	public static function resolveProxyOption(string $proxyid): array {
+		if ($proxyid === '0') {
 			return [];
 		}
 
