@@ -46,35 +46,6 @@ void	zbx_host_maintenance_diff_free(zbx_host_maintenance_diff_t *hmd)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Removes maintenance from maintences vector for specific trigger.  *
- *          Removes entry from maintenances_for_triggers configuration cache  *
- *          if last maintenance was removed from vector.                      *
- *                                                                            *
- * Parameter: maintenances_for_trigger - [IN]                                 *
- *            maintenance              - [IN]                                 *
- *                                                                            *
- ******************************************************************************/
-static void	remove_maintenance_for_trigger(zbx_dc_maintenances_for_trigger_t *maintenances_for_trigger,
-		zbx_dc_maintenance_t	*maintenance)
-{
-	int	idx;
-
-	if (FAIL != (idx = zbx_vector_dc_maintenance_ptr_bsearch(&maintenances_for_trigger->maintenances, maintenance,
-			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-	{
-		zbx_vector_dc_maintenance_ptr_remove(&maintenances_for_trigger->maintenances, idx);
-
-		if (0 == maintenances_for_trigger->maintenances.values_num)
-		{
-			zbx_vector_dc_maintenance_ptr_destroy(&maintenances_for_trigger->maintenances);
-			zbx_hashset_remove_direct(&get_dc_config()->maintenances_for_triggers,
-					maintenances_for_trigger);
-		}
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: Updates maintenances in configuration cache                       *
  *                                                                            *
  * Parameters: sync - [IN] the db synchronization data                        *
@@ -143,6 +114,7 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
+		int					idx;
 		zbx_hashset_iter_t			iter;
 		zbx_dc_maintenances_for_trigger_t	*maintenances_for_trigger;
 
@@ -154,7 +126,18 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
 		while (NULL != (maintenances_for_trigger = (zbx_dc_maintenances_for_trigger_t *)zbx_hashset_iter_next(
 				&iter)))
 		{
-			remove_maintenance_for_trigger(maintenances_for_trigger, maintenance);
+			if (FAIL != (idx = zbx_vector_dc_maintenance_ptr_bsearch(
+					&maintenances_for_trigger->maintenances, maintenance,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				zbx_vector_dc_maintenance_ptr_remove(&maintenances_for_trigger->maintenances, idx);
+
+				if (0 == maintenances_for_trigger->maintenances.values_num)
+				{
+					zbx_vector_dc_maintenance_ptr_destroy(&maintenances_for_trigger->maintenances);
+					zbx_hashset_iter_remove(&iter);
+				}
+			}
 		}
 
 		zbx_vector_uint64_destroy(&maintenance->groupids);
@@ -724,7 +707,18 @@ void	DCsync_maintenance_triggers(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(temp_maintenance.maintenanceid, row[1]);
 
-		remove_maintenance_for_trigger(maintenances_for_trigger, &temp_maintenance);
+		if (FAIL != (idx = zbx_vector_dc_maintenance_ptr_bsearch(&maintenances_for_trigger->maintenances,
+				&temp_maintenance, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			zbx_vector_dc_maintenance_ptr_remove(&maintenances_for_trigger->maintenances, idx);
+
+			if (0 == maintenances_for_trigger->maintenances.values_num)
+			{
+				zbx_vector_dc_maintenance_ptr_destroy(&maintenances_for_trigger->maintenances);
+				zbx_hashset_remove_direct(&get_dc_config()->maintenances_for_triggers,
+						maintenances_for_trigger);
+			}
+		}
 	}
 
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
@@ -1669,26 +1663,16 @@ static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenan
  ******************************************************************************/
 static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_ptr_t *tags)
 {
-	switch (maintenance->tags_evaltype)
-	{
-		case ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR:
-			/* break; is not missing here */
-		case ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR:
-			if (0 == maintenance->tags.values_num)
-				return SUCCEED;
-
-			if (0 == tags->values_num)
-				return FAIL;
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-	}
+	if (0 == maintenance->tags.values_num)
+		return SUCCEED;
 
 	if (ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR == maintenance->tags_evaltype)
 		return dc_maintenance_match_tags_andor(maintenance, tags);
-	else
+	else if(ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR == maintenance->tags_evaltype)
 		return dc_maintenance_match_tags_or(maintenance, tags);
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	return FAIL;
 }
 
 /******************************************************************************
@@ -1714,11 +1698,11 @@ static int	dc_maintenance_match_event_name(const zbx_dc_maintenance_t *maintenan
 		mt_eventname = maintenance->eventnames.values[i];
 		switch (mt_eventname->op)
 		{
-			case ZBX_MAINTENANCE_OPERATOR_LIKE:
+			case ZBX_CONDITION_OPERATOR_LIKE:
 				if (NULL != strstr(event_name, mt_eventname->value))
 					return SUCCEED;
 				break;
-			case ZBX_MAINTENANCE_OPERATOR_NOT_LIKE:
+			case ZBX_CONDITION_OPERATOR_NOT_LIKE:
 				if (NULL == strstr(event_name, mt_eventname->value))
 					return SUCCEED;
 				break;
