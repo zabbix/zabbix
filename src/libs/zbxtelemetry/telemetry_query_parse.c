@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxdbhigh.h"
 #include "zbxtelemetry.h"
 
 #include "telemetry.h"
@@ -23,6 +22,7 @@
 #include "zbxcommon.h"
 #include "zbxtime.h"
 #include "zbxalgo.h"
+#include "zbxdbhigh.h"
 
 /******************************************************************************
  *                                                                            *
