@@ -22,7 +22,6 @@ import (
 	"strings"
 	"time"
 
-	"golang.zabbix.com/agent2/internal/agent/runtimecontrol"
 	"golang.zabbix.com/sdk/errs"
 )
 
@@ -49,8 +48,7 @@ func (c *Controller) Commands() []string {
 	return slices.Sorted(maps.Keys(c.handlers))
 }
 
-// ExecuteCommand parses and executes a profiler runtime command.
-func (c *Controller) ExecuteCommand(params []string) (string, error) {
+func (c *Controller) executeCommand(params []string) (string, error) {
 	if len(params) == 0 {
 		return "", errEmptyCommand
 	}
@@ -63,17 +61,17 @@ func (c *Controller) ExecuteCommand(params []string) (string, error) {
 	return handler(params)
 }
 
-// ProcessCommand executes a profiler runtime command and replies to the command client.
-func (c *Controller) ProcessCommand(client runtimecontrol.Exchanger) error {
+// ProcessCommand parses a profiler runtime command and returns its response.
+func (c *Controller) ProcessCommand(request string) (string, error) {
 	if c == nil {
-		return errs.New("profiler is not initialized")
+		return "", errs.New("profiler is not initialized")
 	}
 
-	params := strings.Fields(client.Request())
+	params := strings.Fields(request)
 	if len(params) == 1 && params[0] == commandExecute {
 		c.executeAsync()
 
-		err := client.Reply(fmt.Sprintf(
+		return fmt.Sprintf(
 			"profiler: collecting CPU profile; results will be written to %q in %d seconds; "+
 				"CPU data will cover the next %d seconds; heap, allocs, goroutine, block, mutex, and threadcreate "+
 				"profiles will also be written there; for more precise CPU data, enable periodic profiling with %s",
@@ -81,25 +79,10 @@ func (c *Controller) ProcessCommand(client runtimecontrol.Exchanger) error {
 			onDemandCPUProfileSeconds,
 			onDemandCPUProfileSeconds,
 			commandEnable,
-		))
-		if err != nil {
-			return errs.Wrap(err, "cannot reply to remote command")
-		}
-
-		return nil
+		), nil
 	}
 
-	message, err := c.ExecuteCommand(params)
-	if err != nil {
-		return err
-	}
-
-	err = client.Reply(message)
-	if err != nil {
-		return errs.Wrap(err, "cannot reply to remote command")
-	}
-
-	return nil
+	return c.executeCommand(params)
 }
 
 func commandWithoutParameters(execute func() (string, error)) commandHandler {

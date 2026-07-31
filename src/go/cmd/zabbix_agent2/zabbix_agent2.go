@@ -845,9 +845,14 @@ func processCommandWithoutParameters(handler remoteCommandHandler) remoteCommand
 
 func registerProfilerCommands(controller *profiler.Controller) {
 	handler := func(c *runtimecontrol.Client) error {
-		err := controller.ProcessCommand(c)
+		message, err := controller.ProcessCommand(c.Request())
 		if err != nil {
 			return errs.Wrap(err, "cannot process profiler command")
+		}
+
+		err = c.Reply(message)
+		if err != nil {
+			return errs.Wrap(err, "cannot reply to remote command")
 		}
 
 		return nil
