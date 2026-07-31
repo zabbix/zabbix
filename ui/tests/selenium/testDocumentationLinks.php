@@ -1720,14 +1720,14 @@ class testDocumentationLinks extends CWebTest {
 			// #174 Administration -> General -> Regular expressions -> Create form view.
 			[
 				[
-					'url' => 'zabbix.php?action=regex.edit',
+					'url' => 'zabbix.php?action=popup&popup=regex.edit',
 					'doc_link' => '/en/manual/regular_expressions#global-regular-expressions'
 				]
 			],
 			// #175 Administration -> General -> Regular expressions -> Edit form view.
 			[
 				[
-					'url' => 'zabbix.php?action=regex.edit&regexid=3',
+					'url' => 'zabbix.php?action=popup&popup=regex.edit&regexpid=3',
 					'doc_link' => '/en/manual/regular_expressions#global-regular-expressions'
 				]
 			],
