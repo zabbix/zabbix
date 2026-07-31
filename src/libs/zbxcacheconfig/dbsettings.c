@@ -845,7 +845,6 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 	store_str_setting_local(values, ZBX_SETTINGS_APM_ATTRIBUTES, defaults_log_level,
 			&dc_local()->apm_config.attributes, revision);
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

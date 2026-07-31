@@ -13,8 +13,48 @@
 **/
 
 #include "otel_exporter.h"
+#include "zbxcfg.h"
+#include "zbxcommon.h"
+
+#define OTEL_EXPORTER_PROVIDER_URL	"url"
+#define OTEL_EXPORTER_PROVIDER_USERNAME	"username"
+#define OTEL_EXPORTER_PROVIDER_PASSWORD	"password"
+#define OTEL_EXPORTER_PROVIDER_DB	"db"
+
 
 ZBX_PTR_VECTOR_LITE_IMPL(otel_exporter_ptr, zbx_otel_exporter_t *)
+
+static char	*otel_option_dup(const zbx_config_option_t *options, int options_num, const char *key, char **error)
+{
+	const char	*value;
+
+	if (NULL == (value = zbx_config_option_value(options, options_num, key)))
+	{
+		*error = zbx_dsprintf(NULL, "missing mandatory ClickHouse telemetry provider option \"%s\"", key);
+		return NULL;
+	}
+
+	return zbx_strdup(NULL, value);
+
+}
+
+static int	otel_clickhouse_cfg_init(zbx_otel_clickhouse_cfg_t *cfg, const zbx_config_option_t *options,
+		int options_num, char **error)
+{
+	if (NULL == (cfg->url = otel_option_dup(options, options_num, OTEL_EXPORTER_PROVIDER_URL, error)))
+		return FAIL;
+
+	if (NULL == (cfg->database = otel_option_dup(options, options_num, OTEL_EXPORTER_PROVIDER_DB, error)))
+		return FAIL;
+
+	if (NULL == (cfg->username = otel_option_dup(options, options_num, OTEL_EXPORTER_PROVIDER_USERNAME, error)))
+		return FAIL;
+
+	if (NULL == (cfg->password = otel_option_dup(options, options_num, OTEL_EXPORTER_PROVIDER_PASSWORD, error)))
+		return FAIL;
+
+	return SUCCEED;
+}
 
 static void	otel_clickhouse_cfg_clear(zbx_otel_clickhouse_cfg_t *cfg)
 {
@@ -28,10 +68,15 @@ static void	otel_exporter_cfg_clear(zbx_otel_exporter_cfg_t *cfg)
 {
 	switch (cfg->type)
 	{
+		case OTEL_EXPORTER_UNKNOWN:
+			break;
 		case OTEL_EXPORTER_CLICKHOUSE:
 			otel_clickhouse_cfg_clear(&cfg->data.clickhouse);
 			break;
 	}
+
+	zbx_config_option_clear_options(cfg->options.values, cfg->options.values_num);
+	zbx_vector_config_option_destroy(&cfg->options);
 }
 
 zbx_otel_exporter_pool_t	*otel_exporter_pool_create(zbx_otel_exporter_cfg_t *cfg, char **error)
@@ -151,13 +196,53 @@ int	otel_exporter_commit(zbx_otel_exporter_t *exporter, zbx_otel_dataset_t *ds)
 
 int	otel_exporter_cfg_init(zbx_otel_exporter_cfg_t *cfg, const char *options, char **error)
 {
-	/* TODO: implement proper options parsing */
-	cfg->type = OTEL_EXPORTER_CLICKHOUSE;
-	cfg->data.clickhouse.url = zbx_strdup(NULL, "http://localhost:8123");
-	cfg->data.clickhouse.database = zbx_strdup(NULL, "zabbix");
-	cfg->data.clickhouse.username = zbx_strdup(NULL, "zb");
-	cfg->data.clickhouse.password = zbx_strdup(NULL, "2b");
+#define	OTEL_EXPORTER_PROVIDER		"clickhouse"
+	ssize_t		len;
+	const char	*ptr;
+	int		ret = FAIL;
 
-	return SUCCEED;
+	memset(cfg, 0, sizeof(zbx_otel_exporter_cfg_t));
+	zbx_vector_config_option_create(&cfg->options);
+
+	len = zbx_config_option_parse_param(options);
+	ptr = options + len;
+	while (' ' == *ptr)
+		ptr++;
+
+	if (0 == len || ';' != *ptr)
+	{
+		*error = zbx_dsprintf(NULL, "invalid TelemetryProvider value \"%s\"", options);
+		goto out;
+	}
+
+	while (' ' == *(++ptr))
+		;
+
+	if (SUCCEED != zbx_config_option_parse_options(ptr, &cfg->options, error))
+		return FAIL;
+
+	if (0 == strncmp(options, OTEL_EXPORTER_PROVIDER, ZBX_CONST_STRLEN(OTEL_EXPORTER_PROVIDER)))
+	{
+		cfg->type = OTEL_EXPORTER_CLICKHOUSE;
+		if (FAIL == otel_clickhouse_cfg_init(&cfg->data.clickhouse, cfg->options.values,
+				cfg->options.values_num, error))
+		{
+			goto out;
+		}
+	}
+	else
+	{
+		*error = zbx_dsprintf(NULL, "invalid TelemetryProvider\"%s\"", options);
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	if (FAIL == ret)
+		otel_exporter_cfg_clear(cfg);
+
+#undef OTEL_EXPORTER_PROVIDER
+
+	return ret;
 }
 

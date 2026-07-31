@@ -332,6 +332,9 @@ static char	*config_ssl_key_location = NULL;
 /* browser item */
 static char	*config_webdriver_url = NULL;
 
+/* open telemetry */
+static char	*config_telemetry_provider = NULL;
+
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_db_config_t		*zbx_db_config = NULL;
 static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
@@ -1136,6 +1139,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartOTCollectors",		&config_forks[ZBX_PROCESS_TYPE_OTEL_MANAGER],
 											ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1},
+		{"TelemetryProvider",		&config_telemetry_provider,		ZBX_CFG_TYPE_STRING,
+					ZBX_CONF_PARM_OPT,	0,			0},
+
 		{0}
 	};
 
@@ -1701,7 +1707,7 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 	zbx_thread_otel_manager_args_t	otel_args =
 	{
 		.config_timeout = zbx_config_timeout,
-		.exporter_options = ""	/* TODO: get correct configuration parameter */
+		.exporter_options = config_telemetry_provider
 	};
 
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_OTEL_MANAGER] = (zbx_supervisor_unit_def_t){

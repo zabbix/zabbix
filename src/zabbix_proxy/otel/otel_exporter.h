@@ -17,11 +17,13 @@
 
 #include "otel_dataset.h"
 #include "otel_clickhouse.h"
+#include "zbxcfg.h"
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 
 typedef enum
 {
+	OTEL_EXPORTER_UNKNOWN,
 	OTEL_EXPORTER_CLICKHOUSE
 }
 zbx_otel_exporter_type_t;
@@ -35,6 +37,7 @@ zbx_otel_exporter_cfg_data_t;
 typedef struct
 {
 	zbx_otel_exporter_type_t	type;
+	zbx_vector_config_option_t	options;
 	zbx_otel_exporter_cfg_data_t	data;
 }
 zbx_otel_exporter_cfg_t;

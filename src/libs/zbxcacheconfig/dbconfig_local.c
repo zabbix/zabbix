@@ -65,8 +65,6 @@ void	zbx_dc_config_local_release(void)
 	zbx_hashset_destroy(&config_local->trigger_depends_links);
 	zbx_hashset_destroy(&config_local->item_tag_links);
 	correlation_config_destroy(config_local->correlation_config);
-	memset(&config_local->apm_config, 0, sizeof(config_local->apm_config));
-
 	zbx_dc_apm_config_clear(&config_local->apm_config);
 
 	zbx_free(config_local);

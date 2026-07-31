@@ -79,13 +79,13 @@ static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, in
 {
 	zbx_otel_manager_t	*manager;
 	zbx_otel_worker_t	**workers;
-	zbx_otel_queue_t	*queue;
+	zbx_otel_queue_t	*queue = NULL;
 	int			ret = FAIL;
 	zbx_otel_exporter_cfg_t	cfg;
 
 	manager = (zbx_otel_manager_t *)zbx_calloc(NULL, 1, sizeof(zbx_otel_manager_t));
-	queue = otel_queue_create(quota);
 	workers = (zbx_otel_worker_t **)zbx_calloc(NULL, (size_t)OTEL_WORKERS_MAX, sizeof(zbx_otel_worker_t));
+	queue = otel_queue_create(quota);
 
 	if (SUCCEED != otel_exporter_cfg_init(&cfg, options, error))
 		goto out;
@@ -113,6 +113,17 @@ static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, in
 out:
 	if (SUCCEED != ret)
 	{
+		if (queue != (zbx_otel_queue_t *)manager->base.queue)
+			zbx_free(queue);
+
+		if (workers != (zbx_otel_worker_t **)manager->base.workers)
+		{
+			for (int i = 0; i < OTEL_WORKERS_MAX; i++)
+				zbx_free(workers[i]);
+
+			zbx_free(workers);
+		}
+
 		otel_manager_free(manager);
 		manager = NULL;
 	}
@@ -189,6 +200,7 @@ void	*zbx_otel_manager_thread(void *args)
 
 	otel_args = (const zbx_thread_otel_manager_args_t *)unit_args->args.args;
 
+	zbx_dc_config_local_acquire();
 	zbx_dc_get_apm_config(&cfg, &cfg_revision);
 	quota = cfg.quota;
 
@@ -199,6 +211,10 @@ void	*zbx_otel_manager_thread(void *args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize open telemetry manager: %s", error);
 		zbx_free(error);
+		zbx_dc_apm_config_clear(&cfg);
+		zbx_dc_config_local_release();
+		zbx_free(args);
+
 		zbx_exit(EXIT_FAILURE);
 	}
 
@@ -317,9 +333,10 @@ void	*zbx_otel_manager_thread(void *args)
 	if (SUCCEED != ZBX_EXIT_STATUS())
 		zbx_rtc_unsubscribe_service(otel_args->config_timeout, ZBX_IPC_SERVICE_OTEL);
 
-	zbx_dc_apm_config_clear(&cfg);
-
 	otel_manager_free(manager);
+out:
+	zbx_dc_apm_config_clear(&cfg);
+	zbx_dc_config_local_release();
 	zbx_free(args);
 
 	return NULL;
