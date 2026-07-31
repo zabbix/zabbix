@@ -3,6 +3,7 @@
 *.o
 *.gcda
 *.gcno
+grouped-libs-generated.mk
 /tests_results
 .cproject
 .deps

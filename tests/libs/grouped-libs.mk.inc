@@ -36,6 +36,7 @@ proxy_DEPS = \
 	$(ZBX_IPMI_LIB)
 
 GROUPED_LIBS_MK = grouped-libs-generated.mk
+CLEANFILES = $(GROUPED_LIBS_MK)
 
 $(GROUPED_LIBS_MK): Makefile
 	@echo "AGENT_GROUPED_LIBS := -Wl,--start-group $(agent_DEPS) -Wl,--end-group" > $@
