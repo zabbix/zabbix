@@ -445,6 +445,7 @@ class CMultiSelect extends CTag {
 
 				if (array_key_exists('without_proxy_group', $parameters)) {
 					$popup_parameters['without_proxy_group'] = '1';
+					$autocomplete_parameters['without_proxy_group'] = true;
 				}
 			}
 
