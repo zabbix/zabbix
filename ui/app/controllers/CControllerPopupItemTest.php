@@ -352,6 +352,10 @@ abstract class CControllerPopupItemTest extends CController {
 					'editable' => true
 				]);
 
+				if (!$hosts) {
+					return false;
+				}
+
 				$hosts[0] = CArrayHelper::renameKeys($hosts[0], ['templateid' => 'hostid']);
 			}
 

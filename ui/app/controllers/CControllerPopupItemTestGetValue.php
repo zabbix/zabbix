@@ -242,6 +242,19 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		return $ret;
 	}
 
+	protected function checkPermissions() {
+		if (!parent::checkPermissions()) {
+			return false;
+		}
+
+		if ($this->host && $this->host['status'] != HOST_STATUS_TEMPLATE
+				&& $this->getInput('test_with', self::TEST_WITH_SERVER) == self::TEST_WITH_PROXY) {
+			return bccomp($this->getInput('proxyid', 0), $this->host['proxyid']) == 0;
+		}
+
+		return true;
+	}
+
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
