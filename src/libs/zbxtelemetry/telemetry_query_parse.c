@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxdbhigh.h"
 #include "zbxtelemetry.h"
 
 #include "telemetry.h"
@@ -492,10 +493,10 @@ out:
 static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char *error, size_t max_error_len)
 {
 	/* in case of an error the query is cleaned by the calling function */
-	int		ret = FAIL;
-	char		buf[MAX_STRING_LEN];
-	size_t		buf_size = sizeof(buf);
-	const char	*p = NULL;
+	int				ret = FAIL;
+	static ZBX_THREAD_LOCAL char	buf[ZBX_ITEM_QUERY_LEN];
+	size_t				buf_size = sizeof(buf);
+	const char			*p = NULL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 

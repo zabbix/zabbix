@@ -29,7 +29,8 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 	struct zbx_json	j;
 	char		*str = NULL;
 	const char	*p = NULL;
-	char		buf[MAX_STRING_LEN];
+	char		*buf = NULL;
+	size_t		buf_alloc = 0;
 	zbx_uint64_t	timestamp;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
@@ -38,7 +39,7 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 	zbx_json_adduint64(&j, "id", row_id);
 
 	/* timestamp */
-	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)) ||
+	if (NULL == (p = zbx_json_next_value_dyn(jp, p, &buf, &buf_alloc, NULL)) ||
 			SUCCEED != zbx_is_uint64(buf, &timestamp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse timestamp from row \"%s\"", jp->start);
@@ -55,7 +56,7 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 		char			*field_name = tq_get_result_field_name_dyn(col);
 		zbx_json_type_t		type;
 
-		if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), &type)) ||
+		if (NULL == (p = zbx_json_next_value_dyn(jp, p, &buf, &buf_alloc, &type)) ||
 				SUCCEED != tq_validate_result_column_type(type))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from row \"%s\"", field_name,
@@ -74,7 +75,7 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 		const char	*field_name = query->aggregated_columns.values[i].alias;
 		zbx_json_type_t	type;
 
-		if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), &type)) ||
+		if (NULL == (p = zbx_json_next_value_dyn(jp, p, &buf, &buf_alloc, &type)) ||
 				SUCCEED != tq_validate_result_aggr_column_type(type))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from row \"%s\"", field_name,
@@ -90,6 +91,7 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 	str = zbx_strdup(NULL, j.buffer);
 out:
 	zbx_json_free(&j);
+	zbx_free(buf);
 
 	return str;
 }
