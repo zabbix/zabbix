@@ -529,10 +529,10 @@ zabbix_export:
                   value: security
         - uuid: 868440292732425c8f9df52882822c82
           name: 'Get filesystems'
-          key: 'vfs.fs.get[short]'
+          key: vfs.fs.get
           history: '0'
           value_type: TEXT
-          description: 'The `vfs.fs.get[short]` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
+          description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
           tags:
             - tag: component
               value: raw
@@ -1340,7 +1340,7 @@ zabbix_export:
                   parameters:
                     - '$.[?(@.fsname==''{#FSNAME}'')].first()'
               master_item:
-                key: 'vfs.fs.get[full,{#FSNAME}]'
+                key: vfs.fs.get
               tags:
                 - tag: component
                   value: raw
@@ -1429,7 +1429,7 @@ zabbix_export:
                     host: 'Linux by Zabbix agent'
                     key: 'vfs.fs.dependent.size[{#FSNAME},free]'
           master_item:
-            key: 'vfs.fs.get[short]'
+            key: vfs.fs.get
           lld_macro_paths:
             - lld_macro: '{#FSNAME}'
               path: $.fsname
