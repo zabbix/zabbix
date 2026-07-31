@@ -6278,6 +6278,348 @@ HEREDOC;
 	}
 
 	/**
+	 * The counterpart of testTriggerCEP_OpenProblem for triggers that generate an event per value and
+	 * problems that are closed by a CEP window instead of by the trigger recovering (part 1/3).
+	 *
+	 * The prototypes are the close-on-up ones - multiple event generation, a 'state' tag saying "down" or
+	 * "up" and a 'service' tag pairing the two - and the only rule in place is the tag correlation window of
+	 * prepareDataCepWindowTagCorrelationCloseOnUp(), which closes a window, and with it every problem the
+	 * window holds, as soon as an "up" event of that 'service' arrives. The trigger expression never turns
+	 * false in these tests: whatever closes a problem here is the rule.
+	 *
+	 * This part sends the first "down" value to every discovered trigger, so each of them opens one problem.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_MultEventOpenProblem$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_MultEventOpenProblem() {
+		$this->runMultEventOpenProblemTest(false);
+	}
+
+	/**
+	 * Part 2/3, and the place where multiple event generation shows: re-sending a problem value opens another
+	 * problem instead of doing nothing, which is what testTriggerCEP_OpenAlreadyOpenedProblem asserts for the
+	 * single event triggers. The second value carries a different 'service' id, so it also gives the window
+	 * rule two groups to keep apart.
+	 *
+	 * @depends testTriggerCEP_MultEventOpenProblem
+	 */
+	public function testTriggerCEP_MultEventOpenSecondProblem() {
+		$this->runMultEventOpenSecondProblemTest(false);
+	}
+
+	/**
+	 * Part 3/3: the counterpart of testTriggerCEP_CloseProblem. The two problems of every trigger are closed
+	 * by the window rule, one 'service' id at a time, while the trigger expression stays true throughout - so
+	 * the triggers end up back in OK state without ever having recovered on their own.
+	 *
+	 * @depends testTriggerCEP_MultEventOpenSecondProblem
+	 */
+	public function testTriggerCEP_MultEventCloseByWindow() {
+		try {
+			$this->runMultEventCloseByWindowTest(false);
+		}
+		finally {
+			// The sequence closed every problem itself; only the rule must not survive it.
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * Same as testTriggerCEP_MultEventOpenProblem but the server component is stopped and restarted first.
+	 *
+	 * @depends testTriggerCEP_MultEventCloseByWindow
+	 */
+	public function testTriggerCEP_MultEventOpenProblemRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runMultEventOpenProblemTest(true);
+	}
+
+	/**
+	 * Same as testTriggerCEP_MultEventOpenSecondProblem but the server component is stopped and restarted
+	 * first, so the second problem is opened on a trigger whose first one was cached before the restart.
+	 *
+	 * @depends testTriggerCEP_MultEventOpenProblemRestart
+	 */
+	public function testTriggerCEP_MultEventOpenSecondProblemRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runMultEventOpenSecondProblemTest(true);
+	}
+
+	/**
+	 * Same as testTriggerCEP_MultEventCloseByWindow but the server component is stopped and restarted first,
+	 * so the window has to close problems it only knows from what it restored at startup.
+	 *
+	 * @depends testTriggerCEP_MultEventOpenSecondProblemRestart
+	 */
+	public function testTriggerCEP_MultEventCloseByWindowRestart() {
+		$this->skipIfRestartTestsDisabled();
+
+		try {
+			$this->runMultEventCloseByWindowTest(true);
+		}
+		finally {
+			// The sequence closed every problem itself; only the rule must not survive it.
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same open and close by window sequence in one test, with the per-trigger services in place: every
+	 * service must follow its trigger into problem while the two problems are open and back to OK once the
+	 * window rule has closed them - a recovery the services see without the trigger ever recovering.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_MultEventCloseByWindowWithServices$)
+	 * @depends testTriggerCEP_AddServices
+	 */
+	public function testTriggerCEP_MultEventCloseByWindowWithServices() {
+		try {
+			$this->runMultEventOpenProblemTest(false);
+			$this->runMultEventOpenSecondProblemTest(false);
+			$this->runMultEventCloseByWindowTest(false, true);
+		}
+		finally {
+			// The sequence closed every problem itself; only the rule must not survive it.
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The counterpart of testTriggerCEP_OpenAndImmediateRecoverySingleItem: the same kind of rapid burst sent
+	 * as one batch to a single item, but made of "down"/"up" pairs and closed by the window rule instead of
+	 * by the trigger recovering.
+	 *
+	 * Every pair carries an id of its own, so each of them is a window of its own: a "down" opens a problem,
+	 * and the "up" of the same id closes that window with both its events in it. The burst therefore has to be
+	 * paired up correctly while it is being processed, and by the end every problem it opened must be closed
+	 * again - with the trigger expression still true throughout, so only the rule can have done it.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_MultEventWindowBurstSingleItem$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_MultEventWindowBurstSingleItem() {
+		$this->prepareMultEventWindow();
+
+		try {
+			// Drive a single discovered item, so the whole burst lands on one event stream.
+			$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+			$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+			$all = [$triggerid];
+
+			$this->captureEventBaseline($all);
+
+			// One "down"/"up" pair per cycle, each pair with an id no other pair uses, sent in a single
+			// batch: every value gets a strictly increasing (clock, ns), so CEP has to work through the
+			// whole burst in order.
+			$cycles = static::RECOVERY_CYCLES_COUNT;
+			$data = [];
+
+			for ($i = 0; $i < $cycles; $i++) {
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down_'.$i];
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'up_'.$i];
+			}
+
+			$vps_written = $this->getVpsWritten();
+			$this->dispatchSenderValues($data);
+			$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
+
+			// Four events per cycle: the "down" and the "up" are a problem event each, and closing the window
+			// they share closes both of them, which is a recovery event each as well. Waiting for the exact
+			// number fails on a dropped or a duplicated one alike.
+			$this->waitForAllTriggerEventCounts($all, 4 * $cycles);
+
+			// Each "up" closed the window of its own id, so nothing is left open and the trigger is back to
+			// OK although its expression never turned false.
+			$this->waitForNoOpenProblems($all, 'after the paired burst');
+			$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+			$this->assertCepStatEquals('tasks', 'cached_events', 0);
+		}
+		finally {
+			// The sequence closed every problem itself; only the rule must not survive it.
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The counterpart of testTriggerCEP_OpenAndImmediateRecoveryValueWaves: one batch grouped by value rather
+	 * than by key, so the values of all discovered items are interleaved, with the window rule doing the
+	 * closing.
+	 *
+	 * The batch is a "down_0" wave, an "up_0" wave and a "down_1" wave. The middle wave closes the window of
+	 * the first id on every trigger, so when the batch has been worked through each trigger is left with the
+	 * one problem of the second id; a closing "up_1" wave then takes that one too.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_MultEventWindowValueWaves$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_MultEventWindowValueWaves() {
+		$this->prepareMultEventWindow();
+
+		try {
+			$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+			$triggerids = self::$discovered_triggerids;
+
+			$this->captureEventBaseline($triggerids);
+
+			$first = self::CEP_RULE_WINDOW_NONE_SERVICE;
+			$second = self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT;
+			$data = [];
+
+			foreach (['down_'.$first, 'up_'.$first, 'down_'.$second] as $value) {
+				foreach ($keys as $key) {
+					$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
+				}
+			}
+
+			$vps_written = $this->getVpsWritten();
+			$this->dispatchSenderValues($data);
+			$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
+
+			// Five events per trigger: the three waves are a problem event each, and the "up" wave closed the
+			// window of the first id with two events in it, which recovered both of them.
+			$this->waitForAllTriggerEventCounts($triggerids, 5);
+
+			// The "up" wave closed the first id's window on every trigger - its own event and the "down" it
+			// paired with - so exactly the problem of the second id is left open on each of them.
+			$this->waitForOpenProblemCount($triggerids, count($keys));
+			$this->assertAllTriggerValues($triggerids, TRIGGER_VALUE_TRUE,
+				'must be PROBLEM after the batch, with the second id still open'
+			);
+
+			// The closing wave, sent once the batch has been worked through, takes the rest.
+			$data = [];
+
+			foreach ($keys as $key) {
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'up_'.$second];
+			}
+
+			$vps_written = $this->getVpsWritten();
+			$this->dispatchSenderValues($data);
+			$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
+
+			// Three more: the closing wave itself, and the recovery of the two events its window held.
+			$this->waitForAllTriggerEventCounts($triggerids, 8);
+			$this->waitForNoOpenProblems($triggerids, 'after the closing up wave');
+			$this->waitForParentsValue($triggerids, TRIGGER_VALUE_FALSE);
+			$this->assertCepStatEquals('tasks', 'cached_events', 0);
+		}
+		finally {
+			// The sequence closed every problem itself; only the rule must not survive it.
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * Put the close-on-up prototypes and the tag correlation window rule in place for the multiple event
+	 * scenarios above. Every part calls it, so each of them can also be run on its own; it changes nothing
+	 * when it is already in place, and in particular it neither closes the problems a previous part opened
+	 * nor replaces the rule that is to close them.
+	 */
+	private function prepareMultEventWindow(): void {
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
+	}
+
+	/**
+	 * Send $value to every discovered item of the primary prototype, the way the smoke tests drive all
+	 * discovered triggers at once.
+	 */
+	private function sendDiscoveredValues(array $keys, string $value): void {
+		$this->dispatchSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value], $keys)
+		);
+	}
+
+	/**
+	 * Open the first problem of every discovered trigger with a "down" value and verify CEP processed and
+	 * cached it. When $restart is true, the server is restarted first.
+	 */
+	private function runMultEventOpenProblemTest(bool $restart): void {
+		$this->prepareMultEventWindow();
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		$cep_processed = $this->getCepStat('events', 'processed');
+		$this->captureEventBaseline($triggerids);
+
+		// OK→PROBLEM: one PROBLEM event per trigger, and the trigger value follows.
+		$this->sendDiscoveredValues($keys, 'down_'.self::CEP_RULE_WINDOW_NONE_SERVICE);
+		$this->waitForAllTriggerEventCounts($triggerids, 1);
+		$this->waitForParentsValue($triggerids, TRIGGER_VALUE_TRUE);
+		$this->waitForOpenProblemCount($triggerids, count($keys));
+
+		// CEP processed the opened problem events and is holding one per trigger.
+		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
+		$this->assertCepStatEquals('tasks', 'cached_events', count($keys));
+		$this->assertCepStatEquals('tasks', 'cached_objects', count($keys));
+	}
+
+	/**
+	 * Send a second "down" value, with an id of its own, to triggers that are already in problem state. With
+	 * multiple event generation this opens a second problem on every one of them rather than being ignored.
+	 * When $restart is true, the server is restarted first.
+	 */
+	private function runMultEventOpenSecondProblemTest(bool $restart): void {
+		$this->prepareMultEventWindow();
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		$cep_processed = $this->getCepStat('events', 'processed');
+		$this->captureEventBaseline($triggerids);
+
+		// PROBLEM→PROBLEM: one more event per trigger, and the trigger value stays where it is.
+		$this->sendDiscoveredValues($keys, 'down_'.self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT);
+		$this->waitForAllTriggerEventCounts($triggerids, 1);
+		$this->waitForParentsValue($triggerids, TRIGGER_VALUE_TRUE);
+		$this->waitForOpenProblemCount($triggerids, 2 * count($keys));
+
+		// Two cached events per trigger now, but still one object per trigger.
+		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
+		$this->assertCepStatEquals('tasks', 'cached_events', 2 * count($keys));
+		$this->assertCepStatEquals('tasks', 'cached_objects', count($keys));
+	}
+
+	/**
+	 * Close the problems of every discovered trigger with the window rule, one 'service' id at a time: the
+	 * "up" value of an id is itself a problem event, and the rule closes the window of that id with both of
+	 * them in it. The trigger expression stays true the whole time, so the triggers can only return to OK
+	 * because their last problem was closed.
+	 *
+	 * When $restart is true, the server is restarted first. With $check_services the per-trigger services are
+	 * expected to follow: in problem while the problems are open, OK once the rule has closed them.
+	 */
+	private function runMultEventCloseByWindowTest(bool $restart, bool $check_services = false): void {
+		$this->prepareMultEventWindow();
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		if ($check_services) {
+			$this->waitForServicesStatus(TRIGGER_SEVERITY_DISASTER);
+		}
+
+		// The "up" of the first id closes that id's window: its own event and the "down" it pairs with are
+		// both closed, so one problem per trigger is left - the one of the other id.
+		$this->sendDiscoveredValues($keys, 'up_'.self::CEP_RULE_WINDOW_NONE_SERVICE);
+		$this->waitForOpenProblemCount($triggerids, count($keys));
+		$this->waitForParentsValue($triggerids, TRIGGER_VALUE_TRUE);
+
+		// The "up" of the other id closes the rest. Nothing recovered the triggers - closing their last
+		// problem is what puts them back to OK.
+		$this->sendDiscoveredValues($keys, 'up_'.self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT);
+		$this->waitForNoOpenProblems($triggerids, 'close by window correlation');
+		$this->waitForParentsValue($triggerids, TRIGGER_VALUE_FALSE);
+
+		// Nothing is left cached once every problem of every trigger is closed.
+		$this->assertCepStatEquals('tasks', 'cached_events', 0);
+		$this->assertCepStatEquals('tasks', 'cached_objects', 0);
+
+		if ($check_services) {
+			$this->waitForServicesStatus(ZBX_SEVERITY_OK);
+		}
+	}
+
+	/**
 	 * Complex event processing without a window (WINDOW_NONE): thirty windowless rules tag the problem events
 	 * of one discovered trigger the moment they occur, each with a tag named after the operator it applies
 	 * ("service_equals", "event_name_contains", ...), and one more rule runs every tag operation over those
