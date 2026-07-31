@@ -547,7 +547,8 @@ class testMap extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Cannot add map element of the map "C" due to circular reference.'
+				'expected_error' => 'Cannot add map element of the map "C" due to circular reference.',
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix']
 			],
 			// Success. Map element label is of valid length.
 			[

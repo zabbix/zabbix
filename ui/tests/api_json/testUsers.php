@@ -106,11 +106,6 @@ class testUsers extends CAPITest {
 	 * Prepare data for user.checkAuthentication tests.
 	 */
 	public function prepareUsersData() {
-		CDataHelper::call('role.update', [
-			'roleid' => 1, // User role.
-			'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
-		]);
-
 		$usergroup_data = [
 			[
 				'name' => 'API test users status enabled',

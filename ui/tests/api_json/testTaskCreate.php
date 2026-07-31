@@ -39,11 +39,6 @@ class testTaskCreate extends CAPITest {
 	private static $clear_taskids = [];
 
 	public function prepareItemsData() {
-		CDataHelper::call('role.update', [
-			'roleid' => 1, // User role.
-			'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
-		]);
-
 		/**
 		 * Permission-related records missing in test SQL data. Force recalculation for zabbix-user and zabbix-admin by
 		 * removing them from, and then adding back to a common user group.

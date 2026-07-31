@@ -949,20 +949,24 @@ class testConfiguration extends CAPITest {
 	* @dataProvider import_users
 	*/
 	public function testConfiguration_UsersPermissionsToImportCreate($format, $parameter, $source, $sql, $expected_error) {
-		$this->authorize('zabbix-admin', 'zabbix');
-		$this->call('configuration.import', [
-				'format' => $format,
-				'rules' => [
-					$parameter => [
-						'createMissing' => true,
-						'updateExisting' => false
-					]
-				],
-				'source' => $source
-			],
-			$expected_error
-		);
+		$users = ['zabbix-admin', 'zabbix-user'];
 
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		foreach ($users as $username) {
+			$this->authorize($username, 'zabbix');
+			$this->call('configuration.import', [
+					'format' => $format,
+					'rules' => [
+						$parameter => [
+							'createMissing' => true,
+							'updateExisting' => false
+						]
+					],
+					'source' => $source
+				],
+				$expected_error
+			);
+
+			$this->assertEquals(0, CDBHelper::getCount($sql));
+		}
 	}
 }
