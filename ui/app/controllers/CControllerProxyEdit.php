@@ -135,10 +135,12 @@ class CControllerProxyEdit extends CController {
 					'timeout_browser' => $this->proxy['timeout_browser']
 				];
 
+			$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE);
+
 			$usrgrps = API::UserGroup()->get([
 				'output' => ['name'],
 				'proxyids' => $this->proxy['proxyid'],
-				'limit' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+				'limit' => $limit
 			]);
 
 			if ($usrgrps) {
