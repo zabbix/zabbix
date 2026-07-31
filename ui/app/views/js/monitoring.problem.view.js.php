@@ -200,6 +200,9 @@
 
 					const input_id = `${column.getId()}_${eventid}`;
 
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 					const checkbox = document.createElement('input');
 					checkbox.classList.add(ZBX_STYLE_CHECKBOX_RADIO);
 					checkbox.setAttribute('type', 'checkbox');
@@ -218,7 +221,7 @@
 						label.classList.add('symptoms-left');
 					}
 					else {
-						cell.append(checkbox, label);
+						flex_wrapper.append(checkbox, label);
 					}
 
 					const filter = this.#datatable.getFilter();
@@ -279,7 +282,9 @@
 							}
 						}
 
-						cell.appendChild(symptoms);
+						flex_wrapper.append(symptoms);
+
+						cell.appendChild(flex_wrapper);
 					}
 
 					requestAnimationFrame(() => {

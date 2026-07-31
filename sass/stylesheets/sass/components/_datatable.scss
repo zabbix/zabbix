@@ -331,6 +331,10 @@
 
 				&.nested-small {
 					font-size: 11px;
+
+					.cell.cell-data .flex-wrapper {
+						justify-content: flex-end;
+					}
 				}
 			}
 
@@ -624,8 +628,12 @@
 				height: 18px;
 
 				&:not(.no-indent):not(:first-child) {
-					margin-left: 5px;
+					margin-left: 2px;
 				}
+			}
+
+			&:not(.cell-checkbox) .btn-icon:not(.no-indent):not(:first-child) {
+				margin-left: 5px;
 			}
 
 			.action-wrapper {
@@ -644,7 +652,7 @@
 				align-items: center;
 				flex-shrink: 0;
 				gap: 3px;
-				height: var(--datatable-row-height);
+				margin-top: 2px;
 
 				.symptoms-left {
 					min-width: 17px;
@@ -656,6 +664,7 @@
 				.symptoms-right {
 					width: 18px;
 					height: 16px;
+					margin: 5px 0 0 2px;
 				}
 			}
 
