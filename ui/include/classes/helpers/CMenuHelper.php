@@ -492,6 +492,7 @@ class CMenuHelper {
 
 			$menu->add(
 				(new CMenuItem(_('User settings')))
+					->setId('user-menu-user-settings')
 					->setIcon(ZBX_ICON_USER_SETTINGS)
 					->setTitle(getUserFullname($user))
 					->setSubMenu($submenu)
