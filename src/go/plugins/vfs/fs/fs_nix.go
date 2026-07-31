@@ -31,7 +31,7 @@ func init() {
 	err := plugin.RegisterMetrics(
 		&impl, "VfsFs",
 		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
-		"vfs.fs.get", "List of mounted filesystems with statistics.",
+		"vfs.fs.get", "List of mounted filesystems with statistics. vfs.fs.get[<mode>,<mountpoint>] - mode: full(default), short; mountpoint: exact match.",
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
 		"vfs.fs.inode", "Disk space in bytes or in percentage from total.",
 	)
@@ -40,16 +40,32 @@ func init() {
 	}
 }
 
-func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
+func filterByMountpoint(data []*FsInfo, mountpoint string) []*FsInfo {
+	if mountpoint == "" {
+		return data
+	}
+	var filtered []*FsInfo
+	for _, info := range data {
+		if *info.FsName == mountpoint {
+			filtered = append(filtered, info)
+		}
+	}
+	return filtered
+}
+
+func (p *Plugin) getFsInfoStats(mountpoint string) (data []*FsInfoNew, err error) {
 	allData, err := p.getFsInfo()
 	if err != nil {
 		return nil, err
 	}
+	// Apply mountpoint filter before stat calls
+	allData = filterByMountpoint(allData, mountpoint)
 
 	fsmap := make(map[string]*FsInfoNew)
 	fsStatCaller := p.newFSCaller(getFsStats, len(allData))
 	fsInodeCaller := p.newFSCaller(getFsInode, len(allData))
 
+	data = make([]*FsInfoNew, 0)
 	for _, info := range allData {
 		bytes, err := fsStatCaller.run(*info.FsName)
 		if err != nil {
@@ -66,17 +82,31 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 		fsmap[*info.FsName+*info.FsType] = &FsInfoNew{info.FsName, info.FsType, nil, nil, bytes, inodes, info.FsOptions}
 	}
 
-	allData, err = p.getFsInfo()
-	if err != nil {
-		return nil, err
-	}
-
 	for _, info := range allData {
 		if fsInfo, ok := fsmap[*info.FsName+*info.FsType]; ok {
 			data = append(data, fsInfo)
 		}
 	}
 
+	return
+}
+
+func (p *Plugin) getFsInfoShort(mountpoint string) (data []*FsInfoShort, err error) {
+	allData, err := p.getFsInfo()
+	if err != nil {
+		return nil, err
+	}
+	// Apply mountpoint filter before returning
+	allData = filterByMountpoint(allData, mountpoint)
+
+	data = make([]*FsInfoShort, 0)
+	for _, info := range allData {
+		data = append(data, &FsInfoShort{
+			FsName:    info.FsName,
+			FsType:    info.FsType,
+			FsOptions: info.FsOptions,
+		})
+	}
 	return
 }
 

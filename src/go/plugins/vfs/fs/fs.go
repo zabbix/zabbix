@@ -51,6 +51,14 @@ type FsInfo struct {
 	FsOptions  *string  `json:"{#FSOPTIONS},omitempty"`
 }
 
+type FsInfoShort struct {
+	FsName     *string `json:"fsname,omitempty"`
+	FsType     *string `json:"fstype,omitempty"`
+	DriveLabel *string `json:"fslabel,omitempty"`
+	DriveType  *string `json:"fsdrivetype,omitempty"`
+	FsOptions  *string `json:"options,omitempty"`
+}
+
 type FsInfoNew struct {
 	FsName     *string  `json:"fsname,omitempty"`
 	FsType     *string  `json:"fstype,omitempty"`
@@ -58,7 +66,7 @@ type FsInfoNew struct {
 	DriveType  *string  `json:"fsdrivetype,omitempty"`
 	Bytes      *FsStats `json:"bytes,omitempty"`
 	Inodes     *FsStats `json:"inodes,omitempty"`
-	FsOptions  *string  `json:"options",omitempty"`
+	FsOptions  *string  `json:"options,omitempty"`
 }
 
 type Plugin struct {
@@ -83,11 +91,38 @@ func (p *Plugin) exportDiscovery(params []string) (value interface{}, err error)
 }
 
 func (p *Plugin) exportGet(params []string) (value interface{}, err error) {
-	if len(params) != 0 {
-		return nil, errors.New(errorInvalidParameters)
+	if len(params) > 2 {
+		return nil, errors.New("Too many parameters.")
 	}
+	var mode, mountpoint string
+	if len(params) >= 1 {
+		mode = params[0]
+	}
+	if len(params) >= 2 {
+		mountpoint = params[1]
+	}
+	/* validate mode */
+	if mode != "" && mode != "full" && mode != "short" {
+		return nil, errors.New("Invalid first parameter.")
+	}
+	/* empty mode defaults to full */
+	if mode == "" {
+		mode = "full"
+	}
+	if mode == "short" {
+		var d []*FsInfoShort
+		if d, err = p.getFsInfoShort(mountpoint); err != nil {
+			return
+		}
+		var b []byte
+		if b, err = json.Marshal(&d); err != nil {
+			return
+		}
+		return string(b), nil
+	}
+	/* full mode */
 	var d []*FsInfoNew
-	if d, err = p.getFsInfoStats(); err != nil {
+	if d, err = p.getFsInfoStats(mountpoint); err != nil {
 		return
 	}
 	var b []byte
