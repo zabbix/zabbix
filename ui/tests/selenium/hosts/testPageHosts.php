@@ -429,7 +429,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->query('button:Reset')->one()->click();
 		$filter->fill($data['filter']);
 		$filter->submit();
-		$table ->waitUntilReloaded();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		$this->assertTableStats(count($data['expected']));
