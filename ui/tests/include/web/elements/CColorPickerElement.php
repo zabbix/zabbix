@@ -136,7 +136,7 @@ class CColorPickerElement extends CElement {
 		catch (TimeoutException $exception) {
 			$button->click();
 
-			return $ppopup->waitUntilVisible()->one();
+			return $popup->waitUntilVisible()->one();
 		}
 	}
 

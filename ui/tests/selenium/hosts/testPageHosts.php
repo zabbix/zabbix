@@ -427,8 +427,10 @@ class testPageHosts extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->fill($data['filter']);
+		$table = $this->query('class:list-table')->waitUntilpresent()->one();
 		$filter->submit();
 		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		$this->assertTableStats(count($data['expected']));
 		$table = $this->query('class:list-table')->asTable()->one();
