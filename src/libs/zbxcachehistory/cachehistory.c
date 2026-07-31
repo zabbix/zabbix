@@ -112,7 +112,6 @@ typedef struct
 	zbx_hc_proxyqueue_t	proxyqueue;
 	int			processing_num;
 	int			refcount;
-
 }
 ZBX_DC_CACHE;
 
@@ -3130,18 +3129,13 @@ void	zbx_hc_pop_items(zbx_vector_hc_item_ptr_t *history_items)
 	zbx_binary_heap_elem_t	*elem;
 	zbx_hc_item_t		*item;
 
-	/* DEV4972 TEMP: repro aid, must be removed before shipping. */
 	while (ZBX_HC_SYNC_MAX > history_items->values_num && FAIL == zbx_binary_heap_empty(&cache->history_queue))
 	{
 		elem = zbx_binary_heap_find_min(&cache->history_queue);
 		item = elem->data;
+		zbx_vector_hc_item_ptr_append(history_items, item);
 
 		zbx_binary_heap_remove_min(&cache->history_queue);
-
-		if (NULL != item->tail && 0 != (item->tail->flags & ZBX_DC_FLAG_NOVALUE))
-			continue;
-
-		zbx_vector_hc_item_ptr_append(history_items, item);
 	}
 
 	if (0 != history_items->values_num)
