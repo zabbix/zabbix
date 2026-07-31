@@ -798,6 +798,7 @@ $formgrid
 				new CTemplateTag('condition-row-tmpl',
 					(new CRow([
 						[
+							new CVar('conditions[#{row_index}][formulaid]', '#{formulaid}'),
 							new CVar('conditions[#{row_index}][column]', '#{column}'),
 							new CVar('conditions[#{row_index}][attribute_key]', '#{attribute_key}'),
 							new CVar('conditions[#{row_index}][operator]', '#{operator}'),

@@ -463,8 +463,9 @@ class CControllerItemCreate extends CControllerItem {
 					['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 				]
 			],
-			'conditions' => ['objects',
+			'conditions' => ['objects', 'uniq' => ['formulaid'],
 				'fields' => [
+					'formulaid' => ['string', 'required', 'not_empty'],
 					'column' => ['string', 'required', 'not_empty'],
 					'attribute_key' => ['string', 'required', 'not_empty',
 						'when' => ['column', 'in' => CTelemetryData::getComplexColumns()]

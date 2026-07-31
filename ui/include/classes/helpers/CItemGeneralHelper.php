@@ -682,7 +682,7 @@ JAVASCRIPT;
 			];
 
 			if ($is_expression) {
-				$new_condition['formulaid'] = num2letter(count($conditions));
+				$new_condition['formulaid'] = $condition['formulaid'];
 			}
 
 			$conditions[] = $new_condition;
