@@ -51,8 +51,8 @@ proxy_module_load_LDADD = \
 	$(PROXY_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS) \
-	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS) \
-	@PROXY_LIBS@
+	@PROXY_LIBS@ \
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 proxy_module_load_LDFLAGS = @PROXY_LDFLAGS@
 
