@@ -1767,9 +1767,12 @@ class testTriggerCEP extends CIntegrationTest {
 	 * through untouched apart from the tags.
 	 *
 	 * $window_type gives every rule of the set a window of that type instead of none, and $name_infix names
-	 * them after the flavour so the two can exist side by side. The rule set behaves the same either way as
-	 * long as the window type is not an exclusive one - see testTriggerCEP_CepWindowSimple(), which runs it
-	 * with a simple window and expects exactly what the windowless run produces.
+	 * them after the flavour so they can exist side by side. The rule set behaves the same either way as long
+	 * as the window type is not an exclusive one - see testTriggerCEP_CepWindowSimple() and
+	 * testTriggerCEP_CepWindowPattern(), which run it with a simple and with a pattern match window and expect
+	 * exactly what the windowless run produces. The exclusive types cannot be used for it at all: only the
+	 * first matching rule of such a window type is processed for an event, so the rules after it would never
+	 * tag anything.
 	 */
 	public function prepareDataCepWindowNoneTagOperations(?int $window_type = null,
 			string $name_infix = 'none') {
@@ -1789,6 +1792,13 @@ class testTriggerCEP extends CIntegrationTest {
 		// get the same one, grouped by the 'service' tag.
 		$prefix = self::CEP_RULE_NAME_PREFIX.'window '.$name_infix.' ';
 		$window = $window_type === null ? [] : $this->buildWindowOperationsWindow();
+
+		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+			// A pattern window is not allowed without a script. This one reports a match every time the
+			// window is examined, which changes nothing at all: none of these rules has an operation at that
+			// execution point, so there is nothing for a match to run.
+			$window['script'] = "return 'true';";
+		}
 
 		foreach ($this->getWindowNoneRules() as $tag => $rule) {
 			[$conditions, $operand] = $rule;
@@ -6344,6 +6354,29 @@ HEREDOC;
 	 */
 	public function testTriggerCEP_CepWindowSimple() {
 		$this->prepareDataCepWindowNoneTagOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple all');
+
+		try {
+			$this->runEventAssessmentTestCepWindowNone();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The rule set of testTriggerCEP_CepWindowNone once more, this time with a pattern match window on every
+	 * rule and a script that reports a match every time a window is examined.
+	 *
+	 * The outcome must again be the one the windowless run produces. A pattern window is not exclusive, so
+	 * every rule still processes every event; the script decides nothing here beyond being run, because none
+	 * of these rules has an operation at the pattern matched execution point - so a match has nothing to
+	 * execute. What the flavour does show is that having a window, examining it once a second and matching in
+	 * it leaves the events themselves alone.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPattern$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPattern() {
+		$this->prepareDataCepWindowNoneTagOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH, 'pattern all');
 
 		try {
 			$this->runEventAssessmentTestCepWindowNone();
