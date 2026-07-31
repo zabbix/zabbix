@@ -84,7 +84,7 @@
 				if (sendto_input === null) {
 					const sendto_inputs = row.querySelectorAll(`[name="medias[${row_index}][sendto][]"`);
 
-					popup_params.sendto_emails = Array.from(sendto_inputs).map((input) => input.value);
+					popup_params.sendto_list = Array.from(sendto_inputs).map((input) => input.value);
 				}
 				else {
 					popup_params.sendto = sendto_input.value;

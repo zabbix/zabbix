@@ -13,6 +13,7 @@
 **/
 
 #include "nodecommand.h"
+#include "trapper.h"
 
 #include "zbxtrapper.h"
 
@@ -695,14 +696,6 @@ fail:
 
 	return ret;
 }
-
-/* user role permissions */
-typedef enum
-{
-	ROLE_PERM_DENY = 0,
-	ROLE_PERM_ALLOW = 1,
-}
-zbx_user_role_permission_t;
 
 /******************************************************************************
  *                                                                            *

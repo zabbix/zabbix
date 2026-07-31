@@ -481,6 +481,19 @@ switch ($data['method']) {
 					$options['filter']['userdirectoryid'] = 0;
 				}
 
+				if (array_key_exists('has_devices_access', $data) && $data['has_devices_access']) {
+					$roles = API::Role()->get([
+						'output' => ['roleid'],
+						'selectRules' => [CRoleHelper::DEVICES_ACCESS]
+					]);
+
+					$roles = array_filter($roles, static fn($role) =>
+						$role['rules'][CRoleHelper::DEVICES_ACCESS] == 1
+					);
+
+					$options['filter']['roleid'] = array_column($roles, 'roleid');
+				}
+
 				$users = API::User()->get($options);
 
 				if (array_key_exists('context', $data) && stripos('system', $data['search']) !== false) {
@@ -782,6 +795,34 @@ switch ($data['method']) {
 				foreach (array_slice($inventory_fields, 0, $limit, true) as $nr => $title) {
 					$result[] = ['id' => (string) $nr, 'name' => $title];
 				}
+				break;
+
+			case 'devices':
+				$options = [
+					'output' => ['uuid', 'name'],
+					'filter' => ['status' => ZBX_DEVICE_STATUS_ACTIVATED],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				];
+
+				if (array_key_exists('userid', $data)) {
+					$options['userids'] = [$data['userid']];
+				}
+
+				$devices = API::Device()->get($options);
+
+				if ($devices) {
+					CArrayHelper::sort($devices, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$devices = array_slice($devices, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($devices, ['uuid' => 'id']);
+				}
+
 				break;
 		}
 		break;

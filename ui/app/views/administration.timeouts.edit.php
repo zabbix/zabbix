@@ -193,6 +193,19 @@ $form_grid = (new CFormGrid())
 						->setAriaRequired()
 				)
 			])
+			->addItem(array_key_exists('device_link_timeout', $data)
+				? [
+					(new CLabel(_('Device link'), 'device_link_timeout'))->setAsteriskMark(),
+					new CFormField(
+						(new CTextBox('device_link_timeout', $data['device_link_timeout'], false,
+							CSettingsSchema::getFieldLength('device_link_timeout')
+						))
+							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							->setAriaRequired()
+					)
+				]
+				: null
+			)
 	)
 	->addItem(
 		new CFormActions(

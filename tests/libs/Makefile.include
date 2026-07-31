@@ -17,14 +17,6 @@ MUTEX_DEPS = \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-CFG_DEPS = \
-	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
-	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
-
 LOG_DEPS = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(MUTEX_DEPS) \
@@ -36,6 +28,15 @@ LOG_DEPS = \
 REGEXP_DEPS = \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+CFG_DEPS = \
+	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
+	$(REGEXP_DEPS) \
+	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
 VARIANT_DEPS = \
