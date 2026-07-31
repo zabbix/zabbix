@@ -331,6 +331,8 @@ class CDataTable {
 
 	#user_configs = [];
 
+	#calculated_overrides = ['width'];
+
 	/**
 	 * Elements in this queue are all removed at the same time, once new data is ready to be rendered.
 	 *
@@ -2303,10 +2305,23 @@ class CDataTable {
 		return min_width;
 	}
 
+	#resetCalculatedOverrides(column) {
+		const overrides = column.getOverrides();
+
+		for (const override of this.#calculated_overrides) {
+			if (override in overrides) {
+				delete overrides[override];
+			}
+		}
+
+		column.setOverrides(overrides);
+	}
+
 	#calculateColumnWidths() {
 		for (const column of this.#columns.filter(column => !column.isResized())) {
-			column.setOverrides({})
-				.setWidth(column.getDefaults().getWidth());
+			this.#resetCalculatedOverrides(column);
+
+			column.setWidth(column.getDefaults().getWidth());
 		}
 
 		this.#row_spacer_width = '0px';
@@ -2338,7 +2353,8 @@ class CDataTable {
 		const min_width = this.#getColumnMinWidth(column);
 
 		let header_width = Math.floor(column.getHeaderCell()?.target.getBoundingClientRect().width ?? 0);
-		if (!('width' in overrides) && this.#visible_columns.length > 2 && this.#visible_columns.at(-1) === column) {
+		if (!('width' in overrides) && this.#visible_columns.length > 2
+				&& this.#visible_columns.at(-1) === column && column.getDefaults().getWidth() !== 'auto') {
 			header_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
 		}
 
