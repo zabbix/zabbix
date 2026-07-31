@@ -29,7 +29,6 @@ import (
 
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/internal/agent/keyaccess"
-	"golang.zabbix.com/agent2/internal/agent/profiler"
 	"golang.zabbix.com/agent2/internal/agent/resultcache"
 	"golang.zabbix.com/agent2/internal/agent/runtimecontrol"
 	"golang.zabbix.com/agent2/internal/agent/scheduler"
@@ -46,6 +45,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/profiler"
 	"golang.zabbix.com/sdk/zbxerr"
 	"golang.zabbix.com/sdk/zbxflag"
 )
