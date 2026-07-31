@@ -122,14 +122,21 @@ class testPageUsers extends CLegacyWebTest {
 
 	public function testPageUsers_FilterByAllFields() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
+		$this->page->waitUntilReady();
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'Zabbix administrators');
-		$this->zbxTestInputTypeOverwrite('filter_username', $this->userAlias);
-		$this->zbxTestInputTypeOverwrite('filter_name', $this->userName);
-		$this->zbxTestInputTypeOverwrite('filter_surname', $this->userSurname);
-		$this->zbxTestClickButtonMultiselect('filter_roles_');
-		$this->zbxTestLaunchOverlayDialog('User roles');
-		$this->zbxTestClickLinkTextWait($this->userRole);
-		$this->zbxTestClickButtonText('Apply');
+		$this->page->waitUntilReady();
+
+		$filter_form = $this->query('name:zbx_filter')->waitUntilVisible()->asForm()->one();
+		$values = [
+			'Username' => $this->userAlias,
+			'Name' => $this->userName,
+			'Last name' => $this->userSurname,
+			'User roles' => $this->userRole
+		];
+		$filter_form->fill($values);
+		$filter_form->submit();
+		$this->page->waitUntilReady();
+
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $this->userAlias);
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}

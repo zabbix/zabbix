@@ -20,8 +20,9 @@
 
 
 require_once 'vendor/autoload.php';
-
 require_once dirname(__FILE__).'/../CElement.php';
+
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 
 /**
  * Table element.
@@ -193,7 +194,13 @@ class CTableElement extends CElement {
 	 * @return CTableRow|CNullElement
 	 */
 	public function findRow($column, $value, $contains = false) {
-		$headers = $this->getColumnNames();
+		try {
+			$headers = $this->getColumnNames();
+		}
+		catch (StaleElementReferenceException $exception) {
+			$this->invalidate();
+			$headers = $this->getColumnNames();
+		}
 
 		if (is_string($column)) {
 			$index = array_search($column, $headers);

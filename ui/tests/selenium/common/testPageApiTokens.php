@@ -265,13 +265,14 @@ class testPageApiTokens extends CWebTest {
 	 * @param string $token		Name of the token to be deleted.
 	 */
 	public function checkDelete($url, $token) {
-		$this->page->login()->open($url);
+		$this->page->login()->open($url)->waitUntilReady();
 
 		// Delete API token.
-		$this->query('class:list-table')->asTable()->one()->findRow('Name', $token)->select();
-		$this->query('button:Delete')->one()->waitUntilClickable()->click();
+		$this->query('class:list-table')->waitUntilVisible()->asTable()->one()->findRow('Name', $token)->select();
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'API token deleted');
 
 		// Check that token is deleted from DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT tokenid FROM token WHERE name='.zbx_dbstr($token)));

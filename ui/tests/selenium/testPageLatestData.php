@@ -578,12 +578,15 @@ class testPageLatestData extends CWebTest {
 			: 'zabbix.php?action=latest.view';
 
 		$this->page->login()->open($link)->waitUntilReady();
+		$results_table = $this->query('xpath://form/table')->waitUntilPresent()->asTable()->one();
 
 		foreach ($data['subfilter'] as $header => $values) {
 			foreach ($values as $value) {
 				$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
 						CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
 				$this->page->waitUntilReady();
+				$results_table->waitUntilReloaded();
+				$results_table->invalidate();
 			}
 		}
 
