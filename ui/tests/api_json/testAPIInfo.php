@@ -18,17 +18,23 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 class testAPIInfo extends CAPITest {
 	public function testAPIInfo_VersionWithAuth() {
-		$error = [
-			'code' => -32602,
-			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without authorization header.'
-		];
+		$result = $this->call('apiinfo.version', []);
 
-		$this->call('apiinfo.version', [], $error);
+		$this->assertSame('8.0.0', $result['result']);
+	}
+
+	public function testAPIInfo_VersionWithInvalidToken() {
+		$request = '{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}, "id": 1}';
+
+		$result = $this->callRaw($request, '12345');
+
+		$this->assertArrayHasKey('error', $result);
+		$this->assertSame('Session terminated, re-login, please.', $result['error']['data']);
 	}
 
 	public function testAPIInfo_VersionWithoutAuth() {
 		$this->disableAuthorization();
+
 		$result = $this->call('apiinfo.version', []);
 
 		$this->assertSame('8.0.0', $result['result']);
