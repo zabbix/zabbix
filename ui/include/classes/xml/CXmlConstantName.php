@@ -298,6 +298,7 @@ class CXmlConstantName {
 	const SCRIPT = 'SCRIPT';
 	const SMS = 'SMS';
 	const WEBHOOK = 'WEBHOOK';
+	const PUSH = 'PUSH';
 
 	const GENERIC_SMTP = 'GENERIC_SMTP';
 	const GMAIL = 'GMAIL';

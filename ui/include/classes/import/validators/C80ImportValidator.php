@@ -407,7 +407,8 @@ class C80ImportValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL,
 		CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
 		CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS,
-		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK
+		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK,
+		CXmlConstantValue::MEDIA_TYPE_PUSH => CXmlConstantName::PUSH
 	];
 
 	private $MEDIA_PROVIDER = [
