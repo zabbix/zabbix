@@ -9010,7 +9010,7 @@ HEREDOC;
 		$this->waitForProblemEventCountByTagAtLeast($all, 'service', $first,
 			self::CEP_RULE_WINDOW_COPY_ALWAYS_MIN
 		);
-	
+
 		// Removing the rule is what ends it. Recovering the trigger first would not: the copies are problem
 		// events, so they would reopen the trigger as fast as it was recovered.
 		$this->cleanupCepRules();

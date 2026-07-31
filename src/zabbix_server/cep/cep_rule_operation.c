@@ -1035,7 +1035,6 @@ zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_
 
 	for (int i = 0; i < rule->operations.values_num; i++)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "rule->operations.values[i].execute_when:%d when %d", rule->operations.values[i].execute_when, execute_when);
 		if (rule->operations.values[i].execute_when == execute_when)
 		{
 			if (SUCCEED == cep_operation_event_execute(&rule->operations.values[i], execute_when,
