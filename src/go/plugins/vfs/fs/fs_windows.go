@@ -15,6 +15,7 @@
 package vfsfs
 
 import (
+	"strings"
 	"syscall"
 
 	"golang.org/x/sys/windows"
@@ -26,7 +27,7 @@ func init() {
 	err := plugin.RegisterMetrics(
 		&impl, "VfsFs",
 		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
-		"vfs.fs.get", "List of mounted filesystems with statistics.",
+		"vfs.fs.get", "List of mounted filesystems with statistics. vfs.fs.get[<mode>,<mountpoint>] - mode: full(default), short; mountpoint: exact match.",
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
 	)
 	if err != nil {
@@ -146,6 +147,83 @@ func getFsStats(path string) (stats *FsStats, err error) {
 	return
 }
 
+func filterByMountpoint(paths []string, mountpoint string) []string {
+	if mountpoint == "" {
+		return paths
+	}
+	var filtered []string
+	for _, path := range paths {
+		fsname := path
+		if len(fsname) > 0 && fsname[len(fsname)-1] == '\\' {
+			fsname = fsname[:len(fsname)-1]
+		}
+		// Case-insensitive comparison for Windows
+		if strings.EqualFold(fsname, mountpoint) {
+			filtered = append(filtered, path)
+		}
+	}
+	return filtered
+}
+
+func (p *Plugin) getFsInfoStats(mountpoint string) (data []*FsInfoNew, err error) {
+	var paths []string
+	if paths, err = getMountPaths(); err != nil {
+		return
+	}
+	// Apply mountpoint filter before stat calls
+	paths = filterByMountpoint(paths, mountpoint)
+	fsmap := make(map[string]*FsInfoNew)
+	data = make([]*FsInfoNew, 0)
+	for _, path := range paths {
+		var info FsInfoNew
+		if fsname, fstype, drivetype, drivelabel, fserr := getFsInfo(path); fserr == nil {
+			info.FsName = &fsname
+			info.FsType = &fstype
+			info.DriveType = &drivetype
+			info.DriveLabel = &drivelabel
+		} else {
+			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fserr)
+			continue
+		}
+		if stats, fserr := getFsStats(path); fserr == nil {
+			info.Bytes = stats
+			fsmap[path] = &info
+		} else {
+			p.Debugf(`cannot obtain file system statistics for "%s": %s`, path, fserr)
+			continue
+		}
+	}
+	for _, path := range paths {
+		if info, ok := fsmap[path]; ok {
+			data = append(data, info)
+		}
+	}
+	return
+}
+
+func (p *Plugin) getFsInfoShort(mountpoint string) (data []*FsInfoShort, err error) {
+	var paths []string
+	if paths, err = getMountPaths(); err != nil {
+		return
+	}
+	// Apply mountpoint filter before processing
+	paths = filterByMountpoint(paths, mountpoint)
+	data = make([]*FsInfoShort, 0)
+	for _, path := range paths {
+		if fsname, fstype, drivetype, drivelabel, fserr := getFsInfo(path); fserr == nil {
+			data = append(data, &FsInfoShort{
+				FsName:     &fsname,
+				FsType:     &fstype,
+				DriveType:  &drivetype,
+				DriveLabel: &drivelabel,
+			})
+		} else {
+			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fserr)
+		}
+	}
+	return
+}
+
 func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
 	var paths []string
 	if paths, err = getMountPaths(); err != nil {
@@ -161,42 +239,6 @@ func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
 			})
 		} else {
 			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fserr)
-		}
-	}
-	return
-}
-
-func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
-	var paths []string
-	if paths, err = getMountPaths(); err != nil {
-		return
-	}
-	fsmap := make(map[string]*FsInfoNew)
-	for _, path := range paths {
-		var info FsInfoNew
-		if fsname, fstype, drivetype, drivelabel, fserr := getFsInfo(path); fserr == nil {
-			info.FsName = &fsname
-			info.FsType = &fstype
-			info.DriveType = &drivetype
-			info.DriveLabel = &drivelabel
-		} else {
-			p.Debugf(`cannot obtain file system information for "%s": %s`, path, fserr)
-			continue
-		}
-		if stats, fserr := getFsStats(path); err == nil {
-			info.Bytes = stats
-			fsmap[path] = &info
-		} else {
-			p.Debugf(`cannot obtain file system statistics for "%s": %s`, path, fserr)
-			continue
-		}
-	}
-	if paths, err = getMountPaths(); err != nil {
-		return
-	}
-	for _, path := range paths {
-		if info, ok := fsmap[path]; ok {
-			data = append(data, info)
 		}
 	}
 	return
