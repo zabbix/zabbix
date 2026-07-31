@@ -444,7 +444,7 @@ class CControllerItemCreate extends CControllerItem {
 							AGGREGATE_PCTILE
 						]]
 					],
-					'percentile' => ['float', 'required', 'min' => 0, 'max' => 100,
+					'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100,
 						'when' => ['function', 'in' => [AGGREGATE_PCTILE]]
 					],
 					'alias' => ['string', 'required', 'not_empty']

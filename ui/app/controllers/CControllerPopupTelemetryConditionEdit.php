@@ -59,6 +59,36 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
+	private static function getValidationRules(): array {
+		$complex_columns = CTelemetryData::getComplexColumns();
+		$operators = CTelemetryData::getConditionOperators();
+
+		return ['object', 'fields' => [
+			'row_index' => ['integer', 'required'],
+			'signal_type' => ['integer', 'required',
+				'in' => [APM_SIGNAL_TYPE_TRACES, APM_SIGNAL_TYPE_METRICS, APM_SIGNAL_TYPE_LOGS]
+			],
+			'metric_point_type' => ['integer',
+				'in' => [APM_METRICS_POINT_SUM, APM_METRICS_POINT_GAUGE, APM_METRICS_POINT_HISTOGRAM,
+					APM_METRICS_POINT_EXPHISTOGRAM
+				]
+			],
+			'column' => ['string', 'required', 'not_empty'],
+			'attribute_key' => ['string', 'required', 'not_empty',
+				'when' => ['column', 'in' => $complex_columns]
+			],
+			'operator' => [
+				['integer', 'required', 'in' => $operators['complex'], 'when' => ['column', 'in' => $complex_columns]],
+				['integer', 'required', 'in' => $operators['simple'], 'when' => ['column', 'not_in' => $complex_columns]]
+			],
+			'value' => ['string', 'required', 'not_empty',
+				'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
+					CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
+				]]
+			]
+		]];
+	}
+
 	protected function doAction(): void {
 		$data = [
 			'action' => $this->getAction(),
@@ -69,9 +99,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			'attribute_key' => $this->getInput('attribute_key', ''),
 			'operator' => (int) $this->getInput('operator', (string) CONDITION_OPERATOR_EQUAL),
 			'value' => $this->getInput('value', ''),
-			'js_validation_rules' => (new CFormValidator(
-				CControllerPopupTelemetryConditionCheck::getValidationRules()
-			))->getRules(),
+			'js_validation_rules' => (new CFormValidator(self::getValidationRules()))->getRules(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -59,6 +59,34 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 			|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
+	private static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'row_index' => ['integer', 'required'],
+			'signal_type' => ['integer', 'required',
+				'in' => [APM_SIGNAL_TYPE_TRACES, APM_SIGNAL_TYPE_METRICS, APM_SIGNAL_TYPE_LOGS]
+			],
+			'metric_point_type' => ['integer',
+				'in' => [APM_METRICS_POINT_SUM, APM_METRICS_POINT_GAUGE, APM_METRICS_POINT_HISTOGRAM,
+					APM_METRICS_POINT_EXPHISTOGRAM
+				]
+			],
+			'function' => ['integer', 'required',
+				'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM,
+					AGGREGATE_PCTILE
+				]
+			],
+			'column' => ['string', 'required', 'not_empty',
+				'when' => ['function', 'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM,
+					AGGREGATE_PCTILE
+				]]
+			],
+			'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100,
+				'when' => ['function', 'in' => [AGGREGATE_PCTILE]]
+			],
+			'alias' => ['string', 'required', 'not_empty']
+		]];
+	}
+
 	protected function doAction(): void {
 		$data = [
 			'action' => $this->getAction(),
@@ -69,9 +97,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 			'function' => (int) $this->getInput('function', (string) AGGREGATE_COUNT),
 			'percentile' => $this->getInput('percentile', ''),
 			'alias' => $this->getInput('alias', ''),
-			'js_validation_rules' => (new CFormValidator(
-				CControllerPopupTelemetryAggregatedColumnCheck::getValidationRules()
-			))->getRules(),
+			'js_validation_rules' => (new CFormValidator(self::getValidationRules()))->getRules(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

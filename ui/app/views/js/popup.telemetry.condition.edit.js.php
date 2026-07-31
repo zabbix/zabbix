@@ -72,9 +72,6 @@ window.telemetry_condition_popup = new class {
 	}
 
 	submit() {
-		this.overlay.setLoading();
-		this.#clearMessages();
-
 		const fields = this.form.getAllValues();
 
 		this.form.validateSubmit(fields)
@@ -85,57 +82,19 @@ window.telemetry_condition_popup = new class {
 					return;
 				}
 
-				const curl = new Curl('zabbix.php');
+				const is_complex = this.complex_columns.includes(fields.column);
+				const operator = parseInt(fields.operator, 10);
 
-				curl.setArgument('action', 'popup.telemetry.condition.check');
-
-				fetch(curl.getUrl(), {
-					method: 'POST',
-					headers: {'Content-Type': 'application/json'},
-					body: JSON.stringify(fields)
-				})
-					.then((response) => response.json())
-					.then((response) => {
-						if ('error' in response) {
-							throw {error: response.error};
-						}
-
-						if ('form_errors' in response) {
-							this.form.setErrors(response.form_errors, true, true);
-							this.form.renderErrors();
-
-							return;
-						}
-
-						overlayDialogueDestroy(this.overlay.dialogueid);
-						this.dialogue.dispatchEvent(
-							new CustomEvent('telemetry_condition.submit', {detail: response})
-						);
-					})
-					.catch((exception) => this.#ajaxExceptionHandler(exception))
-					.finally(() => this.overlay.unsetLoading());
+				overlayDialogueDestroy(this.overlay.dialogueid);
+				this.dialogue.dispatchEvent(new CustomEvent('telemetry_condition.submit', {
+					detail: {
+						row_index: fields.row_index,
+						column: fields.column,
+						attribute_key: is_complex ? fields.attribute_key : '',
+						operator,
+						value: operator === <?= CONDITION_OPERATOR_EXISTS ?> ? '' : fields.value
+					}
+				}));
 			});
-	}
-
-	#clearMessages() {
-		for (const element of this.form_element.parentNode.children) {
-			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-				element.parentNode.removeChild(element);
-			}
-		}
-	}
-
-	#ajaxExceptionHandler(exception) {
-		let title, messages;
-
-		if (typeof exception === 'object' && 'error' in exception) {
-			title = exception.error.title;
-			messages = exception.error.messages;
-		}
-		else {
-			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-		}
-
-		this.form_element.parentNode.insertBefore(makeMessageBox('bad', messages, title)[0], this.form_element);
 	}
 }
