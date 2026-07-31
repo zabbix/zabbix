@@ -30,19 +30,6 @@ $form = (new CForm())
 
 $form_grid = (new CFormGrid())
 	->addItem([
-		(new CLabel([
-			_('Column'),
-			makeHelpIcon(_('Applies only to numeric and timestamp columns.'))
-		], 'label-column'))->setId('js-column-label'),
-		(new CFormField(
-			(new CSelect('column'))
-				->setId('column')
-				->setFocusableElementId('label-column')
-				->setValue($data['column'])
-				->addOptions(CSelect::createOptionsFromArray($data['columns']))
-		))->setId('js-column-field')
-	])
-	->addItem([
 		new CLabel(_('Function'), 'label-function'),
 		new CFormField(
 			(new CSelect('function'))
@@ -59,6 +46,19 @@ $form_grid = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		))->setId('js-percentile-field')
+	])
+	->addItem([
+		(new CLabel([
+			_('Column'),
+			makeHelpIcon(_('Applies only to numeric and timestamp columns.'))
+		], 'label-column'))->setId('js-column-label'),
+		(new CFormField(
+			(new CSelect('column'))
+				->setId('column')
+				->setFocusableElementId('label-column')
+				->setValue($data['column'])
+				->addOptions(CSelect::createOptionsFromArray($data['columns']))
+		))->setId('js-column-field')
 	])
 	->addItem([
 		(new CLabel(_('Alias'), 'alias'))->setAsteriskMark(),
