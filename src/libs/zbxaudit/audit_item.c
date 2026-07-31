@@ -1397,6 +1397,8 @@ static void	audit_item_add_query(const char *prop, const zbx_tq_query_t *query,
 #define KEY(a, b) audit_item_query_key(a, b, key, sizeof(key))
 	char	key[AUDIT_DETAILS_KEY_LEN];
 
+	add_string_cb(prop, "Added", ctx);
+
 	add_int_cb(KEY(prop, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE), (int)query->signal_type, ctx);
 	add_int_cb(KEY(prop, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE), (int)query->metric_point_type, ctx);
 
@@ -1543,6 +1545,20 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 	if (0 == strcmp(val_old, val_new))
 		return;
 
+	lld_audit_item_prop(flags, "query", prop, sizeof(prop));
+
+	if ('\0' == *val_old)
+	{
+		zbx_audit_item_update_json_add_query(audit_context_mode, itemid, flags, val_new);
+		return;
+	}
+
+	if ('\0' == *val_new)
+	{
+		zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE, prop);
+		return;
+	}
+
 	if (SUCCEED != zbx_tq_parse_query(&query_old, val_old, error, sizeof(error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot parse old query for itemid: " ZBX_FS_UI64 ", error: %s", itemid,
@@ -1559,8 +1575,6 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 		zbx_tq_query_clean(&query_old);
 		return;
 	}
-
-	lld_audit_item_prop(flags, "query", prop, sizeof(prop));
 
 	UPD_INT(KEY(prop, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE),
 			(int)query_old.signal_type, (int)query_new.signal_type, NULL);
@@ -1602,7 +1616,7 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 		}
 		else /* NULL == col_new */
 		{
-			zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID,AUDIT_DETAILS_ACTION_DELETE, prefix_col);
+			zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE, prefix_col);
 		}
 	}
 
