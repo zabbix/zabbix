@@ -404,43 +404,42 @@ class CCepRuleHelper {
 			default => ''
 		};
 
-		$format_tag_pair = fn (array $value): string => sprintf('%s:%s', $value['tag'], $value['value']);
-		$format_value_added = fn (array $value): string => sprintf('> %s', $value['new']);
-		$format_value_changed = fn (array $value): string => array_key_exists('old', $value)
-			? sprintf('%s > %s', $value['old'], $value['new'])
-			: $format_value_added($value);
-
 		$target_details = $target ? $ceprule_operation[$target] : [];
-
 		$arguments = match($operation) {
 			self::OP_SET_NAME
-				=> $format_value_changed($target_details),
+				=> array_key_exists('old', $target_details)
+					? sprintf('%s > %s', $target_details['old'], $target_details['new'])
+					: sprintf('> %s', $target_details['new']),
 
 			self::OP_RENAME_TAG
-				=> $format_value_changed($target_details['tag']),
+				=> array_key_exists('old', $target_details['tag'])
+					? sprintf('%s > %s', $target_details['tag']['old'], $target_details['tag']['new'])
+					: sprintf('> %s', $target_details['tag']['new']),
 
 			self::OP_SET_SEVERITY, self::OP_DECREASE_SEVERITY, self::OP_INCREASE_SEVERITY
-				=> $format_value_changed([
-					'old' => CSeverityHelper::getName($target_details['old']),
-					'new' => CSeverityHelper::getName($target_details['new'])
-				]),
+				=> array_key_exists('old', $target_details)
+					? sprintf('%s > %s', CSeverityHelper::getName($target_details['old']),
+						CSeverityHelper::getName($target_details['new'])
+					)
+					: sprintf('> %s', CSeverityHelper::getName($target_details['new'])),
 
 			self::OP_ADD_TAG, self::OP_REMOVE_TAG
-				=> $format_tag_pair($target_details),
+				=> sprintf('%s:%s', $target_details['tag'], $target_details['value']),
 
 			self::OP_DECREASE_TAG_VALUE, self::OP_INCREASE_TAG_VALUE, self::OP_SET_TAG_VALUE
-				=> $format_tag_pair([
-					'tag' => $target_details['tag'],
-					'value' => $format_value_changed($target_details['value'])
-				]),
+				=> sprintf('%s:%s', $target_details['tag'],
+					array_key_exists('old', $target_details['value'])
+						? sprintf('%s > %s', $target_details['value']['old'], $target_details['value']['new'])
+						: sprintf('> %s', $target_details['value']['new'])
+					),
 
 			self::OP_SET_TAG
-				=> $format_tag_pair([
-					'tag' => $target_details['tag'],
-					'value' => is_string($target_details['value'])
-						? $target_details['value']
-						: $format_value_changed($target_details['value'])
-				]),
+				=> sprintf('%s:%s', $target_details['tag'], is_string($target_details['value'])
+					? $target_details['value']
+					: (array_key_exists('old', $target_details['value'])
+						? sprintf('%s > %s', $target_details['value']['old'], $target_details['value']['new'])
+						: sprintf('> %s', $target_details['value']['new']))
+					),
 
 			default => ''
 		};
