@@ -25,7 +25,9 @@ $tags = (new CMultiSelect([
 	'data' => array_map(fn (string $name) => ['id' => $name, 'name' => $name], $data['window']['tags']),
 	'placeholder' => _('tag names'),
 	'add_post_js' => false
-]))->setId('ceprule-window-groupby-tag');
+]))
+	->setId('ceprule-window-groupby-tag')
+	->addStyle('width: '.ZBX_TEXTAREA_TAG_WIDTH.'px;');
 
 zbx_add_post_js($tags->getPostJS());
 

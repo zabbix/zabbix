@@ -7903,8 +7903,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     line-height: 16px; }
 
 #ceprule-window-groupby .multiselect-control {
-  display: inline-block;
-  width: 300px; }
+  display: inline-block; }
 
 #ceprule-window-capacity,
 #ceprule-window-counttag {
