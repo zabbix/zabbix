@@ -159,10 +159,14 @@ class testTriggerCEP extends CIntegrationTest {
 	//   - a tag correlation window is, so only the first rule is processed and the tag is never added.
 	const CEP_TAG_WINDOW_SECOND = 'window_second';
 	const CEP_TAG_WINDOW_SECOND_VALUE = 'second';
-	// How long the windows of those flavours stay open. Closing one changes nothing for the scenario (no
-	// operation runs when a window closes or an event is evicted, and the problems stay open either way), so
-	// the duration only has to be long enough that the events of one id share a window.
+	// How long the windows of those flavours stay open. The evicted flavours wait for it to run out before
+	// their operations run, so it is kept short.
 	const CEP_RULE_WINDOW_OPS_DURATION = '3s';
+	// The capacity flavours (see prepareDataCepWindowCapacityOperations()) let the window overflow instead: it
+	// holds a single event and outlasts the whole test, so every event after the first one is evicted for not
+	// fitting rather than for having been in the window too long.
+	const CEP_RULE_WINDOW_CAPACITY_DURATION = '2m';
+	const CEP_RULE_WINDOW_CAPACITY = 1;
 	// How long the suppress operation of that rule suppresses the events for, counted from the moment the
 	// rules are created. It has to outlast the configuration cache reload plus the three waves of values the
 	// scenario sends and their verification, because the operation stores an absolute deadline and does
@@ -225,6 +229,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const LOG_COMPONENT_VALUE = 'logsensor1';
 	const WAIT_ITERATIONS = 30;
 	const WAIT_ITERATION_DELAY = 1;
+	const WAIT_ITERATIONS_LONGER = 30;
 
 	// change iterations to fail faster when debugging
 	const STATE_CHANGE_WAIT_ITERATIONS = 30;
@@ -1733,10 +1738,7 @@ class testTriggerCEP extends CIntegrationTest {
 		// pair tests for; its value is irrelevant. The rest are the tags the tag operation rule modifies,
 		// renames and removes, so those operations are exercised on tags the trigger itself generated and not
 		// only on tags an earlier operation of the same rule added.
-		$this->prepareCloseOnUpTriggerPrototypes(array_merge(
-			[['tag' => self::CEP_SERVICE_TAG, 'value' => '']],
-			$this->getWindowNoneTagOperationTriggerTags()
-		));
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// Nothing except the trigger expression may close these problems - the scenario asserts they all stay
 		// open - so drop both the global correlation rules and the window CEP rule a previous CloseOnUp
@@ -1808,6 +1810,90 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Prepare the simple window flavour of the capacity scenario, see
+	 * prepareDataCepWindowCapacityOperations().
+	 */
+	public function prepareDataCepWindowSimpleCapacity() {
+		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple capacity');
+	}
+
+	/**
+	 * Prepare the tag correlation window flavour of the capacity scenario, see
+	 * prepareDataCepWindowCapacityOperations().
+	 */
+	public function prepareDataCepWindowTagCapacity() {
+		return $this->prepareDataCepWindowCapacityOperations(CCepRuleHelper::WINDOW_TAG_MATCH, 'tag capacity');
+	}
+
+	/**
+	 * Prepare a windowed flavour whose window overflows instead of expiring: it holds a single event
+	 * (CEP_RULE_WINDOW_CAPACITY) and lasts longer than the whole test (CEP_RULE_WINDOW_CAPACITY_DURATION), and
+	 * it groups by nothing, so every event of the scenario competes for that one place.
+	 *
+	 * An event arriving at a window that has no place left is not added to it - it is evicted right away, and
+	 * the operations of the rule decide what happens to it. The one rule this flavour creates does:
+	 *   - "close" when an event is evicted: an event that did not fit is closed immediately;
+	 *   - "close window" when an event is evicted, restricted to the "up" events by its condition - a tag
+	 *     exists condition on CEP_STATE_TAG_UP, a tag only an "up" event carries because its name is resolved
+	 *     from the item value: the event that did not fit also ends the window it could not enter;
+	 *   - "close" when the window closes: the event the window did hold is closed with it.
+	 *
+	 * Sending "down" values therefore leaves exactly the first problem open (every later one is closed as it
+	 * arrives), and the "up" value closes both itself and that first problem, see
+	 * runEventAssessmentTestCepWindowCapacity(). Nothing here depends on the duration: the evictions are
+	 * caused by the capacity alone, when the event arrives.
+	 */
+	private function prepareDataCepWindowCapacityOperations(int $window_type, string $name_infix) {
+		// The same prototypes as the other windowed flavours, so switching between them does not re-discover
+		// the triggers; the one that matters here is CEP_STATE_TAG, whose resolved name tells the close window
+		// operation which event is an "up" one.
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// The rule of this flavour is the only thing that may close a problem.
+		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
+
+		$window = [
+			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
+			'capacity' => self::CEP_RULE_WINDOW_CAPACITY,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_NO
+		];
+
+		$operations = [
+			[
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+				'type' => CCepRuleHelper::OP_CLOSE
+			],
+			[
+				'sortorder' => 1,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				// The "up" events are singled out by the presence of a tag, not by a tag value: CEP_STATE_TAG
+				// resolves its name at event time, so only an "up" event carries CEP_STATE_TAG_UP at all.
+				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+			],
+			[
+				'sortorder' => 2,
+				'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
+				'type' => CCepRuleHelper::OP_CLOSE
+			]
+		];
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(
+			self::CEP_RULE_NAME_PREFIX.'window '.$name_infix, [], $operations, CONDITION_EVAL_TYPE_AND, '',
+			$window_type, $window
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
 	 * Prepare a windowed flavour of the scenario above: the very same operations, applied by a rule that has a
 	 * $window_type window instead of none. The trigger prototypes are set up exactly as for the windowless
 	 * flavour (so the events carry the same tags), and the operations are the same tag and event operations,
@@ -1827,10 +1913,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	private function prepareDataCepWindowOperations(int $window_type, string $name_infix,
 			bool $on_event_evicted = false) {
-		$this->prepareCloseOnUpTriggerPrototypes(array_merge(
-			[['tag' => self::CEP_SERVICE_TAG, 'value' => '']],
-			$this->getWindowNoneTagOperationTriggerTags()
-		));
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// As in the windowless flavour, nothing except the trigger expression may close these problems.
 		$this->deleteCepCorrelations();
@@ -2975,6 +3058,24 @@ HEREDOC;
 	 * or rename on events that already carry them when CEP sees them, as opposed to the tags an operation of
 	 * the rule itself adds first.
 	 */
+	/**
+	 * Every extra tag the trigger prototypes of the windowless and windowed flavours carry, kept in one place
+	 * so all of them discover the same triggers and switching between them does not re-discover anything:
+	 *   - CEP_SERVICE_TAG, whose name carries the 'service' id, for the tag exists conditions;
+	 *   - CEP_STATE_TAG, whose name carries the "down"/"up" state, so an "up" event can be singled out by a
+	 *     plain tag exists condition on CEP_STATE_TAG_UP instead of by comparing the value of a 'state' tag;
+	 *   - the tags the tag operations work on, see getWindowNoneTagOperationCases().
+	 */
+	private function getWindowOperationsTriggerTags(): array {
+		return array_merge(
+			[
+				['tag' => self::CEP_SERVICE_TAG, 'value' => ''],
+				['tag' => self::CEP_STATE_TAG, 'value' => '']
+			],
+			$this->getWindowNoneTagOperationTriggerTags()
+		);
+	}
+
 	private function getWindowNoneTagOperationTriggerTags(): array {
 		$tags = [];
 
@@ -5838,6 +5939,44 @@ HEREDOC;
 	}
 
 	/**
+	 * A simple window that overflows instead of expiring: it has room for one event and lasts longer than the
+	 * test, so every event after the first one is evicted the moment it arrives, and the rule closes what it
+	 * evicts. The "up" value at the end also closes the window, which closes the one problem the window was
+	 * holding, so nothing is left open - see runEventAssessmentTestCepWindowCapacity().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCapacity$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCapacity() {
+		$this->prepareDataCepWindowSimpleCapacity();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCapacity();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same as testTriggerCEP_CepWindowSimpleCapacity with a tag correlation window: overflowing a window
+	 * and closing it from an evicted event must work the same for both window types. Unlike the evicted
+	 * flavours this one does not depend on the window duration at all - an event that does not fit is evicted
+	 * as it arrives, not by the timer.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCapacity$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCapacity() {
+		$this->prepareDataCepWindowTagCapacity();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCapacity();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
 	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
@@ -7178,6 +7317,65 @@ HEREDOC;
 	}
 
 	/**
+	 * Drive the capacity flavour: one window with room for a single event, so every event after the first one
+	 * is evicted the moment it arrives, and the rule closes what it evicts.
+	 *
+	 *   1. "down_0" finds the window empty and takes its one place; its problem stays open;
+	 *   2. "down_1" does not fit, so it is evicted and closed straight away - the only problem still open is
+	 *      the one of "down_0", which never left the window;
+	 *   3. "down_10" is closed the same way;
+	 *   4. "up_0" does not fit either, so it is closed as well, and being an "up" event it additionally closes
+	 *      the window it could not enter - which closes the problem of "down_0" that the window held.
+	 *
+	 * Nothing is open afterwards. The trigger itself is still in problem state (its expression is unchanged),
+	 * so a value matching neither "down" nor "up" is sent at the end to bring it back to OK for the tests
+	 * that follow.
+	 */
+	private function runEventAssessmentTestCepWindowCapacity(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the window capacity test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$first = self::CEP_RULE_WINDOW_NONE_SERVICE;
+
+		// 1. The window is empty, so this event takes its place and its problem stays open.
+		$send('down_'.$first);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForOpenProblemCountByTag($all, 'service', $first, 1);
+
+		// 2. Every further "down" opens a problem that does not fit into the window and is closed as it is
+		//    evicted, so the count returns to the one problem the window holds.
+		foreach ([self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT, self::CEP_RULE_WINDOW_NONE_SERVICE_LAST] as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCountByTag($all, 'service', $service, 0);
+			$this->waitForOpenProblemCount($all, 1);
+			$this->waitForOpenProblemCountByTag($all, 'service', $first, 1);
+		}
+
+		// 3. The "up" event does not fit either, so it is closed too, and it closes the window - and with it
+		//    the problem the window was holding all along.
+		$send('up_'.$first);
+		$this->waitForNoOpenProblems($all, 'After the window capacity close on up');
+
+		// The trigger stays in problem state until its expression turns false.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+	}
+
+	/**
 	 * Wait until none of the events the windowless scenario generated is suppressed any more. The suppress
 	 * operation suppressed every one of them until getWindowNoneSuppressUntil(), which the assertions of
 	 * waitForCepWindowNoneTaggedEvents() confirmed; here the other half is checked - the suppression is
@@ -7607,7 +7805,7 @@ HEREDOC;
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS
-		], $expected, 120, self::WAIT_ITERATION_DELAY);
+		], $expected, static::WAIT_ITERATIONS_LONGER, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -7621,7 +7819,7 @@ HEREDOC;
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'suppressed' => true
-		], $expected, 120, self::WAIT_ITERATION_DELAY);
+		], $expected, static::WAIT_ITERATIONS_LONGER, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -7641,7 +7839,7 @@ HEREDOC;
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'suppressed' => true,
 			'selectSuppressionData' => ['maintenanceid']
-		], 120, self::WAIT_ITERATION_DELAY, function (array $response) use ($expected, $expected_ids) {
+		], static::WAIT_ITERATIONS_LONGER, self::WAIT_ITERATION_DELAY, function (array $response) use ($expected, $expected_ids) {
 			if (count($response['result']) != $expected) {
 				return 'expected '.$expected.' suppressed problems, got '.count($response['result']);
 			}
@@ -7676,7 +7874,7 @@ HEREDOC;
 			'suppressed' => true,
 			'selectTags' => ['tag', 'value'],
 			'selectSuppressionData' => ['maintenanceid']
-		], 120, self::WAIT_ITERATION_DELAY, function (array $response) use ($expected, $maintenance_by_component) {
+		], static::WAIT_ITERATIONS_LONGER, self::WAIT_ITERATION_DELAY, function (array $response) use ($expected, $maintenance_by_component) {
 			if (count($response['result']) != $expected) {
 				return 'expected '.$expected.' suppressed problems, got '.count($response['result']);
 			}
@@ -7722,7 +7920,7 @@ HEREDOC;
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'suppressed' => true
-		], 0, 120, self::WAIT_ITERATION_DELAY);
+		], 0, static::WAIT_ITERATIONS_LONGER, self::WAIT_ITERATION_DELAY);
 
 		$this->waitForServicesNoLongerSuppressed();
 	}
@@ -8375,6 +8573,14 @@ HEREDOC;
 			}
 			$data[] = $entry;
 		}
+
+		// Trace what goes to the server, so a test log shows the exact values and their (clock, ns).
+		/*foreach (array_values($values) as $i => $value) {
+			fwrite(STDOUT, sprintf("send: %s:%s = %s (itemid %s, clock %d.%09d)%s", $value['host'],
+				$value['key'], var_export($value['value'], true), $data[$i]['itemid'], $data[$i]['clock'],
+				$data[$i]['ns'], PHP_EOL
+			));
+		}*/
 
 		$this->dispatchValues($data, $delayOverride);
 

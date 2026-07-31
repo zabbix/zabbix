@@ -36,4 +36,5 @@ class testTriggerCEPRestart extends testTriggerCEP {
 
 	// Larger scale needs longer to settle; override the parent's reduced default back up.
 	const WAIT_ITERATIONS = 60;
+	const WAIT_ITERATIONS_LONGER = 120;
 }
