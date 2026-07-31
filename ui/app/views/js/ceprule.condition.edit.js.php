@@ -62,9 +62,6 @@ window.ceprule_condition_edit_popup = new class {
 				node.value = condition[node.name] ?? '';
 			}
 		});
-
-		this.form_element.querySelector('[name="type"]').value = condition.type;
-		this.form_element.querySelector('[name="formulaid"]').value = condition.formulaid;
 	}
 
 	#handleTypeChanged(type) {

@@ -57,7 +57,7 @@ class CCepRuleHelper {
 	public const WHEN_EVENT_OCCURRED = 0;
 	public const WHEN_EVENT_EVICTED = 1;
 	public const WHEN_WINDOW_CLOSED = 2;
-	public const WHEN_TAGS_CORRELATED = 3;
+	public const WHEN_TAGS_CORRELATED = 3; // TODO: Server has removed this type, API shall remove this too.
 	public const WHEN_PATTERN_MATCHED = 4;
 
 	public const WINDOW_CONDITION_TAG_PAIR = 0;
@@ -190,7 +190,7 @@ class CCepRuleHelper {
 		$labels = self::getConditionLabels();
 
 		if (!array_key_exists($type, $labels)) {
-			throw new LogicException("Uknown condition type $type.");
+			throw new LogicException("Unknown condition type $type.");
 		}
 
 		return $labels[$type];
@@ -228,14 +228,14 @@ class CCepRuleHelper {
 		$labels = self::getConditionOperatorLabels();
 
 		if (!array_key_exists($operator, $labels)) {
-			throw new LogicException("Uknown condition operator $operator.");
+			throw new LogicException("Unknown condition operator $operator.");
 		}
 
 		return static::getConditionOperatorLabels()[$operator];
 	}
 
 	public static function getConditionDescription(array $ceprule_condition): array {
-		[$arg1, $arg2] = match((int) $ceprule_condition['type']) {
+		[$argument_1, $argument_2] = match((int) $ceprule_condition['type']) {
 			self::CONDITION_EVENT_NAME => [$ceprule_condition['event_name'], null],
 			self::CONDITION_SEVERITY => [CSeverityHelper::getName($ceprule_condition['severity']), null],
 			self::CONDITION_HOST => [$ceprule_condition['host'], null],
@@ -250,14 +250,14 @@ class CCepRuleHelper {
 		$result = [
 			CCepRuleHelper::getConditionLabel($ceprule_condition['type']),
 			' ',
-			italic($arg1),
+			italic($argument_1),
 			' ',
 			mb_strtolower(CCepRuleHelper::getConditionOperatorLabel($ceprule_condition['operator']))
 		];
 
-		if ($arg2 !== null) {
+		if ($argument_2 !== null) {
 			$result[] = ' ';
-			$result[] = italic($arg2);
+			$result[] = italic($argument_2);
 		}
 
 		return $result;
@@ -268,8 +268,6 @@ class CCepRuleHelper {
 			self::WHEN_EVENT_OCCURRED => _('Event occured'),
 			self::WHEN_EVENT_EVICTED => _('Event evicted'),
 			self::WHEN_WINDOW_CLOSED => _('Window closed'),
-			/* self::WHEN_TAGS_CORRELATED => _('Tags correlated'), */
-			// TODO: Remove the WHEN_TAGS_CORRELATED completely - helper, API and form-rules.
 			self::WHEN_PATTERN_MATCHED => _('Event pattern matched')
 		];
 	}
