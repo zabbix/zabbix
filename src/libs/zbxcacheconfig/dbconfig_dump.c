@@ -80,6 +80,7 @@ static void	DCdump_config(void)
 
 	zabbix_log(LOG_LEVEL_TRACE, "  auditlog_enabled: %d", config->config->auditlog_enabled);
 	zabbix_log(LOG_LEVEL_TRACE, "  auditlog_mode: %d", config->config->auditlog_mode);
+	zabbix_log(LOG_LEVEL_TRACE, "  enable_mobile_devices: %d", config->config->enable_mobile_devices);
 
 	zabbix_log(LOG_LEVEL_TRACE, "item timeouts:");
 	zabbix_log(LOG_LEVEL_TRACE, "  agent:%s", config->config->item_timeouts.agent);

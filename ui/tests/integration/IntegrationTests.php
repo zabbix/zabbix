@@ -41,6 +41,7 @@ require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
 /* require_once dirname(__FILE__).'/testTlsRequest.php'; */
 require_once dirname(__FILE__).'/testActiveAvailability.php';
+require_once dirname(__FILE__).'/testActiveCheckHeartbeat.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
 /* require_once dirname(__FILE__).'/testDiscoveryRules.php'; snmpsim does not work properly on new Debian */
 require_once dirname(__FILE__).'/testAutoregistration.php';
@@ -48,6 +49,7 @@ require_once dirname(__FILE__).'/testAutoregistrationPSK.php';
 require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
 require_once dirname(__FILE__).'/testHistoryGet.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
+require_once dirname(__FILE__).'/testWebScenarioDynamicVariables.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
 require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
 require_once dirname(__FILE__).'/testScriptManualInput.php';
@@ -70,6 +72,7 @@ require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 require_once dirname(__FILE__).'/testLLDProxyHistorySyncAtScale.php';
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
+require_once dirname(__FILE__).'/testBridgeAdapter.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -110,6 +113,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testTriggerState');
 		/* $suite->addTestSuite('testTlsRequest'); */
 		$suite->addTestSuite('testActiveAvailability');
+		$suite->addTestSuite('testActiveCheckHeartbeat');
 		$suite->addTestSuite('testProxyConfSync');
 		$suite->addTestSuite('testInitialConfSync');
 		$suite->addTestSuite('testEventsCauseAndSymptoms');
@@ -133,10 +137,12 @@ class IntegrationTests {
 		$suite->addTestSuite('testFunctions');
 		$suite->addTestSuite('testCalculatedExpression');
 		$suite->addTestSuite('testDiagInfo');
+		$suite->addTestSuite('testHousekeepingConfSync');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
-		$suite->addTestSuite('testHousekeepingConfSync');
+		$suite->addTestSuite('testWebScenarioDynamicVariables');
+		$suite->addTestSuite('testBridgeAdapter');
 		return $suite;
 	}
 }

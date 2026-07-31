@@ -38,6 +38,12 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			unset($fields['fields']['modules'], $fields['fields']['modules_default_access']);
 		}
 
+		if (!CSettingsHelper::isMobileDevicesEnabled()) {
+			unset($fields['fields']['ui_administration_linked_devices'], $fields['fields']['devices_actions'],
+				$fields['fields']['devices_actions_default_access']
+			);
+		}
+
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
@@ -153,7 +159,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	private function getLabels(array $db_modules): array {
 		$labels = [
 			'sections' => CRoleHelper::getUiSectionsLabels(USER_TYPE_SUPER_ADMIN),
-			'actions' => CRoleHelper::getActionsLabels(USER_TYPE_SUPER_ADMIN)
+			'actions' => CRoleHelper::getActionsLabels(USER_TYPE_SUPER_ADMIN),
+			'devices_actions' => CRoleHelper::getDevicesActionsLabels(USER_TYPE_SUPER_ADMIN)
 		];
 
 		foreach (array_keys(CRoleHelper::getUiSectionsLabels(USER_TYPE_SUPER_ADMIN)) as $section) {
@@ -195,7 +202,10 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'api.access' => true,
 			'api.mode' => 'api.mode',
 			'actions' => array_fill_keys(CRoleHelper::getActionsByUserType($user_type), true),
-			'actions.default_access' => true
+			'actions.default_access' => true,
+			'devices.access' => ZBX_ROLE_RULE_DISABLED,
+			'devices.actions' => array_fill_keys(CRoleHelper::getDeviceActionsByUserType($user_type), false),
+			'devices.actions.default_access' => ZBX_ROLE_RULE_DISABLED
 		];
 	}
 
@@ -207,7 +217,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 		$select_rules = ['ui', 'ui.default_access', 'api', 'api.access', 'api.mode', 'actions',
 			'actions.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag',
-			'services.write.mode', 'services.write.list', 'services.write.tag'
+			'services.write.mode', 'services.write.list', 'services.write.tag', 'devices.access', 'devices.actions',
+			'devices.actions.default_access'
 		];
 
 		if ($ZBX_FEATURE_FLAGS['modules_config_enabled']) {
@@ -248,7 +259,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'ui.default_access' => $input['ui.default_access'],
 			'api.access' => $input['api.access'],
 			'api.mode' => $input['api.mode'],
-			'actions.default_access' => $input['actions.default_access']
+			'actions.default_access' => $input['actions.default_access'],
+			'devices.access' => $input['devices.access'],
+			'devices.actions.default_access' => $input['devices.actions.default_access']
 		];
 
 		foreach ($input['ui'] as $rule) {
@@ -276,6 +289,10 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 		foreach ($input['actions'] as $rule) {
 			$rules['actions']['actions.'.$rule['name']] = $rule['status'];
+		}
+
+		foreach ($input['devices.actions'] as $rule) {
+			$rules['devices.actions']['devices.actions.'.$rule['name']] = $rule['status'];
 		}
 
 		return $rules;

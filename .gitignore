@@ -144,6 +144,8 @@ tests/libs/zbxalgo/zbx_mode_code
 tests/libs/zbxalgo/zbx_int128
 tests/libs/zbxalgo/zbx_vector
 tests/libs/zbxcfg/parse_cfg_file
+tests/libs/zbxcfg/zbx_cfg_prepare_bridge_adapter_connect_to
+tests/libs/zbxcfg/zbx_cfg_validate_bridge_adapter_url
 tests/libs/zbxcommon/init_library_common
 tests/libs/zbxcommon/zbx_calloc
 tests/libs/zbxcommon/zbx_malloc
@@ -259,6 +261,7 @@ tests/libs/zbxcalc/zbx_evaluate_function
 tests/libs/zbxcalc/zbx_format_value
 tests/libs/zbxcalc/zbx_get_percentage_of_deviations_in_stl_remainder
 tests/libs/zbxcalc/zbx_STL
+tests/libs/zbxcomms/zbx_tcp_check_allowed_peers_ipv4
 tests/libs/zbxexpr/zbx_calculate_macro_function
 tests/libs/zbxdbwrap/zbx_db_get_expression_macro_result
 tests/libs/zbxcalc/evaluate_value_by_map
@@ -267,6 +270,7 @@ tests/libs/zbxhistory/history_clickhouse_parse_response
 tests/libs/zbxhistory/history_provider_parse_options
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxhttp/zbx_determine_charset
+tests/libs/zbxhttppoller/http_process_variables
 tests/libs/zbxip/zbx_ip_in_list
 tests/libs/zbxip/zbx_is_ip
 tests/libs/zbxip/zbx_is_rfc_extended_hostname
@@ -336,6 +340,7 @@ tests/libs/zbxstr/zbx_trim_str_list
 tests/libs/zbxstr/zbx_truncate_itemkey
 tests/libs/zbxstr/zbx_truncate_value
 tests/libs/zbxstr/zbx_utf8_char_len
+tests/libs/zbxsysinfo/linux/net_if_get
 tests/libs/zbxodbc/odbc_pass
 tests/libs/zbxsysinfo/zbx_parse_item_key_check_get_fqdn
 tests/libs/zbxsysinfo/zbx_check_key_access_rules

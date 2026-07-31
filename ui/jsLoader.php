@@ -112,9 +112,11 @@ $available_js = [
 	'class.options-popup.monitoring.problems.problem.js' => 'datatable/options-popup/',
 	'class.options-popup.monitoring.host.problems.js' => 'datatable/options-popup/',
 	'class.options-popup.monitoring.latest.name.js' => 'datatable/options-popup/',
+	'class.options-popup.custom-text.js' => 'datatable/options-popup/',
 	'class.column.js' => 'datatable/column/',
 	'class.column.tags.js' => 'datatable/column/',
 	'class.column.tagvalue.js' => 'datatable/column/',
+	'class.column.custom-text.js' => 'datatable/column/',
 	'class.datatable.js' => 'datatable/',
 	'class.message.js' => '',
 	'class.pager.js' => '',
@@ -183,6 +185,7 @@ $available_js = [
 	'setup.js' => 'pages/',
 	// fields
 	'class.field.js' => 'fields/',
+	'class.field.collection.js' => 'fields/',
 	'class.field.array.js' => 'fields/',
 	'class.field.checkbox.js' => 'fields/',
 	'class.field.file.js' => 'fields/',
@@ -298,6 +301,10 @@ $translate_strings = [
 	],
 	'class.options-popup.tagvalue.js' => [
 		'Tag name' => _('Tag name')
+	],
+	'class.options-popup.custom-text.js' => [
+		'Custom text' => _('Custom text'),
+		'Text, macros, or combined' => _('Text, macros, or combined')
 	],
 	'class.options-popup.table-options.js' => [
 		'Table options' => _('Table options'),
@@ -724,14 +731,17 @@ if (empty($_GET['files'])) {
 		'class.options-popup.monitoring.problems.problem.js',
 		'class.options-popup.monitoring.host.problems.js',
 		'class.options-popup.monitoring.latest.name.js',
+		'class.options-popup.custom-text.js',
 		'class.column.js',
 		'class.column.tags.js',
 		'class.column.tagvalue.js',
+		'class.column.custom-text.js',
 		'class.datatable.js',
 		'class.pager.js',
 		'class.state.js',
 		'class.message.js',
 		'class.field.js',
+		'class.field.collection.js',
 		'class.field.array.js',
 		'class.field.checkbox.js',
 		'class.field.file.js',

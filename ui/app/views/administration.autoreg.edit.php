@@ -41,7 +41,6 @@ $form_grid = (new CFormGrid())
 					->setChecked($data['tls_in_none'])
 					->setUncheckedValue(0)
 					->setLabel(_('No encryption'))
-					->setAttribute('autofocus', 'autofocus')
 					->setErrorContainer('encryption_error_container'),
 				(new CCheckBox('tls_in_psk'))
 					->setChecked($data['tls_in_psk'])

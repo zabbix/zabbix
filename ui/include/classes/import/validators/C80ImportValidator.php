@@ -407,7 +407,8 @@ class C80ImportValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL,
 		CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
 		CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS,
-		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK
+		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK,
+		CXmlConstantValue::MEDIA_TYPE_PUSH => CXmlConstantName::PUSH
 	];
 
 	private $MEDIA_PROVIDER = [
@@ -3051,7 +3052,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 							'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'display_period' =>				['type' => XML_STRING, 'default' => '30'],
-							'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'pages' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'page', 'rules' => [
 								'page' =>						['type' => XML_ARRAY, 'rules' => [
 									'name' =>						['type' => XML_STRING, 'default' => ''],
@@ -3396,7 +3397,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 				'dashboard' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'display_period' =>				['type' => XML_STRING, 'default' => '30'],
-					'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 					'pages' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'page', 'rules' => [
 						'page' =>						['type' => XML_ARRAY, 'rules' => [
 							'name' =>						['type' => XML_STRING, 'default' => ''],
