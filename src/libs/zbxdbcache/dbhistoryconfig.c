@@ -60,10 +60,7 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 	dst_item->mtime = src_item->mtime;
 	dst_item->flags = src_item->flags;
 
-	if ('\0' != *src_item->error)
-		dst_item->error = zbx_strdup(NULL, src_item->error);
-	else
-		dst_item->error = NULL;
+	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
 
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
@@ -160,8 +157,6 @@ void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int 
 
 		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
 			zbx_free(items[i].units);
-
-		zbx_free(items[i].error);
 	}
 }
 
