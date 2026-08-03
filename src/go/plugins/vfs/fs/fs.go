@@ -17,12 +17,9 @@ package vfsfs
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"golang.zabbix.com/sdk/plugin"
-)
-
-const (
-	errorInvalidParameters = "Invalid number of parameters."
 )
 
 const (
@@ -31,6 +28,20 @@ const (
 	statModeUsed
 	statModePFree
 	statModePUsed
+)
+
+var (
+	//nolint:revive,staticcheck // Keep error text compatible with C agent.
+	errInvalidParameters = errors.New("Invalid number of parameters.")
+
+	//nolint:revive,staticcheck // Keep error text compatible with C agent.
+	errTooManyParameters = errors.New("Too many parameters.")
+
+	//nolint:revive,staticcheck // Keep error text compatible with C agent.
+	errInvalidFirstParameter = errors.New("Invalid first parameter.")
+
+	//nolint:revive,staticcheck // Keep error text compatible with C agent.
+	errInvalidSecondParameter = errors.New("Invalid second parameter.")
 )
 
 type FsStats struct {
@@ -51,6 +62,7 @@ type FsInfo struct {
 	FsOptions  *string  `json:"{#FSOPTIONS},omitempty"`
 }
 
+// FsInfoShort contains basic filesystem metadata returned by short mode.
 type FsInfoShort struct {
 	FsName     *string `json:"fsname,omitempty"`
 	FsType     *string `json:"fstype,omitempty"`
@@ -77,68 +89,83 @@ var impl Plugin
 
 func (p *Plugin) exportDiscovery(params []string) (value interface{}, err error) {
 	if len(params) != 0 {
-		return nil, errors.New(errorInvalidParameters)
+		return nil, errInvalidParameters
 	}
-	var d []*FsInfo
-	if d, err = p.getFsInfo(); err != nil {
-		return
+
+	d, getErr := p.getFsInfo()
+	if getErr != nil {
+		return nil, getErr
 	}
-	var b []byte
-	if b, err = json.Marshal(&d); err != nil {
-		return
+
+	b, marshalErr := json.Marshal(&d)
+	if marshalErr != nil {
+		return nil, fmt.Errorf("cannot marshal filesystem discovery data: %w", marshalErr)
 	}
+
 	return string(b), nil
 }
 
 func (p *Plugin) exportGet(params []string) (value interface{}, err error) {
 	if len(params) > 2 {
-		return nil, errors.New("Too many parameters.")
+		return nil, errTooManyParameters
 	}
+
 	var mode, mountpoint string
+
 	if len(params) >= 1 {
 		mode = params[0]
 	}
+
 	if len(params) >= 2 {
 		mountpoint = params[1]
 	}
+
 	/* validate mode */
 	if mode != "" && mode != "full" && mode != "short" {
-		return nil, errors.New("Invalid first parameter.")
+		return nil, errInvalidFirstParameter
 	}
+
 	/* empty mode defaults to full */
 	if mode == "" {
 		mode = "full"
 	}
+
 	if mode == "short" {
-		var d []*FsInfoShort
-		if d, err = p.getFsInfoShort(mountpoint); err != nil {
-			return
+		d, getErr := p.getFsInfoShort(mountpoint)
+		if getErr != nil {
+			return nil, getErr
 		}
-		var b []byte
-		if b, err = json.Marshal(&d); err != nil {
-			return
+
+		b, marshalErr := json.Marshal(&d)
+		if marshalErr != nil {
+			return nil, fmt.Errorf("cannot marshal filesystem data: %w", marshalErr)
 		}
+
 		return string(b), nil
 	}
+
 	/* full mode */
-	var d []*FsInfoNew
-	if d, err = p.getFsInfoStats(mountpoint); err != nil {
-		return
+	d, getErr := p.getFsInfoStats(mountpoint)
+	if getErr != nil {
+		return nil, getErr
 	}
-	var b []byte
-	if b, err = json.Marshal(&d); err != nil {
-		return
+
+	b, marshalErr := json.Marshal(&d)
+	if marshalErr != nil {
+		return nil, fmt.Errorf("cannot marshal filesystem data: %w", marshalErr)
 	}
+
 	return string(b), nil
 }
 
 func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)) (value interface{}, err error) {
 	if len(params) < 1 || params[0] == "" {
-		return nil, errors.New("Invalid first parameter.")
+		return nil, errInvalidFirstParameter
 	}
 	if len(params) > 2 {
-		return nil, errors.New("Too many parameters.")
+		return nil, errTooManyParameters
 	}
+
 	mode := statModeTotal
 	if len(params) == 2 {
 		switch params[1] {
@@ -152,15 +179,15 @@ func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)
 		case "pused":
 			mode = statModePUsed
 		default:
-			return nil, errors.New("Invalid second parameter.")
+			return nil, errInvalidSecondParameter
 		}
 	}
 
 	fsCaller := p.newFSCaller(getStats, 1)
 
-	var stats *FsStats
-	if stats, err = fsCaller.run(params[0]); err != nil {
-		return
+	stats, runErr := fsCaller.run(params[0])
+	if runErr != nil {
+		return nil, runErr
 	}
 
 	switch mode {
@@ -176,7 +203,7 @@ func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)
 		return stats.PUsed, nil
 	}
 
-	return nil, errors.New("Invalid second parameter.")
+	return nil, errInvalidSecondParameter
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
