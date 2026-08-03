@@ -361,7 +361,7 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, zbx_clickho
 	/* either username and password both have been set or both are NULL */
 	if (NULL != d->username)
 	{
-		if (SUCCEED != zbx_http_prepare_auth(conn->handle, CURLAUTH_BASIC, d->username, d->password, NULL,
+		if (SUCCEED != zbx_http_prepare_auth(conn->handle, HTTPTEST_AUTH_BASIC, d->username, d->password, NULL,
 				error))
 		{
 			goto fail;
