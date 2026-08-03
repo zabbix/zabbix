@@ -879,7 +879,7 @@ class CRole extends CApiService {
 			'modules' => [],
 			'modules.default_access' => ZBX_ROLE_RULE_ENABLED,
 			'api' => [],
-			'api.access' => ZBX_ROLE_RULE_DISABLED,
+			'api.access' => ZBX_ROLE_RULE_ENABLED,
 			'api.mode' => ZBX_ROLE_RULE_API_MODE_DENY,
 			'actions' => [],
 			'actions.default_access' => ZBX_ROLE_RULE_ENABLED
