@@ -385,13 +385,18 @@ out:
 	return ret;
 }
 
+static int	match_mountpoint(const char *current, const char *requested)
+{
+	return (NULL == requested || 0 == _stricmp(current, requested)) ? SUCCEED : FAIL;
+}
+
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	size_t			sz;
 	struct zbx_json		j;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_wmpoint_t		*mpoint;
-	int			ret = SYSINFO_RET_FAIL, mode_short = 0;
+	int			ret = SYSINFO_RET_FAIL, mode_short = 0, json_initialized = 0;
 	char			*mode, *mountpoint, *error = NULL;
 	zbx_vector_ptr_t	mount_paths;
 
@@ -418,7 +423,6 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 		}
 	}
 
-	/* NULL or empty mode defaults to "full" */
 	/* empty mountpoint means no filter */
 	if (NULL != mountpoint && '\0' == *mountpoint)
 		mountpoint = NULL;
@@ -431,30 +435,35 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 	if (1 == mode_short)
 	{
 		zbx_vector_ptr_create(&mount_paths);
-		zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 		if (FAIL == get_mount_paths(&mount_paths, &error))
 		{
 			SET_MSG_RESULT(result, error);
+			zbx_vector_ptr_clear_ext(&mount_paths, (zbx_clean_func_t)zbx_ptr_free);
 			zbx_vector_ptr_destroy(&mount_paths);
 			return SYSINFO_RET_FAIL;
 		}
 
+		zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
 		for (int i = 0; i < mount_paths.values_num; i++)
 		{
-			char *fsname = zbx_unicode_to_utf8(mount_paths.values[i]);
+			char *filter_fsname, *fsname = NULL, *fstype = NULL, *fslabel = NULL, *fsdrivetype = NULL;
 
-			if (0 < (sz = strlen(fsname)) && '\\' == fsname[--sz])
-				fsname[sz] = '\0';
+			filter_fsname = zbx_unicode_to_utf8(mount_paths.values[i]);
+
+			if (0 < (sz = strlen(filter_fsname)) && '\\' == filter_fsname[--sz])
+				filter_fsname[sz] = '\0';
 
 			/* apply mountpoint filter */
-			if (NULL != mountpoint && 0 != _stricmp(fsname, mountpoint))
+			if (FAIL == match_mountpoint(filter_fsname, mountpoint))
 			{
-				zbx_free(fsname);
+				zbx_free(filter_fsname);
 				continue;
 			}
 
-			char *fstype = NULL, *fslabel = NULL, *fsdrivetype = NULL;
+			zbx_free(filter_fsname);
+
 			get_fs_data(mount_paths.values[i], &fsname, &fstype, &fslabel, &fsdrivetype);
 
 			zbx_json_addobject(&j, NULL);
@@ -470,14 +479,14 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 			zbx_free(fsdrivetype);
 		}
 
-		zbx_vector_ptr_clear_ext(&mount_paths, (zbx_clean_func_t)zbx_ptr_free);
-		zbx_vector_ptr_destroy(&mount_paths);
-
 		zbx_json_close(&j);
 
 		SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 		zbx_json_free(&j);
+
+		zbx_vector_ptr_clear_ext(&mount_paths, (zbx_clean_func_t)zbx_ptr_free);
+		zbx_vector_ptr_destroy(&mount_paths);
 
 		return SYSINFO_RET_OK;
 	}
@@ -485,7 +494,6 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 	/* process full mode */
 	zbx_vector_ptr_create(&mount_paths);
 	zbx_vector_ptr_create(&mntpoints);
-	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (FAIL == get_mount_paths(&mount_paths, &error))
 	{
@@ -495,6 +503,20 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 
 	for (int i = 0; i < mount_paths.values_num; i++)
 	{
+		char *fsname = zbx_unicode_to_utf8(mount_paths.values[i]);
+
+		if (0 < (sz = strlen(fsname)) && '\\' == fsname[--sz])
+			fsname[sz] = '\0';
+
+		/* apply mountpoint filter */
+		if (FAIL == match_mountpoint(fsname, mountpoint))
+		{
+			zbx_free(fsname);
+			continue;
+		}
+
+		zbx_free(fsname);
+
 		if (FAIL == add_fs_to_vector(&mntpoints, mount_paths.values[i], &error))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
@@ -511,6 +533,9 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 		goto out;
 	}
 
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+	json_initialized = 1;
+
 	for (int i = 0; i < mount_paths.values_num; i++)
 	{
 		zbx_wmpoint_t	mpoint_local;
@@ -522,7 +547,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 			mpoint_local.fsname[sz] = '\0';
 
 		/* apply mountpoint filter */
-		if (NULL != mountpoint && 0 != _stricmp(mpoint_local.fsname, mountpoint))
+		if (FAIL == match_mountpoint(mpoint_local.fsname, mountpoint))
 		{
 			zbx_free(mpoint_local.fsname);
 			continue;
@@ -558,7 +583,9 @@ out:
 	zbx_vector_ptr_destroy(&mount_paths);
 	zbx_vector_ptr_clear_ext(&mntpoints, (zbx_clean_func_t)zbx_wmpoints_free);
 	zbx_vector_ptr_destroy(&mntpoints);
-	zbx_json_free(&j);
+
+	if (1 == json_initialized)
+		zbx_json_free(&j);
 
 	return ret;
 }
