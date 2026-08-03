@@ -23,7 +23,7 @@ window.ceprule_operation_edit_popup = new class {
 
 
 	/** @type {Object} */
-	#execute_when_by_window_type;
+	#execute_when_for_window_type;
 
 	/** @type {Object} */
 	#operation_types_by_execute_when;
@@ -42,7 +42,7 @@ window.ceprule_operation_edit_popup = new class {
 
 	init({rules, operation, overlay, window_type, operation_types_by_execute_when, execute_when_by_window_type}) {
 		this.#operation_types_by_execute_when = operation_types_by_execute_when;
-		this.#execute_when_by_window_type = execute_when_by_window_type;
+		this.#execute_when_for_window_type = execute_when_by_window_type[window_type];
 
 		this.#overlay = overlay;
 		this.#tag_template = new Template(window['ceprule-operation-tag-template'].innerHTML);
@@ -158,7 +158,7 @@ window.ceprule_operation_edit_popup = new class {
 		// Set enabled options.
 		const zselect = window['ceprule-operation-execute-when'];
 		const options = zselect.options.map(option => ({...option,
-			is_disabled: !this.#execute_when_by_window_type.includes(Number(option.value))
+			is_disabled: !this.#execute_when_for_window_type.includes(Number(option.value)),
 		}));
 
 		zselect.clearOptions();
