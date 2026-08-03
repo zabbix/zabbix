@@ -1319,7 +1319,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Open Kiosk mode and check widget display again.
 		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status, 'kiosk');
-		$this->query('xpath://button[@title="Normal view"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
 		// Open dashboard in edit mode or open dashboard on template and check widget display again.
@@ -1365,7 +1365,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Switch to kiosk mode if required.
 		if ($mode === 'kiosk') {
-			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+			$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 			$this->page->waitUntilReady();
 		}
 

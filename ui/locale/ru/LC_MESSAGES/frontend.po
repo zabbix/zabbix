@@ -141,6 +141,15 @@ msgstr[0] "%1$s действие"
 msgstr[1] "%1$s действия"
 msgstr[2] "%1$s действий"
 
+#: include/actions.inc.php:1811
+#, c-format
+msgctxt "screen reader"
+msgid "%1$s action have been taken"
+msgid_plural "%1$s actions have been taken"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: jsLoader.php:321
 #, c-format
 msgid "%1$s characters"
@@ -1055,6 +1064,10 @@ msgstr "Добавить с узла сети"
 msgid "Add from template"
 msgstr "Добавить с шаблона"
 
+#: app/controllers/CControllerFavoriteDelete.php:65 include/html.inc.php:178
+msgid "Add graph to Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
 msgstr "Добавить узел сети"
@@ -1077,6 +1090,10 @@ msgstr "Добавить триггер узла сети"
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
 msgstr "Добавить элемент"
+
+#: app/controllers/CControllerFavoriteDelete.php:64 include/html.inc.php:177
+msgid "Add map to Favorite maps widget"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -4860,6 +4877,10 @@ msgstr "Изменить секрет клиента"
 msgid "Change indicator"
 msgstr "Индикатор изменений"
 
+#: include/classes/html/CMacroValue.php:243
+msgid "Change macro value type"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:157
 #: app/views/administration.user.edit.php:209 app/views/mediatype.edit.php:214
 #: app/views/popup.ldap.edit.php:98
@@ -5163,10 +5184,18 @@ msgstr "Закрыть"
 msgid "Close expression constructor"
 msgstr "Закрыть конструктор выражения"
 
+#: jsLoader.php:416
+msgid "Close modal window"
+msgstr ""
+
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
 msgstr "Закрыть новое событие"
+
+#: include/func.inc.php:1653 jsLoader.php:290
+msgid "Close notification"
+msgstr ""
 
 #: app/views/correlation.edit.php:247
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -5192,6 +5221,12 @@ msgstr "Длина кода"
 #: jsLoader.php:304 widgets/problems/Widget.php:35
 msgid "Collapse"
 msgstr "Свернуть"
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:60 jsLoader.php:428
+#: jsLoader.php:460
+msgid "Collapse section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:40
 msgid "Collapse sidebar"
@@ -6409,6 +6444,10 @@ msgstr "Панель \"%1$s\" уже существует."
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
 msgstr "Панель \"%1$s\" используется в \"%2$s\" отчете."
 
+#: app/views/monitoring.dashboard.view.php:97
+msgid "Dashboard actions"
+msgstr ""
+
 #: app/controllers/CControllerDashboardUpdate.php:218
 #: app/controllers/CControllerTemplateDashboardUpdate.php:190
 msgid "Dashboard created"
@@ -6777,6 +6816,10 @@ msgstr "Доступ по умолчанию к новым модулям"
 #: app/views/administration.authentication.edit.php:42
 msgid "Default authentication"
 msgstr "Аутентификация по умолчанию"
+
+#: include/classes/html/CTabFilter.php:169
+msgid "Default filter tab"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
@@ -7340,6 +7383,10 @@ msgstr "Зависимость"
 #: include/items.inc.php:102
 msgid "Dependent item"
 msgstr "Зависимый элемент данных"
+
+#: include/triggers.inc.php:2024 widgets/trigover/includes/ViewHelper.php:94
+msgid "Dependent trigger"
+msgstr ""
 
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
@@ -8271,6 +8318,10 @@ msgstr "Изменить"
 msgid "Edit dashboard"
 msgstr "Изменить панель"
 
+#: jsLoader.php:597
+msgid "Edit filter properties"
+msgstr ""
+
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
 msgstr "Изменить карту сети"
@@ -8287,6 +8338,10 @@ msgstr "Изменить элемент дерева"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "Изменение виджета"
+
+#: jsLoader.php:242
+msgid "Edit widget settings"
+msgstr ""
 
 #: jsLoader.php:185
 msgid "Editing other objects is not allowed in dashboard editing mode."
@@ -8712,6 +8767,10 @@ msgstr "Введите строку идентификатора PSK (pre-shared
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr "Введите уникальное имя, которое компоненты Zabbix будут использовать для распознавания pre-shared ключа."
 
+#: include/html.inc.php:201
+msgid "Enter full screen mode"
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "Введите IP/DNS адрес и порт установленного Zabbix агента на вашем объекте мониторинга."
@@ -9034,6 +9093,10 @@ msgstr "Подтверждение выполнения"
 msgid "Exists"
 msgstr "Существует"
 
+#: include/classes/html/CHtmlPage.php:113 include/html.inc.php:192
+msgid "Exit full screen mode"
+msgstr ""
+
 #: app/views/js/monitoring.problem.view.js.php:230
 #: include/classes/html/CFormFieldsetCollapsible.php:45
 #: include/classes/html/CSectionCollapsible.php:46
@@ -9046,6 +9109,12 @@ msgstr "Раскрыть"
 #: include/views/monitoring.sysmap.constructor.php:49
 msgid "Expand macros"
 msgstr "Раскрывать макросы"
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:63 jsLoader.php:427
+#: jsLoader.php:459
+msgid "Expand section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
@@ -9745,6 +9814,10 @@ msgstr "Перейти на первую страницу"
 msgid "Go to last page, %1$s"
 msgstr "Перейти на посл. страницу, %1$s"
 
+#: include/classes/html/CTabFilter.php:387
+msgid "Go to next filter tab"
+msgstr ""
+
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
 msgid "Go to next page, %1$s"
@@ -9759,6 +9832,10 @@ msgstr "Перейти на страницу %1$s"
 #, c-format
 msgid "Go to page %1$s, current page"
 msgstr "Перейти на страницу %1$s, текущую страницу"
+
+#: include/classes/html/CTabFilter.php:400
+msgid "Go to previous filter tab"
+msgstr ""
 
 #: include/classes/helpers/CPagerHelper.php:199
 #, c-format
@@ -13794,6 +13871,10 @@ msgstr "Список объектов экземпляров счётчиков 
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr "Список объектов экзепляров счётчиков производительности Windows. Возвращает JSON"
 
+#: include/classes/html/CTabFilter.php:382
+msgid "List of open filter tabs"
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
 msgid "List of user group shares"
@@ -14422,6 +14503,11 @@ msgstr "Макс. количество повторений"
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "Максимальное количество повторений применимо только к обнаружению и к SNMP walk."
 
+#: app/partials/configuration.host.interface.row.php:57
+#: app/views/host.wizard.edit.php:752
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
 msgstr "Максимальный уровень масштаба"
@@ -15017,6 +15103,14 @@ msgstr "Самое критичное, если все дочерние имею
 #: include/classes/helpers/CServiceHelper.php:26
 msgid "Most critical of child services"
 msgstr "Самое критичное из дочерних услуг"
+
+#: include/classes/html/CFilter.php:256 include/classes/html/CTabFilter.php:332
+msgid "Move time range backward"
+msgstr ""
+
+#: include/classes/html/CFilter.php:261 include/classes/html/CTabFilter.php:339
+msgid "Move time range forward"
+msgstr ""
 
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
@@ -16766,6 +16860,11 @@ msgstr "Подсчитываются только триггеры у актив
 msgid "Open URL"
 msgstr "Открыть URL"
 
+#: app/views/popup.generic.php:436 include/classes/html/CHtmlPage.php:175
+#: jsLoader.php:417
+msgid "Open Zabbix documentation in a new tab"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "Открывать в новом окне"
@@ -16778,6 +16877,10 @@ msgstr "Открыть инструкции по инсталляции"
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
 msgstr "Открыть журнал"
+
+#: jsLoader.php:243
+msgid "Open widget actions"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
@@ -17407,6 +17510,10 @@ msgstr "Родительские услуги"
 msgid "Parent templates"
 msgstr "Родительские шаблоны"
 
+#: include/triggers.inc.php:2024 widgets/trigover/includes/ViewHelper.php:94
+msgid "Parent trigger"
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:32
 msgid "Parent triggers"
 msgstr "Родительские триггеры"
@@ -18007,6 +18114,21 @@ msgstr "Восстановление проблемы"
 #: include/actions.inc.php:1981
 msgid "Problem resolved"
 msgstr "Проблема решена"
+
+#: include/actions.inc.php:1724
+msgctxt "screen reader"
+msgid "Problem severity changed"
+msgstr ""
+
+#: include/actions.inc.php:1714
+msgctxt "screen reader"
+msgid "Problem severity decreased"
+msgstr ""
+
+#: include/actions.inc.php:1719
+msgctxt "screen reader"
+msgid "Problem severity increased"
+msgstr ""
 
 #: app/views/usergroup.edit.php:273
 msgid "Problem tag filter"
@@ -18810,6 +18932,10 @@ msgstr "Удалить из группы узлов сети"
 msgid "Remove from host groups"
 msgstr "Удалить из групп узлов сети"
 
+#: app/controllers/CControllerFavoriteCreate.php:54 include/html.inc.php:169
+msgid "Remove graph from the Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
 msgstr "Удалить узел сети"
@@ -18817,6 +18943,10 @@ msgstr "Удалить узел сети"
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
 msgstr "Удалить теги узла сети"
+
+#: app/controllers/CControllerFavoriteCreate.php:53 include/html.inc.php:168
+msgid "Remove map from the Favorite maps widget"
+msgstr ""
 
 #: widgets/favgraphs/views/widget.view.php:43
 #: widgets/favmaps/views/widget.view.php:42
@@ -19992,6 +20122,10 @@ msgstr "Выберите SLA для отображения отчета по SLA
 msgid "Select a template"
 msgstr "Выберите шаблон"
 
+#: include/classes/html/CDateSelector.php:198
+msgid "Select date"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
 #: include/views/configuration.graph.edit.php:336
@@ -20498,6 +20632,10 @@ msgstr "Показать"
 msgid "Show aggregation function"
 msgstr "Отображение функции агрегирования"
 
+#: include/events.inc.php:761
+msgid "Show all tags"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
 msgstr "Показать дугу"
@@ -20558,6 +20696,10 @@ msgstr "Количество строк"
 #: include/views/monitoring.sysmap.edit.php:274
 msgid "Show link labels"
 msgstr "Показать лейблы ссылки"
+
+#: include/classes/html/CHtmlPage.php:146
+msgid "Show main menu"
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:267
 msgid "Show map element labels"
