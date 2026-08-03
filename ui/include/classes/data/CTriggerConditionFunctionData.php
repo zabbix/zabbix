@@ -210,7 +210,7 @@ final class CTriggerConditionFunctionData {
 			'ltrim' => _('ltrim() - Remove specified characters from the beginning of a string'),
 			'mad' => _('mad() - Median absolute deviation'),
 			'max' => _('max() - Maximum value for period T'),
-			'mid' => _('mid() - Returns a substring beginning at the character position specified by start for N characters'),
+			'mid' => _('mid() - Alias for substring()'),
 			'min' => _('min() - Minimum value for period T'),
 			'mod' => _('mod() - Division remainder'),
 			'monodec' => _('monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)'),
@@ -235,7 +235,7 @@ final class CTriggerConditionFunctionData {
 			'sqrt' => _('sqrt() - Square root of a value'),
 			'stddevpop' => _('stddevpop() - Population standard deviation'),
 			'stddevsamp' => _('stddevsamp() - Sample standard deviation'),
-			'substring' => _('substring() - Alias for mid()'),
+			'substring' => _('substring() - Returns a substring beginning at the character position specified by start for N characters'),
 			'sum' => _('sum() - Sum of values of a period T'),
 			'sumofsquares' => _('sumofsquares() - The sum of squares'),
 			'tan' => _('tan() - The tangent of a value'),
@@ -789,7 +789,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'search' => ['string', 'required', 'not_empty']
+					'search' => ['string', 'required']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -2778,7 +2778,7 @@ final class CTriggerConditionFunctionData {
 				'params' => [
 					'shift' => ['label' => _('Time shift'), 'placeholder' => 'now-1h'],
 					'last' => ['label' => _('Last of').' (T)'],
-					'search' => ['label' => _('Search value'), 'required' => true]
+					'search' => ['label' => _('Search value')]
 				],
 				'operator' => ['options' => self::OPERATORS],
 				'value' => ['label' => _('Result'), 'required' => true]
