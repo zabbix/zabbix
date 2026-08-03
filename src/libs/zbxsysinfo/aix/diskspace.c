@@ -285,6 +285,11 @@ error:
 	return ret;
 }
 
+static int	match_mountpoint(const char *current, const char *requested)
+{
+	return (NULL == requested || 0 == strcmp(current, requested)) ? SUCCEED : FAIL;
+}
+
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int			rc, sz, i, ret = SYSINFO_RET_FAIL, mode_short = 0;
@@ -320,7 +325,6 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	/* NULL or empty mode defaults to "full" */
 	/* empty mountpoint means no filter */
 	if (NULL != mountpoint && '\0' == *mountpoint)
 		mountpoint = NULL;
@@ -357,7 +361,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 			mntopts = (char *)vm + vm->vmt_data[VMT_ARGS].vmt_off;
 
 			/* apply mountpoint filter */
-			if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+			if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 			{
 				/* go to the next vmount structure */
 				vm = (struct vmount *)((char *)vm + vm->vmt_length);
@@ -396,7 +400,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mntopts = (char *)vm + vm->vmt_data[VMT_ARGS].vmt_off;
 
 		/* apply mountpoint filter */
-		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 		{
 			/* go to the next vmount structure */
 			vm = (struct vmount *)((char *)vm + vm->vmt_length);
@@ -459,7 +463,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		fsname.type = type;
 
 		/* apply mountpoint filter */
-		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 		{
 			/* go to the next vmount structure */
 			vm = (struct vmount *)((char *)vm + vm->vmt_length);
