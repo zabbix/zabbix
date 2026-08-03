@@ -79,7 +79,7 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		return $tag_filters;
 	}
 
-	protected function validateProxyGroupConflicts(): void {
+	protected function validateProxiesNotInProxyGroup(): void {
 		$proxyids = $this->getInput('proxyids');
 
 		if (!$proxyids) {
@@ -87,25 +87,28 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		}
 
 		$proxy_groups = API::ProxyGroup()->get([
-			'output' => ['proxy_groupid', 'name'],
-			'proxyids' => $proxyids,
-			'selectProxies' => ['proxyid', 'name']
+			'output' => [],
+			'selectProxies' => ['proxyid', 'name'],
+			'proxyids' => $proxyids
 		]);
 
-		$selected_proxyids = array_flip($proxyids);
+		$proxy_names = [];
 
 		foreach ($proxy_groups as $proxy_group) {
 			foreach ($proxy_group['proxies'] ?? [] as $proxy) {
-				if (!isset($selected_proxyids[$proxy['proxyid']])) {
-					continue;
+				if (in_array($proxy['proxyid'], $proxyids)) {
+					$proxy_names[$proxy['proxyid']] = $proxy['name'];
 				}
-
-				CMessageHelper::addError(_s(
-					'Proxy "%1$s" cannot be added to the proxy list because it is already managed by "%2$s".',
-					$proxy['name'],
-					$proxy_group['name']
-				));
 			}
+		}
+
+		if ($proxy_names) {
+			CMessageHelper::addError(_n(
+				'Proxy "%1$s" cannot be added to the proxy list because it is already managed by proxy group',
+				'Proxies "%1$s" cannot be added to the proxy list because they are already managed by proxy group',
+				implode(', ', $proxy_names),
+				count($proxy_names)
+			));
 		}
 	}
 }

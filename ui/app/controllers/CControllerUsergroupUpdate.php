@@ -123,7 +123,7 @@ class CControllerUsergroupUpdate extends CControllerUsergroupUpdateGeneral {
 	protected function doAction(): void {
 		$user_group = self::processUserGroupInputData($this->getUserGroupInputData());
 
-		$this->validateProxyGroupConflicts();
+		$this->validateProxiesNotInProxyGroup();
 
 		$output = [];
 

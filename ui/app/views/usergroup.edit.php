@@ -334,7 +334,6 @@ $proxy_access_list_form_grid = (new CFormGrid())
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-
 		)
 	)
 	->addItem([

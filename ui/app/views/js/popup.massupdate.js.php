@@ -170,9 +170,8 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 	updateFieldsVisibility();
 
-	monitored_by.querySelectorAll('input[name="monitored_by"]').forEach((input) => {
-		input.addEventListener('change', updateFieldsVisibility);
-	});
+	monitored_by.querySelectorAll('input[name="monitored_by"]')
+		.forEach(input => input.addEventListener('change', updateFieldsVisibility));
 })();
 
 // Inventory mode.
