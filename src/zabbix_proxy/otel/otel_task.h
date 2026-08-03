@@ -16,6 +16,7 @@
 #define ZABBIX_OTEL_TASK_H
 
 #include "otel_queue.h"
+#include "otel_config.h"
 #include "zbxmw.h"
 
 typedef enum
@@ -38,12 +39,12 @@ typedef struct
 {
 	zbx_mw_task_t			base;
 	zbx_vector_mw_task_ptr_t	tasks;
-	char				*attributes;
+	zbx_otel_config_attrs_t		*attrs;
 }
 zbx_otel_task_commit_t;
 
 zbx_mw_task_t	*otel_task_request_create(zbx_otel_request_t request, zbx_otel_request_type_t type);
-zbx_mw_task_t	*otel_task_commit_create(zbx_vector_mw_task_ptr_t *tasks, const char *attributes);
+zbx_mw_task_t	*otel_task_commit_create(zbx_vector_mw_task_ptr_t *tasks, zbx_otel_config_attrs_t *attrs);
 
 void	otel_task_free(zbx_mw_task_t *mw_task);
 

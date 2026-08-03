@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "otel_config.h"
 #include "otel_worker.h"
 #include "otel_grpc.h"
 #include "otel_exporter.h"
@@ -19,14 +20,18 @@
 #include "otel_task.h"
 #include "zbx_otel.h"
 #include "zbx_otel_client.h"
+#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
+#include "zbxjson.h"
 #include "zbxmw.h"
 #include "zbxcommon.h"
 #include "zbxnix.h"
+#include "zbxnum.h"
 #include "zbxprof.h"
 #include "zbxrtc.h"
 #include "zbxself.h"
 #include "zbxsupervisor_client.h"
+#include "zbxtypes_ext.h"
 
 #define OTEL_WORKERS_MAX		100
 #define OTEL_WORKERS_DEFAULT		10
@@ -103,7 +108,7 @@ static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, in
 		goto out;
 	}
 
-	/* TODO: make configuratble */
+	/* TODO: make configurable */
 	manager->commit_limit = 10;
 	manager->commit_task_num = 0;
 
@@ -165,9 +170,9 @@ static void	otel_manager_deactivate(zbx_otel_manager_t *manager)
 	manager->grpc = NULL;
 }
 
-static void	otel_manager_commit_tasks(zbx_otel_manager_t *manager, const char *attributes)
+static void	otel_manager_commit_tasks(zbx_otel_manager_t *manager, zbx_otel_config_attrs_t *attrs)
 {
-	zbx_mw_task_t	*t = otel_task_commit_create(&manager->commits, attributes);
+	zbx_mw_task_t	*t = otel_task_commit_create(&manager->commits, attrs);
 
 	zbx_mw_queue_lock(manager->base.queue);
 	zbx_mw_queue_push_normal(manager->base.queue, t);
@@ -196,22 +201,27 @@ void	*zbx_otel_manager_thread(void *args)
 	int					shutdown = 0, workers_num, apm_status = 1;
 	zbx_vector_mw_task_ptr_t		tasks;
 	zbx_uint64_t				cfg_revision = 0, quota;
-	zbx_dc_apm_config_t                    cfg = {0};
+	char					*apm_config = NULL;
+	zbx_otel_config_t			otel_config;
 
 	otel_args = (const zbx_thread_otel_manager_args_t *)unit_args->args.args;
 
 	zbx_dc_config_local_acquire();
-	zbx_dc_get_apm_config(&cfg, &cfg_revision);
-	quota = cfg.quota;
+	apm_config = zbx_dc_get_apm_config(apm_config, &cfg_revision);
+	if (SUCCEED != otel_config_set(&otel_config, apm_config, cfg_revision))
+		otel_config_reset(&otel_config);
+
+	quota = otel_config.quota;
 
 	/* when disabled leave one worker running */
-	workers_num = (0 == cfg.status ? 1 : OTEL_WORKERS_DEFAULT);
+	workers_num = (0 == otel_config.status ? 1 : OTEL_WORKERS_DEFAULT);
 
-	if (NULL == (manager = otel_manager_create(info, workers_num, cfg.quota, otel_args->exporter_options, &error)))
+	if (NULL == (manager = otel_manager_create(info, workers_num, otel_config.quota,
+			otel_args->exporter_options, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize open telemetry manager: %s", error);
 		zbx_free(error);
-		zbx_dc_apm_config_clear(&cfg);
+		otel_config_clear(&otel_config);
 		zbx_dc_config_local_release();
 		zbx_free(args);
 
@@ -245,11 +255,13 @@ void	*zbx_otel_manager_thread(void *args)
 
 		if (CONFIG_INTERVAL < time_start - time_config)
 		{
-			zbx_dc_get_apm_config(&cfg, &cfg_revision);
+			apm_config = zbx_dc_get_apm_config(apm_config, &cfg_revision);
+			if (SUCCEED != otel_config_set(&otel_config, apm_config, cfg_revision))
+				otel_config_reset(&otel_config);
 
-			if (apm_status != cfg.status)
+			if (apm_status != otel_config.status)
 			{
-				if (0 == cfg.status)
+				if (0 == otel_config.status)
 				{
 					if (FAIL == otel_manager_activate(manager, &error))
 					{
@@ -263,18 +275,18 @@ void	*zbx_otel_manager_thread(void *args)
 				{
 					otel_manager_deactivate(manager);
 				}
-				apm_status = cfg.status;
+				apm_status = otel_config.status;
 			}
 
-			if (quota != cfg.quota)
+			if (quota != otel_config.quota)
 			{
 				zbx_mw_queue_lock(manager->base.queue);
-				otel_queue_set_quota((zbx_otel_queue_t *)manager->base.queue, cfg.quota);
+				otel_queue_set_quota((zbx_otel_queue_t *)manager->base.queue, otel_config.quota);
 				zbx_mw_queue_unlock(manager->base.queue);
 
 				zabbix_log(LOG_LEVEL_WARNING, "changed Open Telemetry quota from " ZBX_FS_UI64 " to "
-						ZBX_FS_UI64, quota, cfg.quota);
-				quota = cfg.quota;
+						ZBX_FS_UI64, quota, otel_config.quota);
+				quota = otel_config.quota;
 			}
 		}
 
@@ -321,7 +333,7 @@ void	*zbx_otel_manager_thread(void *args)
 		}
 
 		if (0 != manager->commits.values_num && manager->commit_task_num < manager->commit_limit)
-			otel_manager_commit_tasks(manager, cfg.attributes);
+			otel_manager_commit_tasks(manager, otel_config_attrs_acquire(otel_config.attrs));
 
 	}
 
@@ -335,7 +347,7 @@ void	*zbx_otel_manager_thread(void *args)
 
 	otel_manager_free(manager);
 out:
-	zbx_dc_apm_config_clear(&cfg);
+	otel_config_clear(&otel_config);
 	zbx_dc_config_local_release();
 	zbx_free(args);
 

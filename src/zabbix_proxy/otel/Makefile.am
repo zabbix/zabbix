@@ -76,6 +76,8 @@ libzbxotel_a_SOURCES = \
 	otel_exporter.h \
 	otel_clickhouse.c \
 	otel_clickhouse.h \
+	otel_config.c \
+	otel_config.h \
 	otel_grpc.cc \
 	otel_grpc.h \
 	otel_decode.cc \

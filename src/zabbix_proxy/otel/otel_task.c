@@ -14,6 +14,7 @@
 
 #include "otel_task.h"
 #include "otel_grpc.h"
+#include "otel_config.h"
 
 static void	otel_task_request_free(void *task);
 static void	otel_task_commit_free(void *task);
@@ -41,7 +42,7 @@ static void	otel_task_request_free(void *task)
 	zbx_free(otel_task);
 }
 
-zbx_mw_task_t	*otel_task_commit_create(zbx_vector_mw_task_ptr_t *tasks, const char *attributes)
+zbx_mw_task_t	*otel_task_commit_create(zbx_vector_mw_task_ptr_t *tasks, zbx_otel_config_attrs_t *attrs)
 {
 	zbx_otel_task_commit_t	*task;
 
@@ -52,7 +53,7 @@ zbx_mw_task_t	*otel_task_commit_create(zbx_vector_mw_task_ptr_t *tasks, const ch
 	zbx_vector_mw_task_ptr_append_array(&task->tasks, tasks->values, tasks->values_num);
 	zbx_vector_mw_task_ptr_clear(tasks);
 
-	task->attributes = zbx_strdup(NULL, attributes);
+	task->attrs = attrs;
 
 	return (zbx_mw_task_t *)task;
 }
@@ -66,7 +67,7 @@ static void	otel_task_commit_free(void *task)
 
 	zbx_vector_mw_task_ptr_destroy(&otel_task->tasks);
 
-	zbx_free(otel_task->attributes);
+	otel_config_attrs_release(otel_task->attrs);
 
 	zbx_free(otel_task);
 }

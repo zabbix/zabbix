@@ -32,55 +32,27 @@ zbx_otel_worker_t	*otel_worker_create(zbx_otel_exporter_pool_t *exporters)
 	return worker;
 }
 
-static void	otel_worker_get_section_attributes(const struct zbx_json_parse *jp, const char *section, char **attrs)
-{
-	struct zbx_json_parse	jp_attrs;
-
-	if (FAIL == zbx_json_brackets_by_name(jp, section, &jp_attrs))
-		return;
-
-	size_t	len = jp_attrs.end - jp_attrs.start + 1;
-
-	*attrs = (char *)zbx_malloc(NULL, len + 1);
-	memcpy(*attrs, jp_attrs.start, len);
-	(*attrs)[len] = '\0';
-}
-
-static void	otel_worker_get_attributes(const char *attributes, char **metrics, char **logs, char **traces)
-{
-	struct zbx_json_parse	jp;
-
-	if (NULL == attributes || FAIL == zbx_json_open(attributes, &jp))
-		return;
-
-	otel_worker_get_section_attributes(&jp, "metrics", metrics);
-	otel_worker_get_section_attributes(&jp, "logs", logs);
-	otel_worker_get_section_attributes(&jp, "traces", traces);
-}
-
 static void	otel_worker_process_commit(zbx_otel_worker_t *worker, zbx_otel_task_commit_t *task)
 {
 	zbx_otel_dataset_t	ds;
-	char			*metrics = NULL, *logs = NULL, *traces = NULL;
+	zbx_vector_tag_t	*attrs;
 
-	otel_worker_get_attributes(task->attributes, &metrics, &logs, &traces);
 	otel_dataset_init(&ds);
 
 	for (int i = 0; i < task->tasks.values_num; i++)
 	{
 		zbx_otel_task_request_t	*t = (zbx_otel_task_request_t *)task->tasks.values[i];
-		const char		*attrs = NULL;
 
 		switch (t->type)
 		{
 			case OTEL_METRICS:
-				attrs = metrics;
+				attrs = &task->attrs->metrics;
 				break;
 			case OTEL_LOGS:
-				attrs = logs;
+				attrs = &task->attrs->logs;
 				break;
 			case OTEL_TRACES:
-				attrs = traces;
+				attrs = &task->attrs->traces;
 				break;
 		}
 
@@ -99,10 +71,6 @@ static void	otel_worker_process_commit(zbx_otel_worker_t *worker, zbx_otel_task_
 	otel_exporter_release(worker->exporters, exporter);
 
 	otel_dataset_clear(&ds);
-
-	zbx_free(metrics);
-	zbx_free(logs);
-	zbx_free(traces);
 }
 
 void	*otel_worker_entry(void *args)

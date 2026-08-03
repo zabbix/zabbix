@@ -23,6 +23,8 @@
 #include "zbxlog.h"
 #include "zbxstr.h"
 
+#if defined(HAVE_CURL)
+
 int	otel_clickhouse_init(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg, char **error)
 {
 	CURLoption	opt;
@@ -217,3 +219,31 @@ int	otel_clickhouse_commit(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhous
 
 	return ret;
 }
+
+#else
+int	otel_clickhouse_init(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg, char **error)
+{
+	ZBX_UNUSED(conn);
+	ZBX_UNUSED(cfg);
+
+	*error = zbx_strdup(NULL, "ClickHouse telemetry provider requires curl library."
+			" This Zabbix server binary was compiled without curl");
+
+	return FAIL;
+}
+
+void	otel_clickhouse_clear(zbx_otel_clickhouse_t *conn)
+{
+	ZBX_UNUSED(conn);
+}
+
+int	otel_clickhouse_commit(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg,
+		zbx_otel_dataset_t *ds)
+{
+	ZBX_UNUSED(conn);
+	ZBX_UNUSED(cfg);
+	ZBX_UNUSED(ds);
+	return FAIL;
+}
+#endif
+

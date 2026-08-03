@@ -65,7 +65,7 @@ void	zbx_dc_config_local_release(void)
 	zbx_hashset_destroy(&config_local->trigger_depends_links);
 	zbx_hashset_destroy(&config_local->item_tag_links);
 	correlation_config_destroy(config_local->correlation_config);
-	zbx_dc_apm_config_clear(&config_local->apm_config);
+	zbx_free(config_local->apm_config);
 
 	zbx_free(config_local);
 }
@@ -90,10 +90,4 @@ int	zbx_dc_local_get_itservices_num(void)
 {
 	return atomic_load(&dc_local()->itservices_num);
 }
-
-void   zbx_dc_apm_config_clear(zbx_dc_apm_config_t *cfg)
-{
-	zbx_free(cfg->attributes);
-}
-
 

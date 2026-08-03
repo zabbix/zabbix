@@ -41,6 +41,7 @@ static char	*otel_option_dup(const zbx_config_option_t *options, int options_num
 static int	otel_clickhouse_cfg_init(zbx_otel_clickhouse_cfg_t *cfg, const zbx_config_option_t *options,
 		int options_num, char **error)
 {
+#if defined(HAVE_CURL)
 	if (NULL == (cfg->url = otel_option_dup(options, options_num, OTEL_EXPORTER_PROVIDER_URL, error)))
 		return FAIL;
 
@@ -54,6 +55,12 @@ static int	otel_clickhouse_cfg_init(zbx_otel_clickhouse_cfg_t *cfg, const zbx_co
 		return FAIL;
 
 	return SUCCEED;
+#else
+	*error = zbx_strdup(NULL, "ClickHouse telemetry provider requires curl library."
+			" This Zabbix server binary was compiled without curl");
+
+	return FAIL;
+#endif
 }
 
 static void	otel_clickhouse_cfg_clear(zbx_otel_clickhouse_cfg_t *cfg)
@@ -111,6 +118,8 @@ static zbx_otel_exporter_t *otel_exporter_create(zbx_otel_exporter_cfg_t *cfg, c
 
 	switch (cfg->type)
 	{
+		case OTEL_EXPORTER_UNKNOWN:
+			break;
 		case OTEL_EXPORTER_CLICKHOUSE:
 			ret = otel_clickhouse_init(&exporter->conn.clickhouse, &cfg->data.clickhouse, error);
 			break;
@@ -127,6 +136,8 @@ static void	otel_exporter_destroy(zbx_otel_exporter_t *exporter)
 {
 	switch (exporter->cfg->type)
 	{
+		case OTEL_EXPORTER_UNKNOWN:
+			break;
 		case OTEL_EXPORTER_CLICKHOUSE:
 			otel_clickhouse_clear(&exporter->conn.clickhouse);
 			break;
@@ -186,6 +197,8 @@ int	otel_exporter_commit(zbx_otel_exporter_t *exporter, zbx_otel_dataset_t *ds)
 
 	switch (exporter->cfg->type)
 	{
+		case OTEL_EXPORTER_UNKNOWN:
+			break;
 		case OTEL_EXPORTER_CLICKHOUSE:
 			ret = otel_clickhouse_commit(&exporter->conn.clickhouse, &exporter->cfg->data.clickhouse, ds);
 			break;

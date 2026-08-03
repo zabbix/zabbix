@@ -17061,18 +17061,18 @@ void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uin
 	UNLOCK_CACHE;
 }
 
-void   zbx_dc_get_apm_config(zbx_dc_apm_config_t *cfg, zbx_uint64_t *revision)
+char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision)
 {
+	char	*apm_config = NULL;
+
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	if (*revision < config->revision.settings_table)
-	{
-		cfg->status = dc_local()->apm_config.status;
-		cfg->quota = dc_local()->apm_config.quota;
-		cfg->attributes = zbx_strdup(cfg->attributes, dc_local()->apm_config.attributes);
-	}
+	if (NULL == old_config || *revision < config->revision.settings_table)
+		apm_config = zbx_strdup(old_config, dc_local()->apm_config);
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	return apm_config;
 }
 
 

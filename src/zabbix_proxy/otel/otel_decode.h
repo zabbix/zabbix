@@ -21,9 +21,10 @@ extern "C" {
 
 #include "otel_dataset.h"
 #include "otel_grpc.h"
+#include "zbxalgo.h"
 
 void	zbx_otel_request_decode(zbx_otel_request_t request, zbx_otel_request_type_t type, zbx_otel_dataset_t *ds,
-		const char *resource_attrs);
+		const zbx_vector_tag_t *resource_attrs);
 
 #ifdef __cplusplus
 }

@@ -469,17 +469,7 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 
 				zbx_json_addstring(j, NULL, timeout_value, ZBX_JSON_TYPE_STRING);
 			}
-			else if (0 == strcmp(name, ZBX_SETTINGS_APM_STATUS) &&
-					0 == strcmp(table->fields[i].name, "value_int"))
-			{
-				zbx_json_addint64(j, NULL, proxy->apm_status);
-			}
-			else if (0 == strcmp(name, ZBX_SETTINGS_APM_QUOTA) &&
-					0 == strcmp(table->fields[i].name, "value_int"))
-			{
-				zbx_json_addint64(j, NULL, proxy->apm_quota);
-			}
-			else if (0 == strcmp(name, ZBX_SETTINGS_APM_ATTRIBUTES) &&
+			else if (0 == strcmp(name, ZBX_SETTINGS_APM) &&
 					0 == strcmp(table->fields[i].name, "value_str"))
 			{
 				zbx_json_addstring(j, NULL, ZBX_NULL2EMPTY_STR(proxy->apm_attributes),

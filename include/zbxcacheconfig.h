@@ -1706,20 +1706,8 @@ void	zbx_correlation_config_close(zbx_correlation_config_handle_t handle);
 zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correlation_config_handle_t handle);
 
 /* open telemetry settings */
-#define ZBX_SETTINGS_APM		"apm_"
-#define ZBX_SETTINGS_APM_STATUS		ZBX_SETTINGS_APM "status"
-#define ZBX_SETTINGS_APM_QUOTA		ZBX_SETTINGS_APM "quota"
-#define ZBX_SETTINGS_APM_ATTRIBUTES	ZBX_SETTINGS_APM "attributes"
+#define ZBX_SETTINGS_APM		"apm"
 
-typedef struct
-{
-	int	status;
-	int	quota;
-	char	*attributes;
-}
-zbx_dc_apm_config_t;
-
-void   zbx_dc_get_apm_config(zbx_dc_apm_config_t *cfg, zbx_uint64_t *revision);
-void   zbx_dc_apm_config_clear(zbx_dc_apm_config_t *cfg);
+char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision);
 
 #endif
