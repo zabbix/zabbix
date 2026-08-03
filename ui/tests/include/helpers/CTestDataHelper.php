@@ -815,23 +815,11 @@ class CTestDataHelper {
 			return;
 		}
 
-		foreach ($roles as &$role) {
-			$role = self::prepareRole($role);
-		}
-		unset($role);
-
 		$result = CDataHelper::call('role.create', $roles);
 
 		foreach ($roles as $role) {
 			self::$objectids['role'][$role['name']] = array_shift($result['roleids']);
 		}
-	}
-
-	public static function prepareRole(array &$role): array {
-		$role += ['rules' => []];
-		$role['rules'] += ['api.access' => ZBX_ROLE_RULE_ENABLED];
-
-		return $role;
 	}
 
 	private static function createUserGroups(array $user_groups): void {
