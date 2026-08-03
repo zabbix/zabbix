@@ -116,8 +116,7 @@ $tabs = (new CTabView())
 	)
 	->addTab('processing-tab', _('Preprocessing'),
 		new CPartial('item.edit.preprocessing.tab', [
-			'preprocessing_types' => $data['preprocessing_types'],
-			'show_full_hint' => false
+			'preprocessing_types' => $data['preprocessing_types']
 		]),
 		TAB_INDICATOR_PREPROCESSING
 	)

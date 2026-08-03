@@ -338,7 +338,7 @@ $helper_icon_texts = [
 	_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.')
 ];
 
-if ($data['show_full_hint']) {
+if (in_array(ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, $data['preprocessing_types'])) {
 	$helper_icon_texts = array_merge($helper_icon_texts, [
 		BR(), BR(),
 		_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
