@@ -234,6 +234,11 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+static int	match_mountpoint(const char *current, const char *requested)
+{
+	return (NULL == requested || 0 == strcmp(current, requested)) ? SUCCEED : FAIL;
+}
+
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct mnttab		mt;
@@ -270,7 +275,6 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	/* NULL or empty mode defaults to "full" */
 	/* empty mountpoint means no filter */
 	if (NULL != mountpoint && '\0' == *mountpoint)
 		mountpoint = NULL;
@@ -293,7 +297,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 			fsname.mpoint = mt.mnt_mountp;
 
 			/* apply mountpoint filter */
-			if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+			if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 				continue;
 
 			zbx_json_addobject(&j, NULL);
@@ -323,7 +327,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		fsname.mpoint = mt.mnt_mountp;
 
 		/* apply mountpoint filter */
-		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 			continue;
 
 		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused,&error))
@@ -376,7 +380,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		fsname.type = mt.mnt_fstype;
 
 		/* apply mountpoint filter */
-		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 			continue;
 
 		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, &fsname, zbx_fsname_compare)))
