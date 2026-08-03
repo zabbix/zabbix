@@ -151,8 +151,8 @@ $output = [
 			'rules_for_clone' => $data['js_validation_rules_for_clone'],
 			'condition_rules' => $data['condition_js_validation_rules'],
 			'operation_rules' => $data['operation_js_validation_rules'],
-			'operation_types_by_execute_when' => json_encode(CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN),
-			'execute_when_by_window_type' => json_encode(CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE),
+			'operation_types_by_execute_when' => CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN,
+			'execute_when_by_window_type' => CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE,
 			'ceprule' => $data['ceprule']
 		]).');',
 	'dialogue_class' => 'modal-popup-large'

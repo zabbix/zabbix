@@ -124,8 +124,9 @@ window.ceprule_operation_edit_popup = new class {
 
 		// Select first enabled option, if previous selection got disabled.
 		if (!zselect.value.length) {
-			zselect.value = [...events_options, ...tags_options]
-				.find(option => !option.is_disabled).value;
+			const enabled_option = [...events_options, ...tags_options].find(option => !option.is_disabled);
+
+			zselect.value = enabled_option ? enabled_option.value : events_options[0].value;
 		}
 	}
 
