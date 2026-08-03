@@ -348,6 +348,7 @@ class testFormFilterProblems extends testFormFilter {
 			$this->query('xpath://input[@id="from"]')->one()->fill('now-2y');
 			$filter->query('id:apply')->one()->click();
 			$filter->setContext(CFilterElement::CONTEXT_LEFT)->selectTab($data['filter']['Name']);
+			$table = $this->query('class:list-table')->asTable()->one();
 			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 			$table->waitUntilReloaded();

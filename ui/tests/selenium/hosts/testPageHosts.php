@@ -239,11 +239,13 @@ class testPageHosts extends CLegacyWebTest {
 	 */
 	public function testPageHosts_FilterByStatus($data) {
 		$this->page->login()->open('zabbix.php?action=host.list');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 
 		// Apply filtering parameters.
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		if (array_key_exists('expected', $data)) {
