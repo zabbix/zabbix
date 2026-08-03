@@ -1,1 +1,0 @@
-..F....... [ZBX-27918] fixed a bug, where "Menu entry URL" input was enabled when "Include event menu entry" checkbox was unchecked (scernisenko)
