@@ -1158,6 +1158,9 @@ int	zbx_config_option_parse_options(const char *text, zbx_vector_config_option_t
 		}
 
 		ptr++;
+
+		while (' ' == *ptr)
+			ptr++;
 	}
 
 	ret = SUCCEED;
