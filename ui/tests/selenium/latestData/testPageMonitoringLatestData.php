@@ -692,9 +692,9 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
 
 		if ($kiosk_mode) {
-			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+			$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
+			$this->assertTrue($this->query('xpath://button[@aria-label="Exit full screen mode"]')->exists());
 		}
 
 		$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
@@ -715,9 +715,9 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->assertTableData($data, $this->getTableSelector());
 
 		if ($kiosk_mode) {
-			$this->query('xpath://button[@title="Normal view"]')->one()->click();
+			$this->query('xpath://button[@aria-label="Exit full screen mode"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+			$this->assertTrue($this->query('xpath://button[@aria-label="Enter full screen mode"]')->exists());
 			$this->assertTableData($data, $this->getTableSelector());
 		}
 		else {
@@ -880,7 +880,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one();
+			$overlay = $this->query('css:div.overlay-dialogue.wordbreak')->one();
 
 			// Verify the real description with the expected one.
 			$this->assertEquals($data['description'], $overlay->getText());
@@ -894,7 +894,7 @@ class testPageMonitoringLatestData extends CWebTest {
 			}
 
 			// Verify that the tool-tip can be closed.
-			$overlay->query('xpath:./button[@title="Close"]')->one()->click();
+			$overlay->query('xpath:.//button[@title="Close"]')->one()->click();
 			$this->assertFalse($overlay->isDisplayed());
 		}
 		// If the item has no description the description icon should not be there.
