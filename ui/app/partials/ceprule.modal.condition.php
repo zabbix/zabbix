@@ -35,7 +35,7 @@ foreach (CCepRuleHelper::getConditionTagOperators() as $value => $name) {
 	$tag_operators->addOption(new CSelectOption($value, $name));
 }
 
-echo (new CForm())
+(new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addClass(ZBX_STYLE_DISPLAY_NONE)
@@ -114,4 +114,5 @@ echo (new CForm())
 				->setAttribute('data-field-type', 'hidden')
 				->removeId()
 		)
-	);
+	)
+	->show();

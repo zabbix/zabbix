@@ -46,7 +46,7 @@ foreach ($labels as $option => $label) {
 	}
 }
 
-echo (new CForm())
+(new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addVar('sortorder', '0')
@@ -147,4 +147,5 @@ echo (new CForm())
 			->setId('ceprule-operation-severity-argument')
 			->addItem(new CSeverity('severity', TRIGGER_SEVERITY_INFORMATION))
 		)
-	);
+	)
+	->show();

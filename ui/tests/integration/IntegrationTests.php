@@ -75,6 +75,7 @@ require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 require_once dirname(__FILE__).'/testLLDProxyHistorySyncAtScale.php';
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
+require_once dirname(__FILE__).'/testBridgeAdapter.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -147,6 +148,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testTriggerCEPRestart');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testWebScenarioDynamicVariables');
+		$suite->addTestSuite('testBridgeAdapter');
 		return $suite;
 	}
 }

@@ -57,7 +57,7 @@ class CCepRuleHelper {
 	public const WHEN_EVENT_OCCURRED = 0;
 	public const WHEN_EVENT_EVICTED = 1;
 	public const WHEN_WINDOW_CLOSED = 2;
-	public const WHEN_TAGS_CORRELATED = 3;
+	public const WHEN_TAGS_CORRELATED = 3; // TODO: Server has removed this type, API shall remove this too.
 	public const WHEN_PATTERN_MATCHED = 4;
 
 	public const WINDOW_CONDITION_TAG_PAIR = 0;
@@ -190,7 +190,7 @@ class CCepRuleHelper {
 		$labels = self::getConditionLabels();
 
 		if (!array_key_exists($type, $labels)) {
-			throw new LogicException("Uknown condition type $type.");
+			throw new LogicException("Unknown condition type $type.");
 		}
 
 		return $labels[$type];
@@ -228,14 +228,14 @@ class CCepRuleHelper {
 		$labels = self::getConditionOperatorLabels();
 
 		if (!array_key_exists($operator, $labels)) {
-			throw new LogicException("Uknown condition operator $operator.");
+			throw new LogicException("Unknown condition operator $operator.");
 		}
 
 		return static::getConditionOperatorLabels()[$operator];
 	}
 
 	public static function getConditionDescription(array $ceprule_condition): array {
-		[$arg1, $arg2] = match((int) $ceprule_condition['type']) {
+		[$argument_1, $argument_2] = match((int) $ceprule_condition['type']) {
 			self::CONDITION_EVENT_NAME => [$ceprule_condition['event_name'], null],
 			self::CONDITION_SEVERITY => [CSeverityHelper::getName($ceprule_condition['severity']), null],
 			self::CONDITION_HOST => [$ceprule_condition['host'], null],
@@ -250,14 +250,14 @@ class CCepRuleHelper {
 		$result = [
 			CCepRuleHelper::getConditionLabel($ceprule_condition['type']),
 			' ',
-			italic($arg1),
+			italic($argument_1),
 			' ',
 			mb_strtolower(CCepRuleHelper::getConditionOperatorLabel($ceprule_condition['operator']))
 		];
 
-		if ($arg2 !== null) {
+		if ($argument_2 !== null) {
 			$result[] = ' ';
-			$result[] = italic($arg2);
+			$result[] = italic($argument_2);
 		}
 
 		return $result;
@@ -268,8 +268,6 @@ class CCepRuleHelper {
 			self::WHEN_EVENT_OCCURRED => _('Event occured'),
 			self::WHEN_EVENT_EVICTED => _('Event evicted'),
 			self::WHEN_WINDOW_CLOSED => _('Window closed'),
-			/* self::WHEN_TAGS_CORRELATED => _('Tags correlated'), */
-			// TODO: Remove the WHEN_TAGS_CORRELATED completely - helper, API and form-rules.
 			self::WHEN_PATTERN_MATCHED => _('Event pattern matched')
 		];
 	}
@@ -406,43 +404,42 @@ class CCepRuleHelper {
 			default => ''
 		};
 
-		$format_tag_pair = fn (array $value): string => sprintf('%s:%s', $value['tag'], $value['value']);
-		$format_value_added = fn (array $value): string => sprintf('> %s', $value['new']);
-		$format_value_changed = fn (array $value): string => array_key_exists('old', $value)
-			? sprintf('%s > %s', $value['old'], $value['new'])
-			: $format_value_added($value);
-
 		$target_details = $target ? $ceprule_operation[$target] : [];
-
 		$arguments = match($operation) {
 			self::OP_SET_NAME
-				=> $format_value_changed($target_details),
+				=> array_key_exists('old', $target_details)
+					? sprintf('%s > %s', $target_details['old'], $target_details['new'])
+					: sprintf('> %s', $target_details['new']),
 
 			self::OP_RENAME_TAG
-				=> $format_value_changed($target_details['tag']),
+				=> array_key_exists('old', $target_details['tag'])
+					? sprintf('%s > %s', $target_details['tag']['old'], $target_details['tag']['new'])
+					: sprintf('> %s', $target_details['tag']['new']),
 
 			self::OP_SET_SEVERITY, self::OP_DECREASE_SEVERITY, self::OP_INCREASE_SEVERITY
-				=> $format_value_changed([
-					'old' => CSeverityHelper::getName($target_details['old']),
-					'new' => CSeverityHelper::getName($target_details['new'])
-				]),
+				=> array_key_exists('old', $target_details)
+					? sprintf('%s > %s', CSeverityHelper::getName($target_details['old']),
+						CSeverityHelper::getName($target_details['new'])
+					)
+					: sprintf('> %s', CSeverityHelper::getName($target_details['new'])),
 
 			self::OP_ADD_TAG, self::OP_REMOVE_TAG
-				=> $format_tag_pair($target_details),
+				=> sprintf('%s:%s', $target_details['tag'], $target_details['value']),
 
 			self::OP_DECREASE_TAG_VALUE, self::OP_INCREASE_TAG_VALUE, self::OP_SET_TAG_VALUE
-				=> $format_tag_pair([
-					'tag' => $target_details['tag'],
-					'value' => $format_value_changed($target_details['value'])
-				]),
+				=> sprintf('%s:%s', $target_details['tag'],
+					array_key_exists('old', $target_details['value'])
+						? sprintf('%s > %s', $target_details['value']['old'], $target_details['value']['new'])
+						: sprintf('> %s', $target_details['value']['new'])
+					),
 
 			self::OP_SET_TAG
-				=> $format_tag_pair([
-					'tag' => $target_details['tag'],
-					'value' => is_string($target_details['value'])
-						? $target_details['value']
-						: $format_value_changed($target_details['value'])
-				]),
+				=> sprintf('%s:%s', $target_details['tag'], is_string($target_details['value'])
+					? $target_details['value']
+					: (array_key_exists('old', $target_details['value'])
+						? sprintf('%s > %s', $target_details['value']['old'], $target_details['value']['new'])
+						: sprintf('> %s', $target_details['value']['new']))
+					),
 
 			default => ''
 		};

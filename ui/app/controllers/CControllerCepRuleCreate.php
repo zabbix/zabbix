@@ -206,6 +206,7 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 					'usermacros' => false, 'lldmacros' => false
 				]]
 			],
+			'sortorder' => ['db cep_rule.sortorder', 'required', 'min' => 1, 'max' => ZBX_MAX_INT32],
 			'description' => ['db cep_rule.description'],
 			'status' => ['db cep_rule.status', 'required',
 				'in' => [CCepRuleHelper::STATUS_ENABLED, CCepRuleHelper::STATUS_DISABLED]
@@ -218,15 +219,12 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
-			$response = array_filter([
-				'form_errors' => $form_errors,
-				'error' => !$form_errors
-					? [
-						'title' => _('Cannot add complex event processing rule'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-					: null
-			]);
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot add complex event processing rule'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
 			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}

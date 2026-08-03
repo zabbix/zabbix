@@ -25,11 +25,13 @@ $tags = (new CMultiSelect([
 	'data' => array_map(fn (string $name) => ['id' => $name, 'name' => $name], $data['window']['tags']),
 	'placeholder' => _('tag names'),
 	'add_post_js' => false
-]))->setId('ceprule-window-groupby-tag');
+]))
+	->setId('ceprule-window-groupby-tag')
+	->addStyle('width: '.ZBX_TEXTAREA_TAG_WIDTH.'px;');
 
 zbx_add_post_js($tags->getPostJS());
 
-echo (new CObject())
+(new CObject())
 	->addItem((new CLabel(_('Time window'), 'ceprule-window-type'))
 		->addItem(makeHelpIcon([
 			_("None - there will be no time window specific processing.").PHP_EOL,
@@ -109,9 +111,8 @@ echo (new CObject())
 
 	->addItem((new CLabel(_('Event count tag'), 'ceprule-window-counttag'))->setAsteriskMark())
 	->addItem((new CFormField())
-		->addItem((new CRadioButtonList(
-			name: 'window[event_count_tag_enabled]',
-			value: ($data['window']['event_count_tag'] !== '') ? '1' : '0'
+		->addItem((new CRadioButtonList('window[event_count_tag_enabled]',
+			($data['window']['event_count_tag'] !== '') ? '1' : '0'
 		))
 			->setId('ceprule-window-counttag-toggle')
 			->addValue('No', '0')
@@ -134,4 +135,6 @@ echo (new CObject())
 		->addStyle('width: '.ZBX_TEXTAREA_BIG_WIDTH.'px')
 		->setAttribute('data-name', 'window[script]')
 		->setAttribute('data-field-type', 'multiline')
-	));
+	))
+
+	->show();

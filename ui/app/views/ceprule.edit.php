@@ -110,7 +110,7 @@ $form = (new CForm())
 		)
 		->addItem([
 			new CLabel(_('Stop processing'), 'stop'),
-			new CFormField((new CCheckBox('stop'))
+			new CFormField((new CCheckBox('stop', CCepRuleHelper::EXECUTION_STOP))
 				->setChecked($data['ceprule']['stop'] == CCepRuleHelper::EXECUTION_STOP)
 				->setUncheckedValue(CCepRuleHelper::EXECUTION_CONTINUE)
 			)

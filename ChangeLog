@@ -1,8 +1,49 @@
 Changes for 8.0.0rc1
 
 New features:
+A.F.I...S. [ZBXNEXT-10357] implemented Zabbix server, API and frontend changes for mobile application (agriscenko, gberzina, rtrizna, wczerneha)
+.........T [ZBXNEXT-10644] added Oracle Cloud Costs by HTTP template (abrosimovs)
+.........T [ZBXNEXT-10639] added template GCP Cost monitoring by HTTP (kflorowski)
+.........T [ZBXNEXT-10328] added Percona by Zabbix agent template (mruszczyk)
+.........T [ZBXNEXT-10326] added MariaDB by Zabbix agent template (mruszczyk)
+.........T [ZBXNEXT-10320] added new metrics, expanded discovery rules for tables and improved dashboard in MySQL by Zabbix agent template (mruszczyk)
+A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+..F....PS. [ZBX-27637] fixed leading zeroes in database version numbers (mprihodko)
+..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
+.........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
+..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
+..F....... [ZBX-27920] fixed event menu entry parameters being marked as required when they are disabled (scernisenko)
+..F....... [ZBX-27942] fixed time filter error for Dashboard in Kiosk mode (scernisenko)
+..F....... [ZBX-25485] fixed language change to work for different environments (gberzina)
+..F....... [ZBX-27921] fixed item and item prototype validation of intervals for trapper and dependent items (gberzina)
+.........T [ZBX-24343] fixed temperature threshold trigger duplication for Cisco IOS by SNMP (kflorowski)
+..F....... [ZBX-27386] fixed select dropdown not collapsing after sorting items (gklavins)
+..F....... [ZBX-27984] fixed item test when prometheus pattern preprocessing step is used (gberzina)
+A......... [ZBX-27875] fixed the display of the "Show templates" filter in the "Host wizard" form (Sasha)
+..F....... [ZBX-27961] fixed delete cancel confirmation in API tokens and proxy group edit forms (scernisenko)
+..F....... [ZBX-27825] fixed to set correct mode parameter for nodata function in trigger expression edit form (gberzina)
+..F....... [ZBX-27140] fixed overall hintbox positioning (dfofanovs)
+..F....... [ZBX-25815] removed mention of discovery from SNMP max_repetition help note (vskalbins)
+..F....... [ZBX-27941] fixed console error on Dashboard list page in Kiosk mode (scernisenko)
+.......PS. [ZBX-27975] fixed potential VMware collector crash caused by network connectivity issues to vCenter (MVekslers)
+.........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates. (abrosimovs)
+..F....... [ZBX-26583] fixed incorrectly displayed templates after clearing search field in host wizard (aluchko, gklavins)
+....I..... [ZBX-27125] added DB patches for graph themes (gklavins)
+..F....... [ZBX-27886] renamed datatable element ids (gklavins)
+..F....... [ZBX-26953] fixed redirect functionality for the Discovery rules, Discovery prototypes, Web scenarios and Maps (msnihach)
+..F....... [ZBX-27663] fixed switching between tag lists in host, host prototypes, and templates edit form in case there are no tags (scernisenko)
+..F....... [ZBX-27918] fixed a bug, where "Menu entry URL" input was enabled when "Include event menu entry" checkbox was unchecked (scernisenko)
+........S. [ZBX-27665] fixed remote command execution failing for trigger action operations when the target host is monitored by a proxy group (vsmelovs)
+..F....... [ZBX-27689] fixed permission check for bulk actions in hosts web monitoring list (scernisenko)
+...G...... [ZBX-27922] added retry to persistent buffer writes (esneiders)
+..F....... [ZBX-27413] renamed Approaching to Upcoming in Maintenance (vskalbins)
+...G...... [ZBX-26916] fixed some websites not having their certificates accessed (dbriedis)
+...G...... [ZBX-27724] fixed build script for Zabbix web service (opucka)
+...G...... [ZBX-27024] resolved systemrun failing and race conditions (opucka)
+.........T [ZBX-25578] fixed GCP get db instances script (kflorowski)
+.........T [ZBX-27139] fixed naming and description of PLE trigger in 'MSSQL by Zabbix agent 2' template (smansurovs)
 ........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
 .........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
 ..F....... [ZBX-27145] improved selected row color for dark themes (gklavins)
@@ -406,12 +447,49 @@ A......... [ZBX-27567] prevented low-privilege users from modifying entities via
 .......PS. [ZBX-27638] prohibited to modify or override global system JavaScript objects via user script for preprocessing subsystem and zabbix_js (MVekslers)
 
 --------------------------------------------------------------------------------
-Changes for 7.4.13rc1
+Changes for 7.4.14rc1
 
 New features:
 
 Bug fixes:
-.........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
+..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
+.........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
+..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
+..F....... [ZBX-26465] improved aria-label text for all functional buttons and icons and aria-expanded of side menu elements for Screen Reader users (aluchko)
+..F....... [ZBX-27920] fixed event menu entry parameters being marked as required when they are disabled (scernisenko)
+..F....... [ZBX-25485] fixed language change to work for different environments (gberzina)
+..F....... [ZBX-27921] fixed item and item prototype validation of intervals for trapper and dependent items (gberzina)
+..F....... [ZBX-27942] fixed time filter error for Dashboard in Kiosk mode (scernisenko)
+..F....... [ZBX-25815] removed mention of discovery from SNMP max_repetition help note (vskalbins)
+..F....... [ZBX-27140] fixed overall hintbox positioning (dfofanovs)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.13
+
+7.4.13rc1 was released as 7.4.13 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.4.13rc1
+
+New features:
+A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
+.........T [ZBXNEXT-10558] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates (egordymov)
+
+Bug fixes:
+.......PS. [ZBX-27975] fixed potential VMware collector crash caused by network connectivity issues to vCenter (MVekslers)
+.........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates (abrosimovs)
+..F....... [ZBX-26583] fixed incorrectly displayed templates after clearing search field in host wizard (aluchko, gklavins)
+..F....... [ZBX-26953] fixed redirect functionality for discovery rules, discovery prototypes, host prototypes, web scenarios, and maps (msnihach)
+........S. [ZBX-27665] fixed remote command execution failing for trigger action operations when target host is monitored by proxy group (vsmelovs)
+..F....... [ZBX-27689] fixed permission check for bulk actions in hosts web monitoring list (scernisenko)
+...G...... [ZBX-27922] added retry to persistent buffer writes (esneiders)
+...G...... [ZBX-26916] fixed some websites not having their certificates accessed (dbriedis)
+...G...... [ZBX-27724] fixed build script for Zabbix web service (opucka)
+...G...... [ZBX-18840] fixed misleading comments in Zabbix agent 2 (dbriedis)
+...G...... [ZBX-27024] resolved system.run failing and race conditions (opucka)
+.........T [ZBX-25578] fixed GCP get db instances script (kflorowski)
+.........T [ZBX-27139] fixed naming and description of PLE trigger in MSSQL by Zabbix agent 2 template (smansurovs)
+.........T [ZBX-26704] fixed redundant preprocessing before discarding values (kflorowski)
 ........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
 
 --------------------------------------------------------------------------------
@@ -1907,13 +1985,46 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
-Changes for 7.0.29rc1
+Changes for 7.0.30rc1
 
 New features:
 
 Bug fixes:
-.........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
-..F....... [ZBX-26465] improved aria-label text for all functional buttons and icons and aria-expanded of side menu elements for Screen Reader users (aluchko)
+..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
+.........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
+..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
+..F....... [ZBX-27920] fixed event menu entry parameters being marked as required when they are disabled (scernisenko)
+..F....... [ZBX-25485] fixed language change to work for different environments (gberzina)
+..F....... [ZBX-25815] removed mention of discovery from SNMP max_repetition help note (vskalbins)
+..F....... [ZBX-27140] fixed overall hintbox positioning (dfofanovs)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.29
+
+7.0.29rc1 was released as 7.0.29 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.29rc1
+
+New features:
+A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
+
+Bug fixes:
+.......PS. [ZBX-27975] fixed potential VMware collector crash caused by network connectivity issues to vCenter (MVekslers)
+.........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates (abrosimovs)
+..F....... [ZBX-26953] fixed redirect functionality for discovery rules, host prototypes, graphs, graph prototypes, web scenarios, and maps (msnihach)
+........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
+........S. [ZBX-27665] fixed remote command execution failing for trigger action operations when target host is monitored by proxy group (vsmelovs)
+..F....... [ZBX-27689] fixed permission check for bulk actions in hosts web monitoring list (scernisenko)
+...G...... [ZBX-27922] added retry to persistent buffer writes (esneiders)
+...G...... [ZBX-26916] fixed some websites not having their certificates accessed (dbriedis)
+...G...... [ZBX-27724] fixed build script for Zabbix web service (opucka)
+...G...... [ZBX-18840] fixed misleading comments in Zabbix agent 2 (dbriedis)
+.........T [ZBX-25578] fixed GCP get db instances script (kflorowski)
+...G...... [ZBX-27024] resolved system.run failing and race conditions (opucka)
+.........T [ZBX-27139] fixed naming and description of PLE trigger in MSSQL by Zabbix agent 2 template (smansurovs)
+.........T [ZBX-26704] fixed redundant preprocessing before discarding values (kflorowski)
+..F....... [ZBX-26465] improved aria-label text for all functional buttons and icons and aria-expanding of side menu elements for screen reader users (aluchko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.28
@@ -6043,11 +6154,25 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
-Changes for 6.0.48rc1
+Changes for 6.0.49rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.48
+
+6.0.48rc1 was released as 6.0.48 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.48rc1
+
+New features:
+A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
+
+Bug fixes:
+...G...... [ZBX-27024] resolved system.run failing and race conditions (opucka)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.47

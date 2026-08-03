@@ -440,10 +440,17 @@ else {
 	];
 }
 
+$deprecation_warning = makeMessageBox(
+	class: ZBX_STYLE_MSG_WARNING,
+	messages: [],
+	title: _('Global event correlation is deprecated and may be removed in next releases.'),
+	show_close_box: false
+);
+
 $output = [
 	'header' => $data['correlation']['correlationid'] === null ? _('New event correlation') : _('Event correlation'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_EDIT),
-	'body' => $form->toString(),
+	'body' => $deprecation_warning->toString().$form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('correlation.edit.js.php').

@@ -54,7 +54,7 @@ window.ceprule_condition_edit_popup = new class {
 	}
 
 	#setValues(condition) {
-		[...this.form_element.querySelectorAll('[name]')].map((node) => {
+		this.form_element.querySelectorAll('[name]').forEach(node => {
 			if (node.type === 'radio') {
 				node.checked = node.value === condition[node.name];
 			}
@@ -62,9 +62,6 @@ window.ceprule_condition_edit_popup = new class {
 				node.value = condition[node.name] ?? '';
 			}
 		});
-
-		this.form_element.querySelector('[name="type"]').value = condition.type;
-		this.form_element.querySelector('[name="formulaid"]').value = condition.formulaid;
 	}
 
 	#handleTypeChanged(type) {
@@ -132,7 +129,7 @@ window.ceprule_condition_edit_popup = new class {
 				<?= CONDITION_OPERATOR_NOT_IN ?>
 			]
 		};
-		[...window['ceprule-condition-operator'].querySelectorAll('input')].map((node) => {
+		window['ceprule-condition-operator'].querySelectorAll('input').forEach(node => {
 			const is_type_option = condition_type_operators[Number(type)].includes(Number(node.value));
 
 			node.disabled = !is_type_option;
@@ -145,12 +142,20 @@ window.ceprule_condition_edit_popup = new class {
 			radio_inputs[0].checked = true;
 		}
 
-		[...this.form_element.querySelectorAll('[for-type]')].map((field) => {
+		this.form_element.querySelectorAll('[for-type]').forEach(field => {
 			const is_visible = Number(type) === Number(field.getAttribute('for-type'));
 
 			field.style.display = is_visible ? '' : 'none';
 			field.previousElementSibling.style.display = is_visible ? '' : 'none';
 			field.querySelector('input').disabled = !is_visible;
 		});
+	}
+
+	submit() {
+		const fields = this.form.getAllValues();
+
+		return new Promise((resolve, reject) => this.form.validateSubmit(fields)
+			.then(result => result && resolve(fields) || reject(fields))
+		);
 	}
 };

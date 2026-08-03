@@ -910,7 +910,7 @@ class testPSKEncryption extends CWebTest {
 		}
 
 		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-		$table = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 		$table->findRows('Name', $data['hosts'])->select();
 
 		// Open mass update form.

@@ -84,8 +84,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 	}
 
 	protected static function getOperationValidationFields(): array {
-		// Note: the correct fix is needed to be done in IV-core client side (BE has no issues) -
-		// when "objects" has no "fields" in rules definition it currently deteles "fields" instead of merging.
 		return [
 			'execute_when' => array_map(fn(int $window_type) => ['db cep_operation.execute_when', 'required',
 				'in' => CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$window_type],
@@ -131,7 +129,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SET_SEVERITY]
 			]],
-			'suppress_until' => ['string',
+			'suppress_until' => ['string', 'required', 'not_empty',
 				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
 			],

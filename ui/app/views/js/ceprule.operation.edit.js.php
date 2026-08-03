@@ -116,9 +116,9 @@ window.ceprule_operation_edit_popup = new class {
 		zselect.clearOptions();
 		zselect.addOptionGroup({label: <?= json_encode(_('Events')) ?>, options: events_options});
 		zselect.addOptionGroup({label: <?= json_encode(_('Tags')) ?>, options: tags_options});
+		zselect.value = type;
 
 		// Select first enabled option, if previous selection got disabled.
-		zselect.value = type;
 		if (!zselect.value.length) {
 			zselect.value = [...events_options, ...tags_options]
 				.find(option => !option.is_disabled).value;
@@ -142,10 +142,10 @@ window.ceprule_operation_edit_popup = new class {
 		this.form_element.querySelector(`[name="tag"]`).value = operation.tag;
 		this.form_element.querySelector(`[name="new_tag"]`).value = operation.new_tag;
 		this.form_element.querySelector(`[name="suppress_until"]`).value = operation.suppress_until;
-		[...this.form_element.querySelectorAll(`[name="severity"]`)].map(node => {
+		this.form_element.querySelectorAll(`[name="severity"]`).forEach(node => {
 			node.checked = node.value === operation.severity;
 		});
-		[...this.form_element.querySelectorAll(`[name="evaltype"]`)].map(node => {
+		this.form_element.querySelectorAll(`[name="evaltype"]`).forEach(node => {
 			node.checked = node.value === operation.evaltype;
 		});
 		this.form_element.querySelector(`[name="event_name"]`).value = operation.event_name;
@@ -285,8 +285,8 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 				const tag = e.target.dataset?.tag;
 
 				if (tag !== undefined) {
-					[...node.querySelectorAll('li')]
-						.map(li => li.classList.toggle('suggest-hover', tag === li.dataset.tag));
+					node.querySelectorAll('li')
+						.forEach(li => li.classList.toggle('suggest-hover', tag === li.dataset.tag));
 				}
 			});
 
