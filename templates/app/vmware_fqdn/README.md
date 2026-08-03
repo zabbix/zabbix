@@ -10,6 +10,8 @@ This template set is designed for the effortless deployment of VMware vCenter an
 
 For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/7.0/manual/vm_monitoring).
 
+**Note:** VMware alarm item/trigger prototype names include the alarm entity name since template version 7.0.26. The entity name value itself is only returned by Zabbix server 7.0.28 and higher - on earlier servers, `{#VMWARE.ALARMS.ENTITY.NAME}` will remain unresolved.
+
 ## Requirements
 
 Zabbix version: 7.0 and higher.
