@@ -33,6 +33,12 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#condition_rules;
 
+	/** @type {Object} */
+	#execute_when_by_window_type;
+
+	/** @type {Object} */
+	#operation_types_by_execute_when;
+
 	/** @type {Template} */
 	#condition_row_template;
 
@@ -57,10 +63,13 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#rules_for_clone;
 
-	init({rules, rules_for_clone, operation_rules, condition_rules, ceprule}) {
+	init({rules, rules_for_clone, operation_rules, condition_rules, operation_types_by_execute_when,
+			execute_when_by_window_type, ceprule}) {
 		this.#rules_for_clone = rules_for_clone;
 		this.#initTemplates();
 		this.#condition_rules = condition_rules;
+		this.#operation_types_by_execute_when = operation_types_by_execute_when;
+		this.#execute_when_by_window_type = execute_when_by_window_type;
 		this.#operation_rules = operation_rules;
 		this.#overlay = overlays_stack.getById('ceprule.edit');
 		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
@@ -618,7 +627,9 @@ window.ceprule_edit_popup = new class {
 		});
 
 		ceprule_operation_edit_popup.init({rules: this.#operation_rules, operation, overlay,
-			window_type: this.form.findFieldByName('window_type').getValue()
+			window_type: this.form.findFieldByName('window_type').getValue(),
+			operation_types_by_execute_when: this.#operation_types_by_execute_when,
+			execute_when_by_window_type: this.#execute_when_by_window_type
 		});
 	}
 
