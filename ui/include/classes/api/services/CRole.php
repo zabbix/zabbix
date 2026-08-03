@@ -1150,7 +1150,7 @@ class CRole extends CApiService {
 			'value' => $new_rules['api.access']
 		];
 
-		if ($new_rules['api.access'] == ZBX_ROLE_RULE_ENABLED) { // in jenkins tests there is no api.access key in $new_rules
+		if ($new_rules['api.access'] == ZBX_ROLE_RULE_ENABLED) {
 			$compiled_rules[] = [
 				'name' => 'api.mode',
 				'type' => self::RULE_TYPE_INT32,
