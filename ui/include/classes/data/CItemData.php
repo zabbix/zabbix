@@ -108,7 +108,7 @@ final class CItemData {
 			'vfs.file.size[file,<mode>]',
 			'vfs.file.time[file,<mode>]',
 			'vfs.fs.discovery',
-			'vfs.fs.get',
+			'vfs.fs.get[<mode>,<mountpoint>]',
 			'vfs.fs.inode[fs,<mode>]',
 			'vfs.fs.size[fs,<mode>]',
 			'vm.memory.size[<mode>]',
@@ -216,7 +216,7 @@ final class CItemData {
 			'vfs.file.size[file,<mode>]',
 			'vfs.file.time[file,<mode>]',
 			'vfs.fs.discovery',
-			'vfs.fs.get',
+			'vfs.fs.get[<mode>,<mountpoint>]',
 			'vfs.fs.inode[fs,<mode>]',
 			'vfs.fs.size[fs,<mode>]',
 			'vm.memory.size[<mode>]',
@@ -1864,8 +1864,8 @@ final class CItemData {
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#vfs.fs.discovery'
 				]
 			],
-			'vfs.fs.get' => [
-				'description' => _('List of mounted filesystems, their types, disk space and inode statistics. Returns JSON'),
+			'vfs.fs.get[<mode>,<mountpoint>]' => [
+				'description' => _('List of mounted filesystems, their types, disk space and inode statistics. Returns JSON. mode: full(default), short; mountpoint: exact match.'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#vfs.fs.get',
