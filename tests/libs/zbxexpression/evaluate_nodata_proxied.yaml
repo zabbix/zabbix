@@ -1,3 +1,4 @@
+---
 test case: DEV-4972 - proxied nodata(5m) no longer sticks forever on a metadata-only (NOVALUE) cached tail (covers log entries with metadata but no value, and preprocessing discarding the value)
 in:
   history:
@@ -439,3 +440,4 @@ in:
 out:
   return: FAIL
   error: 'item does not have enough data after server start or item creation'
+...
