@@ -228,6 +228,13 @@ class testTriggerCEP extends CIntegrationTest {
 	// like any other, so the two must close the same problems. The rule of a variant is named after the flavour it
 	// varies with this suffix appended, see buildEvictCloseRuleName().
 	const CEP_RULE_WINDOW_CLOSE_EVICT_SUFFIX = ' with evict close';
+	// The reset scenario (see prepareDataCepWindowResetOperations()) is run once per window type that has a window
+	// at all: resetting a rule throws away the windows it has open, and what a window holds is the one thing every
+	// window type keeps, so each of them must lose it the same way.
+	const CEP_RULE_WINDOW_SIMPLE_RESET = self::CEP_RULE_NAME_PREFIX.'window simple reset';
+	const CEP_RULE_WINDOW_TAG_RESET = self::CEP_RULE_NAME_PREFIX.'window tag reset';
+	const CEP_RULE_WINDOW_CAUSE_RESET = self::CEP_RULE_NAME_PREFIX.'window cause reset';
+	const CEP_RULE_WINDOW_PATTERN_RESET = self::CEP_RULE_NAME_PREFIX.'window pattern reset';
 	// The built in tag telling a symptom apart from a cause, the counterpart of CEP_TAG_IS_COPIED for the rank a
 	// cause and symptom window assigns.
 	const CEP_TAG_IS_SYMPTOM = '$IS.SYMPTOM';
@@ -2714,6 +2721,108 @@ HEREDOC;
 				]
 			]);
 		}
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
+			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the simple window flavour of the reset scenario, see prepareDataCepWindowResetOperations().
+	 */
+	public function prepareDataCepWindowSimpleReset() {
+		return $this->prepareDataCepWindowResetOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_RESET
+		);
+	}
+
+	/**
+	 * Prepare the tag correlation flavour of the reset scenario, see prepareDataCepWindowResetOperations().
+	 */
+	public function prepareDataCepWindowTagReset() {
+		return $this->prepareDataCepWindowResetOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+			self::CEP_RULE_WINDOW_TAG_RESET
+		);
+	}
+
+	/**
+	 * Prepare the cause and symptom flavour of the reset scenario, see prepareDataCepWindowResetOperations().
+	 */
+	public function prepareDataCepWindowCauseSymptomReset() {
+		return $this->prepareDataCepWindowResetOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_WINDOW_CAUSE_RESET
+		);
+	}
+
+	/**
+	 * Prepare the pattern match flavour of the reset scenario, see prepareDataCepWindowResetOperations().
+	 */
+	public function prepareDataCepWindowPatternReset() {
+		return $this->prepareDataCepWindowResetOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_RESET
+		);
+	}
+
+	/**
+	 * Prepare the reset scenario: the same window every close window flavour uses - one per id, grouped by the
+	 * 'service' tag and outlasting the whole scenario (CEP_RULE_WINDOW_CAPACITY_DURATION), so what a window holds
+	 * is exactly the events of its id and only the operations may end it - given the two operations that make what
+	 * a window holds visible from the outside:
+	 *   - "close window" when an "up" event occurs, restricted to those events by a tag exists condition on
+	 *     CEP_STATE_TAG_UP, a tag only an "up" event carries because its name is resolved from the item value;
+	 *   - "close" when the window closes, which reaches every event that window held.
+	 *
+	 * Together they close the problems of an id the moment it recovers, exactly as the arrival flavour of the close
+	 * window scenario does (prepareDataCepWindowCloseWindowOperations()) - which is what the reset is measured
+	 * against: a window that was reset holds nothing any more, so the "up" event of an id can only close itself,
+	 * and the "down" problem that had been in the window before the reset is left open for the trigger expression
+	 * to recover. Neither operation is tied to the window type, so every window type is given the same pair and
+	 * must produce the same outcome, see runEventAssessmentTestCepWindowReset().
+	 *
+	 * $window_type is the type under test. A pattern match window cannot be without a script and this scenario is
+	 * not driven by a match, so that type gets one that never reports one - the events of its window are only ever
+	 * acted on by the operations above, as in the window types that have no script at all.
+	 */
+	private function prepareDataCepWindowResetOperations(int $window_type, string $name) {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// The rule of this scenario is the only thing that may close a problem.
+		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
+
+		$window = [
+			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
+			// Every event must be held: the reset is about what a window has in it, so nothing may be evicted for
+			// not fitting.
+			'capacity' => 0,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => ['service']
+		];
+
+		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+			$window['script'] = "return 'false';";
+		}
+
+		$operations = [
+			[
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+			],
+			[
+				'sortorder' => 1,
+				'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
+				'type' => CCepRuleHelper::OP_CLOSE
+			]
+		];
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
@@ -7986,6 +8095,81 @@ HEREDOC;
 		}
 	}
 
+	/* Reset of a rule - test that the windows of each window type are thrown away with it */
+
+	/**
+	 * Resetting a rule whose simple windows are holding the problems of three ids: the windows are thrown away
+	 * with everything in them, so the problems they were holding are left to the trigger expression - see
+	 * runEventAssessmentTestCepWindowReset().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleReset$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleReset() {
+		$this->prepareDataCepWindowSimpleReset();
+
+		try {
+			$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_SIMPLE_RESET);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same reset scenario with tag correlation windows: correlating the events of a group is not what keeps
+	 * them, so a reset must empty this window type exactly as it empties a simple one - see
+	 * runEventAssessmentTestCepWindowReset().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagReset$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagReset() {
+		$this->prepareDataCepWindowTagReset();
+
+		try {
+			$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_TAG_RESET);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same reset scenario with cause and symptom windows, the one window type that ranks what it is given: the
+	 * reset takes the cause of every id with the window that ranked it, so the "up" event that follows the reset
+	 * opens a window of its own and is the cause of it rather than a symptom of the event before it - see
+	 * runEventAssessmentTestCepWindowReset().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomReset$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomReset() {
+		$this->prepareDataCepWindowCauseSymptomReset();
+
+		try {
+			$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_CAUSE_RESET);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same reset scenario with pattern match windows, the one window type that is examined on its own: a reset
+	 * window is gone rather than closed, so nothing examines it again and the events it held are not acted on by
+	 * anything - see runEventAssessmentTestCepWindowReset().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternReset$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternReset() {
+		$this->prepareDataCepWindowPatternReset();
+
+		try {
+			$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_PATTERN_RESET);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
 	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
@@ -9707,6 +9891,99 @@ HEREDOC;
 	}
 
 	/**
+	 * Drive the reset scenario of the $rule_name rule, whose windows hold the problems of the ids that opened them
+	 * and close them once that id recovers, see prepareDataCepWindowResetOperations(). The rule is reset while its
+	 * windows are full, and what that must do is asserted from the outside, by what the rule can and cannot close
+	 * afterwards:
+	 *
+	 *   1. every id gets a window of its own and no window expires, so the three "down" values leave three open
+	 *      problems, one held by each window;
+	 *   2. the rule is reset. A reset window is thrown away rather than closed - the operations of a closing window
+	 *      are not performed for the events it held - so nothing of the three problems changes;
+	 *   3. the "up" value of one id would, without the reset, have closed both problems of that id: it ends the
+	 *      window of its id and everything that window holds is closed with it. After the reset the window it ends
+	 *      is one it opened itself, holding nothing but the "up" event, so the only problem closed is its own and
+	 *      the "down" problem of that id stays open. That is what the reset did, measured on the rule itself;
+	 *   4. nothing else closed the three "down" problems, so the trigger expression has to - the recovery value
+	 *      closes what is left and returns the trigger to OK, and the rule that was reset is still there and still
+	 *      working while that happens.
+	 *
+	 * The scenario is the same for every window type: what a window holds is not what tells the types apart, so a
+	 * reset must take it away from all of them alike.
+	 */
+	private function runEventAssessmentTestCepWindowReset(string $rule_name): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the reset test of "'.$rule_name.'".');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$services = [self::CEP_RULE_WINDOW_NONE_SERVICE, self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT,
+			self::CEP_RULE_WINDOW_NONE_SERVICE_LAST
+		];
+
+		// 1. Every id takes the place its own window has for it, and a window that has seen no "up" event is not
+		//    closed, so every problem stays open.
+		$open = 0;
+
+		foreach ($services as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, ++$open);
+			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+			$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
+		}
+
+		// 2. Reset the rule while all three windows are holding a problem. The request only queues the reset, so
+		//    the queue is waited out before anything is sent that its outcome is read from.
+		$this->resetCepRule($rule_name);
+		$this->waitForCepTasksDrained();
+
+		// A window is discarded by a reset, not closed: the "close" operation of a closing window is not performed
+		// for the events it held, so the problems are exactly as they were.
+		$this->waitForOpenProblemCount($all, $open);
+
+		// 3. The id whose recovery is used to look into the window that was reset. Any of them would do - they are
+		//    told apart by nothing but their tag, and each has a window of its own.
+		$probe = $services[0];
+
+		$send('up_'.$probe);
+
+		try {
+			// The "up" event is a problem of its own, because "up" is not a recovery value for this trigger, and
+			// it is the only problem of the id the rule can still close: it ends the window it has just opened,
+			// which holds nothing else. Had the reset left the window of the id in place, the "down" problem
+			// would have been closed with it and this would be waiting for an open problem that no longer exists.
+			$this->waitForProblemEventCountByTag($all, 'service', $probe, 2);
+			$this->waitForOpenProblemCountByTag($all, 'service', $probe, 1);
+		}
+		catch (Throwable $e) {
+			$error = $this->getCepRuleError($rule_name);
+
+			$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error: '.$error);
+
+			throw $e;
+		}
+
+		// The ids that were not sent an "up" value are untouched, so all three "down" problems are still open.
+		$this->waitForOpenProblemCount($all, $open);
+
+		// 4. Nothing closed them, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the window reset scenario of "'.$rule_name.'"');
+	}
+
+	/**
 	 * Drive the cause and symptom grouping flavour: every value goes into the same group, so the problem of
 	 * the first one becomes the cause and each of the following ones becomes a symptom of it as it arrives.
 	 * Nothing closes anything, so all three problems stay open, ranked but otherwise untouched, and the
@@ -10526,6 +10803,44 @@ HEREDOC;
 		]);
 
 		return $response['result'] ? $response['result'][0]['error'] : '';
+	}
+
+	/**
+	 * Ask the server to reset the CEP rule named $name, the request the frontend sends when a rule is reset from
+	 * the user interface (see CZabbixServer::resetCepRule()). There is no API method for it, so the rule is looked
+	 * up by name and the server is asked directly, over the same trapper request and with the same session the
+	 * frontend would use.
+	 *
+	 * The server only queues the reset before answering, so a successful response means the request was accepted
+	 * and not that the windows of the rule are gone yet - see waitForCepTasksDrained().
+	 */
+	private function resetCepRule(string $name): void {
+		$response = $this->call('ceprule.get', [
+			'filter' => ['name' => $name],
+			'output' => ['cep_ruleid']
+		]);
+
+		$this->assertNotEmpty($response['result'], 'There is no CEP rule named "'.$name.'" to reset.');
+
+		$client = $this->getClient(self::COMPONENT_SERVER);
+		$result = $client->resetCepRule(['cep_ruleid' => $response['result'][0]['cep_ruleid']],
+			$this->getApiSessionId()
+		);
+
+		$this->assertNotFalse($result,
+			'The server refused to reset the CEP rule "'.$name.'": '.$client->getError()
+		);
+	}
+
+	/**
+	 * Wait until the CEP service has nothing left to do: both of its task queues are empty, so everything that had
+	 * been queued - the reset of a rule among it - has been carried out. Only the queued work is waited for, not
+	 * what it leads to elsewhere, so this is a starting point for the assertions that follow rather than one of
+	 * them.
+	 */
+	private function waitForCepTasksDrained(): void {
+		$this->assertCepStatEquals('tasks', 'remote', 0);
+		$this->assertCepStatEquals('tasks', 'internal', 0);
 	}
 
 	/**
