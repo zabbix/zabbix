@@ -41,7 +41,7 @@ class CCepRule extends CApiService {
 	];
 
 	public const OPERATIONS_OUTPUT_FIELDS = ['sortorder', 'execute_when', 'evaltype', 'tags', 'type', 'event_name',
-		'severity', 'suppress_until', 'tag', 'new_tag', 'tag_value'
+		'severity', 'suppress_duration', 'tag', 'new_tag', 'tag_value'
 	];
 
 	public function get(array $options = []): array|string {
@@ -689,11 +689,11 @@ class CCepRule extends CApiService {
 											])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
 											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'severity')]
 					]],
-					'suppress_until' =>	['type' => API_MULTIPLE, 'rules' => [
+					'suppress_duration' =>	['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'type', 'in' => implode(',', [
 												CCepRuleHelper::OP_SUPPRESS
-											])], 'type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
-											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'suppress_until')]
+											])], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED],
+											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'suppress_duration')]
 					]],
 					'tag' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'type', 'in' => implode(',', [
