@@ -32,22 +32,22 @@
 #include "mocks/valuecache/valuecache_mock.h"
 #include "../../../src/libs/zbxtrends/trends.h"
 
-/* DEV-4972: nodata() on a proxied item in lazy mode also consults the proxy's suppression window      */
-/* (zbx_dc_get_proxy_nodata_win) and the history cache tail state (zbx_hc_is_itemid_cached_and_normal(),*/
-/* fixed in cachehistory.c) to decide whether it might still be waiting on data still in transit from   */
+/* DEV-4972: nodata() on a proxied item in lazy mode also consults the proxy's suppression window        */
+/* (zbx_dc_get_proxy_nodata_win) and the history cache tail state (zbx_hc_is_itemid_cached_and_normal(), */
+/* fixed in cachehistory.c) to decide whether it might still be waiting on data still in transit from    */
 /* the proxy. zbx_dc_get_proxy_nodata_win() is wrapped (there is no lightweight way to fake a proxy's    */
 /* real DC config cache state here), but zbx_hc_is_itemid_cached_and_normal() itself is NOT wrapped -    */
 /* instead a real, minimal history cache is initialised (zbx_init_database_cache()) and a real tail      */
-/* record is pushed into it through the actual production write path (zbx_dc_add_history_variant() +    */
+/* record is pushed into it through the actual production write path (zbx_dc_add_history_variant() +     */
 /* zbx_dc_flush_history()), so evaluate_NODATA() ends up calling the real, unmodified fixed function.    */
 /* zbx_hashset_search() itself is deliberately left unwrapped for this reason too - wrapping it would    */
-/* also hijack the value cache's own internal item index used by every other test case in this file.    */
-/* These knobs are all optional and default to values that reproduce the pre-existing (proxyid == 0)    */
-/* behaviour untouched, so none of the other function test cases here are affected. */
+/* also hijack the value cache's own internal item index used by every other test case in this file.     */
+/* These knobs are all optional and default to values that reproduce the pre-existing (proxyid == 0)     */
+/* behaviour untouched, so none of the other function test cases here are affected.                      */
 static unsigned char	mock_proxy_flags;
 static int		mock_proxy_lastaccess_age;
 
-static int	zbx_mock_get_optional_parameter_int(const char *path, int default_value)
+static int	get_optional_parameter_int(const char *path, int default_value)
 {
 	const char	*value;
 
@@ -58,8 +58,8 @@ static int	zbx_mock_get_optional_parameter_int(const char *path, int default_val
 }
 
 /* mirrors zbx_mock_str_to_value_type()'s pattern (tests/zbxmockutil.c) so item state reads as a name */
-/* in the yaml (e.g. "ITEM_STATE_NOTSUPPORTED") instead of an opaque 0/1 integer.                      */
-static unsigned char	zbx_mock_str_to_item_state(const char *str)
+/* in the yaml (e.g. "ITEM_STATE_NOTSUPPORTED") instead of an opaque 0/1 integer.                     */
+static unsigned char	str_to_item_state(const char *str)
 {
 	if (0 == strcmp(str, "ITEM_STATE_NORMAL"))
 		return ITEM_STATE_NORMAL;
@@ -72,20 +72,20 @@ static unsigned char	zbx_mock_str_to_item_state(const char *str)
 	return ITEM_STATE_NORMAL;
 }
 
-static unsigned char	zbx_mock_get_optional_item_state(const char *path, unsigned char default_value)
+static unsigned char	get_optional_item_state(const char *path, unsigned char default_value)
 {
 	const char	*value;
 
 	if (NULL == (value = zbx_mock_get_optional_parameter_string(path)))
 		return default_value;
 
-	return zbx_mock_str_to_item_state(value);
+	return str_to_item_state(value);
 }
 
-/* reads a yaml sequence of flag names (e.g. "[ZBX_PROXY_SUPPRESS_ACTIVE, ZBX_PROXY_SUPPRESS_MORE]")  */
-/* and ORs them together via name_to_bit, so multi-bit fields read as names instead of an opaque      */
-/* combined integer. An absent key or an empty list both mean "no flags set". */
-static unsigned char	zbx_mock_get_optional_flag_list(const char *path, unsigned char (*name_to_bit)(const char *))
+/* reads a yaml sequence of flag names (e.g. "[ZBX_PROXY_SUPPRESS_ACTIVE, ZBX_PROXY_SUPPRESS_MORE]") */
+/* and ORs them together via name_to_bit, so multi-bit fields read as names instead of an opaque     */
+/* combined integer. An absent key or an empty list both mean "no flags set".                        */
+static unsigned char	get_optional_flag_list(const char *path, unsigned char (*name_to_bit)(const char *))
 {
 	zbx_mock_handle_t	handle, element;
 	zbx_mock_error_t	err;
@@ -106,7 +106,7 @@ static unsigned char	zbx_mock_get_optional_flag_list(const char *path, unsigned 
 	return flags;
 }
 
-static unsigned char	zbx_mock_str_to_proxy_suppress_flag(const char *str)
+static unsigned char	str_to_proxy_suppress_flag(const char *str)
 {
 	if (0 == strcmp(str, "ZBX_PROXY_SUPPRESS_ACTIVE"))
 		return ZBX_PROXY_SUPPRESS_ACTIVE;
@@ -124,8 +124,8 @@ static unsigned char	zbx_mock_str_to_proxy_suppress_flag(const char *str)
 
 /* only ZBX_DC_FLAG_NOVALUE is actually actioned by zbx_vcmock_push_history_tail() below - the fix    */
 /* under test only inspects that one bit - but the full name set is recognised so a yaml author can't */
-/* silently typo a flag name into a no-op. */
-static unsigned char	zbx_mock_str_to_dc_flag(const char *str)
+/* silently typo a flag name into a no-op.                                                            */
+static unsigned char	str_to_dc_flag(const char *str)
 {
 	if (0 == strcmp(str, "ZBX_DC_FLAG_META"))
 		return ZBX_DC_FLAG_META;
@@ -165,6 +165,12 @@ static void	zbx_dummy_history_sync(int *values_num, int *triggers_num, const zbx
 	*more = 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initializes a minimal, real history cache so that the fixed      *
+ *          zbx_hc_is_itemid_cached_and_normal() can be exercised unwrapped  *
+ *                                                                            *
+ ******************************************************************************/
 static void	zbx_vcmock_ensure_history_cache(void)
 {
 	char		*error = NULL;
@@ -177,6 +183,13 @@ static void	zbx_vcmock_ensure_history_cache(void)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: pushes a history cache tail record for itemid through the        *
+ *          production write path (zbx_dc_add_history_variant() +           *
+ *          zbx_dc_flush_history())                                         *
+ *                                                                            *
+ ******************************************************************************/
 static void	zbx_vcmock_push_history_tail(zbx_uint64_t itemid, unsigned char value_type, zbx_timespec_t ts,
 		int novalue, int notsupported)
 {
@@ -213,8 +226,8 @@ int	__wrap_zbx_dc_get_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t
 	return SUCCEED;
 }
 
-/* zbx_dc_flush_history()'s VPS (values-per-second licensing) accounting step reads the separate DC   */
-/* config cache singleton (get_dc_config()), which a lightweight history-cache-only test has no       */
+/* zbx_dc_flush_history()'s VPS (values-per-second licensing) accounting step reads the separate DC    */
+/* config cache singleton (get_dc_config()), which a lightweight history-cache-only test has no        */
 /* reason to bootstrap - it is pure telemetry, not part of the nodata()/is_itemid_cached_and_normal()  */
 /* decision logic under test here, so it is stubbed out rather than initialising a second subsystem.   */
 void	__wrap_zbx_vps_monitor_add_collected(zbx_uint64_t values_num)
@@ -331,10 +344,10 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vcmock_set_time(handle, "time");
 	ts = zbx_vcmock_get_ts();
 
-	mock_proxy_flags = zbx_mock_get_optional_flag_list("in.proxy_flags", zbx_mock_str_to_proxy_suppress_flag);
-	mock_proxy_lastaccess_age = zbx_mock_get_optional_parameter_int("in.proxy_lastaccess_age", 0);
+	mock_proxy_flags = get_optional_flag_list("in.proxy_flags", str_to_proxy_suppress_flag);
+	mock_proxy_lastaccess_age = get_optional_parameter_int("in.proxy_lastaccess_age", 0);
 
-	if (0 != zbx_mock_get_optional_parameter_int("in.proxyid", 0))
+	if (0 != get_optional_parameter_int("in.proxyid", 0))
 	{
 		unsigned char	tail_flags;
 
@@ -342,23 +355,23 @@ void	zbx_mock_test_entry(void **state)
 		/* singleton, so it must exist even for the "nothing cached for this item" scenario     */
 		zbx_vcmock_ensure_history_cache();
 
-		if (0 != zbx_mock_get_optional_parameter_int("in.tail_exists", 0))
+		if (0 != get_optional_parameter_int("in.tail_exists", 0))
 		{
 			zbx_timespec_t	tail_ts = ts;
 
-			tail_flags = zbx_mock_get_optional_flag_list("in.tail_flags", zbx_mock_str_to_dc_flag);
-			tail_ts.sec -= zbx_mock_get_optional_parameter_int("in.tail_ts_offset", 0);
+			tail_flags = get_optional_flag_list("in.tail_flags", str_to_dc_flag);
+			tail_ts.sec -= get_optional_parameter_int("in.tail_ts_offset", 0);
 			zbx_vcmock_push_history_tail(item.itemid, item.value_type, tail_ts,
 					0 != (tail_flags & ZBX_DC_FLAG_NOVALUE),
 					ITEM_STATE_NOTSUPPORTED ==
-							zbx_mock_get_optional_item_state("in.tail_state",
+							get_optional_item_state("in.tail_state",
 									ITEM_STATE_NORMAL));
 		}
 	}
 
 	evaluate_item.itemid = item.itemid;
 	evaluate_item.value_type = item.value_type;
-	evaluate_item.proxyid = (0 != zbx_mock_get_optional_parameter_int("in.proxyid", 0) ? 1 : item.host.proxyid);
+	evaluate_item.proxyid = (0 != get_optional_parameter_int("in.proxyid", 0) ? 1 : item.host.proxyid);
 	evaluate_item.host = item.host.host;
 	evaluate_item.key_orig = item.key_orig;
 
