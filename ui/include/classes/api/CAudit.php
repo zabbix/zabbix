@@ -87,7 +87,8 @@ class CAudit {
 	public const RESOURCE_MFA = 54;
 	public const RESOURCE_PROXY_GROUP = 55;
 	public const RESOURCE_LLD_RULE_PROTOTYPE = 56;
-	public const RESOURCE_CEP_RULE = 57;
+	public const RESOURCE_DEVICE = 57;
+	public const RESOURCE_CEP_RULE = 58;
 
 	/**
 	 * Audit details actions.
@@ -118,6 +119,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_DEVICE => 'device',
 		self::RESOURCE_LLD_RULE => 'items',
 		self::RESOURCE_LLD_RULE_PROTOTYPE => 'items',
 		self::RESOURCE_HOST => 'hosts',
@@ -171,6 +173,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'name',
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
+		self::RESOURCE_DEVICE => 'name',
 		self::RESOURCE_LLD_RULE => 'name',
 		self::RESOURCE_LLD_RULE_PROTOTYPE => 'name',
 		self::RESOURCE_HOST => 'host',
@@ -216,6 +219,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_DEVICE => 'device',
 		self::RESOURCE_LLD_RULE => 'discoveryrule',
 		self::RESOURCE_LLD_RULE_PROTOTYPE => 'discoveryruleprototype',
 		self::RESOURCE_HOST => 'host',
@@ -271,6 +275,9 @@ class CAudit {
 				'conditions' => ['authtype' => ZBX_HTTP_AUTH_BEARER]
 			],
 			['paths' => ['connector.ssl_key_password']]
+		],
+		self::RESOURCE_DEVICE => [
+			'paths' => ['device.push_token', 'device.keys.key_']
 		],
 		self::RESOURCE_LLD_RULE => [
 			[
@@ -423,6 +430,7 @@ class CAudit {
 		'ceprule.operations.tags' => 'cep_operation_condition',
 		'ceprule.window' => 'cep_window',
 		'connector.tags' => 'connector_tag',
+		'connector.tags' => 'connector_tag',
 		'correlation.filter' => 'correlation',
 		'correlation.filter.conditions' => 'corr_condition',
 		'correlation.operations' => 'corr_operation',
@@ -431,6 +439,7 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_page',
 		'dashboard.pages.widgets' => 'widget',
 		'dashboard.pages.widgets.fields' => 'widget_field',
+		'device.keys' => 'device_key',
 		'discoveryrule.filter' => 'items',
 		'discoveryrule.filter.conditions' => 'item_condition',
 		'discoveryrule.lld_macro_paths' => 'lld_macro_path',
@@ -536,6 +545,9 @@ class CAudit {
 		'action.operations.opmessage_usr' => 'opmessage_usrid',
 		'action.operations.opcommand_grp' => 'opcommand_grpid',
 		'action.operations.opcommand_hst' => 'opcommand_hstid',
+		'ceprule.filter.conditions' => 'cep_conditionid',
+		'ceprule.operations' => 'cep_operationid',
+		'ceprule.operations.tags' => 'cep_operation_conditionid',
 		'action.operations.opgroup' => 'opgroupid',
 		'action.operations.optemplate' => 'optemplateid',
 		'action.operations.optag' => 'optagid',
@@ -549,9 +561,6 @@ class CAudit {
 		'action.update_operations.opmessage_usr' => 'opmessage_usrid',
 		'action.update_operations.opcommand_grp' => 'opcommand_grpid',
 		'action.update_operations.opcommand_hst' => 'opcommand_hstid',
-		'ceprule.filter.conditions' => 'cep_conditionid',
-		'ceprule.operations' => 'cep_operationid',
-		'ceprule.operations.tags' => 'cep_operation_conditionid',
 		'connector.tags' => 'connector_tagid',
 		'correlation.filter.conditions' => 'corr_conditionid',
 		'correlation.operations' => 'corr_operationid',
@@ -560,6 +569,7 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_pageid',
 		'dashboard.pages.widgets' => 'widgetid',
 		'dashboard.pages.widgets.fields' => 'widget_fieldid',
+		'device.keys' => 'device_keyid',
 		'discoveryrule.filter.conditions' => 'item_conditionid',
 		'discoveryrule.headers' => 'sortorder',
 		'discoveryrule.lld_macro_paths' => 'lld_macro_pathid',

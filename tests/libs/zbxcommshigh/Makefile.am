@@ -10,7 +10,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 COMMSHIGH_LIBS = \
-	$(COMMSHIGH_DEPS) \
+	$(ANY_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

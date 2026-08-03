@@ -31,7 +31,7 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			['role.get', ['name' => '{name}'], 'roleid']
 		];
 
-		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+		$rules = ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'roleid' => ['db role.roleid', 'required'],
 			'name' => ['db role.name', 'required', 'not_empty'],
 			'type' => ['db role.type', 'required', 'in' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN,
@@ -97,6 +97,18 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			],
 			'form_refresh' => ['integer']
 		]];
+
+		if (CSettingsHelper::isMobileDevicesEnabled()) {
+			$rules['fields'] += [
+				'devices_access' => ['boolean'],
+				'devices_actions' => ['array', 'required',
+					'field' => ['string', 'in' => CRoleHelper::getDeviceActionsByUserType(USER_TYPE_SUPER_ADMIN)]
+				],
+				'devices_actions_default_access' => ['boolean']
+			];
+		}
+
+		return $rules;
 	}
 
 	protected function checkInput(): bool {

@@ -2519,7 +2519,19 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
 			'priority' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'lastchange' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -2531,6 +2543,12 @@ return [
 				'length' => 65535,
 				'default' => ''
 			],
+			'error' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			],
 			'templateid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
@@ -2539,6 +2557,12 @@ return [
 				'ref_field' => 'triggerid'
 			],
 			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'state' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -4849,12 +4873,6 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
-			],
-			'flags' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
 			]
 		]
 	],
@@ -5029,19 +5047,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'maintenances',
 				'ref_field' => 'maintenanceid'
-			],
-			'details' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => ''
-			],
-			'cep_ruleid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'cep_rule',
-				'ref_field' => 'cep_ruleid'
 			]
 		]
 	],
@@ -6554,19 +6559,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'events',
 				'ref_field' => 'eventid'
-			],
-			'cep_ruleid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'cep_rule',
-				'ref_field' => 'cep_ruleid'
-			],
-			'flags' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
 			]
 		]
 	],
@@ -6672,13 +6664,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
-			],
-			'cep_ruleid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'cep_rule',
-				'ref_field' => 'cep_ruleid'
 			]
 		]
 	],
@@ -7748,13 +7733,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
-			],
-			'cep_ruleid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'cep_rule',
-				'ref_field' => 'cep_ruleid'
 			]
 		]
 	],
@@ -8485,6 +8463,12 @@ return [
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
+			],
+			'auth_scheme' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
@@ -10279,69 +10263,45 @@ return [
 			]
 		]
 	],
-	'trigger_rtdata' => [
-		'key' => 'triggerid',
+	'dpop_jti_cache' => [
+		'key' => 'jti',
 		'fields' => [
-			'triggerid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'triggers',
-				'ref_field' => 'triggerid'
-			],
-			'value' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'state' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'lastchange' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'error' => [
+			'jti' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'length' => 36,
 				'default' => ''
+			],
+			'expires_at' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
-	'cep_rule' => [
-		'key' => 'cep_ruleid',
+	'device' => [
+		'key' => 'deviceid',
 		'fields' => [
-			'cep_ruleid' => [
+			'deviceid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'name' => [
+			'userid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid'
+			],
+			'uuid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 36,
 				'default' => ''
 			],
-			'description' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'length' => 65535,
-				'default' => ''
-			],
-			'evaltype' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'formula' => [
+			'name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
@@ -10353,13 +10313,13 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'stop' => [
+			'push_token' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1'
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
 			],
-			'sortorder' => [
+			'activated_at' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -10367,343 +10327,93 @@ return [
 			]
 		]
 	],
-	'cep_rule_rtdata' => [
-		'key' => 'cep_ruleid',
+	'token_device' => [
+		'key' => 'tokenid',
 		'fields' => [
-			'cep_ruleid' => [
+			'tokenid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'cep_rule',
-				'ref_field' => 'cep_ruleid'
+				'ref_table' => 'token',
+				'ref_field' => 'tokenid'
 			],
-			'error' => [
+			'deviceid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => ''
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'device',
+				'ref_field' => 'deviceid'
 			]
 		]
 	],
-	'cep_condition' => [
-		'key' => 'cep_conditionid',
+	'device_key' => [
+		'key' => 'device_keyid',
 		'fields' => [
-			'cep_conditionid' => [
+			'device_keyid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'cep_ruleid' => [
+			'deviceid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'cep_rule',
-				'ref_field' => 'cep_ruleid'
+				'ref_table' => 'device',
+				'ref_field' => 'deviceid'
 			],
-			'type' => [
+			'scope' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '25'
+				'default' => '0'
 			],
-			'operator' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '12'
-			],
-			'event_name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => ''
-			],
-			'tag' => [
+			'kid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
 			],
-			'tag_value' => [
+			'key_' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 512,
 				'default' => ''
 			],
-			'host' => [
+			'active' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'created_at' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			]
+		]
+	],
+	'device_enrollment_token' => [
+		'key' => 'deviceid',
+		'fields' => [
+			'deviceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'device',
+				'ref_field' => 'deviceid'
+			],
+			'token' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
 				'default' => ''
 			],
-			'host_group' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'time_period' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'severity' => [
+			'expires_at' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
-			]
-		]
-	],
-	'cep_window' => [
-		'key' => 'cep_ruleid',
-		'fields' => [
-			'cep_ruleid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'cep_rule',
-				'ref_field' => 'cep_ruleid'
-			],
-			'type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1'
-			],
-			'duration' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '0'
-			],
-			'capacity' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '0'
-			],
-			'script' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'length' => 65535,
-				'default' => ''
-			],
-			'group_by_host_group' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'group_by_host' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'group_by_tags' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'tags' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'event_count_tag' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			]
-		]
-	],
-	'cep_group' => [
-		'key' => 'cep_groupid',
-		'fields' => [
-			'cep_groupid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'cep_ruleid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'group_by' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10
-			],
-			'groupid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'hostid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'tags' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'length' => 65535,
-				'default' => ''
-			],
-			'tags_value' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'nextcheck' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10
-			]
-		]
-	],
-	'cep_group_event' => [
-		'key' => 'cep_group_eventid',
-		'fields' => [
-			'cep_group_eventid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'cep_groupid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'eventid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			]
-		]
-	],
-	'cep_operation' => [
-		'key' => 'cep_operationid',
-		'fields' => [
-			'cep_operationid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'cep_ruleid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'cep_rule',
-				'ref_field' => 'cep_ruleid'
-			],
-			'execute_when' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1'
-			],
-			'evaltype' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'event_name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => ''
-			],
-			'tag' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'new_tag' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'tag_value' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'severity' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'suppress_duration' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 32,
-				'default' => '0'
-			],
-			'sortorder' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			]
-		]
-	],
-	'cep_operation_condition' => [
-		'key' => 'cep_operation_conditionid',
-		'fields' => [
-			'cep_operation_conditionid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'cep_operationid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'cep_operation',
-				'ref_field' => 'cep_operationid'
-			],
-			'type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '25'
-			],
-			'operator' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '12'
-			],
-			'tag' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'value' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
 			]
 		]
 	],

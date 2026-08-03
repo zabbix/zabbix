@@ -462,14 +462,6 @@ class testFormMaintenance extends CWebTest {
 				if ($mode === 'Create') {
 					$this->page->removeFocus();
 
-					// Remove Add and Cancel buttons edge curling from screenshots as their rendering is unstable.
-					$dialog_footer = $dialog->getFooter();
-					foreach (['Add', 'Cancel'] as $button) {
-						$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
-							[$dialog_footer->query('button', $button)->one()]
-						);
-					}
-
 					if ($period_type === 'One time only') {
 						$this->assertScreenshotExcept($dialog, [$dialog->query('id:start_date')->one()], $period_type);
 					}
