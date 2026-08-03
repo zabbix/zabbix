@@ -224,7 +224,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckHeader('Regular expressions');
-		$this->zbxTestTextPresent('Regular expressions deleted');
+		$this->assertMessage(TEST_GOOD, 'Regular expressions deleted');
 
 		$sql = 'SELECT * FROM regexps';
 		$this->assertEquals(0, CDBHelper::getCount($sql), 'Regexp has not been deleted from the DB');
