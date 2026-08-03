@@ -251,6 +251,11 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+static int	match_mountpoint(const char *current, const char *requested)
+{
+	return (NULL == requested || 0 == strcmp(current, requested)) ? SUCCEED : FAIL;
+}
+
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int			rc, ret = SYSINFO_RET_FAIL, mode_short = 0;
@@ -286,7 +291,6 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	/* NULL or empty mode defaults to "full" */
 	/* empty mountpoint means no filter */
 	if (NULL != mountpoint && '\0' == *mountpoint)
 		mountpoint = NULL;
@@ -304,17 +308,20 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		for (int i = 0; i < rc; i++)
 		{
+			char *options;
+
 			fsname.mpoint = mntbuf[i].f_mntonname;
 
 			/* apply mountpoint filter */
-			if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+			if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 				continue;
 
 			zbx_json_addobject(&j, NULL);
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname.mpoint, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mntbuf[i].f_fstypename, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, zbx_format_mntopt_string(mntopts,
-					mntbuf[i].f_flags & MNT_VISFLAGMASK), ZBX_JSON_TYPE_STRING);
+			options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flags & MNT_VISFLAGMASK);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, options, ZBX_JSON_TYPE_STRING);
+			zbx_free(options);
 			zbx_json_close(&j);
 		}
 
@@ -335,10 +342,10 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		fsname.mpoint = mntbuf[i].f_mntonname;
 
 		/* apply mountpoint filter */
-		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 			continue;
 
-		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused,&error))
+		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused, &error))
 		{
 			zbx_free(error);
 			continue;
@@ -385,7 +392,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		fsname.type = mntbuf[i].f_fstypename;
 
 		/* apply mountpoint filter */
-		if (NULL != mountpoint && 0 != strcmp(fsname.mpoint, mountpoint))
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 			continue;
 
 		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, &fsname, zbx_fsname_compare)))
