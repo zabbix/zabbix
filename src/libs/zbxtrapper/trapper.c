@@ -1453,7 +1453,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, av.value, ZBX_JSON_TYPE_STRING);
 
 			if (0 != av.timestamp)
-				zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, (zbx_uint64_t)av.timestamp);
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, (zbx_uint64_t)av.timestamp);
 
 			if (0 != av.lastlogsize)
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, av.lastlogsize);
