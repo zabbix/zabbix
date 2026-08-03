@@ -48,10 +48,7 @@ $form_grid = (new CFormGrid())
 		))->setId('js-percentile-field')
 	])
 	->addItem([
-		(new CLabel([
-			_('Column'),
-			makeHelpIcon(_('Applies only to numeric and timestamp columns.'))
-		], 'label-column'))->setId('js-column-label'),
+		(new CLabel(_('Column'), 'label-column'))->setId('js-column-label'),
 		(new CFormField(
 			(new CSelect('column'))
 				->setId('column')
