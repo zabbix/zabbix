@@ -27,6 +27,7 @@ class CElasticsearchHelper {
 
 	/**
 	 * Perform request to Elasticsearch.
+	 * Return empty string for failed request.
 	 *
 	 * @param string $method      HTTP method to be used to perform request
 	 * @param string $endpoint    requested url
@@ -49,16 +50,13 @@ class CElasticsearchHelper {
 			$options['http']['content'] = $request;
 		}
 
-		try {
-			$result = file_get_contents($endpoint, false, stream_context_create($options));
-		}
-		catch (Exception $e) {
-			error($e->getMessage());
-		}
+		$result = file_get_contents($endpoint, false, stream_context_create($options));
 
-		CProfiler::getInstance()->profileElasticsearch(microtime(true) - $time_start, $method, $endpoint, $request);
+		CProfiler::getInstance()->profileElasticsearch(microtime(true) - $time_start,
+			parse_url($endpoint, PHP_URL_PATH).' '.$request
+		);
 
-		return $result;
+		return $result === false ? '' : $result;
 	}
 
 	/**
@@ -78,8 +76,8 @@ class CElasticsearchHelper {
 			}
 			else {
 				// Endpoint is in different format, no way to get scroll API url.
-				error(_s('Elasticsearch error: %1$s.',
-						_('cannot perform Scroll API request, data could be truncated'))
+				error(_s('Elasticsearch error: %1$s.', _('cannot perform Scroll API request, data could be truncated')),
+					true
 				);
 
 				return null;
@@ -177,7 +175,7 @@ class CElasticsearchHelper {
 	private static function parseResult($data, $parse_as) {
 		$result = json_decode($data, TRUE);
 		if (!is_array($result)) {
-			error(_s('Elasticsearch error: %1$s.', _('failed to parse JSON')));
+			error(_s('Elasticsearch error: %1$s.', _('failed to parse JSON')), true);
 
 			return [];
 		}
@@ -187,7 +185,7 @@ class CElasticsearchHelper {
 					? $result['error']['reason']
 					: _('Unknown error');
 
-			error(_s('Elasticsearch error: %1$s.', $error));
+			error(_s('Elasticsearch error: %1$s.', $error), true);
 
 			return [];
 		}
@@ -211,8 +209,15 @@ class CElasticsearchHelper {
 					$values = [];
 
 					foreach ($result['hits']['hits'] as $row) {
-						if (!array_key_exists('_source', $row)) {
+						if (!array_key_exists('_source', $row) && !array_key_exists('fields', $row)) {
 							continue;
+						}
+
+						if (array_key_exists('fields', $row)) {
+							foreach ($row['fields'] as $name => $value) {
+								// Elasticsearch returns field values as arrays and first element holds the value.
+								$row['_source'][$name] = $value[0];
+							}
 						}
 
 						$values[] = $row['_source'];
@@ -351,5 +356,37 @@ class CElasticsearchHelper {
 		}
 
 		return $query;
+	}
+
+	/**
+	 * Returns an Elasticsearch Painless script that truncates a string field
+	 * to the given number of Unicode code points.
+	 *
+	 * @param string $field   Source field name.
+	 * @param int    $length  Maximum length in code points.
+	 *
+	 * @return array Script configuration for Elasticsearch.
+	 */
+	public static function getSubstring($field, $length): array {
+		return [
+			'script' => [
+				'lang' => 'painless',
+				'source' => <<<'SCRIPT'
+					def string;
+					string = params._source[params.field].toString();
+					int string_length = string.codePointCount(0, string.length());
+
+					if (string_length > params.len) {
+						return string.substring(0, string.offsetByCodePoints(0, params.len));
+					} else {
+						return string;
+					}
+				SCRIPT,
+				'params' => [
+					'len' => (int) $length,
+					'field' => $field
+				]
+			]
+		];
 	}
 }

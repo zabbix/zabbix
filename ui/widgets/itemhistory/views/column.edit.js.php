@@ -180,8 +180,6 @@ window.item_history_column_edit = new class {
 
 		this.#form.removeAttribute('style');
 		this.#overlay.recoverFocus();
-
-		this.#form.addEventListener('submit', () => this.submit());
 	}
 
 	/**
@@ -220,11 +218,11 @@ window.item_history_column_edit = new class {
 	}
 
 	#updateForm() {
-		const is_item_type_numeric = this.#item_value_type == <?= ITEM_VALUE_TYPE_FLOAT ?>
-			|| this.#item_value_type == <?= ITEM_VALUE_TYPE_UINT64 ?>;
+		const is_item_type_numeric = this.#item_value_type == ITEM_VALUE_TYPE_FLOAT
+			|| this.#item_value_type == ITEM_VALUE_TYPE_UINT64;
 
 		const is_item_type_text = !is_item_type_numeric
-			&& [<?= ITEM_VALUE_TYPE_STR?>, <?= ITEM_VALUE_TYPE_LOG ?>, <?= ITEM_VALUE_TYPE_TEXT ?>].some(
+			&& [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_JSON].some(
 				(type) => type == this.#item_value_type
 			);
 
@@ -267,12 +265,12 @@ window.item_history_column_edit = new class {
 				];
 
 			for (const input of this.#form.querySelectorAll('[name=display]')) {
-				const show_input = visible_values.some((value) => value == input.value);
+				const hide_input = !visible_values.some((value) => value == input.value);
 
-				input.parentElement.style.display = show_input ? '' : 'none';
-				input.disabled = !show_input;
+				input.parentElement.hidden = hide_input;
+				input.disabled = hide_input;
 
-				if (!show_input && input.checked) {
+				if (hide_input && input.checked) {
 					input.checked = false;
 
 					this.#form.querySelector('[name=display][value="<?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>"]')

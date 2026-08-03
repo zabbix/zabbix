@@ -18,6 +18,7 @@
 #include "zbx_dbversion_constants.h"
 #include "zbxjson.h"
 #include "zbxtypes.h"
+
 #if defined(HAVE_POSTGRESQL)
 #	include "zbxstr.h"
 #endif
@@ -25,7 +26,7 @@
 /******************************************************************************
  *                                                                            *
  * Purpose: For PostgreSQL, MySQL and MariaDB:                                *
- *          stoires DBMS version as integer: MMmmuu                           *
+ *          stores DBMS version as integer: MMmmuu                            *
  *          M = major version part                                            *
  *          m = minor version part                                            *
  *          u = patch version part                                            *
@@ -50,7 +51,7 @@ static int	ZBX_MARIADB_SFORK = OFF;
 /*********************************************************************************
  *                                                                               *
  * Purpose: determine if a vendor database(MySQL, MariaDB, PostgreSQL,           *
- *          ElasticDB) version satisfies Zabbix requirements                     *
+ *          ElasticDB, clickhouse) version satisfies Zabbix requirements         *
  *                                                                               *
  * Parameters: database                - [IN] database name                      *
  *             current_version         - [IN] detected numeric version           *
@@ -206,7 +207,7 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 		ZBX_DB_SVERSION = (zbx_uint32_t)mysql_get_server_version(db->conn);
 
 	version_info->current_version = ZBX_DB_SVERSION;
-	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%.2d.%.2d",
+	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d",
 			RIGHT2(ZBX_DB_SVERSION/10000), RIGHT2(ZBX_DB_SVERSION/100),
 			RIGHT2(ZBX_DB_SVERSION));
 
@@ -308,7 +309,8 @@ out:
 
 void	zbx_dbconn_tsdb_extract_compressed_chunk_flags(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info)
 {
-#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history','history_bin'"
+#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history','history_bin',\
+		'history_json'"
 #define ZBX_TSDB_TRENDS_TABLES "'trends','trends_uint'"
 
 	version_info->history_compressed_chunks =
@@ -434,7 +436,7 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
  *                                                                            *
  * Purpose: retrieves TimescaleDB (TSDB) compression availability             *
  *                                                                            *
- * Return value: compression availability as as integer                       *
+ * Return value: compression availability as integer                          *
  *               0 (OFF): compression is not available                        *
  *               1 (ON): compression is available                             *
  *                                                                            *

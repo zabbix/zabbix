@@ -1,0 +1,169 @@
+---
+test case: "1. Empty string"
+in:
+  string: ""
+out:
+  return: FAIL
+---
+test case: "2. Starts with hyphen"
+in:
+  string: "-"
+out:
+  return: FAIL
+---
+test case: "3. Hyphen before dot"
+in:
+  string: "a-.a"
+out:
+  return: FAIL
+---
+test case: "4. Hyphen after dot"
+in:
+  string: "a.-a"
+out:
+  return: FAIL
+---
+test case: "5. Too long label"
+in:
+  string: "0123456789012345678901234567890123456789012345678901234567890123456789"
+out:
+  return: FAIL
+---
+test case: "6. Label is 63 character long"
+in:
+  string: "123456789-123456789-123456789-123456789-123456789-123456789-123"
+out:
+  return: SUCCEED
+---
+test case: "7. Label is 64 character long"
+in:
+  string: "123456789-123456789-123456789-123456789-123456789-123456789-1234"
+out:
+  return: FAIL
+---
+test case: "8. Hostname is 253 character long"
+in:
+  string: "123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123"
+out:
+  return: SUCCEED
+---
+test case: "9. Hostname is 254 character long"
+in:
+  string: "123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.1234"
+out:
+  return: FAIL
+---
+test case: "9-2. Hostname is 254 character long with trailing dot"
+in:
+  string: "123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123."
+out:
+  return: SUCCEED
+---
+test case: "9-3. Hostname is 255 character long with dot at position 254"
+in:
+  string: "123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123.5"
+out:
+  return: FAIL
+---
+test case: "10. Unicode character"
+in:
+  string: "tēst.zabbix.com"
+out:
+  return: FAIL
+---
+test case: "11. Leading dot"
+in:
+  string: ".example.com"
+out:
+  return: FAIL
+---
+test case: "11-2. Trailing dot"
+in:
+  string: "example.com."
+out:
+  return: SUCCEED
+---
+test case: "12. Underscore"
+in:
+  string: "example_com.com"
+out:
+  return: SUCCEED
+---
+test case: "12-1. Underscore at start"
+in:
+  string: "_example.com"
+out:
+  return: SUCCEED
+---
+test case: "13. Space"
+in:
+  string: "ex ample.com"
+out:
+  return: FAIL
+---
+test case: "14. Ends with hyphen"
+in:
+  string: "example.com-"
+out:
+  return: FAIL
+---
+test case: "15. Empty label"
+in:
+  string: "example.."
+out:
+  return: FAIL
+---
+test case: "16. Minimal label"
+in:
+  string: "a.com"
+out:
+  return: SUCCEED
+---
+test case: "17. Punycode"
+in:
+  string: "xn--bcher-kva.com"
+out:
+  return: SUCCEED
+---
+test case: "18. Localhost"
+in:
+  string: "localhost"
+out:
+  return: SUCCEED
+---
+test case: "19. Purely numeric 192"
+in:
+  string: "192"
+out:
+  return: FAIL
+---
+test case: "20. Purely numeric 192.168"
+in:
+  string: "192.168"
+out:
+  return: FAIL
+---
+test case: "21. Purely numeric 192.168.10"
+in:
+  string: "192.168.10"
+out:
+  return: FAIL
+---
+test case: "22. Purely numeric 192.168.10.4"
+in:
+  string: "192.168.10.4"
+out:
+  return: FAIL
+---
+test case: "23. Almost numerical X92.168.10.4"
+in:
+  string: "X92.168.10.4"
+out:
+  return: SUCCEED
+---
+test case: "24. Numeric with underscore"
+in:
+  string: "123_456"
+out:
+  return: SUCCEED
+...

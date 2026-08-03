@@ -120,8 +120,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				}
 			);
 
-			$result = false;
-
 			try {
 				DBstart();
 
@@ -144,7 +142,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				}
 
 				if (array_key_exists('tags', $visible)) {
-					$options['selectTags'] = ['tag', 'value', 'automatic'];
+					$options['selectTags'] = ['tag', 'value'];
 				}
 
 				if (array_key_exists('macros', $visible)) {
@@ -372,14 +370,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 										continue;
 									}
 
-									if ($tags_map[$tag['tag']][$tag['value']]['automatic'] == ZBX_TAG_AUTOMATIC) {
-										error(_s(
-											'Cannot remove the tag with name "%1$s" and value "%2$s", defined in a host prototype, from host "%3$s".',
-											$tag['tag'], $tag['value'], $host['host']
-										));
-										throw new Exception();
-									}
-
 									unset($tags_map[$tag['tag']][$tag['value']]);
 								}
 
@@ -387,7 +377,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 								foreach ($tags_map as $tags_map_2) {
 									foreach ($tags_map_2 as $tag) {
-										unset($tag['automatic']);
 										$host['tags'][] = $tag;
 									}
 								}

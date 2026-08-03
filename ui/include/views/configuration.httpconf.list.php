@@ -33,7 +33,7 @@ $filter_column_left = (new CFormList())
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true,
 					'enrich_parent_groups' => true
@@ -55,7 +55,7 @@ $filter_column_left = (new CFormList())
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'filter_hostids_',
 					'editable' => 1
 				]
@@ -158,9 +158,9 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 	$name[] = new CLink($httpTest['name'],
 		(new CUrl('httpconf.php'))
 			->setArgument('form', 'update')
+			->setArgument('context', $data['context'])
 			->setArgument('hostid', $httpTest['hostid'])
 			->setArgument('httptestid', $httpTestId)
-			->setArgument('context', $data['context'])
 	);
 
 	if ($data['context'] === 'host') {
@@ -213,7 +213,6 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 					: 'httptest.massdisable'
 				)
 				->setArgument('context', $data['context'])
-				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addCsrfToken($csrf_token)
@@ -265,6 +264,8 @@ $httpForm->addItem([$httpTable, new CActionButtonList('action', 'group_httptesti
 $html_page
 	->addItem($httpForm)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	view.init('.json_encode([

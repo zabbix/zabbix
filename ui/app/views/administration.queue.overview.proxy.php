@@ -20,21 +20,7 @@
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Queue overview by proxy'))
-	->setTitleSubmenu([
-		'main_section' => [
-			'items' => [
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.overview')
-					->getUrl() => _('Queue overview'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.overview.proxy')
-					->getUrl() => _('Queue overview by proxy'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'queue.details')
-					->getUrl() => _('Queue details')
-			]
-		]
-	])
+	->setTitleSubmenu(getAdministrationQueueSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::QUEUE_OVERVIEW_PROXY));
 
 $table = (new CTableInfo())->setHeader([
@@ -85,9 +71,9 @@ if (CWebUser::getRefresh()) {
 $html_page
 	->addItem($table)
 	->addItem((new CDiv())
-		->addClass(ZBX_STYLE_TABLE_PAGING)
+		->addClass(ZBX_STYLE_PAGER)
 		->addItem((new CDiv())
-			->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+			->addClass(ZBX_STYLE_PAGER_CONTAINER)
 			->addItem((new CDiv())
 				->addClass(ZBX_STYLE_TABLE_STATS)
 				->addItem(_('Total').': '.$table->getNumRows())

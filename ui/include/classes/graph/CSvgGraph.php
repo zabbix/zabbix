@@ -247,8 +247,8 @@ class CSvgGraph extends CSvg {
 				'data_set' => $metric['data_set'],
 				'name' => $metric['name'],
 				'itemid' => $metric['itemid'],
+				'itemids' => $metric['itemids'],
 				'units' => $metric['units'],
-				'host' => $metric['hosts'][0],
 				'options' => ['order' => $index] + $metric['options']
 			];
 
@@ -1202,7 +1202,9 @@ class CSvgGraph extends CSvg {
 							(int) ceil($x),
 							(int) ceil($y),
 							convertUnits([
-								'value' => $value,
+								'value' => $metric['options']['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON
+									? -$value
+									: $value,
 								'units' => $metric['units']
 							])
 						];
@@ -1292,7 +1294,9 @@ class CSvgGraph extends CSvg {
 						(int) ceil($y),
 						$stacked_point[2] !== null
 							? convertUnits([
-								'value' => $stacked_point[2],
+								'value' => $metric['options']['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON
+									? -$stacked_point[2]
+									: $stacked_point[2],
 								'units' => $metric['units']
 							])
 							: ''
@@ -1428,13 +1432,15 @@ class CSvgGraph extends CSvg {
 						$bar_y1 = min($y_max, max($y_min, $bar_y1));
 						$bar_y2 = min($y_max, max($y_min, $bar_y2));
 
+						$invert_values = $this->metrics[$metric_index]['options']['invert_values'];
+
 						$this->bar_paths[$metric_index][] = [
 							(int) ($this->canvas_x + $bar_stack_x1),
 							(int) ($this->canvas_x + $bar_stack_x2),
 							(int) $bar_y1,
 							(int) $bar_y2,
 							convertUnits([
-								'value' => $point_value,
+								'value' => $invert_values == SVG_GRAPH_INVERT_VALUES_ON ? -$point_value	: $point_value,
 								'units' => $this->metrics[$metric_index]['units']
 							]),
 							(int) ($this->canvas_x + $group_x1)
@@ -1755,7 +1761,7 @@ class CSvgGraph extends CSvg {
 				]);
 
 				$this->addItem(
-					(new CSvgGraphPercentile(_s('%1$sth percentile: %2$s', $percent, $label), $value, $scale,
+					(new CSvgGraphPercentile(_s('Percentile %1$s: %2$s', $percent, $label), $value, $scale,
 						$scale_boundaries
 					))
 						->setPosition($this->canvas_x, $this->canvas_y)
@@ -1781,7 +1787,8 @@ class CSvgGraph extends CSvg {
 			if ($simple_triggers['value'] >= $y_min && $simple_triggers['value'] <= $y_max) {
 				$this->addItem(
 					(new CSvgGraphSimpleTrigger($simple_triggers['constant'], $simple_triggers['description'],
-						$simple_triggers['value'], $y_min, $y_max))
+						$simple_triggers['label_suffix'], $simple_triggers['value'], $y_min, $y_max
+					))
 						->setPosition($this->canvas_x, $this->canvas_y)
 						->setIndex($index)
 						->setSize($this->canvas_width, $this->canvas_height)

@@ -269,7 +269,7 @@ class testConnector extends CAPITest {
 					'name' => 'API create connector',
 					'url' => 'javascript:alert(123);'
 				],
-				'expected_error' => 'Invalid parameter "/1/url": unacceptable URL.'
+				'expected_error' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 			],
 			'Test connector.create: invalid "url" (too long)' => [
 				'connector' => [
@@ -295,7 +295,7 @@ class testConnector extends CAPITest {
 					'url' => 'http://localhost/',
 					'item_value_type' => self::INVALID_NUMBER
 				],
-				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 1-63.'
+				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 1-127.'
 			],
 			'Test connector.create: invalid "item_value_type" (not in range) where "data_type" equals 1' => [
 				'connector' => [
@@ -1640,7 +1640,7 @@ class testConnector extends CAPITest {
 					'connectorid' => 'update_custom_defaults',
 					'url' => 'javascript:alert(123);'
 				],
-				'expected_error' => 'Invalid parameter "/1/url": unacceptable URL.'
+				'expected_error' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 			],
 			'Test connector.update: invalid "url" (too long)' => [
 				'connector' => [
@@ -1664,7 +1664,7 @@ class testConnector extends CAPITest {
 					'connectorid' => 'update_custom_defaults',
 					'item_value_type' => self::INVALID_NUMBER
 				],
-				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 1-63.'
+				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 1-127.'
 			],
 			'Test connector.update: invalid "item_value_type" (not in range) where "data_type" equals 1' => [
 				'connector' => [

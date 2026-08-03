@@ -164,8 +164,8 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#SNMPVALUE}: Free memory|<p>MIB: CISCO-ENHANCED-MEMPOOL-MIB.</p><p>The object name: `cempMemPoolFree`.</p><p>It indicates the number of bytes from the memory pool that are currently unused on the physical entity.</p>|SNMP agent|vm.memory.free[{#SNMPINDEX}]|
-|{#SNMPVALUE}: Used memory|<p>MIB: CISCO-ENHANCED-MEMPOOL-MIB.</p><p>The object name: `cempMemPoolUsed`.</p><p>It indicates the number of bytes from the memory pool that are currently in use by applications on the physical entity.</p>|SNMP agent|vm.memory.used[{#SNMPINDEX}]|
+|{#SNMPVALUE}: Free memory|<p>MIB: CISCO-ENHANCED-MEMPOOL-MIB.</p><p>The object name: `cempMemPoolHCFree`.</p><p>It indicates the number of bytes from the memory pool that are currently unused on the physical entity. This object is the 64-bit version of `cempMemPoolFree`.</p>|SNMP agent|vm.memory.free[{#SNMPINDEX}]|
+|{#SNMPVALUE}: Used memory|<p>MIB: CISCO-ENHANCED-MEMPOOL-MIB.</p><p>The object name: `cempMemPoolHCUsed`.</p><p>It indicates the number of bytes from the memory pool that are currently in use by applications on the physical entity. This object is the 64-bit version of `cempMemPoolUsed`.</p>|SNMP agent|vm.memory.used[{#SNMPINDEX}]|
 |{#SNMPVALUE}: Memory utilization|<p>The memory utilization expressed in %.</p>|Calculated|vm.memory.util[{#SNMPINDEX}]|
 
 ### Trigger prototypes for Memory discovery

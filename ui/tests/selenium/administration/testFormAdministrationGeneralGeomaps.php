@@ -115,7 +115,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 
 			foreach ($hintboxes as $field => $text) {
 				$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+				$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilPresent()->one();
 				$this->assertEquals($text, $hint->getText());
 				$hint->asOverlayDialog()->close();
 			}
@@ -203,7 +203,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 						'Max zoom level' => 0
 					],
 					'errors' => [
-						'Max zoom level' => 'This value must be no less than "1".'
+						'Max zoom level' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -217,7 +217,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 						'Max zoom level' => 31
 					],
 					'errors' => [
-						'Max zoom level' => 'This value must be no greater than "30".'
+						'Max zoom level' => 'Value must be less than or equal to 30.'
 					]
 				]
 			],
@@ -231,7 +231,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 						'Max zoom level' => 'aa'
 					],
 					'errors' => [
-						'Max zoom level' => 'This value must be no less than "1".'
+						'Max zoom level' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -245,7 +245,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 						'Max zoom level' => '!%:'
 					],
 					'errors' => [
-						'Max zoom level' => 'This value must be no less than "1".'
+						'Max zoom level' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -259,7 +259,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 						'Max zoom level' => -1
 					],
 					'errors' => [
-						'Max zoom level' => 'This value must be no less than "1".'
+						'Max zoom level' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],

@@ -53,7 +53,7 @@
 
 						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
 
-						uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
+						uncheckTableRows(`graphs_${this.checkbox_hash}`, [], false);
 						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
 						chkbxRange.update(this.checkbox_object);
 
@@ -118,7 +118,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('graph', response.keepids ?? []);
+						uncheckTableRows(`graphs_${this.checkbox_hash}`, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -127,7 +127,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows('graph');
+						uncheckTableRows(`graphs_${this.checkbox_hash}`);
 					}
 
 					location.href = location.href;

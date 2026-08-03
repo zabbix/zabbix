@@ -63,7 +63,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'acknowledgement_status' => $this->fields_values['acknowledgement_status'],
 				'acknowledged_by_me' => $this->fields_values['acknowledgement_status'] == ZBX_ACK_STATUS_ACK
 					? $this->fields_values['acknowledged_by_me']
-					: 0,
+					: 0
+			], [
 				'show_opdata' => $this->fields_values['show_opdata']
 			], $search_limit);
 
@@ -83,8 +84,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$data['problems'] = array_slice($data['problems'], 0, $this->fields_values['show_lines'], true);
 
-			$data = CScreenProblem::makeData($data, [
-				'show' => $this->fields_values['show'],
+			$data = CScreenProblem::makeData($data, ['show' => $this->fields_values['show']], [
 				'details' => 0,
 				'show_opdata' => $this->fields_values['show_opdata']
 			]);
@@ -150,9 +150,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 							'show_symptoms' => true,
 							'show_suppressed' => true,
 							'cause_eventid' => $cause_eventid,
-							'show' => $this->fields_values['show'],
+							'show' => $this->fields_values['show']
+						], [
 							'show_opdata' => $this->fields_values['show_opdata']
-						], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
+						], ZBX_PROBLEM_SYMPTOM_LIMIT);
 
 						if ($_symptom_data['problems']) {
 							$_symptom_data = CScreenProblem::sortData($_symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT,
@@ -170,10 +171,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 							// Filter does not matter.
 							$_symptom_data = CScreenProblem::makeData($_symptom_data, [
-								'show' => $this->fields_values['show'],
-								'show_opdata' => $this->fields_values['show_opdata'],
-								'details' => 0
-							], true);
+								'show' => $this->fields_values['show']
+							], [
+								'details' => 0,
+								'show_opdata' => $this->fields_values['show_opdata']
+							]);
 
 							$data['users'] += $_symptom_data['users'];
 							$data['correlations'] += $_symptom_data['correlations'];

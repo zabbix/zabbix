@@ -21,78 +21,90 @@
 
 window.media_type_mapping_edit_popup = new class {
 
-	constructor() {
-		this.overlay = null;
-		this.dialogue = null;
-		this.form = null;
+	#overlay;
+	#dialogue;
+	#form_element;
+	#form;
+
+	init({rules}) {
+		this.#overlay = overlays_stack.getById('media_type_mapping_edit');
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
+
+		this.#initEvents();
 	}
 
-	init() {
-		this.overlay = overlays_stack.getById('media_type_mapping_edit');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+	#initEvents() {
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
 	}
 
-	submit() {
-		this.removePopupMessages();
-		this.overlay.setLoading();
+	#submit() {
+		this.#removePopupMessages();
+		this.#overlay.setLoading();
+		const fields = this.#form.getAllValues();
 
-		const fields = this.trimFields(getFormFields(this.form));
-		const curl = new Curl(this.form.getAttribute('action'));
+		this.#form.validateSubmit(fields).then(result => {
+			if (!result) {
+				this.#overlay.unsetLoading();
 
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(fields)
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				overlayDialogueDestroy(this.overlay.dialogueid);
-
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-			})
-			.catch((exception) => {
-				let title;
-				let messages = [];
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					title = <?= json_encode(_('Unexpected server error.')) ?>;
-				}
-
-				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
-
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
-	}
-
-	trimFields(fields) {
-		const fields_to_trim = ['name', 'attribute', 'period'];
-
-		for (const field of fields_to_trim) {
-			if (field in fields) {
-				fields[field] = fields[field].trim();
+				return;
 			}
-		}
 
-		return fields;
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'popup.mediatypemapping.check');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(fields)
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						throw {error: response.error};
+					}
+
+					if ('form_errors' in response) {
+						this.#form.setErrors(response.form_errors, true, true);
+						this.#form.renderErrors();
+
+						return;
+					}
+
+					overlayDialogueDestroy(this.#overlay.dialogueid);
+
+					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				})
+				.catch((exception) => this.#ajaxExceptionHandler(exception))
+				.finally(() => {
+					this.#overlay.unsetLoading();
+				});
+		});
 	}
 
-	removePopupMessages() {
-		for (const el of this.form.parentNode.children) {
+	#removePopupMessages() {
+		for (const el of this.#form_element.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 				el.parentNode.removeChild(el);
 			}
 		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 	}
 };

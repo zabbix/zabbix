@@ -282,7 +282,7 @@ int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **va
 static int	expr_macro_index(const char *macro)
 {
 	/* macros that are supported in expression macro */
-	static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY, NULL};
+	static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_ITEM_KEY, NULL};
 
 	zbx_strloc_t	loc;
 	int		func_num;
@@ -1076,7 +1076,7 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value,
 			evaluate_item.key_orig = item.key_orig;
 
 			if (SUCCEED == evaluate_function_trigger_cb(&var, &evaluate_item, function.function, parameter,
-					&ts, &error) && ZBX_VARIANT_NONE != var.type)
+					&ts, NULL, &error) && ZBX_VARIANT_NONE != var.type)
 			{
 				*value = zbx_strdup(NULL, zbx_variant_value_desc(&var));
 				zbx_variant_clear(&var);

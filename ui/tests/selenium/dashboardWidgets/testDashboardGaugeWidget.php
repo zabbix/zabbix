@@ -224,7 +224,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			'Angle' => ['value' => '180°', 'enabled' => true, 'labels' => ['180°', '270°'], 'visible' => false],
 
 			// Description.
-			'id:description' => ['value' => '{ITEM.NAME}', 'maxlength' => 2048, 'enabled' => true, 'visible' => false],
+			'id:description' => ['value' => '{ITEM.NAME}', 'maxlength' => 65535, 'enabled' => true, 'visible' => false],
 			'id:desc_size' => ['value' => '15', 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:desc_v_pos' => ['value' => 'Bottom', 'enabled' => true, 'labels' => ['Top', 'Bottom'], 'visible' => false],
 			'id:desc_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
@@ -480,7 +480,7 @@ class testDashboardGaugeWidget extends testWidgets {
 		$this->assertEquals(['Widget', 'Dashboard'], $menu->getItems()->asText());
 		$menu->select('Dashboard');
 		$form->checkValue(['Override host' => 'Dashboard']);
-		$this->assertTrue($override->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+		$this->assertTrue($override->query('xpath:.//span[@data-hintbox-html="Dashboard is used as data source."]')
 				->one()->isVisible()
 		);
 

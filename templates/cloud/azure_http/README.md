@@ -5,7 +5,7 @@
 
 - This template is designed to monitor Microsoft Azure by HTTP.
 - It works without any external scripts and uses the script item.
-- Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
+- Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, PostgreSQL servers, Backup Job vaults, Sentinel workspaces, and Container apps.
 
 ## Included Monitoring Templates
 
@@ -21,6 +21,8 @@
 - *Azure SQL Managed Instance by HTTP*
 - *Azure Cost Management by HTTP*
 - *Azure Backup Jobs by HTTP*
+- *Azure Sentinel by HTTP*
+- *Azure Container Apps by HTTP*
 
 ## Requirements
 
@@ -50,54 +52,63 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
-|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
-|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
-|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
-|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
-|{$AZURE.VM.NAME.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
-|{$AZURE.VM.NAME.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.VM.LOCATION.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
-|{$AZURE.VM.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SCALESET.NAME.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`.*`|
-|{$AZURE.SCALESET.NAME.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SCALESET.LOCATION.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`.*`|
-|{$AZURE.SCALESET.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SQL.INST.NAME.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`.*`|
-|{$AZURE.SQL.INST.NAME.NOT.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SQL.INST.LOCATION.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`.*`|
-|{$AZURE.SQL.INST.LOCATION.NOT.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.VAULT.NAME.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`.*`|
-|{$AZURE.VAULT.NAME.NOT.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.VAULT.LOCATION.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`.*`|
-|{$AZURE.VAULT.LOCATION.NOT.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.STORAGE.ACC.NAME.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
-|{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.STORAGE.ACC.LOCATION.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
-|{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SUBSCRIPTION.ID}|<p>Azure Subscription ID used to scope all API requests.</p>||
+|{$AZURE.TENANT.ID}|<p>Azure Tenant (Directory) ID used for authentication.</p>||
+|{$AZURE.APP.ID}|<p>Client (Application) ID of the Azure service principal.</p>||
+|{$AZURE.PASSWORD}|<p>Client secret of the Azure service principal used for API authentication.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>Maximum time to wait for Azure API responses before request fails.</p>|`15s`|
+|{$AZURE.PROXY}|<p>HTTP proxy used for Azure API requests (leave empty to connect directly).</p>||
+|{$AZURE.VM.NAME.MATCHES}|<p>Regex string to include discovered virtual machines by name.</p>|`.*`|
+|{$AZURE.VM.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered virtual machines by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.VM.LOCATION.MATCHES}|<p>Regex string to include discovered virtual machine locations by name.</p>|`.*`|
+|{$AZURE.VM.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered virtual machine locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SCALESET.NAME.MATCHES}|<p>Regex string to include discovered VM scale sets by name.</p>|`.*`|
+|{$AZURE.SCALESET.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered VM scale sets by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SCALESET.LOCATION.MATCHES}|<p>Regex string to include discovered VM scale set locations by name.</p>|`.*`|
+|{$AZURE.SCALESET.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered VM scale set locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SQL.INST.NAME.MATCHES}|<p>Regex string to include discovered Azure SQL managed instances by name.</p>|`.*`|
+|{$AZURE.SQL.INST.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered Azure SQL managed instances by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SQL.INST.LOCATION.MATCHES}|<p>Regex string to include discovered Azure SQL managed instance locations by name.</p>|`.*`|
+|{$AZURE.SQL.INST.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered Azure SQL managed instance locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.VAULT.NAME.MATCHES}|<p>Regex string to include discovered Azure Vaults by name.</p>|`.*`|
+|{$AZURE.VAULT.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered Azure Vaults by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.VAULT.LOCATION.MATCHES}|<p>Regex string to include discovered Azure Vault locations by name.</p>|`.*`|
+|{$AZURE.VAULT.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered Azure Vault locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.STORAGE.ACC.NAME.MATCHES}|<p>Regex string to include discovered storage accounts by name.</p>|`.*`|
+|{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered storage accounts by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.STORAGE.ACC.LOCATION.MATCHES}|<p>Regex string to include discovered storage account locations by name.</p>|`.*`|
+|{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered storage account locations by name.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.STORAGE.ACC.AVAILABILITY}|<p>The warning threshold of the storage account availability.</p>|`70`|
 |{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY}|<p>The warning threshold of the storage account blob services availability.</p>|`70`|
 |{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY}|<p>The warning threshold of the storage account table services availability.</p>|`70`|
-|{$AZURE.RESOURCE.GROUP.MATCHES}|<p>This macro is used in discovery rules.</p>|`.*`|
-|{$AZURE.RESOURCE.GROUP.NOT.MATCHES}|<p>This macro is used in discovery rules.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MYSQL.DB.NAME.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`.*`|
-|{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MYSQL.DB.LOCATION.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`.*`|
-|{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.PGSQL.DB.NAME.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`.*`|
-|{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.PGSQL.DB.LOCATION.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`.*`|
-|{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.NAME.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`.*`|
-|{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.LOCATION.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`.*`|
-|{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`^System$`|
-|{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`.*`|
-|{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`.*`|
-|{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.RESOURCE.GROUP.MATCHES}|<p>Regex string to include discovered resource groups by name.</p>|`.*`|
+|{$AZURE.RESOURCE.GROUP.NOT.MATCHES}|<p>Regex string to exclude discovered resource groups by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MYSQL.DB.NAME.MATCHES}|<p>Regex string to include discovered MySQL servers by name.</p>|`.*`|
+|{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered MySQL servers by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MYSQL.DB.LOCATION.MATCHES}|<p>Regex string to include discovered MySQL server locations by name.</p>|`.*`|
+|{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered MySQL server locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.PGSQL.DB.NAME.MATCHES}|<p>Regex string to include discovered PostgreSQL servers by name.</p>|`.*`|
+|{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered PostgreSQL servers by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.PGSQL.DB.LOCATION.MATCHES}|<p>Regex string to include discovered PostgreSQL server locations by name.</p>|`.*`|
+|{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered PostgreSQL server locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.NAME.MATCHES}|<p>Regex string to include discovered MSSQL databases by name.</p>|`.*`|
+|{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered MSSQL databases by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.LOCATION.MATCHES}|<p>Regex string to include discovered MSSQL database locations by name.</p>|`.*`|
+|{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered MSSQL database locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}|<p>Regex string to exclude discovered MSSQL database locations by SKU type.</p>|`^System$`|
+|{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}|<p>Regex string to include discovered Cosmos DB accounts by name.</p>|`.*`|
+|{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered Cosmos DB accounts by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}|<p>Regex string to include discovered Cosmos DB account locations by name.</p>|`.*`|
+|{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered Cosmos DB account locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.WORKSPACE.NAME.MATCHES}|<p>Regex string to include discovered workspace by name.</p>|`.*`|
+|{$AZURE.WORKSPACE.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered workspace by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.WORKSPACE.LOCATION.MATCHES}|<p>Regex string to include discovered workspace locations by name.</p>|`.*`|
+|{$AZURE.WORKSPACE.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered workspace locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.CONT_APP.NAME.MATCHES}|<p>This macro is used in Azure Container App discovery rule.</p>|`.*`|
+|{$AZURE.CONT_APP.NAME.NOT.MATCHES}|<p>This macro is used in Azure Container App discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.CONT_APP.LOCATION.MATCHES}|<p>This macro is used in Azure Container App discovery rule.</p>|`.*`|
+|{$AZURE.CONT_APP.LOCATION.NOT.MATCHES}|<p>This macro is used in Azure Container App discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.DISCOVERY.INTERVAL}|<p>Azure resource discovery interval. Could be used with context.</p>|`1h`|
 
 ### Items
 
@@ -227,6 +238,18 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Cosmos DB account discovery|<p>The list of Cosmos databases provided by the subscription.</p>|Dependent item|azure.cosmos.mongo.db.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### LLD rule Azure Workspace discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure Workspace discovery|<p>The list of Azure workspaces provided by the subscription.</p>|Dependent item|azure.workspace.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### LLD rule Azure Container App discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure Container App discovery|<p>The list of Azure Container apps provided by the subscription.</p>|Script|azure.container_app.discovery<p>**Preprocessing**</p><ul><li><p>Does not match regular expression: `ERROR`</p><p>⛔️Custom on fail: Set error to: `Errors in discovery script. Check logs for more info.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 # Azure VM Scale Set by HTTP
 
@@ -1470,6 +1493,257 @@ This template has been tested on:
 |Azure backup jobs: Job completed with warnings [{#JOB.NAME}]|<p>Job has received "Completed with warnings" status.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=4`|Warning|**Manual close**: Yes|
 |Azure backup jobs: Job expired [{#JOB.NAME}]|<p>Job has received "Expired" status.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=7`|Average|**Manual close**: Yes|
 |Azure backup jobs: Job status unknown [{#JOB.NAME}]|<p>Job has received "Unknown" status.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=0`|Average|**Manual close**: Yes|
+
+# Azure Sentinel by HTTP
+
+## Overview
+
+This template is designed to monitor Microsoft Azure Sentinel by HTTP.
+It works without any external scripts and uses the script item.
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Microsoft Azure workspaces with Sentinel
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+2. Give the created principal the "Microsoft Sentinel Reader" role via the Azure command-line interface (Azure CLI).
+
+      `az role assignment create --assignee "zabbix" --role "Microsoft Sentinel Reader" --scope /subscriptions/<subscription_id>`
+
+3. Link the template to a host.
+4. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
+|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
+|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
+|{$AZURE.RESOURCE.ID}|<p>Microsoft Azure scale set ID.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$AZURE.SENTINEL.PERIOD}|<p>The number of days during which to retrieve modified entities (incidents, alert rules, automation rules).</p>|`30`|
+|{$AZURE.SENTINEL.INTERVAL}|<p>The update interval for the script items that retrieve data from the API.</p>|`10m`|
+|{$AZURE.SENTINEL.INCIDENTS.NEW}|<p>The threshold for new incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. Can be used with context if needed (check the context values in relevant items).</p>|`1`|
+|{$AZURE.SENTINEL.INCIDENTS.NEW:info}|<p>The threshold for new informational severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.</p>|`10`|
+|{$AZURE.SENTINEL.INCIDENTS.NEW:low}|<p>The threshold for new low-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.</p>|`5`|
+|{$AZURE.SENTINEL.INCIDENTS.NEW:medium}|<p>The threshold for new medium-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.</p>|`1`|
+|{$AZURE.SENTINEL.INCIDENTS.NEW:high}|<p>The threshold for new high-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.</p>|`1`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get data|<p>Gathers data from Azure Sentinel.</p>|Script|azure.sentinel.data.get|
+|Incidents: Total number|<p>The total number of incidents.</p>|Dependent item|azure.sentinel.incidents.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.incidents.length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: Informational severity|<p>The number of informational severity incidents.</p>|Dependent item|azure.sentinel.incidents.info<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: Low severity|<p>The number of low-severity incidents.</p>|Dependent item|azure.sentinel.incidents.low<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: Medium severity|<p>The number of medium-severity incidents.</p>|Dependent item|azure.sentinel.incidents.medium<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: High severity|<p>The number of high-severity incidents.</p>|Dependent item|azure.sentinel.incidents.high<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: New|<p>The number of new incidents.</p>|Dependent item|azure.sentinel.incidents.new<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: Active|<p>The number of active incidents.</p>|Dependent item|azure.sentinel.incidents.active<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: Closed|<p>The number of closed incidents.</p>|Dependent item|azure.sentinel.incidents.closed<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Total number|<p>The number of alert rules.</p>|Dependent item|azure.sentinel.alert_rules.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.alertRules.length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Enabled|<p>The number of enabled alert rules.</p>|Dependent item|azure.sentinel.alert_rules.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Disabled|<p>The number of disabled alert rules.</p>|Dependent item|azure.sentinel.alert_rules.disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Informational severity|<p>The number of informational severity alert rules.</p>|Dependent item|azure.sentinel.alert_rules.info<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Low severity|<p>The number of low-severity alert rules.</p>|Dependent item|azure.sentinel.alert_rules.low<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Medium severity|<p>The number of medium-severity alert rules.</p>|Dependent item|azure.sentinel.alert_rules.medium<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: High severity|<p>The number of high-severity alert rules.</p>|Dependent item|azure.sentinel.alert_rules.high<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Microsoft security incident creation|<p>The number of Microsoft security incident creation alert rules.</p>|Dependent item|azure.sentinel.alert_rules.creation<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Scheduled|<p>The number of scheduled alert rules.</p>|Dependent item|azure.sentinel.alert_rules.scheduled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.alertRules[?(@.kind == "Scheduled")].length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Fusion|<p>The number of fusion alert rules.</p>|Dependent item|azure.sentinel.alert_rules.fusion<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.alertRules[?(@.kind == "Fusion")].length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: Total|<p>The total number of automation rules.</p>|Dependent item|azure.sentinel.automation_rules.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.automationRules.length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: On incidents|<p>The number of automation rules that are triggered on incidents.</p>|Dependent item|azure.sentinel.automation_rules.incidents<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: On alerts|<p>The number of automation rules that are triggered on alerts.</p>|Dependent item|azure.sentinel.automation_rules.alerts<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: Modify properties|<p>The number of automation rules that modify an object's properties.</p>|Dependent item|azure.sentinel.automation_rules.modify<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: Run playbook|<p>The number of automation rules that run a playbook on an object.</p>|Dependent item|azure.sentinel.automation_rules.playbook<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: Add incident task|<p>The number of automation rules that add a task to an incident object.</p>|Dependent item|azure.sentinel.automation_rules.add_incident<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data connectors: Total|<p>The total number of data connectors.</p>|Dependent item|azure.sentinel.data_connectors.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.dataConnectors.length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data connectors: Enabled|<p>The number of enabled data connectors.</p>|Dependent item|azure.sentinel.data_connectors.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data connectors: Disabled|<p>The number of disabled data connectors.</p>|Dependent item|azure.sentinel.data_connectors.disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Total|<p>The total number of watchlists.</p>|Dependent item|azure.sentinel.watchlist.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.watchlists.length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Canceled|<p>The number of canceled watchlists.</p>|Dependent item|azure.sentinel.watchlist.canceled<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Failed|<p>The number of failed watchlists.</p>|Dependent item|azure.sentinel.watchlist.failed<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Succeeded|<p>The number of succeeded watchlists.</p>|Dependent item|azure.sentinel.watchlist.succeeded<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Deleting|<p>The number of watchlists being deleted.</p>|Dependent item|azure.sentinel.watchlist.deleting<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Uploading|<p>The number of watchlists being uploaded.</p>|Dependent item|azure.sentinel.watchlist.uploading<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: In progress|<p>The number of watchlists in progress.</p>|Dependent item|azure.sentinel.watchlist.progress<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: New|<p>The number of new watchlists.</p>|Dependent item|azure.sentinel.watchlist.new<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure Sentinel: Informational severity incident total has increased.|<p>The number of informational severity incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.info)>={$AZURE.SENTINEL.INCIDENTS.NEW:info} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0`|Info|**Manual close**: Yes|
+|Azure Sentinel: Low-severity incident total has increased.|<p>The number of low-severity incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.low)>={$AZURE.SENTINEL.INCIDENTS.NEW:low} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Medium-severity incident total has increased.|<p>The number of medium-severity incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.medium)>={$AZURE.SENTINEL.INCIDENTS.NEW:medium} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0`|Average|**Manual close**: Yes|
+|Azure Sentinel: High-severity incident total has increased.|<p>The number of high-severity incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.high)>={$AZURE.SENTINEL.INCIDENTS.NEW:high} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0`|High|**Manual close**: Yes|
+|Azure Sentinel: New incident total has increased.|<p>The number of new incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.new)>={$AZURE.SENTINEL.INCIDENTS.NEW} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0`|Info|**Manual close**: Yes|
+|Azure Sentinel: Incident become active.|<p>The number of active incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.active)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)=0`|Info|**Manual close**: Yes|
+|Azure Sentinel: Alert rule total has changed.|<p>The number of alert rules has changed.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.total)<>0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Alert rule was enabled.|<p>The number of enabled alert rules has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.enabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.total)=0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Alert rule was disabled.|<p>The number of disabled alert rules has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.disabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.total)=0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Automation rule total has changed.|<p>The number of automation rules has changed.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.automation_rules.total)<>0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Data connector total has changed.|<p>The number of data connectors has changed.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.total)<>0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Data connector was enabled.|<p>The number of enabled data connectors has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.enabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.total)=0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Data connector was disabled.|<p>The number of disabled data connectors has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.disabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.total)=0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Watchlist total has changed.|<p>The number of watchlists has changed.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)<>0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Watchlist was disabled.|<p>The number of canceled watchlists has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.canceled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)=0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Watchlist has failed.|<p>The number of failed watchlists has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.failed)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)=0`|Warning|**Manual close**: Yes|
+
+# Azure Container Apps by HTTP
+
+## Overview
+
+This template is designed to monitor Microsoft Azure Container Apps via HTTP.
+It works without any external scripts and uses the script item.
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Azure Container Apps
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
+|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
+|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
+|{$AZURE.RESOURCE.ID}|<p>Microsoft Azure container app resource ID.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$AZURE.CONTAINER_APP.JVM.METRICS}|<p>Enable Java virtual machine metric collection. Useful for container apps with Java development stack.</p>|`false`|
+|{$AZURE.CONTAINER_APP.CPU.WARN}|<p>Warning threshold for CPU utilization.</p>|`75`|
+|{$AZURE.CONTAINER_APP.CPU.CRIT}|<p>Critical threshold for CPU utilization.</p>|`90`|
+|{$AZURE.CONTAINER_APP.MEMORY.WARN}|<p>Warning threshold for memory utilization.</p>|`75`|
+|{$AZURE.CONTAINER_APP.MEMORY.CRIT}|<p>Critical threshold for memory utilization.</p>|`90`|
+|{$AZURE.CONTAINER_APP.GPU.WARN}|<p>Warning threshold for GPU utilization.</p>|`75`|
+|{$AZURE.CONTAINER_APP.GPU.CRIT}|<p>Critical threshold for GPU utilization.</p>|`90`|
+|{$AZURE.CONTAINER_APP.REBOOT.WARN}|<p>Threshold for amount of reboots per minute for a replica.</p>|`1`|
+|{$AZURE.CONTAINER_APP.RESPONSE.WARN}|<p>Threshold for average response time threshold, in milliseconds.</p>|`5000`|
+|{$AZURE.CONTAINER_APP.GC.ACTIONS.WARN}|<p>Threshold for amount of Java garbage collectors.</p>|`10`|
+|{$AZURE.CONTAINER_APP.GC.DURATION.WARN}|<p>Threshold for duration of Java garbage collectors, in milliseconds.</p>|`500`|
+|{$AZURE.CONTAINER_APP.THREAD.COUNT.WARN}|<p>Threshold for amount of threads in Java virtual machine.</p>|`500`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get data|<p>Gathers data of the Azure container app.</p>|Script|azure.container_app.data.get|
+|Get data, errors|<p>A list of errors from API requests.</p>|Dependent item|azure.container_app.data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Provisioning state|<p>The provisioning state of the container app.</p><p>0 - Unknown</p><p>1 - In progress</p><p>2 - Succeeded</p><p>3 - Failed</p><p>4 - Canceled</p><p>5 - Deleting</p>|Dependent item|azure.container_app.provisioning.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.overview.properties.provisioningState`</p><p>⛔️Custom on fail: Set value to: `Unknown`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Running status|<p>The current state of the container app.</p><p>0 - Unknown</p><p>1 - Progressing (container app is transitioning between Stopped and Running)</p><p>2 - Running</p><p>3 - Stopped</p><p>4 - Suspended</p><p>5 - Ready</p>|Dependent item|azure.container_app.running.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.overview.properties.runningStatus`</p><p>⛔️Custom on fail: Set value to: `Unknown`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Cores: Usage|<p>CPU consumed by the container app, in cores.</p>|Dependent item|azure.container_app.cores.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.UsageNanoCores`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1e-09`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Memory: Used|<p>Container app working set memory used, in bytes.</p>|Dependent item|azure.container_app.memory.bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.WorkingSetBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Network: Transmitted bytes|<p>Bytes transmitted by the container app.</p>|Dependent item|azure.container_app.bytes.tx<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.TxBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Network: Received bytes|<p>Bytes received by the container app.</p>|Dependent item|azure.container_app.bytes.rx<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.RxBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Requests: Processed|<p>Requests processed.</p>|Dependent item|azure.container_app.requests.processed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.Requests`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replica: Restarts|<p>The number of times the replica has restarted since the last check.</p>|Dependent item|azure.container_app.restart.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.RestartCount`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li>Simple change</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replica: Count|<p>Number of replicas.</p>|Dependent item|azure.container_app.replica.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.Replicas`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|GPU: Utilization|<p>GPU utilization, in percent.</p>|Dependent item|azure.container_app.utilization.gpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.GpuUtilizationPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Cores: Reserved, for revisions|<p>Number of reserved cores for container app revisions.</p>|Dependent item|azure.container_app.cores.reserved.revisions<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.CoresQuotaUsed`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Cores: Reserved, total|<p>Number of total reserved cores for the container app.</p>|Dependent item|azure.container_app.cores.reserved.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.TotalCoresQuotaUsed`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Connection timeouts|<p>Total connection timeouts.</p>|Dependent item|azure.container_app.connection.timeouts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyConnectTimeouts`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Requests: Retries|<p>Total request retries.</p>|Dependent item|azure.container_app.requests.retries<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyRequestRetries`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Requests: Timed out|<p>Total requests that timed out waiting for a response.</p>|Dependent item|azure.container_app.requests.timeouts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyRequestTimeouts`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Requests: Pending|<p>Total requests pending a connection pool connection.</p>|Dependent item|azure.container_app.requests.pending<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyRequestsPendingConnectionPool`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Ejected hosts|<p>Number of currently ejected hosts.</p>|Dependent item|azure.container_app.ejection.hosts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyEjectedHosts`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Ejections, aborted|<p>Number of ejections aborted due to the max ejection %.</p>|Dependent item|azure.container_app.ejection.aborted<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyEjectionsAborted`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Response time|<p>Average response time per status code.</p>|Dependent item|azure.container_app.response.time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResponseTime`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU: Utilization|<p>CPU utilization, in percent.</p>|Dependent item|azure.container_app.utilization.cpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.CpuPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Memory: Utilization|<p>Memory utilization, in percent.</p>|Dependent item|azure.container_app.utilization.memory<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.MemoryPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure container Apps: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Container Apps by HTTP/azure.container_app.data.errors))>0`|Average||
+|Azure container Apps: Azure container app failed|<p>The resource failed.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=3`|High||
+|Azure container Apps: Azure container app is canceled|<p>The resource is in the Canceled state.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=4`|Average||
+|Azure container Apps: Azure container app is being deleted|<p>The resource deletion process is happening.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=5`|High||
+|Azure container Apps: Azure container app is in unknown state|<p>The resource state is Unknown.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=0`|Warning||
+|Azure container Apps: Azure container app stopped|<p>The resource stopped.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=3`|High||
+|Azure container Apps: Azure container app suspended|<p>The resource is suspended.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=4`|Average||
+|Azure container Apps: Azure container app progressing|<p>The resource is transitioning between Stopped and Running states.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=1`|Warning||
+|Azure container Apps: Azure container app status is unknown|<p>The status of the resource is Unknown.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=0`|Warning||
+|Azure container Apps: Replica reboots too often|<p>A container app replica is restarting repeatedly within a defined time window.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.restart.count,3m)>{$AZURE.CONTAINER_APP.REBOOT.WARN}`|Warning||
+|Azure container Apps: GPU utilization is high|<p>GPU usage has exceeded the warning threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: GPU utilization is critical</li></ul>|
+|Azure container Apps: GPU utilization is critical|<p>GPU usage has reached a critical threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.CRIT}`|Average||
+|Azure container Apps: Container response time is too high|<p>The average response time of the container app has exceeded the acceptable limit.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.response.time,3m)>{$AZURE.CONTAINER_APP.RESPONSE.WARN}`|Warning||
+|Azure container Apps: CPU utilization is high|<p>CPU usage has exceeded the warning threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: CPU utilization is critical</li></ul>|
+|Azure container Apps: CPU utilization is critical|<p>CPU usage has reached a critical threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.CRIT}`|Average||
+|Azure container Apps: Memory utilization is high|<p>Memory consumption has exceeded the warning threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: Memory utilization is critical</li></ul>|
+|Azure container Apps: Memory utilization is critical|<p>Memory usage has reached a critical threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.CRIT}`|Average||
+
+### LLD rule Java metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Java metrics discovery|<p>Java metric discovery based on the `{$AZURE.CONTAINER_APP.JVM.METRICS}` macro.</p>|Script|azure.container_app.jvm_metrics.discovery|
+
+### Item prototypes for Java metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|JVM: Memory: Used, total{#SINGLETON}|<p>Total amount of memory used by heap or non-heap (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.used.total[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryTotalUsed`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Memory: Committed, total{#SINGLETON}|<p>Total amount of memory guaranteed to be available for heap or non-heap (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.committed.total[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryTotalCommitted`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Memory: Limit, total{#SINGLETON}|<p>Total amount of maximum obtainable memory for heap or non-heap (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.limit.total[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryTotalLimit`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Memory: Used{#SINGLETON}|<p>Amount of memory used by each pool (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.used[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryUsed`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Memory: Committed{#SINGLETON}|<p>Amount of memory guaranteed to be available for each pool (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.committed[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryCommitted`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Memory: Limit{#SINGLETON}|<p>Amount of maximum obtainable memory for each pool (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.limit[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryLimit`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: GC: Actions{#SINGLETON}|<p>Count of JVM garbage collection actions.</p>|Dependent item|azure.container_app.jvm.gc.actions[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmGcCount`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: GC: Duration{#SINGLETON}|<p>Duration of JVM garbage collection actions (in milliseconds).</p>|Dependent item|azure.container_app.jvm.gc.duration[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmGcDuration`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Threads{#SINGLETON}|<p>Number of executing platform threads.</p>|Dependent item|azure.container_app.jvm.thread.count[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmThreadCount`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Buffers: Usage{#SINGLETON}|<p>Amount of memory used by buffers, such as direct memory (in bytes).</p>|Dependent item|azure.container_app.jvm.buffers.usage[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmBufferMemoryUsage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Buffers: Limit{#SINGLETON}|<p>Amount of total memory capacity of buffers (in bytes).</p>|Dependent item|azure.container_app.jvm.buffers.limit[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmBufferMemoryLimit`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Buffers: Count{#SINGLETON}|<p>Number of buffers in the memory pool.</p>|Dependent item|azure.container_app.jvm.buffers.count[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmBufferCount`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for Java metrics discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure container Apps: Garbage collector action count is high|<p>Garbage collection is running too frequently.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.gc.actions[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.GC.ACTIONS.WARN}`|Warning||
+|Azure container Apps: Garbage collector duration is high|<p>Garbage collection duration has exceeded the warning threshold.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.gc.duration[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.GC.DURATION.WARN}`|Warning||
+|Azure container Apps: JVM thread amount is high|<p>Active JVM thread count has exceeded the warning threshold.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.thread.count[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.THREAD.COUNT.WARN}`|Warning||
 
 ## Feedback
 

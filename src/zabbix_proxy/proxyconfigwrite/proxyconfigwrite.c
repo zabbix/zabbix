@@ -704,20 +704,20 @@ static int	proxyconfig_delete_rows(const zbx_table_data_t *td, id_unhash_func_t 
 				(const char * const*)ids.values, ids.values_num);
 
 		zbx_vector_str_destroy(&ids);
-	}
-	else
-	{
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid, td->del_ids.values,
-				td->del_ids.values_num);
-	}
 
-	if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-	{
-		*error = zbx_dsprintf(NULL, "cannot remove old objects from table \"%s\"", td->table->table);
-		ret = FAIL;
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		{
+			*error = zbx_dsprintf(NULL, "cannot remove old objects from table \"%s\"", td->table->table);
+			ret = FAIL;
+		}
+		else
+			ret = SUCCEED;
 	}
 	else
-		ret = SUCCEED;
+	{
+		if (FAIL == (ret = zbx_db_execute_multiple_query(sql, td->table->recid, &td->del_ids)))
+			*error = zbx_dsprintf(NULL, "cannot remove old objects from table \"%s\"", td->table->table);
+	}
 
 	zbx_free(sql);
 
@@ -843,20 +843,20 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, id_unhash_func_t unhas
 				(const char * const*)ids.values, ids.values_num);
 
 		zbx_vector_str_destroy(&ids);
-	}
-	else
-	{
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid, updateids.values,
-				updateids.values_num);
-	}
 
-	if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-	{
-		*error = zbx_dsprintf(NULL, "cannot prepare rows for update in table \"%s\"", td->table->table);
-		ret = FAIL;
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		{
+			*error = zbx_dsprintf(NULL, "cannot prepare rows for update in table \"%s\"", td->table->table);
+			ret = FAIL;
+		}
+		else
+			ret = SUCCEED;
 	}
 	else
-		ret = SUCCEED;
+	{
+		if (FAIL == (ret = zbx_db_execute_multiple_query(sql, td->table->recid, &updateids)))
+			*error = zbx_dsprintf(NULL, "cannot prepare rows for update in table \"%s\"", td->table->table);
+	}
 
 	zbx_free(sql);
 out:
@@ -968,6 +968,8 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, id_unhash_func_t unhash
 	if (0 == td->updates.values_num)
 		return SUCCEED;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'", __func__, td->table->table);
+
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
 
 	for (i = 0; i < td->updates.values_num; i++)
@@ -1049,6 +1051,8 @@ out:
 
 	if (SUCCEED != ret && NULL == *error)
 		*error = zbx_dsprintf(NULL, "cannot update rows in table \"%s\"", td->table->table);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() '%s'", __func__, td->table->table);
 
 	return ret;
 }
@@ -2458,7 +2462,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		const char *config_ssl_key_location, const char *server)
 {
 	struct zbx_json_parse		jp_config, jp_kvs_paths = {0};
-	int				ret;
+	int				ret, locked = 0;
 	struct zbx_json			j;
 	char				*error = NULL;
 	zbx_uint64_t			config_revision, hostmap_revision;
@@ -2481,6 +2485,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		goto out;
 	}
 
+	locked = 1;
 	zbx_dc_get_upstream_revision(&config_revision, &hostmap_revision);
 
 	zbx_json_init(&j, 1024);
@@ -2546,14 +2551,17 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy onfiguration data received from server at"
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy configuration data received from server at"
 				" \"%s\": %s", sock->peer, error);
 	}
 
 	zbx_dc_sync_unlock();
+	locked = 0;
 	zbx_send_proxy_response(sock, ret, error, config_timeout);
 	zbx_free(error);
 out:
+	if (0 != locked)
+		zbx_dc_sync_unlock();
 #ifdef	HAVE_MALLOC_TRIM
 	/* avoid memory not being released back to the system if large proxy configuration is retrieved from database */
 	if (ZBX_PROXYCONFIG_WRITE_STATUS_DATA == status)

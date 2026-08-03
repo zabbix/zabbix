@@ -53,7 +53,7 @@ class WidgetForm extends CWidgetForm {
 				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField(
-				new CWidgetFieldTextBox('problem', _('Problem'))
+				(new CWidgetFieldTextBox('problem', _('Problem')))->setMaxLength(2048)
 			)
 			->addField(
 				new CWidgetFieldSeverities('severities', _('Severity'))

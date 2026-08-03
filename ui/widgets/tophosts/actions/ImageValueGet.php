@@ -57,7 +57,8 @@ class ImageValueGet extends CController {
 				'filter' => [
 					'clock' => $this->getInput('clock'),
 					'ns' => $this->getInput('ns')
-				]
+				],
+				'maxValueSize' => null
 			]);
 
 			if ($history_value) {

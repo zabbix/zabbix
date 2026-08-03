@@ -23,9 +23,8 @@ class CSvgGraphMetricsPoint extends CSvgGroup {
 
 	private const ZBX_STYLE_CLASS = 'svg-graph-points';
 
-	private $path;
-	private $itemid;
-	private $item_name;
+	private array $path;
+	private array $metric;
 
 	protected $options;
 
@@ -33,8 +32,7 @@ class CSvgGraphMetricsPoint extends CSvgGroup {
 		parent::__construct();
 
 		$this->path = $path ? : [];
-		$this->itemid = $metric['itemid'];
-		$this->item_name = $metric['name'];
+		$this->metric = $metric;
 
 		$this->options = $metric['options'] + [
 			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
@@ -47,10 +45,10 @@ class CSvgGraphMetricsPoint extends CSvgGroup {
 	public function makeStyles(): array {
 		$this
 			->addClass(self::ZBX_STYLE_CLASS)
-			->addClass(self::ZBX_STYLE_CLASS.'-'.$this->itemid.'-'.$this->options['order']);
+			->addClass(self::ZBX_STYLE_CLASS.'-'.$this->metric['itemid'].'-'.$this->options['order']);
 
 		return [
-			'.'.self::ZBX_STYLE_CLASS.'-'.$this->itemid.'-'.$this->options['order'] => [
+			'.'.self::ZBX_STYLE_CLASS.'-'.$this->metric['itemid'].'-'.$this->options['order'] => [
 				'fill-opacity' => $this->options['transparency'] * 0.1,
 				'fill' => $this->options['color']
 			]
@@ -73,7 +71,10 @@ class CSvgGraphMetricsPoint extends CSvgGroup {
 	public function toString($destroy = true): string {
 		$this
 			->setAttribute('data-set', 'points')
-			->setAttribute('data-metric', $this->item_name)
+			->setAttribute('data-metric', $this->metric['name'])
+			->setAttribute('data-itemid', $this->metric['itemid'])
+			->setAttribute('data-itemids', $this->metric['itemids'])
+			->setAttribute('data-ds', $this->metric['data_set'])
 			->setAttribute('data-color', $this->options['color'])
 			->draw();
 

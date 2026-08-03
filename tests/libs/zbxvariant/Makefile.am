@@ -13,7 +13,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 VARIANT_LIBS = \
-	$(VARIANT_DEPS) \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

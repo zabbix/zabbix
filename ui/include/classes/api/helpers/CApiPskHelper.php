@@ -59,22 +59,6 @@ class CApiPskHelper {
 		}
 	}
 
-	public static function checkPskOfIdentityInAutoregistration(array $psk_pair): void {
-		$row = DBfetch(DBselect(
-			'SELECT NULL'.
-			' FROM config_autoreg_tls'.
-			' WHERE '.dbConditionString('tls_psk_identity', [$psk_pair['tls_psk_identity']]).
-				' AND '.dbConditionString('tls_psk', [$psk_pair['tls_psk']], true),
-			1
-		));
-
-		if ($row) {
-			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/tls_psk',
-				_('another tls_psk value is already associated with given tls_psk_identity')
-			));
-		}
-	}
-
 	public static function checkPskOfIdentitiesAmongHosts(array $psk_pairs, ?array $hostids = null): void {
 		$object_indexes = [];
 		$psk_conditions = [];

@@ -54,7 +54,7 @@ $snmp_details = (new CDiv(
 		->addItem([
 			(new CLabel([
 				_('Max repetition count'),
-				makeHelpIcon(_('Max repetition count is applicable to discovery and walk only.'))
+				makeHelpIcon(_('Max repetition count is applicable to walk only.'))
 			], 'interfaces[#{iface.interfaceid}][details][max_repetitions]'))
 				->setId('snmp_repetition_count_label_#{iface.interfaceid}'),
 			(new CFormField(
@@ -185,19 +185,21 @@ $snmp_details = (new CDiv(
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_TYPE),
 		(new CDiv(
-			(new CTextBox('interfaces[#{iface.interfaceid}][ip]', '#{iface.ip}', false, DB::getFieldLength('interface', 'ip')))
+			(new CTextAreaFlexible('interfaces[#{iface.interfaceid}][ip]', '#{iface.ip}'))
 				->setErrorContainer('interface_#{iface.interfaceid}_error_container')
 				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
+				->setMaxlength(DB::getFieldLength('interface', 'ip'))
 				->setErrorLabel(_('IP address'))
 		))
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_IP),
 		(new CDiv(
-			(new CTextBox('interfaces[#{iface.interfaceid}][dns]', '#{iface.dns}', false, DB::getFieldLength('interface', 'dns')))
+			(new CTextAreaFlexible('interfaces[#{iface.interfaceid}][dns]', '#{iface.dns}'))
 				->setErrorContainer('interface_#{iface.interfaceid}_error_container')
 				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
+				->setMaxlength(DB::getFieldLength('interface', 'dns'))
 				->setErrorLabel(_('DNS name'))
 		))
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)

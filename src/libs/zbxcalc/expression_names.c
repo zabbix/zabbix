@@ -17,6 +17,7 @@
 #include "eval.h"
 
 #include "zbx_discoverer_constants.h"
+#include "zbxhistory.h"
 
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 {
@@ -63,12 +64,16 @@ const char	*zbx_type_string(zbx_value_type_t type)
 {
 	switch (type)
 	{
+		case ZBX_VALUE_UNKNOWN:
+			return "unknown";
 		case ZBX_VALUE_NONE:
 			return "none";
 		case ZBX_VALUE_SECONDS:
 			return "sec";
 		case ZBX_VALUE_NVALUES:
 			return "num";
+		case ZBX_VALUE_NODATA:
+			return "nodata";
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return "unknown";

@@ -16,10 +16,13 @@
 #include "logfiles.h"
 
 #include "zbxalgo.h"
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__) && !defined(WITH_AGENT2_METRICS)
 #include "zbxhash.h"
 #include "zbxnum.h"
 #include "zbxjson.h"
 #include "zbxcrypto.h"
+#endif
 
 /* tags for agent persistent storage files */
 #define ZBX_PERSIST_TAG_FILENAME		"filename"
@@ -40,7 +43,7 @@
 ZBX_VECTOR_IMPL(pre_persistent, zbx_pre_persistent_t)
 ZBX_VECTOR_IMPL(persistent_inactive, zbx_persistent_inactive_t)
 
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#if !defined(_WINDOWS) && !defined(__MINGW32__) && !defined(WITH_AGENT2_METRICS)
 static int	zbx_persistent_inactive_compare_func(const void *d1, const void *d2)
 {
 	const zbx_persistent_inactive_t	*p1 = (const zbx_persistent_inactive_t *)d1;
@@ -936,4 +939,4 @@ int	zbx_restore_file_details(const char *str, struct st_logfile **logfiles, int 
 
 	return SUCCEED;
 }
-#endif	/* not WINDOWS */
+#endif	/* not WINDOWS, not WITH_AGENT2_METRICS */

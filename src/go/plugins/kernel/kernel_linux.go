@@ -15,45 +15,49 @@
 package kernel
 
 import (
-	"bufio"
-	"fmt"
 	"strconv"
-	"strings"
+
+	"golang.zabbix.com/agent2/pkg/procfs"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 )
 
-// getFirstNum  - get first number from file
-func getFirstNum(key string) (max uint64, err error) {
-	fileName := "/proc"
+// gatherData  - get first number from file.
+func (p *Plugin) gatherData(key string) (uint64, error) {
+	var fileName string
+
 	switch key {
 	case "kernel.maxproc":
-		fileName += "/sys/kernel/pid_max"
+		fileName = p.pidMaxPath
 	case "kernel.maxfiles":
-		fileName += "/sys/fs/file-max"
+		fileName = p.fileMaxPath
 	case "kernel.openfiles":
-		fileName += "/sys/fs/file-nr"
+		fileName = p.fileNrPath
+	default:
+		return 0, plugin.UnsupportedMetricError
 	}
 
-	file, err := stdOs.Open(fileName)
-	if err == nil {
-		var line []byte
-		var long bool
+	parser := procfs.NewParser().
+		SetScanStrategy(procfs.StrategyReadAll).
+		SetMaxMatches(1)
 
-		reader := bufio.NewReader(file)
-
-		if line, long, err = reader.ReadLine(); err == nil && !long {
-			if key == "kernel.openfiles" {
-				max, err = strconv.ParseUint(strings.Split(string(line), "\t")[0], 10, 64)
-			} else {
-				max, err = strconv.ParseUint(string(line), 10, 64)
-			}
-		}
-
-		file.Close()
+	if key == "kernel.openfiles" {
+		parser.SetSplitter("\t", 0) // there are several values in the line.
 	}
 
+	data, err := parser.Parse(fileName)
 	if err != nil {
-		err = fmt.Errorf("Cannot obtain data from %s.", fileName)
+		return 0, errs.Wrapf(err, "failed to read %s", fileName)
 	}
 
-	return
+	if len(data) == 0 {
+		return 0, errs.Errorf("failed to parse %s", fileName)
+	}
+
+	result, err := strconv.ParseUint(data[0], 10, 64)
+	if err != nil {
+		return 0, errs.Wrapf(err, "data obtained from %s was invalid", fileName)
+	}
+
+	return result, nil
 }

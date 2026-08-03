@@ -34,7 +34,12 @@ window.media_edit_popup = new class {
 	/**
 	 * @type {HTMLFormElement}
 	 */
-	#form;
+	#form_element;
+
+	/**
+	 * @type {CForm}
+	 */
+	#form
 
 	/**
 	 * @type {Object}
@@ -46,37 +51,60 @@ window.media_edit_popup = new class {
 	 */
 	#media_type;
 
-	init({mediatypes, sendto_emails}) {
+	init({rules, mediatypes, sendto_list}) {
 		this.#overlay = overlays_stack.getById('media-edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
-		this.#form = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
 		this.#mediatypes = mediatypes;
 		this.#media_type = document.getElementById('mediatypeid');
 
-		jQuery('#sendto_emails').dynamicRows({
-			template: '#sendto-emails-row-tmpl',
-			rows: sendto_emails.map(email => ({email})),
+		jQuery('#sendto_list').dynamicRows({
+			template: '#sendto-list-row-tmpl',
+			rows: sendto_list.map(value => ({value})),
 			allow_empty: true
 		});
 
 		this.#media_type.addEventListener('change', () => this.#updateForm());
+		this.#form.findFieldByName('sendto_active_devices').getField()
+			.addEventListener('change', () => this.#updateForm());
 
 		this.#updateForm();
+		this.#form.discoverAllFields();
 
-		this.#form.style.display = '';
+		this.#form_element.style.display = '';
 	}
 
 	#updateForm() {
 		const mediatypeid = this.#media_type.value;
-		const is_type_email = mediatypeid in this.#mediatypes
-			&& this.#mediatypes[mediatypeid].type == <?= MEDIA_TYPE_EMAIL ?>;
+		const mediatype_type = mediatypeid in this.#mediatypes ? this.#mediatypes[mediatypeid].type : null;
+		const visible_sendto_class = mediatype_type == <?= MEDIA_TYPE_EMAIL ?>
+			? 'js-field-sendto-list'
+			:  mediatype_type == <?= MEDIA_TYPE_PUSH ?> ? 'js-field-sendto-devices' : 'js-field-sendto';
 
-		for (const field of this.#form.querySelectorAll('.js-field-sendto')) {
-			field.style.display = is_type_email ? 'none' : '';
+		if (mediatypeid in this.#mediatypes) {
+			document.getElementById('mediatype_type').setAttribute('value', this.#mediatypes[mediatypeid].type);
 		}
 
-		for (const field of this.#form.querySelectorAll('.js-field-sendto-emails')) {
-			field.style.display = is_type_email ? '' : 'none';
+		const sendto_fields = this.#form_element
+			.querySelectorAll('.js-field-sendto, .js-field-sendto-list, .js-field-sendto-devices');
+
+		for (const field of sendto_fields) {
+			field.style.display = field.classList.contains(visible_sendto_class) ? '' : 'none';
+		}
+
+		const field_sendto_devices = this.#form.findFieldByName('sendto_deviceuuids').getField();
+
+		if (this.#form.findFieldByName('sendto_active_devices').getValue() === '1') {
+			$(field_sendto_devices).multiSelect('disable');
+			field_sendto_devices.closest('.js-field-sendto-devices').style.display = 'none';
+		}
+		else {
+			$(field_sendto_devices).multiSelect('enable');
+
+			if (visible_sendto_class === 'js-field-sendto-devices') {
+				field_sendto_devices.closest('.js-field-sendto-devices').style.display = '';
+			}
 		}
 
 		if (mediatypeid in this.#mediatypes) {
@@ -87,30 +115,20 @@ window.media_edit_popup = new class {
 	}
 
 	submit() {
-		const fields = this.#trimFields(getFormFields(this.#form));
-		const url = new URL('zabbix.php', location.href);
+		const fields = this.#form.getAllValues();
+		this.#overlay.setLoading();
 
-		url.searchParams.set('action', 'popup.media.check');
-
-		this.#post(url, fields);
-	}
-
-	#trimFields(fields) {
-		for (const field of ['period', 'sendto']) {
-			if (field in fields) {
-				fields[field] = fields[field].trim();
-			}
-		}
-
-		if ('sendto_emails' in fields) {
-			for (const key in fields.sendto_emails) {
-				if (fields.sendto_emails.hasOwnProperty(key)) {
-					fields.sendto_emails[key] = fields.sendto_emails[key].trim();
+		this.#form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#overlay.unsetLoading();
+					return;
 				}
-			}
-		}
 
-		return fields;
+				const url = new URL('zabbix.php', location.href);
+				url.searchParams.set('action', 'popup.media.check');
+				this.#post(url, fields);
+			});
 	}
 
 	#post(url, data) {
@@ -127,12 +145,19 @@ window.media_edit_popup = new class {
 					throw {error: response.error};
 				}
 
+				if ('form_errors' in response) {
+					this.#form.setErrors(response.form_errors, true, true);
+					this.#form.renderErrors();
+
+					return;
+				}
+
 				overlayDialogueDestroy(this.#overlay.dialogueid);
 
 				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
 			.catch(exception => {
-				for (const element of this.#form.parentNode.children) {
+				for (const element of this.#form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -151,7 +176,7 @@ window.media_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
 
-				this.#form.parentNode.insertBefore(message_box, this.#form);
+				this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 			})
 			.finally(() => {
 				this.#overlay.unsetLoading();

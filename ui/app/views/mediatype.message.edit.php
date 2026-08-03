@@ -38,37 +38,14 @@ if ($data['params']['old_message_type'] != -1) {
 $message_type_select = (new CSelect('message_type'))
 	->setId('message_type')
 	->setFocusableElementId('message-type')
-	->setValue($data['params']['old_message_type'])
-	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_PROBLEM, _('Problem')))
-		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_PROBLEM, $data['params']['message_types']))
-	)
-	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_RECOVERY, _('Problem recovery')))
-		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_RECOVERY, $data['params']['message_types']))
-	)
-	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_UPDATE, _('Problem update')))
-		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_UPDATE, $data['params']['message_types']))
-	)
-	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_SERVICE, _('Service')))
-		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_SERVICE, $data['params']['message_types']))
-	)
-	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_SERVICE_RECOVERY, _('Service recovery')))
-		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_SERVICE_RECOVERY, $data['params']['message_types']))
-	)
-	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_SERVICE_UPDATE, _('Service update')))
-		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_SERVICE_UPDATE, $data['params']['message_types']))
-	)
-	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_DISCOVERY, _('Discovery')))
-		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_DISCOVERY, $data['params']['message_types']))
-	)
-	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_AUTOREG, _('Autoregistration')))
-		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_AUTOREG, $data['params']['message_types']))
-	)
-	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_INTERNAL, _('Internal problem')))
-		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_INTERNAL, $data['params']['message_types']))
-	)
-	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_INTERNAL_RECOVERY, _('Internal problem recovery')))
-		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_INTERNAL_RECOVERY, $data['params']['message_types']))
+	->setValue($data['params']['old_message_type']);
+
+foreach($data['message_templates'] as $message_type => $message_template) {
+	$message_type_select->addOption(
+		(new CSelectOption($message_type, $message_template['name']))
+			->setDisabled(in_array($message_type, $data['params']['message_types']))
 	);
+}
 
 $form_grid = (new CFormGrid())
 	->addItem([
@@ -80,7 +57,7 @@ if ($data['params']['type'] != MEDIA_TYPE_SMS) {
 	$form_grid->addItem([
 		new CLabel(_('Subject'), 'subject'),
 		new CFormField(
-			(new CTextBox('subject', $data['params']['subject']))
+			(new CTextAreaFlexible('subject', $data['params']['subject']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('media_type_message', 'subject'))
 		)
@@ -100,7 +77,8 @@ $form
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'))
 	->addItem(
 		(new CScriptTag('mediatype_message_popup.init('.json_encode([
-			'message_templates' => CMediatypeHelper::getAllMessageTemplates()
+			'rules' => $data['js_validation_rules'],
+			'message_templates' => $data['message_templates']
 		]).');'))->setOnDocumentReady()
 	);
 
@@ -110,9 +88,9 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['params']['old_message_type'] == -1 ? _('Add') : _('Update'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'mediatype_message_popup.submit();'
+			'isSubmit' => true
 		]
 	],
 	'script_inline' => getPagePostJs().$this->readJsFile('mediatype.message.edit.js.php')

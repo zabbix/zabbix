@@ -453,6 +453,14 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
+							new CLabel(_('Invert values'), $field_name.'['.$row_num.'][invert_values]'),
+							new CFormField([
+								(new CVar($field_name.'['.$row_num.'][invert_values]', '0'))->removeId(),
+								(new CCheckBox($field_name.'['.$row_num.'][invert_values]'))
+									->setChecked((bool) $value['invert_values'])
+							])
+						])
+						->addItem([
 							new CLabel(_('Time shift'), $field_name.'['.$row_num.'][timeshift]'),
 							new CFormField(
 								(new CTextBox($field_name.'['.$row_num.'][timeshift]', $value['timeshift']))

@@ -244,7 +244,7 @@ class CWidgetTopHosts extends CWidget {
 					break;
 
 				case CWidgetTopHosts.VALUE_TYPE_RAW:
-					const curl = this.#getHintboxContentCUrl(button);
+					const curl = this.#getHintboxHtmlCUrl(button);
 					curl.setArgument('action', 'widget.tophosts.binary_value.get');
 
 					this.#addHintbox(button, '', curl);
@@ -268,7 +268,7 @@ class CWidgetTopHosts extends CWidget {
 		}
 	}
 
-	#getHintboxContentCUrl(button) {
+	#getHintboxHtmlCUrl(button) {
 		const curl = new Curl('zabbix.php');
 		const value = this.#binary_buttons.get(button);
 
@@ -291,25 +291,12 @@ class CWidgetTopHosts extends CWidget {
 
 				hint_box.classList.add('dashboard-widget-tophosts-hintbox-image');
 
-				const curl = this.#getHintboxContentCUrl(button);
+				const curl = this.#getHintboxHtmlCUrl(button);
 
 				curl.setArgument('action', 'widget.tophosts.image_value.get');
 				content.src = curl.getUrl();
 				container.innerHTML = '';
 				container.append(content);
-
-				e.target.resize_observer = new ResizeObserver((entries) => {
-					entries.forEach(entry => {
-						if (entry.contentBoxSize) {
-							const overlay = content.closest('.dashboard-widget-tophosts-hintbox-image');
-							const size = entry.contentBoxSize[0];
-
-							overlay.style.width = `${size.inlineSize}px`;
-							overlay.style.height = `${size.blockSize}px`;
-						}
-					})
-				});
-				e.target.resize_observer.observe(content);
 
 				if (!content.complete) {
 					hint_box.classList.add('is-loading');
@@ -325,22 +312,14 @@ class CWidgetTopHosts extends CWidget {
 					});
 				}
 			});
-
-			button.addEventListener('onHideHint.hintBox', e => {
-				if (e.target.resize_observer !== undefined) {
-					e.target.resize_observer.disconnect();
-
-					delete e.target.resize_observer;
-				}
-			})
 		}
 		else {
 			if (curl !== null) {
-				button.dataset.hintboxContents = '';
+				button.dataset.hintboxHtml = '';
 				button.dataset.hintboxPreload = JSON.stringify({action: curl.args.action, data: curl.args});
 			}
 			else {
-				button.dataset.hintboxContents = content || t('Empty value.');
+				button.dataset.hintboxHtml = content || t('Empty value.');
 			}
 		}
 	}

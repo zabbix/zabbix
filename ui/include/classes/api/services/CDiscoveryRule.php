@@ -1319,18 +1319,6 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		]);
 		DB::delete('items', ['itemid' => $del_itemids]);
 
-		$ins_housekeeper = [];
-
-		foreach ($del_itemids as $itemid) {
-			$ins_housekeeper[] = [
-				'tablename' => 'events',
-				'field' => 'lldruleid',
-				'value' => $itemid
-			];
-		}
-
-		DB::insertBatch('housekeeper', $ins_housekeeper);
-
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_LLD_RULE, $db_items);
 	}
 

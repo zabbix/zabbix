@@ -91,7 +91,7 @@
 
 				background-color: $ui-bg-color;
 				border: 1px solid $ui-border-color;
-				border-radius: 2px;
+				border-radius: var(--surface-border-radius);
 
 				@if $ui-transitions {
 					transition: background-color $ui-transition-duration,
@@ -248,6 +248,7 @@
 		overflow: hidden;
 		background-color: rgba($ui-bg-color, .7);
 		border: 1px dashed $form-border-color;
+		border-radius: var(--surface-border-radius);
 		box-shadow: 2px 2px 6px $action-shadow-color;
 		flex: 1;
 	}
@@ -319,8 +320,10 @@
 	flex-direction: row;
 	overflow: hidden;
 	align-items: flex-start;
-	border: 1px solid $ui-border-color;
-	border-bottom: 0;
+	border: solid $ui-border-color;
+	border-width: 1px 1px 0;
+	border-top-left-radius: var(--surface-border-radius);
+	border-top-right-radius: var(--surface-border-radius);
 	background-color: $ui-bg-color;
 	z-index: 10;
 
@@ -392,6 +395,8 @@
 	padding-bottom: 8px;
 	overflow: auto;
 	border: 1px solid $ui-border-color;
+	border-bottom-left-radius: var(--surface-border-radius);
+	border-bottom-right-radius: var(--surface-border-radius);
 	background-color: $ui-bg-color;
 
 	@extend %webkit-scrollbar;
@@ -487,14 +492,13 @@
 
 	&.dashboard-grid-widget-hidden-header {
 		.dashboard-grid-widget-header {
-			height: 0;
+			height: var(--surface-border-radius);
 			z-index: 11;
 
 			@if $ui-transitions {
 				transition: height $ui-transition-duration ease-out,
 							margin-top $ui-transition-duration ease-out,
-							box-shadow $ui-transition-duration ease-out,
-							opacity $ui-transition-duration ease-out;
+							box-shadow $ui-transition-duration ease-out;
 			}
 		}
 
@@ -502,6 +506,10 @@
 			margin-top: 0;
 			height: 100%;
 			padding-top: 8px;
+			border-top-color: transparent;
+			border-top-left-radius: var(--surface-border-radius);
+			border-top-right-radius: var(--surface-border-radius);
+			transition-property: border-radius;
 
 			&.no-padding {
 				.dashboard-grid-widget-messages {
@@ -529,6 +537,13 @@
 				height: 2rem;
 				margin-top: -2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+			}
+
+			.dashboard-grid-widget-contents {
+				border-top-left-radius: 0;
+				border-top-right-radius: 0;
+
+				transition-delay: 0ms;
 			}
 		}
 	}
@@ -562,12 +577,14 @@
 	box-sizing: border-box;
 	border: 1px solid $ui-border-color;
 	border-bottom: 0;
+	border-radius: var(--surface-border-radius);
 	background-color: $ui-bg-color;
 	opacity: 0;
 	z-index: 11;
 
 	// Transition for opacity is set for best border disappearance on different themes.
 	@if $ui-transitions {
+		clip-path: inset(0 0 0 0 round var(--surface-border-radius));
 		transition: margin-top $ui-transition-duration ease-out,
 					height $ui-transition-duration ease-out,
 					opacity .15s .15s ease-out,
@@ -596,7 +613,7 @@
 		height: 2rem;
 		display: none;
 		flex-direction: row;
-		flex-shrink: 0; // IE11 fix.
+		flex-shrink: 0;
 		align-items: center;
 
 		.dashboard-grid-iterator-pager-info {
@@ -651,6 +668,7 @@
 		flex-grow: 1;
 		flex-direction: column;
 		border: 1px solid $ui-border-color;
+		border-radius: var(--surface-border-radius);
 		background-color: rgba($ui-bg-color, .3);
 	}
 }
@@ -785,6 +803,7 @@
 
 	.dashboard-grid-widget .dashboard-grid-widget-header,
 	.dashboard-grid-iterator .dashboard-grid-iterator-header {
+		border-radius: var(--surface-border-radius);
 		cursor: auto;
 	}
 }

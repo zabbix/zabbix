@@ -60,6 +60,7 @@ class CZabbixServer {
 	const ERROR_CODE_NONE = 0;
 	const ERROR_CODE_TLS = 1;
 	const ERROR_CODE_TCP = 2;
+	const ERROR_CODE_DEVICE_NOT_FOUND = 3;
 
 	/**
 	 * Zabbix server host name.
@@ -292,6 +293,43 @@ class CZabbixServer {
 			'request' => 'report.test',
 			'sid' => $sid,
 			'data' => $data
+		]);
+	}
+
+	/**
+	 * Request server to init mobile device.
+	 *
+	 * @param array  $data
+	 * @param string $data['userid']  User ID.
+	 * @param string $data['uuid']    External device ID.
+	 * @param string $sid             User session ID or token.
+	 *
+	 * @return array|bool
+	 */
+	public function initDevice(array $data, string $sid) {
+		return $this->request([
+			'request' => 'device.init',
+			'data' => $data,
+			'sid' => $sid,
+			'clientip' => CWebUser::getIp()
+		]);
+	}
+
+	/**
+	 * Request server to offboard mobile device.
+	 *
+	 * @param array  $data
+	 * @param string $data['uuid']  External device ID.
+	 * @param string $sid           User session ID or token.
+	 *
+	 * @return array|bool
+	 */
+	public function offboardDevice(array $data, string $sid) {
+		return $this->request([
+			'request' => 'device.offboard',
+			'data' => $data,
+			'sid' => $sid,
+			'clientip' => CWebUser::getIp()
 		]);
 	}
 
@@ -587,9 +625,62 @@ class CZabbixServer {
 		}
 
 		// An error on the server side occurred.
-		$this->error = rtrim($response['info']);
+		$this->error = match ($params['request']) {
+			'device.init', 'device.offboard' => $this->getDeviceRequestError($params['request'], $response['info']),
+			default => rtrim($response['info'])
+		};
 
 		return false;
+	}
+
+	/**
+	 * @param string $request           Request name. Possible values: 'device.init', 'device.offboard'.
+	 * @param array  $error             Contains either an error message or both an error domain and a reason.
+	 * @param string $error['message']  Error message prepared by Zabbix server.
+	 * @param string $error['domain]    Error domain code propagated from Bridge adapter.
+	 * @param string $error['reason']   Error reason code propagated from Bridge adapter.
+	 *
+	 * @return string
+	 */
+	private function getDeviceRequestError(string $request, array $error): string {
+		if (array_key_exists('message', $error)) {
+			return $error['message'];
+		}
+
+		$default_error = _s('Failed to process "%1$s" request. Please contact your system administrator.', $request);
+
+		if ($error['domain'] === 'bridge.device') {
+			return match ($request) {
+				'device.init' => $this->getDeviceInitError($error['reason'], $default_error),
+				'device.offboard' => $this->getDeviceOffboardError($error['reason'], $default_error)
+			};
+		}
+
+		return $default_error;
+	}
+
+	private function getDeviceInitError(string $reason, string $default_error): string {
+		return match ($reason) {
+			'INSTANCE_NOT_FOUND', 'DEVICE_DISABLED_OR_REDEEMED', 'FIELDS_VALIDATION_FAILED' => _('Cannot add device. Please contact your system administrator.'),
+			'REGISTRATION_FAILED' => _('Cannot add device. Please try again later. If error persists, please contact your system administrator.'),
+			'DEVICE_LIMIT_EXCEEDED' => _('Cannot add device because the device limit has been reached. Please remove redundant devices, or contact your system administrator.'),
+			default => $default_error
+		};
+	}
+
+	private function getDeviceOffboardError(string $reason, string $default_error): string {
+		return match ($reason) {
+			'DEVICE_NOT_FOUND' => $this->deviceNotFoundError(),
+			'INSTANCE_NOT_FOUND', 'FIELDS_VALIDATION_FAILED' => _('Cannot unlink device. Please contact your system administrator.'),
+			'DEACTIVATION_FAILED', 'EXTERNAL_UNAVAILABLE' => _('Cannot unlink device. Please try again later. If error persists, please contact your system administrator.'),
+			default => $default_error
+		};
+	}
+
+	private function deviceNotFoundError(): string {
+		$this->error_code = self::ERROR_CODE_DEVICE_NOT_FOUND;
+
+		return _('Cannot unlink device. Please contact your system administrator.');
 	}
 
 	protected function connect(): bool {
@@ -603,7 +694,7 @@ class CZabbixServer {
 			return false;
 		}
 
-		if ($this->tls_config['ACTIVE'] == 1) {
+		if ($this->tls_config['ACTIVE']) {
 			$this->socket = $this->connectTLS();
 		}
 		else {

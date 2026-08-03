@@ -75,10 +75,10 @@ Note: Since version 7.2.0, you can also connect to the MSSQL instance using its 
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MSSQL.URI}|<p>Connection string.</p>||
+|{$MSSQL.URI}|<p>Connection string for the MSSQL instance.</p>||
 |{$MSSQL.USER}|<p>MSSQL database username.</p>||
 |{$MSSQL.PASSWORD}|<p>MSSQL database password.</p>||
-|{$MSSQL.HOST}|<p>The hostname or IP address of the MSSQL instance.</p>|`localhost`|
+|{$MSSQL.HOST}|<p>Hostname or IP address of the MSSQL instance.</p>|`localhost`|
 |{$MSSQL.PORT}|<p>MSSQL TCP port.</p>|`1433`|
 |{$MSSQL.WORK_FILES.MAX}|<p>The maximum number of work files created per second - for the trigger expression.</p>|`20`|
 |{$MSSQL.WORK_TABLES.MAX}|<p>The maximum number of work tables created per second - for the trigger expression.</p>|`20`|
@@ -87,7 +87,7 @@ Note: Since version 7.2.0, you can also connect to the MSSQL instance using its 
 |{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}|<p>The minimum buffer cache hit ratio, in percent - for the High trigger expression.</p>|`30`|
 |{$MSSQL.FREE_LIST_STALLS.MAX}|<p>The maximum free list stalls per second - for the trigger expression.</p>|`2`|
 |{$MSSQL.LAZY_WRITES.MAX}|<p>The maximum lazy writes per second - for the trigger expression.</p>|`20`|
-|{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}|<p>The minimum page life expectancy - for the trigger expression.</p>|`300`|
+|{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}|<p>The minimum page life (in seconds) expectancy - for the trigger expression.</p>|`300`|
 |{$MSSQL.PAGE_READS.MAX}|<p>The maximum page reads per second - for the trigger expression.</p>|`90`|
 |{$MSSQL.PAGE_WRITES.MAX}|<p>The maximum page writes per second - for the trigger expression.</p>|`90`|
 |{$MSSQL.AVERAGE_WAIT_TIME.MAX}|<p>The maximum average wait time, in milliseconds - for the trigger expression.</p>|`500`|

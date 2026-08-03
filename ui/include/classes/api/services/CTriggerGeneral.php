@@ -1268,7 +1268,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 				// Discovered fields, except status, cannot be updated.
 				$update_discovered_validator = new CUpdateDiscoveredValidator([
-					'allowed' => ['triggerid', 'status'],
+					'allowed' => ['triggerid', 'status', 'tags'],
 					'messageAllowedField' => _('Cannot update "%2$s" for a discovered trigger "%1$s".')
 				]);
 				break;
@@ -1450,9 +1450,12 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$options = [
-			'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
+			'output' => self::isTrigger()
+				? ['triggertagid', 'triggerid', 'tag', 'value', 'automatic']
+				: ['triggertagid', 'triggerid', 'tag', 'value'],
 			'filter' => ['triggerid' => $triggerids]
 		];
+
 		$db_tags = DBselect(DB::makeSql('trigger_tag', $options));
 
 		while ($db_tag = DBfetch($db_tags)) {
@@ -1892,6 +1895,10 @@ abstract class CTriggerGeneral extends CApiService {
 							continue 2;
 						}
 					}
+
+					if (array_key_exists('automatic', $tag_delete) && $tag_delete['automatic'] == ZBX_TAG_AUTOMATIC) {
+						unset($tags_delete[$dt_key]);
+					}
 				}
 
 				foreach ($tags_delete as $tag_delete) {
@@ -2016,8 +2023,12 @@ abstract class CTriggerGeneral extends CApiService {
 
 		foreach ($triggers as $trigger) {
 			$expressions_changed = ($db_triggers === null
-				|| ($trigger['expression'] !== $db_triggers[$trigger['triggerid']]['expression']
-				|| $trigger['recovery_expression'] !== $db_triggers[$trigger['triggerid']]['recovery_expression']));
+				|| $trigger['expression'] !== $db_triggers[$trigger['triggerid']]['expression']
+				|| $trigger['recovery_expression'] !== $db_triggers[$trigger['triggerid']]['recovery_expression']
+				|| (array_key_exists('event_name', $trigger)
+						&& $trigger['event_name'] !== $db_triggers[$trigger['triggerid']]['event_name']
+				)
+			);
 
 			if (!$expressions_changed) {
 				continue;
@@ -2028,11 +2039,31 @@ abstract class CTriggerGeneral extends CApiService {
 				[CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]
 			);
 
+			$hostnames = $expression_parser->getResult()->getHosts();
+
 			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 				$expression_parser->parse($trigger['recovery_expression']);
 				$hist_functions = array_merge($hist_functions, $expression_parser->getResult()->getTokensOfTypes(
 					[CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]
 				));
+
+				$hostnames = array_merge($hostnames, $expression_parser->getResult()->getHosts());
+			}
+
+			$event_name = array_key_exists('event_name', $trigger)
+				? $trigger['event_name']
+				: ($db_triggers === null ? '' : $db_triggers[$trigger['triggerid']]['event_name']);
+
+			if ($event_name !== '') {
+				$event_name_validator = new CEventNameValidator([
+					'hostnames' => $hostnames,
+					'message_hostnames' =>
+						_('Only hosts referenced in problem or recovery expressions can be used in event name.')
+				]);
+
+				if (!$event_name_validator->validate($event_name)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $event_name_validator->getError());
+				}
 			}
 
 			foreach ($hist_functions as $hist_function) {

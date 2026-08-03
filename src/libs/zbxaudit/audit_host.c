@@ -899,7 +899,7 @@ static int	audit_host_flags_to_resource_type(int flags)
 	else
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected host flags detected: %d", flags);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 

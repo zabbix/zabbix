@@ -498,7 +498,7 @@ class testItemTimeouts extends CIntegrationTest {
 			]
 		]);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_async_check_snmp", true, 90, 1, true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In async_check_snmp_context", true, 90, 1, true);
 		$tm1 = time();
 
 		$fail_logmsg = ":10987.*timed out, retrying";

@@ -15,21 +15,18 @@
 
 
 /**
- * A parser for absolute time in "YYYY[-MM[-DD]][ hh[:mm[:ss]]]" format.
+ * A parser for absolute time or date based on passed configuration to parser.
  */
 class CAbsoluteTimeParser extends CParser {
 
 	/**
-	 * Full date in "YYYY-MM-DD hh:mm:ss" format.
-	 *
-	 * @var string $date
+	 * Time in format, which depends on $date_only value:
+	 * - FALSE: "YYYY-MM-DD hh:mm:ss"
+	 * - TRUE: "YYYY-MM-DD"
 	 */
-	private $date;
-
-	/**
-	 * @var array $tokens
-	 */
-	private $tokens;
+	private string $date;
+	private array $tokens;
+	private bool $date_only = false;
 
 	/**
 	 * Parse the given period.
@@ -37,11 +34,19 @@ class CAbsoluteTimeParser extends CParser {
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
 	 */
-	public function parse($source, $pos = 0) {
-		$this->tokens = [];
-		$this->length = 0;
-		$this->match = '';
-		$this->date = '';
+
+	/**
+	 * @param array $options
+	 * @param bool  $options['date_only']
+	 */
+	public function __construct(array $options = []) {
+		if (array_key_exists('date_only', $options)) {
+			$this->date_only = $options['date_only'];
+		}
+	}
+
+	public function parse($source, $pos = 0):int {
+		$this->resetState();
 
 		$p = $pos;
 
@@ -55,48 +60,52 @@ class CAbsoluteTimeParser extends CParser {
 		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 
+	private function resetState() {
+		$this->tokens = [];
+		$this->length = 0;
+		$this->match = '';
+		$this->date = '';
+	}
+
 	/**
 	 * Parse absolute time.
 	 *
-	 * @param string	$source
-	 * @param int		$pos
+	 * @param string $source
+	 * @param int $pos
 	 *
 	 * @return bool
 	 */
-	private function parseAbsoluteTime($source, &$pos) {
-		$pattern_Y = '(?P<Y>[12][0-9]{3})';
-		$pattern_m = '(?P<m>[0-9]{1,2})';
-		$pattern_d = '(?P<d>[0-9]{1,2})';
-		$pattern_H = '(?P<H>[0-9]{1,2})';
-		$pattern_i = '(?P<i>[0-9]{1,2})';
-		$pattern_s = '(?P<s>[0-9]{1,2})';
-		$pattern = $pattern_Y.'(-'.$pattern_m.'(-'.$pattern_d.'( +'.$pattern_H.'(:'.$pattern_i.'(:'.$pattern_s.')?)?)?)?)?';
+	private function parseAbsoluteTime(string $source, int &$pos): bool {
+		$pattern = [
+			'Y' => '(?P<Y>[12][0-9]{3})',
+			'm' => '(?P<m>[0-9]{1,2})',
+			'd' => '(?P<d>[0-9]{1,2})',
+			'H' => '(?P<H>[0-9]{1,2})',
+			'i' => '(?P<i>[0-9]{1,2})',
+			's' => '(?P<s>[0-9]{1,2})'
+		];
 
-		if (!preg_match('/^'.$pattern.'/', substr($source, $pos), $matches)) {
+		$date_pattern = $this->date_only
+			? '^'.$pattern['Y'].'(-'.$pattern['m'].'(-'.$pattern['d'].')?)?$'
+			: $pattern['Y'].'(-'.$pattern['m'].'(-'.$pattern['d'].
+				'( +'.$pattern['H'].'(:'.$pattern['i'].'(:'.$pattern['s'].')?)?)?)?)?';
+
+		if (!preg_match('/^'.$date_pattern .'/', substr($source, $pos), $matches)) {
 			return false;
 		}
 
-		foreach (['Y', 'm', 'd', 'H', 'i', 's'] as $key) {
-			if (array_key_exists($key, $matches)) {
-				$this->tokens[$key] = $matches[$key];
-			}
-		}
+		$this->tokens = array_intersect_key($matches, array_flip(['Y', 'm', 'd', 'H', 'i', 's']));
 
-		$matches += ['m' => 1, 'd' => 1, 'H' => 0, 'i' => 0, 's' => 0];
-
-		$date = sprintf('%04d-%02d-%02d %02d:%02d:%02d', $matches['Y'], $matches['m'], $matches['d'], $matches['H'],
-			$matches['i'], $matches['s']
-		);
-
+		$date = $this->buildDateString($matches);
 		$datetime = date_create($date);
 
 		if ($datetime === false) {
 			return false;
 		}
 
-		$datetime_errors = $datetime->getLastErrors();
+		$errors = $datetime->getLastErrors();
 
-		if ($datetime_errors !== false && $datetime_errors['warning_count'] != 0) {
+		if ($errors && ($errors['errors'] || $errors['warnings'])) {
 			return false;
 		}
 
@@ -121,7 +130,7 @@ class CAbsoluteTimeParser extends CParser {
 
 		$date = new DateTime($this->date, $timezone);
 
-		if ($is_start) {
+		if ($is_start || $this->date_only) {
 			return $date;
 		}
 
@@ -146,5 +155,17 @@ class CAbsoluteTimeParser extends CParser {
 		}
 
 		return $date;
+	}
+
+	private function buildDateString(array $matches): string {
+		if($this->date_only) {
+			$matches += ['m' => 1, 'd' => 1];
+			return sprintf('%04d-%02d-%02d', $matches['Y'], $matches['m'], $matches['d']);
+		}
+
+		$matches += ['m' => 1, 'd' => 1, 'H' => 0, 'i' => 0, 's' => 0];
+		return sprintf('%04d-%02d-%02d %02d:%02d:%02d', $matches['Y'], $matches['m'], $matches['d'], $matches['H'],
+			$matches['i'], $matches['s']
+		);
 	}
 }

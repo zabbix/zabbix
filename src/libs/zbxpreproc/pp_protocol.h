@@ -16,6 +16,7 @@
 #define ZABBIX_PP_PROTOCOL_H
 
 #include "zbxpreproc.h"
+#include "zbxtypes.h"
 #include "zbxipcservice.h"
 #include "zbxtime.h"
 #include "zbxalgo.h"
@@ -93,7 +94,7 @@ void	zbx_preprocessor_unpack_top_stats_result(zbx_vector_pp_top_stats_ptr_t *sta
 zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count);
 
 zbx_uint32_t    zbx_preprocessor_deserialize_value(const unsigned char *data, zbx_uint64_t *itemid,
-		unsigned char *value_type, unsigned char *item_flags, zbx_variant_t *value, zbx_timespec_t *ts,
-		zbx_pp_value_opt_t *opt);
+		unsigned char *value_type, unsigned char *item_flags, unsigned char *preprocessing,
+		zbx_variant_t *value, zbx_timespec_t *ts, zbx_pp_value_opt_t *opt);
 
 #endif

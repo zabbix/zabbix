@@ -62,11 +62,6 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	private $suppress_until;
 
 	/**
-	 * @var CRangeTimeParser
-	 */
-	private $suppress_until_time_parser;
-
-	/**
 	 * @var int
 	 */
 	private $change_rank;
@@ -81,60 +76,62 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	 */
 	private $rank_change_to_symptom;
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+	}
+
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'eventids' => ['array', 'required', 'not_empty', 'field' => ['db acknowledges.eventid']],
+			'scope' => ['integer', 'in' => [ZBX_ACKNOWLEDGE_SELECTED, ZBX_ACKNOWLEDGE_PROBLEM]],
+			'operation_count' => ['integer', 'min' => 1,
+				'messages' => ['min' => _('A message or at least one operation is required.')]
+			],
+			'change_severity' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_SEVERITY]],
+			'severity' => ['integer', 'required',
+				'in' => range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT),
+				'when' => ['change_severity', 'in' => [ZBX_PROBLEM_UPDATE_SEVERITY]]
+			],
+			'acknowledge_problem' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_ACKNOWLEDGE]],
+			'unacknowledge_problem' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE]],
+			'close_problem' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_CLOSE]],
+			'suppress_problem' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_SUPPRESS]],
+			'suppress_time_option' => ['integer',
+				'in' => [ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE, ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE],
+				'when' => ['suppress_problem', 'in' => [ZBX_PROBLEM_UPDATE_SUPPRESS]]
+			],
+			'suppress_until_problem' => ['string', 'required', 'not_empty',
+				'use' => [CRangeTimeValidator::class, ['min_in_future' => true]],
+				'when' => [
+					['suppress_problem', 'in' => [ZBX_PROBLEM_UPDATE_SUPPRESS]],
+					['suppress_time_option', 'in' => [ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE]]
+				]
+			],
+			'unsuppress_problem' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_UNSUPPRESS]],
+			'change_rank' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE, ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM]],
+			'cause_eventid' => ['db acknowledges.eventid', 'required',
+				'when' => ['change_rank', 'in' => [ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM]]
+			],
+			'message' => ['db acknowledges.message']
+		]];
+	}
+
 	protected function checkInput() {
-		$fields = [
-			'eventids' =>				'required|array_db acknowledges.eventid',
-			'cause_eventid' =>			'db acknowledges.eventid',
-			'message' =>				'db acknowledges.message|flags '.P_CRLF,
-			'scope' =>					'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
-			'change_severity' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
-			'severity' =>				'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
-			'acknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
-			'unacknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE,
-			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
-			'suppress_problem' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SUPPRESS,
-			'suppress_time_option' =>	'in '.ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE.','.ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE,
-			'suppress_until_problem' => 'range_time',
-			'unsuppress_problem' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNSUPPRESS,
-			'change_rank' => 			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE.','.ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
-		];
-
-		$ret = $this->validateInput($fields);
-
-		$suppress = $this->getInput('suppress_problem', ZBX_PROBLEM_UPDATE_NONE);
-		$suppress_time = $this->getInput('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE);
-
-		if ($ret && $suppress == ZBX_PROBLEM_UPDATE_SUPPRESS && $suppress_time == ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE) {
-			$this->suppress_until_time_parser = new CRangeTimeParser();
-			$this->suppress_until_time_parser->parse($this->getInput('suppress_until_problem', ''));
-			$suppress_until = $this->suppress_until_time_parser->getDateTime(false)->getTimestamp();
-
-			if (!validateUnixTime($suppress_until) || $suppress_until < time()) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Suppress'), _('invalid time')));
-				$ret = false;
-			}
-		}
-
-		$this->change_rank = $this->getInput('change_rank', ZBX_PROBLEM_UPDATE_NONE);
-
-		if ($ret && $this->change_rank == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
-				&& !$this->hasInput('cause_eventid')) {
-			error(_s('Field "%1$s" is mandatory.', 'cause_eventid'));
-			$ret = false;
-		}
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$error_title = $this->hasInput('eventids')
-				? _n('Cannot update event', 'Cannot update events', count($this->getInput('eventids', [])))
-				: _('Cannot update events');
+			$form_errors = $this->getValidationError();
+
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot update events'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => $error_title,
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 
@@ -194,6 +191,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		$this->unsuppress = $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 			? ($this->getInput('unsuppress_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_UNSUPPRESS)
 			: false;
+		$this->change_rank = $this->getInput('change_rank', ZBX_PROBLEM_UPDATE_NONE);
 		$this->rank_change_to_cause = $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
 			? ($this->change_rank == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE)
 			: false;
@@ -209,9 +207,11 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			// Check if suppress time option was definite or indefinite.
 			if ($this->getInput('suppress_time_option') == ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE) {
 				// Convert suppress until problem input to Unix timestamp.
-				$this->suppress_until = $this->suppress_until_time_parser->getDateTime(false)->getTimestamp();
+				$suppress_until_time_parser = new CRangeTimeParser();
+				$suppress_until_time_parser->parse($this->getInput('suppress_until_problem'));
+				$this->suppress_until = $suppress_until_time_parser->getDateTime(false)->getTimestamp();
 				// Save if inserted was relative time.
-				if ($this->suppress_until_time_parser->getTimeType() == CRangeTimeParser::ZBX_TIME_RELATIVE) {
+				if ($suppress_until_time_parser->getTimeType() == CRangeTimeParser::ZBX_TIME_RELATIVE) {
 					$suppress_until_time = $this->getInput('suppress_until_problem');
 					CProfile::update('web.problem_suppress_action_time_until', $suppress_until_time, PROFILE_TYPE_STR);
 				}

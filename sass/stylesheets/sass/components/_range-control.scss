@@ -100,6 +100,7 @@ $range-input-width: 31px;
 
 		input[type=range] {
 			cursor: default;
+			border-radius: var(--input-border-radius);
 		}
 		.range-control-progress,
 		.range-control-thumb {

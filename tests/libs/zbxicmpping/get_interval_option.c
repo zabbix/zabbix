@@ -73,10 +73,9 @@ const char	*mock_get_progname(void)
 
 void	zbx_mock_test_entry(void **state)
 {
-	const int	hosts_cnt = 1;
-
+#define	HOSTS_CNT 1
 	int			value, ret;
-	zbx_fping_host_t	hosts[hosts_cnt];
+	zbx_fping_host_t	hosts[HOSTS_CNT];
 	char 			error[ZBX_ITEM_ERROR_LEN_MAX];
 	char			status[1];
 
@@ -94,14 +93,15 @@ void	zbx_mock_test_entry(void **state)
 	error[0] = '\0';
 	status[0] = '\0';
 
-	memset(hosts, 0, sizeof(zbx_fping_host_t) * hosts_cnt);
+	memset(hosts, 0, sizeof(zbx_fping_host_t) * HOSTS_CNT);
 
 	hosts[0].addr = (char *)zbx_mock_get_parameter_string("in.target_host_addr");
 	hosts[0].status = status;
 
-	ret = get_interval_option("/usr/bin/fping", hosts, hosts_cnt, &value, error, ZBX_ITEM_ERROR_LEN_MAX);
+	ret = get_interval_option("/usr/bin/fping", hosts, HOSTS_CNT, &value, error, ZBX_ITEM_ERROR_LEN_MAX);
 
 	zbx_mock_assert_int_eq("get_interval_option() return value", zbx_mock_str_to_return_code("SUCCEED"), ret);
 	zbx_mock_assert_str_eq("error message returned by get_interval_option()", "", error);
 	zbx_mock_assert_int_eq("minimal detected interval", (int)zbx_mock_get_parameter_uint64("out.value"), value);
+#undef	HOSTS_CNT
 }

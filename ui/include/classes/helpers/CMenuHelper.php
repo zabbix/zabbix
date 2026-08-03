@@ -23,6 +23,8 @@ class CMenuHelper {
 	 * @return CMenu
 	 */
 	public static function getMainMenu(): CMenu {
+		global $ZBX_FEATURE_FLAGS;
+
 		$menu = new CMenu();
 
 		if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)) {
@@ -315,6 +317,11 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION)
 				? (new CMenuItem(_('Authentication')))
 					->setAction('authentication.edit')
+				: null,
+			!CWebUser::isGuest() && CSettingsHelper::isMobileDevicesEnabled() &&
+				CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)
+				? (new CMenuItem(_('Devices')))
+					->setAction('user.device.list')
 				: null
 		];
 		$submenu_users = array_filter($submenu_users);
@@ -351,9 +358,11 @@ class CMenuHelper {
 							->setAction('trigdisplay.edit'),
 						(new CMenuItem(_('Geographical maps')))
 							->setAction('geomaps.edit'),
-						(new CMenuItem(_('Modules')))
-							->setAction('module.list')
-							->setAliases(['module.edit', 'module.scan']),
+						$ZBX_FEATURE_FLAGS['modules_config_enabled']
+							? (new CMenuItem(_('Modules')))
+								->setAction('module.list')
+								->setAliases(['module.edit', 'module.scan'])
+							: null,
 						(new CMenuItem(_('Connectors')))
 							->setAction('connector.list')
 							->setAliases(['connector.edit']),
@@ -456,32 +465,33 @@ class CMenuHelper {
 					->setTitle(getUserFullname($user))
 			);
 		}
-		elseif (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
-			$menu->add(
-				(new CMenuItem(_('User settings')))
-					->setIcon(ZBX_ICON_USER_SETTINGS)
-					->setTitle(getUserFullname($user))
-					->setSubMenu(new CMenu([
-						(new CMenuItem(_('Profile')))
-							->setAction('userprofile.edit'),
-						(new CMenuItem(_('Notifications')))
-							->setAction('userprofile.notification.edit'),
-						(new CMenuItem(_('API tokens')))
-							->setAction('user.token.list')
-					]))
-			);
-		}
 		else {
+			$submenu = new CMenu([
+				(new CMenuItem(_('Profile')))
+					->setAction('userprofile.edit'),
+				(new CMenuItem(_('Notifications')))
+					->setAction('userprofile.notification.edit')
+			]);
+
+			if (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
+				$submenu->add(
+					(new CMenuItem(_('API tokens')))
+						->setAction('user.token.list')
+				);
+			}
+
+			if (CSettingsHelper::isMobileDevicesEnabled() && CWebUser::checkAccess(CRoleHelper::DEVICES_ACCESS)) {
+				$submenu->add(
+					(new CMenuItem(_('Devices')))
+						->setAction('userprofile.device.list')
+				);
+			}
+
 			$menu->add(
 				(new CMenuItem(_('User settings')))
 					->setIcon(ZBX_ICON_USER_SETTINGS)
 					->setTitle(getUserFullname($user))
-					->setSubMenu(new CMenu([
-						(new CMenuItem(_('Profile')))
-							->setAction('userprofile.edit'),
-						(new CMenuItem(_('Notifications')))
-							->setAction('userprofile.notification.edit')
-					]))
+					->setSubMenu($submenu)
 			);
 		}
 

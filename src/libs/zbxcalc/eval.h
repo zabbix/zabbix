@@ -20,14 +20,6 @@
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
-typedef enum
-{
-	ZBX_VALUE_NONE,
-	ZBX_VALUE_SECONDS,
-	ZBX_VALUE_NVALUES
-}
-zbx_value_type_t;
-
 typedef struct
 {
 	char	value[ZBX_VALUEMAP_STRING_LEN];
@@ -53,5 +45,7 @@ int	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, zbx_
 		zbx_vector_history_record_t *records, int limit, int *count, char **error);
 
 const char	*zbx_type_string(zbx_value_type_t type);
+
+int	history_record_float_compare(const void *a1, const void *a2);
 
 #endif

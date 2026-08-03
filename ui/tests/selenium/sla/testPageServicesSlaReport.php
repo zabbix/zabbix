@@ -20,8 +20,6 @@ require_once __DIR__.'/../common/testSlaReport.php';
  * @backup profiles
  *
  * @dataSource Services, Sla
- *
- * @onBefore getDateTimeData
  */
 class testPageServicesSlaReport extends testSlaReport {
 
@@ -1419,10 +1417,12 @@ class testPageServicesSlaReport extends testSlaReport {
 	 * are covered by data provider).
 	 *
 	 * @param	array	$data	data provider
+	 *
 	 * @return	array
 	 */
 	public function getPeriodDataWithCustomDates($data) {
-		foreach (self::$reporting_periods[$data['reporting_period']] as $period) {
+		$reporting_periods = $this->getDateTimeData($data['reporting_period']);
+		foreach ($reporting_periods as $period) {
 			// Write all periods that end after the value in From field into the reference array.
 			if ($period['end'] >= strtotime($data['fields']['From'])) {
 				$expected_periods[] = $period['value'];

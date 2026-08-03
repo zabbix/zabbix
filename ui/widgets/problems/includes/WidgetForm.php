@@ -73,7 +73,7 @@ class WidgetForm extends CWidgetForm {
 				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField(
-				new CWidgetFieldTextBox('problem', _('Problem'))
+				(new CWidgetFieldTextBox('problem', _('Problem')))->setMaxLength(2048)
 			)
 			->addField(
 				new CWidgetFieldSeverities('severities', _('Severity'))
@@ -107,6 +107,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextBox('tag_priority', _('Tag display priority')))
 					->setFlags($this->show_tags ? 0x00 : CWidgetField::FLAG_DISABLED)
+					->setMaxLength(2048)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('show_opdata', _('Show operational data'), [

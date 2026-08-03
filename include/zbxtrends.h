@@ -17,6 +17,7 @@
 
 #include "zbxeval.h"
 #include "zbxtime.h"
+#include "zbxhistory.h"
 
 /* value_avg_t structure is used for item average value trend calculations. */
 /*                                                                          */
@@ -70,6 +71,8 @@ typedef struct
 	zbx_uint64_t	misses;
 	zbx_uint64_t	items_num;
 	zbx_uint64_t	requests_num;
+	zbx_uint64_t	slots_num;
+	zbx_uint64_t	recent_entry_num;
 }
 zbx_tfc_stats_t;
 

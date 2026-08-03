@@ -31,14 +31,16 @@ class CControllerConnectorUpdate extends CControllerConnectorUpdateGeneral {
 			'data_type' => ['db connector.data_type', 'required',
 				'in' => [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]
 			],
-			'url' => ['db connector.url', 'required', 'not_empty',
-				'use' => [CUrlValidator::class, []]
-			],
+			'url' => ['db connector.url', 'required', 'not_empty', 'use' => [CUrlValidator::class, [
+				'user_macro' => true,
+				'schemes' => CSettingsHelper::getAllowedUriSchemes()
+			]]],
 			'item_value_types' => ['array', 'required', 'not_empty',
 				'field' => ['integer',
 					'in' => [ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64, ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT,
 						ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR, ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG,
-						ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT, ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN
+						ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT, ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN,
+						ZBX_CONNECTOR_ITEM_VALUE_TYPE_JSON
 					]
 				],
 				'when' => ['data_type', 'in' => [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES]],
@@ -149,9 +151,6 @@ class CControllerConnectorUpdate extends CControllerConnectorUpdateGeneral {
 
 	protected function doAction(): void {
 		$connector = $this->getInputAll();
-
-		// TODO: remove when DEV-4580 is merged
-		self::removeInvalidWhenRuleInput($connector);
 
 		self::processConnectorInput($connector);
 		$result = API::Connector()->update($connector);

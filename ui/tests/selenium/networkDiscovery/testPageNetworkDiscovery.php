@@ -150,7 +150,7 @@ class testPageNetworkDiscovery extends CWebTest {
 		// Check the presence and data of the error hintboxes for a specific rows.
 		foreach ([self::CUSTOM_ERROR_RULE, self::SYMBOLS_ERROR_RULE] as $rule_name) {
 			$table->findRow('Name', $rule_name)->getColumn('Info')->query('button')->one()->click();
-			$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+			$hintbox = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilPresent();
 
 			$this->assertEquals(self::ERROR_MESSAGES[$rule_name], $hintbox->one()->getText());
 			$hintbox->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotPresent();
@@ -623,7 +623,7 @@ class testPageNetworkDiscovery extends CWebTest {
 
 			if ($data['default'] === DRULE_STATUS_DISABLED && array_key_exists('hintbox', $data)) {
 				$this->assertEquals($data['hintbox'], $table->findRow('Name', $data['name'])->getColumn('Info')
-						->query('button')->one()->getAttribute('data-hintbox-contents')
+						->query('button')->one()->getAttribute('data-hintbox-html')
 				);
 			}
 			else {
@@ -663,7 +663,7 @@ class testPageNetworkDiscovery extends CWebTest {
 
 				if (array_key_exists('hintbox', $data)) {
 					$this->assertEquals($data['hintbox'], $table->findRow('Name', $data['name'])->getColumn('Info')
-							->query('button')->one()->getAttribute('data-hintbox-contents')
+							->query('button')->one()->getAttribute('data-hintbox-html')
 					);
 				}
 

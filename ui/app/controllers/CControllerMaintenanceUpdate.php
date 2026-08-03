@@ -109,8 +109,6 @@ class CControllerMaintenanceUpdate extends CControllerMaintenanceUpdateGeneral {
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules());
-		$ret = $ret && $this->validateTimePeriods();
-
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
 			$response = $form_errors

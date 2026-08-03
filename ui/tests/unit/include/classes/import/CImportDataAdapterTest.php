@@ -1740,14 +1740,14 @@ class CImportDataAdapterTest extends TestCase {
 
 		$this->assertEquals([
 			[
-				'uuid' => '4b481ada990d4511894db8f49239c611',
+				'uuid' => '26cace61118e4517af5a83d98e10e116',
 				'type' => '0',
 				'expression' => 'last(/Template_Linux/vfs.fs.size[/,pfree])<10',
 				'url' => 'http://www.zabbix.com/',
 				'status' => '0',
 				'priority' => '4',
 				'comments' => 'test comments',
-				'description' => 'Low free disk space on {HOSTNAME} volume /',
+				'description' => 'Low free disk space on {HOST.HOST} volume /',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
 				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
@@ -3143,7 +3143,7 @@ class CImportDataAdapterTest extends TestCase {
 		$import_validator_factory = new CImportValidatorFactory(CImportReaderFactory::XML);
 		$import_converter_factory = new CImportConverterFactory();
 
-		$validator = new CImportXmlValidator($import_validator_factory, CImportReaderFactory::XML);
+		$validator = new CImportValidator($import_validator_factory, CImportReaderFactory::XML);
 
 		$source = $validator
 			->setStrict(true)

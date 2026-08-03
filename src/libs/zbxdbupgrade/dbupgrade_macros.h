@@ -66,7 +66,7 @@ void	dbpatch_convert_simple_macro(const char *expression, const zbx_token_simple
 int	dbpatch_is_time_function(const char *name, size_t len);
 void	dbpatch_update_hist2common(zbx_dbpatch_function_t *function, int extended, char **expression);
 void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **replace, zbx_vector_ptr_t *functions);
-void	dbpatch_function_free(zbx_dbpatch_function_t *func);
+void	dbpatch_function_free(void *ptr);
 int	dbpatch_is_composite_constant(const char *str);
 void	dbpatch_strcpy_alloc_quoted_compat(char **str, size_t *str_alloc, size_t *str_offset, const char *source);
 void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_strloc_t *params, ...);

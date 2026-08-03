@@ -16,6 +16,7 @@
 #include "async_worker.h"
 #include "async_queue.h"
 
+#include "zbxcacheconfig.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
 #include "zbxpoller.h"
@@ -216,10 +217,21 @@ void	zbx_interface_status_free(zbx_interface_status_t *interface_status)
 
 void	zbx_poller_item_free(zbx_poller_item_t *poller_item)
 {
-	zbx_clean_items(poller_item->items, poller_item->num, poller_item->results);
-	zbx_dc_config_clean_items(poller_item->items, NULL, (size_t)poller_item->num);
+	switch (poller_item->poller_type)
+	{
+		case ZBX_POLLER_TYPE_AGENT:
+			zbx_clean_agent_items(poller_item->items.agent_items, poller_item->num, poller_item->results);
+			break;
+		case ZBX_POLLER_TYPE_SNMP:
+			zbx_clean_snmp_items(poller_item->items.snmp_items, poller_item->num, poller_item->results);
+			break;
+		case ZBX_POLLER_TYPE_HTTPAGENT:
+			zbx_clean_httpagent_items(poller_item->items.httpagent_items, poller_item->num,
+					poller_item->results);
+			break;
+	}
 	zbx_free(poller_item->results);
 	zbx_free(poller_item->errcodes);
-	zbx_free(poller_item->items);
+	zbx_free(poller_item->items.any);
 	zbx_free(poller_item);
 }

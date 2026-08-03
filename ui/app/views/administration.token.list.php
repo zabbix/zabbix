@@ -35,7 +35,6 @@ $filter = (new CFilter())
 			->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
 			)
 			->addRow(new CLabel(_('Users'), 'filter_userids__ms'), [
 				(new CMultiSelect([
@@ -48,7 +47,7 @@ $filter = (new CFilter())
 							'srctbl' => 'users',
 							'srcfld1' => 'userid',
 							'srcfld2' => 'fullname',
-							'dstfrm' => 'zbx_filter',
+							'dstfrm' => CFilter::FORM_NAME,
 							'dstfld1' => 'filter_userids_'
 						]
 					]
@@ -79,7 +78,7 @@ $filter = (new CFilter())
 							'srctbl' => 'users',
 							'srcfld1' => 'userid',
 							'srcfld2' => 'fullname',
-							'dstfrm' => 'zbx_filter',
+							'dstfrm' => CFilter::FORM_NAME,
 							'dstfld1' => 'filter_creator_userids_'
 						]
 					]

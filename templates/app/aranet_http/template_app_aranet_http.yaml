@@ -14,7 +14,7 @@ zabbix_export:
         This Zabbix template enables monitoring of Aranet Cloud sensors via the Aranet Cloud API. It collects temperature, humidity, CO₂, and other environmental metrics from linked devices, providing real-time data visualization, alerting, and historical trends within Zabbix. Easy to configure and ideal for smart building, greenhouse, or industrial monitoring setups.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -1313,6 +1313,7 @@ zabbix_export:
             description: 'Aranet Cloud API endpoint.'
             required: 'YES'
         - macro: '{$ARANET.API.PASSWORD}'
+          type: SECRET_TEXT
           description: 'Aranet Cloud password.'
           config:
             type: TEXT

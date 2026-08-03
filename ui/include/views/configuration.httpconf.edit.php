@@ -31,8 +31,15 @@ if ($data['hostid'] != 0) {
 }
 
 $url = (new CUrl('httpconf.php'))
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update')
 	->setArgument('context', $data['context'])
-	->getUrl();
+	->setArgument('hostid', $data['hostid']);
+
+if ($data['form'] !== 'create') {
+	$url->setArgument('httptestid', $data['httptestid']);
+}
+
+$url = $url->getUrl();
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
@@ -51,7 +58,7 @@ if ($data['httptestid'] != 0) {
 // Scenario tab.
 $scenario_tab = new CFormGrid();
 
-if ($data['templates']) {
+if ($data['templates'] && $data['form'] !== 'clone') {
 	$scenario_tab->addItem([
 		new CLabel(_('Parent web scenarios')),
 		new CFormField($data['templates'])
@@ -135,13 +142,13 @@ $scenario_tab
 				(new CTemplateTag('variable-row-tmpl'))->addItem(
 					(new CRow([
 						'',
-						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name'))
 							->disableSpellcheck(),
 						RARR(),
-						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(DB::getFieldLength('httpstep_field', 'value'))
@@ -174,13 +181,13 @@ $scenario_tab
 						(new CCol(
 							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name'))
 							->disableSpellcheck(),
 						RARR(),
-						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(DB::getFieldLength('httpstep_field', 'value'))
@@ -381,7 +388,7 @@ if ($data['form_refresh'] == 0) {
 }
 
 // Append buttons to form.
-if ($data['httptestid'] != 0) {
+if ($data['form'] === 'update') {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -417,6 +424,8 @@ $form->addItem($webscenario_tabs);
 $html_page
 	->addItem($form)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	view.init('.json_encode([

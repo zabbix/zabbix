@@ -25,7 +25,6 @@ abstract class CHostGeneral extends CHostBase {
 		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massupdate' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
@@ -87,14 +86,14 @@ abstract class CHostGeneral extends CHostBase {
 		}
 	}
 
-	public function checkHostsWithoutGroups(array $hosts, array $db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function checkHostsWithoutGroups(array $hosts, array $db_hosts): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('groups', $host) && !$host['groups']
 					&& (!array_key_exists('nopermissions_groups', $db_hosts[$host[$id_field_name]])
 						|| !$db_hosts[$host[$id_field_name]]['nopermissions_groups'])) {
-				$error = $this instanceof CTemplate
+				$error = self::isTemplate()
 					? _s('Template "%1$s" cannot be without template group.', $db_hosts[$host[$id_field_name]]['host'])
 					: _s('Host "%1$s" cannot be without host group.', $db_hosts[$host[$id_field_name]]['host']);
 
@@ -295,13 +294,14 @@ abstract class CHostGeneral extends CHostBase {
 	private static function createHostHgSets(array $hgsets): void {
 		$ins_host_hgsets = [];
 
-		$options = [
-			'output' => ['hgsetid', 'hash'],
-			'filter' => ['hash' => array_keys($hgsets)]
-		];
-		$result = DBselect(DB::makeSql('hgset', $options));
+		$resource = DBselect(
+			'SELECT hs.hash,MIN(hs.hgsetid) AS hgsetid'.
+			' FROM hgset hs'.
+			' WHERE '.dbConditionString('hs.hash', array_keys($hgsets)).
+			' GROUP BY hs.hash'
+		);
 
-		while ($row = DBfetch($result)) {
+		while ($row = DBfetch($resource)) {
 			foreach ($hgsets[$row['hash']]['hostids'] as $hostid) {
 				$ins_host_hgsets[] = [
 					'hostid' => $hostid,
@@ -331,64 +331,33 @@ abstract class CHostGeneral extends CHostBase {
 	private static function updateHostHgSets(array $hgsets): void {
 		$upd_host_hgsets = [];
 
-		$db_hgsetids = array_flip(self::getDbHgSetIds($hgsets));
+		$resource = DBselect(
+			'SELECT hs.hash,MIN(hs.hgsetid) AS hgsetid'.
+			' FROM hgset hs'.
+			' WHERE '.dbConditionString('hs.hash', array_keys($hgsets)).
+			' GROUP BY hs.hash'
+		);
 
-		$empty_hgset_hash = hash('sha256', '');
-
-		if (array_key_exists($empty_hgset_hash, $hgsets)) {
-			DB::delete('host_hgset', ['hostid' => $hgsets[$empty_hgset_hash]['hostids']]);
-			unset($hgsets[$empty_hgset_hash]);
+		while ($row = DBfetch($resource)) {
+			$upd_host_hgsets[] = [
+				'values' => ['hgsetid' => $row['hgsetid']],
+				'where' => ['hostid' => $hgsets[$row['hash']]['hostids']]
+			];
+			unset($hgsets[$row['hash']]);
 		}
 
 		if ($hgsets) {
-			$options = [
-				'output' => ['hgsetid', 'hash'],
-				'filter' => ['hash' => array_keys($hgsets)]
-			];
-			$result = DBselect(DB::makeSql('hgset', $options));
+			self::createHgSets($hgsets);
 
-			while ($row = DBfetch($result)) {
+			foreach ($hgsets as $hgset) {
 				$upd_host_hgsets[] = [
-					'values' => ['hgsetid' => $row['hgsetid']],
-					'where' => ['hostid' => $hgsets[$row['hash']]['hostids']]
+					'values' => ['hgsetid' => $hgset['hgsetid']],
+					'where' => ['hostid' => $hgset['hostids']]
 				];
-
-				if (array_key_exists($row['hgsetid'], $db_hgsetids)) {
-					unset($db_hgsetids[$row['hgsetid']]);
-				}
-
-				unset($hgsets[$row['hash']]);
 			}
-
-			if ($hgsets) {
-				self::createHgSets($hgsets);
-
-				foreach ($hgsets as $hgset) {
-					$upd_host_hgsets[] = [
-						'values' => ['hgsetid' => $hgset['hgsetid']],
-						'where' => ['hostid' => $hgset['hostids']]
-					];
-				}
-			}
-
-			DB::update('host_hgset', $upd_host_hgsets);
 		}
 
-		self::deleteUnusedHgSets(array_keys($db_hgsetids));
-	}
-
-	private static function getDbHgSetIds(array $hgsets): array {
-		$hostids = [];
-
-		foreach ($hgsets as $hgset) {
-			$hostids = array_merge($hostids, $hgset['hostids']);
-		}
-
-		return DBfetchColumn(DBselect(
-			'SELECT DISTINCT hh.hgsetid'.
-			' FROM host_hgset hh'.
-			' WHERE '.dbConditionId('hh.hostid', $hostids)
-		), 'hgsetid');
+		DB::update('host_hgset', $upd_host_hgsets);
 	}
 
 	private static function createHgSets(array &$hgsets): void {
@@ -467,22 +436,6 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($ins_permissions) {
 			DB::insert('permission', $ins_permissions, false);
-		}
-	}
-
-	private static function deleteUnusedHgSets(array $db_hgsetids): void {
-		$del_hgsetids = DBfetchColumn(DBselect(
-			'SELECT h.hgsetid'.
-			' FROM hgset h'.
-			' LEFT JOIN host_hgset hh ON h.hgsetid=hh.hgsetid'.
-			' WHERE '.dbConditionId('h.hgsetid', $db_hgsetids).
-				' AND hh.hostid IS NULL'
-		), 'hgsetid');
-
-		if ($del_hgsetids) {
-			DB::delete('permission', ['hgsetid' => $del_hgsetids]);
-			DB::delete('hgset_group', ['hgsetid' => $del_hgsetids]);
-			DB::delete('hgset', ['hgsetid' => $del_hgsetids]);
 		}
 	}
 
@@ -1364,8 +1317,8 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */
-	public function addAffectedGroups(array $hosts, array &$db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function addAffectedGroups(array $hosts, array &$db_hosts): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		$hostids = [];
 
@@ -1383,7 +1336,7 @@ abstract class CHostGeneral extends CHostBase {
 		$editable_groups = null;
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if ($this instanceof CTemplate) {
+			if (self::isTemplate()) {
 				$permitted_groups = API::TemplateGroup()->get([
 					'output' => [],
 					'templateids' => $hostids,
@@ -1439,30 +1392,8 @@ abstract class CHostGeneral extends CHostBase {
 		}
 	}
 
-	protected function addHostMacroIds(array &$hosts, array $db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		foreach ($hosts as &$host) {
-			$db_hostmacroids = [];
-
-			foreach ($db_hosts[$host[$id_field_name]]['macros'] as $db_macro) {
-				$db_hostmacroids[CApiInputValidator::trimMacro($db_macro['macro'])] = $db_macro['hostmacroid'];
-			}
-
-			foreach ($host['macros'] as &$macro) {
-				$trimmed_macro = CApiInputValidator::trimMacro($macro['macro']);
-
-				if (array_key_exists($trimmed_macro, $db_hostmacroids)) {
-					$macro['hostmacroid'] = $db_hostmacroids[$trimmed_macro];
-				}
-			}
-			unset($macro);
-		}
-		unset($host);
-	}
-
-	public function addUnchangedGroups(array &$hosts, array $db_hosts, array $del_objectids = []): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function addUnchangedGroups(array &$hosts, array $db_hosts, array $del_objectids = []): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		if (!array_key_exists('groups', reset($hosts))) {
 			return;
@@ -1530,18 +1461,5 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 		unset($host);
-	}
-
-	protected static function deleteHgSets(array $db_hosts): void {
-		$hgsets = [];
-		$hgset_hash = self::getHgSetHash([]);
-
-		foreach ($db_hosts as $hostid => $foo) {
-			$hgsets[$hgset_hash]['hash'] = $hgset_hash;
-			$hgsets[$hgset_hash]['groupids'] = [];
-			$hgsets[$hgset_hash]['hostids'][] = $hostid;
-		}
-
-		self::updateHostHgSets($hgsets);
 	}
 }

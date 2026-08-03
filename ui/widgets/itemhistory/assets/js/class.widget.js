@@ -89,6 +89,32 @@ class CWidgetItemHistory extends CWidget {
 			return;
 		}
 
+		for (const iframe of this.#values_table.querySelectorAll('.js-iframe')) {
+			iframe.addEventListener('load', () => {
+				const iframe_content_body = iframe.contentDocument.body;
+				const computed_style = getComputedStyle(iframe);
+
+				iframe_content_body.style.margin = '0';
+				iframe_content_body.style.font = computed_style.font;
+				iframe_content_body.style.color = computed_style.color;
+
+				const resizeIframe = () => {
+					const content_scroll_width = iframe_content_body.scrollWidth;
+
+					if (content_scroll_width > iframe_content_body.clientWidth) {
+						iframe.style.minWidth =	`${content_scroll_width}px`;
+					}
+
+					iframe.style.height = `${iframe_content_body.scrollHeight}px`;
+				};
+
+				const resize_observer = new ResizeObserver(resizeIframe);
+				resize_observer.observe(iframe_content_body);
+
+				resizeIframe();
+			});
+		}
+
 		const items_data = new Map();
 		this.#values_table.querySelectorAll('.has-broadcast-data').forEach(element => {
 			const itemid = element.dataset.itemid;
@@ -106,11 +132,7 @@ class CWidgetItemHistory extends CWidget {
 			const element = e.target.closest('.has-broadcast-data');
 
 			if (element !== null) {
-				this.#selected_clock = element.dataset.clock;
-				this.#selected_itemid = element.dataset.itemid;
-				this.#selected_key_ = element.dataset.key_;
-
-				this.#broadcast();
+				this.#broadcast(element.dataset.clock, element.dataset.itemid, element.dataset.key_);
 				this.#markSelected();
 			}
 		});
@@ -120,30 +142,23 @@ class CWidgetItemHistory extends CWidget {
 				const element = this.#getDefaultSelectable();
 
 				if (element !== null) {
-					this.#selected_clock = element.dataset.clock;
-					this.#selected_itemid = element.dataset.itemid;
-					this.#selected_key_ = element.dataset.key_;
+					this.#broadcast(element.dataset.clock, element.dataset.itemid, element.dataset.key_);
 				}
 			}
-
-			this.#broadcast();
-			this.#markSelected();
 		}
 		else if (this.#selected_itemid !== null) {
 			if (!items_data.has(this.#selected_itemid)) {
 				for (let [itemid, item] of items_data) {
 					if (item.key_ === this.#selected_key_) {
-						this.#selected_itemid = itemid;
-						this.#selected_clock = item.clock;
+						this.#broadcast(itemid, item.clock, item.key_);
 
-						this.#broadcast();
 						break;
 					}
 				}
 			}
-
-			this.#markSelected();
 		}
+
+		this.#markSelected();
 
 		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM) {
 			if (this.#scroll_bottom) {
@@ -166,10 +181,7 @@ class CWidgetItemHistory extends CWidget {
 		const element = this.#getDefaultSelectable();
 
 		if (element !== null) {
-			this.#selected_clock = element.dataset.clock;
-			this.#selected_itemid = element.dataset.itemid;
-
-			this.#broadcast();
+			this.#broadcast(element.dataset.clock, element.dataset.itemid, element.dataset.key_);
 			this.#markSelected();
 		}
 	}
@@ -209,7 +221,11 @@ class CWidgetItemHistory extends CWidget {
 		this.#contents_scroll_width = this._contents.scrollWidth;
 	}
 
-	#broadcast() {
+	#broadcast(clock, itemid, key) {
+		this.#selected_clock = clock;
+		this.#selected_itemid = itemid;
+		this.#selected_key_ = key;
+
 		this.broadcast({
 			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
 			[CWidgetsData.DATA_TYPE_ITEM_IDS]: [this.#selected_itemid]
@@ -340,7 +356,7 @@ class CWidgetItemHistory extends CWidget {
 					break;
 
 				case CWidgetItemHistory.VALUE_TYPE_RAW:
-					const curl = this.#getHintboxContentCUrl(button);
+					const curl = this.#getHintboxHtmlCUrl(button);
 					curl.setArgument('action', 'widget.itemhistory.binary_value.get');
 
 					this.#addHintbox(button, '', curl);
@@ -364,7 +380,7 @@ class CWidgetItemHistory extends CWidget {
 		}
 	}
 
-	#getHintboxContentCUrl(button) {
+	#getHintboxHtmlCUrl(button) {
 		const curl = new Curl('zabbix.php');
 		const value = this.#binary_buttons.get(button);
 
@@ -387,25 +403,12 @@ class CWidgetItemHistory extends CWidget {
 
 				hint_box.classList.add('dashboard-widget-itemhistory-hintbox-image');
 
-				const curl = this.#getHintboxContentCUrl(button);
+				const curl = this.#getHintboxHtmlCUrl(button);
 
 				curl.setArgument('action', 'widget.itemhistory.image_value.get');
 				content.src = curl.getUrl();
 				container.innerHTML = '';
 				container.append(content);
-
-				e.target.resize_observer = new ResizeObserver((entries) => {
-					entries.forEach(entry => {
-						if (entry.contentBoxSize) {
-							const overlay = content.closest('.dashboard-widget-itemhistory-hintbox-image');
-							const size = entry.contentBoxSize[0];
-
-							overlay.style.width = `${size.inlineSize}px`;
-							overlay.style.height = `${size.blockSize}px`;
-						}
-					})
-				});
-				e.target.resize_observer.observe(content);
 
 				if (!content.complete) {
 					hint_box.classList.add('is-loading');
@@ -421,22 +424,14 @@ class CWidgetItemHistory extends CWidget {
 					});
 				}
 			});
-
-			button.addEventListener('onHideHint.hintBox', e => {
-				if (e.target.resize_observer !== undefined) {
-					e.target.resize_observer.disconnect();
-
-					delete e.target.resize_observer;
-				}
-			})
 		}
 		else {
 			if (curl !== null) {
-				button.dataset.hintboxContents = '';
+				button.dataset.hintboxHtml = '';
 				button.dataset.hintboxPreload = JSON.stringify({action: curl.args.action, data: curl.args});
 			}
 			else {
-				button.dataset.hintboxContents = content || t('Empty value.');
+				button.dataset.hintboxHtml = content || t('Empty value.');
 			}
 		}
 	}

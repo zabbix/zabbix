@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbx_rtc_constants.h"
 #include "zbxalerter.h"
 
 #include "alerter_defs.h"
@@ -25,6 +26,7 @@
 #include "zbxexec.h"
 #include "zbxhash.h"
 #include "zbxipcservice.h"
+#include "zbxjson.h"
 #include "zbxmedia.h"
 #include "zbxnix.h"
 #include "zbxself.h"
@@ -35,6 +37,14 @@
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
 #include "zbxexpr.h"
+#include "zbx_bridge_adapter_constants.h"
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
+
+#if defined(HAVE_LIBCURL)
+#	include "zbxhttp.h"
+#endif
 
 #define	ALARM_ACTION_TIMEOUT	40
 
@@ -107,40 +117,131 @@ static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int
 	zbx_free(data);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: create email In-Reply_To field value to group related messages    *
- *                                                                            *
- * Parameters: mediatypeid - [IN]                                             *
- *             sendto      - [IN] message's Send-To field                     *
- *             eventid     - [IN]                                             *
- *                                                                            *
- * Return value: In-Reply_To field value                                      *
- *                                                                            *
- ******************************************************************************/
-static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto, zbx_uint64_t eventid)
+static char	*generate_sendto_hash(const char *sendto)
 {
-	const char	*hex = "0123456789abcdef";
-	char		*str = NULL;
 	md5_state_t	state;
 	md5_byte_t	hash[ZBX_MD5_DIGEST_SIZE];
-	int		i;
-	size_t		str_alloc = 0, str_offset = 0;
+	char		*sendto_hash;
+
+	sendto_hash = zbx_malloc(NULL, ZBX_MD5_DIGEST_SIZE * 2 + 1);
 
 	zbx_md5_init(&state);
 	zbx_md5_append(&state, (const md5_byte_t *)sendto, strlen(sendto));
 	zbx_md5_finish(&state, hash);
+	zbx_md5buf2str(hash, sendto_hash);
 
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "<" ZBX_FS_UI64 ".", eventid);
+	return sendto_hash;
+}
 
-	for (i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create unique email Message-ID field value                        *
+ *                                                                            *
+ * Parameters: mediatypeid  - [IN]                                            *
+ *             sendto_hash  - [IN] hash of message's Send-To field            *
+ *             eventid      - [IN]                                            *
+ *             actionid     - [IN]                                            *
+ *             alertid      - [IN]                                            *
+ *             message_type - [IN]                                            *
+ *             process_num  - [IN]                                            *
+ *                                                                            *
+ * Return value: In-Reply_To field value                                      *
+ *                                                                            *
+ ******************************************************************************/
+static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto_hash, zbx_uint64_t eventid,
+		zbx_uint64_t actionid, zbx_uint64_t alertid, int message_type, int process_num)
+{
+	static ZBX_THREAD_LOCAL unsigned short	counter = 0;
+	time_t					utc_time;
+	struct tm				tm;
+	char					*str = NULL;
+	size_t					str_alloc = 0, str_offset = 0;
+
+	switch (message_type)
 	{
-		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, hex[hash[i] >> 4]);
-		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, hex[hash[i] & 15]);
+		case ZBX_ALERT_MESSAGE_EVENT:
+			if (0 == alertid)
+			{
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
+						"<" ZBX_FS_UI64 "-" ZBX_FS_UI64
+						".%s." ZBX_FS_UI64 ".%s@zabbix-events>",
+						eventid, actionid,
+						sendto_hash, mediatypeid, zbx_dc_get_instanceid());
+			}
+			else
+			{
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
+						"<" ZBX_FS_UI64 "-" ZBX_FS_UI64 "-" ZBX_FS_UI64
+						".%s." ZBX_FS_UI64 ".%s@zabbix-events>",
+						eventid, actionid, alertid,
+						sendto_hash, mediatypeid, zbx_dc_get_instanceid());
+			}
+			break;
+		case ZBX_ALERT_MESSAGE_REPORT:
+			time(&utc_time);
+			gmtime_r(&utc_time, &tm);
+
+			zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
+					"<%04d%02d%02d-%02d%02d%02d-%d-%hu"
+					".%s." ZBX_FS_UI64 ".%s@zabbix-reports>",
+					1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
+					tm.tm_hour, tm.tm_min, tm.tm_sec, process_num, counter++,
+					sendto_hash, mediatypeid, zbx_dc_get_instanceid());
+			break;
+		default:
+			time(&utc_time);
+			gmtime_r(&utc_time, &tm);
+
+			zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
+					"<%04d%02d%02d-%02d%02d%02d-%d-%hu"
+					".%s." ZBX_FS_UI64 ".%s@zabbix>",
+					1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
+					tm.tm_hour, tm.tm_min, tm.tm_sec, process_num, counter++,
+					sendto_hash, mediatypeid, zbx_dc_get_instanceid());
+			break;
 	}
 
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "." ZBX_FS_UI64 ".%s@zabbix.com>", mediatypeid,
-			zbx_dc_get_instanceid());
+	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create email In-Reply_To field value to group related messages    *
+ *                                                                            *
+ * Parameters: mediatypeid  - [IN]                                            *
+ *             sendto_hash  - [IN] hash of message's Send-To field            *
+ *             eventid      - [IN]                                            *
+ *             actionid     - [IN]                                            *
+ *             message_type - [IN]                                            *
+ *                                                                            *
+ * Return value: In-Reply_To field value                                      *
+ *                                                                            *
+ ******************************************************************************/
+static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto_hash, zbx_uint64_t eventid,
+		zbx_uint64_t actionid, int message_type)
+{
+	char		*str = NULL;
+	size_t		str_alloc = 0, str_offset = 0;
+
+	switch (message_type)
+	{
+		case ZBX_ALERT_MESSAGE_EVENT:
+			zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
+					"<" ZBX_FS_UI64 "-" ZBX_FS_UI64
+					".%s." ZBX_FS_UI64 ".%s@zabbix-events>",
+					eventid, actionid,
+					sendto_hash, mediatypeid, zbx_dc_get_instanceid());
+			break;
+		case ZBX_ALERT_MESSAGE_REPORT:
+			zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
+					"<" ZBX_FS_UI64
+					".%s." ZBX_FS_UI64 ".%s@zabbix-reports>",
+					eventid,
+					sendto_hash, mediatypeid, zbx_dc_get_instanceid());
+			break;
+		default:
+			break;
+	}
 
 	return str;
 }
@@ -201,26 +302,27 @@ static int	macro_alert_email_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
  *             ipc_message            - [IN] ipc message with media type and alert data *
  *             config_source_ip       - [IN]                                            *
  *             config_ssl_ca_location - [IN]                                            *
+ *             process_num            - [IN] sequential number of alerter process       *
  *                                                                                      *
  ****************************************************************************************/
 static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
-		const char *config_source_ip, const char *config_ssl_ca_location)
+		const char *config_source_ip, const char *config_ssl_ca_location, int process_num)
 {
-	zbx_uint64_t	alertid, mediatypeid, eventid, objectid;
+	zbx_uint64_t	alertid, mediatypeid, eventid, p_eventid, actionid, objectid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *smtp_username,
-			*smtp_password, *inreplyto = NULL, *expression, *recovery_expression, *mediatype_name,
-			*error = NULL;
+			*smtp_password, *sendto_hash, *messageid, *inreplyto = NULL, *expression,
+			*recovery_expression, *mediatype_name, *error = NULL;
 	unsigned short	smtp_port;
 	unsigned char	smtp_authentication, smtp_security, smtp_verify_peer, smtp_verify_host, message_format;
-	int		maxattempts, object, source, ret;
+	int		maxattempts, object, source, message_type, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &mediatype_name, &maxattempts,
-			&eventid, &source, &object, &objectid, &sendto, &subject, &message, &smtp_server, &smtp_port,
-			&smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer, &smtp_verify_host,
-			&smtp_authentication, &smtp_username, &smtp_password, &message_format, &expression,
-			&recovery_expression);
+			&eventid, &p_eventid, &actionid, &source, &object, &objectid, &message_type, &sendto, &subject,
+			&message, &smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer,
+			&smtp_verify_host, &smtp_authentication, &smtp_username, &smtp_password, &message_format,
+			&expression, &recovery_expression);
 
 	if (SMTP_AUTHENTICATION_PASSWORD == smtp_authentication)
 	{
@@ -244,9 +346,39 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 		zbx_db_trigger_clean(&event.trigger);
 	}
 
-	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
+	sendto_hash = generate_sendto_hash(sendto);
 
-	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, inreplyto, subject, message,
+	switch (message_type)
+	{
+		case ZBX_ALERT_MESSAGE_EVENT:
+			if (0 != p_eventid)
+			{
+				messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, actionid,
+						alertid, message_type, 0);
+
+				inreplyto = create_email_inreplyto(mediatypeid, sendto_hash, p_eventid, actionid,
+						message_type);
+			}
+			else
+			{
+				messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, actionid,
+						0, message_type, 0);
+			}
+			break;
+		case ZBX_ALERT_MESSAGE_REPORT:
+			messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, 0, 0, message_type,
+					process_num);
+
+			inreplyto = create_email_inreplyto(mediatypeid, sendto_hash, p_eventid, actionid,
+					message_type);
+			break;
+		default:
+			messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, 0, 0, message_type,
+					process_num);
+			break;
+	}
+
+	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, messageid, inreplyto, subject, message,
 			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, smtp_username,
 			smtp_password, message_format, ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location,
 			&error);
@@ -255,6 +387,8 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 	zbx_free(error);
 	zbx_free(inreplyto);
+	zbx_free(messageid);
+	zbx_free(sendto_hash);
 	zbx_free(sendto);
 	zbx_free(subject);
 	zbx_free(mediatype_name);
@@ -374,6 +508,114 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_free(script_bin);
 }
 
+static void	alerter_process_push(zbx_ipc_socket_t *socket,
+		zbx_ipc_message_t *ipc_message,
+		const char *config_bridge_adapter_url,
+		const char *config_bridge_adapter_ca_file,
+		const char *config_bridge_adapter_crl_file,
+		const char *config_bridge_adapter_cert_file,
+		const char *config_bridge_adapter_key_file,
+		const char *config_bridge_adapter_connect_to)
+{
+	zbx_config_t	cfg;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES);
+
+	if (0 == cfg.enable_mobile_devices)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send device notification: mobile devices are disabled");
+		alerter_send_result(socket, NULL, FAIL, "Mobile devices are disabled.", NULL);
+		return;
+	}
+
+#ifndef HAVE_LIBCURL
+	ZBX_UNUSED(ipc_message);
+	ZBX_UNUSED(config_bridge_adapter_url);
+	ZBX_UNUSED(config_bridge_adapter_ca_file);
+	ZBX_UNUSED(config_bridge_adapter_crl_file);
+	ZBX_UNUSED(config_bridge_adapter_cert_file);
+	ZBX_UNUSED(config_bridge_adapter_key_file);
+	ZBX_UNUSED(config_bridge_adapter_connect_to);
+
+	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
+	alerter_send_result(socket, NULL, FAIL, "Application compiled without cURL library.", NULL);
+#else
+	int				ret = FAIL;
+	zbx_uint64_t			alertid;
+	char				*params, *payload = NULL, *error = NULL, *error_data = NULL, *body_data = NULL,
+					code[ZBX_BRIDGE_ERROR_CODE_LEN], message[ZBX_BRIDGE_MESSAGE_LEN];
+	struct zbx_json_parse		jp_body, jp_result;
+	zbx_http_jsonrpc_error_t	err_kind;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
+	payload = zbx_strdup(NULL, params);
+
+	if (NULL == config_bridge_adapter_url || '\0' == *config_bridge_adapter_url)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: \"BridgeAdapterURL\""
+				" configuration parameter is not set");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_NOT_CONFIGURED);
+		goto out;
+	}
+
+	if (SUCCEED != zbx_http_post_json_rpc(config_bridge_adapter_url, config_bridge_adapter_ca_file,
+			config_bridge_adapter_crl_file, config_bridge_adapter_cert_file, config_bridge_adapter_key_file,
+			config_bridge_adapter_connect_to, payload, ZBX_PROTO_VALUE_DEVICE_NOTIFY,
+			ZBX_BRIDGE_ADAPTER_SERVICE_NAME, (long)ZBX_BRIDGE_ADAPTER_TIMEOUT, &body_data, &jp_body,
+			&err_kind))
+	{
+		switch (err_kind)
+		{
+			case ZBX_HTTP_JSONRPC_ERR_CONNECT:
+				error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
+				break;
+			default:
+				error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
+				break;
+		}
+
+		goto out;
+	}
+
+	if (SUCCEED == zbx_json_brackets_by_name(&jp_body, "error", &jp_result))
+	{
+		if (SUCCEED == zbx_json_value_by_name(&jp_result, "code", code, sizeof(code), NULL) &&
+				SUCCEED == zbx_json_value_by_name(&jp_result, "message", message,
+				sizeof(message), NULL))
+		{
+#ifdef ZBX_DEBUG
+			error_data = zbx_json_raw_value_by_path_dyn(&jp_result, "$.data");
+			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
+					code, message, ZBX_NULL2EMPTY_STR(error_data));
+#else
+			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s",
+					code, message);
+#endif
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_RETURNED_ERROR);
+		}
+		else
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
+
+		goto out;
+	}
+
+	ret = SUCCEED;
+
+out:
+	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
+
+	zbx_free(params);
+	zbx_free(error_data);
+	zbx_free(error);
+	zbx_free(body_data);
+	zbx_free(payload);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically check table alerts and send notifications if needed  *
@@ -394,7 +636,9 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
-
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_ipc_message_init(&message);
@@ -403,7 +647,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to alert manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	alerter_register(&alerter_socket);
@@ -443,7 +687,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		{
 			if (ZBX_IS_RUNNING())
 				zabbix_log(LOG_LEVEL_CRIT, "cannot read alert manager service request");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -456,7 +700,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		{
 			case ZBX_IPC_ALERTER_EMAIL:
 				alerter_process_email(&alerter_socket, &message, alerter_args_in->config_source_ip,
-						alerter_args_in->config_ssl_ca_location);
+						alerter_args_in->config_ssl_ca_location, process_num);
 				break;
 			case ZBX_IPC_ALERTER_SMS:
 				alerter_process_sms(&alerter_socket, &message, alerter_args_in->config_sms_devices);
@@ -466,6 +710,18 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 				break;
 			case ZBX_IPC_ALERTER_WEBHOOK:
 				alerter_process_webhook(&alerter_socket, &message, alerter_args_in->config_source_ip);
+				break;
+			case ZBX_IPC_ALERTER_PUSH:
+				alerter_process_push(&alerter_socket, &message,
+						alerter_args_in->config_bridge_adapter_url,
+						alerter_args_in->config_bridge_adapter_ca_file,
+						alerter_args_in->config_bridge_adapter_crl_file,
+						alerter_args_in->config_bridge_adapter_cert_file,
+						alerter_args_in->config_bridge_adapter_key_file,
+						alerter_args_in->config_bridge_adapter_connect_to);
+				break;
+			case ZBX_RTC_SHUTDOWN:
+				zbx_set_exiting_with_succeed();
 				break;
 		}
 

@@ -8,4 +8,5 @@ libzbxproxyconfig_a_SOURCES = \
 
 libzbxproxyconfig_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_proxy \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(ARES_CFLAGS)

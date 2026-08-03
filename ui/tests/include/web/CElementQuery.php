@@ -45,6 +45,8 @@ require_once __DIR__.'/elements/CInputGroupElement.php';
 require_once __DIR__.'/elements/CHostInterfaceElement.php';
 require_once __DIR__.'/elements/CFilterElement.php';
 require_once __DIR__.'/elements/CFieldsetElement.php';
+require_once __DIR__.'/elements/CTextareaFlexibleElement.php';
+require_once __DIR__.'/elements/CDatatableElement.php';
 
 require_once __DIR__.'/IWaitable.php';
 require_once __DIR__.'/WaitableTrait.php';
@@ -588,7 +590,8 @@ class CElementQuery implements IWaitable {
 			'CDropdownElement'			=> '/z-select[@name]',
 			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
 			'CMultiselectElement'		=> [
-				'/div[contains(@class, "multiselect-control")]'
+				'/div[contains(@class, "multiselect-control")]',
+				'/div/div[contains(@class, "multiselect-control")]'
 			],
 			'CSegmentedRadioElement'	=> [
 				'/ul[contains(@class, "radio-list-control")]',
@@ -614,7 +617,8 @@ class CElementQuery implements IWaitable {
 			],
 			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',
 			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]',
-			'CFieldsetElement'			=> '/fieldset'
+			'CFieldsetElement'			=> '/fieldset',
+			'CTextareaFlexibleElement'	=> '/z-textarea-flexible[@name]'
 		];
 
 		if ($class !== null) {

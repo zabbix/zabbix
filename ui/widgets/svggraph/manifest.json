@@ -18,6 +18,12 @@
 		"out": [
 			{
 				"type": "_timeperiod"
+			},
+			{
+				"type": "_itemid"
+			},
+			{
+				"type": "_itemids"
 			}
 		]
 	},
@@ -27,6 +33,6 @@
 		}
 	},
 	"assets": {
-		"js": ["class.widget.js"]
+		"js": ["class.csvggraph.js", "class.widget.js"]
 	}
 }

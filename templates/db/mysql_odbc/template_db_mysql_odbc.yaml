@@ -14,15 +14,9 @@ zabbix_export:
         CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
         GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
         
-        For more information please read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html.
+        For more information please read the MySQL documentation: https://dev.mysql.com/doc/refman/8.0/en/grant.html.
         
-        NOTE: In order to collect replication metrics, MariaDB Enterprise Server 10.5.8-5 and above and MariaDB Community Server 10.5.9 and above require the SLAVE MONITOR privilege to be set for the monitoring user:
-        
-        GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW,SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
-        
-        For more information please read the MariaDB documentation https://mariadb.com/docs/server/ref/mdb/privileges/SLAVE_MONITOR/.
-        
-        2. Set the user name and password in the host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}).
+        2. Set the user name and password in the host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}) if they are not already specified in the `odbc.ini` configuration file for ODBC monitoring.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql.
         
@@ -38,20 +32,19 @@ zabbix_export:
         GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
         ```
         
-        For more information, please see MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
+        For more information, please see MySQL documentation: https://dev.mysql.com/doc/refman/8.0/en/grant.html.
         
-        **NOTE:** In order to collect replication metrics, MariaDB Enterprise Server 10.5.8-5 and above and MariaDB Community Server 10.5.9 and above require the `SLAVE MONITOR` privilege to be set for the monitoring user:
+        2. Set the username and password in the `MySQL user` and `MySQL password` fields in the host wizard,
+        if they are not already specified in the `odbc.ini` configuration file for ODBC monitoring.
         
-        ```text
-        GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW,SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
-        ```
-        
-        For more information please read the MariaDB documentation https://mariadb.com/docs/server/ref/mdb/privileges/SLAVE_MONITOR/
-        
-        2. Set the username and password in the `MySQL user` and `MySQL password` host wizard configuration fields.
+        Optionally, it is possible to customize the template:
+        - The discovery of tables is disabled by default. To enable table discovery, change the value of the macro `{$MYSQL.TABLE.NAMES.MATCHES}` to the name of a single table, or use a regex string to include multiple tables.
+        - You can also add an additional context macro `{$MYSQL.TABLE.NAMES.MATCHES:<dbname>}` for specific databases to precisely control which tables should be discovered.
+        - To exclude certain tables from discovery, change the value of the macro `{$MYSQL.TABLE.NAMES.NOT_MATCHES}` to the name of a single table, or use a regex string to exclude multiple tables.
+        - You can also add an additional context macro `{$MYSQL.TABLE.NAMES.NOT_MATCHES:<dbname>}` for specific databases to precisely control which tables should be excluded.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Databases
       items:
@@ -66,56 +59,6 @@ zabbix_export:
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
           description: 'Used for scanning databases in DBMS.'
-          tags:
-            - tag: component
-              value: raw
-        - uuid: e389af9f1d134e028e3b637544c8a265
-          name: 'Get replication'
-          type: ODBC
-          key: 'db.odbc.get[get_replication,"{$MYSQL.DSN}"]'
-          delay: 1h
-          history: '0'
-          value_type: TEXT
-          params: 'show replica status'
-          username: '{$MYSQL.USER}'
-          password: '{$MYSQL.PASSWORD}'
-          description: 'Gets replication status information.'
-          preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '-1'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: deprecated
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var result = [];
-                  
-                  if (value === "deprecated") {
-                  	result = [{
-                  		"replica_key": "slave",
-                  		"replica_name": "Slave",
-                  		"source_key": "master",
-                  		"source_name": "Master"
-                  	}];
-                  } else {
-                  	try {
-                  		value = JSON.parse(value);
-                  		if (value.length > 0) {
-                  			result = [{
-                  				"replica_key": "replica",
-                  				"replica_name": "Replica",
-                  				"source_key": "source",
-                  				"source_name": "Source"
-                  			}];
-                  		}
-                  	}
-                  	catch (error) {
-                  		Zabbix.log(3, "MySQL replica status ERROR: " + error);
-                  	}
-                  }
-                  
-                  return JSON.stringify(result);
           tags:
             - tag: component
               value: raw
@@ -143,6 +86,11 @@ zabbix_export:
           valuemap:
             name: 'Service state'
           preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
@@ -154,9 +102,9 @@ zabbix_export:
           triggers:
             - uuid: e664e41d7b4f4336a3e5ef4720f6ee41
               expression: 'last(/MySQL by ODBC/db.odbc.select[ping,"{$MYSQL.DSN}"])=0'
-              name: 'MySQL: Service is down'
+              name: 'MySQL: Service is unreachable'
               priority: HIGH
-              description: 'MySQL is down.'
+              description: 'MySQL is unreachable.'
               tags:
                 - tag: scope
                   value: availability
@@ -226,7 +174,7 @@ zabbix_export:
               name: 'MySQL: Server has aborted connections'
               event_name: 'MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)'
               priority: AVERAGE
-              description: 'The number of failed attempts to connect to the MySQL server is more than `{$MYSQL.ABORTED_CONN.MAX.WARN}` in the last 5 minutes.'
+              description: 'The number of failed attempts to connect to the MySQL server has been more than `{$MYSQL.ABORTED_CONN.MAX.WARN}` in the last 5 minutes.'
               dependencies:
                 - name: 'MySQL: Refused connections'
                   expression: 'last(/MySQL by ODBC/mysql.connection_errors_max_connections.rate)>0'
@@ -282,16 +230,6 @@ zabbix_export:
           tags:
             - tag: component
               value: memory
-          triggers:
-            - uuid: f4c2e4edf0c34bb1856ed392f2bc7c87
-              expression: 'max(/MySQL by ODBC/mysql.buffer_pool_utilization,5m)<{$MYSQL.BUFF_UTIL.MIN.WARN}'
-              name: 'MySQL: Buffer pool utilization is too low'
-              event_name: 'MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
-              priority: WARNING
-              description: 'The buffer pool utilization is less than `{$MYSQL.BUFF_UTIL.MIN.WARN}`% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
-              tags:
-                - tag: scope
-                  value: notice
         - uuid: f05d592e6ae74e64bc54c649418761a6
           name: 'Bytes received'
           type: DEPENDENT
@@ -327,7 +265,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: a43ec23dad9345a5a1b0ff8bda12ed77
-          name: 'Command Delete per second'
+          name: 'Command delete per second'
           type: DEPENDENT
           key: mysql.com_delete.rate
           value_type: FLOAT
@@ -343,7 +281,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: cd924e3b51074b3baf642a7aa1eeb474
-          name: 'Command Insert per second'
+          name: 'Command insert per second'
           type: DEPENDENT
           key: mysql.com_insert.rate
           value_type: FLOAT
@@ -359,7 +297,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 31e6372d1249442ab3ebdd993f397e26
-          name: 'Command Select per second'
+          name: 'Command select per second'
           type: DEPENDENT
           key: mysql.com_select.rate
           value_type: FLOAT
@@ -375,7 +313,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 0f5f638777284093bcdc5f2dacc8e951
-          name: 'Command Update per second'
+          name: 'Command update per second'
           type: DEPENDENT
           key: mysql.com_update.rate
           value_type: FLOAT
@@ -594,6 +532,20 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
+        - uuid: f183707b926045589328e8834cb75663
+          name: 'Full table scan ratio'
+          type: CALCULATED
+          key: mysql.full_scans.ratio
+          value_type: FLOAT
+          params: 'last(//mysql.select_scan.rate) / last(//mysql.com_select.rate)'
+          description: 'The ratio of `SELECT` statements executed as full table scans to all `SELECT` statements.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: operations
         - uuid: e31f66bbc32b404c92debc4d9367162d
           name: 'InnoDB buffer pool pages free'
           type: DEPENDENT
@@ -698,11 +650,11 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 4e829cbb3cc2485dac2757867badd0f4
-          name: 'Innodb buffer pool wait free'
+          name: 'InnoDB buffer pool wait free'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_wait_free
           value_type: FLOAT
-          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing `innodb_buffer_pool_size`.'
+          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the number of waits for this operation to finish. If this value is not small, look at the increasing `innodb_buffer_pool_size`.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -723,7 +675,7 @@ zabbix_export:
           key: mysql.innodb_log_file_size
           value_type: FLOAT
           params: '(last(//mysql.innodb_os_log_written) - last(//mysql.innodb_os_log_written,#1:now-1h)) / {$MYSQL.INNODB_LOG_FILES}'
-          description: '`Innodb_log_file_size` is calculated as: (`innodb_os_log_written`-`innodb_os_log_written`(time shift -1h))/`{$MYSQL.INNODB_LOG_FILES}`. `Innodb_log_file_size` is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512 GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
+          description: '`Innodb_log_file_size` is calculated as: (`innodb_os_log_written`-`innodb_os_log_written`(time shift -1h))/`{$MYSQL.INNODB_LOG_FILES}`. `Innodb_log_file_size` is the size in bytes of each InnoDB redo log file in the log group. The combined size can be no more than 512 GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -731,8 +683,29 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: 5ef490ea780d4f439721cd952fb98656
+          name: 'InnoDB log waits per second'
+          type: DEPENDENT
+          key: mysql.innodb_log_waits.rate
+          value_type: FLOAT
+          description: 'Number of InnoDB log waits per second. An increase in this per-second value indicates that threads are increasingly waiting for redo log writes, which typically points to disk subsystem performance issues or an `innodb_log_file_size` that is too small.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_log_waits'')].Value.first()'
+            - type: CHANGE_PER_SECOND
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            - tag: component
+              value: innodb
+            - tag: component
+              value: system
         - uuid: 79218a1068394ce69dfc6eeb626e83bc
-          name: 'Innodb number open files'
+          name: 'InnoDB number open files'
           type: DEPENDENT
           key: mysql.innodb_num_open_files
           value_type: FLOAT
@@ -752,7 +725,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: fc561c5392bb43a4842977bdf4b882a8
-          name: 'Innodb log written'
+          name: 'InnoDB log written'
           type: DEPENDENT
           key: mysql.innodb_os_log_written
           value_type: FLOAT
@@ -770,6 +743,102 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: 04b8adbe69454f44975c89461d501e9b
+          name: 'InnoDB rows deleted per second'
+          type: DEPENDENT
+          key: mysql.innodb_rows_deleted.rate
+          description: 'Number of rows deleted from InnoDB tables per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_rows_deleted'')].Value.first()'
+            - type: CHANGE_PER_SECOND
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            - tag: component
+              value: innodb
+            - tag: component
+              value: tables
+        - uuid: 46e0edfd8e7247dea34ca5bf3b96b200
+          name: 'InnoDB rows inserted per second'
+          type: DEPENDENT
+          key: mysql.innodb_rows_inserted.rate
+          description: 'Number of rows inserted into InnoDB tables per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_rows_inserted'')].Value.first()'
+            - type: CHANGE_PER_SECOND
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            - tag: component
+              value: innodb
+            - tag: component
+              value: tables
+        - uuid: b21f2b4f150a46fa8b65452eee49b656
+          name: 'InnoDB rows read per second'
+          type: DEPENDENT
+          key: mysql.innodb_rows_read.rate
+          description: 'Number of rows read from InnoDB tables per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_rows_read'')].Value.first()'
+            - type: CHANGE_PER_SECOND
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            - tag: component
+              value: innodb
+            - tag: component
+              value: tables
+        - uuid: bd1f5108add1492b84e008fe44f4e95d
+          name: 'InnoDB rows update per second'
+          type: DEPENDENT
+          key: mysql.innodb_rows_updated.rate
+          description: 'Number of rows updated in InnoDB tables per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_rows_updated'')].Value.first()'
+            - type: CHANGE_PER_SECOND
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            - tag: component
+              value: innodb
+            - tag: component
+              value: tables
+        - uuid: 4e171da655b340baa65e60685ea3d086
+          name: 'InnoDB row lock current waits'
+          type: DEPENDENT
+          key: mysql.innodb_row_lock_current_waits
+          description: 'Current number of active row lock waits in InnoDB.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_row_lock_current_waits'')].Value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            - tag: component
+              value: innodb
+            - tag: component
+              value: tables
         - uuid: a62951afcfbd44e595a4d294b24056e5
           name: 'InnoDB row lock time'
           type: DEPENDENT
@@ -794,6 +863,25 @@ zabbix_export:
               value: innodb
             - tag: component
               value: tables
+        - uuid: 2fe14572f5d44a958f9a49b5256a0ccc
+          name: 'InnoDB row lock wait time avg'
+          type: DEPENDENT
+          key: mysql.innodb_row_lock_time_avg
+          value_type: FLOAT
+          units: s
+          description: 'Average time spent waiting for row locks in InnoDB, in milliseconds.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_row_lock_time_avg'')].Value.first()'
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
         - uuid: 22277695b7154c019a76ca730e68e833
           name: 'InnoDB row lock time max'
           type: DEPENDENT
@@ -919,6 +1007,25 @@ zabbix_export:
           tags:
             - tag: component
               value: queries
+        - uuid: 00ef80ebfe264704a2968f22f2ffda4e
+          name: 'Select scan per second'
+          type: DEPENDENT
+          key: mysql.select_scan.rate
+          value_type: FLOAT
+          description: 'The number of `SELECT` queries that required a full table scan. A high value indicates a lack of or improper use of indexes.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Select_scan'')].Value.first()'
+            - type: CHANGE_PER_SECOND
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          tags:
+            - tag: component
+              value: operations
         - uuid: b0227399437f4219b65ab1511d5e67c6
           name: 'Slow queries per second'
           type: DEPENDENT
@@ -941,7 +1048,7 @@ zabbix_export:
               name: 'MySQL: Server has slow queries'
               event_name: 'MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'The number of slow queries is more than `{$MYSQL.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.'
+              description: 'The number of slow queries has been more than `{$MYSQL.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.'
               tags:
                 - tag: scope
                   value: performance
@@ -1026,7 +1133,7 @@ zabbix_export:
               priority: INFO
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               dependencies:
-                - name: 'MySQL: Service is down'
+                - name: 'MySQL: Service is unreachable'
                   expression: 'last(/MySQL by ODBC/db.odbc.select[ping,"{$MYSQL.DSN}"])=0'
               tags:
                 - tag: scope
@@ -1053,10 +1160,10 @@ zabbix_export:
               - macro: '{#DATABASE}'
                 value: '{$MYSQL.DBNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'Used for the discovery of the databases.'
+          description: 'Used for the discovery of databases.'
           item_prototypes:
             - uuid: f358179ef78b4a31affa9e049b4048b8
-              name: 'Size of database {#DATABASE}'
+              name: 'Database [{#DATABASE}]: Size'
               type: ODBC
               key: 'db.odbc.select[{#DATABASE}_size,"{$MYSQL.DSN}"]'
               delay: 5m
@@ -1079,106 +1186,26 @@ zabbix_export:
           lld_macro_paths:
             - lld_macro: '{#DATABASE}'
               path: $.Database
+            - lld_macro: '{#TABLES_MATCHES}'
+              path: $.matches
+            - lld_macro: '{#TABLES_NOT_MATCHES}'
+              path: $.not_matches
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
-        - uuid: ad12522557df499e9a78b8b3c07733dd
-          name: 'MariaDB discovery'
-          type: DEPENDENT
-          key: mysql.extra_metric.discovery
-          description: 'Used for additional metrics if MariaDB is used.'
-          item_prototypes:
-            - uuid: eb8713584314461488b8769f1081d48d
-              name: 'Binlog commits'
-              type: DEPENDENT
-              key: 'mysql.binlog_commits[{#SINGLETON}]'
-              value_type: FLOAT
-              description: 'Total number of transactions committed to the binary log.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$[?(@.Variable_name==''Binlog_commits'')].Value.first()'
-              master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
-              tags:
-                - tag: component
-                  value: transactions
-            - uuid: cbb7c1fadd934420b47950f52751795f
-              name: 'Binlog group commits'
-              type: DEPENDENT
-              key: 'mysql.binlog_group_commits[{#SINGLETON}]'
-              value_type: FLOAT
-              description: 'Total number of group commits done to the binary log.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$[?(@.Variable_name==''Binlog_group_commits'')].Value.first()'
-              master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
-              tags:
-                - tag: component
-                  value: transactions
-            - uuid: 278488a9c0f543f6815a24592766d9bb
-              name: 'Master GTID wait count'
-              type: DEPENDENT
-              key: 'mysql.master_gtid_wait_count[{#SINGLETON}]'
-              value_type: FLOAT
-              description: 'The number of times `MASTER_GTID_WAIT` called.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$[?(@.Variable_name==''Master_gtid_wait_count'')].Value.first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 6h
-              master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
-              tags:
-                - tag: component
-                  value: transactions
-            - uuid: 93ad282dc3b24dba9f0351b0d0a59d39
-              name: 'Master GTID wait timeouts'
-              type: DEPENDENT
-              key: 'mysql.master_gtid_wait_timeouts[{#SINGLETON}]'
-              value_type: FLOAT
-              description: 'Number of timeouts occurring in `MASTER_GTID_WAIT`.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$[?(@.Variable_name==''Master_gtid_wait_timeouts'')].Value.first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 6h
-              master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
-              tags:
-                - tag: component
-                  value: transactions
-            - uuid: fd8bf7e639af4d3291030cdb9dd37bc9
-              name: 'Master GTID wait time'
-              type: DEPENDENT
-              key: 'mysql.master_gtid_wait_time[{#SINGLETON}]'
-              value_type: FLOAT
-              description: 'Total number of time spent in `MASTER_GTID_WAIT`.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$[?(@.Variable_name==''Master_gtid_wait_time'')].Value.first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 6h
-              master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
-              tags:
-                - tag: component
-                  value: transactions
-          master_item:
-            key: 'db.odbc.select[version,"{$MYSQL.DSN}"]'
-          preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - 'return JSON.stringify(value.search(''MariaDB'')>-1 ? [{''{#SINGLETON}'': ''''}] : []);'
+                - |
+                  var dbs = JSON.parse(value);
+                  
+                  dbs.forEach(function (db) {
+                    var name = db.Database;
+                    db.matches = "{" + "$MYSQL.TABLE.NAMES.MATCHES:" + name + "}";
+                    db.not_matches = "{" + "$MYSQL.TABLE.NAMES.NOT_MATCHES:" + name + "}";
+                  });
+                  
+                  return JSON.stringify(dbs);
         - uuid: d0a235c0267c48e28bc6ecb99fb2380d
           name: 'Replication discovery'
           type: DEPENDENT
@@ -1186,7 +1213,7 @@ zabbix_export:
           description: 'Discovery of the replication.'
           item_prototypes:
             - uuid: d88f65c4bee84e74bb6e00061ab27f0c
-              name: 'Replication {#REPLICA.NAME} status'
+              name: 'Replication {#REPLICA.KEY} status'
               type: ODBC
               key: 'db.odbc.get["get_{#REPLICA.KEY}_status","{$MYSQL.DSN}"]'
               history: '0'
@@ -1194,8 +1221,11 @@ zabbix_export:
               params: 'show {#REPLICA.KEY} status'
               username: '{$MYSQL.USER}'
               password: '{$MYSQL.PASSWORD}'
-              description: 'Gets status information on the essential parameters of the {#REPLICA.KEY} threads.'
+              description: 'Gets status information on the essential parameters of the `{#REPLICA.KEY}` threads.'
               preprocessing:
+                - type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - '-1'
                 - type: JSONPATH
                   parameters:
                     - $.first()
@@ -1203,25 +1233,129 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      if (value.indexOf("Source_Host") !== 0) {
-                      	value = value.replace(/Source/g, "Master");
-                      	value = value.replace(/Replica_/g, "Slave_");
+                      var result = [];
+                      
+                      try {
+                      	const obj = JSON.parse(value);
+                      	if ("Source_Host" in obj) {
+                      		result = [{
+                      			"replica_key": "replica",
+                      			"replica_name": "Replica",
+                      			"source_key": "source",
+                      			"source_name": "Source"
+                      		}];
+                      	} else {
+                      		result = [{
+                      			"replica_key": "slave",
+                      			"replica_name": "Slave",
+                      			"source_key": "master",
+                      			"source_name": "Master"
+                      		}];
+                      	}
+                      } catch (error) {
+                      	Zabbix.log(3, "MySQL replica status ERROR: " + error);
                       }
                       
-                      return value;
+                      return JSON.stringify(result);
               tags:
                 - tag: component
                   value: raw
-            - uuid: 15f7b22867f54551afbed139d746e210
-              name: 'Replication Seconds Behind {#SOURCE.NAME}'
-              type: DEPENDENT
-              key: 'mysql.seconds_behind_master["{#REPLICA.KEY}"]'
-              units: s
-              description: 'The number of seconds the {#REPLICA.KEY} SQL thread has been behind processing the {#SOURCE.KEY} binary log. A high number (or an increasing one) can indicate that the {#REPLICA.KEY} is unable to handle events from the {#SOURCE.KEY} in a timely fashion.'
+          master_item:
+            key: 'db.odbc.select[version,"{$MYSQL.DSN}"]'
+          lld_macro_paths:
+            - lld_macro: '{#REPLICA.KEY}'
+              path: $.replica_key
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const ref = '{$MYSQL.REPLICA.STATUS.MIN.VER}';
+                  
+                  if (!value || value.length === 0) {
+                  	return "[]";
+                  }
+                  
+                  var dataReplica = [{
+                  	"replica_key": "replica",
+                  }];
+                  
+                  var dataSlave = [{
+                  	"replica_key": "slave",
+                  }];
+                  
+                  const valueParts = value.replace('-', '.').split('.').map(Number);
+                  const refParts = ref.replace('-', '.').split('.').map(Number);
+                  
+                  const maxLength = Math.max(valueParts.length, refParts.length);
+                  
+                  for (var i = 0; i < maxLength; i++) {
+                  	const valuePart = valueParts[i] || 0;
+                  	const refPart = refParts[i] || 0;
+                  
+                  	if (valuePart > refPart) {
+                  		return JSON.stringify(dataReplica);
+                  	}
+                  	if (valuePart < refPart) {
+                  		return JSON.stringify(dataSlave);
+                  	}
+                  }
+                  
+                  return JSON.stringify(dataReplica);
+        - uuid: 7fb726d59c3f4f249d54e68320847fb7
+          name: 'Replication [{#REPLICA.KEY}]: Replica discovery'
+          type: DEPENDENT
+          key: 'mysql.replication.discovery["{#REPLICA.KEY}_discovery","{$MYSQL.DSN}"]'
+          description: 'Discovery of the replication.'
+          item_prototypes:
+            - uuid: f5c5905362c049c2a46fc56bdaee36d8
+              name: 'Replication: Get data'
+              type: ODBC
+              key: 'db.odbc.get["{#REPLICA.KEY}/{#REPLICA.NAME}_get_data","{$MYSQL.DSN}"]'
+              history: '0'
+              value_type: TEXT
+              params: 'show {#REPLICA.KEY} status'
+              username: '{$MYSQL.USER}'
+              password: '{$MYSQL.PASSWORD}'
+              description: 'Gets status information on the essential parameters of the `{#REPLICA.KEY}` threads.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.Seconds_Behind_Master
+                    - $.first()
+                  error_handler: DISCARD_VALUE
+              tags:
+                - tag: component
+                  value: raw
+            - uuid: b03da43d0582459dbba2decdd1238fbe
+              name: 'Replication: {#SOURCE.NAME} Host'
+              type: DEPENDENT
+              key: 'mysql.master_host["{#REPLICA.KEY}/{#REPLICA.NAME}"]'
+              value_type: CHAR
+              description: 'Describes the hostname or IP address of the MySQL primary (source/master) server that the replica uses.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.{#SOURCE.NAME}_Host'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'db.odbc.get["{#REPLICA.KEY}/{#REPLICA.NAME}_get_data","{$MYSQL.DSN}"]'
+              tags:
+                - tag: component
+                  value: replication
+            - uuid: 15f7b22867f54551afbed139d746e210
+              name: 'Replication: Seconds behind {#SOURCE.NAME}'
+              type: DEPENDENT
+              key: 'mysql.seconds_behind_master["{#REPLICA.KEY}/{#REPLICA.NAME}"]'
+              units: s
+              description: 'The number of seconds the `{#REPLICA.KEY}` SQL thread has been behind processing the `{#SOURCE.KEY}` binary log. A high number (or an increasing one) can indicate that the `{#REPLICA.KEY}` is unable to handle events from the `{#SOURCE.KEY}` in a timely fashion.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.Seconds_Behind_{#SOURCE.NAME}'
                 - type: MATCHES_REGEX
                   parameters:
                     - \d+
@@ -1231,13 +1365,13 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get["get_{#REPLICA.KEY}_status","{$MYSQL.DSN}"]'
+                key: 'db.odbc.get["{#REPLICA.KEY}/{#REPLICA.NAME}_get_data","{$MYSQL.DSN}"]'
               tags:
                 - tag: component
                   value: replication
               trigger_prototypes:
                 - uuid: f2188a73bbf34ffcb95b3e11e2824feb
-                  expression: 'min(/MySQL by ODBC/mysql.seconds_behind_master["{#REPLICA.KEY}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}'
+                  expression: 'min(/MySQL by ODBC/mysql.seconds_behind_master["{#REPLICA.KEY}/{#REPLICA.NAME}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}'
                   name: 'MySQL: Replication lag is too high'
                   event_name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
                   priority: WARNING
@@ -1245,105 +1379,439 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: notice
-            - uuid: e063b116753d4124a88443fe4de20d41
-              name: 'Replication {#REPLICA.NAME} IO Running'
+            - uuid: 25357b80eb904bc9bfa0a211161d2aca
+              name: 'Replication: {#REPLICA.NAME} Last IO error'
               type: DEPENDENT
-              key: 'mysql.slave_io_running["{#REPLICA.KEY}"]'
-              value_type: CHAR
-              description: 'Whether the I/O thread for reading the {#SOURCE.KEY}''s binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `stop {#REPLICA.KEY}`.'
+              key: 'mysql.slave_io_error["{#REPLICA.KEY}/{#REPLICA.NAME}"]'
+              value_type: TEXT
+              description: 'Describes the last I/O error message reported by the replica I/O thread that caused replication to stop or behave incorrectly.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.Slave_IO_Running
+                    - $.Last_IO_Error
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'db.odbc.get["{#REPLICA.KEY}/{#REPLICA.NAME}_get_data","{$MYSQL.DSN}"]'
+              tags:
+                - tag: component
+                  value: replication
+            - uuid: e063b116753d4124a88443fe4de20d41
+              name: 'Replication: {#REPLICA.NAME} IO running'
+              type: DEPENDENT
+              key: 'mysql.slave_io_running["{#REPLICA.KEY}/{#REPLICA.NAME}"]'
+              description: 'Indicates whether the I/O thread for reading the `{#SOURCE.KEY}` binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `stop {#REPLICA.KEY}`.'
+              valuemap:
+                name: 'Running state'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.{#REPLICA.NAME}_IO_Running'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [
+                      	'Yes',
+                      	'No',
+                      	'Connecting'
+                      ].indexOf(value);
+                      return idx === -1 ? 0 : idx + 1;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get["get_{#REPLICA.KEY}_status","{$MYSQL.DSN}"]'
+                key: 'db.odbc.get["{#REPLICA.KEY}/{#REPLICA.NAME}_get_data","{$MYSQL.DSN}"]'
               tags:
                 - tag: component
                   value: replication
               trigger_prototypes:
                 - uuid: 6f216036f4f14ae7adc8c70126bb315a
-                  expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}"],#1,"ne","Yes")=1'
+                  expression: 'last(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}/{#REPLICA.NAME}"])<>1'
                   name: 'MySQL: The {#REPLICA.KEY} I/O thread is not connected to a replication {#SOURCE.KEY}'
                   priority: WARNING
-                  description: 'Whether the {#REPLICA.KEY} I/O thread is connected to the {#SOURCE.KEY}.'
+                  description: 'Indicates whether the `{#REPLICA.KEY}` I/O thread is connected to the `{#SOURCE.KEY}`.'
                   dependencies:
                     - name: 'MySQL: The {#REPLICA.KEY} I/O thread is not running'
-                      expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}"],#1,"eq","No")=1'
+                      expression: 'last(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}/{#REPLICA.NAME}"])=0'
                   tags:
                     - tag: scope
                       value: availability
                 - uuid: ba08061a61df4bbb8bac516ecec91b70
-                  expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}"],#1,"eq","No")=1'
+                  expression: 'last(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}/{#REPLICA.NAME}"])=0'
                   name: 'MySQL: The {#REPLICA.KEY} I/O thread is not running'
                   priority: AVERAGE
-                  description: 'Whether the I/O thread for reading the {#SOURCE.KEY}''s binary log is running.'
+                  description: 'Indicates whether the I/O thread for reading the `{#SOURCE.KEY}` binary log is running.'
                   tags:
                     - tag: scope
                       value: notice
-            - uuid: 113be79554c14c2aad08036febb15d71
-              name: 'Replication {#REPLICA.NAME} SQL Running'
+            - uuid: 3397f5d118b74be291b46644e57f7320
+              name: 'Replication: {#REPLICA.NAME} Last SQL error'
               type: DEPENDENT
-              key: 'mysql.slave_sql_running["{#REPLICA.KEY}"]'
-              value_type: CHAR
-              description: |
-                Whether the SQL thread for executing events in the relay log is running.
-                As with the I/O thread, this should normally be `Yes`.
+              key: 'mysql.slave_sql_error["{#REPLICA.KEY}/{#REPLICA.NAME}"]'
+              value_type: TEXT
+              description: 'Describes the last SQL error message reported by the replica SQL thread that caused replication to stop or behave incorrectly.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.Slave_SQL_Running
+                    - $.Last_SQL_Error
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'db.odbc.get["{#REPLICA.KEY}/{#REPLICA.NAME}_get_data","{$MYSQL.DSN}"]'
+              tags:
+                - tag: component
+                  value: replication
+            - uuid: 113be79554c14c2aad08036febb15d71
+              name: 'Replication: {#REPLICA.NAME} SQL running'
+              type: DEPENDENT
+              key: 'mysql.slave_sql_running["{#REPLICA.KEY}/{#REPLICA.NAME}"]'
+              description: |
+                Indicates whether the SQL thread for executing events in the relay log is running.
+                As with the I/O thread, this should normally be `Yes`.
+              valuemap:
+                name: 'Running state'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.{#REPLICA.NAME}_SQL_Running'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [
+                      	'Yes',
+                      	'No',
+                      	'Connecting'
+                      ].indexOf(value);
+                      return idx === -1 ? 0 : idx + 1;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get["get_{#REPLICA.KEY}_status","{$MYSQL.DSN}"]'
+                key: 'db.odbc.get["{#REPLICA.KEY}/{#REPLICA.NAME}_get_data","{$MYSQL.DSN}"]'
               tags:
                 - tag: component
                   value: replication
               trigger_prototypes:
                 - uuid: 39d229e5e3f34e8b828b4a0e2eaa0026
-                  expression: 'count(/MySQL by ODBC/mysql.slave_sql_running["{#REPLICA.KEY}"],#1,"eq","No")=1'
+                  expression: 'last(/MySQL by ODBC/mysql.slave_sql_running["{#REPLICA.KEY}/{#REPLICA.NAME}"])=0'
                   name: 'MySQL: The SQL thread is not running'
                   priority: WARNING
-                  description: 'Whether the SQL thread for executing events in the relay log is running.'
+                  description: 'Indicates whether the SQL thread for executing events in the relay log is running.'
                   dependencies:
                     - name: 'MySQL: The {#REPLICA.KEY} I/O thread is not running'
-                      expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}"],#1,"eq","No")=1'
+                      expression: 'last(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}/{#REPLICA.NAME}"])=0'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: a88eb463bb9740a4a4256306f11816bf
-              name: 'Replication {#REPLICA.NAME} SQL Running State'
+              name: 'Replication: SQL running state'
               type: DEPENDENT
-              key: 'mysql.slave_sql_running_state["{#REPLICA.KEY}"]'
+              key: 'mysql.slave_sql_running_state["{#REPLICA.KEY}.{#REPLICA.NAME}"]'
               value_type: TEXT
               description: 'Shows the state of the SQL driver threads.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.Slave_SQL_Running_State
+                    - '$.{#REPLICA.NAME}_SQL_Running_State'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: 'db.odbc.get["get_{#REPLICA.KEY}_status","{$MYSQL.DSN}"]'
+                key: 'db.odbc.get["{#REPLICA.KEY}/{#REPLICA.NAME}_get_data","{$MYSQL.DSN}"]'
               tags:
                 - tag: component
                   value: replication
+          parent_discovery_rule:
+            key: mysql.replication.discovery
           master_item:
-            key: 'db.odbc.get[get_replication,"{$MYSQL.DSN}"]'
+            key: 'db.odbc.get["get_{#REPLICA.KEY}_status","{$MYSQL.DSN}"]'
           lld_macro_paths:
-            - lld_macro: '{#REPLICA.KEY}'
-              path: $.replica_key
             - lld_macro: '{#REPLICA.NAME}'
               path: $.replica_name
             - lld_macro: '{#SOURCE.KEY}'
               path: $.source_key
             - lld_macro: '{#SOURCE.NAME}'
               path: $.source_name
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        - uuid: befbe7e0c19045d09de6ae2d5cec6442
+          name: 'Database [{#DATABASE}]: Enable table discovery'
+          type: SCRIPT
+          key: 'mysql.table.enable.discovery[{#DATABASE}]'
+          delay: 1h
+          params: |
+            const params = JSON.parse(value);
+            var out = [];
+            
+            const tables_matches = params['tables_matches'];
+            const tables_not_matches = params['tables_not_matches'];
+            
+            if (tables_matches !== 'CHANGE_IF_NEEDED' || tables_not_matches !== 'CHANGE_IF_NEEDED') {
+            	out = [{'singleton': ''}];
+            }
+            return JSON.stringify(out);
+          description: 'Used to enable table discovery.'
+          item_prototypes:
+            - uuid: 3e3996efa5c74a09aed6fc566d0d68c1
+              name: 'Database [{#DATABASE}]: Get tables'
+              type: ODBC
+              key: 'db.odbc.get[{#SINGLETON}{#DATABASE}_tables,"{$MYSQL.DSN}"]'
+              delay: 1h
+              history: '0'
+              value_type: TEXT
+              params: 'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ''{#DATABASE}'' AND TABLE_NAME REGEXP ''{$MYSQL.TABLE.NAMES.MATCHES:"{#DATABASE}"}'' AND TABLE_NAME NOT REGEXP ''{$MYSQL.TABLE.NAMES.NOT_MATCHES:"{#DATABASE}"}'';'
+              username: '{$MYSQL.USER}'
+              password: '{$MYSQL.PASSWORD}'
+              description: 'Database table discovery.'
+              tags:
+                - tag: component
+                  value: raw
+          parent_discovery_rule:
+            key: mysql.database.discovery
+          parameters:
+            - name: tables_matches
+              value: '{#TABLES_MATCHES}'
+            - name: tables_not_matches
+              value: '{#TABLES_NOT_MATCHES}'
+          lld_macro_paths:
+            - lld_macro: '{#SINGLETON}'
+              path: $.singleton
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          overrides:
+            - name: 'Disable tables discovery'
+              step: '1'
+              filter:
+                conditions:
+                  - macro: '{#SINGLETON}'
+                    operator: NOT_EXISTS
+              operations:
+                - operator: LIKE
+                  value: 'Get tables'
+                  discover: NO_DISCOVER
+                  status: DISABLED
+                - operationobject: LLD_RULE_PROTOTYPE
+                  operator: LIKE
+                  value: 'Tables discovery'
+                  discover: NO_DISCOVER
+                  status: DISABLED
+        - uuid: 44c795267ff645bd8db8ae0fd6264e34
+          name: 'Database [{#DATABASE}]: Table discovery'
+          type: DEPENDENT
+          key: 'mysql.tables.discovery[{#SINGLETON}{#DATABASE}]'
+          description: 'Used for the discovery of tables of the databases.'
+          item_prototypes:
+            - uuid: 77940e0841b546069a28f104d8994138
+              name: 'Table [{#DATABASE}/{#TABLE_NAME}]: Get data'
+              type: ODBC
+              key: 'db.odbc.get[{#SINGLETON}{#DATABASE}/{#TABLE_NAME}.data,"{$MYSQL.DSN}"]'
+              delay: 5m
+              history: '0'
+              value_type: TEXT
+              params: 'SELECT TABLE_NAME, DATA_LENGTH, INDEX_LENGTH, DATA_FREE, TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ''{#DATABASE}'' AND TABLE_NAME = ''{#TABLE_NAME}'';'
+              username: '{$MYSQL.USER}'
+              password: '{$MYSQL.PASSWORD}'
+              description: 'Database table data.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.first()
+                  error_handler: DISCARD_VALUE
+              tags:
+                - tag: component
+                  value: raw
+            - uuid: b4958b535c62423eb8003bce432033ae
+              name: 'Table [{#DATABASE}/{#TABLE_NAME}]: Data free'
+              type: DEPENDENT
+              key: 'mysql.table.data_free[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]'
+              units: B
+              description: 'The amount of unused but allocated space.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.DATA_FREE
+                - type: MULTIPLIER
+                  parameters:
+                    - '1'
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get[{#SINGLETON}{#DATABASE}/{#TABLE_NAME}.data,"{$MYSQL.DSN}"]'
+              tags:
+                - tag: database
+                  value: '{#DATABASE}'
+                - tag: table
+                  value: '{#TABLE_NAME}'
+            - uuid: 33cf1366222f4c3e965cdbe0185ab4de
+              name: 'Table [{#DATABASE}/{#TABLE_NAME}]: Data length'
+              type: DEPENDENT
+              key: 'mysql.table.data_length[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]'
+              units: B
+              description: 'The size of the data in the table.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.DATA_LENGTH
+                - type: MULTIPLIER
+                  parameters:
+                    - '1'
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get[{#SINGLETON}{#DATABASE}/{#TABLE_NAME}.data,"{$MYSQL.DSN}"]'
+              tags:
+                - tag: database
+                  value: '{#DATABASE}'
+                - tag: table
+                  value: '{#TABLE_NAME}'
+            - uuid: 7f85a26520e84f45965da139b618377e
+              name: 'Table [{#DATABASE}/{#TABLE_NAME}]: Free ratio'
+              type: CALCULATED
+              key: 'mysql.table.free_ratio[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]'
+              value_type: FLOAT
+              params: '(last(//mysql.table.data_free[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) / last(//mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]))'
+              description: |
+                The fraction of allocated table space that is currently unused (`DATA_FREE` / (`DATA_LENGTH` + `INDEX_LENGTH`)).
+                High values indicate potential table fragmentation or inefficient space usage.
+              preprocessing:
+                - type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - '-1'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                - tag: database
+                  value: '{#DATABASE}'
+                - tag: table
+                  value: '{#TABLE_NAME}'
+            - uuid: 96ff7374b56041da825e544b24d52d87
+              name: 'Table [{#DATABASE}/{#TABLE_NAME}]: Index length'
+              type: DEPENDENT
+              key: 'mysql.table.index_length[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]'
+              units: B
+              description: 'The size occupied by the table''s indexes.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.INDEX_LENGTH
+                - type: MULTIPLIER
+                  parameters:
+                    - '1'
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get[{#SINGLETON}{#DATABASE}/{#TABLE_NAME}.data,"{$MYSQL.DSN}"]'
+              tags:
+                - tag: database
+                  value: '{#DATABASE}'
+                - tag: table
+                  value: '{#TABLE_NAME}'
+            - uuid: f5583b13155942428a8d67abb80f9487
+              name: 'Table [{#DATABASE}/{#TABLE_NAME}]: Rows'
+              type: DEPENDENT
+              key: 'mysql.table.rows[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]'
+              units: '!rows'
+              description: 'The approximate number of rows in the table. For InnoDB, the `TABLE_ROWS` value is approximate and may differ from the actual count.'
+              preprocessing:
+                - type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - '-1'
+                - type: JSONPATH
+                  parameters:
+                    - $.TABLE_ROWS
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get[{#SINGLETON}{#DATABASE}/{#TABLE_NAME}.data,"{$MYSQL.DSN}"]'
+              tags:
+                - tag: database
+                  value: '{#DATABASE}'
+                - tag: table
+                  value: '{#TABLE_NAME}'
+            - uuid: 11f652a0187e41dbaa227f9b8c8ef063
+              name: 'Table [{#DATABASE}/{#TABLE_NAME}]: Total size'
+              type: CALCULATED
+              key: 'mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]'
+              units: B
+              params: 'last(//mysql.table.data_length[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) + last(//mysql.table.index_length[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"])'
+              description: 'The sum of `DATA_LENGTH` and `INDEX_LENGTH` represents the total size of the table.'
+              preprocessing:
+                - type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - '-1'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                - tag: database
+                  value: '{#DATABASE}'
+                - tag: table
+                  value: '{#TABLE_NAME}'
+              trigger_prototypes:
+                - uuid: b64dc4cba9dd49b996a5d1cc84df1657
+                  expression: '(last(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"])-min(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"],5m))>{$MYSQL.TOTALSIZE.GROWTH.MAX.WARN}'
+                  name: 'MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Total size growth is high'
+                  event_name: 'MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Total size growth is high (over {$MYSQL.TOTALSIZE.GROWTH.MAX.WARN} for 5m)'
+                  priority: WARNING
+                  description: 'Total table size growth is high.'
+                  dependencies:
+                    - name: 'MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Total size growth is too high'
+                      expression: '(last(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"])-min(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"],5m))>{$MYSQL.TOTALSIZE.GROWTH.MAX.CRIT}'
+                  tags:
+                    - tag: scope
+                      value: capacity
+                - uuid: 86e3fdd7fba64ac18de0a2eaf0b86170
+                  expression: '(last(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"])-min(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"],5m))>{$MYSQL.TOTALSIZE.GROWTH.MAX.CRIT}'
+                  name: 'MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Total size growth is too high'
+                  event_name: 'MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Total size growth is too high (over {$MYSQL.TOTALSIZE.GROWTH.MAX.CRIT} for 5m)'
+                  priority: HIGH
+                  description: 'Total table size growth is too high.'
+                  tags:
+                    - tag: scope
+                      value: capacity
+          trigger_prototypes:
+            - uuid: c0630effd39a4031b2f8e26c11065400
+              expression: 'last(/MySQL by ODBC/mysql.table.free_ratio[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.FRAGMENTATION.WARN} and last(/MySQL by ODBC/mysql.table.data_free[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.DATA_FREE.MIN.WARN} and last(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.TABLE_SIZE.MIN.WARN}'
+              name: 'MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Free space high'
+              event_name: 'MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Free space high (fragmentation warning)'
+              priority: WARNING
+              description: 'Free table space is high (fragmentation warning).'
+              dependencies:
+                - name: 'MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Free space very high'
+                  expression: 'last(/MySQL by ODBC/mysql.table.free_ratio[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.FRAGMENTATION.CRIT} and last(/MySQL by ODBC/mysql.table.data_free[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.DATA_FREE.MIN.CRIT} and last(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.TABLE_SIZE.MIN.CRIT}'
+              tags:
+                - tag: scope
+                  value: performance
+            - uuid: d9ab42ca19694e88a8757561b19aae96
+              expression: 'last(/MySQL by ODBC/mysql.table.free_ratio[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.FRAGMENTATION.CRIT} and last(/MySQL by ODBC/mysql.table.data_free[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.DATA_FREE.MIN.CRIT} and last(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.TABLE_SIZE.MIN.CRIT}'
+              name: 'MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Free space very high'
+              event_name: 'MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Free space very high (fragmentation critical)'
+              priority: HIGH
+              description: 'Free table space is very high (fragmentation critical).'
+              tags:
+                - tag: scope
+                  value: performance
+          parent_discovery_rule:
+            key: 'mysql.table.enable.discovery[{#DATABASE}]'
+          master_item:
+            key: 'db.odbc.get[{#SINGLETON}{#DATABASE}_tables,"{$MYSQL.DSN}"]'
+          lld_macro_paths:
+            - lld_macro: '{#TABLE_NAME}'
+              path: $.TABLE_NAME
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1368,10 +1836,10 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MYSQL.BUFF_UTIL.MIN.WARN}'
           value: '50'
-          description: 'The minimum buffer pool utilization in percentage for trigger expressions.'
+          description: 'The minimum buffer pool utilization in percent for trigger expressions.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '9'
             section_name: Thresholds
             label: 'Buffer pool utilization threshold'
             description: 'Threshold of the minimum percentage of buffer pool utilization. In the range from 0 to 100 inclusive.'
@@ -1381,7 +1849,7 @@ zabbix_export:
           description: 'The maximum number of temporary tables created on a disk per second for trigger expressions.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '11'
             section_name: Thresholds
             label: 'Temporary tables created on a disk per second threshold'
             description: 'Threshold for the maximum number of temporary tables created on a disk per second. No less than 0.'
@@ -1391,7 +1859,7 @@ zabbix_export:
           description: 'The maximum number of temporary files created on a disk per second for trigger expressions.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '12'
             section_name: Thresholds
             label: 'Temporary files created on a disk per second threshold'
             description: 'Threshold for the maximum number of temporary files created on a disk per second. No less than 0.'
@@ -1401,17 +1869,35 @@ zabbix_export:
           description: 'The maximum number of temporary tables created in memory per second for trigger expressions.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '10'
             section_name: Thresholds
             label: 'Temporary tables created in memory per second threshold'
             description: 'Threshold for the maximum number of temporary tables created in memory per second. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$MYSQL.DATA_FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The minimum `Data_free` value for critical fragmentation trigger expressions.'
+          config:
+            type: TEXT
+            priority: '23'
+            section_name: Filters
+            label: 'Critical data free threshold'
+            description: 'The minimum `Data_free` value for critical fragmentation trigger expressions.'
+        - macro: '{$MYSQL.DATA_FREE.MIN.WARN}'
+          value: 1G
+          description: 'The minimum `Data_free` value for warning fragmentation trigger expressions.'
+          config:
+            type: TEXT
+            priority: '22'
+            section_name: Filters
+            label: 'Warning data free threshold'
+            description: 'The minimum `Data_free` value for warning fragmentation trigger expressions.'
         - macro: '{$MYSQL.DBNAME.MATCHES}'
           value: .+
           description: 'Filter of discoverable databases.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '14'
             section_name: Filters
             label: 'Include database filter'
             description: 'Regex string to include discovered database by its name.'
@@ -1420,7 +1906,7 @@ zabbix_export:
           description: 'Filter to exclude discovered databases.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '15'
             section_name: Filters
             label: 'Exclude database filter'
             description: 'Regex string to exclude discovered database by its name.'
@@ -1432,12 +1918,50 @@ zabbix_export:
             label: 'MySQL DSN'
             description: 'Data source name of the MySQL instance.'
             required: 'YES'
+        - macro: '{$MYSQL.FRAGMENTATION.CRIT}'
+          value: '0.6'
+          description: 'The free ratio threshold for critical fragmentation trigger expressions.'
+          config:
+            type: TEXT
+            priority: '21'
+            section_name: Filters
+            label: 'Critical fragmentation threshold'
+            description: 'The free ratio threshold for critical fragmentation trigger expressions.'
+        - macro: '{$MYSQL.FRAGMENTATION.WARN}'
+          value: '0.3'
+          description: 'The free ratio threshold for warning fragmentation trigger expressions.'
+          config:
+            type: TEXT
+            priority: '20'
+            section_name: Filters
+            label: 'Warning fragmentation threshold'
+            description: 'The free ratio threshold for warning fragmentation trigger expressions.'
+        - macro: '{$MYSQL.FULLSCAN.RATIO.WARN}'
+          value: '0.1'
+          description: 'Warning threshold for full table scan ratio.'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Thresholds
+            label: 'Full table scan ratio threshold'
+            description: 'Threshold for full table scan ratio (fraction of SELECT statements executed as full table scans). No less than 0.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$MYSQL.FULLSCAN.SELECT_RATE.MIN.WARN}'
+          value: '5'
+          description: 'The minimum `SELECT` statement rate (per second) for trigger expressions.'
+          config:
+            type: TEXT
+            priority: '8'
+            section_name: Thresholds
+            label: 'SELECT statements rate threshold'
+            description: 'Threshold for minimum SELECT statements rate (per second) required for evaluating full table scan ratio. No less than 0.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MYSQL.INNODB_LOG_FILES}'
           value: '2'
           description: 'Number of physical files in the InnoDB redo log for calculating `innodb_log_file_size`.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '13'
             section_name: Thresholds
             label: 'InnoDB redo log files number (for calculating)'
             description: 'Threshold for the maximum number of physical files in the InnoDB redo log for calculating `innodb_log_file_size`. No less than 0.'
@@ -1450,7 +1974,15 @@ zabbix_export:
             priority: '3'
             label: 'MySQL password'
             description: 'Password for the MySQL user used in the ODBC data source connection.'
-            required: 'YES'
+        - macro: '{$MYSQL.REPLICA.STATUS.MIN.VER}'
+          value: 8.0.22
+          description: 'Minimum MySQL version for `SHOW REPLICA STATUS` (`SHOW SLAVE STATUS` deprecated).'
+          config:
+            type: TEXT
+            priority: '26'
+            section_name: Filters
+            label: 'Minimum MySQL version for `SHOW REPLICA STATUS`'
+            description: 'Minimum MySQL version for `SHOW REPLICA STATUS` (`SHOW SLAVE STATUS` deprecated).'
         - macro: '{$MYSQL.REPL_LAG.MAX.WARN}'
           value: 30m
           description: 'Amount of time the slave is behind the master for trigger expressions.'
@@ -1470,6 +2002,60 @@ zabbix_export:
             label: 'Number of slow queries threshold'
             description: 'Threshold for the maximum number of slow queries. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$MYSQL.TABLE.NAMES.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter of discoverable tables. Use a context to change the filter of discoverable tables for a specific database.'
+          config:
+            type: TEXT
+            priority: '16'
+            section_name: Filters
+            label: 'Include table filter'
+            description: 'Regex string to include discovered table by its name.'
+        - macro: '{$MYSQL.TABLE.NAMES.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered tables. Use a context to change the filter to exclude discovered tables for a specific database.'
+          config:
+            type: TEXT
+            priority: '17'
+            section_name: Filters
+            label: 'Exclude table filter'
+            description: 'Regex string to exclude discovered table by its name.'
+        - macro: '{$MYSQL.TABLE_SIZE.MIN.CRIT}'
+          value: 10G
+          description: 'The minimum table size for critical fragmentation trigger expressions.'
+          config:
+            type: TEXT
+            priority: '25'
+            section_name: Filters
+            label: 'Critical table size threshold'
+            description: 'The minimum table size for critical fragmentation trigger expressions.'
+        - macro: '{$MYSQL.TABLE_SIZE.MIN.WARN}'
+          value: 3G
+          description: 'The minimum table size for warning fragmentation trigger expressions.'
+          config:
+            type: TEXT
+            priority: '24'
+            section_name: Filters
+            label: 'Warning table size threshold'
+            description: 'The minimum table size for warning fragmentation trigger expressions.'
+        - macro: '{$MYSQL.TOTALSIZE.GROWTH.MAX.CRIT}'
+          value: 1G
+          description: 'The critical threshold of the total table size growth for trigger expressions.'
+          config:
+            type: TEXT
+            priority: '19'
+            section_name: Filters
+            label: 'Maximum table total size growth (critical)'
+            description: 'The critical threshold of the table total size growth for trigger expressions.'
+        - macro: '{$MYSQL.TOTALSIZE.GROWTH.MAX.WARN}'
+          value: 300M
+          description: 'The warning threshold of the total table size growth for trigger expressions.'
+          config:
+            type: TEXT
+            priority: '18'
+            section_name: Filters
+            label: 'Maximum table total size growth (warning)'
+            description: 'The warning threshold of the total table size growth for trigger expressions.'
         - macro: '{$MYSQL.USER}'
           description: 'MySQL username.'
           config:
@@ -1477,105 +2063,1336 @@ zabbix_export:
             priority: '2'
             label: 'MySQL user'
             description: 'Username for MySQL used in the ODBC data source connection.'
-            required: 'YES'
       dashboards:
         - uuid: d56c53704c264552a09cf3e59a1835f3
-          name: 'MySQL performance'
+          name: 'MySQL: Performance'
           pages:
-            - widgets:
-                - type: graph
-                  name: 'MySQL: Operations'
+            - name: Overview
+              widgets:
+                - type: item
+                  name: Status
+                  width: '8'
+                  hide_header: 'YES'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: STRING
+                      name: description
+                      value: Status
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: 'db.odbc.select[ping,"{$MYSQL.DSN}"]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                    - type: INTEGER
+                      name: units_size
+                      value: '18'
+                    - type: INTEGER
+                      name: value_size
+                      value: '18'
+                - type: item
+                  name: Uptime
+                  'y': '2'
+                  width: '16'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: description
+                      value: Uptime
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.uptime
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '1'
+                    - type: INTEGER
+                      name: units_size
+                      value: '25'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
+                - type: svggraph
+                  name: Queries
+                  'y': '4'
                   width: '36'
                   height: '5'
                   fields:
-                    - type: GRAPH
-                      name: graphid.0
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: E45959
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
                       value:
                         host: 'MySQL by ODBC'
-                        name: 'MySQL: Operations'
+                        key: mysql.queries.rate
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.questions.rate
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.slow_queries.rate
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
                     - type: STRING
                       name: reference
-                      value: AAAAA
-                - type: graph
-                  name: 'MySQL: Connections'
+                      value: QURES
+                    - type: INTEGER
+                      name: severities.0
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '5'
+                    - type: INTEGER
+                      name: show_problems
+                      value: '1'
+                - type: svggraph
+                  name: Bandwidth
+                  'y': '9'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.bytes_received.rate
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.bytes_sent.rate
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: BNDWT
+                - type: item
+                  name: Version
+                  x: '8'
+                  width: '8'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: description
+                      value: Version
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: 'db.odbc.select[version,"{$MYSQL.DSN}"]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '1'
+                    - type: INTEGER
+                      name: units_size
+                      value: '25'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
+                - type: gauge
+                  name: 'Buffer pool efficiency'
+                  x: '16'
+                  width: '20'
+                  height: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: description
+                      value: 'Buffer pool efficiency'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '8'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.buffer_pool_efficiency
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '1'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '95'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '99'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: units_size
+                      value: '20'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                    - type: INTEGER
+                      name: value_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: value_size
+                      value: '20'
+                - type: problems
+                  name: Problems
+                  x: '36'
+                  width: '36'
+                  height: '9'
+                - type: svggraph
+                  name: Threads
+                  x: '36'
+                  'y': '9'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: FFBF59
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: E45959
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.threads_cached
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.threads_connected
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.threads_created.rate
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.threads_running
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: THRDS
+            - name: 'Connections & Errors'
+              widgets:
+                - type: svggraph
+                  name: 'New connections and Threads created'
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.connections.rate
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.threads_created.rate
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: NCONN
+                    - type: INTEGER
+                      name: righty
+                      value: '1'
+                - type: honeycomb
+                  name: 'Connection errors, by type'
+                  'y': '6'
+                  width: '72'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Connection errors*'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("Connection\serrors\s(.*)\sper\ssecond", \1)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: CNERR
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '0.001'
+                - type: svggraph
+                  name: 'Connection errors'
+                  'y': '9'
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: FF465C
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.itemids.0._reference
+                      value: CNERR._itemid
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: reference
+                      value: GCERR
+                - type: svggraph
+                  name: 'Connections: Aborted and Max used'
+                  x: '36'
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: FFA059
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: E45959
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.aborted_clients.rate
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.aborted_connects.rate
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.max_used_connections
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: ACONN
+                    - type: INTEGER
+                      name: righty
+                      value: '1'
+                    - type: INTEGER
+                      name: severities.0
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '5'
+                    - type: INTEGER
+                      name: show_problems
+                      value: '1'
+            - name: InnoDB
+              widgets:
+                - type: svggraph
+                  name: 'Buffer pool'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_buffer_pool_pages_free
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_buffer_pool_pages_total
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: FFBF59
+                    - type: STRING
+                      name: ds.1.color.1
+                      value: E45959
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_buffer_pool_read_requests.rate
+                    - type: ITEM
+                      name: ds.1.itemids.1
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_buffer_pool_reads.rate
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: IDBBP
+                    - type: INTEGER
+                      name: righty
+                      value: '1'
+                - type: svggraph
+                  name: 'Buffer pool wait free'
                   'y': '5'
                   width: '36'
-                  height: '5'
+                  height: '4'
                   fields:
-                    - type: GRAPH
-                      name: graphid.0
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
                       value:
                         host: 'MySQL by ODBC'
-                        name: 'MySQL: Connections'
+                        key: mysql.innodb_buffer_pool_wait_free
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
                     - type: STRING
                       name: reference
-                      value: AAAAC
-                - type: graph
-                  name: 'MySQL: InnoDB buffer pool'
-                  'y': '10'
+                      value: IBPWF
+                - type: svggraph
+                  name: 'Log activity'
+                  'y': '9'
                   width: '36'
                   height: '5'
                   fields:
-                    - type: GRAPH
-                      name: graphid.0
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
                       value:
                         host: 'MySQL by ODBC'
-                        name: 'MySQL: InnoDB buffer pool'
+                        key: mysql.innodb_log_waits.rate
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_os_log_written
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
                     - type: STRING
                       name: reference
-                      value: AAAAE
-                - type: graph
-                  name: 'MySQL: Queries'
+                      value: ILOGA
+                    - type: INTEGER
+                      name: righty
+                      value: '1'
+                - type: gauge
+                  name: 'Buffer pool efficiency'
+                  x: '36'
+                  width: '18'
+                  height: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: description
+                      value: 'Buffer pool efficiency'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '8'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.buffer_pool_efficiency
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '1'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '95'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '99'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: units_size
+                      value: '20'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                    - type: INTEGER
+                      name: value_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: value_size
+                      value: '20'
+                - type: svggraph
+                  name: 'Rows activity'
+                  x: '36'
+                  'y': '4'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: E45959
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: FFBF59
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_rows_deleted.rate
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_rows_inserted.rate
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_rows_read.rate
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_rows_updated.rate
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: IDBRO
+                - type: svggraph
+                  name: 'Row lock activity'
+                  x: '36'
+                  'y': '9'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_row_lock_waits
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_row_lock_current_waits
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 97AAB3
+                    - type: STRING
+                      name: ds.1.color.1
+                      value: FFA059
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_row_lock_time
+                    - type: ITEM
+                      name: ds.1.itemids.1
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.innodb_row_lock_time_avg
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: ILCKA
+                    - type: INTEGER
+                      name: righty
+                      value: '1'
+                - type: gauge
+                  name: 'Buffer pool utilization'
+                  x: '54'
+                  width: '18'
+                  height: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: description
+                      value: 'Buffer pool utilization'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '8'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.buffer_pool_utilization
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '1'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '50'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '80'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: units_size
+                      value: '20'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                    - type: INTEGER
+                      name: value_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: value_size
+                      value: '20'
+            - name: 'Query performance'
+              widgets:
+                - type: svggraph
+                  name: Operations
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: E45959
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: FFBF59
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.com_delete.rate
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.com_insert.rate
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.com_select.rate
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.com_update.rate
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: OPRTN
+                - type: svggraph
+                  name: 'Select scan'
+                  'y': '6'
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.select_scan.rate
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: IBPWF
+                - type: svggraph
+                  name: Queries
                   x: '36'
                   width: '36'
-                  height: '5'
+                  height: '6'
                   fields:
-                    - type: GRAPH
-                      name: graphid.0
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: E45959
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
                       value:
                         host: 'MySQL by ODBC'
-                        name: 'MySQL: Queries'
+                        key: mysql.queries.rate
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.questions.rate
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.slow_queries.rate
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
                     - type: STRING
                       name: reference
-                      value: AAAAB
-                - type: graph
-                  name: 'MySQL: Bandwidth'
+                      value: QURES
+                    - type: INTEGER
+                      name: severities.0
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '5'
+                    - type: INTEGER
+                      name: show_problems
+                      value: '1'
+                - type: svggraph
+                  name: 'Temporary operations'
                   x: '36'
-                  'y': '5'
+                  'y': '6'
                   width: '36'
-                  height: '5'
+                  height: '6'
                   fields:
-                    - type: GRAPH
-                      name: graphid.0
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
                       value:
                         host: 'MySQL by ODBC'
-                        name: 'MySQL: Bandwidth'
-                    - type: STRING
-                      name: reference
-                      value: AAAAD
-                - type: graph
-                  name: 'MySQL: Threads'
-                  x: '36'
-                  'y': '10'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
+                        key: mysql.created_tmp_tables.rate
+                    - type: ITEM
+                      name: ds.0.itemids.1
                       value:
                         host: 'MySQL by ODBC'
-                        name: 'MySQL: Threads'
+                        key: mysql.created_tmp_disk_tables.rate
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 97AAB3
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'MySQL by ODBC'
+                        key: mysql.created_tmp_files.rate
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
                     - type: STRING
                       name: reference
-                      value: AAAAF
+                      value: TMPOP
+                    - type: INTEGER
+                      name: righty
+                      value: '1'
+                    - type: INTEGER
+                      name: severities.0
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '5'
+                    - type: INTEGER
+                      name: show_problems
+                      value: '1'
+            - name: Tables
+              widgets:
+                - type: honeycomb
+                  name: 'Tables total size'
+                  width: '72'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Table*total size'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("\[(.*?)\]","\1")}'
+                    - type: STRING
+                      name: reference
+                      value: TBLSS
+                    - type: STRING
+                      name: secondary_label_units
+                      value: B
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: 1G
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: FFA059
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: 10G
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: 100G
+                - type: honeycomb
+                  name: 'Tables data free'
+                  'y': '4'
+                  width: '72'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Table*data free'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("\[(.*?)\]","\1")}'
+                    - type: STRING
+                      name: reference
+                      value: TBLDF
+                    - type: STRING
+                      name: secondary_label_units
+                      value: B
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: 1G
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: FFA059
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: 10G
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: 100G
+                - type: svggraph
+                  name: 'Table size and data free'
+                  'y': '8'
+                  width: '72'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.itemids.0._reference
+                      value: TBLSS._itemid
+                    - type: STRING
+                      name: ds.0.itemids.1._reference
+                      value: TBLDF._itemid
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: reference
+                      value: TBLGP
       valuemaps:
+        - uuid: 4a55a3bc6c614f1d931e155553a11242
+          name: 'Running state'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: 'Yes'
+            - value: '2'
+              newvalue: 'No'
+            - value: '3'
+              newvalue: Connecting
         - uuid: 622c38d0af2a4b6ea7a640a5d1a22b93
           name: 'Service state'
           mappings:
             - value: '0'
-              newvalue: Down
+              newvalue: Unreachable
             - value: '1'
               newvalue: Up
+  triggers:
+    - uuid: f4c2e4edf0c34bb1856ed392f2bc7c87
+      expression: 'max(/MySQL by ODBC/mysql.buffer_pool_utilization,5m)<{$MYSQL.BUFF_UTIL.MIN.WARN} and last(/MySQL by ODBC/mysql.uptime)>3600'
+      name: 'MySQL: Buffer pool utilization is too low'
+      event_name: 'MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
+      priority: WARNING
+      description: 'The buffer pool utilization has been less than `{$MYSQL.BUFF_UTIL.MIN.WARN}`% in the last 5 minutes with server uptime over 1 hour. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: a3780d8174ad46acadac90dd9e1f1d0b
+      expression: 'avg(/MySQL by ODBC/mysql.full_scans.ratio,5m)>{$MYSQL.FULLSCAN.RATIO.WARN} and avg(/MySQL by ODBC/mysql.com_select.rate,5m)>{$MYSQL.FULLSCAN.SELECT_RATE.MIN.WARN}'
+      name: 'MySQL: High rate of full table scans'
+      event_name: 'MySQL: High rate of full table scans (over {$MYSQL.FULLSCAN.RATIO.WARN} for 5m)'
+      priority: WARNING
+      description: 'The rate of `SELECT` statements exceeds `{$MYSQL.FULLSCAN.SELECT_RATE.MIN.WARN}` per second and the full table scan ratio has been above `{$MYSQL.FULLSCAN.RATIO.WARN}` for the last 5 minutes.'
+      tags:
+        - tag: scope
+          value: performance
   graphs:
     - uuid: 3522a11cae374d08a751f419e51748e1
       name: 'MySQL: Bandwidth'

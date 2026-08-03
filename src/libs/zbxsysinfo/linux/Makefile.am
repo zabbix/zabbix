@@ -1,6 +1,18 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libfunclistsysinfo.a libspecsysinfo.a libspechostnamesysinfo.a
+noinst_LIBRARIES = libfunclistsysinfo.a libspechostnamesysinfo.a
+
+if AGENT
+noinst_LIBRARIES += libspecsysinfo.a
+endif
+
+if TESTS
+noinst_LIBRARIES += libspecsysinfo.a
+endif
+
+if AGENT2
+noinst_LIBRARIES += libzbxagent2specsysinfo.a
+endif
 
 libfunclistsysinfo_a_SOURCES = \
 	linux.c
@@ -29,6 +41,16 @@ libspecsysinfo_a_SOURCES = \
 	system.c \
 	swap.c \
 	uptime.c
+
+libzbxagent2specsysinfo_a_CFLAGS = \
+	-I$(top_srcdir)/src/zabbix_agent \
+	-DWITH_AGENT2_METRICS
+
+libzbxagent2specsysinfo_a_SOURCES = \
+	cpu.c \
+	hardware.c \
+	net.c \
+	sensors.c
 
 libspechostnamesysinfo_a_SOURCES = \
 	hostname.c

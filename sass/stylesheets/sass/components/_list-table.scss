@@ -3,6 +3,8 @@
 	background-color: $ui-bg-color;
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
+	border-top-left-radius: var(--surface-border-radius);
+	border-top-right-radius: var(--surface-border-radius);
 
 	&.fixed {
 		table-layout: fixed;
@@ -225,6 +227,10 @@
 	}
 
 	&.no-data {
+		overflow: clip;
+		border-bottom-left-radius: var(--surface-border-radius);
+		border-bottom-right-radius: var(--surface-border-radius);
+
 		tbody {
 			tr {
 				td {
@@ -261,7 +267,18 @@
 	}
 
 	.icon {
-		border-radius: 2px;
+		border-radius: var(--button-border-radius);
+	}
+
+	[aria-label] {
+		@if $ui-transitions {
+			transition: box-shadow $ui-controls-transition-duration ease-out;
+		}
+
+		&:focus {
+			outline: none;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
+		}
 	}
 
 	.btn-icon:not(.btn-small),

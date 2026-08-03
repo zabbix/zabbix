@@ -28,6 +28,9 @@ ZABBIX_OPTIONS=""
 if [ -n "$PID_FILE" ]; then
 	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.pidFile=$PID_FILE"
 fi
+if [ -n "$SERVER" ]; then
+	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.server=$SERVER"
+fi
 if [ -n "$LISTEN_IP" ]; then
 	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.listenIP=$LISTEN_IP"
 fi

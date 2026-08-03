@@ -66,10 +66,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Check layout at Host tab.
 		$this->zbxTestAssertElementPresentXpath('//label[text()="Parent discovery rules"]/../..//'.
 				'a[contains(@href, "&hostid='.$host_prototype.'") and contains(@href, "&parent_discoveryid='.$discovery_id.'")]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/input[@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="name"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="host"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/z-textarea-flexible[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/z-textarea-flexible[@readonly]');
 		$interface = CDBHelper::getValue('SELECT interfaceid'.
 				' FROM interface'.
 				' WHERE hostid IN ('.
@@ -131,9 +131,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		for ($i = 0; $i < $count; $i += 3) {
 			$macro = [];
 			$row = $table->getRow($i);
-			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
+			$macro['macro'] = $row->query('xpath:./td[1]/z-textarea-flexible')->one()->getValue();
 			$macro['value'] = $this->getValueField($macro['macro'])->getValue();
-			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
+			$macro['description'] = $table->getRow($i + 1)->query('tag:z-textarea-flexible')->one()->getValue();
 			$macro['type'] = ($this->getValueField($macro['macro'])->getInputType() === 'Secret text') ? '1' : '0';
 
 			$macros['frontend'][] = $macro;
@@ -460,6 +460,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		if (array_key_exists('cloned_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('host', $data['cloned_name']);
+			// Remove focus to avoid inline error "This object already exists." appearing from the original clone name.
+			$this->query('id:host')->one()->removeFocus();
 		}
 		if (array_key_exists('cloned_visible_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('name', $data['cloned_visible_name']);
@@ -497,9 +499,11 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog->getFooter()->query('button:Add')->one()->click();
+		$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 
 		if (array_key_exists('error_inline', $data)) {
+			$dialog->waitUntilTextPresent(array_values($data['error_inline'])[0]);
+
 			$this->assertInlineError($dialog->waitUntilReady()->asForm(), $data['error_inline']);
 		}
 		else {
@@ -593,6 +597,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$form->submit();
 
 		$dialog->ensureNotPresent();
+		$this->assertMessage(TEST_GOOD, 'Host prototype updated');
 		$this->page->waitUntilReady();
 
 		// Open host prototype inherited from template on host and check inherited macros.

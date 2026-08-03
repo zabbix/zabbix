@@ -181,7 +181,7 @@ ZBX_THREAD_ENTRY(zbx_ipmi_poller_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to IPMI service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_init_ipmi_handler();
@@ -219,7 +219,7 @@ ZBX_THREAD_ENTRY(zbx_ipmi_poller_thread, args)
 			if (SUCCEED != zbx_ipc_async_socket_recv(&ipmi_socket, ipc_timeout, &message))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot read IPMI service request");
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 
 			if (NULL != message)

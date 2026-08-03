@@ -273,24 +273,17 @@ class CApiService {
 	 */
 	protected function unsetExtraFields(array $objects, array $fields, $output = []) {
 		// find the fields that have not been requested
-		$extraFields = [];
+		$extra_fields = [];
 		foreach ($fields as $field) {
 			if (!$this->outputIsRequested($field, $output)) {
-				$extraFields[] = $field;
+				$extra_fields[$field] = true;
 			}
 		}
 
 		// unset these fields
-		if ($extraFields) {
-			foreach ($objects as &$object) {
-				foreach ($extraFields as $field) {
-					unset($object[$field]);
-				}
-			}
-			unset($object);
-		}
-
-		return $objects;
+		return $extra_fields
+			? array_map(static fn (array $row) => array_diff_key($row, $extra_fields), $objects)
+			: $objects;
 	}
 
 	/**
@@ -470,7 +463,10 @@ class CApiService {
 			}
 		}
 
-		$sql_select = ($sql_parts['distinct'] ? 'DISTINCT ' : '').implode(',', array_unique($sql_parts['select']));
+		$sql_select = implode(',', array_unique($sql_parts['select']));
+		if (!str_starts_with($sql_select, 'COUNT(')) {
+			$sql_select = (self::dbDistinct($sql_parts) ? 'DISTINCT ' : '').$sql_select;
+		}
 		$sql_where = $sql_parts['where'] ? ' WHERE '.implode(' AND ', array_unique($sql_parts['where'])) : '';
 		$sql_group = $sql_parts['group'] ? ' GROUP BY '.implode(',', array_unique($sql_parts['group'])) : '';
 		$sql_order = $sql_parts['order'] ? ' ORDER BY '.implode(',', array_unique($sql_parts['order'])) : '';
@@ -495,8 +491,6 @@ class CApiService {
 		$pk = $this->pk($table_name);
 		$pk_composite = strpos($pk, ',') !== false;
 
-		$sql_parts['distinct'] = self::dbDistinct($sql_parts);
-
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
 			$has_joins = array_key_exists('join', $sql_parts) && $sql_parts['join'];
@@ -506,11 +500,9 @@ class CApiService {
 			}
 
 			$sql_parts['select'] = $has_joins
-				? ['COUNT('.($sql_parts['distinct'] ? 'DISTINCT ' : '').$this->fieldId($pk, $table_alias).')'.
+				? ['COUNT('.(self::dbDistinct($sql_parts) ? 'DISTINCT ' : '').$this->fieldId($pk, $table_alias).')'.
 					' AS rowscount']
 				: ['COUNT(*) AS rowscount'];
-
-			$sql_parts['distinct'] = false;
 
 			// Select columns used by group count.
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {
@@ -826,11 +818,11 @@ class CApiService {
 	/**
 	 * Throws an API exception.
 	 *
-	 * @param int    $code
-	 * @param string $error
+	 * @throws APIException
 	 */
-	protected static function exception($code = ZBX_API_ERROR_INTERNAL, $error = '') {
-		throw new APIException($code, $error);
+	protected static function exception(int $code = ZBX_API_ERROR_INTERNAL, string $error = '',
+			string $debug_message = '') {
+		throw new APIException($code, $error, $debug_message);
 	}
 
 	/**

@@ -21,32 +21,59 @@
 
 window.popup_import = new class {
 
-	constructor() {
-		this.overlay = null;
-		this.dialogue = null;
-		this.form = null;
+	/**
+	 * @var {Overlay}
+	 */
+	#overlay;
+
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	#dialogue;
+
+	/**
+	 * @type {HTMLFormElement}
+	 */
+	#form;
+
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	#footer;
+
+	init({submit_compare}) {
+		this.#overlay = overlays_stack.getById('popup_import');
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#form = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#footer = this.#overlay.$dialogue.$footer[0];
+
+		this.#initActions({submit_compare});
+		this.#initWarningListeners();
+		this.#initAdvancedConfigurationListeners();
 	}
 
-	init() {
-		this.overlay = overlays_stack.getById('popup_import');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-
-		this.warningListeners();
-		this.advancedConfigurationListeners();
+	#initActions({submit_compare}) {
+		this.#footer.querySelector('.js-import').addEventListener('click', () => {
+			if (submit_compare) {
+				this.#openImportComparePopup();
+			}
+			else {
+				this.#submitPopup();
+			}
+		});
 	}
 
-	warningListeners() {
+	#initWarningListeners() {
 		const rules_images = document.getElementById('rules_images_updateExisting')
 
 		if (rules_images) {
 			rules_images.addEventListener('change', (e) => {
-				this.updateWarning(e.target, <?= json_encode(_('Images for all maps will be updated!')) ?>)
+				this.#updateWarning(e.target, <?= json_encode(_('Images for all maps will be updated!')) ?>)
 			})
 		}
 	}
 
-	advancedConfigurationListeners() {
+	#initAdvancedConfigurationListeners() {
 		const advanced_configuration = document.getElementById('advanced_options');
 
 		if (!advanced_configuration) {
@@ -54,41 +81,37 @@ window.popup_import = new class {
 		}
 
 		advanced_configuration.addEventListener('change', () => {
-			this.form.querySelectorAll('.js-advanced-configuration').forEach((e) => {
+			this.#form.querySelectorAll('.js-advanced-configuration').forEach((e) => {
 				return e.classList.toggle("display-none");
 			});
 		});
 
 		document
 			.getElementById('update_all')
-			.addEventListener('change', () => { this.toggleCheckboxColumn('update')})
+			.addEventListener('change', () => { this.#toggleCheckboxColumn('update')})
 
 		document
 			.getElementById('create_all')
-			.addEventListener('change', () => { this.toggleCheckboxColumn('create')})
+			.addEventListener('change', () => { this.#toggleCheckboxColumn('create')})
 
 		document
 			.getElementById('delete_all')
-			.addEventListener('change', () => { this.toggleCheckboxColumn('delete')})
+			.addEventListener('change', () => { this.#toggleCheckboxColumn('delete')})
 
-		this.form.addEventListener('change',  (e) => {
+		this.#form.addEventListener('change',  (e) => {
 			if (e.target.classList.contains('js-delete')) {
-				this.updateMainCheckbox('delete');
+				this.#updateMainCheckbox('delete');
 			}
 			else if (e.target.classList.contains('js-create')) {
-				this.updateMainCheckbox('create');
+				this.#updateMainCheckbox('create');
 			}
 			else if (e.target.classList.contains('js-update')) {
-				this.updateMainCheckbox('update');
+				this.#updateMainCheckbox('update');
 			}
 		})
 	}
 
-	submitPopup() {
-		if (document.getElementById('rules_preset').value === 'template') {
-			return this.openImportComparePopup();
-		}
-
+	#submitPopup() {
 		if (this.isDeleteMissingChecked()) {
 			return this.confirmSubmit();
 		}
@@ -97,7 +120,7 @@ window.popup_import = new class {
 	}
 
 	isDeleteMissingChecked() {
-		return this.form.querySelectorAll('.js-delete:checked').length > 0;
+		return this.#form.querySelectorAll('.js-delete:checked').length > 0;
 	}
 
 	confirmSubmit(compare_overlay) {
@@ -115,36 +138,38 @@ window.popup_import = new class {
 				{
 					title: <?= json_encode(_('OK')) ?>,
 					focused: true,
-					action: function() {
+					action: () => {
 						if (compare_overlay !== undefined) {
 							overlayDialogueDestroy(compare_overlay.dialogueid);
 						}
-						popup_import.submitImportPopup();
+
+						this.submitImportPopup();
 					}
 				},
 				{
 					title: <?= json_encode(_('Cancel')) ?>,
 					cancel: true,
 					class: '<?= ZBX_STYLE_BTN_ALT ?>',
-					action: function() {
-						(compare_overlay || popup_import.overlay).unsetLoading();
+					action: () => {
+						(compare_overlay || this.#overlay).unsetLoading();
+
 						return true;
 					}
 				}
 			]
 		}, {
 			position: Overlay.prototype.POSITION_CENTER,
-			trigger_element: (compare_overlay || this.overlay).$btn_submit
+			trigger_element: (compare_overlay || this.#overlay).$btn_submit
 		});
 	}
 
-	openImportComparePopup() {
+	#openImportComparePopup() {
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'popup.import.compare');
 
 		fetch(url.getUrl(), {
 			method: 'post',
-			body: new FormData(this.form)
+			body: new FormData(this.#form)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -162,13 +187,13 @@ window.popup_import = new class {
 				}, {
 					dialogueid: 'popup_import_compare',
 					position: response.no_changes ? Overlay.prototype.POSITION_CENTER : undefined,
-					trigger_element: this.overlay.$btn_submit
+					trigger_element: this.#overlay.$btn_submit
 				});
 			})
 			.catch((exception) => {
 				document.getElementById('import_file').value = '';
 
-				const msg_bad = this.dialogue.querySelector('.<?= ZBX_STYLE_MSG_BAD ?>');
+				const msg_bad = this.#dialogue.querySelector('.<?= ZBX_STYLE_MSG_BAD ?>');
 				if (msg_bad) {
 					msg_bad.remove();
 				}
@@ -185,10 +210,10 @@ window.popup_import = new class {
 
 				const message_box = makeMessageBox('bad', messages, title);
 
-				message_box.insertBefore(this.form);
+				message_box.insertBefore(this.#form);
 			})
 			.finally(() => {
-				this.overlay.unsetLoading();
+				this.#overlay.unsetLoading();
 			});
 	}
 
@@ -196,11 +221,11 @@ window.popup_import = new class {
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'popup.import');
 
-		this.overlay.setLoading();
+		this.#overlay.setLoading();
 
 		fetch(url.getUrl(), {
 			method: 'post',
-			body: new FormData(this.form)
+			body: new FormData(this.#form)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -214,14 +239,14 @@ window.popup_import = new class {
 					postMessageDetails('success', response.success.messages);
 				}
 
-				overlayDialogueDestroy(this.overlay.dialogueid);
+				overlayDialogueDestroy(this.#overlay.dialogueid);
 
 				location.href = location.href.split('#')[0];
 			})
 			.catch((exception) => {
 				document.getElementById('import_file').value = '';
 
-				const msg_bad = this.dialogue.querySelector('.<?= ZBX_STYLE_MSG_BAD ?>');
+				const msg_bad = this.#dialogue.querySelector('.<?= ZBX_STYLE_MSG_BAD ?>');
 				if (msg_bad) {
 					msg_bad.remove();
 				}
@@ -238,16 +263,16 @@ window.popup_import = new class {
 
 				const message_box = makeMessageBox('bad', messages, title);
 
-				message_box.insertBefore(this.form);
+				message_box.insertBefore(this.#form);
 			})
 			.finally(() => {
-				this.overlay.unsetLoading();
-				this.overlay.recoverFocus();
-				this.overlay.containFocus();
+				this.#overlay.unsetLoading();
+				this.#overlay.recoverFocus();
+				this.#overlay.containFocus();
 			});
 	}
 
-	updateWarning(obj, content) {
+	#updateWarning(obj, content) {
 		if (obj.checked) {
 			overlayDialogue({
 				content: document.createElement('span').innerText = content,
@@ -273,21 +298,21 @@ window.popup_import = new class {
 		}
 	}
 
-	updateMainCheckbox(action) {
+	#updateMainCheckbox(action) {
 		const all_checkbox = document.getElementById(action + '_all');
 		all_checkbox.checked = true;
 
-		this.form.querySelectorAll('.js-' + action).forEach(function (checkbox) {
+		this.#form.querySelectorAll('.js-' + action).forEach(function (checkbox) {
 			if (!checkbox.checked) {
 				all_checkbox.checked = false;
 			}
 		})
 	}
 
-	toggleCheckboxColumn(action) {
+	#toggleCheckboxColumn(action) {
 		const check = document.getElementById(action + '_all').checked;
 
-		this.form.querySelectorAll('.js-' + action).forEach(function (checkbox) {
+		this.#form.querySelectorAll('.js-' + action).forEach(function (checkbox) {
 			if (checkbox.checked !== check) {
 				checkbox.checked = check;
 			}

@@ -17,7 +17,7 @@
 require_once __DIR__.'/../common/testFormHost.php';
 
 /**
- * @dataSource DiscoveredHosts, Proxies
+ * @dataSource DiscoveredHosts, Proxies, HostAvailabilityWidget
  *
  * @backup hosts
  *

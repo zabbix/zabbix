@@ -20,7 +20,6 @@
 #include "zbxtimekeeper.h"
 #include "zbxpreproc.h"
 
-
 typedef struct
 {
 	int				id;

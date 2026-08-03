@@ -28,6 +28,33 @@
 
 static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
 
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+
+static ZBX_THREAD_LOCAL void	(*zbx_exit_impl)(int) ZBX_NORETURN = exit;
+static ZBX_THREAD_LOCAL void	(*zbx_exit_immediate_impl)(int) ZBX_NORETURN = _exit;
+
+void	zbx_set_exit(zbx_exit_cb_t exit_cb)
+{
+	zbx_exit_impl = exit_cb;
+}
+
+void	zbx_set_exit_immediate(zbx_exit_cb_t exit_cb)
+{
+	zbx_exit_immediate_impl = exit_cb;
+}
+
+void	zbx_exit(int ret)
+{
+	zbx_exit_impl(ret);
+}
+
+void	zbx_exit_immediate(int ret)
+{
+	zbx_exit_immediate_impl(ret);
+}
+
+#endif
+
 #if defined(_WINDOWS) || defined(__MINGW32__)
 
 int	__zbx_stat(const char *path, zbx_stat_t *buf)
@@ -115,7 +142,7 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 			"[file:%s,line:%d] zbx_calloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
 
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -153,7 +180,7 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size, void *
 			"Requested " ZBX_FS_SIZE_T " byte(s).",
 			filename, line, (zbx_fs_size_t)size);
 
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -181,7 +208,7 @@ void	*zbx_realloc2(const char *filename, int line, size_t size, void *new_ptr)
 			"[file:%s,line:%d] zbx_realloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
 
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 char	*zbx_strdup2(const char *filename, int line, char *old, const char *str)
@@ -198,7 +225,7 @@ char	*zbx_strdup2(const char *filename, int line, char *old, const char *str)
 			"[file:%s,line:%d] zbx_strdup: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)(strlen(str) + 1));
 
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 /****************************************************************************************
@@ -245,7 +272,8 @@ void	zbx_print_version(const char *title_message)
  *                                                                            *
  * Purpose: check if string is a valid internet hostname                      *
  *                                                                            *
- * Parameters: hostname - [IN] hostname string to be checked                  *
+ * Parameters: hostname -     [IN] hostname string to be checked              *
+ *             hostname_len - [IN] length of the hostname string              *
  *                                                                            *
  * Return value: SUCCEED - could be a valid hostname,                         *
  *               FAIL - definitely not a valid hostname                       *
@@ -256,7 +284,7 @@ void	zbx_print_version(const char *title_message)
  *         - underscores ('_') allowed in domain name, but not in hostname.   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_validate_hostname(const char *hostname)
+int	zbx_validate_hostname_len(const char *hostname, size_t hostname_len)
 {
 	int		component;	/* periods ('.') are only allowed when they serve to delimit components */
 	int		len = ZBX_MAX_DNSNAME_LEN;
@@ -267,7 +295,7 @@ int	zbx_validate_hostname(const char *hostname)
 		return FAIL;
 
 	/* check only up to the first 'len' characters, the 1st character is already successfully checked */
-	for (p = hostname + 1, component = 1; '\0' != *p; p++)
+	for (p = hostname + 1, component = 1; p < hostname + hostname_len; p++)
 	{
 		if (0 == --len)				/* hostname too long */
 			return FAIL;
@@ -282,6 +310,27 @@ int	zbx_validate_hostname(const char *hostname)
 	}
 
 	return SUCCEED;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if string is a valid internet hostname                      *
+ *                                                                            *
+ * Parameters: hostname - [IN] hostname string to be checked                  *
+ *                                                                            *
+ * Return value: SUCCEED - could be a valid hostname,                         *
+ *               FAIL - definitely not a valid hostname                       *
+ * Comments:                                                                  *
+ *     Validation is not strict. Restrictions not checked:                    *
+ *         - individual label (component) length 1-63,                        *
+ *         - hyphens ('-') allowed only as interior characters in labels,     *
+ *         - underscores ('_') allowed in domain name, but not in hostname.   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_validate_hostname(const char *hostname)
+{
+	return zbx_validate_hostname_len(hostname, strlen(hostname));
 }
 
 /******************************************************************************

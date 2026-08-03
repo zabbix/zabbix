@@ -19,6 +19,10 @@ $thumbnail-height: 56px;
 
 div.dashboard-widget-itemhistory {
 	.list-table {
+		iframe {
+			vertical-align: top;
+		}
+
 		pre {
 			font-family: inherit;
 		}
@@ -57,7 +61,7 @@ div.dashboard-widget-itemhistory {
 
 			&:not(.is-loading) {
 				border: 1px solid $ui-border-color;
-				border-radius: 3px;
+				border-radius: var(--button-border-radius);
 			}
 		}
 	}

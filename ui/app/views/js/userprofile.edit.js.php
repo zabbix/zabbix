@@ -21,16 +21,27 @@
 
 <script type="text/javascript">
 	const view = new class {
-		init() {
-			document.getElementById('userprofile-form').addEventListener('submit', (e) => {
-				document.querySelectorAll('#autologout, #refresh, #url').forEach((elem) => {
-					elem.value = elem.value.trim();
-				});
+		init({rules}) {
+			this.form_element = document.getElementById('userprofile-form');
+			this.form = new CForm(this.form_element, rules);
 
-				if (!this.#confirmSubmit()) {
-					e.preventDefault();
+			this.form_element.addEventListener('submit', (e) => {
+				e.preventDefault();
+				this.#submit();
+			});
+
+			document.getElementById('change-password-button')?.addEventListener('click', () => {
+				document.getElementById('change_password').value = 1;
+				this.#displayPasswordChange(true);
+
+				const current_password = document.getElementById('current_password');
+
+				if (current_password !== null) {
+					current_password.focus();
 				}
 			});
+
+			this.#displayPasswordChange(false);
 
 			this.#changeVisibilityAutoLoginLogout();
 			this.#autologoutHandler();
@@ -84,12 +95,7 @@
 			const hidden = autologout.parentElement.
 				querySelector(`input[type=hidden][name=${autologout.getAttribute('name')}]`);
 
-			if (disabled) {
-				autologout.setAttribute('disabled', '')
-			}
-			else {
-				autologout.removeAttribute('disabled')
-			}
+			autologout.disabled = disabled;
 
 			if (!hidden) {
 				const hidden_input = document.createElement('input');
@@ -104,5 +110,119 @@
 				hidden.remove();
 			}
 		}
-	}
+
+		#displayPasswordChange(visible = true) {
+			const password1 = document.getElementById('password1');
+			const password2 = document.getElementById('password2');
+			const current_password = document.getElementById('current_password');
+
+			if (password1 === null && password2 === null) {
+				return;
+			}
+
+			this.form_element.querySelectorAll('.password-change-active').forEach(element => {
+				element.style.display = visible ? '' : 'none';
+			});
+
+			this.form_element.querySelectorAll('.password-change-inactive').forEach(element => {
+				element.style.display = visible ? 'none' : '';
+			});
+
+			password1.disabled = !visible;
+			password2.disabled = !visible;
+
+			if (current_password !== null) {
+				current_password.disabled = !visible;
+			}
+		}
+
+		#submit() {
+			if (!this.#confirmSubmit()) {
+				return;
+			}
+
+			this.#setLoadingStatus('js-submit');
+			clearMessages();
+			const fields = this.form.getAllValues();
+
+			this.form.validateSubmit(fields)
+				.then((result) => {
+					if (!result) {
+						this.#unsetLoadingStatus();
+						return;
+					}
+
+					var curl = new Curl('zabbix.php');
+					curl.setArgument('action', 'userprofile.update');
+
+					fetch(curl.getUrl(), {
+						method: 'POST',
+						headers: {'Content-Type': 'application/json'},
+						body: JSON.stringify(fields)
+					})
+						.then((response) => response.json())
+						.then((response) => {
+							if ('error' in response) {
+								throw {error: response.error};
+							}
+
+							if ('form_errors' in response) {
+								this.form.setErrors(response.form_errors, true, true);
+								this.form.renderErrors();
+
+								return;
+							}
+
+							if ('success' in response) {
+								postMessageOk(response.success.title);
+
+								if ('messages' in response.success) {
+									postMessageDetails('success', response.success.messages);
+								}
+
+								location.href = new URL(response.success.redirect, location.href).href;
+							}
+						})
+						.catch((exception) => this.#ajaxExceptionHandler(exception))
+						.finally(() => this.#unsetLoadingStatus())
+				});
+		}
+
+		#ajaxExceptionHandler(exception) {
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			}
+
+			addMessage(makeMessageBox('bad', messages, title)[0]);
+		}
+
+		#setLoadingStatus(loading_btn_class) {
+			this.form_element.classList.add('is-loading', 'is-loading-fadein');
+
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
+					button.disabled = true;
+
+					if (button.classList.contains(loading_btn_class)) {
+						button.classList.add('is-loading');
+					}
+				});
+		}
+
+		#unsetLoadingStatus() {
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
+					button.classList.remove('is-loading');
+					button.disabled = false;
+				});
+
+			this.form_element.classList.remove('is-loading', 'is-loading-fadein');
+		}
+	};
 </script>

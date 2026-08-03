@@ -207,12 +207,13 @@ $form_grid->addItem([
 $form_grid->addItem([
 	(new CLabel(_('Subject'), 'operation-opmessage-subject'))->setId('operation-message-subject-label'),
 	(new CFormField(
-		(new CTextBox('operation[opmessage][subject]'))
+		(new CTextAreaFlexible('operation[opmessage][subject]'))
 			->setAttribute('value', $operation['opmessage']['default_msg'] == 1
 				? ''
 				: $operation['opmessage']['subject']
 			)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('opmessage', 'subject'))
 			->setId('operation-opmessage-subject')
 	))->setId('operation-message-subject')
 ]);
@@ -351,17 +352,15 @@ $form_grid->addItem(
 			->addItem(
 				(new CRow([
 					(new CCol(
-						(new CTextAreaFlexible('operation[optag][#{row_index}][tag]', '#{tag}',
-							['add_post_js' => false]
-						))
+						(new CTextAreaFlexible('operation[optag][#{row_index}][tag]', '#{tag}'))
 							->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+							->setMaxlength(DB::getFieldLength('host_tag', 'tag'))
 							->setAttribute('placeholder', _('tag'))
 					))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 					(new CCol(
-						(new CTextAreaFlexible('operation[optag][#{row_index}][value]', '#{value}',
-							['add_post_js' => false]
-						))
+						(new CTextAreaFlexible('operation[optag][#{row_index}][value]', '#{value}'))
 							->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
+							->setMaxlength(DB::getFieldLength('host_tag', 'value'))
 							->setAttribute('placeholder', _('value'))
 					))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 					(new CCol(

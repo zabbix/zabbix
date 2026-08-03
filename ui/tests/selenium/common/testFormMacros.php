@@ -16,6 +16,7 @@
 
 require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
@@ -37,7 +38,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 	public function getBehaviors() {
 		return [
 			CMacrosBehavior::class,
-			CMessageBehavior::class
+			CMessageBehavior::class,
+			CDatatableBehavior::class
 		];
 	}
 
@@ -534,14 +536,15 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if ($update) {
 			if ($host_type === 'host') {
 				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
-				$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
-				$column->query('link', $name)->asPopupButton()->one()->select('Host');
+
+				$column = $this->getNameColumn($name);
+				$column->query('link', $name)->asPopupButton()->waitUntilPresent()->one()->select('Host');
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 			else if ($host_type === 'template') {
 				$this->page->login()
 						->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-				$this->query('link', $name)->one()->click();
+				$this->query('link', $name)->waitUntilClickable()->one()->click();
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 			else {
@@ -596,6 +599,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->fillMacros($data['macros']);
 
 		if ($data['expected'] === TEST_BAD && array_key_exists('inline_error', $data)) {
+			// Click the field to ensure it has focus before blur, so inline validation reliably fires.
+			$form->query(array_key_first($data['inline_error']))->one()->click();
 			$this->page->removeFocus();
 		}
 		else {
@@ -644,14 +649,15 @@ abstract class testFormMacros extends CLegacyWebTest {
 	protected function checkRemoveAll($name, $host_type, $is_prototype = false, $lld_id = null) {
 		if ($host_type === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
+
+			$column = $this->getNameColumn($name);
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else if ($host_type === 'template') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
@@ -660,7 +666,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->login()->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.
 					'&hostid='.$id
 			);
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
 		}
 
@@ -810,8 +816,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				// Check that host macro is editable.
 				foreach ($data['macros'] as $data_macro) {
-					$this->assertTrue($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
-							']')->waitUntilPresent()->one()->isEnabled()
+					$this->assertTrue($this->query('xpath://z-textarea-flexible[@value='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']')->waitUntilPresent()->one()->isEnabled()
 					);
 
 					$this->assertTrue($this->getValueField($data_macro['macro'])->isEnabled());
@@ -852,8 +858,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				// Check enabled/disabled fields.
 				foreach ($data['macros'] as $data_macro) {
-					$this->assertFalse($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).']')
-							->waitUntilPresent()->one()->isEnabled()
+					$this->assertFalse($this->query('xpath://z-textarea-flexible[@value='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']')->waitUntilPresent()->one()->isEnabled()
 					);
 
 					$this->assertTrue($this->getValueField($data_macro['macro'])->isEnabled());
@@ -862,7 +868,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					$this->assertTrue($this->query('id:macros_'.$this->getMacroIndex($data_macro['macro']).
 							'_description')->one()->isEnabled()
 					);
-					$this->assertTrue($this->query('xpath://textarea[text()='.
+					$this->assertTrue($this->query('xpath://z-textarea-flexible[@value='.
 							CXPathHelper::escapeQuotes($data_macro['macro']).']/../..//button[text()="Remove"]')->exists()
 					);
 				}
@@ -879,7 +885,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				foreach ($data['macros'] as $data_macro) {
 					// Find necessary row by macro name and click Change button.
-					$this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
+					$this->query('xpath://z-textarea-flexible[@value='.CXPathHelper::escapeQuotes($data_macro['macro']).
 							']/../..//button[text()="Change"]')->waitUntilPresent()->one()->click();
 
 					// Fill macro value by new value.
@@ -923,20 +929,19 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		if ($host_type === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-					->getColumn('Name');
+			$column = $this->getNameColumn($name);
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else if ($host_type === 'template') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$this->page->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id);
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 
@@ -1061,22 +1066,21 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$lld_id = null, $name = null) {
 		if ($host_type === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-					->getColumn('Name');
+			$column = $this->getNameColumn($name);
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else if ($host_type === 'template') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$this->page->login()->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.
 					'&hostid='.$id
-			);
-			$this->query('link', $name)->one()->click();
+			)->waitUntilReady();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 
@@ -1185,18 +1189,19 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				// Check enabled/disabled fields and values.
 				foreach ($data['macros'] as $data_macro) {
-					$this->assertTrue($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
-							']/../..//button[text()="Change"]')->exists()
+					$this->assertTrue($this->query('xpath://z-textarea-flexible[@value='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']/../..//button[text()="Change"]')->exists()
 					);
 
 					// Check macro field disabled.
-					$this->assertFalse($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).']')
-							->waitUntilPresent()->one()->isEnabled()
+					$this->assertFalse($this->query('xpath://z-textarea-flexible[@value='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']')->waitUntilPresent()->one()->isEnabled()
 					);
 
 					// Check macro value and disabled field.
-					$this->assertFalse($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
-							']/../..//div[contains(@class, "macro-value")]/textarea')->waitUntilPresent()->one()->isEnabled()
+					$this->assertFalse($this->query('xpath://z-textarea-flexible[@value='.CXPathHelper::escapeQuotes($data_macro['macro']).
+							']/../..//div[contains(@class, "macro-value")]/z-textarea-flexible')->waitUntilPresent()
+							->one()->isEnabled()
 					);
 					$this->assertEquals($data_macro['value'], $this->getValueField($data_macro['macro'])->getValue());
 
@@ -1221,19 +1226,18 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		if ($host_type === 'host') {
 			$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-					->getColumn('Name');
+			$column = $this->getNameColumn($name);
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 		}
 		else if ($host_type === 'template') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$this->page->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id);
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			COverlayDialogElement::find()->waitUntilReady();
 		}
 
@@ -1286,20 +1290,20 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		if ($host_type === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-					->getColumn('Name');
+
+			$column = $this->getNameColumn($name);
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else if ($host_type === 'template') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$this->page->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id);
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		}
 
@@ -1373,10 +1377,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 		for ($i = 0; $i < $count; $i += 2) {
 			$macro = [];
 			$row = $rows->get($i);
-			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
+			$macro['macro'] = $row->query('xpath:./td[1]/z-textarea-flexible')->one()->getValue();
 			$macro_value = $this->getValueField($macro['macro']);
 			$macro['value'] = $macro_value->getValue();
-			$macro['description'] = $rows->get($i + 1)->query('tag:textarea')->one()->getValue();
+			$macro['description'] = $rows->get($i + 1)->query('tag:z-textarea-flexible')->one()->getValue();
 			$macro['type'] = ($macro_value->getInputType() === CInputGroupElement::TYPE_SECRET) ?
 					ZBX_MACRO_TYPE_SECRET : ZBX_MACRO_TYPE_TEXT;
 			$macros_frontend[] = $macro;
@@ -1443,8 +1447,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$revert_button = $value_field->getRevertButton();
 
 			if ($data['type'] === CInputGroupElement::TYPE_TEXT) {
-				$this->assertTrue($value_field->query('xpath:./textarea')->one()->isAttributePresent('readonly'));
-				$this->assertEquals(2048, $value_field->query('xpath:./textarea')->one()->getAttribute('maxlength'));
+				$this->assertTrue($value_field->query('xpath:./z-textarea-flexible')->one()->isAttributePresent('readonly'));
+				$this->assertEquals(2048, $value_field->query('xpath:./z-textarea-flexible')->one()->getAttribute('maxlength'));
 				$this->assertFalse($change_button->isValid());
 				$this->assertFalse($revert_button->isValid());
 			}
@@ -1468,11 +1472,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 			$change_button = $value_field->getNewValueButton();
 			$revert_button = $value_field->getRevertButton();
-			$textarea_xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]';
 
 			if ($data['type'] === CInputGroupElement::TYPE_SECRET) {
-				$this->assertFalse($value_field->query($textarea_xpath)->exists());
-				$this->assertEquals(2048, $value_field->query('xpath:.//input')->one()->getAttribute('maxlength'));
+				$this->assertFalse($value_field->query('tag:z-textarea-flexible')->exists());
+				$this->assertEquals(2048, $value_field->query('tag:input')->one()->getAttribute('maxlength'));
 
 				$this->assertTrue($change_button->isValid());
 				$this->assertFalse($revert_button->isClickable());
@@ -1491,8 +1494,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$this->assertTrue($revert_button->isClickable());
 			}
 			else {
-				$this->assertTrue($value_field->query($textarea_xpath)->exists());
-				$this->assertEquals(2048, $value_field->query('xpath:./textarea')->one()->getAttribute('maxlength'));
+				$this->assertTrue($value_field->query('tag:z-textarea-flexible')->exists());
+				$this->assertEquals(2048, $value_field->query('tag:z-textarea-flexible')->one()->getAttribute('maxlength'));
 				$this->assertFalse($change_button->isValid());
 				$this->assertFalse($revert_button->isValid());
 
@@ -1829,15 +1832,14 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->page->open($url)->waitUntilReady();
 
 		if ($source === 'hosts') {
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilReady()
-					->findRow('Name', $name, true)->getColumn('Name');
+			$column = $this->getDatatable()->findRow('Name', $name, true)->getColumn('Name');
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
-			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Macros');
+			$form = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one()->selectTab('Macros');
 		}
 		else if ($source === 'templates') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Macros');
 		}
 		else {
@@ -1870,7 +1872,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @return int
 	 */
 	private function getMacroIndex($macro) {
-		$index = explode('_', $this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).']')
+		$index = explode('_', $this->query('xpath://z-textarea-flexible[@value='.CXPathHelper::escapeQuotes($macro).']')
 				->one()->getAttribute('id'), 3
 		);
 
@@ -2403,7 +2405,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$result = [];
 		foreach (['macro', 'value', 'description'] as $field) {
-			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')->one()->getText();
+			$result[] = $this->query('xpath://z-textarea-flexible[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')
+					->one()->getValue();
 		}
 
 		$data = CTestArrayHelper::get($data, 'expected_macros', $data);
@@ -2580,9 +2583,16 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 */
 	private function checkItemFields($url, $name, $key) {
 		$this->page->login()->open($url)->waitUntilReady();
-		$table = $this->query('xpath://form[@name="item_list"]/table[@class="list-table"] | '.
-				'//table[contains(@class, "list-table fixed")]')->asTable()->waitUntilPresent()->one();
 
+		if ($this->query('class:datatable')->one(false)->isValid()) {
+			$table = $this->getDatatable();
+			$this->changeLayoutFromHeader(['Name' => ['Show item key' => true]]);
+			$table->waitUntilReady()->invalidate();
+		}
+		else {
+			$table = $this->query('xpath://form[@name="item_list"]/table[@class="list-table"]')->asTable()
+					->waitUntilPresent()->one();
+		}
 		$name_column = $table->findRow('Name', $name, true)->getColumn('Name');
 		$this->assertEquals($name, $name_column->query('tag:a')->one()->getText());
 
@@ -2590,5 +2600,22 @@ abstract class testFormMacros extends CLegacyWebTest {
 				? $name_column->query('xpath://span[@class="green"]')->one()->getText()
 				: $table->findRow('Name', $name)->getColumn('Key')->getText()
 		));
+	}
+
+	/**
+	 * Return "Name" column in the corresponding list table or datatable.
+	 *
+	 * @param string $name   value of "Name" column in the required row.
+	 *
+	 * @return CElement
+	 */
+	protected function getNameColumn($name) {
+		if ($this->query('class:datatable')->one(false)->isValid()) {
+			return $this->getDatatable()->findRow('Name', $name)->getColumn('Name');
+		}
+		else {
+			return $this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible()->one()
+					->findRow('Name', $name)->getColumn('Name');
+		}
 	}
 }

@@ -74,7 +74,7 @@ class CProblem extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid']), 'default' => null],
+			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid', 'maintenanceid']), 'default' => null],
 			'selectSuppressionData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -235,14 +235,12 @@ class CProblem extends CApiService {
 			')';
 		}
 
-		// suppressed
-		if ($options['suppressed'] !== null) {
-			$sql_parts['where'][] = (!$options['suppressed'] ? 'NOT ' : '').
-				'EXISTS ('.
-					'SELECT NULL'.
-					' FROM event_suppress es'.
-					' WHERE es.eventid=p.eventid'.
-				')';
+		if ($options['suppressed'] === true) {
+			$sql_parts['join']['esup'] = ['table' => 'event_suppress', 'using' => 'eventid'];
+		}
+		elseif ($options['suppressed'] === false) {
+			$sql_parts['join']['esup'] = ['type' => 'left', 'table' => 'event_suppress', 'using' => 'eventid'];
+			$sql_parts['where'][] = 'esup.eventid IS NULL';
 		}
 
 		// symptom
@@ -285,6 +283,27 @@ class CProblem extends CApiService {
 		// eventid_till
 		if ($options['eventid_till'] !== null) {
 			$sql_parts['where'][] = 'p.eventid<='.zbx_dbstr($options['eventid_till']);
+		}
+
+		return $sql_parts;
+	}
+
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (!$options['countOutput'] && $this->outputIsRequested('suppressed', $options['output'])) {
+			if ($options['suppressed'] === true) {
+				$sql_parts['select'][] = zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_TRUE).' AS suppressed';
+			}
+			else {
+				$sql_parts['select'][] = 'CASE WHEN esup.eventid IS NULL'.
+					' THEN '.zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_FALSE).
+					' ELSE '.zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_TRUE).' END AS suppressed';
+			}
+
+			if ($options['suppressed'] === null) {
+				$sql_parts['join']['esup'] = ['type' => 'left', 'table' => 'event_suppress', 'using' => 'eventid'];
+			}
 		}
 
 		return $sql_parts;
@@ -375,7 +394,6 @@ class CProblem extends CApiService {
 		$this->addRelatedAcknowledges($options, $result);
 		$this->addRelatedOpdata($options, $result);
 		self::addRelatedSuppressionData($options, $result);
-		$this->addRelatedSuppressed($options, $result);
 		self::addRelatedTags($options, $result);
 		$this->addRelatedUrls($options, $result);
 
@@ -395,15 +413,15 @@ class CProblem extends CApiService {
 
 			$output = $options['selectAcknowledges'] === API_OUTPUT_EXTEND
 				? ['acknowledgeid', 'userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-					'suppress_until', 'taskid'
+					'suppress_until', 'taskid', 'maintenanceid'
 				]
 				: array_unique(array_merge(['acknowledgeid', 'eventid'], $options['selectAcknowledges']));
 
 			$sql_options = [
 				'output' => $output,
 				'filter' => ['eventid' => array_keys($result)],
-				'sortfield' => ['clock'],
-				'sortorder' => [ZBX_SORT_DOWN]
+				'sortfield' => ['clock', 'acknowledgeid'],
+				'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_DOWN]
 			];
 			$db_acknowledges = DBselect(DB::makeSql('acknowledges', $sql_options));
 
@@ -448,10 +466,10 @@ class CProblem extends CApiService {
 			' WHERE '.dbConditionInt('p.eventid', array_keys($result))
 		), 'eventid');
 
+		$problems = CMacrosResolverHelper::resolveEventOpdatas($problems);
+
 		foreach ($result as $eventid => $problem) {
-			$result[$eventid]['opdata'] = array_key_exists($eventid, $problems) && $problems[$eventid]['opdata'] !== ''
-				? CMacrosResolverHelper::resolveTriggerOpdata($problems[$eventid], ['events' => true])
-				: '';
+			$result[$eventid]['opdata'] = $problems[$eventid]['opdata'] ?? '';
 		}
 	}
 
@@ -481,37 +499,6 @@ class CProblem extends CApiService {
 			unset($db_suppression_data['event_suppressid'], $db_suppression_data['eventid']);
 
 			$result[$eventid]['suppression_data'][] = $db_suppression_data;
-		}
-	}
-
-	private function addRelatedSuppressed(array $options, array &$result): void {
-		if (!$this->outputIsRequested('suppressed', $options['output'])) {
-			return;
-		}
-
-		if ($options['selectSuppressionData'] !== null) {
-			foreach ($result as &$row) {
-				$row['suppressed'] = $row['suppression_data']
-					? (string) ZBX_PROBLEM_SUPPRESSED_TRUE
-					: (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
-			}
-			unset($row);
-		}
-		else {
-			foreach ($result as &$row) {
-				$row['suppressed'] = (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
-			}
-			unset($row);
-
-			$sql_options = [
-				'output' => ['eventid'],
-				'filter' => ['eventid' => array_keys($result)]
-			];
-			$db_event_suppress = DBselect(DB::makeSql('event_suppress', $sql_options));
-
-			while ($db_suppression_data = DBfetch($db_event_suppress)) {
-				$result[$db_suppression_data['eventid']]['suppressed'] = (string) ZBX_PROBLEM_SUPPRESSED_TRUE;
-			}
 		}
 	}
 

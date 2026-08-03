@@ -67,7 +67,7 @@ zabbix_export:
         3. If you have enabled authentication in the HAProxy configuration file in step 1, set the username and password in the `Stats username` and `Stats password` host wizard configuration fields.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -1955,6 +1955,7 @@ zabbix_export:
             description: 'Maximum of session usage percentage on frontend for trigger expression. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$HAPROXY.PASSWORD}'
+          type: SECRET_TEXT
           description: 'The password of the HAProxy stats page.'
           config:
             type: TEXT
