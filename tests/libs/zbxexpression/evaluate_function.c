@@ -194,6 +194,8 @@ static void	zbx_vcmock_push_history_tail(zbx_uint64_t itemid, unsigned char valu
 
 	zbx_dc_add_history_variant(itemid, value_type, 0, &value, ts, &value_opt);
 	zbx_dc_flush_history();
+
+	zbx_variant_clear(&value);
 }
 
 int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
