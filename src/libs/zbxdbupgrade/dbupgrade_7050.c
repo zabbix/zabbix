@@ -1163,6 +1163,159 @@ static int	DBpatch_7050087(void)
 	return DBcreate_index("device", "device_2", "uuid", 1);
 }
 
+static int	DBpatch_7050088(void)
+{
+	const zbx_db_table_t	table =
+			{"trigger_rtdata", "triggerid", 0,
+				{
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"value", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"lastchange", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050089(void)
+{
+	return DBcreate_index("trigger_rtdata", "trigger_rtdata_1", "value,lastchange", 0);
+}
+
+static int	DBpatch_7050090(void)
+{
+	const zbx_db_field_t	field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("trigger_rtdata", 1, &field);
+}
+
+static int	DBpatch_7050091(void)
+{
+	/* hosts.status 3 - HOST_STATUS_TEMPLATE */
+	/* triggers.flags 0, 4 - ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED */
+	if (ZBX_DB_OK > zbx_db_execute(
+		"insert into trigger_rtdata (triggerid,value,lastchange,state,error)"
+			"select t.triggerid,t.value,t.lastchange,t.state,t.error"
+			" from triggers t"
+			" where t.flags in (0,4)"
+				" and exists ("
+					" select null"
+					" from functions f"
+						" join items i on f.itemid=i.itemid"
+						" join hosts h on i.hostid=h.hostid"
+					" where f.triggerid = t.triggerid"
+						" and h.status<>3"
+				")"
+		))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050092(void)
+{
+	return DBdrop_field("triggers", "value");
+}
+
+static int	DBpatch_7050093(void)
+{
+	return DBdrop_field("triggers", "state");
+}
+
+static int	DBpatch_7050094(void)
+{
+	return DBdrop_field("triggers", "lastchange");
+}
+
+static int	DBpatch_7050095(void)
+{
+	return DBdrop_field("triggers", "error");
+}
+
+static int	DBpatch_7050096(void)
+{
+	return DBcreate_changelog_insert_trigger("trigger_depends", "triggerdepid");
+}
+
+static int	DBpatch_7050097(void)
+{
+	return DBcreate_changelog_update_trigger("trigger_depends", "triggerdepid");
+}
+
+static int	DBpatch_7050098(void)
+{
+	return DBcreate_changelog_delete_trigger("trigger_depends", "triggerdepid");
+}
+
+static int	DBpatch_7050099(void)
+{
+	return DBdrop_foreign_key("trigger_depends", 2);
+}
+
+static int	DBpatch_7050100(void)
+{
+	return DBdrop_foreign_key("trigger_depends", 1);
+}
+
+static int	DBpatch_7050101(void)
+{
+	const zbx_db_field_t	field = {"triggerid_down", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("trigger_depends", 1, &field);
+}
+
+static int	DBpatch_7050102(void)
+{
+	const zbx_db_field_t	field = {"triggerid_up", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("trigger_depends", 2, &field);
+}
+
+static int	DBpatch_7050103(void)
+{
+	int	i;
+	const char	*values[] = {
+		"web.correlation.filter_name", "web.ceprule.filter_name",
+		"web.correlation.filter_type", "web.ceprule.filter_type",
+		"web.correlation.filter_status", "web.ceprule.filter_status",
+		"web.correlation.php.sortorder", "web.ceprule.list.sortorder",
+		"web.correlation.php.sort", "web.ceprule.list.sort",
+		"web.correlation.filter.active", "web.ceprule.filter.active"
+	};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050104(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update role_rule set name='ui.configuration.ceprules'"
+			" where name='ui.configuration.event_correlation'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1257,5 +1410,22 @@ DBPATCH_ADD(7050084, 0, 1)
 DBPATCH_ADD(7050085, 0, 1)
 DBPATCH_ADD(7050086, 0, 1)
 DBPATCH_ADD(7050087, 0, 1)
+DBPATCH_ADD(7050088, 0, 1)
+DBPATCH_ADD(7050089, 0, 1)
+DBPATCH_ADD(7050090, 0, 1)
+DBPATCH_ADD(7050091, 0, 1)
+DBPATCH_ADD(7050092, 0, 1)
+DBPATCH_ADD(7050093, 0, 1)
+DBPATCH_ADD(7050094, 0, 1)
+DBPATCH_ADD(7050095, 0, 1)
+DBPATCH_ADD(7050096, 0, 1)
+DBPATCH_ADD(7050097, 0, 1)
+DBPATCH_ADD(7050098, 0, 1)
+DBPATCH_ADD(7050099, 0, 1)
+DBPATCH_ADD(7050100, 0, 1)
+DBPATCH_ADD(7050101, 0, 1)
+DBPATCH_ADD(7050102, 0, 1)
+DBPATCH_ADD(7050103, 0, 1)
+DBPATCH_ADD(7050104, 0, 1)
 
 DBPATCH_END()
