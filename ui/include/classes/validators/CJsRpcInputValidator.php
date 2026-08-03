@@ -398,6 +398,7 @@ class CJsRpcInputValidator {
 					'hostids' => ['type' => API_IDS, 'flags' => API_NORMALIZE | API_REQUIRED],
 
 					// Option is not passed to API.
+					'context' => ['type' => API_STRING_UTF8],
 					'editable' => ['type' => API_INT32]
 				]];
 				break;
