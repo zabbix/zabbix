@@ -1379,7 +1379,7 @@ out:
   return: FAIL
   error: 'historical data transfer from proxy is still in progress'
 ---
-test case: DEV-4972 - proxied nodata(5m) no longer sticks forever on a metadata-only (NOVALUE) cached tail
+test case: DEV-4972 - proxied nodata(5m) no longer sticks forever on a metadata-only (NOVALUE) cached tail (covers log entries with metadata but no value, and preprocessing discarding the value)
 in:
   history:
   - itemid: 1
