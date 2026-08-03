@@ -162,7 +162,7 @@ class testDashboardsViewMode extends CLegacyWebTest {
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//header[@class='header-title']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
-		$this->zbxTestAssertAttribute('//button['.CXPathHelper::fromClass('btn-dashboard-normal').']', 'data-hintbox-contents', 'Normal view');
+		$this->zbxTestAssertAttribute('//button['.CXPathHelper::fromClass('btn-dashboard-normal').']', 'data-hintbox-html', 'Normal view');
 
 		// Set layout mode to default layout.
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view&kiosk=0');

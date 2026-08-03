@@ -5832,7 +5832,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
-		$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilPresent();
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->waitUntilPresent();
 	}
 
 	/**
