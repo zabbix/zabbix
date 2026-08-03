@@ -1053,11 +1053,7 @@ void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_t
 	}
 
 	if (0 != (opmask & CEP_FLAG(ZBX_CEP_OP_CLOSE_WINDOW)))
-	{
-		cep_window_lock(window);
 		cep_window_close(rule, window, tasks);
-		cep_window_unlock(window);
-	}
 enqueue:
 	cep_window_pool_acquire(&pool);
 	if (0 != zbx_queue_ptr_values_num(&window->hevents) || 0 != window->access_num)
