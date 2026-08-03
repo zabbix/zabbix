@@ -1483,29 +1483,6 @@ void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenancei
 
 /******************************************************************************
  *                                                                            *
- * Purpose: perform maintenance tag comparison using maintenance tag operator *
- *                                                                            *
- ******************************************************************************/
-static int	dc_maintenance_tag_value_match(const zbx_dc_maintenance_tag_t *mt, const zbx_tag_t *tag)
-{
-	switch (mt->op)
-	{
-		case ZBX_MAINTENANCE_OPERATOR_EQUAL:
-			return (0 == strcmp(tag->value, mt->value) ? SUCCEED : FAIL);
-		case ZBX_MAINTENANCE_OPERATOR_NOT_EQUAL:
-			return (0 != strcmp(tag->value, mt->value) ? SUCCEED : FAIL);
-		case ZBX_MAINTENANCE_OPERATOR_LIKE:
-			return (NULL != strstr(tag->value, mt->value) ? SUCCEED : FAIL);
-		case ZBX_MAINTENANCE_OPERATOR_NOT_LIKE:
-			return (NULL == strstr(tag->value, mt->value) ? SUCCEED : FAIL);
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: matches tags with [*mt_pos] maintenance tag name                  *
  *                                                                            *
  * Parameters: mtags    - [IN] the maintenance tags, sorted by tag names      *
@@ -1521,9 +1498,8 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 		int *mt_pos, int *et_pos)
 {
 	const zbx_dc_maintenance_tag_t	*mtag;
-	const zbx_tag_t			*etag;
 	const char			*name;
-	int				i, j, ret, mt_start, mt_end, et_start, et_end;
+	int				i, j, cmp, mt_start, mt_end, et_start, et_end, neg_cond_status = FAIL;
 
 	/* get the maintenance tag name */
 	mtag = (const zbx_dc_maintenance_tag_t *)mtags->values[*mt_pos];
@@ -1532,70 +1508,87 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 	/* find maintenance and event tag ranges matching the first maintenance tag name */
 	/* (maintenance tag range [mt_start,mt_end], event tag range [et_start,et_end])  */
 
-	mt_start = *mt_pos;
-	et_start = *et_pos;
+	mt_start = (*mt_pos)++;
 
 	/* find last maintenance tag with the required name */
 
-	for (i = mt_start + 1; i < mtags->values_num; i++)
+	for (; *mt_pos < mtags->values_num; (*mt_pos)++)
 	{
-		mtag = (const zbx_dc_maintenance_tag_t *)mtags->values[i];
+		mtag = (const zbx_dc_maintenance_tag_t *)mtags->values[*mt_pos];
 		if (0 != strcmp(mtag->tag, name))
 			break;
 	}
-	mt_end = i - 1;
-	*mt_pos = i;
+
+	mt_end = *mt_pos;
 
 	/* find first event tag with the required name */
 
-	for (i = et_start; i < etags->values_num; i++)
-	{
-		etag = etags->values[i];
-		if (0 < (ret = strcmp(etag->tag, name)))
-		{
-			*et_pos = i;
-			return FAIL;
-		}
+	et_start = FAIL;
 
-		if (0 == ret)
+	for (; *et_pos < etags->values_num; (*et_pos)++)
+	{
+		cmp = strcmp(etags->values[*et_pos]->tag, name);
+
+		if (0 < cmp)
 			break;
-	}
 
-	if (i == etags->values_num)
-	{
-		*et_pos = i;
-		return FAIL;
+		if (0 == cmp)
+		{
+			et_start = *et_pos;
+			break;
+		}
 	}
-
-	et_start = i++;
 
 	/* find last event tag with the required name */
 
-	for (; i < etags->values_num; i++)
+	if (FAIL != et_start)
 	{
-		etag = etags->values[i];
-		if (0 != strcmp(etag->tag, name))
-			break;
-	}
+		for ((*et_pos)++; *et_pos < etags->values_num; (*et_pos)++)
+		{
+			if (0 != strcmp(etags->values[*et_pos]->tag, name))
+				break;
+		}
 
-	et_end = i - 1;
-	*et_pos = i;
+		et_end = *et_pos;
+	}
+	else
+		et_end = et_start;
 
 	/* cross-compare maintenance and event tags within the found ranges */
 
-	for (i = mt_start; i <= mt_end; i++)
+	for (i = mt_start; i < mt_end; i++)
 	{
 		mtag = (const zbx_dc_maintenance_tag_t *)mtags->values[i];
 
-		for (j = et_start; j <= et_end; j++)
+		if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == mtag->op || ZBX_CONDITION_OPERATOR_NOT_LIKE == mtag->op)
 		{
-			etag = etags->values[j];
-			if (SUCCEED == dc_maintenance_tag_value_match(mtag, etag))
-				return SUCCEED;
+			if (FAIL == neg_cond_status)
+				neg_cond_status = 1;
+			else if (0 == neg_cond_status)
+				continue;
+
+			for (j = et_start; j < et_end; j++)
+			{
+				if (FAIL == zbx_strmatch_condition(etags->values[j]->value, mtag->value, mtag->op))
+				{
+					neg_cond_status = 0;
+					break;
+				}
+			}
+		}
+		else
+		{
+			for (j = et_start; j < et_end; j++)
+			{
+				if (SUCCEED == zbx_strmatch_condition(etags->values[j]->value, mtag->value, mtag->op))
+				{
+					return SUCCEED;
+				}
+			}
 		}
 	}
 
-	return FAIL;
+	return 1 == neg_cond_status ? SUCCEED : FAIL;
 }
 
 /******************************************************************************

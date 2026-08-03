@@ -1319,6 +1319,32 @@ static void	DCdump_maintenance_tags(zbx_dc_maintenance_t *maintenance)
 	zbx_vector_ptr_destroy(&index);
 }
 
+static void	DCdump_maintenance_eventnames(zbx_dc_maintenance_t *maintenance)
+{
+	int						i;
+	zbx_vector_dc_maintenance_eventname_ptr_t	index;
+
+	zbx_vector_dc_maintenance_eventname_ptr_create(&index);
+
+	if (0 != maintenance->eventnames.values_num)
+	{
+		zbx_vector_dc_maintenance_eventname_ptr_append_array(&index, maintenance->eventnames.values,
+				maintenance->eventnames.values_num);
+		zbx_vector_dc_maintenance_eventname_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  eventnames:");
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		zbx_dc_maintenance_eventname_t	*eventname = index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "    maintenance_eventnameid:" ZBX_FS_UI64 " operator:%u value:'%s'",
+				eventname->maintenance_eventnameid, eventname->op, eventname->value);
+	}
+
+	zbx_vector_dc_maintenance_eventname_ptr_destroy(&index);
+}
+
 static void	DCdump_maintenance_periods(zbx_dc_maintenance_t *maintenance)
 {
 	int			i;
@@ -1372,10 +1398,67 @@ static void	DCdump_maintenances(void)
 		DCdump_maintenance_groups(maintenance);
 		DCdump_maintenance_hosts(maintenance);
 		DCdump_maintenance_tags(maintenance);
+		DCdump_maintenance_eventnames(maintenance);
 		DCdump_maintenance_periods(maintenance);
 	}
 
 	zbx_vector_ptr_destroy(&index);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
+static void	DCdump_maintenances_for_trigger(zbx_dc_maintenances_for_trigger_t *maintenances_for_trigger)
+{
+	int				i;
+	zbx_vector_dc_maintenance_ptr_t	index;
+
+	zbx_vector_dc_maintenance_ptr_create(&index);
+
+	if (0 != maintenances_for_trigger->maintenances.values_num)
+	{
+		zbx_vector_dc_maintenance_ptr_append_array(&index,
+				maintenances_for_trigger->maintenances.values,
+				maintenances_for_trigger->maintenances.values_num);
+		zbx_vector_dc_maintenance_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  maintenances:");
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		zbx_dc_maintenance_t	*maintenance = index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "    maintenanceid:" ZBX_FS_UI64, maintenance->maintenanceid);
+	}
+
+	zbx_vector_dc_maintenance_ptr_destroy(&index);
+}
+
+static void	DCdump_maintenances_for_triggers(void)
+{
+	zbx_dc_maintenances_for_trigger_t		*maintenances_for_trigger;
+	zbx_hashset_iter_t				iter;
+	int						i;
+	zbx_vector_dc_maintenances_for_trigger_ptr_t	index;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_vector_dc_maintenances_for_trigger_ptr_create(&index);
+	zbx_hashset_iter_reset(&(get_dc_config())->maintenances_for_triggers, &iter);
+
+	while (NULL != (maintenances_for_trigger = (zbx_dc_maintenances_for_trigger_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_dc_maintenances_for_trigger_ptr_append(&index, maintenances_for_trigger);
+
+	zbx_vector_dc_maintenances_for_trigger_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		maintenances_for_trigger = index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "triggerid:" ZBX_FS_UI64, maintenances_for_trigger->triggerid);
+
+		DCdump_maintenances_for_trigger(maintenances_for_trigger);
+	}
+
+	zbx_vector_dc_maintenances_for_trigger_ptr_destroy(&index);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
@@ -1681,6 +1764,7 @@ void	DCdump_configuration(void)
 	DCdump_host_groups();
 	DCdump_host_group_index();
 	DCdump_maintenances();
+	DCdump_maintenances_for_triggers();
 	DCdump_drules();
 	DCdump_dchecks();
 	DCdump_httptests();

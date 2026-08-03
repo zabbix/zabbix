@@ -920,6 +920,8 @@ typedef struct
 }
 zbx_dc_maintenances_for_trigger_t;
 
+ZBX_PTR_VECTOR_DECL(dc_maintenances_for_trigger_ptr, zbx_dc_maintenances_for_trigger_t *)
+
 typedef struct
 {
 	zbx_uint64_t	triggerid;
