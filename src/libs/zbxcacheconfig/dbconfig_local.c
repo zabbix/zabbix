@@ -33,7 +33,7 @@ void	zbx_dc_config_local_init(void)
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	config_local->correlation_config = correlation_config_create();
-	memset(&config_local->apm_config, 0, sizeof(config_local->apm_config));
+	config_local->apm_config = NULL;
 
 	atomic_fetch_add(&config_local_refcount, 1);
 }

@@ -538,9 +538,7 @@ typedef struct
 
 	int				pending_history;
 
-	int				apm_status;
-	int				apm_quota;
-	const char			*apm_attributes;
+	const char			*apm;
 }
 ZBX_DC_PROXY;
 

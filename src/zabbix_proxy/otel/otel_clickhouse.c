@@ -23,7 +23,7 @@
 #include "zbxlog.h"
 #include "zbxstr.h"
 
-#if defined(HAVE_CURL)
+#if defined(HAVE_LIBCURL)
 
 int	otel_clickhouse_init(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg, char **error)
 {
@@ -141,10 +141,10 @@ static int	otel_clickhouse_commit_rowset(zbx_otel_clickhouse_t *conn, const zbx_
 
 	struct zbx_json	json;
 
+	zbx_json_initarray(&json, 1024);
+
 	for (int i = 0; i < rs->rows.values_num; i++)
 	{
-		zbx_json_initarray(&json, 1024);
-
 		for (int j = 0; j < rs->cols_num; j++)
 		{
 			otel_clickhouse_write_value(&json, &rs->cols[j], &rs->rows.values[i].cols[j]);
@@ -153,7 +153,7 @@ static int	otel_clickhouse_commit_rowset(zbx_otel_clickhouse_t *conn, const zbx_
 		zbx_strncpy_alloc(&data, &data_alloc, &data_offset, json.buffer, json.buffer_size);
 		zbx_chrcpy_alloc(&data, &data_alloc, &data_offset, '\n');
 
-		zbx_json_setempty(&json);
+		zbx_json_reset_array(&json);
 	}
 
 	zbx_json_free(&json);

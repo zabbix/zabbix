@@ -42,7 +42,7 @@ zbx_otel_queue_t	*otel_queue_create(zbx_uint64_t quota)
 
 void	otel_queue_set_quota(zbx_otel_queue_t *queue, zbx_uint64_t quota)
 {
-	queue->quota = quota;
+	queue->quota = quota * SEC_PER_MIN;
 }
 
 int	otel_queue_push_request(zbx_otel_queue_t *queue, zbx_otel_request_t request, zbx_otel_request_type_t type)

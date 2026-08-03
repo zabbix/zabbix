@@ -41,7 +41,7 @@ static char	*otel_option_dup(const zbx_config_option_t *options, int options_num
 static int	otel_clickhouse_cfg_init(zbx_otel_clickhouse_cfg_t *cfg, const zbx_config_option_t *options,
 		int options_num, char **error)
 {
-#if defined(HAVE_CURL)
+#if defined(HAVE_LIBCURL)
 	if (NULL == (cfg->url = otel_option_dup(options, options_num, OTEL_EXPORTER_PROVIDER_URL, error)))
 		return FAIL;
 
@@ -56,6 +56,10 @@ static int	otel_clickhouse_cfg_init(zbx_otel_clickhouse_cfg_t *cfg, const zbx_co
 
 	return SUCCEED;
 #else
+	ZBX_UNUSED(cfg);
+	ZBX_UNUSED(options);
+	ZBX_UNUSED(options_num);
+
 	*error = zbx_strdup(NULL, "ClickHouse telemetry provider requires curl library."
 			" This Zabbix server binary was compiled without curl");
 

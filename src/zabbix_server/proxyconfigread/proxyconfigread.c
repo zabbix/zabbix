@@ -472,8 +472,7 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 			else if (0 == strcmp(name, ZBX_SETTINGS_APM) &&
 					0 == strcmp(table->fields[i].name, "value_str"))
 			{
-				zbx_json_addstring(j, NULL, ZBX_NULL2EMPTY_STR(proxy->apm_attributes),
-						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(j, NULL, ZBX_NULL2EMPTY_STR(proxy->apm), ZBX_JSON_TYPE_STRING);
 			}
 			else
 			{

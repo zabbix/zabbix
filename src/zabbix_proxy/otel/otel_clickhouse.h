@@ -30,7 +30,7 @@ zbx_otel_clickhouse_cfg_t;
 
 typedef struct
 {
-#if defined(HAVE_CURL)
+#if defined(HAVE_LIBCURL)
 	CURL			*handle;
 	zbx_curl_response_t	resp;
 #endif

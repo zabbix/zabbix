@@ -1344,7 +1344,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 		proxy->location = ZBX_LOC_NOWHERE;
 	}
 
-	dc_strpool_release(proxy->apm_attributes);
+	dc_strpool_release(proxy->apm);
 	dc_strpool_release(proxy->allowed_addresses);
 	dc_strpool_release(proxy->address);
 	dc_strpool_release(proxy->port);
@@ -7300,9 +7300,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		proxy->mode = mode;
 		proxy->proxy_groupid = proxy_groupid;
 
-		proxy->apm_status = atoi(row[27]);
-		proxy->apm_quota = atoi(row[28]);
-		dc_strpool_replace(found, &proxy->apm_attributes, row[29]);
+		dc_strpool_replace(found, &proxy->apm, row[27]);
 
 		proxy->revision = revision;
 	}
@@ -12541,17 +12539,15 @@ static void	DCget_proxy(zbx_dc_proxy_t *dst_proxy, const ZBX_DC_PROXY *src_proxy
 	dst_proxy->addr = NULL;
 	dst_proxy->port = 0;
 
-	dst_proxy->apm_status = src_proxy->apm_status;
-	dst_proxy->apm_quota = src_proxy->apm_quota;
-	if ('\0' != *src_proxy->apm_attributes)
-		dst_proxy->apm_attributes = zbx_strdup(NULL, src_proxy->apm_attributes);
+	if ('\0' != *src_proxy->apm)
+		dst_proxy->apm = zbx_strdup(NULL, src_proxy->apm);
 	else
-		dst_proxy->apm_attributes = NULL;
+		dst_proxy->apm = NULL;
 }
 
 void	zbx_dc_proxy_clear(zbx_dc_proxy_t *proxy)
 {
-	zbx_free(proxy->apm_attributes);
+	zbx_free(proxy->apm);
 }
 
 int	zbx_dc_config_get_last_sync_time(void)
@@ -17068,7 +17064,12 @@ char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision)
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	if (NULL == old_config || *revision < config->revision.settings_table)
-		apm_config = zbx_strdup(old_config, dc_local()->apm_config);
+	{
+		if (NULL != dc_local()->apm_config)
+			apm_config = zbx_strdup(old_config, dc_local()->apm_config);
+
+		*revision = config->revision.settings_table;
+	}
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 

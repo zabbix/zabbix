@@ -195,14 +195,14 @@ void	*zbx_otel_manager_thread(void *args)
 	const zbx_thread_otel_manager_args_t	*otel_args;
 	zbx_otel_manager_t			*manager;
 	char					*error = NULL;
-	double					time_stat, time_flush, time_idle = 0, time_config;
+	double					time_stat, time_flush, time_idle = 0, time_config = 0;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	int					shutdown = 0, workers_num, apm_status = 1;
+	int					shutdown = 0, workers_num, apm_status = OTEL_STATUS_DISABLED;
 	zbx_vector_mw_task_ptr_t		tasks;
 	zbx_uint64_t				cfg_revision = 0, quota;
 	char					*apm_config = NULL;
-	zbx_otel_config_t			otel_config;
+	zbx_otel_config_t			otel_config = {0};
 
 	otel_args = (const zbx_thread_otel_manager_args_t *)unit_args->args.args;
 
@@ -210,11 +210,12 @@ void	*zbx_otel_manager_thread(void *args)
 	apm_config = zbx_dc_get_apm_config(apm_config, &cfg_revision);
 	if (SUCCEED != otel_config_set(&otel_config, apm_config, cfg_revision))
 		otel_config_reset(&otel_config);
+	zbx_free(apm_config);
 
 	quota = otel_config.quota;
 
 	/* when disabled leave one worker running */
-	workers_num = (0 == otel_config.status ? 1 : OTEL_WORKERS_DEFAULT);
+	workers_num = (OTEL_STATUS_ENABLED != otel_config.status ? 1 : OTEL_WORKERS_DEFAULT);
 
 	if (NULL == (manager = otel_manager_create(info, workers_num, otel_config.quota,
 			otel_args->exporter_options, &error)))
@@ -231,7 +232,7 @@ void	*zbx_otel_manager_thread(void *args)
 	zbx_vector_mw_task_ptr_create(&tasks);
 
 	/* initialize statistics */
-	time_config = time_stat = zbx_time();
+	time_stat = zbx_time();
 
 	zbx_supervisor_update_activity("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -258,10 +259,11 @@ void	*zbx_otel_manager_thread(void *args)
 			apm_config = zbx_dc_get_apm_config(apm_config, &cfg_revision);
 			if (SUCCEED != otel_config_set(&otel_config, apm_config, cfg_revision))
 				otel_config_reset(&otel_config);
+			zbx_free(apm_config);
 
 			if (apm_status != otel_config.status)
 			{
-				if (0 == otel_config.status)
+				if (OTEL_STATUS_ENABLED == otel_config.status)
 				{
 					if (FAIL == otel_manager_activate(manager, &error))
 					{
@@ -346,7 +348,7 @@ void	*zbx_otel_manager_thread(void *args)
 		zbx_rtc_unsubscribe_service(otel_args->config_timeout, ZBX_IPC_SERVICE_OTEL);
 
 	otel_manager_free(manager);
-out:
+
 	otel_config_clear(&otel_config);
 	zbx_dc_config_local_release();
 	zbx_free(args);
