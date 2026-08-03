@@ -248,7 +248,7 @@ static int	match_mountpoint(const char *current, const char *requested)
 
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*mode, *mountpoint, line[MAX_STRING_LEN], *p, *mntopts, *error;
+	char			*mode, *mountpoint, line[MAX_STRING_LEN], *mntopts, *error;
 	FILE			*f;
 	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
 	double			pfree, pused, ipfree, ipused;
