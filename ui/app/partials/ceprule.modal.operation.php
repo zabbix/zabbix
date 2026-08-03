@@ -124,7 +124,7 @@ foreach ($labels as $option => $label) {
 				->setId('ceprule-operation-tag-argument')
 				->setAttribute('placeholder', 'tag')
 			)
-			->addItem((new CDateSelector('suppress_until'))
+			->addItem((new CDateSelector('suppress_duration'))
 				->setId('ceprule-operation-period-argument')
 				->setDateFormat(ZBX_DATE_TIME)
 				->setPlaceholder(_('YYYY-MM-DD hh:mm'))

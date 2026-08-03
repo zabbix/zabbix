@@ -63,11 +63,11 @@ abstract class CControllerCepRuleGeneral extends CController {
 			$request['operations'] = array_values($request['operations']);
 			array_walk($request['operations'], function(array &$operation) {
 				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS) {
-					if ($operation['suppress_until'] === '') {
-						$operation['suppress_until'] = DB::getDefault('cep_operation', 'suppress_until');
+					if ($operation['suppress_duration'] === '') {
+						$operation['suppress_duration'] = DB::getDefault('cep_operation', 'suppress_duration');
 					}
 					else {
-						$operation['suppress_until'] = self::parseSuppressUntil($operation['suppress_until']);
+						$operation['suppress_duration'] = self::parseSuppressUntil($operation['suppress_duration']);
 					}
 				}
 			});
@@ -76,9 +76,9 @@ abstract class CControllerCepRuleGeneral extends CController {
 		return $request;
 	}
 
-	protected static function parseSuppressUntil(string $suppress_until): int {
+	protected static function parseSuppressUntil(string $suppress_duration): int {
 		$absolute_time_parser = new CAbsoluteTimeParser();
-		$absolute_time_parser->parse($suppress_until);
+		$absolute_time_parser->parse($suppress_duration);
 
 		return $absolute_time_parser->getDateTime(true)->getTimestamp();
 	}
@@ -129,7 +129,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SET_SEVERITY]
 			]],
-			'suppress_until' => ['string', 'required', 'not_empty',
+			'suppress_duration' => ['string', 'required', 'not_empty',
 				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
 			],

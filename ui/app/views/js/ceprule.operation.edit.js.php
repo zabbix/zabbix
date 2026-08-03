@@ -146,7 +146,7 @@ window.ceprule_operation_edit_popup = new class {
 		this.form_element.querySelector(`[name="tag_value"]`).value = operation.tag_value;
 		this.form_element.querySelector(`[name="tag"]`).value = operation.tag;
 		this.form_element.querySelector(`[name="new_tag"]`).value = operation.new_tag;
-		this.form_element.querySelector(`[name="suppress_until"]`).value = operation.suppress_until;
+		this.form_element.querySelector(`[name="suppress_duration"]`).value = operation.suppress_duration;
 		this.form_element.querySelectorAll(`[name="severity"]`).forEach(node => {
 			node.checked = node.value === operation.severity;
 		});

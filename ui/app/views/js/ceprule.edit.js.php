@@ -166,7 +166,7 @@ window.ceprule_edit_popup = new class {
 					<input data-field-type="hidden" name="operations[#{sortorder}][new_tag]" type="hidden" value="#{new_tag}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][tag_value]" type="hidden" value="#{tag_value}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][severity]" type="hidden" value="#{severity}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][suppress_until]" type="hidden" value="#{suppress_until}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][suppress_duration]" type="hidden" value="#{suppress_duration}"/>
 				</td>
 			</tr>
 		`);
@@ -567,7 +567,7 @@ window.ceprule_edit_popup = new class {
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
 				new_tag: '',
-				suppress_until: '',
+				suppress_duration: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
 				tag_value: '',
@@ -700,8 +700,8 @@ window.ceprule_edit_popup = new class {
 		else if ([
 			<?= CCepRuleHelper::OP_SUPPRESS ?>
 		].includes(operation_type)) {
-			arguments_str = operation.suppress_until
-				? <?= json_encode(_('until')) ?> + ' ' + operation.suppress_until
+			arguments_str = operation.suppress_duration
+				? <?= json_encode(_('until')) ?> + ' ' + operation.suppress_duration
 				: <?= json_encode(_('Indefinately')) ?>;
 		}
 		else if ([
