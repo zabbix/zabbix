@@ -21,6 +21,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
+#include <fstream>
+#include <sstream>
 
 extern "C" {
 	#include "otel_queue.h"
@@ -167,11 +169,46 @@ namespace
 		*error = static_cast<char *>(zbx_malloc(NULL, msg.length() + 1));
 		memcpy(*error, msg.c_str(), msg.length() + 1);
 	}
+
+	static std::string read_pem(const char *path)
+	{
+		std::ifstream	f(path, std::ios::binary);
+
+		if (!f)
+			throw std::runtime_error(std::string("cannot open \"") + path + "\": " + zbx_strerror(errno));
+
+		std::ostringstream	ss;
+		ss << f.rdbuf();
+
+		if (f.bad())
+			throw std::runtime_error(std::string("cannot read \"") + path + "\"");
+
+		return ss.str();
+	}
+
+	static std::shared_ptr<grpc::ServerCredentials>	build_credentials(const zbx_otel_config_tls_t *tls)
+	{
+		if (NULL == tls)
+			return grpc::InsecureServerCredentials();
+
+		grpc::SslServerCredentialsOptions	opts(NULL != tls->ca_file ?
+				GRPC_SSL_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY :
+				GRPC_SSL_DONT_REQUEST_CLIENT_CERTIFICATE);
+
+		/* private key first, then certificate chain */
+		opts.pem_key_cert_pairs.push_back({read_pem(tls->key_file), read_pem(tls->cert_file)});
+
+		if (NULL != tls->ca_file)
+			opts.pem_root_certs = read_pem(tls->ca_file);
+
+		return grpc::SslServerCredentials(opts);
+	}
 }
 
 extern "C"
 {
-	zbx_grpc_handle_t zbx_grpc_start(const char *address, const char *port, zbx_otel_queue_t *queue, char **error)
+	zbx_grpc_handle_t zbx_grpc_start(const char *address, const char *port, zbx_otel_queue_t *queue,
+			const zbx_otel_config_tls_t *tls, char **error)
 	{
 		try
 		{
@@ -184,8 +221,7 @@ extern "C"
 
 			ServerBuilder builder;
 
-			/* TODO: TLS support */
-			builder.AddListeningPort(listen_address, grpc::InsecureServerCredentials());
+			builder.AddListeningPort(listen_address, build_credentials(tls));
 			builder.RegisterService(handle->trace_service.get());
 			builder.RegisterService(handle->metrics_service.get());
 			builder.RegisterService(handle->logs_service.get());

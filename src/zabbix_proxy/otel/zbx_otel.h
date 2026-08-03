@@ -19,6 +19,11 @@ typedef struct
 {
 	int		config_timeout;
 	const char	*exporter_options;
+	const char	*sourceip;
+	const char	*port;
+	const char	*ca_file;
+	const char	*cert_file;
+	const char	*key_file;
 }
 zbx_thread_otel_manager_args_t;
 

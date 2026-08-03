@@ -155,11 +155,14 @@ static void	otel_manager_process_finished(zbx_otel_manager_t *manager, zbx_vecto
 	zbx_vector_mw_task_ptr_clear(tasks);
 }
 
-static int	otel_manager_activate(zbx_otel_manager_t *manager, char **error)
+static int	otel_manager_activate(zbx_otel_manager_t *manager, const char *sourceip, const char *port,
+		const zbx_otel_config_tls_t *tls, char **error)
 {
-	/* TODO: use configured address/port */
-	if (NULL == (manager->grpc = zbx_grpc_start(NULL, NULL, (zbx_otel_queue_t *)manager->base.queue, error)))
+	if (NULL == (manager->grpc = zbx_grpc_start(sourceip, port, (zbx_otel_queue_t *)manager->base.queue, tls,
+			error)))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -179,6 +182,20 @@ static void	otel_manager_commit_tasks(zbx_otel_manager_t *manager, zbx_otel_conf
 	zbx_mw_queue_unlock(manager->base.queue);
 
 	manager->commit_task_num++;
+}
+
+static zbx_otel_config_tls_t	*otel_manager_validate_tls(zbx_otel_config_tls_t *tls)
+{
+	if (NULL == tls->ca_file || '\0' == *tls->ca_file)
+		return NULL;
+
+	if (NULL == tls->cert_file || '\0' == *tls->cert_file)
+		return NULL;
+
+	if (NULL == tls->key_file || '\0' == *tls->key_file)
+		return NULL;
+
+	return tls;
 }
 
 void	*zbx_otel_manager_thread(void *args)
@@ -203,8 +220,15 @@ void	*zbx_otel_manager_thread(void *args)
 	zbx_uint64_t				cfg_revision = 0, quota;
 	char					*apm_config = NULL;
 	zbx_otel_config_t			otel_config = {0};
+	zbx_otel_config_tls_t			otel_config_tls, *tls;
 
 	otel_args = (const zbx_thread_otel_manager_args_t *)unit_args->args.args;
+
+	otel_config_tls.ca_file = otel_args->ca_file;
+	otel_config_tls.key_file = otel_args->key_file;
+	otel_config_tls.cert_file = otel_args->cert_file;
+
+	tls = otel_manager_validate_tls(&otel_config_tls);
 
 	zbx_dc_config_local_acquire();
 	apm_config = zbx_dc_get_apm_config(apm_config, &cfg_revision);
@@ -265,7 +289,8 @@ void	*zbx_otel_manager_thread(void *args)
 			{
 				if (OTEL_STATUS_ENABLED == otel_config.status)
 				{
-					if (FAIL == otel_manager_activate(manager, &error))
+					if (FAIL == otel_manager_activate(manager, otel_args->sourceip, otel_args->port,
+							tls, &error))
 					{
 						zabbix_log(LOG_LEVEL_CRIT, "cannot activate Open Telemetry listener:"
 								" %s", error);

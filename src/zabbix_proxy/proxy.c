@@ -335,6 +335,12 @@ static char	*config_webdriver_url = NULL;
 /* open telemetry */
 static char	*config_telemetry_provider = NULL;
 
+static char	*config_ot_sourceip = NULL;
+static char	*config_ot_port = NULL;
+static char	*config_ot_ca_file = NULL;
+static char	*config_ot_cert_file = NULL;
+static char	*config_ot_key_file = NULL;
+
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_db_config_t		*zbx_db_config = NULL;
 static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
@@ -1141,6 +1147,17 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"TelemetryProvider",		&config_telemetry_provider,		ZBX_CFG_TYPE_STRING,
 					ZBX_CONF_PARM_OPT,	0,			0},
+		{"OTListenIP",			&config_ot_sourceip,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"OTListenPort",		&config_ot_port,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"OTTLSCAFile",			&config_ot_ca_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"OTTLSCertFile",		&config_ot_cert_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"OTTLSKeyFile",		&config_ot_key_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+
 
 		{0}
 	};
@@ -1707,7 +1724,12 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 	zbx_thread_otel_manager_args_t	otel_args =
 	{
 		.config_timeout = zbx_config_timeout,
-		.exporter_options = config_telemetry_provider
+		.exporter_options = config_telemetry_provider,
+		.sourceip = config_ot_sourceip,
+		.port = config_ot_port,
+		.ca_file = config_ot_ca_file,
+		.cert_file = config_ot_cert_file,
+		.key_file = config_ot_key_file
 	};
 
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_OTEL_MANAGER] = (zbx_supervisor_unit_def_t){

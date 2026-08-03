@@ -20,10 +20,12 @@ extern "C" {
 #endif
 
 #include "otel_queue.h"
+#include "otel_config.h"
 
 typedef void * zbx_grpc_handle_t;
 
-zbx_grpc_handle_t	zbx_grpc_start(const char *address, const char *port, zbx_otel_queue_t *queue, char **error);
+zbx_grpc_handle_t	zbx_grpc_start(const char *address, const char *port, zbx_otel_queue_t *queue,
+		const zbx_otel_config_tls_t *tls, char **error);
 void	zbx_grpc_stop(zbx_grpc_handle_t handle);
 
 int	zbx_otel_decode_request(zbx_otel_request_t request, zbx_otel_request_type_t type, char **output,
