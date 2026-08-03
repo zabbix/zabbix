@@ -165,7 +165,7 @@ void	zbx_json_init_with(struct zbx_json *j, const char *src, size_t len)
 	j->status = ('{' == *ptr ? ZBX_JSON_EMPTY : ZBX_JSON_COMMA);
 }
 
-void	zbx_json_setempty(struct zbx_json *j)
+static void	zbx_json_setempty(struct zbx_json *j)
 {
 	j->buffer_offset = 0;
 	j->buffer_size = 0;
@@ -465,12 +465,13 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 	zbx_json_addstring_limit(j, name, string, type, 0);
 }
 
-void	zbx_json_addraw_len(struct zbx_json *j, const char *name, const char *data, size_t len_data)
+void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data)
 {
-	size_t	len = 0;
+	size_t	len = 0, len_data;
 	char	*p, *psrc, *pdst;
 
 	assert(j);
+	len_data = strlen(data);
 
 	if (ZBX_JSON_COMMA == j->status)
 		len++; /* , */
@@ -506,11 +507,6 @@ void	zbx_json_addraw_len(struct zbx_json *j, const char *name, const char *data,
 	j->buffer_offset = (size_t)(p - j->buffer);
 	j->buffer_size += len;
 	j->status = ZBX_JSON_COMMA;
-}
-
-void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data)
-{
-	zbx_json_addraw_len(j, name, data, strlen(data));
 }
 
 void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value)
@@ -1081,33 +1077,6 @@ const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, c
 		return NULL;
 
 	SKIP_WHITESPACE(p);
-
-	return p;
-}
-
-const char	*zbx_json_pair_next_raw(const struct zbx_json_parse *jp, const char *p, char *name, size_t len,
-		struct zbx_json_parse *jp_pair)
-{
-	if (NULL == (p = zbx_json_next(jp, p)))
-		return NULL;
-
-	if (ZBX_JSON_TYPE_STRING != __zbx_json_type(p))
-		return NULL;
-
-	jp_pair->start = p;
-
-	if (NULL == (p = json_copy_string(p, name, len)))
-		return NULL;
-
-	SKIP_WHITESPACE(p);
-
-	if (':' != *p++)
-		return NULL;
-
-	SKIP_WHITESPACE(p);
-
-	p += json_parse_value(p, NULL, 0, NULL);
-	jp_pair->end = p - 1;
 
 	return p;
 }
