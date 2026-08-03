@@ -288,19 +288,19 @@ class testUsers extends CAPITest {
 				'name' => 'API test disabled token',
 				'userid' => self::$data['userids']['user_for_token_tests'],
 				'status' => ZBX_AUTH_TOKEN_DISABLED,
-				'expires_at' => $now + 200
+				'expires_at' => $now + 100
 			],
 			[
 				'name' => 'API test valid token',
 				'userid' => self::$data['userids']['user_with_valid_session'],
 				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'expires_at' => $now + 200
+				'expires_at' => $now + 100
 			],
 			[
 				'name' => 'API test valid token for user with disabled user group',
 				'userid' => self::$data['userids']['user_with_disabled_usergroup'],
 				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'expires_at' => $now + 200
+				'expires_at' => $now + 100
 			]
 		];
 
