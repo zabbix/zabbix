@@ -477,52 +477,6 @@ class CMacroFunction {
 	}
 
 	/**
-	 * Extracts a value from a JSON string using a JSONPath pattern.
-	 *
-	 * @param string $value       [IN] The input value, expected to be a JSON document.
-	 * @param array  $parameters  [IN] [0] JSONPath pattern, [1] optional default value.
-	 *
-	 * @return string
-	 */
-	private static function macrofuncJsonpath(string $value, array $parameters): string {
-		if (count($parameters) < 1 || count($parameters) > 2) {
-			return UNRESOLVED_MACRO_STRING;
-		}
-
-		try {
-			$matches = (new \Symfony\Component\JsonPath\JsonCrawler($value))->find($parameters[0]);
-		}
-		catch (\Symfony\Component\JsonPath\Exception\ExceptionInterface) {
-			return UNRESOLVED_MACRO_STRING;
-		}
-
-		if ($matches === []) {
-			return count($parameters) == 2 ? $parameters[1] : UNRESOLVED_MACRO_STRING;
-		}
-
-		if (self::isSingularJsonPath($parameters[0])) {
-			$match = reset($matches);
-
-			return is_string($match)
-				? $match
-				: json_encode($match, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-		}
-
-		return json_encode(array_values($matches), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-	}
-
-	/**
-	 * Determines whether a JSONPath is a singular query.
-	 *
-	 * @param string $path  [IN] The JSONPath pattern.
-	 *
-	 * @return bool
-	 */
-	private static function isSingularJsonPath(string $path): bool {
-		return !preg_match('/\.\.|\[\s*\*\s*]|\.\*|\[[^]]*:[^]]*]|\[[^]]*,[^]]*]|\[\s*\?/', $path);
-	}
-
-	/**
 	 * Extracts a value from an XML string using an XPath pattern.
 	 *
 	 * @param string $value       [IN] The input value, expected to be an XML document.
@@ -633,9 +587,6 @@ class CMacroFunction {
 
 			case 'uppercase':
 				return self::macrofuncUppercase($value, $macrofunc['parameters']);
-
-			case 'jsonpath':
-				return self::macrofuncJsonpath($value, $macrofunc['parameters']);
 
 			case 'xmlxpath':
 				return self::macrofuncXmlxpath($value, $macrofunc['parameters']);
