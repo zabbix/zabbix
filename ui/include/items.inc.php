@@ -2368,12 +2368,19 @@ function getInheritedTimeouts(string $proxyid): array {
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
 				'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
 			],
-			'proxyids' => $proxyid,
-			'nopermissions' => true
+			'proxyids' => $proxyid
 		]);
 		$db_proxy = reset($db_proxies);
 
-		if ($db_proxy && $db_proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
+		if (!$db_proxy) {
+			return [
+				'source' => 'inaccessible',
+				'proxyid' => $proxyid,
+				'timeouts' => []
+			];
+		}
+
+		if ($db_proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
 			return [
 				'source' => 'proxy',
 				'proxyid' => $proxyid,
