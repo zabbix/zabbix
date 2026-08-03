@@ -234,7 +234,7 @@ $form
 				'druleid' => $data['drule']['druleid'],
 				'dchecks' => array_values($data['drule']['dchecks']),
 				'drule' => $data['drule'],
-				'can_select_server_for_discovery_by' => $data['host']['can_select_server_for_discovery_by']
+				'can_select_server_for_discovery_by' => $data['user']['can_select_server_for_discovery_by']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);
