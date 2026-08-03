@@ -93,6 +93,10 @@ class testTriggerCEP extends CIntegrationTest {
 	// the "up" events with a plain tag-exists condition on CEP_STATE_TAG_UP, without comparing tag values.
 	const CEP_STATE_TAG = 'state_{{ITEM.VALUE}.regsub("^([a-z]+)", "\\1")}';
 	const CEP_STATE_TAG_UP = 'state_up';
+	// Its counterpart, the tag name a "down" event gets instead - what the discarding close window flavours single
+	// out, since there the "up" events are the ones that must be kept, see
+	// prepareDataCepWindowCloseWindowOperations().
+	const CEP_STATE_TAG_DOWN = 'state_down';
 
 	// The thirty operator coverage rules of the windowless scenario, see getWindowNoneRules(): none of them has a window
 	// (WINDOW_NONE) and each one applies a different operator, so which rules match an event is fully
@@ -209,6 +213,16 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_TAG_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window tag close window evicted';
 	const CEP_RULE_WINDOW_CAUSE_CLOSE = self::CEP_RULE_NAME_PREFIX.'window cause close window';
 	const CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window cause close window evicted';
+	// One flavour per window type is additionally run with the "down" values of a single id discarded as they occur,
+	// while the "up" values still end the windows of the ids around it: a discarded event never takes a place in a
+	// window, so the window of that id has nothing to hold and nothing to be closed with, which is the one thing a
+	// discard can do to a window that closes, see prepareDataCepWindowCloseWindowOperations(). The id is the last of
+	// the three the scenario sends, so the two before it are kept and behave exactly as they do without a discard.
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_DISCARD = self::CEP_RULE_NAME_PREFIX.'window simple close window discard';
+	const CEP_RULE_WINDOW_TAG_CLOSE_DISCARD = self::CEP_RULE_NAME_PREFIX.'window tag close window discard';
+	const CEP_RULE_WINDOW_CAUSE_CLOSE_DISCARD = self::CEP_RULE_NAME_PREFIX.'window cause close window discard';
+	const CEP_RULE_WINDOW_PATTERN_CLOSE_DISCARD = self::CEP_RULE_NAME_PREFIX.'window pattern close window discard';
+	const CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE = self::CEP_RULE_WINDOW_NONE_SERVICE_LAST;
 	// Every one of those flavours is additionally run in a variant that closes the events of the window at the
 	// eviction execution point instead of the window closed one - leaving a window because it ends is an eviction
 	// like any other, so the two must close the same problems. The rule of a variant is named after the flavour it
@@ -226,13 +240,12 @@ class testTriggerCEP extends CIntegrationTest {
 	// fitting rather than for having been in the window too long.
 	const CEP_RULE_WINDOW_CAPACITY_DURATION = '2m';
 	const CEP_RULE_WINDOW_CAPACITY = 1;
-	// How long the suppress operation of that rule suppresses the events for, counted from the moment the
-	// rules are created. It has to outlast the configuration cache reload plus the three waves of values the
-	// scenario sends and their verification, because the operation stores an absolute deadline and does
-	// nothing at all once that deadline has passed - a window too short would leave the later events
-	// unsuppressed depending on how fast the machine is. Everything after the deadline is waited for, so the
-	// window is kept as short as it can safely be.
-	const CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD = 60;
+	// How long the suppress operation of that rule suppresses an event for. The operation stores a duration
+	// rather than a deadline, so the period is counted from the moment it runs on that event and every event
+	// of the scenario gets the full period of its own - it only has to outlast the verification of the wave
+	// the event belongs to, not the whole run. Everything after it is waited for, so it is kept as short as
+	// it can safely be.
+	const CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD = '60s';
 	// Expired suppressions are removed by the timer, which does that pass once a minute, so clearing them
 	// takes up to a minute longer than the suppression itself.
 	const CEP_RULE_WINDOW_NONE_UNSUPPRESS_ITERATIONS = 180;
@@ -390,10 +403,6 @@ class testTriggerCEP extends CIntegrationTest {
 	// Name of the host group the discovered host belongs to, resolved on first use by
 	// getDiscHostGroupName() for the host group rules of the windowless CEP scenario.
 	private $disc_hostgroup_name = null;
-
-	// Absolute deadline the suppress operation of the windowless scenario suppresses its events until,
-	// resolved on first use by getWindowNoneSuppressUntil() so the rule and the assertions share it.
-	private $window_none_suppress_until = null;
 
 	/**
 	 * @inheritdoc
@@ -2473,6 +2482,53 @@ HEREDOC;
 	}
 
 	/**
+	 * Prepare the pattern match flavour of the close window scenario with the "down" values of one id discarded as
+	 * they occur, so the window of that id is never given the event the script would have found beside the "up" one,
+	 * see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowPatternCloseWindowDiscardDown() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_DISCARD, CCepRuleHelper::WHEN_PATTERN_MATCHED,
+			CCepRuleHelper::WHEN_WINDOW_CLOSED, true
+		);
+	}
+
+	/**
+	 * Prepare the simple window flavour of the close window scenario with the "down" values of one id discarded as
+	 * they occur, so the window of that id never has the problem that an ending window would have closed, see
+	 * prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowDiscardDown() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DISCARD, CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			CCepRuleHelper::WHEN_WINDOW_CLOSED, true
+		);
+	}
+
+	/**
+	 * Prepare the tag correlation flavour of the close window scenario with the "down" values of one id discarded as
+	 * they occur, see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowTagCloseWindowDiscardDown() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+			self::CEP_RULE_WINDOW_TAG_CLOSE_DISCARD, CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			CCepRuleHelper::WHEN_WINDOW_CLOSED, true
+		);
+	}
+
+	/**
+	 * Prepare the cause and symptom flavour of the close window scenario with the "down" values of one id discarded
+	 * as they occur: the discarded event is not taken into the window, so it never becomes the cause the "up" event
+	 * of that id would have been ranked a symptom of, see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowCauseSymptomCloseWindowDiscardDown() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_DISCARD, CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			CCepRuleHelper::WHEN_WINDOW_CLOSED, true
+		);
+	}
+
+	/**
 	 * Prepare the close window scenario: a window per id that is ended by the rule as soon as that id has
 	 * recovered, which closes the events the window held. The window groups by the 'service' tag, so every id
 	 * gets a window of its own and outlasts the whole scenario (CEP_RULE_WINDOW_CAPACITY_DURATION), so what a
@@ -2525,9 +2581,16 @@ HEREDOC;
 	 *
 	 * The ids that have not been sent an "up" value are untouched by any of this, so their window is not closed
 	 * and their problems stay open - see runEventAssessmentTestCepWindowCloseWindow().
+	 *
+	 * $discard_down adds one operation on top of all that: the "down" values of a single id
+	 * (CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE) are discarded as they occur. Everything the flavour does is left in
+	 * place - the other ids fill their windows and their "up" values still end them - so what the scenario compares
+	 * is an id whose event was dropped against the ids around it: the dropped event never took a place in a window,
+	 * so there is nothing for the ending window of that id to close, and it left no problem of its own either. That
+	 * is the one thing a discard can do to a window that closes: not stop it, but empty it.
 	 */
 	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when,
-			int $close_when = CCepRuleHelper::WHEN_WINDOW_CLOSED) {
+			int $close_when = CCepRuleHelper::WHEN_WINDOW_CLOSED, bool $discard_down = false) {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this flavour is the only thing that may close a problem.
@@ -2629,6 +2692,28 @@ HEREDOC;
 			'execute_when' => $close_when,
 			'type' => CCepRuleHelper::OP_CLOSE
 		];
+
+		if ($discard_down) {
+			// Discarding is decided while the rules are matched, before the event is stored and before any window is
+			// given it, so a discarded event never takes a place in a window, is never ranked by one and is never
+			// closed with one - it leaves nothing at all behind. What is discarded here are the "down" values of a
+			// single id (CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE), so the ids around it keep filling their windows and
+			// the "up" values still end them: the operations above are left to do their work, and the one id whose
+			// event was dropped is what shows the difference. Conditions on distinct tags are AND-ed, so this
+			// matches an event that is both a "down" one and of that id.
+			array_unshift($operations, [
+				'sortorder' => -1,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_DISCARD,
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'tags' => [
+					['tag' => self::CEP_STATE_TAG_DOWN, 'operator' => TAG_OPERATOR_EXISTS, 'value' => ''],
+					['tag' => 'service', 'operator' => TAG_OPERATOR_EQUAL,
+						'value' => self::CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE
+					]
+				]
+			]);
+		}
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
@@ -2739,7 +2824,7 @@ HEREDOC;
 				'sortorder' => 0,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
 				'type' => CCepRuleHelper::OP_SUPPRESS,
-				'suppress_until' => $this->getWindowNoneSuppressUntil()
+				'suppress_duration' => self::CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD
 			],
 			[
 				'sortorder' => 1,
@@ -4016,7 +4101,7 @@ HEREDOC;
 	 *     severity" shift it by one step each, leaving Warning. The severity is asserted after the whole
 	 *     chain, and since the three shifts do not cancel out, an operation that did nothing would leave a
 	 *     different severity behind;
-	 *   - "suppress" suppresses the event until getWindowNoneSuppressUntil().
+	 *   - "suppress" suppresses the event for CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD.
 	 *
 	 * The rule runs last (see prepareDataCepWindowNoneTagOperations()): it changes the event name and severity,
 	 * which the event name and severity rules of getWindowNoneRules() have conditions on, so it must not run
@@ -4026,28 +4111,16 @@ HEREDOC;
 	 * "discard" would drop the event before it is ever stored, and "close" would close the problem this
 	 * scenario needs to stay open (the CEP window scenarios cover closing).
 	 *
-	 * The suppression is not indefinite: it runs out CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD seconds after the
-	 * rules were created, so both halves of it can be checked - the events are suppressed first, and the
-	 * suppression is gone once the deadline has passed. Only the first half is checked by default; the wait
-	 * for the second one is the slowest step of the scenario and SKIP_UNSUPPRESS_WAIT leaves it out (see
-	 * waitForCepWindowNoneUnsuppressed()).
+	 * The suppression is not indefinite: a duration is given rather than the 0 that would suppress the event
+	 * for good, so both halves of it can be checked - the events are suppressed first, and the suppression is
+	 * gone once CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD has passed since the operation ran on them. Only the
+	 * first half is checked by default; the wait for the second one is the slowest step of the scenario and
+	 * SKIP_UNSUPPRESS_WAIT leaves it out (see waitForCepWindowNoneUnsuppressed()).
 	 *
 	 * Either way the suppressions cannot outlive the test: event_suppress.cep_ruleid is an ON DELETE CASCADE
 	 * foreign key, so deleting the CEP rules in the teardown removes them - a manual unsuppress could not, it
 	 * only clears rows with no cep_ruleid.
 	 */
-	/**
-	 * The moment the suppression the event operations apply runs out, resolved once and reused, so the rule
-	 * that suppresses until it and the wait that expects it to be over agree on the same deadline.
-	 */
-	private function getWindowNoneSuppressUntil(): int {
-		if ($this->window_none_suppress_until === null) {
-			$this->window_none_suppress_until = time() + self::CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD;
-		}
-
-		return $this->window_none_suppress_until;
-	}
-
 	private function getWindowNoneEventOperationCase(): array {
 		return [
 			'operations' => [
@@ -4056,7 +4129,7 @@ HEREDOC;
 				[CCepRuleHelper::OP_INCREASE_SEVERITY, []],
 				[CCepRuleHelper::OP_INCREASE_SEVERITY, []],
 				[CCepRuleHelper::OP_DECREASE_SEVERITY, []],
-				[CCepRuleHelper::OP_SUPPRESS, ['suppress_until' => $this->getWindowNoneSuppressUntil()]]
+				[CCepRuleHelper::OP_SUPPRESS, ['suppress_duration' => self::CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD]]
 			],
 			'expected' => [
 				'name' => self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME,
@@ -7073,8 +7146,8 @@ HEREDOC;
 	 *
 	 * The other one runs the operations that change the event itself: "set name", then "set severity" to
 	 * Information followed by two "increase severity" and one "decrease severity" (so the shifts cannot cancel
-	 * out and every event must end up at Warning), then "suppress" until a deadline shortly ahead. Every event
-	 * must be suppressed while it holds, and - when the scenario is run with SKIP_UNSUPPRESS_WAIT turned off -
+	 * out and every event must end up at Warning), then "suppress" for a short period. Every event must be
+	 * suppressed while it holds, and - when the scenario is run with SKIP_UNSUPPRESS_WAIT turned off -
 	 * unsuppressed again once it has passed. The two operations that would contradict the scenario are left
 	 * out: "discard" would drop the event and "close" would close the problem this test needs to stay open. None of the rules
 	 * closes anything, so all three problems stay open until the trigger expression recovers them.
@@ -7228,8 +7301,9 @@ HEREDOC;
 	 * a suppressed one. The "down" values around it must still open their problems, so the rule is shown to
 	 * drop exactly what its condition selects.
 	 *
-	 * No window is involved on purpose: discarding is decided while the rules are matched, before the event is
-	 * stored or handed to any window, so a window could not change the outcome.
+	 * No window is involved here: discarding is decided while the rules are matched, before the event is stored or
+	 * handed to any window, so a window could not change the outcome. What a window can be robbed of is asserted
+	 * where the rules that close a window are - see runEventAssessmentTestCepWindowCloseWindow().
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepDiscardOnUp$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -7585,6 +7659,27 @@ HEREDOC;
 		}
 	}
 
+	/**
+	 * The pattern match close window rule with one operation added: the "down" values of one id are discarded as they
+	 * occur, while its "up" values are kept and still end a window. The ids that were kept behave exactly as they do
+	 * without the discard - their "up" event completes what the script looks for and the match closes the window with
+	 * both events in it - and the discarded id has nothing at all: its "down" value was dropped while the rules were
+	 * matched, before the event was stored and before the window was given it, so no problem of it exists to be held
+	 * or closed - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowDiscardOnDown$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowDiscardOnDown() {
+		$this->prepareDataCepWindowPatternCloseWindowDiscardDown();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE_DISCARD, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
 	/* Close window operation - test abbility to close window for each type of window */
 
 	/**
@@ -7663,6 +7758,25 @@ HEREDOC;
 			$this->runEventAssessmentTestCepWindowCloseWindow(
 				self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED)
 			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The simple window close window rule with the "down" values of one id discarded as they occur: the "up" values
+	 * of the other ids still close the window they enter and the problem it holds, while the discarded id never
+	 * opened a problem for a window to hold in the first place - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowDiscardOnDown$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowDiscardOnDown() {
+		$this->prepareDataCepWindowSimpleCloseWindowDiscardDown();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DISCARD, true);
 		}
 		finally {
 			$this->cleanupCepRules();
@@ -7751,6 +7865,25 @@ HEREDOC;
 	}
 
 	/**
+	 * The tag correlation close window rule with the "down" values of one id discarded as they occur: the discard is
+	 * decided before the event is handed to a window of any type, so it must keep an event out of a tag correlation
+	 * window exactly as it does out of the others, while the ids it does not match still correlate and close as
+	 * usual - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseWindowDiscardOnDown$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseWindowDiscardOnDown() {
+		$this->prepareDataCepWindowTagCloseWindowDiscardDown();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE_DISCARD, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * The same close window scenario with a cause and symptom window, whose close window operation is performed
 	 * when an event occurs - restricted this time not by a tag of the event but by the rank the window itself gave
 	 * it: the "down" event of an id becomes the cause of its window and the "up" event that follows it becomes a
@@ -7827,6 +7960,26 @@ HEREDOC;
 			$this->runEventAssessmentTestCepWindowCloseWindow(
 				self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED)
 			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The cause and symptom close window rule with the "down" values of one id discarded as they occur, which takes
+	 * away the cause of that id: a discarded event is never taken into the window, so it never becomes the cause its
+	 * "up" event would have been ranked a symptom of - and being a symptom is what this flavour ends its window on.
+	 * The ids that were kept are ranked and closed as usual, so the ranking is shown to follow what the window was
+	 * given rather than what was sent - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomCloseWindowDiscardOnDown$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomCloseWindowDiscardOnDown() {
+		$this->prepareDataCepWindowCauseSymptomCloseWindowDiscardDown();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE_DISCARD, true);
 		}
 		finally {
 			$this->cleanupCepRules();
@@ -9458,8 +9611,14 @@ HEREDOC;
 	 *
 	 * After the "up" of every id nothing is left open, and closing the last problem of a trigger is what puts the
 	 * trigger itself back to OK, so no recovery value is needed.
+	 *
+	 * $discarded drives the flavours whose rule additionally discards the "down" values of one id
+	 * (CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE). The "up" values still end the windows of the ids around it, so what
+	 * changes is only what those windows have to give: the discarded id opens no problem in step 1 and is left out of
+	 * step 2, so nothing is ever sent for it that a window could hold or close. That it left nothing behind is
+	 * asserted once every kept value has been processed - by then an event that had been stored would be there.
 	 */
-	private function runEventAssessmentTestCepWindowCloseWindow(string $rule_name): void {
+	private function runEventAssessmentTestCepWindowCloseWindow(string $rule_name, bool $discarded = false): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
 		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
 		$all = [$triggerid];
@@ -9480,12 +9639,23 @@ HEREDOC;
 			self::CEP_RULE_WINDOW_NONE_SERVICE_LAST
 		];
 
+		// The discarding flavours drop the "down" values of this one id, so it opens no problem and gets no window.
+		// It is left out of the "up" values as well: with nothing of its own stored, an "up" of that id would be
+		// given a window of its own and closed with it, which says nothing about the event that was dropped.
+		$discarded_service = $discarded ? self::CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE : null;
+
 		// 1. Every id takes the place its own window has for it, and a window that has seen no "up" event is not
-		//    closed.
+		//    closed. The discarded id takes no place anywhere - there is nothing to wait for after its value, and
+		//    that nothing is what the assertions at the end are about.
 		$open = 0;
 
 		foreach ($services as $service) {
 			$send('down_'.$service);
+
+			if ($service === $discarded_service) {
+				continue;
+			}
+
 			$this->waitForOpenProblemCount($all, ++$open);
 			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 			$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
@@ -9496,6 +9666,10 @@ HEREDOC;
 		//    server keeps that message on the rule, so it is reported here rather than leaving the problems simply
 		//    never closing.
 		foreach ($services as $service) {
+			if ($service === $discarded_service) {
+				continue;
+			}
+
 			$send('up_'.$service);
 
 			try {
@@ -9519,7 +9693,15 @@ HEREDOC;
 			$this->waitForOpenProblemCount($all, --$open);
 		}
 
-		// The last window took the last two problems with it, which is what returns the trigger to OK as well.
+		if ($discarded_service !== null) {
+			// Every kept value has been processed by now, so a discarded "down" that had been stored would be here
+			// too - and there is nothing of that id at all: no problem event of its own, and therefore nothing its
+			// window could have held or been closed with. Only the ids that were kept have a "down" event.
+			$this->waitForProblemEventCountByTag($all, 'service', $discarded_service, 0);
+			$this->waitForProblemEventsTagged($all, self::CEP_STATE_TAG_DOWN, count($services) - 1);
+		}
+
+		// The last window took the problems it held with it, which is what returns the trigger to OK as well.
 		$this->waitForNoOpenProblems($all, 'After the close window scenario of "'.$rule_name.'"');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 	}
@@ -9913,9 +10095,9 @@ HEREDOC;
 
 	/**
 	 * Wait until none of the events the windowless scenario generated is suppressed any more. The suppress
-	 * operation suppressed every one of them until getWindowNoneSuppressUntil(), which the assertions of
+	 * operation suppressed every one of them for CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD, which the assertions of
 	 * waitForCepWindowNoneTaggedEvents() confirmed; here the other half is checked - the suppression is
-	 * temporary and must be gone once its deadline has passed.
+	 * temporary and must be gone once that period has passed.
 	 *
 	 * The wait is a long one: it has to cover the rest of the suppression period plus the timer pass that
 	 * removes expired event_suppress records, which happens once a minute. That is why SKIP_UNSUPPRESS_WAIT
