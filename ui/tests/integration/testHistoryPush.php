@@ -265,6 +265,11 @@ class testHistoryPush extends CIntegrationTest {
 				'user.delete did not return the expected userids');
 		}
 
+		CDataHelper::call('role.update', [
+			'roleid' => 1, // User role.
+			'rules' => ['api.access' => ZBX_ROLE_RULE_DISABLED]
+		]);
+
 		self::$hostid_normal = null;
 		self::$hostid_non_monitored = null;
 		self::$hostid_maintained = null;
