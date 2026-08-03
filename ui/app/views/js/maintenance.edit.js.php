@@ -68,6 +68,8 @@ window.maintenance_edit = new class {
 				}
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
+
+					this.#synchronizeActivesAndPeriod();
 				}
 			});
 
@@ -149,6 +151,8 @@ window.maintenance_edit = new class {
 			else {
 				this.#addTimePeriod(e.detail);
 			}
+
+			this.#synchronizeActivesAndPeriod()
 		});
 	}
 
@@ -165,6 +169,31 @@ window.maintenance_edit = new class {
 
 		row.insertAdjacentHTML('afterend', template.evaluate(timeperiod));
 		row.remove();
+	}
+
+	#synchronizeActivesAndPeriod() {
+		requestAnimationFrame(() => {
+			const fields = this.form.getAllValues();
+
+			if (Object.keys(fields.timeperiods).length === 1) {
+				const timeperiod = Object.values(fields.timeperiods)[0];
+				const is_adhoc = document.getElementById('name').value.includes('Ad-hoc');
+
+				if (timeperiod.timeperiod_type === '<?= TIMEPERIOD_TYPE_ONETIME ?>' && is_adhoc) {
+					const formatDate = (date) => date.toLocaleString('sv-SE', {
+						hour12: false,
+						timeZone: <?= json_encode(date_default_timezone_get()) ?>
+					}).slice(0, -3);
+
+					const start_date = new Date(timeperiod.start_date * 1000);
+					const active_since = formatDate(start_date);
+					const active_till = formatDate(new Date(start_date.getTime() + timeperiod.period * 1000));
+
+					document.getElementById('active_since').value = active_since;
+					document.getElementById('active_till').value = active_till;
+				}
+			}
+		});
 	}
 
 	#updateEventNames(is_enabled) {
