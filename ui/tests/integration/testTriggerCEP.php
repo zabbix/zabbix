@@ -165,8 +165,9 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_OPS_DURATION = '3s';
 	// The event pattern match flavour (see prepareDataCepWindowPattern()) is driven by a script instead: the
 	// window runs it over its events once a second and, when it reports a match, the operations of the rule
-	// are applied to the events the window holds. The only operations that execution point allows are the two
-	// that copy an event, so the match is observed through the copies appearing.
+	// are applied to the events the window holds. The operations that execution point allows are the two that
+	// copy an event, discarding one and closing the window, so the match is observed through the copies
+	// appearing (this flavour) or through the window ending (see prepareDataCepWindowPatternCloseWindow()).
 	// The service scenario (see prepareDataCepServiceTag()): a service that is in problem for as long as an
 	// event carries CEP_SERVICE_TAG_NAME, a tag no trigger produces and only the CEP rule adds and takes away
 	// again. The service status therefore follows the tag rather than the problem.
@@ -189,6 +190,28 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_COPY_ALWAYS_MIN = 4;
 	const CEP_RULE_WINDOW_PATTERN = self::CEP_RULE_NAME_PREFIX.'window pattern match';
 	const CEP_RULE_WINDOW_PATTERN_EVENTS = 3;
+	// The close window scenario (see prepareDataCepWindowCloseWindowOperations()) performs the same close window
+	// operation from every execution point that may decide an id has recovered: on a pattern match, where a script
+	// reports one and the window therefore ends at the examination that follows the "up" value rather than at the
+	// value itself; when the "up" event occurs, where the window is closed by an event it holds; and when the "up"
+	// event is evicted, where it is closed by an event that did not fit into it. Every window type is run from
+	// every execution point it has - both event driven ones for a simple, a tag correlation and a cause and
+	// symptom window, all three for a pattern match window - so that no combination of the two is left untried.
+	// The cause and symptom flavour additionally singles out the event that ends the window by the rank its window
+	// gave it (CEP_TAG_IS_SYMPTOM) rather than by a tag of the event itself, which is what only that window type
+	// can do.
+	const CEP_RULE_WINDOW_PATTERN_CLOSE = self::CEP_RULE_NAME_PREFIX.'window pattern close window';
+	const CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT = self::CEP_RULE_NAME_PREFIX.'window pattern close window on event';
+	const CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window pattern close window evicted';
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE = self::CEP_RULE_NAME_PREFIX.'window simple close window';
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window simple close window evicted';
+	const CEP_RULE_WINDOW_TAG_CLOSE = self::CEP_RULE_NAME_PREFIX.'window tag close window';
+	const CEP_RULE_WINDOW_TAG_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window tag close window evicted';
+	const CEP_RULE_WINDOW_CAUSE_CLOSE = self::CEP_RULE_NAME_PREFIX.'window cause close window';
+	const CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window cause close window evicted';
+	// The built in tag telling a symptom apart from a cause, the counterpart of CEP_TAG_IS_COPIED for the rank a
+	// cause and symptom window assigns.
+	const CEP_TAG_IS_SYMPTOM = '$IS.SYMPTOM';
 	// The cause and symptom flavour (see prepareDataCepWindowCauseSymptom()) needs neither: its window does its
 	// work as the events arrive, ranking the first event of a group as the cause of the ones that follow. The
 	// count of those is kept in a tag of the cause event, which only this window type has.
@@ -2127,9 +2150,10 @@ class testTriggerCEP extends CIntegrationTest {
 	 * guard the pattern would match again, copy again, and never stop. The copies are recognised by the
 	 * is_copied property the script sees on them.
 	 *
-	 * The operations are "copy first" and "copy last", the only ones besides discarding that a pattern match
-	 * may perform. They run for every event of the window but each one acts only on the event at its end of
-	 * it, so a match leaves two new events behind: a copy of the oldest and a copy of the newest.
+	 * The operations are "copy first" and "copy last". They run for every event of the window but each one acts
+	 * only on the event at its end of it, so a match leaves two new events behind: a copy of the oldest and a
+	 * copy of the newest. The other operations a pattern match may perform are discarding an event and closing
+	 * the window, which prepareDataCepWindowPatternCloseWindow() covers.
 	 *
 	 * The window groups by the 'component' tag, so all the events of the driven trigger form one group, and it
 	 * outlasts the test with no capacity limit so nothing is evicted while the pattern is being collected.
@@ -2221,6 +2245,265 @@ HEREDOC;
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_PATTERN, [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_PATTERN_MATCH, $window
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the pattern match flavour of the close window scenario, whose close window operation is performed
+	 * on a pattern match, see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowPatternCloseWindow() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE, CCepRuleHelper::WHEN_PATTERN_MATCHED
+		);
+	}
+
+	/**
+	 * Prepare the flavour of the close window scenario that has a pattern match window but performs its close
+	 * window operation when an "up" event occurs, so the window of that window type is ended by an arriving
+	 * event and not by its own script, see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowPatternCloseWindowOnEvent() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT, CCepRuleHelper::WHEN_EVENT_OCCURRED
+		);
+	}
+
+	/**
+	 * Prepare the flavour of the close window scenario that has a pattern match window and performs its close
+	 * window operation when an "up" event is evicted, so the window is ended by an event that never entered it,
+	 * see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowPatternCloseWindowOnEvicted() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED
+		);
+	}
+
+	/**
+	 * Prepare the simple window flavour of the close window scenario, whose close window operation is performed
+	 * when an "up" event occurs. A simple window has no matching of its own, so this and the eviction flavour
+	 * below are the only execution points it can be closed from, see
+	 * prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowSimpleCloseWindow() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE, CCepRuleHelper::WHEN_EVENT_OCCURRED
+		);
+	}
+
+	/**
+	 * Prepare the simple window flavour of the close window scenario that performs its close window operation
+	 * when an "up" event is evicted, so the window is ended by an event that never entered it, see
+	 * prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowOnEvicted() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED
+		);
+	}
+
+	/**
+	 * Prepare the tag correlation flavour of the close window scenario, whose close window operation is
+	 * performed when an "up" event occurs, see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowTagCloseWindow() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+			self::CEP_RULE_WINDOW_TAG_CLOSE, CCepRuleHelper::WHEN_EVENT_OCCURRED
+		);
+	}
+
+	/**
+	 * Prepare the tag correlation flavour of the close window scenario that performs its close window operation
+	 * when an "up" event is evicted, so the window is ended by an event that never entered it, see
+	 * prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowTagCloseWindowOnEvicted() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+			self::CEP_RULE_WINDOW_TAG_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED
+		);
+	}
+
+	/**
+	 * Prepare the cause and symptom flavour of the close window scenario, whose close window operation is
+	 * performed when an "up" event occurs - and singles that event out by the rank its window has just given it
+	 * (CEP_TAG_IS_SYMPTOM) instead of by a tag the event carries, which is something only this window type can be
+	 * asked, see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowCauseSymptomCloseWindow() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE, CCepRuleHelper::WHEN_EVENT_OCCURRED
+		);
+	}
+
+	/**
+	 * Prepare the cause and symptom flavour of the close window scenario that performs its close window operation
+	 * when an "up" event is evicted. An evicted event was never taken into the window, so it was never ranked
+	 * either and this flavour is back to the tag condition of the other window types, see
+	 * prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowCauseSymptomCloseWindowOnEvicted() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED
+		);
+	}
+
+	/**
+	 * Prepare the close window scenario: a window per id that is ended by the rule as soon as that id has
+	 * recovered, which closes the events the window held. The window groups by the 'service' tag, so every id
+	 * gets a window of its own and outlasts the whole scenario (CEP_RULE_WINDOW_CAPACITY_DURATION), so what a
+	 * window holds is exactly the events of its id and only the operations may end it.
+	 *
+	 * What differs between the flavours is $execute_when, the execution point the close window operation is
+	 * performed at, and therefore what decides that the id has recovered:
+	 *   - WHEN_PATTERN_MATCHED, which only a WINDOW_PATTERN_MATCH window has: the script of the window reports a
+	 *     match as soon as the window it is given holds an "up" event, so the operation is not caused by an event
+	 *     at all - a pattern window is examined once a second, so the window is closed at the first examination
+	 *     after the "up" event landed in it;
+	 *   - WHEN_EVENT_OCCURRED, which every window type has: the operation is performed by the "up" event itself,
+	 *     restricted to those events by its condition. The new event is already in the window when the operation
+	 *     runs, so it closes the window it has just entered - immediately, without waiting for the window to be
+	 *     examined, which is what tells this flavour from the one above when both have the same window type;
+	 *   - WHEN_EVENT_EVICTED, which is reached by an event that does not fit into its window. This flavour is the
+	 *     one that needs a capacity limit, and it is one (CEP_RULE_WINDOW_CAPACITY): the "down" event of an id
+	 *     takes the single place of its window, so the "up" event of that id finds it taken and is evicted -
+	 *     without ever entering the window it ends. Being evicted rather than held is also why this flavour needs
+	 *     the extra "close" operation below.
+	 *
+	 * $window_type decides which of them the rule may use: a WINDOW_SIMPLE window does nothing of its own, so the
+	 * two event driven execution points are all it has; a WINDOW_TAG_MATCH window correlates the events of a group
+	 * and a WINDOW_CAUSE_SYMPTOM window ranks them, without that giving either of them another execution point;
+	 * and a WINDOW_PATTERN_MATCH window additionally has the pattern match execution point.
+	 *
+	 * However the operation is reached, an "up" event is recognised by the presence of a CEP_STATE_TAG_UP tag, a
+	 * tag only an "up" event carries because its name is resolved from the item value - the pattern match
+	 * execution point looks for it among the tags the window hands its script, the event driven ones with a
+	 * tag-exists operation condition. The one flavour that recognises it differently is the arrival flavour of a
+	 * cause and symptom window, which asks the window about the event instead of the event about itself, see
+	 * $close_window_condition below.
+	 *
+	 * A pattern match window cannot be without a script, so the flavours that do not close the window on a match
+	 * get one that never reports one: the events of such a window are only ever acted on by the operation of the
+	 * arriving or evicted event, exactly as in the window types that have no script at all.
+	 *
+	 * The last operation of every flavour is "close" when the window closes, which closes the events that window
+	 * held. Which events those are is the one thing the flavours do not share:
+	 *   - the arrival and pattern match flavours hold both events of the id, so closing the window closes the
+	 *     "down" problem and the "up" problem that ended it;
+	 *   - the eviction flavours never held the "up" event, so closing the window only closes the "down" problem.
+	 *     Their "up" problem is closed by a "close" operation of the eviction execution point instead, which
+	 *     leaves every flavour with the same two closed problems per id.
+	 *
+	 * The ids that have not been sent an "up" value are untouched by any of this, so their window is not closed
+	 * and their problems stay open - see runEventAssessmentTestCepWindowCloseWindow().
+	 */
+	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when) {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// The rule of this flavour is the only thing that may close a problem.
+		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
+
+		$window = [
+			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
+			// Only the eviction flavour needs an event not to fit; the others must hold everything they are given.
+			'capacity' => $execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED ? self::CEP_RULE_WINDOW_CAPACITY : 0,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => ['service']
+		];
+
+		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+			if ($execute_when == CCepRuleHelper::WHEN_PATTERN_MATCHED) {
+				$state_tag_up = self::CEP_STATE_TAG_UP;
+
+				// The window is handed the events of one id, so finding an "up" event among them means that id
+				// has recovered. Only the tag name is looked at, not its value - see CEP_STATE_TAG.
+				$window['script'] = <<<HEREDOC
+var events = cep_get_events();
+
+for (var i = 0; i < events.length; i++) {
+	for (var j = 0; j < events[i].tags.length; j++) {
+		if (events[i].tags[j].tag === '$state_tag_up') {
+			return 'true';
+		}
+	}
+}
+
+return 'false';
+HEREDOC;
+			}
+			else {
+				// A pattern match window is required to have a script even when the match is not what ends it, so
+				// this one reports no match however many events it is given.
+				$window['script'] = "return 'false';";
+			}
+		}
+
+		// Restricts an operation to the "up" events. The pattern match execution point is only reached once the
+		// script has found such an event, but every event that occurs or is evicted reaches the other two, so
+		// there the condition of the operation is what singles them out - without it every event would close the
+		// window it just entered, and every problem would be closed the moment it opened.
+		$up_condition = [
+			'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+			'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+		];
+
+		// A cause and symptom window ranks an event as it takes it in - the first event of a group is its cause
+		// and every later one a symptom of it - so its arrival flavour can single out the event that ends the
+		// window by that rank instead: the "down" event of an id is the cause of its window and the "up" event
+		// that follows it the symptom, and being a symptom is what the operation acts on. The ranking is done
+		// before the operations of the arriving event are performed, so the condition sees the rank of the very
+		// event that caused it.
+		//
+		// An evicted event was never taken into a window and therefore never ranked, so the eviction flavour of
+		// this window type keeps the tag condition of the others.
+		$close_window_condition = $window_type === CCepRuleHelper::WINDOW_CAUSE_SYMPTOM
+				&& $execute_when == CCepRuleHelper::WHEN_EVENT_OCCURRED
+			? [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'tags' => [['tag' => self::CEP_TAG_IS_SYMPTOM, 'operator' => TAG_OPERATOR_EQUAL,
+					'value' => 'true'
+				]]
+			]
+			: $up_condition;
+
+		$operations = [];
+
+		if ($execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED) {
+			// The evicted event is not in the window it ends, so the "close" operation of the window is not
+			// applied to it: this is what closes it, leaving this flavour with the same two closed problems per id
+			// as the ones whose window held both events.
+			$operations[] = [
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+				'type' => CCepRuleHelper::OP_CLOSE
+			] + $up_condition;
+		}
+
+		$close_window = [
+			'sortorder' => 1,
+			'execute_when' => $execute_when,
+			'type' => CCepRuleHelper::OP_CLOSE_WINDOW
+		];
+
+		$operations[] = $execute_when == CCepRuleHelper::WHEN_PATTERN_MATCHED
+			? $close_window
+			: $close_window + $close_window_condition;
+
+		$operations[] = [
+			'sortorder' => 2,
+			'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
+			'type' => CCepRuleHelper::OP_CLOSE
+		];
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
+			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -7052,6 +7335,195 @@ HEREDOC;
 		}
 	}
 
+	/* Close window operation (event pattern match) - test abbility to close window for each type of window */
+
+	/**
+	 * The close window operation driven by an event pattern match instead of by an arriving event: the script of
+	 * the window reports a match once the window holds the "up" event of its id, and the match closes the window
+	 * along with both events it held - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindow$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindow() {
+		$this->prepareDataCepWindowPatternCloseWindow();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same close window scenario with the same pattern match window, whose close window operation is this
+	 * time performed when an event occurs, restricted to the "up" events, while its script never reports a match:
+	 * a pattern match window must honour the arrival execution point as well, so the "up" event closes the window
+	 * it has just entered without the window ever being matched against - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowOnEvent$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowOnEvent() {
+		$this->prepareDataCepWindowPatternCloseWindowOnEvent();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same close window scenario with the same pattern match window, whose close window operation is this
+	 * time performed when an event is evicted: the window has room for one event, so the "down" event of an id
+	 * takes its place and the "up" event of that id does not fit. The window is therefore ended by an event that
+	 * never entered it, which is also why the rule closes the evicted event itself - the "close" operation of the
+	 * window only reaches the "down" event it held - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowOnEvicted$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowOnEvicted() {
+		$this->prepareDataCepWindowPatternCloseWindowOnEvicted();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/* Close window operation - test abbility to close window for each type of window */
+
+	/**
+	 * The same close window scenario with a simple window, whose close window operation is performed when an
+	 * event occurs, restricted to the "up" events: the operation is performed by the event itself, which is
+	 * already in the window of its id when it runs, so it closes the window it has just entered and both events
+	 * that window held. A simple window has no matching of its own, so this is the arrival flavour of
+	 * testTriggerCEP_CepWindowPatternCloseWindowOnEvent with the window type that does the least of all - closing
+	 * a window from an arriving event must not depend on it, so the outcome must be the same - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindow$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindow() {
+		$this->prepareDataCepWindowSimpleCloseWindow();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same close window scenario with the same simple window, whose close window operation is this time
+	 * performed when an event is evicted: the window has room for one event, so the "down" event of an id takes
+	 * its place and the "up" event of that id does not fit. The window is therefore ended by an event that never
+	 * entered it, which is also why the rule closes the evicted event itself - the "close" operation of the window
+	 * only reaches the "down" event it held. The two execution points a simple window has are thereby both
+	 * covered - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowOnEvicted$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowOnEvicted() {
+		$this->prepareDataCepWindowSimpleCloseWindowOnEvicted();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same close window scenario with a tag correlation window, whose close window operation is performed
+	 * when an event occurs, restricted to the "up" events: the operation is performed by the event itself, which
+	 * is already in the window of its id when it runs, so it closes the window it has just entered and both
+	 * events that window held. The window type is all that differs from
+	 * testTriggerCEP_CepWindowPatternCloseWindowOnEvent, and closing a window from an arriving event must not
+	 * depend on it, so the outcome must be the same - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseWindow$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseWindow() {
+		$this->prepareDataCepWindowTagCloseWindow();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same close window scenario with the same tag correlation window, whose close window operation is this
+	 * time performed when an event is evicted: the window has room for one event, so the "down" event of an id
+	 * takes its place and the "up" event of that id does not fit. The window is therefore ended by an event that
+	 * never entered it, which is also why the rule closes the evicted event itself - the "close" operation of the
+	 * window only reaches the "down" event it held. With this the operation is covered from every execution point
+	 * of every window type that has it - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseWindowOnEvicted$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseWindowOnEvicted() {
+		$this->prepareDataCepWindowTagCloseWindowOnEvicted();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE_EVICTED);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same close window scenario with a cause and symptom window, whose close window operation is performed
+	 * when an event occurs - restricted this time not by a tag of the event but by the rank the window itself gave
+	 * it: the "down" event of an id becomes the cause of its window and the "up" event that follows it becomes a
+	 * symptom, and it is being a symptom that the operation acts on. A window is therefore ended by what its own
+	 * ranking says about the event that entered it, and closing it closes the cause and the symptom together - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomCloseWindow$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomCloseWindow() {
+		$this->prepareDataCepWindowCauseSymptomCloseWindow();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same close window scenario with the same cause and symptom window, whose close window operation is this
+	 * time performed when an event is evicted: the window has room for one event, so the "down" event of an id
+	 * takes its place and the "up" event of that id does not fit. An evicted event is never taken into the window
+	 * and is therefore never ranked, so this flavour singles it out by its tag as the other window types do - and
+	 * closes it itself, the "close" operation of the window only reaching the "down" event it held - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomCloseWindowOnEvicted$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomCloseWindowOnEvicted() {
+		$this->prepareDataCepWindowCauseSymptomCloseWindowOnEvicted();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
 	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
@@ -8656,6 +9128,91 @@ HEREDOC;
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 		$this->waitForNoOpenProblems($all, 'After the capacity discard recovery value');
+	}
+
+	/**
+	 * Drive every flavour of the close window scenario, whose $rule_name rule ends the window of an id once that
+	 * id has recovered - on a pattern match, on the arrival of the "up" event or on its eviction, see
+	 * prepareDataCepWindowCloseWindowOperations(). What ends the window is the only difference between the
+	 * flavours, so the outcome this asserts is the same for all of them:
+	 *
+	 *   1. every id has a window of its own and no window expires, so every "down" event takes a place in the
+	 *      window of its id and its problem stays open. No window has seen an "up" event yet, so none is closed;
+	 *   2. the "up" of an id ends that id's window, and both problems of that id are closed with it - the "down"
+	 *      problem the window held and the "up" problem that ended it;
+	 *   3. the ids whose "up" value has not been sent are untouched: their windows have seen no "up" event, so they
+	 *      are not closed and their problems are still open.
+	 *
+	 * The pattern match flavour is not tied to the value that ends the window: its window is examined once a
+	 * second, so the closing follows the "up" value rather than accompanying it - which is why every step of this
+	 * scenario is waited for rather than asserted right away.
+	 *
+	 * After the "up" of every id nothing is left open, and closing the last problem of a trigger is what puts the
+	 * trigger itself back to OK, so no recovery value is needed.
+	 */
+	private function runEventAssessmentTestCepWindowCloseWindow(string $rule_name): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the close window test of "'.$rule_name.'".');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$services = [self::CEP_RULE_WINDOW_NONE_SERVICE, self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT,
+			self::CEP_RULE_WINDOW_NONE_SERVICE_LAST
+		];
+
+		// 1. Every id takes the place its own window has for it, and a window that has seen no "up" event is not
+		//    closed.
+		$open = 0;
+
+		foreach ($services as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, ++$open);
+			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+			$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
+		}
+
+		// 2. The "up" of an id ends that id's window, and both problems of the id are closed with it. A pattern
+		//    window whose script rejected what it was handed would throw instead of reporting a match, and the
+		//    server keeps that message on the rule, so it is reported here rather than leaving the problems simply
+		//    never closing.
+		foreach ($services as $service) {
+			$send('up_'.$service);
+
+			try {
+				// Two problem events for the id, neither of them open: the "up" one is a problem of its own,
+				// because "up" is not a recovery value for this trigger - the rule is what closes both.
+				$this->waitForProblemEventCountByTag($all, 'service', $service, 2);
+				$this->waitForOpenProblemCountByTag($all, 'service', $service, 0);
+			}
+			catch (Throwable $e) {
+				$error = $this->getCepRuleError($rule_name);
+
+				$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error: '.$error);
+
+				throw $e;
+			}
+
+			// 3. Only that id was affected - the windows of the ids without an "up" value are still open, and so
+			//    are the problems they hold. The id is down one open problem, not two: its "up" problem was
+			//    opened and closed within this step, so what the count loses is the "down" problem that had been
+			//    holding the place in its window.
+			$this->waitForOpenProblemCount($all, --$open);
+		}
+
+		// The last window took the last two problems with it, which is what returns the trigger to OK as well.
+		$this->waitForNoOpenProblems($all, 'After the close window scenario of "'.$rule_name.'"');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 	}
 
 	/**

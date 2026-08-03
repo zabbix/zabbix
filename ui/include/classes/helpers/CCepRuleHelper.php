@@ -171,7 +171,8 @@ class CCepRuleHelper {
 		self::WHEN_PATTERN_MATCHED => [
 			self::OP_DISCARD,
 			self::OP_COPY_FIRST,
-			self::OP_COPY_LAST
+			self::OP_COPY_LAST,
+			self::OP_CLOSE_WINDOW
 		]
 	];
 
