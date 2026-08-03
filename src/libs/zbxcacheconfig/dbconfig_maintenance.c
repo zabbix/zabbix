@@ -1659,9 +1659,9 @@ static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, co
 	if (0 == maintenance->tags.values_num)
 		return SUCCEED;
 
-	if (ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR == maintenance->tags_evaltype)
+	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == maintenance->tags_evaltype)
 		return dc_maintenance_match_tags_andor(maintenance, tags);
-	else if(ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR == maintenance->tags_evaltype)
+	else if(ZBX_CONDITION_EVAL_TYPE_OR == maintenance->tags_evaltype)
 		return dc_maintenance_match_tags_or(maintenance, tags);
 
 	THIS_SHOULD_NEVER_HAPPEN;
