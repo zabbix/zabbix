@@ -94,8 +94,11 @@ class CDatatableElement extends CElement {
 	 * @return CElement
 	 */
 	public function getHeaderByText($text = '') {
-		return $this->query($this->selectors['header'].'//span[text()='.CXPathHelper::escapeQuotes($text).']/..')
-				->waitUntilVisible()->one();
+		$selector = in_array($text, ['Name', 'Time', 'Problem'])
+			? $this->selectors['header'].'//span[text()='.CXPathHelper::escapeQuotes($text).']/..'
+			: $this->selectors['header'].'//div[@class="header-name" and text()='.CXPathHelper::escapeQuotes($text).']/..';
+
+			return $this->query($selector)->waitUntilVisible()->one();
 	}
 
 	/**
