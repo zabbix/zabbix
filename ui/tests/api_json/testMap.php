@@ -20,7 +20,6 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * @backup sysmaps
  */
 class testMap extends CAPITest {
-
 	/**
 	 * Create map tests data provider.
 	 *
