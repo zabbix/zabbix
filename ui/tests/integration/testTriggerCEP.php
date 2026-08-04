@@ -2778,10 +2778,10 @@ HEREDOC;
 	 *
 	 * Together they close the problems of an id the moment it recovers, exactly as the arrival flavour of the close
 	 * window scenario does (prepareDataCepWindowCloseWindowOperations()) - which is what the reset is measured
-	 * against: a window that was reset holds nothing any more, so the "up" event of an id can only close itself,
-	 * and the "down" problem that had been in the window before the reset is left open for the trigger expression
-	 * to recover. Neither operation is tied to the window type, so every window type is given the same pair and
-	 * must produce the same outcome, see runEventAssessmentTestCepWindowReset().
+	 * against: the recovery of an id closes what the window of that id holds, so after a reset it closes only what
+	 * the id was sent afterwards, and the problems the reset window had been holding are left open for the trigger
+	 * expression to recover. Neither operation is tied to the window type, so every window type is given the same
+	 * pair and must produce the same outcome, see runEventAssessmentTestCepWindowReset().
 	 *
 	 * $window_type is the type under test. A pattern match window cannot be without a script and this scenario is
 	 * not driven by a match, so that type gets one that never reports one - the events of its window are only ever
@@ -8135,7 +8135,7 @@ HEREDOC;
 
 	/**
 	 * The same reset scenario with cause and symptom windows, the one window type that ranks what it is given: the
-	 * reset takes the cause of every id with the window that ranked it, so the "up" event that follows the reset
+	 * reset takes the cause of every id with the window that ranked it, so the "down" value that follows the reset
 	 * opens a window of its own and is the cause of it rather than a symptom of the event before it - see
 	 * runEventAssessmentTestCepWindowReset().
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomReset$)
@@ -9897,16 +9897,20 @@ HEREDOC;
 	 * afterwards:
 	 *
 	 *   1. every id gets a window of its own and no window expires, so the three "down" values leave three open
-	 *      problems, one held by each window;
+	 *      problems, one held by each window. Their eventids are what the reset is measured on;
 	 *   2. the rule is reset. A reset window is thrown away rather than closed - the operations of a closing window
 	 *      are not performed for the events it held - so nothing of the three problems changes;
-	 *   3. the "up" value of one id would, without the reset, have closed both problems of that id: it ends the
-	 *      window of its id and everything that window holds is closed with it. After the reset the window it ends
-	 *      is one it opened itself, holding nothing but the "up" event, so the only problem closed is its own and
-	 *      the "down" problem of that id stays open. That is what the reset did, measured on the rule itself;
-	 *   4. nothing else closed the three "down" problems, so the trigger expression has to - the recovery value
-	 *      closes what is left and returns the trigger to OK, and the rule that was reset is still there and still
-	 *      working while that happens.
+	 *   3. a second "down" value per id, to show that a reset rule is an empty one and not a broken one: every id
+	 *      gets a new window and the problem of its second "down" is held by it, so six problems are open;
+	 *   4. the "up" value of an id ends the window of that id and everything that window holds is closed with it.
+	 *      The window it ends is the one opened after the reset, holding the second "down" event and the "up" event
+	 *      itself - a problem of its own, since "up" is not a recovery value for this trigger - and both of those
+	 *      are closed. What is not closed is the problem of the first "down": the window that had been holding it is
+	 *      gone, so the recovery of its id no longer reaches it. Three problems are therefore left open and they are
+	 *      the very three of step 1, asserted by eventid. Had the reset left those windows in place, the "up" values
+	 *      would have closed the first "down" problems as well and nothing would be left;
+	 *   5. only the trigger expression can close what is left - the recovery value closes all three and returns the
+	 *      trigger to OK, and the rule that was reset reports no error through any of this.
 	 *
 	 * The scenario is the same for every window type: what a window holds is not what tells the types apart, so a
 	 * reset must take it away from all of them alike.
@@ -9943,6 +9947,15 @@ HEREDOC;
 			$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
 		}
 
+		// The problems the windows are holding when the reset arrives. They are what the reset is measured on: no
+		// operation of the rule may reach them afterwards, so these exact problems have to be the ones still open
+		// once the second round of values has closed everything the rule can still close.
+		$held = $this->getOpenProblemEventids($all);
+
+		$this->assertCount(count($services), $held,
+			'Expected one held problem per id before resetting "'.$rule_name.'", got: '.implode(', ', $held)
+		);
+
 		// 2. Reset the rule while all three windows are holding a problem. The request only queues the reset, so
 		//    the queue is waited out before anything is sent that its outcome is read from.
 		$this->resetCepRule($rule_name);
@@ -9952,19 +9965,36 @@ HEREDOC;
 		// for the events it held, so the problems are exactly as they were.
 		$this->waitForOpenProblemCount($all, $open);
 
-		// 3. The id whose recovery is used to look into the window that was reset. Any of them would do - they are
-		//    told apart by nothing but their tag, and each has a window of its own.
-		$probe = $services[0];
-
-		$send('up_'.$probe);
+		// 3. A second "down" value per id. A reset rule is an empty one, not a broken one, so every id gets a new
+		//    window and the problem of its second "down" is the one that window holds.
+		foreach ($services as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, ++$open);
+			$this->waitForOpenProblemCountByTag($all, 'service', $service, 2);
+		}
 
 		try {
-			// The "up" event is a problem of its own, because "up" is not a recovery value for this trigger, and
-			// it is the only problem of the id the rule can still close: it ends the window it has just opened,
-			// which holds nothing else. Had the reset left the window of the id in place, the "down" problem
-			// would have been closed with it and this would be waiting for an open problem that no longer exists.
-			$this->waitForProblemEventCountByTag($all, 'service', $probe, 2);
-			$this->waitForOpenProblemCountByTag($all, 'service', $probe, 1);
+			// 4. The "up" value of an id ends the window of that id and everything that window holds is closed with
+			//    it. That window is the one opened after the reset: it holds the second "down" event and the "up"
+			//    event itself - a problem of its own, because "up" is not a recovery value for this trigger - so
+			//    the id is left with the three problem events it was sent and only the first "down" still open. Had
+			//    the reset left the first window in place, that problem would have been closed with it too.
+			foreach ($services as $service) {
+				$send('up_'.$service);
+				$this->waitForProblemEventCountByTag($all, 'service', $service, 3);
+				$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
+			}
+
+			// One problem per id survived, and it is the very problem its window had been holding when the rule was
+			// reset - the reset is what put it out of reach of the recovery that closed everything else of that id.
+			$this->waitForOpenProblemCount($all, count($services));
+
+			$left = $this->getOpenProblemEventids($all);
+
+			$this->assertSame($held, $left, 'The problems left open by "'.$rule_name.'" are not the ones its '
+				.'windows were holding when it was reset: expected '.implode(', ', $held).', got '
+				.implode(', ', $left).'.'
+			);
 		}
 		catch (Throwable $e) {
 			$error = $this->getCepRuleError($rule_name);
@@ -9974,13 +10004,15 @@ HEREDOC;
 			throw $e;
 		}
 
-		// The ids that were not sent an "up" value are untouched, so all three "down" problems are still open.
-		$this->waitForOpenProblemCount($all, $open);
-
-		// 4. Nothing closed them, so the trigger expression has to.
+		// 5. Nothing of the rule can close them any more, so the trigger expression has to.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 		$this->waitForNoOpenProblems($all, 'After the window reset scenario of "'.$rule_name.'"');
+
+		// The rule that was reset is still there and still working - a reset empties a rule, it does not break it.
+		$error = $this->getCepRuleError($rule_name);
+
+		$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error: '.$error);
 	}
 
 	/**
@@ -10884,6 +10916,25 @@ HEREDOC;
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS
 		], $expected, static::WAIT_ITERATIONS_LONGER, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * The eventids of the problems currently open on $triggerids, sorted, so two sets taken at different points of
+	 * a scenario can be compared as they are: which problems are open, not only how many.
+	 */
+	private function getOpenProblemEventids(array $triggerids): array {
+		$response = $this->call('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'output' => ['eventid']
+		]);
+
+		$eventids = array_column($response['result'], 'eventid');
+
+		sort($eventids, SORT_NUMERIC);
+
+		return $eventids;
 	}
 
 	/**
