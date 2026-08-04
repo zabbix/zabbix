@@ -1462,7 +1462,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 				zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, av.source, ZBX_JSON_TYPE_STRING);
 
 			if (0 != av.severity)
-				zbx_json_adduint64(&json, ZBX_PROTO_TAG_SEVERITY, (zbx_uint64_t)av.severity);
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, (zbx_uint64_t)av.severity);
 
 			zbx_json_close(&json);
 			zbx_json_close(&json);
