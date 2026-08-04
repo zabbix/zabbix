@@ -134,20 +134,6 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 			});
 	}
 
-	onReset() {
-		for (const option of Object.values(this.#options)) {
-			const event = {
-				target: {
-					checked: option.checked
-				}
-			};
-
-			option.onChange(event, option);
-		}
-
-		super.onReset();
-	}
-
 	#createSortableItem(column) {
 		const column_index = column.getColumnIndex();
 		const id = `col-${column_index.toString()}`;

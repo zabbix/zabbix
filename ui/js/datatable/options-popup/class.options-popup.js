@@ -335,13 +335,16 @@ class CDataTableOptionsPopup {
 			name: this.#column_name
 		});
 
-		this.#column.setColumnOptions(this.#data);
+		const active_element = document.activeElement;
 
-		this.getDataTable()
-			.updateUserConfig()
-			.dispatchEvent(CDataTable.EVENT_INIT);
+		if (active_element?.type === 'text') {
+			const column_options = this.#column.getColumnOptions();
+			column_options[active_element.name] = this.#data[active_element.name];
 
-		this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE, {reset: true, column_index});
+			this.dispatchEvent(CDataTableOptionsPopup.EVENT_UPDATE, {column_index, column_options, reset: true});
+		}
+
+		this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE, {column_index});
 		this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 	}
 

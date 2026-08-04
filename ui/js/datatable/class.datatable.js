@@ -1529,10 +1529,10 @@ class CDataTable {
 			return;
 		}
 
-		const {column_index, column_options} = e.detail;
+		const {column_index, column_options, reset = false} = e.detail;
 		const column = this.getColumn(column_index);
 
-		if (!deepCompare(column.getColumnOptions(), column_options)) {
+		if (reset || !deepCompare(column.getColumnOptions(), column_options)) {
 			column.setColumnOptions(column_options);
 
 			this.#renderColumnDataCells(column);
