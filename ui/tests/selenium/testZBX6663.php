@@ -191,6 +191,7 @@ class testZBX6663 extends CLegacyWebTest {
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 			$table->waitUntilReloaded();
+			$table->waitUntilRowsCount(1);
 
 			if (isset($zbx_data['discoveryRule'])) {
 				$table->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();
