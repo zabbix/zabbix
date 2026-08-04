@@ -1331,6 +1331,7 @@ class testFormUserRoles extends CWebTest {
 				$this->query('button:Enable')->one()->click();
 				$this->page->acceptAlert();
 				$this->page->waitUntilReady();
+				$this->assertMessage(TEST_GOOD, 'Modules enabled');
 			}
 			else {
 				$this->assertFalse($form->query('xpath://label[text()="No enabled modules found."]')->one($enable_modules)->isDisplayed());
