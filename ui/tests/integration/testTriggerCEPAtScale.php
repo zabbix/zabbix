@@ -39,6 +39,9 @@ class testTriggerCEPAtScale extends testTriggerCEP {
 	// How deep each of those windows is filled before the "up" value ends it, so an ending window has this many
 	// held problems to close in one go instead of a couple.
 	const CEP_CLOSE_WINDOW_EVENT_COUNT = 4;
+	// The single id flavour keeps one window whatever this is set to, so its depth is what carries the load there:
+	// the "up" value of that id has to close this many held problems at once.
+	const CEP_CLOSE_WINDOW_SINGLE_SERVICE_EVENT_COUNT = 100;
 	const SKIP_RESTART_TESTS = true;
 
 	// Larger scale needs longer to settle; override the parent's reduced default back up.

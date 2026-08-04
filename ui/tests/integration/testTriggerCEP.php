@@ -53,6 +53,17 @@ class testTriggerCEP extends CIntegrationTest {
 	// see getCloseWindowCapacity(). Any value from 1 up says something; 1 leaves the scenario with one event
 	// per window.
 	const CEP_CLOSE_WINDOW_EVENT_COUNT = 2;
+	// How many values the single id flavours of the scenario send, which drive one id instead of one per id (see
+	// prepareDataCepWindowPatternCloseWindowSingleService() and prepareDataCepWindowSimpleCloseWindowSingleService()):
+	// all of them are the "down" value of that one id, so this is how deep its single window is filled before the "up"
+	// value of the same id ends it - "down_0" this many times over and no other id at all. It is the other half of the
+	// knob above rather than a repetition of it: the id count spreads the rule over many windows each holding a couple
+	// of events, this leaves the rule with one window holding a stack of them, all opened by the same value, so what an
+	// ending window has to close is deep rather than wide. That is also why it is set higher than the count above - one
+	// window is all such a flavour costs, so it can afford to go deeper than the flavours that keep a window per id.
+	// Any value from 1 up says something; the fill order knob below has nothing to decide with a single id, both orders
+	// coming to the same sequence of values.
+	const CEP_CLOSE_WINDOW_SINGLE_SERVICE_EVENT_COUNT = 5;
 	// In which order those values go out, which only matters once the count above is more than one (see
 	// getCloseWindowFillOrder()):
 	//   - false, round by round ("down_0, down_1, down_0, down_1, ..."): every window of the rule is being
@@ -64,6 +75,18 @@ class testTriggerCEP extends CIntegrationTest {
 	// Neither order changes what the scenario asserts: an id has as many open problems as it has been sent
 	// values whichever way round they went out.
 	const CEP_CLOSE_WINDOW_FILL_PER_SERVICE = true;
+	// Whether those values go out in one sender batch instead of one at a time:
+	//   - true, all of them in a single batch (in the order above), after which the totals are checked once -
+	//     every id having all of its problems open and no more problems being open than the ids opened. The
+	//     values are as distinct as they are when sent one by one, dispatchSenderValues() giving every value a
+	//     strictly increasing (clock, ns) of its own, but the server receives them all at once and every window
+	//     of the rule fills as fast as it can. This is what makes a large id count practical: nothing is polled
+	//     for between values, so the scenario costs one wait instead of one per value;
+	//   - false, one value at a time, with the counts waited for after each of them before the next goes out.
+	//     Nothing more is asserted this way - the end state is the same - but a value that is not processed as
+	//     it must be is caught as it happens rather than as a total that never comes out, so this is the one to
+	//     use when a failure has to be pinned to a value.
+	const CEP_CLOSE_WINDOW_BATCH_FILL = true;
 	const SKIP_RESTART_TESTS = true;
 	// The windowless CEP scenario suppresses its events for a while and can then wait for that suppression to
 	// run out again (see waitForCepWindowNoneUnsuppressed()). That wait is the slowest part of the scenario by
@@ -302,6 +325,16 @@ class testTriggerCEP extends CIntegrationTest {
 	// Which id that is follows from how many the scenario sends, so it is getCloseWindowDiscardService() rather
 	// than a constant: a constant expression cannot read a knob through static:: and would therefore ignore the
 	// count a child class overrides.
+	// The pattern match and the simple window flavour are additionally run over a single id, the first of the ones
+	// the scenario has (getCloseWindowServices()), with every value they send being the "down" value of that one id:
+	// the rule then keeps one window instead of one per id and everything the closing window has to close was opened
+	// by the same value, CEP_CLOSE_WINDOW_SINGLE_SERVICE_EVENT_COUNT of them. The two differ in what ends that one
+	// window - a match of its script or the arrival of the "up" event - so the depth of a window is tried from both
+	// the execution point that is not caused by an event and the one that is, see
+	// prepareDataCepWindowPatternCloseWindowSingleService() and
+	// prepareDataCepWindowSimpleCloseWindowSingleService().
+	const CEP_RULE_WINDOW_PATTERN_CLOSE_SINGLE = self::CEP_RULE_NAME_PREFIX.'window pattern close window single id';
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_SINGLE = self::CEP_RULE_NAME_PREFIX.'window simple close window single id';
 	// Every one of those flavours is additionally run in a variant that closes the events of the window at the
 	// eviction execution point instead of the window closed one - leaving a window because it ends is an eviction
 	// like any other, so the two must close the same problems. The rule of a variant is named after the flavour it
@@ -2655,6 +2688,31 @@ HEREDOC;
 	}
 
 	/**
+	 * Prepare the pattern match flavour of the close window scenario over a single id: the same rule the flavour
+	 * above builds, only sized for the one window it keeps rather than for one per id, see
+	 * prepareDataCepWindowCloseWindowOperations() and runEventAssessmentTestCepWindowCloseWindow().
+	 */
+	public function prepareDataCepWindowPatternCloseWindowSingleService() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_SINGLE, CCepRuleHelper::WHEN_PATTERN_MATCHED,
+			CCepRuleHelper::WHEN_WINDOW_CLOSED, false, true
+		);
+	}
+
+	/**
+	 * Prepare the same single id flavour with a simple window, which has no matching of its own and is therefore ended
+	 * by the arrival of the "up" event instead of by a script reporting a match - the one window it keeps is filled
+	 * exactly as the flavour above fills its own, see prepareDataCepWindowCloseWindowOperations() and
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowSingleService() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_SINGLE, CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			CCepRuleHelper::WHEN_WINDOW_CLOSED, false, true
+		);
+	}
+
+	/**
 	 * Prepare the close window scenario: a window per id that is ended by the rule as soon as that id has
 	 * recovered, which closes the events the window held. The window groups by the 'service' tag, so every id
 	 * gets a window of its own and outlasts the whole scenario (getCloseWindowDuration()), so what a window
@@ -2725,9 +2783,16 @@ HEREDOC;
 	 * what the scenario compares is an id whose events were dropped against the ids around it: a dropped event never
 	 * took a place in a window, so there is nothing for the ending window of that id to close, and it left no problem
 	 * of its own either. That is the one thing a discard can do to a window that closes: not stop it, but empty it.
+	 *
+	 * $single_service leaves the rule with a single window instead of one per id: the scenario then drives one id only
+	 * and sends it CEP_CLOSE_WINDOW_SINGLE_SERVICE_EVENT_COUNT values rather than CEP_CLOSE_WINDOW_EVENT_COUNT, so both
+	 * limits of the window are sized from those instead - the duration from the one id the flavour drives and the
+	 * capacity, for an eviction flavour, from how deep that one window goes. Nothing else about the rule changes,
+	 * which is what lets the same assessment drive it.
 	 */
 	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when,
-			int $close_when = CCepRuleHelper::WHEN_WINDOW_CLOSED, bool $discard_down = false) {
+			int $close_when = CCepRuleHelper::WHEN_WINDOW_CLOSED, bool $discard_down = false,
+			bool $single_service = false) {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this flavour is the only thing that may close a problem.
@@ -2737,10 +2802,10 @@ HEREDOC;
 		// Both limits reach the window as user macros rather than as the values written here, so what the rule
 		// stores are the macro names and these are only what the macros are set to, see macroizeWindowLimits().
 		$window = $this->macroizeWindowLimits([
-			'duration' => static::getCloseWindowDuration(),
+			'duration' => static::getCloseWindowDuration($single_service),
 			// Only the eviction flavour needs an event not to fit; the others must hold everything they are given.
 			'capacity' => $execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED
-				? static::getCloseWindowCapacity()
+				? static::getCloseWindowCapacity($single_service)
 				: 0,
 			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
 			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
@@ -2805,7 +2870,7 @@ HEREDOC;
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 				'tags' => array_merge(
 					[['tag' => self::CEP_TAG_IS_SYMPTOM, 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'true']],
-					static::getCloseWindowEventCount() > 1 ? $up_condition['tags'] : []
+					static::getCloseWindowEventCount($single_service) > 1 ? $up_condition['tags'] : []
 				)
 			]
 			: $up_condition;
@@ -8249,6 +8314,27 @@ HEREDOC;
 		}
 	}
 
+	/**
+	 * The same pattern match close window rule driven over a single id instead of one per id: every value sent is the
+	 * "down" value of that one id, CEP_CLOSE_WINDOW_SINGLE_SERVICE_EVENT_COUNT of them, so the rule keeps one window
+	 * and everything it holds was opened by the very same value - a deep window rather than many shallow ones. The
+	 * "up" value of that id then completes what the script looks for, and the match closes the window with every one
+	 * of those problems in it in a single step, leaving nothing open at all - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowSingleService$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowSingleService() {
+		$this->prepareDataCepWindowPatternCloseWindowSingleService();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE_SINGLE, false, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
 	/* Close window operation - test abbility to close window for each type of window */
 
 	/**
@@ -8346,6 +8432,29 @@ HEREDOC;
 
 		try {
 			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DISCARD, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The simple window close window rule driven over a single id instead of one per id, as
+	 * testTriggerCEP_CepWindowPatternCloseWindowSingleService drives the pattern match one: every value sent is the
+	 * "down" value of that one id, CEP_CLOSE_WINDOW_SINGLE_SERVICE_EVENT_COUNT of them, so the rule keeps one window
+	 * and everything it holds was opened by the very same value. The "up" value of that id is what ends the window
+	 * here - the operation is performed by the event itself, so the window is closed the moment that event enters it -
+	 * and every one of those problems is closed with it, leaving nothing open at all. What the window type changes is
+	 * only what ends the window, so the outcome must be the one of the pattern match flavour - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowSingleService$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowSingleService() {
+		$this->prepareDataCepWindowSimpleCloseWindowSingleService();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_SINGLE, false, true);
 		}
 		finally {
 			$this->cleanupCepRules();
@@ -10340,9 +10449,16 @@ HEREDOC;
 	 *
 	 * The knob is read through static:: so a child class raising it (see testTriggerCEPAtScale) redirects every
 	 * flavour of the scenario at once, which is also why the ids are computed here instead of being listed.
+	 *
+	 * $single_service is the single id flavours, which drive one id however many the knob asks for - the first of
+	 * them, so it is an id of the same space as the others and needs no knob of its own. Their window then holds
+	 * nothing but the values of that one id, all of them the same value, see
+	 * prepareDataCepWindowPatternCloseWindowSingleService().
 	 */
-	private static function getCloseWindowServices(): array {
-		return array_map('strval', range(0, static::CEP_CLOSE_WINDOW_SERVICE_COUNT - 1));
+	private static function getCloseWindowServices(bool $single_service = false): array {
+		$services = array_map('strval', range(0, static::CEP_CLOSE_WINDOW_SERVICE_COUNT - 1));
+
+		return $single_service ? [reset($services)] : $services;
 	}
 
 	/**
@@ -10360,9 +10476,15 @@ HEREDOC;
 	 * How many "down" values every id of the close window scenarios is sent, and therefore how many events each of
 	 * its windows holds when the "up" value ends it, CEP_CLOSE_WINDOW_EVENT_COUNT of them. Like the id count it is
 	 * read through static:: so a child class raising it redirects every flavour of the scenario at once.
+	 *
+	 * The single id flavours have a count of their own instead (CEP_CLOSE_WINDOW_SINGLE_SERVICE_EVENT_COUNT): they fill
+	 * one window rather than one per id, so they can go deeper than the flavours that keep a window per id for the same
+	 * cost, see prepareDataCepWindowPatternCloseWindowSingleService().
 	 */
-	private static function getCloseWindowEventCount(): int {
-		return static::CEP_CLOSE_WINDOW_EVENT_COUNT;
+	private static function getCloseWindowEventCount(bool $single_service = false): int {
+		return $single_service
+			? static::CEP_CLOSE_WINDOW_SINGLE_SERVICE_EVENT_COUNT
+			: static::CEP_CLOSE_WINDOW_EVENT_COUNT;
 	}
 
 	/**
@@ -10403,8 +10525,8 @@ HEREDOC;
 	 * per held event (CEP_RULE_WINDOW_CAPACITY) is what that comes to, so the limit follows the number of values
 	 * sent instead of being a constant.
 	 */
-	private static function getCloseWindowCapacity(): int {
-		return self::CEP_RULE_WINDOW_CAPACITY * static::getCloseWindowEventCount();
+	private static function getCloseWindowCapacity(bool $single_service = false): int {
+		return self::CEP_RULE_WINDOW_CAPACITY * static::getCloseWindowEventCount($single_service);
 	}
 
 	/**
@@ -10415,8 +10537,9 @@ HEREDOC;
 	 * it, so it is generous: the rules are deleted once the flavour is done, taking their windows with them, and a
 	 * window that lasts longer than needed costs nothing.
 	 */
-	private static function getCloseWindowDuration(): string {
-		return (120 + 30 * count(static::getCloseWindowServices()) * static::getCloseWindowEventCount()).'s';
+	private static function getCloseWindowDuration(bool $single_service = false): string {
+		return (120 + 30 * count(static::getCloseWindowServices($single_service))
+				* static::getCloseWindowEventCount($single_service)).'s';
 	}
 
 	/**
@@ -10452,6 +10575,12 @@ HEREDOC;
 	 * first holding what they were given while the rest of the scenario runs. What is asserted is the same for both,
 	 * an id having as many open problems as it has been sent values, so the order is free to be either.
 	 *
+	 * A fourth says whether they go out in one sender batch or one at a time (CEP_CLOSE_WINDOW_BATCH_FILL). Batched,
+	 * step 1 hands the server everything at once and then waits for the state all of it must leave - every id with
+	 * all of its problems open and no more open problems than the ids opened - which is what the per-value waits of
+	 * the other mode add up to; one at a time, that state is waited for after every value instead, which costs a
+	 * wait per value but pins a value that is not processed as it must be to that value.
+	 *
 	 * After the "up" of every id nothing is left open, and closing the last problem of a trigger is what puts the
 	 * trigger itself back to OK, so no recovery value is needed.
 	 *
@@ -10461,8 +10590,19 @@ HEREDOC;
 	 * "down" values it is sent, and is left out of step 2, so nothing is ever sent for it that a window could hold
 	 * or close. That it left nothing behind is asserted once every kept value has been processed - by then an event
 	 * that had been stored would be there.
+	 *
+	 * $single_service drives the flavours whose rule keeps a single window instead of one per id - one ended by a
+	 * pattern match and one by the arriving event (prepareDataCepWindowPatternCloseWindowSingleService() and
+	 * prepareDataCepWindowSimpleCloseWindowSingleService()): one id is sent
+	 * CEP_CLOSE_WINDOW_SINGLE_SERVICE_EVENT_COUNT "down" values, all of them the same value, and no other id is sent
+	 * anything at all. The steps are the ones above with a single id in them - the depth of the one window is where
+	 * the scenario goes instead of the number of them, so step 1 leaves that window holding a stack of problems all
+	 * opened by the same value and step 2 has its "up" value close every one of them in the single step of the window
+	 * ending. Step 3 has nothing left to compare against, there being no other id whose window must stay open, so
+	 * what it comes to is that nothing at all is open once that one window is gone.
 	 */
-	private function runEventAssessmentTestCepWindowCloseWindow(string $rule_name, bool $discarded = false): void {
+	private function runEventAssessmentTestCepWindowCloseWindow(string $rule_name, bool $discarded = false,
+			bool $single_service = false): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
 		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
 		$all = [$triggerid];
@@ -10479,7 +10619,7 @@ HEREDOC;
 			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
 		]);
 
-		$services = self::getCloseWindowServices();
+		$services = static::getCloseWindowServices($single_service);
 
 		// The discarding flavours drop the "down" values of this one id, so it opens no problem and gets no window.
 		// It is left out of the "up" values as well: with nothing of its own stored, an "up" of that id would be
@@ -10488,29 +10628,57 @@ HEREDOC;
 
 		// How many "down" values every id is sent, and therefore how many events the window of an id holds when its
 		// "up" value ends it. The eviction flavours have room for exactly that many, so the "up" value is the one
-		// that does not fit however deep the windows go, see getCloseWindowCapacity().
-		$events = static::getCloseWindowEventCount();
+		// that does not fit however deep the windows go, see getCloseWindowCapacity(). The single id flavour has a
+		// count of its own, all of its values going to the one id it drives.
+		$events = static::getCloseWindowEventCount($single_service);
 
 		// 1. Every id takes the places its own window has for it, and a window that has seen no "up" event is not
 		//    closed. In which order the values go out - one per id and round by round, or every value of an id in a
-		//    row - is CEP_CLOSE_WINDOW_FILL_PER_SERVICE, see getCloseWindowFillOrder(); what is waited for after a
-		//    value is the same either way. The discarded id takes no place anywhere - there is nothing to wait for
-		//    after its values, and that nothing is what the assertions at the end are about.
+		//    row - is CEP_CLOSE_WINDOW_FILL_PER_SERVICE, see getCloseWindowFillOrder(); whether they go out
+		//    together or one at a time is CEP_CLOSE_WINDOW_BATCH_FILL. Either way the state they leave behind is
+		//    the same, so the same counts are waited for - all at once after the batch, or after every value. The
+		//    discarded id takes no place anywhere - there is nothing to wait for after its values, and that nothing
+		//    is what the assertions at the end are about.
+		$order = static::getCloseWindowFillOrder($services, $events);
 		$open = 0;
 
-		foreach (static::getCloseWindowFillOrder($services, $events) as [$service, $count]) {
-			$send('down_'.$service);
+		if (static::CEP_CLOSE_WINDOW_BATCH_FILL) {
+			$this->dispatchSenderValues(array_map(fn(array $step) => [
+				'host' => self::HOST_DISC_VALUE,
+				'key' => $key,
+				'value' => 'down_'.$step[0]
+			], $order));
 
-			if ($service === $discarded_service) {
-				continue;
-			}
+			// Every id but the discarded one has all of its values open at once.
+			$open = ($discarded_service === null ? count($services) : count($services) - 1) * $events;
 
-			$this->waitForOpenProblemCount($all, ++$open);
+			$this->waitForOpenProblemCount($all, $open);
 			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
-			// One open problem per value the id has been sent: the window keeps the earlier ones as well, so its
-			// problems accumulate instead of replacing each other.
-			$this->waitForOpenProblemCountByTag($all, 'service', $service, $count);
+			// The total alone would also be reached by windows that took more of one id and less of another, so
+			// every id is asked for its own count as well: as many open problems as it was sent values, which is
+			// what the window of that id held on to instead of replacing what it had.
+			foreach ($services as $service) {
+				if ($service !== $discarded_service) {
+					$this->waitForOpenProblemCountByTag($all, 'service', $service, $events);
+				}
+			}
+		}
+		else {
+			foreach ($order as [$service, $count]) {
+				$send('down_'.$service);
+
+				if ($service === $discarded_service) {
+					continue;
+				}
+
+				$this->waitForOpenProblemCount($all, ++$open);
+				$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+				// One open problem per value the id has been sent: the window keeps the earlier ones as well, so
+				// its problems accumulate instead of replacing each other.
+				$this->waitForOpenProblemCountByTag($all, 'service', $service, $count);
+			}
 		}
 
 		// 2. The "up" of an id ends that id's window, and every problem of the id is closed with it. A pattern
