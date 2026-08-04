@@ -23,11 +23,6 @@ if HAVE_PCRE2
 BINARIES_tests += macro_regrepl
 endif
 
-CONFIGCACHE_WRAP_FUNCS = \
-	-Wl,--wrap=__zbx_shmem_malloc \
-	-Wl,--wrap=__zbx_shmem_realloc \
-	-Wl,--wrap=__zbx_shmem_free
-
 noinst_PROGRAMS = $(BINARIES_tests)
 
 COMMON_SRC_FILES = \
