@@ -4374,7 +4374,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		if (array_key_exists('actions', $data)) {
 			foreach ($data['actions'] as $type => $action_element) {
 				if ($type === 'click') {
-					$form->query($action_element)->one()->click();
+					$form->query($action_element)->waitUntilClickable()->one()->click();
 				}
 				else {
 					foreach ($action_element as $field => $value) {
