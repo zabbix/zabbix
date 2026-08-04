@@ -283,9 +283,9 @@
 						}
 
 						flex_wrapper.append(symptoms);
-
-						cell.appendChild(flex_wrapper);
 					}
+
+					cell.appendChild(flex_wrapper);
 
 					requestAnimationFrame(() => {
 						const highlight_row = this.#datatable.getOption('highlight_row');
