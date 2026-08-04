@@ -116,60 +116,17 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#initTemplates() {
-		this.#condition_row_template_value = new Template(`<div class="text">#{name} #{operator} <em>#{value}</em>.</div>`);
-		this.#condition_row_template_tag = new Template(`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em>.</div>`);
-		this.#condition_row_template_tag_exists = new Template(`<div class="text">#{name} <em>#{tag_name}</em> #{operator}.</div>`);
-		this.#condition_row_template = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td>#{formulaid}</td>
-				<td>#{*description_html}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-edit"><?= _('Edit') ?></button>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-remove"><?= _('Remove') ?></button>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][type]" type="hidden" value="#{type}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][operator]" type="hidden" value="#{operator}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][severity]" type="hidden" value="#{severity}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][event_name]" type="hidden" value="#{event_name}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][tag_operator]" type="hidden" value="#{tag_operator}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][tag]" type="hidden" value="#{tag}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][tag_value]" type="hidden" value="#{tag_value}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][host]" type="hidden" value="#{host}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][host_group]" type="hidden" value="#{host_group}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][time_period]" type="hidden" value="#{time_period}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][formulaid]" type="hidden" value="#{formulaid}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][row_index]" type="hidden" value="#{row_index}"/>
-				</td>
-			</tr>
-		`);
-
-		this.#operation_row_template = new Template(`
-			<tr data-sortorder="#{sortorder}">
-				<td class="td-drag-icon">
-					<div class="drag-icon"></div>
-					<span class="list-numbered-item">:</span>
-				</td>
-				<td>
-					<div class="text"><?= _('Execute when') ?> #{execute_when_str} : #{label_str}<em> #{arguments_str}</em></div>
-				</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-operation-edit"><?= _('Edit') ?></button>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-operation-remove"><?= _('Remove') ?></button>
-
-					#{*tags_input_html}
-
-					<input data-field-type="hidden" name="operations[#{sortorder}][sortorder]" type="hidden" value="#{sortorder}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][execute_when]" type="hidden" value="#{execute_when}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][type]" type="hidden" value="#{type}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][evaltype]" type="hidden" value="#{evaltype}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][event_name]" type="hidden" value="#{event_name}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][tag]" type="hidden" value="#{tag}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][new_tag]" type="hidden" value="#{new_tag}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][tag_value]" type="hidden" value="#{tag_value}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][severity]" type="hidden" value="#{severity}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][suppress_duration]" type="hidden" value="#{suppress_duration}"/>
-				</td>
-			</tr>
-		`);
+		this.#condition_row_template_value = new Template(
+			`<div class="text">#{name} #{operator} <em>#{value}</em>.</div>`
+		);
+		this.#condition_row_template_tag = new Template(
+			`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em>.</div>`
+		);
+		this.#condition_row_template_tag_exists = new Template(
+			`<div class="text">#{name} <em>#{tag_name}</em> #{operator}.</div>`
+		);
+		this.#condition_row_template = new Template(window['ceprule-condition-row-template'].innerHTML);
+		this.#operation_row_template = new Template(window['ceprule-operation-row-template'].innerHTML);
 	}
 
 	#initActions() {

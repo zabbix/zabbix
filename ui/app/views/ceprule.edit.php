@@ -83,6 +83,51 @@ $form = (new CForm())
 		->addItem((new CTemplateTag('ceprule-operation-modal-template'))->addItem(
 			new CPartial('ceprule.modal.operation')
 		))
+		->addItem((new CTemplateTag('ceprule-condition-row-template'))->addItem(
+			(new CRow(['#{formulaid}', '#{*description_html}',
+				[
+					(new CButtonLink(_('Edit')))->addClass('js-condition-edit'),
+					(new CButtonLink(_('Remove')))->addClass('js-condition-remove'),
+					(new CVar('filter[conditions][#{row_index}][type]', '#{type}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][operator]', '#{operator}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][severity]', '#{severity}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][event_name]', '#{event_name}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][tag_operator]', '#{tag_operator}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][tag]', '#{tag}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][tag_value]', '#{tag_value}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][host]', '#{host}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][host_group]', '#{host_group}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][time_period]', '#{time_period}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][formulaid]', '#{formulaid}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][row_index]', '#{row_index}'))->removeId()
+				]
+			]))->setAttribute('data-row_index', '#{row_index}')
+		))
+		->addItem((new CTemplateTag('ceprule-operation-row-template'))->addItem(
+			(new CRow([
+				(new CCol())->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CCol([
+					_('Execute when'),
+					' #{execute_when_str} : #{label_str}',
+					new CTag('em', true, ' #{arguments_str}')
+				]))->addClass('text'),
+				[
+					(new CButtonLink(_('Edit')))->addClass('js-operation-edit'),
+					(new CButtonLink(_('Remove')))->addClass('js-operation-remove'),
+					'#{*tags_input_html}',
+					(new CVar('operations[#{sortorder}][sortorder]', '#{sortorder}'))->removeId(),
+					(new CVar('operations[#{sortorder}][execute_when]', '#{execute_when}'))->removeId(),
+					(new CVar('operations[#{sortorder}][type]', '#{type}'))->removeId(),
+					(new CVar('operations[#{sortorder}][evaltype]', '#{evaltype}'))->removeId(),
+					(new CVar('operations[#{sortorder}][event_name]', '#{event_name}'))->removeId(),
+					(new CVar('operations[#{sortorder}][tag]', '#{tag}'))->removeId(),
+					(new CVar('operations[#{sortorder}][new_tag]', '#{new_tag}'))->removeId(),
+					(new CVar('operations[#{sortorder}][tag_value]', '#{tag_value}'))->removeId(),
+					(new CVar('operations[#{sortorder}][severity]', '#{severity}'))->removeId(),
+					(new CVar('operations[#{sortorder}][suppress_duration]', '#{suppress_duration}'))->removeId()
+				]
+			]))->setAttribute('data-sortorder', '#{sortorder}')
+		))
 		->addItem((new CLabel('Operations'))->setAsteriskMark()->setId('ceprule-operations-label'))
 		->addItem((new CFormField())
 			->addItem((new CDiv())
