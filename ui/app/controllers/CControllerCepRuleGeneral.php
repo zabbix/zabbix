@@ -49,6 +49,10 @@ abstract class CControllerCepRuleGeneral extends CController {
 					$is_exists_operator = $condition['operator'] == CONDITION_OPERATOR_EXISTS
 						|| $condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS;
 
+					if ($is_exists_operator) {
+						$condition['tag_value'] = '';
+					}
+
 					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG && !$is_exists_operator) {
 						$condition['type'] = CCepRuleHelper::CONDITION_TAG_VALUE;
 					}
