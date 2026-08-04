@@ -167,7 +167,7 @@ class testFormMaintenance extends CWebTest {
 			// Check asterisk in required field labels.
 			$this->assertEquals(['Name', 'Active since', 'Active till', 'Periods'], $form->getRequiredLabels());
 			$this->assertTrue($this->query('xpath://label[contains(@class,"form-label-asterisk") and contains(text(),'.
-				'"At least one host group or host must be selected.")]')->exists()
+				'"At least one host group, host or trigger must be selected.")]')->exists()
 			);
 
 			$check_fields = [
@@ -898,7 +898,7 @@ class testFormMaintenance extends CWebTest {
 						'id:active_since' => 'This field cannot be empty.',
 						'id:active_till' => 'This field cannot be empty.',
 						'xpath://table[@id="timeperiods"]/..' => 'At least one period must be added.',
-						'Host groups' => 'At least one host group or host must be selected.'
+						'Host groups' => 'At least one host group, host or trigger must be selected.'
 					]
 				]
 			],
