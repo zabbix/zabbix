@@ -91,7 +91,6 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	event->severity = severity;
 	event->suppress_mtime = 0;
 	event->name = zbx_strdup(NULL, name);
-	event->cause_eventid = 0;
 	event->flags = flags;
 	event->cause_eventid = cause_eventid;
 

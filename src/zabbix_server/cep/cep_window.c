@@ -1265,6 +1265,9 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
  ******************************************************************************/
 void	cep_window_pool_remove_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window)
 {
+	if (CEP_LOCATION_REMOVED == window->location)
+		return;
+
 	zbx_hashset_remove_direct(&pool->windows, window->ref);
 }
 
