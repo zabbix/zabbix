@@ -64,12 +64,6 @@ ZBX_VECTOR_IMPL(cep_object_value, zbx_cep_object_value_t)
 static void	cep_db_write_event(const zbx_cep_event_t *event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_events,
 		zbx_db_insert_t *db_insert_tag)
 {
-	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_events))
-	{
-		zbx_dbconn_prepare_insert(db, db_insert_events, "events", "eventid", "source", "object",
-				"objectid", "clock", "ns", "value", "name", "severity", "flags", (char *)NULL);
-	}
-
 	zbx_db_insert_add_values(db_insert_events, event->eventid, event->origin.source, event->origin.object,
 			event->origin.objectid, event->clock, event->ns, event->value,
 			ZBX_NULL2EMPTY_STR(event->name), event->severity, (int)event->flags);
@@ -107,12 +101,6 @@ static void	cep_db_write_event(const zbx_cep_event_t *event, zbx_dbconn_t *db, z
 static void	cep_db_write_problem(const zbx_cep_event_t *event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_problem,
 		zbx_db_insert_t *db_insert_tag)
 {
-	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_problem))
-	{
-		zbx_dbconn_prepare_insert(db, db_insert_problem, "problem", "eventid", "source", "object",
-				"objectid", "clock", "ns", "name", "severity", "cause_eventid", "flags", (char *)NULL);
-	}
-
 	zbx_db_insert_add_values(db_insert_problem, event->eventid, event->origin.source, event->origin.object,
 			event->origin.objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name),
 			event->severity, event->cause_eventid, (int)event->flags);
@@ -150,15 +138,9 @@ static void	cep_db_write_problem(const zbx_cep_event_t *event, zbx_dbconn_t *db,
 static void	cep_db_write_db_event(const zbx_db_event *db_event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_events,
 		zbx_db_insert_t *db_insert_tag)
 {
-	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_events))
-	{
-		zbx_dbconn_prepare_insert(db, db_insert_events, "events", "eventid", "source", "object",
-				"objectid", "clock", "ns", "value", "name", "severity", (char *)NULL);
-	}
-
 	zbx_db_insert_add_values(db_insert_events, db_event->eventid, db_event->source, db_event->object,
 			db_event->objectid, db_event->clock, db_event->ns, db_event->value,
-			ZBX_NULL2EMPTY_STR(db_event->name), db_event->severity);
+			ZBX_NULL2EMPTY_STR(db_event->name), db_event->severity, 0);
 
 	if (0 == db_event->tags.values_num)
 		return;
@@ -193,15 +175,9 @@ static void	cep_db_write_db_event(const zbx_db_event *db_event, zbx_dbconn_t *db
 static void	cep_db_write_db_problem(const zbx_db_event *db_event, zbx_dbconn_t *db,
 		zbx_db_insert_t *db_insert_problem, zbx_db_insert_t *db_insert_tag)
 {
-	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_problem))
-	{
-		zbx_dbconn_prepare_insert(db, db_insert_problem, "problem", "eventid", "source", "object",
-				"objectid", "clock", "ns", "name", "severity", (char *)NULL);
-	}
-
 	zbx_db_insert_add_values(db_insert_problem, db_event->eventid, db_event->source, db_event->object,
 			db_event->objectid, db_event->clock, db_event->ns, ZBX_NULL2EMPTY_STR(db_event->name),
-			db_event->severity);
+			db_event->severity, __UINT64_C(0), 0);
 
 	if (0 == db_event->tags.values_num)
 		return;
@@ -236,6 +212,12 @@ static void	cep_db_write_events(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t
 	for (int i = 0; i < tasks->values_num; i++)
 	{
 		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
+
+		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert_events))
+		{
+			zbx_dbconn_prepare_insert(db, &db_insert_events, "events", "eventid", "source", "object",
+					"objectid", "clock", "ns", "value", "name", "severity", "flags", (char *)NULL);
+		}
 
 		/* trigger event might have been changed by CEP - need to commit from cache                  */
 		/* while other (internal) event tags are not cached - need to commit from received db_event  */
@@ -282,6 +264,12 @@ static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 
 		if (CEP_EVENT_OPEN != task->event_op)
 			continue;
+
+		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert_problem))
+		{
+			zbx_dbconn_prepare_insert(db, &db_insert_problem, "problem", "eventid", "source", "object",
+				"objectid", "clock", "ns", "name", "severity", "cause_eventid", "flags", (char *)NULL);
+		}
 
 		/* trigger event might have been changed by CEP - need to commit from cache                  */
 		/* while other (internal) event tags are not cached - need to commit from received db_event  */
