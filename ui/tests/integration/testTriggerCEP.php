@@ -251,6 +251,21 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_TAG_DELETE = self::CEP_RULE_NAME_PREFIX.'window tag delete';
 	const CEP_RULE_WINDOW_CAUSE_DELETE = self::CEP_RULE_NAME_PREFIX.'window cause delete';
 	const CEP_RULE_WINDOW_PATTERN_DELETE = self::CEP_RULE_NAME_PREFIX.'window pattern delete';
+	// The delete is additionally run against a pattern match window that is being examined while it happens: the
+	// script of this rule sleeps, so the delete lands in the middle of a script that goes on running for seconds
+	// after the rule it belongs to is gone - and the window it was examining has to clean itself up once it returns,
+	// see runEventAssessmentTestCepWindowDeleteDuringScript().
+	const CEP_RULE_WINDOW_PATTERN_DELETE_SLEEP = self::CEP_RULE_NAME_PREFIX.'window pattern delete sleeping script';
+	// How long that script sleeps on every examination of the window. It has to outlast the delete by enough for the
+	// script to still be running when the rule is gone, and stay below the JS execution timeout (ZBX_ES_TIMEOUT, ten
+	// seconds) - Zabbix.sleep() throws instead of sleeping when it is asked for longer than that.
+	const CEP_RULE_WINDOW_SLEEP_SCRIPT_MS = 3000;
+	// How long the scenario waits before deleting the rule, counted from the moment the event it sent is known to be
+	// in the window. A pattern match window is examined once a second and every examination holds it for the whole
+	// sleep above, so the window is being examined nearly all the time - waiting a second only makes it near certain
+	// that the delete lands inside a script rather than between two of them, and leaves two seconds of the script to
+	// run without a rule behind it.
+	const CEP_RULE_WINDOW_SLEEP_DELETE_DELAY = 1;
 	// The built in tag telling a symptom apart from a cause, the counterpart of CEP_TAG_IS_COPIED for the rank a
 	// cause and symptom window assigns.
 	const CEP_TAG_IS_SYMPTOM = '$IS.SYMPTOM';
@@ -2828,6 +2843,33 @@ HEREDOC;
 	}
 
 	/**
+	 * Prepare the pattern match flavour of the delete scenario whose script sleeps: the window is examined once a
+	 * second and every examination sleeps CEP_RULE_WINDOW_SLEEP_SCRIPT_MS before reporting anything, so the window is
+	 * being examined nearly all the time and the delete of the rule lands in the middle of a script - see
+	 * runEventAssessmentTestCepWindowDeleteDuringScript().
+	 *
+	 * The script reports no match however long it took, so nothing it decides can close a problem: what the scenario
+	 * reads is what the window does when the rule it belongs to is deleted while its script is running, not what a
+	 * match would have done. Everything else is the rule of the other delete flavours, see
+	 * prepareDataCepWindowHeldProblemsOperations() - except for the duration, which this flavour states itself: the
+	 * window has to be holding an event while the delete lands in a script, so it must outlast both the sleep and the
+	 * wait before the delete by a wide margin.
+	 */
+	public function prepareDataCepWindowPatternDeleteSleep() {
+		$sleep_ms = self::CEP_RULE_WINDOW_SLEEP_SCRIPT_MS;
+
+		$script = <<<HEREDOC
+Zabbix.sleep($sleep_ms);
+
+return 'false';
+HEREDOC;
+
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_DELETE_SLEEP, $script, self::CEP_RULE_WINDOW_CAPACITY_DURATION
+		);
+	}
+
+	/**
 	 * Prepare the rule of the two scenarios that take a rule away while its windows are holding problems - the
 	 * reset one (runEventAssessmentTestCepWindowReset()) and the delete one
 	 * (runEventAssessmentTestCepWindowDelete()): the same window every close window flavour uses - one per id,
@@ -2847,9 +2889,14 @@ HEREDOC;
 	 *
 	 * $window_type is the type under test. A pattern match window cannot be without a script and this scenario is
 	 * not driven by a match, so that type gets one that never reports one - the events of its window are only ever
-	 * acted on by the operations above, as in the window types that have no script at all.
+	 * acted on by the operations above, as in the window types that have no script at all. $script replaces that
+	 * script with one of the caller's, which is how the flavour that deletes the rule while the window is being
+	 * examined gets a script that sleeps (prepareDataCepWindowPatternDeleteSleep()); it is ignored by every window
+	 * type that has no script. $duration replaces the duration of the window the same way, for the flavours that need
+	 * one of their own rather than the one the reset and delete flavours share.
 	 */
-	private function prepareDataCepWindowHeldProblemsOperations(int $window_type, string $name) {
+	private function prepareDataCepWindowHeldProblemsOperations(int $window_type, string $name,
+			?string $script = null, $duration = null) {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this scenario is the only thing that may close a problem.
@@ -2857,7 +2904,7 @@ HEREDOC;
 		$this->deleteCepRules();
 
 		$window = [
-			'duration' => 3,
+			'duration' => $duration === null ? 3 : $duration,
 			// Every event must be held: both scenarios are about what a window has in it when it is taken away, so
 			// nothing may be evicted for not fitting.
 			'capacity' => 0,
@@ -2868,7 +2915,7 @@ HEREDOC;
 		];
 
 		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
-			$window['script'] = "return 'false';";
+			$window['script'] = $script === null ? "return 'false';" : $script;
 		}
 
 		$operations = [
@@ -8309,6 +8356,25 @@ HEREDOC;
 	}
 
 	/**
+	 * The pattern match delete scenario driven by two events and a script that sleeps three seconds on every
+	 * examination of the window: the rule is deleted one second into a script, so the script runs on for two seconds
+	 * with no rule behind it and the window it is examining has to be discarded once it returns rather than leaking
+	 * with the events it holds - see runEventAssessmentTestCepWindowDeleteDuringScript().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternDeleteDuringScript$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternDeleteDuringScript() {
+		$this->prepareDataCepWindowPatternDeleteSleep();
+
+		try {
+			$this->runEventAssessmentTestCepWindowDeleteDuringScript(self::CEP_RULE_WINDOW_PATTERN_DELETE_SLEEP);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
 	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
@@ -10306,6 +10372,105 @@ HEREDOC;
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 		$this->waitForNoOpenProblems($all, 'After the window delete scenario of "'.$rule_name.'"');
+	}
+
+	/**
+	 * Drive the delete scenario of the $rule_name rule against a window that is being examined while the delete
+	 * happens: its script sleeps CEP_RULE_WINDOW_SLEEP_SCRIPT_MS on every examination, so it is still running - with
+	 * the window and the events it holds in its hands - for seconds after the rule it belongs to is gone, see
+	 * prepareDataCepWindowPatternDeleteSleep(). Two events are enough for that, so this drives a single id:
+	 *
+	 *   1. one "down" value. Its problem is held by the window of its id, and the window is handed to the script once
+	 *      a second, every examination holding it for the whole sleep;
+	 *   2. a second (CEP_RULE_WINDOW_SLEEP_DELETE_DELAY) is waited out, which puts the delete inside a script rather
+	 *      than between two of them, and the rule is deleted with the script of its window still running. The window
+	 *      is left behind by the rule it belonged to, so the script that returns to it has to end it and let go of
+	 *      the event it held;
+	 *   3. nothing of the rule reaches the problem the window was holding - it is left open, exactly as it is when
+	 *      the rule is deleted between two examinations (runEventAssessmentTestCepWindowDelete());
+	 *   4. the "up" value that used to end the window of the id and close everything it held. There is no rule to act
+	 *      on it, so it closes nothing and is left open as a problem of its own - and it shows the CEP service kept
+	 *      working through all this: the event is processed, so the worker that had been sleeping in a script of a
+	 *      deleted rule came back for it;
+	 *   5. only the trigger expression can close the two problems, and once it has, nothing of the CEP service may be
+	 *      holding their events any more - which is what says the window cleaned itself up. Its events are the ones
+	 *      it holds handles of, so a window that outlived its rule without ever being discarded would keep them in
+	 *      the event cache and waitForNoOpenProblems() would never see it empty.
+	 */
+	private function runEventAssessmentTestCepWindowDeleteDuringScript(string $rule_name): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the delete during script test of "'.$rule_name.'".');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$service = self::CEP_RULE_WINDOW_NONE_SERVICE;
+
+		// 1. The one "down" value of the scenario. Its problem being open means the event was assessed and is in the
+		//    window of its id, which is what the script of the rule is handed from then on.
+		$send('down_'.$service);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		$held = $this->getOpenProblemEventids($all);
+
+		$this->assertCount(1, $held,
+			'Expected the one held problem before deleting "'.$rule_name.'", got: '.implode(', ', $held)
+		);
+
+		// A sleeping script is a working script: the rule must not have failed on it, or the sleep this scenario is
+		// built on never happened.
+		$error = $this->getCepRuleError($rule_name);
+
+		$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error: '.$error);
+
+		// 2. Delete the rule from under the script that is examining its window.
+		sleep(self::CEP_RULE_WINDOW_SLEEP_DELETE_DELAY);
+
+		$this->deleteCepRule($rule_name);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+		$this->waitForCepTasksDrained();
+
+		// 3. The window went away with the rule instead of being closed, whether the script was in the middle of it
+		//    or not: the problem it was holding is untouched.
+		$this->waitForOpenProblemCount($all, 1);
+
+		// 4. The value that used to end the window of the id and close everything it held, sent while the script of
+		//    that window may still be running. Nothing acts on it any more, so both problem events of the id are
+		//    open - the "down" one the window had been holding and the "up" one, a problem of its own because "up" is
+		//    not a recovery value for this trigger.
+		$cep_processed = $this->getCepStat('events', 'processed');
+
+		$send('up_'.$service);
+		$this->waitForProblemEventCountByTag($all, 'service', $service, 2);
+		$this->waitForOpenProblemCountByTag($all, 'service', $service, 2);
+
+		// The event was taken in by the CEP service, so it is still assessing events after a script of a deleted rule
+		// ran on without one.
+		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, 1);
+
+		$left = $this->getOpenProblemEventids($all);
+
+		$this->assertSame($held, array_values(array_intersect($left, $held)),
+			'The problem the window of "'.$rule_name.'" was holding when it was deleted mid script is no longer '
+				.'open: expected '.implode(', ', $held).' among '.implode(', ', $left).'.'
+		);
+
+		// 5. Only the trigger expression can close them, and with them closed the CEP event cache must be empty -
+		//    the window that was being examined when its rule went away has to have let go of the event it held.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the sleeping script delete scenario of "'.$rule_name.'"');
 	}
 
 	/**
