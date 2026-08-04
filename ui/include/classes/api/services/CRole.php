@@ -1415,7 +1415,7 @@ class CRole extends CApiService {
 					$this->getRelatedServicesReadRules($roles_rules[$roleid], $output),
 					$this->getRelatedServicesWriteRules($roles_rules[$roleid], $output),
 					$this->getRelatedModulesRules($roles_rules[$roleid], $output),
-					$this->getRelatedApiRules($roles_rules[$roleid], $output, (int) $role['type']),
+					$this->getRelatedApiRules($roles_rules[$roleid], $output),
 					$this->getRelatedActionsRules($roles_rules[$roleid], $output, (int) $role['type']),
 					$this->getRelatedDeviceActionsRules($roles_rules[$roleid], $output, (int) $role['type'])
 				);
@@ -1609,22 +1609,14 @@ class CRole extends CApiService {
 	/**
 	 * @param array $rules
 	 * @param array $output
-	 * @param int $type
 	 *
 	 * @return array
 	 */
-	private function getRelatedApiRules(array $rules, array $output, int $type): array {
+	private function getRelatedApiRules(array $rules, array $output): array {
 		$result = [];
 
 		if (in_array('api.access', $output, true)) {
-			if (array_key_exists('api.access', $rules)) {
-				$result['api.access'] = $rules['api.access'];
-			}
-			else {
-				$result['api.access'] = ($type == USER_TYPE_ZABBIX_ADMIN || $type == USER_TYPE_SUPER_ADMIN)
-					? (string) ZBX_ROLE_RULE_ENABLED
-					: (string) ZBX_ROLE_RULE_DISABLED;
-			}
+			$result['api.access'] = $rules['api.access'];
 		}
 
 		if (in_array('api.mode', $output, true)) {
