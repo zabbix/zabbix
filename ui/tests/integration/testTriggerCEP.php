@@ -156,8 +156,60 @@ class testTriggerCEP extends CIntegrationTest {
 	// Two more rules beside those, both matching every problem event of the scenario: one running through
 	// every tag operation a windowless rule can perform (see getWindowNoneTagOperationCases()), the other
 	// through the operations changing the event itself (see getWindowNoneEventOperationCase()).
-	// The name the event operations rule gives every event it processes.
-	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME = 'CEP window none event operations';
+	// The name the event operations rule gives every event it processes. Only its middle is written into the
+	// operation as it stands: what leads it comes from a user macro (CEP_OP_EVENT_NAME_MACRO) and what ends it from
+	// an expression macro (CEP_OP_EXPRESSION_MACRO), so the name below is what the event ends up with only if the
+	// server resolved both of them. That is also why it is kept as the parts it is assembled from rather than as
+	// one string: the operation and the expectation are built from the same pieces and cannot drift apart.
+	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_PREFIX = 'CEP window none';
+	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_MIDDLE = ' event operations ';
+	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME = self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_PREFIX
+			.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_MIDDLE.self::CEP_OP_EXPRESSION_VALUE;
+	// The macros the operations of those two rules are given instead of plain strings, and the values they must
+	// resolve to. Unlike the limits of a window (CEP_WINDOW_DURATION_MACRO), an operation acts on an event, so its
+	// user macros are resolved for the host of that event and its templates first and only fall back to the global
+	// ones - which is why these are put on the template the discovered host is linked to (see
+	// prepareWindowOperationMacros()) and not created globally.
+	// Every form an operation may resolve is covered, because each of them is a token of its own to the server and
+	// takes a path of its own through it:
+	//   - a plain user macro, in a tag value, in a tag name and mixed into surrounding text;
+	//   - a user macro with a context, which must win over the plain macro of the same name;
+	//   - a macro function over a user macro ({{$MACRO}.uppercase()});
+	//   - a macro of the event itself, plain ({HOST.HOST}), in its indexed form ({HOST.HOST1}) and under a macro
+	//     function ({{HOST.HOST}.uppercase()});
+	//   - an expression macro ({?...}), which only the event name accepts - the tag operations are resolved without
+	//     the expression macro search enabled, so a tag may not hold one.
+	// The event macros a case may use are limited to those that are the same for every event of the scenario: one
+	// tag state is asserted for all of them, so a value carrying macro like {ITEM.VALUE} could not be expected -
+	// the trigger tags cover that one (see prepareCloseOnUpTriggerPrototypes(), which builds the 'state' and
+	// 'service' tags from it).
+	const CEP_OP_TAG_NAME_MACRO = '{$CEP_OP_TAG_NAME}';
+	const CEP_OP_TAG_NAME = 'op_macro_name';
+	const CEP_OP_TAG_VALUE_MACRO = '{$CEP_OP_TAG_VALUE}';
+	const CEP_OP_TAG_VALUE = 'from_macro';
+	// The same macro name with a context, and therefore a different value: a context macro is looked up by name
+	// and context first, so as long as this one exists it - and not the plain macro above - is what an operation
+	// asking for the context gets.
+	const CEP_OP_TAG_VALUE_CONTEXT_MACRO = '{$CEP_OP_TAG_VALUE:"cep"}';
+	const CEP_OP_TAG_VALUE_CONTEXT = 'from_context';
+	// A macro function applied to the user macro above. uppercase() needs no parameters and no escaping, so what
+	// the case expects is the value of the macro in capitals and nothing about the function itself.
+	const CEP_OP_TAG_VALUE_FUNC_MACRO = '{{$CEP_OP_TAG_VALUE}.uppercase()}';
+	const CEP_OP_EVENT_NAME_MACRO = '{$CEP_OP_EVENT_NAME}';
+	// The macros of the event itself, which an operation resolves as well: the host of the event, the same host
+	// through the indexed form of the macro (the index selects the item of the trigger expression the host is taken
+	// from, and these triggers have one), and the host under a macro function. Every event of the scenario comes
+	// from the one discovered host, so all three are the same for all of them.
+	const CEP_OP_HOST_MACRO = '{HOST.HOST}';
+	const CEP_OP_HOST_INDEXED_MACRO = '{HOST.HOST1}';
+	const CEP_OP_HOST_FUNC_MACRO = '{{HOST.HOST}.uppercase()}';
+	// The expression macro of the event name and what it must evaluate to. Its expression is a constant one on
+	// purpose: the name is asserted as a whole, so an expression reading the history of the item would resolve to
+	// something different for every event of the scenario and could not be expected at all. What is covered by it
+	// is that the name is resolved with the expression macro search enabled - the expression itself is the
+	// evaluator's business, not CEP's.
+	const CEP_OP_EXPRESSION_MACRO = '{?2*3}';
+	const CEP_OP_EXPRESSION_VALUE = '6';
 	// The windowed flavours of the scenario (see prepareDataCepWindowOperations()) run the very same
 	// operations from a rule that has a window instead of none, grouped by the 'service' tag, so every id gets
 	// a window of its own. They cannot reuse the operator coverage rules above, because how many windowed
@@ -280,6 +332,18 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_CAPACITY = 1;
 	// The close window flavours compute the duration of their windows instead, from the number of ids they drive,
 	// see getCloseWindowDuration().
+	// They, like the windowed flavours of the operations scenario, also hand those limits to the window as user
+	// macros rather than as the values themselves: the duration and the capacity are the only window parameters
+	// that may hold one (the API allows a user macro in no other window field), and the server resolves them anew
+	// whenever it works on a window - limits that do not resolve are not applied at all, leaving the window with
+	// the zero duration it starts out with and therefore with nothing it holds for any length of time. Between
+	// them those flavours cover every window type, so the resolving is tried from all of them, while the
+	// remaining window scenarios keep plain values - both forms of the same limits are therefore covered.
+	// One name for each is enough for all of the flavours: the macros are global and macroizeWindowLimits() points
+	// them at the limits of the window the flavour about to run builds, so a flavour never inherits the ones of
+	// the flavour before it.
+	const CEP_WINDOW_DURATION_MACRO = '{$CEP_WINDOW_DURATION}';
+	const CEP_WINDOW_CAPACITY_MACRO = '{$CEP_WINDOW_CAPACITY}';
 	// How long the suppress operation of that rule suppresses an event for. The operation stores a duration
 	// rather than a deadline, so the period is counted from the moment it runs on that event and every event
 	// of the scenario gets the full period of its own - it only has to outlast the verification of the wave
@@ -1859,6 +1923,9 @@ class testTriggerCEP extends CIntegrationTest {
 		// only on tags an earlier operation of the same rule added.
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
+		// Some of the operations of the two rules below are given macros instead of the strings they act with.
+		$this->prepareWindowOperationMacros();
+
 		// Nothing except the trigger expression may close these problems - the scenario asserts they all stay
 		// open - so drop both the global correlation rules and the window CEP rule a previous CloseOnUp
 		// variant left behind; either of them would close the problems this scenario opens.
@@ -1866,9 +1933,9 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->deleteCepRules();
 
 		// The rules of a flavour are named after it, and the ones of a flavour that gives them a window all
-		// get the same one, grouped by the 'service' tag.
+		// get the same one, grouped by the 'service' tag, with its limits handed to it as user macros.
 		$prefix = self::CEP_RULE_NAME_PREFIX.'window '.$name_infix.' ';
-		$window = $window_type === null ? [] : $this->buildWindowOperationsWindow();
+		$window = $window_type === null ? [] : $this->macroizeWindowLimits($this->buildWindowOperationsWindow());
 
 		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
 			// A pattern window is not allowed without a script. This one reports a match every time the
@@ -2621,6 +2688,14 @@ HEREDOC;
 	 *     same problems as the one above. The extra operation is then not needed - the evicted "up" event of an
 	 *     eviction flavour reaches this very operation.
 	 *
+	 * The limits of the window - its duration and its capacity - are given to it as the user macros
+	 * CEP_WINDOW_DURATION_MACRO and CEP_WINDOW_CAPACITY_MACRO rather than as the values themselves, whatever the
+	 * window type is: they are the only window parameters that may hold a macro, and the server resolves them anew
+	 * whenever it works on a window. A macro that does not resolve leaves the window with a zero duration, so it
+	 * would hold nothing at all - and then not one of the assertions of this scenario could hold, which is what
+	 * makes the resolving as much a part of it as the closing. What the macros are set to is what the flavour
+	 * would have put into the window directly, see macroizeWindowLimits().
+	 *
 	 * The ids that have not been sent an "up" value are untouched by any of this, so their window is not closed
 	 * and their problems stay open - see runEventAssessmentTestCepWindowCloseWindow().
 	 *
@@ -2639,7 +2714,9 @@ HEREDOC;
 		$this->deleteCepCorrelations();
 		$this->deleteCepRules();
 
-		$window = [
+		// Both limits reach the window as user macros rather than as the values written here, so what the rule
+		// stores are the macro names and these are only what the macros are set to, see macroizeWindowLimits().
+		$window = $this->macroizeWindowLimits([
 			'duration' => static::getCloseWindowDuration(),
 			// Only the eviction flavour needs an event not to fit; the others must hold everything they are given.
 			'capacity' => $execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED ? self::CEP_RULE_WINDOW_CAPACITY : 0,
@@ -2647,7 +2724,7 @@ HEREDOC;
 			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
 			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
 			'tags' => ['service']
-		];
+		]);
 
 		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
 			if ($execute_when == CCepRuleHelper::WHEN_PATTERN_MATCHED) {
@@ -2757,9 +2834,24 @@ HEREDOC;
 			]);
 		}
 
-		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
+		$cep_ruleid = $this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
 		));
+
+		// The limits must have been stored as the macros themselves: were they resolved before reaching the
+		// database, the scenario would be running on plain values again and would say nothing about macros at all.
+		$stored = $this->call('ceprule.get', [
+			'cep_ruleids' => $cep_ruleid,
+			'output' => ['cep_ruleid'],
+			'selectWindow' => ['duration', 'capacity']
+		]);
+		$this->assertCount(1, $stored['result'], 'The rule of "'.$name.'" must exist after it was created.');
+		$this->assertSame(self::CEP_WINDOW_DURATION_MACRO, $stored['result'][0]['window']['duration'],
+			'The window of "'.$name.'" must keep its duration macro unresolved.'
+		);
+		$this->assertSame(self::CEP_WINDOW_CAPACITY_MACRO, $stored['result'][0]['window']['capacity'],
+			'The window of "'.$name.'" must keep its capacity macro unresolved.'
+		);
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -3110,11 +3202,15 @@ HEREDOC;
 			bool $on_event_evicted = false) {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
+		// The operations of the rule are the very ones of the windowless flavour, macros and all.
+		$this->prepareWindowOperationMacros();
+
 		// As in the windowless flavour, nothing except the trigger expression may close these problems.
 		$this->deleteCepCorrelations();
 		$this->deleteCepRules();
 
-		$window = $this->buildWindowOperationsWindow();
+		// The limits of the window are given to it as user macros, as in the windowless flavour's windowed runs.
+		$window = $this->macroizeWindowLimits($this->buildWindowOperationsWindow());
 		$name = self::CEP_RULE_NAME_PREFIX.'window '.$name_infix.' ';
 
 		// Both operation sets in one rule: with a window there is no second rule to run them from. They run
@@ -3460,6 +3556,120 @@ HEREDOC;
 		}
 
 		return $cep_ruleid;
+	}
+
+	/**
+	 * Turn the limits of $window into the user macros CEP_WINDOW_DURATION_MACRO and CEP_WINDOW_CAPACITY_MACRO: the
+	 * macros are pointed at the duration and the capacity the window was built with and the window is returned with
+	 * the macro names in their place, so its rule stores the macros and the server has to resolve them to arrive at
+	 * the very limits the caller asked for.
+	 *
+	 * The macros are global, because that is the only kind a window can be given: a window belongs to a rule and
+	 * not to a host, so the server resolves them without a host to resolve them for - unlike the macros of an
+	 * operation, which acts on an event and therefore has one, see prepareWindowOperationMacros(). They outlive the
+	 * rules of a flavour, which is why every flavour sets them rather than creating them once: the limits of the
+	 * flavour that ran before must not be what the next one gets. clearData() takes them away with the rest of the
+	 * suite.
+	 *
+	 * The configuration cache is not reloaded here: the caller does that after creating its rule, which is before
+	 * any event of the scenario can open a window.
+	 */
+	private function macroizeWindowLimits(array $window): array {
+		$this->upsertGlobalMacro(self::CEP_WINDOW_DURATION_MACRO, (string) $window['duration']);
+		$this->upsertGlobalMacro(self::CEP_WINDOW_CAPACITY_MACRO, (string) $window['capacity']);
+
+		$window['duration'] = self::CEP_WINDOW_DURATION_MACRO;
+		$window['capacity'] = self::CEP_WINDOW_CAPACITY_MACRO;
+
+		return $window;
+	}
+
+	/**
+	 * Create the user macros the tag and event operations of the windowless scenario and of its windowed flavours
+	 * are given instead of plain strings, see getWindowNoneTagOperationCases() and
+	 * getWindowNoneEventOperationCase().
+	 *
+	 * They are put on the template the discovered host is linked to rather than created globally, because that is
+	 * how an operation macro is resolved: an operation acts on an event, so the server looks the macro up on the
+	 * host of that event and walks its templates, and only a macro found nowhere there falls back to the global
+	 * ones. Coming from the template means the whole chain had to be walked for the operations to produce what the
+	 * scenario expects - and the window limit macros (see macroizeWindowLimits()) cover the global kind, which is
+	 * the only kind a window can be given.
+	 *
+	 * The macros outlive the rules of a flavour but not the suite: they are removed with the template itself in
+	 * clearData().
+	 */
+	private function prepareWindowOperationMacros(): void {
+		$this->upsertHostMacro(self::$templateid, self::CEP_OP_TAG_NAME_MACRO, self::CEP_OP_TAG_NAME);
+		$this->upsertHostMacro(self::$templateid, self::CEP_OP_TAG_VALUE_MACRO, self::CEP_OP_TAG_VALUE);
+		// The same name with a context, and a value of its own so the two cannot be confused: an operation asking
+		// for the context must get this one and an operation asking for the plain name the one above.
+		$this->upsertHostMacro(self::$templateid, self::CEP_OP_TAG_VALUE_CONTEXT_MACRO,
+			self::CEP_OP_TAG_VALUE_CONTEXT
+		);
+		$this->upsertHostMacro(self::$templateid, self::CEP_OP_EVENT_NAME_MACRO,
+			self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_PREFIX
+		);
+		// The macro function and the event macros of the operations need nothing created for them: a function is
+		// applied to what the macro it wraps resolved to, and an event macro comes from the event itself.
+	}
+
+	/**
+	 * Set the user macro $macro of the host or template $hostid to $value, creating it if it does not exist yet.
+	 * The macros are set one by one rather than in a single host.update, which would replace every macro the host
+	 * has with the ones it is given.
+	 */
+	private function upsertHostMacro(string $hostid, string $macro, string $value): void {
+		$existing = $this->call('usermacro.get', [
+			'hostids' => $hostid,
+			'filter' => ['macro' => $macro],
+			'output' => ['hostmacroid', 'value']
+		]);
+
+		if (!$existing['result']) {
+			$response = $this->call('usermacro.create', [
+				'hostid' => $hostid,
+				'macro' => $macro,
+				'value' => $value
+			]);
+			$this->assertArrayHasKey('hostmacroids', $response['result']);
+			$this->assertArrayHasKey(0, $response['result']['hostmacroids']);
+
+			return;
+		}
+
+		if ($existing['result'][0]['value'] !== $value) {
+			$this->call('usermacro.update', [
+				'hostmacroid' => $existing['result'][0]['hostmacroid'],
+				'value' => $value
+			]);
+		}
+	}
+
+	/**
+	 * Set the global user macro $macro to $value, creating it if this suite has not created it yet.
+	 */
+	private function upsertGlobalMacro(string $macro, string $value): void {
+		$existing = $this->call('usermacro.get', [
+			'globalmacro' => true,
+			'filter' => ['macro' => $macro],
+			'output' => ['globalmacroid', 'value']
+		]);
+
+		if (!$existing['result']) {
+			$response = $this->call('usermacro.createglobal', ['macro' => $macro, 'value' => $value]);
+			$this->assertArrayHasKey('globalmacroids', $response['result']);
+			$this->assertArrayHasKey(0, $response['result']['globalmacroids']);
+
+			return;
+		}
+
+		if ($existing['result'][0]['value'] !== $value) {
+			$this->call('usermacro.updateglobal', [
+				'globalmacroid' => $existing['result'][0]['globalmacroid'],
+				'value' => $value
+			]);
+		}
 	}
 
 	/**
@@ -4129,9 +4339,20 @@ HEREDOC;
 	 *   - "rename tag" moves the value to another tag name, leaving no tag under the old one;
 	 *   - "remove tag" drops a tag.
 	 *
-	 * The first cases build the tag they act on with an operation of their own; the last ones act on tags the
+	 * The first cases build the tag they act on with an operation of their own; the next ones act on tags the
 	 * trigger put on the event, which is what the operations are for in practice - overwriting, renaming and
 	 * dropping the tags an event arrives with.
+	 *
+	 * The last cases give the operations macros where an operation may hold one - in its tag name as well as in its
+	 * tag value, both of which the server resolves against the event the operation acts on - so what they expect is
+	 * the resolved tag and never the macro text. Every form an operation resolves gets a case of its own, since each
+	 * of them is a distinct token to the server: a plain user macro of the template the event's host is linked to
+	 * (see prepareWindowOperationMacros()), the same macro inside a longer value, a tag named through a macro that a
+	 * second operation then has to find under that same name, a user macro with a context (which must win over the
+	 * plain macro of the same name), a macro function over a user macro, and the event's own macros - {HOST.HOST},
+	 * its indexed form and a macro function over it. An expression macro is not among them on purpose: tags are
+	 * resolved without the expression macro search, and the event name is where that form is covered instead (see
+	 * getWindowNoneEventOperationCase()).
 	 */
 	private function getWindowNoneTagOperationCases(): array {
 		return [
@@ -4247,6 +4468,97 @@ HEREDOC;
 					[CCepRuleHelper::OP_REMOVE_TAG, ['tag' => 'op_trigger_remove']]
 				],
 				'expected' => ['op_trigger_remove' => null]
+			],
+			// The cases below give the operations macros instead of the plain strings the ones above use: an
+			// operation resolves both its tag name and its tag value against the event it acts on, so the tag a
+			// case is expected to leave behind is the resolved one - a macro the server did not resolve stays in
+			// the event as the macro text and is caught as a wrong tag name or a wrong tag value. The user macros
+			// they use are put on the template of the discovered host by prepareWindowOperationMacros().
+			[
+				// The value is a macro of its own, so the tag carries what the macro resolves to.
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_macro_value',
+						'tag_value' => self::CEP_OP_TAG_VALUE_MACRO
+					]]
+				],
+				'expected' => ['op_macro_value' => self::CEP_OP_TAG_VALUE]
+			],
+			[
+				// A macro in the middle of a value: only the macro is replaced and the text around it is kept, so
+				// this fails both when the macro is left unresolved and when the whole value is thrown away.
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_macro_in_text',
+						'tag_value' => 'value '.self::CEP_OP_TAG_VALUE_MACRO.' end'
+					]]
+				],
+				'expected' => ['op_macro_in_text' => 'value '.self::CEP_OP_TAG_VALUE.' end']
+			],
+			[
+				// The tag NAME comes from a macro, so the tag the event ends up with is named after what the macro
+				// resolved to and no tag named after the macro text itself may exist. The second operation names
+				// the tag through the same macro, which is what a later operation has to do to find it again: it
+				// only updates a tag that exists, so a name resolving to anything else would leave the value of
+				// the first operation in place.
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => self::CEP_OP_TAG_NAME_MACRO,
+						'tag_value' => 'named_by_macro'
+					]],
+					[CCepRuleHelper::OP_SET_TAG_VALUE, ['tag' => self::CEP_OP_TAG_NAME_MACRO,
+						'tag_value' => 'set_by_macro'
+					]]
+				],
+				'expected' => [self::CEP_OP_TAG_NAME => 'set_by_macro', self::CEP_OP_TAG_NAME_MACRO => null]
+			],
+			[
+				// The same macro name with a context: the context macro exists, so it is what the operation must
+				// get - the plain macro of that name (asserted by the first case above) may not be used instead.
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_macro_context',
+						'tag_value' => self::CEP_OP_TAG_VALUE_CONTEXT_MACRO
+					]]
+				],
+				'expected' => ['op_macro_context' => self::CEP_OP_TAG_VALUE_CONTEXT]
+			],
+			[
+				// A macro function over that user macro: the macro is resolved first and the function applied to
+				// what it resolved to, so the value only comes out in capitals when both steps happened.
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_macro_function',
+						'tag_value' => self::CEP_OP_TAG_VALUE_FUNC_MACRO
+					]]
+				],
+				'expected' => ['op_macro_function' => strtoupper(self::CEP_OP_TAG_VALUE)]
+			],
+			[
+				// Not a user macro but a macro of the event itself, which an operation resolves as well: every
+				// event of the scenario is from the one discovered host, so all of them carry its name here.
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_macro_host',
+						'tag_value' => self::CEP_OP_HOST_MACRO
+					]]
+				],
+				'expected' => ['op_macro_host' => self::HOST_DISC_VALUE]
+			],
+			[
+				// The indexed form of that macro, which is a token of its own: the index picks the item of the
+				// trigger expression the host is taken from, and these triggers are built on a single item, so the
+				// first index is the host of the event again.
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_macro_host_indexed',
+						'tag_value' => self::CEP_OP_HOST_INDEXED_MACRO
+					]]
+				],
+				'expected' => ['op_macro_host_indexed' => self::HOST_DISC_VALUE]
+			],
+			[
+				// A macro function over an event macro rather than over a user macro - the same two steps, reached
+				// through a different token.
+				'operations' => [
+					[CCepRuleHelper::OP_ADD_TAG, ['tag' => 'op_macro_host_function',
+						'tag_value' => self::CEP_OP_HOST_FUNC_MACRO
+					]]
+				],
+				'expected' => ['op_macro_host_function' => strtoupper(self::HOST_DISC_VALUE)]
 			]
 		];
 	}
@@ -4314,7 +4626,11 @@ HEREDOC;
 	 * The operations changing the event itself rather than its tags, with the state they must leave on every
 	 * problem event of the scenario. They all run in one rule, the "event operations" one, whose filter is
 	 * just the 'type' Equals "cep" guard, in the order listed:
-	 *   - "set name" replaces the event name;
+	 *   - "set name" replaces the event name. Its leading half is a user macro of the template the event's host is
+	 *     linked to (see prepareWindowOperationMacros()) and the rest is written out, so the expected name is
+	 *     reached only by resolving the one and keeping the other - the name is the only field of these operations
+	 *     that may hold a macro at all: a severity is a number and a suppression duration is read straight from
+	 *     the configuration, without a macro ever being resolved in it;
 	 *   - "set severity" puts the event at Information, then two "increase severity" and one "decrease
 	 *     severity" shift it by one step each, leaving Warning. The severity is asserted after the whole
 	 *     chain, and since the three shifts do not cancel out, an operation that did nothing would leave a
@@ -4342,7 +4658,13 @@ HEREDOC;
 	private function getWindowNoneEventOperationCase(): array {
 		return [
 			'operations' => [
-				[CCepRuleHelper::OP_SET_NAME, ['event_name' => self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME]],
+				// The name is a user macro (see prepareWindowOperationMacros()), then text, then an expression
+				// macro - the one macro form only the name accepts, the tag operations being resolved without the
+				// expression macro search. The event ends up with the expected name below only when both macros
+				// were resolved and the text between them was left alone.
+				[CCepRuleHelper::OP_SET_NAME, ['event_name' => self::CEP_OP_EVENT_NAME_MACRO
+					.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_MIDDLE.self::CEP_OP_EXPRESSION_MACRO
+				]],
 				[CCepRuleHelper::OP_SET_SEVERITY, ['severity' => TRIGGER_SEVERITY_INFORMATION]],
 				[CCepRuleHelper::OP_INCREASE_SEVERITY, []],
 				[CCepRuleHelper::OP_INCREASE_SEVERITY, []],
@@ -13280,6 +13602,19 @@ HEREDOC;
 			CDataHelper::call('ceprule.delete', array_column($cep_rules, 'cep_ruleid'));
 		}
 		self::$cep_ruleid = null;
+
+		// Remove the window limit macros the close window and operations flavours give their windows (created by
+		// macroizeWindowLimits()): they belong to no host and are not deleted with the rules that used them, so
+		// nothing else would take them away. The macros of the operations themselves need no such cleanup - they
+		// are on the template and go with it.
+		$macros = CDataHelper::call('usermacro.get', [
+			'globalmacro' => true,
+			'filter' => ['macro' => [self::CEP_WINDOW_DURATION_MACRO, self::CEP_WINDOW_CAPACITY_MACRO]],
+			'output' => ['globalmacroid']
+		]);
+		if (!empty($macros)) {
+			CDataHelper::call('usermacro.deleteglobal', array_column($macros, 'globalmacroid'));
+		}
 
 		// stopDiscHostMaintenance() only pushes the maintenance out of its active window; delete it for real
 		// here (before its host) so it does not leak into later suites.
