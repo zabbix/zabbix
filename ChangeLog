@@ -1,3 +1,25 @@
+Changes for 7.4.14rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
+.........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
+..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
+..F....... [ZBX-26465] improved aria-label text for all functional buttons and icons and aria-expanded of side menu elements for Screen Reader users (aluchko)
+..F....... [ZBX-27920] fixed event menu entry parameters being marked as required when they are disabled (scernisenko)
+..F....... [ZBX-25485] fixed language change to work for different environments (gberzina)
+..F....... [ZBX-27921] fixed item and item prototype validation of intervals for trapper and dependent items (gberzina)
+..F....... [ZBX-27942] fixed time filter error for Dashboard in Kiosk mode (scernisenko)
+..F....... [ZBX-25815] removed mention of discovery from SNMP max_repetition help note (vskalbins)
+..F....... [ZBX-27140] fixed overall hintbox positioning (dfofanovs)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.13
+
+7.4.13rc1 was released as 7.4.13 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.4.13rc1
 
 New features:
@@ -1512,6 +1534,20 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.30rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
+.........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
+..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
+..F....... [ZBX-27920] fixed event menu entry parameters being marked as required when they are disabled (scernisenko)
+..F....... [ZBX-25485] fixed language change to work for different environments (gberzina)
+..F....... [ZBX-25815] removed mention of discovery from SNMP max_repetition help note (vskalbins)
+..F....... [ZBX-27140] fixed overall hintbox positioning (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.29
@@ -5667,6 +5703,13 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.49rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 6.0.48

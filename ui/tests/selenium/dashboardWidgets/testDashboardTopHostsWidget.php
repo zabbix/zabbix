@@ -2822,7 +2822,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				}
 
 				$this->assertMessage(TEST_BAD, null, $data['column_error']);
-				$this->query('xpath://div/h4[text()="'.$dialog_title.'"]/../button[@title="Close"]')->one()->click();
+				$this->query('xpath://div/h4[text()="'.$dialog_title.'"]/../button[@aria-label="Close modal window"]')->one()->click();
 			}
 
 			$column_form->waitUntilNotVisible();
@@ -6622,7 +6622,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			foreach ($data['check_maintenance'] as $host => $hint_text) {
 				$this->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($host).
 						']/..//button[contains(@class,"wrench")]')->waitUntilClickable()->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+				$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent();
 				$this->assertEquals($hint_text, $hint->one()->getText());
 				$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint->waitUntilNotPresent();
