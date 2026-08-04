@@ -157,6 +157,12 @@ window.token_edit_popup = new class {
 	}
 
 	#delete() {
+		if (!window.confirm(<?= json_encode(_('Delete selected API token?')) ?>)) {
+			this.overlay.unsetLoading();
+
+			return;
+		}
+
 		this.#removePopupMessages();
 
 		const curl = new Curl('zabbix.php');

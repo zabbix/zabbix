@@ -55,7 +55,14 @@ try {
 	API::setWrapper();
 
 	$jsonRpc = new CJsonRpc($apiClient, $data);
-	echo $jsonRpc->execute($http_request);
+
+	$http_response = $jsonRpc->execute($http_request);
+
+	foreach ($http_response->headers as $header) {
+		header($header);
+	}
+
+	echo $http_response->body;
 }
 catch (Throwable $e) {
 	$json_data = json_decode($data, true);
