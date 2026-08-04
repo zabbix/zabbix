@@ -69,7 +69,7 @@ window.maintenance_edit = new class {
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
 
-					this.#synchronizeActivesAndPeriod();
+					this.#synchronizeActivesAndTimePeriod();
 				}
 			});
 
@@ -152,7 +152,7 @@ window.maintenance_edit = new class {
 				this.#addTimePeriod(e.detail);
 			}
 
-			this.#synchronizeActivesAndPeriod()
+			this.#synchronizeActivesAndTimePeriod()
 		});
 	}
 
@@ -171,7 +171,7 @@ window.maintenance_edit = new class {
 		row.remove();
 	}
 
-	#synchronizeActivesAndPeriod() {
+	#synchronizeActivesAndTimePeriod() {
 		requestAnimationFrame(() => {
 			const fields = this.form.getAllValues();
 
