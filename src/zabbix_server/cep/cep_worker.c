@@ -938,6 +938,12 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 				update.op = CEP_EVENT_SUPPRESS;
 				zbx_vector_cep_event_update_append(&updates, update);
 			}
+			if (0 != (sync->flags & CEP_SYNC_EVENT_UNSUPPRESS))
+			{
+				update.handle = zbx_cep_event_handle_addref(sync->hevent);
+				update.op = CEP_EVENT_UNSUPPRESS;
+				zbx_vector_cep_event_update_append(&updates, update);
+			}
 			if (0 != (sync->flags & CEP_SYNC_EVENT_SEVERITY))
 			{
 				update.handle = zbx_cep_event_handle_addref(sync->hevent);

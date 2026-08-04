@@ -369,8 +369,7 @@ out:
  *                      if not already set                                    *
  *                                                                            *
  * Return value: SUCCEED - the suppress entry was added                       *
- *               FAIL - the suppress operation has already expired, or the    *
- *                      event could not be resolved                           *
+ *               FAIL - event could not be obtained                           *
  *                                                                            *
  ******************************************************************************/
 static int	cep_operation_event_execute_suppress_event(zbx_uint64_t ruleid, const zbx_cep_operation_t *op,
@@ -393,6 +392,46 @@ static int	cep_operation_event_execute_suppress_event(zbx_uint64_t ruleid, const
 		cep_acknowledge_update(ack, op->type);
 		cep_event_add_suppress(*event, &suppress_local, 1);
 		ctx->sync_flags |= CEP_SYNC_EVENT_SUPPRESS;
+		ret = SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a unsuppress-event operation on an event context's event  *
+ *                                                                            *
+ * Parameters: ruleid - [IN] identifier of the rule the operation belongs to  *
+ *             op     - [IN] operation to execute                             *
+ *             ctx    - [IN/OUT] event context                                *
+ *             ack    - [IN/OUT] acknowledge                                  *
+ *             event  - [IN/OUT] resolved mutable event, resolved from ctx    *
+ *                      if not already set                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the suppress entry was removed                     *
+ *               FAIL - FAIL - event could not be obtained                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_operation_event_execute_unsuppress_event(zbx_uint64_t ruleid, const zbx_cep_operation_t *op,
+		zbx_cep_event_context_t *ctx, zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
+{
+	int	ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
+
+	if (NULL == *event)
+		*event = cep_event_context_get_mutable_event(ctx);
+
+	if (NULL != *event)
+	{
+		zbx_db_event_suppress_t	suppress_local = {.cep_ruleid = ruleid};
+
+		cep_acknowledge_update(ack, op->type);
+		cep_event_remove_suppress(*event, &suppress_local, 1);
+		ctx->sync_flags |= CEP_SYNC_EVENT_UNSUPPRESS;
 		ret = SUCCEED;
 	}
 
@@ -998,6 +1037,10 @@ static int	cep_operation_event_execute(const zbx_cep_operation_t *op, int execut
 		case ZBX_CEP_OP_CLOSE_WINDOW:
 			if (0 != (CEP_OP_CLOSE_WINDOW_MASK & CEP_FLAG(execute_when)))
 				ret = SUCCEED;
+			break;
+		case ZBX_CEP_OP_UNSUPPRESS:
+			if (0 != (CEP_OP_UNSUPPRESS_MASK & CEP_FLAG(execute_when)))
+				ret = cep_operation_event_execute_unsuppress_event(ruleid, op, ctx, ack, event);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported operation type %d", op->type);

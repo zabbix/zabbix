@@ -56,6 +56,8 @@ char	*cep_tag_value_shift(const char *value, int shift);
 #define CEP_OP_DISCARD_MASK		CEP_FLAG(ZBX_CEP_WHEN_EVENT_OCCURRED)
 #define CEP_OP_CLOSE_WINDOW_MASK	(CEP_FLAG(ZBX_CEP_WHEN_EVENT_OCCURRED) | \
 					CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH))
+#define CEP_OP_UNSUPPRESS_MASK		(CEP_FLAG(ZBX_CEP_WHEN_EVENT_OCCURRED) | \
+					CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | CEP_FLAG(ZBX_CEP_WHEN_WINDOW_CLOSED))
 
 int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx);
 

@@ -1202,14 +1202,16 @@ static int	cep_event_suppress_compare(const void *a1, const void *a2)
  *                           records                                          *
  *             event       - [IN] event to sync suppress records for          *
  *             suppress    - [IN] existing suppress records for the event     *
+ *             deleteids   - [IN] event suppress ids to delete                *
  *                                                                            *
  ******************************************************************************/
 static void	cep_db_update_event_suppress(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_db_insert_t *db_insert, const zbx_cep_event_t *event, zbx_vector_cep_event_suppress_t *suppress)
+		zbx_db_insert_t *db_insert, const zbx_cep_event_t *event,
+		const zbx_vector_cep_event_suppress_t *suppress, zbx_vector_uint64_t *deleteids)
 {
 	for (int i = 0; i < event->suppress.values_num; i++)
 	{
-		zbx_db_event_suppress_t		*sup = &event->suppress.values[i];
+		const zbx_db_event_suppress_t	*sup = &event->suppress.values[i];
 		zbx_cep_event_suppress_t	sup_local;
 		int				j;
 
@@ -1234,6 +1236,17 @@ static void	cep_db_update_event_suppress(zbx_dbconn_t *db, char **sql, size_t *s
 			}
 		}
 	}
+
+	for (int i = 0; i < suppress->values_num; i++)
+	{
+		zbx_db_event_suppress_t	db_sup_local = {.cep_ruleid = suppress->values[i].ruleid};
+
+		if (FAIL == zbx_vector_db_event_suppress_search(&event->suppress, db_sup_local,
+				db_event_suppress_compare))
+		{
+			zbx_vector_uint64_append(deleteids, suppress->values[i].event_suppressid);
+		}
+	}
 }
 
 /******************************************************************************
@@ -1241,13 +1254,13 @@ static void	cep_db_update_event_suppress(zbx_dbconn_t *db, char **sql, size_t *s
  * Purpose: sync suppress records in the database for a set of events         *
  *          referenced by handles                                             *
  *                                                                            *
- * Parameters: db    - [IN] database connection                               *
- *             htags - [IN] handles of events to sync suppress records for    *
+ * Parameters: db        - [IN] database connection                           *
+ *             hsuppress - [IN] handles of events to sync suppress records for*
  *                                                                            *
  ******************************************************************************/
-static void	cep_db_update_events_suppress(zbx_dbconn_t *db, const zbx_vector_cep_event_handle_t *htags)
+static void	cep_db_update_events_suppress(zbx_dbconn_t *db, const zbx_vector_cep_event_handle_t *hsuppress)
 {
-	zbx_vector_uint64_t		eventids;
+	zbx_vector_uint64_t		eventids, deleteids;
 	zbx_cep_event_t			**events;
 	int				events_num = 0, index = 0;
 	zbx_cep_t			*cep;
@@ -1259,17 +1272,18 @@ static void	cep_db_update_events_suppress(zbx_dbconn_t *db, const zbx_vector_cep
 	zbx_db_insert_t			db_insert;
 
 	zbx_vector_uint64_create(&eventids);
-	zbx_vector_uint64_reserve(&eventids, (size_t)htags->values_num);
+	zbx_vector_uint64_create(&deleteids);
+	zbx_vector_uint64_reserve(&eventids, (size_t)hsuppress->values_num);
 
 	zbx_vector_cep_event_suppress_create(&suppress);
 
-	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * htags->values_num);
+	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * hsuppress->values_num);
 
 	cep_cache_acquire(&cep);
-	cep_get_events_by_handles(cep, htags->values, htags->values_num, events);
+	cep_get_events_by_handles(cep, hsuppress->values, hsuppress->values_num, events);
 	cep_cache_release(&cep);
 
-	for (int i = 0; i < htags->values_num; i++)
+	for (int i = 0; i < hsuppress->values_num; i++)
 	{
 		if (NULL == events[i])
 			continue;
@@ -1304,7 +1318,7 @@ static void	cep_db_update_events_suppress(zbx_dbconn_t *db, const zbx_vector_cep
 		while (events[index]->eventid != eventid)
 		{
 			cep_db_update_event_suppress(db, &sql, &sql_alloc, &sql_offset, &db_insert, events[index],
-					&suppress);
+					&suppress, &deleteids);
 			zbx_vector_cep_event_suppress_clear(&suppress);
 			index++;
 		}
@@ -1319,11 +1333,20 @@ static void	cep_db_update_events_suppress(zbx_dbconn_t *db, const zbx_vector_cep
 	for (;index < events_num; index++)
 	{
 		cep_db_update_event_suppress(db, &sql, &sql_alloc, &sql_offset, &db_insert,
-				events[index], &suppress);
+				events[index], &suppress, &deleteids);
 		zbx_vector_cep_event_suppress_clear(&suppress);
 	}
 
 	zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
+
+	if (0 != deleteids.values_num)
+	{
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from event_suppress where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "event_suppressid", deleteids.values,
+				deleteids.values_num);
+		zbx_dbconn_execute(db, "%s", sql);
+	}
 
 	zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
 	zbx_db_insert_execute(&db_insert);
@@ -1331,6 +1354,7 @@ static void	cep_db_update_events_suppress(zbx_dbconn_t *db, const zbx_vector_cep
 
 	zbx_free(sql);
 	zbx_vector_cep_event_suppress_destroy(&suppress);
+	zbx_vector_uint64_destroy(&deleteids);
 	zbx_vector_uint64_destroy(&eventids);
 
 	for (int i = 0; i < events_num; i++)
@@ -1440,7 +1464,8 @@ static void	cep_db_sync_event(zbx_dbconn_t *db, const zbx_vector_cep_event_sync_
  * Purpose: synchronize event changes to the database                         *
  *                                                                            *
  * Parameters: dbpool - [IN] database connection pool                         *
- *             tasks  - [IN] sync tasks with changed events                   *
+ *             tasks  - [IN] sync tasks with changed events, sorted by eventid*
+ *                           of the affected event                            *
  *                                                                            *
  ******************************************************************************/
 void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
@@ -1508,7 +1533,7 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 			if (0 != (task->flags & CEP_SYNC_EVENT_TAGS))
 				zbx_vector_cep_event_handle_append(&htags, task->hevent);
 
-			if (0 != (task->flags & CEP_SYNC_EVENT_SUPPRESS))
+			if (0 != (task->flags & (CEP_SYNC_EVENT_SUPPRESS | CEP_SYNC_EVENT_UNSUPPRESS)))
 				zbx_vector_cep_event_handle_append(&hsuppress, task->hevent);
 		}
 

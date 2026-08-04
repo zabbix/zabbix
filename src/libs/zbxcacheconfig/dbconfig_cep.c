@@ -787,6 +787,7 @@ static void	cep_operation_dump(zbx_cep_operation_t *operation)
 		case ZBX_CEP_OP_SUPPRESS:
 		case ZBX_CEP_OP_COPY_FIRST:
 		case ZBX_CEP_OP_COPY_LAST:
+		case ZBX_CEP_OP_UNSUPPRESS:
 			break;
 	}
 
@@ -1386,6 +1387,7 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 				{
 					operation->args.suppress.duration = 0;
 				}
+			case ZBX_CEP_OP_UNSUPPRESS:
 				break;
 		}
 	}
