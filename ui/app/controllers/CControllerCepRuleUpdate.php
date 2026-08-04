@@ -194,7 +194,7 @@ class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(), 'when' => [
 						'window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]],
 					'count_values' => [
-						'field_rules' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_PATTERN_MATCHED]],
+						'field_rules' => ['execute_when', 'in' => [(string) CCepRuleHelper::WHEN_PATTERN_MATCHED]],
 						'min' => 1,
 						'message' => _('At least one operation must execute when event pattern matched.')
 					]
