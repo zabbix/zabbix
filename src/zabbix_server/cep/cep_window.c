@@ -980,7 +980,7 @@ static int	cep_window_js_prepare(zbx_cep_window_t *window, zbx_es_t *es, char **
 
 	return SUCCEED;
 }
-#include "zbxlog.h"
+
 /******************************************************************************
  *                                                                            *
  * Purpose: run cep window js pattern-match script and execute resulting ops  *
@@ -1067,12 +1067,11 @@ enqueue:
 	}
 	cep_window_pool_release(&pool);
 	cep_window_unlock(window);
-	zbx_cep_rule_release(rule);
-
 out:
 	if (NULL != rule)
 		cep_rule_handle_error(rule, &error, tasks);
 
+	zbx_cep_rule_release(rule);
 	zbx_free(error);
 
 	if (NULL != es.env && FAIL == zbx_es_destroy_env(&es, &error))
@@ -1362,13 +1361,7 @@ void	cep_window_pool_enqueue(zbx_cep_window_pool_t *pool, zbx_cep_window_t *wind
 {
 	zbx_binary_heap_elem_t	elem;
 
-	if (CEP_LOCATION_REMOVED == window->location)
-	{
-		cep_window_release(window);
-		return;
-	}
-
-	if (CEP_LOCATION_QUEUE == window->location)
+	if (CEP_LOCATION_REMOVED == window->location || CEP_LOCATION_QUEUE == window->location)
 		return;
 
 	window->location = CEP_LOCATION_QUEUE;

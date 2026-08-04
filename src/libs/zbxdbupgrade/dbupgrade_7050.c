@@ -1588,6 +1588,7 @@ static int	DBpatch_7050135(void)
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"tags", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{"tags_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"nextcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
