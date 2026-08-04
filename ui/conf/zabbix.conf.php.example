@@ -109,7 +109,7 @@ $ZBX_SERVER_TLS['CERT_FILE'] = '';
 $ZBX_SERVER_TLS['CERTIFICATE_ISSUER']  = '';
 $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] = '';
 
-// Uncomment and set to desired values to override global APM database configuration.
+// Uncomment and set to desired values to override the global APM data source configuration.
 // Supported configuration parameters for all providers:
 // 'provider'   - Telemetry provider type: 'zabbix' or 'clickhouse'.
 // Additional parameters for ClickHouse:
@@ -127,7 +127,7 @@ $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] = '';
 // 'ssl_cert_location' - Client certificate location path.
 // 'ssl_key_location' - Client private key location path.
 // ClickHouse:
-//$TELEMETRY_PROVIDER = [
+//$TELEMETRY_PROVIDERS[] = [
 //	'provider' => 'clickhouse',
 //	'url' => 'http://localhost:8123',
 //	'db' => 'zabbix',
@@ -135,6 +135,6 @@ $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] = '';
 //	'password' => 'zabbix'
 //];
 // Zabbix database:
-//$TELEMETRY_PROVIDER = [
+//$TELEMETRY_PROVIDERS[] = [
 //	'provider' => 'zabbix'
 //];
