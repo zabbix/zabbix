@@ -347,6 +347,8 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		}
 
 		if (array_key_exists('Display actions', $data['filter'])) {
+			$table->waitUntilReloaded();
+
 			// Get the list of expected actions from DB and compare it to the value in the "Used in actions" column.
 			$sql = 'SELECT name FROM actions WHERE actionid IN (SELECT DISTINCT actionid FROM operations WHERE'.
 					' operationid IN (SELECT operationid FROM opmessage'.$data['sql_part'].')) ORDER BY name';
