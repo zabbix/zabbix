@@ -37,7 +37,7 @@ zabbix_export:
         > Refer to the [vendor documentation](https://www.cisco.com/c/en/us/support/switches/nexus-9000-series-switches/products-installation-and-configuration-guides-list.html) for details.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: 'Templates/Network devices'
       items:
