@@ -2857,6 +2857,8 @@ button {
         border-bottom-color: var(--severity-color-disaster-bg); }
       .datatable .cell.cell-data:first-child {
         border-right: 1px solid transparent; }
+      .datatable .cell.cell-data .wordbreak {
+        white-space: normal; }
       .datatable .cell.cell-data .flex-wrapper {
         display: flex;
         column-gap: 5px;

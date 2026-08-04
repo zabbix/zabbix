@@ -611,6 +611,10 @@
 				border-right: 1px solid transparent;
 			}
 
+			.wordbreak {
+				white-space: normal;
+			}
+
 			.flex-wrapper {
 				display: flex;
 				column-gap: 5px;
