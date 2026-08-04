@@ -2795,7 +2795,7 @@ HEREDOC;
 		$this->deleteCepRules();
 
 		$window = [
-			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
+			'duration' => 3,
 			// Every event must be held: the reset is about what a window has in it, so nothing may be evicted for
 			// not fitting.
 			'capacity' => 0,
