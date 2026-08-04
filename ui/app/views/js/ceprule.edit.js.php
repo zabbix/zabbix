@@ -75,7 +75,7 @@ window.ceprule_edit_popup = new class {
 		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 
 		for (const condition of Object.values(ceprule.filter.conditions)) {
-			const formulaid = this.#indexToFormulaId(this.#condition_row_index++);
+			const formulaid = num2letter(this.#condition_row_index++);
 
 			this.#addConditionRow({...condition, formulaid, row_index: this.#condition_row_index});
 		}
@@ -100,19 +100,6 @@ window.ceprule_edit_popup = new class {
 		this.#handleWindowTypeChanged();
 
 		window.requestAnimationFrame(() => this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE));
-	}
-
-	/**
-	 * Formula ID from large number.
-	 */
-	#indexToFormulaId(index) {
-		let formulaid = '';
-
-		for (index++; index; index = Math.floor(index / 26)) {
-			formulaid = String.fromCharCode(65 + --index % 26) + formulaid
-		};
-
-		return formulaid;
 	}
 
 	#initTemplates() {
@@ -462,7 +449,7 @@ window.ceprule_edit_popup = new class {
 		if (is_new) {
 			condition = {
 				row_index: this.#condition_row_index + 1,
-				formulaid: this.#indexToFormulaId(this.#condition_row_index),
+				formulaid: num2letter(this.#condition_row_index),
 				type: '<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>',
 				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 				host_group: '',
