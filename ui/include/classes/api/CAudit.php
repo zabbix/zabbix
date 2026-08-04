@@ -514,6 +514,15 @@ class CAudit {
 	];
 
 	/**
+	 * List of field names having indexed array of scalar values as value.
+	 *
+	 * @var array
+	 */
+	private const SCALAR_VALUE_LIST_FIELD = [
+		'item.query.aggregated_columns.parameters',
+	];
+
+	/**
 	 * ID field names of nested objects that stored in a parent object properties containing an array of nested objects.
 	 * abstract path => id field name
 	 *
@@ -583,6 +592,9 @@ class CAudit {
 		'item.preprocessing' => 'item_preprocid',
 		'item.tags' => 'itemtagid',
 		'item.query_fields' => 'sortorder',
+		'item.query.columns' => null,
+		'item.query.aggregated_columns' => null,
+		'item.query.filter.conditions' => null,
 		'itemprototype.headers' => 'sortorder',
 		'itemprototype.parameters' => 'item_parameterid',
 		'itemprototype.preprocessing' => 'item_preprocid',
@@ -834,9 +846,16 @@ class CAudit {
 			}
 
 			if (is_array($db_value) && $db_value) {
-				ctype_digit((string) key($db_value))
-					? self::intersectNestedObjects($path.'.'.$field, $db_value, $object[$field])
-					: self::intersectObjectFields($path.'.'.$field, $db_value, $object[$field]);
+				$abstract_path = $path.'.'.$field;
+
+				if (array_key_exists($abstract_path, self::NESTED_OBJECTS_ID_FIELD_NAMES)) {
+					ctype_digit((string) key($db_value))
+						? self::intersectNestedObjects($path.'.'.$field, $db_value, $object[$field])
+						: self::intersectObjectFields($path.'.'.$field, $db_value, $object[$field]);
+				}
+				elseif (in_array($abstract_path, self::SCALAR_VALUE_LIST_FIELD, true)) {
+					self::intersectObjectFields($path.'.'.$field, $db_value, $object[$field]);
+				}
 			}
 		}
 		unset($db_value);
@@ -948,9 +967,8 @@ class CAudit {
 
 		if ($is_nested_object_field) {
 			$abstract_path = self::getAbstractPath($path);
-			$is_array_of_objects = array_key_exists($abstract_path, self::NESTED_OBJECTS_ID_FIELD_NAMES);
 
-			if ($is_array_of_objects) {
+			if (array_key_exists($abstract_path, self::NESTED_OBJECTS_ID_FIELD_NAMES)) {
 				$objects = $object;
 				$id_field_name = self::NESTED_OBJECTS_ID_FIELD_NAMES[$abstract_path];
 
@@ -960,6 +978,13 @@ class CAudit {
 						: $path.'['.$object[$id_field_name].']';
 
 					$result += self::convertKeysToPaths($path_to_object, $object);
+				}
+
+				return $result;
+			}
+			elseif (in_array($abstract_path, self::SCALAR_VALUE_LIST_FIELD, true)) {
+				foreach ($object as $i => $value) {
+					$result[$path.'['.$i.']'] = $value;
 				}
 
 				return $result;
