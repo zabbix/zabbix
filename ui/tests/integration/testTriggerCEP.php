@@ -45,6 +45,15 @@ class testTriggerCEP extends CIntegrationTest {
 	// than a handful of them to work at once. Use at least 100 to stress CEP; the lowest value the discarding
 	// flavours still say anything with is 2 - one id whose values are dropped and one whose are kept.
 	const CEP_CLOSE_WINDOW_SERVICE_COUNT = 3;
+	// How many "down" values each of those ids is sent, and therefore how many events every window of the
+	// scenario holds before the "up" value ends it. The values are sent id by id and round by round
+	// ("down_0, down_1, down_0, down_1, ..." rather than every value of one id in a row), so raising this is
+	// the other half of the same scale knob: the service count spreads the rule over more windows at once,
+	// this one fills each of those windows deeper, and an ending window then has that many held problems to
+	// close instead of a single one. The eviction flavours size their window capacity from it, so the "up"
+	// value is still the one event that does not fit, see getCloseWindowCapacity(). Any value from 1 up says
+	// something; 1 leaves the scenario with one event per window.
+	const CEP_CLOSE_WINDOW_EVENT_COUNT = 2;
 	const SKIP_RESTART_TESTS = true;
 	// The windowless CEP scenario suppresses its events for a while and can then wait for that suppression to
 	// run out again (see waitForCepWindowNoneUnsuppressed()). That wait is the slowest part of the scenario by
@@ -260,7 +269,7 @@ class testTriggerCEP extends CIntegrationTest {
 	// every execution point it has - both event driven ones for a simple, a tag correlation and a cause and
 	// symptom window, all three for a pattern match window - so that no combination of the two is left untried.
 	// The cause and symptom flavour additionally singles out the event that ends the window by the rank its window
-	// gave it (CEP_TAG_IS_SYMPTOM) rather than by a tag of the event itself, which is what only that window type
+	// gave it (CEP_TAG_IS_SYMPTOM) and not only by a tag of the event itself, which is what only that window type
 	// can do.
 	const CEP_RULE_WINDOW_PATTERN_CLOSE = self::CEP_RULE_NAME_PREFIX.'window pattern close window';
 	const CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT = self::CEP_RULE_NAME_PREFIX.'window pattern close window on event';
@@ -330,8 +339,8 @@ class testTriggerCEP extends CIntegrationTest {
 	// fitting rather than for having been in the window too long.
 	const CEP_RULE_WINDOW_CAPACITY_DURATION = '2m';
 	const CEP_RULE_WINDOW_CAPACITY = 1;
-	// The close window flavours compute the duration of their windows instead, from the number of ids they drive,
-	// see getCloseWindowDuration().
+	// The close window flavours compute both limits of their windows instead, from the number of ids they drive and
+	// the number of values each of them is sent, see getCloseWindowDuration() and getCloseWindowCapacity().
 	// They, like the windowed flavours of the operations scenario, also hand those limits to the window as user
 	// macros rather than as the values themselves: the duration and the capacity are the only window parameters
 	// that may hold one (the API allows a user macro in no other window field), and the server resolves them anew
@@ -2641,7 +2650,8 @@ HEREDOC;
 	 * gets a window of its own and outlasts the whole scenario (getCloseWindowDuration()), so what a window
 	 * holds is exactly the events of its id and only the operations may end it. How many ids the scenario drives
 	 * - and therefore how many windows the rule keeps at once - is CEP_CLOSE_WINDOW_SERVICE_COUNT, see
-	 * getCloseWindowServices().
+	 * getCloseWindowServices(); how many "down" values each of them is sent, and therefore how many events a window
+	 * holds when it ends, is CEP_CLOSE_WINDOW_EVENT_COUNT, see getCloseWindowEventCount().
 	 *
 	 * What differs between the flavours is $execute_when, the execution point the close window operation is
 	 * performed at, and therefore what decides that the id has recovered:
@@ -2654,10 +2664,10 @@ HEREDOC;
 	 *     runs, so it closes the window it has just entered - immediately, without waiting for the window to be
 	 *     examined, which is what tells this flavour from the one above when both have the same window type;
 	 *   - WHEN_EVENT_EVICTED, which is reached by an event that does not fit into its window. This flavour is the
-	 *     one that needs a capacity limit, and it is one (CEP_RULE_WINDOW_CAPACITY): the "down" event of an id
-	 *     takes the single place of its window, so the "up" event of that id finds it taken and is evicted -
-	 *     without ever entering the window it ends. Being evicted rather than held is also why this flavour needs
-	 *     the extra "close" operation below.
+	 *     one that needs a capacity limit, and it has room for exactly the "down" events of an id
+	 *     (getCloseWindowCapacity()): they take every place of its window, so the "up" event of that id finds them
+	 *     all taken and is evicted - without ever entering the window it ends. Being evicted rather than held is
+	 *     also why this flavour needs the extra "close" operation below.
 	 *
 	 * $window_type decides which of them the rule may use: a WINDOW_SIMPLE window does nothing of its own, so the
 	 * two event driven execution points are all it has; a WINDOW_TAG_MATCH window correlates the events of a group
@@ -2678,11 +2688,11 @@ HEREDOC;
 	 * The last operation of every flavour closes the events the window held, and $close_when says at which
 	 * execution point it does that:
 	 *   - WHEN_WINDOW_CLOSED, the execution point a closing window reaches for every event it held. Which events
-	 *     those are is the one thing the flavours do not share: the arrival and pattern match flavours hold both
-	 *     events of the id, so this closes the "down" problem and the "up" problem that ended it, while the
-	 *     eviction flavours never held the "up" event, so it only closes the "down" problem - their "up" problem is
+	 *     those are is the one thing the flavours do not share: the arrival and pattern match flavours hold every
+	 *     event of the id, so this closes its "down" problems and the "up" problem that ended it, while the
+	 *     eviction flavours never held the "up" event, so it only closes the "down" problems - their "up" problem is
 	 *     closed by an extra "close" operation of the eviction execution point instead, which leaves every flavour
-	 *     with the same two closed problems per id;
+	 *     with the same closed problems per id;
 	 *   - WHEN_EVENT_EVICTED, which is what the events of an ending window are expected to reach as well: leaving a
 	 *     window because it ends is an eviction like any other, so this variant of every flavour must close the
 	 *     same problems as the one above. The extra operation is then not needed - the evicted "up" event of an
@@ -2700,11 +2710,11 @@ HEREDOC;
 	 * and their problems stay open - see runEventAssessmentTestCepWindowCloseWindow().
 	 *
 	 * $discard_down adds one operation on top of all that: the "down" values of a single id
-	 * (getCloseWindowDiscardService()) are discarded as they occur. Everything the flavour does is left in
-	 * place - the other ids fill their windows and their "up" values still end them - so what the scenario compares
-	 * is an id whose event was dropped against the ids around it: the dropped event never took a place in a window,
-	 * so there is nothing for the ending window of that id to close, and it left no problem of its own either. That
-	 * is the one thing a discard can do to a window that closes: not stop it, but empty it.
+	 * (getCloseWindowDiscardService()) are discarded as they occur, all of them however many it is sent. Everything
+	 * the flavour does is left in place - the other ids fill their windows and their "up" values still end them - so
+	 * what the scenario compares is an id whose events were dropped against the ids around it: a dropped event never
+	 * took a place in a window, so there is nothing for the ending window of that id to close, and it left no problem
+	 * of its own either. That is the one thing a discard can do to a window that closes: not stop it, but empty it.
 	 */
 	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when,
 			int $close_when = CCepRuleHelper::WHEN_WINDOW_CLOSED, bool $discard_down = false) {
@@ -2719,7 +2729,9 @@ HEREDOC;
 		$window = $this->macroizeWindowLimits([
 			'duration' => static::getCloseWindowDuration(),
 			// Only the eviction flavour needs an event not to fit; the others must hold everything they are given.
-			'capacity' => $execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED ? self::CEP_RULE_WINDOW_CAPACITY : 0,
+			'capacity' => $execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED
+				? static::getCloseWindowCapacity()
+				: 0,
 			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
 			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
 			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
@@ -2764,20 +2776,27 @@ HEREDOC;
 
 		// A cause and symptom window ranks an event as it takes it in - the first event of a group is its cause
 		// and every later one a symptom of it - so its arrival flavour can single out the event that ends the
-		// window by that rank instead: the "down" event of an id is the cause of its window and the "up" event
-		// that follows it the symptom, and being a symptom is what the operation acts on. The ranking is done
+		// window by that rank as well: the first "down" event of an id is the cause of its window and the "up"
+		// event that follows it a symptom, and being a symptom is what the operation acts on. The ranking is done
 		// before the operations of the arriving event are performed, so the condition sees the rank of the very
 		// event that caused it.
 		//
+		// The rank alone only identifies the "up" event while a window holds a single "down" event: with more of
+		// them (getCloseWindowEventCount()) every "down" event after the first is a symptom too, and the window
+		// would end on the second value of its id instead of on its recovery. The tag condition of the other
+		// flavours is then AND-ed to it, which leaves the rank just as much a part of what the operation needs -
+		// an "up" event its window failed to rank a symptom still reaches nothing and closes no window.
+		//
 		// An evicted event was never taken into a window and therefore never ranked, so the eviction flavour of
-		// this window type keeps the tag condition of the others.
+		// this window type keeps the tag condition of the others alone.
 		$close_window_condition = $window_type === CCepRuleHelper::WINDOW_CAUSE_SYMPTOM
 				&& $execute_when == CCepRuleHelper::WHEN_EVENT_OCCURRED
 			? [
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'tags' => [['tag' => self::CEP_TAG_IS_SYMPTOM, 'operator' => TAG_OPERATOR_EQUAL,
-					'value' => 'true'
-				]]
+				'tags' => array_merge(
+					[['tag' => self::CEP_TAG_IS_SYMPTOM, 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'true']],
+					static::getCloseWindowEventCount() > 1 ? $up_condition['tags'] : []
+				)
 			]
 			: $up_condition;
 
@@ -10328,14 +10347,35 @@ HEREDOC;
 	}
 
 	/**
+	 * How many "down" values every id of the close window scenarios is sent, and therefore how many events each of
+	 * its windows holds when the "up" value ends it, CEP_CLOSE_WINDOW_EVENT_COUNT of them. Like the id count it is
+	 * read through static:: so a child class raising it redirects every flavour of the scenario at once.
+	 */
+	private static function getCloseWindowEventCount(): int {
+		return static::CEP_CLOSE_WINDOW_EVENT_COUNT;
+	}
+
+	/**
+	 * How much the windows of the eviction close window flavours hold: exactly the "down" values of one id, so all
+	 * of them fit and the "up" value that follows them is the one event that does not - which is what gets it
+	 * evicted rather than held, and an evicted event is what those flavours end the window from. A capacity of one
+	 * per held event (CEP_RULE_WINDOW_CAPACITY) is what that comes to, so the limit follows the number of values
+	 * sent instead of being a constant.
+	 */
+	private static function getCloseWindowCapacity(): int {
+		return self::CEP_RULE_WINDOW_CAPACITY * static::getCloseWindowEventCount();
+	}
+
+	/**
 	 * How long the windows of the close window scenarios last. They must outlast the whole scenario - an expiring
 	 * window would evict what it holds and close the problems the scenario expects to find open - and how long
-	 * that takes grows with the number of ids driven, two values and their verification per id, so the duration
-	 * grows with it as well. Nothing is waited for on it, so it is generous: the rules are deleted once the
-	 * flavour is done, taking their windows with them, and a window that lasts longer than needed costs nothing.
+	 * that takes grows with the number of ids driven and with the number of values each of them is sent, every
+	 * value being verified before the next one goes out, so the duration grows with both. Nothing is waited for on
+	 * it, so it is generous: the rules are deleted once the flavour is done, taking their windows with them, and a
+	 * window that lasts longer than needed costs nothing.
 	 */
 	private static function getCloseWindowDuration(): string {
-		return (120 + 30 * count(static::getCloseWindowServices())).'s';
+		return (120 + 30 * count(static::getCloseWindowServices()) * static::getCloseWindowEventCount()).'s';
 	}
 
 	/**
@@ -10346,8 +10386,8 @@ HEREDOC;
 	 *
 	 *   1. every id has a window of its own and no window expires, so every "down" event takes a place in the
 	 *      window of its id and its problem stays open. No window has seen an "up" event yet, so none is closed;
-	 *   2. the "up" of an id ends that id's window, and both problems of that id are closed with it - the "down"
-	 *      problem the window held and the "up" problem that ended it;
+	 *   2. the "up" of an id ends that id's window, and every problem of that id is closed with it - the "down"
+	 *      problems the window held and the "up" problem that ended it;
 	 *   3. the ids whose "up" value has not been sent are untouched: their windows have seen no "up" event, so they
 	 *      are not closed and their problems are still open.
 	 *
@@ -10359,14 +10399,23 @@ HEREDOC;
 	 * a scale knob instead (CEP_CLOSE_WINDOW_SERVICE_COUNT, see getCloseWindowServices()): raising it makes the
 	 * rule keep that many windows open at once, which is what spreads the scenario over the CEP worker processes.
 	 *
+	 * How deep those windows go is the second knob (CEP_CLOSE_WINDOW_EVENT_COUNT, see getCloseWindowEventCount()):
+	 * every id is sent that many "down" values, so a window holds that many events and the "up" value of its id has
+	 * to close all of them at once rather than a single one. The values are sent round by round - one per id, then
+	 * the next one per id - so the windows of every id are being filled at the same time instead of one window
+	 * being filled and left alone while the others are. Nothing about the steps changes with it: the counts they
+	 * wait for are what the knob is multiplied into, so a count of one leaves the scenario with one event per
+	 * window.
+	 *
 	 * After the "up" of every id nothing is left open, and closing the last problem of a trigger is what puts the
 	 * trigger itself back to OK, so no recovery value is needed.
 	 *
 	 * $discarded drives the flavours whose rule additionally discards the "down" values of one id
 	 * (getCloseWindowDiscardService()). The "up" values still end the windows of the ids around it, so what
-	 * changes is only what those windows have to give: the discarded id opens no problem in step 1 and is left out of
-	 * step 2, so nothing is ever sent for it that a window could hold or close. That it left nothing behind is
-	 * asserted once every kept value has been processed - by then an event that had been stored would be there.
+	 * changes is only what those windows have to give: the discarded id opens no problem in step 1, however many
+	 * "down" values it is sent, and is left out of step 2, so nothing is ever sent for it that a window could hold
+	 * or close. That it left nothing behind is asserted once every kept value has been processed - by then an event
+	 * that had been stored would be there.
 	 */
 	private function runEventAssessmentTestCepWindowCloseWindow(string $rule_name, bool $discarded = false): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
@@ -10392,24 +10441,36 @@ HEREDOC;
 		// given a window of its own and closed with it, which says nothing about the event that was dropped.
 		$discarded_service = $discarded ? static::getCloseWindowDiscardService() : null;
 
-		// 1. Every id takes the place its own window has for it, and a window that has seen no "up" event is not
-		//    closed. The discarded id takes no place anywhere - there is nothing to wait for after its value, and
-		//    that nothing is what the assertions at the end are about.
+		// How many "down" values every id is sent, and therefore how many events the window of an id holds when its
+		// "up" value ends it. The eviction flavours have room for exactly that many, so the "up" value is the one
+		// that does not fit however deep the windows go, see getCloseWindowCapacity().
+		$events = static::getCloseWindowEventCount();
+
+		// 1. Every id takes the places its own window has for it, and a window that has seen no "up" event is not
+		//    closed. The values go out round by round - one per id, then the next one per id - so every window is
+		//    being filled while the others are, rather than one window being filled and left alone. The discarded
+		//    id takes no place anywhere - there is nothing to wait for after its values, and that nothing is what
+		//    the assertions at the end are about.
 		$open = 0;
 
-		foreach ($services as $service) {
-			$send('down_'.$service);
+		for ($round = 1; $round <= $events; $round++) {
+			foreach ($services as $service) {
+				$send('down_'.$service);
 
-			if ($service === $discarded_service) {
-				continue;
+				if ($service === $discarded_service) {
+					continue;
+				}
+
+				$this->waitForOpenProblemCount($all, ++$open);
+				$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+				// One open problem per round the id has been through: the window keeps the earlier ones as well,
+				// so its problems accumulate instead of replacing each other.
+				$this->waitForOpenProblemCountByTag($all, 'service', $service, $round);
 			}
-
-			$this->waitForOpenProblemCount($all, ++$open);
-			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
-			$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
 		}
 
-		// 2. The "up" of an id ends that id's window, and both problems of the id are closed with it. A pattern
+		// 2. The "up" of an id ends that id's window, and every problem of the id is closed with it. A pattern
 		//    window whose script rejected what it was handed would throw instead of reporting a match, and the
 		//    server keeps that message on the rule, so it is reported here rather than leaving the problems simply
 		//    never closing.
@@ -10421,9 +10482,10 @@ HEREDOC;
 			$send('up_'.$service);
 
 			try {
-				// Two problem events for the id, neither of them open: the "up" one is a problem of its own,
-				// because "up" is not a recovery value for this trigger - the rule is what closes both.
-				$this->waitForProblemEventCountByTag($all, 'service', $service, 2);
+				// Every "down" event of the id plus its "up" one, none of them open: the "up" event is a problem of
+				// its own, because "up" is not a recovery value for this trigger - the rule is what closes them
+				// all, and the ones the window held it closes in the single step of the window ending.
+				$this->waitForProblemEventCountByTag($all, 'service', $service, $events + 1);
 				$this->waitForOpenProblemCountByTag($all, 'service', $service, 0);
 			}
 			catch (Throwable $e) {
@@ -10435,18 +10497,21 @@ HEREDOC;
 			}
 
 			// 3. Only that id was affected - the windows of the ids without an "up" value are still open, and so
-			//    are the problems they hold. The id is down one open problem, not two: its "up" problem was
-			//    opened and closed within this step, so what the count loses is the "down" problem that had been
-			//    holding the place in its window.
-			$this->waitForOpenProblemCount($all, --$open);
+			//    are the problems they hold. The id is down as many open problems as its window held, not one more:
+			//    its "up" problem was opened and closed within this step, so what the count loses is the "down"
+			//    problems that had been holding the places in its window.
+			$open -= $events;
+
+			$this->waitForOpenProblemCount($all, $open);
 		}
 
 		if ($discarded_service !== null) {
 			// Every kept value has been processed by now, so a discarded "down" that had been stored would be here
-			// too - and there is nothing of that id at all: no problem event of its own, and therefore nothing its
-			// window could have held or been closed with. Only the ids that were kept have a "down" event.
+			// too - and there is nothing of that id at all: not one problem event of its own however many values it
+			// was sent, and therefore nothing its window could have held or been closed with. Only the ids that
+			// were kept have "down" events, all of theirs.
 			$this->waitForProblemEventCountByTag($all, 'service', $discarded_service, 0);
-			$this->waitForProblemEventsTagged($all, self::CEP_STATE_TAG_DOWN, count($services) - 1);
+			$this->waitForProblemEventsTagged($all, self::CEP_STATE_TAG_DOWN, (count($services) - 1) * $events);
 		}
 
 		// The last window took the problems it held with it, which is what returns the trigger to OK as well.
