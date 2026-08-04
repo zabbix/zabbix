@@ -230,9 +230,7 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#handleWindowTypeChanged() {
-		const input = [...window['ceprule-window-type'].querySelectorAll('[name="window_type"]')]
-			.find(node => node.checked);
-		const type = Number(input.value);
+		const type = Number(this.form.findFieldByName('window_type').getValue());
 
 		if (this.form.findFieldByName('window[group_by_host]').hasChanged()
 				|| this.form.findFieldByName('window[group_by_host_group]').hasChanged()
