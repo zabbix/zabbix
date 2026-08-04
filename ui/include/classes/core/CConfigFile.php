@@ -573,6 +573,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			'CERTIFICATE_ISSUER' => '',
 			'CERTIFICATE_SUBJECT' => ''
 		];
+		$this->config['TELEMETRY_PROVIDERS'] = [];
 	}
 
 	/**
