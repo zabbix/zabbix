@@ -1069,9 +1069,11 @@ enqueue:
 	cep_window_unlock(window);
 out:
 	if (NULL != rule)
+	{
 		cep_rule_handle_error(rule, &error, tasks);
+		zbx_cep_rule_release(rule);
+	}
 
-	zbx_cep_rule_release(rule);
 	zbx_free(error);
 
 	if (NULL != es.env && FAIL == zbx_es_destroy_env(&es, &error))
