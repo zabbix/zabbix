@@ -2190,7 +2190,6 @@ class CDataTable {
 
 		this.#pager.update(response);
 
-		this.#initCheckBoxRange();
 		this.#unlockHeight();
 
 		this.#element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
@@ -2211,6 +2210,7 @@ class CDataTable {
 				this.#body.scrollTo(scroll_to);
 			}
 
+			this.#initCheckBoxRange();
 			this.#handleScrollbar();
 			this.#applyLastColumnPadding();
 			this.#updateTableOptionsButtonPosition();
