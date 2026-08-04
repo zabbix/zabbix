@@ -7845,6 +7845,16 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     height: 16px;
     line-height: 16px; }
 
+#user-device-init-form .hidden {
+  display: none; }
+#user-device-init-form .qr-code-container {
+  width: 300px;
+  margin: 0 auto;
+  text-align: center;
+  white-space: wrap; }
+#user-device-init-form .qr-code-expiration {
+  margin-top: 10px; }
+
 .link-action {
   color: #ffffff;
   cursor: pointer; }
@@ -8718,13 +8728,6 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   line-height: 18px;
   white-space: nowrap;
   min-width: 160px; }
-  .svg-graph-hintbox .pager {
-    min-height: 18px;
-    padding: 0 0 2px;
-    border: 0;
-    top: 2px; }
-    .svg-graph-hintbox .pager .pager-container {
-      min-height: inherit; }
   .svg-graph-hintbox .list-table tbody tr:last-child td {
     border-bottom-style: none;
     box-shadow: none; }
