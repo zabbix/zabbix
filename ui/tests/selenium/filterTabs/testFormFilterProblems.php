@@ -328,7 +328,7 @@ class testFormFilterProblems extends testFormFilter {
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Checking result amount before changing time period.
-		$this->assertEquals($table->getRows()->count(), 2);
+		$this->assertEquals(2, $table->getRows()->filter(CElementFilter::CLASSES_NOT_PRESENT, ['hover-nobg'])->count());
 
 		if ($data['filter']['Name'] === 'Timeselect_1') {
 			// Enable Set custom time period option.
@@ -348,6 +348,7 @@ class testFormFilterProblems extends testFormFilter {
 			$this->query('xpath://input[@id="from"]')->one()->fill('now-2y');
 			$filter->query('id:apply')->one()->click();
 			$filter->setContext(CFilterElement::CONTEXT_LEFT)->selectTab($data['filter']['Name']);
+			$table = $this->query('class:list-table')->asTable()->one();
 			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 			$table->waitUntilReloaded();
@@ -362,6 +363,6 @@ class testFormFilterProblems extends testFormFilter {
 		$this->assertTrue($this->query('xpath://li[@data-target="tabfilter_timeselector"]')->one()->isEnabled($value));
 
 		// Checking that table result changed.
-		$this->assertEquals(2, $table->getRows()->count());
+		$this->assertEquals(2, $table->getRows()->filter(CElementFilter::CLASSES_NOT_PRESENT, ['hover-nobg'])->count());
 	}
 }

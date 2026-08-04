@@ -1455,7 +1455,7 @@ class testFormUser extends CWebTest {
 		}
 
 		if ($update_user === 'Admin') {
-			$this->assertTrue($form->query('id:current_password')->one()->isVisible());
+			$form->query('id:current_password')->waitUntilVisible();
 		}
 		else {
 			$this->assertFalse($form->query('id:current_password')->one(false)->isValid());

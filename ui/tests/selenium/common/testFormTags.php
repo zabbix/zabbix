@@ -555,7 +555,9 @@ class testFormTags extends CWebTest {
 				$this->query('button:Reset')->one()->click();
 				$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 				$form->fill(['Name' => $this->update_name]);
+				$table = $this->query('class:list-table')->asTable()->one();
 				$this->query('button:Apply')->one()->waitUntilClickable()->click();
+				$table->waitUntilReloaded();
 			}
 
 			$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
