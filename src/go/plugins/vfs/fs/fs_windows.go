@@ -27,7 +27,8 @@ func init() {
 	err := plugin.RegisterMetrics(
 		&impl, "VfsFs",
 		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
-		"vfs.fs.get", "List of mounted filesystems with statistics. vfs.fs.get[<mode>,<mountpoint>] - mode: full(default), short; mountpoint: exact match.",
+		"vfs.fs.get", "List of mounted filesystems with statistics. "+
+			"vfs.fs.get[<mode>,<mountpoint>] - mode: full(default), short; mountpoint: exact match.",
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
 	)
 	if err != nil {
