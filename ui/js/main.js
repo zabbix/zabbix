@@ -452,7 +452,7 @@ const hintBox = {
 		}
 
 		if (!isStatic) {
-			id = 'hintbox-'+hintboxid;
+			id = 'hintbox-' + hintboxid;
 			$(target).attr('aria-describedby', id);
 			box.attr('id', id);
 			box.attr('role', 'tooltip');
