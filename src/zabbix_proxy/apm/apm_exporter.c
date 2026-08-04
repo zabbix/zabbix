@@ -12,19 +12,19 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "otel_exporter.h"
+#include "apm_exporter.h"
 #include "zbxcfg.h"
 #include "zbxcommon.h"
 
-#define OTEL_EXPORTER_PROVIDER_URL	"url"
-#define OTEL_EXPORTER_PROVIDER_USERNAME	"username"
-#define OTEL_EXPORTER_PROVIDER_PASSWORD	"password"
-#define OTEL_EXPORTER_PROVIDER_DB	"db"
+#define APM_EXPORTER_PROVIDER_URL	"url"
+#define APM_EXPORTER_PROVIDER_USERNAME	"username"
+#define APM_EXPORTER_PROVIDER_PASSWORD	"password"
+#define APM_EXPORTER_PROVIDER_DB	"db"
 
 
-ZBX_PTR_VECTOR_LITE_IMPL(otel_exporter_ptr, zbx_otel_exporter_t *)
+ZBX_PTR_VECTOR_LITE_IMPL(apm_exporter_ptr, zbx_apm_exporter_t *)
 
-static char	*otel_option_dup(const zbx_config_option_t *options, int options_num, const char *key, char **error)
+static char	*apm_option_dup(const zbx_config_option_t *options, int options_num, const char *key, char **error)
 {
 	const char	*value;
 
@@ -38,20 +38,20 @@ static char	*otel_option_dup(const zbx_config_option_t *options, int options_num
 
 }
 
-static int	otel_clickhouse_cfg_init(zbx_otel_clickhouse_cfg_t *cfg, const zbx_config_option_t *options,
+static int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_config_option_t *options,
 		int options_num, char **error)
 {
 #if defined(HAVE_LIBCURL)
-	if (NULL == (cfg->url = otel_option_dup(options, options_num, OTEL_EXPORTER_PROVIDER_URL, error)))
+	if (NULL == (cfg->url = apm_option_dup(options, options_num, APM_EXPORTER_PROVIDER_URL, error)))
 		return FAIL;
 
-	if (NULL == (cfg->database = otel_option_dup(options, options_num, OTEL_EXPORTER_PROVIDER_DB, error)))
+	if (NULL == (cfg->database = apm_option_dup(options, options_num, APM_EXPORTER_PROVIDER_DB, error)))
 		return FAIL;
 
-	if (NULL == (cfg->username = otel_option_dup(options, options_num, OTEL_EXPORTER_PROVIDER_USERNAME, error)))
+	if (NULL == (cfg->username = apm_option_dup(options, options_num, APM_EXPORTER_PROVIDER_USERNAME, error)))
 		return FAIL;
 
-	if (NULL == (cfg->password = otel_option_dup(options, options_num, OTEL_EXPORTER_PROVIDER_PASSWORD, error)))
+	if (NULL == (cfg->password = apm_option_dup(options, options_num, APM_EXPORTER_PROVIDER_PASSWORD, error)))
 		return FAIL;
 
 	return SUCCEED;
@@ -67,7 +67,7 @@ static int	otel_clickhouse_cfg_init(zbx_otel_clickhouse_cfg_t *cfg, const zbx_co
 #endif
 }
 
-static void	otel_clickhouse_cfg_clear(zbx_otel_clickhouse_cfg_t *cfg)
+static void	apm_clickhouse_cfg_clear(zbx_apm_clickhouse_cfg_t *cfg)
 {
 	zbx_free(cfg->url);
 	zbx_free(cfg->database);
@@ -75,14 +75,14 @@ static void	otel_clickhouse_cfg_clear(zbx_otel_clickhouse_cfg_t *cfg)
 	zbx_free(cfg->password);
 }
 
-static void	otel_exporter_cfg_clear(zbx_otel_exporter_cfg_t *cfg)
+static void	apm_exporter_cfg_clear(zbx_apm_exporter_cfg_t *cfg)
 {
 	switch (cfg->type)
 	{
-		case OTEL_EXPORTER_UNKNOWN:
+		case APM_EXPORTER_UNKNOWN:
 			break;
-		case OTEL_EXPORTER_CLICKHOUSE:
-			otel_clickhouse_cfg_clear(&cfg->data.clickhouse);
+		case APM_EXPORTER_CLICKHOUSE:
+			apm_clickhouse_cfg_clear(&cfg->data.clickhouse);
 			break;
 	}
 
@@ -90,42 +90,42 @@ static void	otel_exporter_cfg_clear(zbx_otel_exporter_cfg_t *cfg)
 	zbx_vector_config_option_destroy(&cfg->options);
 }
 
-zbx_otel_exporter_pool_t	*otel_exporter_pool_create(zbx_otel_exporter_cfg_t *cfg, char **error)
+zbx_apm_exporter_pool_t	*apm_exporter_pool_create(zbx_apm_exporter_cfg_t *cfg, char **error)
 {
-	zbx_otel_exporter_pool_t	*pool;
+	zbx_apm_exporter_pool_t	*pool;
 	int				err;
 
-	pool = (zbx_otel_exporter_pool_t *)zbx_calloc(NULL, 1, sizeof(zbx_otel_exporter_pool_t));
+	pool = (zbx_apm_exporter_pool_t *)zbx_calloc(NULL, 1, sizeof(zbx_apm_exporter_pool_t));
 	pool->cfg = *cfg;
 
 	if (0 != (err = pthread_mutex_init(&pool->lock, NULL)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot initialize open telemetry exporter mutex: %s", zbx_strerror(err));
-		otel_exporter_cfg_clear(cfg);
+		apm_exporter_cfg_clear(cfg);
 		zbx_free(pool);
 
 		return NULL;
 	}
 
-	zbx_vector_otel_exporter_ptr_create(&pool->exporters);
+	zbx_vector_apm_exporter_ptr_create(&pool->exporters);
 
 	return pool;
 }
 
-static zbx_otel_exporter_t *otel_exporter_create(zbx_otel_exporter_cfg_t *cfg, char **error)
+static zbx_apm_exporter_t *apm_exporter_create(zbx_apm_exporter_cfg_t *cfg, char **error)
 {
-	zbx_otel_exporter_t	*exporter;
+	zbx_apm_exporter_t	*exporter;
 	int			ret = FAIL;
 
-	exporter = (zbx_otel_exporter_t *)zbx_calloc(NULL, 1, sizeof(zbx_otel_exporter_t));
+	exporter = (zbx_apm_exporter_t *)zbx_calloc(NULL, 1, sizeof(zbx_apm_exporter_t));
 	exporter->cfg = cfg;
 
 	switch (cfg->type)
 	{
-		case OTEL_EXPORTER_UNKNOWN:
+		case APM_EXPORTER_UNKNOWN:
 			break;
-		case OTEL_EXPORTER_CLICKHOUSE:
-			ret = otel_clickhouse_init(&exporter->conn.clickhouse, &cfg->data.clickhouse, error);
+		case APM_EXPORTER_CLICKHOUSE:
+			ret = apm_clickhouse_init(&exporter->conn.clickhouse, &cfg->data.clickhouse, error);
 			break;
 	}
 
@@ -136,41 +136,41 @@ static zbx_otel_exporter_t *otel_exporter_create(zbx_otel_exporter_cfg_t *cfg, c
 	return exporter;
 }
 
-static void	otel_exporter_destroy(zbx_otel_exporter_t *exporter)
+static void	apm_exporter_destroy(zbx_apm_exporter_t *exporter)
 {
 	switch (exporter->cfg->type)
 	{
-		case OTEL_EXPORTER_UNKNOWN:
+		case APM_EXPORTER_UNKNOWN:
 			break;
-		case OTEL_EXPORTER_CLICKHOUSE:
-			otel_clickhouse_clear(&exporter->conn.clickhouse);
+		case APM_EXPORTER_CLICKHOUSE:
+			apm_clickhouse_clear(&exporter->conn.clickhouse);
 			break;
 	}
 
 	zbx_free(exporter);
 }
 
-void	otel_exporter_pool_destroy(zbx_otel_exporter_pool_t *pool)
+void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool)
 {
 	for (int i = 0; i < pool->exporters.values_num; i++)
-		otel_exporter_destroy(pool->exporters.values[i]);
+		apm_exporter_destroy(pool->exporters.values[i]);
 
-	zbx_vector_otel_exporter_ptr_destroy(&pool->exporters);
-	otel_exporter_cfg_clear(&pool->cfg);
+	zbx_vector_apm_exporter_ptr_destroy(&pool->exporters);
+	apm_exporter_cfg_clear(&pool->cfg);
 
 	zbx_free(pool);
 }
 
-zbx_otel_exporter_t	*otel_exporter_acquire(zbx_otel_exporter_pool_t *pool)
+zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool)
 {
-	zbx_otel_exporter_t	*exporter;
+	zbx_apm_exporter_t	*exporter;
 	char			*error = NULL;
 
 	pthread_mutex_lock(&pool->lock);
 
 	if (0 == pool->exporters.values_num)
 	{
-		if (NULL == (exporter = otel_exporter_create(&pool->cfg, &error)))
+		if (NULL == (exporter = apm_exporter_create(&pool->cfg, &error)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot create Open Telemetry exporter: %s", error);
 			zbx_free(error);
@@ -180,7 +180,7 @@ zbx_otel_exporter_t	*otel_exporter_acquire(zbx_otel_exporter_pool_t *pool)
 	else
 	{
 		exporter = pool->exporters.values[pool->exporters.values_num - 1];
-		zbx_vector_otel_exporter_ptr_remove(&pool->exporters, pool->exporters.values_num - 1);
+		zbx_vector_apm_exporter_ptr_remove(&pool->exporters, pool->exporters.values_num - 1);
 	}
 
 	pthread_mutex_unlock(&pool->lock);
@@ -188,37 +188,37 @@ zbx_otel_exporter_t	*otel_exporter_acquire(zbx_otel_exporter_pool_t *pool)
 	return exporter;
 }
 
-void	otel_exporter_release(zbx_otel_exporter_pool_t *pool, zbx_otel_exporter_t *exporter)
+void	apm_exporter_release(zbx_apm_exporter_pool_t *pool, zbx_apm_exporter_t *exporter)
 {
 	pthread_mutex_lock(&pool->lock);
-	zbx_vector_otel_exporter_ptr_append(&pool->exporters, exporter);
+	zbx_vector_apm_exporter_ptr_append(&pool->exporters, exporter);
 	pthread_mutex_unlock(&pool->lock);
 }
 
-int	otel_exporter_commit(zbx_otel_exporter_t *exporter, zbx_otel_dataset_t *ds)
+int	apm_exporter_commit(zbx_apm_exporter_t *exporter, zbx_apm_dataset_t *ds)
 {
 	int	ret = SUCCEED;
 
 	switch (exporter->cfg->type)
 	{
-		case OTEL_EXPORTER_UNKNOWN:
+		case APM_EXPORTER_UNKNOWN:
 			break;
-		case OTEL_EXPORTER_CLICKHOUSE:
-			ret = otel_clickhouse_commit(&exporter->conn.clickhouse, &exporter->cfg->data.clickhouse, ds);
+		case APM_EXPORTER_CLICKHOUSE:
+			ret = apm_clickhouse_commit(&exporter->conn.clickhouse, &exporter->cfg->data.clickhouse, ds);
 			break;
 	}
 
 	return ret;
 }
 
-int	otel_exporter_cfg_init(zbx_otel_exporter_cfg_t *cfg, const char *options, char **error)
+int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const char *options, char **error)
 {
-#define	OTEL_EXPORTER_PROVIDER		"clickhouse"
+#define	APM_EXPORTER_PROVIDER		"clickhouse"
 	ssize_t		len;
 	const char	*ptr;
 	int		ret = FAIL;
 
-	memset(cfg, 0, sizeof(zbx_otel_exporter_cfg_t));
+	memset(cfg, 0, sizeof(zbx_apm_exporter_cfg_t));
 	zbx_vector_config_option_create(&cfg->options);
 
 	len = zbx_config_option_parse_param(options);
@@ -238,10 +238,10 @@ int	otel_exporter_cfg_init(zbx_otel_exporter_cfg_t *cfg, const char *options, ch
 	if (SUCCEED != zbx_config_option_parse_options(ptr, &cfg->options, error))
 		return FAIL;
 
-	if (0 == strncmp(options, OTEL_EXPORTER_PROVIDER, ZBX_CONST_STRLEN(OTEL_EXPORTER_PROVIDER)))
+	if (0 == strncmp(options, APM_EXPORTER_PROVIDER, ZBX_CONST_STRLEN(APM_EXPORTER_PROVIDER)))
 	{
-		cfg->type = OTEL_EXPORTER_CLICKHOUSE;
-		if (FAIL == otel_clickhouse_cfg_init(&cfg->data.clickhouse, cfg->options.values,
+		cfg->type = APM_EXPORTER_CLICKHOUSE;
+		if (FAIL == apm_clickhouse_cfg_init(&cfg->data.clickhouse, cfg->options.values,
 				cfg->options.values_num, error))
 		{
 			goto out;
@@ -256,9 +256,9 @@ int	otel_exporter_cfg_init(zbx_otel_exporter_cfg_t *cfg, const char *options, ch
 	ret = SUCCEED;
 out:
 	if (FAIL == ret)
-		otel_exporter_cfg_clear(cfg);
+		apm_exporter_cfg_clear(cfg);
 
-#undef OTEL_EXPORTER_PROVIDER
+#undef APM_EXPORTER_PROVIDER
 
 	return ret;
 }

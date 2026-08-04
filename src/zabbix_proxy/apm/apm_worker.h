@@ -12,33 +12,21 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_OTEL_QUEUE_H
-#define ZABBIX_OTEL_QUEUE_H
+#ifndef ZABBIX_APM_WORKER_H
+#define ZABBIX_APM_WORKER_H
 
+#include "apm_exporter.h"
 #include "zbxmw.h"
-
-typedef enum
-{
-	OTEL_METRICS,
-	OTEL_LOGS,
-	OTEL_TRACES
-}
-zbx_otel_request_type_t;
-
-typedef void * zbx_otel_request_t;
 
 typedef struct
 {
-	zbx_mw_queue_t	base;
-	zbx_uint64_t	usage;
-	zbx_uint64_t	quota;
-	time_t		window_start;
+	zbx_mw_worker_t			base;
+	zbx_apm_exporter_pool_t	*exporters;
 }
-zbx_otel_queue_t;
+zbx_apm_worker_t;
 
-zbx_otel_queue_t	*otel_queue_create(zbx_uint64_t quota);
-void	otel_queue_set_quota(zbx_otel_queue_t *queue, zbx_uint64_t quota);
+zbx_apm_worker_t	*apm_worker_create(zbx_apm_exporter_pool_t *exporters);
 
-int	otel_queue_push_request(zbx_otel_queue_t *queue, zbx_otel_request_t request, zbx_otel_request_type_t type);
+void	*apm_worker_entry(void *args);
 
 #endif

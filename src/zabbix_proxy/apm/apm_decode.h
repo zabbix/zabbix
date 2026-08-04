@@ -12,18 +12,18 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_OTEL_DECODE_H
-#define ZABBIX_OTEL_DECODE_H
+#ifndef ZABBIX_APM_DECODE_H
+#define ZABBIX_APM_DECODE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "otel_dataset.h"
-#include "otel_grpc.h"
+#include "apm_dataset.h"
+#include "apm_grpc.h"
 #include "zbxalgo.h"
 
-void	zbx_otel_request_decode(zbx_otel_request_t request, zbx_otel_request_type_t type, zbx_otel_dataset_t *ds,
+void	zbx_apm_request_decode(zbx_apm_request_t request, zbx_apm_request_type_t type, zbx_apm_dataset_t *ds,
 		const zbx_vector_tag_t *resource_attrs);
 
 #ifdef __cplusplus

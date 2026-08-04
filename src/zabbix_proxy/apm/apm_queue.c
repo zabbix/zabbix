@@ -12,12 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "otel_queue.h"
-#include "otel_task.h"
+#include "apm_queue.h"
+#include "apm_task.h"
 #include "zbxmw.h"
-#include <bits/time.h>
 
-#define OTEL_THROTTLE_WINDOW	SEC_PER_MIN
+#define APM_THROTTLE_WINDOW	SEC_PER_MIN
 
 static time_t	time_monotonic(void)
 {
@@ -29,23 +28,23 @@ static time_t	time_monotonic(void)
 	return time(NULL);
 }
 
-zbx_otel_queue_t	*otel_queue_create(zbx_uint64_t quota)
+zbx_apm_queue_t	*apm_queue_create(zbx_uint64_t quota)
 {
-	zbx_otel_queue_t	*queue;
+	zbx_apm_queue_t	*queue;
 
-	queue = (zbx_otel_queue_t *)zbx_calloc(NULL, 1, sizeof(zbx_otel_queue_t));
+	queue = (zbx_apm_queue_t *)zbx_calloc(NULL, 1, sizeof(zbx_apm_queue_t));
 	queue->quota = quota;
 	queue->window_start = time_monotonic();
 
 	return queue;
 }
 
-void	otel_queue_set_quota(zbx_otel_queue_t *queue, zbx_uint64_t quota)
+void	apm_queue_set_quota(zbx_apm_queue_t *queue, zbx_uint64_t quota)
 {
 	queue->quota = quota * SEC_PER_MIN;
 }
 
-int	otel_queue_push_request(zbx_otel_queue_t *queue, zbx_otel_request_t request, zbx_otel_request_type_t type)
+int	apm_queue_push_request(zbx_apm_queue_t *queue, zbx_apm_request_t request, zbx_apm_request_type_t type)
 {
 	int	ret = SUCCEED;
 
@@ -76,7 +75,7 @@ int	otel_queue_push_request(zbx_otel_queue_t *queue, zbx_otel_request_t request,
 	}
 
 	if (SUCCEED == ret)
-		zbx_mw_queue_push_completed_direct(&queue->base, otel_task_request_create(request, type));
+		zbx_mw_queue_push_completed_direct(&queue->base, apm_task_request_create(request, type));
 
 	zbx_mw_queue_unlock(&queue->base);
 

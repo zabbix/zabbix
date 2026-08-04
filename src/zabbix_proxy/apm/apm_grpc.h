@@ -12,25 +12,25 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_OTEL_GRPC_H
-#define ZABBIX_OTEL_GRPC_H
+#ifndef ZABBIX_APM_GRPC_H
+#define ZABBIX_APM_GRPC_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "otel_queue.h"
-#include "otel_config.h"
+#include "apm_queue.h"
+#include "apm_config.h"
 
 typedef void * zbx_grpc_handle_t;
 
-zbx_grpc_handle_t	zbx_grpc_start(const char *address, const char *port, zbx_otel_queue_t *queue,
-		const zbx_otel_config_tls_t *tls, char **error);
+zbx_grpc_handle_t	zbx_grpc_start(const char *address, const char *port, zbx_apm_queue_t *queue,
+		const zbx_apm_config_tls_t *tls, char **error);
 void	zbx_grpc_stop(zbx_grpc_handle_t handle);
 
-int	zbx_otel_decode_request(zbx_otel_request_t request, zbx_otel_request_type_t type, char **output,
+int	zbx_apm_decode_request(zbx_apm_request_t request, zbx_apm_request_type_t type, char **output,
 		char **error);
-void	zbx_otel_request_free(zbx_otel_request_t request, zbx_otel_request_type_t type);
+void	zbx_apm_request_free(zbx_apm_request_t request, zbx_apm_request_type_t type);
 
 #ifdef __cplusplus
 }

@@ -297,8 +297,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_SUPERVISOR */
 	1, /* ZBX_PROCESS_TYPE_CEP_MANAGER */
 	10, /* ZBX_PROCESS_TYPE_CEP_WORKER */
-	0, /* ZBX_PROCESS_TYPE_OTEL_MANAGER */
-	0 /* ZBX_PROCESS_TYPE_OTEL_WORKER */
+	0, /* ZBX_PROCESS_TYPE_APM_MANAGER */
+	0  /* ZBX_PROCESS_TYPE_APM_WORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)

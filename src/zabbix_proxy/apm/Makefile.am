@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxotel.a
+noinst_LIBRARIES = libzbxapm.a
 
 # vendored .proto sources (from open-telemetry/opentelemetry-proto)
 OTEL_PROTO_DIR = $(srcdir)
@@ -52,36 +52,36 @@ OTEL_PROTO_HDRS = $(OTEL_PROTO_MSG_HDRS) $(OTEL_PROTO_SVC_HDRS)
 
 BUILT_SOURCES = $(OTEL_PROTO_SRCS) $(OTEL_PROTO_HDRS)
 
-libzbxotel_a_CFLAGS = \
+libzbxapm_a_CFLAGS = \
 	$(TLS_CFLAGS)
 
-libzbxotel_a_CXXFLAGS = \
+libzbxapm_a_CXXFLAGS = \
 	$(GRPCPP_CFLAGS) \
 	$(PROTOBUF_CFLAGS) \
 	-I$(builddir) \
 	-I$(srcdir)
 
-libzbxotel_a_SOURCES = \
-	zbx_otel.h \
-	otel_manager.c \
-	otel_worker.c \
-	otel_worker.h \
-	otel_task.c \
-	otel_task.h \
-	otel_queue.c \
-	otel_queue.h \
-	otel_dataset.c  \
-	otel_dataset.h \
-	otel_exporter.c \
-	otel_exporter.h \
-	otel_clickhouse.c \
-	otel_clickhouse.h \
-	otel_config.c \
-	otel_config.h \
-	otel_grpc.cc \
-	otel_grpc.h \
-	otel_decode.cc \
-	otel_decode.h \
+libzbxapm_a_SOURCES = \
+	zbx_apm.h \
+	apm_manager.c \
+	apm_worker.c \
+	apm_worker.h \
+	apm_task.c \
+	apm_task.h \
+	apm_queue.c \
+	apm_queue.h \
+	apm_dataset.c  \
+	apm_dataset.h \
+	apm_exporter.c \
+	apm_exporter.h \
+	apm_clickhouse.c \
+	apm_clickhouse.h \
+	apm_config.c \
+	apm_config.h \
+	apm_grpc.cc \
+	apm_grpc.h \
+	apm_decode.cc \
+	apm_decode.h \
 	$(OTEL_PROTO_SRCS)
 
 # --- message-only protos: --cpp_out only ---

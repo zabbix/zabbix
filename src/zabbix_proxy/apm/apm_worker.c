@@ -12,72 +12,72 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "otel_worker.h"
-#include "otel_dataset.h"
-#include "otel_decode.h"
-#include "otel_task.h"
+#include "apm_worker.h"
+#include "apm_dataset.h"
+#include "apm_decode.h"
+#include "apm_task.h"
 #include "zbxjson.h"
 #include "zbxlog.h"
 #include "zbxmw.h"
 #include "zbxnix.h"
 #include "zbxsupervisor_client.h"
 
-zbx_otel_worker_t	*otel_worker_create(zbx_otel_exporter_pool_t *exporters)
+zbx_apm_worker_t	*apm_worker_create(zbx_apm_exporter_pool_t *exporters)
 {
-	zbx_otel_worker_t	*worker;
+	zbx_apm_worker_t	*worker;
 
-	worker = (zbx_otel_worker_t *)zbx_calloc(NULL, 1, sizeof(zbx_otel_worker_t));
+	worker = (zbx_apm_worker_t *)zbx_calloc(NULL, 1, sizeof(zbx_apm_worker_t));
 	worker->exporters = exporters;
 
 	return worker;
 }
 
-static void	otel_worker_process_commit(zbx_otel_worker_t *worker, zbx_otel_task_commit_t *task)
+static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_commit_t *task)
 {
-	zbx_otel_dataset_t	ds;
+	zbx_apm_dataset_t	ds;
 	zbx_vector_tag_t	*attrs;
 
-	otel_dataset_init(&ds);
+	apm_dataset_init(&ds);
 
 	for (int i = 0; i < task->tasks.values_num; i++)
 	{
-		zbx_otel_task_request_t	*t = (zbx_otel_task_request_t *)task->tasks.values[i];
+		zbx_apm_task_request_t	*t = (zbx_apm_task_request_t *)task->tasks.values[i];
 
 		switch (t->type)
 		{
-			case OTEL_METRICS:
+			case APM_METRICS:
 				attrs = &task->attrs->metrics;
 				break;
-			case OTEL_LOGS:
+			case APM_LOGS:
 				attrs = &task->attrs->logs;
 				break;
-			case OTEL_TRACES:
+			case APM_TRACES:
 				attrs = &task->attrs->traces;
 				break;
 		}
 
-		zbx_otel_request_decode(t->request, t->type, &ds, attrs);
+		zbx_apm_request_decode(t->request, t->type, &ds, attrs);
 	}
 
-	zbx_otel_exporter_t	*exporter;
+	zbx_apm_exporter_t	*exporter;
 
-	exporter = otel_exporter_acquire(worker->exporters);
+	exporter = apm_exporter_acquire(worker->exporters);
 
-	while (0 != (otel_exporter_commit(exporter, &ds) & OTEL_COMMIT_RETRY) &&
+	while (0 != (apm_exporter_commit(exporter, &ds) & APM_COMMIT_RETRY) &&
 			SUCCEED == zbx_mw_worker_is_running(&worker->base))
 	{
 	}
 
-	otel_exporter_release(worker->exporters, exporter);
+	apm_exporter_release(worker->exporters, exporter);
 
-	otel_dataset_clear(&ds);
+	apm_dataset_clear(&ds);
 }
 
-void	*otel_worker_entry(void *args)
+void	*apm_worker_entry(void *args)
 {
 #define CEP_RTC_OPEN_TIMEOUT	10
 
-	zbx_otel_worker_t	*worker = (zbx_otel_worker_t *)args;
+	zbx_apm_worker_t	*worker = (zbx_apm_worker_t *)args;
 	char			*error = NULL;
 
 	zbx_supervisor_update_activity("%s starting", worker->base.name);
@@ -99,10 +99,10 @@ void	*otel_worker_entry(void *args)
 
 			switch (task->type)
 			{
-				case OTEL_TASK_COMMIT:
-					otel_worker_process_commit(worker, (zbx_otel_task_commit_t *)task);
+				case APM_TASK_COMMIT:
+					apm_worker_process_commit(worker, (zbx_apm_task_commit_t *)task);
 					break;
-				case OTEL_TASK_REQUEST:
+				case APM_TASK_REQUEST:
 					THIS_SHOULD_NEVER_HAPPEN_MSG("incomplete request task received");
 					break;
 				default:

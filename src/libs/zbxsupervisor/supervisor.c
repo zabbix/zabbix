@@ -315,13 +315,13 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 			*runlevel = ZBX_RUNLEVEL_UNKNOWN;
 			break;
 
-		case ZBX_PROCESS_TYPE_OTEL_MANAGER:
-#ifdef HAVE_OTEL
+		case ZBX_PROCESS_TYPE_APM_MANAGER:
+#ifdef HAVE_APM
 			*owner = PROCESS_OWNER_SUPERVISOR;
 			*runlevel = ZBX_RUNLEVEL_DEFAULT;
 			break;
 #endif
-		case ZBX_PROCESS_TYPE_OTEL_WORKER:
+		case ZBX_PROCESS_TYPE_APM_WORKER:
 			*owner = PROCESS_OWNER_UNKNOWN;
 			*runlevel = ZBX_RUNLEVEL_UNKNOWN;
 			break;

@@ -132,10 +132,10 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "event manager";
 		case ZBX_PROCESS_TYPE_CEP_WORKER:
 			return "event processor";
-		case ZBX_PROCESS_TYPE_OTEL_MANAGER:
-			return "otel manager";
-		case ZBX_PROCESS_TYPE_OTEL_WORKER:
-			return "otel worker";
+		case ZBX_PROCESS_TYPE_APM_MANAGER:
+			return "apm manager";
+		case ZBX_PROCESS_TYPE_APM_WORKER:
+			return "apm worker";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

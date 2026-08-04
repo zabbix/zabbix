@@ -12,10 +12,10 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "otel_clickhouse.h"
-#include "otel_dataset.h"
+#include "apm_clickhouse.h"
+#include "apm_dataset.h"
+#include "apm_exporter.h"
 #include "libs/zbxhistory/history_curl.h"
-#include "zabbix_proxy/otel/otel_exporter.h"
 #include "zbxcommon.h"
 #include "zbxcurl.h"
 #include "zbxhttp.h"
@@ -25,7 +25,7 @@
 
 #if defined(HAVE_LIBCURL)
 
-int	otel_clickhouse_init(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg, char **error)
+int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg, char **error)
 {
 	CURLoption	opt;
 	CURLcode	err;
@@ -66,7 +66,7 @@ out:
 	return ret;
 }
 
-void	otel_clickhouse_clear(zbx_otel_clickhouse_t *conn)
+void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn)
 {
 	if (NULL != conn->handle)
 		curl_easy_cleanup(conn->handle);
@@ -74,37 +74,37 @@ void	otel_clickhouse_clear(zbx_otel_clickhouse_t *conn)
 	zbx_free(conn->resp.page.data);
 }
 
-static void	otel_clickhouse_write_value(struct zbx_json *json, const zbx_otel_col_t *col,
-		const zbx_otel_value_t *value)
+static void	apm_clickhouse_write_value(struct zbx_json *json, const zbx_apm_col_t *col,
+		const zbx_apm_value_t *value)
 {
 	switch (col->type)
 	{
-		case OTEL_COL_BOOL:
+		case APM_COL_BOOL:
 			zbx_json_addstring(json, NULL, 0 != value->ui64 ? "true" : "false", ZBX_JSON_TYPE_INT);
 			break;
-		case OTEL_COL_UINT8:
-		case OTEL_COL_UINT32:
-		case OTEL_COL_UINT64:
-		case OTEL_COL_DATETIME:
-		case OTEL_COL_DATETIME64:
+		case APM_COL_UINT8:
+		case APM_COL_UINT32:
+		case APM_COL_UINT64:
+		case APM_COL_DATETIME:
+		case APM_COL_DATETIME64:
 			zbx_json_adduint64(json, NULL, value->ui64);
 			break;
-		case OTEL_COL_INT32:
+		case APM_COL_INT32:
 			zbx_json_addint64(json, NULL, value->i32);
 			break;
-		case OTEL_COL_FLOAT64:
+		case APM_COL_FLOAT64:
 			zbx_json_adddouble(json, NULL, value->dbl);
 			break;
-		case OTEL_COL_STRING:
+		case APM_COL_STRING:
 			zbx_json_addstring(json, NULL, ZBX_NULL2EMPTY_STR(value->str), ZBX_JSON_TYPE_STRING);
 			break;
-		case OTEL_COL_MAP:
-		case OTEL_COL_ARRAY_MAP:
-		case OTEL_COL_ARRAY_STRING:
-		case OTEL_COL_ARRAY_UINT64:
-		case OTEL_COL_ARRAY_FLOAT64:
-		case OTEL_COL_ARRAY_DATETIME:
-		case OTEL_COL_ARRAY_DATETIME64:
+		case APM_COL_MAP:
+		case APM_COL_ARRAY_MAP:
+		case APM_COL_ARRAY_STRING:
+		case APM_COL_ARRAY_UINT64:
+		case APM_COL_ARRAY_FLOAT64:
+		case APM_COL_ARRAY_DATETIME:
+		case APM_COL_ARRAY_DATETIME64:
 			zbx_json_addraw(json, NULL, ZBX_NULL2EMPTY_STR(value->str));
 			break;
 		default:
@@ -113,14 +113,14 @@ static void	otel_clickhouse_write_value(struct zbx_json *json, const zbx_otel_co
 	}
 }
 
-static int	otel_clickhouse_commit_rowset(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg,
-		const char *table, zbx_otel_rowset_t *rs)
+static int	apm_clickhouse_commit_rowset(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg,
+		const char *table, zbx_apm_rowset_t *rs)
 {
 #define ZBX_CLICKHOUSE_ASYNC_INSERT	"&async_insert=1&wait_for_async_insert=0"
 
 	char		url[MAX_STRING_LEN];
 	CURLcode	err;
-	int		ret = OTEL_COMMIT_ERR;
+	int		ret = APM_COMMIT_ERR;
 	char		*data = NULL;
 	size_t		data_alloc = 0, data_offset = 0;
 	long		http_ret;
@@ -147,7 +147,7 @@ static int	otel_clickhouse_commit_rowset(zbx_otel_clickhouse_t *conn, const zbx_
 	{
 		for (int j = 0; j < rs->cols_num; j++)
 		{
-			otel_clickhouse_write_value(&json, &rs->cols[j], &rs->rows.values[i].cols[j]);
+			apm_clickhouse_write_value(&json, &rs->cols[j], &rs->rows.values[i].cols[j]);
 		}
 
 		zbx_strncpy_alloc(&data, &data_alloc, &data_offset, json.buffer, json.buffer_size);
@@ -161,7 +161,7 @@ static int	otel_clickhouse_commit_rowset(zbx_otel_clickhouse_t *conn, const zbx_
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, data)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot post telemetry data: %s", curl_easy_strerror(err));
-		ret |= OTEL_COMMIT_RETRY;
+		ret |= APM_COMMIT_RETRY;
 		goto out;
 	}
 
@@ -186,12 +186,12 @@ static int	otel_clickhouse_commit_rowset(zbx_otel_clickhouse_t *conn, const zbx_
 		goto out;
 	}
 
-	otel_rowset_clear(rs);
+	apm_rowset_clear(rs);
 
-	ret = OTEL_COMMIT_OK;
+	ret = APM_COMMIT_OK;
 out:
-	if (0 != (ret & OTEL_COMMIT_RETRY))
-		otel_rowset_clear(rs);
+	if (0 != (ret & APM_COMMIT_RETRY))
+		apm_rowset_clear(rs);
 
 	zbx_free(data);
 
@@ -200,45 +200,45 @@ out:
 #undef ZBX_CLICKHOUSE_ASYNC_INSERT
 }
 
-int	otel_clickhouse_commit(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg,
-		zbx_otel_dataset_t *ds)
+int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg,
+		zbx_apm_dataset_t *ds)
 {
-	int	ret = OTEL_COMMIT_OK;
+	int	ret = APM_COMMIT_OK;
 
-	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_gauge", &ds->metrics_gauge);
-	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_sum", &ds->metrics_sum);
-	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_histogram", &ds->metrics_histogram);
-	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_exponential_histogram",
+	ret |= apm_clickhouse_commit_rowset(conn, cfg, "otel_metrics_gauge", &ds->metrics_gauge);
+	ret |= apm_clickhouse_commit_rowset(conn, cfg, "otel_metrics_sum", &ds->metrics_sum);
+	ret |= apm_clickhouse_commit_rowset(conn, cfg, "otel_metrics_histogram", &ds->metrics_histogram);
+	ret |= apm_clickhouse_commit_rowset(conn, cfg, "otel_metrics_exponential_histogram",
 			&ds->metrics_exponential_histogram);
-	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_metrics_summary", &ds->metrics_summary);
-	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_logs", &ds->logs);
-	ret |= otel_clickhouse_commit_rowset(conn, cfg, "otel_traces", &ds->traces);
+	ret |= apm_clickhouse_commit_rowset(conn, cfg, "otel_metrics_summary", &ds->metrics_summary);
+	ret |= apm_clickhouse_commit_rowset(conn, cfg, "otel_logs", &ds->logs);
+	ret |= apm_clickhouse_commit_rowset(conn, cfg, "otel_traces", &ds->traces);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
-		otel_dataset_dump(ds);
+		apm_dataset_dump(ds);
 
 	return ret;
 }
 
 #else
-int	otel_clickhouse_init(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg, char **error)
+int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg, char **error)
 {
 	ZBX_UNUSED(conn);
 	ZBX_UNUSED(cfg);
 
-	*error = zbx_strdup(NULL, "ClickHouse telemetry provider requires curl library."
+	*error = zbx_strdup(NULL, "ClickHouse APM provider requires curl library."
 			" This Zabbix server binary was compiled without curl");
 
 	return FAIL;
 }
 
-void	otel_clickhouse_clear(zbx_otel_clickhouse_t *conn)
+void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn)
 {
 	ZBX_UNUSED(conn);
 }
 
-int	otel_clickhouse_commit(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg,
-		zbx_otel_dataset_t *ds)
+int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg,
+		zbx_apm_dataset_t *ds)
 {
 	ZBX_UNUSED(conn);
 	ZBX_UNUSED(cfg);

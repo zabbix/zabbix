@@ -12,11 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_OTEL_CLICKHOUSE_H
-#define ZABBIX_OTEL_CLICKHOUSE_H
+#ifndef ZABBIX_APM_CLICKHOUSE_H
+#define ZABBIX_APM_CLICKHOUSE_H
 
+#include "apm_dataset.h"
 #include "libs/zbxhistory/history_curl.h"
-#include "otel_dataset.h"
 #include "zbxcommon.h"
 
 typedef struct
@@ -26,7 +26,7 @@ typedef struct
 	char	*username;
 	char	*password;
 }
-zbx_otel_clickhouse_cfg_t;
+zbx_apm_clickhouse_cfg_t;
 
 typedef struct
 {
@@ -35,11 +35,11 @@ typedef struct
 	zbx_curl_response_t	resp;
 #endif
 }
-zbx_otel_clickhouse_t;
+zbx_apm_clickhouse_t;
 
-int	otel_clickhouse_init(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg, char **error);
-void	otel_clickhouse_clear(zbx_otel_clickhouse_t *conn);
-int	otel_clickhouse_commit(zbx_otel_clickhouse_t *conn, const zbx_otel_clickhouse_cfg_t *cfg,
-	zbx_otel_dataset_t *ds);
+int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg, char **error);
+void	apm_clickhouse_clear(zbx_apm_clickhouse_t *conn);
+int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg_t *cfg,
+	zbx_apm_dataset_t *ds);
 
 #endif

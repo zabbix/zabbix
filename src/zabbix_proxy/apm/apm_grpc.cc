@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "otel_grpc.h"
+#include "apm_grpc.h"
 #include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
@@ -25,7 +25,7 @@
 #include <sstream>
 
 extern "C" {
-	#include "otel_queue.h"
+	#include "apm_queue.h"
 	#include "zbxmw.h"
 	#include "zbxlog.h"
 }
@@ -81,14 +81,14 @@ private:
 
 struct GrpcServerHandle
 {
-	GrpcServerHandle(zbx_otel_queue_t *queue) : queue(queue) {}
+	GrpcServerHandle(zbx_apm_queue_t *queue) : queue(queue) {}
 
 	std::unique_ptr<Server> server;
 	std::unique_ptr<TraceServiceImpl> trace_service;
 	std::unique_ptr<MetricsServiceImpl> metrics_service;
 	std::unique_ptr<LogsServiceImpl> logs_service;
 
-	zbx_otel_queue_t * const queue;
+	zbx_apm_queue_t * const queue;
 };
 
 ServerUnaryReactor *TraceServiceImpl::Export(CallbackServerContext *context,
@@ -100,7 +100,7 @@ ServerUnaryReactor *TraceServiceImpl::Export(CallbackServerContext *context,
 	auto *heap_request = new otlp_trace::ExportTraceServiceRequest();
 	heap_request->Swap(const_cast<otlp_trace::ExportTraceServiceRequest *>(request));
 
-	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_TRACES))
+	if (FAIL == apm_queue_push_request(handle->queue, static_cast<zbx_apm_request_t>(heap_request), APM_TRACES))
 	{
 		reactor->Finish(grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "export rate limit exceeded"));
 		delete heap_request;
@@ -120,7 +120,7 @@ ServerUnaryReactor *MetricsServiceImpl::Export(CallbackServerContext *context,
 	auto *heap_request = new otlp_metrics::ExportMetricsServiceRequest();
 	heap_request->Swap(const_cast<otlp_metrics::ExportMetricsServiceRequest *>(request));
 
-	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_METRICS))
+	if (FAIL == apm_queue_push_request(handle->queue, static_cast<zbx_apm_request_t>(heap_request), APM_METRICS))
 	{
 		reactor->Finish(grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "export rate limit exceeded"));
 		delete heap_request;
@@ -141,7 +141,7 @@ ServerUnaryReactor *LogsServiceImpl::Export(CallbackServerContext *context,
 	auto *heap_request = new otlp_logs::ExportLogsServiceRequest();
 	heap_request->Swap(const_cast<otlp_logs::ExportLogsServiceRequest *>(request));
 
-	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_LOGS))
+	if (FAIL == apm_queue_push_request(handle->queue, static_cast<zbx_apm_request_t>(heap_request), APM_LOGS))
 	{
 		reactor->Finish(grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "export rate limit exceeded"));
 		delete heap_request;
@@ -155,12 +155,12 @@ ServerUnaryReactor *LogsServiceImpl::Export(CallbackServerContext *context,
 
 namespace
 {
-	constexpr const char *DEFAULT_OTEL_PORT = "4317";
+	constexpr const char *DEFAULT_APM_PORT = "4317";
 
 	std::string build_listen_address(const char *address, const char *port)
 	{
 		std::string addr = (address != nullptr && address[0] != '\0') ? address : "0.0.0.0";
-		std::string prt = (port != nullptr && port[0] != '\0') ? port : DEFAULT_OTEL_PORT;
+		std::string prt = (port != nullptr && port[0] != '\0') ? port : DEFAULT_APM_PORT;
 		return addr + ":" + prt;
 	}
 
@@ -186,7 +186,7 @@ namespace
 		return ss.str();
 	}
 
-	static std::shared_ptr<grpc::ServerCredentials>	build_credentials(const zbx_otel_config_tls_t *tls)
+	static std::shared_ptr<grpc::ServerCredentials>	build_credentials(const zbx_apm_config_tls_t *tls)
 	{
 		if (NULL == tls)
 			return grpc::InsecureServerCredentials();
@@ -207,8 +207,8 @@ namespace
 
 extern "C"
 {
-	zbx_grpc_handle_t zbx_grpc_start(const char *address, const char *port, zbx_otel_queue_t *queue,
-			const zbx_otel_config_tls_t *tls, char **error)
+	zbx_grpc_handle_t zbx_grpc_start(const char *address, const char *port, zbx_apm_queue_t *queue,
+			const zbx_apm_config_tls_t *tls, char **error)
 	{
 		try
 		{
@@ -265,7 +265,7 @@ extern "C"
 		zabbix_log(LOG_LEVEL_WARNING, "Open Telemetry collector stopped");
 	}
 
-	int	zbx_otel_decode_request(zbx_otel_request_t request, zbx_otel_request_type_t type, char **output,
+	int	zbx_apm_decode_request(zbx_apm_request_t request, zbx_apm_request_type_t type, char **output,
 			char **error)
 	{
 
@@ -275,26 +275,26 @@ extern "C"
 
 			switch (type)
 			{
-				case OTEL_TRACES:
+				case APM_TRACES:
 				{
 					auto *req = static_cast<otlp_trace::ExportTraceServiceRequest *>(request);
 					debug_string = req->DebugString();
 					break;
 				}
-				case OTEL_METRICS:
+				case APM_METRICS:
 				{
 					auto *req = static_cast<otlp_metrics::ExportMetricsServiceRequest *>(request);
 					debug_string = req->DebugString();
 					break;
 				}
-				case OTEL_LOGS:
+				case APM_LOGS:
 				{
 					auto *req = static_cast<otlp_logs::ExportLogsServiceRequest *>(request);
 					debug_string = req->DebugString();
 					break;
 				}
 				default:
-					set_error(error, "unknown otel request type: " +
+					set_error(error, "unknown APM request type: " +
 							std::to_string(static_cast<int>(type)));
 					return FAIL;
 			}
@@ -307,35 +307,35 @@ extern "C"
 		}
 		catch (const std::exception &e)
 		{
-			set_error(error, std::string("error decoding otel request: ") + e.what());
+			set_error(error, std::string("error decoding APM request: ") + e.what());
 			return FAIL;
 		}
 	}
 
-	void	zbx_otel_request_free(zbx_otel_request_t request, zbx_otel_request_type_t type)
+	void	zbx_apm_request_free(zbx_apm_request_t request, zbx_apm_request_type_t type)
 	{
 		switch (type)
 		{
-			case OTEL_TRACES:
+			case APM_TRACES:
 			{
 				auto *req = static_cast<otlp_trace::ExportTraceServiceRequest *>(request);
 				delete req;
 				break;
 			}
-			case OTEL_METRICS:
+			case APM_METRICS:
 			{
 				auto *req = static_cast<otlp_metrics::ExportMetricsServiceRequest *>(request);
 				delete req;
 				break;
 			}
-			case OTEL_LOGS:
+			case APM_LOGS:
 			{
 				auto *req = static_cast<otlp_logs::ExportLogsServiceRequest *>(request);
 				delete req;
 				break;
 			}
 			default:
-				THIS_SHOULD_NEVER_HAPPEN_MSG("unknown otel message type %d", type);
+				THIS_SHOULD_NEVER_HAPPEN_MSG("unknown APM message type %d", type);
 				break;
 		}
 	}

@@ -12,14 +12,14 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "otel_config.h"
-#include "otel_worker.h"
-#include "otel_grpc.h"
-#include "otel_exporter.h"
-#include "otel_queue.h"
-#include "otel_task.h"
-#include "zbx_otel.h"
-#include "zbx_otel_client.h"
+#include "apm_config.h"
+#include "apm_worker.h"
+#include "apm_grpc.h"
+#include "apm_exporter.h"
+#include "apm_queue.h"
+#include "apm_task.h"
+#include "zbx_apm.h"
+#include "zbx_apm_client.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxjson.h"
@@ -33,8 +33,8 @@
 #include "zbxsupervisor_client.h"
 #include "zbxtypes_ext.h"
 
-#define OTEL_WORKERS_MAX		100
-#define OTEL_WORKERS_DEFAULT		10
+#define APM_WORKERS_MAX		100
+#define APM_WORKERS_DEFAULT	10
 typedef struct
 {
 	zbx_mw_manager_t		base;
@@ -45,14 +45,14 @@ typedef struct
 	int				commit_limit;
 	int				commit_task_num;
 
-	zbx_otel_exporter_pool_t	*exporters;
+	zbx_apm_exporter_pool_t	*exporters;
 }
-zbx_otel_manager_t;
+zbx_apm_manager_t;
 
-static void	otel_manager_free(zbx_otel_manager_t *manager)
+static void	apm_manager_free(zbx_apm_manager_t *manager)
 {
 	for (int i = 0; i < manager->commits.values_num; i++)
-		otel_task_free(manager->commits.values[i]);
+		apm_task_free(manager->commits.values[i]);
 	zbx_vector_mw_task_ptr_destroy(&manager->commits);
 
 	if (NULL != manager->grpc)
@@ -74,35 +74,35 @@ static void	otel_manager_free(zbx_otel_manager_t *manager)
 	}
 
 	if (NULL != manager->exporters)
-		otel_exporter_pool_destroy(manager->exporters);
+		apm_exporter_pool_destroy(manager->exporters);
 
 	zbx_free(manager);
 }
 
-static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, int workers_num, int quota,
+static zbx_apm_manager_t	*apm_manager_create(const zbx_thread_info_t *info, int workers_num, int quota,
 		const char *options, char **error)
 {
-	zbx_otel_manager_t	*manager;
-	zbx_otel_worker_t	**workers;
-	zbx_otel_queue_t	*queue = NULL;
+	zbx_apm_manager_t	*manager;
+	zbx_apm_worker_t	**workers;
+	zbx_apm_queue_t	*queue = NULL;
 	int			ret = FAIL;
-	zbx_otel_exporter_cfg_t	cfg;
+	zbx_apm_exporter_cfg_t	cfg;
 
-	manager = (zbx_otel_manager_t *)zbx_calloc(NULL, 1, sizeof(zbx_otel_manager_t));
-	workers = (zbx_otel_worker_t **)zbx_calloc(NULL, (size_t)OTEL_WORKERS_MAX, sizeof(zbx_otel_worker_t));
-	queue = otel_queue_create(quota);
+	manager = (zbx_apm_manager_t *)zbx_calloc(NULL, 1, sizeof(zbx_apm_manager_t));
+	workers = (zbx_apm_worker_t **)zbx_calloc(NULL, (size_t)APM_WORKERS_MAX, sizeof(zbx_apm_worker_t));
+	queue = apm_queue_create(quota);
 
-	if (SUCCEED != otel_exporter_cfg_init(&cfg, options, error))
+	if (SUCCEED != apm_exporter_cfg_init(&cfg, options, error))
 		goto out;
 
-	if (NULL == (manager->exporters = otel_exporter_pool_create(&cfg, error)))
+	if (NULL == (manager->exporters = apm_exporter_pool_create(&cfg, error)))
 		goto out;
 
-	for (int i = 0; i < OTEL_WORKERS_MAX; i++)
-		workers[i] = otel_worker_create(manager->exporters);
+	for (int i = 0; i < APM_WORKERS_MAX; i++)
+		workers[i] = apm_worker_create(manager->exporters);
 
-	if (SUCCEED != zbx_mw_manager_init(&manager->base, info, ZBX_IPC_SERVICE_OTEL, ZBX_PROCESS_TYPE_OTEL_WORKER,
-			(zbx_mw_worker_t **)workers, OTEL_WORKERS_MAX, workers_num, otel_worker_entry,
+	if (SUCCEED != zbx_mw_manager_init(&manager->base, info, ZBX_IPC_SERVICE_APM, ZBX_PROCESS_TYPE_APM_WORKER,
+			(zbx_mw_worker_t **)workers, APM_WORKERS_MAX, workers_num, apm_worker_entry,
 			(zbx_mw_queue_t *)queue, error))
 	{
 		goto out;
@@ -118,35 +118,35 @@ static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, in
 out:
 	if (SUCCEED != ret)
 	{
-		if (queue != (zbx_otel_queue_t *)manager->base.queue)
+		if (queue != (zbx_apm_queue_t *)manager->base.queue)
 			zbx_free(queue);
 
-		if (workers != (zbx_otel_worker_t **)manager->base.workers)
+		if (workers != (zbx_apm_worker_t **)manager->base.workers)
 		{
-			for (int i = 0; i < OTEL_WORKERS_MAX; i++)
+			for (int i = 0; i < APM_WORKERS_MAX; i++)
 				zbx_free(workers[i]);
 
 			zbx_free(workers);
 		}
 
-		otel_manager_free(manager);
+		apm_manager_free(manager);
 		manager = NULL;
 	}
 
 	return manager;
 }
 
-static void	otel_manager_process_finished(zbx_otel_manager_t *manager, zbx_vector_mw_task_ptr_t *tasks)
+static void	apm_manager_process_finished(zbx_apm_manager_t *manager, zbx_vector_mw_task_ptr_t *tasks)
 {
 	for (int i = 0; i < tasks->values_num; i++)
 	{
 		switch (tasks->values[i]->type)
 		{
-			case OTEL_TASK_REQUEST:
+			case APM_TASK_REQUEST:
 				zbx_vector_mw_task_ptr_append(&manager->commits, tasks->values[i]);
 				break;
-			case OTEL_TASK_COMMIT:
-				otel_task_free(tasks->values[i]);
+			case APM_TASK_COMMIT:
+				apm_task_free(tasks->values[i]);
 				manager->commit_task_num--;
 				break;
 		}
@@ -155,10 +155,10 @@ static void	otel_manager_process_finished(zbx_otel_manager_t *manager, zbx_vecto
 	zbx_vector_mw_task_ptr_clear(tasks);
 }
 
-static int	otel_manager_activate(zbx_otel_manager_t *manager, const char *sourceip, const char *port,
-		const zbx_otel_config_tls_t *tls, char **error)
+static int	apm_manager_activate(zbx_apm_manager_t *manager, const char *sourceip, const char *port,
+		const zbx_apm_config_tls_t *tls, char **error)
 {
-	if (NULL == (manager->grpc = zbx_grpc_start(sourceip, port, (zbx_otel_queue_t *)manager->base.queue, tls,
+	if (NULL == (manager->grpc = zbx_grpc_start(sourceip, port, (zbx_apm_queue_t *)manager->base.queue, tls,
 			error)))
 	{
 		return FAIL;
@@ -167,15 +167,15 @@ static int	otel_manager_activate(zbx_otel_manager_t *manager, const char *source
 	return SUCCEED;
 }
 
-static void	otel_manager_deactivate(zbx_otel_manager_t *manager)
+static void	apm_manager_deactivate(zbx_apm_manager_t *manager)
 {
 	zbx_grpc_stop(manager->grpc);
 	manager->grpc = NULL;
 }
 
-static void	otel_manager_commit_tasks(zbx_otel_manager_t *manager, zbx_otel_config_attrs_t *attrs)
+static void	apm_manager_commit_tasks(zbx_apm_manager_t *manager, zbx_apm_config_attrs_t *attrs)
 {
-	zbx_mw_task_t	*t = otel_task_commit_create(&manager->commits, attrs);
+	zbx_mw_task_t	*t = apm_task_commit_create(&manager->commits, attrs);
 
 	zbx_mw_queue_lock(manager->base.queue);
 	zbx_mw_queue_push_normal(manager->base.queue, t);
@@ -184,7 +184,7 @@ static void	otel_manager_commit_tasks(zbx_otel_manager_t *manager, zbx_otel_conf
 	manager->commit_task_num++;
 }
 
-static zbx_otel_config_tls_t	*otel_manager_validate_tls(zbx_otel_config_tls_t *tls)
+static zbx_apm_config_tls_t	*apm_manager_validate_tls(zbx_apm_config_tls_t *tls)
 {
 	if (NULL == tls->ca_file || '\0' == *tls->ca_file)
 		return NULL;
@@ -198,7 +198,7 @@ static zbx_otel_config_tls_t	*otel_manager_validate_tls(zbx_otel_config_tls_t *t
 	return tls;
 }
 
-void	*zbx_otel_manager_thread(void *args)
+void	*zbx_apm_manager_thread(void *args)
 {
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 			/* once in STAT_INTERVAL seconds */
@@ -209,44 +209,43 @@ void	*zbx_otel_manager_thread(void *args)
 	int					server_num = info->server_num,
 						process_num = info->process_num;
 	unsigned char				process_type = info->process_type;
-	const zbx_thread_otel_manager_args_t	*otel_args;
-	zbx_otel_manager_t			*manager;
+	const zbx_thread_apm_manager_args_t	*apm_args;
+	zbx_apm_manager_t			*manager;
 	char					*error = NULL;
 	double					time_stat, time_flush, time_idle = 0, time_config = 0;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	int					shutdown = 0, workers_num, apm_status = OTEL_STATUS_DISABLED;
+	int					shutdown = 0, workers_num, apm_status = APM_STATUS_DISABLED;
 	zbx_vector_mw_task_ptr_t		tasks;
 	zbx_uint64_t				cfg_revision = 0, quota;
-	char					*apm_config = NULL;
-	zbx_otel_config_t			otel_config = {0};
-	zbx_otel_config_tls_t			otel_config_tls, *tls;
+	char					*proxy_apm_config = NULL;
+	zbx_apm_config_t			apm_config = {0};
+	zbx_apm_config_tls_t			apm_config_tls, *tls;
 
-	otel_args = (const zbx_thread_otel_manager_args_t *)unit_args->args.args;
+	apm_args = (const zbx_thread_apm_manager_args_t *)unit_args->args.args;
 
-	otel_config_tls.ca_file = otel_args->ca_file;
-	otel_config_tls.key_file = otel_args->key_file;
-	otel_config_tls.cert_file = otel_args->cert_file;
+	apm_config_tls.ca_file = apm_args->ca_file;
+	apm_config_tls.key_file = apm_args->key_file;
+	apm_config_tls.cert_file = apm_args->cert_file;
 
-	tls = otel_manager_validate_tls(&otel_config_tls);
+	tls = apm_manager_validate_tls(&apm_config_tls);
 
 	zbx_dc_config_local_acquire();
-	apm_config = zbx_dc_get_apm_config(apm_config, &cfg_revision);
-	if (SUCCEED != otel_config_set(&otel_config, apm_config, cfg_revision))
-		otel_config_reset(&otel_config);
-	zbx_free(apm_config);
+	proxy_apm_config = zbx_dc_get_apm_config(proxy_apm_config, &cfg_revision);
+	if (SUCCEED != apm_config_set(&apm_config, proxy_apm_config, cfg_revision))
+		apm_config_reset(&apm_config);
 
-	quota = otel_config.quota;
+	quota = apm_config.quota;
 
 	/* when disabled leave one worker running */
-	workers_num = (OTEL_STATUS_ENABLED != otel_config.status ? 1 : OTEL_WORKERS_DEFAULT);
+	workers_num = (APM_STATUS_ENABLED != apm_config.status ? 1 : APM_WORKERS_DEFAULT);
 
-	if (NULL == (manager = otel_manager_create(info, workers_num, otel_config.quota,
-			otel_args->exporter_options, &error)))
+	if (NULL == (manager = apm_manager_create(info, workers_num, apm_config.quota,
+			apm_args->exporter_options, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize open telemetry manager: %s", error);
 		zbx_free(error);
-		otel_config_clear(&otel_config);
+		apm_config_clear(&apm_config);
 		zbx_dc_config_local_release();
 		zbx_free(args);
 
@@ -280,16 +279,15 @@ void	*zbx_otel_manager_thread(void *args)
 
 		if (CONFIG_INTERVAL < time_start - time_config)
 		{
-			apm_config = zbx_dc_get_apm_config(apm_config, &cfg_revision);
-			if (SUCCEED != otel_config_set(&otel_config, apm_config, cfg_revision))
-				otel_config_reset(&otel_config);
-			zbx_free(apm_config);
+			proxy_apm_config = zbx_dc_get_apm_config(proxy_apm_config, &cfg_revision);
+			if (SUCCEED != apm_config_set(&apm_config, proxy_apm_config, cfg_revision))
+				apm_config_reset(&apm_config);
 
-			if (apm_status != otel_config.status)
+			if (apm_status != apm_config.status)
 			{
-				if (OTEL_STATUS_ENABLED == otel_config.status)
+				if (APM_STATUS_ENABLED == apm_config.status)
 				{
-					if (FAIL == otel_manager_activate(manager, otel_args->sourceip, otel_args->port,
+					if (FAIL == apm_manager_activate(manager, apm_args->sourceip, apm_args->port,
 							tls, &error))
 					{
 						zabbix_log(LOG_LEVEL_CRIT, "cannot activate Open Telemetry listener:"
@@ -300,20 +298,20 @@ void	*zbx_otel_manager_thread(void *args)
 				}
 				else
 				{
-					otel_manager_deactivate(manager);
+					apm_manager_deactivate(manager);
 				}
-				apm_status = otel_config.status;
+				apm_status = apm_config.status;
 			}
 
-			if (quota != otel_config.quota)
+			if (quota != apm_config.quota)
 			{
 				zbx_mw_queue_lock(manager->base.queue);
-				otel_queue_set_quota((zbx_otel_queue_t *)manager->base.queue, otel_config.quota);
+				apm_queue_set_quota((zbx_apm_queue_t *)manager->base.queue, apm_config.quota);
 				zbx_mw_queue_unlock(manager->base.queue);
 
 				zabbix_log(LOG_LEVEL_WARNING, "changed Open Telemetry quota from " ZBX_FS_UI64 " to "
-						ZBX_FS_UI64, quota, otel_config.quota);
-				quota = otel_config.quota;
+						ZBX_FS_UI64, quota, apm_config.quota);
+				quota = apm_config.quota;
 			}
 		}
 
@@ -355,12 +353,12 @@ void	*zbx_otel_manager_thread(void *args)
 
 		if (0 != tasks.values_num)
 		{
-			otel_manager_process_finished(manager, &tasks);
+			apm_manager_process_finished(manager, &tasks);
 			zbx_vector_mw_task_ptr_clear(&tasks);
 		}
 
 		if (0 != manager->commits.values_num && manager->commit_task_num < manager->commit_limit)
-			otel_manager_commit_tasks(manager, otel_config_attrs_acquire(otel_config.attrs));
+			apm_manager_commit_tasks(manager, apm_config_attrs_acquire(apm_config.attrs));
 
 	}
 
@@ -370,11 +368,12 @@ void	*zbx_otel_manager_thread(void *args)
 
 	/* on normal exit the shutdown message already has been processed and no more messages will be sent */
 	if (SUCCEED != ZBX_EXIT_STATUS())
-		zbx_rtc_unsubscribe_service(otel_args->config_timeout, ZBX_IPC_SERVICE_OTEL);
+		zbx_rtc_unsubscribe_service(apm_args->config_timeout, ZBX_IPC_SERVICE_APM);
 
-	otel_manager_free(manager);
+	apm_manager_free(manager);
 
-	otel_config_clear(&otel_config);
+	zbx_free(proxy_apm_config);
+	apm_config_clear(&apm_config);
 	zbx_dc_config_local_release();
 	zbx_free(args);
 

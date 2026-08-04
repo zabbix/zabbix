@@ -12,10 +12,33 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_ZBX_OTEL_CLIENT_H
-#define ZABBIX_ZBX_OTEL_CLIENT_H
+#ifndef ZABBIX_APM_QUEUE_H
+#define ZABBIX_APM_QUEUE_H
 
-#define ZBX_IPC_SERVICE_OTEL	"otel"
+#include "zbxmw.h"
+
+typedef enum
+{
+	APM_METRICS,
+	APM_LOGS,
+	APM_TRACES
+}
+zbx_apm_request_type_t;
+
+typedef void * zbx_apm_request_t;
+
+typedef struct
+{
+	zbx_mw_queue_t	base;
+	zbx_uint64_t	usage;
+	zbx_uint64_t	quota;
+	time_t		window_start;
+}
+zbx_apm_queue_t;
+
+zbx_apm_queue_t	*apm_queue_create(zbx_uint64_t quota);
+void	apm_queue_set_quota(zbx_apm_queue_t *queue, zbx_uint64_t quota);
+
+int	apm_queue_push_request(zbx_apm_queue_t *queue, zbx_apm_request_t request, zbx_apm_request_type_t type);
 
 #endif
-

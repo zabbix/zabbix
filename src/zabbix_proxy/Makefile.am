@@ -16,11 +16,11 @@ SUBDIRS_COMMON = \
 	proxyconfigwrite \
 	poller
 
-DIST_SUBDIRS = $(SUBDIRS_COMMON) otel
+DIST_SUBDIRS = $(SUBDIRS_COMMON) apm
 
 SUBDIRS = $(SUBDIRS_COMMON)
-if HAVE_OTEL
-SUBDIRS += otel
+if HAVE_APM
+SUBDIRS += apm
 endif
 
 sbin_PROGRAMS = zabbix_proxy
@@ -150,10 +150,10 @@ if HAVE_IPMI
 zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxipmi/libzbxipmi.a
 endif
 
-if HAVE_OTEL
+if HAVE_APM
 zabbix_proxy_LDADD += \
-	otel/libzbxotel.a \
-	$(OTEL_LIBS)
+	apm/libzbxapm.a \
+	$(APM_LIBS)
 endif
 
 zabbix_proxy_LDADD += $(PROXY_LIBS)

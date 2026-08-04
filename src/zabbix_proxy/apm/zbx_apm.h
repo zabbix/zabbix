@@ -12,21 +12,21 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_OTEL_WORKER_H
-#define ZABBIX_OTEL_WORKER_H
-
-#include "otel_exporter.h"
-#include "zbxmw.h"
+#ifndef ZABBIX_ZBX_APM_H
+#define ZABBIX_ZBX_APM_H
 
 typedef struct
 {
-	zbx_mw_worker_t			base;
-	zbx_otel_exporter_pool_t	*exporters;
+	int		config_timeout;
+	const char	*exporter_options;
+	const char	*sourceip;
+	const char	*port;
+	const char	*ca_file;
+	const char	*cert_file;
+	const char	*key_file;
 }
-zbx_otel_worker_t;
+zbx_thread_apm_manager_args_t;
 
-zbx_otel_worker_t	*otel_worker_create(zbx_otel_exporter_pool_t *exporters);
+void	*zbx_apm_manager_thread(void *args);
 
-void	*otel_worker_entry(void *args);
-
-#endif /* ZABBIX_OTEL_WORKER_H */
+#endif

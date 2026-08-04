@@ -12,21 +12,10 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_ZBX_OTEL_H
-#define ZABBIX_ZBX_OTEL_H
+#ifndef ZABBIX_ZBX_APM_CLIENT_H
+#define ZABBIX_ZBX_APM_CLIENT_H
 
-typedef struct
-{
-	int		config_timeout;
-	const char	*exporter_options;
-	const char	*sourceip;
-	const char	*port;
-	const char	*ca_file;
-	const char	*cert_file;
-	const char	*key_file;
-}
-zbx_thread_otel_manager_args_t;
-
-void	*zbx_otel_manager_thread(void *args);
+#define ZBX_IPC_SERVICE_APM	"apm"
 
 #endif
+

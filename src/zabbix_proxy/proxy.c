@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zabbix_proxy/otel/zbx_otel.h"
+#include "zabbix_proxy/apm/zbx_apm.h"
 #include "zbxdbwrap.h"
 
 #include "zbxcfg.h"
@@ -258,8 +258,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_SUPERVISOR */
 	0, /* ZBX_PROCESS_TYPE_CEP_MANAGER */
 	0, /* ZBX_PROCESS_TYPE_CEP_WORKER */
-	0, /* ZBX_PROCESS_TYPE_OTEL_MANAGER */
-	0 /* ZBX_PROCESS_TYPE_OTEL_WORKER */
+	0, /* ZBX_PROCESS_TYPE_APM_MANAGER */
+	0  /* ZBX_PROCESS_TYPE_APM_WORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -522,10 +522,10 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 		*local_process_type = ZBX_PROCESS_TYPE_INTERNAL_POLLER;
 		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_INTERNAL_POLLER];
 	}
-	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_OTEL_MANAGER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_APM_MANAGER]))
 	{
-		*local_process_type = ZBX_PROCESS_TYPE_OTEL_MANAGER;
-		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_OTEL_MANAGER];
+		*local_process_type = ZBX_PROCESS_TYPE_APM_MANAGER;
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_APM_MANAGER];
 	}
 	else
 		return FAIL;
@@ -1142,7 +1142,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1000},
 		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"StartOTCollectors",		&config_forks[ZBX_PROCESS_TYPE_OTEL_MANAGER],
+		{"StartOTCollectors",		&config_forks[ZBX_PROCESS_TYPE_APM_MANAGER],
 											ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"TelemetryProvider",		&config_telemetry_provider,		ZBX_CFG_TYPE_STRING,
@@ -1720,8 +1720,8 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.args = &proxyconfig_args
 	};
 
-#ifdef HAVE_OTEL
-	zbx_thread_otel_manager_args_t	otel_args =
+#ifdef HAVE_APM
+	zbx_thread_apm_manager_args_t	apm_args =
 	{
 		.config_timeout = zbx_config_timeout,
 		.exporter_options = config_telemetry_provider,
@@ -1732,9 +1732,9 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 		.key_file = config_ot_key_file
 	};
 
-	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_OTEL_MANAGER] = (zbx_supervisor_unit_def_t){
-		.entry = zbx_otel_manager_thread,
-		.args = &otel_args
+	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_APM_MANAGER] = (zbx_supervisor_unit_def_t){
+		.entry = zbx_apm_manager_thread,
+		.args = &apm_args
 	};
 #endif
 
