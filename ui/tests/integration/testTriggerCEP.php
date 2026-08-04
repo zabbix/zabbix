@@ -46,14 +46,24 @@ class testTriggerCEP extends CIntegrationTest {
 	// flavours still say anything with is 2 - one id whose values are dropped and one whose are kept.
 	const CEP_CLOSE_WINDOW_SERVICE_COUNT = 3;
 	// How many "down" values each of those ids is sent, and therefore how many events every window of the
-	// scenario holds before the "up" value ends it. The values are sent id by id and round by round
-	// ("down_0, down_1, down_0, down_1, ..." rather than every value of one id in a row), so raising this is
-	// the other half of the same scale knob: the service count spreads the rule over more windows at once,
-	// this one fills each of those windows deeper, and an ending window then has that many held problems to
-	// close instead of a single one. The eviction flavours size their window capacity from it, so the "up"
-	// value is still the one event that does not fit, see getCloseWindowCapacity(). Any value from 1 up says
-	// something; 1 leaves the scenario with one event per window.
+	// scenario holds before the "up" value ends it. Raising this is the other half of the same scale knob: the
+	// service count spreads the rule over more windows at once, this one fills each of those windows deeper,
+	// and an ending window then has that many held problems to close instead of a single one. The eviction
+	// flavours size their window capacity from it, so the "up" value is still the one event that does not fit,
+	// see getCloseWindowCapacity(). Any value from 1 up says something; 1 leaves the scenario with one event
+	// per window.
 	const CEP_CLOSE_WINDOW_EVENT_COUNT = 2;
+	// In which order those values go out, which only matters once the count above is more than one (see
+	// getCloseWindowFillOrder()):
+	//   - false, round by round ("down_0, down_1, down_0, down_1, ..."): every window of the rule is being
+	//     filled while the others are, so the windows are all open and all growing at the same time;
+	//   - true, id by id ("down_0, down_0, down_1, down_1, ..."): a window is filled to the end before the next
+	//     one is opened, so the windows opened first sit untouched while the later ones are filled - which is
+	//     what makes a window hold what it was given for the whole scenario rather than only for the last round
+	//     of it.
+	// Neither order changes what the scenario asserts: an id has as many open problems as it has been sent
+	// values whichever way round they went out.
+	const CEP_CLOSE_WINDOW_FILL_PER_SERVICE = true;
 	const SKIP_RESTART_TESTS = true;
 	// The windowless CEP scenario suppresses its events for a while and can then wait for that suppression to
 	// run out again (see waitForCepWindowNoneUnsuppressed()). That wait is the slowest part of the scenario by
@@ -10356,6 +10366,37 @@ HEREDOC;
 	}
 
 	/**
+	 * The "down" values the close window scenarios send, as [id, how many values that id has been sent including
+	 * this one] pairs in the order they go out. Which order that is follows CEP_CLOSE_WINDOW_FILL_PER_SERVICE:
+	 * round by round, one value per id and then the next round, or id by id, every value of an id before the next
+	 * id is touched at all.
+	 *
+	 * The pairs carry the per-id count rather than the round number, because that is what the scenario waits for
+	 * after every value and it is the same number in both orders - the count of values that id has been sent so
+	 * far. That is what lets one loop drive either order, see runEventAssessmentTestCepWindowCloseWindow().
+	 */
+	private static function getCloseWindowFillOrder(array $services, int $events): array {
+		$order = [];
+
+		if (static::CEP_CLOSE_WINDOW_FILL_PER_SERVICE) {
+			foreach ($services as $service) {
+				for ($count = 1; $count <= $events; $count++) {
+					$order[] = [$service, $count];
+				}
+			}
+		}
+		else {
+			for ($count = 1; $count <= $events; $count++) {
+				foreach ($services as $service) {
+					$order[] = [$service, $count];
+				}
+			}
+		}
+
+		return $order;
+	}
+
+	/**
 	 * How much the windows of the eviction close window flavours hold: exactly the "down" values of one id, so all
 	 * of them fit and the "up" value that follows them is the one event that does not - which is what gets it
 	 * evicted rather than held, and an evicted event is what those flavours end the window from. A capacity of one
@@ -10401,11 +10442,15 @@ HEREDOC;
 	 *
 	 * How deep those windows go is the second knob (CEP_CLOSE_WINDOW_EVENT_COUNT, see getCloseWindowEventCount()):
 	 * every id is sent that many "down" values, so a window holds that many events and the "up" value of its id has
-	 * to close all of them at once rather than a single one. The values are sent round by round - one per id, then
-	 * the next one per id - so the windows of every id are being filled at the same time instead of one window
-	 * being filled and left alone while the others are. Nothing about the steps changes with it: the counts they
+	 * to close all of them at once rather than a single one. Nothing about the steps changes with it: the counts they
 	 * wait for are what the knob is multiplied into, so a count of one leaves the scenario with one event per
 	 * window.
+	 *
+	 * A third knob says in which order those values go out (CEP_CLOSE_WINDOW_FILL_PER_SERVICE, see
+	 * getCloseWindowFillOrder()): round by round, which keeps every window of the rule growing at the same time, or
+	 * id by id, which fills one window to the end before opening the next and therefore leaves the windows opened
+	 * first holding what they were given while the rest of the scenario runs. What is asserted is the same for both,
+	 * an id having as many open problems as it has been sent values, so the order is free to be either.
 	 *
 	 * After the "up" of every id nothing is left open, and closing the last problem of a trigger is what puts the
 	 * trigger itself back to OK, so no recovery value is needed.
@@ -10447,27 +10492,25 @@ HEREDOC;
 		$events = static::getCloseWindowEventCount();
 
 		// 1. Every id takes the places its own window has for it, and a window that has seen no "up" event is not
-		//    closed. The values go out round by round - one per id, then the next one per id - so every window is
-		//    being filled while the others are, rather than one window being filled and left alone. The discarded
-		//    id takes no place anywhere - there is nothing to wait for after its values, and that nothing is what
-		//    the assertions at the end are about.
+		//    closed. In which order the values go out - one per id and round by round, or every value of an id in a
+		//    row - is CEP_CLOSE_WINDOW_FILL_PER_SERVICE, see getCloseWindowFillOrder(); what is waited for after a
+		//    value is the same either way. The discarded id takes no place anywhere - there is nothing to wait for
+		//    after its values, and that nothing is what the assertions at the end are about.
 		$open = 0;
 
-		for ($round = 1; $round <= $events; $round++) {
-			foreach ($services as $service) {
-				$send('down_'.$service);
+		foreach (static::getCloseWindowFillOrder($services, $events) as [$service, $count]) {
+			$send('down_'.$service);
 
-				if ($service === $discarded_service) {
-					continue;
-				}
-
-				$this->waitForOpenProblemCount($all, ++$open);
-				$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
-
-				// One open problem per round the id has been through: the window keeps the earlier ones as well,
-				// so its problems accumulate instead of replacing each other.
-				$this->waitForOpenProblemCountByTag($all, 'service', $service, $round);
+			if ($service === $discarded_service) {
+				continue;
 			}
+
+			$this->waitForOpenProblemCount($all, ++$open);
+			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+			// One open problem per value the id has been sent: the window keeps the earlier ones as well, so its
+			// problems accumulate instead of replacing each other.
+			$this->waitForOpenProblemCountByTag($all, 'service', $service, $count);
 		}
 
 		// 2. The "up" of an id ends that id's window, and every problem of the id is closed with it. A pattern
