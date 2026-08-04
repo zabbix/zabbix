@@ -213,8 +213,8 @@ define('PASSWD_CHECK_DIGITS', 0x02);
 define('PASSWD_CHECK_SPECIAL', 0x04);
 define('PASSWD_CHECK_SIMPLE', 0x08);
 
-define('ZBX_DB_MYSQL',			'MYSQL');
-define('ZBX_DB_POSTGRESQL',		'POSTGRESQL');
+define('ZBX_DB_MYSQL',		'MYSQL');
+define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 
 define('ZBX_DB_EXTENSION_TIMESCALEDB', 'timescaledb');
 
