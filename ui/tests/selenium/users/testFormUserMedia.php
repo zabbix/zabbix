@@ -164,7 +164,7 @@ class testFormUserMedia extends CWebTest {
 					'emails' => [
 						['email' => ' ', 'action' => USER_ACTION_UPDATE, 'index' => 0]
 					],
-					'error_message' => ['id:sendto_emails_0' => 'This field cannot be empty.']
+					'error_message' => ['id:sendto_list_0' => 'This field cannot be empty.']
 				]
 			],
 			// Email address without the "@" symbol.
@@ -177,7 +177,7 @@ class testFormUserMedia extends CWebTest {
 					'emails' => [
 						['email' => 'no_at.zabbix.com', 'action' => USER_ACTION_UPDATE, 'index' => 0]
 					],
-					'error_message' => ['id:sendto_emails_0' => 'Invalid email address "no_at.zabbix.com".']
+					'error_message' => ['id:sendto_list_0' => 'Invalid email address "no_at.zabbix.com".']
 				]
 			],
 			// Email address without the domain.
@@ -190,7 +190,7 @@ class testFormUserMedia extends CWebTest {
 					'emails' => [
 						['email' => 'no_domain@zabbix', 'action' => USER_ACTION_UPDATE, 'index' => 0]
 					],
-					'error_message' => ['id:sendto_emails_0' => 'Invalid email address "no_domain@zabbix".']
+					'error_message' => ['id:sendto_list_0' => 'Invalid email address "no_domain@zabbix".']
 				]
 			],
 			// Email address with numbers in domain.
@@ -203,7 +203,7 @@ class testFormUserMedia extends CWebTest {
 					'emails' => [
 						['email' => 'number_in_domain@zabbix.2u', 'action' => USER_ACTION_UPDATE, 'index' => 0]
 					],
-					'error_message' => ['id:sendto_emails_0' => 'Invalid email address "number_in_domain@zabbix.2u".']
+					'error_message' => ['id:sendto_list_0' => 'Invalid email address "number_in_domain@zabbix.2u".']
 				]
 			],
 			// Email address with name and missing "<" and ">" symbols.
@@ -216,7 +216,7 @@ class testFormUserMedia extends CWebTest {
 					'emails' => [
 						['email' => 'Mr Person person@zabbix.com', 'action' => USER_ACTION_UPDATE, 'index' => 0]
 					],
-					'error_message' => ['id:sendto_emails_0' => 'Invalid email address "Mr Person person@zabbix.com".']
+					'error_message' => ['id:sendto_list_0' => 'Invalid email address "Mr Person person@zabbix.com".']
 				]
 			],
 			// Email address without the recipient specified - just the domain.
@@ -229,7 +229,7 @@ class testFormUserMedia extends CWebTest {
 					'emails' => [
 						['email' => '@zabbix.com', 'action' => USER_ACTION_UPDATE, 'index' => 0]
 					],
-					'error_message' => ['id:sendto_emails_0' => 'Invalid email address "@zabbix.com".']
+					'error_message' => ['id:sendto_list_0' => 'Invalid email address "@zabbix.com".']
 				]
 			],
 			// Email address that contains a space.
@@ -242,7 +242,7 @@ class testFormUserMedia extends CWebTest {
 					'emails' => [
 						['email' => 'person @zabbix.com', 'action' => USER_ACTION_UPDATE, 'index' => 0]
 					],
-					'error_message' => ['id:sendto_emails_0' => 'Invalid email address "person @zabbix.com".']
+					'error_message' => ['id:sendto_list_0' => 'Invalid email address "person @zabbix.com".']
 				]
 			],
 			// Empty MS Teams channel name.
