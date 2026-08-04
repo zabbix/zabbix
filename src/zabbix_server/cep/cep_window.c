@@ -1341,7 +1341,7 @@ void	cep_window_pool_reset_rule(zbx_cep_window_pool_t *pool, zbx_uint64_t ruleid
 		if (ref->ruleid == ruleid)
 		{
 			ref->window->location = CEP_LOCATION_REMOVED;
-			zbx_hashset_remove_direct(&pool->windows, ref);
+			zbx_hashset_iter_remove(&iter);
 		}
 	}
 }
