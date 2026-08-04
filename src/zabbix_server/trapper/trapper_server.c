@@ -13,6 +13,7 @@
 **/
 
 #include "trapper_history_push.h"
+#include "trapper_push_test.h"
 #include "trapper_server.h"
 
 #include "proxydata.h"
@@ -182,6 +183,15 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	ZBX_STR2UCHAR(smtp_authentication, row[12]);
 	ZBX_STR2UCHAR(message_format, row[16]);
 	ZBX_STR2UCHAR(type, row[0]);
+
+	if (MEDIA_TYPE_PUSH == type)
+	{
+		ret = trapper_process_push_test(sendto, subject, message, mediatypeid, type, row, smtp_port,
+				smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, message_format,
+				&error, &debug);
+		zbx_db_free_result(result);
+		goto fail;
+	}
 
 	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[19], row[1], row[2], row[3], row[4],
 			row[5], row[6], row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,

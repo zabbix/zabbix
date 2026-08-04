@@ -1723,6 +1723,10 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 			data_len = zbx_alerter_serialize_webhook(&data, mediatype->script_bin, mediatype->script_bin_sz,
 					mediatype->timeout, alert->params, debug);
 			break;
+		case MEDIA_TYPE_PUSH:
+			command = ZBX_IPC_ALERTER_PUSH;
+			data_len = zbx_alerter_serialize_push(&data, alert->alertid, alert->params);
+			break;
 		default:
 			error = "unsupported media type";
 			if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))

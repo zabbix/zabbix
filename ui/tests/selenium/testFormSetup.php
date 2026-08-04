@@ -326,9 +326,9 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
 		// Complete the setup and check in DB that the default timezone was applied.
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Finish')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Finish')->waitUntilVisible()->one()->click();
 
 		$db_values = CDBHelper::getColumn('SELECT name, value_str FROM settings WHERE name IN (\'default_theme\','.
 				' \'default_timezone\') ORDER BY name', 'value_str'

@@ -6,15 +6,8 @@ SERVER_tests = prometheus_filter_init zbx_prometheus_pattern zbx_prometheus_to_j
 noinst_PROGRAMS = $(SERVER_tests)
 
 PROMETHEUS_LIBS = \
-	$(top_srcdir)/src/libs/zbxprometheus/libzbxprometheus.a \
-	$(EVAL_DEPS) \
-	$(EXPR_DEPS) \
-	$(JSON_DEPS) \
-	$(REGEXP_DEPS) \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(SERVER_GROUPED_LIBS) \
+	@SERVER_LIBS@ \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
@@ -26,7 +19,7 @@ prometheus_filter_init_CFLAGS = \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS)
 
-prometheus_filter_init_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@
+prometheus_filter_init_LDADD = $(PROMETHEUS_LIBS)
 prometheus_filter_init_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_prometheus_pattern_SOURCES = \
@@ -37,7 +30,7 @@ zbx_prometheus_pattern_CFLAGS = \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS)
 
-zbx_prometheus_pattern_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@
+zbx_prometheus_pattern_LDADD = $(PROMETHEUS_LIBS)
 zbx_prometheus_pattern_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_prometheus_to_json_SOURCES = \
@@ -48,7 +41,7 @@ zbx_prometheus_to_json_CFLAGS = \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS)
 
-zbx_prometheus_to_json_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@
+zbx_prometheus_to_json_LDADD = $(PROMETHEUS_LIBS)
 zbx_prometheus_to_json_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 prometheus_parse_row_SOURCES = \
@@ -59,7 +52,7 @@ prometheus_parse_row_CFLAGS = \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS)
 
-prometheus_parse_row_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@
+prometheus_parse_row_LDADD = $(PROMETHEUS_LIBS)
 prometheus_parse_row_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 endif

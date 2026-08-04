@@ -118,6 +118,7 @@ This template has been tested on:
 |Get errors|<p>A list of errors from API requests.</p>|Dependent item|azure.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get storage accounts|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.storage.acc|
 |Get storage accounts errors|<p>The errors from API requests.</p>|Dependent item|azure.get.storage.acc.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Virtual machine count|<p>Get the total count of virtual machines.</p>|Dependent item|azure.get.vm.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Triggers
 

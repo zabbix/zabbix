@@ -387,6 +387,59 @@ $form_grid->addItem([
 	)
 ]);
 
+if (CSettingsHelper::isMobileDevicesEnabled()) {
+	$form_grid
+		->addItem(
+			new CFormField(
+				(new CTag('h4', true, _('Devices')))->addClass('input-section-header')
+			)
+		)
+		->addItem([
+			new CLabel(_('Enabled'), $data['readonly'] ? '' : CRoleHelper::DEVICES_ACCESS),
+			new CFormField(
+				(new CCheckBox('devices_access', 1))
+					->setId('devices.access')
+					->setChecked($data['rules'][CRoleHelper::DEVICES_ACCESS])
+					->setReadonly($data['readonly'])
+					->setUncheckedValue(0)
+			)
+		]);
+
+	$devices_actions = [];
+	foreach ($data['labels']['devices_actions'] as $action => $label) {
+		$devices_actions[] = (new CDiv(
+			(new CCheckBox('devices_actions[]', $action))
+				->setId($action)
+				->setChecked(array_key_exists($action, $data['rules']['devices.actions'])
+					&& $data['rules']['devices.actions'][$action]
+				)
+				->setReadonly($data['readonly'])
+				->setLabel($label)
+		))
+			->addClass(ZBX_STYLE_NOWRAP);
+	}
+
+	$form_grid->addItem([
+		new CLabel(_('Device actions'), ''),
+		(new CFormField($devices_actions))
+			->setAttribute('data-field-type', 'array')
+			->setAttribute('data-field-name', 'devices_actions')
+	]);
+
+	$form_grid->addItem([
+		new CLabel(_('Default access to new device actions'),
+			$data['readonly'] ? '' : CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS
+		),
+		new CFormField(
+			(new CCheckBox('devices_actions_default_access', 1))
+				->setId('devices.actions.default_access')
+				->setChecked($data['rules'][CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS])
+				->setReadonly($data['readonly'])
+				->setUncheckedValue(0)
+		)
+	]);
+}
+
 $cancel_button = (new CRedirectButton(_('Cancel'),
 	(new CUrl('zabbix.php'))
 		->setArgument('action', 'userrole.list')

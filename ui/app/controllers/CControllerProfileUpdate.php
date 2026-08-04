@@ -85,6 +85,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state':
 				case 'web.user.filter.active':
 				case 'web.user.token.filter.active':
+				case 'web.user.device.list.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
 				case 'web.monitoring.problem.datatable':
