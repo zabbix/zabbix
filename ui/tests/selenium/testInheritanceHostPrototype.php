@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -34,7 +35,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMacrosBehavior::class];
+		return [
+			CMacrosBehavior::class,
+			CMessageBehavior::class
+		];
 	}
 
 	public static function getLayoutData() {
@@ -566,10 +570,12 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$form->selectTab('Macros');
 		$this->fillMacros($macros);
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Host prototype updated');
 
 		// Open host prototype inherited from template on host and check inherited macros.
 		$this->page->open('host_prototypes.php?form=update&context=host&parent_discoveryid='
 			.$host_lld_id.'&hostid='.$host_prototype_id);
+		$form = $this->query('name:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->assertMacros($macros);
 

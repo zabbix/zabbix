@@ -257,6 +257,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		if (CTestArrayHelper::get($data, 'disabled')) {
 			$this->query('button:Disable')->one()->click();
 			$this->page->acceptAlert();
+			$this->assertMessage(TEST_GOOD, 'Discovery rule disabled');
 			$this->selectTableRows($data['names'], 'Name', $this->selector);
 		}
 
@@ -535,10 +536,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'&filter_type=-1&filter_delay=&filter_lifetime=&filter_snmp_oid='.
 				'&filter_state=-1&filter_status=-1&filter_set=1&context='.$context);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$table = $this->query($this->selector)->asTable()->one();
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
-		$table = $this->query($this->selector)->asTable()->one();
 
 		if (array_key_exists('expected', $data)) {
 			$this->assertTableDataColumn($data['expected'], 'Name', $this->selector);
@@ -551,10 +553,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	private function massChangeStatus($action) {
 		$table = $this->query($this->selector)->asTable()->one();
+		$count = $table->getRows()->count();
 		$this->query('id:all_items')->asCheckbox()->one()->check();
 		$this->query('button', $action)->one()->click();
 		$this->page->acceptAlert();
-		$string = ($table->getRows()->count() == 1) ? 'Discovery rule ' : 'Discovery rules ';
+		$string = ($count == 1) ? 'Discovery rule ' : 'Discovery rules ';
 		$this->assertEquals($string.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
 	}
 

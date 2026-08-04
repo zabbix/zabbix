@@ -1207,11 +1207,10 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->page->login()->open('actionconf.php?eventsource='.$eventsource);
 		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckTitle('Configuration of actions');
-
-		$this->zbxTestCheckHeader($this->event_sources[$data['eventsource']]);
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
+		$this->page->assertTitle('Configuration of actions');
+		$this->page->assertHeader($this->event_sources[$data['eventsource']]);
 		$this->zbxTestTextPresent([
 				'Action updated',
 				'Actions',

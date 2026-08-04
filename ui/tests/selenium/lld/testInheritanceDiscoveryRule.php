@@ -124,6 +124,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 		}
 
 		$this->zbxTestClickWait('add');
+		$this->page->waitUntilReady();
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -177,10 +178,9 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				break;
 
 			case TEST_BAD:
+				$this->assertMessage(TEST_BAD, 'Cannot add discovery rule', $data['errors']);
 				$this->zbxTestCheckTitle('Configuration of discovery rules');
 				$this->zbxTestCheckHeader('Discovery rules');
-				$this->zbxTestTextPresent('Cannot add discovery rule');
-				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
 	}

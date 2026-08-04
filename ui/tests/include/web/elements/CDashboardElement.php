@@ -23,6 +23,7 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 
 use Facebook\WebDriver\Exception\TimeoutException;
+use Facebook\WebDriver\Exception\NoSuchElementException;
 
 /**
  * Dashboard element.
@@ -81,7 +82,18 @@ class CDashboardElement extends CElement {
 			$query->waitUntilPresent();
 		}
 
-		$widget = $query->asWidget()->one($should_exist);
+		try {
+			$widget = $query->asWidget()->one($should_exist);
+		}
+		catch (NoSuchElementException $exception) {
+			/*
+			 * A Clock widget without a custom name shows its time type (Local/Server/Host time) as the header,
+			 * which can flicker while it loads, so the lookup by header text can miss it. Wait for it and retry.
+			 */
+			$query->waitUntilPresent();
+			$widget = $query->asWidget()->one($should_exist);
+		}
+
 		if ($widget->isValid() && $should_exist) {
 				$widget->waitUntilReady();
 		}

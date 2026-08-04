@@ -722,7 +722,8 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'Access to specific services',
 						'User type' => 'Admin',
 						'Read-write access to services' => 'Service list',
-						'Read-only access to services' => 'Service list'
+						'Read-only access to services' => 'Service list',
+						'Default access to new actions' => false
 					],
 					'write_services' => [
 						'xpath:(//div[@class="multiselect-control"])[1]' => 'Update service',
@@ -1330,6 +1331,7 @@ class testFormUserRoles extends CWebTest {
 				$this->query('button:Enable')->one()->click();
 				$this->page->acceptAlert();
 				$this->page->waitUntilReady();
+				$this->assertMessage(TEST_GOOD, 'Modules enabled');
 			}
 			else {
 				$this->assertFalse($form->query('xpath://label[text()="No enabled modules found."]')->one($enable_modules)->isDisplayed());

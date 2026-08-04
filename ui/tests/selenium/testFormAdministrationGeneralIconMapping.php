@@ -774,7 +774,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 	public function testFormAdministrationGeneralIconMapping_Clone($data) {
 		$this->zbxTestLogin('zabbix.php?action=iconmap.list');
 		$this->zbxTestClickLinkTextWait($data['old_name']);
-		$this->zbxTestClickWait('clone');
+		$this->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestInputTypeOverwrite('iconmap_name', $data['name']);
 		}

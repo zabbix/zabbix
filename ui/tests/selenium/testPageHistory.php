@@ -54,7 +54,10 @@ class testPageHistory extends CLegacyWebTest {
 		$this->zbxTestTextPresent($table_titles);
 
 		$view_as = $this->query('id:filter-view-as')->asDropdown()->one();
+		$table = $this->query('class:list-table')->waitUntilVisible()->one();
 		$view_as->select('500 latest values');
+		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
 		$this->zbxTestCheckTitle('History [refreshed every 30 sec.]');
 		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
 

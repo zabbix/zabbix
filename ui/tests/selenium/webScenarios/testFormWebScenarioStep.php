@@ -113,7 +113,7 @@ class testFormWebScenarioStep extends CWebTest {
 			$steps_table->query('button:Add')->waitUntilClickable()->one()->click();
 		}
 
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilVisible()->one()->waitUntilReady();
 		$step_form = $dialog->asForm();
 
 		$this->assertEquals('Step of web scenario', $dialog->getTitle());
@@ -863,7 +863,7 @@ class testFormWebScenarioStep extends CWebTest {
 		$open_step = ($action === 'create') ? 'button:Add' : 'link:'.self::$update_step;
 		$steps_table->query($open_step)->waitUntilClickable()->one()->click();
 
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilVisible()->one()->waitUntilReady();
 		$step_form = $dialog->asForm();
 
 		$step_form->fill($data['fields']);
@@ -992,7 +992,7 @@ class testFormWebScenarioStep extends CWebTest {
 			$open_step = ($action === 'cancel_create') ? 'button:Add' : 'link:'.self::IMPACTLESS_STEP;
 			$steps->query($open_step)->waitUntilClickable()->one()->click();
 
-			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$dialog = COverlayDialogElement::find()->waitUntilVisible()->one()->waitUntilReady();
 			$step_form = $dialog->asForm();
 
 			if ($action === 'simple_update') {
@@ -1309,7 +1309,7 @@ class testFormWebScenarioStep extends CWebTest {
 		$scenario_form = $this->getScenarioFormOnStepsTab($scenario);
 		$scenario_form->getField('Steps')->query('button:Add')->one()->click();
 
-		return COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
+		return COverlayDialogElement::find()->waitUntilVisible()->one()->waitUntilReady()->asForm();
 	}
 
 	/**

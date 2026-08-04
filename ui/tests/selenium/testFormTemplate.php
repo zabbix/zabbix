@@ -108,8 +108,13 @@ class testFormTemplate extends CLegacyWebTest {
 	public function testFormTemplate_Create($data) {
 		$this->zbxTestLogin('templates.php?page=1');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->query('class:list-table')->waitUntilVisible()->one();
+
 		$filter->getField('Host groups')->select('Templates');
 		$filter->submit();
+		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
+
 		$this->zbxTestContentControlButtonClickTextWait('Create template');
 		$this->zbxTestInputTypeWait('template_name', $data['name']);
 		$this->zbxTestAssertElementValue('template_name', $data['name']);
@@ -250,7 +255,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 		$this->zbxTestLogin('templates.php?page=2');
 		$this->filterAndOpenTemplate($this->template_clone);
-		$this->zbxTestClickWait('full_clone');
+		$this->query('button:Full clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');

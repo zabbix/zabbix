@@ -946,6 +946,10 @@ class testFormGraphs extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' updated');
 		}
 		else {
+			// After clicking the clone button, wait until the button becomes invisible.
+			if ($data['case'] === 'Clone') {
+				$form->query('button:Clone')->waitUntilNotVisible();
+			}
 			$form->query('button:Cancel')->waitUntilClickable()->one()->click();
 		}
 

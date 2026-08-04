@@ -80,7 +80,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		];
 		// Open modules page and check header.
 		$this->page->login()->open('zabbix.php?action=module.list');
-		$this->assertEquals('Modules', $this->query('tag:h1')->one()->getText());
+		$this->assertEquals('Modules', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
 
 		// Check status of buttons on the modules page.
 		foreach (['Scan directory' => true, 'Enable' => false, 'Disable' => false] as $button => $enabled) {
@@ -459,8 +459,10 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Apply and submit the filter from data provider.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->query('class:list-table')->asTable()->one();
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		// Check (using module name) that only the expected filters are returned in the list.
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));

@@ -885,7 +885,8 @@ class testFormTrigger extends CLegacyWebTest {
 		}
 
 		if (isset($data['constructor'])) {
-			$this->zbxTestClickButtonText('Expression constructor');
+			$this->query('button:Expression constructor')->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
 
 			$constructor = $data['constructor'];
 			if (isset($constructor['errors']) && !array_key_exists('elementError', $constructor)) {
