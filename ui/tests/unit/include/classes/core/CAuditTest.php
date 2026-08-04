@@ -147,7 +147,7 @@ class CAuditTest extends TestCase {
 				'item.query.filter.conditions[0].column' => [CAudit::DETAILS_ACTION_ADD, 'filter 1'],
 				'item.query.filter.conditions[0].attribute_key' => [CAudit::DETAILS_ACTION_ADD, ''],
 				'item.query.filter.conditions[0].operator' => [CAudit::DETAILS_ACTION_ADD, '0'],
-				'item.query.filter.conditions[0].value' => [CAudit::DETAILS_ACTION_ADD, ''],
+				'item.query.filter.conditions[0].value' => [CAudit::DETAILS_ACTION_ADD, '']
 			]
 		];
 
@@ -358,14 +358,14 @@ class CAuditTest extends TestCase {
 			CAudit::ACTION_UPDATE,
 			[
 				'password' => 'passwordpassword',
-				'type' => ITEM_TYPE_SIMPLE,
+				'type' => ITEM_TYPE_SIMPLE
 			],
 			[
 				'type' => ITEM_TYPE_SIMPLE,
-				'password' => '123',
+				'password' => '123'
 			],
 			[
-				'item.password' => [CAudit::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK],
+				'item.password' => [CAudit::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK]
 			]
 		];
 		yield '"item.password" change from empty value to "password"' => [
@@ -373,14 +373,14 @@ class CAuditTest extends TestCase {
 			CAudit::ACTION_UPDATE,
 			[
 				'password' => 'password',
-				'type' => ITEM_TYPE_SIMPLE,
+				'type' => ITEM_TYPE_SIMPLE
 			],
 			[
 				'type' => ITEM_TYPE_SIMPLE,
-				'password' => '',
+				'password' => ''
 			],
 			[
-				'item.password' => [CAudit::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK],
+				'item.password' => [CAudit::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK]
 			]
 		];
 		yield '"item.password" change "password" to empty value' => [

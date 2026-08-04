@@ -519,7 +519,7 @@ class CAudit {
 	 * @var array
 	 */
 	private const SCALAR_VALUE_LIST_FIELD = [
-		'item.query.aggregated_columns.parameters',
+		'item.query.aggregated_columns.parameters'
 	];
 
 	/**
