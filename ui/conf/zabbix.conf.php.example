@@ -109,22 +109,32 @@ $ZBX_SERVER_TLS['CERT_FILE'] = '';
 $ZBX_SERVER_TLS['CERTIFICATE_ISSUER']  = '';
 $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] = '';
 
-// Uncomment and set to desired values to override APM database configuration.
-//$APM_DB['TYPE']		= 'CLICKHOUSE';
-//$APM_DB['SERVER']		= '';
-//$APM_DB['PORT']		= '0';
-//$APM_DB['DATABASE']		= '';
-//$APM_DB['USER']		= '';
-//$APM_DB['PASSWORD']		= '';
-//$APM_DB['API_KEY']		= '';
-
-// APM database schema name. Used for PostgreSQL.
-//$APM_DB['SCHEMA']		= '';
-
-// Used for TLS connection of APM database.
-//$APM_DB['ENCRYPTION']		= false;
-//$APM_DB['KEY_FILE']		= '';
-//$APM_DB['CERT_FILE']		= '';
-//$APM_DB['CA_FILE']		= '';
-//$APM_DB['VERIFY_PEER']	= true;
-//$APM_DB['VERIFY_HOST']	= true;
+// Uncomment and set to desired values to override global APM database configuration.
+// Supported configuration parameters for all providers:
+// 'provider'   - Telemetry provider type: 'zabbix' or 'clickhouse'.
+// Additional parameters for ClickHouse:
+// 'url'        - Telemetry provider URL.
+// 'db'         - Database name.
+// 'username'   - Database user.
+// 'password'   - Database password.
+// 'vault_path' - Vault path if vault is used for credentials, cannot be set with username and password.
+// Additional parameters for ClickHouse with 'https' schema:
+// 'tls_verity_peer' - Verify peer.
+// 'tls_verity_host' - Verify host.
+// 'ssl_cert_file' - Client certificate file path.
+// 'ssl_key_password' - Client private key password file path.
+// 'ssl_ca_location' - Certificate authority location path.
+// 'ssl_cert_location' - Client certificate location path.
+// 'ssl_key_location' - Client private key location path.
+// ClickHouse:
+//$TELEMETRY_PROVIDER = [
+//	'provider' => 'clickhouse',
+//	'url' => 'http://localhost:8123',
+//	'db' => 'zabbix',
+//	'username' => 'zabbix',
+//	'password' => 'zabbix'
+//];
+// Zabbix database:
+//$TELEMETRY_PROVIDER = [
+//	'provider' => 'zabbix'
+//];

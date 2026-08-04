@@ -39,6 +39,10 @@ class CConfigFile {
 		ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC
 	];
 
+	public const SUPPORTED_TELEMETRY_SOURCE = [
+		ZBX_TELEMETRY_SOURCE_CLICKHOUSE, ZBX_TELEMETRY_SOURCE_ZABBIX
+	];
+
 	private static $supported_db_types = [
 		ZBX_DB_MYSQL => true,
 		ZBX_DB_POSTGRESQL => true
@@ -98,25 +102,6 @@ class CConfigFile {
 
 		if (!isset($DB['DATABASE'])) {
 			self::exception('DB database is not set.');
-		}
-
-		if (isset($APM_DB) && is_array($APM_DB)) {
-			$this->validateApmDbConfiguration($APM_DB);
-			$this->setApmDbDefaults();
-
-			$this->config['APM_DB']['TYPE'] = $APM_DB['TYPE'];
-			$this->config['APM_DB']['SERVER'] = $APM_DB['SERVER'];
-			$this->config['APM_DB']['DATABASE'] = $APM_DB['DATABASE'];
-
-			$keys = ['PORT', 'USER', 'PASSWORD', 'API_KEY', 'SCHEMA', 'ENCRYPTION', 'VERIFY_PEER', 'KEY_FILE',
-				'CERT_FILE', 'CA_FILE', 'VERIFY_HOST'
-			];
-
-			foreach ($keys as $key) {
-				if (array_key_exists($key, $APM_DB)) {
-					$this->config['APM_DB'][$key] = $APM_DB[$key];
-				}
-			}
 		}
 
 		$this->setDefaults();
@@ -243,6 +228,16 @@ class CConfigFile {
 			$this->config['HISTORY_PROVIDERS'] = $this->validateHistoryProviders($HISTORY_PROVIDERS);
 		}
 
+		if (isset($TELEMETRY_PROVIDER)) {
+			if (!is_array($TELEMETRY_PROVIDER)) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', '$TELEMETRY_PROVIDER',
+						_('incorrect format'))
+				);
+			}
+
+			$this->config['TELEMETRY_PROVIDER'] = $this->validateTelemetryProvider($TELEMETRY_PROVIDER);
+		}
+
 		if (isset($SSO)) {
 			$this->config['SSO'] = $SSO;
 		}
@@ -316,7 +311,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY_PROVIDERS, $SSO,
-			$ZBX_SERVER_TLS, $ZBX_FEATURE_FLAGS, $APM_DB;
+			$ZBX_SERVER_TLS, $ZBX_FEATURE_FLAGS, $TELEMETRY_PROVIDER;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -327,8 +322,7 @@ class CConfigFile {
 		$SSO = $this->config['SSO'];
 		$ZBX_FEATURE_FLAGS = $this->config['ZBX_FEATURE_FLAGS'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
-
-		$APM_DB = array_key_exists('APM_DB', $this->config) ? $this->config['APM_DB'] : [];
+		$TELEMETRY_PROVIDER = $this->config['TELEMETRY_PROVIDER'];
 	}
 
 	public function save() {
@@ -480,25 +474,35 @@ $ZBX_SERVER_TLS[\'CERT_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']
 $ZBX_SERVER_TLS[\'CERTIFICATE_ISSUER\']  = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'], "'\\").'\';
 
-// Uncomment and set to desired values to override APM database configuration.
-//$APM_DB[\'TYPE\']		= \'CLICKHOUSE\';
-//$APM_DB[\'SERVER\']		= \'\';
-//$APM_DB[\'PORT\']		= \'0\';
-//$APM_DB[\'DATABASE\']		= \'\';
-//$APM_DB[\'USER\']		= \'\';
-//$APM_DB[\'PASSWORD\']		= \'\';
-//$APM_DB[\'API_KEY\']		= \'\';
-
-// APM database schema name. Used for PostgreSQL.
-//$APM_DB[\'SCHEMA\']		= \'\';
-
-// Used for TLS connection of APM database.
-//$APM_DB[\'ENCRYPTION\']		= false;
-//$APM_DB[\'KEY_FILE\']		= \'\';
-//$APM_DB[\'CERT_FILE\']		= \'\';
-//$APM_DB[\'CA_FILE\']		= \'\';
-//$APM_DB[\'VERIFY_PEER\']	= true;
-//$APM_DB[\'VERIFY_HOST\']	= true;
+// Uncomment and set to desired values to override global APM database configuration.
+// Supported configuration parameters for all providers:
+// \'provider\'   - Telemetry provider type: \'zabbix\' or \'clickhouse\'.
+// Additional parameters for ClickHouse:
+// \'url\'        - Telemetry provider URL.
+// \'db\'         - Database name.
+// \'username\'   - Database user.
+// \'password\'   - Database password.
+// \'vault_path\' - Vault path if vault is used for credentials, cannot be set with username and password.
+// Additional parameters for ClickHouse with \'https\' url schema:
+// \'tls_verity_peer\' - Verify peer.
+// \'tls_verity_host\' - Verify host.
+// \'ssl_cert_file\' - Client certificate file path.
+// \'ssl_key_password\' - Client private key password file path.
+// \'ssl_ca_location\' - Certificate authority location path.
+// \'ssl_cert_location\' - Client certificate location path.
+// \'ssl_key_location\' - Client private key location path.
+// ClickHouse database:
+//$TELEMETRY_PROVIDER = [
+//	\'provider\' => \'clickhouse\',
+//	\'url\' => \'http://localhost:8123\',
+//	\'db\' => \'zabbix\',
+//	\'username\' => \'zabbix\',
+//	\'password\' => \'zabbix\'
+//];
+// Zabbix database:
+//$TELEMETRY_PROVIDER = [
+//	\'provider\' => \'zabbix\'
+//];
 ';
 	}
 
@@ -570,22 +574,6 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			'CERT_FILE' => '',
 			'CERTIFICATE_ISSUER' => '',
 			'CERTIFICATE_SUBJECT' => ''
-		];
-	}
-
-	protected function setApmDbDefaults(): void {
-		$this->config['APM_DB'] = [
-			'PORT' => '0',
-			'USER' => '',
-			'PASSWORD' => '',
-			'API_KEY' => '',
-			'SCHEMA' => '',
-			'ENCRYPTION' => false,
-			'VERIFY_PEER' => true,
-			'KEY_FILE' => '',
-			'CERT_FILE' => '',
-			'CA_FILE' => '',
-			'VERIFY_HOST' => true
 		];
 	}
 
@@ -687,46 +675,139 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 	}
 
 	/**
-	 * @param array $apm_db  APM database configuration
+	 * Get valid telemetry provider configuration.
+	 *
+	 * @param array $provider
+	 *
 	 * @throws ConfigFileException
+	 * @return array
 	 */
-	protected function validateApmDbConfiguration(array $apm_db): void {
-		if (!array_key_exists('TYPE', $apm_db) || $apm_db['TYPE'] == '') {
-			self::exception('APM DB type is not set.');
+	protected function validateTelemetryProvider(array $provider): array {
+		$path = '/';
+		$required = [
+			ZBX_TELEMETRY_SOURCE_CLICKHOUSE => ['url', 'db'],
+			ZBX_TELEMETRY_SOURCE_ZABBIX => []
+		];
+
+		$missing = array_key_exists('provider', $provider) && array_key_exists($provider['provider'], $required)
+			? $required[$provider['provider']]
+			: ['provider'];
+		$missing = array_diff($missing, array_keys($provider));
+
+		if ($missing) {
+			self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
+				_s('the parameter "%1$s" is missing', reset($missing))
+			));
 		}
 
-		if (!array_key_exists($apm_db['TYPE'], ZBX_APM_DB_SUPPORTED_TYPES)) {
-			self::exception(
-				'Incorrect value "'.$apm_db['TYPE'].'" for APM DB type. Possible values '.
-				implode(', ', array_keys(ZBX_APM_DB_SUPPORTED_TYPES)).'.'
-			);
+		if (!in_array($provider['provider'], self::SUPPORTED_TELEMETRY_SOURCE)) {
+			self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.'provider',
+				_s('value must be one of %1$s', implode(',', self::SUPPORTED_TELEMETRY_SOURCE))
+			));
 		}
 
-		if (!array_key_exists('SERVER', $apm_db) || $apm_db['SERVER'] == '') {
-			self::exception('APM DB server is not set.');
+		if ($provider['provider'] == ZBX_TELEMETRY_SOURCE_ZABBIX) {
+			$unexpected_params = array_diff(['provider'], array_keys($provider));
+
+			if ($unexpected_params) {
+				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
+					_s('unexpected parameter "%1$s"', reset($unexpected_params))
+				));
+			}
+
+			return $provider;
 		}
 
-		if (!array_key_exists('DATABASE', $apm_db) || $apm_db['DATABASE'] == '') {
-			self::exception('APM DB database is not set.');
+		$expected_params = ['provider', 'url', 'db'];
+
+		$has_username = array_key_exists('username', $provider) && $provider['username'] != '';
+		$has_password = array_key_exists('password', $provider) && $provider['password'] != '';
+		$has_vault_path = array_key_exists('vault_path', $provider) && $provider['vault_path'] != '';
+
+		if ($has_vault_path && ($has_username || $has_password)) {
+			self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
+				_s('username and password must be empty if vault path is provided')
+			));
+		}
+		elseif (!$has_vault_path && !$has_username) {
+			self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
+				_s('db credentials or vault db path must be provided')
+			));
+		}
+		elseif ($has_username) {
+			$provider['password'] = $has_password ? $provider['password'] : '';
+			$expected_params = array_merge($expected_params, ['username', 'password']);
+
+			unset($provider['vault_path']);
+		}
+		else {
+			$expected_params[] = 'vault_path';
+
+			unset($provider['username'], $provider['password']);
 		}
 
-		$has_user_name = array_key_exists('USER', $apm_db) && $apm_db['USER'] != '';
-		$has_password = array_key_exists('PASSWORD', $apm_db) && $apm_db['PASSWORD'] != '';
-		$has_api_key = array_key_exists('API_KEY', $apm_db) && $apm_db['API_KEY'] != '';
+		$url_parts = parse_url('url');
 
-		if (($has_user_name || $has_password) && $has_api_key) {
-			self::exception('APM DB username and password must be empty if API key is provided.');
+		if (!$url_parts || !array_key_exists('scheme', $url_parts) || !$url_parts['scheme']) {
+			self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.'url',
+				_s('schema is invalid')
+			));
 		}
 
-		if ($has_api_key && $apm_db['TYPE'] != ZBX_DB_ELASTICSEARCH) {
-			self::exception('APM DB API key is only allowed with '.ZBX_DB_ELASTICSEARCH.' database type.');
+		$provider['url'] = rtrim($provider['url'], '/');
+
+		foreach (['ssl_verify_peer', 'ssl_verify_host'] as $tls_key) {
+			if (array_key_exists($tls_key, $provider)) {
+				if (!is_bool($provider[$tls_key])) {
+					self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$tls_key,
+						_s('boolean is expected')
+					));
+				}
+			}
+			else {
+				$provider[$tls_key] = false;
+			}
 		}
 
-		if ($apm_db['TYPE'] != ZBX_DB_ELASTICSEARCH && $apm_db['TYPE'] != ZBX_DB_CLICKHOUSE && !$has_api_key
-				&& !$has_user_name) {
-			self::exception(
-				'APM DB empty credentials are only allowed with '.ZBX_DB_ELASTICSEARCH.' or '.ZBX_DB_CLICKHOUSE.' database type.'
-			);
+		$tls_string_keys = ['ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'ssl_cert_location',
+			'ssl_key_location'
+		];
+		foreach ($tls_string_keys as $tls_key) {
+			if (array_key_exists($tls_key, $provider) && !is_string($provider[$tls_key])) {
+				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$tls_key,
+					_s('string is expected')
+				));
+			}
 		}
+
+		if (array_key_exists('ssl_ca_location', $provider)) {
+			if (!is_string($provider['ssl_ca_location'])) {
+				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$tls_key,
+					_s('string is expected')
+				));
+			}
+
+			if ($provider['ssl_ca_location'] !== '' && $provider['ssl_verify_peer'] === false) {
+				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.'ssl_verify_peer',
+					_s('should be activated if %1$s is provided', 'ssl_ca_location')
+				));
+			}
+		}
+
+		$expected_params = $url_parts['scheme'] === 'https'
+			? array_merge($expected_params, ['ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'ssl_verify_peer',
+				'ssl_verify_host', 'ssl_ca_location', 'ssl_cert_location', 'ssl_key_location'
+			])
+			: $expected_params;
+
+		$unexpected_params = array_diff($expected_params, array_keys($provider));
+
+		if ($unexpected_params) {
+			self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
+				_s('unexpected parameter "%1$s"', reset($unexpected_params))
+			));
+		}
+
+		return $provider;
 	}
 }
