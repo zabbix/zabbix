@@ -388,14 +388,14 @@ class CAuditTest extends TestCase {
 			CAudit::ACTION_UPDATE,
 			[
 				'type' => ITEM_TYPE_SIMPLE,
-				'password' => '',
+				'password' => ''
 			],
 			[
 				'password' => 'password',
-				'type' => ITEM_TYPE_SIMPLE,
+				'type' => ITEM_TYPE_SIMPLE
 			],
 			[
-				'item.password' => [CAudit::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK],
+				'item.password' => [CAudit::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK]
 			]
 		];
 

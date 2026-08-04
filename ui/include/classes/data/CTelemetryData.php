@@ -89,13 +89,13 @@ final class CTelemetryData {
 		self::COL_ATTRIBUTES,
 		self::COL_START_TIME_UNIX,
 		self::COL_TIME_UNIX,
-		self::COL_FLAGS,
+		self::COL_FLAGS
 	];
 
 	private const METRICS_AGGREGATED = [
 		self::COL_SCOPE_DROPPED_ATTR_COUNT,
 		self::COL_START_TIME_UNIX,
-		self::COL_TIME_UNIX,
+		self::COL_TIME_UNIX
 	];
 
 	private const METRICS_CONDITIONS = [
@@ -110,7 +110,7 @@ final class CTelemetryData {
 		self::COL_METRIC_DESCRIPTION,
 		self::COL_METRIC_UNIT,
 		self::COL_ATTRIBUTES,
-		self::COL_EXEMPLARS_FILTERED_ATTRIBUTES,
+		self::COL_EXEMPLARS_FILTERED_ATTRIBUTES
 	];
 
 	/**
