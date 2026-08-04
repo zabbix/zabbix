@@ -36,15 +36,16 @@ static int	send_query_http(const char *posts, const zbx_apm_db_config_t *apm_db_
 	char			*http_error = NULL;
 	char			query_fields[] = "", headers[] = "", status_codes[] = "200,201,202,203,204";
 
+	unsigned char	authtype = (NULL != apm_db_config->username ? HTTPTEST_AUTH_BASIC : HTTPTEST_AUTH_NONE);
+
 	zbx_http_context_create(&context);
 
 	if (SUCCEED == zbx_http_request_prepare(&context, HTTP_REQUEST_POST, url, query_fields, headers,
 			posts, ZBX_RETRIEVE_MODE_CONTENT, NULL, 0, timeout, 1, apm_db_config->ssl_cert_file,
 			apm_db_config->ssl_key_file, apm_db_config->ssl_key_password, apm_db_config->ssl_verify_peer,
-			apm_db_config->ssl_verify_host, HTTPTEST_AUTH_BASIC, apm_db_config->username,
-			apm_db_config->password, NULL, post_type, output_format, apm_db_config->source_ip,
-			apm_db_config->ssl_ca_location, apm_db_config->ssl_cert_location,
-			apm_db_config->ssl_key_location, &http_error))
+			apm_db_config->ssl_verify_host, authtype, apm_db_config->username, apm_db_config->password,
+			NULL, post_type, output_format, apm_db_config->source_ip, apm_db_config->ssl_ca_location,
+			apm_db_config->ssl_cert_location, apm_db_config->ssl_key_location, &http_error))
 	{
 		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context, 0,
 				ZBX_HTTP_IGNORE_RESPONSE_CODE);

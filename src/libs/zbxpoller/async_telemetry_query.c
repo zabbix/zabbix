@@ -50,6 +50,8 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 	CURLMcode			merr;
 	char				query_fields[] = "", headers[] = "";
 
+	unsigned char	authtype = (NULL != apm_db_config->username ? HTTPTEST_AUTH_BASIC : HTTPTEST_AUTH_NONE);
+
 	telemetry_query_context = zbx_malloc(NULL, sizeof(zbx_telemetry_query_context));
 
 	memset(&telemetry_query_context->item_context, 0, sizeof(telemetry_query_context->item_context));
@@ -71,14 +73,13 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 	telemetry_query_context->item_context.min_free_ts = *min_free_ts;
 	telemetry_query_context->item_context.db_type = apm_db_config->db_type;
 
-	if (SUCCEED != zbx_http_request_prepare(&telemetry_query_context->http_context, HTTP_REQUEST_POST,
-			url, query_fields, headers, telemetry_query_context->item_context.posts,
-			ZBX_RETRIEVE_MODE_CONTENT, NULL, 0, item->timeout, 1,
-			apm_db_config->ssl_cert_file, apm_db_config->ssl_key_file, apm_db_config->ssl_key_password,
-			apm_db_config->ssl_verify_peer, apm_db_config->ssl_verify_host, HTTPTEST_AUTH_BASIC,
-			apm_db_config->username, apm_db_config->password, NULL, post_type,
-			output_format, apm_db_config->source_ip, apm_db_config->ssl_ca_location,
-			apm_db_config->ssl_cert_location, apm_db_config->ssl_key_location, &http_error))
+	if (SUCCEED != zbx_http_request_prepare(&telemetry_query_context->http_context, HTTP_REQUEST_POST, url,
+			query_fields, headers, telemetry_query_context->item_context.posts, ZBX_RETRIEVE_MODE_CONTENT,
+			NULL, 0, item->timeout, 1, apm_db_config->ssl_cert_file, apm_db_config->ssl_key_file,
+			apm_db_config->ssl_key_password, apm_db_config->ssl_verify_peer, apm_db_config->ssl_verify_host,
+			authtype, apm_db_config->username, apm_db_config->password, NULL, post_type, output_format,
+			apm_db_config->source_ip, apm_db_config->ssl_ca_location, apm_db_config->ssl_cert_location,
+			apm_db_config->ssl_key_location, &http_error))
 	{
 		*error = http_error;
 		http_error = NULL;

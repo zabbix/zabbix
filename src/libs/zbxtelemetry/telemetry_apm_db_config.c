@@ -210,24 +210,10 @@ out:
 
 static int	validate_config(const zbx_apm_db_config_t *apm_db_config, char **error)
 {
-	if (NULL != apm_db_config->vault_path && (NULL != apm_db_config->username || NULL != apm_db_config->password))
-	{
-		*error = zbx_strdup(NULL,
-				"vault_path cannot be set when username or password is set in TelemetryProvider");
-		return FAIL;
-	}
-
 	if (NULL == apm_db_config->url)
 	{
 		*error = zbx_dsprintf(NULL, "missing mandatory \"%s\" option in TelemetryProvider",
 				APM_PROVIDER_OPTION_URL);
-		return FAIL;
-	}
-
-	if (NULL == apm_db_config->vault_path && (NULL == apm_db_config->username || NULL == apm_db_config->password))
-	{
-		*error = zbx_strdup(NULL,
-				"either vault_path or username and password must be set in TelemetryProvider");
 		return FAIL;
 	}
 
@@ -236,6 +222,36 @@ static int	validate_config(const zbx_apm_db_config_t *apm_db_config, char **erro
 		*error = zbx_dsprintf(NULL, "missing mandatory \"%s\" option in TelemetryProvider",
 				APM_PROVIDER_OPTION_DB);
 		return FAIL;
+	}
+
+	if (NULL != apm_db_config->vault_path)
+	{
+		if (NULL != apm_db_config->username || NULL != apm_db_config->password)
+		{
+			*error = zbx_dsprintf(NULL,
+					"\"%s\" cannot be set when \"%s\" or \"%s\" is set in TelemetryProvider",
+					APM_PROVIDER_OPTION_VAULT_PATH, APM_PROVIDER_OPTION_USERNAME,
+					APM_PROVIDER_OPTION_PASSWORD);
+			return FAIL;
+		}
+	}
+	else /* NULL == apm_db_config->vault_path */
+	{
+		/* either both username and password must be set or both must be unset */
+
+		if (NULL != apm_db_config->username && NULL == apm_db_config->password)
+		{
+			*error = zbx_dsprintf(NULL, "missing \"%s\" option in TelemetryProvider",
+					APM_PROVIDER_OPTION_PASSWORD);
+			return FAIL;
+		}
+
+		if (NULL != apm_db_config->password && NULL == apm_db_config->username)
+		{
+			*error = zbx_dsprintf(NULL, "missing \"%s\" option in TelemetryProvider",
+					APM_PROVIDER_OPTION_USERNAME);
+			return FAIL;
+		}
 	}
 
 	return SUCCEED;
