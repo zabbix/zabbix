@@ -10,15 +10,12 @@ noinst_PROGRAMS = $(BINARIES_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-PARAM_LIBS = \
+ODBC_LIBS = \
+	$(ANY_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
-	$(MOCK_TEST_DEPS) \
-	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
-	$(JSON_DEPS)
+	$(MOCK_TEST_DEPS)
 
-
-
-PARAM_COMPILER_FLAGS = \
+ODBC_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
 	$(CMOCKA_CFLAGS)
 
@@ -27,12 +24,12 @@ odbc_pass_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 odbc_pass_LDADD = \
-	$(PARAM_LIBS)
+	$(ODBC_LIBS)
 
 odbc_pass_LDADD += @SERVER_LIBS@
 
 odbc_pass_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-odbc_pass_CFLAGS = $(PARAM_COMPILER_FLAGS)
+odbc_pass_CFLAGS = $(ODBC_COMPILER_FLAGS)
 
 endif

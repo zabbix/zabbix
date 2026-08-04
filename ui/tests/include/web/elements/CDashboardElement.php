@@ -18,6 +18,7 @@ require_once 'vendor/autoload.php';
 require_once __DIR__.'/../CElement.php';
 
 use Facebook\WebDriver\Exception\TimeoutException;
+use Facebook\WebDriver\Exception\NoSuchElementException;
 
 /**
  * Dashboard element.
@@ -76,7 +77,18 @@ class CDashboardElement extends CElement {
 			$query->waitUntilPresent();
 		}
 
-		$widget = $query->asWidget()->one($should_exist);
+		try {
+			$widget = $query->asWidget()->one($should_exist);
+		}
+		catch (NoSuchElementException $exception) {
+			/*
+			 * While a widget loads, its header shows the widget type instead of the name, so the name can flicker away
+			 * between waiting for it and retrieving it. Wait for the name again and retry.
+			 */
+			$query->waitUntilPresent();
+			$widget = $query->asWidget()->one($should_exist);
+		}
+
 		if ($widget->isValid() && $should_exist) {
 				$widget->waitUntilReady();
 		}

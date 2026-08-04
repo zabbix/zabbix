@@ -589,6 +589,7 @@ typedef struct
 	int		auditlog_enabled;
 	int		auditlog_mode;
 	int		proxy_secrets_provider;
+	int		enable_mobile_devices;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
@@ -613,6 +614,7 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER		__UINT64_C(0x0000000000000800)
 #define ZBX_CONFIG_FLAGS_ALERT_USRGRPID			__UINT64_C(0x0000000000001000)
 #define ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION		__UINT64_C(0x0000000000002000)
+#define ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES		__UINT64_C(0x0000000000004000)
 
 typedef struct
 {
@@ -1399,6 +1401,7 @@ int	zbx_dc_um_shared_handle_reacquire(zbx_dc_um_shared_handle_t *old_handle, zbx
 zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_copy(zbx_dc_um_shared_handle_t *handle);
 void	zbx_dc_um_shared_handle_release(zbx_dc_um_shared_handle_t *handle);
 
+int	zbx_dc_get_host_proxyid_by_name(const char *host, zbx_uint64_t *proxyid);
 int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
 int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
 
