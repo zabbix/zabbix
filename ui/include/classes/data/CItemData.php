@@ -1865,7 +1865,7 @@ final class CItemData {
 				]
 			],
 			'vfs.fs.get[<mode>,<mountpoint>]' => [
-				'description' => _('List of mounted filesystems, their types, disk space and inode statistics. Returns JSON. mode: full(default), short; mountpoint: exact match.'),
+				'description' => _('List of mounted filesystems, their types, disk space and inode statistics. Returns JSON. Mode: full(default), short; mountpoint: exact match.'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#vfs.fs.get',
