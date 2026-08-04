@@ -39,6 +39,12 @@ class testTriggerCEP extends CIntegrationTest {
 	const RECOVERY_CYCLES_COUNT = 10;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
 	const MAINTENANCE_COUNT_EXTRA = 10;
+	// How many ids the close window scenarios drive (see runEventAssessmentTestCepWindowCloseWindow()). Every
+	// id gets a window of its own and the scenario treats them all alike, so this is a scale knob like the ones
+	// above: the windows of a rule are spread over the CEP worker processes, so raising it is what puts more
+	// than a handful of them to work at once. Use at least 100 to stress CEP; the lowest value the discarding
+	// flavours still say anything with is 2 - one id whose values are dropped and one whose are kept.
+	const CEP_CLOSE_WINDOW_SERVICE_COUNT = 3;
 	const SKIP_RESTART_TESTS = true;
 	// The windowless CEP scenario suppresses its events for a while and can then wait for that suppression to
 	// run out again (see waitForCepWindowNoneUnsuppressed()). That wait is the slowest part of the scenario by
@@ -217,12 +223,14 @@ class testTriggerCEP extends CIntegrationTest {
 	// while the "up" values still end the windows of the ids around it: a discarded event never takes a place in a
 	// window, so the window of that id has nothing to hold and nothing to be closed with, which is the one thing a
 	// discard can do to a window that closes, see prepareDataCepWindowCloseWindowOperations(). The id is the last of
-	// the three the scenario sends, so the two before it are kept and behave exactly as they do without a discard.
+	// the ones the scenario sends, so every id before it is kept and behaves exactly as it does without a discard.
 	const CEP_RULE_WINDOW_SIMPLE_CLOSE_DISCARD = self::CEP_RULE_NAME_PREFIX.'window simple close window discard';
 	const CEP_RULE_WINDOW_TAG_CLOSE_DISCARD = self::CEP_RULE_NAME_PREFIX.'window tag close window discard';
 	const CEP_RULE_WINDOW_CAUSE_CLOSE_DISCARD = self::CEP_RULE_NAME_PREFIX.'window cause close window discard';
 	const CEP_RULE_WINDOW_PATTERN_CLOSE_DISCARD = self::CEP_RULE_NAME_PREFIX.'window pattern close window discard';
-	const CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE = self::CEP_RULE_WINDOW_NONE_SERVICE_LAST;
+	// Which id that is follows from how many the scenario sends, so it is getCloseWindowDiscardService() rather
+	// than a constant: a constant expression cannot read a knob through static:: and would therefore ignore the
+	// count a child class overrides.
 	// Every one of those flavours is additionally run in a variant that closes the events of the window at the
 	// eviction execution point instead of the window closed one - leaving a window because it ends is an eviction
 	// like any other, so the two must close the same problems. The rule of a variant is named after the flavour it
@@ -247,6 +255,8 @@ class testTriggerCEP extends CIntegrationTest {
 	// fitting rather than for having been in the window too long.
 	const CEP_RULE_WINDOW_CAPACITY_DURATION = '2m';
 	const CEP_RULE_WINDOW_CAPACITY = 1;
+	// The close window flavours compute the duration of their windows instead, from the number of ids they drive,
+	// see getCloseWindowDuration().
 	// How long the suppress operation of that rule suppresses an event for. The operation stores a duration
 	// rather than a deadline, so the period is counted from the moment it runs on that event and every event
 	// of the scenario gets the full period of its own - it only has to outlast the verification of the wave
@@ -2538,8 +2548,10 @@ HEREDOC;
 	/**
 	 * Prepare the close window scenario: a window per id that is ended by the rule as soon as that id has
 	 * recovered, which closes the events the window held. The window groups by the 'service' tag, so every id
-	 * gets a window of its own and outlasts the whole scenario (CEP_RULE_WINDOW_CAPACITY_DURATION), so what a
-	 * window holds is exactly the events of its id and only the operations may end it.
+	 * gets a window of its own and outlasts the whole scenario (getCloseWindowDuration()), so what a window
+	 * holds is exactly the events of its id and only the operations may end it. How many ids the scenario drives
+	 * - and therefore how many windows the rule keeps at once - is CEP_CLOSE_WINDOW_SERVICE_COUNT, see
+	 * getCloseWindowServices().
 	 *
 	 * What differs between the flavours is $execute_when, the execution point the close window operation is
 	 * performed at, and therefore what decides that the id has recovered:
@@ -2590,7 +2602,7 @@ HEREDOC;
 	 * and their problems stay open - see runEventAssessmentTestCepWindowCloseWindow().
 	 *
 	 * $discard_down adds one operation on top of all that: the "down" values of a single id
-	 * (CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE) are discarded as they occur. Everything the flavour does is left in
+	 * (getCloseWindowDiscardService()) are discarded as they occur. Everything the flavour does is left in
 	 * place - the other ids fill their windows and their "up" values still end them - so what the scenario compares
 	 * is an id whose event was dropped against the ids around it: the dropped event never took a place in a window,
 	 * so there is nothing for the ending window of that id to close, and it left no problem of its own either. That
@@ -2605,7 +2617,7 @@ HEREDOC;
 		$this->deleteCepRules();
 
 		$window = [
-			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
+			'duration' => static::getCloseWindowDuration(),
 			// Only the eviction flavour needs an event not to fit; the others must hold everything they are given.
 			'capacity' => $execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED ? self::CEP_RULE_WINDOW_CAPACITY : 0,
 			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
@@ -2704,7 +2716,7 @@ HEREDOC;
 			// Discarding is decided while the rules are matched, before the event is stored and before any window is
 			// given it, so a discarded event never takes a place in a window, is never ranked by one and is never
 			// closed with one - it leaves nothing at all behind. What is discarded here are the "down" values of a
-			// single id (CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE), so the ids around it keep filling their windows and
+			// single id (getCloseWindowDiscardService()), so the ids around it keep filling their windows and
 			// the "up" values still end them: the operations above are left to do their work, and the one id whose
 			// event was dropped is what shows the difference. Conditions on distinct tags are AND-ed, so this
 			// matches an event that is both a "down" one and of that id.
@@ -2716,7 +2728,7 @@ HEREDOC;
 				'tags' => [
 					['tag' => self::CEP_STATE_TAG_DOWN, 'operator' => TAG_OPERATOR_EXISTS, 'value' => ''],
 					['tag' => 'service', 'operator' => TAG_OPERATOR_EQUAL,
-						'value' => self::CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE
+						'value' => static::getCloseWindowDiscardService()
 					]
 				]
 			]);
@@ -9777,6 +9789,42 @@ HEREDOC;
 	}
 
 	/**
+	 * The 'service' ids the close window scenarios drive, CEP_CLOSE_WINDOW_SERVICE_COUNT of them counted from zero.
+	 * An id is the trailing number of the item value (see prepareCloseOnUpTriggerPrototypes()), so counting up
+	 * gives as many distinct ids - and, the windows being grouped by that tag, as many windows - as the knob asks
+	 * for. Which ids they are does not matter to these scenarios, unlike in the windowless one where the ids
+	 * (CEP_RULE_WINDOW_NONE_SERVICE and its two companions) are chosen to tell the operators apart.
+	 *
+	 * The knob is read through static:: so a child class raising it (see testTriggerCEPAtScale) redirects every
+	 * flavour of the scenario at once, which is also why the ids are computed here instead of being listed.
+	 */
+	private static function getCloseWindowServices(): array {
+		return array_map('strval', range(0, static::CEP_CLOSE_WINDOW_SERVICE_COUNT - 1));
+	}
+
+	/**
+	 * The id whose "down" values the discarding close window flavours drop: the last of the ones the scenario
+	 * sends, so every id before it is kept and behaves exactly as it does without a discard. That there is an id
+	 * before it is what the flavour compares against, which is why the smallest count still saying anything is 2.
+	 */
+	private static function getCloseWindowDiscardService(): string {
+		$services = static::getCloseWindowServices();
+
+		return end($services);
+	}
+
+	/**
+	 * How long the windows of the close window scenarios last. They must outlast the whole scenario - an expiring
+	 * window would evict what it holds and close the problems the scenario expects to find open - and how long
+	 * that takes grows with the number of ids driven, two values and their verification per id, so the duration
+	 * grows with it as well. Nothing is waited for on it, so it is generous: the rules are deleted once the
+	 * flavour is done, taking their windows with them, and a window that lasts longer than needed costs nothing.
+	 */
+	private static function getCloseWindowDuration(): string {
+		return (120 + 30 * count(static::getCloseWindowServices())).'s';
+	}
+
+	/**
 	 * Drive every flavour of the close window scenario, whose $rule_name rule ends the window of an id once that
 	 * id has recovered - on a pattern match, on the arrival of the "up" event or on its eviction, see
 	 * prepareDataCepWindowCloseWindowOperations(). What ends the window is the only difference between the
@@ -9793,11 +9841,15 @@ HEREDOC;
 	 * second, so the closing follows the "up" value rather than accompanying it - which is why every step of this
 	 * scenario is waited for rather than asserted right away.
 	 *
+	 * Every id is driven the same way and none of the steps depends on how many there are, so the number of ids is
+	 * a scale knob instead (CEP_CLOSE_WINDOW_SERVICE_COUNT, see getCloseWindowServices()): raising it makes the
+	 * rule keep that many windows open at once, which is what spreads the scenario over the CEP worker processes.
+	 *
 	 * After the "up" of every id nothing is left open, and closing the last problem of a trigger is what puts the
 	 * trigger itself back to OK, so no recovery value is needed.
 	 *
 	 * $discarded drives the flavours whose rule additionally discards the "down" values of one id
-	 * (CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE). The "up" values still end the windows of the ids around it, so what
+	 * (getCloseWindowDiscardService()). The "up" values still end the windows of the ids around it, so what
 	 * changes is only what those windows have to give: the discarded id opens no problem in step 1 and is left out of
 	 * step 2, so nothing is ever sent for it that a window could hold or close. That it left nothing behind is
 	 * asserted once every kept value has been processed - by then an event that had been stored would be there.
@@ -9819,14 +9871,12 @@ HEREDOC;
 			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
 		]);
 
-		$services = [self::CEP_RULE_WINDOW_NONE_SERVICE, self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT,
-			self::CEP_RULE_WINDOW_NONE_SERVICE_LAST
-		];
+		$services = self::getCloseWindowServices();
 
 		// The discarding flavours drop the "down" values of this one id, so it opens no problem and gets no window.
 		// It is left out of the "up" values as well: with nothing of its own stored, an "up" of that id would be
 		// given a window of its own and closed with it, which says nothing about the event that was dropped.
-		$discarded_service = $discarded ? self::CEP_RULE_WINDOW_CLOSE_DISCARD_SERVICE : null;
+		$discarded_service = $discarded ? static::getCloseWindowDiscardService() : null;
 
 		// 1. Every id takes the place its own window has for it, and a window that has seen no "up" event is not
 		//    closed. The discarded id takes no place anywhere - there is nothing to wait for after its value, and

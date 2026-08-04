@@ -33,6 +33,9 @@ class testTriggerCEPAtScale extends testTriggerCEP {
 	const RECOVERY_CYCLES_COUNT = 2000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
 	const MAINTENANCE_COUNT_EXTRA = 10;
+	// One window per id, so this is how many windows of the same rule the close window flavours keep open at
+	// once - enough of them to be spread over the CEP worker processes instead of a handful.
+	const CEP_CLOSE_WINDOW_SERVICE_COUNT = 100;
 	const SKIP_RESTART_TESTS = true;
 
 	// Larger scale needs longer to settle; override the parent's reduced default back up.
