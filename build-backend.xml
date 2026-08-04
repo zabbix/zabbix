@@ -249,7 +249,7 @@
 
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
-			<arg line="src"/>
+			<arg line="."/>
 			<arg line="-zerocounters"/>
 		</exec>
 		<exec executable="./bootstrap.sh" failonerror="on">
@@ -258,7 +258,7 @@
 		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql" conf-name="gen-test-coverage-report"/>
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
-			<arg line="src"/>
+			<arg line="."/>
 			<arg line="--capture"/>
 			<arg line="--output-file"/>
 			<arg line="tests_results/html/app.info"/>
