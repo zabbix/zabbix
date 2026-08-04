@@ -236,13 +236,21 @@ class testTriggerCEP extends CIntegrationTest {
 	// like any other, so the two must close the same problems. The rule of a variant is named after the flavour it
 	// varies with this suffix appended, see buildEvictCloseRuleName().
 	const CEP_RULE_WINDOW_CLOSE_EVICT_SUFFIX = ' with evict close';
-	// The reset scenario (see prepareDataCepWindowResetOperations()) is run once per window type that has a window
-	// at all: resetting a rule throws away the windows it has open, and what a window holds is the one thing every
-	// window type keeps, so each of them must lose it the same way.
+	// The reset scenario (see prepareDataCepWindowHeldProblemsOperations()) is run once per window type that has a
+	// window at all: resetting a rule throws away the windows it has open, and what a window holds is the one thing
+	// every window type keeps, so each of them must lose it the same way.
 	const CEP_RULE_WINDOW_SIMPLE_RESET = self::CEP_RULE_NAME_PREFIX.'window simple reset';
 	const CEP_RULE_WINDOW_TAG_RESET = self::CEP_RULE_NAME_PREFIX.'window tag reset';
 	const CEP_RULE_WINDOW_CAUSE_RESET = self::CEP_RULE_NAME_PREFIX.'window cause reset';
 	const CEP_RULE_WINDOW_PATTERN_RESET = self::CEP_RULE_NAME_PREFIX.'window pattern reset';
+	// The delete scenario is run over the same rule of every window type, differing only in how the rule is taken
+	// away: deleting it must do to its windows what resetting it does, and it additionally takes the rule itself, so
+	// nothing opens a window again and what those windows held is the last thing the rule ever holds - see
+	// runEventAssessmentTestCepWindowDelete().
+	const CEP_RULE_WINDOW_SIMPLE_DELETE = self::CEP_RULE_NAME_PREFIX.'window simple delete';
+	const CEP_RULE_WINDOW_TAG_DELETE = self::CEP_RULE_NAME_PREFIX.'window tag delete';
+	const CEP_RULE_WINDOW_CAUSE_DELETE = self::CEP_RULE_NAME_PREFIX.'window cause delete';
+	const CEP_RULE_WINDOW_PATTERN_DELETE = self::CEP_RULE_NAME_PREFIX.'window pattern delete';
 	// The built in tag telling a symptom apart from a cause, the counterpart of CEP_TAG_IS_COPIED for the rank a
 	// cause and symptom window assigns.
 	const CEP_TAG_IS_SYMPTOM = '$IS.SYMPTOM';
@@ -2744,62 +2752,104 @@ HEREDOC;
 	}
 
 	/**
-	 * Prepare the simple window flavour of the reset scenario, see prepareDataCepWindowResetOperations().
+	 * Prepare the simple window flavour of the reset scenario, see prepareDataCepWindowHeldProblemsOperations().
 	 */
 	public function prepareDataCepWindowSimpleReset() {
-		return $this->prepareDataCepWindowResetOperations(CCepRuleHelper::WINDOW_SIMPLE,
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_SIMPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_RESET
 		);
 	}
 
 	/**
-	 * Prepare the tag correlation flavour of the reset scenario, see prepareDataCepWindowResetOperations().
+	 * Prepare the tag correlation flavour of the reset scenario, see
+	 * prepareDataCepWindowHeldProblemsOperations().
 	 */
 	public function prepareDataCepWindowTagReset() {
-		return $this->prepareDataCepWindowResetOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
 			self::CEP_RULE_WINDOW_TAG_RESET
 		);
 	}
 
 	/**
-	 * Prepare the cause and symptom flavour of the reset scenario, see prepareDataCepWindowResetOperations().
+	 * Prepare the cause and symptom flavour of the reset scenario, see
+	 * prepareDataCepWindowHeldProblemsOperations().
 	 */
 	public function prepareDataCepWindowCauseSymptomReset() {
-		return $this->prepareDataCepWindowResetOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 			self::CEP_RULE_WINDOW_CAUSE_RESET
 		);
 	}
 
 	/**
-	 * Prepare the pattern match flavour of the reset scenario, see prepareDataCepWindowResetOperations().
+	 * Prepare the pattern match flavour of the reset scenario, see prepareDataCepWindowHeldProblemsOperations().
 	 */
 	public function prepareDataCepWindowPatternReset() {
-		return $this->prepareDataCepWindowResetOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
 			self::CEP_RULE_WINDOW_PATTERN_RESET
 		);
 	}
 
 	/**
-	 * Prepare the reset scenario: the same window every close window flavour uses - one per id, grouped by the
-	 * 'service' tag and outlasting the whole scenario (CEP_RULE_WINDOW_CAPACITY_DURATION), so what a window holds
-	 * is exactly the events of its id and only the operations may end it - given the two operations that make what
-	 * a window holds visible from the outside:
+	 * Prepare the simple window flavour of the delete scenario, see prepareDataCepWindowHeldProblemsOperations().
+	 */
+	public function prepareDataCepWindowSimpleDelete() {
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_DELETE
+		);
+	}
+
+	/**
+	 * Prepare the tag correlation flavour of the delete scenario, see
+	 * prepareDataCepWindowHeldProblemsOperations().
+	 */
+	public function prepareDataCepWindowTagDelete() {
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+			self::CEP_RULE_WINDOW_TAG_DELETE
+		);
+	}
+
+	/**
+	 * Prepare the cause and symptom flavour of the delete scenario, see
+	 * prepareDataCepWindowHeldProblemsOperations().
+	 */
+	public function prepareDataCepWindowCauseSymptomDelete() {
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_WINDOW_CAUSE_DELETE
+		);
+	}
+
+	/**
+	 * Prepare the pattern match flavour of the delete scenario, see prepareDataCepWindowHeldProblemsOperations().
+	 */
+	public function prepareDataCepWindowPatternDelete() {
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_DELETE
+		);
+	}
+
+	/**
+	 * Prepare the rule of the two scenarios that take a rule away while its windows are holding problems - the
+	 * reset one (runEventAssessmentTestCepWindowReset()) and the delete one
+	 * (runEventAssessmentTestCepWindowDelete()): the same window every close window flavour uses - one per id,
+	 * grouped by the 'service' tag and outlasting the whole scenario (CEP_RULE_WINDOW_CAPACITY_DURATION), so what a
+	 * window holds is exactly the events of its id and only the operations may end it - given the two operations
+	 * that make what a window holds visible from the outside:
 	 *   - "close window" when an "up" event occurs, restricted to those events by a tag exists condition on
 	 *     CEP_STATE_TAG_UP, a tag only an "up" event carries because its name is resolved from the item value;
 	 *   - "close" when the window closes, which reaches every event that window held.
 	 *
 	 * Together they close the problems of an id the moment it recovers, exactly as the arrival flavour of the close
-	 * window scenario does (prepareDataCepWindowCloseWindowOperations()) - which is what the reset is measured
-	 * against: the recovery of an id closes what the window of that id holds, so after a reset it closes only what
-	 * the id was sent afterwards, and the problems the reset window had been holding are left open for the trigger
-	 * expression to recover. Neither operation is tied to the window type, so every window type is given the same
-	 * pair and must produce the same outcome, see runEventAssessmentTestCepWindowReset().
+	 * window scenario does (prepareDataCepWindowCloseWindowOperations()) - which is what taking the rule away is
+	 * measured against: the recovery of an id closes what the window of that id holds, so once those windows are
+	 * gone the problems they had been holding are left open for the trigger expression to recover, whether the rule
+	 * was reset or deleted. Neither operation is tied to the window type, so every window type is given the same
+	 * pair and must produce the same outcome.
 	 *
 	 * $window_type is the type under test. A pattern match window cannot be without a script and this scenario is
 	 * not driven by a match, so that type gets one that never reports one - the events of its window are only ever
 	 * acted on by the operations above, as in the window types that have no script at all.
 	 */
-	private function prepareDataCepWindowResetOperations(int $window_type, string $name) {
+	private function prepareDataCepWindowHeldProblemsOperations(int $window_type, string $name) {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this scenario is the only thing that may close a problem.
@@ -2808,8 +2858,8 @@ HEREDOC;
 
 		$window = [
 			'duration' => 3,
-			// Every event must be held: the reset is about what a window has in it, so nothing may be evicted for
-			// not fitting.
+			// Every event must be held: both scenarios are about what a window has in it when it is taken away, so
+			// nothing may be evicted for not fitting.
 			'capacity' => 0,
 			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
 			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
@@ -8182,6 +8232,82 @@ HEREDOC;
 		}
 	}
 
+	/* Deletion of a rule - test that the windows of each window type are thrown away with it, and stay away */
+
+	/**
+	 * Deleting a rule whose simple windows are holding the problems of three ids: the windows are thrown away with
+	 * everything in them, and unlike a reset the delete takes the rule with them - so the values that used to close
+	 * those problems close nothing and everything is left to the trigger expression, see
+	 * runEventAssessmentTestCepWindowDelete().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleDelete$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleDelete() {
+		$this->prepareDataCepWindowSimpleDelete();
+
+		try {
+			$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_SIMPLE_DELETE);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same delete scenario with tag correlation windows: correlating the events of a group is not what keeps
+	 * them, so deleting the rule must empty this window type exactly as it empties a simple one - see
+	 * runEventAssessmentTestCepWindowDelete().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagDelete$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagDelete() {
+		$this->prepareDataCepWindowTagDelete();
+
+		try {
+			$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_TAG_DELETE);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same delete scenario with cause and symptom windows, the one window type that ranks what it is given: the
+	 * delete takes the cause of every id with the window that ranked it, and no window ranks anything afterwards, so
+	 * every event that follows the delete is a cause of nothing and a symptom of nothing - see
+	 * runEventAssessmentTestCepWindowDelete().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomDelete$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomDelete() {
+		$this->prepareDataCepWindowCauseSymptomDelete();
+
+		try {
+			$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_CAUSE_DELETE);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same delete scenario with pattern match windows, the one window type that is examined on its own: a deleted
+	 * window is gone rather than closed and there is no rule left to examine one, so neither the events it held nor
+	 * the ones sent afterwards are acted on by anything - see runEventAssessmentTestCepWindowDelete().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternDelete$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternDelete() {
+		$this->prepareDataCepWindowPatternDelete();
+
+		try {
+			$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_PATTERN_DELETE);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
 	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
@@ -9942,9 +10068,9 @@ HEREDOC;
 
 	/**
 	 * Drive the reset scenario of the $rule_name rule, whose windows hold the problems of the ids that opened them
-	 * and close them once that id recovers, see prepareDataCepWindowResetOperations(). The rule is reset while its
-	 * windows are full, and what that must do is asserted from the outside, by what the rule can and cannot close
-	 * afterwards:
+	 * and close them once that id recovers, see prepareDataCepWindowHeldProblemsOperations(). The rule is reset
+	 * while its windows are full, and what that must do is asserted from the outside, by what the rule can and
+	 * cannot close afterwards:
 	 *
 	 *   1. every id gets a window of its own and no window expires, so the three "down" values leave three open
 	 *      problems, one held by each window. Their eventids are what the reset is measured on;
@@ -10063,6 +10189,123 @@ HEREDOC;
 		$error = $this->getCepRuleError($rule_name);
 
 		$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error: '.$error);
+	}
+
+	/**
+	 * Drive the delete scenario of the $rule_name rule, the same rule the reset scenario drives - its windows hold
+	 * the problems of the ids that opened them and close them once that id recovers, see
+	 * prepareDataCepWindowHeldProblemsOperations(). This time the rule is deleted while its windows are full instead
+	 * of being reset, so it is taken away with them:
+	 *
+	 *   1. every id gets a window of its own and no window expires, so the three "down" values leave three open
+	 *      problems, one held by each window. Their eventids are what the delete is measured on;
+	 *   2. the rule is deleted. The windows of a deleted rule are thrown away rather than closed - the operations of
+	 *      a closing window are not performed for the events it held, and a deleted rule has no operations left to
+	 *      perform at all - so nothing of the three problems changes;
+	 *   3. a second "down" value per id. This is where a delete parts with a reset: a reset rule opens a window
+	 *      again, a deleted one is not there to assess anything, so the problems of these values are held by nothing
+	 *      and six problems are open;
+	 *   4. the "up" value of an id, the value that had been ending the window of that id and closing everything it
+	 *      held. There is no rule to act on it, so it closes nothing and is left open as a problem of its own -
+	 *      "up" is not a recovery value for this trigger. All nine problems the trigger was given are therefore
+	 *      open, and among them, asserted by eventid, are the very three of step 1: the windows that had been
+	 *      holding them went away with the rule instead of closing them;
+	 *   5. only the trigger expression can close any of them - the recovery value closes all nine and returns the
+	 *      trigger to OK.
+	 *
+	 * The scenario is the same for every window type: what a window holds is not what tells the types apart, so
+	 * deleting a rule must take it away from all of them alike.
+	 */
+	private function runEventAssessmentTestCepWindowDelete(string $rule_name): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the delete test of "'.$rule_name.'".');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$services = [self::CEP_RULE_WINDOW_NONE_SERVICE, self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT,
+			self::CEP_RULE_WINDOW_NONE_SERVICE_LAST
+		];
+
+		// 1. Every id takes the place its own window has for it, and a window that has seen no "up" event is not
+		//    closed, so every problem stays open.
+		$open = 0;
+
+		foreach ($services as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, ++$open);
+			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+			$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
+		}
+
+		// The problems the windows are holding when the rule is deleted. They are what the delete is measured on:
+		// these exact problems have to be among the ones still open once the rule is gone and the values that used
+		// to close them have been sent.
+		$held = $this->getOpenProblemEventids($all);
+
+		$this->assertCount(count($services), $held,
+			'Expected one held problem per id before deleting "'.$rule_name.'", got: '.implode(', ', $held)
+		);
+
+		// The rule held those problems without failing on any of them, so whatever the delete leads to is the
+		// delete and not a rule that had already stopped working.
+		$error = $this->getCepRuleError($rule_name);
+
+		$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error: '.$error);
+
+		// 2. Delete the rule while all three windows are holding a problem, and wait for the server to pick up the
+		//    configuration the rule is no longer in - the rule is gone from the database right away, but it is the
+		//    configuration cache the event assessment reads it from.
+		$this->deleteCepRule($rule_name);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+		$this->waitForCepTasksDrained();
+
+		// The windows went away with the rule rather than being closed: the "close" operation of a closing window is
+		// not performed for the events they held, so the problems are exactly as they were.
+		$this->waitForOpenProblemCount($all, $open);
+
+		// 3. A second "down" value per id. There is no rule left to assess them, so no window takes them and their
+		//    problems are held by nothing.
+		foreach ($services as $service) {
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, ++$open);
+			$this->waitForOpenProblemCountByTag($all, 'service', $service, 2);
+		}
+
+		// 4. The "up" value of an id, the one value the deleted rule used to close everything of that id on. Nothing
+		//    acts on it any more, so all three problem events of the id are open - the two "down" ones and the "up"
+		//    one, which is a problem of its own because "up" is not a recovery value for this trigger.
+		foreach ($services as $service) {
+			$send('up_'.$service);
+			$this->waitForProblemEventCountByTag($all, 'service', $service, 3);
+			$this->waitForOpenProblemCountByTag($all, 'service', $service, 3);
+		}
+
+		$this->waitForOpenProblemCount($all, 3 * count($services));
+
+		// Nothing was closed, so the problems the windows had been holding when the rule was deleted are still among
+		// the open ones - had the delete closed those windows instead of discarding them, they would be gone.
+		$left = $this->getOpenProblemEventids($all);
+
+		$this->assertSame($held, array_values(array_intersect($left, $held)),
+			'The problems the windows of "'.$rule_name.'" were holding when it was deleted are no longer open: '
+				.'expected '.implode(', ', $held).' among '.implode(', ', $left).'.'
+		);
+
+		// 5. There is no rule to close any of them, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the window delete scenario of "'.$rule_name.'"');
 	}
 
 	/**
@@ -10912,6 +11155,32 @@ HEREDOC;
 		$this->assertNotFalse($result,
 			'The server refused to reset the CEP rule "'.$name.'": '.$client->getError()
 		);
+	}
+
+	/**
+	 * Delete the single CEP rule named $name over the API, the counterpart of resetCepRule() for the scenarios that
+	 * take a rule away for good. Unlike deleteCepRules() this names the rule under test rather than every rule of
+	 * the suite, so it also asserts that the rule was there to be deleted and is gone afterwards.
+	 *
+	 * The rule is removed from the database by this, not from the running server - the configuration cache has to be
+	 * reloaded before the server stops assessing events against it.
+	 */
+	private function deleteCepRule(string $name): void {
+		$response = $this->call('ceprule.get', [
+			'filter' => ['name' => $name],
+			'output' => ['cep_ruleid']
+		]);
+
+		$this->assertNotEmpty($response['result'], 'There is no CEP rule named "'.$name.'" to delete.');
+
+		$this->call('ceprule.delete', [$response['result'][0]['cep_ruleid']]);
+
+		$response = $this->call('ceprule.get', [
+			'filter' => ['name' => $name],
+			'output' => ['cep_ruleid']
+		]);
+
+		$this->assertEmpty($response['result'], 'The CEP rule "'.$name.'" is still there after it was deleted.');
 	}
 
 	/**
