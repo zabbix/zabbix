@@ -72,6 +72,13 @@ class CLocalApiClient extends CApiClient {
 			return $response;
 		}
 
+		if ($this->requiresAuthentication($api, $method) && CApiService::$userData === null) {
+			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+			$response->errorMessage = _('Session terminated, re-login, please.');
+
+			return $response;
+		}
+
 		$newTransaction = false;
 		try {
 			// check permissions
