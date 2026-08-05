@@ -325,6 +325,16 @@ class testTriggerCEP extends CIntegrationTest {
 	// the dropped one against. The rule of a single id variant is named after the flavour it varies with this suffix
 	// appended, see buildSingleServiceRuleName().
 	const CEP_RULE_WINDOW_CLOSE_SINGLE_SUFFIX = ' single id';
+	// The flavours of the window types that are not exclusive are additionally run with a second rule of their own
+	// kind beside the first, so two rules keep a window of the same events at once and both of them close it: only
+	// a simple and a pattern match window may be doubled that way, a tag correlation and a cause and symptom window
+	// being the types of which only the first matching rule is ever processed for an event (CEP_WINDOW_UNIQ in
+	// cep_event_process_rules()), so a second rule of those types could not act on the same event at all. The second
+	// rule is the first one plus a tag it adds as an event occurs (CEP_TAG_WINDOW_SECOND), which is what tells from
+	// the outside that it really was processed for the events the first rule closed, see
+	// prepareDataCepWindowCloseWindowOperations(). Its rule is named after the flavour it doubles with this suffix
+	// appended, see buildSecondRuleName().
+	const CEP_RULE_WINDOW_CLOSE_SECOND_SUFFIX = ' second rule';
 	// Every one of those flavours is additionally run in a variant that closes the events of the window at the
 	// eviction execution point instead of the window closed one - leaving a window because it ends is an eviction
 	// like any other, so the two must close the same problems. The rule of a variant is named after the flavour it
@@ -2514,6 +2524,16 @@ HEREDOC;
 	}
 
 	/**
+	 * The name of the second rule of the $name flavour, the one a doubled flavour puts beside the first so that two
+	 * rules hold and close a window of the same events at once. The scenario needs it in two places as the names above
+	 * are needed - the rule is created under it and the assessment reports its errors - see
+	 * prepareDataCepWindowCloseWindowOperations().
+	 */
+	private static function buildSecondRuleName(string $name): string {
+		return $name.self::CEP_RULE_WINDOW_CLOSE_SECOND_SUFFIX;
+	}
+
+	/**
 	 * Prepare the pattern match flavour of the close window scenario, whose close window operation is performed
 	 * on a pattern match, see prepareDataCepWindowCloseWindowOperations().
 	 */
@@ -2957,6 +2977,116 @@ HEREDOC;
 	}
 
 	/**
+	 * The doubled variants of every close window flavour that may have one: the rule of the flavour is created twice -
+	 * once under its own name and once under buildSecondRuleName() - so two rules of the same window type keep a window
+	 * of the same events at once and both of them close it when it ends, see
+	 * prepareDataCepWindowCloseWindowOperations() and runEventAssessmentTestCepWindowCloseWindow().
+	 *
+	 * Only the simple and the pattern match flavours are doubled. A tag correlation and a cause and symptom window are
+	 * the exclusive window types - only the first matching rule of such a type is processed for an event (CEP_WINDOW_UNIQ
+	 * in cep_event_process_rules()) - so their second rule would never be given the event the first one took, which is
+	 * asserted where it belongs, in the operations scenario (see prepareDataCepWindowOperations()). The discarding
+	 * flavours are left out as well: a discarded event is dropped while the rules are matched and reaches neither rule's
+	 * window, so doubling the rule adds nothing to what a discard says.
+	 */
+	public function prepareDataCepWindowPatternCloseWindowDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE, CCepRuleHelper::WHEN_PATTERN_MATCHED,
+			CCepRuleHelper::WHEN_WINDOW_CLOSED, false, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowPatternCloseWindowDoubleRule()
+	 */
+	public function prepareDataCepWindowPatternCloseWindowWithEvictCloseDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE),
+			CCepRuleHelper::WHEN_PATTERN_MATCHED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowPatternCloseWindowDoubleRule()
+	 */
+	public function prepareDataCepWindowPatternCloseWindowOnEventDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT, CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			CCepRuleHelper::WHEN_WINDOW_CLOSED, false, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowPatternCloseWindowDoubleRule()
+	 */
+	public function prepareDataCepWindowPatternCloseWindowOnEventWithEvictCloseDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT),
+			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowPatternCloseWindowDoubleRule()
+	 */
+	public function prepareDataCepWindowPatternCloseWindowOnEvictedDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED,
+			CCepRuleHelper::WHEN_WINDOW_CLOSED, false, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowPatternCloseWindowDoubleRule()
+	 */
+	public function prepareDataCepWindowPatternCloseWindowOnEvictedWithEvictCloseDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED),
+			CCepRuleHelper::WHEN_EVENT_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowPatternCloseWindowDoubleRule()
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE, CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			CCepRuleHelper::WHEN_WINDOW_CLOSED, false, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowPatternCloseWindowDoubleRule()
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowWithEvictCloseDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE),
+			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowPatternCloseWindowDoubleRule()
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowOnEvictedDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED,
+			CCepRuleHelper::WHEN_WINDOW_CLOSED, false, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowPatternCloseWindowDoubleRule()
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowOnEvictedWithEvictCloseDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED),
+			CCepRuleHelper::WHEN_EVENT_EVICTED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true
+		);
+	}
+
+	/**
 	 * Prepare the close window scenario: a window per id that is ended by the rule as soon as that id has
 	 * recovered, which closes the events the window held. The window groups by the 'service' tag, so every id
 	 * gets a window of its own and outlasts the whole scenario (getCloseWindowDuration()), so what a window
@@ -3033,10 +3163,19 @@ HEREDOC;
 	 * so both limits of the window are sized from those instead - the duration from the one id the flavour drives and
 	 * the capacity, for an eviction flavour, from how deep that one window goes. Nothing else about the rule changes,
 	 * which is what lets the same assessment drive it.
+	 *
+	 * $second_rule creates the whole rule a second time under buildSecondRuleName(), so two rules of the same window
+	 * type keep a window of the same events at once and both of them close it when it ends. Only the window types that
+	 * are not exclusive can be doubled - of a tag correlation and a cause and symptom window only the first matching
+	 * rule is ever processed for an event (CEP_WINDOW_UNIQ in cep_event_process_rules()), so a second rule of those
+	 * types would never see the event the first one took. The second rule differs from the first in one operation
+	 * only: it adds CEP_TAG_WINDOW_SECOND as an event occurs, which is what the assessment reads to know it was
+	 * processed for the very events the first rule's window closed. Closing a problem twice may not do anything more
+	 * than closing it once, so the doubled flavours assert what the single ones do.
 	 */
 	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when,
 			int $close_when = CCepRuleHelper::WHEN_WINDOW_CLOSED, bool $discard_down = false,
-			bool $single_service = false) {
+			bool $single_service = false, bool $second_rule = false) {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this flavour is the only thing that may close a problem.
@@ -3190,6 +3329,27 @@ HEREDOC;
 		$this->assertSame(self::CEP_WINDOW_CAPACITY_MACRO, $stored['result'][0]['window']['capacity'],
 			'The window of "'.$name.'" must keep its capacity macro unresolved.'
 		);
+
+		if ($second_rule) {
+			// The second rule of a doubled flavour: the rule above once more, window and operations alike, so two
+			// windows of the same events exist at once and both of them are closed by what ends them. Only its name
+			// and one added operation differ - the tag it adds as an event occurs, which is what shows from the
+			// outside that this rule was processed for the events the other one closes. A higher rule sortorder puts
+			// it second of the two, so which of them acts first is fixed rather than left to the order the rules
+			// happen to be stored in.
+			$second_operations = array_merge($operations, [[
+				'sortorder' => 3,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_ADD_TAG,
+				'tag' => self::CEP_TAG_WINDOW_SECOND,
+				'tag_value' => self::CEP_TAG_WINDOW_SECOND_VALUE
+			]]);
+
+			$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams(
+				self::buildSecondRuleName($name), [], $second_operations, CONDITION_EVAL_TYPE_AND, '', $window_type,
+				$window
+			));
+		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -9034,6 +9194,132 @@ HEREDOC;
 		}
 	}
 
+	/**
+	 * The pattern match close window flavour with a second rule of its own kind beside the first: the same window and
+	 * the same operations twice over, so both rules keep a window of the same events and the script of each of them
+	 * finds the "up" event of an id in the window it was handed. Both windows are therefore closed and every problem
+	 * of that id is closed by two rules rather than one, which may leave it no different from being closed once - the
+	 * counts this asserts are the ones of testTriggerCEP_CepWindowPatternCloseWindow. A pattern match window is not
+	 * one of the exclusive window types, so the second rule really is processed for those events, and the tag it adds
+	 * as an event occurs is what says so - see runEventAssessmentTestCepWindowCloseWindow().
+	 *
+	 * This is the first of the doubled flavours: the rest of them vary the execution point that ends the window and
+	 * where the events it held are closed, exactly as they do with one rule, see
+	 * prepareDataCepWindowPatternCloseWindowDoubleRule().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowDoubleRule() {
+		$this->prepareDataCepWindowPatternCloseWindowDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE, false, false, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The doubled variant of testTriggerCEP_CepWindowPatternCloseWindowWithEvictClose: both windows are closed by a
+	 * pattern match and both close the events they held at the eviction execution point instead of the window closed
+	 * one - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowWithEvictCloseDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowWithEvictCloseDoubleRule() {
+		$this->prepareDataCepWindowPatternCloseWindowWithEvictCloseDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE), false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The doubled variant of testTriggerCEP_CepWindowPatternCloseWindowOnEvent: the "up" event closes both windows it
+	 * has just entered, one per rule, and the problems of its id are closed with both of them - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowOnEventDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowOnEventDoubleRule() {
+		$this->prepareDataCepWindowPatternCloseWindowOnEventDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT, false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The doubled variant of testTriggerCEP_CepWindowPatternCloseWindowOnEventWithEvictClose: both windows are closed
+	 * by the arriving "up" event and both close what they held at the eviction execution point - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowOnEventWithEvictCloseDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowOnEventWithEvictCloseDoubleRule() {
+		$this->prepareDataCepWindowPatternCloseWindowOnEventWithEvictCloseDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT), false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The doubled variant of testTriggerCEP_CepWindowPatternCloseWindowOnEvicted: each rule has a window with room for
+	 * exactly the "down" events of an id, so the "up" event of that id fits into neither of them and is evicted from
+	 * both - one event ending two windows - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowOnEvictedDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowOnEvictedDoubleRule() {
+		$this->prepareDataCepWindowPatternCloseWindowOnEvictedDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED, false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The doubled variant of testTriggerCEP_CepWindowPatternCloseWindowOnEvictedWithEvictClose: the "up" event is
+	 * evicted from both windows and reaches the one "close" operation of each rule that closes the evicted event and
+	 * everything its window held alike - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowOnEvictedWithEvictCloseDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowOnEvictedWithEvictCloseDoubleRule() {
+		$this->prepareDataCepWindowPatternCloseWindowOnEvictedWithEvictCloseDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED), false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
 	/* Close window operation - test abbility to close window for each type of window */
 
 	/**
@@ -9220,6 +9506,86 @@ HEREDOC;
 					self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED)
 				),
 				false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The simple window close window flavour with a second rule of its own kind beside the first: a simple window is
+	 * not exclusive either, so both rules take every event into a window of their own and the arriving "up" event
+	 * closes both of those windows and the problems each of them held. Being closed by two rules may leave a problem
+	 * no different from being closed by one, so the counts are those of testTriggerCEP_CepWindowSimpleCloseWindow -
+	 * see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowDoubleRule() {
+		$this->prepareDataCepWindowSimpleCloseWindowDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE, false, false, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The doubled variant of testTriggerCEP_CepWindowSimpleCloseWindowWithEvictClose: both windows are closed by the
+	 * arriving "up" event and both close the events they held at the eviction execution point instead of the window
+	 * closed one - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowWithEvictCloseDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowWithEvictCloseDoubleRule() {
+		$this->prepareDataCepWindowSimpleCloseWindowWithEvictCloseDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE), false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The doubled variant of testTriggerCEP_CepWindowSimpleCloseWindowOnEvicted: each rule has a window with room for
+	 * exactly the "down" events of an id, so the "up" event of that id is evicted from both and ends two windows
+	 * without having entered either - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedDoubleRule() {
+		$this->prepareDataCepWindowSimpleCloseWindowOnEvictedDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED, false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The doubled variant of testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedWithEvictClose: the "up" event is
+	 * evicted from both windows and reaches the one "close" operation of each rule that closes the evicted event and
+	 * everything that rule's window held alike - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedWithEvictCloseDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedWithEvictCloseDoubleRule() {
+		$this->prepareDataCepWindowSimpleCloseWindowOnEvictedWithEvictCloseDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED), false, false, true
 			);
 		}
 		finally {
@@ -11645,9 +12011,21 @@ HEREDOC;
 	 * the trigger behind an event may neither keep it out of the group nor split the group into one window per trigger,
 	 * and when the window closes, the problems it closes are spread over that many triggers, each of which must return
 	 * to OK once the last of its own is gone.
+	 *
+	 * $doubled drives the flavours whose rule was created twice (prepareDataCepWindowCloseWindowOperations()), which
+	 * only the window types that are not exclusive can be: two rules then keep a window of the same events at once and
+	 * both windows are closed by what ends them, so every problem is closed by two rules instead of one. Closing a
+	 * problem that is already closed may not do anything, so what this asserts is the outcome of the single rule
+	 * flavours unchanged - no problem closed twice over into something else, none left open, and neither rule
+	 * reporting an error. That both rules really were processed for those events is read from the tag the second one
+	 * adds as an event occurs (CEP_TAG_WINDOW_SECOND): every problem event of the run must carry it, so the second
+	 * rule cannot have been the one that never got its turn.
 	 */
 	private function runEventAssessmentTestCepWindowCloseWindow(string $rule_name, bool $discarded = false,
-			bool $single_service = false): void {
+			bool $single_service = false, bool $doubled = false): void {
+		// The rules whose errors are reported when an assertion of the scenario fails: a doubled flavour has two, and
+		// either of them failing is what would leave the problems never closing.
+		$rule_names = $doubled ? [$rule_name, self::buildSecondRuleName($rule_name)] : [$rule_name];
 		$services = static::getCloseWindowServices($single_service);
 
 		// The discarding flavours drop the "down" values of this one id, so it opens no problem and gets no window.
@@ -11767,9 +12145,11 @@ HEREDOC;
 				$this->waitForOpenProblemCountByTag($all, 'service', $service, 0);
 			}
 			catch (Throwable $e) {
-				$error = $this->getCepRuleError($rule_name);
+				foreach ($rule_names as $name) {
+					$error = $this->getCepRuleError($name);
 
-				$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error: '.$error);
+					$this->assertSame('', $error, 'The rule "'.$name.'" reported an error: '.$error);
+				}
 
 				throw $e;
 			}
@@ -11790,6 +12170,17 @@ HEREDOC;
 			// were kept have "down" events, all of theirs.
 			$this->waitForProblemEventCountByTag($all, 'service', $discarded_service, 0);
 			$this->waitForProblemEventsTagged($all, self::CEP_STATE_TAG_DOWN, (count($services) - 1) * $events);
+		}
+
+		if ($doubled) {
+			// The second rule of the flavour was processed for every event the first one closed: its tag is added as
+			// an event occurs, so an event of this run without it would be one the second rule never got its turn for
+			// - which is what a window type that is exclusive would have done to it. Every "down" value and every
+			// "up" value of the ids driven is therefore tagged, and the counts above have already shown that being
+			// closed by two rules instead of one left the problems exactly as one rule leaves them.
+			$this->waitForProblemEventsTagged($all, self::CEP_TAG_WINDOW_SECOND,
+				($discarded_service === null ? count($services) : count($services) - 1) * ($events + 1)
+			);
 		}
 
 		// The last window took the problems it held with it, which is what returns every trigger whose problems those
