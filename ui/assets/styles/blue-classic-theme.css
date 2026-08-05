@@ -7896,6 +7896,16 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     height: 16px;
     line-height: 16px; }
 
+#user-device-init-form .hidden {
+  display: none; }
+#user-device-init-form .qr-code-container {
+  width: 300px;
+  margin: 0 auto;
+  text-align: center;
+  white-space: wrap; }
+#user-device-init-form .qr-code-expiration {
+  margin-top: 10px; }
+
 .link-action {
   color: #1f2c33;
   cursor: pointer; }

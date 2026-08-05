@@ -894,6 +894,275 @@ static int	DBpatch_7050063(void)
 	return FAIL;
 }
 
+static int	DBpatch_7050064(void)
+{
+	const zbx_db_field_t	field = {"auth_scheme", "0", NULL, NULL, 32, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("token", &field);
+}
+
+static int	DBpatch_7050065(void)
+{
+	return DBdrop_foreign_key("token", 1);
+}
+
+static int	DBpatch_7050066(void)
+{
+	return DBdrop_index("token", "token_2");
+}
+
+static int	DBpatch_7050067(void)
+{
+	return DBcreate_index("token", "token_2", "userid,auth_scheme,name", 1);
+}
+
+static int	DBpatch_7050068(void)
+{
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("token", 1, &field);
+}
+
+static int	DBpatch_7050069(void)
+{
+	const zbx_db_table_t	table =
+			{"dpop_jti_cache", "jti", 0,
+				{
+					{"jti", "", NULL, NULL, 36, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"expires_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050070(void)
+{
+	const zbx_db_table_t	table =
+			{"device", "deviceid", 0,
+				{
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"uuid", "", NULL, NULL, 36, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"push_token", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"activated_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050071(void)
+{
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("device", 1, &field);
+}
+
+static int	DBpatch_7050072(void)
+{
+	return DBcreate_index("device", "device_1", "userid", 0);
+}
+
+static int	DBpatch_7050073(void)
+{
+	const zbx_db_table_t	table =
+			{"token_device", "tokenid", 0,
+				{
+					{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050074(void)
+{
+	const zbx_db_field_t	field = {"tokenid", NULL, "token", "tokenid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("token_device", 1, &field);
+}
+
+static int	DBpatch_7050075(void)
+{
+	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("token_device", 2, &field);
+}
+
+static int	DBpatch_7050076(void)
+{
+	return DBcreate_index("token_device", "token_device_1", "deviceid", 0);
+}
+
+static int	DBpatch_7050077(void)
+{
+	const zbx_db_table_t	table =
+			{"device_key", "device_keyid", 0,
+				{
+					{"device_keyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"scope", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"kid", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"active", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"created_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050078(void)
+{
+	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("device_key", 1, &field);
+}
+
+static int	DBpatch_7050079(void)
+{
+	return DBcreate_index("device_key", "device_key_1", "deviceid", 0);
+}
+
+static int	DBpatch_7050080(void)
+{
+	return DBcreate_index("device_key", "device_key_2", "kid", 0);
+}
+
+static int	DBpatch_7050081(void)
+{
+	const zbx_db_table_t	table =
+			{"device_enrollment_token", "deviceid", 0,
+				{
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"token", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"expires_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050082(void)
+{
+	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("device_enrollment_token", 1, &field);
+}
+
+static int	DBpatch_7050083(void)
+{
+	return DBcreate_index("device_enrollment_token", "device_enrollment_token_1", "token", 1);
+}
+
+static int	DBpatch_7050084(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str) values"
+			" ('device_link_timeout',1,'60s')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050085(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int",
+			(char *)NULL);
+
+	result = zbx_db_select("select roleid from role");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	roleid;
+		int		access;
+
+		ZBX_STR2UINT64(roleid, row[0]);
+		access = (3 == roleid) ? 1 : 0; /* roleid=3 -> default role with type=USER_TYPE_SUPER_ADMIN */
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "devices.access", access);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "devices.actions.default_access",
+				access);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_7050086(void)
+{
+	zbx_db_insert_t	db_insert;
+	zbx_uint64_t	mediatypeid;
+	int		ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	mediatypeid = zbx_db_get_maxid("media_type");
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into media_type (mediatypeid,type,name,script,description) values "
+			"(" ZBX_FS_UI64 ",5,'Push notification','','')", mediatypeid))
+	{
+		return FAIL;
+	}
+
+	zbx_db_insert_prepare(&db_insert, "media_type_message", "mediatype_messageid", "mediatypeid", "eventsource",
+			"recovery", "subject", "message", (char *)NULL);
+
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mediatypeid, 0, 0, "{HOST.NAME} - {EVENT.NAME}",
+			"Started on {{EVENT.TIMESTAMP}.fmttime(\"%x %X\")}\nData: {EVENT.OPDATA}");
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mediatypeid, 0, 1,
+			"[RESOLVED] {HOST.NAME} - {EVENT.NAME}",
+			"Resolved on {{EVENT.RECOVERY.TIMESTAMP}.fmttime(\"%x %X\")}\nDuration: {EVENT.DURATION}");
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mediatypeid, 0, 2,
+			"[UPDATED] {HOST.NAME} - {EVENT.NAME}",
+			"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem on "
+			"{{EVENT.UPDATE.TIMESTAMP}.fmttime(\"%x %X\")}\n{EVENT.UPDATE.MESSAGE}");
+
+	zbx_db_insert_autoincrement(&db_insert, "mediatype_messageid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_7050087(void)
+{
+	return DBcreate_index("device", "device_2", "uuid", 1);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -964,5 +1233,29 @@ DBPATCH_ADD(7050060, 0, 1)
 DBPATCH_ADD(7050061, 0, 1)
 DBPATCH_ADD(7050062, 0, 1)
 DBPATCH_ADD(7050063, 0, 1)
+DBPATCH_ADD(7050064, 0, 1)
+DBPATCH_ADD(7050065, 0, 1)
+DBPATCH_ADD(7050066, 0, 1)
+DBPATCH_ADD(7050067, 0, 1)
+DBPATCH_ADD(7050068, 0, 1)
+DBPATCH_ADD(7050069, 0, 1)
+DBPATCH_ADD(7050070, 0, 1)
+DBPATCH_ADD(7050071, 0, 1)
+DBPATCH_ADD(7050072, 0, 1)
+DBPATCH_ADD(7050073, 0, 1)
+DBPATCH_ADD(7050074, 0, 1)
+DBPATCH_ADD(7050075, 0, 1)
+DBPATCH_ADD(7050076, 0, 1)
+DBPATCH_ADD(7050077, 0, 1)
+DBPATCH_ADD(7050078, 0, 1)
+DBPATCH_ADD(7050079, 0, 1)
+DBPATCH_ADD(7050080, 0, 1)
+DBPATCH_ADD(7050081, 0, 1)
+DBPATCH_ADD(7050082, 0, 1)
+DBPATCH_ADD(7050083, 0, 1)
+DBPATCH_ADD(7050084, 0, 1)
+DBPATCH_ADD(7050085, 0, 1)
+DBPATCH_ADD(7050086, 0, 1)
+DBPATCH_ADD(7050087, 0, 1)
 
 DBPATCH_END()
