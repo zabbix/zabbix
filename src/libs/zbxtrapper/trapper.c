@@ -1294,14 +1294,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 		{
 #ifndef ZBX_DEBUG
-		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+			zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
 			recv_agenthistory(sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 		{
 #ifndef ZBX_DEBUG
-		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+			zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
 			recv_senderhistory(sock, &jp, ts, config_comms->config_timeout);
 		}
@@ -1313,7 +1313,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 		{
 #ifndef ZBX_DEBUG
-		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+			zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
 			ret = send_list_of_active_checks_json(sock, &jp, events_cbs, config_comms->config_timeout,
 					autoreg_update_host_cb);
@@ -1324,7 +1324,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
 						config_comms->config_trapper_timeout, config_comms->config_source_ip,
-						config_ssh_key_location, get_config_forks, config_enable_global_scripts, zbx_get_program_type_cb());
+						config_ssh_key_location, get_config_forks, config_enable_global_scripts,
+						zbx_get_program_type_cb());
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
