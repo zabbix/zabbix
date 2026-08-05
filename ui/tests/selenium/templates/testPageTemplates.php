@@ -92,7 +92,8 @@ class testPageTemplates extends CLegacyWebTest {
 		$oldHashHosts = CDBHelper::getHash($sqlHosts);
 		$sqlItems = "select * from items order by itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
-		$sqlTriggers = "select triggerid,expression,description,url,status,value,priority,comments,error,templateid,type,state,flags from triggers order by triggerid";
+		$sqlTriggers = 'select triggerid,expression,description,url,status,priority,comments,templateid,type,flags'.
+				' from triggers order by triggerid';
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
 		$this->zbxTestLogin('zabbix.php?action=template.list');
