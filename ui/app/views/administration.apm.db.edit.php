@@ -40,12 +40,12 @@ $apm_tab = (new CFormGrid())
 	])
 	->addItem([
 		(new CLabel(_('Database type'), 'type'))
-			->addClass('js-type')
+			->addClass('js-db-type')
 			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
 		(new CFormField(
 			_('ClickHouse')
 		))
-			->addClass('js-type')
+			->addClass('js-db-type')
 			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
 	])
 	->addItem([

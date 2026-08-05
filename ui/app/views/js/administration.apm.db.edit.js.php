@@ -126,6 +126,7 @@ const view = new class {
 		this.#updateDisplayState([
 			...document.querySelectorAll('.js-url'),
 			...document.querySelectorAll('.js-auth-type'),
+			...document.querySelectorAll('.js-db-type'),
 			...document.querySelectorAll('.js-database'),
 		], show_fields);
 
