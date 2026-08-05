@@ -17,9 +17,6 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxsysinfo.h"
-#include "zbxalgo.h"
-
 #include "../../../../src/libs/zbxsysinfo/common/cpustat.c"
 #include "../../../../src/libs/zbxsysinfo/common/stats.h"
 
