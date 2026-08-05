@@ -140,7 +140,7 @@ class testFormTotpEnroll extends testFormTotp {
 		}
 		else {
 			// Verify validation error.
-			$this->assertEquals($data['error'], $form->query('class:red')->one()->getText());
+			$this->assertEquals($data['error'], $form->query('class:red')->waitUntilVisible()->one()->getText());
 		}
 	}
 
