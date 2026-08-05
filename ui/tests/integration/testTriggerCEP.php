@@ -2061,7 +2061,9 @@ class testTriggerCEP extends CIntegrationTest {
 	 * rather than when it occurs, see prepareDataCepWindowOperations().
 	 */
 	public function prepareDataCepWindowSimpleEvictedOperations() {
-		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple evicted', true);
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple evicted',
+			CCepRuleHelper::WHEN_EVENT_EVICTED
+		);
 	}
 
 	/**
@@ -2069,7 +2071,61 @@ class testTriggerCEP extends CIntegrationTest {
 	 * the window rather than when it occurs, see prepareDataCepWindowOperations().
 	 */
 	public function prepareDataCepWindowTagEvictedOperations() {
-		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH, 'tag evicted', true);
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH, 'tag evicted',
+			CCepRuleHelper::WHEN_EVENT_EVICTED
+		);
+	}
+
+	/**
+	 * Prepare the pattern match window flavour that applies its operations when the event is evicted from the
+	 * window, the third and last window type whose events are evicted at all: a pattern match window evicts what
+	 * its duration has outlived exactly as a simple one does, examining what is left against its script, so the
+	 * operations must reach an evicted event here as well - see prepareDataCepWindowOperations().
+	 */
+	public function prepareDataCepWindowPatternEvictedOperations() {
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH, 'pattern evicted',
+			CCepRuleHelper::WHEN_EVENT_EVICTED
+		);
+	}
+
+	/**
+	 * Prepare the simple window flavour that applies its operations as the window closes rather than when the
+	 * event occurs, see prepareDataCepWindowOperations().
+	 */
+	public function prepareDataCepWindowSimpleClosedOperations() {
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple closed',
+			CCepRuleHelper::WHEN_WINDOW_CLOSED
+		);
+	}
+
+	/**
+	 * Prepare the tag correlation window flavour that applies its operations as the window closes, see
+	 * prepareDataCepWindowOperations().
+	 */
+	public function prepareDataCepWindowTagClosedOperations() {
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH, 'tag closed',
+			CCepRuleHelper::WHEN_WINDOW_CLOSED
+		);
+	}
+
+	/**
+	 * Prepare the cause and symptom window flavour that applies its operations as the window closes, see
+	 * prepareDataCepWindowOperations().
+	 */
+	public function prepareDataCepWindowCauseSymptomClosedOperations() {
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, 'cause closed',
+			CCepRuleHelper::WHEN_WINDOW_CLOSED
+		);
+	}
+
+	/**
+	 * Prepare the pattern match window flavour that applies its operations as the window closes, see
+	 * prepareDataCepWindowOperations().
+	 */
+	public function prepareDataCepWindowPatternClosedOperations() {
+		return $this->prepareDataCepWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH, 'pattern closed',
+			CCepRuleHelper::WHEN_WINDOW_CLOSED
+		);
 	}
 
 	/**
@@ -3604,9 +3660,25 @@ HEREDOC;
 	 *     processed for an event, so the operations rule (the lower sortorder, hence the one that is
 	 *     processed) uses up the slot and no event ever gets the tag. A matrix of tag correlation rules could
 	 *     therefore never tag one event more than once, which is why the operator rules stay windowless.
+	 *
+	 * $execute_when is the execution point the operations are performed at, and the state they leave behind must be
+	 * the same from all of them - an operation is what it does, not when it is asked to do it:
+	 *   - WHEN_EVENT_OCCURRED, the moment the event enters the window. This is the only point that has the second
+	 *     rule above, the window types differing in nothing else;
+	 *   - WHEN_EVENT_EVICTED, once the window duration has run out and the event is evicted from it. A cause and
+	 *     symptom window has no such point - the duration running out closes that window instead of evicting what
+	 *     it holds (see cep_window_causal_process()) - so it is the one window type this flavour is not run for;
+	 *   - WHEN_WINDOW_CLOSED, reached through a "close window" operation added below.
+	 *
+	 * The macros of the operations are what make the later two points more than the same coverage twice: an
+	 * operation resolves its event name and its tag names and values against the event it acts on, and an event
+	 * leaving a window is no longer the event that was just assessed - the server has to build its context from the
+	 * event the window was holding. Whether a macro can be resolved that late is therefore what these flavours read,
+	 * expression macro (which only the name accepts) and event macros included, see getWindowNoneEventOperationCase()
+	 * and getWindowNoneTagOperationCases().
 	 */
 	private function prepareDataCepWindowOperations(int $window_type, string $name_infix,
-			bool $on_event_evicted = false) {
+			int $execute_when = CCepRuleHelper::WHEN_EVENT_OCCURRED) {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The operations of the rule are the very ones of the windowless flavour, macros and all.
@@ -3620,22 +3692,46 @@ HEREDOC;
 		$window = $this->macroizeWindowLimits($this->buildWindowOperationsWindow());
 		$name = self::CEP_RULE_NAME_PREFIX.'window '.$name_infix.' ';
 
-		// Both operation sets in one rule: with a window there is no second rule to run them from. They run
-		// either the moment the event occurs or, for the evicted flavours, only once the window duration has
-		// run out and the event is evicted from it.
+		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+			// A pattern match window cannot be without a script and none of these flavours is driven by a match,
+			// so this one reports none however many events it is handed: what acts on the events of the window are
+			// the operations alone, exactly as in the window types that have no script at all.
+			$window['script'] = "return 'false';";
+		}
+
+		// Both operation sets in one rule: with a window there is no second rule to run them from. When they run
+		// is $execute_when - the moment the event occurs, once the window duration has run out and the event is
+		// evicted from it, or as the window that holds the event closes.
 		$operations = $this->buildWindowNoneOperations(
 			array_merge(
 				$this->getWindowNoneTagOperationOperations(),
 				$this->getWindowNoneEventOperationCase()['operations']
 			),
-			$on_event_evicted ? CCepRuleHelper::WHEN_EVENT_EVICTED : CCepRuleHelper::WHEN_EVENT_OCCURRED
+			$execute_when
 		);
+
+		if ($execute_when == CCepRuleHelper::WHEN_WINDOW_CLOSED) {
+			// Nothing but a "close window" operation ever closes a window - the duration running out evicts what
+			// a simple, a tag correlation and a pattern match window hold rather than closing it - so the window
+			// closed execution point is only reached by a rule that asks for it. This one asks for it
+			// unconditionally and as the event occurs, so every event closes the window it has just entered and
+			// the operations above are performed for it right there: the shortest path from an event to that
+			// execution point, and the same one for every window type.
+			//
+			// It is listed last only because its sortorder must not collide with the operations above; the order
+			// within a rule is the order of one execution point, and this one is the only operation of its own.
+			$operations[] = [
+				'sortorder' => count($operations),
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_CLOSE_WINDOW
+			];
+		}
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name.'operations', [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
 		));
 
-		if ($on_event_evicted) {
+		if ($execute_when != CCepRuleHelper::WHEN_EVENT_OCCURRED) {
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
 			return true;
@@ -8311,6 +8407,108 @@ HEREDOC;
 	}
 
 	/**
+	 * The same as testTriggerCEP_CepWindowSimpleEvictedOperations with a pattern match window, the third and last
+	 * window type whose events are evicted at all: what the duration has outlived leaves a pattern match window
+	 * exactly as it leaves a simple one, so its evicted events must come out with the same name, tags, severity and
+	 * suppression - resolved macros and all. A cause and symptom window has no counterpart here: its duration
+	 * running out closes the window instead of evicting what it holds, which is what
+	 * testTriggerCEP_CepWindowCauseSymptomClosedOperations covers instead.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternEvictedOperations$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternEvictedOperations() {
+		$this->prepareDataCepWindowPatternEvictedOperations();
+
+		try {
+			$this->runEventAssessmentTestCepWindowEvictedOperations();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same operations as testTriggerCEP_CepWindowSimpleOperations, applied at the window closed execution point
+	 * of a simple window instead of at the arriving event: the event closes the window it has just entered and the
+	 * operations are performed for it as that window closes.
+	 *
+	 * The event they act on is therefore the one the window was holding rather than the one being assessed, and the
+	 * server has to build its context from that - so the event name and the tags, macros and all, must come out
+	 * exactly as they do when the very same operations run the moment the event occurs: the user macro and the
+	 * expression macro of the name resolved, the macro named tags resolved and named after what they resolved to.
+	 * See runEventAssessmentTestCepWindowClosedOperations().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleClosedOperations$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleClosedOperations() {
+		$this->prepareDataCepWindowSimpleClosedOperations();
+
+		try {
+			$this->runEventAssessmentTestCepWindowClosedOperations();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same as testTriggerCEP_CepWindowSimpleClosedOperations with a tag correlation window: correlating the
+	 * events of a group is not what an operation acts on, so the closing window of this type must leave its event in
+	 * the same state - see runEventAssessmentTestCepWindowClosedOperations().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagClosedOperations$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagClosedOperations() {
+		$this->prepareDataCepWindowTagClosedOperations();
+
+		try {
+			$this->runEventAssessmentTestCepWindowClosedOperations();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same as testTriggerCEP_CepWindowSimpleClosedOperations with a cause and symptom window, the one window
+	 * type that ranks what it is given and the one whose events reach this execution point on their own: its
+	 * duration running out closes the window rather than evicting what it holds. Here the window is closed by the
+	 * operation of the rule as in every other flavour, so what is compared is the operations and not the two ways
+	 * that window type may end - see runEventAssessmentTestCepWindowClosedOperations().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomClosedOperations$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomClosedOperations() {
+		$this->prepareDataCepWindowCauseSymptomClosedOperations();
+
+		try {
+			$this->runEventAssessmentTestCepWindowClosedOperations();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same as testTriggerCEP_CepWindowSimpleClosedOperations with a pattern match window, whose script reports
+	 * no match: what closes the window is the operation of the rule, so the operations of the window closed
+	 * execution point are reached by this window type without a match having anything to do with it - see
+	 * runEventAssessmentTestCepWindowClosedOperations().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternClosedOperations$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternClosedOperations() {
+		$this->prepareDataCepWindowPatternClosedOperations();
+
+		try {
+			$this->runEventAssessmentTestCepWindowClosedOperations();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * Discarding: a windowless rule whose only operation drops the "up" events as they occur, so they leave no
 	 * trace at all - unlike a close, which leaves a closed problem behind, and unlike a suppress, which leaves
 	 * a suppressed one. The "down" values around it must still open their problems, so the rule is shown to
@@ -10947,6 +11145,30 @@ HEREDOC;
 	 * been applied once the windows expired. No rule closes a problem, so all three stay open.
 	 */
 	private function runEventAssessmentTestCepWindowEvictedOperations(): void {
+		$this->runEventAssessmentTestCepWindowLateOperations('evicted');
+	}
+
+	/**
+	 * Drive a windowed flavour whose operations run as the window closes: every id gets a window of its own, and
+	 * the event that enters it closes it right away (the "close window" operation of the rule, see
+	 * prepareDataCepWindowOperations()), so the operations are performed for it at the window closed execution
+	 * point instead of at the one of the arriving event.
+	 *
+	 * What that has to leave behind is the state of every other flavour, the resolved macros above all: the event
+	 * the operations act on is the one the closing window was holding rather than the one being assessed, so a name
+	 * or a tag the server could not resolve that late shows up as macro text where the resolved value is expected.
+	 * No rule closes a problem, so all three stay open.
+	 */
+	private function runEventAssessmentTestCepWindowClosedOperations(): void {
+		$this->runEventAssessmentTestCepWindowLateOperations('closed');
+	}
+
+	/**
+	 * The body of the two flavours above, which differ in nothing but the execution point their rule applies its
+	 * operations at ($what naming it for the failure messages): the events are driven the same way and the state
+	 * they must end up in is the same, an operation being what it does and not when it was asked to do it.
+	 */
+	private function runEventAssessmentTestCepWindowLateOperations(string $what): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
 		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
 		$all = [$triggerid];
@@ -10954,7 +11176,7 @@ HEREDOC;
 		// The one trigger must start in OK state.
 		foreach ($this->getTriggers($all) as $t) {
 			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
-				'Trigger must start in OK state for the window evicted operations test.');
+				'Trigger must start in OK state for the window '.$what.' operations test.');
 		}
 
 		$this->captureEventBaseline($all);
@@ -10975,9 +11197,9 @@ HEREDOC;
 			$expected_tags[$service] = [];
 		}
 
-		// The operations have not run yet - they only do once the window duration has run out and the events
-		// are evicted, which the wait below covers. This flavour creates no second rule, so its tag may not be
-		// on any event either.
+		// The operations run only once the events have left their windows - evicted because the duration ran out,
+		// or closed with the window that held them - which the wait below covers. These flavours create no second
+		// rule, so its tag may not be on any event either.
 		$this->waitForCepWindowNoneTaggedEvents($triggerid, $expected_tags,
 			[self::CEP_TAG_WINDOW_SECOND => null]
 		);
@@ -10988,7 +11210,7 @@ HEREDOC;
 		// every problem left open.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the window evicted operations recovery value');
+		$this->waitForNoOpenProblems($all, 'After the window '.$what.' operations recovery value');
 	}
 
 	/**
