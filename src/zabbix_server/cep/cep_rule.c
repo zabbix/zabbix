@@ -149,7 +149,7 @@ static int	cep_operation_condition_eval_tag_value(const zbx_cep_op_condition_t *
 static int	cep_operation_condition_eval_state(const zbx_cep_op_condition_t *condition, int state)
 {
 	int	ret = (state == condition->args.state.value ? 1 : 0);
-
+	zabbix_log(LOG_LEVEL_INFORMATION, "condition->args.state.value:%d state:%d", condition->args.state.value, state);
 	if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
 		ret = !ret;
 
@@ -202,6 +202,7 @@ static int	cep_operation_condition_eval_suppressed(const zbx_cep_op_condition_t 
 
 static int	cep_operation_condition_eval(const zbx_cep_op_condition_t *condition, zbx_cep_event_context_t *ctx)
 {
+	zabbix_log(LOG_LEVEL_INFORMATION, "condition->type:%d", condition->type);
 	switch (condition->type)
 	{
 		case ZBX_CONDITION_TYPE_EVENT_TAG:
@@ -300,7 +301,7 @@ static int	cep_operation_eval_or(const zbx_cep_operation_t *op, zbx_cep_event_co
 
 	return FAIL;
 }
-
+#include "zbxlog.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: check if event matches operation condition                        *
@@ -316,7 +317,7 @@ static int	cep_operation_eval_or(const zbx_cep_operation_t *op, zbx_cep_event_co
 int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx)
 {
 	int	ret = FAIL;
-
+	zbx_set_log_level(LOG_LEVEL_DEBUG);
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
 
 	if (0 == op->conditions.values_num)
@@ -339,7 +340,7 @@ int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_conte
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
+zbx_set_log_level(LOG_LEVEL_WARNING);
 	return ret;
 }
 

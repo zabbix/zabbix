@@ -398,9 +398,9 @@ class testTriggerCEP extends CIntegrationTest {
 	// The built in tag telling a symptom apart from a cause, the counterpart of CEP_TAG_IS_COPIED for the rank a
 	// cause and symptom window assigns.
 	const CEP_TAG_IS_SYMPTOM = '$IS.SYMPTOM';
-	// The cause and symptom flavour (see prepareDataCepWindowCauseSymptom()) needs neither: its window does its
-	// work as the events arrive, ranking the first event of a group as the cause of the ones that follow. The
-	// count of those is kept in a tag of the cause event, which only this window type has.
+	// The cause and symptom flavour (see prepareDataCepWindowCauseSymptom()) needs neither for its grouping: its
+	// window does that work as the events arrive, ranking the first event of a group as the cause of the ones that
+	// follow. The count of those is kept in a tag of the cause event, which only this window type has.
 	const CEP_TAG_SYMPTOM_COUNT = 'symptom_count';
 	// The capacity flavours (see prepareDataCepWindowCapacityOperations()) let the window overflow instead: it
 	// holds a single event and outlasts the whole test, so every event after the first one is evicted for not
@@ -2175,15 +2175,24 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * Prepare the cause and symptom grouping flavour. This window type needs no operations at all: it ranks
-	 * the events of a group itself as they arrive - the first event of the group is the cause, and every event
-	 * that arrives while it is still in the window becomes a symptom of it, pointing at it through its
-	 * cause_eventid. The number of events the group has collected is written to the CEP_TAG_SYMPTOM_COUNT tag
-	 * of the cause event, a tag only this window type maintains.
+	 * Prepare the cause and symptom grouping flavour. This window type needs no operations for the grouping
+	 * itself: it ranks the events of a group as they arrive - the first event of the group is the cause, and
+	 * every event that arrives while it is still in the window becomes a symptom of it, pointing at it through
+	 * its cause_eventid. The number of events the group has collected is written to the CEP_TAG_SYMPTOM_COUNT
+	 * tag of the cause event, a tag only this window type maintains.
 	 *
 	 * The window groups by the 'component' tag, which every event of the driven trigger carries with the same
 	 * value, so all of them form one group; it lasts longer than the test and has no capacity limit, so
 	 * nothing is evicted and the group is never reset while the events are being sent.
+	 *
+	 * The only operations the rule has are the ones that recover the scenario, the same pair as the other
+	 * windowed flavours (see buildCloseOnUpCepRuleParams()): "close window" when an event occurs, restricted to
+	 * the "up" events by a tag exists condition on CEP_STATE_TAG_UP - a tag only an "up" event carries because
+	 * its name is resolved from the item value - and "close" when the window closes, which closes every event
+	 * that window held. Neither of them is reached while the "down" values are being sent, so the ranking they
+	 * build is left untouched, and the "up" value at the end of the scenario closes the whole group at once: the
+	 * ranked "down" problems and the "up" problem that ended their window alike, see
+	 * runEventAssessmentTestCepWindowCauseSymptom().
 	 *
 	 * A second rule of the same window type is created beside it, matching the same events and doing nothing
 	 * but adding a tag. A cause and symptom window is one of the exclusive window types, so only the first
@@ -2193,7 +2202,8 @@ class testTriggerCEP extends CIntegrationTest {
 	public function prepareDataCepWindowCauseSymptom() {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
-		// Nothing may close these problems: the scenario asserts all of them stay open, ranked but untouched.
+		// Only the rule of the flavour may close these problems: the scenario asserts all of them stay open,
+		// ranked but untouched, until its "up" value ends their window.
 		$this->deleteCepCorrelations();
 		$this->deleteCepRules();
 
@@ -2207,9 +2217,27 @@ class testTriggerCEP extends CIntegrationTest {
 			'event_count_tag' => self::CEP_TAG_SYMPTOM_COUNT
 		];
 
+		// The recovery of the scenario: the "up" event closes the window it has just entered, and the closing
+		// window closes every event it held. Without the condition every event would close the window it just
+		// entered, so nothing would ever be ranked.
+		$operations = [
+			[
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+			],
+			[
+				'sortorder' => 1,
+				'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
+				'type' => CCepRuleHelper::OP_CLOSE
+			]
+		];
+
 		$name = self::CEP_RULE_NAME_PREFIX.'window cause ';
 
-		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name.'symptom', [], [],
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name.'symptom', [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, $window
 		));
 
@@ -8712,11 +8740,11 @@ HEREDOC;
 	}
 
 	/**
-	 * Cause and symptom grouping: the window ranks the events of a group itself, without a single operation.
-	 * All three values go into one group, so the first problem becomes the cause and the two after it become
-	 * its symptoms, each pointing at it through its cause_eventid, while the cause counts them in a tag of its
-	 * own. Nothing closes anything, so all three problems stay open and only the trigger expression recovers
-	 * them.
+	 * Cause and symptom grouping: the window ranks the events of a group itself, without an operation taking
+	 * part in it. All three values go into one group, so the first problem becomes the cause and the two after it
+	 * become its symptoms, each pointing at it through its cause_eventid, while the cause counts them in a tag of
+	 * its own. Nothing closes anything while that is being built, so all three problems stay open - the "up"
+	 * value at the end closes their window and the window closes them all with it.
 	 *
 	 * As with a tag correlation window, only the first matching rule of this window type is processed for an
 	 * event: a second rule that would only add a tag must leave no trace.
@@ -12684,9 +12712,12 @@ HEREDOC;
 	/**
 	 * Drive the cause and symptom grouping flavour: every value goes into the same group, so the problem of
 	 * the first one becomes the cause and each of the following ones becomes a symptom of it as it arrives.
-	 * Nothing closes anything, so all three problems stay open, ranked but otherwise untouched, and the
-	 * ranking is re-checked after every value - a symptom is expected to point at the cause the moment its
-	 * problem exists, not only at the end.
+	 * Nothing closes anything while the "down" values are being sent, so all three problems stay open, ranked
+	 * but otherwise untouched, and the ranking is re-checked after every value - a symptom is expected to point
+	 * at the cause the moment its problem exists, not only at the end.
+	 *
+	 * The scenario then recovers the way the other windowed flavours do: the "up" value closes the window it
+	 * enters and the window closes every event it held, which is every problem the scenario opened.
 	 */
 	private function runEventAssessmentTestCepWindowCauseSymptom(): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
@@ -12717,10 +12748,13 @@ HEREDOC;
 			$this->waitForCepCauseSymptomEvents($triggerid, $open - 1);
 		}
 
-		// Nothing in this flavour closes a problem, so the trigger expression has to.
-		$send('0');
+		// The "up" value joins the very same window as one more event and closes it, and the closing window
+		// closes every event it held: the ranked problems above and the "up" problem itself. Nothing else can
+		// touch them, so the rule alone is what brings the trigger back to OK - the trigger expression recovers
+		// nothing here, "up" being a problem value like any other.
+		$send('up_'.self::CEP_RULE_WINDOW_NONE_SERVICE);
+		$this->waitForNoOpenProblems($all, 'After the cause and symptom close on up value');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the cause and symptom recovery value');
 	}
 
 	/**
