@@ -1,0 +1,30 @@
+---
+test case: autoreg holds the globally oldest record and is evicted
+in:
+  autoreg_age: 300
+  discovery_age: 100
+  history_age: 50
+out:
+  autoreg_rows: 1
+  discovery_rows: 1
+  history_rows: 1
+---
+test case: discovery holds the globally oldest record and is evicted
+in:
+  autoreg_age: 100
+  discovery_age: 300
+  history_age: 50
+out:
+  autoreg_rows: 2
+  discovery_rows: 0
+  history_rows: 1
+---
+test case: history holds the globally oldest record and is evicted
+in:
+  autoreg_age: 100
+  discovery_age: 50
+  history_age: 300
+out:
+  autoreg_rows: 2
+  discovery_rows: 1
+  history_rows: 0
