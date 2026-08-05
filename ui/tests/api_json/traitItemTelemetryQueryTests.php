@@ -157,6 +157,8 @@ trait traitItemTelemetryQueryTests {
 				'lookback_limit' => '{#M}',
 				'granularity' => '{#M}',
 				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
@@ -172,6 +174,8 @@ trait traitItemTelemetryQueryTests {
 				'lookback_limit' => '{$M}',
 				'granularity' => '{$M}',
 				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
@@ -200,13 +204,14 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A or B',
 						'conditions' => [
-							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A'],
-							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'B']
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'B', 'operator' => CONDITION_OPERATOR_EQUAL]
 						]
 					]
 				]
@@ -247,6 +252,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [
 						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [10], 'alias' => 'time']
 					],
@@ -260,6 +266,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [
 						['function' => AGGREGATE_COUNT, 'alias' => str_repeat('A', 65535)]
 					],
@@ -273,6 +280,8 @@ trait traitItemTelemetryQueryTests {
 			[
 				'value_type' => ITEM_VALUE_TYPE_BINARY,
 				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
@@ -307,6 +316,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [['alias' => 'Timestamp']]
 				]
 			],
@@ -317,6 +327,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -334,12 +345,13 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A or B',
 						'conditions' => [
-							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A']
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A', 'operator' => CONDITION_OPERATOR_EQUAL]
 						]
 					]
 				]
@@ -351,13 +363,14 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A or A',
 						'conditions' => [
-							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A'],
-							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'B']
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'B', 'operator' => CONDITION_OPERATOR_EQUAL]
 						]
 					]
 				]
@@ -369,13 +382,14 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A or D',
 						'conditions' => [
-							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A'],
-							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'B']
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'B', 'operator' => CONDITION_OPERATOR_EQUAL]
 						]
 					]
 				]
@@ -387,13 +401,14 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [['alias' => 'Timestamp']],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A or A',
 						'conditions' => [
-							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A'],
-							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'A']
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TraceId', 'value' => 'test2', 'formulaid' => 'A', 'operator' => CONDITION_OPERATOR_EQUAL]
 						]
 					]
 				]
@@ -419,6 +434,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [
 						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [200], 'alias' => 'time']
 					],
@@ -432,6 +448,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [
 						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [2, 10], 'alias' => 'time']
 					],
@@ -516,8 +533,8 @@ trait traitItemTelemetryQueryTests {
 						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 						'formula' => 'A or B',
 						'conditions' => [
-							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A'],
-							['column' => 'ScopeName', 'value' => 'test', 'formulaid' => 'B']
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'ScopeName', 'value' => 'test', 'formulaid' => 'B', 'operator' => CONDITION_OPERATOR_EQUAL]
 						]
 					],
 					'aggregated_columns' => [
