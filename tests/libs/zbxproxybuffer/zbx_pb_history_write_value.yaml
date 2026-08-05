@@ -1,0 +1,81 @@
+---
+test case: write 0 values - empty buffer, get_rows returns 0
+in:
+  value: "42"
+  rows: 0
+out:
+  rows: 0
+---
+test case: write 1 value - row flushed to memory buffer with correct fields
+in:
+  value: "42"
+  rows: 1
+out:
+  rows: 1
+---
+test case: write 3 values - all rows flushed to memory buffer
+in:
+  value: "17.5"
+  rows: 3
+out:
+  rows: 3
+---
+test case: empty value string is stored correctly
+in:
+  value: ""
+  rows: 1
+out:
+  rows: 1
+---
+test case: long value string - large payload stored in shared memory
+in:
+  value: "the quick brown fox jumps over the lazy dog, repeated for length: the quick brown fox jumps over the lazy dog"
+  rows: 5
+out:
+  rows: 5
+---
+test case: partial set_lastid clears only first row leaving remainder
+in:
+  value: "42"
+  rows: 3
+out:
+  rows: 3
+  rows_after_partial_clear: 2
+---
+# Allocation-failure coverage for pb_history_add_row_mem() - parity with the
+# pb_discovery_add_row_mem()/pb_autoreg_add_row_mem() regression tests. Each
+# case fails the Nth shmem allocation made while writing the 2 rows below;
+# the first row is discarded, but the second must still be written correctly
+# afterwards, proving the failure did not corrupt the allocator or leak into
+# subsequent writes.
+test case: row allocation fails - nothing to free, second row still written
+in:
+  value: "42"
+  rows: 2
+  fail_alloc_at: 1
+out:
+  rows: 1
+---
+test case: value allocation fails - row must be freed, source is not set
+in:
+  value: "42"
+  rows: 2
+  fail_alloc_at: 2
+out:
+  rows: 1
+---
+test case: source allocation fails - row/value must be freed
+in:
+  value: "42"
+  rows: 2
+  fail_alloc_at: 3
+out:
+  rows: 1
+---
+test case: list insertion fails - fully-built row must still be freed
+in:
+  value: "42"
+  rows: 2
+  fail_alloc_at: 4
+out:
+  rows: 1

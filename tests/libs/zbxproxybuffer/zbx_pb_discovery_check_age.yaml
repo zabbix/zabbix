@@ -1,0 +1,28 @@
+---
+test case: row younger than offline buffer is kept alongside the new row
+in:
+  offline_buffer: 3600
+  row_age: 10
+out:
+  rows: 2
+---
+test case: row older than offline buffer is evicted when a new row is closed
+in:
+  offline_buffer: 5
+  row_age: 100
+out:
+  rows: 1
+---
+test case: row at exact offline buffer boundary is not evicted (inclusive)
+in:
+  offline_buffer: 10
+  row_age: 10
+out:
+  rows: 2
+---
+test case: row one second past the offline buffer boundary is evicted
+in:
+  offline_buffer: 10
+  row_age: 11
+out:
+  rows: 1
