@@ -1059,6 +1059,11 @@ class CSvgGraphHelper {
 				}
 			}
 
+			if ($right !== null && $right['avg'] == 0
+					&& $metric['options']['aggregate_function'] == AGGREGATE_COUNT) {
+				$right = null;
+			}
+
 			self::addSyntheticEdgePoints($metric, $metric['time_period']['time_from'],
 				$metric['time_period']['time_to'], null, $right);
 		}
