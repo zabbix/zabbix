@@ -58,7 +58,10 @@ window.ceprule_operation_edit_popup = new class {
 		window['ceprule-operation-execute-when'].dispatchEvent(new Event('change'));
 		window['ceprule-operation-type'].dispatchEvent(new Event('change'));
 
-		window.requestAnimationFrame(() => this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE));
+		window.requestAnimationFrame(() => {
+			this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+			Focuser.focus(this.form_element.querySelector('[autofocus]'));
+		});
 	}
 
 	#initActions() {
