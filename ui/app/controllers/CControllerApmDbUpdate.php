@@ -86,7 +86,7 @@ class CControllerApmDbUpdate extends CController {
 		$apm = $this->getInputAll();
 		self::processApmInput($apm);
 
-		// TODO: ApmSettings->update($apm)
+		// TODO: Settings->update($apm)
 		$result = true;
 
 		$output = [];
@@ -109,43 +109,49 @@ class CControllerApmDbUpdate extends CController {
 	protected static function processApmInput(array &$apm): void {
 		$reset_fields = [];
 
-		switch ($apm['authentication_type']) {
-			case APM_AUTH_TYPE_PASSWORD:
-				$reset_fields = ['vault_path'];
-				break;
-
-			case APM_AUTH_TYPE_VAULT_PATH:
-				$reset_fields = ['username', 'password'];
-				break;
-
-			case APM_AUTH_TYPE_NONE:
-				$reset_fields = ['vault_path', 'username', 'password'];
-				break;
+		if ($apm['status'] === 0) {
+			$apm = [];
 		}
+		else {
+			switch ($apm['authentication_type']) {
+				case APM_AUTH_TYPE_PASSWORD:
+					$reset_fields = ['vault_path'];
+					break;
 
-		$apm['url'] = CUrlValidator::sanitizeUrl($apm['url']);
+				case APM_AUTH_TYPE_VAULT_PATH:
+					$reset_fields = ['username', 'password'];
+					break;
 
-		if (str_starts_with($apm['url'], 'https://')) {
-			if ($apm['ssl_verify_peer'] === 0) {
-				$reset_fields = array_merge($reset_fields, ['ssl_verify_host', 'ssl_ca_location']);
+				case APM_AUTH_TYPE_NONE:
+					$reset_fields = ['vault_path', 'username', 'password'];
+					break;
 			}
-		} else {
-			$reset_fields = array_merge($reset_fields, ['ssl_verify_peer', 'ssl_ca_location', 'ssl_verify_host',
-				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password']);
-		}
 
-		$default_values = CControllerApmDbEdit::getDefaultValues();
+			$apm['url'] = CUrlValidator::sanitizeUrl($apm['url']);
 
-		foreach ($reset_fields as $field) {
-			if (array_key_exists($field, $default_values)) {
-				$apm[$field] = $default_values[$field];
+			if (str_starts_with($apm['url'], 'https://')) {
+				if ($apm['ssl_verify_peer'] === 0) {
+					$reset_fields = array_merge($reset_fields, ['ssl_verify_host', 'ssl_ca_location']);
+				}
 			}
+			else {
+				$reset_fields = array_merge($reset_fields, ['ssl_verify_peer', 'ssl_ca_location', 'ssl_verify_host',
+					'ssl_cert_file', 'ssl_key_file', 'ssl_key_password']);
+			}
+
+			$default_values = CControllerApmDbEdit::getDefaultValues();
+
+			foreach ($reset_fields as $field) {
+				if (array_key_exists($field, $default_values)) {
+					$apm[$field] = $default_values[$field];
+				}
+			}
+
+			$apm = array_merge([
+				// TODO: Settings->get()
+			], $apm);
+
+			unset($apm['change_password']);
 		}
-
-		$apm = array_merge([
-			// TODO: ApmSettings->get()
-		], $apm);
-
-		unset($apm['change_password']);
 	}
 }
