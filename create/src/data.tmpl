@@ -1150,25 +1150,25 @@ ROW   |2            |{$SNMP_COMMUNITY}       |public       |           |0   |
 ROW   |3            |{$TRAPPER.ALLOWED_HOSTS}|127.0.0.1,::1|           |0   |
 
 TABLE |regexps
-FIELDS|regexpid|name                                        |test_string|
-ROW   |1       |File systems for discovery                  |ext3       |
-ROW   |2       |Network interfaces for discovery            |eth0       |
-ROW   |3       |Storage devices for SNMP discovery          |/boot      |
-ROW   |4       |Windows service names for discovery         |SysmonLog  |
-ROW   |5       |Windows service startup states for discovery|automatic  |
+FIELDS|regexpid|name                                        |test_string|description|
+ROW   |1       |File systems for discovery                  |ext3       |           |
+ROW   |2       |Network interfaces for discovery            |eth0       |           |
+ROW   |3       |Storage devices for SNMP discovery          |/boot      |           |
+ROW   |4       |Windows service names for discovery         |SysmonLog  |           |
+ROW   |5       |Windows service startup states for discovery|automatic  |           |
 
 TABLE |expressions
 FIELDS|expressionid|regexpid|expression                                                                                                                                                            |expression_type|exp_delimiter|case_sensitive|
-ROW   |1           |1       |^(btrfs&pipe;ext2&pipe;ext3&pipe;ext4&pipe;reiser&pipe;xfs&pipe;ffs&pipe;ufs&pipe;jfs&pipe;jfs2&pipe;vxfs&pipe;hfs&pipe;apfs&pipe;refs&pipe;ntfs&pipe;fat32&pipe;zfs)$|3              |,            |0             |
-ROW   |3           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$                                                                        |4              |,            |1             |
-ROW   |5           |4       |^(MMCSS&pipe;gupdate&pipe;SysmonLog&pipe;clr_optimization_v2.0.50727_32&pipe;clr_optimization_v4.0.30319_32)$                                                         |4              |,            |1             |
-ROW   |6           |5       |^(automatic&pipe;automatic delayed)$                                                                                                                                  |3              |,            |1             |
-ROW   |7           |2       |^Software Loopback Interface                                                                                                                                          |4              |,            |1             |
-ROW   |8           |2       |^(In)?[Ll]oop[Bb]ack[0-9._]*$                                                                                                                                         |4              |,            |1             |
-ROW   |9           |2       |^NULL[0-9.]*$                                                                                                                                                         |4              |,            |1             |
-ROW   |10          |2       |^[Ll]o[0-9.]*$                                                                                                                                                        |4              |,            |1             |
-ROW   |11          |2       |^[Ss]ystem$                                                                                                                                                           |4              |,            |1             |
-ROW   |12          |2       |^Nu[0-9.]*$                                                                                                                                                           |4              |,            |1             |
+ROW   |1           |1       |^(btrfs&pipe;ext2&pipe;ext3&pipe;ext4&pipe;reiser&pipe;xfs&pipe;ffs&pipe;ufs&pipe;jfs&pipe;jfs2&pipe;vxfs&pipe;hfs&pipe;apfs&pipe;refs&pipe;ntfs&pipe;fat32&pipe;zfs)$|3              |             |0             |
+ROW   |3           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$                                                                        |4              |             |1             |
+ROW   |5           |4       |^(MMCSS&pipe;gupdate&pipe;SysmonLog&pipe;clr_optimization_v2.0.50727_32&pipe;clr_optimization_v4.0.30319_32)$                                                         |4              |             |1             |
+ROW   |6           |5       |^(automatic&pipe;automatic delayed)$                                                                                                                                  |3              |             |1             |
+ROW   |7           |2       |^Software Loopback Interface                                                                                                                                          |4              |             |1             |
+ROW   |8           |2       |^(In)?[Ll]oop[Bb]ack[0-9._]*$                                                                                                                                         |4              |             |1             |
+ROW   |9           |2       |^NULL[0-9.]*$                                                                                                                                                         |4              |             |1             |
+ROW   |10          |2       |^[Ll]o[0-9.]*$                                                                                                                                                        |4              |             |1             |
+ROW   |11          |2       |^[Ss]ystem$                                                                                                                                                           |4              |             |1             |
+ROW   |12          |2       |^Nu[0-9.]*$                                                                                                                                                           |4              |             |1             |
 
 TABLE |config_autoreg_tls
 FIELDS|autoreg_tlsid|tls_psk_identity|tls_psk|
