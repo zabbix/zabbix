@@ -41,122 +41,44 @@ $apm_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Database type'), 'type'))
 			->addClass('js-type')
-			->setAsteriskMark($data['is_type_sql'])
 			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
 		(new CFormField(
-			(new CSelect('type'))
-				->addOptions([
-					(new CSelectOption(ZBX_DB_CLICKHOUSE, _('ClickHouse'))),
-					(new CSelectOption(ZBX_DB_MYSQL, _('MySQL'))),
-					(new CSelectOption(ZBX_DB_POSTGRESQL, _('PostgreSQL'))),
-					(new CSelectOption(ZBX_DB_ELASTICSEARCH, _('Elasticsearch')))
-				])
-				->setValue($data['type'])
+			_('ClickHouse')
 		))
 			->addClass('js-type')
 			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
 	])
 	->addItem([
-		(new CLabel([
-			_('Host'),
-			makeHelpIcon([
-				_('Enter one or more values as host:port or [host]:port (IPv6), separated by commas.'),
-				BR(),
-				_('If no port is specified, the "Database port" value is used.')
-			])
-				->addClass('js-host-help')
-				->addClass($data['is_type_postgresql'] ? null : ZBX_STYLE_DISPLAY_NONE)
-		], 'host'))
+		(new CLabel(_('URL'), 'url'))
 			->setAsteriskMark()
-			->addClass('js-host')
+			->addClass('js-url')
 			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
-		(new CFormField([
-			(new CTextBox('host', $data['host']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setReadonly($data['host'] !== ''),
-			(new CDiv())
-				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-				->addClass('js-change-host'),
-			(new CButton('change_host', _('Change host')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->addClass('js-change-host')
-		]))
-			->addClass('js-host')
-			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
-	])
-	->addItem([
-		(new CLabel(_('Port'), 'port'))
-			->addClass('js-port')
-			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
-		(new CFormField([
-			(new CTextBox('port', $data['port']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			(new CDiv())
-				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CSpan(_('0 - use default port')))
-				->addClass(ZBX_STYLE_GREY)
-		]))->addClass('js-port')
-			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
-	])
-	->addItem([
-		(new CLabel(_('Authentication'), 'authentication'))
-			->addClass('js-authentication')
-			->addClass($data['show_authentication_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
 		(new CFormField(
-			(new CRadioButtonList('authentication', (int) $data['authentication']))
-				->addValue(_('None'), ELASTICSEARCH_AUTH_NONE)
-				->addValue(_('Basic'), ELASTICSEARCH_AUTH_BASIC)
-				->addValue(_('API key'), ELASTICSEARCH_AUTH_API_KEY)
+			(new CTextBox('url', $data['url']))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAttribute('maxlength', 2048)
+		))
+			->addClass('js-url')
+			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
+	])
+	->addItem([
+		(new CLabel(_('Authentication'), 'authentication_type'))
+			->setAsteriskMark()
+			->addClass('js-auth-type')
+			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
+		(new CFormField(
+			(new CRadioButtonList('authentication_type', (int) $data['authentication_type']))
+				->addValue(_('Username and password'), APM_AUTH_TYPE_PASSWORD)
+				->addValue(_('Vault path'), APM_AUTH_TYPE_VAULT_PATH)
+				->addValue(_('None'), APM_AUTH_TYPE_NONE)
 				->setModern()
 		))
-			->addClass('js-authentication')
-			->addClass($data['show_authentication_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
-	])
-	->addItem([
-		(new CLabel(_('API key'), 'api_key'))
-			->setAsteriskMark()
-			->addClass('js-api-key')
-			->addClass($data['show_api_key_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
-		(new CFormField([
-			(new CTextBox('api_key'))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->addClass($data['has_api_key'] ? ZBX_STYLE_DISPLAY_NONE : null),
-			makeWarningIcon(_('The previous API key was cleared due to a host change. Please enter the new API key.'))
-				->addClass('js-api-key-warning')
-				->addClass(ZBX_STYLE_DISPLAY_NONE),
-			(new CButton('change_api_key', _('Change API key')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->addClass($data['has_api_key'] ? null : ZBX_STYLE_DISPLAY_NONE)
-		]))
-			->addClass('js-api-key')
-			->addClass($data['show_api_key_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
-	])
-	->addItem([
-		(new CLabel(_('Name'), 'database'))
-			->addClass('js-database')
-			->setAsteriskMark($data['is_type_sql'])
-			->addClass($data['show_database_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
-		(new CFormField(
-			(new CTextBox('database', $data['database']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setAriaRequired()
-		))
-			->addClass('js-database')
-			->addClass($data['show_database_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
-	])
-	->addItem([
-		(new CLabel(_('Schema'), 'schema'))
-			->addClass('js-schema')
-			->addClass($data['show_schema_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
-		(new CFormField(
-			(new CTextBox('schema', $data['schema']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		))
-			->addClass('js-schema')
-			->addClass($data['show_schema_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('js-auth-type')
+			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
 	])
 	->addItem([
 		(new CLabel(_('Username'), 'username'))
+			->setAsteriskMark()
 			->addClass('js-username')
 			->addClass($data['show_user_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
 		(new CFormField(
@@ -174,84 +96,112 @@ $apm_tab = (new CFormGrid())
 			(new CPassBox('password'))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->addClass($data['has_password'] ? ZBX_STYLE_DISPLAY_NONE : null),
-			makeWarningIcon(_('The previous password was cleared due to a host change. Please enter the new password.'))
+			makeWarningIcon(_('The previous password was cleared due to a url change. Please enter the new password.'))
 				->addClass('js-password-warning')
 				->addClass(ZBX_STYLE_DISPLAY_NONE),
 			(new CButton('change_password', _('Change password')))
+				->removeId()
+				->removeAttribute('name')
 				->addClass(ZBX_STYLE_BTN_GREY)
+				->addClass('js-change-password')
 				->addClass($data['has_password'] ? null : ZBX_STYLE_DISPLAY_NONE)
 		]))
 			->addClass('js-password')
 			->addClass($data['show_user_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
 	])
 	->addItem([
-		(new CLabel(_('Use secure connection (TLS)'), 'encryption'))
-			->addClass('js-encryption')
+		(new CLabel(_('Vault path'), 'vault_path'))
+			->setAsteriskMark()
+			->addClass('js-vault-path')
+			->addClass($data['show_vault_path'] ? null : ZBX_STYLE_DISPLAY_NONE),
+		(new CFormField(
+			(new CTextBox('vault_path', $data['vault_path']))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+		))
+			->addClass('js-vault-path')
+			->addClass($data['show_vault_path'] ? null : ZBX_STYLE_DISPLAY_NONE)
+	])
+	->addItem([
+		(new CLabel(_('Database'), 'db'))
+			->addClass('js-database')
 			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
 		(new CFormField(
-			(new CCheckBox('encryption'))
-				->setUncheckedValue('0')
-				->setChecked($data['encryption'] == 1),
+			(new CTextBox('db', $data['db']))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 		))
-			->addClass('js-encryption')
+			->addClass('js-database')
 			->addClass($data['show_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
 	])
 	->addItem([
-		(new CLabel(_('Verify server certificate'), 'verify_peer'))
-			->addClass('js-verify-peer')
-			->addClass($data['show_encryption_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
+		(new CLabel(_('Verify server certificate'), 'ssl_verify_peer'))
+			->addClass('js-ssl-verify-peer')
+			->addClass($data['show_ssl_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
 		(new CFormField(
-			(new CCheckBox('verify_peer'))
+			(new CCheckBox('ssl_verify_peer'))
 				->setUncheckedValue('0')
-				->setChecked($data['verify_peer'] == 1),
+				->setChecked($data['ssl_verify_peer'] == 1),
 		))
-			->addClass('js-verify-peer')
-			->addClass($data['show_encryption_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('js-ssl-verify-peer')
+			->addClass($data['show_ssl_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
 	])
 	->addItem([
-		(new CLabel(_('CA certificate file'), 'ca_file'))
-			->addClass('js-ca-file')
-			->addClass($data['show_verify_peer'] ? null : ZBX_STYLE_DISPLAY_NONE),
+		(new CLabel(_('CA certificate file'), 'ssl_ca_location'))
+			->addClass('js-ssl-ca-location')
+			->addClass($data['show_ssl_verify_peer_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
 		(new CFormField(
-			(new CTextBox('ca_file', $data['ca_file']))
+			(new CTextBox('ssl_ca_location', $data['ssl_ca_location']))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAttribute('maxlength', 2048)
 		))
-			->addClass('js-ca-file')
-			->addClass($data['show_verify_peer'] ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('js-ssl-ca-location')
+			->addClass($data['show_ssl_verify_peer_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
 	])
 	->addItem([
-		(new CLabel(_('Client private key file'), 'key_file'))
-			->addClass('js-key-file')
-			->addClass($data['show_key_file_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
-		(new CFormField(
-			(new CTextBox('key_file', $data['key_file']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		))
-			->addClass('js-key-file')
-			->addClass($data['show_key_file_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
-	])
-	->addItem([
-		(new CLabel(_('Client certificate file'), 'cert_file'))
+		(new CLabel(_('Client certificate file'), 'ssl_cert_file'))
 			->addClass('js-cert-file')
-			->addClass($data['show_cert_file_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
+			->addClass($data['show_ssl_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
 		(new CFormField(
-			(new CTextBox('cert_file', $data['cert_file']))
+			(new CTextBox('ssl_cert_file', $data['ssl_cert_file']))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAttribute('maxlength', 2048)
 		))
 			->addClass('js-cert-file')
-			->addClass($data['show_cert_file_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass($data['show_ssl_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
 	])
 	->addItem([
-		(new CLabel(_('Verify hostname'), 'verify_host'))
-			->addClass('js-verify-host')
-			->addClass($data['show_encryption_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
+		(new CLabel(_('Client private key file'), 'ssl_key_file'))
+			->addClass('js-ssl-key-file')
+			->addClass($data['show_ssl_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
 		(new CFormField(
-			(new CCheckBox('verify_host'))
-				->setUncheckedValue('0')
-				->setChecked($data['verify_host'] == 1),
+			(new CTextBox('ssl_key_file', $data['ssl_key_file']))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAttribute('maxlength', 2048)
 		))
-			->addClass('js-verify-host')
-			->addClass($data['show_encryption_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('js-ssl-key-file')
+			->addClass($data['show_ssl_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
+	])
+	->addItem([
+		(new CLabel(_('Client private key file password'), 'ssl_key_password'))
+			->addClass('js-ssl-key-password')
+			->addClass($data['show_ssl_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
+		(new CFormField(
+			(new CTextBox('ssl_key_password', $data['ssl_key_password']))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+		))
+			->addClass('js-ssl-key-password')
+			->addClass($data['show_ssl_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
+	])
+	->addItem([
+		(new CLabel(_('Verify hostname'), 'ssl_verify_host'))
+			->addClass('js-ssl-verify-host')
+			->addClass($data['show_ssl_verify_peer_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
+		(new CFormField(
+			(new CCheckBox('ssl_verify_host'))
+				->setUncheckedValue('0')
+				->setChecked($data['ssl_verify_host'] == 1),
+		))
+			->addClass('js-ssl-verify-host')
+			->addClass($data['show_ssl_verify_peer_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
 	]);
 
 $apm_view = (new CTabView())
@@ -265,8 +215,7 @@ $form = (new CForm())
 	->setId('apm-form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem($apm_view)
-	->addVar('change_password', $data['change_password'])
-	->addVar('change_api_key', $data['change_api_key']);
+	->addVar('change_password', $data['change_password']);
 
 $html_page
 	->addItem($form)
@@ -276,7 +225,6 @@ $html_page
 	'view.init('.json_encode([
 		'rules' => $data['js_validation_rules'],
 		'default_values' => $data['default_values'],
-		'has_api_key' => $data['has_api_key'],
 		'has_password' => $data['has_password']
 	]).');'
 ))

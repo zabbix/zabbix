@@ -23,47 +23,38 @@ class CControllerApmDbUpdate extends CController {
 
 	public static function getValidationRules(): array {
 		$status_enabled = ['status', 'in' => [1]];
-		$encryption_enabled = ['encryption', 'in' => [1]];
-		$type_sql = ['type', 'in' => [ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL]];
-		$type_elasticsearch = ['type', 'in' => [ZBX_DB_ELASTICSEARCH]];
+		$auth_type_basic = ['authentication_type', 'in' => [APM_AUTH_TYPE_PASSWORD]];
+		$auth_type_vault_path = ['authentication_type', 'in' => [APM_AUTH_TYPE_VAULT_PATH]];
 
 		return ['object', 'fields' => [
 			'status' => ['boolean', 'required', 'in' => [0, 1]],
-			'type' => ['string', 'required',
-				'in' => [ZBX_DB_CLICKHOUSE, ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ELASTICSEARCH],
+			'url' => ['string', 'required', 'not_empty', 'length' => 2048, 'when' => $status_enabled,
+				'use' => [CUrlValidator::class, ['schemes' => ['http', 'https']]]],
+			'authentication_type' => ['integer', 'required',
+				'in' => [APM_AUTH_TYPE_PASSWORD, APM_AUTH_TYPE_VAULT_PATH, APM_AUTH_TYPE_NONE],
 				'when' => $status_enabled
 			],
-			'host' => ['string', 'required', 'not_empty', 'length' => 255, 'when' => $status_enabled],
-			'port' => ['integer', 'required', 'min' => 0, 'max' => 65535, 'when' => $status_enabled],
-			'database' => ['string', 'required', 'not_empty', 'length' => 255,
-				'when' => [$status_enabled, $type_sql]
+			'username' => ['string', 'required', 'not_empty', 'length' => 255,
+				'when' => [$status_enabled, $auth_type_basic]],
+			'password' => ['string', 'required', 'length' => 255, 'when' => [$status_enabled, $auth_type_basic]],
+			'vault_path' => ['string', 'required', 'not_empty', 'length' => 255,
+				'when' => [$status_enabled, $auth_type_vault_path]],
+			'db' => ['string', 'required', 'length' => 255, 'when' => $status_enabled],
+			'ssl_verify_peer' => ['boolean', 'required', 'when' => $status_enabled],
+			'ssl_ca_location' => ['string', 'required', 'length' => 2048,
+				'when' => [$status_enabled, ['ssl_verify_peer', 'in' => [1]]]
 			],
-			'authentication' => ['integer', 'required',
-				'in' => [ELASTICSEARCH_AUTH_NONE, ELASTICSEARCH_AUTH_BASIC, ELASTICSEARCH_AUTH_API_KEY],
-				'when' => [$status_enabled, $type_elasticsearch]
-			],
-			'change_password' => ['integer', 'required', 'in' => [0, 1], 'when' => $status_enabled],
-			'change_api_key' => ['integer', 'required', 'in' => [0, 1], 'when' => $status_enabled],
-			'username' => ['string', 'required', 'length' => 255, 'when' => $status_enabled],
-			'password' => ['string', 'required', 'length' => 255, 'when' => $status_enabled],
-			'api_key' => ['string', 'required', 'not_empty', 'length' => 255,
-				'when' => [
-					['authentication', 'in' => [ELASTICSEARCH_AUTH_API_KEY]],
-					['change_api_key', 'in' => [1]]
+			'ssl_verify_host' => ['boolean', 'required', 'when' => $status_enabled],
+			'ssl_cert_file' => ['string', 'required', 'length' => 2048, 'when' => $status_enabled],
+			'ssl_key_file' => ['string', 'required', 'length' => 2048, 'when' => $status_enabled],
+			'ssl_key_password' => [
+				['string', 'length' => 255],
+				['string', 'length' => 255, 'in' => [''],
+					'when' => [$status_enabled, ['ssl_key_file', 'in' => ['']]],
+					'messages' => ['in' => 'Must be empty, if previous field is not specified.']
 				]
 			],
-			'encryption' => ['boolean', 'required', 'when' => $status_enabled],
-			'verify_peer' => ['boolean', 'required', 'when' => [$status_enabled, $encryption_enabled]],
-			'ca_file' => ['string', 'required', 'length' => 255,
-				'when' => [$status_enabled, $encryption_enabled, ['verify_peer', 'in' => [1]]]
-			],
-			'cert_file' => ['string', 'required', 'length' => 255,
-				'when' => [$status_enabled, $encryption_enabled, $type_sql]
-			],
-			'key_file' => ['string', 'required', 'length' => 255,
-				'when' => [$status_enabled, $encryption_enabled, $type_sql]
-			],
-			'verify_host' => ['boolean', 'required', 'when' => [$status_enabled, $encryption_enabled]],
+			'change_password' => ['integer', 'required', 'in' => [0, 1]],
 		]];
 	}
 
@@ -116,58 +107,45 @@ class CControllerApmDbUpdate extends CController {
 	}
 
 	protected static function processApmInput(array &$apm): void {
+		$reset_fields = [];
+
+		switch ($apm['authentication_type']) {
+			case APM_AUTH_TYPE_PASSWORD:
+				$reset_fields = ['vault_path'];
+				break;
+
+			case APM_AUTH_TYPE_VAULT_PATH:
+				$reset_fields = ['username', 'password'];
+				break;
+
+			case APM_AUTH_TYPE_NONE:
+				$reset_fields = ['vault_path', 'username', 'password'];
+				break;
+		}
+
+		$apm['url'] = CUrlValidator::sanitizeUrl($apm['url']);
+
+		if (str_starts_with($apm['url'], 'https://')) {
+			if ($apm['ssl_verify_peer'] === 0) {
+				$reset_fields = array_merge($reset_fields, ['ssl_verify_host', 'ssl_ca_location']);
+			}
+		} else {
+			$reset_fields = array_merge($reset_fields, ['ssl_verify_peer', 'ssl_ca_location', 'ssl_verify_host',
+				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password']);
+		}
+
 		$default_values = CControllerApmDbEdit::getDefaultValues();
 
-		// TODO: ApmSettings->get()
-
-		switch ($apm['type']) {
-			case ZBX_DB_CLICKHOUSE:
-				foreach (['schema', 'authentication', 'api_key', 'key_file'] as $key) {
-					$apm[$key] = $default_values[$key];
-				}
-				break;
-
-			case ZBX_DB_ELASTICSEARCH:
-				switch ($apm['authentication']) {
-					case ELASTICSEARCH_AUTH_NONE:
-						foreach (['username', 'password', 'api_key'] as $key) {
-							$apm[$key] = $default_values[$key];
-						}
-						break;
-
-					case ELASTICSEARCH_AUTH_BASIC:
-						$apm['api_key'] = $default_values['api_key'];
-						break;
-
-					case ELASTICSEARCH_AUTH_API_KEY:
-						foreach (['username', 'password'] as $key) {
-							$apm[$key] = $default_values[$key];
-						}
-						break;
-				}
-
-				$apm['key_file'] = $default_values['key_file'];
-				break;
-
-			case ZBX_DB_MYSQL:
-			case ZBX_DB_POSTGRESQL:
-				foreach (['authentication', 'api_key'] as $key) {
-					$apm[$key] = $default_values[$key];
-				}
-				break;
-		}
-
-		if ($apm['encryption'] == 1) {
-			if ($apm['verify_peer'] == 0) {
-				$apm['ca_file'] = $default_values['ca_file'];
-			}
-		}
-		else {
-			foreach (['verify_peer', 'ca_file', 'cert_file', 'key_file', 'verify_host'] as $key) {
-				$apm[$key] = $default_values[$key];
+		foreach ($reset_fields as $field) {
+			if (array_key_exists($field, $default_values)) {
+				$apm[$field] = $default_values[$field];
 			}
 		}
 
-		unset($apm['change_api_key'], $apm['change_password']);
+		$apm = array_merge([
+			// TODO: ApmSettings->get()
+		], $apm);
+
+		unset($apm['change_password']);
 	}
 }

@@ -29,9 +29,6 @@ const view = new class {
 	#default_values = {};
 
 	/** @type {boolean} */
-	#has_api_key = false;
-
-	/** @type {boolean} */
 	#has_password = false;
 
 	/** @type {HTMLFormElement|null} */
@@ -41,35 +38,35 @@ const view = new class {
 	#form = null;
 
 	/** @type {boolean} */
-	#host_changed = false;
+	#url_changed = false;
 
-	/** @type {HTMLButtonElement|null} */
-	#change_host_btn = null;
+	/** @type {HTMLInputElement|null} */
+	#url_input = null;
 
 	/** @type {boolean} */
 	#password_changed = false;
 
+	/** @type {HTMLInputElement|null} */
+	#password_input = null;
+
+	/** @type {HTMLButtonElement|null} */
+	#password_warning = null;
+
 	/** @type {HTMLButtonElement|null} */
 	#change_password_btn = null;
 
-	/** @type {boolean} */
-	#api_key_changed = false;
-
-	/** @type {HTMLButtonElement|null} */
-	#change_api_key_btn = null;
-
-	init({rules, default_values, has_api_key, has_password}) {
+	init({rules, default_values, has_password}) {
 		this.#rules = rules;
 		this.#default_values = default_values;
-		this.#has_api_key = has_api_key;
 		this.#has_password = has_password;
 
 		this.#form_element = document.getElementById('apm-form');
 		this.#form = new CForm(this.#form_element, this.#rules);
 
-		this.#change_host_btn = document.getElementById('change_host');
-		this.#change_password_btn = document.getElementById('change_password');
-		this.#change_api_key_btn = document.getElementById('change_api_key');
+		this.#url_input = this.#getFormField('url');
+		this.#password_input = this.#getFormField('password');
+		this.#password_warning = document.querySelector('.js-password-warning');
+		this.#change_password_btn = document.querySelector('.js-change-password');
 
 		this.#bindEvents();
 	}
@@ -77,190 +74,102 @@ const view = new class {
 	#bindEvents() {
 		this.#form_element.addEventListener('submit', this.#submitForm);
 
-		const host_input = this.#getFormField('host');
-		const password_input = this.#getFormField('password');
-		const api_key_input = this.#getFormField('api_key');
+		this.#url_input?.addEventListener('input', () => {
+			this.#url_changed = true;
 
-		host_input?.addEventListener('change', () => {
-			this.#host_changed = true;
-
-			const fields = this.#getAllValues();
-
-			/** @var {HTMLButtonElement|null} */
-			const password_warning = document.querySelector('.js-password-warning');
-			/** @var {HTMLButtonElement|null} */
-			const api_key_warning = document.querySelector('.js-api-key-warning');
-
-			if ((fields.type !== ZBX_DB_ELASTICSEARCH || fields.authentication === ELASTICSEARCH_AUTH_BASIC)
-					&& password_input !== null) {
-				this.#password_changed = password_input.value !== '';
-
-				password_input.value = '';
-				password_input.classList.remove(ZBX_STYLE_DISPLAY_NONE);
-
-				this.#change_password_btn?.classList.add(ZBX_STYLE_DISPLAY_NONE);
-
-				if (this.#password_changed) {
-					api_key_warning?.classList.add(ZBX_STYLE_DISPLAY_NONE);
-					password_warning?.classList.remove(ZBX_STYLE_DISPLAY_NONE);
-				}
-			}
-
-			if (fields.type === ZBX_DB_ELASTICSEARCH && fields.authentication === ELASTICSEARCH_AUTH_API_KEY
-					&& api_key_input !== null) {
-				this.#api_key_changed = api_key_input.value !== '';
-
-				api_key_input.value = '';
-				api_key_input.classList.remove(ZBX_STYLE_DISPLAY_NONE);
-
-				this.#change_api_key_btn?.classList.add(ZBX_STYLE_DISPLAY_NONE);
-
-				if (this.#api_key_changed) {
-					password_warning?.classList.add(ZBX_STYLE_DISPLAY_NONE);
-					api_key_warning?.classList.remove(ZBX_STYLE_DISPLAY_NONE);
-				}
-			}
-		});
-
-		this.#change_host_btn?.addEventListener('click', () => {
-			this.#host_changed = true;
-
-			host_input?.removeAttribute('readonly');
-			host_input?.focus();
-
-			const value_length = host_input?.value.length ?? 0;
-			host_input?.setSelectionRange(value_length, value_length);
-
-			this.#change_host_btn?.classList.add(ZBX_STYLE_DISPLAY_NONE);
-
-			this.#updateDisplayState(document.querySelectorAll('.js-change-host'), false);
+			this.#updateForm();
 		});
 
 		this.#change_password_btn?.addEventListener('click', e => {
-			this.#password_changed = true;
+			this.#password_changed = this.#password_input.value !== '';
 
 			this.#getFormField('change_password')?.setAttribute('value', '1');
 
-			password_input?.classList.remove(ZBX_STYLE_DISPLAY_NONE);
-			password_input?.focus();
+			this.#password_input?.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+			this.#password_input?.focus();
 
 			e.target.classList.add(ZBX_STYLE_DISPLAY_NONE);
 		});
 
-		this.#change_api_key_btn?.addEventListener('click', e => {
-			this.#api_key_changed = true;
-
-			this.#getFormField('change_api_key')?.setAttribute('value', '1');
-
-			api_key_input?.classList.remove(ZBX_STYLE_DISPLAY_NONE);
-			api_key_input?.focus();
-
-			e.target.classList.add(ZBX_STYLE_DISPLAY_NONE);
-		});
-
-		for (const name of ['authentication', 'status', 'type', 'encryption', 'verify_peer']) {
+		for (const name of ['status', 'authentication_type', 'ssl_verify_peer']) {
 			this.#getFormField(name)?.addEventListener('change', () => this.#updateForm());
 		}
 	}
 
 	#getAllValues() {
-		const fields = this.#form.getAllValues();
-		const type = this.#getFormField('type');
-		const authentication = this.#getFormField('authentication')?.querySelector('input:checked');
+		const values = this.#form.getAllValues();
+		const authentication_type = this.#getFormField('authentication_type')?.querySelector('input:checked');
 
 		return {
-			...fields,
-			status: parseInt(fields.status),
-			type: type?.value ?? this.#default_values.type,
-			authentication: parseInt(authentication?.value ?? this.#default_values.authentication),
-			encryption: parseInt(fields.encryption),
-			verify_peer: parseInt(fields.verify_peer),
-			verify_host: parseInt(fields.verify_host)
+			...values,
+			url: values.url.replace(/^[\x00-\x20]+|[\x00-\x20]+$|[\r\n\t]+/g, ''),
+			status: parseInt(values.status),
+			authentication_type: parseInt(authentication_type?.value ?? this.#default_values.authentication_type),
+			ssl_verify_peer: parseInt(values.ssl_verify_peer),
+			ssl_verify_host: parseInt(values.ssl_verify_host)
 		};
 	}
 
 	#updateForm() {
-		const fields = this.#getAllValues();
+		const values = this.#getAllValues();
 
-		const is_type_sql = [ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL].includes(fields.type);
-		const is_type_postgresql = fields.type === ZBX_DB_POSTGRESQL;
-		const is_type_elasticsearch = fields.type === ZBX_DB_ELASTICSEARCH;
-
-		const show_fields = fields.status === 1;
-		const show_change_host_btn = !this.#host_changed && String(fields.host).length > 0;
-		const show_database_fields = show_fields && !is_type_elasticsearch;
-		const show_schema_fields = show_fields && is_type_postgresql;
-		const show_authentication_fields = show_fields && is_type_elasticsearch;
-		const show_api_key_fields = show_authentication_fields && fields.authentication === ELASTICSEARCH_AUTH_API_KEY;
-		const show_encryption_fields = show_fields && fields.encryption === 1;
-		const show_key_file_fields = show_encryption_fields && is_type_sql;
-		const show_cert_file_fields = show_encryption_fields && is_type_sql;
-		const show_user_fields = show_fields
-			&& (show_database_fields || (!show_api_key_fields && fields.authentication !== ELASTICSEARCH_AUTH_NONE));
-		const show_verify_peer = show_encryption_fields && fields.verify_peer === 1;
+		const show_fields = values.status === 1;
+		const show_user_fields = show_fields && values.authentication_type === APM_AUTH_TYPE_PASSWORD;
+		const show_vault_path = show_fields && values.authentication_type === APM_AUTH_TYPE_VAULT_PATH;
+		const show_ssl_fields = show_fields && values.url.substring(0, 8) === 'https://';
+		const show_ssl_verify_peer_fields = show_ssl_fields && values.ssl_verify_peer === 1;
 
 		if (!show_fields) {
 			this.#resetFormState();
 		}
 
 		this.#updateDisplayState([
-			...document.querySelectorAll('.js-type'),
-			...document.querySelectorAll('.js-host'),
-			...document.querySelectorAll('.js-port'),
-			...document.querySelectorAll('.js-encryption')
+			...document.querySelectorAll('.js-url'),
+			...document.querySelectorAll('.js-auth-type'),
+			...document.querySelectorAll('.js-database'),
 		], show_fields);
-
-		this.#updateDisplayState(document.querySelectorAll('.js-change-host'), show_change_host_btn);
-
-		if (show_change_host_btn) {
-			this.#getFormField('host')?.setAttribute('readonly', 'readonly');
-		}
-
-		this.#updateDisplayState(document.querySelectorAll('.js-schema'), show_schema_fields);
 
 		this.#updateDisplayState([
 			...document.querySelectorAll('.js-username'),
 			...document.querySelectorAll('.js-password')
 		], show_user_fields);
 
-		this.#updateDisplayState(document.querySelectorAll('.js-authentication'), show_authentication_fields);
-		this.#updateDisplayState(document.querySelectorAll('.js-api-key'), show_api_key_fields);
+		this.#updateDisplayState([
+			...document.querySelectorAll('.js-vault-path')
+		], show_vault_path);
 
 		this.#updateDisplayState([
-			...document.querySelectorAll('.js-verify-peer'),
-			...document.querySelectorAll('.js-certificate-file'),
-			...document.querySelectorAll('.js-verify-host')
-		], show_encryption_fields);
+			...document.querySelectorAll('.js-ssl-verify-peer'),
+			...document.querySelectorAll('.js-ssl-cert-file'),
+			...document.querySelectorAll('.js-ssl-key-file'),
+			...document.querySelectorAll('.js-ssl-key-password')
+		], show_ssl_fields);
 
-		this.#updateDisplayState(document.querySelectorAll('.js-key-file'), show_key_file_fields);
-		this.#updateDisplayState(document.querySelectorAll('.js-cert-file'), show_cert_file_fields);
-		this.#updateDisplayState(document.querySelectorAll('.js-ca-file'), show_verify_peer);
-		this.#updateDisplayState(document.querySelectorAll('.js-database'), show_database_fields);
+		this.#updateDisplayState([
+			...document.querySelectorAll('.js-ssl-ca-location'),
+			...document.querySelectorAll('.js-ssl-verify-host')
+		], show_ssl_verify_peer_fields);
 
-		this.#updateRequiredState('database', is_type_sql);
-
-		/** @var {HTMLElement|null} */
-		const host_help = document.querySelector('.js-host-help');
-		host_help?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !is_type_postgresql);
-
-		const show_change_api_key_btn = !this.#api_key_changed && this.#has_api_key;
-
-		this.#getFormField('api_key')?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, show_change_api_key_btn);
-
-		this.#getFormField('change_api_key')?.setAttribute('value',
-			!show_change_api_key_btn && fields.authentication === ELASTICSEARCH_AUTH_API_KEY ? '1' : '0');
-
-		this.#change_api_key_btn?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !show_change_api_key_btn);
-
-		const show_change_password_btn = !this.#password_changed && this.#has_password;
+		const show_change_password_btn = !this.#url_changed && !this.#password_changed && this.#has_password;
 
 		if (show_change_password_btn) {
 			this.#getFormField('change_password')?.setAttribute('value', '0');
 		}
 
-		this.#getFormField('password')?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, show_change_password_btn);
+		if (this.#password_input !== null) {
+			if (this.#url_changed && this.#password_input.value !== '') {
+				this.#password_input.value = '';
 
-		this.#change_password_btn?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !show_change_password_btn);
+				this.#password_warning?.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+			}
+
+			this.#password_input.classList.toggle(ZBX_STYLE_DISPLAY_NONE, show_change_password_btn);
+
+			this.#change_password_btn?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !show_change_password_btn);
+		}
+
+		this.#url_changed = false;
+		this.#password_changed = false;
 	}
 
 	#getFormField(name) {
@@ -273,24 +182,15 @@ const view = new class {
 		}
 	}
 
-	#updateRequiredState(field, required) {
-		/** @var {HTMLLabelElement|null} */
-		const label = document.querySelector(`label[for="${field}"]`);
-		label?.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
-	}
-
 	#resetFormState() {
-		const default_values = {
-			...this.#default_values,
-			password: '',
-			api_key: ''
-		};
+		const default_values = Object.entries(this.#default_values)
+			.filter(([name]) => name !== 'status');
 
-		for (const [name, value] of Object.entries(default_values).filter(([name]) => name !== 'status')) {
+		for (const [name, value] of default_values) {
 			const field = this.#form.findFieldByName(name);
 
 			const input = field?.getField();
-			if (input !== null) {
+			if (input) {
 				if (input.type === 'checkbox') {
 					input.checked = value === 1;
 				}
@@ -302,9 +202,7 @@ const view = new class {
 			}
 		}
 
-		this.#host_changed = false;
-		this.#password_changed = false;
-		this.#api_key_changed = false;
+		this.#url_changed = false;
 
 		this.#form.reload(this.#rules);
 	}

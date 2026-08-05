@@ -80,9 +80,9 @@ define('ELASTICSEARCH_RESPONSE_PLAIN',			0);
 define('ELASTICSEARCH_RESPONSE_AGGREGATION',	1);
 define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
 
-define('ELASTICSEARCH_AUTH_NONE',		0);
-define('ELASTICSEARCH_AUTH_BASIC',		1);
-define('ELASTICSEARCH_AUTH_API_KEY',	2);
+define('APM_AUTH_TYPE_PASSWORD',	0);
+define('APM_AUTH_TYPE_VAULT_PATH',	1);
+define('APM_AUTH_TYPE_NONE',		2);
 
 define('ZBX_FONTPATH',				realpath('assets/fonts')); // where to search for font (GD > 2.0.18)
 define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
@@ -219,8 +219,6 @@ define('PASSWD_CHECK_SIMPLE', 0x08);
 
 define('ZBX_DB_MYSQL',			'MYSQL');
 define('ZBX_DB_POSTGRESQL',		'POSTGRESQL');
-define('ZBX_DB_CLICKHOUSE',		'CLICKHOUSE');
-define('ZBX_DB_ELASTICSEARCH',	'ELASTICSEARCH');
 
 define('ZBX_DB_EXTENSION_TIMESCALEDB', 'timescaledb');
 

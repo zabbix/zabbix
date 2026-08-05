@@ -12,6 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+const ZBX_DB_MYSQL		= 'MYSQL';
+const ZBX_DB_POSTGRESQL	= 'POSTGRESQL';
 
 const DB_STORE_CREDS_VAULT_HASHICORP	= 1;
 const DB_STORE_CREDS_VAULT_CYBERARK		= 2;

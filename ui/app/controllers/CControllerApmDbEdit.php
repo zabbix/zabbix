@@ -31,23 +31,19 @@ class CControllerApmDbEdit extends CController {
 	public static function getDefaultValues(): array {
 		return [
 			'status' => 0,
-			'type' => ZBX_DB_CLICKHOUSE,
-			'host' => '',
-			'port' => '0',
-			'database' => '',
-			'schema' => '',
-			'authentication' => ELASTICSEARCH_AUTH_NONE,
+			'url' => '',
+			'authentication_type' => APM_AUTH_TYPE_PASSWORD,
 			'username' => '',
 			'password' => '',
-			'api_key' => '',
-			'encryption' => 0,
-			'verify_peer' => 0,
-			'ca_file' => '',
-			'cert_file' => '',
-			'key_file' => '',
-			'verify_host' => 0,
-			'change_password' => 0,
-			'change_api_key' => 0
+			'vault_path' => '',
+			'db' => '',
+			'ssl_verify_peer' => 0,
+			'ssl_ca_location' => '',
+			'ssl_verify_host' => 0,
+			'ssl_cert_file' => '',
+			'ssl_key_file' => '',
+			'ssl_key_password' => '',
+			'change_password' => 0
 		];
 	}
 
@@ -63,26 +59,12 @@ class CControllerApmDbEdit extends CController {
 		$data['default_values'] = $default_values;
 
 		$data['has_password'] = $data['password'] !== '';
-		$data['has_api_key'] = $data['api_key'] !== '';
-
-		$data['is_type_sql'] = in_array($data['type'], [ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL]);
-		$data['is_type_postgresql'] = $data['type'] == ZBX_DB_POSTGRESQL;
-		$data['is_type_elasticsearch'] = $data['type'] == ZBX_DB_ELASTICSEARCH;
 
 		$data['show_fields'] = $data['status'] == 1;
-		$data['show_change_host_btn'] = strlen($data['host']) > 0;
-		$data['show_database_fields'] = $data['show_fields'] && !$data['is_type_elasticsearch'];
-		$data['show_schema_fields'] = $data['show_fields'] && $data['is_type_postgresql'];
-		$data['show_authentication_fields'] = $data['show_fields'] && $data['is_type_elasticsearch'];
-		$data['show_api_key_fields'] = $data['show_authentication_fields']
-			&& $data['authentication'] === ELASTICSEARCH_AUTH_API_KEY;
-		$data['show_encryption_fields'] = $data['show_fields'] && $data['encryption'] === 1;
-		$data['show_key_file_fields'] = $data['show_encryption_fields'] && $data['is_type_sql'];
-		$data['show_cert_file_fields'] = $data['show_encryption_fields'] && $data['is_type_sql'];
-		$data['show_user_fields'] = $data['show_fields']
-			&& ($data['show_database_fields']
-				|| (!$data['show_api_key_fields'] && $data['authentication'] !== ELASTICSEARCH_AUTH_NONE));
-		$data['show_verify_peer'] = $data['show_encryption_fields'] && $data['verify_peer'] === 1;
+		$data['show_user_fields'] = $data['show_fields'] && $data['authentication_type'] === APM_AUTH_TYPE_PASSWORD;
+		$data['show_vault_path'] = $data['show_fields'] && $data['authentication_type'] === APM_AUTH_TYPE_VAULT_PATH;
+		$data['show_ssl_fields'] = $data['show_fields'] &&  str_starts_with($data['url'], 'https://');
+		$data['show_ssl_verify_peer_fields'] = $data['show_ssl_fields'] && $data['ssl_verify_peer'] === 1;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('APM data source'));
