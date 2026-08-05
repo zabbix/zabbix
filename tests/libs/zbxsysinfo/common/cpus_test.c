@@ -65,6 +65,9 @@ static void	test_get_cpus(void)
 	int 				cpu_cnt = 1;
 	int				expected_status[2];
 
+	memset(test_cpus, 0, sizeof(test_cpus));
+	memset(&test_collector, 0, sizeof(test_collector));
+
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.h_cpu_cnt"))
 		cpu_cnt = zbx_mock_get_parameter_int("in.h_cpu_cnt");
 
