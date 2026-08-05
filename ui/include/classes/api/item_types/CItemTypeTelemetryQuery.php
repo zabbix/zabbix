@@ -301,6 +301,67 @@ class CItemTypeTelemetryQuery extends CItemType {
 		return true;
 	}
 
+	/**
+	 * Serialize "item.query" to JSON string.
+	 * Convert "item.query.filter.formula" from "A or B" like notation to "{0} or {1}" notation
+	 * removing "formulaid" property for each condition.
+	 *
+	 * @param array $query  Array for "item.query" configuration
+	 */
+	public static function prepareQueryFieldForDb(array $query): string {
+		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			CConditionHelper::replaceFormulaIds($query['filter']['formula'], $query['filter']['conditions']);
+
+			foreach ($query['filter']['conditions'] as &$condition) {
+				unset($condition['formulaid']);
+			}
+			unset($condition);
+		}
+
+		foreach ($query['aggregated_columns'] as &$column) {
+			if ($column['function'] == AGGREGATE_PCTILE) {
+				// Server expects "query.aggregated_columns[].parameters" to be stored as array of strings.
+				$column['parameters'] = array_map('strval', $column['parameters']);
+			}
+		}
+		unset($column);
+
+		return json_encode($query, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+	}
+
+	/**
+	 * Deserialize "item.query" field from JSON string for API output.
+	 *
+	 * @param string $query       JSON encoded string with "item.query" configuration
+	 * @param bool   $api_output  Set to false to convert "item.query.filter.formula" from "{0} or {1}" like notation
+	 *                            to "A or B" with additional key "formulaid" set for each condition.
+	 */
+	public static function prepareQueryFieldForApi(string $query, bool $api_output): array {
+		if ($query === '') {
+			return [];
+		}
+
+		$query = json_decode($query, true);
+
+		if (json_last_error() != JSON_ERROR_NONE) {
+			return [];
+		}
+
+		if (!$api_output && $query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			$i = 0;
+
+			foreach ($query['filter']['conditions'] as &$condition) {
+				$condition['formulaid'] = num2letter($i);
+				$i++;
+			}
+			unset($condition);
+
+			CConditionHelper::replaceConditionIds($query['filter']['formula'], $query['filter']['conditions']);
+		}
+
+		return $query;
+	}
+
 	private static function getQueryFieldValidationRules(array $item): array {
 		switch ($item['query']['signal_type'] ?? APM_SIGNAL_TYPE_TRACES) {
 			case APM_SIGNAL_TYPE_TRACES:
