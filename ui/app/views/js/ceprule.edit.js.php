@@ -33,6 +33,12 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#condition_rules;
 
+	/** @type {Object} */
+	#execute_when_by_window_type;
+
+	/** @type {Object} */
+	#operation_types_by_execute_when;
+
 	/** @type {Template} */
 	#condition_row_template;
 
@@ -57,16 +63,19 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#rules_for_clone;
 
-	init({rules, rules_for_clone, operation_rules, condition_rules, ceprule}) {
+	init({rules, rules_for_clone, operation_rules, condition_rules, operation_types_by_execute_when,
+			execute_when_by_window_type, ceprule}) {
 		this.#rules_for_clone = rules_for_clone;
 		this.#initTemplates();
 		this.#condition_rules = condition_rules;
+		this.#operation_types_by_execute_when = operation_types_by_execute_when;
+		this.#execute_when_by_window_type = execute_when_by_window_type;
 		this.#operation_rules = operation_rules;
 		this.#overlay = overlays_stack.getById('ceprule.edit');
 		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 
 		for (const condition of Object.values(ceprule.filter.conditions)) {
-			const formulaid = this.#indexToFormulaId(this.#condition_row_index++);
+			const formulaid = num2letter(this.#condition_row_index++);
 
 			this.#addConditionRow({...condition, formulaid, row_index: this.#condition_row_index});
 		}
@@ -93,74 +102,18 @@ window.ceprule_edit_popup = new class {
 		window.requestAnimationFrame(() => this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE));
 	}
 
-	/**
-	 * Formula ID from large number.
-	 */
-	#indexToFormulaId(index) {
-		let formulaid = '';
-
-		for (index++; index; index = Math.floor(index / 26)) {
-			formulaid = String.fromCharCode(65 + --index % 26) + formulaid
-		};
-
-		return formulaid;
-	}
-
 	#initTemplates() {
-		this.#condition_row_template_value = new Template(`<div class="text">#{name} #{operator} <em>#{value}</em>.</div>`);
-		this.#condition_row_template_tag = new Template(`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em>.</div>`);
-		this.#condition_row_template_tag_exists = new Template(`<div class="text">#{name} <em>#{tag_name}</em> #{operator}.</div>`);
-		this.#condition_row_template = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td>#{formulaid}</td>
-				<td>#{*description_html}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-edit"><?= _('Edit') ?></button>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-remove"><?= _('Remove') ?></button>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][type]" type="hidden" value="#{type}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][operator]" type="hidden" value="#{operator}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][severity]" type="hidden" value="#{severity}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][event_name]" type="hidden" value="#{event_name}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][tag_operator]" type="hidden" value="#{tag_operator}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][tag]" type="hidden" value="#{tag}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][tag_value]" type="hidden" value="#{tag_value}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][host]" type="hidden" value="#{host}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][host_group]" type="hidden" value="#{host_group}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][time_period]" type="hidden" value="#{time_period}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][formulaid]" type="hidden" value="#{formulaid}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{row_index}][row_index]" type="hidden" value="#{row_index}"/>
-				</td>
-			</tr>
-		`);
-
-		this.#operation_row_template = new Template(`
-			<tr data-sortorder="#{sortorder}">
-				<td class="td-drag-icon">
-					<div class="drag-icon"></div>
-					<span class="list-numbered-item">:</span>
-				</td>
-				<td>
-					<div class="text"><?= _('Execute when') ?> #{execute_when_str} : #{label_str}<em> #{arguments_str}</em></div>
-				</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-operation-edit"><?= _('Edit') ?></button>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-operation-remove"><?= _('Remove') ?></button>
-
-					#{*tags_input_html}
-
-					<input data-field-type="hidden" name="operations[#{sortorder}][sortorder]" type="hidden" value="#{sortorder}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][execute_when]" type="hidden" value="#{execute_when}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][type]" type="hidden" value="#{type}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][evaltype]" type="hidden" value="#{evaltype}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][event_name]" type="hidden" value="#{event_name}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][tag]" type="hidden" value="#{tag}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][new_tag]" type="hidden" value="#{new_tag}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][tag_value]" type="hidden" value="#{tag_value}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][severity]" type="hidden" value="#{severity}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][suppress_until]" type="hidden" value="#{suppress_until}"/>
-				</td>
-			</tr>
-		`);
+		this.#condition_row_template_value = new Template(
+			`<div class="text">#{name} #{operator} <em>#{value}</em>.</div>`
+		);
+		this.#condition_row_template_tag = new Template(
+			`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em>.</div>`
+		);
+		this.#condition_row_template_tag_exists = new Template(
+			`<div class="text">#{name} <em>#{tag_name}</em> #{operator}.</div>`
+		);
+		this.#condition_row_template = new Template(window['ceprule-condition-row-template'].innerHTML);
+		this.#operation_row_template = new Template(window['ceprule-operation-row-template'].innerHTML);
 	}
 
 	#initActions() {
@@ -277,9 +230,7 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#handleWindowTypeChanged() {
-		const input = [...window['ceprule-window-type'].querySelectorAll('[name="window_type"]')]
-			.find(node => node.checked);
-		const type = Number(input.value);
+		const type = Number(this.form.findFieldByName('window_type').getValue());
 
 		if (this.form.findFieldByName('window[group_by_host]').hasChanged()
 				|| this.form.findFieldByName('window[group_by_host_group]').hasChanged()
@@ -496,7 +447,7 @@ window.ceprule_edit_popup = new class {
 		if (is_new) {
 			condition = {
 				row_index: this.#condition_row_index + 1,
-				formulaid: this.#indexToFormulaId(this.#condition_row_index),
+				formulaid: num2letter(this.#condition_row_index),
 				type: '<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>',
 				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 				host_group: '',
@@ -558,7 +509,7 @@ window.ceprule_edit_popup = new class {
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
 				new_tag: '',
-				suppress_until: '',
+				suppress_duration: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
 				tag_value: '',
@@ -618,7 +569,9 @@ window.ceprule_edit_popup = new class {
 		});
 
 		ceprule_operation_edit_popup.init({rules: this.#operation_rules, operation, overlay,
-			window_type: this.form.findFieldByName('window_type').getValue()
+			window_type: this.form.findFieldByName('window_type').getValue(),
+			operation_types_by_execute_when: this.#operation_types_by_execute_when,
+			execute_when_by_window_type: this.#execute_when_by_window_type
 		});
 	}
 
@@ -689,8 +642,8 @@ window.ceprule_edit_popup = new class {
 		else if ([
 			<?= CCepRuleHelper::OP_SUPPRESS ?>
 		].includes(operation_type)) {
-			arguments_str = operation.suppress_until
-				? <?= json_encode(_('until')) ?> + ' ' + operation.suppress_until
+			arguments_str = operation.suppress_duration
+				? <?= json_encode(_('until')) ?> + ' ' + operation.suppress_duration
 				: <?= json_encode(_('Indefinately')) ?>;
 		}
 		else if ([

@@ -53,7 +53,9 @@ class CControllerCepRuleList extends CController {
 
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.ceprule.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.ceprule.filter_status', $this->getInput('filter_status', CCepRuleHelper::FILTER_SHOW_ALL), PROFILE_TYPE_INT);
+			CProfile::update('web.ceprule.filter_status', $this->getInput('filter_status',
+				CCepRuleHelper::FILTER_SHOW_ALL), PROFILE_TYPE_INT
+			);
 			CProfile::update('web.ceprule.filter_type', $this->getInput('filter_type', -1), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {

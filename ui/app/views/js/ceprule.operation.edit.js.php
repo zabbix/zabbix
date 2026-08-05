@@ -21,6 +21,13 @@
 
 window.ceprule_operation_edit_popup = new class {
 
+
+	/** @type {Object} */
+	#execute_when_for_window_type;
+
+	/** @type {Object} */
+	#operation_types_by_execute_when;
+
 	/** @type {HTMLFormElement} */
 	form_element;
 
@@ -33,7 +40,10 @@ window.ceprule_operation_edit_popup = new class {
 	/** @type {Template} */
 	#tag_template;
 
-	init({rules, operation, overlay, window_type}) {
+	init({rules, operation, overlay, window_type, operation_types_by_execute_when, execute_when_by_window_type}) {
+		this.#operation_types_by_execute_when = operation_types_by_execute_when;
+		this.#execute_when_for_window_type = execute_when_by_window_type[window_type];
+
 		this.#overlay = overlay;
 		this.#tag_template = new Template(window['ceprule-operation-tag-template'].innerHTML);
 
@@ -96,16 +106,10 @@ window.ceprule_operation_edit_popup = new class {
 		const type = Number(this.form.findFieldByName('type').getValue());
 		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
 		const zselect = window['ceprule-operation-type'];
-
-		const operation_by_execute_when = JSON.parse('<?=
-			json_encode(CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN)
-		?>');
-		const available_options = operation_by_execute_when[execute_when];
-
 		const events_options = [];
 		const tags_options = [];
 		const enable_if_allowed = (option) => {
-			option.is_disabled = !operation_by_execute_when[execute_when].includes(Number(option.value));
+			option.is_disabled = !this.#operation_types_by_execute_when[execute_when].includes(Number(option.value));
 		};
 
 		zselect.options.forEach(option => {
@@ -120,8 +124,9 @@ window.ceprule_operation_edit_popup = new class {
 
 		// Select first enabled option, if previous selection got disabled.
 		if (!zselect.value.length) {
-			zselect.value = [...events_options, ...tags_options]
-				.find(option => !option.is_disabled).value;
+			const enabled_option = [...events_options, ...tags_options].find(option => !option.is_disabled);
+
+			zselect.value = enabled_option ? enabled_option.value : events_options[0].value;
 		}
 	}
 
@@ -141,7 +146,7 @@ window.ceprule_operation_edit_popup = new class {
 		this.form_element.querySelector(`[name="tag_value"]`).value = operation.tag_value;
 		this.form_element.querySelector(`[name="tag"]`).value = operation.tag;
 		this.form_element.querySelector(`[name="new_tag"]`).value = operation.new_tag;
-		this.form_element.querySelector(`[name="suppress_until"]`).value = operation.suppress_until;
+		this.form_element.querySelector(`[name="suppress_duration"]`).value = operation.suppress_duration;
 		this.form_element.querySelectorAll(`[name="severity"]`).forEach(node => {
 			node.checked = node.value === operation.severity;
 		});
@@ -152,11 +157,8 @@ window.ceprule_operation_edit_popup = new class {
 
 		// Set enabled options.
 		const zselect = window['ceprule-operation-execute-when'];
-		const available_options = JSON.parse('<?=
-			json_encode(CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE)
-		?>')[Number(operation.window_type)];
 		const options = zselect.options.map(option => ({...option,
-			is_disabled: !available_options.includes(Number(option.value))
+			is_disabled: !this.#execute_when_for_window_type.includes(Number(option.value)),
 		}));
 
 		zselect.clearOptions();

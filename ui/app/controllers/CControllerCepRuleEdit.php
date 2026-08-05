@@ -96,7 +96,7 @@ class CControllerCepRuleEdit extends CController {
 				'cep_ruleids' => $cepruleid,
 				'output' => ['cep_ruleid', 'name', 'description', 'window_type', 'status', 'stop', 'sortorder'],
 				'selectOperations' => ['sortorder', 'execute_when', 'type', 'evaltype', 'event_name', 'tag', 'new_tag',
-					'tag_value', 'severity', 'tags', 'suppress_until'],
+					'tag_value', 'severity', 'tags', 'suppress_duration'],
 				'selectFilter' => ['eval_formula', 'evaltype', 'conditions'],
 				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host',
 					'group_by_tags', 'event_count_tag', 'tags']
@@ -152,11 +152,11 @@ class CControllerCepRuleEdit extends CController {
 			array_walk($ceprule['operations'], function(array &$operation) {
 
 				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS) {
-					if ($operation['suppress_until'] === DB::getDefault('cep_operation', 'suppress_until')) {
-						$operation['suppress_until'] = '';
+					if ($operation['suppress_duration'] === DB::getDefault('cep_operation', 'suppress_duration')) {
+						$operation['suppress_duration'] = '';
 					}
 					else {
-						$operation['suppress_until'] = date(ZBX_DATE_TIME, $operation['suppress_until']);
+						$operation['suppress_duration'] = date(ZBX_DATE_TIME, $operation['suppress_duration']);
 					}
 				}
 			});
@@ -239,7 +239,7 @@ class CControllerCepRuleEdit extends CController {
 					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SET_SEVERITY]
 			]],
-			'suppress_until' => ['string',
+			'suppress_duration' => ['string',
 				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
 			],
