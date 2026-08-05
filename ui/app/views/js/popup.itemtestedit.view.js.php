@@ -333,12 +333,12 @@ window.itemtestedit_view_popup = new class {
 			return;
 		}
 
-		const proxy_multiselect = $(proxy_field.getField());
+		const $proxy_multiselect = $(proxy_field.getField());
 
-		proxy_multiselect.multiSelect(get_value_checked ? 'enable' : 'disable');
+		$proxy_multiselect.multiSelect(get_value_checked ? 'enable' : 'disable');
 
 		if (get_value_checked && !this.#proxies_enabled) {
-			const select_button = proxy_multiselect.multiSelect('getSelectButton');
+			const select_button = $proxy_multiselect.multiSelect('getSelectButton');
 
 			if (select_button !== null) {
 				select_button.disabled = true;

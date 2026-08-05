@@ -385,11 +385,12 @@ class CControllerHostPrototypeEdit extends CController {
 
 		self::extendLinkedTemplates($data);
 
+		$can_edit_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
 		$data += [
 			'readonly' => $data['host_prototype']['templateid'] != 0 || $data['is_discovered_prototype'],
 			'user' => [
-				'debug_mode' => $this->getDebugMode(),
-				'can_edit_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
@@ -427,7 +428,7 @@ class CControllerHostPrototypeEdit extends CController {
 
 		// Parent discovery rules.
 		$data['templates'] = makeHostPrototypeTemplatesHtml($data['hostid'],
-			getHostPrototypeParentTemplates([$data['host_prototype']]), $data['user']['can_edit_templates']
+			getHostPrototypeParentTemplates([$data['host_prototype']]), $can_edit_templates
 		);
 
 		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();

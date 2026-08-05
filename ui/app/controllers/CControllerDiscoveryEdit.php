@@ -138,8 +138,7 @@ class CControllerDiscoveryEdit extends CController {
 			'concurrency_max_type' => $concurrency_max_type,
 			'user' => [
 				'debug_mode' => $this->getDebugMode(),
-				'can_edit_discovery_by' => !$this->drule['druleid'] || $can_select_server_for_discovery_by,
-				'can_select_server_for_discovery_by' => $can_select_server_for_discovery_by
+				'can_edit_discovery_by' => !$this->drule['druleid'] || $can_select_server_for_discovery_by
 			]
 		];
 

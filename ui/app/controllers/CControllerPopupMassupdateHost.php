@@ -465,15 +465,15 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 					$host = $new_values + $host;
 
+					if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+						&& $original_monitored_by == ZBX_MONITORED_BY_SERVER) {
+						unset($host['monitored_by'], $host['proxyid'], $host['proxy_groupid']);
+					}
+
 					/*
 					 * API prevents changing host inventory_mode for discovered hosts. However, inventory values can
 					 * still be updated if inventory mode allows it.
 					 */
-					if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
-							&& $original_monitored_by == ZBX_MONITORED_BY_SERVER) {
-						unset($host['monitored_by'], $host['proxyid'], $host['proxy_groupid']);
-					}
-
 					if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 						unset($host['inventory_mode']);
 					}
@@ -553,9 +553,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			$data = [
 				'title' => _('Mass update'),
 				'user' => [
-					'debug_mode' => $this->getDebugMode(),
-					'can_select_server_for_monitoring' =>
-						CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+					'debug_mode' => $this->getDebugMode()
 				],
 				'hostids' => $this->getInput('hostids'),
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),

@@ -171,9 +171,9 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		$data['groups'] = $user_groups
 			? API::UserGroup()->get([
 				'output' => ['usrgrpid', 'name', 'userdirectoryid', 'proxy_mode', 'proxy_group_mode'],
-				'usrgrpids' => $user_groups,
 				'selectProxies' => ['proxyid', 'name'],
-				'selectProxyGroups' => ['proxy_groupid', 'name']
+				'selectProxyGroups' => ['proxy_groupid', 'name'],
+				'usrgrpids' => $user_groups
 			])
 			: [];
 

@@ -118,7 +118,7 @@ if ($data['host']['parentTemplates']) {
 		->setAttribute('data-field-name', 'templates');
 
 	foreach ($data['host']['parentTemplates'] as $template) {
-		if ($data['user']['can_edit_templates']
+		if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 				&& array_key_exists($template['templateid'], $data['editable_templates'])) {
 			$template_url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'popup')
@@ -285,8 +285,8 @@ $host_tab
 		new CLabel(_('Monitored by'), 'label-proxy'),
 		new CFormField(
 			(new CRadioButtonList('monitored_by', (int) $data['host']['monitored_by']))
-				->addValue(_('Server'), ZBX_MONITORED_BY_SERVER, null, null,
-					!$data['user']['can_select_server_for_monitoring'])
+				->addValue(_('Server'), ZBX_MONITORED_BY_SERVER,
+					disabled: !CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING))
 				->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
 				->addValue(_('Proxy group'), ZBX_MONITORED_BY_PROXY_GROUP)
 				->setReadonly($host_is_discovered || !$data['user']['can_edit_monitoring_by'])
@@ -351,7 +351,8 @@ if ($data['host']['assigned_proxyid'] != 0) {
 		->setArgument('proxyid', $data['host']['assigned_proxyid'])
 		->getUrl();
 
-	$proxy_name = $data['user']['can_edit_proxies'] && !$data['host']['assigned_proxy_inaccessible']
+	$proxy_name = CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+			&& !$data['host']['assigned_proxy_inaccessible']
 		? new CLink($data['host']['assigned_proxy_name'], $proxy_url)
 		: new CSpan($data['host']['assigned_proxy_name']);
 	$proxy_name->addClass('js-proxy-assigned');

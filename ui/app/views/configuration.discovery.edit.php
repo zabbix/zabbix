@@ -30,6 +30,8 @@ if ($this->data['drule']['druleid'] !== null) {
 	$form->addVar('druleid', $this->data['drule']['druleid']);
 }
 
+$can_select_server_for_discovery_by = CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING);
+
 // Create form grid.
 $form_grid = (new CFormGrid())
 	->addItem([
@@ -45,8 +47,7 @@ $form_grid = (new CFormGrid())
 		new CLabel(_('Discovery by'), 'discovery_by'),
 		new CFormField(
 			(new CRadioButtonList('discovery_by', $data['discovery_by']))
-				->addValue(_('Server'), ZBX_DISCOVERY_BY_SERVER, null, null,
-					!$data['user']['can_select_server_for_discovery_by'])
+				->addValue(_('Server'), ZBX_DISCOVERY_BY_SERVER, disabled: !$can_select_server_for_discovery_by)
 				->addValue(_('Proxy'), ZBX_DISCOVERY_BY_PROXY)
 				->setReadonly(!$data['user']['can_edit_discovery_by'])
 				->setModern()
@@ -234,7 +235,7 @@ $form
 				'druleid' => $data['drule']['druleid'],
 				'dchecks' => array_values($data['drule']['dchecks']),
 				'drule' => $data['drule'],
-				'can_select_server_for_discovery_by' => $data['user']['can_select_server_for_discovery_by']
+				'can_select_server_for_discovery_by' => $can_select_server_for_discovery_by
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);

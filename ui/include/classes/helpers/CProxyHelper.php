@@ -60,6 +60,7 @@ class CProxyHelper {
 	 */
 	public static function getProxiesHtml(array $all_proxies, array $user_groups): array {
 		$data = self::prepareAccessListData($all_proxies, $user_groups, 'proxy_mode', 'proxies', 'proxyid');
+
 		return self::buildAccessListHtml($data);
 	}
 
@@ -73,7 +74,9 @@ class CProxyHelper {
 	 */
 	public static function getProxyGroupsHtml(array $all_proxy_groups, array $user_groups): array {
 		$data = self::prepareAccessListData($all_proxy_groups, $user_groups, 'proxy_group_mode', 'proxy_groups',
-			'proxy_groupid');
+			'proxy_groupid'
+		);
+
 		return self::buildAccessListHtml($data);
 	}
 
@@ -91,6 +94,7 @@ class CProxyHelper {
 				)
 		];
 	}
+
 	private static function prepareAccessListData(array $all_objects, array $user_groups, string $mode_key,
 			string $object_key, string $id_key): array {
 		$all_by_id = [];
@@ -135,7 +139,7 @@ class CProxyHelper {
 
 		$total_objects = count($all_objects);
 		$all_allowed = count($final_allowed_ids) == $total_objects;
-		$all_denied = count($final_allowed_ids) === 0;
+		$all_denied = count($final_allowed_ids) == 0;
 
 		if ($all_allowed || $all_denied) {
 			return [

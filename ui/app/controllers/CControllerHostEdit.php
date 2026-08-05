@@ -190,11 +190,7 @@ class CControllerHostEdit extends CController {
 			'warnings' => [],
 			'user' => [
 				'debug_mode' => $this->getDebugMode(),
-				'can_edit_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
-				'can_edit_proxy_groups' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS),
-				'can_edit_proxies' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES),
-				'can_edit_monitoring_by' => !$this->host['hostid'] || $can_select_server_for_monitoring,
-				'can_select_server_for_monitoring' => $can_select_server_for_monitoring
+				'can_edit_monitoring_by' => !$this->host['hostid'] || $can_select_server_for_monitoring
 			]
 		];
 

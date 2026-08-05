@@ -561,8 +561,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'show_snmp_form' => ($this->item_type == ITEM_TYPE_SNMP),
 			'show_warning' => $show_warning,
 			'user' => [
-				'debug_mode' => $this->getDebugMode(),
-				'can_select_server_for_test' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+				'debug_mode' => $this->getDebugMode()
 			],
 			'js_validation_rules' => (new CFormValidator(
 				CControllerPopupItemTestSend::getValidationRules())
