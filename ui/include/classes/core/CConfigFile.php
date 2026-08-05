@@ -474,21 +474,20 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 
 // Uncomment and set to desired values to override the global APM data source configuration.
 // Supported configuration parameters for all providers:
-// \'provider\'   - Telemetry provider type: \'zabbix\' or \'clickhouse\'.
+// \'provider\'   - Telemetry provider type: \'clickhouse\', \'zabbix\'.
 // Additional parameters for ClickHouse:
-// \'url\'        - Telemetry provider URL.
-// \'db\'         - Database name.
-// \'username\'   - Database user.
-// \'password\'   - Database password.
-// \'vault_path\' - Vault path if vault is used for credentials, cannot be set with username and password.
-// Additional parameters for ClickHouse with \'https\' url schema:
-// \'tls_verity_peer\' - Verify peer.
-// \'tls_verity_host\' - Verify host.
-// \'ssl_cert_file\' - Client certificate file path.
-// \'ssl_key_password\' - Client private key password file path.
-// \'ssl_ca_location\' - Certificate authority location path.
-// \'ssl_cert_location\' - Client certificate location path.
-// \'ssl_key_location\' - Client private key location path.
+// \'url\'        - Telemetry provider URL with http or https scheme.
+// \'db\'         - Database name. Can be empty.
+// \'username\'   - Database user. Can be empty.
+// \'password\'   - Database password. Can be empty.
+// \'vault_path\' - Vault path if vault is used for credentials, cannot be set with username or password. Can be empty.
+// Additional parameters for ClickHouse url with \'https\' scheme:
+// \'tls_verity_peer\' - Verify peer. Default: false.
+// \'tls_verity_host\' - Verify host. Only supported if \'tls_verify_peer\' is set to true. Default: false.
+// \'ssl_cert_file\' - Client certificate file path. Can be empty.
+// \'ssl_key_file\' - Client private key file path. Can be empty.
+// \'ssl_key_password\' - Client private key password. Can be empty.
+// \'ssl_ca_location\' - Certificate authority (CA) location. Only supported if \'tls_verify_peer\' is set to true. Can be empty.
 // ClickHouse database:
 //$TELEMETRY_PROVIDERS[] = [
 //	\'provider\' => \'clickhouse\',
@@ -682,23 +681,31 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 	 * @return array
 	 */
 	protected function validateTelemetryProviders(array $providers): array {
-		$results = [];
-		$required = [
-			ZBX_TELEMETRY_SOURCE_CLICKHOUSE => ['url', 'db'],
-			ZBX_TELEMETRY_SOURCE_ZABBIX => []
+		$expected_fields = [
+			'clickhouse' => ['provider', 'url', 'db', 'username', 'password',
+				'vault_path', 'ssl_verify_peer', 'ssl_verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
+				'ssl_ca_location'
+			],
+			'zabbix' => ['provider']
 		];
 
+		$results = [];
+
+		$url_validator = new CUrlValidator(['schemes' => ['http', 'https']]);
+		$https_url_validator = new CurlValidator(['schemes' => ['https']]);
+
 		foreach ($providers as $i => $provider) {
-			$path = '/'.$i;
+			$path = ($i + 1).'/';
 
-			$missing = array_key_exists('provider', $provider) && array_key_exists($provider['provider'], $required)
-				? $required[$provider['provider']]
-				: ['provider'];
-			$missing = array_diff($missing, array_keys($provider));
-
-			if ($missing) {
+			if (!array_key_exists('provider', $provider)) {
 				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
-					_s('the parameter "%1$s" is missing', reset($missing))
+					_s('the parameter "%1$s" is missing', 'provider')
+				));
+			}
+
+			if (!is_string($provider['provider'])) {
+				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.'provider',
+					_s('a string is expected')
 				));
 			}
 
@@ -708,108 +715,98 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 				));
 			}
 
-			if ($provider['provider'] === 'zabbix') {
-				$unexpected_params = array_diff(['provider'], array_keys($provider));
-
-				if ($unexpected_params) {
-					self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
-						_s('unexpected parameter "%1$s"', reset($unexpected_params))
-					));
-				}
-
-				$results[] = $provider;
-
-				continue;
-			}
-
-			$expected_params = ['provider', 'url', 'db'];
-
-			$has_username = array_key_exists('username', $provider) && $provider['username'] != '';
-			$has_password = array_key_exists('password', $provider) && $provider['password'] != '';
-			$has_vault_path = array_key_exists('vault_path', $provider) && $provider['vault_path'] != '';
-
-			if ($has_vault_path && ($has_username || $has_password)) {
-				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
-					_s('username and password must be empty if vault path is provided')
-				));
-			}
-			elseif (!$has_vault_path && !$has_username) {
-				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
-					_s('db credentials or vault db path must be provided')
-				));
-			}
-			elseif ($has_username) {
-				$provider['password'] = $has_password ? $provider['password'] : '';
-				$expected_params = array_merge($expected_params, ['username', 'password']);
-
-				unset($provider['vault_path']);
-			}
-			else {
-				$expected_params[] = 'vault_path';
-
-				unset($provider['username'], $provider['password']);
-			}
-
-			$url_parts = parse_url('url');
-
-			if (!$url_parts || !array_key_exists('scheme', $url_parts) || !$url_parts['scheme']) {
-				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.'url',
-					_s('url schema is invalid')
-				));
-			}
-
-			$provider['url'] = rtrim($provider['url'], '/');
-
-			foreach (['ssl_verify_peer', 'ssl_verify_host'] as $tls_key) {
-				if (array_key_exists($tls_key, $provider)) {
-					if (!is_bool($provider[$tls_key])) {
-						self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$tls_key,
-							_s('a boolean is expected')
-						));
-					}
-				}
-				else {
-					$provider[$tls_key] = false;
-				}
-			}
-
-			$tls_string_keys = ['ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'ssl_cert_location',
-				'ssl_key_location'
-			];
-			foreach ($tls_string_keys as $tls_key) {
-				if (array_key_exists($tls_key, $provider) && !is_string($provider[$tls_key])) {
-					self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$tls_key,
-						_s('a string is expected')
-					));
-				}
-			}
-
-			if (array_key_exists('ssl_ca_location', $provider)) {
-				if (!is_string($provider['ssl_ca_location'])) {
-					self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$tls_key,
-						_s('a string is expected')
-					));
-				}
-
-				if ($provider['ssl_ca_location'] !== '' && $provider['ssl_verify_peer'] === false) {
-					self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.'ssl_verify_peer',
-						_s('should be activated if %1$s is provided', 'ssl_ca_location')
-					));
-				}
-			}
-
-			$expected_params = $url_parts['scheme'] === 'https'
-				? array_merge($expected_params, ['ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'ssl_verify_peer',
-					'ssl_verify_host', 'ssl_ca_location', 'ssl_cert_location', 'ssl_key_location'
-				])
-				: $expected_params;
-
-			$unexpected_params = array_diff($expected_params, array_keys($provider));
+			$unexpected_params = array_diff(array_keys($provider), $expected_fields[$provider['provider']]);
 
 			if ($unexpected_params) {
 				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
 					_s('unexpected parameter "%1$s"', reset($unexpected_params))
 				));
+			}
+
+			if (!array_key_exists('url', $provider)) {
+				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
+					_s('the parameter "%1$s" is missing', 'url')
+				));
+			}
+
+			$provider += [
+				'url' => '',
+				'db' => '',
+				'username' => '',
+				'password' => '',
+				'vault_path' =>	'',
+				'ssl_verify_peer' => false,
+				'ssl_verify_host' => false,
+				'ssl_cert_file' => '',
+				'ssl_key_file' => '',
+				'ssl_key_password' => '',
+				'ssl_ca_location' => ''
+			];
+
+			$string_fields = ['url', 'db', 'username', 'password', 'vault_path', 'ssl_cert_file', 'ssl_key_file',
+				'ssl_key_password', 'ssl_ca_location'
+			];
+			foreach ($string_fields as $field) {
+				if (!is_string($provider[$field])) {
+					self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$field,
+						_s('a string is expected')
+					));
+				}
+			}
+
+			if (!$url_validator->validate($provider['url'])) {
+				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.'url',
+					$url_validator->getError()
+				));
+			}
+
+			$provider['url'] = rtrim($provider['url'], '/');
+
+			if ($provider['vault_path'] !== '' && ($provider['username'] !== '' || $provider['password'] !== '')) {
+				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
+					_s('username and password must be empty if vault path is provided')
+				));
+			}
+
+			$is_https = $https_url_validator->validate($provider['url']);
+
+			foreach (['ssl_verify_peer', 'ssl_verify_host'] as $tls_key) {
+				if (!is_bool($provider[$tls_key])) {
+					self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$tls_key,
+						_s('a boolean is expected')
+					));
+				}
+
+				if (!$is_https && $provider[$tls_key]) {
+					self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$tls_key,
+						_s('should be set to false if the url scheme is not https')
+					));
+				}
+			}
+
+			if ($is_https) {
+				if (!$provider['ssl_verify_peer']) {
+					if ($provider['ssl_verify_host']) {
+						self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.',
+							$path.'ssl_verify_peer', _s('should be enabled if %1$s is enabled', 'ssl_verify_host')
+						));
+					}
+
+					if ($provider['ssl_ca_location'] !== '') {
+						self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.',
+							$path.'ssl_verify_peer', _s('should be enabled if %1$s is provided', 'ssl_ca_location')
+						));
+					}
+				}
+			}
+			else {
+				foreach (['ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'ssl_ca_location'] as $tls_key) {
+					if ($provider[$tls_key]) {
+						self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$tls_key,
+							_s('should be empty if the url scheme is not https')
+						));
+					}
+				}
 			}
 
 			$results[] = $provider;

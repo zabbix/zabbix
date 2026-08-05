@@ -111,21 +111,20 @@ $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] = '';
 
 // Uncomment and set to desired values to override the global APM data source configuration.
 // Supported configuration parameters for all providers:
-// 'provider'   - Telemetry provider type: 'zabbix' or 'clickhouse'.
+// 'provider'   - Telemetry provider type: 'clickhouse', 'zabbix'.
 // Additional parameters for ClickHouse:
-// 'url'        - Telemetry provider URL.
-// 'db'         - Database name.
-// 'username'   - Database user.
-// 'password'   - Database password.
-// 'vault_path' - Vault path if vault is used for credentials, cannot be set with username and password.
-// Additional parameters for ClickHouse with 'https' schema:
-// 'tls_verity_peer' - Verify peer.
-// 'tls_verity_host' - Verify host.
-// 'ssl_cert_file' - Client certificate file path.
-// 'ssl_key_password' - Client private key password file path.
-// 'ssl_ca_location' - Certificate authority location path.
-// 'ssl_cert_location' - Client certificate location path.
-// 'ssl_key_location' - Client private key location path.
+// 'url'        - Telemetry provider URL with http or https scheme.
+// 'db'         - Database name. Can be empty.
+// 'username'   - Database user. Can be empty.
+// 'password'   - Database password. Can be empty.
+// 'vault_path' - Vault path if vault is used for credentials, cannot be set with username or password. Can be empty.
+// Additional parameters for ClickHouse url with 'https' scheme:
+// 'tls_verity_peer' - Verify peer. Default: false.
+// 'tls_verity_host' - Verify host. Only supported if 'tls_verify_peer' is set to true. Default: false.
+// 'ssl_cert_file' - Client certificate file path. Can be empty.
+// 'ssl_key_file' - Client private key file path. Can be empty.
+// 'ssl_key_password' - Client private key password. Can be empty.
+// 'ssl_ca_location' - Certificate authority (CA) location. Only supported if 'tls_verify_peer' is set to true. Can be empty.
 // ClickHouse:
 //$TELEMETRY_PROVIDERS[] = [
 //	'provider' => 'clickhouse',
