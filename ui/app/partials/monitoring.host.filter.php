@@ -295,7 +295,7 @@ if (array_key_exists('render_html', $data)) {
 
 	// Tab filter item events handlers.
 	template.addEventListener(TABFILTERITEM_EVENT_RENDER, function (ev) {
-		render.call(ev.detail, ev.detail._data);
+		render.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
 	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
 		expand.call(ev.detail, ev.detail._data);
