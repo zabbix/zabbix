@@ -779,7 +779,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 
 				if (!$is_https && $provider[$tls_key]) {
 					self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$tls_key,
-						_s('should be set to false if the url scheme is not https')
+						_s('should be set to false if the url scheme is not "https"')
 					));
 				}
 			}
@@ -788,13 +788,13 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 				if (!$provider['ssl_verify_peer']) {
 					if ($provider['ssl_verify_host']) {
 						self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.',
-							$path.'ssl_verify_peer', _s('should be enabled if %1$s is enabled', 'ssl_verify_host')
+							$path.'ssl_verify_peer', _s('should be enabled if "%1$s" is enabled', 'ssl_verify_host')
 						));
 					}
 
 					if ($provider['ssl_ca_location'] !== '') {
 						self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.',
-							$path.'ssl_verify_peer', _s('should be enabled if %1$s is provided', 'ssl_ca_location')
+							$path.'ssl_verify_peer', _s('should be enabled if "%1$s" is provided', 'ssl_ca_location')
 						));
 					}
 				}
