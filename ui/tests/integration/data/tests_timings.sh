@@ -1,7 +1,7 @@
 PERFORMANCE_RATIO_THRESHOLD=3.0
 
 declare -A BASELINE_TIMES=(
-  [Integration]=4493
+  [Integration]=4508
   [testEscalations]=443
   [testProxyHa]=417
   [testNestedLLD]=385
@@ -22,6 +22,7 @@ declare -A BASELINE_TIMES=(
   [testItemState]=98
   [testHistoryPush]=92
   [testValuemaps]=89
+  [testBridgeAdapter]=86
   [testAutoregistrationPSK]=85
   [testLowLevelDiscovery]=84
   [testDataCollection]=77

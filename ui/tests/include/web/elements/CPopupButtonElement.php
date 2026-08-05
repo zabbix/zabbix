@@ -69,7 +69,7 @@ class CPopupButtonElement extends CElement {
 			try {
 				$this->click(true);
 
-				$menu = $query->waitUntilVisible()->one(false);
+				$menu = $query->waitUntilVisible(2)->one(false);
 				if ($menu->isValid()) {
 					return $menu;
 				}

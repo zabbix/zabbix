@@ -131,28 +131,6 @@
 			$(this).parentsUntil('ul').next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?>);
 		});
 
-		$('#clone').click(function() {
-			var form = $(this).attr('id');
-
-			$('#form').val(form);
-
-			$('#delete, #clone, #inaccessible_user').remove();
-
-			$('#update')
-				.text(<?= json_encode(_('Add')) ?>)
-				.attr({id: 'add', name: 'add'});
-
-			$('#tab_sysmap_tab').trigger('click');
-			$('#multiselect_userid_wrapper').show();
-
-			$('#userid').multiSelect('addData', [{
-				'id': $('#current_user_userid').val(),
-				'name': $('#current_user_fullname').val()
-			}]);
-
-			$('#name').focus();
-		});
-
 		$('#label_format').triggerHandler('click');
 	});
 

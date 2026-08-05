@@ -21,6 +21,11 @@ require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
  */
 class testAuditlogSettings extends testAuditlogCommon {
 
+	/**
+	 * Resource type Settings
+	 */
+	const RESOURCE_TYPE = 40;
+
 	public function testAuditlogSettings_Update() {
 		$updated = json_encode([
 			'settings.auditlog_enabled' => ['update', '0', '1'],
@@ -120,6 +125,6 @@ class testAuditlogSettings extends testAuditlogCommon {
 			'timeout_telemetry_query' => '10s'
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, null);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, null, self::RESOURCE_TYPE);
 	}
 }

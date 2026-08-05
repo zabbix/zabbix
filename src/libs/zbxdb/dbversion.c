@@ -190,7 +190,7 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 		version = (zbx_uint32_t)mysql_get_server_version(db->conn);
 
 	version_info->current_version = version;
-	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%.2d.%.2d",
+	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d",
 			RIGHT2(version/10000), RIGHT2(version/100),
 			RIGHT2(version));
 
@@ -419,7 +419,7 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
  *                                                                            *
  * Purpose: retrieves TimescaleDB (TSDB) compression availability             *
  *                                                                            *
- * Return value: compression availability as as integer                       *
+ * Return value: compression availability as integer                          *
  *               0 (OFF): compression is not available                        *
  *               1 (ON): compression is available                             *
  *                                                                            *
