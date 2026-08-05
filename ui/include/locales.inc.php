@@ -105,6 +105,26 @@ function getIntegrationsUrl(string $language): string {
 }
 
 /**
+ * Get subscriptions URL for specified language.
+ *
+ * @param string $language  ISO639-1 code.
+ *
+ * @return string  Fallback to English subscriptions URL.
+ */
+function getSubscriptionsUrl(string $language): string {
+	$urls = [
+		'cs' => 'https://www.zabbix.com/cz/subscriptions',
+		'fr' => 'https://www.zabbix.com/fr/subscriptions',
+		'ja' => 'https://www.zabbix.com/jp/subscriptions',
+		'pt' => 'https://www.zabbix.com/br/subscriptions',
+		'ru' => 'https://www.zabbix.com/ru/subscriptions',
+		'zh' => 'https://www.zabbix.com/cn/subscriptions'
+	];
+
+	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/subscriptions';
+}
+
+/**
  * Returns an array of locale name variants based on language.
  *
  * @param string $language Language in format 'ru_RU', 'en_EN' and so on.
