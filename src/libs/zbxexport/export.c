@@ -38,11 +38,10 @@ static zbx_config_export_t	*config_export;
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
+int	zbx_validate_export_type(const char *export_type, zbx_uint32_t *export_mask)
 {
 	int		ret = SUCCEED;
-	char		*start = export_type;
-	uint32_t	mask;
+	zbx_uint32_t	mask;
 	char		*types[] = {
 				ZBX_OPTION_EXPTYPE_EVENTS,
 				ZBX_OPTION_EXPTYPE_HISTORY,
@@ -54,24 +53,22 @@ int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 				ZBX_CONST_STRLEN(ZBX_OPTION_EXPTYPE_TRENDS),
 				0};
 
-	if (NULL != start)
+	if (NULL != export_type)
 	{
+		const char	*token = NULL, *list = export_type;
+		size_t		token_len;
+
 		mask = 0;
 
-		do
+		while (SUCCEED == zbx_str_list_next(&list, ',', &token, &token_len))
 		{
 			int	i;
-			char	*end;
-
-			end = strchr(start, ',');
 
 			for (i = 0; NULL != types[i]; i++)
 			{
-				if ((NULL != end && lengths[i] == (size_t)(end - start) &&
-						0 == strncmp(start, types[i], lengths[i])) ||
-						(NULL == end && 0 == strcmp(start, types[i])))
+				if (lengths[i] == token_len && 0 == strncmp(token, types[i], token_len))
 				{
-					mask |= (uint32_t)(1 << i);
+					mask |= (zbx_uint32_t)(1 << i);
 					break;
 				}
 			}
@@ -81,12 +78,7 @@ int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 				ret = FAIL;
 				break;
 			}
-
-			if (NULL == end)
-				break;
-
-			start = end;
-		} while (NULL != start++);
+		}
 	}
 	else
 		mask = ZBX_FLAG_EXPTYPE_EVENTS | ZBX_FLAG_EXPTYPE_HISTORY | ZBX_FLAG_EXPTYPE_TRENDS;
@@ -97,10 +89,10 @@ int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 	return ret;
 }
 
-static int	is_export_enabled(zbx_config_export_t *zbx_config_export, uint32_t flags)
+static int	is_export_enabled(zbx_config_export_t *zbx_config_export, zbx_uint32_t flags)
 {
 	int			ret = FAIL;
-	static uint32_t		export_types;
+	static zbx_uint32_t	export_types;
 
 	if (NULL == zbx_config_export || NULL == zbx_config_export->dir)
 		return ret;
@@ -131,7 +123,7 @@ static int	is_export_enabled(zbx_config_export_t *zbx_config_export, uint32_t fl
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_is_export_enabled(uint32_t flags)
+int	zbx_is_export_enabled(zbx_uint32_t flags)
 {
 	return is_export_enabled(config_export, flags);
 }

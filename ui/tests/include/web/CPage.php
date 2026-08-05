@@ -691,7 +691,7 @@ class CPage {
 	 * @throws Exception
 	 */
 	public function assertHeader($header) {
-		$text = $this->query('xpath://h1[@id="page-title-general"]')->one()->getText();
+		$text = $this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible(3)->one()->getText();
 
 		if ($text !== $header) {
 			throw new \Exception('Header of the page "'.$text.'" is not equal to "'.$header.'".');

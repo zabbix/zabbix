@@ -818,11 +818,11 @@ class CApiService {
 	/**
 	 * Throws an API exception.
 	 *
-	 * @param int    $code
-	 * @param string $error
+	 * @throws APIException
 	 */
-	protected static function exception($code = ZBX_API_ERROR_INTERNAL, $error = '') {
-		throw new APIException($code, $error);
+	protected static function exception(int $code = ZBX_API_ERROR_INTERNAL, string $error = '',
+			string $debug_message = '') {
+		throw new APIException($code, $error, $debug_message);
 	}
 
 	/**
