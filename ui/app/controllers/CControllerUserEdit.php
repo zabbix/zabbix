@@ -264,7 +264,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['groups_rights'] = collapseGroupRights(getHostGroupsRights($user_groups));
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
 
-			if (!empty($data['groups'])) {
+			if ($data['groups']) {
 				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
 				$db_proxies = API::Proxy()->get([
