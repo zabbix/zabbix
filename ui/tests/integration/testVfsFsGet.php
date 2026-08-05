@@ -206,7 +206,7 @@ class testVfsFsGet extends CIntegrationTest {
 			'mode' => 'full',
 			'mountpoint' => '/this_should_not_exist',
 			'nonexistent' => true
-		],
+		]
 	];
 
 	/**
@@ -226,7 +226,7 @@ class testVfsFsGet extends CIntegrationTest {
 		[
 			'key' => 'vfs.fs.get[short,/,extra]',
 			'expected_state' => ITEM_STATE_NOTSUPPORTED
-		],
+		]
 	];
 
 	/**
