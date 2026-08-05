@@ -22,14 +22,11 @@
 
 <script>
 const view = new class {
-	/** @type {Object} */
+	/** @type {Object<string, *>} */
 	#rules = {};
 
 	/** @type {Object<string, *>} */
 	#default_values = {};
-
-	/** @type {boolean} */
-	#has_password = false;
 
 	/** @type {HTMLFormElement|null} */
 	#form_element = null;
@@ -55,35 +52,47 @@ const view = new class {
 	/** @type {HTMLButtonElement|null} */
 	#change_password_btn = null;
 
-	init({rules, default_values, has_password}) {
+	/** @type {boolean} */
+	#ssl_key_password_changed = false;
+
+	/** @type {HTMLInputElement|null} */
+	#ssl_key_password_input = null;
+
+	/** @type {HTMLButtonElement|null} */
+	#change_ssl_key_password_btn = null;
+
+	init({rules, default_values}) {
 		this.#rules = rules;
 		this.#default_values = default_values;
-		this.#has_password = has_password;
 
 		this.#form_element = document.getElementById('apm-form');
 		this.#form = new CForm(this.#form_element, this.#rules);
 
 		this.#url_input = this.#getFormField('url');
+
 		this.#password_input = this.#getFormField('password');
 		this.#password_warning = document.querySelector('.js-password-warning');
 		this.#change_password_btn = document.querySelector('.js-change-password');
+
+		this.#ssl_key_password_input = this.#getFormField('ssl_key_password');
+		this.#change_ssl_key_password_btn = document.querySelector('.js-change-ssl-key-password');
 
 		this.#bindEvents();
 	}
 
 	#bindEvents() {
+		const initial_values = this.#getAllValues();
+
 		this.#form_element.addEventListener('submit', this.#submitForm);
 
 		this.#url_input?.addEventListener('input', () => {
 			this.#url_changed = true;
 
-			this.#updateForm();
+			this.#updateForm({initial_values});
 		});
 
 		this.#change_password_btn?.addEventListener('click', e => {
-			this.#password_changed = this.#password_input.value !== '';
-
-			this.#getFormField('change_password')?.setAttribute('value', '1');
+			this.#password_changed = this.#password_input?.value !== '';
 
 			this.#password_input?.classList.remove(ZBX_STYLE_DISPLAY_NONE);
 			this.#password_input?.focus();
@@ -91,8 +100,17 @@ const view = new class {
 			e.target.classList.add(ZBX_STYLE_DISPLAY_NONE);
 		});
 
+		this.#change_ssl_key_password_btn?.addEventListener('click', e => {
+			this.#ssl_key_password_changed = this.#ssl_key_password_input?.value !== '';
+
+			this.#ssl_key_password_input?.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+			this.#ssl_key_password_input?.focus();
+
+			e.target.classList.add(ZBX_STYLE_DISPLAY_NONE);
+		});
+
 		for (const name of ['status', 'authentication_type', 'ssl_verify_peer']) {
-			this.#getFormField(name)?.addEventListener('change', () => this.#updateForm());
+			this.#getFormField(name)?.addEventListener('change', () => this.#updateForm({initial_values}));
 		}
 	}
 
@@ -110,7 +128,7 @@ const view = new class {
 		};
 	}
 
-	#updateForm() {
+	#updateForm({initial_values}) {
 		const values = this.#getAllValues();
 
 		const show_fields = values.status === 1;
@@ -151,11 +169,8 @@ const view = new class {
 			...document.querySelectorAll('.js-ssl-verify-host')
 		], show_ssl_verify_peer_fields);
 
-		const show_change_password_btn = !this.#url_changed && !this.#password_changed && this.#has_password;
-
-		if (show_change_password_btn) {
-			this.#getFormField('change_password')?.setAttribute('value', '0');
-		}
+		const has_password = initial_values.status === 1 && values.authentication_type === APM_AUTH_TYPE_PASSWORD;
+		const show_change_password_btn = has_password && !this.#url_changed && !this.#password_changed;
 
 		if (this.#password_input !== null) {
 			if (this.#url_changed && this.#password_input.value !== '') {

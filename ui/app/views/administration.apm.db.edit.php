@@ -100,8 +100,6 @@ $apm_tab = (new CFormGrid())
 				->addClass('js-password-warning')
 				->addClass(ZBX_STYLE_DISPLAY_NONE),
 			(new CButton('change_password', _('Change password')))
-				->removeId()
-				->removeAttribute('name')
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->addClass('js-change-password')
 				->addClass($data['has_password'] ? null : ZBX_STYLE_DISPLAY_NONE)
@@ -184,10 +182,15 @@ $apm_tab = (new CFormGrid())
 		(new CLabel(_('Client private key file password'), 'ssl_key_password'))
 			->addClass('js-ssl-key-password')
 			->addClass($data['show_ssl_fields'] ? null : ZBX_STYLE_DISPLAY_NONE),
-		(new CFormField(
-			(new CTextBox('ssl_key_password', $data['ssl_key_password']))
+		(new CFormField([
+			(new CPassBox('ssl_key_password'))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		))
+				->addClass($data['has_ssl_key_password'] ? ZBX_STYLE_DISPLAY_NONE : null),
+			(new CButton('change_ssl_key_password', _('Change password')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->addClass('js-change-ssl-key-password')
+				->addClass($data['has_ssl_key_password'] ? null : ZBX_STYLE_DISPLAY_NONE)
+		]))
 			->addClass('js-ssl-key-password')
 			->addClass($data['show_ssl_fields'] ? null : ZBX_STYLE_DISPLAY_NONE)
 	])
@@ -214,8 +217,7 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('apm')))->removeId())
 	->setId('apm-form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addItem($apm_view)
-	->addVar('change_password', $data['change_password']);
+	->addItem($apm_view);
 
 $html_page
 	->addItem($form)
@@ -224,8 +226,7 @@ $html_page
 (new CScriptTag(
 	'view.init('.json_encode([
 		'rules' => $data['js_validation_rules'],
-		'default_values' => $data['default_values'],
-		'has_password' => $data['has_password']
+		'default_values' => $data['default_values']
 	]).');'
 ))
 	->setOnDocumentReady()

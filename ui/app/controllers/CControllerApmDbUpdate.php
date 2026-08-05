@@ -53,8 +53,7 @@ class CControllerApmDbUpdate extends CController {
 					'when' => [$status_enabled, ['ssl_key_file', 'in' => ['']]],
 					'messages' => ['in' => 'Must be empty, if previous field is not specified.']
 				]
-			],
-			'change_password' => ['integer', 'required', 'in' => [0, 1]],
+			]
 		]];
 	}
 
@@ -147,11 +146,11 @@ class CControllerApmDbUpdate extends CController {
 				}
 			}
 
+			unset($apm[CSRF_TOKEN_NAME]);
+
 			$apm = array_merge([
 				// TODO: Settings->get()
 			], $apm);
-
-			unset($apm['change_password']);
 		}
 	}
 }

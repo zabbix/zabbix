@@ -42,8 +42,7 @@ class CControllerApmDbEdit extends CController {
 			'ssl_verify_host' => 0,
 			'ssl_cert_file' => '',
 			'ssl_key_file' => '',
-			'ssl_key_password' => '',
-			'change_password' => 0
+			'ssl_key_password' => ''
 		];
 	}
 
@@ -51,14 +50,15 @@ class CControllerApmDbEdit extends CController {
 		$default_values = self::getDefaultValues();
 
 		$data = array_merge($default_values, [
-			// TODO: ApmSettings->get()
+			// TODO: Settings->get()
 		]);
 
 		$data['js_validation_rules'] = (new CFormValidator(CControllerApmDbUpdate::getValidationRules()))
 			->getRules();
 		$data['default_values'] = $default_values;
 
-		$data['has_password'] = $data['password'] !== '';
+		$data['has_password'] = $data['authentication_type'] === APM_AUTH_TYPE_PASSWORD;
+		$data['has_ssl_key_password'] = $data['ssl_key_file'] !== '';
 
 		$data['show_fields'] = $data['status'] == 1;
 		$data['show_user_fields'] = $data['show_fields'] && $data['authentication_type'] === APM_AUTH_TYPE_PASSWORD;
