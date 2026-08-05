@@ -329,12 +329,15 @@ class testTriggerCEP extends CIntegrationTest {
 	// kind beside the first, so two rules keep a window of the same events at once and both of them close it: only
 	// a simple and a pattern match window may be doubled that way, a tag correlation and a cause and symptom window
 	// being the types of which only the first matching rule is ever processed for an event (CEP_WINDOW_UNIQ in
-	// cep_event_process_rules()), so a second rule of those types could not act on the same event at all. The second
-	// rule is the first one plus a tag it adds as an event occurs (CEP_TAG_WINDOW_SECOND), which is what tells from
-	// the outside that it really was processed for the events the first rule closed, see
-	// prepareDataCepWindowCloseWindowOperations(). Its rule is named after the flavour it doubles with this suffix
-	// appended, see buildSecondRuleName().
+	// cep_event_process_rules()), so a second rule of those types could not act on the same event at all. Both rules
+	// of a doubled flavour add a tag of their own as an event occurs - the first one CEP_TAG_WINDOW_FIRST, the second
+	// CEP_TAG_WINDOW_SECOND - so which of them was processed for an event is read from the event rather than assumed:
+	// every event of such a run must carry both, one rule missing from an event being exactly what an exclusive
+	// window type would leave behind, see prepareDataCepWindowCloseWindowOperations(). The second rule is named after
+	// the flavour it doubles with this suffix appended, see buildSecondRuleName().
 	const CEP_RULE_WINDOW_CLOSE_SECOND_SUFFIX = ' second rule';
+	const CEP_TAG_WINDOW_FIRST = 'window_first';
+	const CEP_TAG_WINDOW_FIRST_VALUE = 'first';
 	// Every one of those flavours is additionally run in a variant that closes the events of the window at the
 	// eviction execution point instead of the window closed one - leaving a window because it ends is an eviction
 	// like any other, so the two must close the same problems. The rule of a variant is named after the flavour it
@@ -3168,10 +3171,11 @@ HEREDOC;
 	 * type keep a window of the same events at once and both of them close it when it ends. Only the window types that
 	 * are not exclusive can be doubled - of a tag correlation and a cause and symptom window only the first matching
 	 * rule is ever processed for an event (CEP_WINDOW_UNIQ in cep_event_process_rules()), so a second rule of those
-	 * types would never see the event the first one took. The second rule differs from the first in one operation
-	 * only: it adds CEP_TAG_WINDOW_SECOND as an event occurs, which is what the assessment reads to know it was
-	 * processed for the very events the first rule's window closed. Closing a problem twice may not do anything more
-	 * than closing it once, so the doubled flavours assert what the single ones do.
+	 * types would never see the event the first one took. The two rules differ in one operation only: each adds a tag
+	 * of its own as an event occurs, CEP_TAG_WINDOW_FIRST and CEP_TAG_WINDOW_SECOND, which is what the assessment
+	 * reads to know that both of them were processed for the very events their windows closed - an event carrying only
+	 * one of the two would be an event one rule never got its turn for. Closing a problem twice may not do anything
+	 * more than closing it once, so the doubled flavours assert what the single ones do.
 	 */
 	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when,
 			int $close_when = CCepRuleHelper::WHEN_WINDOW_CLOSED, bool $discard_down = false,
@@ -3311,6 +3315,32 @@ HEREDOC;
 			]);
 		}
 
+		$second_operations = null;
+
+		if ($second_rule) {
+			// A doubled flavour has both of its rules tag the events they are processed for, each with a tag of its
+			// own, so which of them acted on an event is something the event itself says: an event carrying only one
+			// of the two would be an event one of the rules never got its turn for, which is what an exclusive window
+			// type does to the second rule of its kind and what these flavours must show is not happening. The tag is
+			// added as the event occurs, before either window has done anything with it, so what the windows
+			// themselves did is still read from the problems they closed.
+			$build_tag_operation = fn(string $tag, string $tag_value) => [
+				'sortorder' => 3,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_ADD_TAG,
+				'tag' => $tag,
+				'tag_value' => $tag_value
+			];
+
+			// The second rule is the first one operation for operation, its own tag apart, so both of them keep a
+			// window of the same events and both close it when it ends.
+			$second_operations = array_merge($operations, [
+				$build_tag_operation(self::CEP_TAG_WINDOW_SECOND, self::CEP_TAG_WINDOW_SECOND_VALUE)
+			]);
+
+			$operations[] = $build_tag_operation(self::CEP_TAG_WINDOW_FIRST, self::CEP_TAG_WINDOW_FIRST_VALUE);
+		}
+
 		$cep_ruleid = $this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
 		));
@@ -3330,21 +3360,11 @@ HEREDOC;
 			'The window of "'.$name.'" must keep its capacity macro unresolved.'
 		);
 
-		if ($second_rule) {
-			// The second rule of a doubled flavour: the rule above once more, window and operations alike, so two
-			// windows of the same events exist at once and both of them are closed by what ends them. Only its name
-			// and one added operation differ - the tag it adds as an event occurs, which is what shows from the
-			// outside that this rule was processed for the events the other one closes. A higher rule sortorder puts
-			// it second of the two, so which of them acts first is fixed rather than left to the order the rules
-			// happen to be stored in.
-			$second_operations = array_merge($operations, [[
-				'sortorder' => 3,
-				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-				'type' => CCepRuleHelper::OP_ADD_TAG,
-				'tag' => self::CEP_TAG_WINDOW_SECOND,
-				'tag_value' => self::CEP_TAG_WINDOW_SECOND_VALUE
-			]]);
-
+		if ($second_operations !== null) {
+			// The second rule of a doubled flavour, built above: the rule of the flavour once more, window and
+			// operations alike, so two windows of the same events exist at once and both of them are closed by what
+			// ends them. A higher rule sortorder puts it second of the two, so which of them acts first is fixed
+			// rather than left to the order the rules happen to be stored in.
 			$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams(
 				self::buildSecondRuleName($name), [], $second_operations, CONDITION_EVAL_TYPE_AND, '', $window_type,
 				$window
@@ -12017,9 +12037,9 @@ HEREDOC;
 	 * both windows are closed by what ends them, so every problem is closed by two rules instead of one. Closing a
 	 * problem that is already closed may not do anything, so what this asserts is the outcome of the single rule
 	 * flavours unchanged - no problem closed twice over into something else, none left open, and neither rule
-	 * reporting an error. That both rules really were processed for those events is read from the tag the second one
-	 * adds as an event occurs (CEP_TAG_WINDOW_SECOND): every problem event of the run must carry it, so the second
-	 * rule cannot have been the one that never got its turn.
+	 * reporting an error. That both rules really were processed for those events is read from the tags they add as an
+	 * event occurs, one of its own per rule (CEP_TAG_WINDOW_FIRST and CEP_TAG_WINDOW_SECOND): every problem event of
+	 * the run must carry both of them, so neither rule can have been left out of the events the other one closed.
 	 */
 	private function runEventAssessmentTestCepWindowCloseWindow(string $rule_name, bool $discarded = false,
 			bool $single_service = false, bool $doubled = false): void {
@@ -12173,13 +12193,20 @@ HEREDOC;
 		}
 
 		if ($doubled) {
-			// The second rule of the flavour was processed for every event the first one closed: its tag is added as
-			// an event occurs, so an event of this run without it would be one the second rule never got its turn for
-			// - which is what a window type that is exclusive would have done to it. Every "down" value and every
-			// "up" value of the ids driven is therefore tagged, and the counts above have already shown that being
-			// closed by two rules instead of one left the problems exactly as one rule leaves them.
-			$this->waitForProblemEventsTagged($all, self::CEP_TAG_WINDOW_SECOND,
-				($discarded_service === null ? count($services) : count($services) - 1) * ($events + 1)
+			// Both rules of the flavour were processed for every event of the run, which is what their tags are for:
+			// each rule adds one of its own as an event occurs, so an event carrying only one of the two would be an
+			// event one of the rules never got its turn for - what a window type that is exclusive would have done to
+			// the second rule of its kind. Every "down" value and every "up" value of the ids driven must therefore
+			// carry both tags, and since either count reaching that total means every event has that tag, the two
+			// counts together mean every event has both. The counts above have already shown that being closed by two
+			// rules instead of one left the problems exactly as one rule leaves them.
+			$tagged = ($discarded_service === null ? count($services) : count($services) - 1) * ($events + 1);
+
+			$this->waitForProblemEventCountByTag($all, self::CEP_TAG_WINDOW_FIRST, self::CEP_TAG_WINDOW_FIRST_VALUE,
+				$tagged
+			);
+			$this->waitForProblemEventCountByTag($all, self::CEP_TAG_WINDOW_SECOND, self::CEP_TAG_WINDOW_SECOND_VALUE,
+				$tagged
 			);
 		}
 
