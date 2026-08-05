@@ -1,6 +1,8 @@
 Changes for 8.0.0rc1
 
 New features:
+A.F.I...S. [ZBXNEXT-10357] implemented Zabbix server, API and frontend changes for mobile application (agriscenko, gberzina, rtrizna, wczerneha)
+.........T [ZBXNEXT-10644] added Oracle Cloud Costs by HTTP template (abrosimovs)
 .........T [ZBXNEXT-10639] added template GCP Cost monitoring by HTTP (kflorowski)
 .........T [ZBXNEXT-10328] added Percona by Zabbix agent template (mruszczyk)
 .........T [ZBXNEXT-10326] added MariaDB by Zabbix agent template (mruszczyk)
@@ -8,6 +10,17 @@ New features:
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+..F....PS. [ZBX-27637] fixed leading zeroes in database version numbers (mprihodko)
+..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
+.........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
+..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
+..F....... [ZBX-27920] fixed event menu entry parameters being marked as required when they are disabled (scernisenko)
+..F....... [ZBX-27942] fixed time filter error for Dashboard in Kiosk mode (scernisenko)
+..F....... [ZBX-25485] fixed language change to work for different environments (gberzina)
+..F....... [ZBX-27921] fixed item and item prototype validation of intervals for trapper and dependent items (gberzina)
+.........T [ZBX-24343] fixed temperature threshold trigger duplication for Cisco IOS by SNMP (kflorowski)
+..F....... [ZBX-27386] fixed select dropdown not collapsing after sorting items (gklavins)
+..F....... [ZBX-27984] fixed item test when prometheus pattern preprocessing step is used (gberzina)
 A......... [ZBX-27875] fixed the display of the "Show templates" filter in the "Host wizard" form (Sasha)
 ..F....... [ZBX-27961] fixed delete cancel confirmation in API tokens and proxy group edit forms (scernisenko)
 ..F....... [ZBX-27825] fixed to set correct mode parameter for nodata function in trigger expression edit form (gberzina)
@@ -439,6 +452,16 @@ Changes for 7.4.14rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
+.........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
+..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
+..F....... [ZBX-26465] improved aria-label text for all functional buttons and icons and aria-expanded of side menu elements for Screen Reader users (aluchko)
+..F....... [ZBX-27920] fixed event menu entry parameters being marked as required when they are disabled (scernisenko)
+..F....... [ZBX-25485] fixed language change to work for different environments (gberzina)
+..F....... [ZBX-27921] fixed item and item prototype validation of intervals for trapper and dependent items (gberzina)
+..F....... [ZBX-27942] fixed time filter error for Dashboard in Kiosk mode (scernisenko)
+..F....... [ZBX-25815] removed mention of discovery from SNMP max_repetition help note (vskalbins)
+..F....... [ZBX-27140] fixed overall hintbox positioning (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.13
@@ -1967,6 +1990,13 @@ Changes for 7.0.30rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
+.........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
+..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
+..F....... [ZBX-27920] fixed event menu entry parameters being marked as required when they are disabled (scernisenko)
+..F....... [ZBX-25485] fixed language change to work for different environments (gberzina)
+..F....... [ZBX-25815] removed mention of discovery from SNMP max_repetition help note (vskalbins)
+..F....... [ZBX-27140] fixed overall hintbox positioning (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.29

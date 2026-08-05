@@ -10,32 +10,16 @@ noinst_PROGRAMS = \
 
 # All proxybuffer tests use the same library set and LDFLAGS.
 #
-# libzbxmocktest.a/libzbxmockdata.a are listed both before and after the real
-# libraries: ld only searches an archive for symbols that are already
-# undefined at that point on the command line, and libzbxproxybuffer.a (and
-# the libs after it) are what actually reference zbx_db_*()/exit() - so the
-# mock archives need a second pass after them to be extracted. The same
-# pattern is used by tests/libs/zbxcacheconfig/Makefile.am's CACHE_LIBS.
+# PROXY_GROUPED_LIBS (tests/libs/grouped-libs.mk.inc) links libzbxproxybuffer.a
+# and the mock archives inside a -Wl,--start-group/--end-group, so the linker
+# can resolve their cyclic references (libzbxproxybuffer.a calls zbx_db_*()/
+# exit(), which the mock archives wrap) regardless of archive order - the same
+# pattern used by tests/libs/zbxcacheconfig/Makefile.am's CACHE_LIBS.
 
 PROXYBUFFER_LIBS = \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
-	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
-	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
-	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
-	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
-	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(CMOCKA_LIBS) $(YAML_LIBS)
+	$(PROXY_GROUPED_LIBS) \
+	$(MOCK_DATA_DEPS) \
+	$(MOCK_TEST_DEPS)
 
 # AM_LDFLAGS applies to all targets in this file; per-target *_LDFLAGS would
 # also work but using AM_LDFLAGS avoids automake's "PB has no canonical name"
