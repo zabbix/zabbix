@@ -36,9 +36,9 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CEPH.USER}||`zabbix`|
-|{$CEPH.API.KEY}||`zabbix_pass`|
-|{$CEPH.CONNSTRING}||`https://localhost:8003`|
+|{$CEPH.USER}|<p>Ceph API user.</p>|`zabbix`|
+|{$CEPH.API.KEY}|<p>Ceph API key.</p>|`zabbix_pass`|
+|{$CEPH.CONNSTRING}|<p>Ceph connection string.</p>|`https://localhost:8003`|
 |{$CEPH.MODE}|<p>The mode of data collection. Supported value is `restful` (deprecated), `native`.</p>|`restful`|
 
 ### Items

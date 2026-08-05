@@ -28,7 +28,7 @@ zabbix_export:
         2. Set the user name and password in host wizard configuration fields `Username` and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Databases
       items:
@@ -1586,49 +1586,57 @@ zabbix_export:
       macros:
         - macro: '{$CASSANDRA.KEY_SPACE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable key spaces'
+          description: 'Filter of discoverable key spaces.'
           config:
             type: TEXT
             priority: '3'
             section_name: Filters
             label: 'Key space filter (include)'
-            description: 'Filter of discoverable key spaces'
+            description: 'Filter of discoverable key spaces.'
         - macro: '{$CASSANDRA.KEY_SPACE.NOT_MATCHES}'
           value: (system|system_auth|system_distributed|system_schema)
-          description: 'Filter to exclude discovered key spaces'
+          description: 'Filter to exclude discovered key spaces.'
           config:
             type: TEXT
             priority: '4'
             section_name: Filters
             label: 'Key space filter (excldue)'
-            description: 'Filter to exclude discovered key spaces'
+            description: 'Filter to exclude discovered key spaces.'
         - macro: '{$CASSANDRA.PASSWORD}'
-          value: zabbix
+          type: SECRET_TEXT
+          description: 'Cassandra JMX password.'
           config:
             type: TEXT
             priority: '2'
             label: Password
+            description: 'Cassandra JMX password.'
             required: 'YES'
         - macro: '{$CASSANDRA.PENDING_TASKS.MAX.HIGH}'
           value: '500'
+          description: 'High threshold for the maximum number of pending Cassandra tasks detected via JMX.'
           config:
             type: TEXT
             priority: '5'
             section_name: Thresholds
             label: 'Pending tasks high threshold'
+            description: 'High threshold for the maximum number of pending Cassandra tasks detected via JMX.'
         - macro: '{$CASSANDRA.PENDING_TASKS.MAX.WARN}'
           value: '350'
+          description: 'Warning threshold for the maximum number of pending Cassandra tasks detected via JMX.'
           config:
             type: TEXT
             priority: '6'
             section_name: Thresholds
             label: 'Pending tasks warning threshold'
+            description: 'Warning threshold for the maximum number of pending Cassandra tasks detected via JMX.'
         - macro: '{$CASSANDRA.USER}'
           value: zabbix
+          description: 'Cassandra JMX user.'
           config:
             type: TEXT
             priority: '1'
             label: Username
+            description: 'Cassandra JMX user.'
             required: 'YES'
       dashboards:
         - uuid: 5358e770431145fb8243033b44de8a72

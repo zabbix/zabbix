@@ -67,8 +67,10 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath('//span[@class="status-grey"][text()="ZBX"]');
 
 		// Check host breadcrumbs text and url.
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter->getField('Hosts')->fill($host_name);
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$breadcrumbs = [
 			self::HOST_LIST_PAGE => 'All hosts',
@@ -466,6 +468,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		}
 
 		$dialog->submit();
+		$this->page->waitUntilReady();
 
 		if (array_key_exists('error', $data)) {
 			$this->assertMessage(TEST_BAD, null, $data['error']);

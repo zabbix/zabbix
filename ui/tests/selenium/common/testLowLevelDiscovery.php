@@ -133,7 +133,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'id:lifetime_type' => ['labels' => ['Never', 'Immediately', 'After'], 'value' => 'After'],
 			'id:enabled_lifetime_type' => ['labels' => ['Never', 'Immediately', 'After'], 'value' => 'Immediately'],
 			'Enable trapping' => ['value' => false],
-			'id:trapper_hosts' => ['maxlength' => 255],
+			'id:trapper_hosts' => ['value' => '{$TRAPPER.ALLOWED_HOSTS}', 'maxlength' => 255],
 			'Description' => ['value' => '', 'maxlength' => 65535],
 			'Enabled' => ['value' => true],
 
@@ -2667,7 +2667,7 @@ class testLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 		$this->query('link', self::SIMPLE_UPDATE_CLONE_LLD)->waitUntilClickable()->one()->click();
 		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
-		$form->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$form->invalidate();
 		$this->assertEquals(['Add', 'Test', 'Cancel'], $form->query('xpath:.//div[@class="form-actions"]/button')
 				->waitUntilVisible()->all()->filter(CElementFilter::CLICKABLE)->asText()

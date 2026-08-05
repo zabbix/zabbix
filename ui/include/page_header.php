@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-global $page;
+global $ZBX_FEATURE_FLAGS, $page;
 
 if (!isset($page['type'])) {
 	$page['type'] = PAGE_TYPE_HTML;
@@ -134,6 +134,10 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 				if (CSettingsHelper::isSoftwareUpdateCheckEnabled()) {
 					$page['scripts'][] = 'class.software-version-check.js';
 				}
+
+				if ($ZBX_FEATURE_FLAGS['banners_enabled'] && $page['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE) {
+					$page['scripts'][] = 'class.banner.js';
+				}
 			}
 		}
 	}
@@ -206,6 +210,12 @@ define('PAGE_HEADER_LOADED', 1);
 
 if ($page['type'] != PAGE_TYPE_HTML || defined('ZBX_PAGE_NO_HEADER')) {
 	return null;
+}
+
+if ($page['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE) {
+	echo (new CLink(_('Skip to main content'), '#' . CHtmlPage::PAGE_TITLE_ID))
+		->addClass(ZBX_STYLE_BTN)
+		->addClass('skip-link');
 }
 
 if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] == ZBX_LAYOUT_NORMAL && CWebUser::isLoggedIn()) {

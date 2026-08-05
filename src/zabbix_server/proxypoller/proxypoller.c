@@ -241,13 +241,14 @@ out:
  *                                                                            *
  * Purpose: sends configuration data to proxy                                 *
  *                                                                            *
- * Parameters: proxy                    - [IN/OUT] proxy data                 *
- *             config_vault             - [IN]                                *
- *             config_trapper_timeout   - [IN]                                *
- *             config_source_ip         - [IN]                                *
- *             config_ssl_ca_location   - [IN]                                *
- *             config_ssl_cert_location - [IN]                                *
- *             config_ssl_key_location  - [IN]                                *
+ * Parameters: proxy                     - [IN/OUT] proxy data                *
+ *             config_vault              - [IN]                               *
+ *             config_trapper_timeout    - [IN]                               *
+ *             config_source_ip          - [IN]                               *
+ *             config_ssl_ca_location    - [IN]                               *
+ *             config_ssl_cert_location  - [IN]                               *
+ *             config_ssl_key_location   - [IN]                               *
+ *             config_denyitemtypes_mask - [IN]                               *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               other code - an error occurred                               *
@@ -258,7 +259,8 @@ out:
  ******************************************************************************/
 static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vault_t *config_vault,
 		int config_trapper_timeout, const char *config_source_ip, const char *config_ssl_ca_location,
-		const char *config_ssl_cert_location, const char *config_ssl_key_location)
+		const char *config_ssl_cert_location, const char *config_ssl_key_location,
+		zbx_uint32_t config_denyitemtypes_mask)
 {
 	char				*error = NULL, *buffer = NULL;
 	int				ret, flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, loglevel;
@@ -295,7 +297,8 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 	zbx_json_reset(&j);
 
 	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &status, config_vault, config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error)))
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			config_denyitemtypes_mask, &error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 				proxy->name, error);
@@ -419,10 +422,10 @@ static int	proxy_process_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_dc_proxy_t 
 	}
 
 	if (SUCCEED != (ret = zbx_process_proxy_data(rtc, proxy, &jp, ts, PROXY_OPERATING_MODE_PASSIVE, events_cbs,
-			proxydata_frequency, zbx_discovery_update_host_server, zbx_discovery_update_service_server,
-			zbx_discovery_update_service_down_server, zbx_discovery_find_host_server,
-			zbx_discovery_update_drule_server, zbx_autoreg_host_free_server,
-			(zbx_autoreg_flush_hosts_func_t)zbx_autoreg_flush_hosts_server,
+			proxydata_frequency, zbx_discovery_update_host_server, zbx_discovery_update_hosts_server,
+			zbx_discovery_update_service_server, zbx_discovery_update_service_down_server,
+			zbx_discovery_find_host_server, zbx_discovery_update_drule_server,
+			zbx_autoreg_host_free_server, (zbx_autoreg_flush_hosts_func_t)zbx_autoreg_flush_hosts_server,
 			(zbx_autoreg_prepare_host_func_t)zbx_autoreg_prepare_host_server, more, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
@@ -560,7 +563,8 @@ out:
 static int	process_proxy(zbx_ipc_async_socket_t *rtc, const zbx_config_vault_t *config_vault, int config_timeout,
 		int config_trapper_timeout, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location,
-		const zbx_events_funcs_t *events_cbs, int proxyconfig_frequency, int proxydata_frequency)
+		const zbx_events_funcs_t *events_cbs, int proxyconfig_frequency, int proxydata_frequency,
+		zbx_uint32_t config_denyitemtypes_mask)
 {
 	zbx_dc_proxy_t		proxy, proxy_old;
 	int			num, i;
@@ -616,7 +620,8 @@ static int	process_proxy(zbx_ipc_async_socket_t *rtc, const zbx_config_vault_t *
 			{
 				if (SUCCEED != (ret = proxy_send_configuration(&proxy, config_vault,
 						config_trapper_timeout, config_source_ip, config_ssl_ca_location,
-						config_ssl_cert_location, config_ssl_key_location)))
+						config_ssl_cert_location, config_ssl_key_location,
+						config_denyitemtypes_mask)))
 				{
 					goto error;
 				}
@@ -745,7 +750,8 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 				proxy_poller_args_in->config_ssl_cert_location,
 				proxy_poller_args_in->config_ssl_key_location,
 				proxy_poller_args_in->events_cbs, proxy_poller_args_in->proxyconfig_frequency,
-				proxy_poller_args_in->proxydata_frequency);
+				proxy_poller_args_in->proxydata_frequency,
+				proxy_poller_args_in->config_denyitemtypes_mask);
 		total_sec += zbx_time() - sec;
 
 		nextcheck = zbx_dc_config_get_proxypoller_nextcheck();

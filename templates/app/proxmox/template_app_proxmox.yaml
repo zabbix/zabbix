@@ -100,7 +100,7 @@ zabbix_export:
         3. Set the hostname or IP address of the Proxmox API VE host in the `Proxmox VE Host`. You can also change the API port in the `Proxmox VE Port` if necessary.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -4921,7 +4921,6 @@ zabbix_export:
         - uuid: c5dc124c7789432a905f4cfc6c6eda81
           name: 'Proxmox VE'
           display_period: '3600'
-          auto_start: 'NO'
           pages:
             - name: 'Proxmox VE overview'
               widgets:

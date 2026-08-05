@@ -1121,6 +1121,31 @@ class CFormValidatorTest extends TestCase {
 				['type' => 'object', 'fields' => [
 					'color' => [['type' => 'string', 'regex' => '/^[0-9a-f]{6}$/i']]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'item_type' => ['string', 'in' => [1 => 'agent', 2 => 'snmp', 3 => 'simple']]
+				]],
+				['type' => 'object', 'fields' => [
+					'item_type' => [['type' => 'string', 'in' => ['agent', 'snmp', 'simple']]]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'item_type' => ['string'],
+					'target_field' => ['string',
+						'when' => [
+							'item_type',
+							'in' => [1 => 'agent', 2 => 'snmp', 3 => 'simple']
+						]
+					]
+				]],
+				['type' => 'object', 'fields' => [
+					'item_type' => [['type' => 'string']],
+					'target_field' => [['type' => 'string', 'when' => [
+						['item_type', 'in' => ['agent', 'snmp', 'simple']]
+					]]]
+				]]
 			]
 		];
 	}
@@ -1777,7 +1802,7 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'This value must be no less than "5".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+					['message' => 'Value must be greater than or equal to 5.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
 			],
 			[
@@ -1806,7 +1831,7 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'This value must be no greater than "5".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+					['message' => 'Value must be less than or equal to 5.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
 			],
 			[
@@ -2411,6 +2436,86 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
+					'value' => ['string', 'in' => [1, 2, 3]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => ['1']]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'not_in' => [1]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value cannot be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => [1.0]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => [1]]
+				]],
+				['value' => '1.0'],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value must be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'not_in' => [1.0]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value cannot be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'not_in' => [1]]
+				]],
+				['value' => '01'],
+				['value' => '01'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => [1]]
+				]],
+				['value' => '01'],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value must be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
 					'value' => ['string', 'use' => [CUserMacroParser::class, []]]
 				]],
 				['value' => '{$MACRO}'],
@@ -2638,7 +2743,7 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/field2' => [
-					['message' => 'This value must be no less than "3".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+					['message' => 'Value must be greater than or equal to 3.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
 			],
 			[

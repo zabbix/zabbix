@@ -154,6 +154,31 @@ typedef enum
 }
 zbx_item_type_t;
 
+#define ZBX_ITEM_TYPE_NAME					\
+{								\
+	{"agent",		ITEM_TYPE_ZABBIX},		\
+	{"agent_active",	ITEM_TYPE_ZABBIX_ACTIVE},	\
+	{"trapper",		ITEM_TYPE_TRAPPER},		\
+	{"simple",		ITEM_TYPE_SIMPLE},		\
+	{"internal",		ITEM_TYPE_INTERNAL},		\
+	{"external",		ITEM_TYPE_EXTERNAL},		\
+	{"db_monitor",		ITEM_TYPE_DB_MONITOR},		\
+	{"ipmi",		ITEM_TYPE_IPMI},		\
+	{"ssh",			ITEM_TYPE_SSH},			\
+	{"telnet",		ITEM_TYPE_TELNET},		\
+	{"calculated",		ITEM_TYPE_CALCULATED},		\
+	{"jmx",			ITEM_TYPE_JMX},			\
+	{"snmptrap",		ITEM_TYPE_SNMPTRAP},		\
+	{"dependent",		ITEM_TYPE_DEPENDENT},		\
+	{"httpagent",		ITEM_TYPE_HTTPAGENT},		\
+	{"snmp",		ITEM_TYPE_SNMP},		\
+	{"script",		ITEM_TYPE_SCRIPT},		\
+	{"browser",		ITEM_TYPE_BROWSER},		\
+	{NULL,			0}				\
+}
+
+#define ZBX_ITEM_TYPE_DENIED(mask, type)	((mask) & (1u << (type)))
+
 #define SNMP_BULK_DISABLED	0
 #define SNMP_BULK_ENABLED	1
 
@@ -225,6 +250,9 @@ typedef enum
 	ITEM_VALUE_TYPE_NONE	/* Artificial value, not written into DB, used internally in server. */
 }
 zbx_item_value_type_t;
+
+#define ITEM_VALUE_TYPE_COUNT	(ITEM_VALUE_TYPE_JSON + 1)
+
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
 
 typedef struct
@@ -236,6 +264,16 @@ typedef struct
 	char	*value;
 }
 zbx_log_value_t;
+
+typedef union
+{
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+	zbx_log_value_t	*log;
+}
+zbx_history_value_t;
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -415,8 +453,8 @@ void	zbx_this_should_never_happen_backtrace(void);
 do														\
 {														\
 	zbx_this_should_never_happen_backtrace();								\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something unexpected has just "	\
-			"happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
+	zbx_error("ERROR [file and function: %s:%d,%s, revision:%s] Something unexpected has just"		\
+			" happened.", __FILE__, __LINE__, __func__, ZABBIX_REVISION);				\
 }														\
 while (0)
 
@@ -723,6 +761,9 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
 #define ZBX_SHA512_BINARY_LENGTH 64
+
+/* includes terminating '\0' */
+#define ZBX_UUID_LEN	37
 
 /* includes terminating '\0' */
 #define CUID_LEN	26

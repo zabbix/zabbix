@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package vfsdev
+package dev
 
 import (
 	"encoding/json"
@@ -210,6 +210,7 @@ func vfsDevGet(params []string) (string, error) {
 		return "", err
 	}
 
+	//nolint:revive // should be refactored to include default statement, no-lint for now
 	switch mode {
 	case modeDisks:
 		out = vfsDevGetDisks(devs, rdevs, devNamesRgx)
@@ -283,7 +284,8 @@ func devidsInit() []vfsDevice {
 			continue
 		}
 
-		if err := syscall.Stat(fp, &stat); err != nil {
+		err = syscall.Stat(fp, &stat)
+		if err != nil {
 			continue
 		}
 
@@ -299,6 +301,7 @@ func devidsInit() []vfsDevice {
 		})
 	}
 
+	//nolint:revive // should be refactored to slices.SortFun, no-linting for now.
 	sort.Slice(devices, func(i, j int) bool {
 		return deviceCompare(devices[i], devices[j]) < 0
 	})
@@ -365,6 +368,7 @@ func sysfsDevStatsGet(rdev uint64) *vfsStats {
 			continue
 		}
 
+		//nolint:revive // should be refactored to include default statement, no-lint for now
 		switch idx {
 		case 0:
 			stats.ReadsCompleted = &val

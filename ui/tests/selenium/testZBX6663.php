@@ -165,14 +165,13 @@ class testZBX6663 extends CLegacyWebTest {
 			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->query('button:Reset')->one()->click();
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
-			$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 			$form->fill(['Name' => $zbx_data['host']]);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$table->waitUntilReloaded();
+			$this->page->waitUntilReady();
+			$table = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 			if (isset($zbx_data['discoveryRule'])) {
-				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $zbx_data['host'])
-						->getColumn('Discovery')->query('link:Discovery')->one()->click();
+				$table->findRow('Name', $zbx_data['host'])->getColumn('Discovery')->query('link:Discovery')->one()->click();
 				$this->zbxTestCheckHeader('Discovery rules');
 				$this->zbxTestClickLinkTextWait($this->discoveryRule);
 				$this->zbxTestClickLinkTextWait($zbx_data['discoveryRule']);
@@ -188,16 +187,20 @@ class testZBX6663 extends CLegacyWebTest {
 			$this->query('button:Reset')->one()->click();
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$form->fill(['Name' => $zbx_data['template']]);
+			$table = $this->query('id:templates')->asDatatable()->one();
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
+			$this->page->waitUntilReady();
+			$table->waitUntilReloaded();
+			$table->waitUntilRowsCount(1);
 
 			if (isset($zbx_data['discoveryRule'])) {
-				$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();
+				$table->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();
 				$this->zbxTestCheckHeader('Discovery rules');
 				$this->zbxTestClickLinkTextWait($this->discoveryRule);
 				$this->zbxTestClickLinkTextWait($zbx_data['discoveryRule']);
 			}
 			else {
-				$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link', $zbx_data['link'])->waitUntilVisible()->one()->click();
+				$table->getRow(0)->query('link', $zbx_data['link'])->waitUntilVisible()->one()->click();
 			}
 		}
 

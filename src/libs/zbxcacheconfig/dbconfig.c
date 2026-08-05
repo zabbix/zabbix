@@ -220,6 +220,12 @@ void	zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
 
+static zbx_uint32_t	denyitemtypes_mask = 0;
+static zbx_uint32_t	get_denyitemtypes_mask(void)
+{
+	return denyitemtypes_mask;
+}
+
 zbx_dc_config_t		*config = NULL;
 zbx_dc_config_private_t	config_private;
 
@@ -3616,8 +3622,21 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		old_poller_type = item->poller_type;
 		old_nextcheck = item->nextcheck;
 
-		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
+		if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), item->type))
 		{
+			zbx_timespec_t	ts = {(int)now, 0};
+
+			item->nextcheck = 0;
+			item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
+			item->poller_type = ZBX_NO_POLLER;
+
+			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
+					"Item type is denied by the \"DenyItemTypes\" configuration parameter.");
+		}
+		else if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
+		{
+			unsigned char	state = ITEM_STATE_NORMAL;
+
 			DCitem_poller_type_update(item, host, flags);
 
 			if (SUCCEED == zbx_is_counted_in_item_queue(item->type, item->key))
@@ -3640,10 +3659,19 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 					if (0 == host->proxyid)
 					{
 						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								ITEM_STATE_NOTSUPPORTED, error);
+								(state = ITEM_STATE_NOTSUPPORTED), error);
 					}
 					zbx_free(error);
 				}
+			}
+
+			if (ITEM_STATE_NOTSUPPORTED != state &&
+					0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), old_type))
+			{
+				AGENT_RESULT	r = {0};
+				zbx_timespec_t	ts = {(int)now, 0};
+
+				zbx_dc_add_history(item->itemid, item->value_type, 0, &r, &ts, state, NULL);
 			}
 		}
 		else
@@ -3658,9 +3686,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		{
 			zbx_timespec_t	ts = {(int)now, 0};
 
-			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-					ITEM_STATE_NOTSUPPORTED, "Nested LLD rule type is supported only for discovered"
-							" LLD rules or hosts.");
+			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
+					"Nested LLD rule type is supported only for discovered LLD rules or hosts.");
 		}
 
 		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
@@ -6244,8 +6271,8 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
  *                                                                            *
  * Purpose: calculate nextcheck timestamp                                     *
  *                                                                            *
- * Parameters: seend - [IN] the seed                                          *
- *             delay - [IN] the delay in seconds                              *
+ * Parameters: seed  - [IN]                                                   *
+ *             delay - [IN] delay in seconds                                  *
  *             now   - [IN] current timestamp                                 *
  *                                                                            *
  * Return value: nextcheck value                                              *
@@ -7863,6 +7890,7 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 	{
 		zbx_vector_uint64_t	itemids;
 		int			i;
+		zbx_uint64_t		trends_flags = zbx_history_get_trends_flags();
 
 		zbx_vector_uint64_create(&itemids);
 		zbx_vector_uint64_reserve(&itemids, (size_t)items->values_num);
@@ -7872,6 +7900,9 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 			ZBX_DC_ITEM	*item = items->values[i];
 
 			if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+				continue;
+
+			if (0 == (trends_flags & (__UINT64_C(1) << item->value_type)))
 				continue;
 
 			ZBX_DC_NUMITEM	*numitem;
@@ -8658,7 +8689,9 @@ clean:
 		DCdump_configuration();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
+#ifdef	HAVE_MALLOC_TRIM
+	malloc_trim(128 * ZBX_MEBIBYTE);
+#endif
 	return new_revision;
 }
 
@@ -9018,7 +9051,8 @@ static void	config_unlock_shmem_on_oom(void)
  *                                                                            *
  ******************************************************************************/
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
-		zbx_uint64_t conf_cache_size, const char *hostname, char **error)
+		zbx_uint64_t conf_cache_size, const char *hostname, zbx_uint32_t config_denyitemtypes_mask,
+		char **error)
 {
 	int	i, ret;
 
@@ -9026,6 +9060,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 
 	get_program_type_cb = get_program_type;
 	get_config_forks_cb = get_config_forks;
+	denyitemtypes_mask = config_denyitemtypes_mask;
 
 	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto fail;
@@ -10432,8 +10467,11 @@ int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 		zbx_hashset_iter_reset(&dc_host->items, &iter);
 		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 		{
-			if (ITEM_TYPE_ZABBIX_ACTIVE == ref->item->type)
+			if (ITEM_TYPE_ZABBIX_ACTIVE == ref->item->type &&
+					0 == ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), ref->item->type))
+			{
 				num++;
+			}
 		}
 	}
 
@@ -10458,6 +10496,9 @@ void	zbx_dc_config_get_active_items_by_hostid(zbx_dc_item_t *items, zbx_uint64_t
 		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 		{
 			if (ITEM_TYPE_ZABBIX_ACTIVE != ref->item->type)
+				continue;
+
+			if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), ref->item->type))
 				continue;
 
 			DCget_item(&items[j], ref->item);
@@ -14330,6 +14371,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER))
 		cfg->proxy_secrets_provider = config->config->proxy_secrets_provider;
 
+	if (0 != (flags & ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES))
+		cfg->enable_mobile_devices = config->config->enable_mobile_devices;
+
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	cfg->flags = flags;
@@ -15545,6 +15589,13 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextchec
 			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for itemid [" ZBX_FS_UI64 "]"
 					": item is not in cache", itemids->values[i]);
 
+			proxyid = 0;
+		}
+		else if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), dc_item->type))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot perform check now for item \"%s\" on host \"%s\""
+					": item type is denied by the \"DenyItemTypes\" configuration parameter.",
+					dc_item->key, dc_host->host);
 			proxyid = 0;
 		}
 		else if (ZBX_JAN_2038 == dc_item->nextcheck)
@@ -17225,6 +17276,66 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get drule values                                                  *
+ *                                                                            *
+ * Parameter: dc_drule - [IN/OUT] drule                                       *
+ *                                                                            *
+ * Return value: SUCCEED - drule exists                                       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_drule_get_values(zbx_dc_drule_t *dc_drule)
+{
+	int			ret = FAIL;
+	zbx_dc_drule_t		*drule;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &dc_drule->druleid)))
+	{
+		dc_drule->proxyid = drule->proxyid;
+		dc_drule->name = zbx_strdup(NULL, drule->name);
+		dc_drule->iprange = zbx_strdup(NULL, drule->iprange);
+		dc_drule->status = drule->status;
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve value of uniq if dcheck exists                           *
+ *                                                                            *
+ * Parameter: dcheckid - [IN] id of dcheck                                    *
+ *                uniq - [OUT] value of uniq                                  *
+ *                                                                            *
+ * Return value: SUCCEED - value of uniq retrieved                            *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_dcheck_get_uniq(const zbx_uint64_t dcheckid, unsigned char *uniq)
+{
+	int			ret = FAIL;
+	zbx_dc_dcheck_t		*dcheck;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	if (NULL != (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_search(&config->dchecks, &dcheckid)))
+	{
+		*uniq =  dcheck->uniq;
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get drules ready to be processed                                  *
  *                                                                            *
  * Parameter: now       - [IN] the current timestamp                          *
@@ -17684,7 +17795,7 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
 
-void	zbx_recalc_time_period(time_t *ts_from, int table_group)
+void	zbx_recalc_time_period(time_t *ts_from, int table_group, unsigned char value_type)
 {
 #define HK_CFG_UPDATE_INTERVAL	5
 	time_t			least_ts = 0, now;
@@ -17704,10 +17815,17 @@ void	zbx_recalc_time_period(time_t *ts_from, int table_group)
 
 	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
 	{
-		if (1 != hk.history_global)
-			return;
+		int	hk_period;
 
-		least_ts = now - hk.history;
+		if (0 == (hk_period = hk.history_override[value_type]))
+		{
+			if (1 != hk.history_global)
+				return;
+
+			hk_period = hk.history;
+		}
+
+		least_ts = now - hk_period;
 	}
 	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
 	{

@@ -23,12 +23,15 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	 * @throws APIException
 	 */
 	protected function getRulesInput(int $user_type): array {
+		global $ZBX_FEATURE_FLAGS;
+
 		return array_merge(
 			$this->getUiSectionRules($user_type),
 			$this->getServiceSectionRules(),
-			$this->getModuleSectionRules(),
+			$ZBX_FEATURE_FLAGS['modules_config_enabled'] ? $this->getModuleSectionRules() : [],
 			$this->getApiSectionRules(),
-			$this->getActionSectionRules($user_type)
+			$this->getActionSectionRules($user_type),
+			$this->getDevicesActionSectionRules($user_type)
 		);
 	}
 
@@ -93,25 +96,30 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	 * @throws APIException
 	 */
 	private function getModuleSectionRules(): array {
-		$db_modules = API::Module()->get([
-			'output' => [],
-			'preservekeys' => true
-		]);
+		$fields = [];
 
-		$modules = $this->getInput('modules', []);
+		if ($this->hasInput('modules_default_access')) {
+			$fields['modules.default_access'] = $this->getInput('modules_default_access');
+		}
 
-		return [
-			'modules' => array_map(
-				static function (string $moduleid) use ($modules): array {
-					return [
-						'moduleid' => $moduleid,
-						'status' => array_key_exists($moduleid, $modules) ? $modules[$moduleid] : 0
-					];
-				},
-				array_keys($db_modules)
-			),
-			'modules.default_access' => $this->getInput('modules_default_access')
-		];
+		if ($this->hasInput('modules')) {
+			$db_modules = API::Module()->get([
+				'output' => [],
+				'preservekeys' => true
+			]);
+
+			$modules = $this->getInput('modules', []);
+			$fields['modules'] = [];
+
+			foreach (array_keys($db_modules) as $moduleid) {
+				$fields['modules'][] = [
+					'moduleid' => $moduleid,
+					'status' => array_key_exists($moduleid, $modules) ? $modules[$moduleid] : 0
+				];
+			}
+		}
+
+		return $fields;
 	}
 
 	private function getApiSectionRules() : array {
@@ -136,6 +144,28 @@ abstract class CControllerUserroleEditGeneral extends CController {
 				CRoleHelper::getActionsByUserType($user_type)
 			),
 			'actions.default_access' => $this->getInput('actions_default_access')
+		];
+	}
+
+	private function getDevicesActionSectionRules(int $user_type): array {
+		if (!CSettingsHelper::isMobileDevicesEnabled()) {
+			return [];
+		}
+
+		$device_action_rules = array_flip($this->getInput('devices_actions', []));
+
+		return [
+			'devices.access' => $this->getInput('devices_access') ? 1: 0,
+			'devices.actions' => array_map(
+				function (string $rule) use ($device_action_rules): array {
+					return [
+						'name' => str_replace('devices.actions.', '', $rule),
+						'status' => array_key_exists($rule, $device_action_rules) ? 1 : 0
+					];
+				},
+				CRoleHelper::getDeviceActionsByUserType($user_type)
+			),
+			'devices.actions.default_access' => $this->getInput('devices_actions_default_access')
 		];
 	}
 }

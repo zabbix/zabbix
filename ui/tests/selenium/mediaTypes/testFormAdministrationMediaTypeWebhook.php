@@ -17,6 +17,8 @@
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
+use Facebook\WebDriver\Exception\ElementNotInteractableException;
+
 /**
  * @backup media_type
  */
@@ -205,7 +207,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => ''
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -221,7 +223,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '0'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -237,7 +239,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '101'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no greater than "100".'
+						'Attempts' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -291,7 +293,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Custom' => '101'
 					],
 					'inline_errors' => [
-						'id:maxsessions' => 'This value must be no greater than "100".'
+						'id:maxsessions' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -413,7 +415,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => ''
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -429,7 +431,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '0'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -445,7 +447,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '101'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no greater than "100".'
+						'Attempts' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -461,7 +463,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => 'five'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -569,9 +571,18 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 			$this->fillOperationsTab($data, $form);
 		}
 
-		$overlay->getFooter()->query('button', CTestArrayHelper::get($data, 'update', false) ? 'Update' : 'Add')
-				->one()->click();
-		$this->page->waitUntilReady();
+		/*
+		 * Changing the media type re-renders the form and can shift the footer button while it is being clicked.
+		 * Retry the click if that happens.
+		 */
+		$submit = $overlay->getFooter()->query('button', CTestArrayHelper::get($data, 'update', false) ? 'Update' : 'Add')
+				->one();
+		try {
+			$submit->click();
+		}
+		catch (ElementNotInteractableException $exception) {
+			$submit->click();
+		}
 
 		$this->assertInlineError($form, $data['inline_errors']);
 

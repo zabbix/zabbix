@@ -54,7 +54,7 @@ JAVASCRIPT;
 		'type' => getRequest('type', ITEM_TYPE_ZABBIX),
 		'snmp_oid' => getRequest('snmp_oid', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
-		'trapper_hosts' => getRequest('trapper_hosts', ''),
+		'trapper_hosts' => getRequest('trapper_hosts', ZBX_DEFAULT_TRAPPER_HOSTS),
 		'units' => getRequest('units', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
 		'params' => getRequest('params', ''),
@@ -197,7 +197,7 @@ JAVASCRIPT;
 	if (array_key_exists('itemid', $item)) {
 		$data['item'] = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
-		$data['limited'] = ($data['item']['templateid'] != 0);
+		$data['limited'] = ($data['item']['templateid'] != 0) && $data['form'] !== 'clone';
 		$data['interfaceid'] = $item['interfaceid'];
 
 		// Check for a discovered prototype

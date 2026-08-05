@@ -1304,7 +1304,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.0-6
       groups:
         - name: Templates/Cloud
       items:
@@ -1712,6 +1712,23 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: availability
+        - uuid: 7adb29dab2454f7580d67455995bd0e8
+          name: 'Virtual machine count'
+          type: DEPENDENT
+          key: azure.get.vm.count
+          description: 'Get the total count of virtual machines.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.resources.value.[?(@.type == "Microsoft.Compute/virtualMachines")].length()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: azure.get.resources
+          tags:
+            - tag: component
+              value: vm
       discovery_rules:
         - uuid: a2845cb2ce544653b184bf98026fd073
           name: 'Azure Container App discovery'
@@ -3964,6 +3981,8 @@ zabbix_export:
                   value: '{#GROUP}'
                 - tag: size
                   value: '{#SIZE}'
+                - tag: target
+                  value: azure-compute
           master_item:
             key: azure.get.resources
           lld_macro_paths:
@@ -18267,7 +18286,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure SQL managed instance ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -18959,6 +18978,9 @@ zabbix_export:
                   name: 'Availability state'
                   width: '18'
                   fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -19214,6 +19236,9 @@ zabbix_export:
                   x: '36'
                   width: '18'
                   fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
                     - type: ITEM
                       name: itemid.0
                       value:
