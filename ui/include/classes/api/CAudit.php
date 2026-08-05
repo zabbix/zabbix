@@ -527,7 +527,8 @@ class CAudit {
 	 * @var array
 	 */
 	private const SCALAR_VALUE_LIST_FIELD = [
-		'item.query.aggregated_columns.parameters'
+		'item.query.aggregated_columns.parameters',
+		'itemprototype.query.aggregated_columns.parameters'
 	];
 
 	/**
@@ -609,6 +610,9 @@ class CAudit {
 		'itemprototype.preprocessing' => 'item_preprocid',
 		'itemprototype.tags' => 'itemtagid',
 		'itemprototype.query_fields' => 'sortorder',
+		'itemprototype.query.columns' => null,
+		'itemprototype.query.aggregated_columns' => null,
+		'itemprototype.query.filter.conditions' => null,
 		'maintenance.groups' => 'maintenance_groupid',
 		'maintenance.hosts' => 'maintenance_hostid',
 		'maintenance.tags' => 'maintenancetagid',
@@ -859,11 +863,11 @@ class CAudit {
 
 				if (array_key_exists($abstract_path, self::NESTED_OBJECTS_ID_FIELD_NAMES)) {
 					ctype_digit((string) key($db_value))
-						? self::intersectNestedObjects($path.'.'.$field, $db_value, $object[$field])
-						: self::intersectObjectFields($path.'.'.$field, $db_value, $object[$field]);
+						? self::intersectNestedObjects($abstract_path, $db_value, $object[$field])
+						: self::intersectObjectFields($abstract_path, $db_value, $object[$field]);
 				}
 				elseif (in_array($abstract_path, self::SCALAR_VALUE_LIST_FIELD, true)) {
-					self::intersectObjectFields($path.'.'.$field, $db_value, $object[$field]);
+					self::intersectObjectFields($abstract_path, $db_value, $object[$field]);
 				}
 			}
 		}
