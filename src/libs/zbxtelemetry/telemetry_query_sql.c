@@ -214,6 +214,18 @@ static char	*tq_sql_dyn_get_operand(const char *atom, zbx_tq_column_type_t type,
 			return zbx_strdup(NULL, "");
 		}
 	}
+	else if (ZBX_TQ_COLUMN_TYPE_BOOL == type)
+	{
+		if (ZBX_APM_DB_TYPE_CLICKHOUSE == ctx->db_type)
+		{
+			return zbx_dsprintf(NULL, "toUInt8(%s)", atom);
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			return zbx_strdup(NULL, "");
+		}
+	}
 	else
 	{
 		return zbx_strdup(NULL, atom);

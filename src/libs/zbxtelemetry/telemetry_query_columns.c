@@ -76,7 +76,7 @@ static const tq_column_info_t	column_info_metrics_sum[] = {
 	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
 	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
-	{"IsMonotonic",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"IsMonotonic",			ZBX_TQ_COLUMN_TYPE_BOOL,	TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{0}
 };
 
@@ -212,8 +212,8 @@ zbx_tq_column_type_t	tq_get_column_type(zbx_tq_signal_type_t signal_type,
 int	tq_column_type_is_array(zbx_tq_column_type_t type)
 {
 	return ZBX_TQ_COLUMN_TYPE_ARRAY_STR == type || ZBX_TQ_COLUMN_TYPE_ARRAY_NUM == type ||
-			ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == type ||
-			ZBX_TQ_COLUMN_TYPE_ARRAY_TIMESTAMP == type ? SUCCEED : FAIL;
+			ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == type || ZBX_TQ_COLUMN_TYPE_ARRAY_TIMESTAMP == type ||
+			ZBX_TQ_COLUMN_TYPE_ARRAY_BOOL == type ? SUCCEED : FAIL;
 }
 
 int	tq_column_type_is_attributes(zbx_tq_column_type_t type)
@@ -240,6 +240,10 @@ zbx_tq_column_type_t	tq_get_base_column_type(zbx_tq_column_type_t type)
 		case ZBX_TQ_COLUMN_TYPE_TIMESTAMP:
 		case ZBX_TQ_COLUMN_TYPE_ARRAY_TIMESTAMP:
 			return ZBX_TQ_COLUMN_TYPE_TIMESTAMP;
+
+		case ZBX_TQ_COLUMN_TYPE_BOOL:
+		case ZBX_TQ_COLUMN_TYPE_ARRAY_BOOL:
+			return ZBX_TQ_COLUMN_TYPE_BOOL;
 
 		default:
 		case ZBX_TQ_COLUMN_TYPE_UNKNOWN:

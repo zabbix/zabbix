@@ -645,8 +645,9 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 					ZBX_TQ_QUERY_TAG_COLUMN, i);
 
 		if (!(ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == col->col_type || ZBX_TQ_COLUMN_TYPE_STR == col->col_type ||
-				ZBX_TQ_COLUMN_TYPE_NUM == col->col_type
-				|| ZBX_TQ_COLUMN_TYPE_TIMESTAMP == col->col_type))
+				ZBX_TQ_COLUMN_TYPE_NUM == col->col_type ||
+				ZBX_TQ_COLUMN_TYPE_TIMESTAMP == col->col_type ||
+				ZBX_TQ_COLUMN_TYPE_BOOL == col->col_type))
 			return ret_errf(FAIL, error, max_error_len, "Unsupported column type for column #%d", i);
 
 		if (NULL == col->attribute_key)
