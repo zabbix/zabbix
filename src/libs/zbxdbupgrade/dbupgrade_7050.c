@@ -1165,19 +1165,48 @@ static int	DBpatch_7050087(void)
 
 static int	DBpatch_7050088(void)
 {
+	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("regexps", &field);
+}
+
+static int	DBpatch_7050089(void)
+{
+	const zbx_db_field_t	field = {"expression", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("expressions", &field, NULL);
+}
+
+static int	DBpatch_7050090(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 1  - REGEX_TYPE_CONTAINS_ANY_SUBSTRING   */
+	if (ZBX_DB_OK > zbx_db_execute("update expressions set exp_delimiter='' where expression_type<>1"
+			" and exp_delimiter<>''"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050091(void)
+{
 	const zbx_db_field_t	field = {"proxy_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("usrgrp", &field);
 }
 
-static int	DBpatch_7050089(void)
+static int	DBpatch_7050092(void)
 {
 	const zbx_db_field_t	field = {"proxy_group_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("usrgrp", &field);
 }
 
-static int	DBpatch_7050090(void)
+static int	DBpatch_7050093(void)
 {
 	const zbx_db_table_t	table =
 			{"usrgrp_proxy", "usrgrp_proxyid", 0,
@@ -1193,31 +1222,31 @@ static int	DBpatch_7050090(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050091(void)
+static int	DBpatch_7050094(void)
 {
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy", 1, &field);
 }
 
-static int	DBpatch_7050092(void)
+static int	DBpatch_7050095(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy", 2, &field);
 }
 
-static int	DBpatch_7050093(void)
+static int	DBpatch_7050096(void)
 {
 	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_1", "usrgrpid,proxyid", 1);
 }
 
-static int	DBpatch_7050094(void)
+static int	DBpatch_7050097(void)
 {
 	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_2", "proxyid", 0);
 }
 
-static int	DBpatch_7050095(void)
+static int	DBpatch_7050098(void)
 {
 	const zbx_db_table_t	table =
 			{"usrgrp_proxy_group", "usrgrp_proxy_groupid", 0,
@@ -1233,14 +1262,14 @@ static int	DBpatch_7050095(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050096(void)
+static int	DBpatch_7050099(void)
 {
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy_group", 1, &field);
 }
 
-static int	DBpatch_7050097(void)
+static int	DBpatch_7050100(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1248,15 +1277,16 @@ static int	DBpatch_7050097(void)
 	return DBadd_foreign_key("usrgrp_proxy_group", 2, &field);
 }
 
-static int	DBpatch_7050098(void)
+static int	DBpatch_7050101(void)
 {
 	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_1", "usrgrpid,proxy_groupid", 1);
 }
 
-static int	DBpatch_7050099(void)
+static int	DBpatch_7050102(void)
 {
 	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_2", "proxy_groupid", 0);
 }
+
 
 #endif
 
@@ -1364,5 +1394,8 @@ DBPATCH_ADD(7050096, 0, 1)
 DBPATCH_ADD(7050097, 0, 1)
 DBPATCH_ADD(7050098, 0, 1)
 DBPATCH_ADD(7050099, 0, 1)
+DBPATCH_ADD(7050100, 0, 1)
+DBPATCH_ADD(7050101, 0, 1)
+DBPATCH_ADD(7050102, 0, 1)
 
 DBPATCH_END()
