@@ -360,6 +360,28 @@ class testTriggerCEP extends CIntegrationTest {
 	// that the delete lands inside a script rather than between two of them, and leaves two seconds of the script to
 	// run without a rule behind it.
 	const CEP_RULE_WINDOW_SLEEP_DELETE_DELAY = 1;
+	// The unresolved limits scenario is run over the same rule of every window type as well, this time with the
+	// limits of its window given as user macros that do not exist: a limit that does not resolve is not a limit at
+	// all, so no window is opened for the event that would have needed one and the rule reports what it could not
+	// make sense of - see prepareDataCepWindowUnresolvedLimitsOperations() and
+	// runEventAssessmentTestCepWindowUnresolvedLimits().
+	const CEP_RULE_WINDOW_SIMPLE_LIMITS = self::CEP_RULE_NAME_PREFIX.'window simple unresolved limits';
+	const CEP_RULE_WINDOW_TAG_LIMITS = self::CEP_RULE_NAME_PREFIX.'window tag unresolved limits';
+	const CEP_RULE_WINDOW_CAUSE_LIMITS = self::CEP_RULE_NAME_PREFIX.'window cause unresolved limits';
+	const CEP_RULE_WINDOW_PATTERN_LIMITS = self::CEP_RULE_NAME_PREFIX.'window pattern unresolved limits';
+	// What that rule must report, one message per limit that does not resolve. The macros are the very ones the
+	// working flavours give their windows (CEP_WINDOW_DURATION_MACRO and CEP_WINDOW_CAPACITY_MACRO), which this
+	// scenario leaves uncreated instead, so what the messages name is the macro text the server was left with -
+	// an unknown user macro is not replaced by anything, and neither a duration nor a capacity can be read out of
+	// it. The duration is the limit the server parses first, so it is what a window with neither macro created
+	// reports, and the capacity message is reached only once the duration macro exists.
+	const CEP_RULE_WINDOW_LIMITS_DURATION_ERROR = 'Invalid CEP window duration '.self::CEP_WINDOW_DURATION_MACRO.'.';
+	const CEP_RULE_WINDOW_LIMITS_CAPACITY_ERROR = 'Invalid CEP window capacity '.self::CEP_WINDOW_CAPACITY_MACRO.'.';
+	// What the macros are set to once the scenario has seen the error each of them causes while missing: a duration
+	// outlasting the rest of the run, so the window that is finally opened keeps what it is given until an
+	// operation ends it, and no capacity limit at all, so nothing is evicted for not fitting.
+	const CEP_RULE_WINDOW_LIMITS_DURATION = '2m';
+	const CEP_RULE_WINDOW_LIMITS_CAPACITY = 0;
 	// The built in tag telling a symptom apart from a cause, the counterpart of CEP_TAG_IS_COPIED for the rank a
 	// cause and symptom window assigns.
 	const CEP_TAG_IS_SYMPTOM = '$IS.SYMPTOM';
@@ -3295,6 +3317,131 @@ HEREDOC;
 	}
 
 	/**
+	 * Prepare the simple window flavour of the unresolved limits scenario, see
+	 * prepareDataCepWindowUnresolvedLimitsOperations().
+	 */
+	public function prepareDataCepWindowSimpleUnresolvedLimits() {
+		return $this->prepareDataCepWindowUnresolvedLimitsOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_LIMITS
+		);
+	}
+
+	/**
+	 * Prepare the tag correlation window flavour of the unresolved limits scenario, see
+	 * prepareDataCepWindowUnresolvedLimitsOperations().
+	 */
+	public function prepareDataCepWindowTagUnresolvedLimits() {
+		return $this->prepareDataCepWindowUnresolvedLimitsOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+			self::CEP_RULE_WINDOW_TAG_LIMITS
+		);
+	}
+
+	/**
+	 * Prepare the cause and symptom window flavour of the unresolved limits scenario, see
+	 * prepareDataCepWindowUnresolvedLimitsOperations().
+	 */
+	public function prepareDataCepWindowCauseSymptomUnresolvedLimits() {
+		return $this->prepareDataCepWindowUnresolvedLimitsOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_WINDOW_CAUSE_LIMITS
+		);
+	}
+
+	/**
+	 * Prepare the pattern match window flavour of the unresolved limits scenario, see
+	 * prepareDataCepWindowUnresolvedLimitsOperations().
+	 */
+	public function prepareDataCepWindowPatternUnresolvedLimits() {
+		return $this->prepareDataCepWindowUnresolvedLimitsOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_LIMITS
+		);
+	}
+
+	/**
+	 * Prepare the rule of the scenario that gives a window limits it cannot resolve
+	 * (runEventAssessmentTestCepWindowUnresolvedLimits()): the very rule of the reset and delete scenarios - one
+	 * window per id, grouped by the 'service' tag, "close window" when an "up" event occurs and "close" when the
+	 * window closes, see prepareDataCepWindowHeldProblemsOperations() - whose window limits are the user macros
+	 * CEP_WINDOW_DURATION_MACRO and CEP_WINDOW_CAPACITY_MACRO with neither macro created.
+	 *
+	 * Those two are the only window parameters that may hold a macro and the server resolves them anew whenever it
+	 * works on a window, so a rule is not rejected for holding one that does not exist - what happens instead is
+	 * what this scenario reads: the server has no duration and no capacity to give the window it was about to open,
+	 * so it opens none at all and records why on the rule. The operations are left as they are precisely because
+	 * they are the ones that need a window: with none of them able to reach anything, what a window would have done
+	 * is exactly what the events are missing.
+	 *
+	 * The macros are deleted here rather than assumed absent: they are global and outlive the rules of the flavours
+	 * that create them (macroizeWindowLimits()), so a run following one of those would find both of them
+	 * resolvable and the scenario would be driving a perfectly healthy rule. The assessment creates them itself,
+	 * one at a time, once it has seen the error each of them causes while missing.
+	 *
+	 * $window_type is the type under test, and every type has to behave the same way: the limits of a window are
+	 * not what tells the types apart, so none of them may open a window without them. A pattern match window cannot
+	 * be without a script and this scenario is not driven by a match, so that type gets one that never reports one.
+	 */
+	private function prepareDataCepWindowUnresolvedLimitsOperations(int $window_type, string $name) {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// The rule of this scenario is the only thing that may close a problem.
+		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
+
+		// Neither limit may resolve when the scenario starts, whatever the flavour that ran before it left behind.
+		$this->deleteGlobalMacros([self::CEP_WINDOW_DURATION_MACRO, self::CEP_WINDOW_CAPACITY_MACRO]);
+
+		$window = [
+			'duration' => self::CEP_WINDOW_DURATION_MACRO,
+			'capacity' => self::CEP_WINDOW_CAPACITY_MACRO,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => ['service']
+		];
+
+		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+			$window['script'] = "return 'false';";
+		}
+
+		$operations = [
+			[
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+			],
+			[
+				'sortorder' => 1,
+				'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
+				'type' => CCepRuleHelper::OP_CLOSE
+			]
+		];
+
+		$cep_ruleid = $this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
+			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
+		));
+
+		// A rule holding macros no one can resolve must be accepted and stored as it was written: were the limits
+		// rejected or resolved before reaching the database, there would be no rule to read an error from.
+		$stored = $this->call('ceprule.get', [
+			'cep_ruleids' => $cep_ruleid,
+			'output' => ['cep_ruleid'],
+			'selectWindow' => ['duration', 'capacity']
+		]);
+		$this->assertCount(1, $stored['result'], 'The rule of "'.$name.'" must exist after it was created.');
+		$this->assertSame(self::CEP_WINDOW_DURATION_MACRO, $stored['result'][0]['window']['duration'],
+			'The window of "'.$name.'" must keep its duration macro unresolved.'
+		);
+		$this->assertSame(self::CEP_WINDOW_CAPACITY_MACRO, $stored['result'][0]['window']['capacity'],
+			'The window of "'.$name.'" must keep its capacity macro unresolved.'
+		);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
 	 * Prepare the simple window flavour of the capacity scenario, see
 	 * prepareDataCepWindowCapacityOperations().
 	 */
@@ -3929,6 +4076,27 @@ HEREDOC;
 				'globalmacroid' => $existing['result'][0]['globalmacroid'],
 				'value' => $value
 			]);
+		}
+	}
+
+	/**
+	 * Remove the global user macros $macros, the ones of them that are there - the counterpart of
+	 * upsertGlobalMacro() for the scenario that needs a macro not to resolve
+	 * (prepareDataCepWindowUnresolvedLimitsOperations()). A macro that does not exist is not an error here: what
+	 * this leaves behind is what the caller is after, whether it had to take anything away to get there.
+	 *
+	 * The configuration cache is not reloaded here, exactly as upsertGlobalMacro() does not: the caller does that
+	 * once it has made every change of its own.
+	 */
+	private function deleteGlobalMacros(array $macros): void {
+		$existing = $this->call('usermacro.get', [
+			'globalmacro' => true,
+			'filter' => ['macro' => $macros],
+			'output' => ['globalmacroid']
+		]);
+
+		if ($existing['result']) {
+			$this->call('usermacro.deleteglobal', array_column($existing['result'], 'globalmacroid'));
 		}
 	}
 
@@ -9407,6 +9575,82 @@ HEREDOC;
 		}
 	}
 
+	/* Unresolved window limits - test that each window type reports them and recovers once they resolve */
+
+	/**
+	 * A simple window whose duration and capacity are user macros that do not exist: without limits no window is
+	 * opened at all, so the operations that need one reach nothing and the rule reports the limit it could not parse
+	 * - and it opens a window again the moment the macros are created, see
+	 * runEventAssessmentTestCepWindowUnresolvedLimits().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleUnresolvedLimits$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleUnresolvedLimits() {
+		$this->prepareDataCepWindowSimpleUnresolvedLimits();
+
+		try {
+			$this->runEventAssessmentTestCepWindowUnresolvedLimits(self::CEP_RULE_WINDOW_SIMPLE_LIMITS);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same unresolved limits scenario with a tag correlation window: correlating the events of a group is not
+	 * what a window needs its limits for, so this type must fail on missing ones and recover from them exactly as a
+	 * simple window does - see runEventAssessmentTestCepWindowUnresolvedLimits().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagUnresolvedLimits$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagUnresolvedLimits() {
+		$this->prepareDataCepWindowTagUnresolvedLimits();
+
+		try {
+			$this->runEventAssessmentTestCepWindowUnresolvedLimits(self::CEP_RULE_WINDOW_TAG_LIMITS);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same unresolved limits scenario with a cause and symptom window, the one window type that ranks what it is
+	 * given: a window that was never opened ranks nothing either, so the events sent while the limits do not resolve
+	 * are causes of nothing and symptoms of nothing on top of being held by nothing - see
+	 * runEventAssessmentTestCepWindowUnresolvedLimits().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomUnresolvedLimits$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomUnresolvedLimits() {
+		$this->prepareDataCepWindowCauseSymptomUnresolvedLimits();
+
+		try {
+			$this->runEventAssessmentTestCepWindowUnresolvedLimits(self::CEP_RULE_WINDOW_CAUSE_LIMITS);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same unresolved limits scenario with a pattern match window, the one window type that is examined on its
+	 * own: there is no window to hand to the script of the rule, so the limits are what the rule reports rather than
+	 * anything the script decided - see runEventAssessmentTestCepWindowUnresolvedLimits().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternUnresolvedLimits$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternUnresolvedLimits() {
+		$this->prepareDataCepWindowPatternUnresolvedLimits();
+
+		try {
+			$this->runEventAssessmentTestCepWindowUnresolvedLimits(self::CEP_RULE_WINDOW_PATTERN_LIMITS);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
 	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
@@ -11674,6 +11918,130 @@ HEREDOC;
 	}
 
 	/**
+	 * Drive the unresolved limits scenario of the $rule_name rule, whose window is given both of its limits as user
+	 * macros that do not exist, see prepareDataCepWindowUnresolvedLimitsOperations(). The rule is the one of the
+	 * reset and delete scenarios - the "up" value of an id ends the window of that id and closes every problem the
+	 * window held - so what a window would have done is known, and what the scenario reads is a rule that cannot
+	 * open one. Each of the three ids it drives is sent through a different state of the macros:
+	 *
+	 *   1. neither macro exists. The "down" value of the first id opens its problem, and no window is opened for it:
+	 *      the duration is the limit the server parses first, so the rule reports CEP_RULE_WINDOW_LIMITS_DURATION_ERROR
+	 *      - a message naming the macro text itself, an unknown user macro being replaced by nothing at all. The "up"
+	 *      value of that id, the value that ends a window and closes everything in it, then reaches no window and
+	 *      closes nothing: both problems of the id are open, and the second of them shows what the missing window
+	 *      costs rather than only that the rule complained;
+	 *   2. the duration macro is created, so the capacity is the limit that is left unresolvable. The "down" value of
+	 *      the second id gets the same treatment - no window, nothing closed by its "up" value - and the message the
+	 *      rule reports moves to CEP_RULE_WINDOW_LIMITS_CAPACITY_ERROR, which is what says both limits are resolved
+	 *      and checked rather than the duration alone;
+	 *   3. the capacity macro is created as well. The rule itself was never touched through any of this, so the
+	 *      "down" value of the third id is what shows it is not broken but was only ever missing its limits: a window
+	 *      is opened, the error the rule had been reporting is cleared, and the "up" value of that id ends the window
+	 *      and closes both problems of the id exactly as it does for a rule whose limits were there from the start;
+	 *   4. what the two broken phases left is untouched by that recovery. Their events were never in a window, so a
+	 *      working rule has nothing of theirs to close and the trigger expression is what has to - four problems, the
+	 *      two of every id that was driven without a window.
+	 *
+	 * The scenario is the same for every window type: limits are not what tells the types apart, so none of them may
+	 * open a window without them, and each of them must be able to open one the moment they resolve.
+	 */
+	private function runEventAssessmentTestCepWindowUnresolvedLimits(string $rule_name): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the unresolved limits test of "'.$rule_name.'".');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		// One id per state of the macros: neither of them created, only the duration created, both of them created.
+		$unresolved_service = self::CEP_RULE_WINDOW_NONE_SERVICE;
+		$capacity_service = self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT;
+		$resolved_service = self::CEP_RULE_WINDOW_NONE_SERVICE_LAST;
+
+		// A rule that has not been given an event yet has nothing to report: whatever it says later is the doing of
+		// the values below and not of something it was created with.
+		$error = $this->getCepRuleError($rule_name);
+
+		$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error before any event: '.$error);
+
+		// 1. Neither limit resolves. The problem of the "down" value is opened by the trigger as always - the rule
+		//    does not stand between an event and its problem - and the rule reports the limit it could not parse.
+		$send('down_'.$unresolved_service);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForCepRuleError($rule_name, self::CEP_RULE_WINDOW_LIMITS_DURATION_ERROR);
+
+		// The "up" value of that id, the one that ends the window of its id and closes every problem the window
+		// held. There is no window for it to end, so it closes nothing and is left open as a problem of its own -
+		// "up" is not a recovery value for this trigger.
+		$send('up_'.$unresolved_service);
+		$this->waitForProblemEventCountByTag($all, 'service', $unresolved_service, 2);
+		$this->waitForOpenProblemCountByTag($all, 'service', $unresolved_service, 2);
+		$this->waitForOpenProblemCount($all, 2);
+
+		// 2. The duration macro is created, which leaves the capacity as the only limit that does not resolve.
+		$this->upsertGlobalMacro(self::CEP_WINDOW_DURATION_MACRO, self::CEP_RULE_WINDOW_LIMITS_DURATION);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		// A window needs both of its limits, so the second id fares exactly as the first one did - only the message
+		// the rule reports moves on to the limit that is now the unresolvable one.
+		$send('down_'.$capacity_service);
+		$this->waitForOpenProblemCount($all, 3);
+		$this->waitForCepRuleError($rule_name, self::CEP_RULE_WINDOW_LIMITS_CAPACITY_ERROR);
+
+		$send('up_'.$capacity_service);
+		$this->waitForProblemEventCountByTag($all, 'service', $capacity_service, 2);
+		$this->waitForOpenProblemCountByTag($all, 'service', $capacity_service, 2);
+		$this->waitForOpenProblemCount($all, 4);
+
+		// 3. Both macros exist now, and nothing about the rule was changed to get there.
+		$this->upsertGlobalMacro(self::CEP_WINDOW_CAPACITY_MACRO, (string) self::CEP_RULE_WINDOW_LIMITS_CAPACITY);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		// The "down" value of the third id is the first one the rule can open a window for, and opening it is what
+		// takes the error away: a rule that had been failing on every event reports none again without having been
+		// touched itself.
+		$send('down_'.$resolved_service);
+		$this->waitForOpenProblemCount($all, 5);
+		$this->waitForCepRuleError($rule_name, '');
+
+		// And the window it opened is a window like any other: the "up" value of the id ends it and both problems of
+		// that id are closed with it - the "down" one the window held and the "up" one that ended it.
+		$send('up_'.$resolved_service);
+		$this->waitForProblemEventCountByTag($all, 'service', $resolved_service, 2);
+		$this->waitForOpenProblemCountByTag($all, 'service', $resolved_service, 0);
+
+		// 4. Only the id that had a window was affected. The events of the two ids sent while the limits did not
+		//    resolve were never in one, so there is nothing of theirs for the working rule to close - all four of
+		//    their problems are still open.
+		$this->waitForOpenProblemCount($all, 4);
+		$this->waitForOpenProblemCountByTag($all, 'service', $unresolved_service, 2);
+		$this->waitForOpenProblemCountByTag($all, 'service', $capacity_service, 2);
+
+		// The rule closed what it could without failing on any of it, so nothing of the recovery was a rule that had
+		// started reporting something else.
+		$error = $this->getCepRuleError($rule_name);
+
+		$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error once its limits resolved: '
+			.$error
+		);
+
+		// Nothing of the rule can reach the four problems left, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the unresolved limits scenario of "'.$rule_name.'"');
+	}
+
+	/**
 	 * Drive the cause and symptom grouping flavour: every value goes into the same group, so the problem of
 	 * the first one becomes the cause and each of the following ones becomes a symptom of it as it arrives.
 	 * Nothing closes anything, so all three problems stay open, ranked but otherwise untouched, and the
@@ -12493,6 +12861,32 @@ HEREDOC;
 		]);
 
 		return $response['result'] ? $response['result'][0]['error'] : '';
+	}
+
+	/**
+	 * Wait until the CEP rule named $name reports exactly the $expected error, an empty string being a rule that
+	 * reports none - which is what a rule whose error was cleared has to come back to, so both directions are
+	 * waited for the same way.
+	 *
+	 * The error is recorded by the server rather than by whatever asked it to do the work, so it arrives after the
+	 * event that caused it has been assessed and is polled for instead of being read once. What the rule reports
+	 * while the wait goes on is what the failure names: an error that never appeared and the one that appeared
+	 * instead are told apart by it, see runEventAssessmentTestCepWindowUnresolvedLimits().
+	 */
+	private function waitForCepRuleError(string $name, string $expected): void {
+		$this->callUntilDataIsPresent('ceprule.get', [
+			'filter' => ['name' => $name],
+			'output' => ['cep_ruleid', 'error']
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($name, $expected) {
+			$error = $response['result'][0]['error'];
+
+			if ($error === $expected) {
+				return true;
+			}
+
+			return 'the rule "'.$name.'" reports '.($error === '' ? 'no error' : '"'.$error.'"').', expected '
+				.($expected === '' ? 'none' : '"'.$expected.'"');
+		});
 	}
 
 	/**
