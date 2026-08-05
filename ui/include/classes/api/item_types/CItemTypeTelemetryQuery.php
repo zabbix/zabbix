@@ -332,11 +332,11 @@ class CItemTypeTelemetryQuery extends CItemType {
 	/**
 	 * Deserialize "item.query" field from JSON string for API output.
 	 *
-	 * @param string $query       JSON encoded string with "item.query" configuration
-	 * @param bool   $api_output  Set to false to convert "item.query.filter.formula" from "{0} or {1}" like notation
-	 *                            to "A or B" with additional key "formulaid" set for each condition.
+	 * @param string $query        JSON encoded string with "item.query" configuration
+	 * @param bool   $db_notation  Set to false to convert "item.query.filter.formula" from "{0} or {1}" like notation
+	 *                             to "A or B" with additional key "formulaid" set for each condition.
 	 */
-	public static function prepareQueryFieldForApi(string $query, bool $api_output): array {
+	public static function prepareQueryFieldForApi(string $query, bool $db_notation): array {
 		if ($query === '') {
 			return [];
 		}
@@ -347,7 +347,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 			return [];
 		}
 
-		if (!$api_output && $query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+		if (!$db_notation && $query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 			$i = 0;
 
 			foreach ($query['filter']['conditions'] as &$condition) {
