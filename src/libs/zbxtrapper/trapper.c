@@ -1372,8 +1372,19 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
 		}
+
+		return ret;
 	}
-	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
+
+	if (ZBX_TCP_SEC_UNENCRYPTED == sock->connection_type && NULL != config_comms->config_tls->tls_listen)
+	{
+		zabbix_log(LOG_LEVEL_WARNING,
+				"from %s: unencrypted connection not allowed", sock->peer);
+
+		return FAIL;
+	}
+
+	if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper received request for list of active checks");
 		ret = send_list_of_active_checks(sock, s, events_cbs, config_comms->config_timeout,
