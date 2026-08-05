@@ -176,8 +176,6 @@ class CControllerHostEdit extends CController {
 
 		$this->host = (array) $this->host + $this->getInputValues() + $this->getHostDefaultValues();
 
-		$can_select_server_for_monitoring = CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING);
-
 		$data = [
 			'form_action' => $this->host['hostid'] ? 'host.update' : 'host.create',
 			'hostid' => $this->host['hostid'],
@@ -190,7 +188,8 @@ class CControllerHostEdit extends CController {
 			'warnings' => [],
 			'user' => [
 				'debug_mode' => $this->getDebugMode(),
-				'can_edit_monitoring_by' => !$this->host['hostid'] || $can_select_server_for_monitoring
+				'can_edit_monitoring_by' => !$this->host['hostid']
+					|| CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
 			]
 		];
 
