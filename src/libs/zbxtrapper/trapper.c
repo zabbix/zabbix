@@ -1176,7 +1176,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	if ('{' != *s)
 	{
 		now = zbx_time();
-		dropped_count++;
 
 		if (5 <= now - last_log_time)
 		{
@@ -1192,18 +1191,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			last_log_time = now;
 			dropped_count = 0;
 		}
+		else
+		{
+			dropped_count++;
+		}
 
 		return FAIL;
 	}
 
-	if (0 != last_log_time && 0 < dropped_count)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "trapper dropped %d packets in the last %d seconds",
-				dropped_count, (int)(zbx_time() - last_log_time));
-	}
-
-	last_log_time = 0;
-	dropped_count = 0;
 
 	if (SUCCEED != zbx_json_open(s, &jp))
 	{
@@ -1240,14 +1235,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 	{
 #ifndef ZBX_DEBUG
-	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
 		recv_agenthistory(rtc, sock, &jp, ts, config_comms->config_timeout);
 	}
 	else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 	{
 #ifndef ZBX_DEBUG
-	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
 		recv_senderhistory(rtc, sock, &jp, ts, config_comms->config_timeout);
 	}
@@ -1259,7 +1254,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 	{
 #ifndef ZBX_DEBUG
-	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
 		ret = send_list_of_active_checks_json(sock, &jp, events_cbs, config_comms->config_timeout,
 				autoreg_update_host_cb);
