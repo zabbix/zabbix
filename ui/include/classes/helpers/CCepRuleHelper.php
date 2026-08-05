@@ -57,8 +57,7 @@ class CCepRuleHelper {
 	public const WHEN_EVENT_OCCURRED = 0;
 	public const WHEN_EVENT_EVICTED = 1;
 	public const WHEN_WINDOW_CLOSED = 2;
-	public const WHEN_TAGS_CORRELATED = 3; // TODO: Server has removed this type, API shall remove this too.
-	public const WHEN_PATTERN_MATCHED = 4;
+	public const WHEN_PATTERN_MATCHED = 3;
 
 	public const WINDOW_CONDITION_TAG_PAIR = 0;
 	public const WINDOW_CONDITION_OLD_TAG = 1;
@@ -88,7 +87,6 @@ class CCepRuleHelper {
 		self::WINDOW_TAG_MATCH => [
 			self::WHEN_EVENT_EVICTED,
 			self::WHEN_EVENT_OCCURRED,
-			self::WHEN_TAGS_CORRELATED,
 			self::WHEN_WINDOW_CLOSED
 		],
 		self::WINDOW_PATTERN_MATCH => [
@@ -151,22 +149,6 @@ class CCepRuleHelper {
 			self::OP_DECREASE_TAG_VALUE,
 			self::OP_RENAME_TAG,
 			self::OP_REMOVE_TAG
-		],
-		self::WHEN_TAGS_CORRELATED => [
-			self::OP_SET_NAME,
-			self::OP_CLOSE,
-			self::OP_SET_SEVERITY,
-			self::OP_INCREASE_SEVERITY,
-			self::OP_DECREASE_SEVERITY,
-			self::OP_SUPPRESS,
-			self::OP_ADD_TAG,
-			self::OP_SET_TAG,
-			self::OP_SET_TAG_VALUE,
-			self::OP_INCREASE_TAG_VALUE,
-			self::OP_DECREASE_TAG_VALUE,
-			self::OP_RENAME_TAG,
-			self::OP_REMOVE_TAG,
-			self::OP_CLOSE_WINDOW
 		],
 		self::WHEN_PATTERN_MATCHED => [
 			self::OP_DISCARD,
