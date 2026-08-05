@@ -1269,6 +1269,7 @@ void	cep_window_pool_remove_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t
 		return;
 
 	zbx_hashset_remove_direct(&pool->windows, window->ref);
+	window->location = CEP_LOCATION_REMOVED;
 }
 
 /******************************************************************************
