@@ -2,6 +2,7 @@ PERFORMANCE_RATIO_THRESHOLD=3.0
 
 declare -A BASELINE_TIMES=(
   [Integration]=4508
+  [testVfsFsGet]=730
   [testEscalations]=443
   [testProxyHa]=417
   [testNestedLLD]=385
