@@ -43,6 +43,11 @@ void	zbx_mock_test_entry(void **state)
 	zbx_pb_state_info_t		state_info;
 	zbx_mock_handle_t		hparam;
 	zbx_uint64_t			buffer_size;
+	/* fixed host fields written for every row; safe to hardcode since */
+	/* pb_discovery_check_age() only purges rows already in pb->discovery */
+	/* (empty here) and runs once, in zbx_pb_discovery_close() below      */
+	zbx_uint64_t			druleid = 1;
+	int				status = 1, clock = 1234567890;
 
 	ZBX_UNUSED(state);
 
@@ -74,7 +79,7 @@ void	zbx_mock_test_entry(void **state)
 	handle = zbx_pb_discovery_open();
 
 	for (i = 0; i < rows_written; i++)
-		zbx_pb_discovery_write_host(handle, 1, ip, dns, 1, 1234567890, err);
+		zbx_pb_discovery_write_host(handle, druleid, ip, dns, status, clock, err);
 
 	/* optional: force the Nth shmem allocation made while flushing the queued rows to
 	 * fail, to reach pb_discovery_add_row_mem()'s allocation-failure cleanup branches */
@@ -102,8 +107,11 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_str_eq("dns", dns, row->dns);
 		zbx_mock_assert_str_eq("value", "", row->value);
 		zbx_mock_assert_str_eq("error", err, row->error);
+		zbx_mock_assert_uint64_eq("druleid", druleid, row->druleid);
 		zbx_mock_assert_uint64_eq("dcheckid", 0, row->dcheckid);
 		zbx_mock_assert_int_eq("port", 0, row->port);
+		zbx_mock_assert_int_eq("status", status, row->status);
+		zbx_mock_assert_int_eq("clock", clock, row->clock);
 		count++;
 	}
 

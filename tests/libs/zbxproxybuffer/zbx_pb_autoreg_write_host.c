@@ -33,6 +33,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_pb_autoreg_t	*row;
 	const char		*host, *ip, *dns, *host_metadata;
 	int			i, rows_written, expected_rows, count, port, flags;
+	/* ZBX_TCP_SEC_UNENCRYPTED (zbxcomms.h not included, avoid pulling in libzbxcomms) */
+	int			connection_type = 1;
 	zbx_list_iterator_t	li;
 	struct zbx_json		j;
 	zbx_uint64_t		lastid = 0;
@@ -78,12 +80,11 @@ void	zbx_mock_test_entry(void **state)
 
 	for (i = 0; i < rows_written; i++)
 	{
-		/* connection_type=1 == ZBX_TCP_SEC_UNENCRYPTED (zbxcomms.h not included).
-		 * Use current time: pb_autoreg_check_age() purges rows where
+		/* use current time: pb_autoreg_check_age() purges rows where
 		 * now - clock > offline_buffer (0); a stale hardcoded clock causes every
-		 * row written after the first to immediately evict its predecessor.    */
+		 * row written after the first to immediately evict its predecessor. */
 		zbx_pb_autoreg_write_host(host, ip, dns, (unsigned short)port,
-				1, host_metadata, flags, (int)time(NULL));
+				connection_type, host_metadata, flags, (int)time(NULL));
 	}
 
 	zbx_pb_mock_fail_alloc_at(0);
@@ -103,6 +104,7 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_str_eq("host_metadata", host_metadata, row->host_metadata);
 		zbx_mock_assert_int_eq("listen_port", port, row->listen_port);
 		zbx_mock_assert_int_eq("flags", flags, row->flags);
+		zbx_mock_assert_int_eq("tls_accepted", connection_type, row->tls_accepted);
 		count++;
 	}
 

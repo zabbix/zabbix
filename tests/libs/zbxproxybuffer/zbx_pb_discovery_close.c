@@ -35,6 +35,11 @@ void	zbx_mock_test_entry(void **state)
 	const char		*ip, *dns, *value;
 	int			i, rows_written, expected_rows, count;
 	zbx_list_iterator_t	li;
+	/* fixed service fields written for every row; safe to hardcode since */
+	/* pb_discovery_check_age() only purges rows already in pb->discovery */
+	/* (empty here) and runs once, in zbx_pb_discovery_close() below     */
+	zbx_uint64_t		druleid = 1, dcheckid = 1;
+	int			port = 80, status = 0, clock = 1234567890;
 
 	ZBX_UNUSED(state);
 
@@ -54,7 +59,7 @@ void	zbx_mock_test_entry(void **state)
 	handle = zbx_pb_discovery_open();
 
 	for (i = 0; i < rows_written; i++)
-		zbx_pb_discovery_write_service(handle, 1, 1, ip, dns, 80, 0, value, 1234567890);
+		zbx_pb_discovery_write_service(handle, druleid, dcheckid, ip, dns, port, status, value, clock);
 
 	zbx_pb_discovery_close(handle);
 
@@ -69,6 +74,11 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_str_eq("ip", ip, row->ip);
 		zbx_mock_assert_str_eq("dns", dns, row->dns);
 		zbx_mock_assert_str_eq("value", value, row->value);
+		zbx_mock_assert_uint64_eq("druleid", druleid, row->druleid);
+		zbx_mock_assert_uint64_eq("dcheckid", dcheckid, row->dcheckid);
+		zbx_mock_assert_int_eq("port", port, row->port);
+		zbx_mock_assert_int_eq("status", status, row->status);
+		zbx_mock_assert_int_eq("clock", clock, row->clock);
 		count++;
 	}
 
