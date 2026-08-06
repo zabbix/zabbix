@@ -33,6 +33,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a \
@@ -151,7 +152,16 @@ cpus_test_LDADD += @AGENT_LIBS@
 
 cpus_test_WRAP_FUNCS = \
 	-Wl,--wrap=cpu_collector_started \
-	-Wl,--wrap=get_collector 
+	-Wl,--wrap=get_collector \
+	-Wl,--wrap=fopen \
+	-Wl,--wrap=fclose \
+	-Wl,--wrap=fgets \
+	-Wl,--wrap=open \
+	-Wl,--wrap=close \
+	-Wl,--wrap=lseek \
+	-Wl,--wrap=fstat \
+	-Wl,--wrap=__fxstat \
+	-Wl,--wrap=stat
 
 cpus_test_LDFLAGS = @AGENT_LDFLAGS@ $(cpus_test_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
