@@ -3602,10 +3602,12 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 
 		if (ITEM_TYPE_SNMPTRAP == item->type)
 		{
-			interface_snmpitem = (ZBX_DC_INTERFACE_ITEM *)DCfind_id(&config->interface_snmpitems,
-					item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found);
+			int	found_trap;
 
-			if (0 == found)
+			interface_snmpitem = (ZBX_DC_INTERFACE_ITEM *)DCfind_id(&config->interface_snmpitems,
+					item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found_trap);
+
+			if (0 == found_trap)
 			{
 				zbx_vector_uint64_create_ext(&interface_snmpitem->itemids,
 						__config_shmem_malloc_func,
@@ -3665,7 +3667,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 				}
 			}
 
-			if (ITEM_STATE_NOTSUPPORTED != state &&
+			if (ITEM_STATE_NOTSUPPORTED != state && 1 == found &&
 					0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), old_type))
 			{
 				AGENT_RESULT	r = {0};
