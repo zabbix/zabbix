@@ -509,7 +509,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			$ms_proxy = [$resolved_proxy];
 			$ms_proxy_inaccessible = $resolved_proxy['inaccessible'];
 		}
-		elseif ($this->host['proxy_groupid'] != 0) {
+		elseif (array_key_exists('proxy_groupid', $this->host) && $this->host['proxy_groupid'] != 0) {
 			$accessible_proxy_group = API::ProxyGroup()->get([
 				'output' => ['proxy_groupid', 'name'],
 				'proxy_groupids' => [$this->host['proxy_groupid']]
