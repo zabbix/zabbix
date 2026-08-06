@@ -527,7 +527,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return $payload;
 	}
 
-	/* TODO: do something with float/int not matching failing the test */
 	private function getSubcases(): array {
 		return [
 			[
@@ -1253,6 +1252,30 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		$this->assertEquals(200, $http_code, 'Unexpected http code: ' . $http_code . ', response: ' . $response);
 	}
 
+	private static function normalizeValue(mixed $value): mixed {
+		if (is_int($value) || is_float($value)) {
+			return (float) $value;
+		}
+		return $value;
+	}
+
+	private static function normalizeBucket(array $bucket): array {
+		if (isset($bucket['id'])) {
+			$bucket['id'] = self::normalizeValue($bucket['id']);
+		}
+
+		if (!isset($bucket['columns']) || !is_array($bucket['columns'])) {
+			return $bucket;
+		}
+
+		foreach ($bucket['columns'] as &$value) {
+			$value = self::normalizeValue($value);
+		}
+		unset($value);
+
+		return $bucket;
+	}
+
 	private function executeSubcase(int $hostid, array $subcase) {
 		$msg = $subcase['description'];
 
@@ -1282,7 +1305,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			$this->assertArrayHasKey('timestamp', $value, $msg);
 			unset($value['timestamp']);
 
-			$this->assertSame($expected_buckets[$i], $value, $msg);
+			$this->assertSame(self::normalizeBucket($expected_buckets[$i]), self::normalizeBucket($value), $msg);
 		}
 
 		$this->deleteTQItem($itemid);
