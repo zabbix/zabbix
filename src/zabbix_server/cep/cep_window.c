@@ -198,14 +198,14 @@ static int	cep_window_get_limits(const zbx_cep_rule_t *rule, int *duration, int 
 	if (SUCCEED != zbx_is_time_suffix(duration_str, duration, ZBX_LENGTH_UNLIMITED))
 	{
 		if (NULL != error)
-			*error = zbx_dsprintf(NULL, "Invalid CEP window duration %s.\n", duration_str);
+			*error = zbx_dsprintf(NULL, "Invalid CEP window duration \"%s\".\n", duration_str);
 		goto out;
 	}
 
 	if (SUCCEED != zbx_is_int(capacity_str, capacity))
 	{
 		if (NULL != error)
-			*error = zbx_dsprintf(NULL, "Invalid CEP window capacity %s.\n", capacity_str);
+			*error = zbx_dsprintf(NULL, "Invalid CEP window capacity \"%s\".\n", capacity_str);
 		goto out;
 	}
 
