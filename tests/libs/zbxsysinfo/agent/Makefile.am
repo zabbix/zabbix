@@ -16,7 +16,7 @@ COMMON_LIB_FILES = \
 COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests
 
 modbus_get_SOURCES = \
-	modbus_get.c
+	modbus_get.c \
 	../../../zbxmocktest.h
 
 modbus_get_LDADD = \
