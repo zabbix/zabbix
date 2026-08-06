@@ -1016,18 +1016,19 @@ void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_t
 	}
 
 	limit_update = cep_window_get_limits(rule, &duration, &capacity, &error);
-	ret = cep_window_js_prepare(window, &es, &error);
 
 	cep_window_lock(window);
-
-	if (SUCCEED != ret)
-		goto enqueue;
 
 	if (SUCCEED == limit_update)
 	{
 		window->duration = duration;
 		window->capacity = capacity;
 	}
+
+	ret = cep_window_js_prepare(window, &es, &error);
+
+	if (SUCCEED != ret)
+		goto enqueue;
 
 	cep_window_evict_expired(window, rule, now, tasks);
 

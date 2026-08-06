@@ -488,6 +488,9 @@ void	cep_event_context_clear(zbx_cep_event_context_t *ctx)
 	if (NULL != ctx->hevent)
 		zbx_cep_event_handle_release(ctx->hevent);
 
+	if (NULL != ctx->db_event_local)
+		zbx_db_free_event(ctx->db_event_local);
+
 	/* db_event is owned by the task, not event context */
 }
 
@@ -672,17 +675,21 @@ zbx_cep_event_t *cep_event_context_get_mutable_event(zbx_cep_event_context_t *ct
  * Comments: The db event is created from the event backed by with context.   *
  *                                                                            *
  ******************************************************************************/
-zbx_db_event *cep_event_context_get_db_event(zbx_cep_event_context_t *ctx)
+const zbx_db_event *cep_event_context_get_db_event(zbx_cep_event_context_t *ctx)
 {
 	if (NULL == ctx->db_event)
 	{
-		zbx_cep_event_t	*event = cep_event_context_get_event(ctx);
-
-		if (NULL != event)
+		if (NULL == ctx->db_event_local)
 		{
-			ctx->db_event = cep_db_event_create(&event->origin, event->name, event->clock, event->ns,
-					event->severity, event->value, &event->tags);
+			zbx_cep_event_t	*event = cep_event_context_get_event(ctx);
+
+			if (NULL != event)
+			{
+				ctx->db_event_local = cep_db_event_create(&event->origin, event->name, event->clock,
+						event->ns, event->severity, event->value, &event->tags);
+			}
 		}
+		ctx->db_event = ctx->db_event_local;
 	}
 
 	return ctx->db_event;
@@ -769,7 +776,7 @@ zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx)
 static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int scope,
 		zbx_macro_resolv_func_t resolver, char **str)
 {
-	zbx_db_event		*db_event;
+	const zbx_db_event	*db_event;
 	zbx_dc_um_handle_t	*um_handle;
 
 	if (NULL == strchr(*str, '{'))
