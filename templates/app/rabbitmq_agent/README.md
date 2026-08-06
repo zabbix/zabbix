@@ -100,7 +100,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.cluster.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Health Check 3.8.10+ discovery
 
