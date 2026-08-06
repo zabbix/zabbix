@@ -743,7 +743,6 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			}
 
 			$provider += [
-				'url' => '',
 				'db' => '',
 				'username' => '',
 				'password' => '',
