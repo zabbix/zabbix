@@ -730,6 +730,12 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 				));
 			}
 
+			if ($provider['provider'] === 'zabbix') {
+				$results[] = $provider;
+
+				continue;
+			}
+
 			if (!array_key_exists('url', $provider)) {
 				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
 					_s('the parameter "%1$s" is missing', 'url')
@@ -810,7 +816,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 				foreach (['ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'ssl_ca_location'] as $tls_key) {
 					if ($provider[$tls_key]) {
 						self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.$tls_key,
-							_s('should be empty if the url scheme is not https')
+							_s('should be empty if the url scheme is not "https"')
 						));
 					}
 				}
