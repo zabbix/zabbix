@@ -1248,6 +1248,7 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 		if (SUCCEED != cep_window_get_limits(rule, &ref->window->duration, &ref->window->capacity, error))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
+			ref->window->location = CEP_LOCATION_REMOVED;
 			zbx_hashset_remove_direct(&pool->windows, ref);
 			return NULL;
 		}
