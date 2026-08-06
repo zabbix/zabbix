@@ -596,12 +596,13 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				]
 			],
 			[
-				'description' => 'Traces columns, aggregates, all aggregate functions and formula filter test',
+				'description' => 'Traces all columns test with EXPRESSION evaltype',
 				'item' => self::tqItem(
 					APM_SIGNAL_TYPE_TRACES,
 					APM_METRICS_POINT_SUM,
 					[
 						self::qcol('Timestamp'),
+						self::qcol('TraceId'),
 						self::qcol('SpanId'),
 						self::qcol('ParentSpanId'),
 						self::qcol('TraceState'),
@@ -652,6 +653,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						'id' => 1,
 						'columns' => [
 							'Timestamp' => $now - 10,
+							'TraceId' => '4123456789abcdef0123456789abcdef',
 							'SpanId' => '5122334455667788',
 							'ParentSpanId' => '6122334455667788',
 							'TraceState' => 'vendor=value',
@@ -681,7 +683,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				]
 			],
 			[
-				'description' => 'Logs columns, aggregates and AND filter test',
+				'description' => 'Logs all columns test with AND evaltype',
 				'item' => self::tqItem(
 					APM_SIGNAL_TYPE_LOGS,
 					APM_METRICS_POINT_SUM,
@@ -764,7 +766,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				]
 			],
 			[
-				'description' => 'Metrics sum all columns, aggregates and OR filter test',
+				'description' => 'Metrics sum all columns test with OR evaltype',
 				'item' => self::tqItem(
 					APM_SIGNAL_TYPE_METRICS,
 					APM_METRICS_POINT_SUM,
@@ -804,7 +806,14 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('ResourceAttributes', CONDITION_OPERATOR_EXISTS, '', 'host.name'),
 						self::qcond('ScopeAttributes', CONDITION_OPERATOR_EQUAL, 'sum-scope-value', 'scope.attr'),
 						self::qcond('Attributes', CONDITION_OPERATOR_EQUAL, '/sum', 'endpoint'),
-						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr')
+						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr'),
+						self::qcond('ResourceSchemaUrl', CONDITION_OPERATOR_LIKE, 'resource/sum'),
+						self::qcond('ScopeName', CONDITION_OPERATOR_EQUAL, 'sum-test-scope'),
+						self::qcond('ScopeVersion', CONDITION_OPERATOR_EQUAL, '1.0.0'),
+						self::qcond('ScopeSchemaUrl', CONDITION_OPERATOR_LIKE, 'scope/sum'),
+						self::qcond('ServiceName', CONDITION_OPERATOR_EQUAL, 'sum-test-service'),
+						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'sum description'),
+						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'requests')
 					])
 				),
 				'buckets' => fn(int $now) => [
@@ -847,7 +856,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				]
 			],
 			[
-				'description' => 'Metrics gauge columns, timestamp aggregates and empty AND_OR filter test',
+				'description' => 'Metrics gauge all columns test with AND_OR evaltype',
 				'item' => self::tqItem(
 					APM_SIGNAL_TYPE_METRICS,
 					APM_METRICS_POINT_GAUGE,
@@ -876,7 +885,20 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qagg('ScopeDroppedAttrCount', AGGREGATE_SUM, 'scope_dropped_sum'),
 						self::qagg('Value', AGGREGATE_AVG, 'value_avg')
 					],
-					self::emptyFilter()
+					self::qfilter(CONDITION_EVAL_TYPE_AND_OR, [
+						self::qcond('ResourceAttributes', CONDITION_OPERATOR_EXISTS, '', 'host.name'),
+						self::qcond('ResourceSchemaUrl', CONDITION_OPERATOR_LIKE, 'schemas/1.0.0'),
+						self::qcond('ScopeName', CONDITION_OPERATOR_EQUAL, 'test-scope'),
+						self::qcond('ScopeVersion', CONDITION_OPERATOR_EQUAL, '1.0.0'),
+						self::qcond('ScopeAttributes', CONDITION_OPERATOR_EQUAL, 'scope-value', 'scope.attr'),
+						self::qcond('ScopeSchemaUrl', CONDITION_OPERATOR_LIKE, 'scope/1.0.0'),
+						self::qcond('ServiceName', CONDITION_OPERATOR_EQUAL, 'gauge-test-service'),
+						self::qcond('MetricName', CONDITION_OPERATOR_EQUAL, 'test_gauge'),
+						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'Test description'),
+						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms'),
+						self::qcond('Attributes', CONDITION_OPERATOR_EQUAL, 'grpcurl', 'method'),
+						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr')
+					])
 				),
 				'buckets' => fn(int $now) => [
 					[
@@ -912,7 +934,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				]
 			],
 			[
-				'description' => 'Metrics histogram columns, aggregates and AND_OR complex condition test',
+				'description' => 'Metrics histogram all columns test with AND_OR evaltype',
 				'item' => self::tqItem(
 					APM_SIGNAL_TYPE_METRICS,
 					APM_METRICS_POINT_HISTOGRAM,
@@ -952,7 +974,16 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					self::qfilter(CONDITION_EVAL_TYPE_AND_OR, [
 						self::qcond('MetricName', CONDITION_OPERATOR_EQUAL, 'test_histogram'),
 						self::qcond('Attributes', CONDITION_OPERATOR_EQUAL, '/histogram', 'endpoint'),
-						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr')
+						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr'),
+						self::qcond('ResourceAttributes', CONDITION_OPERATOR_EXISTS, '', 'host.name'),
+						self::qcond('ResourceSchemaUrl', CONDITION_OPERATOR_LIKE, 'resource/histogram'),
+						self::qcond('ScopeName', CONDITION_OPERATOR_EQUAL, 'histogram-test-scope'),
+						self::qcond('ScopeVersion', CONDITION_OPERATOR_EQUAL, '1.0.0'),
+						self::qcond('ScopeAttributes', CONDITION_OPERATOR_EQUAL, 'histogram-scope-value', 'scope.attr'),
+						self::qcond('ScopeSchemaUrl', CONDITION_OPERATOR_LIKE, 'scope/histogram'),
+						self::qcond('ServiceName', CONDITION_OPERATOR_EQUAL, 'histogram-test-service'),
+						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'histogram description'),
+						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms')
 					])
 				),
 				'buckets' => fn(int $now) => [
@@ -997,7 +1028,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				]
 			],
 			[
-				'description' => 'Metrics exponential histogram columns and aggregates test',
+				'description' => 'Metrics exponential histogram all columns test with AND evaltype',
 				'item' => self::tqItem(
 					APM_SIGNAL_TYPE_METRICS,
 					APM_METRICS_POINT_EXPHISTOGRAM,
@@ -1045,7 +1076,16 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					self::qfilter(CONDITION_EVAL_TYPE_AND, [
 						self::qcond('MetricName', CONDITION_OPERATOR_EQUAL, 'test_exponential_histogram'),
 						self::qcond('Attributes', CONDITION_OPERATOR_EQUAL, '/exponential-histogram', 'endpoint'),
-						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr')
+						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr'),
+						self::qcond('ResourceAttributes', CONDITION_OPERATOR_EXISTS, '', 'host.name'),
+						self::qcond('ResourceSchemaUrl', CONDITION_OPERATOR_LIKE, 'resource/exponential-histogram'),
+						self::qcond('ScopeName', CONDITION_OPERATOR_EQUAL, 'exponential-histogram-test-scope'),
+						self::qcond('ScopeVersion', CONDITION_OPERATOR_EQUAL, '1.0.0'),
+						self::qcond('ScopeAttributes', CONDITION_OPERATOR_EQUAL, 'exponential-histogram-scope-value', 'scope.attr'),
+						self::qcond('ScopeSchemaUrl', CONDITION_OPERATOR_LIKE, 'scope/exponential-histogram'),
+						self::qcond('ServiceName', CONDITION_OPERATOR_EQUAL, 'exponential-histogram-test-service'),
+						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'exponential histogram description'),
+						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms')
 					])
 				),
 				'buckets' => fn(int $now) => [
