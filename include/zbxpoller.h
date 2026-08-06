@@ -57,7 +57,6 @@ typedef struct
 	zbx_get_value_internal_ext_f	zbx_get_value_internal_ext_cb;
 	const char			*config_ssh_key_location;
 	const char			*config_webdriver_url;
-	zbx_uint32_t			config_denyitemtypes_mask;
 }
 zbx_thread_poller_args;
 
@@ -76,7 +75,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
-		const char *config_webdriver_url, zbx_uint32_t config_denyitemtypes_mask);
+		const char *config_webdriver_url);
 void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_clean_agent_items(zbx_dc_agent_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_clean_snmp_items(zbx_dc_snmp_item_t *items, int num, AGENT_RESULT *results);
