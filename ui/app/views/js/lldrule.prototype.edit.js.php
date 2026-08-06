@@ -33,7 +33,8 @@ window.lldrule_prototype_edit = new class {
 	#tabs;
 	#testable_item_types;
 
-	init({rules, test_rules, testable_item_types, lldrule, host, field_switches, interface_types, return_url}) {
+	init({rules, test_rules, testable_item_types, lldrule, host, inherited_timeouts, field_switches, interface_types,
+			return_url}) {
 		this.#overlay = overlays_stack.getById('lldrule.prototype.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
@@ -56,7 +57,7 @@ window.lldrule_prototype_edit = new class {
 				lldrule: lldrule,
 				host_interfaces: host.interfaces,
 				readonly: (lldrule.templated || lldrule.discovered),
-				inherited_timeouts: lldrule.inherited_timeouts
+				inherited_timeouts: inherited_timeouts
 			}),
 			preprocessing: new ItemEditPreprocessingTab({
 				container: document.getElementById('processing-tab'),

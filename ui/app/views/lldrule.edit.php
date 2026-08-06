@@ -190,6 +190,7 @@ $output = [
 			'testable_item_types' => $data['testable_item_types'],
 			'lldrule' => $lldrule,
 			'host' => $data['host'],
+			'inherited_timeouts' => $data['inherited_timeouts'],
 			'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => true]),
 			'interface_types' => itemTypeInterface(),
 			'return_url' => $return_url

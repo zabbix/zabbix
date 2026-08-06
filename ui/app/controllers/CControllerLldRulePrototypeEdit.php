@@ -225,7 +225,7 @@ class CControllerLldRulePrototypeEdit extends CController
 
 	public function doAction(): void {
 		$host = $this->getInput('context') === 'host' ? $this->host : $this->template;
-		$lldrule = $this->getLldRuleData($host);
+		[$lldrule, $inherited_timeouts] = $this->getLldRuleData($host);
 
 		$data = [
 			'itemid' => $lldrule['itemid'],
@@ -236,6 +236,7 @@ class CControllerLldRulePrototypeEdit extends CController
 			'preprocessing_types' => CDiscoveryRulePrototype::SUPPORTED_PREPROCESSING_TYPES,
 			'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD_PROTOTYPE,
 			'lldrule' => $lldrule,
+			'inherited_timeouts' => $inherited_timeouts,
 			'readonly' => $lldrule['templated'] || $lldrule['discovered_lld'],
 			'can_edit_source_timeouts' => ($this->host && $this->host['proxyid'])
 				? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
@@ -294,9 +295,9 @@ class CControllerLldRulePrototypeEdit extends CController
 			$item['discoveryData']['lldruleid'] = $parent_lld['itemid'];
 		}
 
-		$item['inherited_timeouts'] = getInheritedTimeouts($host['proxyid'])['timeouts'];
-		$item['inherited_timeout'] = array_key_exists($item['type'], $item['inherited_timeouts'])
-			? $item['inherited_timeouts'][$item['type']] : '';
+		$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
+		$item['inherited_timeout'] = array_key_exists($item['type'], $inherited_timeouts)
+			? $inherited_timeouts[$item['type']] : '';
 
 		if ($item['timeout'] === DB::getDefault('items', 'timeout')) {
 			$item['timeout'] = $item['inherited_timeout'];
@@ -318,6 +319,6 @@ class CControllerLldRulePrototypeEdit extends CController
 
 		CArrayHelper::sort($item['overrides'], ['step']);
 
-		return $item;
+		return [$item, $inherited_timeouts];
 	}
 }
