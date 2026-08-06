@@ -225,7 +225,7 @@ static void	test_system_cpu_discovery(void)
 }
 
 #undef TEST_NAME
-#define TEST_NAME 	"ZBX_UPDATE_CPU_COUNTERS_TEST:"
+#define TEST_NAME	"ZBX_UPDATE_CPU_COUNTERS_TEST:"
 
 static void	test_update_cpu_counters(void)
 {
