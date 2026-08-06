@@ -767,7 +767,7 @@ window.item_edit_form = new class {
 		const is_metrics = parseInt(this.field.signal_type.value, 10) === APM_SIGNAL_TYPE_METRICS;
 		const switcher = globalAllObjForViewSwitcher['type'];
 
-		// "Metric points" is shown only for "APM metrics".
+		// "Metric points" is shown only for "Metrics".
 		['js-item-metric-point-type-label', 'js-item-metric-point-type-field'].forEach(
 			id => switcher[is_metrics ? 'showObj' : 'hideObj']({id})
 		);

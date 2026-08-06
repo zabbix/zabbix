@@ -654,9 +654,9 @@ $formgrid
 				->setId('signal_type')
 				->setValue($item['signal_type'])
 				->addOptions(CSelect::createOptionsFromArray([
-					APM_SIGNAL_TYPE_TRACES => _('APM traces'),
-					APM_SIGNAL_TYPE_METRICS => _('APM metrics'),
-					APM_SIGNAL_TYPE_LOGS => _('APM logs')
+					APM_SIGNAL_TYPE_TRACES => _('Traces'),
+					APM_SIGNAL_TYPE_METRICS => _('Metrics'),
+					APM_SIGNAL_TYPE_LOGS => _('Logs')
 				]))
 				->setReadonly($readonly)
 		))->setId('js-item-signal-type-field')
