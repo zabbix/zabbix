@@ -23,7 +23,7 @@ class CControllerApmDbUpdate extends CController {
 
 	public static function getValidationRules(): array {
 		$status_enabled = ['status', 'in' => [1]];
-		$auth_type_basic = ['authentication_type', 'in' => [APM_AUTH_TYPE_PASSWORD]];
+		$auth_type_password = ['authentication_type', 'in' => [APM_AUTH_TYPE_PASSWORD]];
 		$auth_type_vault_path = ['authentication_type', 'in' => [APM_AUTH_TYPE_VAULT_PATH]];
 
 		return ['object', 'fields' => [
@@ -35,8 +35,8 @@ class CControllerApmDbUpdate extends CController {
 				'when' => $status_enabled
 			],
 			'username' => ['string', 'required', 'not_empty', 'length' => 255,
-				'when' => [$status_enabled, $auth_type_basic]],
-			'password' => ['string', 'required', 'length' => 255, 'when' => [$status_enabled, $auth_type_basic]],
+				'when' => [$status_enabled, $auth_type_password]],
+			'password' => ['string', 'required', 'length' => 255, 'when' => [$status_enabled, $auth_type_password]],
 			'vault_path' => ['string', 'required', 'not_empty', 'length' => 255,
 				'when' => [$status_enabled, $auth_type_vault_path]],
 			'db' => ['string', 'required', 'length' => 255, 'when' => $status_enabled],
