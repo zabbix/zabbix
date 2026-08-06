@@ -83,18 +83,17 @@ var metricsMeta = map[string]handlerFunc{ //nolint:gochecknoglobals
 var (
 	//nolint:gochecknoglobals
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
-		WithValidator(uri.URIValidator{Defaults: dbconn.URIDefaults, AllowedSchemes: []string{"tcp", "tcps"}}). //nolint:gci,gofmt,lll //here and next - suppress linter's dislike of newlines in fluent builder
-		WithDefault(dbconn.URIDefaults.Scheme + "://localhost:" + dbconn.URIDefaults.Port).
-		WithSession()
+			WithValidator(uri.URIValidator{Defaults: dbconn.URIDefaults, AllowedSchemes: []string{"tcp", "tcps"}}).
+			WithDefault(dbconn.URIDefaults.Scheme + "://localhost:" + dbconn.URIDefaults.Port).
+			WithSession()
 	//nolint:gochecknoglobals
-	paramUsername = metric.NewConnParam("User", "Oracle user.").
-		WithDefault("") //nolint:gci,gofmt
+	paramUsername = metric.NewConnParam("User", "Oracle user.").WithDefault("")
 	//nolint:gochecknoglobals
-	paramPassword = metric.NewConnParam("Password", "User's password.").
-		WithDefault("") //nolint:gci,gofmt
+	paramPassword = metric.NewConnParam("Password", "User's password.").WithDefault("")
 	//nolint:gochecknoglobals
-	paramService = metric.NewConnParam("Service", "Service name to be used for connection.").
-		WithDefault("XE") //nolint:gci,gofmt
+	paramService = metric.NewConnParam("Service", "Service name to be used for connection.").WithDefault("XE")
+	//nolint:gochecknoglobals
+	paramConnTimeout = metric.NewSessionOnlyParam("ConnectionTimeout", "Time for connection to timeout.")
 )
 
 var metrics = metric.MetricSet{ //nolint:gochecknoglobals
@@ -102,14 +101,14 @@ var metrics = metric.MetricSet{ //nolint:gochecknoglobals
 		"Returns ASM disk groups statistics.",
 		[]*metric.Param{
 			paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("Diskgroup", "Diskgroup name."),
+			metric.NewParam("Diskgroup", "Diskgroup name."), paramConnTimeout,
 		},
 		false,
 	),
 
 	keyASMDiskGroupsDiscovery: metric.New(
 		"Returns list of ASM disk groups in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
@@ -117,14 +116,14 @@ var metrics = metric.MetricSet{ //nolint:gochecknoglobals
 		"Returns archive logs statistics.",
 		[]*metric.Param{
 			paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("Destination", "Destination name."),
+			metric.NewParam("Destination", "Destination name."), paramConnTimeout,
 		},
 		false,
 	),
 
 	keyArchiveDiscovery: metric.New(
 		"Returns list of archive logs in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
@@ -132,7 +131,7 @@ var metrics = metric.MetricSet{ //nolint:gochecknoglobals
 		"Returns CDBs info.",
 		[]*metric.Param{
 			paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("Database", "Database name."),
+			metric.NewParam("Database", "Database name."), paramConnTimeout,
 		},
 		false,
 	),
@@ -144,32 +143,32 @@ var metrics = metric.MetricSet{ //nolint:gochecknoglobals
 			metric.NewParam(
 				"QueryName", "Name of a custom query "+
 					"(must be equal to a name of an SQL file without an extension).",
-			).SetRequired(),
+			).SetRequired(), paramConnTimeout,
 		},
 		true,
 	),
 
 	keyDataFiles: metric.New(
 		"Returns data files statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
 	keyDatabasesDiscovery: metric.New(
 		"Returns list of databases in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
 	keyFRA: metric.New(
 		"Returns FRA statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
 	keyInstance: metric.New(
 		"Returns instance stats.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
@@ -177,44 +176,44 @@ var metrics = metric.MetricSet{ //nolint:gochecknoglobals
 		"Returns PDBs info.",
 		[]*metric.Param{
 			paramURI, paramUsername, paramPassword, paramService,
-			metric.NewParam("Database", "Database name."),
+			metric.NewParam("Database", "Database name."), paramConnTimeout,
 		},
 		false,
 	),
 
 	keyPDBDiscovery: metric.New(
 		"Returns list of PDBs in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
 	keyPGA: metric.New(
 		"Returns PGA statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
 	keyPing: metric.New(
 		"Tests if connection is alive or not.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
 	keyProc: metric.New(
 		"Returns processes statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
 	keyRedoLog: metric.New(
 		"Returns log file information from the control file.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
 	keySGA: metric.New(
 		"Returns SGA statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
@@ -229,6 +228,7 @@ var metrics = metric.MetricSet{ //nolint:gochecknoglobals
 			).
 				WithDefault("600").
 				WithValidator(metric.NumberValidator{}),
+			paramConnTimeout,
 		},
 		false,
 	),
@@ -243,13 +243,14 @@ var metrics = metric.MetricSet{ //nolint:gochecknoglobals
 			).
 				WithDefault("60").
 				WithValidator(metric.SetValidator{Set: []string{"15", "60"}}),
+			paramConnTimeout,
 		},
 		false,
 	),
 
 	keySysParams: metric.New(
 		"Returns a set of system parameter values.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
@@ -260,13 +261,14 @@ var metrics = metric.MetricSet{ //nolint:gochecknoglobals
 			metric.NewParam("Tablespace", "Table-space name."),
 			metric.NewParam("Type", "table-space type."),
 			metric.NewParam("Conname", "Container name."),
+			paramConnTimeout,
 		},
 		false,
 	),
 
 	keyTablespacesDiscovery: metric.New(
 		"Returns list of tablespaces in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 
@@ -278,13 +280,14 @@ var metrics = metric.MetricSet{ //nolint:gochecknoglobals
 				"Username",
 				"Username for which the information is needed.",
 			),
+			paramConnTimeout,
 		},
 		false,
 	),
 
 	keyVersion: metric.New(
 		"Returns database version.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService, paramConnTimeout},
 		false,
 	),
 }
