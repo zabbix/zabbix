@@ -266,6 +266,11 @@
 #define ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND	"alert.send"
 #define ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST	"item.test"
 #define ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE	"expressions.evaluate"
+#define ZBX_PROTO_VALUE_DEVICE_INIT		"device.init"
+#define ZBX_PROTO_VALUE_DEVICE_OFFBOARD		"device.offboard"
+#define ZBX_PROTO_VALUE_DEVICE_DEACTIVATE	"device.deactivate"
+#define ZBX_PROTO_VALUE_DEVICE_NOTIFY		"device.notify"
+#define ZBX_PROTO_VALUE_MEDIA_TEST		"media.test"
 
 #define ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED	"enabled"
 #define ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED	"disabled"
@@ -363,6 +368,7 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc, zbx_json_type_t *type);
 void		zbx_json_escape(char **string);
 int		zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
+char		*zbx_json_raw_value_by_path_dyn(const struct zbx_json_parse *jp, const char *path);
 zbx_json_type_t	zbx_json_valuetype(const char *p);
 struct zbx_json	*zbx_json_clone(const struct zbx_json *src);
 

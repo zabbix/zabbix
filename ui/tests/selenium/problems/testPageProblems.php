@@ -2010,7 +2010,7 @@ class testPageProblems extends CWebTest {
 				else {
 					$arrow->one()->click();
 					$dependency_dialog = $this->query($dialog_selector)->one()->waitUntilVisible();
-					$this->assertEquals("Depends on\n".$dependency, $dependency_dialog->getText());
+					$this->assertEquals("Dependent trigger\n".$dependency, $dependency_dialog->getText());
 					$dependency_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 					$dependency_dialog->waitUntilNotPresent();
 				}
@@ -2255,12 +2255,12 @@ class testPageProblems extends CWebTest {
 	 *
 	 * @onAfter removeSavedLayout
 	 */
-	public function testPageProblems_OperationalData($data){
+	public function testPageProblems_OperationalData($data) {
 		$this->page->login()->open(self::URL.'&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
 
 		$form->fill($data['filter'])->submit();
-		$this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 
 		// Set operational data in Problem column.
 		if (array_key_exists('header_settings', $data)) {
