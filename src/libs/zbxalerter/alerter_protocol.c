@@ -1428,3 +1428,28 @@ zbx_uint32_t	zbx_alerter_send_alert_code(void)
 {
 	return ZBX_IPC_ALERTER_SEND_ALERT;
 }
+
+zbx_uint32_t	zbx_alerter_serialize_push(unsigned char **data, zbx_uint64_t alertid, const char *params)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len = 0, params_len;
+
+	zbx_serialize_prepare_value(data_len, alertid);
+	zbx_serialize_prepare_str(data_len, params);
+
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+	ptr = *data;
+
+	ptr += zbx_serialize_value(ptr, alertid);
+	zbx_serialize_str(ptr, params, params_len);
+
+	return data_len;
+}
+
+void	zbx_alerter_deserialize_push(const unsigned char *data, zbx_uint64_t *alertid, char **params)
+{
+	zbx_uint32_t	len;
+
+	data += zbx_deserialize_value(data, alertid);
+	(void)zbx_deserialize_str(data, params, len);
+}

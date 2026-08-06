@@ -114,7 +114,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
-				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
+				[$this->query('xpath://table[@class="list-table sticky-header rounded-surface"]/tbody/tr[3]/td[1]')->one()]
 		);
 		$this->assertScreenshot($dashboard, 'widget_without_ha');
 	}
@@ -424,7 +424,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
-				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
+				[$this->query('xpath://table[@class="list-table sticky-header rounded-surface"]/tbody/tr[3]/td[1]')->one()]
 		);
 		$this->assertScreenshot(CDashboardElement::find()->one()->waitUntilReady(), $action.'_widgets');
 

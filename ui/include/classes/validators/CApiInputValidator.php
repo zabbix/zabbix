@@ -223,6 +223,9 @@ class CApiInputValidator {
 			case API_UUID:
 				return self::validateUuid($rule, $data, $path, $error);
 
+			case API_UUID_V7:
+				return self::validateUuidV7($rule, $data, $path, $error);
+
 			case API_CUIDS:
 				return self::validateCuids($rule, $data, $path, $error);
 
@@ -342,6 +345,7 @@ class CApiInputValidator {
 			case API_DATE:
 			case API_NUMERIC_RANGES:
 			case API_UUID:
+			case API_UUID_V7:
 			case API_CUID:
 			case API_VAULT_SECRET:
 			case API_IMAGE:
@@ -677,7 +681,7 @@ class CApiInputValidator {
 					);
 				}
 				else {
-					$error = _s('value must be empty');
+					$error = _('value must be empty');
 				}
 
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path, $error);
@@ -3152,6 +3156,34 @@ class CApiInputValidator {
 		$binary = hex2bin($data);
 		if ((ord($binary[6]) & 0xf0) != 0x40 || (ord($binary[8]) & 0xc0) != 0x80) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('UUIDv4 is expected'));
+			return false;
+		}
+
+		$data = strtolower($data);
+
+		return true;
+	}
+
+	/**
+	 * UUIDv7 validator.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUuidV7(array $rule, &$data, string $path, string &$error): bool {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		$uuid_v7_validator = new CUuidV7Validator();
+
+		if (!$uuid_v7_validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $uuid_v7_validator->getError());
+
 			return false;
 		}
 
