@@ -1472,7 +1472,6 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 {
 	zbx_vector_cep_event_handle_t	htags, hsuppress;
 	zbx_vector_cep_event_sync_t	sync;
-	zbx_cep_event_handle_t		hsync_last = NULL;
 	zbx_vector_uint64_t		eventids, problemids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
@@ -1487,6 +1486,8 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 
 	do
 	{
+		zbx_cep_event_handle_t	hsync_last = NULL;
+
 		zbx_dbconn_begin(db);
 
 		for (int i = 0; i < tasks->values_num; i++)
