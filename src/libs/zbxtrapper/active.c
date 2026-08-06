@@ -504,6 +504,12 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		*host_metadata = '\0';
 	}
 
+	if (MAX_BUFFER_LEN <= host_metadata_alloc)
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "host metadata is too long");
+		goto error;
+	}
+
 	interface = (char *)zbx_malloc(interface, interface_alloc);
 
 	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INTERFACE, &interface, &interface_alloc, NULL))
