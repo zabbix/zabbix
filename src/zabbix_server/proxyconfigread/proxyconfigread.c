@@ -694,17 +694,18 @@ static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t item
  *                                                                            *
  * Purpose: gets item data from items table                                   *
  *                                                                            *
- * Parameters: hostids - [IN] target host identifiers                         *
- *             items   - [IN] selected item identifiers                       *
- *             j       - [OUT] output json                                    *
- *             error   - [OUT] error message                                  *
+ * Parameters: hostids                   - [IN] target host identifiers       *
+ *             items                     - [IN] selected item identifiers     *
+ *             j                         - [OUT] output json                  *
+ *             config_denyitemtypes_mask - [IN] denied item types             *
+ *             error                     - [OUT] error message                *
  *                                                                            *
  * Return value: SUCCEED - data was read successfully                         *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_hashset_t *items, struct zbx_json *j,
-		char **error)
+		zbx_uint32_t config_denyitemtypes_mask, char **error)
 {
 	const zbx_db_table_t	*table;
 	char			*sql;
@@ -773,6 +774,9 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_has
 			zbx_uint64_t	itemid, master_itemid;
 
 			ZBX_STR2UCHAR(type, row[fld_type]);
+			if (0 != ZBX_ITEM_TYPE_DENIED(config_denyitemtypes_mask, type))
+				continue;
+
 			if (SUCCEED == zbx_is_item_processed_by_server(type, row[fld_key]))
 					continue;
 
@@ -845,15 +849,17 @@ out:
  *                                                                            *
  * Purpose: gets host and related table data from database                    *
  *                                                                            *
- * Parameters: hostids    - [IN] target host identifiers                      *
- *             j          - [OUT] output json                                 *
- *             error      - [OUT] error message                               *
+ * Parameters: hostids                   - [IN] target host identifiers       *
+ *             j                         - [OUT] output json                  *
+ *             config_denyitemtypes_mask - [IN] denied item types             *
+ *             error                     - [OUT] error message                *
  *                                                                            *
  * Return value: SUCCEED - data was read successfully                         *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	proxyconfig_get_host_data(const zbx_vector_uint64_t *hostids, struct zbx_json *j, char **error)
+static int	proxyconfig_get_host_data(const zbx_vector_uint64_t *hostids, struct zbx_json *j,
+		zbx_uint32_t config_denyitemtypes_mask, char **error)
 {
 	zbx_vector_uint64_t	interfaceids;
 	int			ret = FAIL;
@@ -881,7 +887,7 @@ static int	proxyconfig_get_host_data(const zbx_vector_uint64_t *hostids, struct 
 	if (SUCCEED != proxyconfig_get_table_data("host_inventory", "hostid", hostids, NULL, NULL, j, error))
 		goto out;
 
-	if (SUCCEED != proxyconfig_get_item_data(hostids, &items, j, error))
+	if (SUCCEED != proxyconfig_get_item_data(hostids, &items, j, config_denyitemtypes_mask, error))
 		goto out;
 
 	if (0 != items.num_data)
@@ -1212,7 +1218,7 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, struct zbx_json *j, zbx_proxyconfig_status_t *status,
 		zbx_uint64_t proxy_secrets_provider, zbx_uint64_t proxy_revision, zbx_uint64_t macro_revision,
-		char **error)
+		zbx_uint32_t config_denyitemtypes_mask, char **error)
 {
 #define ZBX_PROXYCONFIG_SYNC_HOSTS		0x0001
 #define ZBX_PROXYCONFIG_SYNC_GMACROS		0x0002
@@ -1316,7 +1322,8 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		zbx_db_begin();
 
 		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_HOSTS) &&
-				SUCCEED != proxyconfig_get_host_data(&updated_hostids, j, error))
+				SUCCEED != proxyconfig_get_host_data(&updated_hostids, j, config_denyitemtypes_mask,
+				error))
 		{
 			goto out;
 		}
@@ -1496,7 +1503,7 @@ out:
 int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
 		zbx_proxyconfig_status_t *status, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **error)
+		const char *config_ssl_key_location, zbx_uint32_t config_denyitemtypes_mask, char **error)
 {
 	int			ret = FAIL;
 	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1], *failover_delay = NULL;
@@ -1584,7 +1591,8 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 				hostmap_sync, proxy_hostmap_revision, hostmap_revision, failover_delay,
 				&del_hostproxyids, config_vault, config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location, j, status,
-				(zbx_uint64_t)cfg.proxy_secrets_provider, proxy_revision, macro_revision, error)))
+				(zbx_uint64_t)cfg.proxy_secrets_provider, proxy_revision, macro_revision,
+				config_denyitemtypes_mask, error)))
 		{
 			goto out;
 		}
@@ -1632,7 +1640,7 @@ out:
 void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location)
+		const char *config_ssl_key_location, zbx_uint32_t config_denyitemtypes_mask)
 {
 	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
@@ -1676,7 +1684,8 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &status, config_vault, config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			config_denyitemtypes_mask, &error))
 	{
 		(void)zbx_send_response_ext(sock, FAIL, error, NULL, flags, config_timeout);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",

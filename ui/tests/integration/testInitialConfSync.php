@@ -1272,7 +1272,7 @@ class testInitialConfSync extends CIntegrationTest
 			'expressions' => [
 				[
 					'expression' => '.*',
-					'expression_type' => EXPRESSION_TYPE_FALSE,
+					'expression_type' => REGEX_TYPE_NOT_MATCHES_REGEX,
 					'case_sensitive' => 1
 				]
 			]
@@ -1289,7 +1289,7 @@ class testInitialConfSync extends CIntegrationTest
 			'expressions' => [
 				[
 					'expression' => '.*a',
-					'expression_type' => EXPRESSION_TYPE_TRUE,
+					'expression_type' => REGEX_TYPE_MATCHES_REGEX,
 					'case_sensitive' => 1
 				]
 			]
