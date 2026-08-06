@@ -5,7 +5,9 @@ noinst_LIBRARIES = libzbxescalator.a
 libzbxescalator_a_SOURCES = \
 	escalator.c \
 	escalator.h \
-	macro_ctx_msg.c
+	macro_ctx_msg.c \
+	get_build_push_param.c \
+	get_build_push_param.h
 
 libzbxescalator_a_CFLAGS = \
 	$(TLS_CFLAGS) \

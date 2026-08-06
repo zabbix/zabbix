@@ -39,7 +39,8 @@ $titles = [
 	'maps' => _('Maps'),
 	'images' => _('Images'),
 	'mediaTypes' => _('Media types'),
-	'dashboards' => _('Dashboards')
+	'dashboards' => _('Dashboards'),
+	'global_regexes' => _('Regular expressions')
 ];
 
 switch ($data['rules_preset']) {
@@ -57,6 +58,9 @@ switch ($data['rules_preset']) {
 		break;
 	case 'dashboard':
 		$doc_url = CDocHelper::POPUP_DASHBOARD_IMPORT;
+		break;
+	case 'regex':
+		$doc_url = CDocHelper::POPUP_REGEXP_IMPORT;
 		break;
 	}
 

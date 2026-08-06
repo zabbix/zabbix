@@ -122,11 +122,11 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['parentTemplateids'])) {
 			zbx_value2array($options['parentTemplateids']);
 
-			$sqlParts['join']['ht'] = ['table' => 'hosts_templates', 'using' => 'hostid'];
-			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['parentTemplateids']);
+			$sqlParts['join']['ht1'] = ['table' => 'hosts_templates', 'using' => 'hostid'];
+			$sqlParts['where'][] = dbConditionInt('ht1.templateid', $options['parentTemplateids']);
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['templateid'] = 'ht.templateid';
+				$sqlParts['group']['ht1'] = 'ht1.templateid';
 			}
 		}
 
@@ -134,11 +134,11 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['join']['ht'] = ['table' => 'hosts_templates', 'using' => 'hostid'];
-			$sqlParts['where'][] = dbConditionInt('ht.hostid', $options['hostids']);
+			$sqlParts['join']['ht2'] = ['table' => 'hosts_templates', 'on' => ['hostid' => 'templateid']];
+			$sqlParts['where'][] = dbConditionInt('ht2.hostid', $options['hostids']);
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['ht'] = 'ht.hostid';
+				$sqlParts['group']['ht2'] = 'ht2.hostid';
 			}
 		}
 
