@@ -37,101 +37,8 @@ zbx_collector_data	*__wrap_get_collector(void)
 	return test_collector;
 }
 
-static int	str_to_cpu_status(const char *str)
-{
-	if (0 == strcmp(str, "online"))
-		return ZBX_CPU_STATUS_ONLINE;
-
-	if (0 == strcmp(str, "offline"))
-		return ZBX_CPU_STATUS_OFFLINE;
-
-	if (0 == strcmp(str, "unknown"))
-		return ZBX_CPU_STATUS_UNKNOWN;
-
-	fail_msg("Invalid \"status\" parameter in test case data: %s", str);
-
-	return ZBX_CPU_STATUS_UNKNOWN;
-}
-
-#define TEST_NAME	"ZBX_GET_CPUS_TEST:"
-
-static void	test_get_cpus(void)
-{
-	ZBX_SINGLE_CPU_STAT_DATA	*cpu;
-	zbx_vector_uint64_pair_t	cpus;
-	zbx_collector_data		collector;
-	const char			*last_sample;
-	char				parameter_string[20];
-	int				h_first, h_count, index, ret;
-	int				cpu_cnt = 1;
-	int				expected_status[2];
-
-	memset(test_cpus, 0, sizeof(test_cpus));
-	memset(&test_collector, 0, sizeof(test_collector));
-
-	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.h_cpu_cnt"))
-		cpu_cnt = zbx_mock_get_parameter_int("in.h_cpu_cnt");
-
-	collector.cpus.count = cpu_cnt;
-	collector.cpus.cpu = test_cpus;
-	test_collector = &collector;
-
-	for (int idx = 1; idx <= cpu_cnt; idx++ )
-	{
-		zbx_snprintf(parameter_string, sizeof(parameter_string),"in.last_sample_%d",idx);
-		last_sample = zbx_mock_get_optional_parameter_string(parameter_string);
-
-		zbx_snprintf(parameter_string, sizeof(parameter_string),"out.status_%d",idx);
-		expected_status[idx - 1] = str_to_cpu_status(zbx_mock_get_parameter_string(parameter_string));
-
-		zbx_snprintf(parameter_string, sizeof(parameter_string),"in.h_first_%d",idx);
-		h_first = zbx_mock_get_parameter_int(parameter_string);
-
-		zbx_snprintf(parameter_string, sizeof(parameter_string),"in.h_count_%d",idx);
-		h_count = zbx_mock_get_parameter_int(parameter_string);
-
-		cpu = &test_cpus[idx];
-		cpu->h_first = h_first;
-		cpu->h_count = h_count;
-		cpu->cpu_num = idx - 1;
-
-		if (0 < h_count)
-		{
-			if (NULL == last_sample)
-				fail_msg("\"in.last_sample\" is required when \"in.h_count\" is non-zero");
-
-			if (ZBX_MAX_COLLECTOR_HISTORY <= (index = h_first + h_count - 1))
-				index -= ZBX_MAX_COLLECTOR_HISTORY;
-
-			cpu->h_status[index] = (unsigned char)(0 == strcmp(last_sample, "online") ?
-					SYSINFO_RET_OK : SYSINFO_RET_FAIL);
-		}
-	}
-
-	zbx_vector_uint64_pair_create(&cpus);
-
-	ret = get_cpus(&cpus);
-	zbx_mock_assert_result_eq(TEST_NAME" return value", SUCCEED, ret);
-
-	if (0 == cpus.values_num)
-		fail_msg("get_cpus() returned no CPU entries");
-
-	for (int idx = 0; idx < cpu_cnt; idx++ )
-	{
-		zbx_mock_assert_int_eq(TEST_NAME" {#CPU.NUMBER}", idx, (int)cpus.values[idx].first);
-		zbx_mock_assert_int_eq(TEST_NAME" {#CPU.STATUS}", expected_status[idx],
-				(int)cpus.values[idx].second);
-	}
-
-	zbx_vector_uint64_pair_destroy(&cpus);
-}
-
-#undef TEST_NAME
 #define TEST_NAME	"ZBX_SYSTEM_CPU_DISCOVERY_TEST:"
 
-/* item-level counterpart of test_get_cpus(): drives the same mocked collector state, but goes through */
-/* the actual system.cpu.discovery entry point and asserts on its JSON contract instead of the internal */
-/* get_cpus() vector - so it also covers get_cpu_status_string()/JSON serialization in cpu.c            */
 static void	test_system_cpu_discovery(void)
 {
 	AGENT_REQUEST			request;
@@ -279,9 +186,7 @@ void	zbx_mock_test_entry(void **state)
 
 	test_type = zbx_mock_get_parameter_string("in.test_type");
 
-	if (0 == strcmp(test_type, "ZBX_GET_CPUS_TEST"))
-		test_get_cpus();
-	else if (0 == strcmp(test_type, "ZBX_SYSTEM_CPU_DISCOVERY_TEST"))
+	if (0 == strcmp(test_type, "ZBX_SYSTEM_CPU_DISCOVERY_TEST"))
 		test_system_cpu_discovery();
 	else if (0 == strcmp(test_type, "ZBX_UPDATE_CPU_COUNTERS_TEST"))
 		test_update_cpu_counters();
