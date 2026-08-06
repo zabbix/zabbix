@@ -179,8 +179,9 @@ class CRoleHelper {
 
 		$roles = API::Role()->get([
 			'output' => ['roleid', 'name', 'type'],
-			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api.access', 'api.mode',
-				'api', 'actions', 'actions.default_access'
+			'selectRules' => ['ui', 'ui.default_access', 'profile.redirect.enforce' , 'profile.redirect.url' ,
+				'modules', 'modules.default_access', 'api.access', 'api.mode', 'api', 'actions',
+				'actions.default_access'
 			],
 			'roleids' => $roleid
 		]);
@@ -193,6 +194,8 @@ class CRoleHelper {
 
 		$rules = [
 			'ui.default_access' => (bool) $role['rules']['ui.default_access'],
+			'profile.redirect.enforce' => (bool) $role['rules']['profile.redirect.enforce'],
+			'profile.redirect.url' => (bool) $role['rules']['profile.redirect.url'],
 			'modules.default_access' => (bool) $role['rules']['modules.default_access'],
 			'api.access' => (bool) $role['rules']['api.access'],
 			'api.mode' => (bool) $role['rules']['api.mode'],

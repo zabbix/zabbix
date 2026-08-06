@@ -95,12 +95,31 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), g
 		redirect($mfa_url->toString());
 	}
 
-	$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
-	redirect(reset($redirect));
+	try {
+		$redirect = array_filter([$request, CWebUser::getRedirectUrl(), CMenuHelper::getFirstUrl()]);
+
+		$response = new CControllerResponseRedirect(
+			new CUrl(reset($redirect))
+		);
+
+		$response->redirect();
+	}
+	catch (APIException $e) {
+		error($e->getMessage());
+	}
 }
 
 if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
-	redirect(CWebUser::$data['url'] ? : CMenuHelper::getFirstUrl());
+	try {
+		$response = new CControllerResponseRedirect(
+			new CUrl(CWebUser::getRedirectUrl() ? : CMenuHelper::getFirstUrl())
+		);
+
+		$response->redirect();
+	}
+	catch (APIException $e) {
+		error($e->getMessage());
+	}
 }
 
 $messages = get_and_clear_messages();

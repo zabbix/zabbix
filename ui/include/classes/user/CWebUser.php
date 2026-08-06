@@ -90,6 +90,45 @@ class CWebUser {
 		}
 	}
 
+	/**
+	 * Returns the proper URL for redirection according to User profile settings in user role
+	 *
+	 * @return string
+	 *
+	 * @throws APIException
+	 */
+	public static function getRedirectUrl(): string {
+		CMessageHelper::clear();
+
+		$validator = new CFrontendActionValidator();
+
+		$redirect_url = self::$data['url'];
+		$is_valid_url = $validator->validate($redirect_url);
+
+		$roles = API::Role()->get([
+			'output' => [],
+			'selectRules' => ['profile.redirect.enforce', 'profile.redirect.url'],
+			'roleids' => self::$data['roleid']
+		]);
+
+		if ($roles) {
+			$rules = $roles[0]['rules'];
+
+			if ($rules['profile.redirect.enforce'] != 0 || !$is_valid_url) {
+				$redirect_url = $rules['profile.redirect.url'];
+				$is_valid_url = $validator->validate($rules['profile.redirect.url']);
+			}
+		}
+
+		if (!$is_valid_url) {
+			CMessageHelper::addError(_('Invalid redirect URL.'));
+
+			return '';
+		}
+
+		return $redirect_url;
+	}
+
 	public static function checkAuthentication(string $sessionid): bool {
 		self::$data = API::User()->checkAuthentication([
 			'sessionid' => $sessionid,

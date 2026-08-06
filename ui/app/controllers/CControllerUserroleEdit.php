@@ -93,6 +93,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'actions_edit_own_media' =>						'in 0,1',
 			'actions_edit_user_media' =>					'in 0,1',
 			'ui_default_access' => 							'in 0,1',
+			'profile_redirect_enforce' => 					'in 0,1',
+			'profile_redirect_url' => 						'string',
 			'modules_default_access' =>						'in 0,1',
 			'actions_default_access' => 					'in 0,1',
 			'modules' =>									'array',
@@ -273,6 +275,14 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			$data['rules']['ui.default_access'] = $this->getInput('ui_default_access');
 		}
 
+		if ($this->hasInput('profile_redirect_enforce')) {
+			$data['rules']['profile.redirect.enforce'] = $this->getInput('profile_redirect_enforce');
+		}
+
+		if ($this->hasInput('profile_redirect_url')) {
+			$data['rules']['profile.redirect.url'] = $this->getInput('profile_redirect_url');
+		}
+
 		if ($this->hasInput('modules_default_access')) {
 			$data['rules']['modules.default_access'] = $this->getInput('modules_default_access');
 		}
@@ -392,6 +402,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		return [
 			'ui' => array_fill_keys(CRoleHelper::getUiElementsByUserType($user_type), true),
 			'ui.default_access' => true,
+			'profile.redirect.enforce' => false,
+			'profile.redirect.url' => '',
 			'service_read_access' => CRoleHelper::SERVICES_ACCESS_ALL,
 			'service_read_list' => [],
 			'service_read_tag' => ['tag' => '', 'value' => ''],
@@ -414,9 +426,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	private function getRulesByRoleid(string $roleid): array {
 		global $ZBX_FEATURE_FLAGS;
 
-		$select_rules = ['ui', 'ui.default_access', 'api', 'api.access', 'api.mode', 'actions',
-			'actions.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag',
-			'services.write.mode', 'services.write.list', 'services.write.tag'
+		$select_rules = ['ui', 'ui.default_access', 'profile.redirect.enforce', 'profile.redirect.url', 'api',
+			'api.access', 'api.mode', 'actions', 'actions.default_access', 'services.read.mode', 'services.read.list',
+			'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag'
 		];
 
 		if ($ZBX_FEATURE_FLAGS['modules_config_enabled']) {
@@ -492,6 +504,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		}
 
 		$rules['ui.default_access'] = $input['ui.default_access'];
+		$rules['profile.redirect.enforce'] = $input['profile.redirect.enforce'];
+		$rules['profile.redirect.url'] = $input['profile.redirect.url'];
 		$rules['api.access'] = $input['api.access'];
 		$rules['api.mode'] = $input['api.mode'];
 		$rules['actions.default_access'] = $input['actions.default_access'];

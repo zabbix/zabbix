@@ -30,7 +30,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		$users = API::User()->get([
 			'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-				'rows_per_page', 'url', 'timezone', 'provisioned'
+				'rows_per_page', 'url', 'timezone', 'provisioned', 'roleid'
 			],
 			'userids' => CWebUser::$data['userid'],
 			'editable' => true
@@ -54,6 +54,12 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'userids' => CWebUser::$data['userid']
 		]);
 
+		$roles = API::Role()->get([
+			'output' => [],
+			'selectRules' => ['profile.redirect.enforce', 'profile.redirect.url'],
+			'roleids' => $this->user['roleid']
+		]);
+
 		$data = [
 			'change_password' => 0,
 			'allow_empty_password' => !CControllerUserUpdateGeneral::hasInternalAuth($usrgrps),
@@ -68,6 +74,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'refresh' => $this->user['refresh'],
 			'rows_per_page' => $this->user['rows_per_page'],
 			'url' => $this->user['url'],
+			'profile_redirect_enforce' => $roles[0]['rules']['profile.redirect.enforce'] ?? 0,
+			'profile_redirect_url' => $roles[0]['rules']['profile.redirect.url'] ?? '',
 			'userid' => CWebUser::$data['userid'],
 			'username' => $this->user['username'],
 			'name' => $this->user['name'],

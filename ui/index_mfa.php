@@ -119,8 +119,13 @@ try {
 				'auth' => CWebUser::$data['sessionid']
 			];
 
-			$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
-			redirect(reset($redirect));
+			$redirect = array_filter([$request, CWebUser::getRedirectUrl(), CMenuHelper::getFirstUrl()]);
+
+			$response = new CControllerResponseRedirect(
+				new CUrl(reset($redirect))
+			);
+
+			$response->redirect();
 		}
 	}
 }

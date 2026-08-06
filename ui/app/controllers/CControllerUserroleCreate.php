@@ -39,6 +39,8 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 				'messages' => ['not_empty' => _('At least one UI element must be checked.')]
 			],
 			'ui_default_access' => ['boolean'],
+			'profile_redirect_enforce' => ['integer', 'in' => [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]],
+			'profile_redirect_url' => ['string', 'length' => 2048, 'use' => [CFrontendActionValidator::class]],
 			'modules' => ['array', 'field' => ['boolean']],
 			'modules_default_access' => ['boolean'],
 			'actions' => ['array', 'required',
