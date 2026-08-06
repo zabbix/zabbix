@@ -493,12 +493,16 @@ class testFormGroups extends CWebTest {
 		// Change name.
 		$form->fill(['Group name' => $new_name]);
 
-		if (in_array($data['action'], ['Clone', 'Delete'])) {
-			$form->query('button', $data['action'])->one()->click();
+		if ($data['action'] === 'Delete') {
+			$form->query('button:Delete')->one()->click();
+			$this->page->dismissAlert();
 		}
 
-		if ($data['action'] === 'Delete') {
-			$this->page->dismissAlert();
+		// Cloning reloads the page to the new group form, so the form captured above becomes stale; re-fetch it.
+		if ($data['action'] === 'Clone') {
+			$form->query('button:Clone')->one()->click()->waitUntilNotVisible();
+			$form->waitUntilStalled();
+			$form->invalidate();
 		}
 
 		$form->query('button:Cancel')->waitUntilClickable()->one()->click();

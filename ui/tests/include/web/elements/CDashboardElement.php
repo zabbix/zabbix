@@ -133,10 +133,24 @@ class CDashboardElement extends CElement {
 	 */
 	public function editProperties() {
 		$this->checkIfEditable();
-		$this->getControls()->query('id:dashboard-config')->waitUntilClickable()->one()->hoverMouse()->click();
+		$button = $this->getControls()->query('id:dashboard-config')->waitUntilClickable()->one();
+		$button->hoverMouse()->click();
 
-		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="dashboard_properties"]')
-				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
+		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="dashboard_properties"]');
+
+		/*
+		 * Entering edit mode briefly shows a vertical scrollbar that shifts the controls sideways, so the first
+		 * click can miss the config button. Once the layout settles, click again.
+		 */
+		try {
+			$overlay->waitUntilVisible(3);
+		}
+		catch (TimeoutException $exception) {
+			$button->click();
+			$overlay->waitUntilVisible();
+		}
+
+		return $overlay->asOverlayDialog()->one()->waitUntilReady();
 	}
 
 	/**

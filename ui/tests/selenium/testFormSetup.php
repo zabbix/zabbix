@@ -62,6 +62,7 @@ class testFormSetup extends CWebTest {
 
 		// Check that default language can be changed.
 		$language_field->fill('Russian (ru_RU)');
+		$form->waitUntilStalled();
 		$this->page->refresh()->waitUntilReady();
 		$this->assertEquals("Добро пожаловать в\nZabbix 6.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 

@@ -142,8 +142,9 @@ class testPageTemplates extends CLegacyWebTest {
 				'values' => 'Template ZBX6663 Second',
 				'context' => 'Templates'
 		]);
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter->submit();
-		$this->zbxTestWaitForPageToLoad();
+		$table->waitUntilReloaded();
 		$this->assertTableDataColumn(['Template ZBX6663 First']);
 		$this->assertTableDataColumn(['Template ZBX6663 Second'], 'Linked templates');
 		$this->assertTableStats(1);

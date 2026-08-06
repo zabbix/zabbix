@@ -49,8 +49,8 @@ class testFormSysmap extends CLegacyWebTest {
 
 	public function testFormSysmap_Layout() {
 		$this->page->login()->open('sysmaps.php?form=Create+map')->waitUntilReady();
-		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestCheckHeader('Network maps');
+		$this->zbxTestCheckTitle('Configuration of network maps');
 
 		$this->zbxTestAssertElementText("//div[@id='userid']//span[@class='subfilter-enabled']", 'Admin (Zabbix Administrator)');
 		$this->zbxTestAssertElementValue('width', 800);
