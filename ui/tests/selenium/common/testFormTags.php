@@ -1100,9 +1100,11 @@ class testFormTags extends CWebTest {
 			$this->query('button:Reset')->one()->click();
 			$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$filter->fill(['Name' => $parent]);
+			$table = $this->query('class:list-table')->asTable()->one();
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $parent)
-					->getColumn(ucfirst($object).'s')->query('link', ucfirst($object).'s')->one()->click();
+			$table->waitUntilReloaded();
+			$table->findRow('Name', $parent)->getColumn(ucfirst($object).'s')->query('link', ucfirst($object).'s')
+					->one()->click();
 
 			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 			$form->invalidate();

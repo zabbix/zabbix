@@ -614,7 +614,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change template.
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestClickXpathWait('//button[contains(@onclick,"unlink")]');
+			$this->query('xpath://button[contains(@onclick,"unlink")]')->waitUntilClickable()->one()->click()
+					->waitUntilNotPresent();
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			COverlayDialogElement::find()->one()->setDataContext('Templates');

@@ -2291,7 +2291,11 @@ class testManualActionScripts extends CWebTest {
 				if ($data['fields']['Type'] === 'URL') {
 					COverlayDialogElement::ensureNotPresent();
 					$host_name = (array_key_exists('host', $data)) ? $data['host'] : self::HOST;
-					$this->assertEquals($host_name, $this->query('id:host')->one()->getValue());
+					$this->assertEquals($host_name, $this->query('id:host')->waitUntilVisible()->one()->getValue());
+					$this->page->waitUntilReady();
+
+					// Wait for the underlying list to finish reloading so its late load does not override the next open.
+					$this->query('xpath://*[contains(@class, "is-loading")]')->waitUntilNotPresent();
 				}
 				else {
 					$this->query('button:Ok')->waitUntilVisible()->one();
