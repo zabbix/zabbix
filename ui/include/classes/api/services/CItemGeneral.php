@@ -316,7 +316,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if ($db_item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
-					$db_item['query'] = CItemTypeTelemetryQuery::prepareQueryFieldForApi($db_item['query'], true);
+					$db_item['query'] = $item['query'];
 				}
 
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRules($db_item);
