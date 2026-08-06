@@ -29,7 +29,7 @@
 			});
 
 			document.querySelector('.js-create-proxy-in-cloud').addEventListener('click', () => {
-				window.open('https://cloud.zabbix.com', '_blank').focus();
+				window.open('https://cloud.zabbix.com/create-proxy', '_blank').focus();
 			});
 
 			const form = document.getElementById('proxy-list');
