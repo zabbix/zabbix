@@ -120,6 +120,23 @@ class testTelnetChecks extends CIntegrationTest {
 		return $itemid;
 	}
 
+	/**
+	 * Deletes a TELNET item and waits for the config cache reload to take effect before returning.
+	 *
+	 * The detected shell prompt character in zbx_telnet_login()/telnet_rm_echo() is kept in a
+	 * process-wide static in telnet.c, not per-connection state, so two TELNET items using different
+	 * prompt characters (e.g. "$" and "#") being polled concurrently on the same poller can clobber
+	 * each other's prompt character and make the check hang until timeout. Removing each item as soon
+	 * as its test is done, before the next item/mock is set up, keeps at most one TELNET item active on
+	 * the host at any time and avoids that cross-talk.
+	 */
+	private function deleteTelnetItem(string $unique_suffix, string $itemid): void {
+		$this->call('item.delete', [$itemid]);
+		unset(self::$itemids[$unique_suffix]);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+	}
+
 	private function assertTelnetItemValue(string $itemid, string $expected_value): void {
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'output' => ['value'],
@@ -238,6 +255,7 @@ class testTelnetChecks extends CIntegrationTest {
 
 		$itemid = $this->createTelnetItem('echo', 'echo test output');
 		$this->assertTelnetItemValue($itemid, 'hello world');
+		$this->deleteTelnetItem('echo', $itemid);
 
 		self::stopTelnetMock();
 	}
@@ -256,6 +274,7 @@ class testTelnetChecks extends CIntegrationTest {
 
 		$itemid = $this->createTelnetItem('short', 'short output cmd');
 		$this->assertTelnetItemValue($itemid, '');
+		$this->deleteTelnetItem('short', $itemid);
 
 		self::stopTelnetMock();
 	}
@@ -269,6 +288,7 @@ class testTelnetChecks extends CIntegrationTest {
 
 		$itemid = $this->createTelnetItem('eol', 'eol test');
 		$this->assertTelnetItemValue($itemid, "CRLF-line\nLFCR-line\nCR-line\nCRNUL-line");
+		$this->deleteTelnetItem('eol', $itemid);
 
 		self::stopTelnetMock();
 	}
@@ -282,6 +302,7 @@ class testTelnetChecks extends CIntegrationTest {
 
 		$itemid = $this->createTelnetItem('altprompt', 'echo test output');
 		$this->assertTelnetItemValue($itemid, 'hello world');
+		$this->deleteTelnetItem('altprompt', $itemid);
 
 		self::stopTelnetMock();
 	}
@@ -295,6 +316,7 @@ class testTelnetChecks extends CIntegrationTest {
 
 		$itemid = $this->createTelnetItem('nologin', 'echo test output');
 		$this->assertTelnetItemError($itemid, self::NO_LOGIN_PROMPT_ERROR);
+		$this->deleteTelnetItem('nologin', $itemid);
 
 		self::stopTelnetMock();
 	}
@@ -307,6 +329,7 @@ class testTelnetChecks extends CIntegrationTest {
 
 		$itemid = $this->createTelnetItem('nopassword', 'echo test output');
 		$this->assertTelnetItemError($itemid, self::NO_PASSWORD_PROMPT_ERROR);
+		$this->deleteTelnetItem('nopassword', $itemid);
 
 		self::stopTelnetMock();
 	}
@@ -320,6 +343,7 @@ class testTelnetChecks extends CIntegrationTest {
 
 		$itemid = $this->createTelnetItem('loginfailed', 'echo test output');
 		$this->assertTelnetItemError($itemid, self::LOGIN_FAILED_ERROR);
+		$this->deleteTelnetItem('loginfailed', $itemid);
 
 		self::stopTelnetMock();
 	}
