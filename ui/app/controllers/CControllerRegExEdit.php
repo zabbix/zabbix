@@ -31,7 +31,13 @@ class CControllerRegExEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -44,7 +50,7 @@ class CControllerRegExEdit extends CController {
 
 		if ($this->hasInput('regexpid')) {
 			$db_regexps = API::Regexp()->get([
-				'output' => ['regexpid', 'name', 'test_string'],
+				'output' => ['regexpid', 'name', 'description', 'test_string'],
 				'selectExpressions' => ['expression_type', 'expression', 'exp_delimiter', 'case_sensitive'],
 				'regexpids' => $this->getInput('regexpid')
 			]);
@@ -63,6 +69,7 @@ class CControllerRegExEdit extends CController {
 		$regexp_default = [
 			'regexpid' => DB::getDefault('regexps', 'regexpid'),
 			'name' => DB::getDefault('regexps', 'name'),
+			'description' => DB::getDefault('regexps', 'description'),
 			'test_string' => DB::getDefault('regexps', 'test_string'),
 			'expressions' => [[
 				'expression_type' => DB::getDefault('expressions', 'expression_type'),
@@ -79,11 +86,12 @@ class CControllerRegExEdit extends CController {
 
 		$data = [
 			'regexp' => $regexp,
-			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules()
+			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
+			'js_clone_validation_rules' => (new CFormValidator(CControllerRegExCreate::getValidationRules()))
+				->getRules(),
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Configuration of regular expressions'));
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }
