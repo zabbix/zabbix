@@ -548,7 +548,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				})(),
 				self::emptyFilter()
 			),
-			'buckets' => function(int $now) use ($funcs) {
+			'buckets_tmpl' => function(int $now) use ($funcs) {
 				$ret = [
 					[
 						'id' => 1,
@@ -590,7 +590,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'item' => self::tqItem(APM_SIGNAL_TYPE_TRACES, APM_METRICS_POINT_SUM, [], [
 					self::qagg('', AGGREGATE_COUNT, 'cnt')
 				], self::emptyFilter()),
-				'buckets' => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
 				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'traces' => [self::tmplTrace(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
@@ -601,7 +601,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'item' => self::tqItem(APM_SIGNAL_TYPE_LOGS, APM_METRICS_POINT_SUM, [], [
 					self::qagg('', AGGREGATE_COUNT, 'cnt')
 				], self::emptyFilter()),
-				'buckets' => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
 				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'logs' => [self::tmplLog(self::tsOffStr($now, -10))]
@@ -612,7 +612,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'item' => self::tqItem(APM_SIGNAL_TYPE_METRICS, APM_METRICS_POINT_SUM, [], [
 					self::qagg('', AGGREGATE_COUNT, 'cnt')
 				], self::emptyFilter()),
-				'buckets' => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
 				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricSum(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
@@ -623,7 +623,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'item' => self::tqItem(APM_SIGNAL_TYPE_METRICS, APM_METRICS_POINT_GAUGE, [], [
 					self::qagg('', AGGREGATE_COUNT, 'cnt')
 				], self::emptyFilter()),
-				'buckets' => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
 				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricGauge(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
@@ -634,7 +634,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'item' => self::tqItem(APM_SIGNAL_TYPE_METRICS, APM_METRICS_POINT_HISTOGRAM, [], [
 					self::qagg('', AGGREGATE_COUNT, 'cnt')
 				], self::emptyFilter()),
-				'buckets' => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
 				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricHistogram(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
@@ -645,7 +645,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'item' => self::tqItem(APM_SIGNAL_TYPE_METRICS, APM_METRICS_POINT_EXPHISTOGRAM, [], [
 					self::qagg('', AGGREGATE_COUNT, 'cnt')
 				], self::emptyFilter()),
-				'buckets' => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
 				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricExponentialHistogram(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
@@ -704,7 +704,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						'A and B and C and D and E and F and G and H and I and J and K and L and M and N and O'
 					)
 				),
-				'buckets' => fn(int $now) => [
+				'buckets_tmpl' => fn(int $now) => [
 					[
 						'id' => 1,
 						'columns' => [
@@ -786,7 +786,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('EventName', CONDITION_OPERATOR_NOT_LIKE, 'missing-event')
 					])
 				),
-				'buckets' => fn(int $now) => [
+				'buckets_tmpl' => fn(int $now) => [
 					[
 						'id' => 1,
 						'columns' => [
@@ -872,7 +872,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'requests')
 					])
 				),
-				'buckets' => fn(int $now) => [
+				'buckets_tmpl' => fn(int $now) => [
 					[
 						'id' => 1,
 						'columns' => [
@@ -956,7 +956,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr')
 					])
 				),
-				'buckets' => fn(int $now) => [
+				'buckets_tmpl' => fn(int $now) => [
 					[
 						'id' => 1,
 						'columns' => [
@@ -1042,7 +1042,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms')
 					])
 				),
-				'buckets' => fn(int $now) => [
+				'buckets_tmpl' => fn(int $now) => [
 					[
 						'id' => 1,
 						'columns' => [
@@ -1144,7 +1144,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms')
 					])
 				),
-				'buckets' => fn(int $now) => [
+				'buckets_tmpl' => fn(int $now) => [
 					[
 						'id' => 1,
 						'columns' => [
@@ -1436,9 +1436,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			sleep($subcase['delay']);
 		}
 
-		$expected_buckets = is_callable($subcase['buckets'])
-			? $subcase['buckets']($now)
-			: $subcase['buckets'];
+		$expected_buckets = $subcase['buckets_tmpl']($now);
 
 		$response = $this->waitForBuckets($itemid, count($expected_buckets), 30, 1, $msg);
 
