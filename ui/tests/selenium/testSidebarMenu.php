@@ -411,7 +411,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Help',
-					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/'
+					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/en/manual'
 				]
 			],
 			[
