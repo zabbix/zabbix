@@ -247,7 +247,7 @@ class Maps {
 						'selementid' => 7,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE,
 						'iconid_off' => 6,
-						'x' => 250,
+						'x' => 139,
 						'y' => 350,
 						'zindex' => 1
 					],
@@ -292,7 +292,7 @@ class Maps {
 						'elements' => [['hostid' => $result['hostids']['Host_2']]],
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 151,
-						'x' => 89,
+						'x' => 139,
 						'y' => 377,
 						'zindex' => 1
 					],
