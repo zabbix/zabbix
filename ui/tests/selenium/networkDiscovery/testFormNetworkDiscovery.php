@@ -272,7 +272,8 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Local network'
+						'Name' => 'Local network',
+						'Update interval' => '2h'
 					],
 					'Checks' => [['default' => true]],
 					'inline_errors' => ['Name' => 'This object already exists.']
