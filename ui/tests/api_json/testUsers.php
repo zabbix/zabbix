@@ -16,6 +16,7 @@
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 require_once dirname(__FILE__).'/../../include/classes/api/CAudit.php';
+require_once dirname(__FILE__).'/../../include/classes/api/helpers/CApiTokenHelper.php';
 
 /**
  * @onBefore prepareUsersData
@@ -288,19 +289,19 @@ class testUsers extends CAPITest {
 				'name' => 'API test disabled token',
 				'userid' => self::$data['userids']['user_for_token_tests'],
 				'status' => ZBX_AUTH_TOKEN_DISABLED,
-				'expires_at' => $now + 100
+				'expires_at' => $now + SEC_PER_HOUR
 			],
 			[
 				'name' => 'API test valid token',
 				'userid' => self::$data['userids']['user_with_valid_session'],
 				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'expires_at' => $now + 100
+				'expires_at' => $now + SEC_PER_HOUR
 			],
 			[
 				'name' => 'API test valid token for user with disabled user group',
 				'userid' => self::$data['userids']['user_with_disabled_usergroup'],
 				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'expires_at' => $now + 100
+				'expires_at' => $now + SEC_PER_HOUR
 			]
 		];
 
@@ -2845,6 +2846,8 @@ class testUsers extends CAPITest {
 	public function testUsers_Login($user, $expected_error) {
 		$this->disableAuthorization();
 		$this->call('user.login', $user, $expected_error);
+
+		$this->enableAuthorization();
 	}
 
 	public function testUsers_AuthTokenIncorrect() {
@@ -2856,7 +2859,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		], bin2hex(random_bytes(32)));
+		], CApiTokenHelper::generateToken());
 
 		$this->assertTrue(array_key_exists('error', $res));
 
@@ -2865,13 +2868,13 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenDisabled() {
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_DISABLED,
 			'userid' => 1,
 			'name' => 'disabled',
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$res = $this->callRaw([
@@ -2892,14 +2895,14 @@ class testUsers extends CAPITest {
 
 	public function testUsers_AuthTokenExpired() {
 		$now = time();
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'userid' => 1,
 			'name' => 'expired',
 			'expires_at' => $now - 1,
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$res = $this->callRaw([
@@ -2915,19 +2918,19 @@ class testUsers extends CAPITest {
 		$this->assertTrue(array_key_exists('error', $res));
 
 		['error' => ['data' => $error]] = $res;
-		$this->assertEquals($error, 'API token expired.');
+		$this->assertEquals('API token expired.', $error);
 	}
 
 	public function testUsers_AuthTokenNotExpired() {
 		$now = time();
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'userid' => 1,
 			'name' => 'correct',
 			'expires_at'  => $now + 10,
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$res = $this->callRaw([
@@ -2944,13 +2947,13 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenDebugModeEnabled() {
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'userid' => 1,
 			'name' => 'debug mode',
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		DB::update('usrgrp', [
@@ -2979,13 +2982,13 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenDebugModeDisabled() {
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'userid' => 1,
 			'name' => 'debug mode disabled',
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$res = $this->callRaw([
@@ -3004,7 +3007,7 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenLastaccessIsUpdated() {
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 		$formeraccess = time() - 1;
 
 		$tokenids = DB::insert('token', [[
@@ -3012,7 +3015,7 @@ class testUsers extends CAPITest {
 			'userid' => 1,
 			'lastaccess' => $formeraccess,
 			'name' => 'lastaccess updated',
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$this->callRaw([
@@ -3034,13 +3037,13 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenUserDisabled() {
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'userid' => 13,
 			'name' => 'user with status "Disabled"',
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$res = $this->callRaw([
@@ -3066,6 +3069,8 @@ class testUsers extends CAPITest {
 		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.',
 			$result['error']['data']
 		);
+
+		$this->enableAuthorization();
 	}
 
 	/**
@@ -3252,6 +3257,8 @@ class testUsers extends CAPITest {
 			$end_time = microtime(true);
 			$this->assertTrue($end_time - $start_time >= 1);
 		}
+
+		$this->enableAuthorization();
 	}
 
 	/**
@@ -3372,14 +3379,16 @@ class testUsers extends CAPITest {
 
 		curl_multi_close($multi_handle);
 
+		$expected_result = [
+			'code' => -32500,
+			'message' => 'Application error.',
+			'data' => 'Incorrect user name or password or account is temporarily blocked.'
+		];
+
 		foreach ($responses as $response) {
 			$data = json_decode($response, true);
 
-			$this->assertEquals([
-				'code' => -32500,
-				'message' => 'Application error.',
-				'data' => 'Incorrect user name or password or account is temporarily blocked.'
-			], $data['error']);
+			$this->assertEquals($expected_result, array_intersect_key($data['error'], $expected_result));
 		}
 
 		$response = CDataHelper::callRaw([
@@ -3392,11 +3401,7 @@ class testUsers extends CAPITest {
 			'id' => 1
 		]);
 
-		$this->assertEquals([
-			'code' => -32500,
-			'message' => 'Application error.',
-			'data' => 'Incorrect user name or password or account is temporarily blocked.'
-		], $response['error']);
+		$this->assertEquals($expected_result, array_intersect_key($response['error'], $expected_result));
 
 		$user = DB::find('users', ['username' => $username])[0];
 

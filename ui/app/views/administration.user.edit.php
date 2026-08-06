@@ -607,6 +607,31 @@ if ($data['roleid']) {
 		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 		->addClass('rules-status-container')
 	);
+
+	if (CSettingsHelper::isMobileDevicesEnabled() && $data['db_user']['username'] !== ZBX_GUEST_USER) {
+		$permissions_form_list->addRow((new CTag('h4', true, _('Devices')))->addClass('input-section-header'));
+		$elements = [
+			[(new CSpan(_('Enabled')))
+				->addClass(CRoleHelper::checkAccess(CRoleHelper::DEVICES_ACCESS, $data['roleid'])
+					? ZBX_STYLE_STATUS_GREEN
+					: ZBX_STYLE_STATUS_GREY
+				)
+			]
+		];
+
+		foreach (CRoleHelper::getDevicesActionsLabels($data['user_type']) as $rule_name => $rule_label) {
+			$elements[] = (new CSpan($rule_label))
+				->addClass(CRoleHelper::checkAccess($rule_name, $data['roleid'])
+					? ZBX_STYLE_STATUS_GREEN
+					: ZBX_STYLE_STATUS_GREY
+				);
+		}
+
+		$permissions_form_list->addRow((new CDiv($elements))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('rules-status-container')
+		);
+	}
 }
 
 $tabs->addTab('permissionsTab', _('Permissions'), $permissions_form_list);

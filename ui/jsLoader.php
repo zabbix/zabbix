@@ -185,6 +185,7 @@ $available_js = [
 	'setup.js' => 'pages/',
 	// fields
 	'class.field.js' => 'fields/',
+	'class.field.collection.js' => 'fields/',
 	'class.field.array.js' => 'fields/',
 	'class.field.checkbox.js' => 'fields/',
 	'class.field.file.js' => 'fields/',
@@ -269,7 +270,8 @@ $translate_strings = [
 			_('Are you sure you want to delete %1$s? This action cannot be undone.'),
 		'duplicate' => _('duplicate'),
 		'selected' => _('selected'),
-		'Customize table' => _('Customize table')
+		'Customize table' => _('Customize table'),
+		'Show all tags' => _('Show all tags')
 	],
 	'class.options-popup.js' => [
 		'Column name' => _('Column name'),
@@ -315,6 +317,10 @@ $translate_strings = [
 	'class.geomaps.js' => [
 		'Severity filter' => _('Severity filter')
 	],
+	'class.form.fieldset.collapsible.js' => [
+		'S_COLLAPSE' => _('Collapse'),
+		'S_EXPAND' => _('Expand')
+	],
 	'class.widget-base.js' => [
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
@@ -329,7 +335,9 @@ $translate_strings = [
 		'Edit' => _('Edit'),
 		'No refresh' => _('No refresh'),
 		'Paste' => _('Paste'),
-		'Refresh interval' => _('Refresh interval')
+		'Refresh interval' => _('Refresh interval'),
+		'Edit widget settings' => _('Edit widget settings'),
+		'Open widget actions' => _('Open widget actions')
 	],
 	'class.widget.inaccessible.js' => [
 		'No permissions to referred object or it does not exist!' =>
@@ -374,6 +382,7 @@ $translate_strings = [
 	],
 	'functions.js' => [
 		'Close' => _('Close'),
+		'Close notification' => _('Close notification'),
 		'Details' => _('Details'),
 		'Error message' => _('Error message'),
 		'Info message' => _('Info message'),
@@ -499,7 +508,8 @@ $translate_strings = [
 	],
 	'class.overlay.js' => [
 		'Help' => _('Help'),
-		'S_CLOSE' => _('Close')
+		'Close modal window' => _('Close modal window'),
+		'Open Zabbix documentation in a new tab' => _('Open Zabbix documentation in a new tab')
 	],
 	'class.cookie.js' => [
 		'S_MAX_COOKIE_SIZE_REACHED' =>
@@ -509,8 +519,8 @@ $translate_strings = [
 		'S_TIME_SHIFT' => _('time shift')
 	],
 	'class.cverticalaccordion.js' => [
-		'S_COLLAPSE' => _('Collapse'),
-		'S_EXPAND' => _('Expand')
+		'Expand section' => _('Expand section'),
+		'Collapse section' => _('Collapse section')
 	],
 	'class.form.js' => [
 		'Page received incorrect data' => _('Page received incorrect data')
@@ -546,9 +556,9 @@ $translate_strings = [
 		'File format is unsupported.' => _('File format is unsupported.')
 	],
 	'main.js' => [
-		'S_EXPAND' => _('Expand'),
-		'S_COLLAPSE' => _('Collapse'),
-		'S_CLOSE' => _('Close')
+		'S_CLOSE' => _('Close'),
+		'Expand section' => _('Expand section'),
+		'Collapse section' => _('Collapse section')
 	],
 	'hostinterfacemanager.js' => [
 		'Agent' => _('Agent'),
@@ -566,7 +576,7 @@ $translate_strings = [
 	'multilineinput.js' => [
 		'S_N_CHAR_COUNT' => _('%1$s characters'),
 		'S_N_CHAR_COUNT_REMAINING' => _('%1$s characters remaining'),
-		'S_CLICK_TO_VIEW_OR_EDIT' => _('Click to view or edit'),
+		'Click to view or edit' => _('Click to view or edit'),
 		'S_APPLY' => _('Apply'),
 		'S_CANCEL' => _('Cancel')
 	],
@@ -680,6 +690,9 @@ $translate_strings = [
 		'Unexpected server error.' => _('Unexpected server error.'),
 		'URL opening confirmation' => _('URL opening confirmation')
 	],
+	'class.tabfilteritem.js' => [
+		'Edit filter properties' => _('Edit filter properties')
+	],
 	'class.navigationtree.js' => [
 		'Maintenance with data collection' => _('Maintenance with data collection'),
 		'Maintenance without data collection' => _('Maintenance without data collection')
@@ -740,6 +753,7 @@ if (empty($_GET['files'])) {
 		'class.state.js',
 		'class.message.js',
 		'class.field.js',
+		'class.field.collection.js',
 		'class.field.array.js',
 		'class.field.checkbox.js',
 		'class.field.file.js',

@@ -131,7 +131,8 @@ class CMediatypeHelper {
 			MEDIA_TYPE_EMAIL => _('Email'),
 			MEDIA_TYPE_EXEC => _('Script'),
 			MEDIA_TYPE_SMS => _('SMS'),
-			MEDIA_TYPE_WEBHOOK => _('Webhook')
+			MEDIA_TYPE_WEBHOOK => _('Webhook'),
+			MEDIA_TYPE_PUSH => _('Push')
 		];
 
 		if ($type === null) {
@@ -151,7 +152,7 @@ class CMediatypeHelper {
 	public static function getSupportedMediaTypes(): array {
 		global $ZBX_FEATURE_FLAGS;
 
-		$types = [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK];
+		$types = [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK, MEDIA_TYPE_PUSH];
 		$media_type_denylist = $ZBX_FEATURE_FLAGS['media_type_denylist'];
 
 		return array_diff($types, $media_type_denylist);
@@ -159,25 +160,37 @@ class CMediatypeHelper {
 
 	/**
 	 * Returns an array of message templates.
-	 *
-	 * @return array
 	 */
-	protected static function messageTemplates() {
+	protected static function messageTemplates(): array {
 		return [
 			self::MSG_TYPE_PROBLEM => [
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'recovery' => ACTION_OPERATION,
 				'name' => _('Problem'),
 				'template' => [
-					'subject' => 'Problem: {EVENT.NAME}',
-					'html' => '<b>Problem started</b> at {{EVENT.TIME}.htmlencode()} on {{EVENT.DATE}.htmlencode()}<br>'.
-						'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br>'.
-						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Operational data:</b> {{EVENT.OPDATA}.htmlencode()}<br>'.
-						'<b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>{{TRIGGER.URL}.htmlencode()}',
-					'sms' => "{EVENT.SEVERITY}: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}",
-					'text' => "Problem started at {EVENT.TIME} on {EVENT.DATE}\n".
-						"Problem name: {EVENT.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
-						"Operational data: {EVENT.OPDATA}\nOriginal problem ID: {EVENT.ID}\n{TRIGGER.URL}"
+					'default' => [
+						'subject' => 'Problem: {EVENT.NAME}',
+						'message' =>
+							"Problem started at {EVENT.TIME} on {EVENT.DATE}\n".
+							"Problem name: {EVENT.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
+							"Operational data: {EVENT.OPDATA}\nOriginal problem ID: {EVENT.ID}\n{TRIGGER.URL}"
+					],
+					MEDIA_TYPE_EMAIL.'_'.ZBX_MEDIA_MESSAGE_FORMAT_HTML => [
+						'subject' => 'Problem: {EVENT.NAME}',
+						'message' =>
+							'<b>Problem started</b> at {{EVENT.TIME}.htmlencode()} on {{EVENT.DATE}.htmlencode()}<br>'.
+							'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br>'.
+							'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Operational data:</b> {{EVENT.OPDATA}.htmlencode()}<br>'.
+							'<b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>{{TRIGGER.URL}.htmlencode()}'
+					],
+					MEDIA_TYPE_SMS => [
+						'subject' => '',
+						'message' => "{EVENT.SEVERITY}: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}"
+					],
+					MEDIA_TYPE_PUSH => [
+						'subject' => '{HOST.NAME} - {EVENT.NAME}',
+						'message' => "Started on {{EVENT.TIMESTAMP}.fmttime(\"%x %X\")}\nData: {EVENT.OPDATA}"
+					]
 				]
 			],
 			self::MSG_TYPE_RECOVERY => [
@@ -185,14 +198,28 @@ class CMediatypeHelper {
 				'recovery' => ACTION_RECOVERY_OPERATION,
 				'name' => _('Problem recovery'),
 				'template' => [
-					'subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
-					'html' => '<b>Problem has been resolved</b> at {{EVENT.RECOVERY.TIME}.htmlencode()} on {{EVENT.RECOVERY.DATE}.htmlencode()}<br>'.
-						'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br><b>Problem duration:</b> {{EVENT.DURATION}.htmlencode()}<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br>'.
-						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>{{TRIGGER.URL}.htmlencode()}',
-					'sms' => "Resolved in {EVENT.DURATION}: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}",
-					'text' => "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
-						"Problem name: {EVENT.NAME}\nProblem duration: {EVENT.DURATION}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
-						"Original problem ID: {EVENT.ID}\n{TRIGGER.URL}"
+					'default' => [
+						'subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
+						'message' =>
+							"Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
+							"Problem name: {EVENT.NAME}\nProblem duration: {EVENT.DURATION}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
+							"Original problem ID: {EVENT.ID}\n{TRIGGER.URL}"
+					],
+					MEDIA_TYPE_EMAIL.'_'.ZBX_MEDIA_MESSAGE_FORMAT_HTML => [
+						'subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
+						'message' =>
+							'<b>Problem has been resolved</b> at {{EVENT.RECOVERY.TIME}.htmlencode()} on {{EVENT.RECOVERY.DATE}.htmlencode()}<br>'.
+							'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br><b>Problem duration:</b> {{EVENT.DURATION}.htmlencode()}<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br>'.
+							'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>{{TRIGGER.URL}.htmlencode()}'
+					],
+					MEDIA_TYPE_SMS => [
+						'subject' => '',
+						'message' => "Resolved in {EVENT.DURATION}: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}"
+					],
+					MEDIA_TYPE_PUSH => [
+						'subject' => '[RESOLVED] {HOST.NAME} - {EVENT.NAME}',
+						'message' => "Resolved on {{EVENT.RECOVERY.TIMESTAMP}.fmttime(\"%x %X\")}\nDuration: {EVENT.DURATION}"
+					]
 				]
 			],
 			self::MSG_TYPE_UPDATE => [
@@ -200,16 +227,28 @@ class CMediatypeHelper {
 				'recovery' => ACTION_UPDATE_OPERATION,
 				'name' => _('Problem update'),
 				'template' => [
-					'subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
-					'html' =>
-						'<b>{{USER.FULLNAME}.htmlencode()} {{EVENT.UPDATE.ACTION}.htmlencode()} problem</b> at {{EVENT.UPDATE.DATE}.htmlencode()} {{EVENT.UPDATE.TIME}.htmlencode()}.<br>'.
-						'{{EVENT.UPDATE.MESSAGE}.htmlencode()}<br><br><b>Current problem status:</b> {{EVENT.STATUS}.htmlencode()}<br>'.
-						'<b>Age:</b> {{EVENT.AGE}.htmlencode()}<br><b>Acknowledged:</b> {{EVENT.ACK.STATUS}.htmlencode()}.',
-					'sms' => '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem in {EVENT.AGE} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}',
-					'text' =>
-						"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
-						"{EVENT.UPDATE.MESSAGE}\n\n".
-						"Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}."
+					'default' => [
+						'subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
+						'message' =>
+							"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
+							"{EVENT.UPDATE.MESSAGE}\n\n".
+							"Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}."
+					],
+					MEDIA_TYPE_EMAIL.'_'.ZBX_MEDIA_MESSAGE_FORMAT_HTML => [
+						'subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
+						'message' =>
+							'<b>{{USER.FULLNAME}.htmlencode()} {{EVENT.UPDATE.ACTION}.htmlencode()} problem</b> at {{EVENT.UPDATE.DATE}.htmlencode()} {{EVENT.UPDATE.TIME}.htmlencode()}.<br>'.
+							'{{EVENT.UPDATE.MESSAGE}.htmlencode()}<br><br><b>Current problem status:</b> {{EVENT.STATUS}.htmlencode()}<br>'.
+							'<b>Age:</b> {{EVENT.AGE}.htmlencode()}<br><b>Acknowledged:</b> {{EVENT.ACK.STATUS}.htmlencode()}.'
+					],
+					MEDIA_TYPE_SMS => [
+						'subject' => '',
+						'message' => '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem in {EVENT.AGE} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}'
+					],
+					MEDIA_TYPE_PUSH => [
+						'subject' => '[UPDATED] {HOST.NAME} - {EVENT.NAME}',
+						'message' => "{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem on {{EVENT.UPDATE.TIMESTAMP}.fmttime(\"%x %X\")}\n{EVENT.UPDATE.MESSAGE}"
+					]
 				]
 			],
 			self::MSG_TYPE_SERVICE => [
@@ -217,24 +256,32 @@ class CMediatypeHelper {
 				'recovery' => ACTION_OPERATION,
 				'name' => _('Service'),
 				'template' => [
-					'subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
-					'html' =>
-						'<b>Service problem started</b> at {{EVENT.TIME}.htmlencode()} on {{EVENT.DATE}.htmlencode()}<br>'.
-						'<b>Service problem name:</b> {{EVENT.NAME}.htmlencode()}<br>'.
-						'<b>Service:</b> {{SERVICE.NAME}.htmlencode()}<br>'.
-						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br>'.
-						'<b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>'.
-						'<b>Service description:</b> {{SERVICE.DESCRIPTION}.htmlencode()}<br><br>'.
-						'{{SERVICE.ROOTCAUSE}.htmlencode()}',
-					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
-					'text' =>
-						"Service problem started at {EVENT.TIME} on {EVENT.DATE}\n".
-						"Service problem name: {EVENT.NAME}\n".
-						"Service: {SERVICE.NAME}\n".
-						"Severity: {EVENT.SEVERITY}\n".
-						"Original problem ID: {EVENT.ID}\n".
-						"Service description: {SERVICE.DESCRIPTION}\n\n".
-						"{SERVICE.ROOTCAUSE}"
+					'default' => [
+						'subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
+						'message' =>
+							"Service problem started at {EVENT.TIME} on {EVENT.DATE}\n".
+							"Service problem name: {EVENT.NAME}\n".
+							"Service: {SERVICE.NAME}\n".
+							"Severity: {EVENT.SEVERITY}\n".
+							"Original problem ID: {EVENT.ID}\n".
+							"Service description: {SERVICE.DESCRIPTION}\n\n".
+							"{SERVICE.ROOTCAUSE}"
+					],
+					MEDIA_TYPE_EMAIL.'_'.ZBX_MEDIA_MESSAGE_FORMAT_HTML => [
+						'subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
+						'message' =>
+							'<b>Service problem started</b> at {{EVENT.TIME}.htmlencode()} on {{EVENT.DATE}.htmlencode()}<br>'.
+							'<b>Service problem name:</b> {{EVENT.NAME}.htmlencode()}<br>'.
+							'<b>Service:</b> {{SERVICE.NAME}.htmlencode()}<br>'.
+							'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br>'.
+							'<b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>'.
+							'<b>Service description:</b> {{SERVICE.DESCRIPTION}.htmlencode()}<br><br>'.
+							'{{SERVICE.ROOTCAUSE}.htmlencode()}'
+					],
+					MEDIA_TYPE_SMS => [
+						'subject' => '',
+						'message' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}"
+					]
 				]
 			],
 			self::MSG_TYPE_SERVICE_RECOVERY => [
@@ -242,22 +289,30 @@ class CMediatypeHelper {
 				'recovery' => ACTION_RECOVERY_OPERATION,
 				'name' => _('Service recovery'),
 				'template' => [
-					'subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
-					'html' =>
-						'<b>Service "{{SERVICE.NAME}.htmlencode()}" has been resolved</b> at {{EVENT.RECOVERY.TIME}.htmlencode()} on {{EVENT.RECOVERY.DATE}.htmlencode()}<br>'.
-						'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br>'.
-						'<b>Problem duration:</b> {{EVENT.DURATION}.htmlencode()}<br>'.
-						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br>'.
-						'<b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>'.
-						'<b>Service description:</b> {{SERVICE.DESCRIPTION}.htmlencode()}',
-					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
-					'text' =>
-						"Service \"{SERVICE.NAME}\" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
-						"Problem name: {EVENT.NAME}\n".
-						"Problem duration: {EVENT.DURATION}\n".
-						"Severity: {EVENT.SEVERITY}\n".
-						"Original problem ID: {EVENT.ID}\n".
-						"Service description: {SERVICE.DESCRIPTION}"
+					'default' => [
+						'subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
+						'message' =>
+							"Service \"{SERVICE.NAME}\" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
+							"Problem name: {EVENT.NAME}\n".
+							"Problem duration: {EVENT.DURATION}\n".
+							"Severity: {EVENT.SEVERITY}\n".
+							"Original problem ID: {EVENT.ID}\n".
+							"Service description: {SERVICE.DESCRIPTION}"
+					],
+					MEDIA_TYPE_EMAIL.'_'.ZBX_MEDIA_MESSAGE_FORMAT_HTML => [
+						'subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
+						'message' =>
+							'<b>Service "{{SERVICE.NAME}.htmlencode()}" has been resolved</b> at {{EVENT.RECOVERY.TIME}.htmlencode()} on {{EVENT.RECOVERY.DATE}.htmlencode()}<br>'.
+							'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br>'.
+							'<b>Problem duration:</b> {{EVENT.DURATION}.htmlencode()}<br>'.
+							'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br>'.
+							'<b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>'.
+							'<b>Service description:</b> {{SERVICE.DESCRIPTION}.htmlencode()}'
+					],
+					MEDIA_TYPE_SMS => [
+						'subject' => '',
+						'message' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}"
+					]
 				]
 			],
 			self::MSG_TYPE_SERVICE_UPDATE => [
@@ -265,18 +320,26 @@ class CMediatypeHelper {
 				'recovery' => ACTION_UPDATE_OPERATION,
 				'name' => _('Service update'),
 				'template' => [
-					'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
-					'html' =>
-						'<b>Changed "{{SERVICE.NAME}.htmlencode()}" service status</b> to {{EVENT.UPDATE.SEVERITY}.htmlencode()} at {{EVENT.UPDATE.DATE}.htmlencode()} {{EVENT.UPDATE.TIME}.htmlencode()}.<br>'.
-						'<b>Current problem age</b> is {{EVENT.AGE}.htmlencode()}.<br>'.
-						'<b>Service description:</b> {{SERVICE.DESCRIPTION}.htmlencode()}<br><br>'.
-						'{{SERVICE.ROOTCAUSE}.htmlencode()}',
-					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
-					'text' =>
-						"Changed \"{SERVICE.NAME}\" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
-						"Current problem age is {EVENT.AGE}.\n".
-						"Service description: {SERVICE.DESCRIPTION}\n\n".
-						"{SERVICE.ROOTCAUSE}"
+					'default' => [
+						'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
+						'message' =>
+							"Changed \"{SERVICE.NAME}\" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
+							"Current problem age is {EVENT.AGE}.\n".
+							"Service description: {SERVICE.DESCRIPTION}\n\n".
+							"{SERVICE.ROOTCAUSE}"
+					],
+					MEDIA_TYPE_EMAIL.'_'.ZBX_MEDIA_MESSAGE_FORMAT_HTML => [
+						'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
+						'message' =>
+							'<b>Changed "{{SERVICE.NAME}.htmlencode()}" service status</b> to {{EVENT.UPDATE.SEVERITY}.htmlencode()} at {{EVENT.UPDATE.DATE}.htmlencode()} {{EVENT.UPDATE.TIME}.htmlencode()}.<br>'.
+							'<b>Current problem age</b> is {{EVENT.AGE}.htmlencode()}.<br>'.
+							'<b>Service description:</b> {{SERVICE.DESCRIPTION}.htmlencode()}<br><br>'.
+							'{{SERVICE.ROOTCAUSE}.htmlencode()}'
+					],
+					MEDIA_TYPE_SMS => [
+						'subject' => '',
+						'message' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}"
+					]
 				]
 			],
 			self::MSG_TYPE_DISCOVERY => [
@@ -284,25 +347,35 @@ class CMediatypeHelper {
 				'recovery' => ACTION_OPERATION,
 				'name' => _('Discovery'),
 				'template' => [
-					'subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
-					'html' => '<b>Discovery rule:</b> {{DISCOVERY.RULE.NAME}.htmlencode()}<br><br>'.
-						'<b>Device IP:</b> {{DISCOVERY.DEVICE.IPADDRESS}.htmlencode()}<br>'.
-						'<b>Device DNS:</b> {{DISCOVERY.DEVICE.DNS}.htmlencode()}<br>'.
-						'<b>Device status:</b> {{DISCOVERY.DEVICE.STATUS}.htmlencode()}<br>'.
-						'<b>Device uptime:</b> {{DISCOVERY.DEVICE.UPTIME}.htmlencode()}<br><br>'.
-						'<b>Device service name:</b> {{DISCOVERY.SERVICE.NAME}.htmlencode()}<br>'.
-						'<b>Device service port:</b> {{DISCOVERY.SERVICE.PORT}.htmlencode()}<br>'.
-						'<b>Device service status:</b> {{DISCOVERY.SERVICE.STATUS}.htmlencode()}<br>'.
-						'<b>Device service uptime:</b> {{DISCOVERY.SERVICE.UPTIME}.htmlencode()}',
-					'sms' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
-					'text' => "Discovery rule: {DISCOVERY.RULE.NAME}\n\n".
-						"Device IP: {DISCOVERY.DEVICE.IPADDRESS}\nDevice DNS: {DISCOVERY.DEVICE.DNS}\n".
-						"Device status: {DISCOVERY.DEVICE.STATUS}\n".
-						"Device uptime: {DISCOVERY.DEVICE.UPTIME}\n\n".
-						"Device service name: {DISCOVERY.SERVICE.NAME}\n".
-						"Device service port: {DISCOVERY.SERVICE.PORT}\n".
-						"Device service status: {DISCOVERY.SERVICE.STATUS}\n".
-						"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
+					'default' => [
+						'subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
+						'message' =>
+							"Discovery rule: {DISCOVERY.RULE.NAME}\n\n".
+							"Device IP: {DISCOVERY.DEVICE.IPADDRESS}\nDevice DNS: {DISCOVERY.DEVICE.DNS}\n".
+							"Device status: {DISCOVERY.DEVICE.STATUS}\n".
+							"Device uptime: {DISCOVERY.DEVICE.UPTIME}\n\n".
+							"Device service name: {DISCOVERY.SERVICE.NAME}\n".
+							"Device service port: {DISCOVERY.SERVICE.PORT}\n".
+							"Device service status: {DISCOVERY.SERVICE.STATUS}\n".
+							"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
+					],
+					MEDIA_TYPE_EMAIL.'_'.ZBX_MEDIA_MESSAGE_FORMAT_HTML => [
+						'subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
+						'message' =>
+							'<b>Discovery rule:</b> {{DISCOVERY.RULE.NAME}.htmlencode()}<br><br>'.
+							'<b>Device IP:</b> {{DISCOVERY.DEVICE.IPADDRESS}.htmlencode()}<br>'.
+							'<b>Device DNS:</b> {{DISCOVERY.DEVICE.DNS}.htmlencode()}<br>'.
+							'<b>Device status:</b> {{DISCOVERY.DEVICE.STATUS}.htmlencode()}<br>'.
+							'<b>Device uptime:</b> {{DISCOVERY.DEVICE.UPTIME}.htmlencode()}<br><br>'.
+							'<b>Device service name:</b> {{DISCOVERY.SERVICE.NAME}.htmlencode()}<br>'.
+							'<b>Device service port:</b> {{DISCOVERY.SERVICE.PORT}.htmlencode()}<br>'.
+							'<b>Device service status:</b> {{DISCOVERY.SERVICE.STATUS}.htmlencode()}<br>'.
+							'<b>Device service uptime:</b> {{DISCOVERY.SERVICE.UPTIME}.htmlencode()}'
+					],
+					MEDIA_TYPE_SMS => [
+						'subject' => '',
+						'message' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+					]
 				]
 			],
 			self::MSG_TYPE_AUTOREG => [
@@ -310,10 +383,18 @@ class CMediatypeHelper {
 				'recovery' => ACTION_OPERATION,
 				'name' => _('Autoregistration'),
 				'template' => [
-					'subject' => 'Autoregistration: {HOST.HOST}',
-					'html' => '<b>Host name:</b> {{HOST.HOST}.htmlencode()}<br><b>Host IP:</b> {{HOST.IP}.htmlencode()}<br><b>Agent port:</b> {{HOST.PORT}.htmlencode()}',
-					'sms' => "Autoregistration: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}",
-					'text' => "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}"
+					'default' => [
+						'subject' => 'Autoregistration: {HOST.HOST}',
+						'message' => "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}"
+					],
+					MEDIA_TYPE_EMAIL.'_'.ZBX_MEDIA_MESSAGE_FORMAT_HTML => [
+						'subject' => 'Autoregistration: {HOST.HOST}',
+						'message' => '<b>Host name:</b> {{HOST.HOST}.htmlencode()}<br><b>Host IP:</b> {{HOST.IP}.htmlencode()}<br><b>Agent port:</b> {{HOST.PORT}.htmlencode()}'
+					],
+					MEDIA_TYPE_SMS => [
+						'subject' => '',
+						'message' => "Autoregistration: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}"
+					]
 				]
 			],
 			self::MSG_TYPE_INTERNAL => [
@@ -321,10 +402,10 @@ class CMediatypeHelper {
 				'recovery' => ACTION_OPERATION,
 				'name' => _('Internal problem'),
 				'template' => [
-					'subject' => '',
-					'html' => '',
-					'sms' => '',
-					'text' => ''
+					'default' => [
+						'subject' => '',
+						'message' => ''
+					]
 				]
 			],
 			self::MSG_TYPE_INTERNAL_RECOVERY => [
@@ -332,10 +413,10 @@ class CMediatypeHelper {
 				'recovery' => ACTION_RECOVERY_OPERATION,
 				'name' => _('Internal problem recovery'),
 				'template' => [
-					'subject' => '',
-					'html' => '',
-					'sms' => '',
-					'text' => ''
+					'default' => [
+						'subject' => '',
+						'message' => ''
+					]
 				]
 			]
 		];
@@ -343,19 +424,15 @@ class CMediatypeHelper {
 
 	/**
 	 * Returns all message templates.
-	 *
-	 * @return array
 	 */
-	public static function getAllMessageTemplates() {
+	public static function getAllMessageTemplates(): array {
 		return self::messageTemplates();
 	}
 
 	/**
 	 * Returns all message types.
-	 *
-	 * @return array
 	 */
-	public static function getAllMessageTypes() {
+	public static function getAllMessageTypes(): array {
 		return array_keys(self::messageTemplates());
 	}
 
@@ -373,24 +450,6 @@ class CMediatypeHelper {
 	}
 
 	/**
-	 * Gets message type form the specified event source and operation mode.
-	 *
-	 * @param int $eventsource  Event source.
-	 * @param int $recovery     Operation mode.
-	 *
-	 * @return int|bool
-	 */
-	public static function transformToMessageType($eventsource, $recovery) {
-		foreach (self::messageTemplates() as $message_type => $message_template) {
-			if ($eventsource == $message_template['eventsource'] && $recovery == $message_template['recovery']) {
-				return $message_type;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Returns a message template array with message subject and body.
 	 *
 	 * @param int $media_type      Media type.
@@ -402,24 +461,14 @@ class CMediatypeHelper {
 	public static function getMessageTemplate($media_type, $message_type, $message_format = null) {
 		$message_templates = self::messageTemplates();
 
-		if ($media_type == MEDIA_TYPE_SMS) {
-			return [
-				'subject' => '',
-				'message' => $message_templates[$message_type]['template']['sms']
-			];
+		if (array_key_exists($media_type.'_'.$message_format, $message_templates[$message_type]['template'])) {
+			return $message_templates[$message_type]['template'][$media_type.'_'.$message_format];
+		}
+		elseif (array_key_exists($media_type, $message_templates[$message_type]['template'])) {
+			return $message_templates[$message_type]['template'][$media_type];
 		}
 
-		if ($media_type == MEDIA_TYPE_EMAIL && $message_format == ZBX_MEDIA_MESSAGE_FORMAT_HTML) {
-			return [
-				'subject' => $message_templates[$message_type]['template']['subject'],
-				'message' => $message_templates[$message_type]['template']['html']
-			];
-		}
-
-		return [
-			'subject' => $message_templates[$message_type]['template']['subject'],
-			'message' => $message_templates[$message_type]['template']['text']
-		];
+		return $message_templates[$message_type]['template']['default'];
 	}
 
 	/**

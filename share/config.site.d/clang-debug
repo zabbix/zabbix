@@ -44,7 +44,7 @@ then
 	CFLAGS+=" -Werror=vla"
 
 	# flags for clang
-	CFLAGS+=" -Wno-uninitialized"
+	CFLAGS+=" -Wno-sometimes-uninitialized"
 
 	# other
 	CFLAGS+=" -DZBX_DEBUG"

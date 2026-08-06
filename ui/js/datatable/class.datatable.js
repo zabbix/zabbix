@@ -723,6 +723,7 @@ class CDataTable {
 				more_tags.setAttribute('data-hintbox', '1');
 				more_tags.setAttribute('data-hintbox-static', '1');
 				more_tags.setAttribute('aria-expanded', 'false');
+				more_tags.setAttribute('aria-label', t('Show all tags'));
 
 				tags_wrapper.appendChild(more_tags);
 			}

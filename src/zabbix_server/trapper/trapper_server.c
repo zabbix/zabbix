@@ -13,6 +13,7 @@
 **/
 
 #include "trapper_history_push.h"
+#include "trapper_push_test.h"
 #include "trapper_server.h"
 
 #include "proxydata.h"
@@ -183,6 +184,15 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	ZBX_STR2UCHAR(message_format, row[16]);
 	ZBX_STR2UCHAR(type, row[0]);
 
+	if (MEDIA_TYPE_PUSH == type)
+	{
+		ret = trapper_process_push_test(sendto, subject, message, mediatypeid, type, row, smtp_port,
+				smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, message_format,
+				&error, &debug);
+		zbx_db_free_result(result);
+		goto fail;
+	}
+
 	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[19], row[1], row[2], row[3], row[4],
 			row[5], row[6], row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
 			smtp_authentication, atoi(row[13]), atoi(row[14]), row[15], message_format, row[17], row[18],
@@ -243,7 +253,7 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
 		zbx_get_config_forks_f get_config_forks,
 		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip,
-		zbx_ipc_async_socket_t *rtc)
+		zbx_uint32_t config_denyitemtypes_mask, zbx_ipc_async_socket_t *rtc)
 {
 	ZBX_UNUSED(get_program_type_cb);
 
@@ -269,7 +279,7 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 		zbx_send_proxyconfig(sock, jp, config_vault, config_comms->config_timeout,
 				config_comms->config_trapper_timeout, config_comms->config_source_ip,
 				config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
-				config_comms->config_ssl_key_location);
+				config_comms->config_ssl_key_location, config_denyitemtypes_mask);
 
 		return SUCCEED;
 	}

@@ -29,24 +29,32 @@ class CControllerRegExUpdate extends CController {
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'regexpid' => ['db regexps.regexpid', 'required'],
 			'name' => ['db regexps.name', 'required', 'not_empty'],
+			'description' => ['db regexps.description'],
 			'test_string' => ['db regexps.test_string'],
 			'expressions' => ['objects', 'required', 'not_empty', 'uniq' => [['expression_type', 'expression']],
 				'fields' => [
 					'expression_type' => ['db expressions.expression_type', 'required',
-						'in' => [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED,
-							EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE
+						'in' => [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_CONTAINS_ANY_SUBSTRING,
+							REGEX_TYPE_NOT_CONTAINS_STRING, REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX
 						]
 					],
 					'expression' => [
-						['db expressions.expression', 'required', 'not_empty', 'use' => [CRegexValidator::class, []],
-							'when' => ['expression_type', 'in' => [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE]]
+						['db expressions.expression', 'required', 'not_empty', 'use' => [CRegexValidator::class, [
+							'messageInvalid' => _('Regular expression must be a string'),
+							'messageRegex' => _('Incorrect regular expression: "%2$s"')
+						]],
+							'when' => ['expression_type',
+								'in' => [REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX]
+							]
 						],
-						['db expressions.expression', 'required', 'not_empty', 'when' => ['expression_type', 'in' => [
-							EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED
-						]]]
+						['db expressions.expression', 'required', 'not_empty', 'when' => ['expression_type',
+							'in' => [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_CONTAINS_ANY_SUBSTRING,
+								REGEX_TYPE_NOT_CONTAINS_STRING
+							]
+						]]
 					],
 					'exp_delimiter' => ['db expressions.exp_delimiter', 'in' => [',', '.', '/'], 'when' => [
-						'expression_type', 'in' => [EXPRESSION_TYPE_ANY_INCLUDED]
+						'expression_type', 'in' => [REGEX_TYPE_CONTAINS_ANY_SUBSTRING]
 					]],
 					'case_sensitive' => ['db expressions.case_sensitive', 'in' => [0, 1]]
 				],
@@ -86,7 +94,7 @@ class CControllerRegExUpdate extends CController {
 		$expressions = $this->getInput('expressions');
 
 		foreach ($expressions as &$expression) {
-			if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
+			if ($expression['expression_type'] != REGEX_TYPE_CONTAINS_ANY_SUBSTRING) {
 				$expression['exp_delimiter'] = '';
 			}
 		}
@@ -95,6 +103,7 @@ class CControllerRegExUpdate extends CController {
 		$result = API::Regexp()->update([
 			'regexpid' => $this->getInput('regexpid'),
 			'name' => $this->getInput('name'),
+			'description' => $this->getInput('description', ''),
 			'test_string' => $this->getInput('test_string', ''),
 			'expressions' => $expressions
 		]);
