@@ -53,7 +53,7 @@ static int	str_to_cpu_status(const char *str)
 	return ZBX_CPU_STATUS_UNKNOWN;
 }
 
-#define TEST_NAME "ZBX_GET_CPUS_TEST:"
+#define TEST_NAME	"ZBX_GET_CPUS_TEST:"
 
 static void	test_get_cpus(void)
 {
@@ -63,7 +63,7 @@ static void	test_get_cpus(void)
 	const char			*last_sample;
 	char				parameter_string[20];
 	int				h_first, h_count, index, ret;
-	int 				cpu_cnt = 1;
+	int				cpu_cnt = 1;
 	int				expected_status[2];
 
 	memset(test_cpus, 0, sizeof(test_cpus));
@@ -88,7 +88,7 @@ static void	test_get_cpus(void)
 		h_first = zbx_mock_get_parameter_int(parameter_string);
 
 		zbx_snprintf(parameter_string, sizeof(parameter_string),"in.h_count_%d",idx);
-		h_count 	= zbx_mock_get_parameter_int(parameter_string);
+		h_count = zbx_mock_get_parameter_int(parameter_string);
 
 		cpu = &test_cpus[idx];
 		cpu->h_first = h_first;
@@ -127,7 +127,7 @@ static void	test_get_cpus(void)
 }
 
 #undef TEST_NAME
-#define TEST_NAME "ZBX_SYSTEM_CPU_DISCOVERY_TEST:"
+#define TEST_NAME	"ZBX_SYSTEM_CPU_DISCOVERY_TEST:"
 
 /* item-level counterpart of test_get_cpus(): drives the same mocked collector state, but goes through */
 /* the actual system.cpu.discovery entry point and asserts on its JSON contract instead of the internal */
@@ -225,7 +225,7 @@ static void	test_system_cpu_discovery(void)
 }
 
 #undef TEST_NAME
-#define TEST_NAME "ZBX_UPDATE_CPU_COUNTERS_TEST:"
+#define TEST_NAME 	"ZBX_UPDATE_CPU_COUNTERS_TEST:"
 
 static void	test_update_cpu_counters(void)
 {
@@ -255,8 +255,10 @@ static void	test_update_cpu_counters(void)
 		update_cpu_counters(&cpu, counter);
 
 		for (int idx = 0; idx < ZBX_CPU_STATE_COUNT; idx++)
+		{
 			zbx_mock_assert_uint64_eq(TEST_NAME" h_counter[ZBX_CPU_STATE][write_index]",
 				expected_value + idx, cpu.h_counter[idx][expected_write_index]);
+		}
 	}
 	else
 		update_cpu_counters(&cpu, NULL);
