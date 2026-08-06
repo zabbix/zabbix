@@ -103,7 +103,7 @@ class CWebUser {
 		$validator = new CFrontendActionValidator();
 
 		$redirect_url = self::$data['url'];
-		$is_valid_url = $validator->validate($redirect_url);
+		$is_valid_url = $redirect_url === '' || $validator->validate($redirect_url);
 
 		$roles = API::Role()->get([
 			'output' => [],
@@ -114,9 +114,9 @@ class CWebUser {
 		if ($roles) {
 			$rules = $roles[0]['rules'];
 
-			if ($rules['profile.redirect.enforce'] != 0 || !$is_valid_url) {
+			if ($rules['profile.redirect.enforce'] != 0 || !$is_valid_url || $redirect_url === '') {
 				$redirect_url = $rules['profile.redirect.url'];
-				$is_valid_url = $validator->validate($rules['profile.redirect.url']);
+				$is_valid_url = $redirect_url === '' || $validator->validate($redirect_url);
 			}
 		}
 

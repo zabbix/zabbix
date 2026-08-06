@@ -966,7 +966,7 @@ class CRole extends CApiService {
 
 			$rules[$roleid] = array_merge(
 				self::compileUiRules((int) $type, $old_rules, $new_rules),
-				self::compileProfileRules($new_rules),
+				self::compileRedirectRules($new_rules),
 				self::compileServicesReadRules($new_rules),
 				self::compileServicesWriteRules($new_rules),
 				self::compileModulesRules($old_rules, $new_rules),
@@ -1085,7 +1085,7 @@ class CRole extends CApiService {
 	 *
 	 * @return array
 	 */
-	private static function compileProfileRules(array $new_rules): array {
+	private static function compileRedirectRules(array $new_rules): array {
 		$compiled_rules = [];
 
 		$compiled_rules[] = [
@@ -1431,7 +1431,7 @@ class CRole extends CApiService {
 			foreach ($result as $roleid => &$role) {
 				$role['rules'] = array_merge(
 					$this->getRelatedUiRules($roles_rules[$roleid], $output, (int) $role['type']),
-					$this->getRelatedProfileRules($roles_rules[$roleid], $output),
+					$this->getRelatedRedirectRules($roles_rules[$roleid], $output),
 					$this->getRelatedServicesReadRules($roles_rules[$roleid], $output),
 					$this->getRelatedServicesWriteRules($roles_rules[$roleid], $output),
 					$this->getRelatedModulesRules($roles_rules[$roleid], $output),
@@ -1489,7 +1489,7 @@ class CRole extends CApiService {
 	 *
 	 * @return array
 	 */
-	private function getRelatedProfileRules(array $rules, array $output): array {
+	private function getRelatedRedirectRules(array $rules, array $output): array {
 		$profile_redirect_enforce = array_key_exists('profile.redirect.enforce', $rules)
 			? $rules['profile.redirect.enforce']
 			: (string) ZBX_ROLE_RULE_DISABLED;
