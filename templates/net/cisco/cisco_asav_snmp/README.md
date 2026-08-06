@@ -28,6 +28,7 @@ Refer to the vendor documentation.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$SNMP.TIMEOUT}|<p>The time interval for SNMP agent availability trigger expression.</p>|`5m`|
+|{$SNMP.UPTIME.WARN}|<p>Uptime threshold above which the "Host has been restarted" problem auto-resolves.</p>|`10m`|
 |{$CISCO.LLD.FILTER.IF.NAME.MATCHES}|<p>Filter by discoverable interface names.</p>|`.*`|
 |{$CISCO.LLD.FILTER.IF.NAME.NOT_MATCHES}|<p>Filter to exclude discovered interfaces by name.</p>|`CHANGE_IF_NEEDED`|
 |{$CISCO.LLD.FILTER.IF.DESC.MATCHES}|<p>Filter by discoverable interface description.</p>|`.*`|
@@ -54,7 +55,7 @@ Refer to the vendor documentation.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Cisco ASAv: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Cisco ASAv by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
-|Cisco ASAv: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.uptime)<10m`|Info|**Manual close**: Yes|
+|Cisco ASAv: Host has been restarted|<p>The uptime counter has decreased, which indicates that the host has been restarted.<br>A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.<br>The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.</p>|`change(/Cisco ASAv by SNMP/cisco.asav.uptime)<0 and last(/Cisco ASAv by SNMP/cisco.asav.uptime,#2)<42949672.96-(lastclock(/Cisco ASAv by SNMP/cisco.asav.uptime)-lastclock(/Cisco ASAv by SNMP/cisco.asav.uptime,#2))`|Info|**Manual close**: Yes|
 
 ### LLD rule Physical entry discovery
 
