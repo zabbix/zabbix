@@ -145,7 +145,7 @@ class CControllerProxyEdit extends CController {
 
 			if ($usrgrps) {
 				$data['warnings'][] = _s(
-					'By adding the proxy to a proxy group, it will be removed from proxy allow/deny lists of the following user groups: %1$s',
+					'By adding the proxy to a proxy group, it will be removed from proxy allow/deny lists of the following user groups: %1$s.',
 					implode(', ', array_column($usrgrps, 'name'))
 				);
 			}
