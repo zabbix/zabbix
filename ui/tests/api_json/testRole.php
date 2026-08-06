@@ -533,6 +533,7 @@ class testRole extends CAPITest {
 	 */
 	public function testCreateRuleApiAccess(array $roles, array $expected) {
 		['roleids' => $roleids] = $this->call('role.create', $roles)['result'];
+		self::$roleids = array_merge(self::$roleids, $roleids);
 
 		$db_roles = $this->call('role.get', [
 			'output' => ['name'],

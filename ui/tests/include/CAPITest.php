@@ -16,7 +16,7 @@
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CTest.php';
-require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
+require_once __DIR__.'/helpers/CTestDataHelper.php';
 
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
