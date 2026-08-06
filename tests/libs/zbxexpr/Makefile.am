@@ -22,6 +22,7 @@ BINARIES_tests += macro_func \
 if HAVE_PCRE2
 BINARIES_tests += macro_regrepl
 endif
+endif
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -205,6 +206,7 @@ zbx_function_param_parse_ext_LDFLAGS = @SERVER_LDFLAGS@
 zbx_function_param_parse_ext_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 
+if SERVER
 macro_tr_SOURCES = \
 	macro_tr.c \
 	$(COMMON_SRC_FILES)
@@ -244,6 +246,7 @@ macro_func_LDADD += @SERVER_LIBS@
 macro_func_LDFLAGS = @SERVER_LDFLAGS@
 
 macro_func_CFLAGS = $(EXPR_COMPILER_FLAGS)
+endif
 
 zbx_function_param_quote_SOURCES = \
 	zbx_function_param_quote.c \
@@ -270,5 +273,3 @@ zbx_user_macro_parse_dyn_LDADD += @SERVER_LIBS@
 zbx_user_macro_parse_dyn_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_user_macro_parse_dyn_CFLAGS = $(EXPR_COMPILER_FLAGS)
-
-endif
