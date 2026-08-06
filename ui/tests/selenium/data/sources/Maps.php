@@ -288,6 +288,7 @@ class Maps {
 						'elements' => [['hostid' => $result['hostids']['Host_1']]],
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 186,
+						'label_location' => MAP_LABEL_LOC_TOP,
 						'x' => 139,
 						'y' => 27,
 						'zindex' => 0
