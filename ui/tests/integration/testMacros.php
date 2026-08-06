@@ -3139,7 +3139,7 @@ const SUBJECT_INTERNAL = "Internal";
 
 	/***************************************************************************************************************
 
-		Test macro resolution (source: event created by an autoregestration).
+		Test macro resolution (source: event created by an autoregistration).
 
 	***************************************************************************************************************/
 	const SUBJECT_AUTOREG = 'Autoregistration';
@@ -3370,7 +3370,7 @@ const SUBJECT_INTERNAL = "Internal";
 	 * @required-components server, agent
 	 */
 
-	public function testMacros_AutoregestrationEvent() {
+	public function testMacros_AutoregistrationEvent() {
 		if (file_exists(self::$metadata_file)) {
 			unlink(self::$metadata_file);
 		}
