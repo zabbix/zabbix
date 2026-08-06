@@ -76,7 +76,7 @@ static const tq_column_info_t	column_info_metrics_sum[] = {
 	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
 	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
-	{"IsMonotonic",			ZBX_TQ_COLUMN_TYPE_BOOL,	TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"IsMonotonic",			ZBX_TQ_COLUMN_TYPE_BOOL,	0		},
 	{0}
 };
 

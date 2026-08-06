@@ -731,7 +731,6 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 	zbx_snprintf_alloc(sql, &alloc, &offset, "ORDER BY rounded_time%s%s ",
 			(SUCCEED == query_has_columns ? "," : ""), columns_to_select);
 
-	/* format */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "FORMAT JSONCompactEachRow ");
 	zbx_snprintf_alloc(sql, &alloc, &offset, "SETTINGS output_format_json_quote_64bit_integers=0;");
 
