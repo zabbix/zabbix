@@ -38,7 +38,7 @@ zabbix_export:
         Refer to the vendor documentation.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -318,7 +318,7 @@ zabbix_export:
           preprocessing:
             - type: REGEX
               parameters:
-                - 'Version (.+), RELEASE'
+                - 'Version\s+([^\s,]+)'
                 - \1
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
