@@ -1247,7 +1247,6 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 
 		if (SUCCEED != cep_window_get_limits(rule, &ref->window->duration, &ref->window->capacity, error))
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
 			ref->window->location = CEP_LOCATION_REMOVED;
 			zbx_hashset_remove_direct(&pool->windows, ref);
 			return NULL;
@@ -1581,7 +1580,7 @@ static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: load cep window pool's widnows and pending events from database   *
+ * Purpose: load cep window pool's windows and pending events from database   *
  *          and enqueue windows for processing                                *
  *                                                                            *
  * Parameters: pool   - [IN/OUT] cep window pool to load windows into         *
@@ -1603,12 +1602,10 @@ void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool
 
 		zbx_hashset_create(&groups, 100, ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+		/* clear the hashset in the case loading was retried beacuse of database connection failure */
 		zbx_hashset_iter_reset(&pool->windows, &iter);
 		while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			zbx_hashset_remove_direct(&pool->windows, ref);
-		}
+			zbx_hashset_iter_remove(&iter);
 
 		zbx_dbconn_begin(db);
 
