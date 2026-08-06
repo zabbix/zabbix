@@ -102,8 +102,8 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 
 		if ($proxy_names) {
 			CMessageHelper::addError(_n(
-				'Proxy "%1$s" cannot be added to the proxy list because it is already managed by proxy group',
-				'Proxies "%1$s" cannot be added to the proxy list because they are already managed by proxy group',
+				'Proxy "%1$s" cannot be added to the proxy list because it is already managed by proxy group.',
+				'Proxies "%1$s" cannot be added to the proxy list because they are already managed by proxy group.',
 				implode(', ', $proxy_names),
 				count($proxy_names)
 			));
