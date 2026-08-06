@@ -242,9 +242,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 	}
 
 	/**
-	 * Validate value is unique in columns:
+	 * Value uniqueness within columns:
 	 * - "query.columns[].column" (or "query.columns[].column" and "query.columns[].attribute_key" for complex column)
-	 * - "query.aggregated_columns[].alias" if it is not empty, "query.aggregated_columns[].column" otherwise
+	 * - "query.aggregated_columns[].alias"
 	 *
 	 * @param array       $item   Telemetry item to validate.
 	 * @param string      $path   Path in validation message.
@@ -254,48 +254,22 @@ class CItemTypeTelemetryQuery extends CItemType {
 		$uniq = [];
 
 		foreach ($item['query']['columns'] as $i => $column) {
-			$uniq_value = in_array($column['column'], self::COMPLEX_COLUMN_NAME)
+			$uniq_value = in_array($column['column'], self::COMPLEX_COLUMN_NAME, true)
 				? $column['column'].'.'.$column['attribute_key']
 				: $column['column'];
-
-			if (array_key_exists($uniq_value, $uniq)) {
-				$error = _s('Invalid parameter "%1$s": %2$s.',
-					$path.'/query/columns/'.($i + 1).'/column',
-					_s('value %1$s already exists', '('.$uniq_value.')')
-				);
-
-				return false;
-			}
-
 			$uniq[$uniq_value] = true;
 		}
 
 		foreach ($item['query']['aggregated_columns'] as $i => $column) {
-			if ($column['alias'] !== '') {
-				if (array_key_exists($column['alias'], $uniq)) {
-					$error = _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/query/aggregated_columns/'.($i + 1).'/alias',
-						_s('value %1$s already exists', '('.$column['alias'].')')
-					);
-
-					return false;
-				}
-
-				$uniq[$column['alias']] = true;
-
-				continue;
-			}
-
-			if (array_key_exists($column['column'], $uniq)) {
-				$error = _s('Invalid parameter "%1$s": %2$s.',
-					$path.'/query/aggregated_columns/'.($i + 1).'/column',
-					_s('value %1$s already exists', '('.$column['column'].')')
+			if (array_key_exists($column['alias'], $uniq)) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path.'/query/aggregated_columns/'.($i + 1),
+					_s('value %1$s already exists', '(alias)=('.$column['alias'].')')
 				);
 
 				return false;
 			}
 
-			$uniq[$column['column']] = true;
+			$uniq[$column['alias']] = true;
 		}
 
 		return true;
@@ -423,8 +397,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 													'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]]]],
-			'aggregated_columns'	=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['column', 'alias']], 'fields' => [
-				'function'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_PCTILE]), 'default' => AGGREGATE_COUNT],
+			'aggregated_columns'	=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['alias']], 'fields' => [
+				'function'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_PCTILE])],
 				'column'				=> ['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PCTILE])],
 													'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $aggregated_column)],
@@ -432,7 +406,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 				]],
 				'parameters'			=> ['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'function', 'in' => AGGREGATE_PCTILE],
-													'type' => API_INTS32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => '1:100'],
+													'type' => API_FLOATS, 'flags' => API_REQUIRED, 'in' => '0:100'],
 												['else' => true, 'type' => API_OBJECTS, 'length' => 0, 'unset' => true]
 				]],
 				'alias'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
