@@ -357,18 +357,16 @@ window.drule_edit_popup = new class {
 				'[name="discovery_by"][value="<?= ZBX_MONITORED_BY_SERVER ?>"]'
 			);
 
-			if (!discovery_by_server.checked) {
-				return;
+			if (discovery_by_server.checked) {
+				const discovery_by_proxy = this.form.querySelector(
+					'[name="discovery_by"][value="<?= ZBX_MONITORED_BY_PROXY ?>"]'
+				);
+
+				discovery_by_proxy.checked = true;
+				discovery_by_proxy.removeAttribute('readonly');
+
+				this.#updateForm();
 			}
-
-			const discovery_by_proxy = this.form.querySelector(
-				'[name="discovery_by"][value="<?= ZBX_MONITORED_BY_PROXY ?>"]'
-			);
-
-			discovery_by_proxy.checked = true;
-			discovery_by_proxy.removeAttribute('readonly');
-
-			this.#updateForm();
 		}
 
 		// Remove all warning icons and enable all Remove buttons in Checks table.
