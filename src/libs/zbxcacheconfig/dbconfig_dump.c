@@ -1338,6 +1338,7 @@ static void	DCdump_maintenance_eventnames(zbx_dc_maintenance_t *maintenance)
 	for (i = 0; i < index.values_num; i++)
 	{
 		zbx_dc_maintenance_eventname_t	*eventname = index.values[i];
+
 		zabbix_log(LOG_LEVEL_TRACE, "    maintenance_eventnameid:" ZBX_FS_UI64 " operator:%u value:'%s'",
 				eventname->maintenance_eventnameid, eventname->op, eventname->value);
 	}
@@ -1427,6 +1428,7 @@ static void	DCdump_maintenances_for_trigger(zbx_dc_maintenances_for_trigger_t *m
 	for (i = 0; i < index.values_num; i++)
 	{
 		zbx_dc_maintenance_t	*maintenance = index.values[i];
+
 		zabbix_log(LOG_LEVEL_TRACE, "    maintenanceid:" ZBX_FS_UI64, maintenance->maintenanceid);
 	}
 

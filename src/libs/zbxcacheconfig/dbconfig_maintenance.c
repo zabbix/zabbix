@@ -34,8 +34,8 @@ zbx_host_maintenance_t;
 
 typedef struct
 {
-	zbx_uint64_t		hostid;
-	zbx_vector_ptr_t	maintenances;
+	zbx_uint64_t			hostid;
+	zbx_vector_dc_maintenance_ptr_t	maintenances;
 }
 zbx_host_event_maintenance_t;
 
@@ -1253,7 +1253,7 @@ static void	dc_assign_event_maintenance_to_host(zbx_hashset_t *host_event_mainte
 		return;
 	}
 
-	zbx_vector_ptr_append(&host_event_maintenance->maintenances, maintenance);
+	zbx_vector_dc_maintenance_ptr_append(&host_event_maintenance->maintenances, maintenance);
 }
 
 typedef void	(*assign_maintenance_to_host_f)(zbx_hashset_t *host_maintenances,
@@ -1487,13 +1487,17 @@ void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenancei
  *                                                                            *
  * Purpose: matches tags with [*mt_pos] maintenance tag name                  *
  *                                                                            *
- * Parameters: mtags    - [IN] the maintenance tags, sorted by tag names      *
- *             etags    - [IN] the event tags, sorted by tag names            *
- *             mt_pos   - [IN/OUT] the next maintenance tag index             *
- *             et_pos   - [IN/OUT] the next event tag index                   *
+ * Parameters: mtags    - [IN] maintenance tags, sorted by tag names          *
+ *             etags    - [IN] event tags, sorted by tag names                *
+ *             mt_pos   - [IN/OUT] next maintenance tag index                 *
+ *             et_pos   - [IN/OUT] next event tag index                       *
  *                                                                            *
- * Return value: SUCCEED - found matching tag                                 *
- *               FAIL    - no matching tags found                             *
+ * Return value: SUCCEED - event tags match maintenance conditions            *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: any matching positive condition results in match of whole check, *
+ *           in absence of matching positive conditions any failed negative   *
+ *           condition results in fail of whole check                         *
  *                                                                            *
  ******************************************************************************/
 static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const zbx_vector_tags_ptr_t *etags,
@@ -1578,15 +1582,18 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 				}
 			}
 		}
-		else
+		else if (ZBX_CONDITION_OPERATOR_EQUAL == mtag->op || ZBX_CONDITION_OPERATOR_LIKE == mtag->op)
 		{
 			for (j = et_start; j < et_end; j++)
 			{
 				if (SUCCEED == zbx_strmatch_condition(etags->values[j]->value, mtag->value, mtag->op))
-				{
 					return SUCCEED;
-				}
 			}
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
 		}
 	}
 
@@ -1597,8 +1604,8 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
  *                                                                            *
  * Purpose: matches maintenance and event tags using OR eval type             *
  *                                                                            *
- * Parameters: mtags    - [IN] the maintenance tags, sorted by tag names      *
- *             etags    - [IN] the event tags, sorted by tag names            *
+ * Parameters: maintenance - [IN] maintenance with tags, sorted by tag names  *
+ *             tags        - [IN] event tags, sorted by tag names             *
  *                                                                            *
  * Return value: SUCCEED - event tags matches maintenance                     *
  *               FAIL    - otherwise                                          *
@@ -1608,7 +1615,7 @@ static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance,
 {
 	int	mt_pos = 0, et_pos = 0;
 
-	while (mt_pos < maintenance->tags.values_num && et_pos < tags->values_num)
+	while (mt_pos < maintenance->tags.values_num)
 	{
 		if (SUCCEED == dc_maintenance_match_tag_range(&maintenance->tags, tags, &mt_pos, &et_pos))
 			return SUCCEED;
@@ -1621,8 +1628,8 @@ static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance,
  *                                                                            *
  * Purpose: matches maintenance and event tags using AND/OR eval type         *
  *                                                                            *
- * Parameters: mtags    - [IN] the maintenance tags, sorted by tag names      *
- *             etags    - [IN] the event tags, sorted by tag names            *
+ * Parameters: maintenance - [IN] maintenance with tags, sorted by tag names  *
+ *             tags        - [IN] event tags, sorted by tag names             *
  *                                                                            *
  * Return value: SUCCEED - event tags matches maintenance                     *
  *               FAIL    - otherwise                                          *
@@ -1633,24 +1640,21 @@ static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenan
 {
 	int	mt_pos = 0, et_pos = 0;
 
-	while (mt_pos < maintenance->tags.values_num && et_pos < tags->values_num)
+	while (mt_pos < maintenance->tags.values_num)
 	{
 		if (FAIL == dc_maintenance_match_tag_range(&maintenance->tags, tags, &mt_pos, &et_pos))
 			return FAIL;
 	}
-
-	if (mt_pos != maintenance->tags.values_num)
-		return FAIL;
 
 	return SUCCEED;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the tags must be processed by the specified maintenance  *
+ * Purpose: check if tags must be processed by the specified maintenance      *
  *                                                                            *
- * Parameters: maintenance - [IN] the maintenance                             *
- *             tags        - [IN] the tags to check                           *
+ * Parameters: maintenance - [IN]                                             *
+ *             tags        - [IN]                                             *
  *                                                                            *
  * Return value: SUCCEED - the tags must be processed by the maintenance      *
  *               FAIL    - otherwise                                          *
@@ -1663,7 +1667,7 @@ static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, co
 
 	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == maintenance->tags_evaltype)
 		return dc_maintenance_match_tags_andor(maintenance, tags);
-	else if(ZBX_CONDITION_EVAL_TYPE_OR == maintenance->tags_evaltype)
+	else if (ZBX_CONDITION_EVAL_TYPE_OR == maintenance->tags_evaltype)
 		return dc_maintenance_match_tags_or(maintenance, tags);
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -1680,48 +1684,104 @@ static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, co
  * Return value: SUCCEED - event name must be processed by maintenance        *
  *               FAIL    - otherwise                                          *
  *                                                                            *
+ * Comments: any matching positive condition results in match of whole check, *
+ *           in absence of matching positive conditions any failed negative   *
+ *           condition results in fail of whole check                         *
+ *                                                                            *
  ******************************************************************************/
 static int	dc_maintenance_match_event_name(const zbx_dc_maintenance_t *maintenance, const char *event_name)
 {
-	zbx_dc_maintenance_eventname_t	*mt_eventname;
+	int	neg_cond_status = FAIL;
 
 	if (0 == maintenance->eventnames.values_num)
 		return SUCCEED;
 
 	for (int i = 0; i < maintenance->eventnames.values_num; i++)
 	{
+		zbx_dc_maintenance_eventname_t	*mt_eventname;
+
 		mt_eventname = maintenance->eventnames.values[i];
-		switch (mt_eventname->op)
+		if (ZBX_CONDITION_OPERATOR_NOT_LIKE == mt_eventname->op)
 		{
-			case ZBX_CONDITION_OPERATOR_LIKE:
-				if (NULL != strstr(event_name, mt_eventname->value))
-					return SUCCEED;
+			if (FAIL == neg_cond_status)
+				neg_cond_status = 1;
+			else if (0 == neg_cond_status)
+				continue;
+
+			if (FAIL == zbx_strmatch_condition(event_name, mt_eventname->value, mt_eventname->op))
+			{
+				neg_cond_status = 0;
 				break;
-			case ZBX_CONDITION_OPERATOR_NOT_LIKE:
-				if (NULL == strstr(event_name, mt_eventname->value))
-					return SUCCEED;
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-				return FAIL;
+			}
+		}
+		else if (ZBX_CONDITION_OPERATOR_LIKE == mt_eventname->op)
+		{
+			if (SUCCEED == zbx_strmatch_condition(event_name, mt_eventname->value, mt_eventname->op))
+				return SUCCEED;
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
 		}
 	}
 
-	return FAIL;
+	return 1 == neg_cond_status ? SUCCEED : FAIL;
 }
 
 static void	host_event_maintenance_clean(void *data)
 {
 	zbx_host_event_maintenance_t	*host_event_maintenance = (zbx_host_event_maintenance_t*)data;
 
-	zbx_vector_ptr_destroy(&host_event_maintenance->maintenances);
+	zbx_vector_dc_maintenance_ptr_destroy(&host_event_maintenance->maintenances);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: append matching maintenances to query                             *
+ *                                                                            *
+ * Parameters: query        - [IN/OUT]                                        *
+ *             maintenances - [IN]                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	append_query_maintenances(zbx_event_suppress_query_t *query,
+		zbx_vector_dc_maintenance_ptr_t *maintenances)
+{
+	int					i;
+	zbx_uint64_pair_t			pair;
+	const zbx_dc_maintenance_t		*maintenance;
+
+	for (i = 0; i < maintenances->values_num; i++)
+	{
+		maintenance = maintenances->values[i];
+
+		if (ZBX_MAINTENANCE_RUNNING != maintenance->state)
+			continue;
+
+		pair.first = maintenance->maintenanceid;
+
+		if (FAIL != zbx_vector_uint64_pair_search(&query->maintenances, pair,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			continue;
+		}
+
+		if (FAIL == dc_maintenance_match_tags(maintenance, &query->tags))
+			continue;
+
+		if (FAIL == dc_maintenance_match_event_name(maintenance, query->event_name))
+			continue;
+
+		pair.second = maintenance->running_until;
+		zbx_vector_uint64_pair_append(&query->maintenances, pair);
+	}
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: get maintenance data for events                                   *
  *                                                                            *
- * Parameters: event_queries -  [IN/OUT] in - event data                      *
+ * Parameters: event_queries  - [IN/OUT] in - event data                      *
  *                                       out - running maintenances for each  *
  *                                            event                           *
  *             maintenanceids - [IN] the maintenances to process              *
@@ -1732,7 +1792,7 @@ static void	host_event_maintenance_clean(void *data)
 int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_queries,
 		const zbx_vector_uint64_t *maintenanceids)
 {
-	int				i, j, k, ret = FAIL;
+	int				i, j, ret = FAIL;
 	zbx_event_suppress_query_t	*query;
 	ZBX_DC_ITEM			*item;
 	ZBX_DC_FUNCTION			*function;
@@ -1841,8 +1901,9 @@ int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_q
 	zbx_hashset_iter_reset(&host_event_maintenances, &iter);
 	while (NULL != (host_event_maintenance = (zbx_host_event_maintenance_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_ptr_create(&host_event_maintenance->maintenances);
-		zbx_vector_ptr_reserve(&host_event_maintenance->maintenances, (size_t)maintenanceids->values_num);
+		zbx_vector_dc_maintenance_ptr_create(&host_event_maintenance->maintenances);
+		zbx_vector_dc_maintenance_ptr_reserve(&host_event_maintenance->maintenances,
+				(size_t)maintenanceids->values_num);
 	}
 
 	dc_get_host_maintenances_by_ids(maintenanceids, &host_event_maintenances, dc_assign_event_maintenance_to_host);
@@ -1853,85 +1914,36 @@ int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_q
 	zbx_hashset_iter_reset(&host_event_maintenances, &iter);
 	while (NULL != (host_event_maintenance = (zbx_host_event_maintenance_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_ptr_sort(&host_event_maintenance->maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		zbx_vector_ptr_uniq(&host_event_maintenance->maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_dc_maintenance_ptr_sort(&host_event_maintenance->maintenances,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_dc_maintenance_ptr_uniq(&host_event_maintenance->maintenances,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 
+	/* find matching maintenances */
 	for (i = 0; i < event_queries->values_num; i++)
 	{
 		zbx_dc_maintenances_for_trigger_t	*maintenances_for_trigger;
-		const zbx_dc_maintenance_t		*maintenance;
-		zbx_uint64_pair_t			pair;
 
 		query = event_queries->values[i];
 
 		if (NULL != (maintenances_for_trigger = (zbx_dc_maintenances_for_trigger_t *)zbx_hashset_search(
 				&config->maintenances_for_triggers, &query->triggerid)))
 		{
-			for (k = 0; k < maintenances_for_trigger->maintenances.values_num; k++)
-			{
-				maintenance = maintenances_for_trigger->maintenances.values[k];
-
-				if (ZBX_MAINTENANCE_RUNNING != maintenance->state)
-					continue;
-
-				pair.first = maintenance->maintenanceid;
-
-				if (FAIL != zbx_vector_uint64_pair_search(&query->maintenances, pair,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					continue;
-				}
-
-				if (SUCCEED != dc_maintenance_match_tags(maintenance, &query->tags))
-					continue;
-
-				if (SUCCEED != dc_maintenance_match_event_name(maintenance, query->event_name))
-					continue;
-
-				pair.second = maintenance->running_until;
-				zbx_vector_uint64_pair_append(&query->maintenances, pair);
-
-				ret = SUCCEED;
-			}
+			append_query_maintenances(query, &maintenances_for_trigger->maintenances);
 		}
 
-		/* find matching maintenances */
 		for (j = 0; j < query->hostids.values_num; j++)
 		{
-			if (NULL == (host_event_maintenance = zbx_hashset_search(&host_event_maintenances,
-					&query->hostids.values[j])))
+			if (NULL != (host_event_maintenance = (zbx_host_event_maintenance_t *)zbx_hashset_search(
+					&host_event_maintenances, &query->hostids.values[j])))
 			{
-				continue;
-			}
-
-			for (k = 0; k < host_event_maintenance->maintenances.values_num; k++)
-			{
-				maintenance = (zbx_dc_maintenance_t *)host_event_maintenance->maintenances.values[k];
-
-				if (ZBX_MAINTENANCE_RUNNING != maintenance->state)
-					continue;
-
-				pair.first = maintenance->maintenanceid;
-
-				if (FAIL != zbx_vector_uint64_pair_search(&query->maintenances, pair,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					continue;
-				}
-
-				if (SUCCEED != dc_maintenance_match_tags(maintenance, &query->tags))
-					continue;
-
-				if (SUCCEED != dc_maintenance_match_event_name(maintenance, query->event_name))
-					continue;
-
-				pair.second = maintenance->running_until;
-				zbx_vector_uint64_pair_append(&query->maintenances, pair);
-
-				ret = SUCCEED;
+				append_query_maintenances(query, &host_event_maintenance->maintenances);
 			}
 		}
+
+		if (0 != query->maintenances.values_num)
+			ret = SUCCEED;
 	}
 unlock:
 	UNLOCK_CACHE;
