@@ -45,7 +45,10 @@ class testTelnetChecks extends CIntegrationTest {
 	public function serverConfigurationProvider(): array {
 		return [
 			self::COMPONENT_SERVER => [
-				'DebugLevel' => 4,
+				// DebugLevel 4 makes telnet_read() log every single byte it reads, which noticeably slows
+				// the whole server down once several TELNET items are polled - level 3 is plenty to see
+				// "finished forced reloading of the configuration cache" and other startup/shutdown lines.
+				'DebugLevel' => 3,
 				'LogFileSize' => 20
 			]
 		];
@@ -93,15 +96,18 @@ class testTelnetChecks extends CIntegrationTest {
 	}
 
 	/**
-	 * Creates a TELNET item executing $command against the mock and returns its itemid. The item key
-	 * itself carries no parameters - the executed command is the item's "params" field, exactly as the
-	 * real telnet.run[] check works (see checks_telnet.c / telnet_run.c).
+	 * Creates a TELNET item executing $command against the mock and returns its itemid. The executed
+	 * command is the item's "params" field, exactly as the real telnet.run[] check works (see
+	 * checks_telnet.c / telnet_run.c). The port must be repeated as the key's 3rd parameter -
+	 * checks_telnet.c only takes the address from the host interface; the port always comes from the
+	 * key (get_rparam(&request, 2)) and falls back to the hardcoded default telnet port 23 if that key
+	 * parameter is empty, regardless of what port the interface itself is configured with.
 	 */
 	private function createTelnetItem(string $unique_suffix, string $command): string {
 		$response = $this->call('item.create', [
 			'hostid' => self::$hostid,
 			'name' => 'telnet_checks_'.$unique_suffix,
-			'key_' => 'telnet.run['.$unique_suffix.']',
+			'key_' => 'telnet.run['.$unique_suffix.',,'.self::getMockPort().']',
 			'type' => ITEM_TYPE_TELNET,
 			'value_type' => ITEM_VALUE_TYPE_TEXT,
 			'delay' => '1s',
