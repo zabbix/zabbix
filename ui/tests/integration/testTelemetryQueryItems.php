@@ -527,6 +527,62 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return $payload;
 	}
 
+	private static function getAggregationSubcase(string $description, array $values, array $funcs) {
+		return [
+			'description' => $description,
+			'item' => self::tqItem(
+				APM_SIGNAL_TYPE_METRICS,
+				APM_METRICS_POINT_GAUGE,
+				[
+					self::qcol('MetricName')
+				],
+				(function () use ($funcs) {
+					$ret = [];
+
+					foreach ($funcs as $i => $v) {
+						$col = AGGREGATE_COUNT == $v['function'] ? '' : 'Value';
+						$ret[] = self::qagg($col, $v['function'], 'func_' . $i, $v['parameters'] ?? []);
+					}
+
+					return $ret;
+				})(),
+				self::emptyFilter()
+			),
+			'buckets' => function(int $now) use ($funcs) {
+				$ret = [
+					[
+						'id' => 1,
+						'columns' => [
+							'MetricName' => 'test_gauge'
+						]
+					]
+				];
+
+				foreach ($funcs as $i => $v) {
+					$ret[0]['columns']['func_' . $i] = $v['expected'];
+				}
+
+				return $ret;
+			},
+			'delay' => 0,
+			'input_tmpl' => function (int $now) use ($values) {
+				$ret = [];
+				$ret['metrics'] = [];
+
+				foreach ($values as $i => $v) {
+					$ret['metrics'][] = self::tmplMetricGauge(
+						self::tsOffStr($now, -10),
+						self::tsOffStr($now, -5),
+						function (array &$payload) use ($i, $v) {
+							$payload['resourceMetrics'][0]['scopeMetrics'][0]['metrics'][0]['gauge']['dataPoints'][0]['asDouble'] = $v;
+						});
+				}
+
+				return $ret;
+			}
+		];
+	}
+
 	private function getSubcases(): array {
 		return [
 			[
@@ -1136,7 +1192,55 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricExponentialHistogram(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
-			]
+			],
+			self::getAggregationSubcase(
+				'Aggregation test #1',
+				[-3, -2, -1, 0, 1, 2, 3],
+				[
+					['function' => AGGREGATE_COUNT,		'expected' => 7],
+					['function' => AGGREGATE_MIN,		'expected' => -3],
+					['function' => AGGREGATE_MAX,		'expected' => 3],
+					['function' => AGGREGATE_AVG,		'expected' => 0],
+					['function' => AGGREGATE_SUM,		'expected' => 0],
+					['function' => AGGREGATE_PCTILE,	'expected' => 0,	'parameters' => ['50']]
+				]
+			),
+			self::getAggregationSubcase(
+				'Aggregation test #2',
+				[0],
+				[
+					['function' => AGGREGATE_COUNT,		'expected' => 1],
+					['function' => AGGREGATE_MIN,		'expected' => 0],
+					['function' => AGGREGATE_MAX,		'expected' => 0],
+					['function' => AGGREGATE_AVG,		'expected' => 0],
+					['function' => AGGREGATE_SUM,		'expected' => 0],
+					['function' => AGGREGATE_PCTILE,	'expected' => 0,	'parameters' => ['50.05']]
+				]
+			),
+			self::getAggregationSubcase(
+				'Aggregation test #3',
+				[-0.3, -0.2, -0.1, 0.0, 0.1],
+				[
+					['function' => AGGREGATE_COUNT,		'expected' => 5],
+					['function' => AGGREGATE_MIN,		'expected' => -0.3],
+					['function' => AGGREGATE_MAX,		'expected' => 0.1],
+					['function' => AGGREGATE_AVG,		'expected' => -0.1],
+					['function' => AGGREGATE_SUM,		'expected' => -0.5],
+					['function' => AGGREGATE_PCTILE,	'expected' => -0.3,	'parameters' => ['0']]
+				]
+			),
+			self::getAggregationSubcase(
+				'Aggregation test #3',
+				[1, 2, 3],
+				[
+					['function' => AGGREGATE_COUNT,		'expected' => 3],
+					['function' => AGGREGATE_MIN,		'expected' => 1],
+					['function' => AGGREGATE_MAX,		'expected' => 3],
+					['function' => AGGREGATE_AVG,		'expected' => 2],
+					['function' => AGGREGATE_SUM,		'expected' => 6],
+					['function' => AGGREGATE_PCTILE,	'expected' => 3,	'parameters' => ['100']]
+				]
+			)
 		];
 	}
 
