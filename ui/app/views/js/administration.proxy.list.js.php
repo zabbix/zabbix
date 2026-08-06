@@ -28,6 +28,10 @@
 				ZABBIX.PopupManager.open('proxy.edit');
 			});
 
+			document.querySelector('.js-create-proxy-in-cloud').addEventListener('click', () => {
+				window.open('https://cloud.zabbix.com', '_blank').focus();
+			});
+
 			const form = document.getElementById('proxy-list');
 
 			form.querySelector('.js-refresh-proxy-config')
