@@ -259,21 +259,12 @@ class CWidgetGeoMap extends CWidget {
 
 			const hintbox = document.createElement('div');
 			hintbox.classList.add(CWidgetGeoMap.ZBX_STYLE_HINTBOX);
-			hintbox.style.maxHeight = `${node.getBoundingClientRect().top - 27}px`;
 			hintbox.append(this.makePopupContent(cluster.layer.getAllChildMarkers().map(o => o.feature)));
 
 			node.hintBoxItem = hintBox.createBox(cluster.originalEvent, node, hintbox, '', true);
 
 			// Adjust hintbox size in case if scrollbar is necessary.
 			hintBox.positionElement(cluster.originalEvent, node, node.hintBoxItem);
-
-			// Center hintbox relative to node.
-			node.hintBoxItem.position({
-				my: 'center bottom',
-				at: 'center top',
-				of: node,
-				collision: 'fit'
-			});
 
 			Focuser.recoverFocus(node.hintBoxItem[0]);
 			Focuser.containFocus(node.hintBoxItem[0]);
@@ -302,7 +293,6 @@ class CWidgetGeoMap extends CWidget {
 
 			const hintbox = document.createElement('div');
 			hintbox.classList.add(CWidgetGeoMap.ZBX_STYLE_HINTBOX);
-			hintbox.style.maxHeight = `${node.getBoundingClientRect().top - 27}px`;
 			hintbox.append(this.makePopupContent([e.layer.feature]));
 
 			node.hintBoxItem = hintBox.createBox(e.originalEvent, node, hintbox, '', true);
@@ -310,14 +300,6 @@ class CWidgetGeoMap extends CWidget {
 
 			// Adjust hintbox size in case if scrollbar is necessary.
 			hintBox.positionElement(e.originalEvent, node, node.hintBoxItem);
-
-			// Center hintbox relative to node.
-			node.hintBoxItem.position({
-				my: 'center bottom',
-				at: 'center top',
-				of: node,
-				collision: 'fit'
-			});
 
 			Focuser.recoverFocus(node.hintBoxItem[0]);
 			Focuser.containFocus(node.hintBoxItem[0]);
