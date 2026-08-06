@@ -1134,6 +1134,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 		$itemid = $response['result']['itemids'][0];
 
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 0);
+
 		return $itemid;
 	}
 
