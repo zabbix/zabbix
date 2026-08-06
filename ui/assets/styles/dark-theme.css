@@ -2494,7 +2494,7 @@ button {
 :root {
   --datatable-row-height: 31px;
   --datatable-compact-row-height: calc(var(--datatable-row-height) - 9px);
-  --datatable-scrollbar-height: 11px; }
+  --datatable-scrollbar-height: 15px; }
 
 .datatable {
   position: relative;
@@ -2716,8 +2716,6 @@ button {
     box-sizing: border-box;
     scrollbar-width: thin;
     scrollbar-color: #c2c2c2 #2b2b2b; }
-    .datatable .datatable-scrollbar ::-webkit-scrollbar {
-      height: var(--datatable-scrollbar-height); }
     .datatable .datatable-scrollbar .datatable-scrollbar-inner {
       height: 0; }
       .datatable .datatable-scrollbar .datatable-scrollbar-inner::after {

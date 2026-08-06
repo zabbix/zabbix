@@ -1,7 +1,7 @@
 :root {
 	--datatable-row-height: 31px;
 	--datatable-compact-row-height: calc(var(--datatable-row-height) - 9px);
-	--datatable-scrollbar-height: 11px;
+	--datatable-scrollbar-height: 15px;
 }
 
 .datatable {
@@ -362,10 +362,6 @@
 		box-sizing: border-box;
 		scrollbar-width: thin;
 		scrollbar-color: $datatable-scrollbar-thumb-bg-color $ui-bg-color;
-
-		::-webkit-scrollbar {
-			height: var(--datatable-scrollbar-height);
-		}
 
 		.datatable-scrollbar-inner {
 			height: 0;
