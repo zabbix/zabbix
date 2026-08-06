@@ -1424,7 +1424,7 @@ void	cep_window_pool_save(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool
 	{
 		zbx_db_insert_add_values(&db_insert_groups, groupid, ref->ruleid, ref->group_by, ref->hostgroupid,
 				ref->hostid, ZBX_NULL2EMPTY_STR(ref->tag), ZBX_NULL2EMPTY_STR(ref->tag_value),
-				ref->window->nextcheck);
+				(int)ref->window->nextcheck);
 
 		while (SUCCEED != zbx_queue_ptr_empty(&ref->window->hevents))
 		{
