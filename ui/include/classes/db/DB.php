@@ -33,8 +33,8 @@ class DB {
 	const FIELD_TYPE_CUID = 0x0080;
 	const FIELD_TYPE_JSON = 0x0100;
 
-	const SUPPORTED_FILTER_TYPES = self::FIELD_TYPE_INT | self::FIELD_TYPE_CHAR | self::FIELD_TYPE_ID |
-		self::FIELD_TYPE_FLOAT | self::FIELD_TYPE_UINT | self::FIELD_TYPE_CUID;
+	const SUPPORTED_FILTER_TYPES = self::FIELD_TYPE_INT | self::FIELD_TYPE_CHAR | self::FIELD_TYPE_ID
+		| self::FIELD_TYPE_FLOAT | self::FIELD_TYPE_UINT | self::FIELD_TYPE_CUID;
 	const SUPPORTED_SEARCH_TYPES = self::FIELD_TYPE_CHAR | self::FIELD_TYPE_TEXT | self::FIELD_TYPE_CUID;
 
 	/**
@@ -349,7 +349,7 @@ class DB {
 				}
 			}
 			else {
-				if ($tableSchema['fields'][$field]['type'] & (self::FIELD_TYPE_CUID | self::FIELD_TYPE_CHAR)) {
+				if ($tableSchema['fields'][$field]['type'] & (self::FIELD_TYPE_CHAR | self::FIELD_TYPE_CUID)) {
 					$length = mb_strlen($values[$field]);
 
 					if ($length > $tableSchema['fields'][$field]['length']) {

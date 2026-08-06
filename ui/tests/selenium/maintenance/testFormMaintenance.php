@@ -662,7 +662,7 @@ class testFormMaintenance extends CWebTest {
 
 			$period_form = COverlayDialogElement::find(1)->waitUntilReady()->one();
 			$period_form->asForm()->fill(['Period type' => 'Daily']);
-			$period_form->query('button:Cancel')->one()->click();
+			$period_form->query('button:Cancel')->waitUntilClickable()->one()->click();
 
 			$period_form->waitUntilNotVisible();
 			$this->assertEquals($initial_count, $periods_table->getRows()->count());
@@ -676,7 +676,7 @@ class testFormMaintenance extends CWebTest {
 				$row->query('button:Edit')->one()->click();
 				$period_form = COverlayDialogElement::find(1)->waitUntilReady()->one();
 				$period_form->asForm()->fill(['Period type' => 'Monthly']);
-				$period_form->query('button:Cancel')->one()->click();
+				$period_form->query('button:Cancel')->waitUntilClickable()->one()->click();
 
 				$period_form->waitUntilNotVisible();
 				$this->assertEquals($old_text, $periods_table->getRow(0)->getText());

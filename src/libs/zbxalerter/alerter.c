@@ -26,6 +26,7 @@
 #include "zbxexec.h"
 #include "zbxhash.h"
 #include "zbxipcservice.h"
+#include "zbxjson.h"
 #include "zbxmedia.h"
 #include "zbxnix.h"
 #include "zbxself.h"
@@ -36,8 +37,13 @@
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
 #include "zbxexpr.h"
+#include "zbx_bridge_adapter_constants.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
+#endif
+
+#if defined(HAVE_LIBCURL)
+#	include "zbxhttp.h"
 #endif
 
 #define	ALARM_ACTION_TIMEOUT	40
@@ -502,6 +508,114 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_free(script_bin);
 }
 
+static void	alerter_process_push(zbx_ipc_socket_t *socket,
+		zbx_ipc_message_t *ipc_message,
+		const char *config_bridge_adapter_url,
+		const char *config_bridge_adapter_ca_file,
+		const char *config_bridge_adapter_crl_file,
+		const char *config_bridge_adapter_cert_file,
+		const char *config_bridge_adapter_key_file,
+		const char *config_bridge_adapter_connect_to)
+{
+	zbx_config_t	cfg;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES);
+
+	if (0 == cfg.enable_mobile_devices)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send device notification: mobile devices are disabled");
+		alerter_send_result(socket, NULL, FAIL, "Mobile devices are disabled.", NULL);
+		return;
+	}
+
+#ifndef HAVE_LIBCURL
+	ZBX_UNUSED(ipc_message);
+	ZBX_UNUSED(config_bridge_adapter_url);
+	ZBX_UNUSED(config_bridge_adapter_ca_file);
+	ZBX_UNUSED(config_bridge_adapter_crl_file);
+	ZBX_UNUSED(config_bridge_adapter_cert_file);
+	ZBX_UNUSED(config_bridge_adapter_key_file);
+	ZBX_UNUSED(config_bridge_adapter_connect_to);
+
+	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
+	alerter_send_result(socket, NULL, FAIL, "Application compiled without cURL library.", NULL);
+#else
+	int				ret = FAIL;
+	zbx_uint64_t			alertid;
+	char				*params, *payload = NULL, *error = NULL, *error_data = NULL, *body_data = NULL,
+					code[ZBX_BRIDGE_ERROR_CODE_LEN], message[ZBX_BRIDGE_MESSAGE_LEN];
+	struct zbx_json_parse		jp_body, jp_result;
+	zbx_http_jsonrpc_error_t	err_kind;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
+	payload = zbx_strdup(NULL, params);
+
+	if (NULL == config_bridge_adapter_url || '\0' == *config_bridge_adapter_url)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: \"BridgeAdapterURL\""
+				" configuration parameter is not set");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_NOT_CONFIGURED);
+		goto out;
+	}
+
+	if (SUCCEED != zbx_http_post_json_rpc(config_bridge_adapter_url, config_bridge_adapter_ca_file,
+			config_bridge_adapter_crl_file, config_bridge_adapter_cert_file, config_bridge_adapter_key_file,
+			config_bridge_adapter_connect_to, payload, ZBX_PROTO_VALUE_DEVICE_NOTIFY,
+			ZBX_BRIDGE_ADAPTER_SERVICE_NAME, (long)ZBX_BRIDGE_ADAPTER_TIMEOUT, &body_data, &jp_body,
+			&err_kind))
+	{
+		switch (err_kind)
+		{
+			case ZBX_HTTP_JSONRPC_ERR_CONNECT:
+				error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
+				break;
+			default:
+				error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
+				break;
+		}
+
+		goto out;
+	}
+
+	if (SUCCEED == zbx_json_brackets_by_name(&jp_body, "error", &jp_result))
+	{
+		if (SUCCEED == zbx_json_value_by_name(&jp_result, "code", code, sizeof(code), NULL) &&
+				SUCCEED == zbx_json_value_by_name(&jp_result, "message", message,
+				sizeof(message), NULL))
+		{
+#ifdef ZBX_DEBUG
+			error_data = zbx_json_raw_value_by_path_dyn(&jp_result, "$.data");
+			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
+					code, message, ZBX_NULL2EMPTY_STR(error_data));
+#else
+			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s",
+					code, message);
+#endif
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_RETURNED_ERROR);
+		}
+		else
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
+
+		goto out;
+	}
+
+	ret = SUCCEED;
+
+out:
+	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
+
+	zbx_free(params);
+	zbx_free(error_data);
+	zbx_free(error);
+	zbx_free(body_data);
+	zbx_free(payload);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically check table alerts and send notifications if needed  *
@@ -596,6 +710,15 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 				break;
 			case ZBX_IPC_ALERTER_WEBHOOK:
 				alerter_process_webhook(&alerter_socket, &message, alerter_args_in->config_source_ip);
+				break;
+			case ZBX_IPC_ALERTER_PUSH:
+				alerter_process_push(&alerter_socket, &message,
+						alerter_args_in->config_bridge_adapter_url,
+						alerter_args_in->config_bridge_adapter_ca_file,
+						alerter_args_in->config_bridge_adapter_crl_file,
+						alerter_args_in->config_bridge_adapter_cert_file,
+						alerter_args_in->config_bridge_adapter_key_file,
+						alerter_args_in->config_bridge_adapter_connect_to);
 				break;
 			case ZBX_RTC_SHUTDOWN:
 				zbx_set_exiting_with_succeed();

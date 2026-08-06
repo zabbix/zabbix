@@ -293,6 +293,13 @@ Additional information about the metrics and used API methods:
 |{$AWS.BACKUP_VAULT.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable backup vaults by region.</p>|`.*`|
 |{$AWS.BACKUP_VAULT.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered backup vaults by region.</p>|`CHANGE_IF_NEEDED`|
 
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get EC2 instances|<p>Get EC2 instances.</p>|Script|aws.ec2.get|
+|EC2 instances count|<p>Get the total count of EC2 instances.</p>|Dependent item|aws.ec2.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li></ul>|
+
 ### LLD rule S3 buckets discovery
 
 |Name|Description|Type|Key and additional info|
@@ -303,7 +310,7 @@ Additional information about the metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|EC2 instances discovery|<p>Get EC2 instances.</p>|Script|aws.ec2.discovery|
+|EC2 instances discovery|<p>Discover EC2 instances.</p>|Dependent item|aws.ec2.discovery|
 
 ### LLD rule RDS instances discovery
 

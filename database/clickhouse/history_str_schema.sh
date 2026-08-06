@@ -3,7 +3,7 @@
 DIR="$(dirname "$0")"
 . "$DIR/clickhouse.sh"
 
-echo "DROP TABLE IF EXISTS $CH_DB.history_str" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
+echo "DROP TABLE IF EXISTS $CH_DB.history_str SYNC" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
 
 cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
 CREATE TABLE $CH_DB.history_str
@@ -12,7 +12,7 @@ CREATE TABLE $CH_DB.history_str
 	clock_ns DateTime64(9),
 	value String
 )
-ENGINE = MergeTree()
+ENGINE = $CH_ENGINE
 PARTITION BY $CH_PARTITION(clock_ns)
 PRIMARY KEY (itemid, clock_ns)
 TTL clock_ns + toIntervalSecond($CH_TTL)
