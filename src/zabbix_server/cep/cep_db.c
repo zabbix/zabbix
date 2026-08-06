@@ -1681,6 +1681,7 @@ void	cep_db_update_rule_errors(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_ta
 	}
 	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
 
+	zbx_dbconn_pool_release_connection(dbpool, db);
 	zbx_free(sql);
 
 	zbx_cep_t	*cep;
