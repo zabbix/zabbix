@@ -745,7 +745,7 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
  * Return value: the number of processed values                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
+static int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
 		size_t values_num, zbx_proxy_suppress_t *nodata_win)
 {
 	size_t	i;
