@@ -35,7 +35,7 @@ zabbix_export:
         3\. Customize host wizard configuration field values if needed.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Power
       items:
@@ -729,10 +729,6 @@ zabbix_export:
             2 - unknown
           valuemap:
             name: zabbix.host.available
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
           tags:
             - tag: component
               value: health

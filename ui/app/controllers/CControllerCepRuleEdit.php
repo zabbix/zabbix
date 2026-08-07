@@ -142,7 +142,7 @@ class CControllerCepRuleEdit extends CController {
 		$ceprule['cepruleid'] = array_key_exists('cep_ruleid', $ceprule) ? $ceprule['cep_ruleid'] : null;
 		unset($ceprule['cep_ruleid']);
 
-		// Form will use this interpolated formula API field's name in submited structure.
+		// Form will use this interpolated formula API field's name in submitted structure.
 		$ceprule['filter']['formula'] = $ceprule['filter']['eval_formula'];
 		unset($ceprule['filter']['eval_formula']);
 

@@ -1534,7 +1534,7 @@ zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_
  * Purpose: update event maintenances                                         *
  *                                                                            *
  * Parameters: h        - [IN/OUT] event handle                               *
- *             suppress - [IN/OUT] supppress data                             *
+ *             suppress - [IN/OUT] suppress data                             *
  *             action   - [IN]     maintenance operation                      *
  *                                                                            *
  * Comments: Suppresses or unsuppresses event by adding or removing           *

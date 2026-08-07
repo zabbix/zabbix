@@ -299,7 +299,7 @@ class CCepRule extends CApiService {
 			while ($row = DBfetch($resource)) {
 				$cep_ruleid = $operation_ruleids[$row['cep_operationid']];
 
-				$cep_rules[$cep_ruleid]['operations'][$row['cep_operationid']]['filter'][] =
+				$cep_rules[$cep_ruleid]['operations'][$row['cep_operationid']]['filter']['conditions'][] =
 					array_diff_key($row, array_flip(['cep_operationid', 'cep_operation_conditionid']));
 			}
 		}
@@ -1203,7 +1203,7 @@ class CCepRule extends CApiService {
 	private static function getOperationConditionId(array $condition, array $db_conditions): ?string {
 		$condition += [
 			'tag' => DB::getDefault('cep_operation_condition', 'tag'),
-			'value' => DB::getDefault('cep_operation_condition', 'value'),
+			'value' => DB::getDefault('cep_operation_condition', 'value')
 		];
 
 		foreach ($db_conditions as $db_condition) {

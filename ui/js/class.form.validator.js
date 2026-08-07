@@ -618,14 +618,16 @@ class CFormValidator {
 	 */
 	#validateDelayed() {
 		const delayed_checks = this.#use_checks.filter((check) => {
-			let are_all_fields_valid = true;
+			if (check.value === null) {
+				return false;
+			}
 
 			// If at least one of involved field has error, ?action=validate check is skipped.
 			if (check.path in this.#errors && this.#errors[check.path].some((error) => error.message !== '')) {
-				are_all_fields_valid = false;
+				return false;
 			}
 
-			return are_all_fields_valid;
+			return true;
 		});
 
 		const use_validations = delayed_checks.map((check) => {
