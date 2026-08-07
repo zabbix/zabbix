@@ -111,6 +111,9 @@ class CSettingsHelper {
 	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
 	public const SERVER_ID = 'serverid';
 
+	public const APM_GLOBAL_DB_URL_SCHEMA_HTTP = 'http';
+	public const APM_GLOBAL_DB_URL_SCHEMA_HTTPS = 'https';
+
 	private static $params = [];
 	private static $params_public = [];
 	private static $params_private = [];
@@ -158,7 +161,10 @@ class CSettingsHelper {
 					'auditlog_enabled', 'auditlog_mode',
 
 					// Read-only parameters.
-					'ha_failover_delay', 'serverid'
+					'ha_failover_delay', 'serverid',
+
+					// APM global configuration.
+					'apm_global_db'
 				]
 			]);
 

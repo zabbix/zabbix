@@ -58,6 +58,24 @@ class CSettings extends CApiService {
 		'ha_failover_delay', 'serverid'
 	];
 
+	private array $additional_output_fields = ['apm_global_db'];
+
+	private const APM_GLOBAL_DB_DEFAULT = [
+		'status' => APM_GLOBAL_DB_STATUS_NOT_CONFIGURED,
+		'url' => '',
+		'authentication_type' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD,
+		'username' => '',
+		'password' => '',
+		'vault_path' => '',
+		'db' => '',
+		'ssl_verify_peer' => APM_GLOBAL_DB_VERIFY_PEER_DISABLED,
+		'ssl_verify_host' => APM_GLOBAL_DB_VERIFY_HOST_DISABLED,
+		'ssl_ca_location' => '',
+		'ssl_cert_file' => '',
+		'ssl_key_file' => '',
+		'ssl_key_password' => ''
+	];
+
 	/**
 	 * @param array $options
 	 *
@@ -66,19 +84,36 @@ class CSettings extends CApiService {
 	 * @return array
 	 */
 	public function get(array $options): array {
+		$output_fields = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+			? array_merge($this->output_fields, $this->additional_output_fields)
+			: $this->output_fields;
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $this->output_fields), 'default' => API_OUTPUT_EXTEND]
+			'output' =>	['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = $this->output_fields;
-		}
+		$db_settings = CApiSettingsHelper::getParameters($options['output']);
 
-		return CApiSettingsHelper::getParameters($options['output']);
+		self::normalizeAffectedObjects($db_settings, false);
+
+		return $db_settings;
+	}
+
+	private static function normalizeAffectedObjects(array &$db_settings, bool $has_write_only = true): void {
+		if (array_key_exists('apm_global_db', $db_settings)) {
+			$db_settings['apm_global_db']
+					= $db_settings['apm_global_db'] === CSettingsSchema::getDefault('apm_global_db')
+				? self::APM_GLOBAL_DB_DEFAULT
+				: json_decode($db_settings['apm_global_db'], true);
+
+			if (!$has_write_only) {
+				unset($db_settings['apm_global_db']['password'], $db_settings['apm_global_db']['ssl_key_password']);
+			}
+		}
 	}
 
 	/**
@@ -137,6 +172,9 @@ class CSettings extends CApiService {
 		$this->validateUpdate($settings, $db_settings);
 
 		CApiSettingsHelper::updateParameters($settings, $db_settings);
+
+		self::normalizeAffectedObjects($settings);
+		self::normalizeAffectedObjects($db_settings);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_SETTINGS,	[$settings], [$db_settings]);
 
@@ -235,8 +273,16 @@ class CSettings extends CApiService {
 			'auditlog_mode' =>					['type' => API_INT32, 'in' => '0,1']
 		]];
 
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$api_input_rules['fields'] += ['apm_global_db' => ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED]];
+		}
+
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (array_key_exists('apm_global_db', $settings)) {
+			self::validateApmGlobalDbUpdate($settings);
 		}
 
 		if (array_key_exists('discovery_groupid', $settings)) {
@@ -300,9 +346,195 @@ class CSettings extends CApiService {
 			}
 		}
 
-		$db_settings = CApiSettingsHelper::getParameters($this->output_fields, false);
+		$output_fields = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+			? array_merge($this->output_fields, $this->additional_output_fields)
+			: $this->output_fields;
+
+		$db_settings = CApiSettingsHelper::getParameters($output_fields, false);
 
 		CApiSettingsHelper::checkUndeclaredParameters($settings, $db_settings);
+	}
+
+	private static function validateApmGlobalDbUpdate(&$settings): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'status' =>	['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_STATUS_NOT_CONFIGURED, APM_GLOBAL_DB_STATUS_CONFIGURED])],
+			'url' => ['type' => API_URL, 'flags' => API_NOT_EMPTY, 'schemes' => [CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTP, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS], 'length' => 2048],
+			'authentication_type' => ['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_AUTHTYPE_PASSWORD, APM_GLOBAL_DB_AUTHTYPE_VAUL, APM_GLOBAL_DB_AUTHTYPE_NONE])],
+			'ssl_verify_peer' => ['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_VERIFY_PEER_DISABLED, APM_GLOBAL_DB_VERIFY_PEER_ENABLED])],
+			'ssl_cert_file' => ['type' => API_STRING_UTF8, 'length' => 2048],
+			'ssl_key_file' => ['type' => API_STRING_UTF8, 'length' => 2048]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $settings['apm_global_db'], '/apm_global_db', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_settings = CApiSettingsHelper::getParameters(['apm_global_db']);
+
+		self::normalizeAffectedObjects($db_settings);
+
+		$db_apm_global_db = $db_settings['apm_global_db'];
+
+		$status = array_key_exists('status', $settings['apm_global_db'])
+			? $settings['apm_global_db']['status']
+			: $db_apm_global_db['status'];
+
+		if ($status == APM_GLOBAL_DB_STATUS_CONFIGURED) {
+			$authentication_type = array_key_exists('authentication_type', $settings['apm_global_db'])
+				? $settings['apm_global_db']['authentication_type']
+				: $db_apm_global_db['authentication_type'];
+
+			$status_changed = array_key_exists('status', $settings['apm_global_db'])
+				&& $settings['apm_global_db']['status'] != $db_apm_global_db['status'];
+
+			$authentication_type_changed = array_key_exists('authentication_type', $settings['apm_global_db'])
+				&& $settings['apm_global_db']['authentication_type'] != $db_apm_global_db['authentication_type'];
+
+			$url_changed = array_key_exists('url', $settings['apm_global_db'])
+				&& strcasecmp($settings['apm_global_db']['url'], $db_apm_global_db['url']) != 0;
+
+			$username_flags = API_NOT_EMPTY;
+			$password_flags = 0;
+
+			if ($authentication_type == APM_GLOBAL_DB_AUTHTYPE_PASSWORD) {
+				if ($status_changed || $authentication_type_changed) {
+					$username_flags = API_REQUIRED | $username_flags;
+
+					unset($db_apm_global_db['username'], $db_apm_global_db['password']);
+				}
+
+				if ($url_changed) {
+					$password_flags = API_REQUIRED;
+
+					unset($db_apm_global_db['password']);
+				}
+			}
+			else {
+				$db_apm_global_db['username'] = self::APM_GLOBAL_DB_DEFAULT['username'];
+				$db_apm_global_db['password'] = self::APM_GLOBAL_DB_DEFAULT['password'];
+			}
+
+			$vault_path_flags = API_NOT_EMPTY;
+
+			if ($authentication_type == APM_GLOBAL_DB_AUTHTYPE_VAUL) {
+				if ($status_changed || $authentication_type_changed) {
+					$vault_path_flags = API_REQUIRED | $vault_path_flags;
+
+					unset($db_apm_global_db['vault_path']);
+				}
+			}
+			else {
+				$db_apm_global_db['vault_path'] = self::APM_GLOBAL_DB_DEFAULT['vault_path'];
+			}
+
+			$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+				'status' =>	['type' => API_ANY],
+				'url' => ['type' => API_URL, 'flags' => API_NOT_EMPTY],
+				'authentication_type' => ['type' => API_ANY],
+				'username' => ['type' => API_MULTIPLE, 'rules' => [
+					['if' => ['field' => 'authentication_type', 'in' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD], 'type' => API_STRING_UTF8, 'flags' => $username_flags],
+					['else' => true, 'type' => API_STRING_UTF8, 'in' => ''],
+				]],
+				'password' => ['type' => API_MULTIPLE, 'rules' => [
+					['if' => ['field' => 'authentication_type', 'in' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD], 'type' => API_STRING_UTF8, 'flags' => $password_flags],
+					['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+				]],
+				'vault_path' => ['type' => API_MULTIPLE, 'rules' => [
+					['if' => ['field' => 'authentication_type', 'in' => APM_GLOBAL_DB_AUTHTYPE_VAUL], 'type' => API_STRING_UTF8, 'flags' => $vault_path_flags],
+					['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+				]],
+				'db' => ['type' => API_STRING_UTF8, 'length' => 255],
+				'ssl_verify_peer' => ['type' => API_INT32],
+				'ssl_verify_host' => ['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_VERIFY_HOST_DISABLED, APM_GLOBAL_DB_VERIFY_HOST_ENABLED])],
+				'ssl_ca_location' => ['type' => API_STRING_UTF8, 'length' => 2048],
+				'ssl_cert_file' => ['type' => API_STRING_UTF8],
+				'ssl_key_file' => ['type' => API_STRING_UTF8],
+				'ssl_key_password' => ['type' => API_STRING_UTF8, 'length' => 255]
+			]];
+
+			$url = array_key_exists('url', $settings['apm_global_db'])
+				? $settings['apm_global_db']['url']
+				: $db_apm_global_db['url'];
+
+			if (parse_url($url, PHP_URL_SCHEME) === CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTP) {
+				$api_input_rules['fields']['ssl_verify_peer']['in'] = APM_GLOBAL_DB_VERIFY_PEER_DISABLED;
+				$api_input_rules['fields']['ssl_cert_file']['in'] = self::APM_GLOBAL_DB_DEFAULT['ssl_cert_file'];
+
+				$db_apm_global_db['ssl_verify_peer'] = self::APM_GLOBAL_DB_DEFAULT['ssl_verify_peer'];
+				$db_apm_global_db['ssl_verify_host'] = self::APM_GLOBAL_DB_DEFAULT['ssl_verify_host'];
+				$db_apm_global_db['ssl_ca_location'] = self::APM_GLOBAL_DB_DEFAULT['ssl_ca_location'];
+				$db_apm_global_db['ssl_cert_file'] = self::APM_GLOBAL_DB_DEFAULT['ssl_cert_file'];
+				$db_apm_global_db['ssl_key_file'] = self::APM_GLOBAL_DB_DEFAULT['ssl_key_file'];
+				$db_apm_global_db['ssl_key_password'] = self::APM_GLOBAL_DB_DEFAULT['ssl_key_password'];
+			}
+
+			$ssl_verify_peer = array_key_exists('ssl_verify_peer', $settings['apm_global_db'])
+				? $settings['apm_global_db']['ssl_verify_peer']
+				: $db_apm_global_db['ssl_verify_peer'];
+
+			if ($ssl_verify_peer == APM_GLOBAL_DB_VERIFY_PEER_DISABLED) {
+				$api_input_rules['fields']['ssl_verify_host']['in'] = APM_GLOBAL_DB_VERIFY_HOST_DISABLED;
+				$api_input_rules['fields']['ssl_ca_location']['in'] = self::APM_GLOBAL_DB_DEFAULT['ssl_ca_location'];
+				unset($api_input_rules['fields']['ssl_ca_location']['length']);
+
+				$db_apm_global_db['ssl_verify_host'] = self::APM_GLOBAL_DB_DEFAULT['ssl_verify_host'];
+				$db_apm_global_db['ssl_ca_location'] = self::APM_GLOBAL_DB_DEFAULT['ssl_ca_location'];
+			}
+
+			$ssl_cert_file = array_key_exists('ssl_cert_file', $settings['apm_global_db'])
+				? $settings['apm_global_db']['ssl_cert_file']
+				: $db_apm_global_db['ssl_cert_file'];
+
+			if ($ssl_cert_file === self::APM_GLOBAL_DB_DEFAULT['ssl_cert_file']) {
+				$api_input_rules['fields']['ssl_key_file']['in'] = self::APM_GLOBAL_DB_DEFAULT['ssl_key_file'];
+				$api_input_rules['fields']['ssl_key_password']['in'] = self::APM_GLOBAL_DB_DEFAULT['ssl_key_password'];
+				unset($api_input_rules['fields']['ssl_key_password']['length']);
+
+				$db_apm_global_db['ssl_key_file'] = self::APM_GLOBAL_DB_DEFAULT['ssl_key_file'];
+				$db_apm_global_db['ssl_key_password'] = self::APM_GLOBAL_DB_DEFAULT['ssl_key_password'];
+			}
+
+			$ssl_key_file = array_key_exists('ssl_key_file', $settings['apm_global_db'])
+				? $settings['apm_global_db']['ssl_key_file']
+				: $db_apm_global_db['ssl_key_file'];
+
+			if ($ssl_key_file === self::APM_GLOBAL_DB_DEFAULT['ssl_key_file']) {
+				$api_input_rules['fields']['ssl_key_password']['in'] = self::APM_GLOBAL_DB_DEFAULT['ssl_key_password'];
+				unset($api_input_rules['fields']['ssl_key_password']['length']);
+
+				$db_apm_global_db['ssl_key_password'] = self::APM_GLOBAL_DB_DEFAULT['ssl_key_password'];
+			}
+
+			$settings['apm_global_db'] += $db_apm_global_db;
+
+		}
+		else {
+			$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+				'status' =>	['type' => API_ANY],
+				'url' => ['type' => API_STRING_UTF8, 'in' => ''],
+				'authentication_type' => ['type' => API_INT32, 'in' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD],
+				'username' => ['type' => API_STRING_UTF8, 'in' => ''],
+				'password' => ['type' => API_STRING_UTF8, 'in' => ''],
+				'vault_path' => ['type' => API_STRING_UTF8, 'in' => ''],
+				'db' => ['type' => API_STRING_UTF8, 'in' => ''],
+				'ssl_verify_peer' => ['type' => API_INT32, 'in' => APM_GLOBAL_DB_VERIFY_PEER_DISABLED],
+				'ssl_verify_host' => ['type' => API_INT32, 'in' => APM_GLOBAL_DB_VERIFY_HOST_DISABLED],
+				'ssl_ca_location' => ['type' => API_STRING_UTF8, 'in' => ''],
+				'ssl_cert_file' => ['type' => API_STRING_UTF8, 'in' => ''],
+				'ssl_key_file' => ['type' => API_STRING_UTF8, 'in' => ''],
+				'ssl_key_password' => ['type' => API_STRING_UTF8, 'in' => '']
+			]];
+
+			$settings['apm_global_db'] += self::APM_GLOBAL_DB_DEFAULT;
+		}
+
+		if (!CApiInputValidator::validate($api_input_rules, $settings['apm_global_db'], '/apm_global_db', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$settings['apm_global_db'] = $settings['apm_global_db'] == self::APM_GLOBAL_DB_DEFAULT
+			? '{}'
+			: json_encode(array_merge(self::APM_GLOBAL_DB_DEFAULT, $settings['apm_global_db']));
 	}
 
 	public static function updatePrivate(array $settings): array {
