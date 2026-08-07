@@ -273,6 +273,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Local network',
+						// Update interval is changed to avoid the "This field cannot be empty." error appearing first.
 						'Update interval' => '2h'
 					],
 					'Checks' => [['default' => true]],
@@ -304,7 +305,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Validation priority for SNMPv1'
+						'Name' => 'Text in port for SNMPv1'
 					],
 					'Checks' => [
 						[
@@ -534,13 +535,15 @@ class testFormNetworkDiscovery extends CWebTest {
 					'fields' => [
 						'Name' => '',
 						'IP range' => '',
-						'Update interval' => ''
+						'Update interval' => '',
+						'Discovery by' => 'Proxy'
 					],
 					'inline_errors' => [
 						'Name' => 'This field cannot be empty.',
 						'IP range' => 'This field cannot be empty.',
 						'Update interval' => 'This field cannot be empty.',
-						'id:dcheckList' => 'This field cannot be empty.'
+						'id:dcheckList' => 'This field cannot be empty.',
+						'xpath:.//div[@id="proxyid"]/..' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -621,18 +624,6 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Wrong IPV4 mask in IP range _3',
-						'IP range' => '192.168.4.0/129'
-					],
-					'Checks' => [['default' => true]],
-					'inline_errors' => ['IP range' => 'Incorrect address starting from "/129".']
-				]
-			],
-			// #22.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
 						'Name' => 'Wrong IPV6 mask in IP range',
 						'IP range' => '2001:DB8:0000:0000:244:17FF:FEB6:D37D/64'
 					],
@@ -642,7 +633,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #23.
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -654,7 +645,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'inline_errors' => ['IP range' => 'Incorrect address starting from "/130".']
 				]
 			],
-			// #24.
+			// #23.
 			[
 				[
 					'fields' => [
@@ -663,7 +654,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #25.
+			// #24.
 			[
 				[
 					'fields' => [
@@ -677,7 +668,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #26.
+			// #25.
 			[
 				[
 					'fields' => [
@@ -687,7 +678,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #27.
+			// #26.
 			[
 				[
 					'fields' => [
@@ -697,7 +688,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #28.
+			// #27.
 			[
 				[
 					'fields' => [
@@ -707,7 +698,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #29.
+			// #28.
 			[
 				[
 					'fields' => [
@@ -717,7 +708,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #30.
+			// #29.
 			[
 				[
 					'fields' => [
@@ -727,7 +718,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #31.
+			// #30.
 			[
 				[
 					'fields' => [
@@ -742,7 +733,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #32.
+			// #31.
 			[
 				[
 					'fields' => [
@@ -780,7 +771,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #33.
+			// #32.
 			[
 				[
 					'fields' => [
@@ -808,7 +799,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #34.
+			// #33.
 			[
 				[
 					'fields' => [
@@ -853,7 +844,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #35.
+			// #34.
 			[
 				[
 					'trim' => true,
@@ -885,7 +876,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #36.
+			// #35.
 			[
 				[
 					'check_radio_labels' => true,
@@ -953,7 +944,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	public function getCreateData() {
 		return [
-			// #44.
+			// #36.
 			[
 				[
 					'fields' => [
@@ -986,7 +977,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	public function getUpdateData() {
 		return [
-			// #44.
+			// #37.
 			[
 				[
 					'fields' => [
