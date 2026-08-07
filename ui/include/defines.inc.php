@@ -2431,7 +2431,6 @@ define('ZBX_ICON_SPEAKER_OFF', 'zi-speaker-off');
 define('ZBX_ICON_STAR', 'zi-star');
 define('ZBX_ICON_STAR_FILLED', 'zi-star-filled');
 define('ZBX_ICON_SUBSCRIPTIONS', 'zi-subscriptions');
-define('ZBX_ICON_SUPPORT', 'zi-support');
 define('ZBX_ICON_SQUARE', 'zi-square');
 define('ZBX_ICON_TEXT', 'zi-text');
 define('ZBX_ICON_TIME_PERIOD', 'zi-time-period');

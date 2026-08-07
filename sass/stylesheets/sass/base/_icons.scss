@@ -109,36 +109,35 @@ $zi-star-filled: "\ea6a";
 $zi-star: "\ea6b";
 $zi-stop-sign: "\ea6c";
 $zi-subscriptions: "\ea6d";
-$zi-support: "\ea6e";
-$zi-text: "\ea6f";
-$zi-time-period: "\ea70";
-$zi-times: "\ea71";
-$zi-trash: "\ea72";
-$zi-tree-top-bottom: "\ea73";
-$zi-tree-top-right-bottom: "\ea74";
-$zi-tree-top-right: "\ea75";
-$zi-triangle-flipped-warning: "\ea76";
-$zi-triangle-warning: "\ea77";
-$zi-triangle: "\ea78";
-$zi-uncheck: "\ea79";
-$zi-user-filled: "\ea7a";
-$zi-user-settings: "\ea7b";
-$zi-user: "\ea7c";
-$zi-users-filled: "\ea7d";
-$zi-users: "\ea7e";
-$zi-widget-add: "\ea7f";
-$zi-widget-awaiting-data-large: "\ea80";
-$zi-widget-empty-references-large: "\ea81";
-$zi-widget-resize: "\ea82";
-$zi-wrench-alt: "\ea83";
-$zi-wrench: "\ea84";
+$zi-text: "\ea6e";
+$zi-time-period: "\ea6f";
+$zi-times: "\ea70";
+$zi-trash: "\ea71";
+$zi-tree-top-bottom: "\ea72";
+$zi-tree-top-right-bottom: "\ea73";
+$zi-tree-top-right: "\ea74";
+$zi-triangle-flipped-warning: "\ea75";
+$zi-triangle-warning: "\ea76";
+$zi-triangle: "\ea77";
+$zi-uncheck: "\ea78";
+$zi-user-filled: "\ea79";
+$zi-user-settings: "\ea7a";
+$zi-user: "\ea7b";
+$zi-users-filled: "\ea7c";
+$zi-users: "\ea7d";
+$zi-widget-add: "\ea7e";
+$zi-widget-awaiting-data-large: "\ea7f";
+$zi-widget-empty-references-large: "\ea80";
+$zi-widget-resize: "\ea81";
+$zi-wrench-alt: "\ea82";
+$zi-wrench: "\ea83";
 
 @font-face {
 	font-family: "zabbix-icons";
-	src: url("#{$icons-path}zabbix-icons.woff2?t=1785925257310") format("woff2"),
-	url("#{$icons-path}zabbix-icons.woff?t=1785925257310") format("woff"),
-	url('#{$icons-path}zabbix-icons.ttf?t=1785925257310') format('truetype'),
-	url('#{$icons-path}zabbix-icons.svg?t=1785925257310#zabbix-icons') format('svg');
+	src: url("#{$icons-path}zabbix-icons.woff2?t=1786100546126") format("woff2"),
+	url("#{$icons-path}zabbix-icons.woff?t=1786100546126") format("woff"),
+	url('#{$icons-path}zabbix-icons.ttf?t=1786100546126') format('truetype'),
+	url('#{$icons-path}zabbix-icons.svg?t=1786100546126#zabbix-icons') format('svg');
 }
 
 %icons-font {
@@ -275,27 +274,26 @@ $zi-wrench: "\ea84";
 .zi-star:before { content: "\ea6b"; }
 .zi-stop-sign:before { content: "\ea6c"; }
 .zi-subscriptions:before { content: "\ea6d"; }
-.zi-support:before { content: "\ea6e"; }
-.zi-text:before { content: "\ea6f"; }
-.zi-time-period:before { content: "\ea70"; }
-.zi-times:before { content: "\ea71"; }
-.zi-trash:before { content: "\ea72"; }
-.zi-tree-top-bottom:before { content: "\ea73"; }
-.zi-tree-top-right-bottom:before { content: "\ea74"; }
-.zi-tree-top-right:before { content: "\ea75"; }
-.zi-triangle-flipped-warning:before { content: "\ea76"; }
-.zi-triangle-warning:before { content: "\ea77"; }
-.zi-triangle:before { content: "\ea78"; }
-.zi-uncheck:before { content: "\ea79"; }
-.zi-user-filled:before { content: "\ea7a"; }
-.zi-user-settings:before { content: "\ea7b"; }
-.zi-user:before { content: "\ea7c"; }
-.zi-users-filled:before { content: "\ea7d"; }
-.zi-users:before { content: "\ea7e"; }
-.zi-widget-add:before { content: "\ea7f"; }
-.zi-widget-awaiting-data-large:before { content: "\ea80"; }
-.zi-widget-empty-references-large:before { content: "\ea81"; }
-.zi-widget-resize:before { content: "\ea82"; }
-.zi-wrench-alt:before { content: "\ea83"; }
-.zi-wrench:before { content: "\ea84"; }
+.zi-text:before { content: "\ea6e"; }
+.zi-time-period:before { content: "\ea6f"; }
+.zi-times:before { content: "\ea70"; }
+.zi-trash:before { content: "\ea71"; }
+.zi-tree-top-bottom:before { content: "\ea72"; }
+.zi-tree-top-right-bottom:before { content: "\ea73"; }
+.zi-tree-top-right:before { content: "\ea74"; }
+.zi-triangle-flipped-warning:before { content: "\ea75"; }
+.zi-triangle-warning:before { content: "\ea76"; }
+.zi-triangle:before { content: "\ea77"; }
+.zi-uncheck:before { content: "\ea78"; }
+.zi-user-filled:before { content: "\ea79"; }
+.zi-user-settings:before { content: "\ea7a"; }
+.zi-user:before { content: "\ea7b"; }
+.zi-users-filled:before { content: "\ea7c"; }
+.zi-users:before { content: "\ea7d"; }
+.zi-widget-add:before { content: "\ea7e"; }
+.zi-widget-awaiting-data-large:before { content: "\ea7f"; }
+.zi-widget-empty-references-large:before { content: "\ea80"; }
+.zi-widget-resize:before { content: "\ea81"; }
+.zi-wrench-alt:before { content: "\ea82"; }
+.zi-wrench:before { content: "\ea83"; }
 
