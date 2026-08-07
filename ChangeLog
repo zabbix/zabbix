@@ -1,8 +1,20 @@
 Changes for 7.4.14rc1
 
 New features:
+..F....... [ZBXNEXT-10732] implemented update for the Help URL path (scernisenko)
 
 Bug fixes:
+.........T [ZBX-27646] removed MS Teams webhook in default data (egordymov)
+.........T [ZBX-25042] removed DISCARD option for SNMP status items (kflorowski)
+.........T [ZBX-25663] added node name macro to RabbitMQ node templates (abrosimovs)
+.........T [ZBX-26229] fixed CPU user and idle time OIDs in Check Point NGFW SNMP template (mruszczyk)
+.........T [ZBX-25608] fixed missing precision for temperature sensors for Cisco template (kflorowski)
+.........T [ZBX-22458] fixed cache hit ratio base typo in MSSQL by ODBC template (mruszczyk)
+.........T [ZBX-25484] fixed incorrect item configuration in default data (egordymov)
+.........T [ZBX-21236] improved metrics filtering in API response for the 'Elasticsearch Cluster by HTTP' template (smansurovs)
+.........T [ZBX-24512] fixed memory items in Cisco Nexus 9000 Series by SNMP template (kflorowski)
+.........T [ZBX-24343] fixed temperature threshold trigger duplication for Cisco IOS by SNMP (kflorowski)
+..F....... [ZBX-27892] fixed dynamic row counter initialization when tags are read-only in host items (uolekss)
 ..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
 .........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
 ..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
@@ -1539,8 +1551,20 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.30rc1
 
 New features:
+..F....... [ZBXNEXT-10732] implemented update for the Help URL path (scernisenko)
 
 Bug fixes:
+.........T [ZBX-27646] removed MS Teams webhook in default data (egordymov)
+.........T [ZBX-25042] removed DISCARD option for SNMP status items (kflorowski)
+.........T [ZBX-25663] added node name macro to RabbitMQ node templates (abrosimovs)
+.........T [ZBX-26229] fixed CPU user and idle time OIDs in Check Point NGFW SNMP template (mruszczyk)
+..F....... [ZBX-27861] fixed correct shape form layout corruption in Safari on reopen (msnihach)
+.........T [ZBX-25608] fixed missing precision for temperature sensors for Cisco template (kflorowski)
+.........T [ZBX-22458] fixed cache hit ratio base typo in MSSQL by ODBC template (mruszczyk)
+.........T [ZBX-25484] fixed incorrect item configuration in default data (egordymov)
+.........T [ZBX-21236] improved metrics filtering in API response for the 'Elasticsearch Cluster by HTTP' template (smansurovs)
+.........T [ZBX-24512] fixed memory items in Cisco Nexus 9000 Series by SNMP template (kflorowski)
+.........T [ZBX-24343] fixed temperature threshold trigger duplication for Cisco IOS by SNMP (kflorowski)
 ..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
 .........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
 ..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
