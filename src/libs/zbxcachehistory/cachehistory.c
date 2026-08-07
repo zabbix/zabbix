@@ -1271,7 +1271,8 @@ static void	dc_export_add_item_name_json(struct zbx_json *json, zbx_dc_um_handle
  *             um_handle  - [IN] user macros handle for macro resolution      *
  *             hostid     - [IN] host identifier for macro resolution         *
  *                                                                            *
- * Comments: Resolves user macros in tag values before adding to JSON.        *
+ * Comments: Resolves user macros in item tag names and values before adding  *
+ *           them to JSON.                                                    *
  *                                                                            *
  ******************************************************************************/
 static void	dc_export_add_item_tags_json(struct zbx_json *json, const zbx_item_info_t *item_info,
@@ -1279,23 +1280,19 @@ static void	dc_export_add_item_tags_json(struct zbx_json *json, const zbx_item_i
 {
 	for (int i = 0; i < item_info->item_tags.values_num; i++)
 	{
-		zbx_tag_t	*item_tag = item_info->item_tags.values[i];
+		const zbx_tag_t	*item_tag = item_info->item_tags.values[i];
 		char		*tag_resolved, *value_resolved;
 
 		zbx_json_addobject(json, NULL);
 
 		tag_resolved = zbx_strdup(NULL, item_tag->tag);
-		(void)zbx_dc_expand_user_and_func_macros(um_handle, &tag_resolved,
-				hostid, 1, NULL);
-		zbx_json_addstring(json, ZBX_PROTO_TAG_TAG, tag_resolved,
-				ZBX_JSON_TYPE_STRING);
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &tag_resolved, hostid, 1, NULL);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_TAG, tag_resolved, ZBX_JSON_TYPE_STRING);
 		zbx_free(tag_resolved);
 
 		value_resolved = zbx_strdup(NULL, item_tag->value);
-		(void)zbx_dc_expand_user_and_func_macros(um_handle, &value_resolved,
-				hostid, 1, NULL);
-		zbx_json_addstring(json, ZBX_PROTO_TAG_VALUE, value_resolved,
-				ZBX_JSON_TYPE_STRING);
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &value_resolved, hostid, 1, NULL);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_VALUE, value_resolved, ZBX_JSON_TYPE_STRING);
 		zbx_free(value_resolved);
 
 		zbx_json_close(json);
@@ -1345,7 +1342,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 
 		zbx_json_clean(&json);
 
-		zbx_json_addobject(&json,ZBX_PROTO_TAG_HOST);
+		zbx_json_addobject(&json, ZBX_PROTO_TAG_HOST);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item->host.name, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
@@ -1404,6 +1401,60 @@ static int	match_item_value_type_by_mask(int mask, const zbx_history_sync_item_t
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: match connector filters against macro-resolved item tags          *
+ *                                                                            *
+ * Parameters: connector_filters - [IN] connector filters                     *
+ *             item_info         - [IN] item info with raw tags               *
+ *             item              - [IN] item for value type matching          *
+ *             um_handle         - [IN] user macro handle                     *
+ *             hostid            - [IN] host identifier for macro resolution  *
+ *             matching_ids      - [OUT] vector to append matching connector  *
+ *                                      identifiers                           *
+ *                                                                            *
+ * Comments: Creates temporary macro-resolved tag copies for matching and     *
+ *           does not modify original item_info->item_tags.                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	connector_match_resolved_tags(const zbx_vector_connector_filter_t *connector_filters,
+		const zbx_item_info_t *item_info, const zbx_history_sync_item_t *item, zbx_dc_um_handle_t *um_handle,
+		const zbx_uint64_t *hostid, zbx_vector_uint64_t *matching_ids)
+{
+	zbx_vector_tags_ptr_t	resolved_tags;
+
+	zbx_vector_tags_ptr_create(&resolved_tags);
+
+	for (int i = 0; i < item_info->item_tags.values_num; i++)
+	{
+		const zbx_tag_t	*orig_tag = item_info->item_tags.values[i];
+		zbx_tag_t	*resolved_tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+
+		resolved_tag->tag = zbx_strdup(NULL, orig_tag->tag);
+		resolved_tag->value = zbx_strdup(NULL, orig_tag->value);
+
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &resolved_tag->tag, hostid, 1, NULL);
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &resolved_tag->value, hostid, 1, NULL);
+
+		zbx_vector_tags_ptr_append(&resolved_tags, resolved_tag);
+	}
+
+	zbx_vector_tags_ptr_sort(&resolved_tags, zbx_compare_tags);
+
+	for (int i = 0; i < connector_filters->values_num; i++)
+	{
+		if (SUCCEED == match_item_value_type_by_mask(connector_filters->values[i].item_value_type, item) &&
+			SUCCEED == zbx_match_tags(connector_filters->values[i].tags_evaltype,
+				&connector_filters->values[i].connector_tags, &resolved_tags))
+		{
+			zbx_vector_uint64_append(matching_ids, connector_filters->values[i].connectorid);
+		}
+	}
+
+	zbx_vector_tags_ptr_clear_ext(&resolved_tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&resolved_tags);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: export history                                                    *
  *                                                                            *
  * Parameters: history     - [IN/OUT] array of history data                   *
@@ -1453,19 +1504,8 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 		if (0 != connector_filters->values_num)
 		{
-			int	k;
-
-			for (k = 0; k < connector_filters->values_num; k++)
-			{
-				if (SUCCEED == match_item_value_type_by_mask(connector_filters->values[k].
-						item_value_type, item) && SUCCEED ==
-						zbx_match_tags(connector_filters->values[k].tags_evaltype,
-						&connector_filters->values[k].connector_tags, &item_info->item_tags))
-				{
-					zbx_vector_uint64_append(&connector_object.ids,
-							connector_filters->values[k].connectorid);
-				}
-			}
+			connector_match_resolved_tags(connector_filters, item_info, item, um_handle, &item->host.hostid,
+					&connector_object.ids);
 		}
 
 		if (0 == connector_object.ids.values_num &&
