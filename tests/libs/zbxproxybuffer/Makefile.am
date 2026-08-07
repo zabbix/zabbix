@@ -24,7 +24,18 @@ PROXYBUFFER_LIBS = \
 # AM_LDFLAGS applies to all targets in this file; per-target *_LDFLAGS would
 # also work but using AM_LDFLAGS avoids automake's "PB has no canonical name"
 # warning that fires when a FOO_LDFLAGS variable has no matching target FOO.
+# None of these tests exercise file I/O (they force ZBX_PB_MODE_MEMORY), so nothing before
+# libzbxmockdata.a needs __wrap_fopen/__wrap_fclose/__wrap_open/__wrap_close and the linker drops
+# that archive member unused. On --coverage builds gcc appends -lgcov right after the mock libs, and
+# libgcov's own object code calls fopen/fclose/open/close - by then libzbxmockdata.a has already been
+# scanned, so the build fails with "undefined reference to `__wrap_fopen'" (and open/close/fclose).
+# -Wl,-u forces those four symbols onto the linker's undefined list up front so libzbxmockdata.a's
+# definitions get pulled in when it's scanned, before -lgcov needs them.
 AM_LDFLAGS = @PROXY_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
+	-Wl,-u,__wrap_fopen \
+	-Wl,-u,__wrap_fclose \
+	-Wl,-u,__wrap_open \
+	-Wl,-u,__wrap_close \
 	-Wl,--wrap=exit \
 	-Wl,--wrap=fopen \
 	-Wl,--wrap=fclose \
