@@ -120,6 +120,10 @@ class CControllerPopupMassupdateItem extends CController {
 	}
 
 	protected function checkPermissions() {
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
+			return false;
+		}
+
 		$entity = ($this->getInput('prototype') == 1) ? API::ItemPrototype() : API::Item();
 
 		return (bool) $entity->get([
