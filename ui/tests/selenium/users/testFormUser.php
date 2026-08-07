@@ -807,7 +807,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'URL (after login)' => 'Unacceptable URL scheme.'
+						'URL (after login)' => 'A relative URL to the frontend is expected.'
 					]
 				]
 			],
@@ -824,7 +824,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'URL (after login)' => 'Unacceptable URL scheme.'
+						'URL (after login)' => 'A relative URL to the frontend is expected.'
 					]
 				]
 			],
@@ -1381,7 +1381,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'javascript:alert(123);'
 					],
 					'inline_errors' => [
-						'URL (after login)' => 'Unacceptable URL scheme.'
+						'URL (after login)' => 'A relative URL to the frontend is expected.'
 					]
 				]
 			],
@@ -1393,7 +1393,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
 					'inline_errors' => [
-						'URL (after login)' => 'Unacceptable URL scheme.'
+						'URL (after login)' => 'A relative URL to the frontend is expected.'
 					]
 				]
 			],
