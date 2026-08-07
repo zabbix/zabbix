@@ -49,6 +49,10 @@ class CControllerTriggerMassupdate extends CController {
 	}
 
 	protected function checkPermissions() {
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
+			return false;
+		}
+
 		if ($this->hasInput('prototype')) {
 			$discoveryRule = API::DiscoveryRule()->get([
 				'output' => [],

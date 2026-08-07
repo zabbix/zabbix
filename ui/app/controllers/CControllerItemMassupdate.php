@@ -89,6 +89,10 @@ class CControllerItemMassupdate extends CController {
 	}
 
 	protected function checkPermissions() {
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
+			return false;
+		}
+
 		if ($this->getInput('prototype') == 1) {
 			$count = API::ItemPrototype()->get([
 				'countOutput' => true,
