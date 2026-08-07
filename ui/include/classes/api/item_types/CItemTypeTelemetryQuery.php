@@ -25,94 +25,103 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 */
 	public const FIELD_NAMES = ['time_shift', 'lookback_limit', 'granularity', 'query'];
 
+	public const SIGNAL_TYPE_TRACES = 0;
+	public const SIGNAL_TYPE_METRICS = 1;
+	public const SIGNAL_TYPE_LOGS = 2;
+
+	public const METRICS_POINT_SUM = 0;
+	public const METRICS_POINT_GAUGE = 1;
+	public const METRICS_POINT_HISTOGRAM = 2;
+	public const METRICS_POINT_EXPHISTOGRAM = 3;
+
 	// Column names require "attribute_key" to be set.
 	public const COMPLEX_COLUMN_NAME = [
 		'SpanAttributes', 'Events.Attributes', 'LogAttributes', 'ResourceAttributes', 'ScopeAttributes', 'Attributes',
 		'Exemplars.FilteredAttributes'
 	];
 
-	// APM_SIGNAL_TYPE_TRACES column names
-	public const APM_TRACES_COLUMNS_COLUMN = [
+	// SIGNAL_TYPE_TRACES column names
+	public const TRACES_COLUMNS_COLUMN = [
 		'Timestamp', 'TraceId', 'SpanId', 'ParentSpanId', 'TraceState', 'SpanName', 'SpanKind', 'ServiceName',
 		'ResourceAttributes', 'SpanAttributes', 'ScopeName', 'ScopeVersion', 'Duration', 'StatusCode',
 		'StatusMessage'
 	];
-	public const APM_TRACES_AGGREGATED_COLUMN = [
+	public const TRACES_AGGREGATED_COLUMN = [
 		'Timestamp', 'Duration'
 	];
-	public const APM_TRACES_CONDITIONS_COLUMN = [
+	public const TRACES_CONDITIONS_COLUMN = [
 		'TraceId', 'SpanId', 'ParentSpanId', 'TraceState', 'SpanName', 'SpanKind', 'ServiceName', 'ResourceAttributes',
 		'SpanAttributes', 'ScopeName', 'ScopeVersion', 'StatusCode', 'StatusMessage', 'Events.Attributes', 'Events.Name'
 	];
 
-	// APM_SIGNAL_TYPE_LOGS column names
-	public const APM_LOGS_COLUMNS_COLUMN = [
+	// SIGNAL_TYPE_LOGS column names
+	public const LOGS_COLUMNS_COLUMN = [
 		'Timestamp', 'TraceId', 'SpanId', 'TraceFlags', 'SeverityText', 'SeverityNumber', 'ServiceName', 'Body',
 		'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName', 'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes',
 		'LogAttributes', 'EventName'
 	];
-	public const APM_LOGS_AGGREGATED_COLUMN = [
+	public const LOGS_AGGREGATED_COLUMN = [
 		'Timestamp', 'SeverityNumber'
 	];
-	public const APM_LOGS_CONDITIONS_COLUMN = [
+	public const LOGS_CONDITIONS_COLUMN = [
 		'TraceId', 'SpanId', 'SeverityText', 'ServiceName', 'Body', 'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName',
 		'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes', 'LogAttributes', 'EventName'
 	];
 
-	// APM_SIGNAL_TYPE_METRICS column names
-	public const APM_METRICS_COLUMNS_COLUMN = [
-		APM_METRICS_POINT_SUM => [
+	// SIGNAL_TYPE_METRICS column names
+	public const METRICS_COLUMNS_COLUMN = [
+		self::METRICS_POINT_SUM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
 			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
 			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags', 'AggregationTemporality', 'IsMonotonic'
 		],
-		APM_METRICS_POINT_GAUGE => [
+		self::METRICS_POINT_GAUGE => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
 			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription',
 			'MetricUnit', 'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags'
 		],
-		APM_METRICS_POINT_HISTOGRAM => [
+		self::METRICS_POINT_HISTOGRAM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
 			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
 			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Flags', 'Min', 'Max', 'AggregationTemporality'
 		],
-		APM_METRICS_POINT_EXPHISTOGRAM => [
+		self::METRICS_POINT_EXPHISTOGRAM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
 			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
 			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Scale', 'ZeroCount', 'PositiveOffset',
 			'NegativeOffset', 'Flags', 'Min', 'Max', 'AggregationTemporality'
 		]
 	];
-	public const APM_METRICS_AGGREGATED_COLUMN = [
-		APM_METRICS_POINT_SUM => [
+	public const METRICS_AGGREGATED_COLUMN = [
+		self::METRICS_POINT_SUM => [
 			'ScopeDroppedAttrCount', 'StartTimeUnix', 'TimeUnix', 'Value'
 		],
-		APM_METRICS_POINT_GAUGE => [
+		self::METRICS_POINT_GAUGE => [
 			'ScopeDroppedAttrCount', 'StartTimeUnix', 'TimeUnix', 'Value'
 		],
-		APM_METRICS_POINT_HISTOGRAM => [
+		self::METRICS_POINT_HISTOGRAM => [
 			'ScopeDroppedAttrCount', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Min', 'Max'
 		],
-		APM_METRICS_POINT_EXPHISTOGRAM => [
+		self::METRICS_POINT_EXPHISTOGRAM => [
 			'ScopeDroppedAttrCount', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Scale', 'ZeroCount',
 			'PositiveOffset', 'NegativeOffset', 'Min', 'Max'
 		]
 	];
-	public const APM_METRICS_CONDITIONS_COLUMN = [
-		APM_METRICS_POINT_SUM => [
+	public const METRICS_CONDITIONS_COLUMN = [
+		self::METRICS_POINT_SUM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
 			'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes',
 			'Exemplars.FilteredAttributes'
 		],
-		APM_METRICS_POINT_GAUGE => [
+		self::METRICS_POINT_GAUGE => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
 			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
 		],
-		APM_METRICS_POINT_HISTOGRAM => [
+		self::METRICS_POINT_HISTOGRAM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
 			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
 		],
-		APM_METRICS_POINT_EXPHISTOGRAM => [
+		self::METRICS_POINT_EXPHISTOGRAM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
 			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
 		]
@@ -337,24 +346,24 @@ class CItemTypeTelemetryQuery extends CItemType {
 	}
 
 	private static function getQueryFieldValidationRules(array $item): array {
-		switch ($item['query']['signal_type'] ?? APM_SIGNAL_TYPE_TRACES) {
-			case APM_SIGNAL_TYPE_TRACES:
-				$columns_column = self::APM_TRACES_COLUMNS_COLUMN;
-				$aggregated_column = self::APM_TRACES_AGGREGATED_COLUMN;
-				$condition_column = self::APM_TRACES_CONDITIONS_COLUMN;
+		switch ($item['query']['signal_type'] ?? self::SIGNAL_TYPE_TRACES) {
+			case self::SIGNAL_TYPE_TRACES:
+				$columns_column = self::TRACES_COLUMNS_COLUMN;
+				$aggregated_column = self::TRACES_AGGREGATED_COLUMN;
+				$condition_column = self::TRACES_CONDITIONS_COLUMN;
 				break;
 
-			case APM_SIGNAL_TYPE_LOGS:
-				$columns_column = self::APM_LOGS_COLUMNS_COLUMN;
-				$aggregated_column = self::APM_LOGS_AGGREGATED_COLUMN;
-				$condition_column = self::APM_LOGS_CONDITIONS_COLUMN;
+			case self::SIGNAL_TYPE_LOGS:
+				$columns_column = self::LOGS_COLUMNS_COLUMN;
+				$aggregated_column = self::LOGS_AGGREGATED_COLUMN;
+				$condition_column = self::LOGS_CONDITIONS_COLUMN;
 				break;
 
-			case APM_SIGNAL_TYPE_METRICS:
-				$point_type = $item['query']['metric_point_type'] ?? APM_METRICS_POINT_SUM;
-				$columns_column = self::APM_METRICS_COLUMNS_COLUMN[$point_type] ?? [];
-				$aggregated_column = self::APM_METRICS_AGGREGATED_COLUMN[$point_type] ?? [];
-				$condition_column = self::APM_METRICS_CONDITIONS_COLUMN[$point_type] ?? [];
+			case self::SIGNAL_TYPE_METRICS:
+				$point_type = $item['query']['metric_point_type'] ?? self::METRICS_POINT_SUM;
+				$columns_column = self::METRICS_COLUMNS_COLUMN[$point_type] ?? [];
+				$aggregated_column = self::METRICS_AGGREGATED_COLUMN[$point_type] ?? [];
+				$condition_column = self::METRICS_CONDITIONS_COLUMN[$point_type] ?? [];
 				break;
 
 			default:
@@ -384,11 +393,11 @@ class CItemTypeTelemetryQuery extends CItemType {
 		];
 
 		return [
-			'signal_type'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [APM_SIGNAL_TYPE_TRACES, APM_SIGNAL_TYPE_METRICS, APM_SIGNAL_TYPE_LOGS])],
+			'signal_type'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::SIGNAL_TYPE_TRACES, self::SIGNAL_TYPE_METRICS, self::SIGNAL_TYPE_LOGS])],
 			'metric_point_type'		=> ['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'signal_type', 'in' => APM_SIGNAL_TYPE_METRICS],
-												'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [APM_METRICS_POINT_SUM, APM_METRICS_POINT_GAUGE, APM_METRICS_POINT_HISTOGRAM, APM_METRICS_POINT_EXPHISTOGRAM])],
-											['else' => true, 'type' => API_INT32, 'in' => APM_METRICS_POINT_SUM, 'default' => APM_METRICS_POINT_SUM]
+											['if' => ['field' => 'signal_type', 'in' => self::SIGNAL_TYPE_METRICS],
+												'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::METRICS_POINT_SUM, self::METRICS_POINT_GAUGE, self::METRICS_POINT_HISTOGRAM, self::METRICS_POINT_EXPHISTOGRAM])],
+											['else' => true, 'type' => API_INT32, 'in' => self::METRICS_POINT_SUM, 'default' => self::METRICS_POINT_SUM]
 			]],
 			'columns'				=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['column', 'attribute_key']], 'fields' => [
 				'column'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', $columns_column)],
