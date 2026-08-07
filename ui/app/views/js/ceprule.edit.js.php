@@ -214,6 +214,9 @@ window.ceprule_edit_popup = new class {
 			else if (class_list.contains('js-clone')) {
 				this.#clone();
 			}
+			else if (class_list.contains('js-reset-time-windows')) {
+				this.#resetTimeWindwos();
+			}
 		});
 	}
 
@@ -311,6 +314,37 @@ window.ceprule_edit_popup = new class {
 					overlayDialogueDestroy(this.#overlay.dialogueid);
 					this.#overlay.$dialogue[0]
 						.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				}
+				else {
+					throw new Error();
+				}
+			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => {
+				this.#overlay.unsetLoading();
+			});
+	}
+
+	#resetTimeWindwos() {
+		this.#removePopupMessages();
+		fetch(zabbixUrl({action: 'ceprule.resettimewindows'}), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json; charset=UTF-8'},
+			body: JSON.stringify({
+				cepruleids: [this.form.findFieldByName('cepruleid').getValue()],
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
+			})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				if ('success' in response) {
+					const message_box = makeMessageBox('good', response.success.messages, response.success.title)[0];
+
+					this.form_element.parentNode.insertBefore(message_box, this.form_element);
 				}
 				else {
 					throw new Error();

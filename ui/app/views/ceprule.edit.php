@@ -44,6 +44,12 @@ else {
 			'isSubmit' => false
 		],
 		[
+			'title' => _('Reset time windows'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-reset-time-windows']),
+			'keepOpen' => true,
+			'isSubmit' => false
+		],
+		[
 			'title' => _('Delete'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
