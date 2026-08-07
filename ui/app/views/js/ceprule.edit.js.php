@@ -516,7 +516,15 @@ window.ceprule_edit_popup = new class {
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
 				tag_value: '',
-				tags: [{tag: '$STATUS.CODE', operator: <?= TAG_OPERATOR_EQUAL ?>, value: '1'}]
+				filter: {
+					evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
+					conditions: [{
+						type: <?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>,
+						tag: '',
+						operator: <?= CONDITION_OPERATOR_YES ?>,
+						value: ''
+					}]
+				}
 			};
 		}
 
@@ -534,14 +542,6 @@ window.ceprule_edit_popup = new class {
 					action: (overlay) => {
 						const form = ceprule_operation_edit_popup.form;
 						const fields = form.getAllValues();
-
-						for (const tag_index in fields.tags) {
-							const {tag, value} = fields.tags[tag_index];
-
-							if (tag === '' && value === '') {
-								delete fields.tags[tag_index];
-							}
-						}
 
 						form.validateSubmit(fields)
 							.then((result) => {
@@ -673,16 +673,19 @@ window.ceprule_edit_popup = new class {
 			arguments_str = `${operation.tag}:${operation.tag_value}`;
 		}
 
-		const tags_input_html = Object.values(operation.tags).map((tag, tag_index) => (new Template(`
-			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][tag]"
-				type="hidden" value="#{tag}"/>
-			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][operator]"
-				type="hidden" value="#{operator}"/>
-			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][value]"
-				type="hidden" value="#{value}"/>
-		`)).evaluate(tag)).join('');
+		const conditions_input_html = Object.values(operation.filter.conditions)
+			.map((condition, condition_index) => (new Template(`
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][type]"
+					type="hidden" value="#{type}"/>
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][tag]"
+					type="hidden" value="#{tag}"/>
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][operator]"
+					type="hidden" value="#{operator}"/>
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][value]"
+					type="hidden" value="#{value}"/>
+			`)).evaluate(condition)).join('');
 
-		const template_args = {execute_when_str, label_str, arguments_str, tags_input_html, ...operation};
+		const template_args = {execute_when_str, label_str, arguments_str, conditions_input_html, ...operation};
 		const row = this.#operation_row_template.evaluateToElement(template_args);
 		const error_container_id = `ceprule-operations-${template_args.sortorder}-error-container`;
 		const rows = new DocumentFragment();

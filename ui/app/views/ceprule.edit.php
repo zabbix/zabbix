@@ -114,11 +114,11 @@ $form = (new CForm())
 				[
 					(new CButtonLink(_('Edit')))->addClass('js-operation-edit'),
 					(new CButtonLink(_('Remove')))->addClass('js-operation-remove'),
-					'#{*tags_input_html}',
+					'#{*conditions_input_html}',
 					(new CVar('operations[#{sortorder}][sortorder]', '#{sortorder}'))->removeId(),
 					(new CVar('operations[#{sortorder}][execute_when]', '#{execute_when}'))->removeId(),
 					(new CVar('operations[#{sortorder}][type]', '#{type}'))->removeId(),
-					(new CVar('operations[#{sortorder}][evaltype]', '#{evaltype}'))->removeId(),
+					(new CVar('operations[#{sortorder}][filter][evaltype]', '#{filter.evaltype}'))->removeId(),
 					(new CVar('operations[#{sortorder}][event_name]', '#{event_name}'))->removeId(),
 					(new CVar('operations[#{sortorder}][tag]', '#{tag}'))->removeId(),
 					(new CVar('operations[#{sortorder}][new_tag]', '#{new_tag}'))->removeId(),
