@@ -269,10 +269,11 @@ $form->addItem([
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
-				->addItem((new CSimpleButton(_('Create proxy in Cloud')))
+				->addItem((new CLink(_('Create proxy in Cloud'), 'https://cloud.zabbix.com/create-proxy'))
 					->addClass(ZBX_STYLE_LINK_EXTERNAL)
-					->addClass(ZBX_STYLE_BTN_ALT))
-					->addClass('js-create-proxy-in-cloud')
+					->addClass(ZBX_STYLE_BTN)
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->setTarget('_blank'))
 				->addItem((new CSimpleButton(_('Create proxy')))->addClass('js-create-proxy'))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
