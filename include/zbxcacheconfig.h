@@ -1743,6 +1743,7 @@ zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correl
 #define ZBX_CEP_WHEN_EVENT_EVICTED	1
 #define ZBX_CEP_WHEN_WINDOW_CLOSED	2
 #define ZBX_CEP_WHEN_PATTERN_MATCH	3
+#define ZBX_CEP_WHEN_EVENT_ADDED	4
 
 typedef struct
 {

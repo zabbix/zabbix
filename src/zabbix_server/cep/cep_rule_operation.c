@@ -1103,47 +1103,6 @@ zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check whether a rule has a matching close-window operation at a   *
- *          given execution phase                                             *
- *                                                                            *
- * Parameters: rule         - [IN] rule whose operations are checked          *
- *             execute_when - [IN] execution phase                            *
- *             ctx          - [IN] event context                              *
- *                                                                            *
- * Return value: close window operation flag if window must be closed, 0      *
- *               otherwise                                                    *
- *                                                                            *
- ******************************************************************************/
-zbx_uint64_t	cep_rule_event_execute_close_window(const zbx_cep_rule_t *rule, int execute_when,
-		zbx_cep_event_context_t *ctx)
-{
-	zbx_uint64_t	opmask = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64 " operations:%d", __func__, rule->ruleid,
-			rule->operations.values_num);
-
-	for (int i = 0; i < rule->operations.values_num; i++)
-	{
-		if (rule->operations.values[i].execute_when == execute_when)
-		{
-			if (SUCCEED != cep_operation_match_event(&rule->operations.values[i], ctx))
-				continue;
-
-			if (ZBX_CEP_OP_CLOSE_WINDOW == rule->operations.values[i].type)
-			{
-				opmask = CEP_FLAG(ZBX_CEP_OP_CLOSE_WINDOW);
-				break;
-			}
-		}
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() opmask:%x", __func__, opmask);
-
-	return opmask;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: execute a rule's operations against an event context, syncing     *
  *          the event if it was modified                                      *
  *                                                                            *
