@@ -1262,12 +1262,16 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				]
 			),
 			[
-				'description' => 'Time bucket test #1: no gap',
+				'description' => 'Time bucket test #1: no gap, no overlap',
 				'item' => self::tqItem(
 					APM_SIGNAL_TYPE_TRACES,
 					APM_METRICS_POINT_SUM,
 					[],
-					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
+					[
+						self::qagg('', AGGREGATE_COUNT, 'cnt'),
+						self::qagg('Timestamp', AGGREGATE_MIN, 'ts_min'),
+						self::qagg('Timestamp', AGGREGATE_MAX, 'ts_max')
+					],
 					self::emptyFilter(),
 					'0',
 					'1h',
@@ -1277,19 +1281,25 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					[
 						'id' => 1,
 						'columns' => [
-							'cnt' => 3
+							'cnt' => 3,
+							'ts_min' => (int) ($now - 300.2), /* timestamp is rounded down to seconds in the query */
+							'ts_max' => $now - 300
 						]
 					],
 					[
 						'id' => 2,
 						'columns' => [
-							'cnt' => 1
+							'cnt' => 1,
+							'ts_min' => $now - 200,
+							'ts_max' => $now - 200
 						]
 					],
 					[
 						'id' => 3,
 						'columns' => [
-							'cnt' => 2
+							'cnt' => 2,
+							'ts_min' => $now - 101,
+							'ts_max' => $now - 100
 						]
 					]
 				],
