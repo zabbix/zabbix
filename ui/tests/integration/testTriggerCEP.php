@@ -7873,7 +7873,7 @@ HEREDOC;
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUp() {
-		
+
 		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
 
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
