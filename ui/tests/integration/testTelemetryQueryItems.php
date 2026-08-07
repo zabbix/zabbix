@@ -502,16 +502,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return $payload;
 	}
 
-	private static function tmplNamedTraceSpan(float $now, float $offset_s, string $name): array {
-		return self::tmplTrace(
-			self::tsOffStr($now, $offset_s),
-			self::tsOffStr($now, $offset_s),
-			function (array &$payload) use ($name) {
-				$payload['scopeSpans'][0]['spans'][0]['name'] = $name;
-			}
-		);
-	}
-
 	private static function getAggregationSubcase(string $description, array $values, array $funcs): array {
 		return [
 			'description' => $description,
@@ -567,6 +557,26 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		];
 	}
 
+	private static function tmplSpanWithSpanName(float $now, float $offset_s, string $name): array {
+		return self::tmplTrace(
+			self::tsOffStr($now, $offset_s),
+			self::tsOffStr($now, $offset_s),
+			function (array &$payload) use ($name) {
+				$payload['scopeSpans'][0]['spans'][0]['name'] = $name;
+			}
+		);
+	}
+
+	/*
+		TODO: add test cases for:
+			- time buckets with overlap
+			- time buckets with gaps
+			- time buckets with no gaps, no overlaps but in multiple requests
+			- custom expression
+			- array conditions
+			- exists condition
+			- utf-8 handling in attributes (both keys and values)
+	*/
 	private function getSubcases(): array {
 		return [
 			[
@@ -703,7 +713,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 							self::qcond('Events.Name', CONDITION_OPERATOR_EQUAL, 'test-span-event'),
 							self::qcond('Events.Attributes', CONDITION_OPERATOR_EXISTS, '', 'event.attr')
 						],
-						'A and B and C and D and E and F and G and H and I and J and K and L and M and N and O'
+						'A and B and C and D and E or F and G and (H and I and (J or K)) and L and M and N and (O or not O)'
 					)
 				),
 				'buckets_tmpl' => fn(int $now) => [
@@ -1281,12 +1291,12 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				],
 				'input_tmpl' => fn(int $now) => [
 					'traces' => [
-						self::tmplNamedTraceSpan($now, -100, 'a'),
-						self::tmplNamedTraceSpan($now, -101, 'a'),
-						self::tmplNamedTraceSpan($now, -200, 'b'),
-						self::tmplNamedTraceSpan($now, -300, 'c'),
-						self::tmplNamedTraceSpan($now, -300.1, 'd'),
-						self::tmplNamedTraceSpan($now, -300.2, 'e')
+						self::tmplSpanWithSpanName($now, -100, 'a'),
+						self::tmplSpanWithSpanName($now, -101, 'a'),
+						self::tmplSpanWithSpanName($now, -200, 'b'),
+						self::tmplSpanWithSpanName($now, -300, 'c'),
+						self::tmplSpanWithSpanName($now, -300.1, 'd'),
+						self::tmplSpanWithSpanName($now, -300.2, 'e')
 					]
 				]
 			],
@@ -1362,20 +1372,20 @@ class testTelemetryQueryItems extends CIntegrationTest {
 							'SpanName' => 'Zabbix',
 							'cnt' => 2
 						]
-					],
+					]
 				],
 				'input_tmpl' => fn(int $now) => [
 					'traces' => [
-						self::tmplNamedTraceSpan($now, -100, ' a '),
-						self::tmplNamedTraceSpan($now, -101, '  a  '),
-						self::tmplNamedTraceSpan($now, -102, 'Zabbix'),
-						self::tmplNamedTraceSpan($now, -103, 'Zabbix'),
-						self::tmplNamedTraceSpan($now, -104, 'ZABBIX'),
-						self::tmplNamedTraceSpan($now, -200, '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
-						self::tmplNamedTraceSpan($now, -201, '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
-						self::tmplNamedTraceSpan($now, -202, ''),
-						self::tmplNamedTraceSpan($now, -203, 'Zabbix'),
-						self::tmplNamedTraceSpan($now, -204, 'ZABBIX')
+						self::tmplSpanWithSpanName($now, -100, ' a '),
+						self::tmplSpanWithSpanName($now, -101, '  a  '),
+						self::tmplSpanWithSpanName($now, -102, 'Zabbix'),
+						self::tmplSpanWithSpanName($now, -103, 'Zabbix'),
+						self::tmplSpanWithSpanName($now, -104, 'ZABBIX'),
+						self::tmplSpanWithSpanName($now, -200, '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
+						self::tmplSpanWithSpanName($now, -201, '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
+						self::tmplSpanWithSpanName($now, -202, ''),
+						self::tmplSpanWithSpanName($now, -203, 'Zabbix'),
+						self::tmplSpanWithSpanName($now, -204, 'ZABBIX')
 					]
 				]
 			]
@@ -1394,11 +1404,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 										'db="' . self::CLICKHOUSE_DB . '"'
 			]
 		];
-	}
-
-	/* TODO: remove */
-	static private function debugLog(mixed $x): void {
-		echo "\n\n" . json_encode($x, JSON_PRETTY_PRINT) . "\n\n";
 	}
 
 	private function createTQItem(int $hostid, array $item_fields): int {
@@ -1466,13 +1471,11 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			escapeshellarg($method);
 
 		$output_lines = [];
-		$exitCode = 0;
+		$exit_code = 0;
 
-		exec($cmd, $output_lines, $exitCode);
+		exec($cmd, $output_lines, $exit_code);
 
-		$this->assertEquals(0, $exitCode);
-
-		self::debugLog($output_lines);
+		$this->assertEquals(0, $exit_code, "Unexpected exit code: " . $exit_code . ", output_lines:\n" . implode("\n", $output_lines));
 	}
 
 	private function sendInput(array $input): void {
@@ -1579,8 +1582,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		$expected_buckets = $subcase['buckets_tmpl']($now);
 
 		$response = $this->waitForBuckets($itemid, count($expected_buckets), 30, 1, $msg);
-
-		self::debugLog($response['result']);
 
 		for ($i = 0; $i < count($expected_buckets); $i++) {
 			$this->assertArrayHasKey('value', $response['result'][$i], $msg);
