@@ -269,7 +269,7 @@ $form->addItem([
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
-				->addItem((new CLink(_('Create proxy in Cloud'), 'https://cloud.zabbix.com/create-proxy'))
+				->addItem((new CLink(_('Create proxy in Cloud'), ZBX_CREATE_PROXY_IN_CLOUD_URL))
 					->addClass(ZBX_STYLE_LINK_EXTERNAL)
 					->addClass(ZBX_STYLE_BTN)
 					->addClass(ZBX_STYLE_BTN_ALT)
