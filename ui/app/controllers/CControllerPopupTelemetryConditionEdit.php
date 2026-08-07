@@ -23,11 +23,15 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'signal_type' =>		'required|in '.implode(',', [
-										APM_SIGNAL_TYPE_TRACES, APM_SIGNAL_TYPE_METRICS, APM_SIGNAL_TYPE_LOGS
+										CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+										CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+										CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
 									]),
 			'metric_point_type' =>	'in '.implode(',', [
-										APM_METRICS_POINT_SUM, APM_METRICS_POINT_GAUGE, APM_METRICS_POINT_HISTOGRAM,
-										APM_METRICS_POINT_EXPHISTOGRAM
+										CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+										CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+										CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
+										CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
 									]),
 			'row_index' =>			'required|int32',
 			'column' =>				'string',
@@ -60,17 +64,24 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 	}
 
 	private static function getValidationRules(): array {
-		$complex_columns = CTelemetryData::getComplexColumns();
-		$operators = CTelemetryData::getConditionOperators();
+		$complex_columns = CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME;
+		$operators = CTelemetryHelper::getConditionOperators();
 
 		return ['object', 'fields' => [
 			'row_index' => ['integer', 'required'],
 			'signal_type' => ['integer', 'required',
-				'in' => [APM_SIGNAL_TYPE_TRACES, APM_SIGNAL_TYPE_METRICS, APM_SIGNAL_TYPE_LOGS]
+				'in' => [
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
+				]
 			],
 			'metric_point_type' => ['integer',
-				'in' => [APM_METRICS_POINT_SUM, APM_METRICS_POINT_GAUGE, APM_METRICS_POINT_HISTOGRAM,
-					APM_METRICS_POINT_EXPHISTOGRAM
+				'in' => [
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
 				]
 			],
 			'column' => ['string', 'required', 'not_empty'],
@@ -94,7 +105,9 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			'action' => $this->getAction(),
 			'row_index' => $this->getInput('row_index'),
 			'signal_type' => (int) $this->getInput('signal_type'),
-			'metric_point_type' => (int) $this->getInput('metric_point_type', (string) APM_METRICS_POINT_SUM),
+			'metric_point_type' => (int) $this->getInput('metric_point_type',
+				(string) CItemTypeTelemetryQuery::METRICS_POINT_SUM
+			),
 			'column' => $this->getInput('column', ''),
 			'attribute_key' => $this->getInput('attribute_key', ''),
 			'operator' => (int) $this->getInput('operator', (string) CONDITION_OPERATOR_EQUAL),
@@ -105,8 +118,10 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			]
 		];
 
-		$data['columns'] = CTelemetryData::getConditionColumns($data['signal_type'], $data['metric_point_type']);
-		$data['operators'] = CTelemetryData::getOperatorLabels();
+		$data['columns'] = CTelemetryHelper::getConditionColumnOptions($data['signal_type'],
+			$data['metric_point_type']
+		);
+		$data['operators'] = CTelemetryHelper::getOperatorLabels();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

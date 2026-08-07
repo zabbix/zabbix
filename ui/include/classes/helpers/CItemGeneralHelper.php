@@ -103,8 +103,8 @@ JAVASCRIPT;
 			'time_shift' => DB::getDefault('items', 'time_shift'),
 			'lookback_limit' => DB::getDefault('items', 'lookback_limit'),
 			'granularity' => DB::getDefault('items', 'granularity'),
-			'signal_type' => APM_SIGNAL_TYPE_TRACES,
-			'metric_point_type' => APM_METRICS_POINT_SUM,
+			'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+			'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 			'columns' => [],
 			'aggregated_columns' => [],
 			'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -638,10 +638,9 @@ JAVASCRIPT;
 		$input += ['columns' => [], 'aggregated_columns' => [], 'conditions' => []];
 
 		$columns = [];
-		$complex_columns = CTelemetryData::getComplexColumns();
 
 		foreach ($input['columns'] as $column) {
-			$is_complex = in_array($column['column'], $complex_columns, true);
+			$is_complex = in_array($column['column'], CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME, true);
 
 			$columns[] = [
 				'column' => $column['column'],

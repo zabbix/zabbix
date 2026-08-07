@@ -411,16 +411,23 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'signal_type' => ['integer',
-				'in' => [APM_SIGNAL_TYPE_TRACES, APM_SIGNAL_TYPE_METRICS, APM_SIGNAL_TYPE_LOGS],
+				'in' => [
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
+				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'metric_point_type' => ['integer',
-				'in' => [APM_METRICS_POINT_SUM, APM_METRICS_POINT_GAUGE, APM_METRICS_POINT_HISTOGRAM,
-					APM_METRICS_POINT_EXPHISTOGRAM
+				'in' => [
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
 				],
 				'when' => [
 					['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]],
-					['signal_type', 'in' => [APM_SIGNAL_TYPE_METRICS]]
+					['signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS]]
 				]
 			],
 			'columns' => ['objects', 'uniq' => ['column', 'attribute_key'],
@@ -428,7 +435,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				'fields' => [
 					'column' => ['string', 'required', 'not_empty'],
 					'attribute_key' => ['string', 'required', 'not_empty',
-						'when' => ['column', 'in' => CTelemetryData::getComplexColumns()]
+						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 					]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
@@ -474,14 +481,14 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 					'formulaid' => ['string', 'required', 'not_empty'],
 					'column' => ['string', 'required', 'not_empty'],
 					'attribute_key' => ['string', 'required', 'not_empty',
-						'when' => ['column', 'in' => CTelemetryData::getComplexColumns()]
+						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 					],
 					'operator' => [
-						['integer', 'required', 'in' => CTelemetryData::getConditionOperators()['complex'],
-							'when' => ['column', 'in' => CTelemetryData::getComplexColumns()]
+						['integer', 'required', 'in' => CTelemetryHelper::getConditionOperators()['complex'],
+							'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 						],
-						['integer', 'required', 'in' => CTelemetryData::getConditionOperators()['simple'],
-							'when' => ['column', 'not_in' => CTelemetryData::getComplexColumns()]
+						['integer', 'required', 'in' => CTelemetryHelper::getConditionOperators()['simple'],
+							'when' => ['column', 'not_in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 						]
 					],
 					'value' => ['string', 'required', 'not_empty',

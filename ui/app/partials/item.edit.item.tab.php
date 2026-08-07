@@ -654,9 +654,9 @@ $formgrid
 				->setId('signal_type')
 				->setValue($item['signal_type'])
 				->addOptions(CSelect::createOptionsFromArray([
-					APM_SIGNAL_TYPE_TRACES => _('Traces'),
-					APM_SIGNAL_TYPE_METRICS => _('Metrics'),
-					APM_SIGNAL_TYPE_LOGS => _('Logs')
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES => _('Traces'),
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS => _('Metrics'),
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS => _('Logs')
 				]))
 				->setReadonly($readonly)
 		))->setId('js-item-signal-type-field')
@@ -665,10 +665,10 @@ $formgrid
 		(new CLabel(_('Metric points'), 'metric_point_type'))->setId('js-item-metric-point-type-label'),
 		(new CFormField(
 			(new CRadioButtonList('metric_point_type', (int) $item['metric_point_type']))
-				->addValue(_('Sum'), APM_METRICS_POINT_SUM)
-				->addValue(_('Gauge'), APM_METRICS_POINT_GAUGE)
-				->addValue(_('Histogram'), APM_METRICS_POINT_HISTOGRAM)
-				->addValue(_('Exponential histogram'), APM_METRICS_POINT_EXPHISTOGRAM)
+				->addValue(_('Sum'), CItemTypeTelemetryQuery::METRICS_POINT_SUM)
+				->addValue(_('Gauge'), CItemTypeTelemetryQuery::METRICS_POINT_GAUGE)
+				->addValue(_('Histogram'), CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM)
+				->addValue(_('Exponential histogram'), CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM)
 				->setModern()
 				->setReadonly($readonly)
 		))->setId('js-item-metric-point-type-field')

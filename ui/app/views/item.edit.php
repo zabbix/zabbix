@@ -209,9 +209,9 @@ $form
 				'delete' => 'item.delete'
 			],
 			'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false]),
-			'telemetry_columns_config' => CTelemetryData::getColumnConfig(),
-			'telemetry_function_labels' => CTelemetryData::getFunctionLabels(),
-			'telemetry_operator_labels' => CTelemetryData::getOperatorLabels(),
+			'telemetry_columns_config' => CTelemetryHelper::getColumnConfig(),
+			'telemetry_function_labels' => CTelemetryHelper::getFunctionLabels(),
+			'telemetry_operator_labels' => CTelemetryHelper::getOperatorLabels(),
 			'form_data' => $item,
 			'host' => $data['host'],
 			'inherited_timeouts' => $data['inherited_timeouts'],
