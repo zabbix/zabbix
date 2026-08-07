@@ -85,7 +85,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	}
 
 	private static function tqItem(int $signal_type, int $metric_point_type, array $columns,
-			array $aggregated_columns, array $filter, string $time_shift = '1', string $lookback_limit = '120',
+			array $aggregated_columns, array $filter, string $time_shift = '0', string $lookback_limit = '120',
 			string $granularity = '120', string $delay = '1'): array {
 		return [
 			'query' => [
@@ -557,12 +557,20 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		];
 	}
 
-	private static function tmplSpanWithSpanName(float $now, float $offset_s, string $name): array {
+	private static function tmplSimpleSpan(float $now, float $offset_s, string $span_name, array $span_attributes = []): array {
 		return self::tmplTrace(
 			self::tsOffStr($now, $offset_s),
 			self::tsOffStr($now, $offset_s),
-			function (array &$payload) use ($name) {
-				$payload['scopeSpans'][0]['spans'][0]['name'] = $name;
+			function (array &$payload) use ($span_name, $span_attributes) {
+				$payload['scopeSpans'][0]['spans'][0]['name'] = $span_name;
+				$payload['scopeSpans'][0]['spans'][0]['attributes'] = [];
+
+				foreach ($span_attributes as $key => $value) {
+					$payload['scopeSpans'][0]['spans'][0]['attributes'][] = [
+						'key' => $key,
+						'value' => ['stringValue' => $value]
+					];
+				}
 			}
 		);
 	}
@@ -1291,12 +1299,12 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				],
 				'input_tmpl' => fn(int $now) => [
 					'traces' => [
-						self::tmplSpanWithSpanName($now, -100, 'a'),
-						self::tmplSpanWithSpanName($now, -101, 'a'),
-						self::tmplSpanWithSpanName($now, -200, 'b'),
-						self::tmplSpanWithSpanName($now, -300, 'c'),
-						self::tmplSpanWithSpanName($now, -300.1, 'd'),
-						self::tmplSpanWithSpanName($now, -300.2, 'e')
+						self::tmplSimpleSpan($now, -100, 'a'),
+						self::tmplSimpleSpan($now, -101, 'a'),
+						self::tmplSimpleSpan($now, -200, 'b'),
+						self::tmplSimpleSpan($now, -300, 'c'),
+						self::tmplSimpleSpan($now, -300.1, 'd'),
+						self::tmplSimpleSpan($now, -300.2, 'e')
 					]
 				]
 			],
@@ -1376,16 +1384,60 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				],
 				'input_tmpl' => fn(int $now) => [
 					'traces' => [
-						self::tmplSpanWithSpanName($now, -100, ' a '),
-						self::tmplSpanWithSpanName($now, -101, '  a  '),
-						self::tmplSpanWithSpanName($now, -102, 'Zabbix'),
-						self::tmplSpanWithSpanName($now, -103, 'Zabbix'),
-						self::tmplSpanWithSpanName($now, -104, 'ZABBIX'),
-						self::tmplSpanWithSpanName($now, -200, '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
-						self::tmplSpanWithSpanName($now, -201, '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
-						self::tmplSpanWithSpanName($now, -202, ''),
-						self::tmplSpanWithSpanName($now, -203, 'Zabbix'),
-						self::tmplSpanWithSpanName($now, -204, 'ZABBIX')
+						self::tmplSimpleSpan($now, -100, ' a '),
+						self::tmplSimpleSpan($now, -101, '  a  '),
+						self::tmplSimpleSpan($now, -102, 'Zabbix'),
+						self::tmplSimpleSpan($now, -103, 'Zabbix'),
+						self::tmplSimpleSpan($now, -104, 'ZABBIX'),
+						self::tmplSimpleSpan($now, -200, '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
+						self::tmplSimpleSpan($now, -201, '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
+						self::tmplSimpleSpan($now, -202, ''),
+						self::tmplSimpleSpan($now, -203, 'Zabbix'),
+						self::tmplSimpleSpan($now, -204, 'ZABBIX')
+					]
+				]
+			],
+			[
+				'description' => 'Attributes test',
+				'item' => self::tqItem(
+					APM_SIGNAL_TYPE_TRACES,
+					APM_METRICS_POINT_SUM,
+					[
+						self::qcol('SpanName'),
+						self::qcol('SpanAttributes', 'k1'),
+						self::qcol('SpanAttributes', '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
+						self::qcol('SpanAttributes', 'unset')
+					],
+					[
+						self::qagg('', AGGREGATE_COUNT, 'cnt')
+					],
+					self::qfilter(
+						CONDITION_EVAL_TYPE_EXPRESSION,
+						[
+							self::qcond('SpanAttributes', CONDITION_OPERATOR_EQUAL, 'v1', 'k1'),
+							self::qcond('SpanAttributes', CONDITION_OPERATOR_EQUAL, '  🙂🙃  ', '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ')
+						],
+						"A and B"
+					)
+				),
+				'buckets_tmpl' => fn(int $now) => [
+					[
+						'id' => 1,
+						'columns' => [
+							'SpanName' => 'd',
+							'SpanAttributes.k1' => 'v1',
+							'SpanAttributes.  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ' => '  🙂🙃  ',
+							'SpanAttributes.unset' => '',
+							'cnt' => 1
+						]
+					]
+				],
+				'input_tmpl' => fn(int $now) => [
+					'traces' => [
+						self::tmplSimpleSpan($now, -100, 'a', []),
+						self::tmplSimpleSpan($now, -101, 'b', ['k1' => 'v1']),
+						self::tmplSimpleSpan($now, -102, 'c', ['  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ' => '  🙂🙃  ']),
+						self::tmplSimpleSpan($now, -103, 'd', ['k1' => 'v1', '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ' => '  🙂🙃  '])
 					]
 				]
 			]
