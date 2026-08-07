@@ -519,7 +519,8 @@ class CAudit {
 		'usergroup.hostgroup_rights' => 'rights',
 		'usergroup.templategroup_rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
-		'usergroup.users' => 'users_groups'
+		'usergroup.users' => 'users_groups',
+		'proxy.apm' => 'proxy'
 	];
 
 	/**
