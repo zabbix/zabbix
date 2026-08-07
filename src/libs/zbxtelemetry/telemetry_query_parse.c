@@ -95,9 +95,9 @@ static zbx_tq_signal_type_t	tq_match_signal_type(int x)
 {
 	switch (x)
 	{
-		case ZBX_TQ_SIGNAL_TYPE_APM_TRACES:
-		case ZBX_TQ_SIGNAL_TYPE_APM_METRICS:
-		case ZBX_TQ_SIGNAL_TYPE_APM_LOGS:
+		case ZBX_TQ_SIGNAL_TYPE_TRACES:
+		case ZBX_TQ_SIGNAL_TYPE_METRICS:
+		case ZBX_TQ_SIGNAL_TYPE_LOGS:
 			return x;
 		default:
 			return ZBX_TQ_SIGNAL_TYPE_UNKNOWN;

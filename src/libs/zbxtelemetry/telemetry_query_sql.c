@@ -355,11 +355,11 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, co
 
 	switch (query->signal_type)
 	{
-		case ZBX_TQ_SIGNAL_TYPE_APM_TRACES:
+		case ZBX_TQ_SIGNAL_TYPE_TRACES:
 			str = zbx_strdup(NULL, "otel_traces");
 			break;
 
-		case ZBX_TQ_SIGNAL_TYPE_APM_METRICS:
+		case ZBX_TQ_SIGNAL_TYPE_METRICS:
 			switch (query->metric_point_type)
 			{
 				case ZBX_TQ_METRIC_POINT_TYPE_SUM:
@@ -380,7 +380,7 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, co
 			}
 			break;
 
-		case ZBX_TQ_SIGNAL_TYPE_APM_LOGS:
+		case ZBX_TQ_SIGNAL_TYPE_LOGS:
 			str = zbx_strdup(NULL, "otel_logs");
 			break;
 
@@ -668,7 +668,7 @@ static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, const tq_sql
 
 static const char	*tq_sql_get_timestamp_column_name(const zbx_tq_query_t *query)
 {
-	return (ZBX_TQ_SIGNAL_TYPE_APM_METRICS == query->signal_type ? "TimeUnix" : "Timestamp");
+	return (ZBX_TQ_SIGNAL_TYPE_METRICS == query->signal_type ? "TimeUnix" : "Timestamp");
 }
 
 void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,

@@ -174,10 +174,10 @@ const tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
 
 	switch (signal_type)
 	{
-		case ZBX_TQ_SIGNAL_TYPE_APM_TRACES:
+		case ZBX_TQ_SIGNAL_TYPE_TRACES:
 			return get_column_info_from_arr(column_info_traces, column);
 
-		case ZBX_TQ_SIGNAL_TYPE_APM_METRICS:
+		case ZBX_TQ_SIGNAL_TYPE_METRICS:
 			switch (metric_point_type)
 			{
 				case ZBX_TQ_METRIC_POINT_TYPE_SUM:
@@ -193,7 +193,7 @@ const tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
 					return NULL;
 			}
 
-		case ZBX_TQ_SIGNAL_TYPE_APM_LOGS:
+		case ZBX_TQ_SIGNAL_TYPE_LOGS:
 			return get_column_info_from_arr(column_info_logs, column);
 
 		default:
