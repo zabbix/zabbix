@@ -21,6 +21,7 @@
 #include "zbxfile.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxdbhigh.h"
 
 #if !defined(HAVE_LIBSSH2_METHOD_KEX) && !defined(HAVE_LIBSSH2_METHOD_HOSTKEY) && \
 		!defined(HAVE_LIBSSH2_METHOD_CRYPT_CS) && !defined(HAVE_LIBSSH2_METHOD_CRYPT_SC) && \
@@ -84,8 +85,8 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char **err_msg)
 {
 	int	ret = SUCCEED;
-	char	opt_copy[1024] = {0};
 	char	*saveptr;
+	char	opt_copy[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1] = {0};
 
 	zbx_strscpy(opt_copy, options);
 
