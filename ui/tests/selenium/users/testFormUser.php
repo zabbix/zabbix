@@ -856,7 +856,7 @@ class testFormUser extends CWebTest {
 						'Auto-login' => false,
 						'Refresh' => '0',
 						'Rows per page' => '999999',
-						'URL (after login)' => 'https://zabbix.com'
+						'URL (after login)' => 'zabbix.php?action=host.list'
 					],
 					'role' => 'Admin role',
 					'check_form' => true
