@@ -232,9 +232,10 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_TSIZE	5
 #define ZBX_DSIZE	6
 #define ZBX_SSIZE	7
-	char		*procname, *proccomm, *param, *args, *mem_type = NULL, *rxp_error = NULL;
+	char		*procname, *proccomm, *param, *args, *mem_type = NULL, *rxp_error = NULL,
+			*procjail, *end_of_line;
 	int		do_task, pagesize, count, proccount = 0, invalid_user = 0, mem_type_code, mib[4],
-			ret = SYSINFO_RET_OK;
+			ret = SYSINFO_RET_OK, jid = -1;
 	unsigned int	mibs;
 	zbx_uint64_t	mem_size = 0, byte_value = 0;
 	double		pct_size = 0.0, pct_value = 0.0;
@@ -249,7 +250,7 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
 
-	if (5 < request->nparam)
+	if (6 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		ret = SYSINFO_RET_FAIL;
@@ -348,6 +349,36 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto clean;
 	}
 
+	procjail = get_rparam(request, 5);
+	if (NULL != procjail && '\0' != *procjail)
+	{
+#ifdef HAVE_LIBJAIL
+		jid = jail_getid(procjail);
+		if (-1 == jid)	/* No process, associated with that jail name (No jail with that name was found). */
+			goto out;
+#else
+		errno = 0;
+		jid = strtol(procjail, &end_of_line, 10);
+		if ('\0' != *end_of_line || 0 != errno)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Jail name not allowed (Agent was compiled without"
+			" \"libjail\" library support)."));
+			return SYSINFO_RET_FAIL;
+		}
+		if (0 > jid) {
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Jail id must be greater or equal 0."));
+			return SYSINFO_RET_FAIL;
+		}
+#if (__FreeBSD_version) < 500000
+		if (0 != jid) {
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Jails aren't supported (Agent was compiled on"
+			" FreeBSD < 5.0)."));
+			return SYSINFO_RET_FAIL;
+		}
+#endif
+#endif
+	}
+
 	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
 		goto out;
 
@@ -419,6 +450,11 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (0 != zbx_regexp_match_precompiled(args, proccomm_rxp))
 				continue;
 		}
+
+#if (__FreeBSD_version) > 500000
+		if (proc[i].ZBX_PROC_JID != jid && -1 != jid)
+			continue;
+#endif
 
 		switch (mem_type_code)
 		{
@@ -515,15 +551,16 @@ clean:
 
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*procname, *proccomm, *param, *args, *rxp_error = NULL;
+	char			*procname, *proccomm, *param, *args, *rxp_error = NULL,
+				*procjail, *end_of_line;
 	int			zbx_proc_stat, count, proc_ok, stat_ok, comm_ok, mib[4], mibs, proccount = 0,
-				invalid_user = 0, ret = SYSINFO_RET_OK;
+				invalid_user = 0, ret = SYSINFO_RET_OK, jail_ok, jid = -1;
 	size_t			sz;
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
 	zbx_regexp_t		*proccomm_rxp = NULL;
 
-	if (4 < request->nparam)
+	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		ret = SYSINFO_RET_FAIL;
@@ -611,6 +648,36 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mibs = 3;
 	}
 
+	procjail = get_rparam(request, 4);
+	if (NULL != procjail && '\0' != *procjail)
+	{
+#ifdef HAVE_LIBJAIL
+		jid = jail_getid(procjail);
+		if (-1 == jid)	/* No process, associated with that jail name (No jail with that name was found). */
+			goto out;
+#else
+		errno = 0;
+		jid = strtol(procjail, &end_of_line, 10);
+		if ('\0' != *end_of_line || 0 != errno)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Jail name not allowed (Agent was compiled without"
+			" \"libjail\" library support)."));
+			return SYSINFO_RET_FAIL;
+		}
+		if (0 > jid) {
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Jail id must be greater or equal 0."));
+			return SYSINFO_RET_FAIL;
+		}
+#if (__FreeBSD_version) < 500000
+		if (0 != jid) {
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Jails aren't supported (Agent was compiled on"
+			" FreeBSD < 5.0)."));
+			return SYSINFO_RET_FAIL;
+		}
+#endif
+#endif
+	}
+
 	sz = 0;
 	if (0 != sysctl(mib, mibs, NULL, &sz, NULL, 0))
 	{
@@ -637,6 +704,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		proc_ok = 0;
 		stat_ok = 0;
 		comm_ok = 0;
+		jail_ok = 0;
 
 		if (NULL == procname || '\0' == *procname || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
 			proc_ok = 1;
@@ -686,7 +754,12 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 			comm_ok = 1;
 
-		if (proc_ok && stat_ok && comm_ok)
+#if (__FreeBSD_version) > 500000
+		if (proc[i].ZBX_PROC_JID == jid || -1 == jid)
+#endif
+			jail_ok = 1;
+
+		if (proc_ok && stat_ok && comm_ok && jail_ok)
 			proccount++;
 	}
 	zbx_free(proc);
