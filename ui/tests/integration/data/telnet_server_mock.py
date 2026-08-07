@@ -17,12 +17,18 @@ DO = 0xFD
 SGA = 0x03
 
 # Command text (as sent verbatim in the item "params" field) -> (echo the command back, output bytes
-# to send before the next prompt, whether the prompt is followed by a trailing space).
+# to send before the next prompt, whether the prompt is followed by a trailing space), or None to send
+# no reply at all and wait for the next line.
 #
 # "short output cmd" is deliberately longer than any data the mock ever sends back for it (the mock
 # sends only the bare prompt byte, no echo, no output) - this is the "short Telnet command output"
 # condition fixed by DEV-5055: the real reply is shorter than the text zbx_telnet_execute() tries to
 # strip from the front of the buffer (either the echoed command itself, or the "\n"/"$ " fragments).
+#
+# The "multiline command N" trio is the multi-line variant of the same DEV-5055 fix: the first two
+# lines get no reply at all, so the only bytes the client ever reads are the bare "$ " sent after the
+# third line, which is what makes zbx_telnet_execute() call telnet_rm_echo() a second time on an
+# already-zero offset.
 COMMANDS = {
     b"short output cmd": (False, b"", False),
     b"echo test output": (True, b"hello world\r\n", True),
@@ -32,7 +38,10 @@ COMMANDS = {
         b"CR-line\r"
         b"CRNUL-line\r\x00"
         b"\r\n",
-        True)
+        True),
+    b"multiline command 1": None,
+    b"multiline command 2": None,
+    b"multiline command 3": (False, b"", True)
 }
 DEFAULT_COMMAND = (True, b"", True)
 
@@ -42,6 +51,7 @@ class ClientHandler(threading.Thread):
         super().__init__(daemon=True)
         self.conn = conn
         self.args = args
+        self._buf = b""
 
     def run(self):
         try:
@@ -55,17 +65,19 @@ class ClientHandler(threading.Thread):
                 pass
 
     def recv_until(self, terminator=b"\r\n"):
-        buf = b""
-
-        while terminator not in buf:
+        # A multi-line command's lines usually all arrive in the same recv(), so any bytes past the
+        # first terminator have to be kept for the next call instead of being dropped with it.
+        while terminator not in self._buf:
             chunk = self.conn.recv(4096)
 
             if not chunk:
                 return None
 
-            buf += chunk
+            self._buf += chunk
 
-        return buf.split(terminator, 1)[0]
+        line, self._buf = self._buf.split(terminator, 1)
+
+        return line
 
     def handle(self):
         # Ask the client to suppress go-ahead; the reply (IAC WILL/WONT SGA) is consumed transparently
@@ -103,7 +115,12 @@ class ClientHandler(threading.Thread):
             if command is None:
                 return
 
-            echo, output, trailing_space = COMMANDS.get(command, DEFAULT_COMMAND)
+            entry = COMMANDS.get(command, DEFAULT_COMMAND)
+
+            if entry is None:
+                continue
+
+            echo, output, trailing_space = entry
 
             reply = b""
 

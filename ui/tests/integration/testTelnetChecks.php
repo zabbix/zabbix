@@ -286,6 +286,27 @@ class testTelnetChecks extends CIntegrationTest {
 	}
 
 	/**
+	 * Regression test for DEV-5055, multi-line variant: for a command with N embedded newlines,
+	 * zbx_telnet_execute() tries to strip one extra "$ " prompt fragment per newline. The mock never
+	 * replies to the first two lines of the three-line command below (nothing has been echoed for the
+	 * client to read yet), so the only bytes the client ever gets are the bare "$ " sent after the
+	 * third line. The first strip attempt consumes that "$ " and drops the logical offset to zero; the
+	 * second attempt, driven by the command's second embedded newline, must find nothing left to strip
+	 * instead of subtracting from an already-zero offset. This exercises telnet_rm_echo() a second time
+	 * on a zero offset, which is the exact case its length guard exists for.
+	 */
+	public function testTelnetChecks_shortMultilineCommandOutput(): void {
+		self::startTelnetMock();
+
+		$itemid = $this->createTelnetItem('shortmultiline',
+			"multiline command 1\nmultiline command 2\nmultiline command 3");
+		$this->assertTelnetItemValue($itemid, '');
+		$this->deleteTelnetItem('shortmultiline', $itemid);
+
+		self::stopTelnetMock();
+	}
+
+	/**
 	 * Covers convert_telnet_to_unix_eol(): CRLF, LF+CR, bare CR and CR+NUL must all normalize to a
 	 * single Unix "\n" (CR+NUL is dropped entirely, with no newline emitted in its place).
 	 */
