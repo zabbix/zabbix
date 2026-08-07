@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class CAuditTest extends TestCase {
 
-	public static function dataProviderHandleObjectDiff() {
+	public static function dataProviderHandleObjectDiffItem() {
 		// CAudit::ACTION_ADD
 		yield 'action ACTION_ADD' => [
 			CAudit::RESOURCE_ITEM,
@@ -399,7 +399,7 @@ class CAuditTest extends TestCase {
 			]
 		];
 
-		yield 'deleted column in "item.query.columns"' => [
+		yield '"item.query.columns" delete column' => [
 			CAudit::RESOURCE_ITEM,
 			CAudit::ACTION_UPDATE,
 			[
@@ -441,7 +441,7 @@ class CAuditTest extends TestCase {
 				'item.query.columns[1]' => [CAudit::DETAILS_ACTION_DELETE]
 			]
 		];
-		yield 'changes in "item.query.aggregated_columns[1].alias"' => [
+		yield '"item.query.aggregated_columns[1].alias" change from "min" to "minimum"' => [
 			CAudit::RESOURCE_ITEM,
 			CAudit::ACTION_UPDATE,
 			[
@@ -481,7 +481,7 @@ class CAuditTest extends TestCase {
 				'item.query.aggregated_columns[1].alias' => [CAudit::DETAILS_ACTION_UPDATE, 'min', 'minimum']
 			]
 		];
-		yield 'new column "item.query.aggregated_columns"' => [
+		yield '"item.query.aggregated_columns" add new column' => [
 			CAudit::RESOURCE_ITEM,
 			CAudit::ACTION_UPDATE,
 			[
@@ -523,7 +523,7 @@ class CAuditTest extends TestCase {
 				'item.query.aggregated_columns[1].alias' => [CAudit::DETAILS_ACTION_ADD, '']
 			]
 		];
-		yield 'changes in "item.query.aggregated_columns[1].parameters"' => [
+		yield '"item.query.aggregated_columns[1].parameters[0]" change from "5" to "10"' => [
 			CAudit::RESOURCE_ITEM,
 			CAudit::ACTION_UPDATE,
 			[
@@ -561,10 +561,49 @@ class CAuditTest extends TestCase {
 				'item.query.aggregated_columns[0].parameters[0]' => [CAudit::DETAILS_ACTION_UPDATE, '10', '5']
 			]
 		];
+		yield '"item.query.aggregated_columns[0].function" change from "8" to "1"' => [
+			CAudit::RESOURCE_ITEM,
+			CAudit::ACTION_UPDATE,
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [
+						['column' => '', 'function' => AGGREGATE_MIN, 'alias' => '']
+					],
+					'filter' => [
+						'evaltype' => 0,
+						'formula' => '',
+						'conditions' => []
+					]
+				]
+			],
+			[
+				'query' => [
+					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [
+						['column' => '', 'function' => AGGREGATE_PCTILE, 'parameters' => ['10'], 'alias' => '']
+					],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'formula' => '',
+						'conditions' => []
+					]
+				]
+			],
+			[
+				'item.query.aggregated_columns[0]' => [CAudit::DETAILS_ACTION_UPDATE],
+				'item.query.aggregated_columns[0].function' => [CAudit::DETAILS_ACTION_UPDATE, '1', '8'],
+				'item.query.aggregated_columns[0].parameters[0]' => [CAudit::DETAILS_ACTION_DELETE]
+			]
+		];
 	}
 
 	/**
-	 * @dataProvider dataProviderHandleObjectDiff
+	 * @dataProvider dataProviderHandleObjectDiffItem
 	 */
 	public function testHandleObjectDiff(int $resource, int $action, array $object, array $db_object, array $expected) {
 		static $closure;
@@ -579,6 +618,6 @@ class CAuditTest extends TestCase {
 			);
 		}
 
-		$this->assertSame($expected, $closure($resource, $action, $object, $db_object));
+		$this->assertEqualsCanonicalizing($expected, $closure($resource, $action, $object, $db_object));
 	}
 }

@@ -1116,7 +1116,9 @@ class CAudit {
 				continue;
 			}
 
-			$object_path = self::getLastObjectPath($path);
+			$object_path = in_array(self::getAbstractPath($path), self::SCALAR_VALUE_LIST_FIELD, true)
+				? $path
+				: self::getLastObjectPath($path);
 
 			if (!in_array($object_path, $paths)) {
 				$paths[] = $object_path;
