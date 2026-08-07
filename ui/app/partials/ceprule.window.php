@@ -56,7 +56,6 @@ zbx_add_post_js($tags->getPostJS());
 			->setId('ceprule-window-duration')
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
 	))
 
 	->addItem((new CLabel(_('Capacity'), 'ceprule-window-capacity'))
@@ -76,7 +75,6 @@ zbx_add_post_js($tags->getPostJS());
 			->setId('ceprule-window-capacity')
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
 		)
 	)
 
@@ -123,7 +121,6 @@ zbx_add_post_js($tags->getPostJS());
 		->addItem((new CTextBox('window[event_count_tag]', $data['window']['event_count_tag']))
 			->setId('ceprule-window-counttag')
 			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
 		)
 	)
 

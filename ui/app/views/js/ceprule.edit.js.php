@@ -99,7 +99,10 @@ window.ceprule_edit_popup = new class {
 
 		this.#handleWindowTypeChanged();
 
-		window.requestAnimationFrame(() => this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE));
+		window.requestAnimationFrame(() => {
+			this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+			Focuser.focus(this.form_element.querySelector('[autofocus]'));
+		});
 	}
 
 	#initTemplates() {

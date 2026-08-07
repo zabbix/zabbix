@@ -201,11 +201,6 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 			'stop' => ['db cep_rule.stop', 'required', 'in' => [CCepRuleHelper::EXECUTION_CONTINUE,
 				CCepRuleHelper::EXECUTION_STOP
 			]],
-			'sortorder' => ['db cep_rule.sortorder', 'required',
-				'use' => [CNumberValidator::class, ['min' => 1, 'max' => ZBX_MAX_INT64, 'with_float' => false,
-					'usermacros' => false, 'lldmacros' => false
-				]]
-			],
 			'sortorder' => ['db cep_rule.sortorder', 'required', 'min' => 1, 'max' => ZBX_MAX_INT32],
 			'description' => ['db cep_rule.description'],
 			'status' => ['db cep_rule.status', 'required',

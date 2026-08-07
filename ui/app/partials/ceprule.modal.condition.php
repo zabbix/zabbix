@@ -21,6 +21,7 @@
 
 $condition_type = (new CSelect('type'))
 	->setId('ceprule-condition-type')
+	->setAttribute('autofocus', 'autofocus')
 	->setFocusableElementId('ceprule-condition-type-focus');
 
 foreach (CCepRuleHelper::getConditionLabels() as $value => $name) {

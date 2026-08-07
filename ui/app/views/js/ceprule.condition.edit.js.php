@@ -36,7 +36,10 @@ window.ceprule_condition_edit_popup = new class {
 		window['ceprule-condition-type'].dispatchEvent(new Event('change'));
 		window['ceprule-condition-tag-operator'].dispatchEvent(new Event('change'));
 
-		window.requestAnimationFrame(() => this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE));
+		window.requestAnimationFrame(() => {
+			this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+			Focuser.focus(this.form_element.querySelector('[autofocus]'));
+		});
 	}
 
 	#initActions() {
