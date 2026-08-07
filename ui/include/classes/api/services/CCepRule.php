@@ -1203,7 +1203,7 @@ class CCepRule extends CApiService {
 	private static function getOperationConditionId(array $condition, array $db_conditions): ?string {
 		$condition += [
 			'tag' => DB::getDefault('cep_operation_condition', 'tag'),
-			'value' => DB::getDefault('cep_operation_condition', 'value'),
+			'value' => DB::getDefault('cep_operation_condition', 'value')
 		];
 
 		foreach ($db_conditions as $db_condition) {
