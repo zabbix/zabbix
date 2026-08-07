@@ -48,7 +48,7 @@ void	zbx_mock_test_entry(void **state)
 	char			*value = NULL;
 	zbx_vector_uint64_t	hostids;
 	int			ret;
-	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 	double			um_cache_dup_sec = 0;
 	zbx_int64_t		um_cache_dup_size = 0;
 

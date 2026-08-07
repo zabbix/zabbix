@@ -59,7 +59,7 @@ func init() {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
-	impl.SetHandleTimeout(true)
+	impl.SetForceEffectiveTimeoutExtension(true)
 }
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {

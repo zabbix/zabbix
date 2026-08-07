@@ -30,6 +30,7 @@ import (
 	mblib "github.com/goburrow/modbus"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
 
@@ -47,8 +48,8 @@ type Session struct {
 	// SlaveID of modbus devices.
 	SlaveID string `conf:"optional"`
 
-	// Timeout of modbus devices.
-	Timeout int `conf:"optional"`
+	// Deprecated value.
+	LegacyTimeout int `conf:"name=Timeout,optional,range=1:30"`
 }
 
 // PluginOptions -
@@ -161,8 +162,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	timeout := ctx.Timeout()
 	session, ok := p.options.Sessions[params[0]]
 	if ok {
-		if session.Timeout > 0 {
-			timeout = session.Timeout
+		if ctx.LegacyTimeout() {
+			timeout = session.LegacyTimeout
 		}
 
 		if len(session.Endpoint) > 0 {
@@ -217,8 +218,12 @@ func (p *Plugin) Validate(options interface{}) error {
 	}
 
 	for _, s := range opts.Sessions {
-		if s.Timeout > 30 || s.Timeout < 0 {
-			return fmt.Errorf("Unacceptable session Timeout value:%d", s.Timeout)
+		if s.LegacyTimeout != 0 {
+			log.Debugf("config value 'Plugins.Modbus.Sessions.*.Timeout' is deprecated")
+		}
+		// this check should be safe to remove.
+		if s.LegacyTimeout > 30 || s.LegacyTimeout < 0 {
+			return errs.Errorf("Unacceptable session Timeout value:%d", s.LegacyTimeout)
 		}
 
 		var p mbParams
