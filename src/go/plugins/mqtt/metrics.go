@@ -40,6 +40,7 @@ var (
 	paramTLSCaFile   = metric.NewSessionOnlyParam("TLSCAFile", "TLS ca file path.").WithDefault("")
 	paramTLSCertFile = metric.NewSessionOnlyParam("TLSCertFile", "TLS cert file path.").WithDefault("")
 	paramTLSKeyFile  = metric.NewSessionOnlyParam("TLSKeyFile", "TLS key file path.").WithDefault("")
+	paramConnTimeout = metric.NewSessionOnlyParam("ConnectionTimeout", "Time for connection to timeout.")
 )
 
 var metrics = metric.MetricSet{ //nolint:gochecknoglobals // used as a static const.
@@ -47,6 +48,7 @@ var metrics = metric.MetricSet{ //nolint:gochecknoglobals // used as a static co
 		"Subscribe to MQTT topics for published messages.",
 		[]*metric.Param{
 			paramURI, paramTopic, paramUsername, paramPassword, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+			paramConnTimeout,
 		},
 		false,
 	),

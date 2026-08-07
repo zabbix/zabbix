@@ -32,6 +32,7 @@ declare -A BASELINE_TIMES=(
   [testHousekeepingConfSync]=60
   [testTelnetChecks]=54
   [testUserParametersReload]=47
+  [testHashicorpVault]=45
   [testEventsCauseAndSymptoms]=44
   [testTimescaleDb]=44
   [testHistoryValueDuplicates]=43
