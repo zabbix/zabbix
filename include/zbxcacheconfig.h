@@ -883,7 +883,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 		int proxyconfig_frequency);
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location);
+		const char *config_ssl_key_location, int *vault_ret);
 void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
 		zbx_uint64_t conf_cache_size, const char *hostname, zbx_uint32_t config_denyitemtypes_mask,

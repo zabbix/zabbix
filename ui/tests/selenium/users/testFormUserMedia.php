@@ -56,7 +56,7 @@ class testFormUserMedia extends CWebTest {
 		]);
 
 		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('Email', 'SMS',".
-				"'Test script', 'MS Teams', 'Slack', 'Zendesk')"
+				"'Test script', 'MS Teams Workflow', 'Slack', 'Zendesk')"
 		);
 
 		foreach ($mediatypeids as $mediatype) {
@@ -128,7 +128,7 @@ class testFormUserMedia extends CWebTest {
 					],
 					'additional media' => [
 						[
-							'Type' => 'MS Teams',
+							'Type' => 'MS Teams Workflow',
 							'Send to' => 'MS Teams channel 666'
 						],
 						[
@@ -245,12 +245,12 @@ class testFormUserMedia extends CWebTest {
 					'error_message' => ['id:sendto_list_0' => 'Invalid email address "person @zabbix.com".']
 				]
 			],
-			// Empty MS Teams channel name.
+			// Empty MS Teams Workflow channel name.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'MS Teams',
+						'Type' => 'MS Teams Workflow',
 						'Send to' => ''
 					],
 					'error_message' => ['Send to' => 'This field cannot be empty.']

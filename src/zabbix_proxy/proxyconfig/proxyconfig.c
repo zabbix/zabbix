@@ -42,7 +42,7 @@
 
 static void	process_configuration_sync(zbx_dbconn_pool_t *dbpool, size_t *data_size,
 		zbx_synced_new_config_t *synced, const zbx_thread_info_t *thread_info,
-		zbx_thread_proxyconfig_args *args)
+		zbx_thread_proxyconfig_args *args, int *vault_ret)
 {
 	zbx_socket_t			sock;
 	struct	zbx_json_parse		jp, jp_kvs_paths = {0};
@@ -151,7 +151,7 @@ static void	process_configuration_sync(zbx_dbconn_pool_t *dbpool, size_t *data_s
 		{
 			zbx_dc_sync_kvs_paths(&jp_kvs_paths, args->config_vault, args->config_source_ip,
 					args->config_ssl_ca_location, args->config_ssl_cert_location,
-					args->config_ssl_key_location);
+					args->config_ssl_key_location, vault_ret);
 		}
 
 		zbx_dc_update_interfaces_availability();
@@ -262,7 +262,7 @@ fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() removed:%d", __func__, removed_num);
 }
 
-static void	proxyconfig_update_vault_macros(zbx_thread_proxyconfig_args *proxyconfig_args_in)
+static void	proxyconfig_update_vault_macros(zbx_thread_proxyconfig_args *proxyconfig_args_in, int *vault_ret)
 {
 	zbx_config_t	cfg;
 
@@ -273,7 +273,7 @@ static void	proxyconfig_update_vault_macros(zbx_thread_proxyconfig_args *proxyco
 
 	zbx_dc_sync_kvs_paths(NULL, proxyconfig_args_in->config_vault, proxyconfig_args_in->config_source_ip,
 			proxyconfig_args_in->config_ssl_ca_location, proxyconfig_args_in->config_ssl_cert_location,
-			proxyconfig_args_in->config_ssl_key_location);
+			proxyconfig_args_in->config_ssl_key_location, vault_ret);
 }
 
 static void	proxyconfig_prof_enable(const unsigned char *data)
@@ -312,8 +312,8 @@ void	*zbx_proxyconfig_thread(void *args)
 	int				server_num = info->server_num;
 	int				process_num = info->process_num;
 	unsigned char			process_type = info->process_type;
-	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_PROF_ENABLE,
-							ZBX_RTC_PROF_DISABLE};
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_VAULT_NEW_TOKEN,
+							ZBX_RTC_PROF_ENABLE, ZBX_RTC_PROF_DISABLE};
 	time_t				nextcheck;
 	zbx_dbconn_pool_t		*dbpool = unit_args->shared->dbpool;
 	zbx_dbconn_t			*db;
@@ -344,7 +344,7 @@ void	*zbx_proxyconfig_thread(void *args)
 			proxyconfig_args_in->config_vault, proxyconfig_args_in->config_proxyconfig_frequency);
 	zbx_dbconn_pool_release_connection(dbpool, db);
 
-	proxyconfig_update_vault_macros(proxyconfig_args_in);
+	proxyconfig_update_vault_macros(proxyconfig_args_in, NULL);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "finished initial configuration cache synchronization");
 
@@ -359,12 +359,17 @@ void	*zbx_proxyconfig_thread(void *args)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
-		int		config_cache_reload = 0;
+		int		config_cache_reload = 0, vault_ret = SUCCEED;
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			switch (rtc_cmd)
 			{
+				case ZBX_RTC_VAULT_NEW_TOKEN:
+					proxyconfig_args_in->config_vault->token =
+						zbx_strdup(proxyconfig_args_in->config_vault->token,
+							(const char *)rtc_data);
+					break;
 				case ZBX_RTC_CONFIG_CACHE_RELOAD:
 					config_cache_reload = 1;
 					break;
@@ -408,7 +413,15 @@ void	*zbx_proxyconfig_thread(void *args)
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				zbx_dc_update_interfaces_availability();
 
-				proxyconfig_update_vault_macros(proxyconfig_args_in);
+				proxyconfig_update_vault_macros(proxyconfig_args_in, &vault_ret);
+
+				if (SUCCEED != vault_ret && NULL != proxyconfig_args_in->config_vault->token)
+				{
+					zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
+						(unsigned char *)proxyconfig_args_in->config_vault->token,
+						(zbx_uint32_t)strlen(proxyconfig_args_in->config_vault->token) + 1);
+				}
+
 				zbx_hc_remove_items_by_ids(&deleted_itemids);
 
 				zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout,
@@ -434,9 +447,8 @@ void	*zbx_proxyconfig_thread(void *args)
 
 		zbx_supervisor_update_activity("%s [loading configuration]", unit_args->name);
 
-		process_configuration_sync(dbpool, &data_size, &synced, info, proxyconfig_args_in);
-
-		proxyconfig_update_vault_macros(proxyconfig_args_in);
+		process_configuration_sync(dbpool, &data_size, &synced, info, proxyconfig_args_in, &vault_ret);
+		proxyconfig_update_vault_macros(proxyconfig_args_in, &vault_ret);
 
 		interval = zbx_time() - sec;
 
@@ -454,6 +466,13 @@ void	*zbx_proxyconfig_thread(void *args)
 			zbx_dbconn_pool_release_connection(dbpool, db);
 
 			last_template_cleanup_sec = sec;
+		}
+
+		if (SUCCEED != vault_ret && NULL != proxyconfig_args_in->config_vault->token)
+		{
+			zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
+				(unsigned char *)proxyconfig_args_in->config_vault->token,
+				(zbx_uint32_t)strlen(proxyconfig_args_in->config_vault->token) + 1);
 		}
 
 		nextcheck = time(NULL) + proxyconfig_args_in->config_proxyconfig_frequency;

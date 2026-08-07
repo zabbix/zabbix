@@ -1165,6 +1165,35 @@ static int	DBpatch_7050087(void)
 
 static int	DBpatch_7050088(void)
 {
+	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("regexps", &field);
+}
+
+static int	DBpatch_7050089(void)
+{
+	const zbx_db_field_t	field = {"expression", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("expressions", &field, NULL);
+}
+
+static int	DBpatch_7050090(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 1  - REGEX_TYPE_CONTAINS_ANY_SUBSTRING   */
+	if (ZBX_DB_OK > zbx_db_execute("update expressions set exp_delimiter='' where expression_type<>1"
+			" and exp_delimiter<>''"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050091(void)
+{
 	const zbx_db_table_t	table =
 			{"trigger_rtdata", "triggerid", 0,
 				{
@@ -1181,12 +1210,12 @@ static int	DBpatch_7050088(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050089(void)
+static int	DBpatch_7050092(void)
 {
 	return DBcreate_index("trigger_rtdata", "trigger_rtdata_1", "value,lastchange", 0);
 }
 
-static int	DBpatch_7050090(void)
+static int	DBpatch_7050093(void)
 {
 	const zbx_db_field_t	field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1194,7 +1223,7 @@ static int	DBpatch_7050090(void)
 	return DBadd_foreign_key("trigger_rtdata", 1, &field);
 }
 
-static int	DBpatch_7050091(void)
+static int	DBpatch_7050094(void)
 {
 	/* hosts.status 3 - HOST_STATUS_TEMPLATE */
 	/* triggers.flags 0, 4 - ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED */
@@ -1219,66 +1248,66 @@ static int	DBpatch_7050091(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050092(void)
+static int	DBpatch_7050095(void)
 {
 	return DBdrop_field("triggers", "value");
 }
 
-static int	DBpatch_7050093(void)
+static int	DBpatch_7050096(void)
 {
 	return DBdrop_field("triggers", "state");
 }
 
-static int	DBpatch_7050094(void)
+static int	DBpatch_7050097(void)
 {
 	return DBdrop_field("triggers", "lastchange");
 }
 
-static int	DBpatch_7050095(void)
+static int	DBpatch_7050098(void)
 {
 	return DBdrop_field("triggers", "error");
 }
 
-static int	DBpatch_7050096(void)
+static int	DBpatch_7050099(void)
 {
 	return DBcreate_changelog_insert_trigger("trigger_depends", "triggerdepid");
 }
 
-static int	DBpatch_7050097(void)
+static int	DBpatch_7050100(void)
 {
 	return DBcreate_changelog_update_trigger("trigger_depends", "triggerdepid");
 }
 
-static int	DBpatch_7050098(void)
+static int	DBpatch_7050101(void)
 {
 	return DBcreate_changelog_delete_trigger("trigger_depends", "triggerdepid");
 }
 
-static int	DBpatch_7050099(void)
+static int	DBpatch_7050102(void)
 {
 	return DBdrop_foreign_key("trigger_depends", 2);
 }
 
-static int	DBpatch_7050100(void)
+static int	DBpatch_7050103(void)
 {
 	return DBdrop_foreign_key("trigger_depends", 1);
 }
 
-static int	DBpatch_7050101(void)
+static int	DBpatch_7050104(void)
 {
 	const zbx_db_field_t	field = {"triggerid_down", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("trigger_depends", 1, &field);
 }
 
-static int	DBpatch_7050102(void)
+static int	DBpatch_7050105(void)
 {
 	const zbx_db_field_t	field = {"triggerid_up", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("trigger_depends", 2, &field);
 }
 
-static int	DBpatch_7050103(void)
+static int	DBpatch_7050106(void)
 {
 	int	i;
 	const char	*values[] = {
@@ -1302,7 +1331,7 @@ static int	DBpatch_7050103(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050104(void)
+static int	DBpatch_7050107(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1427,5 +1456,8 @@ DBPATCH_ADD(7050101, 0, 1)
 DBPATCH_ADD(7050102, 0, 1)
 DBPATCH_ADD(7050103, 0, 1)
 DBPATCH_ADD(7050104, 0, 1)
+DBPATCH_ADD(7050105, 0, 1)
+DBPATCH_ADD(7050106, 0, 1)
+DBPATCH_ADD(7050107, 0, 1)
 
 DBPATCH_END()
