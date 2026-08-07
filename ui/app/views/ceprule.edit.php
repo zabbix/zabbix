@@ -34,7 +34,6 @@ else {
 		[
 			'title' => _('Update'),
 			'class' => 'js-submit',
-			'withChevron' => 'js-submit-force',
 			'keepOpen' => true,
 			'isSubmit' => true
 		],

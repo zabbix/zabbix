@@ -206,22 +206,7 @@ window.ceprule_edit_popup = new class {
 			const class_list = e.target.classList;
 
 			if (class_list.contains('js-submit')) {
-				if (class_list.contains('js-submit-force')) {
-					const $target = jQuery(e.target);
-					const item = {
-						label: <?= json_encode(_('Force update')) ?>,
-						clickCallback: () => this.#submit(true)
-					};
-					const options = {
-						position: {at: 'left bottom', my: 'left top', of: $target},
-						closeCallback: () => { $target.focus(); }
-					};
-
-					$target.menuPopup([{items: [item]}], jQuery(e), options);
-				}
-				else {
-					this.#submit(false);
-				}
+				this.#submit();
 			}
 			else if (class_list.contains('js-delete')) {
 				window.confirm(<?= json_encode('Delete complex event processing rule?') ?>) && this.#delete();
@@ -361,7 +346,7 @@ window.ceprule_edit_popup = new class {
 		this.form.reload(this.#rules_for_clone);
 	}
 
-	#submit(force_sumbit) {
+	#submit() {
 		const fields = this.form.getAllValues();
 		fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>;
 		fields._cep_rule_reset = force_sumbit ? 1 : 0;
