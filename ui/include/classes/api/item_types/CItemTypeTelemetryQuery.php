@@ -406,7 +406,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 				]],
 				'parameters'			=> ['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'function', 'in' => AGGREGATE_PCTILE],
-													'type' => API_FLOATS, 'flags' => API_REQUIRED, 'in' => '0:100'],
+													'type' => API_FLOATS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => '0:100'],
 												['else' => true, 'type' => API_OBJECTS, 'length' => 0, 'unset' => true]
 				]],
 				'alias'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
