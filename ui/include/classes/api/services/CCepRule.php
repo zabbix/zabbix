@@ -299,7 +299,7 @@ class CCepRule extends CApiService {
 			while ($row = DBfetch($resource)) {
 				$cep_ruleid = $operation_ruleids[$row['cep_operationid']];
 
-				$cep_rules[$cep_ruleid]['operations'][$row['cep_operationid']]['filter'][] =
+				$cep_rules[$cep_ruleid]['operations'][$row['cep_operationid']]['filter']['conditions'][] =
 					array_diff_key($row, array_flip(['cep_operationid', 'cep_operation_conditionid']));
 			}
 		}
