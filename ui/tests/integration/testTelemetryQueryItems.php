@@ -13,8 +13,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-use function PHPUnit\Framework\assertEquals;
-
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
@@ -38,8 +36,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	const ITEM_KEY = 'test_tq_item';
 	const ITEM_VALUE_TYPE = ITEM_VALUE_TYPE_TEXT;
 
-	private static function tsOffStr(int $now, int $offset): string {
-		return (string)(($now + $offset) * 1000000000);
+	private static function tsOffStr(int $now, float $offset): string {
+		return (string) (int) (($now + $offset) * 1000000000);
 	}
 
 	private static function qcol(string $column, string $attribute_key = ''): array {
@@ -88,7 +86,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 	private static function tqItem(int $signal_type, int $metric_point_type, array $columns,
 			array $aggregated_columns, array $filter, string $time_shift = '0', string $lookback_limit = '120',
-			string $granularity = '120'): array {
+			string $granularity = '120', string $delay = '1'): array {
 		return [
 			'query' => [
 				'signal_type' => $signal_type,
@@ -99,11 +97,12 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			],
 			'time_shift' => $time_shift,
 			'lookback_limit' => $lookback_limit,
-			'granularity' => $granularity
+			'granularity' => $granularity,
+			'delay' => $delay
 		];
 	}
 
-	private static function tmplTrace(string $startTimeUnixNano, string $endTimeUnixNano, ?Closure $mutate = null) {
+	private static function tmplTrace(string $startTimeUnixNano, string $endTimeUnixNano, ?Closure $mutate = null): array {
 		$payload = [
 			'resourceSpans' => [
 				[
@@ -179,7 +178,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return $payload;
 	}
 
-	private static function tmplLog(string $timeUnixNano, ?Closure $mutate = null) {
+	private static function tmplLog(string $timeUnixNano, ?Closure $mutate = null): array {
 		$payload = [
 			'resourceLogs' => [
 				[
@@ -238,7 +237,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return $payload;
 	}
 
-	private static function tmplMetricSum(string $startTimeUnixNano, string $timeUnixNano, ?Closure $mutate = null) {
+	private static function tmplMetricSum(string $startTimeUnixNano, string $timeUnixNano, ?Closure $mutate = null): array {
 		$payload = [
 			'resourceMetrics' => [
 				[
@@ -308,7 +307,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return $payload;
 	}
 
-	private static function tmplMetricGauge(string $startTimeUnixNano, string $timeUnixNano, ?Closure $mutate = null) {
+	private static function tmplMetricGauge(string $startTimeUnixNano, string $timeUnixNano, ?Closure $mutate = null): array {
 		$payload = [
 			'resourceMetrics' => [
 				[
@@ -376,7 +375,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return $payload;
 	}
 
-	private static function tmplMetricHistogram(string $startTimeUnixNano, string $timeUnixNano, ?Closure $mutate = null) {
+	private static function tmplMetricHistogram(string $startTimeUnixNano, string $timeUnixNano, ?Closure $mutate = null): array {
 		$payload = [
 			'resourceMetrics' => [
 				[
@@ -451,7 +450,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	}
 
 	private static function tmplMetricExponentialHistogram(string $startTimeUnixNano, string $timeUnixNano,
-			?Closure $mutate = null) {
+			?Closure $mutate = null): array {
 		$payload = [
 			'resourceMetrics' => [
 				[
@@ -527,7 +526,17 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return $payload;
 	}
 
-	private static function getAggregationSubcase(string $description, array $values, array $funcs) {
+	private static function tmplNamedTraceSpan(float $now, float $offset_s, string $name): array {
+		return self::tmplTrace(
+			self::tsOffStr($now, $offset_s),
+			self::tsOffStr($now, $offset_s),
+			function (array &$payload) use ($name) {
+				$payload['resourceSpans'][0]['scopeSpans'][0]['scope']['name'] = $name;
+			}
+		);
+	}
+
+	private static function getAggregationSubcase(string $description, array $values, array $funcs): array {
 		return [
 			'description' => $description,
 			'item' => self::tqItem(
@@ -548,7 +557,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				})(),
 				self::emptyFilter()
 			),
-			'buckets_tmpl' => function(int $now) use ($funcs) {
+			'buckets_tmpl' => function (int $now) use ($funcs) {
 				$ret = [
 					[
 						'id' => 1,
@@ -564,7 +573,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 				return $ret;
 			},
-			'delay' => 0,
 			'input_tmpl' => function (int $now) use ($values) {
 				$ret = [];
 				$ret['metrics'] = [];
@@ -587,66 +595,84 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return [
 			[
 				'description' => 'Minimal traces test',
-				'item' => self::tqItem(APM_SIGNAL_TYPE_TRACES, APM_METRICS_POINT_SUM, [], [
-					self::qagg('', AGGREGATE_COUNT, 'cnt')
-				], self::emptyFilter()),
+				'item' => self::tqItem(
+					APM_SIGNAL_TYPE_TRACES,
+					APM_METRICS_POINT_SUM,
+					[],
+					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
+					self::emptyFilter()
+				),
 				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'traces' => [self::tmplTrace(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
 			],
 			[
 				'description' => 'Minimal logs test',
-				'item' => self::tqItem(APM_SIGNAL_TYPE_LOGS, APM_METRICS_POINT_SUM, [], [
-					self::qagg('', AGGREGATE_COUNT, 'cnt')
-				], self::emptyFilter()),
+				'item' => self::tqItem(
+					APM_SIGNAL_TYPE_LOGS,
+					APM_METRICS_POINT_SUM,
+					[],
+					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
+					self::emptyFilter()
+				),
 				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'logs' => [self::tmplLog(self::tsOffStr($now, -10))]
 				]
 			],
 			[
 				'description' => 'Minimal metrics sum test',
-				'item' => self::tqItem(APM_SIGNAL_TYPE_METRICS, APM_METRICS_POINT_SUM, [], [
-					self::qagg('', AGGREGATE_COUNT, 'cnt')
-				], self::emptyFilter()),
+				'item' => self::tqItem(
+					APM_SIGNAL_TYPE_METRICS,
+					APM_METRICS_POINT_SUM,
+					[],
+					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
+					self::emptyFilter()
+				),
 				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricSum(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
 			],
 			[
 				'description' => 'Minimal metrics gauge test',
-				'item' => self::tqItem(APM_SIGNAL_TYPE_METRICS, APM_METRICS_POINT_GAUGE, [], [
-					self::qagg('', AGGREGATE_COUNT, 'cnt')
-				], self::emptyFilter()),
+				'item' => self::tqItem(
+					APM_SIGNAL_TYPE_METRICS,
+					APM_METRICS_POINT_GAUGE,
+					[],
+					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
+					self::emptyFilter()
+				),
 				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricGauge(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
 			],
 			[
 				'description' => 'Minimal metrics histogram test',
-				'item' => self::tqItem(APM_SIGNAL_TYPE_METRICS, APM_METRICS_POINT_HISTOGRAM, [], [
-					self::qagg('', AGGREGATE_COUNT, 'cnt')
-				], self::emptyFilter()),
+				'item' => self::tqItem(
+					APM_SIGNAL_TYPE_METRICS,
+					APM_METRICS_POINT_HISTOGRAM,
+					[],
+					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
+					self::emptyFilter()
+				),
 				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricHistogram(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
 			],
 			[
 				'description' => 'Minimal metrics exponential histogram test',
-				'item' => self::tqItem(APM_SIGNAL_TYPE_METRICS, APM_METRICS_POINT_EXPHISTOGRAM, [], [
-					self::qagg('', AGGREGATE_COUNT, 'cnt')
-				], self::emptyFilter()),
+				'item' => self::tqItem(
+					APM_SIGNAL_TYPE_METRICS,
+					APM_METRICS_POINT_EXPHISTOGRAM,
+					[],
+					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
+					self::emptyFilter()
+				),
 				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricExponentialHistogram(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
@@ -733,7 +759,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						]
 					]
 				],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'traces' => [self::tmplTrace(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
@@ -816,7 +841,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						]
 					]
 				],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'logs' => [self::tmplLog(self::tsOffStr($now, -10))]
 				]
@@ -906,7 +930,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						]
 					]
 				],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricSum(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
@@ -984,7 +1007,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						]
 					]
 				],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricGauge(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
@@ -1078,7 +1100,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						]
 					]
 				],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricHistogram(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
@@ -1188,7 +1209,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						]
 					]
 				],
-				'delay' => 0,
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricExponentialHistogram(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
@@ -1240,7 +1260,50 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					['function' => AGGREGATE_SUM,		'expected' => 6],
 					['function' => AGGREGATE_PCTILE,	'expected' => 3,	'parameters' => ['100']]
 				]
-			)
+			),
+			[
+				'description' => 'Time bucket test #1: no gap',
+				'item' => self::tqItem(
+					APM_SIGNAL_TYPE_TRACES,
+					APM_METRICS_POINT_SUM,
+					[],
+					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
+					self::emptyFilter(),
+					'0',
+					'1h',
+					'100'
+				),
+				'buckets_tmpl' => fn(int $now) => [
+					[
+						'id' => 1,
+						'columns' => [
+							'cnt' => 3
+						]
+					],
+					[
+						'id' => 2,
+						'columns' => [
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 3,
+						'columns' => [
+							'cnt' => 2
+						]
+					]
+				],
+				'input_tmpl' => fn(int $now) => [
+					'traces' => [
+						self::tmplNamedTraceSpan($now, -100, 'a'),
+						self::tmplNamedTraceSpan($now, -101, 'a'),
+						self::tmplNamedTraceSpan($now, -200, 'b'),
+						self::tmplNamedTraceSpan($now, -300, 'c'),
+						self::tmplNamedTraceSpan($now, -300.1, 'd'),
+						self::tmplNamedTraceSpan($now, -300.2, 'e')
+					]
+				]
+			]
 		];
 	}
 
@@ -1259,20 +1322,19 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	}
 
 	/* TODO: remove */
-	static private function debugLog(mixed $x) {
+	static private function debugLog(mixed $x): void {
 		echo "\n\n" . json_encode($x, JSON_PRETTY_PRINT) . "\n\n";
 	}
 
 	private function createTQItem(int $hostid, array $item_fields): int {
-		$response = $this->call('item.create', array_merge($item_fields, [
+		$response = $this->call('item.create', array_merge([
 			'hostid' => $hostid,
 			'name' => self::ITEM_KEY,
 			'key_' => self::ITEM_KEY,
 			'type' => ITEM_TYPE_TELEMETRY_QUERY,
 			'value_type' => self::ITEM_VALUE_TYPE,
 			'timeout' => '3s',
-			'delay' => '1s',
-		]));
+		], $item_fields));
 
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -1283,7 +1345,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return $itemid;
 	}
 
-	private function deleteTQItem(int $itemid) {
+	private function deleteTQItem(int $itemid): void {
 		$response = $this->call('item.delete', [$itemid]);
 
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -1318,7 +1380,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		$this->fail($msg2);
 	}
 
-	private function sendOTLP(string $import_path, string $proto, string $payload, string $address, string $method) {
+	private function sendOTLP(string $import_path, string $proto, string $payload, string $address, string $method): void {
 		$cmd =
 			'grpcurl '.
 			'-plaintext ' .
@@ -1338,7 +1400,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		self::debugLog($output_lines);
 	}
 
-	private function sendInput(array $input) {
+	private function sendInput(array $input): void {
 		foreach (($input['metrics'] ?? []) as $metric) {
 			$json = json_encode($metric);
 
@@ -1376,7 +1438,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		}
 	}
 
-	private function deleteOTData() {
+	private function deleteOTData(): void {
 		$handle = curl_init();
 
 		$sql = "TRUNCATE ALL TABLES FROM " . self::CLICKHOUSE_DB . " LIKE 'otel_%'";
@@ -1422,7 +1484,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return $bucket;
 	}
 
-	private function executeSubcase(int $hostid, array $subcase) {
+	private function executeSubcase(int $hostid, array $subcase): void {
 		$msg = $subcase['description'];
 
 		$this->deleteOTData();
@@ -1432,9 +1494,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		$now = time();
 		$this->sendInput($subcase['input_tmpl']($now));
 
-		if (isset($subcase['delay'])) {
-			sleep($subcase['delay']);
-		}
 
 		$expected_buckets = $subcase['buckets_tmpl']($now);
 
@@ -1455,7 +1514,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		$this->deleteTQItem($itemid);
 	}
 
-	public function testTelemetryQueryItems_checkData() {
+	public function testTelemetryQueryItems_checkData(): void {
 		$response = $this->call('host.create', [
 			'host' => self::HOST_NAME,
 			'groups' => [
