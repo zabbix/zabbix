@@ -32,10 +32,4 @@ void	zbx_pb_mock_set_nextid(zbx_uint64_t id);
  * behaves normally. Pass 0 to disable (the default). */
 void	zbx_pb_mock_fail_alloc_at(int call_no);
 
-/* Configures what zbx_dc_config_get_items_by_itemids() reports for every item
- * in the batch, applied uniformly (there is no per-itemid fixture table). Any
- * test whose call path reaches zbx_pb_history_get_rows() must call this first
- * - an unconfigured call fails the test instead of silently exporting rows. */
-void	zbx_pb_mock_set_item_status(int errcode, int item_status, int host_status);
-
 #endif

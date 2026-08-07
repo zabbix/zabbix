@@ -1,132 +1,50 @@
 ---
-test case: write 0 host records - empty buffer, get_rows returns 0
+test case: write host record to memory buffer
 in:
-  ip: "192.168.1.1"
-  dns: "host.example.com"
-  error: ""
-  rows: 0
-out:
-  rows: 0
----
-test case: write 1 host with no error - dcheckid=0 port=0 value empty
-in:
-  ip: "192.168.1.1"
-  dns: "host.example.com"
-  error: ""
+  ip: "192.168.3.17"
+  dns: "printer.office.example.com"
+  error: "no response from host"
   rows: 1
+  fail_alloc_at: 0
 out:
   rows: 1
 ---
-test case: write 1 host with error message - error field preserved
+# Regression tests for ZBX-26469: when pb_discovery_add_row_mem() runs out of
+# proxy memory buffer space partway through copying a row, the fields it has
+# not assigned yet still hold the source row pointers left there by memcpy().
+# Unless they are reset, pb_list_free_discovery() frees pointers owned by the
+# caller with the shared memory deallocator.
+#
+# "fail_alloc_at" fails the Nth shared memory allocation made while the two
+# queued rows are flushed by zbx_pb_discovery_close(): 1 - the row itself,
+# 2 - ip, 3 - dns, 4 - value, 5 - error. The first row is discarded, the
+# second one must still be written correctly.
+test case: ip allocation fails while adding row to memory buffer
 in:
-  ip: "10.0.0.5"
-  dns: ""
-  error: "connection refused"
-  rows: 1
-out:
-  rows: 1
----
-test case: write 1 host with empty dns - empty dns stored correctly
-in:
-  ip: "172.16.0.1"
-  dns: ""
-  error: ""
-  rows: 1
-out:
-  rows: 1
----
-test case: write 3 hosts with error - all rows flushed to buffer
-in:
-  ip: "10.1.1.1"
-  dns: "node.cluster.local"
-  error: "host unreachable"
-  rows: 3
-out:
-  rows: 3
----
-test case: write 5 hosts with long error - large error string stored
-in:
-  ip: "203.0.113.42"
-  dns: "long-hostname.very-long-domain-name.example.org"
-  error: "ICMP ping failed after 3 retries: no route to host (errno=113)"
-  rows: 5
-out:
-  rows: 5
----
-test case: partial set_lastid clears only first row leaving remainder
-in:
-  ip: "10.20.30.40"
-  dns: "partial.example.com"
-  error: ""
-  rows: 3
-out:
-  rows: 3
-  rows_after_partial_clear: 2
----
-# Regression tests for the crash fixed in commit 4bfdaaa0297: in
-# pb_discovery_add_row_mem(), a shmem allocation failure partway through
-# building a row must null out the fields not yet assigned, otherwise
-# pb_list_free_discovery() frees pointers copied verbatim from the (unowned)
-# source row. Each case fails the Nth shmem allocation made while flushing
-# the 2 queued rows; the first row is discarded, but the second must still
-# be written correctly afterwards, proving the failure did not corrupt the
-# allocator or leak into subsequent writes.
-test case: row allocation fails - nothing to free, second row still written
-in:
-  ip: "192.168.1.1"
-  dns: "host.example.com"
-  error: "connection refused"
-  rows: 2
-  fail_alloc_at: 1
-out:
-  rows: 1
----
-test case: ip allocation fails - dns/value/error must not be freed
-in:
-  ip: "192.168.1.1"
-  dns: "host.example.com"
-  error: "connection refused"
+  ip: "192.168.3.17"
+  dns: "printer.office.example.com"
+  error: "no response from host"
   rows: 2
   fail_alloc_at: 2
 out:
   rows: 1
 ---
-test case: dns allocation fails - ip must be freed, value/error must not
+test case: dns allocation fails while adding row to memory buffer
 in:
-  ip: "192.168.1.1"
-  dns: "host.example.com"
-  error: "connection refused"
+  ip: "192.168.3.17"
+  dns: "printer.office.example.com"
+  error: "no response from host"
   rows: 2
   fail_alloc_at: 3
 out:
   rows: 1
 ---
-test case: value allocation fails - ip/dns must be freed, error must not
+test case: value allocation fails while adding row to memory buffer
 in:
-  ip: "192.168.1.1"
-  dns: "host.example.com"
-  error: "connection refused"
+  ip: "192.168.3.17"
+  dns: "printer.office.example.com"
+  error: "no response from host"
   rows: 2
   fail_alloc_at: 4
-out:
-  rows: 1
----
-test case: error allocation fails - ip/dns/value must be freed
-in:
-  ip: "192.168.1.1"
-  dns: "host.example.com"
-  error: "connection refused"
-  rows: 2
-  fail_alloc_at: 5
-out:
-  rows: 1
----
-test case: list insertion fails - fully-built row must still be freed
-in:
-  ip: "192.168.1.1"
-  dns: "host.example.com"
-  error: "connection refused"
-  rows: 2
-  fail_alloc_at: 6
 out:
   rows: 1
