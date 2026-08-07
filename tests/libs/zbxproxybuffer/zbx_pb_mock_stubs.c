@@ -60,6 +60,8 @@ void	zbx_pb_mock_set_nextid(zbx_uint64_t id)
 	pb_mock_nextid = id;
 }
 
+zbx_uint64_t	zbx_dc_get_nextid(const char *table, int num);
+
 zbx_uint64_t	zbx_dc_get_nextid(const char *table, int num)
 {
 	zbx_uint64_t	id = pb_mock_nextid;
@@ -70,6 +72,8 @@ zbx_uint64_t	zbx_dc_get_nextid(const char *table, int num)
 	return id;
 }
 
+void	zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
+
 void	zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemids, int *errcodes, size_t num)
 {
 	ZBX_UNUSED(items);
@@ -79,6 +83,8 @@ void	zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemids
 
 	fail_msg("unexpected zbx_dc_config_get_items_by_itemids() call - not exercised by these tests");
 }
+
+void	zbx_dc_config_clean_items(void *items, int *errcodes, size_t num);
 
 void	zbx_dc_config_clean_items(void *items, int *errcodes, size_t num)
 {
