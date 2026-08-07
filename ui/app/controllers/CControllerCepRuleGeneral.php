@@ -18,7 +18,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 
 	protected function prepareApiRequest(): array {
 		$request = $this->getInputAll();
-		unset($request['_cep_rule_reset']);
 
 		if (array_key_exists('cepruleid', $request)) {
 			$request['cep_ruleid'] = $request['cepruleid'];

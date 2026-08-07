@@ -349,7 +349,6 @@ window.ceprule_edit_popup = new class {
 	#submit() {
 		const fields = this.form.getAllValues();
 		fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>;
-		fields._cep_rule_reset = force_sumbit ? 1 : 0;
 
 		this.#removePopupMessages();
 		this.form.validateSubmit(fields)
