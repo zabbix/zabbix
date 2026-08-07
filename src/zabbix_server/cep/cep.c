@@ -1510,7 +1510,7 @@ static void	cep_event_remove_suppress(zbx_cep_event_t *event, const zbx_db_event
  * Purpose: update event maintenances                                         *
  *                                                                            *
  * Parameters: h        - [IN/OUT] event handle                               *
- *             suppress - [IN/OUT] supppress data                             *
+ *             suppress - [IN/OUT] suppress data                             *
  *             action   - [IN]     maintenance operation                      *
  *                                                                            *
  * Comments: Suppresses or unsuppresses event by adding or removing           *

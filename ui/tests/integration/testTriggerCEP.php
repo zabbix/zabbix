@@ -6971,7 +6971,7 @@ HEREDOC;
 			'host' => [
 				'hostid' => $hostid,
 				'maintenance_status' => $host['maintenance_status'],
-				'maintenance_type' => $host['maintenance_type'],
+				'maintenance_type' => $host['maintenance_type']
 			]
 		];
 
