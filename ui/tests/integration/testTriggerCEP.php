@@ -88,6 +88,13 @@ class testTriggerCEP extends CIntegrationTest {
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
 	const SKIP_SERVICES_TESTS = false;
 
+	// Set to true to run the CEP window scenarios alone, so a debugging run starts at the windows instead of at
+	// the hundred correlation and trigger scenarios that come before them: every test with "Cep" in its name is
+	// one of them and no other test is, and the only test kept besides is testPrepareTriggerCEP_LLDDiscovery,
+	// which every one of them @depends on (and nothing they need depends on anything else, so nothing is lost
+	// as a dependency of a skipped test).
+	const SKIP_NON_WINDOW_TESTS = false;
+
 	const HOST_NAME = 'test';
 	const TEMPLATE_NAME = 'template_trigger_cep';
 	const LLD_RULE_KEY = 'lld.cep.trapper';
@@ -124,6 +131,12 @@ class testTriggerCEP extends CIntegrationTest {
 	// The single CEP rule used by the close-on-up complex event processing scenario, see
 	// buildCloseOnUpCepRuleParams().
 	const CEP_RULE_CLOSE_ON_UP = self::CEP_RULE_NAME_PREFIX.'tag correlation close on up';
+	// The very same scenario driven by a cause and symptom grouping window instead, see
+	// prepareDataCepWindowCauseSymptomCloseOnUp(). The window pairs the events on the same 'service' tag, so
+	// what it closes and when is exactly what the tag correlation rule above closes; the difference is what its
+	// grouping leaves on the events - the "down_N" problem is the cause of its window and the "up_N" problem
+	// that ends it a symptom of that cause.
+	const CEP_RULE_CLOSE_ON_UP_CAUSE = self::CEP_RULE_NAME_PREFIX.'cause symptom close on up';
 	// Extra trigger tag used by the tag-exists flavour of that scenario, whose NAME (not value) carries the
 	// state: the tag name contains {ITEM.VALUE}, which is resolved at event time, so a "down_N" event gets a
 	// 'state_down' tag and an "up_N" event a 'state_up' tag. That lets the close-window operation single out
@@ -261,6 +274,8 @@ class testTriggerCEP extends CIntegrationTest {
 	// are applied to the events the window holds. The operations that execution point allows are the two that
 	// copy an event, discarding one and closing the window, so the match is observed through the copies
 	// appearing (this flavour) or through the window ending (see prepareDataCepWindowPatternCloseWindow()).
+	// That flavour ends its window itself, on the "up" value the scenario finishes with, so the window does not
+	// outlive the run - see CEP_TAG_WINDOW_PATTERN_CLOSED.
 	// The service scenario (see prepareDataCepServiceTag()): a service that is in problem for as long as an
 	// event carries CEP_SERVICE_TAG_NAME, a tag no trigger produces and only the CEP rule adds and takes away
 	// again. The service status therefore follows the tag rather than the problem.
@@ -270,10 +285,10 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_SERVICE_TAG = self::CEP_RULE_NAME_PREFIX.'window service tag';
 	// The copy scenario (see prepareDataCepWindowCopy()): a simple window that copies an event when it is
 	// evicted. A copy is a full event of its own, so it matches the same rule, lands in the same window and is
-	// evicted in turn - which would copy it again, and again. CEP_TAG_IS_COPIED is the built in tag telling a
-	// copy apart from what the trigger sent, and the condition on it is the only thing that ends the chain.
+	// evicted in turn - which would copy it again, and again. The "event copied" operation condition
+	// (ZBX_CONDITION_TYPE_EVENT_COPIED) is what tells a copy apart from what the trigger sent, and conditioning
+	// the operation on it is the only thing that ends the chain.
 	const CEP_RULE_WINDOW_COPY = self::CEP_RULE_NAME_PREFIX.'window simple copy';
-	const CEP_TAG_IS_COPIED = '$IS.COPIED';
 	// The runaway copy scenario (see prepareDataCepWindowPatternCopyAlways()): a pattern whose script always
 	// reports a match. Its window is examined once a second and nothing ever leaves it, so the copy operation
 	// runs again on every examination - the rule keeps producing events for as long as it exists. The scenario
@@ -283,6 +298,12 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_COPY_ALWAYS_MIN = 4;
 	const CEP_RULE_WINDOW_PATTERN = self::CEP_RULE_NAME_PREFIX.'window pattern match';
 	const CEP_RULE_WINDOW_PATTERN_EVENTS = 3;
+	// The window of that flavour is ended by the "up" value the scenario finishes with, and what the closing runs
+	// is an operation that tags every event the window held with this tag - the events the values opened and the
+	// copies the match made alike. A window that was never closed leaves the tag on nothing, so the tag is how the
+	// scenario sees that its window ended and what was in it when it did.
+	const CEP_TAG_WINDOW_PATTERN_CLOSED = 'window_pattern_closed';
+	const CEP_TAG_WINDOW_PATTERN_CLOSED_VALUE = 'closed';
 	// The close window scenario (see prepareDataCepWindowCloseWindowOperations()) performs the same close window
 	// operation from every execution point that may decide an id has recovered: on a pattern match, where a script
 	// reports one and the window therefore ends at the examination that follows the "up" value rather than at the
@@ -291,8 +312,8 @@ class testTriggerCEP extends CIntegrationTest {
 	// every execution point it has - both event driven ones for a simple, a tag correlation and a cause and
 	// symptom window, all three for a pattern match window - so that no combination of the two is left untried.
 	// The cause and symptom flavour additionally singles out the event that ends the window by the rank its window
-	// gave it (CEP_TAG_IS_SYMPTOM) and not only by a tag of the event itself, which is what only that window type
-	// can do.
+	// gave it (the "event symptom" operation condition, ZBX_CONDITION_TYPE_EVENT_SYMPTOM) and not only by a tag of
+	// the event itself, which is what only that window type can do.
 	const CEP_RULE_WINDOW_PATTERN_CLOSE = self::CEP_RULE_NAME_PREFIX.'window pattern close window';
 	const CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT = self::CEP_RULE_NAME_PREFIX.'window pattern close window on event';
 	const CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED = self::CEP_RULE_NAME_PREFIX.'window pattern close window evicted';
@@ -381,7 +402,13 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_SIMPLE_LIMITS = self::CEP_RULE_NAME_PREFIX.'window simple unresolved limits';
 	const CEP_RULE_WINDOW_TAG_LIMITS = self::CEP_RULE_NAME_PREFIX.'window tag unresolved limits';
 	const CEP_RULE_WINDOW_CAUSE_LIMITS = self::CEP_RULE_NAME_PREFIX.'window cause unresolved limits';
-	const CEP_RULE_WINDOW_PATTERN_LIMITS = self::CEP_RULE_NAME_PREFIX.'window pattern unresolved limits';
+	// The pattern match window is driven one limit at a time instead. The scenario above leaves both macros
+	// uncreated and therefore only ever reads the limit the server parses first, so neither of them is seen
+	// failing by itself: each of these rules is given the other limit as a macro that does exist, which makes the
+	// limit it is named after the only one the server can stumble on and the only one whose creation can bring the
+	// rule back - see runEventAssessmentTestCepWindowSingleUnresolvedLimit().
+	const CEP_RULE_WINDOW_PATTERN_DURATION_LIMIT = self::CEP_RULE_NAME_PREFIX.'window pattern unresolved duration';
+	const CEP_RULE_WINDOW_PATTERN_CAPACITY_LIMIT = self::CEP_RULE_NAME_PREFIX.'window pattern unresolved capacity';
 	// What that rule must report, one message per limit that does not resolve. The macros are the very ones the
 	// working flavours give their windows (CEP_WINDOW_DURATION_MACRO and CEP_WINDOW_CAPACITY_MACRO), which this
 	// scenario leaves uncreated instead, so what the messages name is the macro text the server was left with -
@@ -395,9 +422,6 @@ class testTriggerCEP extends CIntegrationTest {
 	// operation ends it, and no capacity limit at all, so nothing is evicted for not fitting.
 	const CEP_RULE_WINDOW_LIMITS_DURATION = '2m';
 	const CEP_RULE_WINDOW_LIMITS_CAPACITY = 0;
-	// The built in tag telling a symptom apart from a cause, the counterpart of CEP_TAG_IS_COPIED for the rank a
-	// cause and symptom window assigns.
-	const CEP_TAG_IS_SYMPTOM = '$IS.SYMPTOM';
 	// The cause and symptom flavour (see prepareDataCepWindowCauseSymptom()) needs neither for its grouping: its
 	// window does that work as the events arrive, ranking the first event of a group as the cause of the ones that
 	// follow. The count of those is kept in a tag of the cause event, which only this window type has.
@@ -1880,18 +1904,55 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function prepareDataCepWindowTagCorrelationCloseOnUp(bool $tag_exists_condition = true,
 			bool $extra_tag_via_webhook = false) {
+		return $this->prepareCloseOnUpCepRule(CCepRuleHelper::WINDOW_TAG_MATCH, self::CEP_RULE_CLOSE_ON_UP,
+			$tag_exists_condition, $extra_tag_via_webhook
+		);
+	}
+
+	/**
+	 * Prepare the same "close old down when new up" scenario as
+	 * prepareDataCepWindowTagCorrelationCloseOnUp(), driven by a cause and symptom grouping window
+	 * (WINDOW_CAUSE_SYMPTOM) instead of a tag correlation one.
+	 *
+	 * Everything else is identical - the same trigger prototypes, the same 'service' grouping tag, the same
+	 * "close window" on the "up" events plus "close" when the window closes - so a "down_N" problem still stays
+	 * open in the window of its 'service' id until the matching "up_N" event closes that window, and every
+	 * scenario of the tag correlation family produces exactly the same problem counts here. What the window type
+	 * adds is the ranking: the "down_N" event opens the window of its id and is its cause, the "up_N" event
+	 * joining that window becomes a symptom of it, and the cause counts its symptoms in the
+	 * CEP_TAG_SYMPTOM_COUNT tag - see waitForCloseOnUpCauseSymptomRanking(), which asserts exactly that on the
+	 * events the run generated.
+	 *
+	 * $tag_exists_condition and $extra_tag_via_webhook mean what they mean for the tag correlation flavour.
+	 */
+	public function prepareDataCepWindowCauseSymptomCloseOnUp(bool $tag_exists_condition = true,
+			bool $extra_tag_via_webhook = false) {
+		return $this->prepareCloseOnUpCepRule(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_CLOSE_ON_UP_CAUSE, $tag_exists_condition, $extra_tag_via_webhook
+		);
+	}
+
+	/**
+	 * The body both close-on-up CEP flavours share: the close-on-up trigger prototypes, a single rule of
+	 * $window_type named $name closing the problems (buildCloseOnUpCepRuleParams()) and, optionally, the
+	 * tagging webhook media types.
+	 */
+	private function prepareCloseOnUpCepRule(int $window_type, string $name, bool $tag_exists_condition,
+			bool $extra_tag_via_webhook): bool {
 		$this->prepareCloseOnUpTriggerPrototypes($tag_exists_condition
 			? [['tag' => self::CEP_STATE_TAG, 'value' => '']]
 			: []
 		);
 
-		// The CEP rule must be the only thing closing problems in this scenario: drop the global correlation
+		// This rule must be the only thing closing problems in this scenario: drop the global correlation
 		// rules a previous CloseOnUp variant left behind, otherwise they would close the same problems and
-		// the run would pass regardless of what the CEP rule does.
+		// the run would pass regardless of what the CEP rule does. The rule of the other CEP flavour, which
+		// matches the very same events, is gone already - every scenario removes its own rules in
+		// cleanupCepRules() before the next one prepares.
 		$this->deleteCepCorrelations();
 
 		self::$cep_ruleid = $this->upsertCepRule(
-			$this->buildCloseOnUpCepRuleParams(self::CEP_RULE_CLOSE_ON_UP, $tag_exists_condition)
+			$this->buildCloseOnUpCepRuleParams($name, $tag_exists_condition, $window_type)
 		);
 
 		// Optionally add an extra webhook-computed tag to every problem event.
@@ -2004,10 +2065,9 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->prepareWindowOperationMacros();
 
 		// Nothing except the trigger expression may close these problems - the scenario asserts they all stay
-		// open - so drop both the global correlation rules and the window CEP rule a previous CloseOnUp
-		// variant left behind; either of them would close the problems this scenario opens.
+		// open - so drop the global correlation rules a previous CloseOnUp variant left behind; they would
+		// close the problems this scenario opens.
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 
 		// The rules of a flavour are named after it, and the ones of a flavour that gives them a window all
 		// get the same one, grouped by the 'service' tag, with its limits handed to it as user macros.
@@ -2158,12 +2218,13 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 
 		$operations = $this->buildWindowNoneOperations([
 			[CCepRuleHelper::OP_DISCARD, [
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [self::buildUpEventOperationCondition()]
+				]
 			]]
 		]);
 
@@ -2205,7 +2266,6 @@ class testTriggerCEP extends CIntegrationTest {
 		// Only the rule of the flavour may close these problems: the scenario asserts all of them stay open,
 		// ranked but untouched, until its "up" value ends their window.
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 
 		$window = [
 			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
@@ -2225,8 +2285,10 @@ class testTriggerCEP extends CIntegrationTest {
 				'sortorder' => 0,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [self::buildUpEventOperationCondition()]
+				]
 			],
 			[
 				'sortorder' => 1,
@@ -2273,7 +2335,6 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// Only this rule may touch the problems and the tag the service watches.
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 		$this->deleteCepTagService();
 
 		$response = $this->call('service.create', [
@@ -2335,9 +2396,9 @@ class testTriggerCEP extends CIntegrationTest {
 	 * The copy is a new event with the name, severity and tags of the one it was made from, so it matches the
 	 * same rule and goes into the same window, where it will be evicted in its turn. Copying it again would
 	 * produce another copy, and that one another - the rule would keep making events out of its own output for
-	 * as long as the trigger has a problem. The operation is therefore conditioned on the built in
-	 * CEP_TAG_IS_COPIED tag being "false", which only holds for events the trigger produced, so exactly one
-	 * copy is made of each of them and nothing is made of the copies.
+	 * as long as the trigger has a problem. The operation is therefore conditioned on the event not being a copy
+	 * (the "event copied" condition with the No operator), which only holds for events the trigger produced, so
+	 * exactly one copy is made of each of them and nothing is made of the copies.
 	 *
 	 * The window groups by the 'service' tag, so each id is copied independently of the others.
 	 */
@@ -2346,7 +2407,6 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// Only this rule may add events; nothing may close a problem.
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 
 		// An event evicted because the window duration ran out is presented as the first event of the window,
 		// so "copy first" is the operation that acts on it - "copy last" would never fire here.
@@ -2355,10 +2415,13 @@ class testTriggerCEP extends CIntegrationTest {
 				'sortorder' => 0,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
 				'type' => CCepRuleHelper::OP_COPY_FIRST,
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'tags' => [['tag' => self::CEP_TAG_IS_COPIED, 'operator' => TAG_OPERATOR_EQUAL,
-					'value' => 'false'
-				]]
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [[
+						'type' => ZBX_CONDITION_TYPE_EVENT_COPIED,
+						'operator' => CONDITION_OPERATOR_NO
+					]]
+				]
 			]
 		];
 
@@ -2389,7 +2452,6 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// Only this rule may add events; nothing may close a problem.
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 
 		$window = [
 			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
@@ -2437,6 +2499,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * copy of the newest. The other operations a pattern match may perform are discarding an event and closing
 	 * the window, which prepareDataCepWindowPatternCloseWindow() covers.
 	 *
+	 * The window is ended by the "up" value the scenario finishes with rather than left to outlive the test: an
+	 * arriving event is taken into the window before the operations of its occurrence are performed, so the "up"
+	 * event is one of the events its own close window operation ends the window with. What the closing does is
+	 * add CEP_TAG_WINDOW_PATTERN_CLOSED to every event the window held - the three values that were sent, the two
+	 * copies the match made and the "up" event itself - which is what shows the window ended and what was in it,
+	 * closing being otherwise invisible in a flavour whose operations only copy.
+	 *
 	 * The window groups by the 'component' tag, so all the events of the driven trigger form one group, and it
 	 * outlasts the test with no capacity limit so nothing is evicted while the pattern is being collected.
 	 */
@@ -2445,16 +2514,19 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// Only the copies may change what is open; nothing else may close a problem.
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 
 		$events_num = self::CEP_RULE_WINDOW_PATTERN_EVENTS;
-		$name_prefix = 'CEP trigger '.self::COMPONENT_VALUE.' down_';
+		$name_prefix = 'CEP trigger '.self::COMPONENT_VALUE.' ';
 		$severity = TRIGGER_SEVERITY_DISASTER;
 
 		// Besides counting the events the script checks what the window handed it, so the fields an event is
 		// exposed with are verified inside the server rather than through the API afterwards. A field that is
 		// not what it should be throws, which fails the script, and the rule keeps that message - see
 		// getCepRuleError(), which the scenario reports if the match never happens.
+		//
+		// The name is built from the 'state' and 'service' tags rather than from the "down" values alone: the
+		// "up" value that ends the window is taken into it before the close window operation of its occurrence
+		// runs, so an examination that lands in between is handed an "up" event too and must recognise it.
 		//
 		// The lifecycle fields are only checked for their type, not their value: the script keeps running
 		// after the scenario has recovered the problems, and an event that is no longer open would then throw
@@ -2463,7 +2535,7 @@ class testTriggerCEP extends CIntegrationTest {
 var events = cep_get_events(), originals = 0, copies = 0;
 
 for (var i = 0; i < events.length; i++) {
-	var event = events[i], service = null, type = null;
+	var event = events[i], service = null, state = null, type = null;
 
 	if (event.is_copied) {
 		copies++;
@@ -2493,6 +2565,9 @@ for (var i = 0; i < events.length; i++) {
 		if (event.tags[j].tag === 'service') {
 			service = event.tags[j].value;
 		}
+		else if (event.tags[j].tag === 'state') {
+			state = event.tags[j].value;
+		}
 		else if (event.tags[j].tag === 'type') {
 			type = event.tags[j].value;
 		}
@@ -2502,8 +2577,9 @@ for (var i = 0; i < events.length; i++) {
 		throw 'event ' + event.eventid + ' type tag ' + type + ', expected cep';
 	}
 
-	if (event.name !== '$name_prefix' + service) {
-		throw 'event ' + event.eventid + ' name "' + event.name + '" does not match its service tag ' + service;
+	if (event.name !== '$name_prefix' + state + '_' + service) {
+		throw 'event ' + event.eventid + ' name "' + event.name + '" does not match its state tag ' + state +
+				' and service tag ' + service;
 	}
 }
 
@@ -2524,6 +2600,30 @@ HEREDOC;
 			[CCepRuleHelper::OP_COPY_FIRST, []],
 			[CCepRuleHelper::OP_COPY_LAST, []]
 		], CCepRuleHelper::WHEN_PATTERN_MATCHED);
+
+		// The "up" value ends the window. Every event that occurs reaches this execution point, so the condition
+		// on CEP_STATE_TAG_UP is what singles that value out - without it the first "down" value would close the
+		// window it just opened and the pattern would never be collected at all.
+		$operations[] = [
+			'sortorder' => count($operations),
+			'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [self::buildUpEventOperationCondition()]
+			]
+		];
+
+		// Closing a window runs the operations of this execution point over every event it held, and tagging them
+		// is what leaves a trace of it: the events the values opened and the copies the match made must all come
+		// out carrying the tag.
+		$operations[] = [
+			'sortorder' => count($operations),
+			'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
+			'type' => CCepRuleHelper::OP_ADD_TAG,
+			'tag' => self::CEP_TAG_WINDOW_PATTERN_CLOSED,
+			'tag_value' => self::CEP_TAG_WINDOW_PATTERN_CLOSED_VALUE
+		];
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_PATTERN, [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_PATTERN_MATCH, $window
@@ -2724,8 +2824,8 @@ HEREDOC;
 	/**
 	 * Prepare the cause and symptom flavour of the close window scenario, whose close window operation is
 	 * performed when an "up" event occurs - and singles that event out by the rank its window has just given it
-	 * (CEP_TAG_IS_SYMPTOM) instead of by a tag the event carries, which is something only this window type can be
-	 * asked, see prepareDataCepWindowCloseWindowOperations().
+	 * (the "event symptom" operation condition) instead of by a tag the event carries, which is something only
+	 * this window type can be asked, see prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowCauseSymptomCloseWindow() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
@@ -3212,7 +3312,6 @@ HEREDOC;
 
 		// The rule of this flavour is the only thing that may close a problem.
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 
 		// Both limits reach the window as user macros rather than as the values written here, so what the rule
 		// stores are the macro names and these are only what the macros are set to, see macroizeWindowLimits().
@@ -3260,8 +3359,10 @@ HEREDOC;
 		// there the condition of the operation is what singles them out - without it every event would close the
 		// window it just entered, and every problem would be closed the moment it opened.
 		$up_condition = [
-			'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-			'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [self::buildUpEventOperationCondition()]
+			]
 		];
 
 		// A cause and symptom window ranks an event as it takes it in - the first event of a group is its cause
@@ -3282,11 +3383,18 @@ HEREDOC;
 		$close_window_condition = $window_type === CCepRuleHelper::WINDOW_CAUSE_SYMPTOM
 				&& $execute_when == CCepRuleHelper::WHEN_EVENT_OCCURRED
 			? [
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'tags' => array_merge(
-					[['tag' => self::CEP_TAG_IS_SYMPTOM, 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'true']],
-					static::getCloseWindowEventCount($single_service) > 1 ? $up_condition['tags'] : []
-				)
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => array_merge(
+						[[
+							'type' => ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+							'operator' => CONDITION_OPERATOR_YES
+						]],
+						static::getCloseWindowEventCount($single_service) > 1
+							? $up_condition['filter']['conditions']
+							: []
+					)
+				]
 			]
 			: $up_condition;
 
@@ -3333,11 +3441,20 @@ HEREDOC;
 				'sortorder' => -1,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 				'type' => CCepRuleHelper::OP_DISCARD,
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'tags' => [
-					['tag' => self::CEP_STATE_TAG_DOWN, 'operator' => TAG_OPERATOR_EXISTS, 'value' => ''],
-					['tag' => 'service', 'operator' => TAG_OPERATOR_EQUAL,
-						'value' => static::getCloseWindowDiscardService()
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [
+						[
+							'type' => CCepRuleHelper::CONDITION_TAG,
+							'operator' => CONDITION_OPERATOR_EXISTS,
+							'tag' => self::CEP_STATE_TAG_DOWN
+						],
+						[
+							'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'tag' => 'service',
+							'value' => static::getCloseWindowDiscardService()
+						]
 					]
 				]
 			]);
@@ -3539,7 +3656,6 @@ HEREDOC;
 
 		// The rule of this scenario is the only thing that may close a problem.
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 
 		$window = [
 			'duration' => $duration === null ? 3 : $duration,
@@ -3561,8 +3677,10 @@ HEREDOC;
 				'sortorder' => 0,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [self::buildUpEventOperationCondition()]
+				]
 			],
 			[
 				'sortorder' => 1,
@@ -3611,12 +3729,28 @@ HEREDOC;
 	}
 
 	/**
-	 * Prepare the pattern match window flavour of the unresolved limits scenario, see
-	 * prepareDataCepWindowUnresolvedLimitsOperations().
+	 * Prepare the pattern match window flavour whose duration is the only limit that cannot resolve: the capacity
+	 * macro is created before the rule is, so the duration is both the limit the server parses first and the only
+	 * one it can fail on, see prepareDataCepWindowUnresolvedLimitsOperations() and
+	 * runEventAssessmentTestCepWindowSingleUnresolvedLimit().
 	 */
-	public function prepareDataCepWindowPatternUnresolvedLimits() {
+	public function prepareDataCepWindowPatternDurationUnresolved() {
 		return $this->prepareDataCepWindowUnresolvedLimitsOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
-			self::CEP_RULE_WINDOW_PATTERN_LIMITS
+			self::CEP_RULE_WINDOW_PATTERN_DURATION_LIMIT,
+			[self::CEP_WINDOW_CAPACITY_MACRO => self::CEP_RULE_WINDOW_LIMITS_CAPACITY]
+		);
+	}
+
+	/**
+	 * Prepare the pattern match window flavour whose capacity is the only limit that cannot resolve: the duration
+	 * macro is created before the rule is, so the limit parsed ahead of the capacity is out of the way, see
+	 * prepareDataCepWindowUnresolvedLimitsOperations() and
+	 * runEventAssessmentTestCepWindowSingleUnresolvedLimit().
+	 */
+	public function prepareDataCepWindowPatternCapacityUnresolved() {
+		return $this->prepareDataCepWindowUnresolvedLimitsOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CAPACITY_LIMIT,
+			[self::CEP_WINDOW_DURATION_MACRO => self::CEP_RULE_WINDOW_LIMITS_DURATION]
 		);
 	}
 
@@ -3639,19 +3773,30 @@ HEREDOC;
 	 * resolvable and the scenario would be driving a perfectly healthy rule. The assessment creates them itself,
 	 * one at a time, once it has seen the error each of them causes while missing.
 	 *
+	 * $resolved_limits, macro to value, is what the flavour driving a single limit
+	 * (runEventAssessmentTestCepWindowSingleUnresolvedLimit()) creates back afterwards, so the limit it is after is
+	 * the only one left unresolvable. It changes nothing about the rule - the window is still given both of its
+	 * limits as macros - only which of them the server can read.
+	 *
 	 * $window_type is the type under test, and every type has to behave the same way: the limits of a window are
 	 * not what tells the types apart, so none of them may open a window without them. A pattern match window cannot
 	 * be without a script and this scenario is not driven by a match, so that type gets one that never reports one.
 	 */
-	private function prepareDataCepWindowUnresolvedLimitsOperations(int $window_type, string $name) {
+	private function prepareDataCepWindowUnresolvedLimitsOperations(int $window_type, string $name,
+			array $resolved_limits = []) {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this scenario is the only thing that may close a problem.
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 
 		// Neither limit may resolve when the scenario starts, whatever the flavour that ran before it left behind.
 		$this->deleteGlobalMacros([self::CEP_WINDOW_DURATION_MACRO, self::CEP_WINDOW_CAPACITY_MACRO]);
+
+		// Only then are the limits this flavour wants resolvable given back, so what they are set to is this
+		// scenario's doing and not something a previous flavour happened to leave.
+		foreach ($resolved_limits as $macro => $value) {
+			$this->upsertGlobalMacro($macro, (string) $value);
+		}
 
 		$window = [
 			'duration' => self::CEP_WINDOW_DURATION_MACRO,
@@ -3671,8 +3816,10 @@ HEREDOC;
 				'sortorder' => 0,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [self::buildUpEventOperationCondition()]
+				]
 			],
 			[
 				'sortorder' => 1,
@@ -3694,10 +3841,10 @@ HEREDOC;
 		]);
 		$this->assertCount(1, $stored['result'], 'The rule of "'.$name.'" must exist after it was created.');
 		$this->assertSame(self::CEP_WINDOW_DURATION_MACRO, $stored['result'][0]['window']['duration'],
-			'The window of "'.$name.'" must keep its duration macro unresolved.'
+			'The window of "'.$name.'" must keep its duration macro as it was written.'
 		);
 		$this->assertSame(self::CEP_WINDOW_CAPACITY_MACRO, $stored['result'][0]['window']['capacity'],
-			'The window of "'.$name.'" must keep its capacity macro unresolved.'
+			'The window of "'.$name.'" must keep its capacity macro as it was written.'
 		);
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -3782,7 +3929,6 @@ HEREDOC;
 
 		// The rule of this flavour is the only thing that may close a problem.
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 
 		// By default grouped by the 'component' tag, which every event of the driven trigger carries with the
 		// same value: they all compete for the one place of a single window, and the grouping a tag
@@ -3816,10 +3962,12 @@ HEREDOC;
 				'sortorder' => 2,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
 				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 				// The "up" events are singled out by the presence of a tag, not by a tag value: CEP_STATE_TAG
 				// resolves its name at event time, so only an "up" event carries CEP_STATE_TAG_UP at all.
-				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [self::buildUpEventOperationCondition()]
+				]
 			],
 			[
 				'sortorder' => 3,
@@ -3836,8 +3984,10 @@ HEREDOC;
 				'sortorder' => -1,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 				'type' => CCepRuleHelper::OP_DISCARD,
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'tags' => [['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']]
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [self::buildUpEventOperationCondition()]
+				]
 			]);
 		}
 
@@ -3894,7 +4044,6 @@ HEREDOC;
 
 		// As in the windowless flavour, nothing except the trigger expression may close these problems.
 		$this->deleteCepCorrelations();
-		$this->deleteCepRules();
 
 		// The limits of the window are given to it as user macros, as in the windowless flavour's windowed runs.
 		$window = $this->macroizeWindowLimits($this->buildWindowOperationsWindow());
@@ -4248,8 +4397,13 @@ HEREDOC;
 
 	/**
 	 * Create the CEP rule described by $rule_params, or update it in place if one with the same name already
-	 * exists (prepareData* methods are re-run by every dependent test). Returns the CEP rule id so the caller
-	 * can track it for cleanup.
+	 * exists. Returns the CEP rule id so the caller can track it for cleanup.
+	 *
+	 * The usual case is a create: the scenario that ran before removed its rules in cleanupCepRules(), so a
+	 * prepareData* method starts with none of its own in place. The update is what makes a rule left behind by
+	 * a run that never reached its teardown - an aborted test, a killed server - harmless: the rule the
+	 * scenario needs is brought to the parameters it asks for instead of the create failing on the duplicate
+	 * name.
 	 */
 	private function upsertCepRule(array $rule_params): string {
 		$existing = $this->call('ceprule.get',
@@ -4600,11 +4754,38 @@ HEREDOC;
 	 *   - $tag_exists_condition = false: a tag value comparison on the 'state' tag (state Equals "up");
 	 *   - $tag_exists_condition = true: a tag-exists condition on CEP_STATE_TAG_UP, the tag the prototypes
 	 *     only produce for "up" events because its name is built from {ITEM.VALUE}.
+	 *
+	 * $window_type gives the rule a cause and symptom grouping window (WINDOW_CAUSE_SYMPTOM) instead of the tag
+	 * correlation one. Both group by the same 'service' tag and both close a window on an "up" event, so the
+	 * scenario runs identically either way; a cause and symptom window additionally ranks what it holds - the
+	 * "down_N" event that opened the window is its cause and the "up_N" event that ends it a symptom of that
+	 * cause - and counts the symptoms of a group in the CEP_TAG_SYMPTOM_COUNT tag of its cause, which is what
+	 * waitForCloseOnUpCauseSymptomRanking() asserts.
 	 */
-	private function buildCloseOnUpCepRuleParams(string $name, bool $tag_exists_condition = false): array {
-		$close_window_tag = $tag_exists_condition
-			? ['tag' => self::CEP_STATE_TAG_UP, 'operator' => TAG_OPERATOR_EXISTS, 'value' => '']
-			: ['tag' => 'state', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'up'];
+	private function buildCloseOnUpCepRuleParams(string $name, bool $tag_exists_condition = false,
+			int $window_type = CCepRuleHelper::WINDOW_TAG_MATCH): array {
+		$close_window_condition = $tag_exists_condition
+			? self::buildUpEventOperationCondition()
+			: [
+				'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
+				'operator' => CONDITION_OPERATOR_EQUAL,
+				'tag' => 'state',
+				'value' => 'up'
+			];
+
+		$window = [
+			'duration' => '1h',
+			'capacity' => 0,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => ['service']
+		];
+
+		// Only a cause and symptom window ranks its events, so only it has a count of them to write.
+		if ($window_type == CCepRuleHelper::WINDOW_CAUSE_SYMPTOM) {
+			$window['event_count_tag'] = self::CEP_TAG_SYMPTOM_COUNT;
+		}
 
 		return [
 			'name' => $name,
@@ -4619,22 +4800,17 @@ HEREDOC;
 					]
 				]
 			],
-			'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH,
-			'window' => [
-				'duration' => '1h',
-				'capacity' => 0,
-				'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
-				'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
-				'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
-				'tags' => ['service']
-			],
+			'window_type' => $window_type,
+			'window' => $window,
 			'operations' => [
 				[
 					'sortorder' => 0,
 					'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 					'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
-					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-					'tags' => [$close_window_tag]
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => [$close_window_condition]
+					]
 				],
 				[
 					'sortorder' => 1,
@@ -5433,6 +5609,20 @@ HEREDOC;
 	}
 
 	/**
+	 * The operation filter condition satisfied by an "up" event and by no other event of the close-on-up
+	 * scenarios: CEP_STATE_TAG_UP is the tag name the trigger prototypes build from {ITEM.VALUE} (see
+	 * CEP_STATE_TAG), so only an "up" event carries that tag at all and a plain tag-exists condition singles
+	 * them out without comparing any tag value.
+	 */
+	private static function buildUpEventOperationCondition(): array {
+		return [
+			'type' => CCepRuleHelper::CONDITION_TAG,
+			'operator' => CONDITION_OPERATOR_EXISTS,
+			'tag' => self::CEP_STATE_TAG_UP
+		];
+	}
+
+	/**
 	 * The tag state getWindowNoneTagOperationCases() must leave on every problem event of the scenario, as a
 	 * tag => value map in which a null value means the tag must not be on the event at all.
 	 */
@@ -5648,8 +5838,10 @@ HEREDOC;
 	/**
 	 * Delete every CEP rule (ceprule API) created by these scenarios - their names all start with
 	 * CEP_RULE_NAME_PREFIX - and reset the tracked CEP rule id. A leftover rule would keep closing the
-	 * problems of the scenarios that run afterwards, so this is also called from clearData() in case a test
-	 * aborted before its own teardown ran.
+	 * problems of the scenarios that run afterwards, which is why every CEP scenario calls this through
+	 * cleanupCepRules() from a finally block: the rules of a scenario must not outlive it even when it failed.
+	 * The prepareData* methods therefore find no rules of their own and none of another flavour, and create
+	 * theirs with upsertCepRule() without clearing anything first.
 	 */
 	private function deleteCepRules(): void {
 		$response = $this->call('ceprule.get', [
@@ -7681,6 +7873,7 @@ HEREDOC;
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUp() {
+		
 		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
 
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
@@ -8070,6 +8263,451 @@ HEREDOC;
 		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
 		try {
 			// Same as testTriggerCEP_CepWindowTagSuppressUnsuppressProblemsPerTag but with restart=true.
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true, false, true, true, false, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+
+			// Clean up: ensure maintenance is stopped
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+		}
+	}
+
+	/**
+	 * The cause and symptom grouping counterpart of
+	 * testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUp: the exact same scenario - the same four
+	 * waves through the same runner with the same problem counts after each of them - but the problems are
+	 * closed by a rule whose window is a cause and symptom grouping one instead of a tag correlation one. It
+	 * groups by the same 'service' tag and closes on the same "up" events, so what it closes and when may not
+	 * differ; what it adds is the ranking of what it holds, which the run asserts afterwards: every id ends up
+	 * with its "down_N" event as the cause of its window and the "up_N" event that ended that window as the one
+	 * symptom of it. See prepareDataCepWindowCauseSymptomCloseOnUp().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUp$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUp() {
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp();
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		// Every wave sends one value per discovered item, the two "down" waves with an id set of their own and
+		// the two "up" waves closing those same ids again, so the run opens a window per id and every one of
+		// them holds a "down" and an "up" event.
+		$m = count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY))
+			+ count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2));
+
+		try {
+			// Bound the ranking verification below to the events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+			$this->waitForNoOpenProblems($all);
+
+			$this->waitForCloseOnUpCauseSymptomRanking($all, 2 * $m);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * Same cause and symptom close-on-up scenario as
+	 * testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUp, with the close-window operation singling out
+	 * the "up" events by a tag-exists condition on the CEP_STATE_TAG tag both prototypes then carry - the
+	 * counterpart of testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpTagExists. See
+	 * buildCloseOnUpCepRuleParams().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpTagExists$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpTagExists() {
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp(true);
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+			$this->waitForNoOpenProblems($all);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The cause and symptom grouping counterpart of
+	 * testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpSingleItem: the same close-on-up flow
+	 * landing on a single discovered item (and its one trigger), so the two windows the run opens are filled
+	 * from one event stream. Both are ranked all the same - each holds the "down" event of its id and the "up"
+	 * event that closed it.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpSingleItem$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpSingleItem() {
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp();
+
+		// The one trigger the run drives, derived the way the runner derives it.
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE,
+			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0]
+		);
+
+		try {
+			// Bound the ranking verification below to the events generated by this run only.
+			$this->captureEventBaseline([$triggerid]);
+
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+			$this->waitForNoOpenProblems([$triggerid]);
+
+			// The single-item run sends two ids, so the one trigger fills two windows.
+			$this->waitForCloseOnUpCauseSymptomRanking([$triggerid], 2);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The cause and symptom grouping counterpart of
+	 * testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpFromSameTrigger: every "up_N" value is sent
+	 * to the item whose trigger opened "down_N" instead of the next one, so both events of a window are raised
+	 * on the same trigger. The window is keyed purely on the 'service' tag value, so the pairing - and with it
+	 * the ranking of the pair - must hold either way.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpFromSameTrigger$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpFromSameTrigger() {
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp();
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+		$m = count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY))
+			+ count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2));
+
+		try {
+			// Bound the ranking verification below to the events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, false, false, false);
+			$this->waitForNoOpenProblems($all);
+
+			$this->waitForCloseOnUpCauseSymptomRanking($all, 2 * $m);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The cause and symptom grouping counterpart of
+	 * testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJS: the same close-on-up scenario, but two
+	 * independent webhook media types with process_tags enabled additionally add a WEB_SERVICE_TAG and a
+	 * WEB_SERVICE_TAG2 tag to every problem event from JavaScript. After the scenario the test asserts that
+	 * every problem event carries both tags - the ranked ones included: a symptom escalates like any other
+	 * problem, so the tags a media type returns must land on it too.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpJS$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpJS() {
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp(true, true);
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		// Every one of the four waves opens a problem event per trigger and all of them are tagged, so 4 tagged
+		// problem events per trigger (key) - a CEP rule closing an event leaves its actions enabled, so the
+		// "up" problems escalate and get tagged as well, see
+		// testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJS.
+		$m = count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY))
+			+ count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2));
+
+		try {
+			// Bound the event.get verification below to events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+			$this->waitForNoOpenProblems($all);
+
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 4 * $m);
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, 4 * $m);
+		}
+		finally {
+			$this->removeExtraTagWebhookAction();
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The cause and symptom grouping counterpart of
+	 * testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJSAfterEachWave: same tag-application
+	 * scenario as testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpJS, but the WEB_SERVICE_TAG
+	 * assertion runs after every wave instead of only in the final state, verifying that the tags returned by
+	 * the media type are applied to the problem events as they open and are not disturbed by the later waves.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpJSAfterEachWave$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpJSAfterEachWave() {
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp(true, true);
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		try {
+			// Bound the event.get verification inside the run to events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			// Pass $check_tags = true so the run asserts the WEB_SERVICE_TAG tag count after every wave, and
+			// $up_events_tagged = true so those counts expect the "up" problems to be tagged as well.
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, true, false, true, false, false,
+				true
+			);
+			$this->waitForNoOpenProblems($all);
+		}
+		finally {
+			$this->removeExtraTagWebhookAction();
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The cause and symptom grouping counterpart of
+	 * testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJSServices: the webhook-applied tags drive
+	 * services into problem state instead of only being asserted on the events. One service per discovered
+	 * component is created whose only problem tag matches the webhook-applied WEB_COMPONENT_TAG tag, so a
+	 * service can go into problem state only after the escalation ran the tagging webhook. The run asserts the
+	 * services start OK, turn DISASTER once the webhook tags the open problems, drop to WARNING once the
+	 * still-open problems are manually downgraded after wave 3 and recover to OK once the rule closes every
+	 * problem in wave 4 - the ranking the window gives those problems changes none of it.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpJSServices$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpJSServices() {
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp(true, true);
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		try {
+			// Bound the event.get verification inside the run to events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			$this->createWebTagServices();
+
+			// $check_tags sequences each wave on the webhook having tagged the events ($up_events_tagged = true:
+			// the CEP-closed "up" problems are tagged too); $check_web_services asserts the service state
+			// transitions driven by those webhook-applied tags.
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, true, false, true, true, false,
+				true
+			);
+			$this->waitForNoOpenProblems($all);
+		}
+		finally {
+			$this->removeWebTagServices();
+			$this->removeExtraTagWebhookAction();
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The cause and symptom grouping counterpart of
+	 * testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpRestart: same scenario as
+	 * testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUp but the server component is stopped and
+	 * restarted between each step, so the windows must be restored from the database with their collected
+	 * events - and with the ranking they built - and still close the paired problems afterwards.
+	 *
+	 * @depends testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUp
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp();
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+		$m = count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY))
+			+ count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2));
+
+		try {
+			// Bound the ranking verification below to the events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true);
+			$this->waitForNoOpenProblems($all);
+
+			// A restarted window has to keep ranking where it left off: the "up" event of an id arrives after
+			// the restart that followed its "down" event, so it may only become a symptom of it.
+			$this->waitForCloseOnUpCauseSymptomRanking($all, 2 * $m);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The cause and symptom grouping counterpart of
+	 * testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpSeverity: once every problem is open (at the
+	 * trigger's DISASTER priority, so each per-trigger service is at DISASTER too) the open problems are
+	 * manually downgraded to WARNING via event.acknowledge. When services exist the test also verifies the
+	 * service manager follows the manual severity change: every service drops from DISASTER to WARNING, then
+	 * recovers to OK once the "up" values close the problems through the window.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpSeverity$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpSeverity() {
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp();
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSeverity(false);
+			$this->waitForNoOpenProblems($all);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The cause and symptom grouping counterpart of
+	 * testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpMaintenanceAfterFirst: the discovered host
+	 * only enters data-collection maintenance after the first wave of problems is already open, so the
+	 * already-open problems must be suppressed retroactively and every problem opened afterwards (while
+	 * maintenance is active) suppressed at creation time too, while the rule still closes them all, leaving
+	 * nothing open.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpMaintenanceAfterFirst$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpMaintenanceAfterFirst() {
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true);
+			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		}
+		finally {
+			$this->cleanupCepRules();
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// See testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpMaintenanceAfterFirst: wait
+			// until the timer has taken the host out of maintenance and cleared every suppression, so the next
+			// test cannot observe stale suppression.
+			$this->callUntilCountIsPresent('event.get', [
+				'hostids' => [self::$disc_hostid],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'suppressed' => true
+			], 0, 120, self::WAIT_ITERATION_DELAY);
+		}
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpMaintenanceAfterFirst but the
+	 * server component is stopped and restarted between each step.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpMaintenanceAfterFirstRestart$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpMaintenanceAfterFirstRestart() {
+		$this->skipIfRestartTestsDisabled();
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true);
+			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		}
+		finally {
+			$this->cleanupCepRules();
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// See testTriggerCEP_EventAssessmentCepWindowCauseSymptomCloseOnUpMaintenanceAfterFirst: wait until
+			// the timer has taken the host out of maintenance and cleared every suppression.
+			$this->callUntilCountIsPresent('event.get', [
+				'hostids' => [self::$disc_hostid],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'suppressed' => true
+			], 0, 120, self::WAIT_ITERATION_DELAY);
+		}
+	}
+
+	/**
+	 * The cause and symptom grouping counterpart of
+	 * testTriggerCEP_CepWindowTagSuppressUnsuppressProblems: verifies that problems and services are suppressed
+	 * during maintenance and no longer suppressed after the maintenance is stopped. The stopped maintenances are
+	 * then resumed one at a time out of creation order (middle, first, last) - suppression must return after the
+	 * first resume and survive the overlapping ones - and finally stopped again, after which suppression must
+	 * clear once more. The problems are closed by the cause and symptom window rule.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomSuppressUnsuppressProblems$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomSuppressUnsuppressProblems() {
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true, false, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+
+			// Clean up: ensure maintenance is stopped
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+		}
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_CepWindowCauseSymptomSuppressUnsuppressProblems, but the server component
+	 * is stopped and restarted between each step.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomSuppressUnsuppressProblemsRestart$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomSuppressUnsuppressProblemsRestart() {
+		$this->skipIfRestartTestsDisabled();
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true, false, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+
+			// Clean up: ensure maintenance is stopped
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+		}
+	}
+
+	/**
+	 * The cause and symptom grouping counterpart of
+	 * testTriggerCEP_CepWindowTagSuppressUnsuppressProblemsPerTag: instead of host-wide maintenances that
+	 * suppress every problem, one maintenance is created per discovered component, each scoped to that component
+	 * through a 'component' problem-tag filter. Every open problem must then be suppressed by exactly the single
+	 * maintenance whose tag matches it (and by no other). Stopping the maintenances clears the suppression,
+	 * resuming brings it back per matching tag, and the rule still closes the problems normally.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomSuppressUnsuppressProblemsPerTag$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomSuppressUnsuppressProblemsPerTag() {
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp();
+		try {
+			// maintenance_after_first=true, stop_maintenance_and_verify_suppression=true,
+			// maintenance_by_tag=true
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true, false, true, true, false, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+
+			// Clean up: ensure maintenance is stopped
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+		}
+	}
+
+	/**
+	 * Same "per problem tag" scenario as
+	 * testTriggerCEP_CepWindowCauseSymptomSuppressUnsuppressProblemsPerTag, but the server component is stopped
+	 * and restarted between each step.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomSuppressUnsuppressProblemsPerTagRestart$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomSuppressUnsuppressProblemsPerTagRestart() {
+		$this->skipIfRestartTestsDisabled();
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepWindowCauseSymptomCloseOnUp();
+		try {
+			// Same as testTriggerCEP_CepWindowCauseSymptomSuppressUnsuppressProblemsPerTag but with
+			// restart=true.
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true, false, true, true, false, true);
 		}
 		finally {
@@ -8845,6 +9483,10 @@ HEREDOC;
 	 * The script doubles as an assertion on the event fields the window exposes to it - name, severity,
 	 * timestamp, tags and the lifecycle flags - by refusing to match anything it does not recognise. A match
 	 * therefore means both that the pattern was found and that every event it was found in looked right.
+	 *
+	 * The "up" value at the end closes the window, which tags the five events it held along with the "up" event
+	 * that ended it: closing does nothing else in a flavour whose operations only copy, so the tag is how the
+	 * window is seen ending and how what it held is read off the events.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternMatch$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -10246,17 +10888,45 @@ HEREDOC;
 	}
 
 	/**
-	 * The same unresolved limits scenario with a pattern match window, the one window type that is examined on its
-	 * own: there is no window to hand to the script of the rule, so the limits are what the rule reports rather than
-	 * anything the script decided - see runEventAssessmentTestCepWindowUnresolvedLimits().
-	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternUnresolvedLimits$)
+	 * The unresolved limits scenario with a pattern match window - the one window type that is examined on its own,
+	 * so there is no window to hand to the script of the rule and the limits are what the rule reports rather than
+	 * anything the script decided - driven with the duration as the only limit that cannot resolve: the capacity
+	 * macro exists from the start, so the duration failing is the whole of what the rule has to report and creating
+	 * that one macro is the whole of what has to bring it back - see
+	 * runEventAssessmentTestCepWindowSingleUnresolvedLimit().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternDurationUnresolved$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
-	public function testTriggerCEP_CepWindowPatternUnresolvedLimits() {
-		$this->prepareDataCepWindowPatternUnresolvedLimits();
+	public function testTriggerCEP_CepWindowPatternDurationUnresolved() {
+		$this->prepareDataCepWindowPatternDurationUnresolved();
 
 		try {
-			$this->runEventAssessmentTestCepWindowUnresolvedLimits(self::CEP_RULE_WINDOW_PATTERN_LIMITS);
+			$this->runEventAssessmentTestCepWindowSingleUnresolvedLimit(
+				self::CEP_RULE_WINDOW_PATTERN_DURATION_LIMIT, self::CEP_WINDOW_DURATION_MACRO,
+				self::CEP_RULE_WINDOW_LIMITS_DURATION, self::CEP_RULE_WINDOW_LIMITS_DURATION_ERROR
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same pattern match window with the capacity as the only limit that cannot resolve: the duration macro
+	 * exists from the start, which is what puts the capacity in front of the server instead of behind a duration it
+	 * cannot read - the message the rule reports could come from nowhere else - see
+	 * runEventAssessmentTestCepWindowSingleUnresolvedLimit().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCapacityUnresolved$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCapacityUnresolved() {
+		$this->prepareDataCepWindowPatternCapacityUnresolved();
+
+		try {
+			$this->runEventAssessmentTestCepWindowSingleUnresolvedLimit(
+				self::CEP_RULE_WINDOW_PATTERN_CAPACITY_LIMIT, self::CEP_WINDOW_CAPACITY_MACRO,
+				(string) self::CEP_RULE_WINDOW_LIMITS_CAPACITY, self::CEP_RULE_WINDOW_LIMITS_CAPACITY_ERROR
+			);
 		}
 		finally {
 			$this->cleanupCepRules();
@@ -12611,7 +13281,11 @@ HEREDOC;
 	 *      two of every id that was driven without a window.
 	 *
 	 * The scenario is the same for every window type: limits are not what tells the types apart, so none of them may
-	 * open a window without them, and each of them must be able to open one the moment they resolve.
+	 * open a window without them, and each of them must be able to open one the moment they resolve. Walking the
+	 * limits in the order the server parses them is what it cannot say anything about - the capacity is only ever
+	 * reached through a duration that resolves, so neither limit is seen failing by itself here - and that is what
+	 * runEventAssessmentTestCepWindowSingleUnresolvedLimit() drives, one limit at a time, over the pattern match
+	 * window type.
 	 */
 	private function runEventAssessmentTestCepWindowUnresolvedLimits(string $rule_name): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
@@ -12707,6 +13381,115 @@ HEREDOC;
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 		$this->waitForNoOpenProblems($all, 'After the unresolved limits scenario of "'.$rule_name.'"');
+	}
+
+	/**
+	 * Drive the single unresolved limit scenario of the $rule_name rule: its window is given both of its limits as
+	 * user macros and only $macro is missing, the other limit having been created before the rule was
+	 * (prepareDataCepWindowUnresolvedLimitsOperations()), so $error - the message of the limit $macro stands for -
+	 * is the one thing the rule can fail with, and creating $macro with $value is the one thing that can take that
+	 * failure away.
+	 *
+	 * That split is what this scenario adds to runEventAssessmentTestCepWindowUnresolvedLimits(), which leaves both
+	 * macros uncreated and therefore walks the limits in the order the server parses them: the duration is what a
+	 * window with neither macro reports, and the capacity is only ever reached through a duration that already
+	 * resolves. Neither limit is seen failing on its own there. Here whichever limit is under test is the first one
+	 * the server cannot make sense of, so what the rule reports is unmistakably its message and not the message of
+	 * a limit that happens to be parsed earlier - and the recovery is the creation of that one macro rather than of
+	 * the last one still missing.
+	 *
+	 * The window type driven is the pattern match one, the type that is examined on its own: its window is looked
+	 * at once a second whether or not an event arrives, so the limits are resolved again on every examination and
+	 * there is no script decision anywhere near what the rule reports - the script of the rule is never handed a
+	 * window it does not have.
+	 *
+	 * Two ids are enough. The first is driven while $macro is missing: its "down" value opens a problem and no
+	 * window, and its "up" value - the value that ends the window of an id and closes every problem the window held
+	 * - reaches no window, so it closes nothing and both problems of that id stay open. Then $macro is created and
+	 * the second id is driven through a rule nothing else was done to: a window is opened for its "down" value, the
+	 * error is cleared, and its "up" value ends that window and closes both of its problems. What the first id left
+	 * was never in a window, so the recovered rule has nothing of its to close and the trigger expression is what
+	 * has to.
+	 */
+	private function runEventAssessmentTestCepWindowSingleUnresolvedLimit(string $rule_name, string $macro,
+			string $value, string $error): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the single unresolved limit test of "'.$rule_name.'".');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $item_value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value]
+		]);
+
+		// One id driven while the limit under test does not resolve, one driven once it does.
+		$unresolved_service = self::CEP_RULE_WINDOW_NONE_SERVICE;
+		$resolved_service = self::CEP_RULE_WINDOW_NONE_SERVICE_LAST;
+
+		// A rule that has not been given an event yet has nothing to report: whatever it says later is the doing of
+		// the values below and not of something it was created with.
+		$reported = $this->getCepRuleError($rule_name);
+
+		$this->assertSame('', $reported, 'The rule "'.$rule_name.'" reported an error before any event: '.$reported);
+
+		// 1. The limit under test does not resolve. The problem of the "down" value is opened by the trigger as
+		//    always - the rule does not stand between an event and its problem - and the rule reports that limit
+		//    and no other: the limit parsed before it, if there is one, resolves.
+		$send('down_'.$unresolved_service);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForCepRuleError($rule_name, $error);
+
+		// The "up" value of that id, the one that ends the window of its id and closes every problem the window
+		// held. There is no window for it to end, so it closes nothing and is left open as a problem of its own -
+		// "up" is not a recovery value for this trigger.
+		$send('up_'.$unresolved_service);
+		$this->waitForProblemEventCountByTag($all, 'service', $unresolved_service, 2);
+		$this->waitForOpenProblemCountByTag($all, 'service', $unresolved_service, 2);
+		$this->waitForOpenProblemCount($all, 2);
+
+		// 2. The one macro that was missing is created, so both limits resolve. Nothing about the rule was changed
+		//    to get there.
+		$this->upsertGlobalMacro($macro, $value);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		// The "down" value of the second id is the first one the rule can open a window for, and opening it is what
+		// takes the error away: a rule that had been failing on every event reports none again without having been
+		// touched itself.
+		$send('down_'.$resolved_service);
+		$this->waitForOpenProblemCount($all, 3);
+		$this->waitForCepRuleError($rule_name, '');
+
+		// And the window it opened is a window like any other: the "up" value of the id ends it and both problems of
+		// that id are closed with it - the "down" one the window held and the "up" one that ended it.
+		$send('up_'.$resolved_service);
+		$this->waitForProblemEventCountByTag($all, 'service', $resolved_service, 2);
+		$this->waitForOpenProblemCountByTag($all, 'service', $resolved_service, 0);
+
+		// 3. Only the id that had a window was affected. The events sent while the limit did not resolve were never
+		//    in one, so there is nothing of theirs for the working rule to close - both problems are still open.
+		$this->waitForOpenProblemCount($all, 2);
+		$this->waitForOpenProblemCountByTag($all, 'service', $unresolved_service, 2);
+
+		// The rule closed what it could without failing on any of it, so nothing of the recovery was a rule that had
+		// started reporting something else.
+		$reported = $this->getCepRuleError($rule_name);
+
+		$this->assertSame('', $reported, 'The rule "'.$rule_name.'" reported an error once its limit resolved: '
+			.$reported
+		);
+
+		// Nothing of the rule can reach the two problems left, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the single unresolved limit scenario of "'.$rule_name.'"');
 	}
 
 	/**
@@ -12826,6 +13609,85 @@ HEREDOC;
 	}
 
 	/**
+	 * Wait until every window the cause and symptom flavour of the close-on-up scenario opened has ranked the
+	 * pair of events it held, see prepareDataCepWindowCauseSymptomCloseOnUp().
+	 *
+	 * The window groups by the 'service' tag, so the events generated since the scenario baseline are grouped
+	 * by that very tag here: each group must hold exactly the two events of one id - the "down_N" event that
+	 * opened its window and the "up_N" event that closed it. The older of the two is the cause of its group,
+	 * with no cause of its own and the CEP_TAG_SYMPTOM_COUNT tag stating the single symptom it collected, and
+	 * the younger one must point at it through its cause_eventid. That the "up" event is ranked at all is the
+	 * point: it is taken into the window and ranked before the operation it triggers closes that window, so the
+	 * ranking has to survive the close - the problems are gone by the time this runs, the events are not.
+	 *
+	 * $groups is how many distinct 'service' ids the run sent, i.e. how many such pairs must exist.
+	 */
+	private function waitForCloseOnUpCauseSymptomRanking(array $triggerids, int $groups): void {
+		$this->callUntilDataIsPresent('event.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'filter' => ['value' => TRIGGER_VALUE_TRUE],
+			'output' => ['eventid', 'name', 'cause_eventid'],
+			'selectTags' => 'extend',
+			'sortfield' => 'eventid',
+			'sortorder' => 'ASC'
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($groups) {
+			// Group the events the way the window grouped them: by the value of their 'service' tag. The
+			// events come back oldest first, so the first event of a group is the one that opened its window.
+			$by_service = [];
+			foreach ($response['result'] as $event) {
+				$tags = array_column($event['tags'], 'value', 'tag');
+
+				if (!array_key_exists('service', $tags)) {
+					return 'event '.$event['eventid'].' ('.$event['name'].'): missing the "service" tag the'
+						.' window groups by';
+				}
+
+				$by_service[$tags['service']][] = $event + ['tag_values' => $tags];
+			}
+
+			if (count($by_service) !== $groups) {
+				return 'expected '.$groups.' "service" group(s), got '.count($by_service);
+			}
+
+			foreach ($by_service as $service => $events) {
+				$info = '"service" group '.$service;
+
+				if (count($events) !== 2) {
+					return $info.': expected the 2 events of the id ("down" and "up"), got '.count($events);
+				}
+
+				[$cause, $symptom] = $events;
+
+				if ((int) $cause['cause_eventid'] !== 0) {
+					return $info.': cause event '.$cause['eventid'].' ('.$cause['name'].') has cause '
+						.$cause['cause_eventid'].', the event that opened the window must have none';
+				}
+
+				if (!array_key_exists(self::CEP_TAG_SYMPTOM_COUNT, $cause['tag_values'])) {
+					return $info.': cause event '.$cause['eventid'].' ('.$cause['name'].') is missing the "'
+						.self::CEP_TAG_SYMPTOM_COUNT.'" tag';
+				}
+
+				if ((int) $cause['tag_values'][self::CEP_TAG_SYMPTOM_COUNT] !== 1) {
+					return $info.': cause event '.$cause['eventid'].' ('.$cause['name'].') "'
+						.self::CEP_TAG_SYMPTOM_COUNT.'" tag value "'
+						.$cause['tag_values'][self::CEP_TAG_SYMPTOM_COUNT].'", expected 1';
+				}
+
+				if ($symptom['cause_eventid'] !== $cause['eventid']) {
+					return $info.': event '.$symptom['eventid'].' ('.$symptom['name'].'): cause '
+						.$symptom['cause_eventid'].', expected the cause of the group '.$cause['eventid'];
+				}
+			}
+
+			return true;
+		});
+	}
+
+	/**
 	 * Drive the event pattern match flavour. The three values fill one window; as soon as the script sees that
 	 * many events it reports a match and the rule copies the oldest and the newest of them, so two more
 	 * problems appear without any value having been sent for them.
@@ -12834,6 +13696,11 @@ HEREDOC;
 	 * value and the id of the last one end up with two problem events each, the id in between with one. The
 	 * copies land in the same window, and the script counts them separately for exactly that reason - the
 	 * pattern must not match a second time, so the totals have to stay where they are.
+	 *
+	 * The "up" value that follows ends the window, and the closing tags every event the window held with
+	 * CEP_TAG_WINDOW_PATTERN_CLOSED - the "up" event among them, since an arriving event is taken into the
+	 * window before the operations of its occurrence run. Six tagged events is therefore what shows the window
+	 * closed, and that the copies were in it as the script counting them assumed.
 	 */
 	private function runEventAssessmentTestCepWindowPattern(): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
@@ -12892,6 +13759,17 @@ HEREDOC;
 		// not take them for a new pattern.
 		$this->waitForOpenProblemCount($all, $open + 2);
 		$this->waitForAllTriggerEventCounts($all, $open + 2);
+
+		// The "up" value ends the window. It is a problem of its own - the trigger reports "up" as a problem
+		// too - and it is taken into the window before the close window operation of its occurrence runs, so
+		// the window is closed with six events in it: the three values, the two copies and the "up" event.
+		$send('up_'.$first);
+		$this->waitForOpenProblemCount($all, $open + 3);
+		$this->waitForAllTriggerEventCounts($all, $open + 3);
+
+		// Closing runs the tag operation over every one of them, so all six come out tagged. Nothing else in
+		// this flavour adds that tag, which makes it the whole of what the closed window left behind.
+		$this->waitForProblemEventsTagged($all, self::CEP_TAG_WINDOW_PATTERN_CLOSED, $open + 3);
 
 		// Nothing in this flavour closes a problem, so the trigger expression has to.
 		$send('0');
@@ -14355,6 +15233,26 @@ HEREDOC;
 		}
 
 		return $maintenance_by_component;
+	}
+
+	/**
+	 * Skip every test that is not a CEP window scenario when SKIP_NON_WINDOW_TESTS is enabled, see it for what
+	 * counts as one. Unlike the skips below, this is a @before hook rather than a call from the body of the
+	 * tests it skips: those are the tests that say nothing about windows, and there are a hundred of them.
+	 *
+	 * The components of the suite are started by the time this runs (CIntegrationTest::onBeforeTestCase() is a
+	 * @before of the parent class and those run first), which costs a skipped test nothing here: the suite is
+	 * declared @suite-components-reuse, so its server is started once for all of them rather than per test.
+	 *
+	 * @before
+	 */
+	public function skipNonWindowTests(): void {
+		$name = $this->getName(false);
+
+		if (static::SKIP_NON_WINDOW_TESTS && strpos($name, 'Cep') === false
+				&& strpos($name, 'testPrepare') !== 0) {
+			$this->markTestSkipped('Only the CEP window tests run, see SKIP_NON_WINDOW_TESTS.');
+		}
 	}
 
 	/**
