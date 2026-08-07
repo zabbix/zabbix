@@ -1230,13 +1230,48 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			av.severity = 0;
 		}
 
-		zbx_timespec(&av.ts);
-
-		if (0 == strcmp(av.value, ZBX_NOTSUPPORTED))
-			av.state = ITEM_STATE_NOTSUPPORTED;
-
 		zbx_dc_config_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
-		process_history_data(&item, &av, &errcode, 1, NULL);
+
+		if (SUCCEED == errcode)
+		{
+			struct zbx_json		json;
+			struct zbx_json_parse	jp;
+			char			*info = NULL;
+
+			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+			zbx_json_addobject(&json, NULL);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, host, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, av.value, ZBX_JSON_TYPE_STRING);
+
+			if (0 != av.timestamp)
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, (zbx_uint64_t)av.timestamp);
+
+			if (0 != av.lastlogsize)
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, av.lastlogsize);
+
+			if (NULL != av.source && '\0' != *av.source)
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, av.source, ZBX_JSON_TYPE_STRING);
+
+			if (0 != av.severity)
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, (zbx_uint64_t)av.severity);
+
+			zbx_json_close(&json);
+			zbx_json_close(&json);
+
+			if (SUCCEED == zbx_json_open(json.buffer, &jp))
+			{
+				if (ITEM_TYPE_ZABBIX_ACTIVE == item.type)
+					process_agent_history_data(sock, &jp, ts, &info);
+				else
+					process_sender_history_data(sock, &jp, ts, &info);
+
+				zbx_free(info);
+			}
+
+			zbx_json_free(&json);
+		}
 
 		zbx_alarm_on(CONFIG_TIMEOUT);
 		if (SUCCEED != zbx_tcp_send_raw(sock, "OK"))
