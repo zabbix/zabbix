@@ -28,6 +28,9 @@ $form = (new CForm())
 	->addVar('signal_type', $data['signal_type'])
 	->addVar('metric_point_type', $data['metric_point_type']);
 
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
 $form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Function'), 'label-function'),

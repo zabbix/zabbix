@@ -28,6 +28,9 @@ $form = (new CForm())
 	->addVar('signal_type', $data['signal_type'])
 	->addVar('metric_point_type', $data['metric_point_type']);
 
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
 $operator = new CRadioButtonList('operator', (int) $data['operator']);
 
 foreach ($data['operators'] as $value => $label) {
