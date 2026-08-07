@@ -165,10 +165,10 @@ class Maps {
 					// Green dashed border rectangle.
 					[
 						'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
-						'x' => 63,
-						'y' => 82,
-						'width' => 124,
-						'height' => 86,
+						'x' => 76,
+						'y' => 63,
+						'width' => 198,
+						'height' => 123,
 						'text' => '',
 						'border_type' => SYSMAP_SHAPE_BORDER_TYPE_DASHED,
 						'border_width' => 5,
@@ -178,10 +178,10 @@ class Maps {
 					// Pink ellipse.
 					[
 						'type' => SYSMAP_SHAPE_TYPE_ELLIPSE,
-						'x' => 475,
-						'y' => 257,
-						'width' => 200,
-						'height' => 136,
+						'x' => 457,
+						'y' => 297,
+						'width' => 235,
+						'height' => 156,
 						'text' => '',
 						'border_width' => 2,
 						'background_color' => 'FFCCCC',
@@ -244,8 +244,10 @@ class Maps {
 						'elements' => [['hostid' => $result['hostids']['Host for map for form testing']]],
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 186,
-						'x' => 139,
-						'y' => 27,
+						'label_location' => MAP_LABEL_LOC_TOP,
+						'x' => 143,
+						'y' => 68,
+						'use_iconmap' => 0,
 						'zindex' => 0
 					],
 					// Image.
@@ -253,8 +255,8 @@ class Maps {
 						'selementid' => 7,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE,
 						'iconid_off' => 6,
-						'x' => 139,
-						'y' => 350,
+						'x' => 111,
+						'y' => 314,
 						'zindex' => 1
 					],
 					// Trigger.
