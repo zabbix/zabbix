@@ -36,6 +36,9 @@ The plugin is supplied as part of Zabbix agent 2, and does not require any addit
 Open the Zabbix agent configuration file (`zabbix_agent2.conf`) and set the required parameters.
 
 `Plugins.Mysql.CallTimeout`—The maximum time, in seconds, for waiting when a request has to be completed.
+
+> The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
+
 <br>Default value: equals the global timeout configuration parameter.
 <br>Range: 1–30
 
@@ -47,6 +50,9 @@ Open the Zabbix agent configuration file (`zabbix_agent2.conf`) and set the requ
 <br>Default value: false
 
 `Plugins.Mysql.Timeout`—The maximum time, in seconds, for waiting when a connection has to be established.
+
+> The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
+
 <br>Default value: equals the global timeout configuration parameter.
 <br>Range: 1–30
 
@@ -62,6 +68,10 @@ Open the Zabbix agent configuration file (`zabbix_agent2.conf`) and set the requ
 `Plugins.Mysql.Sessions.<session_name>.TLSCertFile`—Full pathname of a file containing the MySQL certificate or certificate chain.
 
 `Plugins.Mysql.Sessions.<session_name>.TLSKeyFile`—Full pathname of a file containing the MySQL private key.
+
+`Plugins.Mysql.ConnectionTimeout`— The maximum time in seconds for waiting when a connection has to be established.
+<br>Default value: equals the global timeout configuration parameter.
+<br>Range: 1-30
 
 ### Configuring connection
 
@@ -93,7 +103,7 @@ If you use `ConnString` as a session name, skip the rest of the connection param
 
 #### Using named sessions
 
-Named sessions allow you to define specific parameters for each MySQL instance. Currently, these are the supported parameters: `Uri`, `User`, `Password`, `TLSConnect`, `TLSCAFile`, `TLSCertFile`, and `TLSKeyFile`. It's a more secure way to store credentials compared to item keys or macros.
+Named sessions allow you to define specific parameters for each MySQL instance. Currently, these are the supported parameters: `Uri`, `User`, `Password`, `TLSConnect`, `TLSCAFile`, `TLSCertFile`, `TLSKeyFile` and `ConnectionTimeout`. It's a more secure way to store credentials compared to item keys or macros.
 
 For example, if you have two MySQL instances, "Prod" and "Test", you need to add the following options to the agent configuration file:
 
@@ -104,6 +114,7 @@ For example, if you have two MySQL instances, "Prod" and "Test", you need to add
     Plugins.Mysql.Sessions.Prod.TLSCAFile=/path/to/ca_file
     Plugins.Mysql.Sessions.Prod.TLSCertFile=/path/to/cert_file
     Plugins.Mysql.Sessions.Prod.TLSKeyFile=/path/to/key_file
+    Plugins.Mysql.Sessions.Prod.ConnectionTimeout=10
       
     Plugins.Mysql.Sessions.Test.Uri=tcp://192.168.0.1:3306
     Plugins.Mysql.Sessions.Test.User=<UserForTest>   
@@ -112,6 +123,7 @@ For example, if you have two MySQL instances, "Prod" and "Test", you need to add
     Plugins.Mysql.Sessions.Test.TLSCAFile=/path/to/test/ca_file
     Plugins.Mysql.Sessions.Test.TLSCertFile=/path/to/test/cert_file
     Plugins.Mysql.Sessions.Test.TLSKeyFile=/path/to/test/key_file
+    Plugins.Mysql.Sessions.Test.ConnectionTimeout=15
         
 You will then be able to use these session names as the first parameter (`ConnString`) in your keys instead of URIs, e.g.:
 

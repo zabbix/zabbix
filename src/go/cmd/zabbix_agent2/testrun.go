@@ -25,7 +25,7 @@ import (
 func checkMetric(s scheduler.Scheduler, metric string) {
 	const timeoutForTestrunChecks = time.Minute
 
-	value, err := s.PerformTask(metric, timeoutForTestrunChecks, agent.TestrunClientID)
+	value, err := s.PerformTask(metric, timeoutForTestrunChecks, false, agent.TestrunClientID)
 	if err != nil {
 		fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", metric, err.Error())
 	} else if value == nil {
