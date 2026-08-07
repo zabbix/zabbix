@@ -85,7 +85,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	}
 
 	private static function tqItem(int $signal_type, int $metric_point_type, array $columns,
-			array $aggregated_columns, array $filter, string $time_shift = '0', string $lookback_limit = '120',
+			array $aggregated_columns, array $filter, string $time_shift = '1', string $lookback_limit = '120',
 			string $granularity = '120', string $delay = '1'): array {
 		return [
 			'query' => [
@@ -104,66 +104,62 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 	private static function tmplTrace(string $startTimeUnixNano, string $endTimeUnixNano, ?Closure $mutate = null): array {
 		$payload = [
-			'resourceSpans' => [
+			'resource' => [
+				'attributes' => [
+					['key' => 'service.name', 'value' => ['stringValue' => 'trace-test-service']],
+					['key' => 'host.name', 'value' => ['stringValue' => 'trace-test-host']],
+					['key' => 'deployment.environment', 'value' => ['stringValue' => 'test']],
+					['key' => 'rum.sessionId', 'value' => ['stringValue' => 'rum-session-123']]
+				]
+			],
+			'schemaUrl' => 'https://example.com/schemas/resource/trace/1.0.0',
+			'scopeSpans' => [
 				[
-					'resource' => [
+					'scope' => [
+						'name' => 'trace-test-scope',
+						'version' => '1.0.0',
 						'attributes' => [
-							['key' => 'service.name', 'value' => ['stringValue' => 'trace-test-service']],
-							['key' => 'host.name', 'value' => ['stringValue' => 'trace-test-host']],
-							['key' => 'deployment.environment', 'value' => ['stringValue' => 'test']],
-							['key' => 'rum.sessionId', 'value' => ['stringValue' => 'rum-session-123']]
+							['key' => 'scope.attr', 'value' => ['stringValue' => 'trace-scope-value']]
 						]
 					],
-					'schemaUrl' => 'https://example.com/schemas/resource/trace/1.0.0',
-					'scopeSpans' => [
+					'schemaUrl' => 'https://example.com/schemas/scope/trace/1.0.0',
+					'spans' => [
 						[
-							'scope' => [
-								'name' => 'trace-test-scope',
-								'version' => '1.0.0',
-								'attributes' => [
-									['key' => 'scope.attr', 'value' => ['stringValue' => 'trace-scope-value']]
-								]
+							'traceId' => base64_encode(hex2bin('4123456789abcdef0123456789abcdef')),
+							'spanId' => base64_encode(hex2bin('5122334455667788')),
+							'parentSpanId' => base64_encode(hex2bin('6122334455667788')),
+							'traceState' => 'vendor=value',
+							'name' => 'test-span',
+							'kind' => 'SPAN_KIND_SERVER',
+							'startTimeUnixNano' => $startTimeUnixNano,
+							'endTimeUnixNano' => $endTimeUnixNano,
+							'attributes' => [
+								['key' => 'http.method', 'value' => ['stringValue' => 'GET']],
+								['key' => 'http.route', 'value' => ['stringValue' => '/trace']],
+								['key' => 'SampleRate', 'value' => ['stringValue' => '100']]
 							],
-							'schemaUrl' => 'https://example.com/schemas/scope/trace/1.0.0',
-							'spans' => [
+							'events' => [
 								[
-									'traceId' => base64_encode(hex2bin('4123456789abcdef0123456789abcdef')),
-									'spanId' => base64_encode(hex2bin('5122334455667788')),
-									'parentSpanId' => base64_encode(hex2bin('6122334455667788')),
-									'traceState' => 'vendor=value',
-									'name' => 'test-span',
-									'kind' => 'SPAN_KIND_SERVER',
-									'startTimeUnixNano' => $startTimeUnixNano,
-									'endTimeUnixNano' => $endTimeUnixNano,
+									'timeUnixNano' => $endTimeUnixNano,
+									'name' => 'test-span-event',
 									'attributes' => [
-										['key' => 'http.method', 'value' => ['stringValue' => 'GET']],
-										['key' => 'http.route', 'value' => ['stringValue' => '/trace']],
-										['key' => 'SampleRate', 'value' => ['stringValue' => '100']]
-									],
-									'events' => [
-										[
-											'timeUnixNano' => $endTimeUnixNano,
-											'name' => 'test-span-event',
-											'attributes' => [
-												['key' => 'event.attr', 'value' => ['stringValue' => 'event-value']]
-											]
-										]
-									],
-									'links' => [
-										[
-											'traceId' => base64_encode(hex2bin('5123456789abcdef0123456789abcdef')),
-											'spanId' => base64_encode(hex2bin('7122334455667788')),
-											'traceState' => 'linked-vendor=value',
-											'attributes' => [
-												['key' => 'link.attr', 'value' => ['stringValue' => 'link-value']]
-											]
-										]
-									],
-									'status' => [
-										'code' => 'STATUS_CODE_OK',
-										'message' => 'trace status message'
+										['key' => 'event.attr', 'value' => ['stringValue' => 'event-value']]
 									]
 								]
+							],
+							'links' => [
+								[
+									'traceId' => base64_encode(hex2bin('5123456789abcdef0123456789abcdef')),
+									'spanId' => base64_encode(hex2bin('7122334455667788')),
+									'traceState' => 'linked-vendor=value',
+									'attributes' => [
+										['key' => 'link.attr', 'value' => ['stringValue' => 'link-value']]
+									]
+								]
+							],
+							'status' => [
+								'code' => 'STATUS_CODE_OK',
+								'message' => 'trace status message'
 							]
 						]
 					]
@@ -180,50 +176,46 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 	private static function tmplLog(string $timeUnixNano, ?Closure $mutate = null): array {
 		$payload = [
-			'resourceLogs' => [
+			'resource' => [
+				'attributes' => [
+					['key' => 'service.name', 'value' => ['stringValue' => 'log-test-service']],
+					['key' => 'host.name', 'value' => ['stringValue' => 'log-test-host']],
+					['key' => 'k8s.cluster.name', 'value' => ['stringValue' => 'test-cluster']],
+					['key' => 'k8s.container.name', 'value' => ['stringValue' => 'test-container']],
+					['key' => 'k8s.deployment.name', 'value' => ['stringValue' => 'test-deployment']],
+					['key' => 'k8s.namespace.name', 'value' => ['stringValue' => 'test-namespace']],
+					['key' => 'k8s.node.name', 'value' => ['stringValue' => 'test-node']],
+					['key' => 'k8s.pod.name', 'value' => ['stringValue' => 'test-pod']],
+					['key' => 'k8s.pod.uid', 'value' => ['stringValue' => 'test-pod-uid']],
+					['key' => 'deployment.environment.name', 'value' => ['stringValue' => 'test']]
+				]
+			],
+			'schemaUrl' => 'https://example.com/schemas/resource/log/1.0.0',
+			'scopeLogs' => [
 				[
-					'resource' => [
+					'scope' => [
+						'name' => 'log-test-scope',
+						'version' => '1.0.0',
 						'attributes' => [
-							['key' => 'service.name', 'value' => ['stringValue' => 'log-test-service']],
-							['key' => 'host.name', 'value' => ['stringValue' => 'log-test-host']],
-							['key' => 'k8s.cluster.name', 'value' => ['stringValue' => 'test-cluster']],
-							['key' => 'k8s.container.name', 'value' => ['stringValue' => 'test-container']],
-							['key' => 'k8s.deployment.name', 'value' => ['stringValue' => 'test-deployment']],
-							['key' => 'k8s.namespace.name', 'value' => ['stringValue' => 'test-namespace']],
-							['key' => 'k8s.node.name', 'value' => ['stringValue' => 'test-node']],
-							['key' => 'k8s.pod.name', 'value' => ['stringValue' => 'test-pod']],
-							['key' => 'k8s.pod.uid', 'value' => ['stringValue' => 'test-pod-uid']],
-							['key' => 'deployment.environment.name', 'value' => ['stringValue' => 'test']]
+							['key' => 'scope.attr', 'value' => ['stringValue' => 'log-scope-value']]
 						]
 					],
-					'schemaUrl' => 'https://example.com/schemas/resource/log/1.0.0',
-					'scopeLogs' => [
+					'schemaUrl' => 'https://example.com/schemas/scope/log/1.0.0',
+					'logRecords' => [
 						[
-							'scope' => [
-								'name' => 'log-test-scope',
-								'version' => '1.0.0',
-								'attributes' => [
-									['key' => 'scope.attr', 'value' => ['stringValue' => 'log-scope-value']]
-								]
+							'timeUnixNano' => $timeUnixNano,
+							'observedTimeUnixNano' => $timeUnixNano,
+							'traceId' => base64_encode(hex2bin('6123456789abcdef0123456789abcdef')),
+							'spanId' => base64_encode(hex2bin('8122334455667788')),
+							'flags' => 1,
+							'severityText' => 'INFO',
+							'severityNumber' => 'SEVERITY_NUMBER_INFO',
+							'body' => ['stringValue' => 'test log body'],
+							'attributes' => [
+								['key' => 'log.attr', 'value' => ['stringValue' => 'log-attribute-value']],
+								['key' => 'logger.name', 'value' => ['stringValue' => 'test-logger']]
 							],
-							'schemaUrl' => 'https://example.com/schemas/scope/log/1.0.0',
-							'logRecords' => [
-								[
-									'timeUnixNano' => $timeUnixNano,
-									'observedTimeUnixNano' => $timeUnixNano,
-									'traceId' => base64_encode(hex2bin('6123456789abcdef0123456789abcdef')),
-									'spanId' => base64_encode(hex2bin('8122334455667788')),
-									'flags' => 1,
-									'severityText' => 'INFO',
-									'severityNumber' => 'SEVERITY_NUMBER_INFO',
-									'body' => ['stringValue' => 'test log body'],
-									'attributes' => [
-										['key' => 'log.attr', 'value' => ['stringValue' => 'log-attribute-value']],
-										['key' => 'logger.name', 'value' => ['stringValue' => 'test-logger']]
-									],
-									'eventName' => 'test-log-event'
-								]
-							]
+							'eventName' => 'test-log-event'
 						]
 					]
 				]
@@ -239,56 +231,52 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 	private static function tmplMetricSum(string $startTimeUnixNano, string $timeUnixNano, ?Closure $mutate = null): array {
 		$payload = [
-			'resourceMetrics' => [
+			'resource' => [
+				'attributes' => [
+					['key' => 'service.name', 'value' => ['stringValue' => 'sum-test-service']],
+					['key' => 'host.name', 'value' => ['stringValue' => 'sum-test-host']],
+					['key' => 'deployment.environment', 'value' => ['stringValue' => 'test']]
+				]
+			],
+			'schemaUrl' => 'https://example.com/schemas/resource/sum/1.0.0',
+			'scopeMetrics' => [
 				[
-					'resource' => [
+					'scope' => [
+						'name' => 'sum-test-scope',
+						'version' => '1.0.0',
 						'attributes' => [
-							['key' => 'service.name', 'value' => ['stringValue' => 'sum-test-service']],
-							['key' => 'host.name', 'value' => ['stringValue' => 'sum-test-host']],
-							['key' => 'deployment.environment', 'value' => ['stringValue' => 'test']]
-						]
+							['key' => 'scope.attr', 'value' => ['stringValue' => 'sum-scope-value']]
+						],
+						'droppedAttributesCount' => 11
 					],
-					'schemaUrl' => 'https://example.com/schemas/resource/sum/1.0.0',
-					'scopeMetrics' => [
+					'schemaUrl' => 'https://example.com/schemas/scope/sum/1.0.0',
+					'metrics' => [
 						[
-							'scope' => [
-								'name' => 'sum-test-scope',
-								'version' => '1.0.0',
-								'attributes' => [
-									['key' => 'scope.attr', 'value' => ['stringValue' => 'sum-scope-value']]
-								],
-								'droppedAttributesCount' => 11
-							],
-							'schemaUrl' => 'https://example.com/schemas/scope/sum/1.0.0',
-							'metrics' => [
-								[
-									'name' => 'test_sum',
-									'description' => 'Test sum description',
-									'unit' => 'requests',
-									'sum' => [
-										'aggregationTemporality' => 'AGGREGATION_TEMPORALITY_CUMULATIVE',
-										'isMonotonic' => true,
-										'dataPoints' => [
+							'name' => 'test_sum',
+							'description' => 'Test sum description',
+							'unit' => 'requests',
+							'sum' => [
+								'aggregationTemporality' => 'AGGREGATION_TEMPORALITY_CUMULATIVE',
+								'isMonotonic' => true,
+								'dataPoints' => [
+									[
+										'attributes' => [
+											['key' => 'endpoint', 'value' => ['stringValue' => '/sum']],
+											['key' => 'method', 'value' => ['stringValue' => 'grpcurl']]
+										],
+										'startTimeUnixNano' => $startTimeUnixNano,
+										'timeUnixNano' => $timeUnixNano,
+										'asDouble' => 42.5,
+										'flags' => 1,
+										'exemplars' => [
 											[
-												'attributes' => [
-													['key' => 'endpoint', 'value' => ['stringValue' => '/sum']],
-													['key' => 'method', 'value' => ['stringValue' => 'grpcurl']]
+												'filteredAttributes' => [
+													['key' => 'exemplar.attr', 'value' => ['stringValue' => 'sum-exemplar-value']]
 												],
-												'startTimeUnixNano' => $startTimeUnixNano,
 												'timeUnixNano' => $timeUnixNano,
 												'asDouble' => 42.5,
-												'flags' => 1,
-												'exemplars' => [
-													[
-														'filteredAttributes' => [
-															['key' => 'exemplar.attr', 'value' => ['stringValue' => 'sum-exemplar-value']]
-														],
-														'timeUnixNano' => $timeUnixNano,
-														'asDouble' => 42.5,
-														'spanId' => base64_encode(hex2bin('2122334455667788')),
-														'traceId' => base64_encode(hex2bin('1123456789abcdef0123456789abcdef'))
-													]
-												]
+												'spanId' => base64_encode(hex2bin('2122334455667788')),
+												'traceId' => base64_encode(hex2bin('1123456789abcdef0123456789abcdef'))
 											]
 										]
 									]
@@ -309,54 +297,50 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 	private static function tmplMetricGauge(string $startTimeUnixNano, string $timeUnixNano, ?Closure $mutate = null): array {
 		$payload = [
-			'resourceMetrics' => [
+			'resource' => [
+				'attributes' => [
+					['key' => 'service.name', 'value' => ['stringValue' => 'gauge-test-service']],
+					['key' => 'host.name', 'value' => ['stringValue' => 'test-host']],
+					['key' => 'deployment.environment', 'value' => ['stringValue' => 'test']]
+				]
+			],
+			'schemaUrl' => 'https://example.com/schemas/1.0.0',
+			'scopeMetrics' => [
 				[
-					'resource' => [
+					'scope' => [
+						'name' => 'test-scope',
+						'version' => '1.0.0',
 						'attributes' => [
-							['key' => 'service.name', 'value' => ['stringValue' => 'gauge-test-service']],
-							['key' => 'host.name', 'value' => ['stringValue' => 'test-host']],
-							['key' => 'deployment.environment', 'value' => ['stringValue' => 'test']]
-						]
+							['key' => 'scope.attr', 'value' => ['stringValue' => 'scope-value']]
+						],
+						'droppedAttributesCount' => 7
 					],
-					'schemaUrl' => 'https://example.com/schemas/1.0.0',
-					'scopeMetrics' => [
+					'schemaUrl' => 'https://example.com/schemas/scope/1.0.0',
+					'metrics' => [
 						[
-							'scope' => [
-								'name' => 'test-scope',
-								'version' => '1.0.0',
-								'attributes' => [
-									['key' => 'scope.attr', 'value' => ['stringValue' => 'scope-value']]
-								],
-								'droppedAttributesCount' => 7
-							],
-							'schemaUrl' => 'https://example.com/schemas/scope/1.0.0',
-							'metrics' => [
-								[
-									'name' => 'test_gauge',
-									'description' => 'Test description',
-									'unit' => 'ms',
-									'gauge' => [
-										'dataPoints' => [
+							'name' => 'test_gauge',
+							'description' => 'Test description',
+							'unit' => 'ms',
+							'gauge' => [
+								'dataPoints' => [
+									[
+										'attributes' => [
+											['key' => 'endpoint', 'value' => ['stringValue' => '/test']],
+											['key' => 'method', 'value' => ['stringValue' => 'grpcurl']]
+										],
+										'startTimeUnixNano' => $startTimeUnixNano,
+										'timeUnixNano' => $timeUnixNano,
+										'asDouble' => 123.456,
+										'flags' => 1,
+										'exemplars' => [
 											[
-												'attributes' => [
-													['key' => 'endpoint', 'value' => ['stringValue' => '/test']],
-													['key' => 'method', 'value' => ['stringValue' => 'grpcurl']]
+												'filteredAttributes' => [
+													['key' => 'exemplar.attr', 'value' => ['stringValue' => 'exemplar-value']]
 												],
-												'startTimeUnixNano' => $startTimeUnixNano,
 												'timeUnixNano' => $timeUnixNano,
 												'asDouble' => 123.456,
-												'flags' => 1,
-												'exemplars' => [
-													[
-														'filteredAttributes' => [
-															['key' => 'exemplar.attr', 'value' => ['stringValue' => 'exemplar-value']]
-														],
-														'timeUnixNano' => $timeUnixNano,
-														'asDouble' => 123.456,
-														'spanId' => base64_encode(hex2bin('1122334455667788')),
-														'traceId' => base64_encode(hex2bin('0123456789abcdef0123456789abcdef'))
-													]
-												]
+												'spanId' => base64_encode(hex2bin('1122334455667788')),
+												'traceId' => base64_encode(hex2bin('0123456789abcdef0123456789abcdef'))
 											]
 										]
 									]
@@ -377,60 +361,56 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 	private static function tmplMetricHistogram(string $startTimeUnixNano, string $timeUnixNano, ?Closure $mutate = null): array {
 		$payload = [
-			'resourceMetrics' => [
+			'resource' => [
+				'attributes' => [
+					['key' => 'service.name', 'value' => ['stringValue' => 'histogram-test-service']],
+					['key' => 'host.name', 'value' => ['stringValue' => 'histogram-test-host']],
+					['key' => 'deployment.environment', 'value' => ['stringValue' => 'test']]
+				]
+			],
+			'schemaUrl' => 'https://example.com/schemas/resource/histogram/1.0.0',
+			'scopeMetrics' => [
 				[
-					'resource' => [
+					'scope' => [
+						'name' => 'histogram-test-scope',
+						'version' => '1.0.0',
 						'attributes' => [
-							['key' => 'service.name', 'value' => ['stringValue' => 'histogram-test-service']],
-							['key' => 'host.name', 'value' => ['stringValue' => 'histogram-test-host']],
-							['key' => 'deployment.environment', 'value' => ['stringValue' => 'test']]
-						]
+							['key' => 'scope.attr', 'value' => ['stringValue' => 'histogram-scope-value']]
+						],
+						'droppedAttributesCount' => 13
 					],
-					'schemaUrl' => 'https://example.com/schemas/resource/histogram/1.0.0',
-					'scopeMetrics' => [
+					'schemaUrl' => 'https://example.com/schemas/scope/histogram/1.0.0',
+					'metrics' => [
 						[
-							'scope' => [
-								'name' => 'histogram-test-scope',
-								'version' => '1.0.0',
-								'attributes' => [
-									['key' => 'scope.attr', 'value' => ['stringValue' => 'histogram-scope-value']]
-								],
-								'droppedAttributesCount' => 13
-							],
-							'schemaUrl' => 'https://example.com/schemas/scope/histogram/1.0.0',
-							'metrics' => [
-								[
-									'name' => 'test_histogram',
-									'description' => 'Test histogram description',
-									'unit' => 'ms',
-									'histogram' => [
-										'aggregationTemporality' => 'AGGREGATION_TEMPORALITY_DELTA',
-										'dataPoints' => [
+							'name' => 'test_histogram',
+							'description' => 'Test histogram description',
+							'unit' => 'ms',
+							'histogram' => [
+								'aggregationTemporality' => 'AGGREGATION_TEMPORALITY_DELTA',
+								'dataPoints' => [
+									[
+										'attributes' => [
+											['key' => 'endpoint', 'value' => ['stringValue' => '/histogram']],
+											['key' => 'method', 'value' => ['stringValue' => 'grpcurl']]
+										],
+										'startTimeUnixNano' => $startTimeUnixNano,
+										'timeUnixNano' => $timeUnixNano,
+										'count' => '6',
+										'sum' => 63.0,
+										'bucketCounts' => ['1', '2', '3'],
+										'explicitBounds' => [10.0, 50.0],
+										'flags' => 1,
+										'min' => 5.0,
+										'max' => 40.0,
+										'exemplars' => [
 											[
-												'attributes' => [
-													['key' => 'endpoint', 'value' => ['stringValue' => '/histogram']],
-													['key' => 'method', 'value' => ['stringValue' => 'grpcurl']]
+												'filteredAttributes' => [
+													['key' => 'exemplar.attr', 'value' => ['stringValue' => 'histogram-exemplar-value']]
 												],
-												'startTimeUnixNano' => $startTimeUnixNano,
 												'timeUnixNano' => $timeUnixNano,
-												'count' => '6',
-												'sum' => 63.0,
-												'bucketCounts' => ['1', '2', '3'],
-												'explicitBounds' => [10.0, 50.0],
-												'flags' => 1,
-												'min' => 5.0,
-												'max' => 40.0,
-												'exemplars' => [
-													[
-														'filteredAttributes' => [
-															['key' => 'exemplar.attr', 'value' => ['stringValue' => 'histogram-exemplar-value']]
-														],
-														'timeUnixNano' => $timeUnixNano,
-														'asDouble' => 25.0,
-														'spanId' => base64_encode(hex2bin('3122334455667788')),
-														'traceId' => base64_encode(hex2bin('2123456789abcdef0123456789abcdef'))
-													]
-												]
+												'asDouble' => 25.0,
+												'spanId' => base64_encode(hex2bin('3122334455667788')),
+												'traceId' => base64_encode(hex2bin('2123456789abcdef0123456789abcdef'))
 											]
 										]
 									]
@@ -452,62 +432,58 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	private static function tmplMetricExponentialHistogram(string $startTimeUnixNano, string $timeUnixNano,
 			?Closure $mutate = null): array {
 		$payload = [
-			'resourceMetrics' => [
+			'resource' => [
+				'attributes' => [
+					['key' => 'service.name', 'value' => ['stringValue' => 'exponential-histogram-test-service']],
+					['key' => 'host.name', 'value' => ['stringValue' => 'exponential-histogram-test-host']],
+					['key' => 'deployment.environment', 'value' => ['stringValue' => 'test']]
+				]
+			],
+			'schemaUrl' => 'https://example.com/schemas/resource/exponential-histogram/1.0.0',
+			'scopeMetrics' => [
 				[
-					'resource' => [
+					'scope' => [
+						'name' => 'exponential-histogram-test-scope',
+						'version' => '1.0.0',
 						'attributes' => [
-							['key' => 'service.name', 'value' => ['stringValue' => 'exponential-histogram-test-service']],
-							['key' => 'host.name', 'value' => ['stringValue' => 'exponential-histogram-test-host']],
-							['key' => 'deployment.environment', 'value' => ['stringValue' => 'test']]
-						]
+							['key' => 'scope.attr', 'value' => ['stringValue' => 'exponential-histogram-scope-value']]
+						],
+						'droppedAttributesCount' => 17
 					],
-					'schemaUrl' => 'https://example.com/schemas/resource/exponential-histogram/1.0.0',
-					'scopeMetrics' => [
+					'schemaUrl' => 'https://example.com/schemas/scope/exponential-histogram/1.0.0',
+					'metrics' => [
 						[
-							'scope' => [
-								'name' => 'exponential-histogram-test-scope',
-								'version' => '1.0.0',
-								'attributes' => [
-									['key' => 'scope.attr', 'value' => ['stringValue' => 'exponential-histogram-scope-value']]
-								],
-								'droppedAttributesCount' => 17
-							],
-							'schemaUrl' => 'https://example.com/schemas/scope/exponential-histogram/1.0.0',
-							'metrics' => [
-								[
-									'name' => 'test_exponential_histogram',
-									'description' => 'Test exponential histogram description',
-									'unit' => 'ms',
-									'exponentialHistogram' => [
-										'aggregationTemporality' => 'AGGREGATION_TEMPORALITY_DELTA',
-										'dataPoints' => [
+							'name' => 'test_exponential_histogram',
+							'description' => 'Test exponential histogram description',
+							'unit' => 'ms',
+							'exponentialHistogram' => [
+								'aggregationTemporality' => 'AGGREGATION_TEMPORALITY_DELTA',
+								'dataPoints' => [
+									[
+										'attributes' => [
+											['key' => 'endpoint', 'value' => ['stringValue' => '/exponential-histogram']],
+											['key' => 'method', 'value' => ['stringValue' => 'grpcurl']]
+										],
+										'startTimeUnixNano' => $startTimeUnixNano,
+										'timeUnixNano' => $timeUnixNano,
+										'count' => '7',
+										'sum' => 77.0,
+										'scale' => 2,
+										'zeroCount' => '1',
+										'positive' => ['offset' => 1, 'bucketCounts' => ['2', '3']],
+										'negative' => ['offset' => -2, 'bucketCounts' => ['1']],
+										'flags' => 1,
+										'min' => -8.0,
+										'max' => 32.0,
+										'exemplars' => [
 											[
-												'attributes' => [
-													['key' => 'endpoint', 'value' => ['stringValue' => '/exponential-histogram']],
-													['key' => 'method', 'value' => ['stringValue' => 'grpcurl']]
+												'filteredAttributes' => [
+													['key' => 'exemplar.attr', 'value' => ['stringValue' => 'exponential-histogram-exemplar-value']]
 												],
-												'startTimeUnixNano' => $startTimeUnixNano,
 												'timeUnixNano' => $timeUnixNano,
-												'count' => '7',
-												'sum' => 77.0,
-												'scale' => 2,
-												'zeroCount' => '1',
-												'positive' => ['offset' => 1, 'bucketCounts' => ['2', '3']],
-												'negative' => ['offset' => -2, 'bucketCounts' => ['1']],
-												'flags' => 1,
-												'min' => -8.0,
-												'max' => 32.0,
-												'exemplars' => [
-													[
-														'filteredAttributes' => [
-															['key' => 'exemplar.attr', 'value' => ['stringValue' => 'exponential-histogram-exemplar-value']]
-														],
-														'timeUnixNano' => $timeUnixNano,
-														'asDouble' => 16.0,
-														'spanId' => base64_encode(hex2bin('4122334455667788')),
-														'traceId' => base64_encode(hex2bin('3123456789abcdef0123456789abcdef'))
-													]
-												]
+												'asDouble' => 16.0,
+												'spanId' => base64_encode(hex2bin('4122334455667788')),
+												'traceId' => base64_encode(hex2bin('3123456789abcdef0123456789abcdef'))
 											]
 										]
 									]
@@ -531,7 +507,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			self::tsOffStr($now, $offset_s),
 			self::tsOffStr($now, $offset_s),
 			function (array &$payload) use ($name) {
-				$payload['resourceSpans'][0]['scopeSpans'][0]['scope']['name'] = $name;
+				$payload['scopeSpans'][0]['spans'][0]['name'] = $name;
 			}
 		);
 	}
@@ -582,7 +558,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::tsOffStr($now, -10),
 						self::tsOffStr($now, -5),
 						function (array &$payload) use ($i, $v) {
-							$payload['resourceMetrics'][0]['scopeMetrics'][0]['metrics'][0]['gauge']['dataPoints'][0]['asDouble'] = $v;
+							$payload['scopeMetrics'][0]['metrics'][0]['gauge']['dataPoints'][0]['asDouble'] = $v;
 						});
 				}
 
@@ -1313,6 +1289,95 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::tmplNamedTraceSpan($now, -300.2, 'e')
 					]
 				]
+			],
+			[
+				'description' => 'Grouping test #1',
+				'item' => self::tqItem(
+					APM_SIGNAL_TYPE_TRACES,
+					APM_METRICS_POINT_SUM,
+					[
+						self::qcol('SpanName')
+					],
+					[
+						self::qagg('', AGGREGATE_COUNT, 'cnt')
+					],
+					self::emptyFilter(),
+					'0',
+					'1h',
+					'100'
+				),
+				'buckets_tmpl' => fn(int $now) => [
+					[
+						'id' => 1,
+						'columns' => [
+							'SpanName' => '',
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 2,
+						'columns' => [
+							'SpanName' => '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ',
+							'cnt' => 2
+						]
+					],
+					[
+						'id' => 3,
+						'columns' => [
+							'SpanName' => 'ZABBIX',
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 4,
+						'columns' => [
+							'SpanName' => 'Zabbix',
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 5,
+						'columns' => [
+							'SpanName' => '  a  ',
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 6,
+						'columns' => [
+							'SpanName' => ' a ',
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 7,
+						'columns' => [
+							'SpanName' => 'ZABBIX',
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 8,
+						'columns' => [
+							'SpanName' => 'Zabbix',
+							'cnt' => 2
+						]
+					],
+				],
+				'input_tmpl' => fn(int $now) => [
+					'traces' => [
+						self::tmplNamedTraceSpan($now, -100, ' a '),
+						self::tmplNamedTraceSpan($now, -101, '  a  '),
+						self::tmplNamedTraceSpan($now, -102, 'Zabbix'),
+						self::tmplNamedTraceSpan($now, -103, 'Zabbix'),
+						self::tmplNamedTraceSpan($now, -104, 'ZABBIX'),
+						self::tmplNamedTraceSpan($now, -200, '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
+						self::tmplNamedTraceSpan($now, -201, '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  '),
+						self::tmplNamedTraceSpan($now, -202, ''),
+						self::tmplNamedTraceSpan($now, -203, 'Zabbix'),
+						self::tmplNamedTraceSpan($now, -204, 'ZABBIX')
+					]
+				]
 			]
 		];
 	}
@@ -1411,8 +1476,10 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	}
 
 	private function sendInput(array $input): void {
-		foreach (($input['metrics'] ?? []) as $metric) {
-			$json = json_encode($metric);
+		if (isset($input['metrics'])) {
+			$payload = [];
+			$payload['resourceMetrics'] = $input['metrics'];
+			$json = json_encode($payload);
 
 			$this->sendOTLP(
 				self::PROTO_DIR,
@@ -1423,8 +1490,10 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			);
 		}
 
-		foreach (($input['traces'] ?? []) as $trace) {
-			$json = json_encode($trace);
+		if (isset($input['traces'])) {
+			$payload = [];
+			$payload['resourceSpans'] = $input['traces'];
+			$json = json_encode($payload);
 
 			$this->sendOTLP(
 				self::PROTO_DIR,
@@ -1435,8 +1504,10 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			);
 		}
 
-		foreach (($input['logs'] ?? []) as $log) {
-			$json = json_encode($log);
+		if (isset($input['logs'])) {
+			$payload = [];
+			$payload['resourceLogs'] = $input['logs'];
+			$json = json_encode($payload);
 
 			$this->sendOTLP(
 				self::PROTO_DIR,
