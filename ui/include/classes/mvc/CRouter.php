@@ -53,6 +53,8 @@ class CRouter {
 		'action.update'								=> [CControllerActionUpdate::class,									'layout.json',			null],
 		'actionlog.csv'								=> [CControllerActionLogList::class,								'layout.csv',			'reports.actionlog.list.csv'],
 		'actionlog.list'							=> [CControllerActionLogList::class,								'layout.htmlpage',		'reports.actionlog.list'],
+		'apm.db.edit'								=> [CControllerApmDbEdit::class,									'layout.htmlpage',		'administration.apm.db.edit'],
+		'apm.db.update'								=> [CControllerApmDbUpdate::class,									'layout.json',			null],
 		'audit.settings.edit'						=> [CControllerAuditSettingsEdit::class,							'layout.htmlpage',		'administration.audit.settings.edit'],
 		'audit.settings.update'						=> [CControllerAuditSettingsUpdate::class, 							'layout.json',			null],
 		'auditlog.csv'								=> [CControllerAuditLogList::class,									'layout.csv',			'reports.auditlog.list.csv'],
