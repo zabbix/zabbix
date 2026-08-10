@@ -216,7 +216,7 @@ class testRole extends CAPITest {
 								'status' => '1'
 							],
 							[
-								'name' => 'configuration.event_correlation',
+								'name' => 'configuration.ceprules',
 								'status' => '1'
 							],
 							[
@@ -934,7 +934,7 @@ class testRole extends CAPITest {
 									'status' => '1'
 								],
 								[
-									'name' => 'configuration.event_correlation',
+									'name' => 'configuration.ceprules',
 									'status' => '1'
 								],
 								[
