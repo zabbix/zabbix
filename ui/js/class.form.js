@@ -346,7 +346,7 @@ class CForm {
 			if (key in this.#fields) {
 				const field = this.#fields[key];
 
-				if (field instanceof CFieldSet) {
+				if (field instanceof CFieldCollection) {
 					field.setErrors(errors, force_display_errors);
 				}
 				else if (force_display_errors || field.hasChanged() || errors.some((error) => error.message === '')) {
@@ -391,6 +391,47 @@ class CForm {
 	convertRawErrors(raw_errors) {
 		const field_errors = Object.create(null);
 
+		const convertSubfieldErrors = (field, subfield_name, errors, field_errors) => {
+			if (field instanceof CFieldSet) {
+				let subset_errors_set = false;
+
+				for (const [set_field_name, set_field] of Object.entries(field.getFields())) {
+					if (subfield_name.startsWith(set_field_name)) {
+						if (set_field instanceof CFieldCollection) {
+							if (!(set_field_name in field_errors)) {
+								field_errors[set_field_name] = Object.create(null);
+							}
+
+							if (set_field_name === subfield_name) {
+								field_errors[set_field_name][''] = errors;
+							}
+							else {
+								field_errors[set_field_name] = convertSubfieldErrors(
+									set_field,
+									subfield_name.substring(set_field_name.length),
+									errors,
+									field_errors[set_field_name]
+								);
+							}
+
+							subset_errors_set = true;
+						}
+
+						break;
+					}
+				}
+
+				if (!subset_errors_set) {
+					field_errors[subfield_name] = errors;
+				}
+			}
+			else {
+				field_errors[subfield_name] = errors;
+			}
+
+			return field_errors;
+		};
+
 		Object.values(this.#fields).forEach((field) => {
 			const field_name = field.getName();
 			const field_path = field.getPath();
@@ -398,7 +439,7 @@ class CForm {
 
 			if (field instanceof CFieldMultiselect) {
 				const affixed_path = '/' + field_name + '_new';
-				const affixed_subfield = new RegExp('^/' + field_name + '_new/');
+				const affixed_subfield = new RegExp(`^/(${field_name}|${field_name}_new)/`);
 
 				for (const error_path in raw_errors) {
 					const affixed = error_path === affixed_path || affixed_subfield.test(error_path);
@@ -410,7 +451,11 @@ class CForm {
 					if (raw_errors[error_path].length) {
 						raw_errors[field_path] = [...raw_errors[field_path], ...raw_errors[error_path]]
 							.filter(({message}) => message.length);
-						raw_errors[error_path] = [];
+						delete raw_errors[error_path];
+
+						if (raw_errors[field_path].length == 0) {
+							raw_errors[field_path] = [{message: '', level: -1}];
+						}
 					}
 				}
 			}
@@ -431,14 +476,14 @@ class CForm {
 				if (subfield_name === '') {
 					if (!Array.isArray(field_errors[field_name])) {
 						if (Object.values(field_errors[field_name]).length == 0) {
-							field_errors[field_name] = field instanceof CFieldSet ? {'': []} : [];
+							field_errors[field_name] = field instanceof CFieldCollection ? {'': []} : [];
 						}
 						else {
 							field_errors[field_name] = {'': Object.values(field_errors[field_name])};
 						}
 					}
 
-					if (field instanceof CFieldSet) {
+					if (field instanceof CFieldCollection) {
 						errors.forEach((error) => field_errors[field_name][''].push(error));
 					}
 					else {
@@ -456,7 +501,9 @@ class CForm {
 						field_errors[field_name] = set_errors;
 					}
 
-					field_errors[field_name][subfield_name] = errors;
+					field_errors[field_name] = convertSubfieldErrors(field, subfield_name, errors,
+						field_errors[field_name]
+					);
 				}
 			});
 		});

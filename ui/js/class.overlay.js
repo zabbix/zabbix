@@ -64,7 +64,8 @@ function Overlay({
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
 	this.$dialogue.$head = jQuery('<div>', {class: 'overlay-dialogue-header'});
 	this.$dialogue.$head.$header = jQuery('<h4>', {id: this.headerid});
-	this.$dialogue.$head.$close_button = jQuery('<button>', {class: 'btn-overlay-close', title: t('S_CLOSE')});
+	this.$dialogue.$head.$close_button = jQuery('<button>', {class: 'btn-overlay-close',
+		'aria-label': t('Close modal window')});
 	this.$dialogue.$body = jQuery('<div>', {class: 'overlay-dialogue-body'});
 	this.$dialogue.$debug = jQuery('<pre>', {class: 'debug-output'});
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
@@ -725,7 +726,7 @@ Overlay.prototype.setProperties = function(properties) {
 			case 'doc_url':
 				this.unsetProperty(name);
 				this.$dialogue.$head.$header[0].insertAdjacentHTML('afterend', `
-					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${value}"></a>
+					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" aria-label="${t('Open Zabbix documentation in a new tab')}" href="${value}"></a>
 				`);
 				break;
 

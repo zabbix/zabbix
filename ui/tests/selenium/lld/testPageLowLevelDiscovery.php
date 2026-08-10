@@ -610,10 +610,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'&filter_type=-1&filter_delay=&filter_lifetime=&filter_snmp_oid='.
 				'&filter_state=-1&filter_status=-1&filter_set=1&context='.$context);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$table = $this->query(self::SELECTOR)->asTable()->one();
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
-		$table = $this->query(self::SELECTOR)->asTable()->one();
 
 		if (array_key_exists('expected', $data)) {
 			$this->assertTableDataColumn($data['expected'], 'Name', self::SELECTOR);
@@ -643,6 +644,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->query('id:all_items')->asCheckbox()->one()->check();
 		$this->query('button', $action)->one()->click();
 		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
 		$string = ($table->getRows()->count() == 1) ? 'Discovery rule ' : 'Discovery rules ';
 		$this->assertEquals($string.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
 		CMessageElement::find()->one()->close();

@@ -134,9 +134,9 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['name'],
 		(new CUrl('host_discovery_prototypes.php'))
 			->setArgument('form', 'update')
-			->setArgument('itemid', $discovery['itemid'])
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('context', $data['context'])
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('itemid', $discovery['itemid'])
 	);
 
 	$status_disabled = $discovery['status'] == ITEM_STATUS_DISABLED;
@@ -152,7 +152,6 @@ foreach ($data['discoveries'] as $discovery) {
 				)
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 				->setArgument('context', $data['context'])
-				->setArgument('backurl', $url)
 				->getUrl()
 			))
 				->addCsrfToken($csrf_token)
@@ -169,7 +168,6 @@ foreach ($data['discoveries'] as $discovery) {
 				->setArgument('discover', $no_discover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 				->setArgument('context', $data['context'])
-				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addCsrfToken($csrf_token)
@@ -291,6 +289,8 @@ $discoveryForm->addItem([
 $html_page
 	->addItem($discoveryForm)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	view.init('.json_encode([

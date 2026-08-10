@@ -81,8 +81,8 @@ $form_grid = (new CFormGrid())
 	]);
 
 if (array_key_exists('client_secret', $data)) {
-	$client_secrect = [
-		(new CTextBox('client_secret', $data['client_secret']))
+	$client_secret = [
+		(new CPassBox('client_secret', $data['client_secret']))
 			->disableAutocomplete()
 			->setAttribute('maxlength', DB::getFieldLength('media_type_oauth', 'client_secret'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -90,11 +90,11 @@ if (array_key_exists('client_secret', $data)) {
 	];
 }
 else {
-	$client_secrect = [
+	$client_secret = [
 		(new CSimpleButton(_('Change client secret')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setName('client_secret_button'),
-		(new CTextBox('client_secret', ''))
+		(new CPassBox('client_secret', ''))
 			->disableAutocomplete()
 			->setAttribute('maxlength', DB::getFieldLength('media_type_oauth', 'client_secret'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -116,7 +116,7 @@ $form_grid->addItem([
 	], 'client_secret'))
 		->setAsteriskMark()
 		->setId('oauth-client-secret-label'),
-	(new CFormField($client_secrect))->setId('oauth-client-secret-field')
+	(new CFormField($client_secret))->setId('oauth-client-secret-field')
 ]);
 
 if ($data['advanced_form']) {

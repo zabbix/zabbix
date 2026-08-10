@@ -174,7 +174,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Exploded graph prototype duplicated Graph sum type',
-						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
+						'Graph type' => 'Exploded'
 					],
 					'items' => [
 						[
@@ -216,7 +216,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Exploded graph prototype duplicated Graph sum type mixed',
-						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
+						'Graph type' => 'Exploded'
 					],
 					'items' => [
 						[
@@ -249,7 +249,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						'Name' => 'Normal graph prototype with items in Y axis values {#KEY}',
 						'Width' => 65535,
 						'Height' => 65535,
-						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
+						'Graph type' => 'Normal',
 						'Show legend' => false,
 						'Show working time' => false,
 						'Show triggers' => false,
@@ -257,8 +257,8 @@ class testFormGraphPrototype extends testFormGraphs {
 						'id:visible_percent_right' => true,
 						'id:percent_left' => 5.5,
 						'id:percent_right' => 99.9,
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+						'id:ymin_type' => 'Item',
+						'id:ymax_type' => 'Item'
 					],
 					'yaxis_items' => [
 						'min' => 'testFormItemPrototype1',
@@ -324,12 +324,12 @@ class testFormGraphPrototype extends testFormGraphs {
 						'Name' => 'Stacked graph prototype fixed Y axis values',
 						'Width' => 20,
 						'Height' => 20,
-						'Graph type' => CFormElement::RELOADABLE_FILL('Stacked'),
+						'Graph type' => 'Stacked',
 						'Show legend' => true,
 						'Show working time' => true,
 						'Show triggers' => true,
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismin' => 0.1,
 						'id:yaxismax' => 0.99
 					],
@@ -369,8 +369,8 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Max equals min value'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismin' => 0.1,
 						'id:yaxismax' => 0.1
 					],
@@ -390,8 +390,8 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Max less than min'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismin' => 0.2,
 						'id:yaxismax' => 0.1
 					],
@@ -410,7 +410,7 @@ class testFormGraphPrototype extends testFormGraphs {
 				[
 					'fields' => [
 						'Name' => 'Pie graph prototype 3D false',
-						'Graph type' => CFormElement::RELOADABLE_FILL('Pie'),
+						'Graph type' => 'Pie',
 						'Show legend' => true,
 						'3D view' => false
 					],
@@ -440,7 +440,7 @@ class testFormGraphPrototype extends testFormGraphs {
 				[
 					'fields' => [
 						'Name' => 'Pie graph 3D true',
-						'Graph type' => CFormElement::RELOADABLE_FILL('Pie'),
+						'Graph type' => 'Pie',
 						'Show legend' => false,
 						'3D view' => true
 					],
@@ -470,7 +470,7 @@ class testFormGraphPrototype extends testFormGraphs {
 				[
 					'fields' => [
 						'Name' => 'Exploded graph 3D true, mixed items',
-						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded'),
+						'Graph type' => 'Exploded',
 						'Show legend' => false,
 						'3D view' => true
 					],
@@ -516,7 +516,7 @@ class testFormGraphPrototype extends testFormGraphs {
 				[
 					'fields' => [
 						'Name' => 'Exploded graph 3D false, mixed items',
-						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded'),
+						'Graph type' => 'Exploded',
 						'Show legend' => true,
 						'3D view' => false
 					],
@@ -677,8 +677,8 @@ class testFormGraphPrototype extends testFormGraphs {
 				[
 					'fields' => [
 						'Name' => 'Graph prototype of text items',
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+						'id:ymin_type' => 'Item',
+						'id:ymax_type' => 'Item'
 					],
 					'yaxis_items' => [
 						'min' => 'graph_prototype_trap_text',
@@ -699,8 +699,8 @@ class testFormGraphPrototype extends testFormGraphs {
 		$data = [
 			'fields' => [
 				'Name' => 'Graph prototype of text items',
-				'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
-				'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+				'id:ymin_type' => 'Item',
+				'id:ymax_type' => 'Item'
 			],
 			'yaxis_items' => [
 				'min' => 'graph_prototype_trap_text',

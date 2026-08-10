@@ -9,11 +9,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 PARAM_LIBS = \
-	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
-	$(EXPR_DEPS) \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(ANY_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
