@@ -86,9 +86,8 @@ class testHashicorpVault extends CIntegrationTest {
 	private static $vault_macro_itemid;
 
 	/**
-	 * Check that the pre-existing Vault instance (see class docblock) is reachable. Does not start,
-	 * stop or otherwise manage the instance.
-	 *
+	 * Check precondition: pre-existing Vault instance (see class docblock) is reachable.
+	 * Does not start, stop or otherwise manage the instance.
 	 * Unlike the Zabbix components (see WAIT_ITERATIONS_STARTUP/WAIT_ITERATION_DELAY), this suite
 	 * never starts Vault itself, so a Vault that isn't reachable right away never will be within
 	 * this run - retrying for the usual startup-wait duration would just waste time. A single probe
@@ -97,7 +96,7 @@ class testHashicorpVault extends CIntegrationTest {
 	 *
 	 * @throws PHPUnit_Framework_SkippedTestError    if Vault is not reachable
 	 */
-	private static function vaultWaitUntilReady(): void {
+	private static function skipTestIfVaultIsNotAvailable(): void {
 		$context = stream_context_create(['http' => ['timeout' => 2]]);
 
 		if (@file_get_contents(self::VAULT_ADDR.'/v1/sys/health', false, $context) !== false) {
@@ -238,7 +237,7 @@ class testHashicorpVault extends CIntegrationTest {
 	 * naturally repeatable, enabling the AppRole auth method, is explicitly guarded below.
 	 */
 	public function prepareData() {
-		self::vaultWaitUntilReady();
+		self::skipTestIfVaultIsNotAvailable();
 
 		global $DB;
 
