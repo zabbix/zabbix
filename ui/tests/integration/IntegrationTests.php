@@ -49,6 +49,7 @@ require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
 require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
+require_once dirname(__FILE__).'/testConnectorExport.php';
 require_once dirname(__FILE__).'/testScriptManualInput.php';
 require_once dirname(__FILE__).'/testAgentJsonProtocol.php';
 require_once dirname(__FILE__).'/testSnmpTrapsInHa.php';
@@ -111,6 +112,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHistoryPush');
 		$suite->addTestSuite('testItemTimeouts');
 		$suite->addTestSuite('testUserMacrosInItemNames');
+		$suite->addTestSuite('testConnectorExport');
 		$suite->addTestSuite('testScriptManualInput');
 		$suite->addTestSuite('testAgentJsonProtocol');
 		$suite->addTestSuite('testSnmpTrapsInHa');
