@@ -134,12 +134,12 @@ class CMaintenanceHelper {
 
 	public static function getNextIndexedName(string $base_name): string {
 		$maintenances = API::Maintenance()->get([
+			'output' => ['name'],
 			'search' => [
 				'name' => $base_name
 			],
 			'searchByAny' => false,
-			'startSearch' => true,
-			'output' => ['name']
+			'startSearch' => true
 		]);
 
 		$max_index = 0;
