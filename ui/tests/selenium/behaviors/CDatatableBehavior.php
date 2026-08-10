@@ -198,16 +198,8 @@ class CDatatableBehavior extends CBehavior {
 				$table->waitUntilReady()->invalidate();
 			}
 
-			/**
-			 * Press Escape key to save and close entered data in the popup.
-			 * Press Enter key in cases when text is entered in 'Tag display priority' field.
-			 */
-			if (isset($header_settings['Tags']['Tag display priority'])) {
-				CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
-			}
-			else {
-				CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
-			}
+			// Press Enter key to close the popup.
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
 
 			$this->test->query('class:datatable-options-popup')->waitUntilNotVisible();
 		}
