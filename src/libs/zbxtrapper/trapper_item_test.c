@@ -144,121 +144,63 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 		*num = atoi(zbx_db_get_field(table, fieldname)->default_value);
 }
 
-static int	item_type_poller_conf_check(unsigned char type, zbx_get_config_forks_f get_config_forks, char **info)
+static int	process_zero_pollers_items(zbx_dc_item_t *item, zbx_get_config_forks_f get_config_forks, char **info)
 {
-#	define	INFO(item, poller)	zbx_strdup(NULL, "Cannot perform " item " request: configuration parameter" \
-							" \"" poller "\" is 0.")
-	int	ret = SUCCEED;
+	unsigned char	proc_type, snmp_oid_type = 0;
 
-	switch (type)
+	switch (item->type)
 	{
-		case ITEM_TYPE_ZABBIX:
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_AGENT_POLLER))
-			{
-				*info = INFO("Agent Item", "StartAgentPollers");
-				ret = FAIL;
-			}
-			break;
-		case ITEM_TYPE_EXTERNAL:
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_POLLER))
-			{
-				*info = INFO("External", "StartPollers");
-				ret = FAIL;
-			}
-			break;
 		case ITEM_TYPE_DB_MONITOR:
-#ifdef HAVE_UNIXODBC
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_ODBCPOLLER))
-			{
-				*info = INFO("ODBC", "StartODBCPollers");
-				ret = FAIL;
-			}
-#else
+#ifndef HAVE_UNIXODBC
 			*info = zbx_strdup(NULL, "Support for ODBC was not compiled in.");
-			ret = FAIL;
-#endif
+			return FAIL;
+#else
 			break;
+#endif
 		case ITEM_TYPE_IPMI:
-#ifdef HAVE_OPENIPMI
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER))
-			{
-				*info = INFO("IPMI", "StartIPMIPollers");
-				ret = FAIL;
-			}
-#else
+#ifndef HAVE_OPENIPMI
 			*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
-			ret = FAIL;
-#endif
+			return FAIL;
+#else
 			break;
+#endif
 		case ITEM_TYPE_SSH:
-#if defined(HAVE_SSH) || defined(HAVE_SSH2)
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_POLLER))
-			{
-				*info = INFO("SSH", "StartPollers");
-				ret = FAIL;
-			}
-			break;
-#else
+#if !defined(HAVE_SSH) && !defined(HAVE_SSH2)
 			*info = zbx_strdup(NULL, "Support for SSH was not compiled in.");
-			ret = FAIL;
-#endif
-		case ITEM_TYPE_TELNET:
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_POLLER))
-			{
-				*info = INFO("Telnet", "StartPollers");
-				ret = FAIL;
-			}
-			break;
-		case ITEM_TYPE_CALCULATED:
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_HISTORYPOLLER))
-			{
-				*info = INFO("Calculate Item", "StartHistoryPollers");
-				ret = FAIL;
-			}
-			break;
-		case ITEM_TYPE_JMX:
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_JAVAPOLLER))
-			{
-				*info = INFO("JMX", "StartJavaPollers");
-				ret = FAIL;
-			}
-			break;
-		case ITEM_TYPE_HTTPAGENT:
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_HTTPAGENT_POLLER))
-			{
-				*info = INFO("HTTP Agent Item", "StartHTTPAgentPollers");
-				ret = FAIL;
-			}
-			break;
-		case ITEM_TYPE_SNMP:
-#ifdef HAVE_NETSNMP
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_SNMP_POLLER))
-			{
-				*info = INFO("SNMP Item", "StartSNMPPollers");
-				ret = FAIL;
-			}
+			return FAIL;
 #else
-			*info = zbx_strdup(NULL, "Support for SNMP was not compiled in.");
-			ret = FAIL;
+			break;
 #endif
+		case ITEM_TYPE_SNMP:
+#ifndef HAVE_NETSNMP
+			*info = zbx_strdup(NULL, "Support for SNMP was not compiled in.");
+			return FAIL;
+#else
 			break;
-		case ITEM_TYPE_SCRIPT:
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_POLLER))
-			{
-				*info = INFO("Script Item", "StartPollers");
-				ret = FAIL;
-			}
-			break;
-		case ITEM_TYPE_BROWSER:
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_BROWSERPOLLER))
-			{
-				*info = INFO("Browser Item", "StartBrowserPollers");
-				ret = FAIL;
-			}
-			break;
+#endif
 	}
 
-	return ret;
+	if (ITEM_TYPE_SNMP == item->type)
+	{
+#		define ZBX_SNMP_OID_TYPE_WALK	3
+#		define ZBX_SNMP_OID_TYPE_GET	4
+
+		if (0 == strncmp(item->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
+			snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;
+		else if (0 == strncmp(item->snmp_oid, "get[", ZBX_CONST_STRLEN("get[")))
+			snmp_oid_type = ZBX_SNMP_OID_TYPE_GET;
+
+#		undef ZBX_SNMP_OID_TYPE_WALK
+#		undef ZBX_SNMP_OID_TYPE_GET
+	}
+
+	if (ZBX_NO_POLLER != zbx_poller_by_item(item->type, item->key, snmp_oid_type, get_config_forks, &proc_type))
+		return SUCCEED;
+
+	*info = zbx_dsprintf(NULL, "Cannot perform request: \"%s\" is set to 0 in configuration.",
+			get_process_type_string(proc_type));
+
+	return FAIL;
 }
 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
@@ -507,7 +449,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			sizeof(item.host.tls_psk));
 #endif
 
-	if (FAIL == item_type_poller_conf_check(item.type, get_config_forks, info))
+	if (FAIL == process_zero_pollers_items(&item, get_config_forks, info))
 	{
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);
