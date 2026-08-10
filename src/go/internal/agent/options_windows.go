@@ -17,6 +17,7 @@ package agent
 import (
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type AgentOptions struct {
@@ -84,10 +85,15 @@ type AgentOptions struct {
 	Plugins map[string]interface{} `conf:"optional"`
 }
 
-// ProfilerDirectory returns the configured profiler directory with the default temporary directory expanded.
+// ProfilerDirectory returns the configured profiler directory with the temporary directory prefix expanded.
 func (a *AgentOptions) ProfilerDirectory() string {
-	if a.ProfilerDir == `%TEMP%\zabbix` {
-		return filepath.Join(os.TempDir(), "zabbix")
+	const tempPrefix = `%TEMP%`
+
+	rest, found := strings.CutPrefix(a.ProfilerDir, tempPrefix)
+	if found {
+		rest = strings.TrimLeft(rest, `\/`)
+
+		return filepath.Join(os.TempDir(), rest)
 	}
 
 	return a.ProfilerDir
