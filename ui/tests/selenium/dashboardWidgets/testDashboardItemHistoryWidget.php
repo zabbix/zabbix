@@ -19,6 +19,8 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 require_once __DIR__.'/../common/testWidgets.php';
 
+use Facebook\WebDriver\Exception\ElementNotInteractableException;
+
 /**
  * @backup dashboard
  *
@@ -1993,7 +1995,16 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					}
 				}
 
-				$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+				// Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
+				// while being clicked. Retry the click if that happens.
+				$add_button = $column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one();
+
+				try {
+					$add_button->click();
+				}
+				catch (ElementNotInteractableException $exception) {
+					$add_button->click();
+				}
 
 				if (array_key_exists('column_error', $data)) {
 					break;
@@ -2172,7 +2183,18 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				'context' => ['values' => 'Simple host with item for Item history widget']
 			]
 		]);
-		$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+
+		// Selecting an item renders type-specific fields that shift the dialog, so the footer button can move
+		// while being clicked. Retry the click if that happens.
+		$add_button = $column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one();
+
+		try {
+			$add_button->click();
+		}
+		catch (ElementNotInteractableException $exception) {
+			$add_button->click();
+		}
+
 		$column_overlay->waitUntilNotVisible();
 		$form->waitUntilReloaded();
 

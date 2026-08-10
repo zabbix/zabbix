@@ -17,6 +17,8 @@
 require_once 'vendor/autoload.php';
 require_once __DIR__.'/../CElement.php';
 
+use Facebook\WebDriver\Exception\ElementClickInterceptedException;
+
 /**
  * Dashboard widget element.
  */
@@ -44,7 +46,7 @@ class CWidgetElement extends CElement {
 	public function getTimeInterval() {
 		$this->getHeader()->hoverMouse();
 		$this->query('xpath:.//li[@class="widget-info-button"]/button')->waitUntilPresent()->one()->click(true);
-		$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+		$hintbox = $this->query('xpath://div[contains(@class, "overlay-dialogue hintbox wordbreak")]')->waitUntilVisible()->one();
 		$hint_text = $hintbox->getText();
 
 		return $hint_text;
@@ -94,9 +96,23 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
+		// Query the button first: it reloads the widget if the dashboard re-rendered (the mouse actions below would
+		// throw on a stale widget instead of reloading it).
 		$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
 		$this->hoverMouse();
-		$button->hoverMouse()->click();
+		$button->hoverMouse();
+
+		// Hovering a widget in edit mode adds resize handles, and the top resize border (ui-resizable-border-n) can
+		// overlap the edit button and intercept the click. If that happens, re-query the button (the widget may have
+		// re-rendered), scroll it into view to clear the overlap, then click again.
+		try {
+			$button->click();
+		}
+		catch (ElementClickInterceptedException $exception) {
+			$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
+			$button->scrollIntoView();
+			$button->click();
+		}
 
 		return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()
 				->asForm()->one();

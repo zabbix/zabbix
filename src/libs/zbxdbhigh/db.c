@@ -933,7 +933,7 @@ void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
  *                                                                            *
  * Purpose: retrieves TimescaleDB (TSDB) license information                  *
  *                                                                            *
- * Return value: license information from datase as string                    *
+ * Return value: license information from database as string                  *
  *               "apache"    for TimescaleDB Apache 2 Edition                 *
  *               "timescale" for TimescaleDB Community Edition                *
  *                                                                            *
