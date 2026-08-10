@@ -65,26 +65,6 @@ function getLocales(): array {
 }
 
 /**
- * Get support URL for specified language.
- *
- * @param string $language  ISO639-1 code.
- *
- * @return string  Fallback to English support URL.
- */
-function getSupportUrl(string $language): string {
-	$urls = [
-		'cs' => 'https://www.zabbix.com/cz/support',
-		'fr' => 'https://www.zabbix.com/fr/support',
-		'ja' => 'https://www.zabbix.com/jp/support',
-		'pt' => 'https://www.zabbix.com/br/support',
-		'ru' => 'https://www.zabbix.com/ru/support',
-		'zh' => 'https://www.zabbix.com/cn/support'
-	];
-
-	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support';
-}
-
-/**
  * Get integrations URL for specified language.
  *
  * @param string $language  ISO639-1 code.
