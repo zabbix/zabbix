@@ -295,6 +295,10 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			}
 		}
 
+		if (!chmod($export_dir, 0777)) {
+			throw new Exception('Failed to set permissions on export directory: ' . $export_dir);
+		}
+
 		return [
 			self::COMPONENT_SERVER => [
 				'ExportDir' => $export_dir,
@@ -421,7 +425,10 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			if (!mkdir($export_dir, 0777, true) && !is_dir($export_dir)) {
 				throw new Exception('Failed to create export directory: ' . $export_dir);
 			}
-			chmod($export_dir, 0777);
+		}
+
+		if (!chmod($export_dir, 0777)) {
+			throw new Exception('Failed to set permissions on export directory: ' . $export_dir);
 		}
 
 		foreach (glob($export_dir . '/*.ndjson') as $file) {
@@ -481,11 +488,12 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		return $data;
 	}
 
-	private function assertExportTagPairResolvedByItemid($dir, $type, $itemid, $array_key,
-			$expected_tag, $expected_value, array $unresolved_macros) {
+	private function assertExportTagPairResolvedByItemid($dir, $type, $itemid, $array_key, $expected_tag,
+			$expected_value, array $unresolved_macros) {
 		$found = false;
 
-		$this->iterateNdjsonFiles($dir, $type, function ($data, $file, $type) use ($itemid, $array_key, $expected_tag, $expected_value, $unresolved_macros, &$found) {
+		$this->iterateNdjsonFiles($dir, $type, function ($data, $file, $type) use ($itemid, $array_key,
+				$expected_tag, $expected_value, $unresolved_macros, &$found) {
 			if (!is_array($data) || !isset($data['itemid'], $data[$array_key])) {
 				return;
 			}
@@ -525,8 +533,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 				}
 			}
 
-			$this->assertTrue($tag_found,
-				$type . ' NDJSON itemid=' . $itemid . ': tag "' . $expected_tag
+			$this->assertTrue($tag_found, $type . ' NDJSON itemid=' . $itemid . ': tag "' . $expected_tag
 				. '" with value "' . $expected_value . '" not found.'
 			);
 		});
@@ -563,16 +570,14 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			);
 		});
 
-		$this->assertTrue($found,
-			$type . ' NDJSON: no record with itemid=' . $itemid . ' found.'
-		);
+		$this->assertTrue($found, $type . ' NDJSON: no record with itemid=' . $itemid . ' found.');
 	}
 
-	private function assertEventTagResolved($dir, $event_name, $tag_name, $expected_value,
-			$unresolved_macro) {
+	private function assertEventTagResolved($dir, $event_name, $tag_name, $expected_value, $unresolved_macro) {
 		$found = false;
 
-		$this->iterateNdjsonFiles($dir, 'problems', function ($data, $file, $type) use ($event_name, $tag_name, $expected_value, $unresolved_macro, &$found) {
+		$this->iterateNdjsonFiles($dir, 'problems', function ($data, $file, $type) use ($event_name, $tag_name,
+				$expected_value, $unresolved_macro, &$found) {
 			if (!is_array($data) || !isset($data['name'], $data['tags'])) {
 				return;
 			}
