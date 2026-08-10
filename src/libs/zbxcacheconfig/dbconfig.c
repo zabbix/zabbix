@@ -3301,11 +3301,26 @@ static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
 		case ITEM_TYPE_ZABBIX:
 			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_AGENT_POLLER, "Agent pollers");
 			break;
-		case ITEM_TYPE_JMX:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_JAVAPOLLER, "Java pollers");
+		case ITEM_TYPE_EXTERNAL:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "pollers");
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_ODBCPOLLER, "ODBC pollers");
+			break;
+		case ITEM_TYPE_IPMI:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_IPMIPOLLER, "IPMI pollers");
+			break;
+		case ITEM_TYPE_SSH:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "pollers");
+			break;
+		case ITEM_TYPE_TELNET:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "pollers");
+			break;
+		case ITEM_TYPE_CALCULATED:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_HISTORYPOLLER, "History pollers");
+			break;
+		case ITEM_TYPE_JMX:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_JAVAPOLLER, "Java pollers");
 			break;
 		case ITEM_TYPE_HTTPAGENT:
 			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_HTTPAGENT_POLLER,
@@ -3314,14 +3329,11 @@ static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
 		case ITEM_TYPE_SNMP:
 			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_SNMP_POLLER, "SNMP pollers");
 			break;
-		case ITEM_TYPE_BROWSER:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_BROWSERPOLLER, "Browser pollers");
-			break;
 		case ITEM_TYPE_SCRIPT:
 			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "pollers");
 			break;
-		case ITEM_TYPE_IPMI:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_IPMIPOLLER, "IPMI pollers");
+		case ITEM_TYPE_BROWSER:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_BROWSERPOLLER, "Browser pollers");
 			break;
 		default:
 			return;
