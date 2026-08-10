@@ -65,26 +65,6 @@ function getLocales(): array {
 }
 
 /**
- * Get integrations URL for specified language.
- *
- * @param string $language  ISO639-1 code.
- *
- * @return string  Fallback to English integrations URL.
- */
-function getIntegrationsUrl(string $language): string {
-	$urls = [
-		'cs' => 'https://www.zabbix.com/cz/integrations',
-		'fr' => 'https://www.zabbix.com/fr/integrations',
-		'ja' => 'https://www.zabbix.com/jp/integrations',
-		'pt' => 'https://www.zabbix.com/br/integrations',
-		'ru' => 'https://www.zabbix.com/ru/integrations',
-		'zh' => 'https://www.zabbix.com/cn/integrations'
-	];
-
-	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/integrations';
-}
-
-/**
  * Get subscriptions URL for specified language.
  *
  * @param string $language  ISO639-1 code.
@@ -102,6 +82,26 @@ function getSubscriptionsUrl(string $language): string {
 	];
 
 	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/subscriptions';
+}
+
+/**
+ * Get integrations URL for specified language.
+ *
+ * @param string $language  ISO639-1 code.
+ *
+ * @return string  Fallback to English integrations URL.
+ */
+function getIntegrationsUrl(string $language): string {
+	$urls = [
+		'cs' => 'https://www.zabbix.com/cz/integrations',
+		'fr' => 'https://www.zabbix.com/fr/integrations',
+		'ja' => 'https://www.zabbix.com/jp/integrations',
+		'pt' => 'https://www.zabbix.com/br/integrations',
+		'ru' => 'https://www.zabbix.com/ru/integrations',
+		'zh' => 'https://www.zabbix.com/cn/integrations'
+	];
+
+	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/integrations';
 }
 
 /**
