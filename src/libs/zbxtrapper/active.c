@@ -504,6 +504,12 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		*host_metadata = '\0';
 	}
 
+	if (MAX_BUFFER_LEN <= host_metadata_alloc)
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "host metadata is too long");
+		goto error;
+	}
+
 	interface = (char *)zbx_malloc(interface, interface_alloc);
 
 	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INTERFACE, &interface, &interface_alloc, NULL))
@@ -710,6 +716,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		for (int i = 0; i < regexps.values_num; i++)
 		{
 			zbx_expression_t	*regexp = regexps.values[i];
+			char			exp_delimiter = regexp->exp_delimiter;
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, "name", regexp->name, ZBX_JSON_TYPE_STRING);
@@ -718,7 +725,13 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 			zbx_snprintf(str, sizeof(str), "%d", regexp->expression_type);
 			zbx_json_addstring(&json, "expression_type", str, ZBX_JSON_TYPE_INT);
 
-			zbx_snprintf(str, sizeof(str), "%c", regexp->exp_delimiter);
+			/* By Zabbix 5.0.0, agent 2 was already reporting its version without a patch component. */
+			/* Zabbix agent and agent 2 report their version with a patch component in a unified */
+			/* way starting from Zabbix 7.0.0rc1. */
+			if ('\0' == exp_delimiter && ZBX_COMPONENT_VERSION(6, 0, 4) > version)
+				exp_delimiter = ',';
+
+			zbx_snprintf(str, sizeof(str), "%c", exp_delimiter);
 			zbx_json_addstring(&json, "exp_delimiter", str, ZBX_JSON_TYPE_STRING);
 
 			zbx_snprintf(str, sizeof(str), "%d", regexp->case_sensitive);

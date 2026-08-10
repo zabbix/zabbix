@@ -2150,9 +2150,372 @@ zabbix_export:
         * [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Cloud
+      items:
+        - uuid: 499fdd5ecfa14295abe43185fc09fabf
+          name: 'EC2 instances count'
+          type: DEPENDENT
+          key: aws.ec2.count
+          description: 'Get the total count of EC2 instances.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.length()
+          master_item:
+            key: aws.ec2.get
+          tags:
+            - tag: component
+              value: ec2
+        - uuid: 333267f2ee38423191fd01b4e5435526
+          name: 'Get EC2 instances'
+          type: SCRIPT
+          key: aws.ec2.get
+          delay: 12h
+          history: '0'
+          value_type: TEXT
+          params: |
+            var AWS = {
+            	params: {},
+            	metadata: 'http://169.254.169.254/latest/',
+            
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
+            
+            			data = data[step];
+            		}
+            
+            		return data;
+            	},
+            
+            	getRoleBaseCredentials: function () {
+            		AWS.params['auth_type'] = 'role_base';
+            		var request = new HttpRequest();
+            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            			request.setProxy(AWS.params.proxy);
+            		}
+            		request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            		var token = request.put(AWS.metadata + 'api/token');
+            
+            		if (request.getStatus() !== 200 || token === null || token === '') {
+            			throw 'Error getting IMDSv2 session token.';
+            		}
+            		request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            		var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
+            
+            		if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+            			throw 'Error getting security credentials from instance metadata. Role not found.';
+            		}
+            
+            		credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            
+            		if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+            			throw 'Error getting security credentials from instance metadata.';
+            		}
+            
+            		try {
+            			credentials = JSON.parse(credentials);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+            		}
+            
+            		['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+            			if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            				throw 'Required credentials are not set: "' + field + '".';
+            			};
+            			AWS.params[field] = credentials[field];
+            		});
+            	},
+            
+            	setParams: function (params) {
+            		AWS.params['proxy'] = params.proxy;
+            		switch (AWS.getField(params, 'auth_type')) {
+            			case 'role_base':
+            				AWS.getRoleBaseCredentials();
+            				break;
+            			case 'assume_role':
+            				if (typeof params.metadata_auth === 'undefined' || params.metadata_auth === '' || (params.metadata_auth !== 'true' && params.metadata_auth !== 'false')) {
+            					throw 'Required param metadata_auth for assume_role is not set or has invalid value: "' + params.metadata_auth + '". Expected "true" or "false".';
+            				}
+            				if (params.metadata_auth === 'true') {
+            					AWS.getRoleBaseCredentials();
+            					AWS.params['SessionToken'] = AWS.params['Token'];
+            					AWS.params['auth_type'] = 'assume_role_metadata';
+            
+            					['sts_region', 'role_arn'].forEach(function (field) {
+            						if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            							throw 'Required param is not set: "' + field + '".';
+            						}
+            						AWS.params[field] = params[field];
+            					});
+            				}
+            
+            				if (params.metadata_auth === 'false') {
+            					AWS.params['auth_type'] = 'assume_role';
+            
+            					['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            						if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            							throw 'Required param is not set: "' + field + '".';
+            						}
+            						AWS.params[field] = params[field];
+            					});
+            				}
+            
+            				const role_arn_regex = /role\/(.+)$/;
+            				const match = AWS.params.role_arn.match(role_arn_regex);
+            				if (!match) {
+            					throw 'Invalid role ARN format.';
+            				}
+            
+            				const payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': match[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials are not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
+            			default:
+            				AWS.params['auth_type'] = 'access_key';
+            				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            		}
+            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            			AWS.params[field] = params[field];
+            		});
+            	},
+            
+            	sign: function (key, message) {
+            		var hex = hmac('sha256', key, message);
+            
+            		if ((hex.length % 2) === 1) {
+            			throw 'Invalid length of a hex string!';
+            		}
+            
+            		var result = new Int8Array(hex.length / 2);
+            		for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
+            			result[b] = parseInt(hex.substring(i, i + 2), 16);
+            		}
+            
+            		return result;
+            	},
+            
+            	prepareParams: function (params) {
+            		var result = [];
+            
+            		Object.keys(params).sort().forEach(function (key) {
+            			if (typeof params[key] !== 'object') {
+            				result.push(key + '=' + encodeURIComponent(params[key]));
+            			}
+            			else {
+            				result.push(prepareObject(key, params[key]));
+            			}
+            		});
+            
+            		return result.join('&');
+            	},
+            
+            	request: function (method, region, service, params, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
+            
+            		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
+            			date = amzdate.replace(/T\d+Z/, ''),
+            			canonical_uri = '/',
+            			host = service + '.' + region + '.amazonaws.com',
+            			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
+            			signed_headers = 'content-encoding;host;x-amz-date',
+            			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+            			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
+            			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
+            			url = 'https://' + host + canonical_uri + '?' + params;
+            
+            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            			request.setProxy(AWS.params.proxy);
+            		}
+            		request.addHeader('x-amz-date: ' + amzdate);
+            		request.addHeader('x-amz-content-sha256:' + sha256(data));
+            		request.addHeader('Accept: application/json');
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Content-Encoding: amz-1.0');
+            		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+            		if (AWS.params.auth_type === 'role_base' || AWS.params.auth_type === 'assume_role_metadata' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
+            
+            		Zabbix.log(4, '[ AWS EC2 ] Sending request: ' + url);
+            		response = request.get(url);
+            		Zabbix.log(4, '[ AWS EC2 ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
+            
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			try {
+            				response = JSON.parse(XML.toJson(response));
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from AWS API. Check debug log for more information.';
+            			}
+            		}
+            
+            		return response;
+            	},
+            
+            	tagToNameInstances: function (instance) {
+            		try {
+            			var tags = AWS.getField(instance, 'tagSet.item'),
+            				instanceName = AWS.getField(instance, 'instanceId');
+            			if (!Array.isArray(tags))
+            				tags = [tags]
+            			tags.forEach(
+            				function (tag) {
+            					if (String(AWS.getField(tag, 'key')) === 'Name') {
+            						instanceName = AWS.getField(tag, 'value');
+            					}
+            				}
+            			);
+            			return instanceName;
+            		}
+            		catch (error) {
+            			return AWS.getField(instance, 'instanceId');
+            		}
+            	},
+            
+            	listRegions: function () {
+            		var payload = {
+            			'Action': 'DescribeRegions',
+            			'Version': '2016-11-15'
+            		};
+            
+            		regions = AWS.getField(AWS.request('GET', AWS.params.describe_region, 'ec2', AWS.prepareParams(payload)), 'DescribeRegionsResponse.regionInfo.item');
+            
+            		if (!Array.isArray(regions))
+            			regions = [regions]
+            		return regions
+            	},
+            
+            	listInstances: function () {
+            		var lld_array = [],
+            			regions = AWS.listRegions(),
+            			payload = {
+            				'Action': 'DescribeInstances',
+            				'Version': '2016-11-15'
+            			};
+            
+            		regions.forEach(function (region) {
+            			var region_name = AWS.getField(region, 'regionName');
+            			if (region_name.match(AWS.params.region_match) === null ||
+            				region_name.match(AWS.params.region_not_match) !== null)
+            				return;
+            
+            			result = AWS.request('GET', region_name, 'ec2', AWS.prepareParams(payload), '');
+            
+            			if (typeof result !== 'object'
+            				|| typeof result.DescribeInstancesResponse !== 'object'
+            				|| typeof result.DescribeInstancesResponse.reservationSet !== 'object') {
+            				throw 'Cannot get EC2 instance list from AWS API. Check debug log for more information.';
+            			}
+            
+            			if (result.DescribeInstancesResponse.reservationSet === null)
+            				return [];
+            
+            			if (typeof result.DescribeInstancesResponse.reservationSet.item !== 'object')
+            				throw 'Cannot get EC2 instance list from AWS API. Check debug log for more information.';
+            
+            			var reservation = result.DescribeInstancesResponse.reservationSet.item
+            			if (!Array.isArray(reservation))
+            				reservation = [reservation]
+            
+            			reservation.forEach(function (res_item) {
+            				var instances = AWS.getField(res_item, 'instancesSet.item')
+            				if (!Array.isArray(instances))
+            					instances = [instances]
+            				instances.forEach(function (instance) {
+            					if (AWS.getField(instance, 'instanceState.name') === 'terminated') return;
+            					lld_array.push(
+            						{
+            							instanceId: AWS.getField(instance, 'instanceId'),
+            							instanceName: AWS.tagToNameInstances(instance),
+            							instanceRegion: region_name
+            						}
+            					)
+            				});
+            			});
+            		});
+            
+            		return lld_array;
+            	}
+            };
+            
+            try {
+            	AWS.setParams(JSON.parse(value));
+            
+            	return JSON.stringify(AWS.listInstances());
+            }
+            catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ AWS EC2 ] ERROR: ' + error);
+            	return JSON.stringify({ 'error': error });
+            }
+          description: 'Get EC2 instances.'
+          timeout: '{$AWS.DATA.TIMEOUT}'
+          parameters:
+            - name: AccessKeyId
+              value: '{$AWS.ACCESS.KEY.ID}'
+            - name: auth_type
+              value: '{$AWS.AUTH_TYPE}'
+            - name: describe_region
+              value: '{$AWS.DESCRIBE.REGION}'
+            - name: metadata_auth
+              value: '{$AWS.ASSUME.ROLE.AUTH.METADATA}'
+            - name: proxy
+              value: '{$AWS.PROXY}'
+            - name: region_match
+              value: '{$AWS.EC2.LLD.FILTER.REGION.MATCHES}'
+            - name: region_not_match
+              value: '{$AWS.EC2.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
+          tags:
+            - tag: component
+              value: raw
       discovery_rules:
         - uuid: 8c687b699ea2421ea51534c9b80c7db7
           name: 'Backup vault discovery'
@@ -2505,324 +2868,8 @@ zabbix_export:
               path: $.region
         - uuid: c651911bad9244ad9c8d2dad5b0d70e4
           name: 'EC2 instances discovery'
-          type: SCRIPT
+          type: DEPENDENT
           key: aws.ec2.discovery
-          delay: 12h
-          params: |
-            var AWS = {
-            	params: {},
-            	metadata: 'http://169.254.169.254/latest/',
-            
-            	getField: function (data, path) {
-            		var steps = path.split('.');
-            		for (var i = 0; i < steps.length; i++) {
-            			var step = steps[i];
-            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-            				throw 'Required field was not found: ' + path;
-            			}
-            
-            			data = data[step];
-            		}
-            
-            		return data;
-            	},
-            
-            	getRoleBaseCredentials: function () {
-            		AWS.params['auth_type'] = 'role_base';
-            		var request = new HttpRequest();
-            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
-            			request.setProxy(AWS.params.proxy);
-            		}
-            		request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
-            		var token = request.put(AWS.metadata + 'api/token');
-            
-            		if (request.getStatus() !== 200 || token === null || token === '') {
-            			throw 'Error getting IMDSv2 session token.';
-            		}
-            		request.addHeader('X-aws-ec2-metadata-token: ' + token);
-            		var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
-            
-            		if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
-            			throw 'Error getting security credentials from instance metadata. Role not found.';
-            		}
-            
-            		credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
-            
-            		if (request.getStatus() !== 200 || credentials === null || credentials === '') {
-            			throw 'Error getting security credentials from instance metadata.';
-            		}
-            
-            		try {
-            			credentials = JSON.parse(credentials);
-            		}
-            		catch (error) {
-            			throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
-            		}
-            
-            		['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
-            			if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            				throw 'Required credentials are not set: "' + field + '".';
-            			};
-            			AWS.params[field] = credentials[field];
-            		});
-            	},
-            
-            	setParams: function (params) {
-            		AWS.params['proxy'] = params.proxy;
-            		switch (AWS.getField(params, 'auth_type')) {
-            			case 'role_base':
-            				AWS.getRoleBaseCredentials();
-            				break;
-            			case 'assume_role':
-            				if (typeof params.metadata_auth === 'undefined' || params.metadata_auth === '' || (params.metadata_auth !== 'true' && params.metadata_auth !== 'false')) {
-            					throw 'Required param metadata_auth for assume_role is not set or has invalid value: "' + params.metadata_auth + '". Expected "true" or "false".';
-            				}
-            				if (params.metadata_auth === 'true') {
-            					AWS.getRoleBaseCredentials();
-            					AWS.params['SessionToken'] = AWS.params['Token'];
-            					AWS.params['auth_type'] = 'assume_role_metadata';
-            
-            					['sts_region', 'role_arn'].forEach(function (field) {
-            						if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-            							throw 'Required param is not set: "' + field + '".';
-            						}
-            						AWS.params[field] = params[field];
-            					});
-            				}
-            
-            				if (params.metadata_auth === 'false') {
-            					AWS.params['auth_type'] = 'assume_role';
-            
-            					['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
-            						if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-            							throw 'Required param is not set: "' + field + '".';
-            						}
-            						AWS.params[field] = params[field];
-            					});
-            				}
-            
-            				const role_arn_regex = /role\/(.+)$/;
-            				const match = AWS.params.role_arn.match(role_arn_regex);
-            				if (!match) {
-            					throw 'Invalid role ARN format.';
-            				}
-            
-            				const payload = {
-            					'Action': 'AssumeRole',
-            					'Version': '2011-06-15',
-            					'RoleArn': AWS.params.role_arn,
-            					'RoleSessionName': match[1] + 'Session',
-            				};
-            
-            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
-            
-            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
-            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials are not set: "' + field + '".';
-            					};
-            					AWS.params[field] = credentials[field];
-            				});
-            				break;
-            			default:
-            				AWS.params['auth_type'] = 'access_key';
-            				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
-            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-            						throw 'Required param is not set: "' + field + '".';
-            					}
-            					AWS.params[field] = params[field];
-            				});
-            		}
-            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
-            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-            				throw 'Required param is not set: "' + field + '".';
-            			}
-            			AWS.params[field] = params[field];
-            		});
-            	},
-            
-            	sign: function (key, message) {
-            		var hex = hmac('sha256', key, message);
-            
-            		if ((hex.length % 2) === 1) {
-            			throw 'Invalid length of a hex string!';
-            		}
-            
-            		var result = new Int8Array(hex.length / 2);
-            		for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
-            			result[b] = parseInt(hex.substring(i, i + 2), 16);
-            		}
-            
-            		return result;
-            	},
-            
-            	prepareParams: function (params) {
-            		var result = [];
-            
-            		Object.keys(params).sort().forEach(function (key) {
-            			if (typeof params[key] !== 'object') {
-            				result.push(key + '=' + encodeURIComponent(params[key]));
-            			}
-            			else {
-            				result.push(prepareObject(key, params[key]));
-            			}
-            		});
-            
-            		return result.join('&');
-            	},
-            
-            	request: function (method, region, service, params, data) {
-            		if (typeof data === 'undefined' || data === null) {
-            			data = '';
-            		}
-            
-            		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
-            			date = amzdate.replace(/T\d+Z/, ''),
-            			canonical_uri = '/',
-            			host = service + '.' + region + '.amazonaws.com',
-            			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
-            			signed_headers = 'content-encoding;host;x-amz-date',
-            			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-            			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
-            			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
-            			key = AWS.sign(key, region),
-            			key = AWS.sign(key, service),
-            			key = AWS.sign(key, 'aws4_request'),
-            			request = new HttpRequest(),
-            			url = 'https://' + host + canonical_uri + '?' + params;
-            
-            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
-            			request.setProxy(AWS.params.proxy);
-            		}
-            		request.addHeader('x-amz-date: ' + amzdate);
-            		request.addHeader('x-amz-content-sha256:' + sha256(data));
-            		request.addHeader('Accept: application/json');
-            		request.addHeader('Content-Type: application/json');
-            		request.addHeader('Content-Encoding: amz-1.0');
-            		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base' || AWS.params.auth_type === 'assume_role_metadata' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
-            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
-            		}
-            
-            		Zabbix.log(4, '[ AWS EC2 ] Sending request: ' + url);
-            		response = request.get(url);
-            		Zabbix.log(4, '[ AWS EC2 ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
-            		if (request.getStatus() !== 200) {
-            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            		}
-            
-            		try {
-            			response = JSON.parse(response);
-            		}
-            		catch (error) {
-            			try {
-            				response = JSON.parse(XML.toJson(response));
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from AWS API. Check debug log for more information.';
-            			}
-            		}
-            
-            		return response;
-            	},
-            
-            	tagToNameInstances: function (instance) {
-            		try {
-            			var tags = AWS.getField(instance, 'tagSet.item'),
-            				instanceName = AWS.getField(instance, 'instanceId');
-            			if (!Array.isArray(tags))
-            				tags = [tags]
-            			tags.forEach(
-            				function (tag) {
-            					if (String(AWS.getField(tag, 'key')) === 'Name') {
-            						instanceName = AWS.getField(tag, 'value');
-            					}
-            				}
-            			);
-            			return instanceName;
-            		}
-            		catch (error) {
-            			return AWS.getField(instance, 'instanceId');
-            		}
-            	},
-            
-            	listRegions: function () {
-            		var payload = {
-            			'Action': 'DescribeRegions',
-            			'Version': '2016-11-15'
-            		};
-            
-            		regions = AWS.getField(AWS.request('GET', AWS.params.describe_region, 'ec2', AWS.prepareParams(payload)), 'DescribeRegionsResponse.regionInfo.item');
-            
-            		if (!Array.isArray(regions))
-            			regions = [regions]
-            		return regions
-            	},
-            
-            	listInstances: function () {
-            		var lld_array = [],
-            			regions = AWS.listRegions(),
-            			payload = {
-            				'Action': 'DescribeInstances',
-            				'Version': '2016-11-15'
-            			};
-            
-            		regions.forEach(function (region) {
-            			var region_name = AWS.getField(region, 'regionName');
-            			if (region_name.match(AWS.params.region_match) === null ||
-            				region_name.match(AWS.params.region_not_match) !== null)
-            				return;
-            
-            			result = AWS.request('GET', region_name, 'ec2', AWS.prepareParams(payload), '');
-            
-            			if (typeof result !== 'object'
-            				|| typeof result.DescribeInstancesResponse !== 'object'
-            				|| typeof result.DescribeInstancesResponse.reservationSet !== 'object') {
-            				throw 'Cannot get EC2 instance list from AWS API. Check debug log for more information.';
-            			}
-            
-            			if (result.DescribeInstancesResponse.reservationSet === null)
-            				return [];
-            
-            			if (typeof result.DescribeInstancesResponse.reservationSet.item !== 'object')
-            				throw 'Cannot get EC2 instance list from AWS API. Check debug log for more information.';
-            
-            			var reservation = result.DescribeInstancesResponse.reservationSet.item
-            			if (!Array.isArray(reservation))
-            				reservation = [reservation]
-            
-            			reservation.forEach(function (res_item) {
-            				var instances = AWS.getField(res_item, 'instancesSet.item')
-            				if (!Array.isArray(instances))
-            					instances = [instances]
-            				instances.forEach(function (instance) {
-            					if (AWS.getField(instance, 'instanceState.name') === 'terminated') return;
-            					lld_array.push(
-            						{
-            							instanceId: AWS.getField(instance, 'instanceId'),
-            							instanceName: AWS.tagToNameInstances(instance),
-            							instanceRegion: region_name
-            						}
-            					)
-            				});
-            			});
-            		});
-            
-            		return lld_array;
-            	}
-            };
-            
-            try {
-            	AWS.setParams(JSON.parse(value));
-            
-            	return JSON.stringify(AWS.listInstances());
-            }
-            catch (error) {
-            	error += (String(error).endsWith('.')) ? '' : '.';
-            	Zabbix.log(3, '[ AWS EC2 ] ERROR: ' + error);
-            	return JSON.stringify({ 'error': error });
-            }
           filter:
             evaltype: AND
             conditions:
@@ -2836,11 +2883,11 @@ zabbix_export:
               - macro: '{#AWS.EC2.INSTANCE.REGION}'
                 value: '{$AWS.EC2.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'Get EC2 instances.'
+          description: 'Discover EC2 instances.'
           host_prototypes:
             - uuid: c4c830c727294b07926c39b00cf19046
               host: '{#AWS.EC2.INSTANCE.ID}'
-              name: '{#AWS.EC2.INSTANCE.NAME}'
+              name: 'EC2 - {#AWS.EC2.INSTANCE.NAME}'
               group_links:
                 - group:
                     name: 'Virtual machines'
@@ -2863,28 +2910,8 @@ zabbix_export:
               custom_interfaces: 'YES'
               interfaces:
                 - ip: '{#AWS.EC2.INSTANCE.ID}'
-          timeout: '{$AWS.DATA.TIMEOUT}'
-          parameters:
-            - name: AccessKeyId
-              value: '{$AWS.ACCESS.KEY.ID}'
-            - name: auth_type
-              value: '{$AWS.AUTH_TYPE}'
-            - name: describe_region
-              value: '{$AWS.DESCRIBE.REGION}'
-            - name: metadata_auth
-              value: '{$AWS.ASSUME.ROLE.AUTH.METADATA}'
-            - name: proxy
-              value: '{$AWS.PROXY}'
-            - name: region_match
-              value: '{$AWS.EC2.LLD.FILTER.REGION.MATCHES}'
-            - name: region_not_match
-              value: '{$AWS.EC2.LLD.FILTER.REGION.NOT_MATCHES}'
-            - name: role_arn
-              value: '{$AWS.ASSUME.ROLE.ARN}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
-            - name: sts_region
-              value: '{$AWS.STS.REGION}'
+          master_item:
+            key: aws.ec2.get
           lld_macro_paths:
             - lld_macro: '{#AWS.EC2.INSTANCE.ID}'
               path: $.instanceId

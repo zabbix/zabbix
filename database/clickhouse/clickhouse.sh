@@ -7,6 +7,7 @@ display_help()
 	printf "  %-16s %s\n" "-p|--password" "ClickHouse password"
 	printf "  %-16s %s\n" "-t|--ttl" "Housekeeping interval in seconds ($CH_TTL)"
 	printf "  %-16s %s\n" "-P|--partition" "Partitioning schema ($CH_PARTITION)"
+	printf "  %-16s %s\n" "-e|--engine" "Table engine ($CH_ENGINE)"
 	printf "  %-16s %s\n" "-i|--import-dir" "Directory with the exported CSV files ($CH_IMPORT_DIR)"
 	printf "  %-16s %s\n" "-h|--help" "Help message"
 
@@ -22,6 +23,8 @@ CH_PASSWORD=""
 CH_TTL="2678400"
 
 CH_PARTITION="toDate"
+
+CH_ENGINE="MergeTree()"
 
 # directory with the exported CSV files
 CH_IMPORT_DIR="/tmp"
@@ -60,6 +63,10 @@ while [ $# -gt 0 ]; do
 	-P|--partition)
 		shift
 		CH_PARTITION=$1
+		;;
+	-e|--engine)
+		shift
+		CH_ENGINE=$1
 		;;
 	-i|--import-dir)
 		shift
