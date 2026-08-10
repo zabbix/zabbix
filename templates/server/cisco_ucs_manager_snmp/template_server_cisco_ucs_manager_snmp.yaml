@@ -33,7 +33,7 @@ zabbix_export:
         You can download UCS MIB files there ftp://ftp.cisco.com/pub/mibs/ucs-mibs/.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: 'Templates/Server hardware'
       items:
@@ -215,10 +215,6 @@ zabbix_export:
             2 - unknown
           valuemap:
             name: zabbix.host.available
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: health

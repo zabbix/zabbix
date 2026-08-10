@@ -241,6 +241,9 @@ define('DB_STORE_CREDS_CONFIG', 0);
 define('DB_STORE_CREDS_VAULT_HASHICORP', 1);
 define('DB_STORE_CREDS_VAULT_CYBERARK',  2);
 
+define('DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN',	0);
+define('DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE',	1);
+
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_JS',					3); // javascript
