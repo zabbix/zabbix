@@ -33,7 +33,7 @@ class CRole extends CApiService {
 	public const OUTPUT_FIELDS = ['roleid', 'name', 'type', 'readonly'];
 
 	private const RULES_OUTPUT_FIELDS = ['ui', 'ui.default_access', 'profile.redirect.enforce', 'profile.redirect.url',
-		'services.read.mode', 'services.read.list',	'services.read.tag', 'services.write.mode', 'services.write.list',
+		'services.read.mode', 'services.read.list', 'services.read.tag', 'services.write.mode', 'services.write.list',
 		'services.write.tag', 'modules', 'modules.default_access', 'api.access', 'api.mode', 'api', 'actions',
 		'actions.default_access', 'devices.access', 'devices.actions', 'devices.actions.default_access'
 	];

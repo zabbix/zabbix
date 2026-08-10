@@ -264,16 +264,15 @@ $form_list
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow(_('URL (after login)'), [
-			(new CTextAreaFlexible('url', $data['url']))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setMaxlength(DB::getFieldLength('users', 'url'))
-				->setReadonly($data['profile_redirect_enforce'])
-				->setSingleline($data['profile_redirect_enforce'])
-				->addClass(ZBX_STYLE_FORM_READONLY_TRANSPARENT),
-			$default_url_label
-		]
-	);
+	->addRow(_('URL (after login)'),[
+		(new CTextAreaFlexible('url', $data['url']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('users', 'url'))
+			->setReadonly($data['profile_redirect_enforce'])
+			->setSingleline($data['profile_redirect_enforce'])
+			->addClass(ZBX_STYLE_FORM_READONLY_TRANSPARENT),
+		$default_url_label
+	]);
 
 $tabs->addTab('userTab', _('User'), $form_list);
 
