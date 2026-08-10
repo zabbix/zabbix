@@ -78,6 +78,7 @@ $url = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $table = (new CTableInfo())
+	->setId('ceprule-list-table')
 	->setHeader([
 		(new CColHeader((new CCheckBox('all_items'))->onClick(
 			sprintf('checkAll("%s", "all_items", "cepruleids")', $form->getName())
