@@ -41,8 +41,8 @@ typedef struct
 int	zbx_init_library_export(zbx_config_export_t *zbx_config_export, char **error);
 void	zbx_deinit_library_export(void);
 
-int	zbx_validate_export_type(const char *export_type, zbx_uint32_t *export_mask);
-int	zbx_is_export_enabled(zbx_uint32_t flags);
+int	zbx_validate_export_type(char *export_type, uint32_t *export_mask);
+int	zbx_is_export_enabled(uint32_t flags);
 int	zbx_has_export_dir(void);
 void	zbx_export_deinit(zbx_export_file_t *file);
 
