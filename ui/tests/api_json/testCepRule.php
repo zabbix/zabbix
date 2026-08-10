@@ -139,7 +139,8 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+						'sortorder' => 1
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/execute_when": value must be '.CCepRuleHelper::WHEN_EVENT_OCCURRED.'.'
@@ -217,7 +218,8 @@ class testCepRule extends CAPITest {
 					CCepRuleHelper::OP_INCREASE_TAG_VALUE,
 					CCepRuleHelper::OP_DECREASE_TAG_VALUE,
 					CCepRuleHelper::OP_RENAME_TAG,
-					CCepRuleHelper::OP_REMOVE_TAG
+					CCepRuleHelper::OP_REMOVE_TAG,
+					CCepRuleHelper::OP_CLOSE_WINDOW
 				]).'.'
 			],
 			'Operation type must be suited for WHEN_EVENT_OCCURRED' => [
@@ -244,7 +246,8 @@ class testCepRule extends CAPITest {
 					CCepRuleHelper::OP_INCREASE_TAG_VALUE,
 					CCepRuleHelper::OP_DECREASE_TAG_VALUE,
 					CCepRuleHelper::OP_RENAME_TAG,
-					CCepRuleHelper::OP_REMOVE_TAG
+					CCepRuleHelper::OP_REMOVE_TAG,
+					CCepRuleHelper::OP_CLOSE_WINDOW
 				]).'.'
 			],
 			'Need event_name for WHEN_EVENT_OCCURRED' => [
@@ -282,6 +285,19 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
+			'Cant pass operation filter without conditions' => [
+				'request' => [
+					'name' => 'ceprule.operation.tags',
+					'operations' => [
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => []
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1/filter": the parameter "conditions" is missing.'
+			],
 			'Can pass tags for operation' => [
 				'request' => [
 					'name' => 'ceprule.operation.tags',
@@ -290,7 +306,7 @@ class testCepRule extends CAPITest {
 						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
-						'tags' => []
+						'filter' => []
 					]
 				],
 				'expected_error' => null
