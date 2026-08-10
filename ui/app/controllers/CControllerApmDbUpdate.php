@@ -107,8 +107,8 @@ class CControllerApmDbUpdate extends CController {
 	protected static function processApmInput(array &$apm): void {
 		$reset_fields = [];
 
-		if ($apm['status'] === 0) {
-			$apm = [];
+		if ($apm['status'] === APM_GLOBAL_DB_STATUS_NOT_CONFIGURED) {
+			$apm = ['status' => APM_GLOBAL_DB_STATUS_NOT_CONFIGURED];
 		}
 		else {
 			switch ($apm['authentication_type']) {
