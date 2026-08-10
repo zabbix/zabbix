@@ -1509,6 +1509,9 @@ button {
   .btn:link, .btn:visited {
     color: #f2f2f2; }
 
+a.btn-alt:not(:hover):link, a.btn-alt:not(:hover):visited {
+  color: #768d99; }
+
 .btn-icon {
   border-radius: max(0px, calc(var(--button-border-radius) - 2px));
   display: inline-block;

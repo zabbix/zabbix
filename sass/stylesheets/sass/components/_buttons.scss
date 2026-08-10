@@ -198,6 +198,15 @@ button {
 	@extend %button-disabled;
 }
 
+a.btn-alt {
+	&:not(:hover) {
+		&:link,
+		&:visited {
+			color: $btn-alt-color;
+		}
+	}
+}
+
 .btn-grey {
 	@extend %button;
 	@extend %button-form-colors;
