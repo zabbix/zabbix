@@ -810,12 +810,12 @@ zabbix_export:
               parameters:
                 - |
                   var match = /PostgreSQL (\d+)(?:\.(\d+))?(?:\.(\d+))?/.exec(value),
-                    major,
-                    second,
-                    third;
+                  	major,
+                  	second,
+                  	third;
                   
                   if (match === null) {
-                    throw 'Cannot parse the PostgreSQL version: ' + value;
+                  	throw 'Cannot parse the PostgreSQL version: ' + value;
                   }
                   
                   major = parseInt(match[1], 10);
@@ -823,7 +823,7 @@ zabbix_export:
                   third = parseInt(match[3] || '0', 10);
                   
                   if (major >= 10) {
-                    return major * 10000 + second;
+                  	return major * 10000 + second;
                   }
                   
                   return major * 10000 + second * 100 + third;
@@ -851,17 +851,17 @@ zabbix_export:
                   var version = parseInt(value, 10);
                   
                   if (isNaN(version) || version < 100000) {
-                    return JSON.stringify([]);
+                  	return JSON.stringify([]);
                   }
                   
                   return JSON.stringify([{
-                    '{#SINGLETON}': '',
-                    '{#BELOW_V13}': version < 130000 ? 'true' : 'false',
-                    '{#BELOW_V14}': version < 140000 ? 'true' : 'false',
-                    '{#BELOW_V15}': version < 150000 ? 'true' : 'false',
-                    '{#BELOW_V16}': version < 160000 ? 'true' : 'false',
-                    '{#BELOW_V17}': version < 170000 ? 'true' : 'false',
-                    '{#BELOW_V18}': version < 180000 ? 'true' : 'false'
+                  	'{#SINGLETON}': '',
+                  	'{#BELOW_V13}': version < 130000 ? 'true' : 'false',
+                  	'{#BELOW_V14}': version < 140000 ? 'true' : 'false',
+                  	'{#BELOW_V15}': version < 150000 ? 'true' : 'false',
+                  	'{#BELOW_V16}': version < 160000 ? 'true' : 'false',
+                  	'{#BELOW_V17}': version < 170000 ? 'true' : 'false',
+                  	'{#BELOW_V18}': version < 180000 ? 'true' : 'false'
                   }]);
           master_item:
             key: pgsql.version.num
@@ -1950,28 +1950,28 @@ zabbix_export:
                   parameters:
                     - |
                       var data,
-                        hits,
-                        reads;
+                      	hits,
+                      	reads;
                       
                       try {
-                        data = JSON.parse(value);
+                      	data = JSON.parse(value);
                       } catch (error) {
-                        throw 'Cannot parse the I/O statistics as JSON: ' + value;
+                      	throw 'Cannot parse the I/O statistics as JSON: ' + value;
                       }
                       
                       if (data === null || typeof data !== 'object') {
-                        throw 'Expected the I/O statistics as an object, got: ' + value;
+                      	throw 'Expected the I/O statistics as an object, got: ' + value;
                       }
                       
                       hits = parseInt(data.hits, 10);
                       reads = parseInt(data.reads, 10);
                       
                       if (isNaN(hits) || isNaN(reads)) {
-                        throw 'The I/O statistics have no hit or read counters: ' + value;
+                      	throw 'The I/O statistics have no hit or read counters: ' + value;
                       }
                       
                       if (hits + reads === 0) {
-                        return 100;
+                      	return 100;
                       }
                       
                       return 100 * hits / (hits + reads);
@@ -2122,25 +2122,25 @@ zabbix_export:
                   parameters:
                     - |
                       var data,
-                        sum = 0,
-                        i;
+                      	sum = 0,
+                      	i;
                       
                       try {
-                        data = JSON.parse(value);
+                      	data = JSON.parse(value);
                       } catch (error) {
-                        throw 'Cannot parse the collected values as JSON: ' + value;
+                      	throw 'Cannot parse the collected values as JSON: ' + value;
                       }
                       
                       if (!Array.isArray(data)) {
-                        throw 'Expected an array of values, got: ' + value;
+                      	throw 'Expected an array of values, got: ' + value;
                       }
                       
                       for (i = 0; i < data.length; i++) {
-                        sum += parseInt(data[i], 10);
+                      	sum += parseInt(data[i], 10);
                       }
                       
                       if (isNaN(sum)) {
-                        throw 'The collected values are not numbers: ' + value;
+                      	throw 'The collected values are not numbers: ' + value;
                       }
                       
                       return sum;
@@ -2164,25 +2164,25 @@ zabbix_export:
                   parameters:
                     - |
                       var data,
-                        sum = 0,
-                        i;
+                      	sum = 0,
+                      	i;
                       
                       try {
-                        data = JSON.parse(value);
+                      	data = JSON.parse(value);
                       } catch (error) {
-                        throw 'Cannot parse the collected values as JSON: ' + value;
+                      	throw 'Cannot parse the collected values as JSON: ' + value;
                       }
                       
                       if (!Array.isArray(data)) {
-                        throw 'Expected an array of values, got: ' + value;
+                      	throw 'Expected an array of values, got: ' + value;
                       }
                       
                       for (i = 0; i < data.length; i++) {
-                        sum += parseInt(data[i], 10);
+                      	sum += parseInt(data[i], 10);
                       }
                       
                       if (isNaN(sum)) {
-                        throw 'The collected values are not numbers: ' + value;
+                      	throw 'The collected values are not numbers: ' + value;
                       }
                       
                       return sum;
@@ -2206,25 +2206,25 @@ zabbix_export:
                   parameters:
                     - |
                       var data,
-                        sum = 0,
-                        i;
+                      	sum = 0,
+                      	i;
                       
                       try {
-                        data = JSON.parse(value);
+                      	data = JSON.parse(value);
                       } catch (error) {
-                        throw 'Cannot parse the collected values as JSON: ' + value;
+                      	throw 'Cannot parse the collected values as JSON: ' + value;
                       }
                       
                       if (!Array.isArray(data)) {
-                        throw 'Expected an array of values, got: ' + value;
+                      	throw 'Expected an array of values, got: ' + value;
                       }
                       
                       for (i = 0; i < data.length; i++) {
-                        sum += parseInt(data[i], 10);
+                      	sum += parseInt(data[i], 10);
                       }
                       
                       if (isNaN(sum)) {
-                        throw 'The collected values are not numbers: ' + value;
+                      	throw 'The collected values are not numbers: ' + value;
                       }
                       
                       return sum;
@@ -2247,25 +2247,25 @@ zabbix_export:
                   parameters:
                     - |
                       var data,
-                        sum = 0,
-                        i;
+                      	sum = 0,
+                      	i;
                       
                       try {
-                        data = JSON.parse(value);
+                      	data = JSON.parse(value);
                       } catch (error) {
-                        throw 'Cannot parse the collected values as JSON: ' + value;
+                      	throw 'Cannot parse the collected values as JSON: ' + value;
                       }
                       
                       if (!Array.isArray(data)) {
-                        throw 'Expected an array of values, got: ' + value;
+                      	throw 'Expected an array of values, got: ' + value;
                       }
                       
                       for (i = 0; i < data.length; i++) {
-                        sum += parseInt(data[i], 10);
+                      	sum += parseInt(data[i], 10);
                       }
                       
                       if (isNaN(sum)) {
-                        throw 'The collected values are not numbers: ' + value;
+                      	throw 'The collected values are not numbers: ' + value;
                       }
                       
                       return sum;
@@ -2288,33 +2288,33 @@ zabbix_export:
                   parameters:
                     - |
                       var data,
-                        cache,
-                        hits = 0,
-                        reads = 0,
-                        i;
+                      	cache,
+                      	hits = 0,
+                      	reads = 0,
+                      	i;
                       
                       try {
-                        data = JSON.parse(value);
+                      	data = JSON.parse(value);
                       } catch (error) {
-                        throw 'Cannot parse the SLRU statistics as JSON: ' + value;
+                      	throw 'Cannot parse the SLRU statistics as JSON: ' + value;
                       }
                       
                       if (!Array.isArray(data)) {
-                        throw 'Expected an array of SLRU caches, got: ' + value;
+                      	throw 'Expected an array of SLRU caches, got: ' + value;
                       }
                       
                       for (i = 0; i < data.length; i++) {
-                        cache = data[i] || {};
-                        hits += parseInt(cache.blks_hit, 10);
-                        reads += parseInt(cache.blks_read, 10);
+                      	cache = data[i] || {};
+                      	hits += parseInt(cache.blks_hit, 10);
+                      	reads += parseInt(cache.blks_read, 10);
                       }
                       
                       if (isNaN(hits) || isNaN(reads)) {
-                        throw 'The SLRU statistics have no hit or read counters: ' + value;
+                      	throw 'The SLRU statistics have no hit or read counters: ' + value;
                       }
                       
                       if (hits + reads === 0) {
-                        return 100;
+                      	return 100;
                       }
                       
                       return 100 * hits / (hits + reads);
