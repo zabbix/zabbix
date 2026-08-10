@@ -1245,15 +1245,15 @@ footer {
     .form-grid .collapsible > label .icon,
     .form-grid .fields-group > label .icon {
       margin-left: 5px; }
-    .form-grid > label:has(.btn-icon:not([hidden]):not([style*="display: none"]):not(.display-none)),
-    .form-grid .collapsible > label:has(.btn-icon:not([hidden]):not([style*="display: none"]):not(.display-none)),
-    .form-grid .fields-group > label:has(.btn-icon:not([hidden]):not([style*="display: none"]):not(.display-none)) {
+    .form-grid > label:has(.btn-icon:not([hidden]):not([style*="display: none"])),
+    .form-grid .collapsible > label:has(.btn-icon:not([hidden]):not([style*="display: none"])),
+    .form-grid .fields-group > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) {
       position: relative;
       right: -2px;
       padding-right: 23px; }
-      .form-grid > label:has(.btn-icon:not([hidden]):not([style*="display: none"]):not(.display-none)) .btn-icon,
-      .form-grid .collapsible > label:has(.btn-icon:not([hidden]):not([style*="display: none"]):not(.display-none)) .btn-icon,
-      .form-grid .fields-group > label:has(.btn-icon:not([hidden]):not([style*="display: none"]):not(.display-none)) .btn-icon {
+      .form-grid > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon,
+      .form-grid .collapsible > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon,
+      .form-grid .fields-group > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon {
         position: absolute;
         top: 4px;
         right: 2px; }
@@ -9283,7 +9283,7 @@ svg {
   transform: rotate(180deg); }
 
 .display-none, .table-forms > li.display-none {
-  display: none !important; }
+  display: none; }
 
 .visibility-hidden {
   visibility: hidden; }

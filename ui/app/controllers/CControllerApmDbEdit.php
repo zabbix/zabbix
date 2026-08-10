@@ -32,7 +32,7 @@ class CControllerApmDbEdit extends CController {
 		return [
 			'status' => 0,
 			'url' => '',
-			'authentication_type' => APM_AUTH_TYPE_PASSWORD,
+			'authentication_type' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD,
 			'username' => '',
 			'password' => '',
 			'vault_path' => '',
@@ -48,25 +48,14 @@ class CControllerApmDbEdit extends CController {
 
 	protected function doAction(): void {
 		$default_values = self::getDefaultValues();
+		$settings = API::Settings()->get(['output' => ['apm_global_db']]);
 
-		$data = array_merge($default_values, [
-			// TODO: Settings->get()
+		$response = new CControllerResponseData([
+			'default_values' => $default_values,
+			'values' => array_merge($default_values, $settings['apm_global_db']),
+			'js_validation_rules' => (new CFormValidator(CControllerApmDbUpdate::getValidationRules()))
+				->getRules()
 		]);
-
-		$data['js_validation_rules'] = (new CFormValidator(CControllerApmDbUpdate::getValidationRules()))
-			->getRules();
-		$data['default_values'] = $default_values;
-
-		$data['has_password'] = $data['authentication_type'] === APM_AUTH_TYPE_PASSWORD;
-		$data['has_ssl_key_password'] = $data['ssl_key_file'] !== '';
-
-		$data['show_fields'] = $data['status'] == 1;
-		$data['show_user_fields'] = $data['show_fields'] && $data['authentication_type'] === APM_AUTH_TYPE_PASSWORD;
-		$data['show_vault_path'] = $data['show_fields'] && $data['authentication_type'] === APM_AUTH_TYPE_VAULT_PATH;
-		$data['show_ssl_fields'] = $data['show_fields'] &&  str_starts_with($data['url'], 'https://');
-		$data['show_ssl_verify_peer_fields'] = $data['show_ssl_fields'] && $data['ssl_verify_peer'] === 1;
-
-		$response = new CControllerResponseData($data);
 		$response->setTitle(_('APM data source'));
 		$this->setResponse($response);
 	}

@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 const ZBX_DB_MYSQL		= 'MYSQL';
 const ZBX_DB_POSTGRESQL	= 'POSTGRESQL';
 

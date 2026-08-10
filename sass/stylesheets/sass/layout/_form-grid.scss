@@ -125,7 +125,7 @@
 				margin-left: 5px;
 			}
 
-			&:has(.btn-icon:not([hidden]):not([style*="display: none"]):not(.display-none)) {
+			&:has(.btn-icon:not([hidden]):not([style*="display: none"])) {
 				position: relative;
 				right: -2px;
 				padding-right: 23px;

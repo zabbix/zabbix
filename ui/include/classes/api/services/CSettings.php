@@ -359,7 +359,7 @@ class CSettings extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'status' =>	['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_STATUS_NOT_CONFIGURED, APM_GLOBAL_DB_STATUS_CONFIGURED])],
 			'url' => ['type' => API_URL, 'flags' => API_NOT_EMPTY, 'schemes' => [CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTP, CSettingsHelper::APM_GLOBAL_DB_URL_SCHEMA_HTTPS], 'length' => 2048],
-			'authentication_type' => ['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_AUTHTYPE_PASSWORD, APM_GLOBAL_DB_AUTHTYPE_VAUL, APM_GLOBAL_DB_AUTHTYPE_NONE])],
+			'authentication_type' => ['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_AUTHTYPE_PASSWORD, APM_GLOBAL_DB_AUTHTYPE_VAULT, APM_GLOBAL_DB_AUTHTYPE_NONE])],
 			'ssl_verify_peer' => ['type' => API_INT32, 'in' => implode(',', [APM_GLOBAL_DB_VERIFY_PEER_DISABLED, APM_GLOBAL_DB_VERIFY_PEER_ENABLED])],
 			'ssl_cert_file' => ['type' => API_STRING_UTF8, 'length' => 2048],
 			'ssl_key_file' => ['type' => API_STRING_UTF8, 'length' => 2048]
@@ -416,7 +416,7 @@ class CSettings extends CApiService {
 
 			$vault_path_flags = API_NOT_EMPTY;
 
-			if ($authentication_type == APM_GLOBAL_DB_AUTHTYPE_VAUL) {
+			if ($authentication_type == APM_GLOBAL_DB_AUTHTYPE_VAULT) {
 				if ($status_changed || $authentication_type_changed) {
 					$vault_path_flags = API_REQUIRED | $vault_path_flags;
 
@@ -440,7 +440,7 @@ class CSettings extends CApiService {
 					['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 				]],
 				'vault_path' => ['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'authentication_type', 'in' => APM_GLOBAL_DB_AUTHTYPE_VAUL], 'type' => API_STRING_UTF8, 'flags' => $vault_path_flags],
+					['if' => ['field' => 'authentication_type', 'in' => APM_GLOBAL_DB_AUTHTYPE_VAULT], 'type' => API_STRING_UTF8, 'flags' => $vault_path_flags],
 					['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 				]],
 				'db' => ['type' => API_STRING_UTF8, 'length' => 255],

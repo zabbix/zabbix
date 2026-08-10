@@ -126,7 +126,7 @@ class CUrlValidator extends CValidator {
 	}
 
 	protected function validateUrl(string $value): bool {
-		$value = self::sanitizeUrl($value);
+		$value = preg_replace('/[\r\n\t]/', '', trim($value, "\x00..\x20"));
 
 		if ($value === '') {
 			$this->setError(_('unacceptable URL'));
@@ -157,9 +157,5 @@ class CUrlValidator extends CValidator {
 		}
 
 		return true;
-	}
-
-	public static function sanitizeUrl(string $value): string {
-		return preg_replace('/[\r\n\t]/', '', trim($value, "\x00..\x20"));
 	}
 }

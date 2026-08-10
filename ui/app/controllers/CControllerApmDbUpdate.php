@@ -23,15 +23,15 @@ class CControllerApmDbUpdate extends CController {
 
 	public static function getValidationRules(): array {
 		$status_enabled = ['status', 'in' => [1]];
-		$auth_type_password = ['authentication_type', 'in' => [APM_AUTH_TYPE_PASSWORD]];
-		$auth_type_vault_path = ['authentication_type', 'in' => [APM_AUTH_TYPE_VAULT_PATH]];
+		$auth_type_password = ['authentication_type', 'in' => [APM_GLOBAL_DB_AUTHTYPE_PASSWORD]];
+		$auth_type_vault_path = ['authentication_type', 'in' => [APM_GLOBAL_DB_AUTHTYPE_VAULT]];
 
 		return ['object', 'fields' => [
 			'status' => ['boolean', 'required', 'in' => [0, 1]],
 			'url' => ['string', 'required', 'not_empty', 'length' => 2048, 'when' => $status_enabled,
 				'use' => [CUrlValidator::class, ['schemes' => ['http', 'https']]]],
 			'authentication_type' => ['integer', 'required',
-				'in' => [APM_AUTH_TYPE_PASSWORD, APM_AUTH_TYPE_VAULT_PATH, APM_AUTH_TYPE_NONE],
+				'in' => [APM_GLOBAL_DB_AUTHTYPE_PASSWORD, APM_GLOBAL_DB_AUTHTYPE_VAULT, APM_GLOBAL_DB_AUTHTYPE_NONE],
 				'when' => $status_enabled
 			],
 			'username' => ['string', 'required', 'not_empty', 'length' => 255,
@@ -85,8 +85,7 @@ class CControllerApmDbUpdate extends CController {
 		$apm = $this->getInputAll();
 		self::processApmInput($apm);
 
-		// TODO: Settings->update($apm)
-		$result = true;
+		$result = API::Settings()->update(['apm_global_db' => $apm]);
 
 		$output = [];
 
@@ -113,20 +112,20 @@ class CControllerApmDbUpdate extends CController {
 		}
 		else {
 			switch ($apm['authentication_type']) {
-				case APM_AUTH_TYPE_PASSWORD:
+				case APM_GLOBAL_DB_AUTHTYPE_PASSWORD:
 					$reset_fields = ['vault_path'];
 					break;
 
-				case APM_AUTH_TYPE_VAULT_PATH:
+				case APM_GLOBAL_DB_AUTHTYPE_VAULT:
 					$reset_fields = ['username', 'password'];
 					break;
 
-				case APM_AUTH_TYPE_NONE:
+				case APM_GLOBAL_DB_AUTHTYPE_NONE:
 					$reset_fields = ['vault_path', 'username', 'password'];
 					break;
 			}
 
-			$apm['url'] = CUrlValidator::sanitizeUrl($apm['url']);
+			$apm['url'] = preg_replace('/[\r\n\t]/', '', trim($apm['url'], "\x00..\x20"));
 
 			if (str_starts_with($apm['url'], 'https://')) {
 				if ($apm['ssl_verify_peer'] === 0) {
@@ -147,10 +146,6 @@ class CControllerApmDbUpdate extends CController {
 			}
 
 			unset($apm[CSRF_TOKEN_NAME]);
-
-			$apm = array_merge([
-				// TODO: Settings->get()
-			], $apm);
 		}
 	}
 }

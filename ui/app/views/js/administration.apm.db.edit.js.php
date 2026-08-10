@@ -77,12 +77,14 @@ const view = new class {
 		this.#ssl_key_password_input = this.#getFormField('ssl_key_password');
 		this.#change_ssl_key_password_btn = document.querySelector('.js-change-ssl-key-password');
 
-		this.#bindEvents();
+		const initial_values = this.#getAllValues();
+		this.#bindEvents({initial_values});
+		this.#updateForm({initial_values});
+
+		this.#form_element.removeAttribute('hidden');
 	}
 
-	#bindEvents() {
-		const initial_values = this.#getAllValues();
-
+	#bindEvents({initial_values}) {
 		this.#form_element.addEventListener('submit', this.#submitForm);
 
 		this.#url_input?.addEventListener('input', () => {
@@ -94,19 +96,19 @@ const view = new class {
 		this.#change_password_btn?.addEventListener('click', e => {
 			this.#password_changed = this.#password_input?.value !== '';
 
-			this.#password_input?.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+			this.#password_input?.removeAttribute('hidden');
 			this.#password_input?.focus();
 
-			e.target.classList.add(ZBX_STYLE_DISPLAY_NONE);
+			e.target.hidden = true;
 		});
 
 		this.#change_ssl_key_password_btn?.addEventListener('click', e => {
 			this.#ssl_key_password_changed = this.#ssl_key_password_input?.value !== '';
 
-			this.#ssl_key_password_input?.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+			this.#ssl_key_password_input?.removeAttribute('hidden');
 			this.#ssl_key_password_input?.focus();
 
-			e.target.classList.add(ZBX_STYLE_DISPLAY_NONE);
+			e.target.hidden = true;
 		});
 
 		for (const name of ['status', 'authentication_type', 'ssl_verify_peer']) {
@@ -131,15 +133,12 @@ const view = new class {
 	#updateForm({initial_values}) {
 		const values = this.#getAllValues();
 
-		const show_fields = values.status === 1;
-		const show_user_fields = show_fields && values.authentication_type === APM_AUTH_TYPE_PASSWORD;
-		const show_vault_path = show_fields && values.authentication_type === APM_AUTH_TYPE_VAULT_PATH;
+		const show_fields = values.status === APM_GLOBAL_DB_STATUS_CONFIGURED;
+		const show_user_fields = show_fields && values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
+		const show_vault_path = show_fields && values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_VAULT;
 		const show_ssl_fields = show_fields && values.url.substring(0, 8) === 'https://';
-		const show_ssl_verify_peer_fields = show_ssl_fields && values.ssl_verify_peer === 1;
-
-		if (!show_fields) {
-			this.#resetFormState();
-		}
+		const show_ssl_verify_peer_fields = show_ssl_fields
+			&& values.ssl_verify_peer === APM_GLOBAL_DB_VERIFY_PEER_ENABLED;
 
 		this.#updateDisplayState([
 			...document.querySelectorAll('.js-url'),
@@ -169,19 +168,32 @@ const view = new class {
 			...document.querySelectorAll('.js-ssl-verify-host')
 		], show_ssl_verify_peer_fields);
 
-		const has_password = initial_values.status === 1 && values.authentication_type === APM_AUTH_TYPE_PASSWORD;
-		const show_change_password_btn = has_password && !this.#url_changed && !this.#password_changed;
+		const show_change_password_btn = initial_values.status === 1
+			&& values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD
+			&& !this.#url_changed && !this.#password_changed;
+
+		this.#password_warning?.setAttribute('hidden', '');
 
 		if (this.#password_input !== null) {
 			if (this.#url_changed && this.#password_input.value !== '') {
 				this.#password_input.value = '';
 
-				this.#password_warning?.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+				this.#password_warning?.removeAttribute('hidden');
 			}
 
-			this.#password_input.classList.toggle(ZBX_STYLE_DISPLAY_NONE, show_change_password_btn);
+			this.#password_input.toggleAttribute('hidden', show_change_password_btn);
 
-			this.#change_password_btn?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !show_change_password_btn);
+			this.#change_password_btn?.toggleAttribute('hidden', !show_change_password_btn);
+		}
+
+		const show_change_ssl_key_password_btn = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
+			&& show_ssl_fields
+			&& !this.#ssl_key_password_changed;
+
+		if (this.#ssl_key_password_input !== null) {
+			this.#ssl_key_password_input.toggleAttribute('hidden', show_change_ssl_key_password_btn);
+
+			this.#change_ssl_key_password_btn?.toggleAttribute('hidden', !show_change_ssl_key_password_btn);
 		}
 
 		this.#url_changed = false;
@@ -194,33 +206,8 @@ const view = new class {
 
 	#updateDisplayState(elements, display) {
 		for (const element of elements) {
-			element?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !display);
+			element?.toggleAttribute('hidden', !display);
 		}
-	}
-
-	#resetFormState() {
-		const default_values = Object.entries(this.#default_values)
-			.filter(([name]) => name !== 'status');
-
-		for (const [name, value] of default_values) {
-			const field = this.#form.findFieldByName(name);
-
-			const input = field?.getField();
-			if (input) {
-				if (input.type === 'checkbox') {
-					input.checked = value === 1;
-				}
-				else {
-					input.value = value;
-				}
-
-				field?.setChanged(false);
-			}
-		}
-
-		this.#url_changed = false;
-
-		this.#form.reload(this.#rules);
 	}
 
 	#setLoadingStatus(loading_btn_class) {
