@@ -98,16 +98,17 @@ static int	cep_operation_condition_eval_tag_exists(const zbx_cep_op_condition_t 
 		zbx_cep_event_context_t *ctx)
 {
 	zbx_cep_event_t	*event;
-	int		ret;
+	int		ret = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tag:%s", __func__, condition->args.tag_name.tag);
 
-	event = cep_event_context_get_event(ctx);
+	if (NULL != (event = cep_event_context_get_event(ctx)))
+	{
+		ret = (FAIL == cep_event_find_tag(event, condition->args.tag_name.tag) ? 0 : 1);
 
-	ret = (FAIL == cep_event_find_tag(event, condition->args.tag_name.tag) ? 0 : 1);
-
-	if (ZBX_CONDITION_OPERATOR_NOT_EXIST == condition->operator)
-		ret = !ret;
+		if (ZBX_CONDITION_OPERATOR_NOT_EXIST == condition->operator)
+			ret = !ret;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d", __func__, ret);
 
@@ -124,21 +125,24 @@ static int	cep_operation_condition_eval_tag_value(const zbx_cep_op_condition_t *
 
 	zbx_cep_event_t	*event = cep_event_context_get_event(ctx);
 
-	for (int i = 0; i < event->tags.values_num && 0 == ret; i++)
+	if (NULL != event)
 	{
-		if (0 != strcmp(args->tag, event->tags.values[i].tag))
-			continue;
+		for (int i = 0; i < event->tags.values_num && 0 == ret; i++)
+		{
+			if (0 != strcmp(args->tag, event->tags.values[i].tag))
+				continue;
 
-		ret = cep_condition_eval_value(condition->operator, args->value,
-			event->tags.values[i].value);
-	}
+			ret = cep_condition_eval_value(condition->operator, args->value,
+				event->tags.values[i].value);
+		}
 
-	switch (condition->operator)
-	{
-		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
-		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
-			ret = !ret;
-			break;
+		switch (condition->operator)
+		{
+			case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+			case ZBX_CONDITION_OPERATOR_NOT_LIKE:
+				ret = !ret;
+				break;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d", __func__, ret);
