@@ -57,6 +57,10 @@ window.widget_form = new class extends CWidgetForm {
 			element.style.display = is_digital ? '' : 'none';
 		}
 
+		for (const element of this._form.querySelectorAll('.fields-group-tzone')) {
+			element.style.display = this._show_tzone.checked ? '' : 'none';
+		}
+
 		this._form.querySelector('.js-fieldset-adv-conf').style.display = is_digital ? 'contents' : 'none';
 
 		if (is_digital) {
