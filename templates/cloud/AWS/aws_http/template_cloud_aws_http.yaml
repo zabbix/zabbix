@@ -5317,7 +5317,7 @@ zabbix_export:
           key: aws.account.monthly.get
           history: '0'
           value_type: TEXT
-          description: 'Collects account monthly costs.'
+          description: 'Collects monthly account costs.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6964,7 +6964,7 @@ zabbix_export:
           key: aws.region.yearly.costs.get
           history: '0'
           value_type: TEXT
-          description: 'Collects region yearly costs.'
+          description: 'Collects yearly region costs.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -7263,7 +7263,7 @@ zabbix_export:
                   event_name: 'Account [{#AWS.LINKED.ACCOUNT}]: Daily cost >= {$AWS.ACCOUNT.COST.DAILY.WARN}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'AWS `{#AWS.LINKED.ACCOUNT}` account daily cost is above warning threshold `{$AWS.ACCOUNT.COST.DAILY.WARN}`. Please, monitor account spending and investigate cost increase trends.'
+                  description: 'AWS `{#AWS.LINKED.ACCOUNT}` account daily cost is above warning threshold `{$AWS.ACCOUNT.COST.DAILY.WARN}`. Please monitor account spending and investigate cost increase trends.'
                   dependencies:
                     - name: 'AWS account daily cost high'
                       expression: 'last(/AWS Cost Explorer by HTTP/aws.account.daily.total.cost["{#AWS.LINKED.ACCOUNT}"]) >= {$AWS.ACCOUNT.COST.DAILY.HIGH}'
@@ -7327,7 +7327,7 @@ zabbix_export:
             - lld_macro: '{#AWS.LINKED.ACCOUNT}'
               path: $.account_id
         - uuid: 5773c41da90d4a38aff02fccec733741
-          name: 'AWS monthly costs by services discovery'
+          name: 'AWS monthly costs by service discovery'
           type: DEPENDENT
           key: aws.cost.service.monthly.discovery
           filter:
@@ -7338,7 +7338,7 @@ zabbix_export:
               - macro: '{#AWS.BILLING.SERVICE.NAME}'
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'Discovery of monthly costs by services.'
+          description: 'Discovery of monthly costs by service.'
           item_prototypes:
             - uuid: d01ee8df0e204f1a857b8188df47402a
               name: '[{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost'
@@ -7346,7 +7346,7 @@ zabbix_export:
               key: 'aws.monthly.service.cost["{#AWS.BILLING.SERVICE.NAME}", "{#AWS.BILLING.MONTH}"]'
               value_type: FLOAT
               units: '!{#AWS.BILLING.UNIT}'
-              description: 'The monthly cost by service {#AWS.BILLING.SERVICE.NAME}.'
+              description: 'The monthly cost by service `{#AWS.BILLING.SERVICE.NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -7434,7 +7434,7 @@ zabbix_export:
             - lld_macro: '{#AWS.SERVICE.TYPE}'
               path: $.service
         - uuid: 6e65d15251ea4355ac41ed7956f9e5b0
-          name: 'AWS daily costs by services discovery'
+          name: 'AWS daily costs by service discovery'
           type: DEPENDENT
           key: aws.daily.services.costs.discovery
           filter:
@@ -7445,7 +7445,7 @@ zabbix_export:
               - macro: '{#AWS.BILLING.SERVICE.NAME}'
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'Discovery of daily blended costs by services.'
+          description: 'Discovery of daily blended costs by service.'
           item_prototypes:
             - uuid: b6e121c3a1eb49858e942beab12660e2
               name: 'Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost'
@@ -7453,7 +7453,7 @@ zabbix_export:
               key: 'aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]'
               value_type: FLOAT
               units: '!{#AWS.BILLING.UNIT}'
-              description: 'The daily blended cost of the {#AWS.BILLING.SERVICE.NAME} service for the previous day.'
+              description: 'The daily blended cost of the `{#AWS.BILLING.SERVICE.NAME}` service for the previous day.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -7483,7 +7483,7 @@ zabbix_export:
                   event_name: 'AWS [{#AWS.BILLING.SERVICE.NAME}]: Service daily cost >= {$AWS.SERVICE.COST.DAILY.WARN}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'AWS `{#AWS.BILLING.SERVICE.NAME}` service daily cost is above warning threshold `{$AWS.SERVICE.COST.DAILY.WARN}`. Please, monitor service usage and investigate cost increase trends.'
+                  description: 'AWS `{#AWS.BILLING.SERVICE.NAME}` service daily cost is above warning threshold `{$AWS.SERVICE.COST.DAILY.WARN}`. Please monitor service usage and investigate cost increase trends.'
                   dependencies:
                     - name: 'AWS service daily cost high'
                       expression: 'last(/AWS Cost Explorer by HTTP/aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]) >= {$AWS.SERVICE.COST.DAILY.HIGH}'
@@ -7522,7 +7522,7 @@ zabbix_export:
               key: 'aws.month.comparison.current.cost["{#AWS.MONTH.TYPE}"]'
               value_type: FLOAT
               units: '!{#AWS.CURRENCY}'
-              description: 'Collects total cost of AWS `{#AWS.MONTH}` month of the certain `{#AWS.MONTH.TYPE}` type.'
+              description: 'Collects total cost of AWS `{#AWS.MONTH}` month of the `{#AWS.MONTH.TYPE}` type.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -7540,7 +7540,7 @@ zabbix_export:
               key: 'aws.month.comparison.current.get["{#AWS.MONTH.TYPE}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects the latest data of AWS `{#AWS.MONTH}` month of the certain `{#AWS.MONTH.TYPE}` type.'
+              description: 'Collects the latest data of AWS `{#AWS.MONTH}` month of the `{#AWS.MONTH.TYPE}` type.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -7573,7 +7573,7 @@ zabbix_export:
               key: 'aws.monthly.cost["{#AWS.BILLING.MONTH}"]'
               value_type: FLOAT
               units: '!{#AWS.BILLING.UNIT}'
-              description: 'The blended cost by month {#AWS.BILLING.MONTH}.'
+              description: 'The blended cost by month `{#AWS.BILLING.MONTH}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -7606,7 +7606,7 @@ zabbix_export:
                   event_name: 'AWS [{#AWS.BILLING.MONTH}]: Monthly cost >= 80% of budget'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'AWS `{#AWS.BILLING.MONTH}` monthly blended cost has reached 80% of the defined budget `{$AWS.BUDGET.MONTH}`. Please, monitor spending to avoid budget overrun.'
+                  description: 'AWS `{#AWS.BILLING.MONTH}` monthly blended cost has reached 80% of the defined budget `{$AWS.BUDGET.MONTH}`. Please monitor spending to avoid budget overrun.'
                   dependencies:
                     - name: 'AWS monthly billing budget exceeded 100%'
                       expression: 'last(/AWS Cost Explorer by HTTP/aws.monthly.cost["{#AWS.BILLING.MONTH}"]) >= {$AWS.BUDGET.MONTH}'
@@ -7629,7 +7629,7 @@ zabbix_export:
                   event_name: 'AWS [{#AWS.BILLING.MONTH}]: Monthly cost >= {$AWS.BILLING.MONTH.WARN}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'AWS `{#AWS.BILLING.MONTH}` monthly blended cost is above warning threshold `{$AWS.BILLING.MONTH.WARN}`. Please, monitor cost trends and investigate recent usage increases.'
+                  description: 'AWS `{#AWS.BILLING.MONTH}` monthly blended cost is above warning threshold `{$AWS.BILLING.MONTH.WARN}`. Please monitor cost trends and investigate recent usage increases.'
                   dependencies:
                     - name: 'AWS monthly billing high'
                       expression: 'last(/AWS Cost Explorer by HTTP/aws.monthly.cost["{#AWS.BILLING.MONTH}"]) >= {$AWS.BILLING.MONTH.HIGH}'
@@ -7715,7 +7715,7 @@ zabbix_export:
                   event_name: 'Region [{#AWS.REGION}]: Daily cost >= {$AWS.REGION.COST.DAILY.WARN}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'AWS `{#AWS.REGION}` region daily cost is above warning threshold `{$AWS.REGION.COST.DAILY.WARN}`. Please, monitor region spending and investigate cost increase trends.'
+                  description: 'AWS `{#AWS.REGION}` region daily cost is above warning threshold `{$AWS.REGION.COST.DAILY.WARN}`. Please monitor region spending and investigate cost increase trends.'
                   dependencies:
                     - name: 'AWS region daily cost high'
                       expression: 'last(/AWS Cost Explorer by HTTP/aws.region.daily.cost["{#AWS.REGION}"]) >= {$AWS.REGION.COST.DAILY.HIGH}'
@@ -7897,7 +7897,7 @@ zabbix_export:
           name: 'AWS top service daily cost discovery'
           type: DEPENDENT
           key: aws.top.service.daily.cost.discovery
-          description: 'Discovers top daily service and bill.'
+          description: 'Discovers top daily services and billing data.'
           item_prototypes:
             - uuid: 79c424e060df42e78b82c67ab18f5ede
               name: 'Top service [{#AWS.SERVICE.NAME}]: cost, in percent'
@@ -7950,7 +7950,7 @@ zabbix_export:
                   event_name: 'Top service [{#AWS.SERVICE.NAME}]: Daily service cost >= {$AWS.SERVICE.COST.TOP.WARN}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'AWS `{#AWS.SERVICE.NAME}` top service cost is above warning threshold `{$AWS.SERVICE.COST.TOP.WARN}`. Please, monitor service usage and investigate cost increase trends.'
+                  description: 'AWS `{#AWS.SERVICE.NAME}` top service cost is above warning threshold `{$AWS.SERVICE.COST.TOP.WARN}`. Please monitor service usage and investigate cost increase trends.'
                   dependencies:
                     - name: 'AWS top daily service cost high'
                       expression: 'last(/AWS Cost Explorer by HTTP/aws.top.daily.service.cost["{#AWS.SERVICE.NAME}"]) >= {$AWS.SERVICE.COST.TOP.HIGH}'
@@ -8001,23 +8001,23 @@ zabbix_export:
             description: 'Access keys are long-term credentials for an IAM user.'
         - macro: '{$AWS.ACCOUNT.COST.DAILY.HIGH}'
           value: '400'
-          description: 'The threshold for high AWS account daily cost.'
+          description: 'Threshold for high AWS account daily cost.'
           config:
             type: TEXT
             priority: '11'
             section_name: 'AWS Daily'
             label: 'Account daily cost [high]'
-            description: 'The threshold for high AWS account daily cost.'
+            description: 'Threshold for high AWS account daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.ACCOUNT.COST.DAILY.WARN}'
           value: '200'
-          description: 'The threshold for warning AWS account daily cost.'
+          description: 'Warning threshold for AWS account daily cost.'
           config:
             type: TEXT
             priority: '12'
             section_name: 'AWS Daily'
             label: 'Account daily cost [warning]'
-            description: 'The threshold for warning AWS account daily cost.'
+            description: 'Warning threshold for AWS account daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.ASSUME.ROLE.ARN}'
           description: 'ARN assume role; add when using the `assume_role` authorization method.'
@@ -8075,32 +8075,32 @@ zabbix_export:
             description: 'A regex pattern to exclude services from discovery.'
         - macro: '{$AWS.BILLING.MONTH}'
           value: '11'
-          description: 'Months to get historical data from AWS Cost Explorer API, no more than 12 months.'
+          description: 'Number of months of historical cost data to get from AWS Cost Explorer API (maximum 12 months).'
           config:
             type: TEXT
             priority: '20'
             label: 'Billing Month'
-            description: 'The number of months to retrieve historical billing data (maximum 12). In the range from 1 to 12 inclusive.'
+            description: 'Number of months of historical cost data to get from AWS Cost Explorer API. In the range from 1 to 12 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.BILLING.MONTH.HIGH}'
           value: '15000'
-          description: 'The threshold for high AWS monthly billing.'
+          description: 'Threshold for high AWS monthly billing.'
           config:
             type: TEXT
             priority: '7'
             section_name: 'AWS Monthly'
             label: 'Monthly billing [high]'
-            description: 'The threshold for high AWS monthly billing.'
+            description: 'Threshold for high AWS monthly billing.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.BILLING.MONTH.WARN}'
           value: '10000'
-          description: 'The threshold for warning AWS monthly billing.'
+          description: 'Warning threshold for AWS monthly billing.'
           config:
             type: TEXT
             priority: '8'
             section_name: 'AWS Monthly'
             label: 'Monthly billing [warning]'
-            description: 'The threshold for warning AWS monthly billing.'
+            description: 'Warning threshold for AWS monthly billing.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.BILLING.REGION}'
           value: us-east-1
@@ -8112,13 +8112,13 @@ zabbix_export:
             description: 'The AWS region for billing data retrieval.'
         - macro: '{$AWS.BUDGET.MONTH}'
           value: '10000'
-          description: 'The threshold for AWS monthly budget limit.'
+          description: 'Threshold for AWS monthly budget limit.'
           config:
             type: TEXT
             priority: '6'
             section_name: 'AWS Monthly'
             label: 'Monthly budget'
-            description: 'The threshold for AWS monthly budget limit.'
+            description: 'Threshold for AWS monthly budget limit.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.PROXY}'
           description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
@@ -8130,23 +8130,23 @@ zabbix_export:
             description: 'HTTP proxy to use for requests.'
         - macro: '{$AWS.REGION.COST.DAILY.HIGH}'
           value: '400'
-          description: 'The threshold for high AWS region daily cost.'
+          description: 'Threshold for high AWS region daily cost.'
           config:
             type: TEXT
             priority: '13'
             section_name: 'AWS Daily'
             label: 'Region daily cost [high]'
-            description: 'The threshold for high AWS region daily cost.'
+            description: 'Threshold for high AWS region daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.REGION.COST.DAILY.WARN}'
           value: '200'
-          description: 'The threshold for warning AWS region daily cost.'
+          description: 'Warning threshold for AWS region daily cost.'
           config:
             type: TEXT
             priority: '14'
             section_name: 'AWS Daily'
             label: 'Region daily cost [warning]'
-            description: 'The threshold for warning AWS region daily cost.'
+            description: 'Warning threshold for AWS region daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
@@ -8158,43 +8158,43 @@ zabbix_export:
             description: 'Secret access key can be retrieved only at the time you create it.'
         - macro: '{$AWS.SERVICE.COST.DAILY.HIGH}'
           value: '400'
-          description: 'The threshold for high AWS service daily cost.'
+          description: 'Threshold for high AWS service daily cost.'
           config:
             type: TEXT
             priority: '15'
             section_name: 'AWS Daily'
             label: 'Service daily cost [high]'
-            description: 'The threshold for high AWS service daily cost.'
+            description: 'Threshold for high AWS service daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.SERVICE.COST.DAILY.WARN}'
           value: '200'
-          description: 'The threshold for warning AWS service daily cost.'
+          description: 'Warning threshold for AWS service daily cost.'
           config:
             type: TEXT
             priority: '16'
             section_name: 'AWS Daily'
             label: 'Service daily cost [warning]'
-            description: 'The threshold for warning AWS service daily cost.'
+            description: 'Warning threshold for AWS service daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.SERVICE.COST.TOP.HIGH}'
           value: '400'
-          description: 'The threshold for high AWS top service cost.'
+          description: 'Threshold for high AWS top service cost.'
           config:
             type: TEXT
             priority: '9'
             section_name: 'AWS Daily'
             label: 'Top service cost [high]'
-            description: 'The threshold for high AWS top service cost.'
+            description: 'Threshold for high AWS top service cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.SERVICE.COST.TOP.WARN}'
           value: '200'
-          description: 'The threshold for warning AWS top service cost.'
+          description: 'Warning threshold for AWS top service cost.'
           config:
             type: TEXT
             priority: '10'
             section_name: 'AWS Daily'
             label: 'Top service cost [warning]'
-            description: 'The threshold for warning AWS top service cost.'
+            description: 'Warning threshold for AWS top service cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AWS.STS.REGION}'
           value: us-east-1
