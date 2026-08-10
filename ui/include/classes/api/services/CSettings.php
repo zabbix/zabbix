@@ -399,6 +399,7 @@ class CSettings extends CApiService {
 			if ($authentication_type == APM_GLOBAL_DB_AUTHTYPE_PASSWORD) {
 				if ($status_changed || $authentication_type_changed) {
 					$username_flags = API_REQUIRED | $username_flags;
+					$password_flags = API_REQUIRED;
 
 					unset($db_apm_global_db['username'], $db_apm_global_db['password']);
 				}
