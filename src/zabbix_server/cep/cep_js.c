@@ -244,24 +244,31 @@ void	cep_js_init(zbx_es_t *es)
  ******************************************************************************/
 void	cep_js_ctx_init(zbx_cep_js_ctx_t *js, zbx_vector_cep_event_handle_t *hevents)
 {
-	js->events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * hevents->values_num);
-	js->events_num = 0;
-	zbx_cep_get_events_by_handles(hevents->values, hevents->values_num, js->events);
-
-	for (int i = 0; i < hevents->values_num; i++)
-	{
-		if (NULL != js->events[i])
-			js->events[js->events_num++] = js->events[i];
-	}
 	zbx_hashset_create(&js->index, (size_t)js->events_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	for (int i = 0; i < js->events_num; i++)
-	{
-		zbx_cep_event_ref_t	ref_local = {.eventid = js->events[i]->eventid, .event = js->events[i]};
+	js->events_num = 0;
 
-		zbx_hashset_insert(&js->index, &ref_local, sizeof(ref_local));
+	if (0 < hevents->values_num)
+	{
+		js->events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * hevents->values_num);
+		zbx_cep_get_events_by_handles(hevents->values, hevents->values_num, js->events);
+
+		for (int i = 0; i < hevents->values_num; i++)
+		{
+			if (NULL != js->events[i])
+				js->events[js->events_num++] = js->events[i];
+		}
+
+		for (int i = 0; i < js->events_num; i++)
+		{
+			zbx_cep_event_ref_t	ref_local = {.eventid = js->events[i]->eventid, .event = js->events[i]};
+
+			zbx_hashset_insert(&js->index, &ref_local, sizeof(ref_local));
+		}
 	}
+	else
+		js->events = NULL;
 }
 
 /******************************************************************************
