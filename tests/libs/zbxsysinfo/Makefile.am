@@ -54,9 +54,7 @@ parse_item_key_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 parse_item_key_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 check_service_test_LDADD = \
-	$(AGENT_GROUPED_LIBS) \
-	$(MOCK_DATA_DEPS) \
-	$(MOCK_TEST_DEPS)
+	$(SYSINFO_SERVER_LIBS)
 
 check_service_test_LDADD += @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 check_service_test_LDFLAGS = @SERVER_LDFLAGS@ \
