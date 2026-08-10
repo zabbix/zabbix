@@ -1466,7 +1466,7 @@ class CApiInputValidator {
 		}
 
 		// validation of the values type
-		foreach ($rule['fields'] ?? [] as $field_name => $field_rule) {
+		foreach ($rule['fields'] as $field_name => $field_rule) {
 			while ($field_rule['type'] == API_MULTIPLE) {
 				$matched_multiple_rule = null;
 
