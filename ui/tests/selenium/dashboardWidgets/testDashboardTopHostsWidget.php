@@ -1741,6 +1741,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		// Take a screenshot to test draggable object position of columns.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
+			COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertScreenshot($form->query('id:list_columns')->waitUntilPresent()->one(), 'Top hosts columns');
 		}
 
