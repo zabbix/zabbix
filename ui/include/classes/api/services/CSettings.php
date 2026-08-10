@@ -274,7 +274,7 @@ class CSettings extends CApiService {
 		]];
 
 		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
-			$api_input_rules['fields'] += ['apm_global_db' => ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED]];
+			$api_input_rules['fields'] += ['apm_global_db' => ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []]];
 		}
 
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
