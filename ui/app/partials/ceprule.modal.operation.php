@@ -24,26 +24,31 @@ foreach (CCepRuleHelper::getOperationExecuteWhenStrings() as $value => $name) {
 	$execute_when->addOption(new CSelectOption($value, $name));
 }
 
-$events_operations = new CSelectOptionGroup(_('Events'));
-$tags_operations = new CSelectOptionGroup(_('Tags'));
+$events_operations = new CSelectOptionGroup(_('Event'));
+$tags_operations = new CSelectOptionGroup(_('Tag'));
+$window_operations = new CSelectOptionGroup(_('Window'));
 $labels = CCepRuleHelper::getOperationLabelStrings();
 
 $events_group_opts = [CCepRuleHelper::OP_SET_NAME, CCepRuleHelper::OP_CLOSE_EVENT, CCepRuleHelper::OP_DISCARD,
 	CCepRuleHelper::OP_SET_SEVERITY, CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY,
-	CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_UNSUPPRESS, CCepRuleHelper::OP_CLONE_LAST, CCepRuleHelper::OP_CLONE_FIRST
+	CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_UNSUPPRESS, CCepRuleHelper::OP_CLONE_LAST,
+	CCepRuleHelper::OP_CLONE_FIRST
 ];
 
 foreach ($labels as $option => $label) {
-	$is_events_group = in_array($option, $events_group_opts);
-	$option = new CSelectOption($option, $label);
-	$option->setExtra('is_events_group', $is_events_group);
+	$optgroupid = 'optgroup_tags';
+	$optgroup = $tags_operations;
 
-	if ($is_events_group) {
-		$events_operations->addOption($option);
+	if (in_array($option, $events_group_opts)) {
+		$optgroupid = 'optgroup_events';
+		$optgroup = $events_operations;
 	}
-	else {
-		$tags_operations->addOption($option);
+	else if ($option == CCepRuleHelper::OP_CLOSE_WINDOW) {
+		$optgroupid = 'optgroup_window';
+		$optgroup = $window_operations;
 	}
+
+	$optgroup->addOption((new CSelectOption($option, $label))->setExtra('optgroupid', $optgroupid));
 }
 
 (new CForm())
@@ -160,6 +165,7 @@ foreach ($labels as $option => $label) {
 				->setId('ceprule-operation-type')
 				->addOptionGroup($events_operations)
 				->addOptionGroup($tags_operations)
+				->addOptionGroup($window_operations)
 			)
 			->addItem(new CObject('&nbsp;'))
 			->addItem((new CTextBox('event_name'))

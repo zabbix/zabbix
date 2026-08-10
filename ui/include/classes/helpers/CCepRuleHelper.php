@@ -348,7 +348,7 @@ class CCepRuleHelper {
 
 	public static function getOperationLabelStrings(): array {
 		return [
-			self::OP_SET_NAME => _('Set event name'),
+			self::OP_SET_NAME => _('Set name'),
 			self::OP_CLOSE_EVENT => _('Close'),
 			self::OP_DISCARD => _('Discard'),
 			self::OP_SET_SEVERITY => _('Set severity'),
@@ -356,16 +356,16 @@ class CCepRuleHelper {
 			self::OP_DECREASE_SEVERITY => _('Decrease severity'),
 			self::OP_SUPPRESS => _('Suppress'),
 			self::OP_UNSUPPRESS => _('Unsuppress'),
-			self::OP_CLONE_FIRST => _('Clone first as new event'),
-			self::OP_CLONE_LAST => _('Clone last as new event'),
-			self::OP_ADD_TAG => _('Add tag'),
-			self::OP_SET_TAG => _('Set tag'),
-			self::OP_SET_TAG_VALUE => _('Set tag value'),
-			self::OP_INCREASE_TAG_VALUE => _('Increase tag value'),
-			self::OP_DECREASE_TAG_VALUE => _('Decrease tag value'),
-			self::OP_RENAME_TAG => _('Rename tag'),
-			self::OP_REMOVE_TAG => _('Remove tag'),
-			self::OP_CLOSE_WINDOW => _('Close window')
+			self::OP_CLONE_FIRST => _('Clone first'),
+			self::OP_CLONE_LAST => _('Clone last'),
+			self::OP_ADD_TAG => _('Add'),
+			self::OP_SET_TAG => _('Set'),
+			self::OP_SET_TAG_VALUE => _('Set value'),
+			self::OP_INCREASE_TAG_VALUE => _('Increase value'),
+			self::OP_DECREASE_TAG_VALUE => _('Decrease value'),
+			self::OP_RENAME_TAG => _('Rename'),
+			self::OP_REMOVE_TAG => _('Remove'),
+			self::OP_CLOSE_WINDOW => _('Close (window)')
 		];
 	}
 

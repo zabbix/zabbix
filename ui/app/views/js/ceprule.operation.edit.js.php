@@ -231,6 +231,7 @@ window.ceprule_operation_edit_popup = new class {
 		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
 		const zselect = window['ceprule-operation-type'];
 		const events_options = [];
+		const window_options = [];
 		const tags_options = [];
 		const enable_if_allowed = (option) => {
 			option.is_disabled = !this.#operation_types_by_execute_when[execute_when].includes(Number(option.value));
@@ -238,12 +239,22 @@ window.ceprule_operation_edit_popup = new class {
 
 		zselect.options.forEach(option => {
 			enable_if_allowed(option);
-			option.extra.is_events_group ? events_options.push(option) : tags_options.push(option);
+
+			if (option.extra.optgroupid === 'optgroup_events') {
+				events_options.push(option);
+			}
+			else if (option.extra.optgroupid === 'optgroup_window') {
+				window_options.push(option);
+			}
+			else if (option.extra.optgroupid === 'optgroup_tags') {
+				tags_options.push(option);
+			}
 		});
 
 		zselect.clearOptions();
 		zselect.addOptionGroup({label: <?= json_encode(_('Events')) ?>, options: events_options});
 		zselect.addOptionGroup({label: <?= json_encode(_('Tags')) ?>, options: tags_options});
+		zselect.addOptionGroup({label: <?= json_encode(_('Window')) ?>, options: window_options});
 		zselect.value = type;
 
 		// Select first enabled option, if previous selection got disabled.
