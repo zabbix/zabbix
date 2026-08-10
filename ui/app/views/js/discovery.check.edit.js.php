@@ -21,14 +21,20 @@
 
 window.check_popup = new class {
 
-	init() {
-		this.overlay = overlays_stack.getById('discovery-check');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+	#overlay
+	#dialogue
+	#form_element
+	#form
+
+	init({rules}) {
+		this.#overlay = overlays_stack.getById('discovery-check');
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
 
 		this._loadViews();
-		this.form.style.display = '';
-		this.overlay.recoverFocus();
+		this.#form_element.style.display = '';
+		this.#overlay.recoverFocus();
 	}
 
 	_loadViews() {
@@ -107,106 +113,20 @@ window.check_popup = new class {
 		], JSON_THROW_ON_ERROR) ?>);
 	}
 
-	/**
-	 * Checks duplicate discovery checks.
-	 */
-	_hasDCheckDuplicates(dcheck) {
-		let results = [];
-		let fields = [
-			'dcheckid', 'type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
-			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-			'snmpv3_privpassphrase', 'snmp_oid', 'allow_redirect'
-		];
-
-		if (dcheck.type == <?= SVC_ICMPPING ?>) {
-			if (typeof dcheck.allow_redirect === 'undefined') {
-				dcheck.allow_redirect = '0';
-			}
-		}
-
-		[...document.getElementById('dcheckList').getElementsByTagName('tr')].map(element => {
-			let inputs = element.querySelectorAll('input');
-
-			let result = [];
-			for (const input of inputs) {
-				for (let i = 0; i < fields.length; i++) {
-					if (input.name.includes(fields[i])) {
-						result[fields[i]] = input.value;
-						break;
-					}
-				}
-			}
-
-			results.push(result);
-		});
-
-		const lookup = [
-			{
-				types: [
-					<?= SVC_SSH ?>, <?= SVC_LDAP ?>, <?= SVC_SMTP ?>, <?= SVC_FTP ?>, <?= SVC_HTTP ?>, <?= SVC_POP ?>,
-					<?= SVC_NNTP ?>, <?= SVC_IMAP ?>, <?= SVC_TCP ?>, <?= SVC_HTTPS ?>,
-					<?= SVC_TELNET ?>
-				],
-				keys: ['type', 'ports']
-			},
-			{
-				types: [<?= SVC_AGENT ?>],
-				keys: ['type', 'ports', 'key_']
-			},
-			{
-				types: [<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>],
-				keys: ['type', 'ports', 'snmp_community', 'snmp_oid']
-			},
-			{
-				types: [<?= SVC_SNMPv3 ?>],
-				keys: [
-					'type', 'ports', 'snmp_oid', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
-					'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase'
-				]
-			},
-			{
-				types: [<?= SVC_ICMPPING ?>],
-				keys: ['type', 'allow_redirect']
-			}
-		];
-
-		return results.some(result => {
-			if (!result.type || result.dcheckid === dcheck.dcheckid) {
-				return false;
-			}
-
-			if ([<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>].includes(parseInt(result.type))
-					&& "key_" in result) {
-				result.snmp_oid = result.key_;
-				delete result.key_;
-			}
-
-			const check = lookup.find(entry => entry.types.includes(parseInt(result.type)));
-
-			return Object.keys(result)
-				.filter(key => check.keys.includes(key))
-				.every(key => dcheck[key] === result[key]);
-		});
-	}
-
 	submit() {
-		const curl = new Curl('zabbix.php');
-		let fields = getFormFields(this.form);
+		this.#removePopupMessages();
+		let fields = this.#form.getAllValues();
 
-		for (const element of this.form.parentNode.children) {
-			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-				element.parentNode.removeChild(element);
-			}
-		}
+		this.#form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#overlay.unsetLoading();
 
-		if (this._hasDCheckDuplicates(fields)) {
-			this._addDuplicateMessage();
-		}
-		else {
-			this._updateFields(fields);
-			curl.setArgument('action', 'discovery.check.check');
-			this._post(curl.getUrl(), fields);
-		}
+					return;
+				}
+
+				this._post(zabbixUrl({action: 'discovery.check.check'}), fields);
+			});
 	}
 
 	_post(url, data) {
@@ -221,96 +141,44 @@ window.check_popup = new class {
 					throw {error: response.error};
 				}
 
-				this.dialogue.dispatchEvent(new CustomEvent('check.submit', {detail: response}));
-				overlayDialogueDestroy(this.overlay.dialogueid);
+				if ('form_errors' in response) {
+					this.#form.setErrors(response.form_errors, true, true);
+					this.#form.renderErrors();
+
+					return;
+				}
+
+				if (this.#overlay.$dialogue[0].isConnected) {
+					this.#dialogue.dispatchEvent(new CustomEvent('check.submit', {detail: response}));
+					overlayDialogueDestroy(this.#overlay.dialogueid);
+				}
 			})
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title, messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this.#overlay.unsetLoading());
 	}
 
-	_addDuplicateMessage() {
-		const messageBox = makeMessageBox('bad', [<?= json_encode(_('Check already exists.')) ?>])[0];
-		this.form.parentNode.insertBefore(messageBox, this.form);
-
-		this.overlay.unsetLoading();
+	#removePopupMessages() {
+		for (const el of this.#form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
 	}
 
-	/**
-	 * Updates form fields based on check type and trims string values.
-	 */
-	_updateFields(fields) {
-		if (fields.type != <?= SVC_AGENT ?>) {
-			for (const key in fields) {
-				if (key === 'key_') {
-					delete fields[key];
-				}
-			}
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		if (![<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>].includes(parseInt(fields.type))) {
-			for (const key in fields) {
-				if (key === 'snmp_community') {
-					delete fields[key];
-				}
-			}
-		}
+		const message_box = makeMessageBox('bad', messages, title)[0];
 
-		if (![<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>].includes(parseInt(fields.type))) {
-			for (const key in fields) {
-				if (key === 'snmp_oid') {
-					delete fields[key];
-				}
-			}
-		}
-
-		if (fields.type != <?= SVC_SNMPv3 ?>) {
-			for (const key in fields) {
-				if (key === 'snmpv3_privpassphrase') {
-					delete fields[key];
-				}
-			}
-		}
-
-		if (fields.type == <?= SVC_SNMPv3 ?>) {
-			let security_level = false;
-
-			for (const key in fields) {
-				if (key === 'snmpv3_securitylevel' && fields[key] != <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>) {
-					security_level = true;
-				}
-
-				if (key === 'snmpv3_privpassphrase' && security_level) {
-					delete fields[key];
-				}
-			}
-		}
-
-		for (let key in fields) {
-			if (typeof fields[key] === 'string') {
-				fields[key] = fields[key].trim();
-			}
-		}
+		this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 	}
 
 	/**

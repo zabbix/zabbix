@@ -29,10 +29,12 @@ class CControllerServiceEdit extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(['object', 'fields' => [
+		$rules = ['object', 'fields' => [
 			'serviceid' => ['db services.serviceid'],
 			'parent_serviceids' => ['array', 'field' => ['db services.serviceid']]
-		]]);
+		]];
+
+		$ret = $this->validateInput($rules, true);
 
 		if (!$ret) {
 			$this->setResponse(

@@ -87,6 +87,28 @@ class CControllerPopup extends CController {
 			$this->popup_controller = new $popup_controller_class;
 
 			$ret = $this->popup_controller->checkInput();
+
+			if (!$ret) {
+				$response = $this->popup_controller->getResponse();
+
+				if ($response instanceof CControllerResponseData) {
+					$data = $response->getData();
+
+					if (array_key_exists('main_block', $data)) {
+						$main_block = json_decode($data['main_block'], true);
+
+						if (array_key_exists('error', $main_block)) {
+							if (array_key_exists('title', $main_block['error'])) {
+								CMessageHelper::setErrorTitle($main_block['error']['title']);
+							}
+
+							foreach ($main_block['error']['messages'] as $message) {
+								CMessageHelper::addError($message);
+							}
+						}
+					}
+				}
+			}
 		}
 
 		if (!$ret) {

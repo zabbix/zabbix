@@ -509,7 +509,6 @@ window.item_edit_form = new class {
 
 	#getFormFields() {
 		const values = this.form.getAllValues();
-		values.interfaceid = values.interfaceid ? values.interfaceid : null;
 
 		if (values.delay === undefined) {
 			values.delay = '';

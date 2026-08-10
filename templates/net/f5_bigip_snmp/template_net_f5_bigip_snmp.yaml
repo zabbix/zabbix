@@ -17,7 +17,7 @@ zabbix_export:
       wizard_ready: 'YES'
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.0-6
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -393,10 +393,6 @@ zabbix_export:
           key: 'zabbix[host,snmp,available]'
           valuemap:
             name: 'SNMP available'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: network

@@ -69,7 +69,7 @@ func NewPlugin(
 		Logger: log.New(name),
 	}
 	base.SetExternal(true)
-	base.SetHandleTimeout(true)
+	base.SetForceEffectiveTimeoutExtension(true)
 
 	return &Plugin{
 		Base:          base,
@@ -390,15 +390,18 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		respTimeout = time.Second*time.Duration(ctx.Timeout()) + time.Millisecond*500
 	}
 
+	useLegacyTimeout := ctx.LegacyTimeout()
+
 	resp, err := DoWithResponseAs[comms.ExportResponse](
 		p.broker,
 		&comms.ExportRequest{
 			Common: comms.Common{
 				Type: comms.ExportRequestType,
 			},
-			Key:     key,
-			Params:  params,
-			Timeout: ctx.Timeout(),
+			Key:           key,
+			Params:        params,
+			Timeout:       ctx.Timeout(),
+			LegacyTimeout: &useLegacyTimeout,
 		},
 		respTimeout,
 	)

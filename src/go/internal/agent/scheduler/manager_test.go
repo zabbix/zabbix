@@ -16,6 +16,7 @@ package scheduler
 
 import (
 	"container/heap"
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -2075,5 +2076,181 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 				t.Fatalf("getPluginForceActiveChecks() = %s", diff)
 			}
 		})
+	}
+}
+
+//nolint:gocognit,gocyclo,cyclop,paralleltest // will require to rewrite this test to fit our unit test template
+func TestTimeoutParsing(t *testing.T) {
+	// !! this is why we don't globally variable
+	agentTimeoutBackup := agent.Options.Timeout
+	defer func() {
+		agent.Options.Timeout = agentTimeoutBackup
+	}()
+
+	const UnmistakableNumber = 67
+	agent.Options.Timeout = UnmistakableNumber
+
+	// NORMAL CASES
+	// there should be no errors and no surprises in here
+	nilValue, err := ParseAndValidateItemTimeout(nil)
+	if err != nil {
+		t.Errorf("Nil value parse errored out")
+	}
+	if nilValue != UnmistakableNumber { //nolint:wsl
+		t.Errorf("Got %v instead of %v for nil timeout", nilValue, UnmistakableNumber)
+	}
+
+	intValue, err := ParseAndValidateItemTimeout(23)
+	if err != nil {
+		t.Errorf("Integer value parse errored out")
+	}
+	if intValue != 23 { //nolint:wsl
+		t.Errorf("Got %v instead of %v for int timeout", intValue, 23)
+	}
+
+	floatValue, err := ParseAndValidateItemTimeout(23.0)
+	if err != nil {
+		t.Errorf("Float value parse errored out")
+	}
+	if floatValue != 23 { //nolint:wsl
+		t.Errorf("Got %v instead of %v for float timeout", floatValue, 23)
+	}
+
+	stringValueA, err := ParseAndValidateItemTimeout("23s")
+	if err != nil {
+		t.Errorf("Float value parse errored out")
+	}
+	if stringValueA != 23 { //nolint:wsl
+		t.Errorf("Got %v instead of %v for string timeout", stringValueA, 23)
+	}
+
+	stringValueB, err := ParseAndValidateItemTimeout("2m")
+	if err != nil {
+		t.Errorf("Float value parse errored out")
+	}
+	if stringValueB != 2*60 { //nolint:wsl
+		t.Errorf("Got %v instead of %v for string timeout", stringValueB, 2*60)
+	}
+
+	// FLOAT GETS FLOORED
+	// floating point values should be rounded down to nearest integer value
+	floatFloorValueA, err := ParseAndValidateItemTimeout(23.23)
+	if err != nil {
+		t.Errorf("Float value parse errored out")
+	}
+	if floatFloorValueA != 23 { //nolint:wsl
+		t.Errorf("Got %v instead of %v for float timeout", floatFloorValueA, 23)
+	}
+
+	floatFloorValueB, err := ParseAndValidateItemTimeout(23.5)
+	if err != nil {
+		t.Errorf("Float value parse errored out")
+	}
+	if floatFloorValueB != 23 { //nolint:wsl
+		t.Errorf("Got %v instead of %v for float timeout", floatFloorValueB, 23)
+	}
+
+	// ZERO TIMEOUT EDGE CASES
+	// zero int timeout should be replaced with agent timeout.
+	// float timeout can round down to zero and the same logic applies.
+	intZeroValue, err := ParseAndValidateItemTimeout(0)
+	if err != nil {
+		t.Errorf("Integer value parse errored out")
+	}
+	if intZeroValue != UnmistakableNumber { //nolint:wsl
+		t.Errorf("Got %v instead of %v for int zero timeout", intZeroValue, UnmistakableNumber)
+	}
+
+	floatZeroValueA, err := ParseAndValidateItemTimeout(0.0)
+	if err != nil {
+		t.Errorf("Float value parse errored out")
+	}
+	if floatZeroValueA != UnmistakableNumber { //nolint:wsl
+		t.Errorf("Got %v instead of %v for float timeout", floatZeroValueA, UnmistakableNumber)
+	}
+
+	floatZeroValueB, err := ParseAndValidateItemTimeout(0.999)
+	if err != nil {
+		t.Errorf("Float value parse errored out")
+	}
+	if floatZeroValueB != UnmistakableNumber { //nolint:wsl
+		t.Errorf("Got %v instead of %v for float timeout", floatZeroValueB, UnmistakableNumber)
+	}
+
+	stringZeroValueA, err := ParseAndValidateItemTimeout("0s")
+	if err != nil {
+		t.Errorf("Integer value parse errored out")
+	}
+	if stringZeroValueA != UnmistakableNumber { //nolint:wsl
+		t.Errorf("Got %v instead of %v for string zero timeout", stringZeroValueA, UnmistakableNumber)
+	}
+
+	stringZeroValueB, err := ParseAndValidateItemTimeout("0m")
+	if err != nil {
+		t.Errorf("Integer value parse errored out")
+	}
+	if stringZeroValueB != UnmistakableNumber { //nolint:wsl
+		t.Errorf("Got %v instead of %v for string zero timeout", stringZeroValueB, UnmistakableNumber)
+	}
+
+	// MIN/MAX TIMEOUT VALUES
+	// all values below zero should be rejected
+	// same applies to all timeout values longer than 600 seconds
+	_, err = ParseAndValidateItemTimeout(-1)
+	if err == nil || !errors.Is(err, ErrUnsupportedTimeout) {
+		t.Errorf("Expected error %v, got %v instead", ErrUnsupportedTimeout, err)
+	}
+
+	lastValidTimeoutValue, err := ParseAndValidateItemTimeout(600)
+	if err != nil {
+		t.Errorf("Integer value parse errored out")
+	}
+	if lastValidTimeoutValue != 600 { //nolint:wsl
+		t.Errorf("Got %v instead of %v for timeout", lastValidTimeoutValue, 600)
+	}
+
+	_, err = ParseAndValidateItemTimeout(601)
+	if err == nil || !errors.Is(err, ErrUnsupportedTimeout) {
+		t.Errorf("Expected error %v, got %v instead", ErrUnsupportedTimeout, err)
+	}
+
+	// INVALID STRING VALUES
+	// these should not be valid parses.
+	// except the 4m20s ones. I don't know if they should be valid or invalid,
+	// the function didn't parse them prior to these tests being written.
+	_, err = ParseAndValidateItemTimeout("4m20s")
+	if err == nil || !errors.Is(err, ErrUnsupportedTimeout) {
+		t.Errorf("Expected error %v, got %v instead", ErrUnsupportedTimeout, err)
+	}
+
+	_, err = ParseAndValidateItemTimeout("4m 20s")
+	if err == nil || !errors.Is(err, ErrUnsupportedTimeout) {
+		t.Errorf("Expected error %v, got %v instead", ErrUnsupportedTimeout, err)
+	}
+
+	_, err = ParseAndValidateItemTimeout("3eggs")
+	if err == nil || !errors.Is(err, ErrUnsupportedTimeout) {
+		t.Errorf("Expected error %v, got %v instead", ErrUnsupportedTimeout, err)
+	}
+
+	_, err = ParseAndValidateItemTimeout("egg")
+	if err == nil || !errors.Is(err, ErrUnsupportedTimeout) {
+		t.Errorf("Expected error %v, got %v instead", ErrUnsupportedTimeout, err)
+	}
+
+	_, err = ParseAndValidateItemTimeout("6.7s")
+	if err == nil || !errors.Is(err, ErrUnsupportedTimeout) {
+		t.Errorf("Expected error %v, got %v instead", ErrUnsupportedTimeout, err)
+	}
+
+	// INVALID TYPES
+	_, err = ParseAndValidateItemTimeout(true)
+	if err == nil || !errors.Is(err, ErrUnsupportedTimeout) {
+		t.Errorf("Expected error %v, got %v instead", ErrUnsupportedTimeout, err)
+	}
+
+	_, err = ParseAndValidateItemTimeout(make(map[string]any))
+	if err == nil || !errors.Is(err, ErrUnsupportedTimeout) {
+		t.Errorf("Expected error %v, got %v instead", ErrUnsupportedTimeout, err)
 	}
 }

@@ -37,6 +37,16 @@ Plugins.Smart.Path=C:\Program Files\smartctl\smartctl.exe
 - **Range:** 1–30 seconds
 - **Default Value:** Inherits the global timeout setting of the agent.
 - **Example:**
+- **Note:**
+  > The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
+
+#### `Plugins.Smart.ConnectionTimeout`
+- **Description:** Defines the maximum time (in seconds) to wait for SMART data requests to complete.
+- **Mandatory:** No
+- **Range:** 1–30 seconds
+- **Default Value:** Inherits the global timeout setting of the agent.
+- **Example:**
+
 ```
 Plugins.Smart.Timeout=10
 ```

@@ -20,19 +20,20 @@
 class CControllerCorrelationConditionEdit extends CController {
 
 	protected function init(): void {
-		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(['objects', 'fields' => [
+		$rules = ['objects', 'fields' => [
 			'type' => ['db corr_condition.type', 'in' => [
 				ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
 				ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
 				ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
 			]]
-		]]);
+		]];
+
+		$ret = $this->validateInput($rules, true);
 
 		if (!$ret) {
 			$this->setResponse(

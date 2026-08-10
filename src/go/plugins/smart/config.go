@@ -17,13 +17,15 @@ package smart
 import (
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
 
 // Options holds plugin options.
 type Options struct {
-	Timeout int    `conf:"optional,range=1:30"`
-	Path    string `conf:"optional"`
+	LegacyTimeout     int    `conf:"name=Timeout,optional,range=1:30"`
+	ConnectionTimeout int    `conf:"optional,range=1:30"`
+	Path              string `conf:"optional"`
 }
 
 // Configure loads in plugin config files.
@@ -32,11 +34,23 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
+	if p.options.LegacyTimeout != 0 {
+		log.Debugf("'Plugins.Smart.Timeout' is deprecated")
+
+		if p.options.ConnectionTimeout == 0 {
+			p.options.ConnectionTimeout = p.options.LegacyTimeout
+		}
 	}
 
-	p.ctl = NewSmartCtl(p.Logger, p.options.Path, p.options.Timeout)
+	if p.options.ConnectionTimeout == 0 {
+		p.options.ConnectionTimeout = global.Timeout
+	}
+
+	if p.options.LegacyTimeout == 0 {
+		p.options.LegacyTimeout = global.Timeout
+	}
+
+	p.ctl = NewSmartCtl(p.Logger, p.options.Path, p.options.ConnectionTimeout)
 }
 
 // Validate validates plugin config file.
