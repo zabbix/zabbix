@@ -1118,7 +1118,7 @@ class CCepRule extends CApiService {
 		}
 	}
 
-	private static function updateOperationFilters(array $operations, ?array $db_operations = null): void {
+	private static function updateOperationFilters(array $operations, ?array $db_operations): void {
 		$upd_operations = [];
 
 		foreach ($operations as $operation) {
@@ -1147,7 +1147,7 @@ class CCepRule extends CApiService {
 		self::updateOperationFilterConditions($operations, $db_operations);
 	}
 
-	private static function updateOperationFilterConditions(array $operations, array $db_operations): void {
+	private static function updateOperationFilterConditions(array $operations, ?array $db_operations): void {
 		$ins_conditions = [];
 		$del_conditionids = [];
 
