@@ -116,7 +116,7 @@ foreach ($labels as $option => $label) {
 							ZBX_CONDITION_TYPE_EVENT_FIRST => _('First'),
 							ZBX_CONDITION_TYPE_EVENT_LAST => _('Last'),
 							ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => _('Supressed'),
-							ZBX_CONDITION_TYPE_EVENT_COPIED => _('Cloned'),
+							ZBX_CONDITION_TYPE_EVENT_COPIED => _('Cloned')
 						]))
 					)
 				)
