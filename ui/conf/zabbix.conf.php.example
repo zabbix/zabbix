@@ -110,3 +110,32 @@ $ZBX_SERVER_TLS['KEY_FILE'] = '';
 $ZBX_SERVER_TLS['CERT_FILE'] = '';
 $ZBX_SERVER_TLS['CERTIFICATE_ISSUER']  = '';
 $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] = '';
+
+// Uncomment and set to desired values to override the global APM data source configuration.
+// Supported configuration parameters for all providers:
+// 'provider'   - Telemetry provider type: 'clickhouse', 'zabbix'.
+// Additional parameters for ClickHouse:
+// 'url'        - Telemetry provider URL with http or https scheme.
+// 'db'         - Database name. Can be empty.
+// 'username'   - Database user. Can be empty.
+// 'password'   - Database password. Can be empty.
+// 'vault_path' - Vault path if vault is used for credentials, cannot be set with username or password. Can be empty.
+// Additional parameters for ClickHouse url with 'https' scheme:
+// 'tls_verity_peer' - Verify peer. Default: false.
+// 'tls_verity_host' - Verify host. Only supported if 'tls_verify_peer' is set to true. Default: false.
+// 'ssl_cert_file' - Client certificate file path. Can be empty.
+// 'ssl_key_file' - Client private key file path. Can be empty.
+// 'ssl_key_password' - Client private key password. Can be empty.
+// 'ssl_ca_location' - Certificate authority (CA) location. Only supported if 'tls_verify_peer' is set to true. Can be empty.
+// ClickHouse:
+//$TELEMETRY_PROVIDERS[] = [
+//	'provider' => 'clickhouse',
+//	'url' => 'http://localhost:8123',
+//	'db' => 'zabbix',
+//	'username' => 'zabbix',
+//	'password' => 'zabbix'
+//];
+// Zabbix database:
+//$TELEMETRY_PROVIDERS[] = [
+//	'provider' => 'zabbix'
+//];
