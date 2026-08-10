@@ -22,35 +22,36 @@ class CControllerApmDbUpdate extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		$status_enabled = ['status', 'in' => [1]];
+		$status_configured = ['status', 'in' => [APM_GLOBAL_DB_STATUS_CONFIGURED]];
 		$auth_type_password = ['authentication_type', 'in' => [APM_GLOBAL_DB_AUTHTYPE_PASSWORD]];
 		$auth_type_vault_path = ['authentication_type', 'in' => [APM_GLOBAL_DB_AUTHTYPE_VAULT]];
 
 		return ['object', 'fields' => [
-			'status' => ['boolean', 'required', 'in' => [0, 1]],
-			'url' => ['string', 'required', 'not_empty', 'length' => 2048, 'when' => $status_enabled,
+			'status' => ['boolean', 'required', 'in' => [APM_GLOBAL_DB_STATUS_NOT_CONFIGURED,
+				APM_GLOBAL_DB_STATUS_CONFIGURED]],
+			'url' => ['string', 'required', 'not_empty', 'length' => 2048, 'when' => $status_configured,
 				'use' => [CUrlValidator::class, ['schemes' => ['http', 'https']]]],
 			'authentication_type' => ['integer', 'required',
 				'in' => [APM_GLOBAL_DB_AUTHTYPE_PASSWORD, APM_GLOBAL_DB_AUTHTYPE_VAULT, APM_GLOBAL_DB_AUTHTYPE_NONE],
-				'when' => $status_enabled
+				'when' => $status_configured
 			],
 			'username' => ['string', 'required', 'not_empty', 'length' => 255,
-				'when' => [$status_enabled, $auth_type_password]],
-			'password' => ['string', 'required', 'length' => 255, 'when' => [$status_enabled, $auth_type_password]],
+				'when' => [$status_configured, $auth_type_password]],
+			'password' => ['string', 'required', 'length' => 255, 'when' => [$status_configured, $auth_type_password]],
 			'vault_path' => ['string', 'required', 'not_empty', 'length' => 255,
-				'when' => [$status_enabled, $auth_type_vault_path]],
-			'db' => ['string', 'required', 'length' => 255, 'when' => $status_enabled],
-			'ssl_verify_peer' => ['boolean', 'required', 'when' => $status_enabled],
+				'when' => [$status_configured, $auth_type_vault_path]],
+			'db' => ['string', 'required', 'length' => 255, 'when' => $status_configured],
+			'ssl_verify_peer' => ['boolean', 'required', 'when' => $status_configured],
 			'ssl_ca_location' => ['string', 'required', 'length' => 2048,
-				'when' => [$status_enabled, ['ssl_verify_peer', 'in' => [1]]]
+				'when' => [$status_configured, ['ssl_verify_peer', 'in' => [APM_GLOBAL_DB_VERIFY_PEER_ENABLED]]]
 			],
-			'ssl_verify_host' => ['boolean', 'required', 'when' => $status_enabled],
-			'ssl_cert_file' => ['string', 'required', 'length' => 2048, 'when' => $status_enabled],
-			'ssl_key_file' => ['string', 'required', 'length' => 2048, 'when' => $status_enabled],
+			'ssl_verify_host' => ['boolean', 'required', 'when' => $status_configured],
+			'ssl_cert_file' => ['string', 'required', 'length' => 2048, 'when' => $status_configured],
+			'ssl_key_file' => ['string', 'required', 'length' => 2048, 'when' => $status_configured],
 			'ssl_key_password' => [
 				['string', 'length' => 255],
 				['string', 'length' => 255, 'in' => [''],
-					'when' => [$status_enabled, ['ssl_key_file', 'in' => ['']]],
+					'when' => [$status_configured, ['ssl_key_file', 'in' => ['']]],
 					'messages' => ['in' => 'Must be empty, if previous field is not specified.']
 				]
 			]
