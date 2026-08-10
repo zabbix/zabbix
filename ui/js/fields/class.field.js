@@ -74,8 +74,8 @@ class CField {
 		this._field.dispatchEvent(new CustomEvent('field.change', {detail: {source_fields}}));
 	}
 
-	setChanged(changed = true) {
-		this._changed = changed;
+	setChanged() {
+		this._changed = true;
 	}
 
 	hasChanged() {
