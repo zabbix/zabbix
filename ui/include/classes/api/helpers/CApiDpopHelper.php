@@ -108,7 +108,9 @@ class CApiDpopHelper {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Missing htu claim.');
 		}
 
-		$expected_htu = 'urn:zbx:'.CSettingsHelper::get(CSettingsHelper::SERVER_ID).':'.$requested_api_method;
+		$serverid = CApiSettingsHelper::getParameters([CSettingsHelper::SERVER_ID])[CSettingsHelper::SERVER_ID];
+
+		$expected_htu = 'urn:zbx:'.$serverid.':'.$requested_api_method;
 
 		if (!is_string($payload['htu']) || !hash_equals($expected_htu, $payload['htu'])) {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Invalid htu value.');

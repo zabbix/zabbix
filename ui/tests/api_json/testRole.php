@@ -974,6 +974,10 @@ class testRole extends CAPITest {
 									'status' => '1'
 								],
 								[
+									'name' => 'administration.data_source',
+									'status' => '1'
+								],
+								[
 									'name' => 'administration.audit_log',
 									'status' => '1'
 								],
