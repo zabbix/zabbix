@@ -360,11 +360,15 @@ static void	cep_worker_delete_events(zbx_cep_task_remote_t *task)
  *                                                                            *
  * Parameters: task - [IN/OUT] remote task with pre-allocated response buffer *
  *                                                                            *
+ * Comments: The result is stored in pre-allocated task->response buffer      *
+ *                                                                            *
  ******************************************************************************/
 static void	cep_worker_get_stats(zbx_cep_worker_t *worker, zbx_cep_task_remote_t *task)
 {
-	zbx_cep_stats_t	stats;
-	unsigned char	*ptr = task->response;
+	zbx_cep_stats_t			stats;
+	unsigned char			*ptr = task->response;
+	zbx_cep_window_pool_stats_t	win_stats;
+	zbx_cep_window_pool_t		*pool;
 
 	cep_stats_collect(&stats);
 
@@ -373,6 +377,10 @@ static void	cep_worker_get_stats(zbx_cep_worker_t *worker, zbx_cep_task_remote_t
 			&stats.task_completed_num);
 	zbx_mw_queue_unlock(worker->base.queue);
 
+	cep_window_pool_acquire(&pool);
+	cep_window_pool_get_stats(pool, &win_stats);
+	cep_window_pool_release(&pool);
+
 	ptr += zbx_serialize_value(ptr, stats.events_accessed);
 	ptr += zbx_serialize_value(ptr, stats.events_processed);
 	ptr += zbx_serialize_value(ptr, stats.events_discarded);
@@ -380,7 +388,11 @@ static void	cep_worker_get_stats(zbx_cep_worker_t *worker, zbx_cep_task_remote_t
 	ptr += zbx_serialize_value(ptr, stats.task_internal_num);
 	ptr += zbx_serialize_value(ptr, stats.task_completed_num);
 	ptr += zbx_serialize_value(ptr, stats.events_num);
-	(void)zbx_serialize_value(ptr, stats.objects_num);
+	ptr += zbx_serialize_value(ptr, stats.objects_num);
+	ptr += zbx_serialize_value(ptr, win_stats.windows_num);
+	ptr += zbx_serialize_value(ptr, win_stats.alarms_num);
+	(void)zbx_serialize_value(ptr, win_stats.ticks_num);
+
 }
 
 static void	cep_worker_set_event_cause(zbx_cep_task_remote_t *task)
@@ -505,6 +517,8 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 			cep_origin_pending_event_done(cep, &event->origin);
 			cep_cache_release(&cep);
 			zbx_cep_event_release(event);
+			zbx_vector_mw_task_ptr_clear_ext(tasks, cep_task_free);
+
 			goto out;
 		}
 	}

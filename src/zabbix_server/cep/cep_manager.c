@@ -287,7 +287,7 @@ static void	cep_manager_check_trigger_deps(zbx_cep_manager_t *manager, zbx_ipc_c
 }
 
 /******************************************************************************
- *                                                                            *
+ *                                                                            *STATS
  * Purpose: get cep statistics                                                *
  *                                                                            *
  * Parameters: manager - [IN/OUT] CEP manager                                 *
@@ -299,7 +299,7 @@ static void	cep_manager_get_stats(zbx_cep_manager_t *manager, zbx_ipc_client_t *
 	zbx_ipc_message_t **message)
 {
 	unsigned char*	response;
-	zbx_uint32_t	reponse_len = sizeof(zbx_uint64_t) * 3 + sizeof(int) * 5;
+	zbx_uint32_t	reponse_len = sizeof(zbx_uint64_t) * 3 + sizeof(int) * 8;
 
 	response = (unsigned char*)zbx_malloc(NULL, reponse_len);
 

@@ -1650,6 +1650,13 @@ void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool
 	zbx_dbconn_pool_release_connection(dbpool, db);
 }
 
+void	cep_window_pool_get_stats(zbx_cep_window_pool_t *pool, zbx_cep_window_pool_stats_t *stats)
+{
+	stats->windows_num = pool->windows.num_data;
+	stats->alarms_num = pool->alarm_queue.elems_num;
+	stats->ticks_num = pool->tick_queue.values_num;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: log cep window and its pending event ids at trace level           *

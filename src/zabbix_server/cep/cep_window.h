@@ -99,6 +99,14 @@ void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task
  * window pool
  */
 
+typedef struct
+{
+	int	windows_num;
+	int	alarms_num;
+	int	ticks_num;
+}
+zbx_cep_window_pool_stats_t;
+
 typedef struct zbx_cep_window_pool zbx_cep_window_pool_t;
 
 zbx_cep_window_pool_t	*cep_window_pool_create(void);
@@ -113,6 +121,8 @@ void	cep_window_pool_reset_rule(zbx_cep_window_pool_t *pool, zbx_uint64_t ruleid
 void	cep_window_pool_enqueue(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
 void	cep_window_pool_save(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool);
 void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool);
+
+void	cep_window_pool_get_stats(zbx_cep_window_pool_t *pool, zbx_cep_window_pool_stats_t *stats);
 
 void	cep_window_pool_dump(zbx_cep_window_pool_t *pool);
 

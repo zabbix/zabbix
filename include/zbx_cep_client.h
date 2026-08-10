@@ -125,6 +125,10 @@ typedef struct
 
 	int		events_num;
 	int		objects_num;
+
+	int		windows_num;
+	int		window_alarms_num;
+	int		window_ticks_num;
 }
 zbx_cep_stats_t;
 
