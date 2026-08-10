@@ -110,7 +110,10 @@ $form = (new CForm())
 		))
 		->addItem((new CTemplateTag('ceprule-operation-row-template'))->addItem(
 			(new CRow([
-				(new CCol())->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CCol([
+					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+					(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)
+				]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CCol([
 					_('Execute when'),
 					' #{execute_when_str} : #{label_str}',
