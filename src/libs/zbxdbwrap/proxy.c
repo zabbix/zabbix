@@ -101,17 +101,14 @@ zbx_host_rights_t;
 static zbx_lld_process_agent_result_func_t	lld_process_agent_result_cb = NULL;
 static zbx_preprocess_item_value_func_t		preprocess_item_value_cb = NULL;
 static zbx_preprocessor_flush_func_t		preprocessor_flush_cb = NULL;
-static zbx_get_denyitemtypes_mask_func_t	get_denyitemtypes_mask_cb = NULL;
 
 void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func,
 	zbx_preprocess_item_value_func_t preprocess_item_value_func,
-	zbx_preprocessor_flush_func_t preprocessor_flush_func,
-	zbx_get_denyitemtypes_mask_func_t get_denyitemtypes_mask_func)
+	zbx_preprocessor_flush_func_t preprocessor_flush_func)
 {
 	lld_process_agent_result_cb = lld_process_agent_result_func;
 	preprocess_item_value_cb = preprocess_item_value_func;
 	preprocessor_flush_cb = preprocessor_flush_func;
-	get_denyitemtypes_mask_cb = get_denyitemtypes_mask_func;
 }
 
 /******************************************************************************
@@ -654,9 +651,6 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 {
 	AGENT_RESULT	result;
 	zbx_log_t	*log;
-
-	if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask_cb(), item->type))
-		return FAIL;
 
 	if (ITEM_STATUS_ACTIVE != item->status)
 		return FAIL;

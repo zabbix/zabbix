@@ -1227,7 +1227,7 @@ static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
  *                                                                            *
  * Parameters: data         - [IN] task data                                  *
  *             len          - [IN] length of data                             *
- *             proxyid      - [IN] proxy identifier                           *
+ *             proxyid - [IN] proxy identifier                           *
  *             info         - [OUT] task result or error reason               *
  *                                                                            *
  * Return value: SUCCEED - if task was executed without errors                *
