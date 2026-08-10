@@ -148,13 +148,13 @@ def main():
     parser.add_argument("--no-shell-prompt", action="store_true")
     args = parser.parse_args()
 
-    open(args.log_file, "a", encoding="utf-8").close()
-
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((args.host, args.port))
     server.listen(5)
     server.settimeout(0.5)
+
+    open(args.log_file, "a", encoding="utf-8").close()
 
     with open(args.pid_file, "w", encoding="utf-8") as pid:
         pid.write(str(os.getpid()))
