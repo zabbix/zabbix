@@ -166,7 +166,7 @@ struct zbx_snmp_context
 	void				*arg_action;
 	zbx_dc_item_context_t		item;
 	zbx_snmp_sess_t			ssp;
-	int				snmp_max_repetitions;
+	char				*snmp_max_repetitions;
 	int				retries;
 	char				*results;
 	size_t				results_alloc;
@@ -3270,7 +3270,7 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 		if (SNMP_MSG_GETBULK == bulkwalk_context->pdu_type)
 		{
 			pdu->non_repeaters = 0;
-			pdu->max_repetitions = snmp_context->snmp_max_repetitions;
+			pdu->max_repetitions = zbx_atoi(snmp_context->snmp_max_repetitions);
 		}
 
 		if (NULL == snmp_add_null_var(pdu, bulkwalk_context->name, bulkwalk_context->name_length))
@@ -3769,6 +3769,7 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 	zbx_free(snmp_context->snmpv3_contextname);
 	zbx_free(snmp_context->snmpv3_authpassphrase);
 	zbx_free(snmp_context->snmpv3_privpassphrase);
+	zbx_free(snmp_context->snmp_max_repetitions);
 
 	zbx_free(snmp_context->item.key);
 	zbx_free(snmp_context->item.key_orig);
@@ -3813,7 +3814,7 @@ static int 	async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RES
 	char			error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
-			" max_repetitions:%d", __func__, snmp_context->item.itemid, snmp_context->item.key,
+			" max_repetitions:%s", __func__, snmp_context->item.itemid, snmp_context->item.key,
 			snmp_context->item.host, snmp_context->item.interface.addr, snmp_context->config_timeout,
 			snmp_context->retries, snmp_context->snmp_max_repetitions);
 
@@ -3844,13 +3845,6 @@ static int 	async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RES
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid SNMP OID: unsupported parameter."));
-		ret = CONFIG_ERROR;
-		goto out;
-	}
-
-	if (SNMP_MSG_GETBULK == pdu_type && 1 > snmp_context->snmp_max_repetitions)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid max repetition count: it should be at least 1."));
 		ret = CONFIG_ERROR;
 		goto out;
 	}
@@ -3941,6 +3935,7 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 	snmp_context->item.version = item->interface.version;
 	snmp_context->config_timeout = item->timeout;
 	snmp_context->snmp_max_repetitions = item->snmp_max_repetitions;
+	item->snmp_max_repetitions = NULL;
 	snmp_context->snmp_version = item->snmp_version;
 	snmp_context->snmp_community = item->snmp_community;
 	item->snmp_community = NULL;

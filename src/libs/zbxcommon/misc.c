@@ -103,6 +103,25 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose:  convert a string representing a number into an integer           *
+ *                                                                            *
+ * Return value: returns the converted integer or 0- if failed                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_atoi(const char *str)
+{
+	int result = 0;
+
+	if (NULL != str)
+	{
+		result = atoi(str);
+	}
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: return program name without path                                  *
  *                                                                            *
  * Return value: program name without path                                    *

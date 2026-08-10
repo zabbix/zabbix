@@ -1603,7 +1603,7 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const zbx
 		if (FAIL == dbsync_compare_str(dbrow[21], snmp->contextname))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_int(dbrow[22], snmp->max_repetitions))
+		if (FAIL == dbsync_compare_str(dbrow[22], snmp->max_repetitions))
 			return FAIL;
 	}
 	else if (NULL != snmp)

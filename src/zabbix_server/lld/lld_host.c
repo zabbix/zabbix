@@ -100,8 +100,8 @@ typedef struct
 	unsigned char	version_orig;
 	unsigned char	bulk;
 	unsigned char	bulk_orig;
-	int		max_repetitions;
-	int		max_repetitions_orig;
+	char		*max_repetitions;
+	char		*max_repetitions_orig;
 #define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_TYPE		__UINT64_C(0x00000001)	/* interface_snmp.type */
 #define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK		__UINT64_C(0x00000002)	/* interface_snmp.bulk */
 #define ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY	__UINT64_C(0x00000004)	/* interface_snmp.community */
@@ -182,12 +182,14 @@ static void	lld_interface_free(zbx_lld_interface_t *interface)
 		zbx_free(interface->lld_row.snmp->authpassphrase);
 		zbx_free(interface->lld_row.snmp->privpassphrase);
 		zbx_free(interface->lld_row.snmp->contextname);
+		zbx_free(interface->lld_row.snmp->max_repetitions);
 
 		zbx_free(interface->lld_row.snmp->community_orig);
 		zbx_free(interface->lld_row.snmp->securityname_orig);
 		zbx_free(interface->lld_row.snmp->authpassphrase_orig);
 		zbx_free(interface->lld_row.snmp->privpassphrase_orig);
 		zbx_free(interface->lld_row.snmp->contextname_orig);
+		zbx_free(interface->lld_row.snmp->max_repetitions_orig);
 
 		zbx_free(interface->lld_row.snmp);
 	}
@@ -3542,11 +3544,11 @@ static void	lld_interface_snmp_prepare_sql(zbx_audit_entry_t *audit_entry, const
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_MAXREPS))
 	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%smax_repetitions=%d", d,
-				snmp->max_repetitions);
-		d = ",";
+		value_esc = zbx_db_dyn_escape_string(snmp->max_repetitions);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%smax_repetitions='%s'", d, value_esc);
+		zbx_free(value_esc);
 
-		zbx_audit_entry_update_int(audit_entry, KEY(max_repetitions), snmp->max_repetitions_orig,
+		zbx_audit_entry_update_string(audit_entry, KEY(max_repetitions), snmp->max_repetitions_orig,
 				snmp->max_repetitions);
 	}
 
@@ -4349,7 +4351,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 							interface->lld_row.snmp->authprotocol,
 							interface->lld_row.snmp->privprotocol,
 							interface->lld_row.snmp->contextname,
-							(int)interface->lld_row.snmp->max_repetitions,
+							interface->lld_row.snmp->max_repetitions,
 							interface->interfaceid);
 				}
 				else if (0 != (interface->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE))
@@ -5398,8 +5400,8 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_lld_interface_ptr_t *
 			snmp->privprotocol_orig = snmp->privprotocol;
 			snmp->contextname = zbx_strdup(NULL, row[16]);
 			snmp->contextname_orig = NULL;
-			ZBX_STR2UINT64(snmp->max_repetitions, row[17]);
-			snmp->max_repetitions_orig = snmp->max_repetitions;
+			snmp->max_repetitions = zbx_strdup(NULL, row[17]);
+			snmp->max_repetitions_orig = NULL;
 			snmp->flags = 0;
 			interface->lld_row.snmp = snmp;
 			interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
@@ -5496,7 +5498,7 @@ static zbx_uint64_t	lld_interface_compare(const zbx_lld_interface_t *ifold, cons
 		if (0 != strcmp(ifold->lld_row.snmp->contextname, ifnew->lld_row.snmp->contextname))
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT;
 
-		if (ifold->lld_row.snmp->max_repetitions != ifnew->lld_row.snmp->max_repetitions)
+		if (0 != strcmp(ifold->lld_row.snmp->max_repetitions, ifnew->lld_row.snmp->max_repetitions))
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_MAXREPS;
 	}
 
@@ -5598,7 +5600,10 @@ static void	lld_interfaces_link(const zbx_lld_interface_t *ifold, zbx_lld_interf
 			}
 
 			if (0 != (ifnew->lld_row.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_MAXREPS))
-				ifnew->lld_row.snmp->max_repetitions_orig = ifold->lld_row.snmp->max_repetitions;
+			{
+				ifnew->lld_row.snmp->max_repetitions_orig = zbx_strdup(NULL,
+						ifold->lld_row.snmp->max_repetitions);
+			}
 		}
 	}
 }
@@ -5800,8 +5805,8 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 				snmp->privprotocol_orig = snmp->privprotocol;
 				snmp->version_orig = snmp->version;
 				snmp->bulk_orig = snmp->bulk;
-				snmp->max_repetitions = interface->lld_row.snmp->max_repetitions;
-				snmp->max_repetitions_orig = snmp->max_repetitions;
+				snmp->max_repetitions = zbx_strdup(NULL, interface->lld_row.snmp->max_repetitions);
+				snmp->max_repetitions_orig = NULL;
 				snmp->flags = 0x00;
 				new_interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 				new_interface->lld_row.snmp = snmp;
@@ -5821,6 +5826,9 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 				zbx_substitute_lld_macros(&snmp->contextname, host->lld_row->data, ZBX_MACRO_ANY, NULL,
 						0);
 				zbx_lrtrim(snmp->contextname, ZBX_WHITESPACE);
+				zbx_substitute_lld_macros(&snmp->max_repetitions, host->lld_row->data, ZBX_MACRO_ANY,
+						NULL, 0);
+				zbx_lrtrim(snmp->max_repetitions, ZBX_WHITESPACE);
 			}
 			else
 			{
@@ -5901,7 +5909,7 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 				ZBX_STR2UCHAR(snmp->authprotocol, row[16]);
 				ZBX_STR2UCHAR(snmp->privprotocol, row[17]);
 				snmp->contextname = zbx_strdup(NULL, row[18]);
-				ZBX_STR2UINT64(snmp->max_repetitions, row[19]);
+				snmp->max_repetitions = zbx_strdup(NULL, row[19]);
 
 				snmp->flags = 0x00;
 				interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;

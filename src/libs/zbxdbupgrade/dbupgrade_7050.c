@@ -2103,6 +2103,12 @@ static int	DBpatch_7050184(void)
 	return DBadd_field("items", &field);
 }
 
+static int	DBpatch_7050185(void)
+{
+	const zbx_db_field_t	field = {"max_repetitions", "10", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	return DBmodify_field_type("interface_snmp", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -2294,5 +2300,6 @@ DBPATCH_ADD(7050181, 0, 1)
 DBPATCH_ADD(7050182, 0, 1)
 DBPATCH_ADD(7050183, 0, 1)
 DBPATCH_ADD(7050184, 0, 1)
+DBPATCH_ADD(7050185, 0, 1)
 
 DBPATCH_END()
