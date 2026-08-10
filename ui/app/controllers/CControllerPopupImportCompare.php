@@ -30,7 +30,7 @@ class CControllerPopupImportCompare extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'import' => 'in 1',
-			'rules_preset' => 'in template,dashboard',
+			'rules_preset' => 'in template,dashboard,regex',
 			'rules' => 'array'
 		];
 
@@ -60,6 +60,9 @@ class CControllerPopupImportCompare extends CController {
 				return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
 					&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 
+			case 'regex':
+				return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+
 			default:
 				return false;
 		}
@@ -88,7 +91,8 @@ class CControllerPopupImportCompare extends CController {
 			'images' => ['updateExisting' => false, 'createMissing' => false],
 			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'dashboards' => ['updateExisting' => false, 'createMissing' => false]
+			'dashboards' => ['updateExisting' => false, 'createMissing' => false],
+			'global_regexes' => ['updateExisting' => false, 'createMissing' => false]
 		];
 
 		// Adjust defaults for given rule preset, if specified.
@@ -121,6 +125,12 @@ class CControllerPopupImportCompare extends CController {
 				$missing_objects_warning_foot_note = _('Check and reconfigure widgets after the import is completed.');
 
 				$rules['dashboards'] = ['updateExisting' => true, 'createMissing' => true];
+
+				break;
+
+			case 'regex':
+				$title = _('Regular expressions');
+				$rules['global_regexes'] = ['updateExisting' => false, 'createMissing' => false];
 
 				break;
 		}
@@ -214,7 +224,8 @@ class CControllerPopupImportCompare extends CController {
 			'graph_prototypes' => _('Graph prototypes'),
 			'host_prototypes' => _('Host prototypes'),
 			'pages' => _('Dashboard pages'),
-			'widgets' => _('Widgets')
+			'widgets' => _('Widgets'),
+			'global_regexes' => _('Regular expressions')
 		];
 
 		foreach ($toc as $toc_key => $changes) {

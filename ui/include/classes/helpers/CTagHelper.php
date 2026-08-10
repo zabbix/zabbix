@@ -130,6 +130,7 @@ class CTagHelper {
 			}
 
 			$html_elements[$objectid][] = (new CButtonIcon(ZBX_ICON_MORE))
+				->setAttribute('aria-label', _('Show all tags'))
 				->setHint($all_tag_html_elements, ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_TAGS_WRAPPER);
 		}
 

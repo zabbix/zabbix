@@ -163,7 +163,7 @@ class testGraphAxis extends CWebTest {
 
 		// Go to Graphs and set time period.
 		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
-		$table = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 		$table->findRow('Name', 'Dynamic widgets H2')->getColumn('Graphs')->query('tag:a')->waitUntilClickable()->one()
 				->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();

@@ -17,7 +17,7 @@
 class CControllerPopupMediaCheck extends CController {
 
 	private ?array $mediatype;
-	private ?array $sendto_emails;
+	private ?array $sendto_list;
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -32,15 +32,22 @@ class CControllerPopupMediaCheck extends CController {
 			'mediaid' => ['db media.mediaid'],
 			'mediatypeid' => ['db media.mediatypeid', 'required'],
 			'mediatype_type' => ['integer', 'required'],
-			'sendto' => ['db media.sendto', 'not_empty',
-				'when' => ['mediatype_type', 'not_in' => [MEDIA_TYPE_EMAIL]]
+			'sendto' => ['db media.sendto', 'required', 'not_empty',
+				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]]
 			],
-			'sendto_emails' => ['array', 'required', 'not_empty',
-				'field' => ['string'
-					// TODO: uncomment with DEV-4644
-					// 'not_empty', 'use' => [CEmailValidator::class, []]
-				],
+			'sendto_list' => ['array', 'required', 'not_empty',
+				'field' => ['string', 'not_empty', 'use' => [CEmailValidator::class]],
 				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
+			],
+			'sendto_active_devices' => ['boolean', 'required',
+				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
+			],
+			'sendto_deviceuuids' => ['array', 'required', 'not_empty',
+				'field' => ['db device.uuid', 'not_empty'],
+				'when' => [
+					['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]],
+					['sendto_active_devices', 'in' => [0]]
+				]
 			],
 			'period' => ['string', 'required', 'not_empty',
 				'use' => [CTimePeriodsParser::class, ['usermacros' => true]],
@@ -94,9 +101,9 @@ class CControllerPopupMediaCheck extends CController {
 
 	private function validateSendto(): bool {
 		if ($this->mediatype['type'] == MEDIA_TYPE_EMAIL) {
-			$sendto_emails = array_values(array_filter($this->getInput('sendto_emails', [])));
+			$sendto_list = array_values(array_filter($this->getInput('sendto_list', [])));
 
-			if (!$sendto_emails) {
+			if (!$sendto_list) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto_emails', _('cannot be empty')));
 
 				return false;
@@ -104,7 +111,7 @@ class CControllerPopupMediaCheck extends CController {
 
 			$email_validator = new CEmailValidator();
 
-			foreach ($sendto_emails as $email) {
+			foreach ($sendto_list as $email) {
 				if (!$email_validator->validate($email)) {
 					error($email_validator->getError());
 
@@ -112,12 +119,15 @@ class CControllerPopupMediaCheck extends CController {
 				}
 			}
 
-			$this->sendto_emails = $sendto_emails;
+			$this->sendto_list = $sendto_list;
 		}
-		elseif ($this->getInput('sendto', '') === '') {
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
-
-			return false;
+		elseif ($this->mediatype['type'] == MEDIA_TYPE_PUSH) {
+			if ($this->getInput('sendto_active_devices', 0) == 1) {
+				$this->sendto_list = ['*'];
+			}
+			else {
+				$this->sendto_list = $this->getInput('sendto_deviceuuids', []);
+			}
 		}
 
 		return true;
@@ -140,9 +150,6 @@ class CControllerPopupMediaCheck extends CController {
 		$data = [
 			'row_index' => $this->getInput('row_index'),
 			'mediatypeid' => $this->mediatype['mediatypeid'],
-			'sendto' => $this->mediatype['type'] == MEDIA_TYPE_EMAIL
-				? $this->sendto_emails
-				: $this->getInput('sendto'),
 			'period' => $this->getInput('period'),
 			'severity' => $severity,
 			'active' => $this->getInput('active', MEDIA_STATUS_DISABLED),
@@ -151,6 +158,13 @@ class CControllerPopupMediaCheck extends CController {
 			'mediatype_status' => $this->mediatype['status'],
 			'mediatype_type' => $this->mediatype['type']
 		];
+
+		if ($this->mediatype['type'] == MEDIA_TYPE_EMAIL || $this->mediatype['type'] == MEDIA_TYPE_PUSH) {
+			$data['sendto'] = $this->sendto_list;
+		}
+		else {
+			$data['sendto'] = $this->getInput('sendto');
+		}
 
 		if ($this->hasInput('mediaid')) {
 			$data['mediaid'] = $this->getInput('mediaid');

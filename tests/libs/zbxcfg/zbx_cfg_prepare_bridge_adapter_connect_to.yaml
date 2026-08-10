@@ -1,0 +1,239 @@
+---
+test case: "HTTP URL default port with IPv4 connect_to"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "192.168.1.1:9090"
+  ipv: 0
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:80:192.168.1.1:9090"
+---
+test case: "HTTPS URL default port with IPv4 connect_to"
+in:
+  url: "https://example.com/rpc"
+  connect_to: "10.0.0.1:443"
+  ipv: 0
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:443:10.0.0.1:443"
+---
+test case: "HTTP URL with custom port overrides default"
+in:
+  url: "http://proxy.local:8080/rpc"
+  connect_to: "backend.host:1234"
+  ipv: 0
+out:
+  return: SUCCEED
+  curl_connect_to: "proxy.local:8080:backend.host:1234"
+---
+test case: "HTTPS URL with custom port"
+in:
+  url: "https://api.example.com:8443/rpc"
+  connect_to: "192.168.100.1:9090"
+  ipv: 0
+out:
+  return: SUCCEED
+  curl_connect_to: "api.example.com:8443:192.168.100.1:9090"
+---
+test case: "IPv4 URL with IPv4 connect_to"
+in:
+  url: "http://192.168.0.1/rpc"
+  connect_to: "10.0.0.2:9090"
+  ipv: 0
+out:
+  return: SUCCEED
+  curl_connect_to: "192.168.0.1:80:10.0.0.2:9090"
+---
+test case: "invalid URL scheme fails"
+in:
+  url: "ftp://example.com/rpc"
+  connect_to: "192.168.1.1:9090"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "connect_to without port fails"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "192.168.1.1"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "connect_to with port zero fails"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "192.168.1.1:0"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "port zero in URL fails"
+in:
+  url: "http://example.com:0/rpc"
+  connect_to: "192.168.1.1:9090"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "invalid hostname in connect_to fails"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "!invalid!:9090"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "empty connect_to fails"
+in:
+  url: "http://example.com/rpc"
+  connect_to: ""
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "connect_to with percent-encoded host fails hostname check"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "host%20name:9090"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "connect_to with port at maximum valid value"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "192.168.1.1:65535"
+  ipv: 0
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:80:192.168.1.1:65535"
+---
+test case: "connect_to with port above maximum fails"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "192.168.1.1:65536"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "connect_to with underscore hostname is valid"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "my_backend:9090"
+  ipv: 0
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:80:my_backend:9090"
+---
+test case: "URL with rpc endpoint does not leak into curl_connect_to hostname"
+in:
+  url: "http://proxy.example.com:8080/rpc"
+  connect_to: "backend.host:443"
+  ipv: 0
+out:
+  return: SUCCEED
+  curl_connect_to: "proxy.example.com:8080:backend.host:443"
+---
+test case: "connect_to with hyphenated hostname is valid"
+in:
+  url: "https://example.com/rpc"
+  connect_to: "my-backend.internal:9090"
+  ipv: 0
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:443:my-backend.internal:9090"
+---
+test case: "IPv6 loopback connect_to with brackets succeeds"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "[::1]:9090"
+  ipv: 1
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:80:[::1]:9090"
+---
+test case: "full IPv6 connect_to with brackets succeeds"
+in:
+  url: "https://example.com/rpc"
+  connect_to: "[2001:db8::1]:443"
+  ipv: 1
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:443:[2001:db8::1]:443"
+---
+test case: "IPv6 connect_to with maximum port succeeds"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "[::1]:65535"
+  ipv: 1
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:80:[::1]:65535"
+---
+test case: "IPv6 connect_to with HTTPS URL produces correct curl connect_to"
+in:
+  url: "https://api.example.com:8443/rpc"
+  connect_to: "[::1]:443"
+  ipv: 1
+out:
+  return: SUCCEED
+  curl_connect_to: "api.example.com:8443:[::1]:443"
+---
+test case: "IPv6 connect_to with port zero fails"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "[::1]:0"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "IPv6 connect_to without port fails"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "[::1]"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "bare IPv6 connect_to without brackets fails"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "::1:9090"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "invalid IPv6 address in brackets fails"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "[not-ipv6]:9090"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "IPv6 URL with IPv4 connect_to succeeds"
+in:
+  url: "http://[::1]:8080/rpc"
+  connect_to: "192.168.1.1:9090"
+  ipv: 1
+out:
+  return: SUCCEED
+  curl_connect_to: "[::1]:8080:192.168.1.1:9090"
+---
+test case: "emoji in connect_to host rejected by hostname validator"
+in:
+  url: "http://example.com/rpc"
+  connect_to: "\U0001F600:9090"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "empty host with valid port in connect_to fails"
+in:
+  url: "http://example.com/rpc"
+  connect_to: ":9090"
+  ipv: 0
+out:
+  return: FAIL
+...

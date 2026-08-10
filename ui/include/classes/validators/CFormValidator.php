@@ -1514,12 +1514,8 @@ class CFormValidator {
 	public static function existsAPIObject(string $api, array $options, ?string $exclude_primary_id = null): bool {
 		$options['output'] = [];
 		$options['preservekeys'] = true;
-		$auth = [
-			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
-			'auth' => CWebUser::$data['sessionid']
-		];
 
-		$response = API::getWrapper()->getClient()->callMethod($api, 'get', $options, $auth);
+		$response = API::getWrapper()->getClient()->callMethod($api, 'get', $options, CJsonRpc::AUTH_TYPE_COOKIE);
 
 		if ($response->errorCode) {
 			throw new Exception($response->errorMessage);
@@ -2056,10 +2052,6 @@ class CFormValidator {
 	 * depth. This is a helper function for resolveWhenFields.
 	 */
 	private function scanObject(array $rules, $data, string $path): void {
-		if (!is_array($data)) {
-			return;
-		}
-
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
 				foreach ($api_check[1]['filter'] as $param) {
@@ -2092,7 +2084,7 @@ class CFormValidator {
 		}
 
 		foreach ($rules['fields'] as $field => $rule_sets) {
-			$field_data = array_key_exists($field, $data) ? $data[$field] : null;
+			$field_data = is_array($data) && array_key_exists($field, $data) ? $data[$field] : null;
 
 			foreach ($rule_sets as $rule_set) {
 				$this->checkField($rule_set, $field_data, $path.'/'.$field);
@@ -2110,11 +2102,11 @@ class CFormValidator {
 			}
 		}
 
-		if (!$data || !is_array($data)) {
-			return;
-		}
-
 		if ($rule_set['type'] === 'objects') {
+			if (!$data || !is_array($data)) {
+				return;
+			}
+
 			foreach ($data as $field => $value) {
 				$this->scanObject($rule_set, $value, $rule_path.'/'.$field);
 			}
