@@ -864,11 +864,11 @@ class testFormSetup extends CWebTest {
 			}
 			$verify_host_field = $form->query('id:verify_host')->asCheckbox()->one();
 			if ($data['fields']['Database type'] === 'MySQL') {
-				$this->assertTrue($form->getField('Database TLS cipher list')->isDisplayed());
+				$this->assertTrue($form->getField('TLS cipher list')->isDisplayed());
 				$this->assertFalse($verify_host_field->isEnabled());
 			}
 			else {
-				$this->assertFalse($this->query('xpath://span[text()="Database TLS cipher list"]')->one(false)->isValid());
+				$this->assertFalse($this->query('xpath://span[text()="TLS cipher list"]')->one(false)->isValid());
 				$this->assertTrue($verify_host_field->isEnabled());
 			}
 		}

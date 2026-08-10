@@ -1063,7 +1063,7 @@ class CSetupWizard extends CForm {
 
 			if ($db_type === ZBX_DB_MYSQL) {
 				$table->addRow(
-					(new CSpan(_('Database TLS cipher list')))->addClass(ZBX_STYLE_GREY),
+					(new CSpan(_('TLS cipher list')))->addClass(ZBX_STYLE_GREY),
 					$this->getConfig('DB_CIPHER_LIST')
 				);
 			}
