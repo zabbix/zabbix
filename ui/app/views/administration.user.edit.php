@@ -294,8 +294,9 @@ if ($data['db_user']['username'] !== ZBX_GUEST_USER) {
 
 $is_readonly_url = array_key_exists('profile_redirect_enforce', $data) && $data['profile_redirect_enforce'];
 
-$default_url_label = !array_key_exists('profile_redirect_url', $data) || $data['profile_redirect_url'] === '' ? [] :
-	(new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
+$default_url_label = !array_key_exists('profile_redirect_url', $data) || $data['profile_redirect_url'] === ''
+	? []
+	: (new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
 		->addClass(ZBX_STYLE_FORM_FIELDS_HINT);
 
 $user_form_list
@@ -448,11 +449,14 @@ if ($data['roleid']) {
 
 	$permissions_form_list
 		->addRow((new CTag('h4', true, _('User profile settings')))->addClass('input-section-header'))
-		->addRow((new CDiv((new CSpan(_('Redirect URL after login')))->addClass(
-				$data['profile_redirect_enforce'] ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			)))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->addClass('rules-status-container')
+		->addRow(
+			(new CDiv(
+				(new CSpan(_('Redirect URL after login')))->addClass(
+					$data['profile_redirect_enforce'] ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				)
+			))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
 		);
 
 	// Services section.

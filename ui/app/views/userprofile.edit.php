@@ -248,8 +248,9 @@ if ($data['username'] !== ZBX_GUEST_USER) {
 	]);
 }
 
-$default_url_label = $data['profile_redirect_url'] === '' ? [] :
-	(new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
+$default_url_label = $data['profile_redirect_url'] === ''
+	? []
+	: (new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
 		->addClass(ZBX_STYLE_FORM_FIELDS_HINT);
 
 $form_list
@@ -263,7 +264,7 @@ $form_list
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow(_('URL (after login)'),[
+	->addRow(_('URL (after login)'), [
 			(new CTextAreaFlexible('url', $data['url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('users', 'url'))
