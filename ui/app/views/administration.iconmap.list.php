@@ -31,7 +31,7 @@ $html_page = (new CHtmlPage())
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
-$table = (new CTableInfo())->setHeader([_('Name'), _('Icon map')]);
+$table = (new CTableInfo())->setHeader([_('Name'), _('Icon map')])->addClass(ZBX_STYLE_ROUNDED_SURFACE);
 
 foreach ($data['iconmaps'] as $icon_map) {
 	$mappings = [];

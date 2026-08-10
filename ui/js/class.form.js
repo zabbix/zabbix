@@ -320,13 +320,15 @@ class CForm {
 	 *
 	 * @param {Array} fields
 	 * @param {?Object} rules
+	 * @param {?Object} values
 	 *
 	 * @returns {Promise}
 	 */
-	validateFieldsForAction(fields, rules) {
+	validateFieldsForAction(fields, rules, values = null) {
 		const validator = new CFormValidator(rules ? rules : this.#rules);
+		const values_to_validate = values === null ? this.getAllValues() : values;
 
-		return validator.validateChanges(this.getAllValues(), fields)
+		return validator.validateChanges(values_to_validate, fields)
 			.then((result) => {
 				this.setErrors(validator.getErrors(), true);
 				this.renderErrors();
@@ -350,7 +352,7 @@ class CForm {
 			if (key in this.#fields) {
 				const field = this.#fields[key];
 
-				if (field instanceof CFieldSet) {
+				if (field instanceof CFieldCollection) {
 					field.setErrors(errors, force_display_errors);
 				}
 				else if (force_display_errors || field.hasChanged() || errors.some((error) => error.message === '')) {
@@ -395,6 +397,47 @@ class CForm {
 	convertRawErrors(raw_errors) {
 		const field_errors = Object.create(null);
 
+		const convertSubfieldErrors = (field, subfield_name, errors, field_errors) => {
+			if (field instanceof CFieldSet) {
+				let subset_errors_set = false;
+
+				for (const [set_field_name, set_field] of Object.entries(field.getFields())) {
+					if (subfield_name.startsWith(set_field_name)) {
+						if (set_field instanceof CFieldCollection) {
+							if (!(set_field_name in field_errors)) {
+								field_errors[set_field_name] = Object.create(null);
+							}
+
+							if (set_field_name === subfield_name) {
+								field_errors[set_field_name][''] = errors;
+							}
+							else {
+								field_errors[set_field_name] = convertSubfieldErrors(
+									set_field,
+									subfield_name.substring(set_field_name.length),
+									errors,
+									field_errors[set_field_name]
+								);
+							}
+
+							subset_errors_set = true;
+						}
+
+						break;
+					}
+				}
+
+				if (!subset_errors_set) {
+					field_errors[subfield_name] = errors;
+				}
+			}
+			else {
+				field_errors[subfield_name] = errors;
+			}
+
+			return field_errors;
+		};
+
 		Object.values(this.#fields).forEach((field) => {
 			const field_name = field.getName();
 			const field_path = field.getPath();
@@ -415,6 +458,10 @@ class CForm {
 						raw_errors[field_path] = [...raw_errors[field_path], ...raw_errors[error_path]]
 							.filter(({message}) => message.length);
 						delete raw_errors[error_path];
+
+						if (raw_errors[field_path].length == 0) {
+							raw_errors[field_path] = [{message: '', level: -1}];
+						}
 					}
 				}
 			}
@@ -435,14 +482,14 @@ class CForm {
 				if (subfield_name === '') {
 					if (!Array.isArray(field_errors[field_name])) {
 						if (Object.values(field_errors[field_name]).length == 0) {
-							field_errors[field_name] = field instanceof CFieldSet ? {'': []} : [];
+							field_errors[field_name] = field instanceof CFieldCollection ? {'': []} : [];
 						}
 						else {
 							field_errors[field_name] = {'': Object.values(field_errors[field_name])};
 						}
 					}
 
-					if (field instanceof CFieldSet) {
+					if (field instanceof CFieldCollection) {
 						errors.forEach((error) => field_errors[field_name][''].push(error));
 					}
 					else {
@@ -460,7 +507,9 @@ class CForm {
 						field_errors[field_name] = set_errors;
 					}
 
-					field_errors[field_name][subfield_name] = errors;
+					field_errors[field_name] = convertSubfieldErrors(field, subfield_name, errors,
+						field_errors[field_name]
+					);
 				}
 			});
 		});
@@ -543,6 +592,38 @@ class CForm {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Function to disable fields in case they are not disabled. Must be paired with unlock.
+	 * Any field, that is disabled in such way will have attribute data-form-disabled.
+	 * Warning: Locked field values will act as disabled and won't return any values until unlocked.
+	 *
+	 * @param {?Array} field_names
+	 */
+	lock(field_names = null) {
+		const fields = field_names !== null
+			? field_names.map((name) => this.findFieldByName(name))
+			: Object.values(this.#fields);
+
+		for (const field of fields) {
+			field.lock();
+		}
+	}
+
+	/**
+	 * Function to enable fields which were disabled by lock function.
+	 *
+	 * @param {?Array} field_names
+	 */
+	unlock(field_names = null) {
+		const fields = field_names !== null
+			? field_names.map((name) => this.findFieldByName(name))
+			: Object.values(this.#fields);
+
+		for (const field of fields) {
+			field.unlock();
+		}
 	}
 
 	/**

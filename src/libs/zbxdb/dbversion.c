@@ -26,7 +26,7 @@
 /******************************************************************************
  *                                                                            *
  * Purpose: For PostgreSQL, MySQL and MariaDB:                                *
- *          stoires DBMS version as integer: MMmmuu                           *
+ *          stores DBMS version as integer: MMmmuu                            *
  *          M = major version part                                            *
  *          m = minor version part                                            *
  *          u = patch version part                                            *
@@ -207,7 +207,7 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 		ZBX_DB_SVERSION = (zbx_uint32_t)mysql_get_server_version(db->conn);
 
 	version_info->current_version = ZBX_DB_SVERSION;
-	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%.2d.%.2d",
+	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d",
 			RIGHT2(ZBX_DB_SVERSION/10000), RIGHT2(ZBX_DB_SVERSION/100),
 			RIGHT2(ZBX_DB_SVERSION));
 
@@ -436,7 +436,7 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
  *                                                                            *
  * Purpose: retrieves TimescaleDB (TSDB) compression availability             *
  *                                                                            *
- * Return value: compression availability as as integer                       *
+ * Return value: compression availability as integer                          *
  *               0 (OFF): compression is not available                        *
  *               1 (ON): compression is available                             *
  *                                                                            *

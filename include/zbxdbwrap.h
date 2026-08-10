@@ -43,10 +43,12 @@ typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, unsigned c
 		unsigned char item_flags, unsigned char preprocessing, AGENT_RESULT *result, zbx_timespec_t *ts,
 		unsigned char state, char *error);
 typedef size_t (*zbx_preprocessor_flush_func_t)(void);
+typedef zbx_uint32_t (*zbx_get_denyitemtypes_mask_func_t)(void);
 
 void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func,
 		zbx_preprocess_item_value_func_t preprocess_item_value_func,
-		zbx_preprocessor_flush_func_t preprocessor_flush_func);
+		zbx_preprocessor_flush_func_t preprocessor_flush_func,
+		zbx_get_denyitemtypes_mask_func_t get_denyitemtypes_mask_func);
 
 int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *server);
@@ -76,6 +78,7 @@ int	zbx_process_proxy_data(zbx_ipc_async_socket_t *rtc, const zbx_dc_proxy_t *pr
 		const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_hosts_func_t discovery_update_hosts_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
 		zbx_discovery_find_host_func_t discovery_find_host_cb,
@@ -114,6 +117,8 @@ void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
 void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, size_t hash_len);
 void	zbx_delete_lld_rule_host_prototypes(zbx_vector_uint64_t *lldrule_itemids, int audit_context_mode);
 
+int	zbx_db_get_main_interface_ip(const zbx_uint64_t hostid, const unsigned char type,
+		char *ip_buffer, const size_t sz_ip_buffer);
 zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags, int audit_context_mode);
 void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version,
