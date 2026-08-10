@@ -156,8 +156,8 @@ foreach ($data['ceprules'] as $ceprule) {
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass('js-toggle-disabled')
 				->setAttribute('data-action', $ceprule['status'] == ZBX_CORRELATION_ENABLED
-					? 'correlation.disable'
-					: 'correlation.enable'
+					? 'ceprule.disable'
+					: 'ceprule.enable'
 				)
 				->setAttribute('data-id', 'legacy-'.$ceprule['correlationid']),
 			$ceprule['error'] ? makeErrorIcon($ceprule['error']) : ''
