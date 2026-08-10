@@ -1325,14 +1325,17 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			? 'zabbix.php?action=host.dashboard.view&hostid='.self::$hostid.'&dashboardid='.self::$template_dashboardid
 			: 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
 		$this->page->open($url)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status);
 
 		// Open Kiosk mode and check widget display again.
 		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status, 'kiosk');
-		$this->query('xpath://button[@title="Normal view"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
 		$dashboard->waitUntilReady();
+
+		// Kiosk mode hides the dashboard controls; wait for them to be restored before editing.
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->waitUntilVisible();
 
 		// Open dashboard in edit mode or open dashboard on template and check widget display again.
 		if (array_key_exists('template', $module)) {
@@ -1377,7 +1380,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Switch to kiosk mode if required.
 		if ($mode === 'kiosk') {
-			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+			$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 			$this->page->waitUntilReady();
 			$dashboard->waitUntilReady();
 		}
@@ -1633,7 +1636,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	private function changeModuleStatusFromPage($name, $current_status) {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Name', $name);
-		$row->query('link', $current_status)->one()->click();
+		$row->query('link', $current_status)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 	}
 

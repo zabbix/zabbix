@@ -434,18 +434,18 @@ class CSetupWizard extends CForm {
 				$config = new CConfigFile(APP::getRootDir().CConfigFile::CONFIG_FILE_PATH);
 				$config->config = [
 					'DB' => [
-							'TYPE' => $this->getConfig('DB_TYPE'),
-							'SERVER' => $this->getConfig('DB_SERVER'),
-							'PORT' => $this->getConfig('DB_PORT'),
-							'DATABASE' => $this->getConfig('DB_DATABASE'),
-							'SCHEMA' => $this->getConfig('DB_SCHEMA'),
-							'ENCRYPTION' => (bool) $this->getConfig('DB_ENCRYPTION'),
-							'VERIFY_HOST' => (bool) $this->getConfig('DB_VERIFY_HOST'),
-							'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
-							'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
-							'CA_FILE' => $this->getConfig('DB_CA_FILE'),
-							'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
-						] + $db_creds_config + $vault_config,
+						'TYPE' => $this->getConfig('DB_TYPE'),
+						'SERVER' => $this->getConfig('DB_SERVER'),
+						'PORT' => $this->getConfig('DB_PORT'),
+						'DATABASE' => $this->getConfig('DB_DATABASE'),
+						'SCHEMA' => $this->getConfig('DB_SCHEMA'),
+						'ENCRYPTION' => (bool) $this->getConfig('DB_ENCRYPTION'),
+						'VERIFY_HOST' => (bool) $this->getConfig('DB_VERIFY_HOST'),
+						'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
+						'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
+						'CA_FILE' => $this->getConfig('DB_CA_FILE'),
+						'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
+					] + $db_creds_config + $vault_config,
 					'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME'),
 					'ZBX_SERVER_TLS' => $server_tls_config
 				];
@@ -648,13 +648,13 @@ class CSetupWizard extends CForm {
 					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases()))
 			)
 			->addRow(new CLabel([
-				_('Database host'),
-				makeHelpIcon([
-					_('Enter one or more values as host:port or [host]:port (IPv6), separated by commas.'),
-					BR(),
-					_('If no port is specified, the "Database port" value is used.')
-				])
-			], 'server'),
+					_('Database host'),
+					makeHelpIcon([
+						_('Enter one or more values as host:port or [host]:port (IPv6), separated by commas.'),
+						BR(),
+						_('If no port is specified, the "Database port" value is used.')
+					])
+				], 'server'),
 				(new CTextBox('server', $this->getConfig('DB_SERVER', $config->config['DB']['SERVER'])))
 					->setAttribute('placeholder', $config->config['DB']['SERVER'])
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
@@ -754,7 +754,7 @@ class CSetupWizard extends CForm {
 					->setAttribute('maxlength', 2048),
 				'vault_token_row',
 				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP
-				|| $hashicorp_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE
+						|| $hashicorp_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE
 					? ZBX_STYLE_DISPLAY_NONE
 					: null
 			)
@@ -765,7 +765,7 @@ class CSetupWizard extends CForm {
 					->setAttribute('maxlength', 2048),
 				'vault_app_role_id_row',
 				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP
-				|| $hashicorp_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN
+						|| $hashicorp_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN
 					? ZBX_STYLE_DISPLAY_NONE
 					: null
 			)
@@ -776,7 +776,7 @@ class CSetupWizard extends CForm {
 					->setAttribute('maxlength', 2048),
 				'vault_app_secret_id_row',
 				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP
-				|| $hashicorp_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN
+						|| $hashicorp_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN
 					? ZBX_STYLE_DISPLAY_NONE
 					: null
 			)
@@ -988,7 +988,7 @@ class CSetupWizard extends CForm {
 				(new CFormField(
 					(new CTextBox('zbx_server_tls_certificate_subject',
 						$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT', '')))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				))->addClass(ZBX_STYLE_DISPLAY_NONE)
 			]);
 
@@ -1187,20 +1187,20 @@ class CSetupWizard extends CForm {
 				(new CSpan(_('Server TLS CA file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('ZBX_SERVER_TLS_CA_FILE')
 			)
-				->addRow(
-					(new CSpan(_('Web interface TLS key file')))->addClass(ZBX_STYLE_GREY),
-					$this->getConfig('ZBX_SERVER_TLS_KEY_FILE')
-				)
-				->addRow(
-					(new CSpan(_('Web interface TLS certificate file')))->addClass(ZBX_STYLE_GREY),
-					$this->getConfig('ZBX_SERVER_TLS_CERT_FILE')
-				);
+			->addRow(
+				(new CSpan(_('Web interface TLS key file')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('ZBX_SERVER_TLS_KEY_FILE')
+			)
+			->addRow(
+				(new CSpan(_('Web interface TLS certificate file')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('ZBX_SERVER_TLS_CERT_FILE')
+			);
 
 			if ($this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', false)) {
 				$table->addRow(
-					(new CSpan(_('Server TLS certificate issuer')))->addClass(ZBX_STYLE_GREY),
-					$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER')
-				)
+						(new CSpan(_('Server TLS certificate issuer')))->addClass(ZBX_STYLE_GREY),
+						$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER')
+					)
 					->addRow(
 						(new CSpan(_('Server TLS certificate subject')))->addClass(ZBX_STYLE_GREY),
 						$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_SUBJECT')
@@ -1354,18 +1354,18 @@ class CSetupWizard extends CForm {
 		$config = new CConfigFile($config_file_name);
 		$config->config = [
 			'DB' => [
-					'TYPE' => $this->getConfig('DB_TYPE'),
-					'SERVER' => $this->getConfig('DB_SERVER'),
-					'PORT' => $this->getConfig('DB_PORT'),
-					'DATABASE' => $this->getConfig('DB_DATABASE'),
-					'SCHEMA' => $this->getConfig('DB_SCHEMA'),
-					'ENCRYPTION' => $this->getConfig('DB_ENCRYPTION'),
-					'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
-					'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
-					'CA_FILE' => $this->getConfig('DB_CA_FILE'),
-					'VERIFY_HOST' => $this->getConfig('DB_VERIFY_HOST'),
-					'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
-				] + $db_creds_config + $vault_config,
+				'TYPE' => $this->getConfig('DB_TYPE'),
+				'SERVER' => $this->getConfig('DB_SERVER'),
+				'PORT' => $this->getConfig('DB_PORT'),
+				'DATABASE' => $this->getConfig('DB_DATABASE'),
+				'SCHEMA' => $this->getConfig('DB_SCHEMA'),
+				'ENCRYPTION' => $this->getConfig('DB_ENCRYPTION'),
+				'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
+				'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
+				'CA_FILE' => $this->getConfig('DB_CA_FILE'),
+				'VERIFY_HOST' => $this->getConfig('DB_VERIFY_HOST'),
+				'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
+			] + $db_creds_config + $vault_config,
 			'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME'),
 			'ZBX_SERVER_TLS' => $server_tls_config
 		];
@@ -1538,8 +1538,8 @@ class CSetupWizard extends CForm {
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL && $DB['SCHEMA'] !== '') {
 			$db_schema = DBselect(
 				'SELECT NULL'.
-				' FROM information_schema.schemata'.
-				' WHERE schema_name='.zbx_dbstr($DB['SCHEMA'])
+					' FROM information_schema.schemata'.
+					' WHERE schema_name='.zbx_dbstr($DB['SCHEMA'])
 			);
 			$result = (bool) DBfetch($db_schema);
 		}

@@ -257,7 +257,7 @@ class CFormValidator {
 			while (path_for_data_lookup.length) {
 				const part = path_for_data_lookup.shift();
 
-				if (!(part in field_data)) {
+				if (typeof(field_data) !== 'object' || !(part in field_data)) {
 					return null;
 				}
 
@@ -444,8 +444,20 @@ class CFormValidator {
 		const checkField = (rule_set, field, data, field_path) => {
 			const when_paths = updateWhenReferences(rule_set, field_path);
 
+			const when_match = when_paths.every((when_path, index) => {
+				const when_rules = {...rule_set.when[index]};
+				delete when_rules[0];
+
+				return when_path in when_fields_data
+					&& this.#checkValue(when_rules, when_fields_data[when_path]);
+			});
+
+			if (!when_match) {
+				return;
+			}
+
 			if (rule_set.type === 'objects' || rule_set.type === 'array') {
-				if (data[field] !== null) {
+				if (this.#isTypeObject(data) && field in data && data[field] !== null) {
 					Object.entries(data[field]).forEach(([key, value]) => {
 						scanObject(value, field_path + '/' + key);
 
@@ -456,11 +468,12 @@ class CFormValidator {
 				}
 			}
 			else if (rule_set.type === 'object') {
-				if (data[field] !== null) {
-					scanObject(data[field], field_path);
+				if (this.#isTypeObject(data)) {
+					scanObject(field in data ? data[field] : null, field_path);
 				}
 			}
-			else if (['id', 'integer', 'float', 'string'].includes(rule_set.type)) {
+			else if (['id', 'integer', 'float', 'string'].includes(rule_set.type) && this.#isTypeObject(data)
+					&& field in data) {
 				if (!when_paths.length) {
 					checkUse(rule_set, field_path);
 				}
@@ -479,10 +492,6 @@ class CFormValidator {
 		};
 
 		const scanObject = (data, field_path) => {
-			if (!this.#isTypeObject(data)) {
-				return;
-			}
-
 			const rule_sets = getRuleSetsByPath(field_path);
 
 			rule_sets.forEach(rule_set => {
@@ -490,9 +499,7 @@ class CFormValidator {
 
 				if ('fields' in rule_set) {
 					Object.entries(rule_set.fields).forEach(([field, rule_sets]) => {
-						if (field in data) {
-							rule_sets.forEach(rule_set => checkField(rule_set, field, data, field_path + '/' + field));
-						}
+						rule_sets.forEach(rule_set => checkField(rule_set, field, data, field_path + '/' + field));
 					});
 				}
 			});
@@ -503,27 +510,16 @@ class CFormValidator {
 		return {when_fields_data, api_uniq_rules, use_checks};
 	}
 
-	/**
-	 * Call API request to validate all api based validations.
-	 *
-	 * @param {Array} validations
-	 *
-	 * @returns {Promise}
-	 */
-	#validateApiExists(validations) {
-		const url = new URL('zabbix.php', location.href);
-
-		url.searchParams.set('action', 'validate.api.exists');
-
-		return fetch(url.href, {
+	#post(action, data) {
+		return fetch(zabbixUrl({action}), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({validations}),
+			body: JSON.stringify(data),
 		})
 			.then(response => response.json())
 			.then(response => {
 				if ('error' in response) {
-					console.error('validate.api.exists error', response.error);
+					console.error(`${action} error`, response.error);
 					throw new Error();
 				}
 
@@ -532,6 +528,17 @@ class CFormValidator {
 			.catch(() => {
 				return {result: false};
 			});
+	}
+
+	/**
+	 * Call API request to validate all api based validations.
+	 *
+	 * @param {Array} validations
+	 *
+	 * @returns {Promise}
+	 */
+	#validateApiExists(validations) {
+		return this.#post('validate.api.exists', {validations});
 	}
 
 	/**
@@ -583,76 +590,83 @@ class CFormValidator {
 	}
 
 	/**
+	 * Call request to check provided use validations on fields.
+	 * Provided validations are split by VALIDATE_USE_CHUNK_SIZE per request.
+	 *
+	 * @param {Array} use_validations
+	 *
+	 * @returns {Promise}
+	 */
+	#validateUse(use_validations) {
+		const requests = [];
+		const result = {result: true, errors: []};
+
+		for (let offset = 0; offset < use_validations.length; offset += VALIDATE_USE_CHUNK_SIZE) {
+			const validations = use_validations.slice(offset, offset + VALIDATE_USE_CHUNK_SIZE);
+
+			requests.push(
+				this.#post('validate.use', {validations})
+					.then(response => {
+						result.result = result.result && response.result;
+
+						if (response.result === false && response.errors) {
+							result.errors = result.errors.concat(response.errors);
+						}
+					})
+			);
+		}
+
+		return Promise.all(requests).then(() => result);
+	}
+
+	/**
 	 * Function to perform delayed "use" checks that involves server-side parsers and validators.
 	 *
 	 * @returns {Promise}
 	 */
 	#validateDelayed() {
 		const delayed_checks = this.#use_checks.filter((check) => {
-			let are_all_fields_valid = true;
+			if (check.value === null) {
+				return false;
+			}
 
 			// If at least one of involved field has error, ?action=validate check is skipped.
 			if (check.path in this.#errors && this.#errors[check.path].some((error) => error.message !== '')) {
-				are_all_fields_valid = false;
+				return false;
 			}
 
-			return are_all_fields_valid;
+			return true;
 		});
 
-		return new Promise((resolve) => {
-			if (delayed_checks.length) {
-				let requests = [];
-				let id = 0;
-				let result_all = true;
+		const use_validations = delayed_checks.map((check) => {
+			const use_validation = {
+				field: check.path,
+				value: check.value,
+				class: check.rules.use[0],
+				options: check.rules.use[1]
+			};
 
-				for (const check of delayed_checks) {
-					requests.push(new Promise((resolve) => {
-						const curl = new Curl('zabbix.php');
-						curl.setArgument('action', 'validate');
+			if ('messages' in check.rules && 'use' in check.rules.messages) {
+				use_validation.error_msg = check.rules.messages.use;
+			}
 
-						return fetch(curl.getUrl(), {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							credentials: 'same-origin',
-							body: JSON.stringify({
-								use: check.rules.use,
-								value: check.value,
-								jsonrpc: '2.0',
-								id: ++id
-							}),
-						})
-							.then((response) => response.json())
-							.then((response) => {
-								if ('result' in response && response.result !== '') {
-									check.error_msg = this.#getMessage(check.rules, 'use', response.result);
-								}
+			return use_validation;
+		});
 
-								resolve();
-							})
-							.catch(() => {
-								result_all = false;
-								resolve();
-							});
-					}));
-				}
+		if (use_validations.length) {
+			return this.#validateUse(use_validations)
+				.then(result => {
+					if (result.result === false && result.errors) {
+						result.errors.forEach((error) => {
+							this.#addError(error.field, error.message, CFormValidator.ERROR_LEVEL_DELAYED);
+						});
+					}
 
-				Promise.all(requests).then(() => {
-					delayed_checks.forEach((check) => {
-						if ('error_msg' in check) {
-							this.#addError(check.path, check.error_msg, CFormValidator.ERROR_LEVEL_DELAYED);
-							result_all = false;
-						}
-					});
-
-					resolve(result_all);
+					return result.result;
 				});
-			}
-			else {
-				resolve(true);
-			}
-		});
+		}
+
+		return Promise.resolve(true);
 	}
 
 	/**
@@ -835,15 +849,28 @@ class CFormValidator {
 
 		const findRelatedFieldPaths = (lookup_field_path) => {
 			const scan = (lookup_rule_path, rules, current_rule_path) => {
-				const current_field_name = current_rule_path.split('/').at(-1);
 				let related_fields = [];
+
+				const getFieldNameByRefPath = (ref_field_path, current_rule_path) => {
+					let name_parts = 1;
+
+					while (ref_field_path.startsWith('../')) {
+						ref_field_path = ref_field_path.substring(3);
+						name_parts++;
+					}
+
+					return current_rule_path.split('/').splice(-name_parts).join('/');
+				}
 
 				Object.entries(rules).forEach(([rule_key, rule_value]) => {
 					if (rule_key === 'when') {
 						rule_value.forEach((when) => {
 							// Add fields that relates on current lookup field.
 							if (lookup_rule_path === this.#getFieldAbsolutePath(when[0], current_rule_path)) {
-								related_fields.push(this.#getFieldAbsolutePath(current_field_name, lookup_field_path));
+								related_fields.push(this.#getFieldAbsolutePath(
+									getFieldNameByRefPath(when[0], current_rule_path),
+									lookup_field_path
+								));
 							}
 						});
 					}
@@ -953,6 +980,7 @@ class CFormValidator {
 		};
 
 		let subset = Object.create(null);
+		fields_to_validate.sort();
 
 		fields_to_validate.forEach((field_path) => {
 			const parts = field_path.split('/').slice(1);
@@ -1582,15 +1610,11 @@ class CFormValidator {
 	 */
 	#validateArray(rules, array_values, path) {
 		/*
-		 * Some arrays received from form are interpreted as objects so, if it's object but all keys are numeric, it's
-		 * actually array.
+		 * All keys must be numeric. Not all values are always validated therefore some keys might be missing.
 		 */
 		if (this.#isTypeObject(array_values)
-			&& Object.keys(array_values).every((k) => this.#isTypeInt32(k) && parseInt(k) >= 0)) {
-			array_values = Object.values(array_values);
-		}
+				&& !Object.keys(array_values).every((k) => this.#isTypeInt32(k) && parseInt(k) >= 0)) {
 
-		if (!Array.isArray(array_values)) {
 			this.#addError(path, this.#getMessage(rules, 'type', t('An array is expected.')),
 				CFormValidator.ERROR_LEVEL_PRIMARY
 			);
@@ -1598,7 +1622,7 @@ class CFormValidator {
 			return {result: CFormValidator.ERROR};
 		}
 
-		if ('not_empty' in rules && !array_values.filter(v => v !== null).length) {
+		if ('not_empty' in rules && !Object.values(array_values).filter(v => v !== null).length) {
 			this.#addError(path, this.#getMessage(rules, 'not_empty', t('This field cannot be empty.')),
 				CFormValidator.ERROR_LEVEL_PRIMARY
 			);
@@ -1607,22 +1631,28 @@ class CFormValidator {
 		}
 
 		if ('field' in rules) {
-			const normalized_values = [];
+			const normalized_values = Object.create(null);
+			let has_error = false;
 
-			for (let i = 0; array_values.length > i; i++) {
+			for (const i of Object.keys(array_values)) {
 				const {result, error, value = array_values} = this.#validateField(rules.field, array_values, i,
 					path + '/' + i
 				);
 
 				if (result === CFormValidator.ERROR) {
-					error && this.#addError(path, error, CFormValidator.ERROR_LEVEL_PRIMARY);
-
-					return {result: CFormValidator.ERROR};
+					has_error = true;
+					error && this.#addError(path + '/' + i, error, CFormValidator.ERROR_LEVEL_PRIMARY);
 				}
 				else {
-					normalized_values.push(value[i]);
+					this.#addPath(path + '/' + i, CFormValidator.ERROR_LEVEL_PRIMARY);
+					normalized_values[i] = value[i];
 				}
 			}
+
+			if (has_error) {
+				return {result: CFormValidator.ERROR};
+			}
+
 			array_values = normalized_values;
 		}
 

@@ -63,7 +63,7 @@ class testPageMonitoringHosts extends CWebTest {
 		// Check filter collapse/expand.
 		foreach ([true, false] as $status) {
 			$this->assertTrue($this->query('id:monitoring_hosts_filter')->asFilterElement()->one()->isExpanded($status));
-			$this->query('xpath://a[@aria-label="Home"]')->one()->click();
+			$this->query('xpath://a[@aria-label="Default filter tab"]')->one()->click();
 		}
 
 		// Check fields maximum length.
@@ -1141,7 +1141,7 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_TableSorting() {
 		// Sort by name and status.
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1')->waitUntilReady();
-		$table = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 		foreach (['Name', 'Status'] as $listing) {
 			$query = $table->query('xpath:.//span[text()="'.$listing.'"]/../../a[@href]');
 			$query->one()->click();

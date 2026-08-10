@@ -61,6 +61,7 @@ class CRoleHelper {
 	public const UI_ADMINISTRATION_USER_ROLES = 'ui.administration.user_roles';
 	public const UI_ADMINISTRATION_USERS = 'ui.administration.users';
 	public const UI_ADMINISTRATION_API_TOKENS = 'ui.administration.api_tokens';
+	public const UI_ADMINISTRATION_LINKED_DEVICES = 'ui.administration.linked_devices';
 	public const UI_ADMINISTRATION_MEDIA_TYPES = 'ui.administration.media_types';
 	public const UI_ADMINISTRATION_SCRIPTS = 'ui.administration.scripts';
 	public const UI_ADMINISTRATION_QUEUE = 'ui.administration.queue';
@@ -81,6 +82,11 @@ class CRoleHelper {
 	public const ACTIONS_CHANGE_PROBLEM_RANKING = 'actions.change_problem_ranking';
 	public const ACTIONS_EDIT_OWN_MEDIA = 'actions.edit_own_media';
 	public const ACTIONS_EDIT_USER_MEDIA = 'actions.edit_user_media';
+
+	public const DEVICES_ACCESS = 'devices.access';
+	public const DEVICES_ACTIONS_MANAGE_OWN = 'devices.actions.manage_own';
+	public const DEVICES_ACTIONS_MANAGE_USER = 'devices.actions.manage_user';
+	public const DEVICES_ACTIONS_DEFAULT_ACCESS = 'devices.actions.default_access';
 
 	public const UI_SECTION_DASHBOARDS = 'ui.dashboards';
 	public const UI_SECTION_MONITORING = 'ui.monitoring';
@@ -181,7 +187,8 @@ class CRoleHelper {
 		$roles = API::Role()->get([
 			'output' => ['roleid', 'name', 'type'],
 			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api.access', 'api.mode',
-				'api', 'actions', 'actions.default_access'
+				'api', 'actions', 'actions.default_access', 'devices.access', 'devices.actions',
+				'devices.actions.default_access'
 			],
 			'roleids' => $roleid
 		]);
@@ -198,7 +205,9 @@ class CRoleHelper {
 			'api.access' => (bool) $role['rules']['api.access'],
 			'api.mode' => (bool) $role['rules']['api.mode'],
 			'api' => $role['rules']['api'],
-			'actions.default_access' => (bool) $role['rules']['actions.default_access']
+			'actions.default_access' => (bool) $role['rules']['actions.default_access'],
+			'devices.access' => (bool) $role['rules']['devices.access'],
+			'devices.actions.default_access' => (bool) $role['rules']['devices.actions.default_access']
 		];
 
 		foreach ($role['rules']['ui'] as $rule) {
@@ -211,6 +220,10 @@ class CRoleHelper {
 
 		foreach ($role['rules']['actions'] as $rule) {
 			$rules['actions.'.$rule['name']] = (bool) $rule['status'];
+		}
+
+		foreach ($role['rules']['devices.actions'] as $rule) {
+			$rules['devices.actions.'.$rule['name']] = (bool) $rule['status'];
 		}
 
 		$role['type'] = (int) $role['type'];
@@ -274,6 +287,7 @@ class CRoleHelper {
 				self::UI_ADMINISTRATION_USERS,
 				self::UI_ADMINISTRATION_API_TOKENS,
 				self::UI_ADMINISTRATION_AUTHENTICATION,
+				self::UI_ADMINISTRATION_LINKED_DEVICES,
 				self::UI_ADMINISTRATION_GENERAL,
 				self::UI_ADMINISTRATION_DATA_SOURCE,
 				self::UI_ADMINISTRATION_AUDIT_LOG,
@@ -314,6 +328,16 @@ class CRoleHelper {
 
 		if ($user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules[] = self::ACTIONS_EDIT_USER_MEDIA;
+		}
+
+		return $rules;
+	}
+
+	public static function getDeviceActionsByUserType(int $user_type): array {
+		$rules = [self::DEVICES_ACTIONS_MANAGE_OWN];
+
+		if ($user_type === USER_TYPE_SUPER_ADMIN) {
+			$rules[] = self::DEVICES_ACTIONS_MANAGE_USER;
 		}
 
 		return $rules;
@@ -483,6 +507,10 @@ class CRoleHelper {
 						self::UI_ADMINISTRATION_API_TOKENS => _('API tokens'),
 						self::UI_ADMINISTRATION_AUTHENTICATION => _('Authentication')
 					];
+
+					if (CSettingsHelper::isMobileDevicesEnabled()) {
+						$labels[self::UI_ADMINISTRATION_LINKED_DEVICES] = _('Devices');
+					}
 				}
 
 				return $labels;
@@ -557,6 +585,21 @@ class CRoleHelper {
 		return $labels;
 	}
 
+	public static function getDevicesActionsLabels(int $user_type): array {
+		$default_labels = [
+			self::DEVICES_ACTIONS_MANAGE_OWN => _('Manage own devices'),
+			self::DEVICES_ACTIONS_MANAGE_USER => _('Manage user devices')
+		];
+
+		$labels = [];
+
+		foreach (self::getDeviceActionsByUserType($user_type) as $action) {
+			$labels[$action] = $default_labels[$action];
+		}
+
+		return $labels;
+	}
+
 	/**
 	 * Returns a list of all API methods by user type or API methods available only for the given user type.
 	 *
@@ -617,8 +660,13 @@ class CRoleHelper {
 			USER_TYPE_SUPER_ADMIN => []
 		];
 		$api_method_masks = $api_methods;
+		$allowed_api_services = CApiServiceFactory::API_SERVICES;
 
-		foreach (CApiServiceFactory::API_SERVICES as $service => $class_name) {
+		if (!CSettingsHelper::isMobileDevicesEnabled()) {
+			unset($allowed_api_services['device']);
+		}
+
+		foreach ($allowed_api_services as $service => $class_name) {
 			foreach (constant($class_name.'::ACCESS_RULES') as $method => $rules) {
 				if (array_key_exists('min_user_type', $rules)) {
 					switch ($rules['min_user_type']) {
