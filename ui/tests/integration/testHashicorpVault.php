@@ -15,6 +15,15 @@
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
+// Defaults matching the dev-mode Vault instance from the class docblock below; only used when
+// bootstrap.php (or the environment it's generated from) does not already provide these.
+if (!defined('PHPUNIT_HASHICORP_ADDRESS')) {
+	define('PHPUNIT_HASHICORP_ADDRESS', 'http://localhost:8200');
+}
+if (!defined('PHPUNIT_HASHICORP_ROOT_TOKEN_ID')) {
+	define('PHPUNIT_HASHICORP_ROOT_TOKEN_ID', 'root');
+}
+
 /**
  * Test suite for HashiCorp Vault integration: DB credentials retrieval by Zabbix server, and
  * resolution of Vault secret macros (a separate feature, exercised by
@@ -77,21 +86,25 @@ class testHashicorpVault extends CIntegrationTest {
 	private static $vault_macro_itemid;
 
 	/**
-	 * Wait until the pre-existing Vault instance (see class docblock) is reachable. Does not start,
+	 * Check that the pre-existing Vault instance (see class docblock) is reachable. Does not start,
 	 * stop or otherwise manage the instance.
 	 *
-	 * @throws Exception    if Vault is not reachable within the allotted time
+	 * Unlike the Zabbix components (see WAIT_ITERATIONS_STARTUP/WAIT_ITERATION_DELAY), this suite
+	 * never starts Vault itself, so a Vault that isn't reachable right away never will be within
+	 * this run - retrying for the usual startup-wait duration would just waste time. A single probe
+	 * with a short connection timeout is enough, and the whole suite is marked skipped (rather than
+	 * erroring) since the instance is optional infrastructure that most local/CI runs won't have up.
+	 *
+	 * @throws PHPUnit_Framework_SkippedTestError    if Vault is not reachable
 	 */
 	private static function vaultWaitUntilReady(): void {
-		for ($i = 0; $i < self::WAIT_ITERATIONS_STARTUP; $i++) {
-			if (@file_get_contents(self::VAULT_ADDR.'/v1/sys/health') !== false) {
-				return;
-			}
+		$context = stream_context_create(['http' => ['timeout' => 2]]);
 
-			sleep(self::WAIT_ITERATION_DELAY);
+		if (@file_get_contents(self::VAULT_ADDR.'/v1/sys/health', false, $context) !== false) {
+			return;
 		}
 
-		throw new Exception('HashiCorp Vault instance at "'.self::VAULT_ADDR.'" is not reachable. It must be '.
+		self::markTestSkipped('HashiCorp Vault instance at "'.self::VAULT_ADDR.'" is not reachable. It must be '.
 				'started independently before running this test suite, see the class docblock.'
 		);
 	}
