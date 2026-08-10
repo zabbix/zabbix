@@ -30,6 +30,7 @@
 #include "zbxdb.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
+#include "zbx_rtc_constants.h"
 
 static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout,
 		zbx_get_config_forks_f get_config_forks, const zbx_config_tls_t *config_tls,
@@ -273,13 +274,22 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{
+		int	vault_ret = SUCCEED;
+
 #ifndef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", jp->start);
 #endif
 		zbx_send_proxyconfig(sock, jp, config_vault, config_comms->config_timeout,
 				config_comms->config_trapper_timeout, config_comms->config_source_ip,
 				config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
-				config_comms->config_ssl_key_location);
+				config_comms->config_ssl_key_location, &vault_ret);
+
+		if (SUCCEED != vault_ret && NULL != config_vault->token)
+		{
+			zbx_ipc_async_socket_send(rtc, ZBX_RTC_VAULT_RELOGIN,
+					(unsigned char *)config_vault->token,
+					(zbx_uint32_t)strlen(config_vault->token) + 1);
+		}
 
 		return SUCCEED;
 	}
