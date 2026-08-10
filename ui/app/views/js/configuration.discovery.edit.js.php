@@ -28,7 +28,7 @@ window.drule_edit_popup = new class {
 	#clone_rules;
 	#dchecks;
 	#drule;
-    #can_select_server_for_discovery_by;
+	#can_select_server_for_discovery_by;
 	#dcheckid;
 	#available_device_types;
 
@@ -41,7 +41,7 @@ window.drule_edit_popup = new class {
 
 		this.#dchecks = dchecks;
 		this.#drule = drule;
-        this.#can_select_server_for_discovery_by = can_select_server_for_discovery_by;
+		this.#can_select_server_for_discovery_by = can_select_server_for_discovery_by;
 		this.#dcheckid = getUniqueId();
 		this.#available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
