@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',	7050063);
+define('ZABBIX_DB_VERSION',	7050090);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -240,6 +240,9 @@ define('ZBX_DB_MYSQL_ALLOWED_COLLATIONS', ['utf8_bin', 'utf8mb3_bin', 'utf8mb4_b
 define('DB_STORE_CREDS_CONFIG', 0);
 define('DB_STORE_CREDS_VAULT_HASHICORP', 1);
 define('DB_STORE_CREDS_VAULT_CYBERARK',  2);
+
+define('DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN',	0);
+define('DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE',	1);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
@@ -913,6 +916,7 @@ define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);
 define('MEDIA_TYPE_WEBHOOK',	4);
+define('MEDIA_TYPE_PUSH',		5);
 
 define('SMTP_SECURITY_NONE',		0);
 define('SMTP_SECURITY_STARTTLS',	1);
@@ -1202,10 +1206,10 @@ define('ZBX_EVENT_HISTORY_MANUAL_UPDATE',	2);
 define('ZBX_EVENT_HISTORY_ALERT',			3);
 define('ZBX_EVENT_HISTORY_MAINTENANCE',		4);
 
-define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
-define('ZBX_TM_TASK_ACKNOWLEDGE',	4);
-define('ZBX_TM_TASK_CHECK_NOW',		6);
-define('ZBX_TM_TASK_DATA',			7);
+define('ZBX_TM_TASK_CLOSE_PROBLEM', 	1);
+define('ZBX_TM_TASK_ACKNOWLEDGE',		4);
+define('ZBX_TM_TASK_CHECK_NOW',			6);
+define('ZBX_TM_TASK_DATA',				7);
 
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);
@@ -1407,11 +1411,11 @@ define('DHOST_STATUS_DISABLED', 1);
 define('TRIGGER_EXPRESSION',			0);
 define('TRIGGER_RECOVERY_EXPRESSION',	1);
 
-define('EXPRESSION_TYPE_INCLUDED',		0);
-define('EXPRESSION_TYPE_ANY_INCLUDED',	1);
-define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
-define('EXPRESSION_TYPE_TRUE',			3);
-define('EXPRESSION_TYPE_FALSE',			4);
+define('REGEX_TYPE_CONTAINS_STRING',		0);
+define('REGEX_TYPE_CONTAINS_ANY_SUBSTRING',	1);
+define('REGEX_TYPE_NOT_CONTAINS_STRING',	2);
+define('REGEX_TYPE_MATCHES_REGEX',			3);
+define('REGEX_TYPE_NOT_MATCHES_REGEX',		4);
 
 define('HOST_INVENTORY_DISABLED',	-1);
 define('HOST_INVENTORY_MANUAL',		0);
@@ -1640,6 +1644,7 @@ define('API_NUMBER',				71);
 define('API_SELEMENTID',			72);
 define('API_SSL_CERTIFICATE',		73);
 define('API_SSL_PRIVATE_KEY',		74);
+define('API_UUID_V7',				75);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1674,6 +1679,7 @@ define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_DB',			112);
 define('ZBX_API_ERROR_PARAMETERS',	100);
 define('ZBX_API_ERROR_NO_ENTITY',	101);
+define('ZBX_API_ERROR_NO_EXTERNAL_ENTITY',	102);
 define('ZBX_API_ERROR_PERMISSIONS',	120);
 define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
@@ -1685,10 +1691,11 @@ define('API_ERR_DISCOVERED', 1);
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
+define('ZBX_AUTH_SCHEME_BEARER',	0);
+define('ZBX_AUTH_SCHEME_DPOP',		1);
+
 define('ZBX_AUTH_TOKEN_ENABLED', 0);
 define('ZBX_AUTH_TOKEN_DISABLED', 1);
-
-define('ZBX_API_HEADER_AUTHENTICATE_PREFIX', 'Bearer ');
 
 define('ZBX_JAN_2038', 2145916800);
 
@@ -2496,6 +2503,15 @@ define('ZBX_STYLE_DATATABLE', 'datatable');
 
 // Limit amount of validations per request in CControllerValidateUse
 define('VALIDATE_USE_CHUNK_SIZE', 500);
+
+define('ZABBIX_MOBILE_VERSION',			1);
+
+define('ZBX_DEVICE_STATUS_NEW',			0);
+define('ZBX_DEVICE_STATUS_ACTIVATED',	1);
+define('ZBX_DEVICE_STATUS_ORPHANED',	2);
+
+define('MOBILE_KEY_SCOPE_IDENTITY',		0);
+define('MOBILE_KEY_SCOPE_ENCRYPTION',	1);
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');

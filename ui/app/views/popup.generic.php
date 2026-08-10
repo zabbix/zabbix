@@ -87,6 +87,17 @@ if (array_key_exists('templates', $data['filter'])) {
 	$script_inline .= $template_ms->getPostJS(). 'popup_generic.initTemplatesFilter();';
 }
 
+// Add users multiselect.
+if (array_key_exists('users', $data['filter'])) {
+	$multiselect_options = $data['filter']['users'];
+	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
+
+	$user_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Username'), 'popup_user_ms'), $user_ms);
+
+	$script_inline .= $user_ms->getPostJS(). 'popup_generic.initUsersFilter();';
+}
+
 // Show Type dropdown in header for help items.
 if ($data['popup_type'] === 'help_items') {
 	switch ($options['itemtype']) {
@@ -432,8 +443,8 @@ switch ($data['popup_type']) {
 			$documentation_link = (new CLink(null, CDocHelper::getUrl($item['documentation_link'])))
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_HELP)
-				->setTitle(_('Help'))
-				->setTarget('_blank');
+				->setTarget('_blank')
+				->setAttribute('aria-label', _('Open Zabbix documentation in a new tab'));
 
 			$table->addRow([$name, $description, $documentation_link]);
 		}
@@ -874,6 +885,26 @@ switch ($data['popup_type']) {
 			$media_type = $entry;
 		}
 		unset($media_type);
+		break;
+
+	case 'devices':
+		foreach ($data['table_records'] as $device) {
+			$check_box = $data['multiselect']
+				? new CCheckBox('item['.$device['id'].']', $device['id'])
+				: null;
+
+			$name = (new CLink($device['name']))
+				->setId('spanid'.$device['id'])
+				->setAttribute('data-reference', $options['reference'])
+				->setAttribute('data-deviceuuid', $device['id'])
+				->setAttribute('data-parentid', $options['parentid'])
+				->onClick('
+					addValue(this.dataset.reference, this.dataset.deviceuuid, this.dataset.parentid ?? null);
+					popup_generic.closePopup(event);
+				');
+
+			$table->addRow([$check_box, $name]);
+		}
 		break;
 }
 
