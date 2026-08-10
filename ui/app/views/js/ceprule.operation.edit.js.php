@@ -255,7 +255,7 @@ window.ceprule_operation_edit_popup = new class {
 	}
 
 	#setValues(operation) {
-		for (const condition of Object.values(operation.filter.conditions)) {
+		for (const condition of Object.values(operation.filter.conditions || {})) {
 			if (condition.type == <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>
 					|| condition.type == <?= ZBX_CONDITION_TYPE_EVENT_TAG ?>) {
 				this.#addTagRow(condition);
