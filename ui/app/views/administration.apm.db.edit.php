@@ -143,7 +143,7 @@ $apm_tab = (new CFormGrid())
 		))->addClass('js-ssl-key-file')
 	])
 	->addItem([
-		(new CLabel(_('Client private key file password'), 'ssl_key_password'))
+		(new CLabel(_('Client private key password'), 'ssl_key_password'))
 			->addClass('js-ssl-key-password'),
 		(new CFormField([
 			(new CPassBox('ssl_key_password'))
