@@ -86,13 +86,10 @@ class testHashicorpVault extends CIntegrationTest {
 	private static $vault_macro_itemid;
 
 	/**
-	 * Check precondition: pre-existing Vault instance (see class docblock) is reachable.
+	 * Check test precondition: pre-existing Vault instance (see class docblock) is reachable.
 	 * Does not start, stop or otherwise manage the instance.
-	 * Unlike the Zabbix components (see WAIT_ITERATIONS_STARTUP/WAIT_ITERATION_DELAY), this suite
-	 * never starts Vault itself, so a Vault that isn't reachable right away never will be within
-	 * this run - retrying for the usual startup-wait duration would just waste time. A single probe
-	 * with a short connection timeout is enough, and the whole suite is marked skipped (rather than
-	 * erroring) since the instance is optional infrastructure that most local/CI runs won't have up.
+	 *
+	 * If the Vault instance is not reachable the test is marked skipped (rather than failed).
 	 *
 	 * @throws PHPUnit_Framework_SkippedTestError    if Vault is not reachable
 	 */
