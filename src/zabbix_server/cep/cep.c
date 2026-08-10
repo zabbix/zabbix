@@ -2026,7 +2026,10 @@ int	cep_rule_check_error(zbx_cep_t *cep, zbx_uint64_t ruleid, const char *error)
 	if (NULL == (rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_search(&cep->rules, &ruleid)))
 		return (NULL == error ? SUCCEED : FAIL);
 
-	if (NULL == error || 0 != strcmp(rt->error, error))
+	if (NULL == error)
+		return (NULL == rt->error ? SUCCEED : FAIL);
+
+	if (NULL == rt->error || 0 != strcmp(rt->error, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -2047,10 +2050,12 @@ void	cep_rule_set_error(zbx_cep_t *cep, zbx_uint64_t ruleid, char *error)
 
 	if (NULL == error)
 	{
-		if (NULL != (rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_search(&cep->rules, &ruleid)) &&
-				0 == rt->window_start)
+		if (NULL != (rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_search(&cep->rules, &ruleid)))
 		{
-			zbx_hashset_remove_direct(&cep->rules, rt);
+			if (0 == rt->window_start)
+				zbx_hashset_remove_direct(&cep->rules, rt);
+			else
+				zbx_free(rt->error);
 		}
 		return;
 	}

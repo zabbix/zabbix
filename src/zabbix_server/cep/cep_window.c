@@ -369,31 +369,41 @@ static void	cep_window_close(const zbx_cep_rule_t *rule, zbx_cep_window_t *windo
  *                                                                            *
  * Parameters: window     - [IN] cep window                                   *
  *             event      - [IN] first event in simple or tag match window,   *
- *                               NULL if window is empty                      *
- *             start_time - [IN] window start time                            *
+ *                               NULL if window is empty or nextcheck is not  *
+ *                               based on event age                           *
  *                                                                            *
  * Return value: next check timestamp                                         *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	cep_window_get_nextcheck(const zbx_cep_window_t *window, const zbx_cep_event_t *event,
-		time_t start_time)
+static zbx_uint64_t	cep_window_get_nextcheck(const zbx_cep_window_t *window, const zbx_cep_event_t *event)
 {
+#define CEP_MAX_DELAY	10
+
+	time_t		now = time(NULL), nextcheck;
+
 	switch (window->type)
 	{
 		case ZBX_CEP_WINDOW_SIMPLE:
 		case ZBX_CEP_WINDOW_CORRELATION:
 			if (NULL != event)
-				return  (zbx_uint64_t)(event->clock + window->duration);
+				nextcheck = event->clock + window->duration;
 			else
-				return  (zbx_uint64_t)time(NULL) + 1;
+				return (zbx_uint64_t)now + 1;
+			break;
 		case ZBX_CEP_WINDOW_PATTERN:
-			return (zbx_uint64_t)time(NULL) + 1;
+			return (zbx_uint64_t)now + 1;
 		case ZBX_CEP_WINDOW_CAUSAL:
-			return (zbx_uint64_t)start_time + window->duration;
+			for (nextcheck = window->time_created + window->duration; now >= nextcheck;)
+				nextcheck = nextcheck + window->duration;
+			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown window type: %d", window->type);
 			return 0;
 	}
+
+	return (zbx_uint64_t)MIN(now + CEP_MAX_DELAY, nextcheck);
+
+#undef CEP_MAX_DELAY
 }
 
 /******************************************************************************
@@ -436,7 +446,7 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 	else
 	{
 		if (0 == zbx_queue_ptr_values_num(&window->hevents))
-			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, ctx->event, 0));
+			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, ctx->event));
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
@@ -448,9 +458,6 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 	{
 		cep_window_lock(window);
 		cep_window_close(rule, window, tasks);
-
-		/* rescheduled window at current time so it can be removed if still empty */
-		atomic_store(&window->nextcheck, (zbx_uint64_t)time(NULL));
 		cep_window_unlock(window);
 	}
 
@@ -480,7 +487,7 @@ static zbx_uint64_t	cep_window_evict_expired(zbx_cep_window_t *window, zbx_cep_r
 		{
 			if (ctx.event->clock + window->duration > now)
 			{
-				atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, ctx.event, 0));
+				atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, ctx.event));
 				cep_event_context_clear(&ctx);
 				break;
 			}
@@ -550,7 +557,7 @@ void	cep_window_sliding_process(zbx_cep_window_t *window, time_t now, zbx_vector
 	if (0 != pending_num || 0 != window->access_num)
 	{
 		if (0 == pending_num)
-			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL, 0));
+			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
 
 		cep_window_pool_enqueue(pool, window);
 	}
@@ -715,6 +722,9 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 	cep_window_lock(window);
 
+	if (0 == window->time_created)
+		window->time_created = start_time;
+
 	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) >= window->capacity)
 	{
 		cep_window_unlock(window);
@@ -738,7 +748,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
 		if (0 != start_time)
-			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL, start_time));
+			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
 
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
 		cep_window_unlock(window);
@@ -805,16 +815,23 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 		window->capacity = capacity;
 	}
 
-	cep_window_close(rule, window, tasks);
+	if (window->time_created + window->duration <= now)
+		cep_window_close(rule, window, tasks);
 
 	cep_window_pool_acquire(&pool);
-	if (0 != window->access_num)
-	{
-		zbx_uint64_t	start_time = atomic_load(&window->nextcheck);
 
-		window->time_created = now;
-		atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL, (time_t)start_time));
+	/* window was closed - 're-create' it */
+	if (window->time_created + window->duration <= now)
+	{
+		while (window->time_created + window->duration <= now)
+			window->time_created += window->duration;
+
 		window->flags = CEP_WINDOW_FLAGS_NONE;
+	}
+
+	if (0 != zbx_queue_ptr_values_num(&window->hevents) || 0 != window->access_num)
+	{
+		atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
 		cep_window_pool_enqueue(pool, window);
 	}
 	else
@@ -874,7 +891,7 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 	else
 	{
 		if (0 == zbx_queue_ptr_values_num(&window->hevents))
-			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL, 0));
+			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
 
@@ -1064,7 +1081,7 @@ enqueue:
 	cep_window_pool_acquire(&pool);
 	if (0 != zbx_queue_ptr_values_num(&window->hevents) || 0 != window->access_num)
 	{
-		atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL, 0));
+		atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
 		cep_window_pool_enqueue(pool, window);
 	}
 	else

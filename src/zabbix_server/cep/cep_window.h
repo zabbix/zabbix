@@ -32,6 +32,7 @@ zbx_cep_location_t;
 #define CEP_WINDOW_FLAGS_SYMPTOM_TAG_SET	0x0001
 
 typedef struct zbx_cep_window_ref zbx_cep_window_ref_t;
+
 typedef struct
 {
 	zbx_uint64_t		ruleid;
