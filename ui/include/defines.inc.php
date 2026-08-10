@@ -31,7 +31,7 @@ define('DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING',	7);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2026');
 
-define('ZBX_PROXY_IN_CLOUD_URL', 'https://cloud.zabbix.com');
+define('ZBX_CLOUD_URL', 'https://cloud.zabbix.com');
 define('ZBX_DOCUMENTATION_URL', 'https://www.zabbix.com/documentation');
 
 define('ZBX_BCRYPT_COST',		10);
