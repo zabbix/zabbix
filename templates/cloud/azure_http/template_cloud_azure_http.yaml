@@ -7361,7 +7361,7 @@ zabbix_export:
           key: azure.account.daily.get
           history: '0'
           value_type: TEXT
-          description: 'Collects Azure daily account data.'
+          description: 'Collects daily Azure account data.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -8034,7 +8034,7 @@ zabbix_export:
           key: azure.month.cost.total.get
           history: '0'
           value_type: TEXT
-          description: 'Collects Azure monthly costs data.'
+          description: 'Collects Azure monthly cost data.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -8202,7 +8202,7 @@ zabbix_export:
           key: azure.monthly.compare.get
           history: '0'
           value_type: TEXT
-          description: 'Azure monthly compare costs.'
+          description: 'Azure monthly cost comparison.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -8219,7 +8219,7 @@ zabbix_export:
           value_type: FLOAT
           units: '!EUR'
           params: 'max(0, last(//azure.monthly.compare.type.cost["current"]) - last(//azure.monthly.compare.type.cost["previous"]))'
-          description: 'Calculates Azure current monthly delta compared to previous month.'
+          description: 'Calculates current Azure monthly delta compared to previous month.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -8234,7 +8234,7 @@ zabbix_export:
           value_type: FLOAT
           units: '!EUR'
           params: 'last(//azure.monthly.compare.type.cost["current"]) - last(//azure.monthly.compare.type.cost["previous"])'
-          description: 'Calculates Azure current monthly budget delta compared to previous month.'
+          description: 'Calculates current Azure monthly budget delta compared to previous month.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -8249,7 +8249,7 @@ zabbix_export:
           value_type: FLOAT
           units: '!%'
           params: 'max(0, (last(//azure.monthly.compare.type.cost["current"]) - last(//azure.monthly.compare.type.cost["previous"])) / last(//azure.monthly.compare.type.cost["previous"]) * 100)'
-          description: 'Calculates Azure current monthly delta, in percent, compared to previous month.'
+          description: 'Calculates current Azure monthly delta, in percent, compared to previous month.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -8323,7 +8323,7 @@ zabbix_export:
           key: azure.region.subscription.daily.get
           history: '0'
           value_type: TEXT
-          description: 'Collects Azure region and subscription daily costs data.'
+          description: 'Collects Azure region and subscription daily cost data.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -8482,7 +8482,7 @@ zabbix_export:
           key: azure.region.subscription.yearly.get
           history: '0'
           value_type: TEXT
-          description: 'Collects Azure region and account yearly costs data.'
+          description: 'Collects Azure region and account yearly cost data.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -8642,7 +8642,7 @@ zabbix_export:
           key: azure.region.yearly.get
           history: '0'
           value_type: TEXT
-          description: 'Collects data for each region cost within a yearly gap.'
+          description: 'Collects cost data for each region within a yearly gap.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -8658,7 +8658,7 @@ zabbix_export:
           key: azure.regions.daily.get
           history: '0'
           value_type: TEXT
-          description: 'Collects Azure daily regions data.'
+          description: 'Collects daily Azure region data.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -8690,7 +8690,7 @@ zabbix_export:
           key: azure.service.daily.get
           history: '0'
           value_type: TEXT
-          description: 'Collects Azure daily service data.'
+          description: 'Collects daily Azure service data.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -8706,7 +8706,7 @@ zabbix_export:
           key: azure.service.daily.total.get
           history: '0'
           value_type: TEXT
-          description: 'Collects Azure service daily costs data.'
+          description: 'Collects Azure service daily cost data.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -9063,7 +9063,7 @@ zabbix_export:
           key: azure.service.yearly.get
           history: '0'
           value_type: TEXT
-          description: 'Collects data for each service cost within a yearly gap.'
+          description: 'Collects cost data for each service within a yearly gap.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -9079,7 +9079,7 @@ zabbix_export:
           key: azure.service.yearly.total.get
           history: '0'
           value_type: TEXT
-          description: 'Collects Azure service yearly costs data.'
+          description: 'Collects Azure service yearly cost data.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -9286,7 +9286,7 @@ zabbix_export:
           key: azure.subscription.yearly.get
           history: '0'
           value_type: TEXT
-          description: 'Collects data for Azure subscription cost within a yearly gap.'
+          description: 'Collects cost data for Azure subscription within a yearly gap.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -9317,7 +9317,7 @@ zabbix_export:
           name: 'Azure daily account cost discovery'
           type: DEPENDENT
           key: azure.daily.account.cost.discovery
-          description: 'Collects Azure daily account cost data.'
+          description: 'Collects daily Azure account cost data.'
           item_prototypes:
             - uuid: ac02b8c489424a8bb5aa4a17f13d717e
               name: 'Azure subscription [{#AZURE.SUBSCRIPTION.ID}]: Get daily data'
@@ -9325,7 +9325,7 @@ zabbix_export:
               key: 'azure.daily.account.cost.preprocessed.get["{#AZURE.SUBSCRIPTION.ID}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects Azure daily `{#AZURE.SUBSCRIPTION.ID}` account data.'
+              description: 'Collects daily Azure `{#AZURE.SUBSCRIPTION.ID}` account data.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9343,7 +9343,7 @@ zabbix_export:
               key: 'azure.daily.account.cost["{#AZURE.SUBSCRIPTION.ID}"]'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
-              description: 'Collects Azure daily `{#AZURE.SUBSCRIPTION.ID}` account cost.'
+              description: 'Collects daily Azure `{#AZURE.SUBSCRIPTION.ID}` account cost.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9390,7 +9390,7 @@ zabbix_export:
           name: 'Azure daily region cost discovery'
           type: DEPENDENT
           key: azure.daily.region.cost.discovery
-          description: 'Collects Azure daily region cost data.'
+          description: 'Collects daily Azure region cost data.'
           item_prototypes:
             - uuid: 86cb5e5430e74709a8e960c2854a2e60
               name: 'Azure region [{#AZURE.REGION.NAME}]: Get daily data'
@@ -9398,7 +9398,7 @@ zabbix_export:
               key: 'azure.daily.region.cost.preprocessed.get["{#AZURE.REGION.NAME}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects Azure daily `{#AZURE.REGION.NAME}` region data.'
+              description: 'Collects daily Azure `{#AZURE.REGION.NAME}` region data.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9416,7 +9416,7 @@ zabbix_export:
               key: 'azure.daily.region.cost["{#AZURE.REGION.NAME}"]'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
-              description: 'Collects Azure daily `{#AZURE.REGION.NAME}` region cost.'
+              description: 'Collects daily Azure `{#AZURE.REGION.NAME}` region cost.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9435,7 +9435,7 @@ zabbix_export:
                   event_name: 'Azure region [{#AZURE.REGION.NAME}]: Daily cost >= {$AZURE.REGION.COST.DAILY.HIGH}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'Azure `{#AZURE.REGION.NAME}` region daily cost has exceeded high threshold `{$AZURE.REGION.COST.DAILY.HIGH}`. Immediate investigation of region spending is recommended.'
+                  description: 'Azure region `{#AZURE.REGION.NAME}` daily cost has exceeded high threshold `{$AZURE.REGION.COST.DAILY.HIGH}`. Immediate investigation of region spending is recommended.'
                   tags:
                     - tag: scope
                       value: daily-cost
@@ -9445,7 +9445,7 @@ zabbix_export:
                   event_name: 'Azure region [{#AZURE.REGION.NAME}]: Daily cost >= {$AZURE.REGION.COST.DAILY.WARN}'
                   opdata: 'Current cost: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Azure `{#AZURE.REGION.NAME}` region daily cost is above warning threshold `{$AZURE.REGION.COST.DAILY.WARN}`. Please monitor region spending and investigate cost increase trends.'
+                  description: 'Azure region `{#AZURE.REGION.NAME}` daily cost is above warning threshold `{$AZURE.REGION.COST.DAILY.WARN}`. Please monitor region spending and investigate cost increase trends.'
                   dependencies:
                     - name: 'Azure region daily cost high'
                       expression: 'last(/Azure Cost Management by HTTP/azure.daily.region.cost["{#AZURE.REGION.NAME}"]) >= {$AZURE.REGION.COST.DAILY.HIGH}'
@@ -9463,7 +9463,7 @@ zabbix_export:
           name: 'Azure daily service cost discovery'
           type: DEPENDENT
           key: azure.daily.service.cost.discovery
-          description: 'Collects Azure daily service cost data.'
+          description: 'Collects daily Azure service cost data.'
           item_prototypes:
             - uuid: ca779632dc494085b67bc0c5625475bf
               name: 'Azure service [{#AZURE.SERVICE.NAME}]: Get daily data'
@@ -9471,7 +9471,7 @@ zabbix_export:
               key: 'azure.daily.service.cost.preprocessed.get["{#AZURE.SERVICE.NAME}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects Azure daily `{#AZURE.SERVICE.NAME}` service data.'
+              description: 'Collects daily Azure `{#AZURE.SERVICE.NAME}` service data.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9489,7 +9489,7 @@ zabbix_export:
               key: 'azure.daily.service.cost["{#AZURE.SERVICE.NAME}"]'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
-              description: 'Collects Azure daily `{#AZURE.SERVICE.NAME}` service cost.'
+              description: 'Collects daily Azure `{#AZURE.SERVICE.NAME}` service cost.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9536,7 +9536,7 @@ zabbix_export:
           name: 'Azure daily service type costs discovery'
           type: DEPENDENT
           key: azure.daily.service.type.costs.discovery
-          description: 'Collects Azure daily service type data.'
+          description: 'Collects daily Azure service type data.'
           item_prototypes:
             - uuid: 16e8e1ed06ca4c32a46b1dbb114d709f
               name: 'Azure service type [{#AZURE.SERVICE.TYPE}]: Get daily data'
@@ -9544,7 +9544,7 @@ zabbix_export:
               key: 'azure.daily.service.type.preprocessed.get["{#AZURE.SERVICE.TYPE}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects Azure daily service `{#AZURE.SERVICE.TYPE}` type data.'
+              description: 'Collects daily Azure service `{#AZURE.SERVICE.TYPE}` type data.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9562,7 +9562,7 @@ zabbix_export:
               key: 'azure.service.type.daily.cost["{#AZURE.SERVICE.TYPE}"]'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
-              description: 'Collects Azure daily service `{#AZURE.SERVICE.TYPE}` type cost.'
+              description: 'Collects daily Azure service `{#AZURE.SERVICE.TYPE}` type cost.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9579,7 +9579,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'azure.service.type.daily.count["{#AZURE.SERVICE.TYPE}"]'
               units: '!services'
-              description: 'Collects Azure daily service `{#AZURE.SERVICE.TYPE}` type count.'
+              description: 'Collects daily Azure service `{#AZURE.SERVICE.TYPE}` type count.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9688,7 +9688,7 @@ zabbix_export:
               key: 'azure.daily.top.service.cost["{#AZURE.SERVICE.NAME}"]'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
-              description: 'Collects Azure daily top service `{#AZURE.SERVICE.NAME}` cost.'
+              description: 'Collects daily Azure top service `{#AZURE.SERVICE.NAME}` cost.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9730,7 +9730,7 @@ zabbix_export:
               key: 'azure.daily.top.service.percent["{#AZURE.SERVICE.NAME}"]'
               value_type: FLOAT
               units: '!%'
-              description: 'Collects Azure daily top service `{#AZURE.SERVICE.NAME}` cost.'
+              description: 'Collects daily Azure top service `{#AZURE.SERVICE.NAME}` cost.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9748,7 +9748,7 @@ zabbix_export:
               key: 'azure.daily.top.service.preprocessed.get["{#AZURE.SERVICE.NAME}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects Azure daily top service `{#AZURE.SERVICE.NAME}` data.'
+              description: 'Collects daily Azure top service `{#AZURE.SERVICE.NAME}` data.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -9771,7 +9771,7 @@ zabbix_export:
           name: 'Azure monthly compare discovery'
           type: DEPENDENT
           key: azure.monthly.compare.discovery
-          description: 'Collects monthly compare data that compares current to previous months.'
+          description: 'Collects monthly data that compares current to previous months.'
           item_prototypes:
             - uuid: 51053e3b0de749ffba9d86a6b7fcb365
               name: 'Month [{#AZURE.MONTH.DATE}]: Type [{#AZURE.MONTH.TYPE}]: Total cost'
@@ -10101,7 +10101,7 @@ zabbix_export:
           name: 'Azure yearly region costs discovery'
           type: DEPENDENT
           key: azure.yearly.region.costs.discovery
-          description: 'Collects Azure yearly region data.'
+          description: 'Collects yearly Azure region data.'
           item_prototypes:
             - uuid: 40ddf8f7e0cd4bbd939f4ad66c57d37e
               name: 'Azure region [{#AZURE.REGION.NAME}]: Get yearly data'
@@ -10109,7 +10109,7 @@ zabbix_export:
               key: 'azure.yearly.region.preprocessed.get["{#AZURE.REGION.NAME}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects Azure yearly `{#AZURE.REGION.NAME}` region data.'
+              description: 'Collects yearly Azure `{#AZURE.REGION.NAME}` region data.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -10127,7 +10127,7 @@ zabbix_export:
               key: 'azure.yearly.region.yearly.cost["{#AZURE.REGION.NAME}"]'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
-              description: 'Collects Azure yearly `{#AZURE.REGION.NAME}` region total cost.'
+              description: 'Collects yearly Azure `{#AZURE.REGION.NAME}` region total cost.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -10150,7 +10150,7 @@ zabbix_export:
           name: 'Azure yearly service costs discovery'
           type: DEPENDENT
           key: azure.yearly.service.costs.discovery
-          description: 'Collects Azure yearly service data.'
+          description: 'Collects yearly Azure service data.'
           item_prototypes:
             - uuid: c1937fe4b339438cbf6b500307fe9fea
               name: 'Azure service [{#AZURE.SERVICE.NAME}]: Get yearly data'
@@ -10158,7 +10158,7 @@ zabbix_export:
               key: 'azure.yearly.service.preprocessed.get["{#AZURE.SERVICE.NAME}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects Azure yearly `{#AZURE.SERVICE.NAME}` service data.'
+              description: 'Collects yearly Azure `{#AZURE.SERVICE.NAME}` service data.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -10176,7 +10176,7 @@ zabbix_export:
               key: 'azure.yearly.service.yearly.cost["{#AZURE.SERVICE.NAME}"]'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
-              description: 'Collects Azure yearly `{#AZURE.SERVICE.NAME}` service total cost.'
+              description: 'Collects yearly Azure `{#AZURE.SERVICE.NAME}` service total cost.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -10199,7 +10199,7 @@ zabbix_export:
           name: 'Azure yearly service type costs discovery'
           type: DEPENDENT
           key: azure.yearly.service.type.costs.discovery
-          description: 'Collects Azure yearly service type data.'
+          description: 'Collects yearly Azure service type data.'
           item_prototypes:
             - uuid: 40dd2a4caf1549c4bddfb593a5aa107e
               name: 'Azure service type [{#AZURE.SERVICE.TYPE}]: Yearly cost'
@@ -10207,7 +10207,7 @@ zabbix_export:
               key: 'azure.service.type.yearly.cost["{#AZURE.SERVICE.TYPE}"]'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
-              description: 'Collects Azure yearly service `{#AZURE.SERVICE.TYPE}` type cost.'
+              description: 'Collects yearly Azure service `{#AZURE.SERVICE.TYPE}` type cost.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -10224,7 +10224,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'azure.service.type.yearly.count["{#AZURE.SERVICE.TYPE}"]'
               units: '!services'
-              description: 'Collects Azure yearly service `{#AZURE.SERVICE.TYPE}` type count.'
+              description: 'Collects yearly Azure service `{#AZURE.SERVICE.TYPE}` type count.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -10242,7 +10242,7 @@ zabbix_export:
               key: 'azure.yearly.service.type.preprocessed.get["{#AZURE.SERVICE.TYPE}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects Azure yearly service `{#AZURE.SERVICE.TYPE}` type data.'
+              description: 'Collects yearly Azure service `{#AZURE.SERVICE.TYPE}` type data.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -10265,7 +10265,7 @@ zabbix_export:
           name: 'Azure yearly subscription costs discovery'
           type: DEPENDENT
           key: azure.yearly.subscription.costs.discovery
-          description: 'Collects Azure yearly subscription data.'
+          description: 'Collects yearly Azure subscription data.'
           item_prototypes:
             - uuid: aee62c7a2d5e45c783a40e3647751ed1
               name: 'Azure subscription [{#AZURE.SUBSCRIPTION.ID}]: Get yearly data'
@@ -10273,7 +10273,7 @@ zabbix_export:
               key: 'azure.yearly.subscription.preprocessed.get["{#AZURE.SUBSCRIPTION.ID}"]'
               history: '0'
               value_type: CHAR
-              description: 'Collects Azure yearly `{#AZURE.SUBSCRIPTION.ID}` subscription-id data.'
+              description: 'Collects yearly Azure `{#AZURE.SUBSCRIPTION.ID}` subscription ID data.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -10291,7 +10291,7 @@ zabbix_export:
               key: 'azure.yearly.subscription.yearly.cost["{#AZURE.SUBSCRIPTION.ID}"]'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
-              description: 'Collects Azure yearly `{#AZURE.SUBSCRIPTION.ID}` subscription-id total cost.'
+              description: 'Collects yearly Azure `{#AZURE.SUBSCRIPTION.ID}` subscription ID total cost.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -10320,23 +10320,23 @@ zabbix_export:
       macros:
         - macro: '{$AZURE.ACCOUNT.COST.DAILY.HIGH}'
           value: '400'
-          description: 'The threshold for high Azure account daily cost.'
+          description: 'Threshold for high Azure account daily cost.'
           config:
             type: TEXT
             priority: '6'
             section_name: 'Azure Daily'
             label: 'Account daily cost [high]'
-            description: 'The threshold for high Azure account daily cost.'
+            description: 'Threshold for high Azure account daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.ACCOUNT.COST.DAILY.WARN}'
           value: '200'
-          description: 'The threshold for warning Azure account daily cost.'
+          description: 'Warning threshold for Azure account daily cost.'
           config:
             type: TEXT
             priority: '7'
             section_name: 'Azure Daily'
             label: 'Account daily cost [warning]'
-            description: 'The threshold for warning Azure account daily cost.'
+            description: 'Warning threshold for Azure account daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
@@ -10357,33 +10357,33 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.BILLING.MONTH.HIGH}'
           value: '15000'
-          description: 'The threshold for high Azure monthly billing.'
+          description: 'Threshold for high Azure monthly billing.'
           config:
             type: TEXT
             priority: '2'
             section_name: 'Azure Monthly'
             label: 'Monthly billing [high]'
-            description: 'The threshold for high Azure monthly billing.'
+            description: 'Threshold for high Azure monthly billing.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.BILLING.MONTH.WARN}'
           value: '10000'
-          description: 'The threshold for warning Azure monthly billing.'
+          description: 'Warning threshold for Azure monthly billing.'
           config:
             type: TEXT
             priority: '3'
             section_name: 'Azure Monthly'
             label: 'Monthly billing [warning]'
-            description: 'The threshold for warning Azure monthly billing.'
+            description: 'Warning threshold for Azure monthly billing.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.BUDGET.MONTH}'
           value: '10000'
-          description: 'The threshold for Azure monthly budget limit.'
+          description: 'Threshold for Azure monthly budget limit.'
           config:
             type: TEXT
             priority: '1'
             section_name: 'Azure Monthly'
             label: 'Monthly budget'
-            description: 'The threshold for Azure monthly budget limit.'
+            description: 'Threshold for Azure monthly budget limit.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
@@ -10467,63 +10467,63 @@ zabbix_export:
             description: 'HTTP proxy to use for requests.'
         - macro: '{$AZURE.REGION.COST.DAILY.HIGH}'
           value: '400'
-          description: 'The threshold for high Azure region daily cost.'
+          description: 'Threshold for high Azure region daily cost.'
           config:
             type: TEXT
             priority: '8'
             section_name: 'Azure Daily'
             label: 'Region daily cost [high]'
-            description: 'The threshold for high Azure region daily cost.'
+            description: 'Threshold for high Azure region daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.REGION.COST.DAILY.WARN}'
           value: '200'
-          description: 'The threshold for warning Azure region daily cost.'
+          description: 'Warning threshold for Azure region daily cost.'
           config:
             type: TEXT
             priority: '9'
             section_name: 'Azure Daily'
             label: 'Region daily cost [warning]'
-            description: 'The threshold for warning Azure region daily cost.'
+            description: 'Warning threshold for Azure region daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.SERVICE.COST.DAILY.HIGH}'
           value: '400'
-          description: 'The threshold for high Azure service daily cost.'
+          description: 'Threshold for high Azure service daily cost.'
           config:
             type: TEXT
             priority: '10'
             section_name: 'Azure Daily'
             label: 'Service daily cost [high]'
-            description: 'The threshold for high Azure service daily cost.'
+            description: 'Threshold for high Azure service daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.SERVICE.COST.DAILY.WARN}'
           value: '200'
-          description: 'The threshold for warning Azure service daily cost.'
+          description: 'Warning threshold for Azure service daily cost.'
           config:
             type: TEXT
             priority: '11'
             section_name: 'Azure Daily'
             label: 'Service daily cost [warning]'
-            description: 'The threshold for warning Azure service daily cost.'
+            description: 'Warning threshold for Azure service daily cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.SERVICE.COST.TOP.HIGH}'
           value: '400'
-          description: 'The threshold for high Azure top service cost.'
+          description: 'Threshold for high Azure top service cost.'
           config:
             type: TEXT
             priority: '4'
             section_name: 'Azure Daily'
             label: 'Top service cost [high]'
-            description: 'The threshold for high Azure top service cost.'
+            description: 'Threshold for high Azure top service cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.SERVICE.COST.TOP.WARN}'
           value: '200'
-          description: 'The threshold for warning Azure top service cost.'
+          description: 'Warning threshold for Azure top service cost.'
           config:
             type: TEXT
             priority: '5'
             section_name: 'Azure Daily'
             label: 'Top service cost [warning]'
-            description: 'The threshold for warning Azure top service cost.'
+            description: 'Warning threshold for Azure top service cost.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
