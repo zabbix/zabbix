@@ -168,7 +168,7 @@ const view = new class {
 			...document.querySelectorAll('.js-ssl-verify-host')
 		], show_ssl_verify_peer_fields);
 
-		const show_change_password_btn = initial_values.status === 1
+		const show_change_password_btn = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
 			&& values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD
 			&& !this.#url_changed && !this.#password_changed;
 

@@ -105,30 +105,20 @@ class CControllerApmDbUpdate extends CController {
 	}
 
 	protected static function processApmInput(array &$apm): void {
-		$reset_fields = [];
-
 		if ($apm['status'] === APM_GLOBAL_DB_STATUS_NOT_CONFIGURED) {
 			$apm = ['status' => APM_GLOBAL_DB_STATUS_NOT_CONFIGURED];
 		}
 		else {
-			switch ($apm['authentication_type']) {
-				case APM_GLOBAL_DB_AUTHTYPE_PASSWORD:
-					$reset_fields = ['vault_path'];
-					break;
-
-				case APM_GLOBAL_DB_AUTHTYPE_VAULT:
-					$reset_fields = ['username', 'password'];
-					break;
-
-				case APM_GLOBAL_DB_AUTHTYPE_NONE:
-					$reset_fields = ['vault_path', 'username', 'password'];
-					break;
-			}
-
 			$apm['url'] = preg_replace('/[\r\n\t]/', '', trim($apm['url'], "\x00..\x20"));
 
+			$reset_fields = match ($apm['authentication_type']) {
+				APM_GLOBAL_DB_AUTHTYPE_PASSWORD => ['vault_path'],
+				APM_GLOBAL_DB_AUTHTYPE_VAULT => ['username', 'password'],
+				APM_GLOBAL_DB_AUTHTYPE_NONE => ['vault_path', 'username', 'password']
+			};
+
 			if (str_starts_with($apm['url'], 'https://')) {
-				if ($apm['ssl_verify_peer'] === 0) {
+				if ($apm['ssl_verify_peer'] === APM_GLOBAL_DB_VERIFY_PEER_DISABLED) {
 					$reset_fields = array_merge($reset_fields, ['ssl_verify_host', 'ssl_ca_location']);
 				}
 			}
