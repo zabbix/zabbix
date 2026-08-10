@@ -204,12 +204,13 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/type": value must be one of '.implode(', ', [
 					CCepRuleHelper::OP_SET_NAME,
-					CCepRuleHelper::OP_CLOSE,
+					CCepRuleHelper::OP_CLOSE_EVENT,
 					CCepRuleHelper::OP_DISCARD,
 					CCepRuleHelper::OP_SET_SEVERITY,
 					CCepRuleHelper::OP_INCREASE_SEVERITY,
 					CCepRuleHelper::OP_DECREASE_SEVERITY,
 					CCepRuleHelper::OP_SUPPRESS,
+					CCepRuleHelper::OP_UNSUPPRESS,
 					CCepRuleHelper::OP_ADD_TAG,
 					CCepRuleHelper::OP_SET_TAG,
 					CCepRuleHelper::OP_SET_TAG_VALUE,
@@ -225,17 +226,18 @@ class testCepRule extends CAPITest {
 					'operations' => [
 						'sortorder' => 1,
 						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_COPY_LAST
+						'type' => CCepRuleHelper::OP_CLONE_LAST
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/type": value must be one of '.implode(', ', [
 					CCepRuleHelper::OP_SET_NAME,
-					CCepRuleHelper::OP_CLOSE,
+					CCepRuleHelper::OP_CLOSE_EVENT,
 					CCepRuleHelper::OP_DISCARD,
 					CCepRuleHelper::OP_SET_SEVERITY,
 					CCepRuleHelper::OP_INCREASE_SEVERITY,
 					CCepRuleHelper::OP_DECREASE_SEVERITY,
 					CCepRuleHelper::OP_SUPPRESS,
+					CCepRuleHelper::OP_UNSUPPRESS,
 					CCepRuleHelper::OP_ADD_TAG,
 					CCepRuleHelper::OP_SET_TAG,
 					CCepRuleHelper::OP_SET_TAG_VALUE,

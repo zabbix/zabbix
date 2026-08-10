@@ -28,9 +28,9 @@ $events_operations = new CSelectOptionGroup(_('Events'));
 $tags_operations = new CSelectOptionGroup(_('Tags'));
 $labels = CCepRuleHelper::getOperationLabelStrings();
 
-$events_group_opts = [CCepRuleHelper::OP_SET_NAME, CCepRuleHelper::OP_CLOSE, CCepRuleHelper::OP_DISCARD,
+$events_group_opts = [CCepRuleHelper::OP_SET_NAME, CCepRuleHelper::OP_CLOSE_EVENT, CCepRuleHelper::OP_DISCARD,
 	CCepRuleHelper::OP_SET_SEVERITY, CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY,
-	CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_COPY_LAST, CCepRuleHelper::OP_COPY_FIRST
+	CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_UNSUPPRESS, CCepRuleHelper::OP_CLONE_LAST, CCepRuleHelper::OP_CLONE_FIRST
 ];
 
 foreach ($labels as $option => $label) {

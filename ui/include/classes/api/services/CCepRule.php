@@ -665,10 +665,18 @@ class CCepRule extends CApiService {
 			$path = '/'.($i + 1).'/operations';
 
 			foreach ($cep_rule['operations'] as $j => &$operation) {
+				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'execute_when' =>	['type' => API_INT32, 'in' => implode(',', CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$cep_rule['window_type']]), 'flags' => API_REQUIRED]
+				]];
+
+				if (!CApiInputValidator::validate($api_input_rules, $operation, $path.'/'.($j + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'sortorder' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => ZBX_MIN_INT32.':'.ZBX_MAX_INT32],
-					'execute_when' =>	['type' => API_INT32, 'in' => implode(',', CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$cep_rule['window_type']]), 'flags' => API_REQUIRED],
-					'filter' =>			self::getOperationFilterValidationRules(),
+					'execute_when' =>	['type' => API_ANY],
+					'filter' =>			self::getOperationFilterValidationRules($operation['execute_when']),
 					'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN[$operation['execute_when']])],
 					'event_name' =>		['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'type', 'in' => implode(',', [
@@ -729,7 +737,7 @@ class CCepRule extends CApiService {
 		unset($cep_rule);
 	}
 
-	private static function getOperationFilterValidationRules(): array {
+	private static function getOperationFilterValidationRules(int $execute_when): array {
 		return ['type' => API_OBJECT, 'fields' => [
 			'evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR])],
 			'conditions' =>		[
@@ -744,7 +752,7 @@ class CCepRule extends CApiService {
 										['type' => [ZBX_CONDITION_TYPE_EVENT_SUPPRESSED]]
 									],
 									'fields' => [
-				'type' =>				['type' => API_INT32, 'in' => implode(',', CCepRuleHelper::OPERATION_CONDITION_TYPES), 'flags' => API_REQUIRED],
+				'type' =>				['type' => API_INT32, 'in' => implode(',', CCepRuleHelper::OPERATION_CONDITION_TYPES_BY_EXECUTE_WHEN[$execute_when]), 'flags' => API_REQUIRED],
 				'operator' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 											['if' => ['field' => 'type', 'in' => implode(',', [
 												ZBX_CONDITION_TYPE_EVENT_TAG

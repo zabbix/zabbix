@@ -310,12 +310,13 @@ window.ceprule_operation_edit_popup = new class {
 		tag_rename.style.display = 'none';
 
 		if ([
-			<?= CCepRuleHelper::OP_COPY_FIRST ?>,
-			<?= CCepRuleHelper::OP_COPY_LAST ?>,
+			<?= CCepRuleHelper::OP_CLONE_FIRST ?>,
+			<?= CCepRuleHelper::OP_CLONE_LAST ?>,
+			<?= CCepRuleHelper::OP_UNSUPPRESS ?>,
 			<?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>,
 			<?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>,
 			<?= CCepRuleHelper::OP_DISCARD ?>,
-			<?= CCepRuleHelper::OP_CLOSE ?>
+			<?= CCepRuleHelper::OP_CLOSE_EVENT ?>
 		].includes(value)) {
 			return;
 		}

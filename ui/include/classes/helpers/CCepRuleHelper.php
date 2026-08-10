@@ -35,40 +35,31 @@ class CCepRuleHelper {
 	public const CONDITION_HOST_GROUP = ZBX_CONDITION_TYPE_HOST_GROUP;
 	public const CONDITION_TIME_PERIOD = ZBX_CONDITION_TYPE_TIME_PERIOD;
 
-	public const OPERATION_CONDITION_TYPES = [
-		ZBX_CONDITION_TYPE_EVENT_TAG,
-		ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
-		ZBX_CONDITION_TYPE_EVENT_OPEN,
-		ZBX_CONDITION_TYPE_EVENT_FIRST,
-		ZBX_CONDITION_TYPE_EVENT_LAST,
-		ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
-		ZBX_CONDITION_TYPE_EVENT_COPIED,
-		ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
-	];
-
 	public const OP_SET_NAME = 1;
-	public const OP_CLOSE = 2;
+	public const OP_CLOSE_EVENT = 2;
 	public const OP_DISCARD = 3;
 	public const OP_SET_SEVERITY = 4;
 	public const OP_INCREASE_SEVERITY =  5;
 	public const OP_DECREASE_SEVERITY =  6;
 	public const OP_SUPPRESS = 7;
-	public const OP_COPY_FIRST = 8;
-	public const OP_COPY_LAST = 9;
-	public const OP_ADD_TAG = 10;
-	public const OP_SET_TAG = 11;
-	public const OP_SET_TAG_VALUE = 12;
-	public const OP_INCREASE_TAG_VALUE = 13;
-	public const OP_DECREASE_TAG_VALUE = 14;
-	public const OP_RENAME_TAG = 15;
-	public const OP_REMOVE_TAG = 16;
-	public const OP_CLOSE_WINDOW = 17;
-	public const OP_SET_CAUSE = 18;
+	public const OP_UNSUPPRESS = 8;
+	public const OP_CLONE_FIRST = 9;
+	public const OP_CLONE_LAST = 10;
+	public const OP_ADD_TAG = 11;
+	public const OP_SET_TAG = 12;
+	public const OP_SET_TAG_VALUE = 13;
+	public const OP_INCREASE_TAG_VALUE = 14;
+	public const OP_DECREASE_TAG_VALUE = 15;
+	public const OP_RENAME_TAG = 16;
+	public const OP_REMOVE_TAG = 17;
+	public const OP_CLOSE_WINDOW = 18;
+	public const OP_SET_CAUSE = 19;
 
 	public const WHEN_EVENT_OCCURRED = 0;
-	public const WHEN_EVENT_EVICTED = 1;
-	public const WHEN_WINDOW_CLOSED = 2;
-	public const WHEN_PATTERN_MATCHED = 3;
+	public const WHEN_EVENT_ADDED = 1;
+	public const WHEN_EVENT_EVICTED = 2;
+	public const WHEN_WINDOW_CLOSED = 3;
+	public const WHEN_PATTERN_MATCHED = 4;
 
 	public const WINDOW_CONDITION_TAG_PAIR = 0;
 	public const WINDOW_CONDITION_OLD_TAG = 1;
@@ -86,37 +77,109 @@ class CCepRuleHelper {
 			self::WHEN_EVENT_OCCURRED
 		],
 		self::WINDOW_SIMPLE => [
-			self::WHEN_EVENT_EVICTED,
 			self::WHEN_EVENT_OCCURRED,
+			self::WHEN_EVENT_ADDED,
+			self::WHEN_EVENT_EVICTED,
 			self::WHEN_WINDOW_CLOSED
 		],
 		self::WINDOW_CAUSE_SYMPTOM => [
-			self::WHEN_EVENT_EVICTED,
 			self::WHEN_EVENT_OCCURRED,
+			self::WHEN_EVENT_ADDED,
+			self::WHEN_EVENT_EVICTED,
 			self::WHEN_WINDOW_CLOSED
 		],
 		self::WINDOW_TAG_MATCH => [
-			self::WHEN_EVENT_EVICTED,
 			self::WHEN_EVENT_OCCURRED,
+			self::WHEN_EVENT_ADDED,
+			self::WHEN_EVENT_EVICTED,
 			self::WHEN_WINDOW_CLOSED
 		],
 		self::WINDOW_PATTERN_MATCH => [
-			self::WHEN_EVENT_EVICTED,
 			self::WHEN_EVENT_OCCURRED,
-			self::WHEN_PATTERN_MATCHED,
-			self::WHEN_WINDOW_CLOSED
+			self::WHEN_EVENT_ADDED,
+			self::WHEN_EVENT_EVICTED,
+			self::WHEN_WINDOW_CLOSED,
+			self::WHEN_PATTERN_MATCHED
+		]
+	];
+
+	public const OPERATION_CONDITION_TYPES_BY_EXECUTE_WHEN = [
+		self::WHEN_EVENT_OCCURRED => [
+			ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+			ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+		],
+		self::WHEN_EVENT_ADDED => [
+			ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN,
+			ZBX_CONDITION_TYPE_EVENT_FIRST,
+			ZBX_CONDITION_TYPE_EVENT_LAST,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+			ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+		],
+		self::WHEN_EVENT_EVICTED => [
+			ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN,
+			ZBX_CONDITION_TYPE_EVENT_FIRST,
+			ZBX_CONDITION_TYPE_EVENT_LAST,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+			ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+		],
+		self::WHEN_WINDOW_CLOSED => [
+			ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN,
+			ZBX_CONDITION_TYPE_EVENT_FIRST,
+			ZBX_CONDITION_TYPE_EVENT_LAST,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+			ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+		],
+		self::WHEN_PATTERN_MATCHED => [
+			ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN,
+			ZBX_CONDITION_TYPE_EVENT_FIRST,
+			ZBX_CONDITION_TYPE_EVENT_LAST,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+			ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
 		]
 	];
 
 	public const OPERATION_TYPES_BY_EXECUTE_WHEN = [
 		self::WHEN_EVENT_OCCURRED => [
 			self::OP_SET_NAME,
-			self::OP_CLOSE,
+			self::OP_CLOSE_EVENT,
 			self::OP_DISCARD,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,
 			self::OP_DECREASE_SEVERITY,
 			self::OP_SUPPRESS,
+			self::OP_UNSUPPRESS,
+			self::OP_ADD_TAG,
+			self::OP_SET_TAG,
+			self::OP_SET_TAG_VALUE,
+			self::OP_INCREASE_TAG_VALUE,
+			self::OP_DECREASE_TAG_VALUE,
+			self::OP_RENAME_TAG,
+			self::OP_REMOVE_TAG
+		],
+		self::WHEN_EVENT_ADDED => [
+			self::OP_SET_NAME,
+			self::OP_CLOSE_EVENT,
+			self::OP_SET_SEVERITY,
+			self::OP_INCREASE_SEVERITY,
+			self::OP_DECREASE_SEVERITY,
+			self::OP_SUPPRESS,
+			self::OP_UNSUPPRESS,
 			self::OP_ADD_TAG,
 			self::OP_SET_TAG,
 			self::OP_SET_TAG_VALUE,
@@ -128,14 +191,14 @@ class CCepRuleHelper {
 		],
 		self::WHEN_EVENT_EVICTED => [
 			self::OP_SET_NAME,
-			self::OP_CLOSE,
-			self::OP_DISCARD,
+			self::OP_CLOSE_EVENT,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,
 			self::OP_DECREASE_SEVERITY,
 			self::OP_SUPPRESS,
-			self::OP_COPY_FIRST,
-			self::OP_COPY_LAST,
+			self::OP_UNSUPPRESS,
+			self::OP_CLONE_FIRST,
+			self::OP_CLONE_LAST,
 			self::OP_ADD_TAG,
 			self::OP_SET_TAG,
 			self::OP_SET_TAG_VALUE,
@@ -146,13 +209,14 @@ class CCepRuleHelper {
 			self::OP_CLOSE_WINDOW
 		],
 		self::WHEN_WINDOW_CLOSED => [
-			self::OP_SET_NAME,
-			self::OP_CLOSE,
-			self::OP_DISCARD,
+			self::OP_CLOSE_EVENT,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,
 			self::OP_DECREASE_SEVERITY,
 			self::OP_SUPPRESS,
+			self::OP_UNSUPPRESS,
+			self::OP_CLONE_FIRST,
+			self::OP_CLONE_LAST,
 			self::OP_ADD_TAG,
 			self::OP_SET_TAG,
 			self::OP_SET_TAG_VALUE,
@@ -162,9 +226,22 @@ class CCepRuleHelper {
 			self::OP_REMOVE_TAG
 		],
 		self::WHEN_PATTERN_MATCHED => [
-			self::OP_DISCARD,
-			self::OP_COPY_FIRST,
-			self::OP_COPY_LAST
+			self::OP_CLOSE_EVENT,
+			self::OP_SET_SEVERITY,
+			self::OP_INCREASE_SEVERITY,
+			self::OP_DECREASE_SEVERITY,
+			self::OP_SUPPRESS,
+			self::OP_UNSUPPRESS,
+			self::OP_CLONE_FIRST,
+			self::OP_CLONE_LAST,
+			self::OP_ADD_TAG,
+			self::OP_SET_TAG,
+			self::OP_SET_TAG_VALUE,
+			self::OP_INCREASE_TAG_VALUE,
+			self::OP_DECREASE_TAG_VALUE,
+			self::OP_RENAME_TAG,
+			self::OP_REMOVE_TAG,
+			self::OP_CLOSE_WINDOW
 		]
 	];
 
@@ -272,14 +349,15 @@ class CCepRuleHelper {
 	public static function getOperationLabelStrings(): array {
 		return [
 			self::OP_SET_NAME => _('Set event name'),
-			self::OP_CLOSE => _('Close'),
+			self::OP_CLOSE_EVENT => _('Close'),
 			self::OP_DISCARD => _('Discard'),
 			self::OP_SET_SEVERITY => _('Set severity'),
 			self::OP_INCREASE_SEVERITY => _('Increase severity'),
 			self::OP_DECREASE_SEVERITY => _('Decrease severity'),
 			self::OP_SUPPRESS => _('Suppress'),
-			self::OP_COPY_FIRST => _('Clone first as new event'),
-			self::OP_COPY_LAST => _('Clone last as new event'),
+			self::OP_UNSUPPRESS => _('Unsuppress'),
+			self::OP_CLONE_FIRST => _('Clone first as new event'),
+			self::OP_CLONE_LAST => _('Clone last as new event'),
 			self::OP_ADD_TAG => _('Add tag'),
 			self::OP_SET_TAG => _('Set tag'),
 			self::OP_SET_TAG_VALUE => _('Set tag value'),
@@ -288,18 +366,6 @@ class CCepRuleHelper {
 			self::OP_RENAME_TAG => _('Rename tag'),
 			self::OP_REMOVE_TAG => _('Remove tag'),
 			self::OP_CLOSE_WINDOW => _('Close window')
-		];
-	}
-
-	public static function getOperationTypes(): array {
-		return [
-			self::OP_SET_NAME => _('Set name'),
-			self::OP_CLOSE => _('Close event'),
-			self::OP_DISCARD => _('Discard event'),
-			self::OP_SET_SEVERITY => _('Set severity'),
-			self::OP_INCREASE_SEVERITY => _('Increase severity'),
-			self::OP_DECREASE_SEVERITY => _('Decrease severity'),
-			self::OP_SUPPRESS => _('Suppress')
 		];
 	}
 
@@ -316,11 +382,12 @@ class CCepRuleHelper {
 			self::OP_INCREASE_SEVERITY,
 			self::OP_DECREASE_SEVERITY,
 			self::OP_SUPPRESS,
-			self::OP_COPY_FIRST,
+			self::OP_UNSUPPRESS,
+			self::OP_CLONE_FIRST,
 			self::OP_CLOSE_WINDOW,
-			self::OP_COPY_LAST,
+			self::OP_CLONE_LAST,
 			self::OP_DISCARD,
-			self::OP_CLOSE => '',
+			self::OP_CLOSE_EVENT => '',
 
 			self::OP_INCREASE_TAG_VALUE,
 			self::OP_DECREASE_TAG_VALUE,
