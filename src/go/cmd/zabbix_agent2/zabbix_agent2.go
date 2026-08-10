@@ -112,8 +112,8 @@ var remoteCommandHandlers = map[string]remoteCommandHandler{
 	"log_level_increase":   processCommandWithoutParameters(processLoglevelIncreaseCommand),
 	"log_level_decrease":   processCommandWithoutParameters(processLoglevelDecreaseCommand),
 	"metrics":              processCommandWithoutParameters(processMetricsCommand),
-	"userparameter_reload": processCommandWithoutParameters(processVersionCommand),
-	"version":              processCommandWithoutParameters(processUserParamReloadCommand),
+	"userparameter_reload": processCommandWithoutParameters(processUserParamReloadCommand),
+	"version":              processCommandWithoutParameters(processVersionCommand),
 }
 
 type remoteCommandHandler func(*runtimecontrol.Client) error
