@@ -308,8 +308,13 @@ static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
-	zbx_db_insert_t	db_insert = {0};
-	int		symptoms_num = 0;
+	int				symptoms_num = 0;
+	zbx_vector_mw_task_ptr_t	symptom_tasks;
+	zbx_vector_uint64_t		eventids;
+
+	zbx_vector_mw_task_ptr_create(&symptom_tasks);
+	zbx_vector_mw_task_ptr_reserve(&symptom_tasks, (size_t)tasks->values_num);
+	zbx_vector_uint64_create(&eventids);
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
@@ -326,21 +331,49 @@ static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 		if (0 == event->cause_eventid)
 			continue;
 
-		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert))
-		{
-			zbx_dbconn_prepare_insert(db, &db_insert, "event_symptom", "eventid", "cause_eventid",
-					(char *)NULL);
-		}
+		zbx_vector_mw_task_ptr_append(&symptom_tasks, tasks->values[i]);
 
-		zbx_db_insert_add_values(&db_insert, event->eventid, event->cause_eventid);
+		zbx_vector_uint64_append(&eventids, event->eventid);
+		zbx_vector_uint64_append(&eventids, event->cause_eventid);
 	}
 
-	if (SUCCEED == zbx_db_insert_is_prepared(&db_insert))
+	if (0 != symptom_tasks.values_num)
 	{
+		zbx_db_insert_t	db_insert;
+
+		zbx_dbconn_prepare_insert(db, &db_insert, "event_symptom", "eventid", "cause_eventid", (char *)NULL);
+
+		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_dbconn_lock_ids_pk(db, "events", "eventid", &eventids);
+
+		for (int i = 0; i < symptom_tasks.values_num; i++)
+		{
+			const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)symptom_tasks.values[i];
+			zbx_cep_event_t			*event = task->event;
+
+			if (FAIL == zbx_vector_uint64_bsearch(&eventids, event->eventid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				continue;
+			}
+			if (FAIL == zbx_vector_uint64_bsearch(&eventids, event->cause_eventid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+					continue;
+			}
+
+			zbx_db_insert_add_values(&db_insert, event->eventid, event->cause_eventid);
+		}
+
 		symptoms_num =  zbx_db_insert_get_row_count(&db_insert);
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
+
+	zbx_vector_mw_task_ptr_destroy(&symptom_tasks);
+	zbx_vector_uint64_destroy(&eventids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() symptoms:%d", __func__, symptoms_num);
 }
