@@ -125,7 +125,7 @@ static const char	*help_message[] = {
 	"                                 housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
 	"                                 ipmi poller, java poller, odbc poller, poller, agent poller,",
 	"                                 http agent poller, snmp poller, preprocessing manager, preprocessing worker,",
-	"                                 self-monitoring, snmp trapper, supervisor, task manager, trapper,",
+	"                                 self-monitoring, snmp trapper, task manager, trapper,",
 	"                                 unreachable poller, vmware collector)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier",
