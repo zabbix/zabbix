@@ -39,7 +39,7 @@ zabbix_export:
         Device: ZYXEL IES-6000
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -49,10 +49,6 @@ zabbix_export:
           key: 'zabbix[host,snmp,available]'
           valuemap:
             name: 'SNMP available'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: network
