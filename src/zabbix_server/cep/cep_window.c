@@ -427,7 +427,7 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 
 	cep_window_lock(window);
 
-	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) == window->capacity)
+	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) >= window->capacity)
 	{
 		cep_window_unlock(window);
 
@@ -715,7 +715,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 	cep_window_lock(window);
 
-	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) == window->capacity)
+	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) >= window->capacity)
 	{
 		cep_window_unlock(window);
 
@@ -865,7 +865,7 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 	if (NULL == window->js_script)
 		window->js_script = zbx_strdup(NULL, rule->window->script);
 
-	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) == window->capacity)
+	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) >= window->capacity)
 	{
 		cep_window_unlock(window);
 
