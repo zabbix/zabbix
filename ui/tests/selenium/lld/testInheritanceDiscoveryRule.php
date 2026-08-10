@@ -127,7 +127,6 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				$dialog->ensureNotPresent();
 				$this->zbxTestCheckTitle('Configuration of discovery rules');
 				$this->zbxTestCheckHeader('Discovery rules');
-				$this->zbxTestTextPresent('Discovery rule created');
 
 				$itemId = 0;
 
