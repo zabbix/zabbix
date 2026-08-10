@@ -1509,7 +1509,7 @@ button {
   .btn:link, .btn:visited {
     color: #f2f2f2; }
 
-a.btn-alt:not(:hover):link, a.btn-alt:not(:hover):visited {
+a.btn-alt:not(:hover) {
   color: #768d99; }
 
 .btn-icon {

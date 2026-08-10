@@ -200,10 +200,7 @@ button {
 
 a.btn-alt {
 	&:not(:hover) {
-		&:link,
-		&:visited {
-			color: $btn-alt-color;
-		}
+		color: $btn-alt-color;
 	}
 }
 
