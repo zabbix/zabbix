@@ -566,6 +566,8 @@ static void	cep_config_handle_release(zbx_cep_config_handle_t handle)
 	if (1 != atomic_fetch_sub(&handle->refcount, 1))
 		return;
 
+	zbx_hashset_destroy(&handle->index);
+
 	for (int i = 0; i < handle->rules.values_num; i++)
 		zbx_cep_rule_release(handle->rules.values[i]);
 
@@ -596,7 +598,11 @@ static zbx_cep_config_handle_t	cep_config_handle_create(zbx_cep_config_t *cep_co
 	handle = (zbx_cep_config_handle_t)zbx_malloc(NULL, sizeof(struct zbx_cep_config_handle));
 
 	zbx_vector_cep_rule_ptr_create(&handle->rules);
-	zbx_vector_cep_rule_ptr_reserve(&handle->rules, cep_config->rules.num_data);
+	zbx_vector_cep_rule_ptr_reserve(&handle->rules, (size_t)cep_config->rules.num_data);
+	zbx_hashset_create_ext(&handle->index, (size_t)cep_config->rules.num_data, ZBX_DEFAULT_ID_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
 	handle->refcount = 1;
 	handle->revision = revision;
 
@@ -607,6 +613,7 @@ static zbx_cep_config_handle_t	cep_config_handle_create(zbx_cep_config_t *cep_co
 			continue;
 
 		zbx_vector_cep_rule_ptr_append(&handle->rules, cep_rule_addref(ref->rule));
+		zbx_hashset_insert(&handle->index, ref, sizeof(zbx_cep_rule_ref_t));
 	}
 
 	zbx_vector_cep_rule_ptr_sort(&handle->rules, cep_rule_compare_by_sortorder);
@@ -1755,28 +1762,21 @@ const zbx_vector_cep_rule_ptr_t	*zbx_cep_config_get_rules(zbx_cep_config_handle_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get CEP rule by ID with an incremented reference count            *
+ * Purpose: get CEP rule by ID from handle                                    *
  *                                                                            *
- * Parameters: ruleid - [IN] rule ID to look up                               *
+ * Parameters: handle - [IN] config handle                                    *
+ *             ruleid - [IN] rule ID to look up                               *
  *                                                                            *
  * Return value: referenced rule pointer, or NULL if not found                *
- *                                                                            *
- * Comments: Caller must release the returned rule with zbx_cep_rule_release. *
- *                                                                            *
+*                                                                            *
  ******************************************************************************/
-zbx_cep_rule_t	*zbx_cep_config_get_rule(zbx_uint64_t ruleid)
+zbx_cep_rule_t	*zbx_cep_config_get_rule(zbx_cep_config_handle_t handle, zbx_uint64_t ruleid)
 {
-	zbx_cep_config_t	*cep_config = dc_local()->cep_config;
-	zbx_cep_rule_t		*rule = NULL;
 	zbx_cep_rule_ref_t	*ref;
 
-	pthread_mutex_lock(&cep_config->lock);
+	if (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_search(&handle->index, &ruleid)))
+		return ref->rule;
 
-	if (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_search(&cep_config->rules, &ruleid)))
-		rule = cep_rule_addref(ref->rule);
-
-	pthread_mutex_unlock(&cep_config->lock);
-
-	return rule;
+	return NULL;
 }
 

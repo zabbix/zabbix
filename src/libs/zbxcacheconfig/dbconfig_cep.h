@@ -33,6 +33,7 @@ zbx_cep_rule_ref_t;
 struct zbx_cep_config_handle
 {
 	zbx_vector_cep_rule_ptr_t	rules;
+	zbx_hashset_t			index;
 
 	zbx_uint64_t			revision;
 	zbx_atomic_uint32_t		refcount;

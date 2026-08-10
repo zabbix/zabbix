@@ -523,10 +523,13 @@ void	cep_window_sliding_process(zbx_cep_window_t *window, time_t now, zbx_vector
 	char			*error = NULL;
 	zbx_cep_window_pool_t	*pool;
 	zbx_uint64_t		opmask;
+	zbx_cep_config_handle_t	hconfig;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
-	if (NULL == (rule = zbx_cep_config_get_rule(window->ruleid)))
+	hconfig = zbx_cep_config_open();
+
+	if (NULL == (rule = zbx_cep_config_get_rule(hconfig, window->ruleid)))
 	{
 		cep_window_pool_acquire(&pool);
 		cep_window_pool_remove_window(pool, window);
@@ -568,8 +571,9 @@ void	cep_window_sliding_process(zbx_cep_window_t *window, time_t now, zbx_vector
 	cep_window_pool_release(&pool);
 
 	cep_window_unlock(window);
-	zbx_cep_rule_release(rule);
 out:
+	zbx_cep_config_close(hconfig);
+
 	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -792,10 +796,13 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	int			duration, capacity, limit_update;
 	char			*error = NULL;
 	zbx_cep_window_pool_t	*pool;
+	zbx_cep_config_handle_t	hconfig;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
-	if (NULL == (rule = zbx_cep_config_get_rule(window->ruleid)))
+	hconfig = zbx_cep_config_open();
+
+	if (NULL == (rule = zbx_cep_config_get_rule(hconfig, window->ruleid)))
 	{
 		cep_window_pool_acquire(&pool);
 		cep_window_pool_remove_window(pool, window);
@@ -841,8 +848,9 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	cep_window_pool_release(&pool);
 
 	cep_window_unlock(window);
-	zbx_cep_rule_release(rule);
 out:
+	zbx_cep_config_close(hconfig);
+
 	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1041,12 +1049,15 @@ void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_t
 	zbx_cep_rule_t		*rule;
 	int			ret, limit_update, duration, capacity;
 	zbx_uint64_t		opmask = 0;
+	zbx_cep_config_handle_t	hconfig;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
 	zbx_es_init(&es);
 
-	if (NULL == (rule = zbx_cep_config_get_rule(window->ruleid)))
+	hconfig = zbx_cep_config_open();
+
+	if (NULL == (rule = zbx_cep_config_get_rule(hconfig, window->ruleid)))
 	{
 		cep_window_pool_acquire(&pool);
 		cep_window_pool_remove_window(pool, window);
@@ -1092,10 +1103,9 @@ enqueue:
 	cep_window_unlock(window);
 out:
 	if (NULL != rule)
-	{
 		cep_rule_handle_error(rule, &error, tasks);
-		zbx_cep_rule_release(rule);
-	}
+
+	zbx_cep_config_close(hconfig);
 
 	zbx_free(error);
 
@@ -1498,10 +1508,13 @@ zbx_cep_window_group_t;
  ******************************************************************************/
 static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn_t *db, zbx_hashset_t *windows)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_cep_config_handle_t	hconfig;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	hconfig = zbx_cep_config_open();
 
 	result = zbx_dbconn_select(db, "select cep_groupid,cep_ruleid,group_by,groupid,hostid,tags,tags_value,nextcheck"
 					" from cep_group");
@@ -1513,7 +1526,7 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 		zbx_cep_rule_t		*rule;
 
 		ZBX_STR2UINT64(ref_local.ruleid, row[1]);
-		if (NULL == (rule = zbx_cep_config_get_rule(ref_local.ruleid)))
+		if (NULL == (rule = zbx_cep_config_get_rule(hconfig, ref_local.ruleid)))
 			continue;
 
 		ref_local.group_by = atoi(row[2]);
@@ -1542,6 +1555,8 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 		zbx_cep_rule_release(rule);
 	}
 	zbx_db_free_result(result);
+
+	zbx_cep_config_close(hconfig);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() windows:%d", __func__, pool->windows.num_data);
 }

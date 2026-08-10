@@ -1020,11 +1020,6 @@ static int	cep_operation_event_execute(const zbx_cep_operation_t *op, int execut
 			}
 			break;
 		case ZBX_CEP_OP_DISCARD:
-			if (0 != (CEP_OP_DISCARD_MASK & CEP_FLAG(execute_when)))
-			{
-				cep_acknowledge_update(ack, op->type);
-				ret = SUCCEED;
-			}
 			break;
 		case ZBX_CEP_OP_COPY_FIRST:
 			if (0 != (CEP_OP_COPY_EVENT_MASK & CEP_FLAG(execute_when)))

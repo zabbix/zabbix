@@ -1906,7 +1906,7 @@ ZBX_PTR_VECTOR_DECL(cep_rule_ptr, zbx_cep_rule_t *)
 zbx_cep_config_handle_t	zbx_cep_config_open(void);
 void	zbx_cep_config_close(zbx_cep_config_handle_t handle);
 const zbx_vector_cep_rule_ptr_t	*zbx_cep_config_get_rules(zbx_cep_config_handle_t handle);
-zbx_cep_rule_t	*zbx_cep_config_get_rule(zbx_uint64_t ruleid);
+zbx_cep_rule_t	*zbx_cep_config_get_rule(zbx_cep_config_handle_t handle, zbx_uint64_t ruleid);
 void	zbx_cep_rule_release(zbx_cep_rule_t *rule);
 
 #define ZBX_CEP_GROUP_BY_NONE		0x00
