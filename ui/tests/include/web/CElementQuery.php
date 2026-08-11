@@ -734,9 +734,6 @@ class CElementQuery implements IWaitable {
 			case 'table':
 				return 'CMultifieldTableElement';
 
-			case 'fieldset':
-				return 'CFieldsetElement';
-
 			case 'input':
 				return in_array($type, ['checkbox', 'radio']) ? 'CCheckboxElement' : 'CElement';
 		}
