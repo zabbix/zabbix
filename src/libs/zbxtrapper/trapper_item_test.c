@@ -178,6 +178,14 @@ static int	process_zero_pollers_items(zbx_dc_item_t *item, zbx_get_config_forks_
 #else
 			break;
 #endif
+		case ITEM_TYPE_HTTPAGENT:
+		case ITEM_TYPE_BROWSER:
+#ifndef HAVE_LIBCURL
+			*info = zbx_strdup(NULL, "Support for libCURL was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
 	}
 
 	if (ITEM_TYPE_SNMP == item->type)
