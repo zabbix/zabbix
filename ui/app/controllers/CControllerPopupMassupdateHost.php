@@ -461,14 +461,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 					unset($host['parentTemplates']);
 
-					$original_monitored_by = $host['monitored_by'];
-
 					$host = $new_values + $host;
-
-					if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
-						&& $original_monitored_by == ZBX_MONITORED_BY_SERVER) {
-						unset($host['monitored_by'], $host['proxyid'], $host['proxy_groupid']);
-					}
 
 					/*
 					 * API prevents changing host inventory_mode for discovered hosts. However, inventory values can
