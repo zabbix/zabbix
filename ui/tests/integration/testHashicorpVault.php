@@ -131,13 +131,10 @@ class testHashicorpVault extends CIntegrationTest {
 		$body = curl_exec($curl);
 
 		if ($body === false) {
-			curl_close($curl);
-
 			throw new Exception('Failed to communicate with Vault at path "'.$path.'".');
 		}
 
 		$status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-		curl_close($curl);
 
 		return ['status' => $status, 'body' => ($body !== '' ? json_decode($body, true) : null)];
 	}
