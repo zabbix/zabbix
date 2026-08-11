@@ -1800,9 +1800,9 @@ AS_HELP_STRING([--with-apm], [turn on OTLP/gRPC event collector, requires --enab
 
         AC_DEFINE([HAVE_APM], [1], [Define to 1 if built with OTLP/gRPC event collector support])
     fi
-
-    AM_CONDITIONAL([HAVE_APM], [test "x$with_apm" != "xno"])
 fi
+
+AM_CONDITIONAL([HAVE_APM], [test "x$with_apm" != "xno"])
 
 SERVER_LDFLAGS="$SERVER_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
