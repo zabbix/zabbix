@@ -52,7 +52,7 @@ zabbix_export:
             var request = new HttpRequest();
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
-            request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
+            request.addHeader('User-Agent: ZabbixServer/1.3 Zabbix');
             
             var response,
             	error_msg = '',
@@ -496,195 +496,6 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 0c97a8fcad764133b4e7c35d0134665c
-          name: 'Get status'
-          type: SCRIPT
-          key: meraki.device.get.status
-          delay: '{$MERAKI.GET.STATUS.INTERVAL}'
-          history: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value);
-            
-            var request = new HttpRequest();
-            
-            request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
-            request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
-            
-            function hasHeader(headers, name) {
-            	if (typeof headers !== 'object' || headers === null) {
-            		return false;
-            	}
-            
-            	var target = name.toLowerCase();
-            	
-            	for (var key in headers) {
-            		if (key.toLowerCase() === target) {
-            			return true;
-            		}
-            	}
-            
-            	return false;
-            }
-            
-            function parseTime(timeString) {
-            	var match = timeString.match(/^(\d+)([h|m|s])$/);
-            	if (match) {
-            		var value = parseInt(match[1], 10);
-            		var unit = match[2];
-            
-            		switch (unit) {
-            			case 'h':
-            				return value * 3600;
-            			case 'm':
-            				return value * 60;
-            			case 's':
-            				return value;
-            			default:
-            				return 0;
-            		}
-            	}
-            
-            	return 0;
-            };
-            
-            var response,
-            	error_msg = '',
-            	response = [],
-            	timespan;
-            
-            	function getHttpData(url) {
-            		var startTime = new Date().getTime();
-            		var maxWait = parseInt(timespan, 10) * 1000;
-            		var waitFor = 1000;
-            	
-            		while (true) {
-            			response = request.get(url);
-            			Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-            	
-            			var status = request.getStatus();
-            	
-            			if (response !== null) {
-            				try {
-            					response = JSON.parse(response);
-            				}
-            				catch (error) {
-            					throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
-            				}
-            			}
-            	
-            			if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
-            				response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
-            				var now = new Date().getTime();
-            				var headers = request.getHeaders(false);
-            	
-            				if (hasHeader(headers, 'Retry-After')) {
-            					var retryAfter = headers['Retry-After'];
-            					Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
-            					waitFor = parseInt(retryAfter) * 1000;
-            				}
-            				else {
-            					Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
-            				}
-            				if (now - startTime + waitFor > maxWait) {
-            					throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
-            				}
-            				Zabbix.sleep(waitFor);
-            				continue;
-            			}
-            	
-            			if (status !== 200) {
-            				if (response.errors) {
-            					throw response.errors.join(', ');
-            				}
-            				else {
-            					throw 'Failed to receive data: invalid response status code.';
-            				}
-            			}
-            	
-            			if (typeof (response) !== 'object' || response === null) {
-            				throw 'Cannot process response data: received data is not an object.';
-            			}
-            	
-            			return response;
-            		}
-            	};
-            
-            try {
-            
-            	if (params.token === '{' + '$MERAKI.TOKEN}') {
-            		throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
-            	}
-            
-            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-            		params.url = 'https://' + params.url;
-            	}
-            
-            	if (!params.url.endsWith('/')) {
-            		params.url += '/';
-            	}
-            
-            	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
-            		request.setProxy(params.httpproxy);
-            	}
-            
-            	timespan = parseTime('{$MERAKI.GET.STATUS.INTERVAL}');
-            
-            	response = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/availabilities?serials[]=' + encodeURIComponent(params.serial));
-            	if (Array.isArray(response) & response.length > 0) {
-            		response = response[0]
-            	}
-            
-            } catch (error) {
-            	error_msg = error;
-            };
-            
-            return JSON.stringify({
-            	'data': response,
-            	'error': error_msg.toString()
-            });
-          description: 'Item for gathering device status from Meraki API.'
-          timeout: '{$MERAKI.DATA.TIMEOUT}'
-          parameters:
-            - name: httpproxy
-              value: '{$MERAKI.HTTP_PROXY}'
-            - name: organizationId
-              value: '{$ORGANIZATION_ID}'
-            - name: serial
-              value: '{$SERIAL}'
-            - name: token
-              value: '{$MERAKI.TOKEN}'
-            - name: url
-              value: '{$MERAKI.API.URL}'
-          tags:
-            - tag: component
-              value: raw
-        - uuid: b1873bc0a185452dbede07373e0e4a93
-          name: 'Device status item errors'
-          type: DEPENDENT
-          key: meraki.device.get.status.errors
-          value_type: TEXT
-          description: 'Item for gathering errors of the device status item.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.error
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: meraki.device.get.status
-          tags:
-            - tag: component
-              value: error
-          triggers:
-            - uuid: 0f629d0aef6b456fb3d5b1a20ece54ac
-              expression: 'length(last(/Cisco Meraki device by HTTP/meraki.device.get.status.errors))>0'
-              name: 'Meraki: There are errors in ''Get status'' metric'
-              priority: WARNING
-              tags:
-                - tag: scope
-                  value: availability
         - uuid: 878cbc22039b4fab9949c1997041b1a8
           name: 'Device latitude'
           type: DEPENDENT
@@ -834,243 +645,6 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 324b748bfe2e4383927176046e246acb
-          name: Status
-          type: DEPENDENT
-          key: meraki.device.status
-          description: |
-            Device operational status
-            Network: {$NETWORK.ID}
-          valuemap:
-            name: 'Device status'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.data.status
-              error_handler: DISCARD_VALUE
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  switch (value) {
-                  	case 'offline':
-                  		return 0
-                  	case 'online':
-                  		return 1
-                  	case 'dormant':
-                  		return 2
-                  	case 'alerting':
-                  		return 3
-                  	default:
-                  		return 10
-                  }
-          master_item:
-            key: meraki.device.get.status
-          tags:
-            - tag: component
-              value: health
-          triggers:
-            - uuid: 00583ac9e9824f7db12a1685421f0be9
-              expression: 'last(/Cisco Meraki device by HTTP/meraki.device.status)=3'
-              name: 'Meraki: Status is alerting'
-              priority: WARNING
-              tags:
-                - tag: scope
-                  value: availability
-            - uuid: 00583ac9e9824f7db22a1685421f0be9
-              expression: 'last(/Cisco Meraki device by HTTP/meraki.device.status)=0'
-              name: 'Meraki: Status is offline'
-              priority: AVERAGE
-              tags:
-                - tag: scope
-                  value: availability
-        - uuid: e4963b68cdde453f91767ff9e3a31d16
-          name: 'Get device data'
-          type: SCRIPT
-          key: meraki.get.device
-          delay: '{$MERAKI.UPLINK.LL.TIMESPAN}'
-          history: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value);
-            
-            var request = new HttpRequest();
-            
-            request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
-            request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
-            
-            var response,
-            	error_msg = '',
-            	device = [],
-            	uplinksLL = [],
-            	timespan;
-            
-            function isFloat(n) {
-            	n = parseFloat(n);
-            	return Number(n) === n && n % 1 !== 0;
-            };
-            
-            function checkNumber(string) {
-            	if (typeof string !== "string" || isNaN(string) || isFloat(string)) {
-            		throw 'Incorrect "timespan" parameter given: ' + string + ' Must be an unsigned number';
-            	}
-            	return string;
-            };
-            
-            function hasHeader(headers, name) {
-            	if (typeof headers !== 'object' || headers === null) {
-            		return false;
-            	}
-            
-            	var target = name.toLowerCase();
-            	
-            	for (var key in headers) {
-            		if (key.toLowerCase() === target) {
-            			return true;
-            		}
-            	}
-            
-            	return false;
-            }
-            
-            function getHttpData(url) {
-            	var startTime = new Date().getTime();
-            	var maxWait = (parseInt(timespan, 10) - 10) * 1000;
-            	var waitFor = 1000;
-            
-            	while (true) {
-            		response = request.get(url);
-            		Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
-            		var status = request.getStatus();
-            
-            		if (response !== null) {
-            			try {
-            				response = JSON.parse(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
-            			}
-            		}
-            
-            		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
-            			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
-            			var now = new Date().getTime();
-            			var headers = request.getHeaders(false);
-            
-            			if (hasHeader(headers, 'Retry-After')) {
-            				var retryAfter = headers['Retry-After'];
-            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
-            				waitFor = parseInt(retryAfter) * 1000;
-            			}
-            			else {
-            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
-            			}
-            			if (now - startTime + waitFor > maxWait) {
-            				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
-            			}
-            			Zabbix.sleep(waitFor);
-            			continue;
-            		}
-            
-            		if (status !== 200) {
-            			if (response.errors) {
-            				throw response.errors.join(', ');
-            			}
-            			else {
-            				throw 'Failed to receive data: invalid response status code.';
-            			}
-            		}
-            
-            		if (typeof (response) !== 'object' || response === null) {
-            			throw 'Cannot process response data: received data is not an object.';
-            		}
-            
-            		return response;
-            	}
-            };
-            
-            try {
-            
-            	if (params.token === '{' + '$MERAKI.TOKEN}') {
-            		throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
-            	}
-            
-            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-            		params.url = 'https://' + params.url;
-            	}
-            
-            	if (!params.url.endsWith('/')) {
-            		params.url += '/';
-            	}
-            
-            	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
-            		request.setProxy(params.httpproxy);
-            	}
-            
-            	timespan = checkNumber('{$MERAKI.UPLINK.LL.TIMESPAN}');
-            
-            	if (timespan > 86400 || timespan < 1) {
-            		throw 'Incorrect "timespan" parameter given: ' + timespan + ' Must be between 1 and 86400 seconds.';
-            	}
-            
-            	uplinksLL = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=' + timespan);
-            
-            	if (uplinksLL.length > 0) {
-            		uplinksLL = uplinksLL.filter(function (device) {
-            			return device.serial == params.serial;
-            		});
-            	}
-            
-            } catch (error) {
-            	error_msg = error;
-            };
-            
-            return JSON.stringify({
-            	'uplinksLL': uplinksLL,
-            	'error': error_msg.toString()
-            });
-          description: 'Item for gathering device data from Meraki API.'
-          timeout: '{$MERAKI.DATA.TIMEOUT}'
-          parameters:
-            - name: httpproxy
-              value: '{$MERAKI.HTTP_PROXY}'
-            - name: organizationId
-              value: '{$ORGANIZATION_ID}'
-            - name: serial
-              value: '{$SERIAL}'
-            - name: token
-              value: '{$MERAKI.TOKEN}'
-            - name: url
-              value: '{$MERAKI.API.URL}'
-          tags:
-            - tag: component
-              value: raw
-        - uuid: b673516073354c9aaaf60cf3ce2e2fa6
-          name: 'Device data item errors'
-          type: DEPENDENT
-          key: meraki.get.device.errors
-          value_type: TEXT
-          description: 'Item for gathering errors of the device item.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.error
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: meraki.get.device
-          tags:
-            - tag: component
-              value: error
-          triggers:
-            - uuid: c8f8af6c92f14dc0bcdf426b124c7344
-              expression: 'length(last(/Cisco Meraki device by HTTP/meraki.get.device.errors))>0'
-              name: 'Meraki: There are errors in ''Get device data'' metric'
-              priority: WARNING
-              tags:
-                - tag: scope
-                  value: availability
         - uuid: ae461bc520a840d9b0f0847011f52bce
           name: 'Get inventory data'
           type: SCRIPT
@@ -1084,7 +658,7 @@ zabbix_export:
             var request = new HttpRequest();
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
-            request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
+            request.addHeader('User-Agent: ZabbixServer/1.3 Zabbix');
             
             function hasHeader(headers, name) {
             	if (typeof headers !== 'object' || headers === null) {
@@ -1259,134 +833,6 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: availability
-      discovery_rules:
-        - uuid: 9c7e5d2ccad7416b8d58237be4218154
-          name: 'Uplinks loss and quality discovery'
-          type: DEPENDENT
-          key: meraki.device.uplinks.discovery
-          filter:
-            evaltype: AND
-            conditions:
-              - macro: '{#IP}'
-                value: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}'
-              - macro: '{#IP}'
-                value: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-              - macro: '{#UPLINK}'
-                value: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
-              - macro: '{#UPLINK}'
-                value: '{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-          item_prototypes:
-            - uuid: abf642b1bb944d16bebf90dcf58dbd86
-              name: 'Uplink [{#IP}]: [{#UPLINK}]: Latency'
-              type: DEPENDENT
-              key: 'meraki.device.latency[{#IP},{#UPLINK}]'
-              value_type: FLOAT
-              units: s
-              description: |
-                Latency of the device uplink. 
-                Network: {#NETWORK.ID}. 
-                Device serial: {#SERIAL}.
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$.uplinksLL[?(@.ip == ''{#IP}'' && @.uplink== ''{#UPLINK}'')].timeSeries.[0].latencyMs.first()'
-                  error_handler: CUSTOM_VALUE
-                  error_handler_params: '-1000'
-                - type: MULTIPLIER
-                  parameters:
-                    - '0.001'
-              master_item:
-                key: meraki.get.device
-              tags:
-                - tag: component
-                  value: network
-                - tag: ip
-                  value: '{#IP}'
-                - tag: network
-                  value: '{#NETWORK.ID}'
-                - tag: serial-number
-                  value: '{#SERIAL}'
-                - tag: uplink
-                  value: '{#UPLINK}'
-              trigger_prototypes:
-                - uuid: b559ad94b15848089d89e85e4d9db7ff
-                  expression: 'min(/Cisco Meraki device by HTTP/meraki.device.latency[{#IP},{#UPLINK}],#3)>{$MERAKI.DEVICE.LATENCY}'
-                  name: 'Meraki: Uplink [{#IP}]: [{#UPLINK}]: latency > {$MERAKI.DEVICE.LATENCY}'
-                  priority: WARNING
-                  tags:
-                    - tag: scope
-                      value: performance
-            - uuid: bded34f64113486ab0672210e5a8eb1d
-              name: 'Uplink [{#IP}]: [{#UPLINK}]: Loss, %'
-              type: DEPENDENT
-              key: 'meraki.device.loss.pct[{#IP},{#UPLINK}]'
-              value_type: FLOAT
-              units: '%'
-              description: |
-                Loss percent of the device uplink. 
-                Network: {#NETWORK.ID}. 
-                Device serial: {#SERIAL}.
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$.uplinksLL[?(@.ip == ''{#IP}'' && @.uplink== ''{#UPLINK}'')].timeSeries.[0].lossPercent.first()'
-                  error_handler: CUSTOM_VALUE
-                  error_handler_params: '-1'
-              master_item:
-                key: meraki.get.device
-              tags:
-                - tag: component
-                  value: network
-                - tag: ip
-                  value: '{#IP}'
-                - tag: network
-                  value: '{#NETWORK.ID}'
-                - tag: serial-number
-                  value: '{#SERIAL}'
-                - tag: uplink
-                  value: '{#UPLINK}'
-              trigger_prototypes:
-                - uuid: 1309e71025614ce4bb4242e6e291ae48
-                  expression: 'min(/Cisco Meraki device by HTTP/meraki.device.loss.pct[{#IP},{#UPLINK}],#3)>{$MERAKI.DEVICE.LOSS}'
-                  name: 'Meraki: Uplink [{#IP}]: [{#UPLINK}]: loss > {$MERAKI.DEVICE.LOSS}%'
-                  priority: WARNING
-                  tags:
-                    - tag: scope
-                      value: performance
-          graph_prototypes:
-            - uuid: 4e9d84e08b32489c8c3a2cbbd4c6119a
-              name: 'Uplink [{#IP}]: [{#UPLINK}]: Latency'
-              ymin_type_1: FIXED
-              graph_items:
-                - color: 199C0D
-                  item:
-                    host: 'Cisco Meraki device by HTTP'
-                    key: 'meraki.device.latency[{#IP},{#UPLINK}]'
-            - uuid: ebf262afc6d94d29b9831d418fb07edb
-              name: 'Uplink [{#IP}]: [{#UPLINK}]: Loss'
-              ymin_type_1: FIXED
-              graph_items:
-                - color: 199C0D
-                  item:
-                    host: 'Cisco Meraki device by HTTP'
-                    key: 'meraki.device.loss.pct[{#IP},{#UPLINK}]'
-          master_item:
-            key: meraki.get.device
-          lld_macro_paths:
-            - lld_macro: '{#IP}'
-              path: $.ip
-            - lld_macro: '{#NETWORK.ID}'
-              path: $.networkId
-            - lld_macro: '{#SERIAL}'
-              path: $.serial
-            - lld_macro: '{#UPLINK}'
-              path: $.uplink
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.uplinksLL
       tags:
         - tag: class
           value: cloud
@@ -1409,38 +855,14 @@ zabbix_export:
         - macro: '{$MERAKI.DATA.TIMEOUT}'
           value: '60'
           description: 'Response timeout for an API.'
-        - macro: '{$MERAKI.DEVICE.LATENCY}'
-          value: '0.15'
-          description: 'Devices uplink latency threshold, in seconds.'
-        - macro: '{$MERAKI.DEVICE.LOSS}'
-          value: '15'
-          description: 'Devices uplink loss threshold, in percent.'
-        - macro: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}'
-          value: '^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$'
-          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
-        - macro: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.NOT_MATCHES}'
-          value: ^null$
-          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
-        - macro: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
-          value: '.*'
-          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
-        - macro: '{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}'
-          value: ^null$
-          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.GET.INVENTORY.INTERVAL}'
           value: 12h
           description: 'The update interval for the script item that retrieves inventory data from API.'
-        - macro: '{$MERAKI.GET.STATUS.INTERVAL}'
-          value: '300'
-          description: 'Update interval for get status item.'
         - macro: '{$MERAKI.HTTP_PROXY}'
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
         - macro: '{$MERAKI.TOKEN}'
           type: SECRET_TEXT
           description: 'Cisco Meraki dashboard API token.'
-        - macro: '{$MERAKI.UPLINK.LL.TIMESPAN}'
-          value: '180'
-          description: 'Timespan in seconds for getting device uplinks loss and quality stats. Used in the metric configuration and in the JavaScript API query. Must be between 1 and 86400 seconds.'
       dashboards:
         - uuid: 76c4525eacc64f268572fefd76accc2f
           name: 'Meraki: General'
@@ -1458,8 +880,8 @@ zabbix_export:
                     - type: GRAPH_PROTOTYPE
                       name: graphid.0
                       value:
-                        host: 'Cisco Meraki device by HTTP'
-                        name: 'Uplink [{#IP}]: [{#UPLINK}]: Loss'
+                        host: 'Cisco Meraki organization by HTTP'
+                        name: 'Device [{#SERIAL}]: Uplink [{#IP}]: [{#UPLINK}]: Loss'
                     - type: STRING
                       name: reference
                       value: AAAAA
@@ -1475,8 +897,8 @@ zabbix_export:
                     - type: GRAPH_PROTOTYPE
                       name: graphid.0
                       value:
-                        host: 'Cisco Meraki device by HTTP'
-                        name: 'Uplink [{#IP}]: [{#UPLINK}]: Latency'
+                        host: 'Cisco Meraki organization by HTTP'
+                        name: 'Device [{#SERIAL}]: Uplink [{#IP}]: [{#UPLINK}]: Latency'
                     - type: STRING
                       name: reference
                       value: AAAAB
@@ -1528,6 +950,369 @@ zabbix_export:
           tags:
             - tag: component
               value: security
+        - uuid: a1b2c3d4e5f64a7b8c9d0e1f2a3b4c5d
+          name: 'Get all devices uplinks loss and latency'
+          type: SCRIPT
+          key: meraki.get.org.uplinks
+          delay: '{$MERAKI.UPLINK.LL.TIMESPAN}'
+          history: '0'
+          value_type: TEXT
+          params: |
+            var params = JSON.parse(value);
+
+            var request = new HttpRequest();
+
+            request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
+            request.addHeader('User-Agent: ZabbixServer/1.3 Zabbix');
+
+            var response,
+            	error_msg = '',
+            	uplinksLL = [],
+            	timespan;
+
+            function isFloat(n) {
+            	n = parseFloat(n);
+            	return Number(n) === n && n % 1 !== 0;
+            };
+
+            function checkNumber(string) {
+            	if (typeof string !== "string" || isNaN(string) || isFloat(string)) {
+            		throw 'Incorrect "timespan" parameter given: ' + string + ' Must be an unsigned number';
+            	}
+            	return string;
+            };
+
+            function hasHeader(headers, name) {
+            	if (typeof headers !== 'object' || headers === null) {
+            		return false;
+            	}
+
+            	var target = name.toLowerCase();
+            	
+            	for (var key in headers) {
+            		if (key.toLowerCase() === target) {
+            			return true;
+            		}
+            	}
+
+            	return false;
+            }
+
+            function getHttpData(url) {
+            	var startTime = new Date().getTime();
+            	var maxWait = (parseInt(timespan, 10) - 10) * 1000;
+            	var waitFor = 1000;
+
+            	while (true) {
+            		response = request.get(url);
+            		Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+
+            		var status = request.getStatus();
+
+            		if (response !== null) {
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+            			}
+            		}
+
+            		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
+            			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
+            			var now = new Date().getTime();
+            			var headers = request.getHeaders(false);
+
+            			if (hasHeader(headers, 'Retry-After')) {
+            				var retryAfter = headers['Retry-After'];
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');
+            				waitFor = parseInt(retryAfter) * 1000;
+            			}
+            			else {
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
+            			}
+            			if (now - startTime + waitFor > maxWait) {
+            				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
+            			}
+            			Zabbix.sleep(waitFor);
+            			continue;
+            		}
+
+            		if (status !== 200) {
+            			if (response.errors) {
+            				throw response.errors.join(', ');
+            			}
+            			else {
+            				throw 'Failed to receive data: invalid response status code.';
+            			}
+            		}
+
+            		if (typeof (response) !== 'object' || response === null) {
+            			throw 'Cannot process response data: received data is not an object.';
+            		}
+
+            		return response;
+            	}
+            };
+
+            try {
+
+            	if (params.token === '{' + '$MERAKI.TOKEN}') {
+            		throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
+            	}
+
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
+
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
+
+            	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
+            		request.setProxy(params.httpproxy);
+            	}
+
+            	timespan = checkNumber('{$MERAKI.UPLINK.LL.TIMESPAN}');
+
+            	if (timespan > 86400 || timespan < 1) {
+            		throw 'Incorrect "timespan" parameter given: ' + timespan + ' Must be between 1 and 86400 seconds.';
+            	}
+
+            	uplinksLL = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=' + timespan);
+
+            } catch (error) {
+            	error_msg = error;
+            };
+
+            return JSON.stringify({
+            	'uplinksLL': uplinksLL,
+            	'error': error_msg.toString()
+            });
+          description: 'Item for gathering uplink loss and latency data for all devices in the organization.'
+          timeout: '{$MERAKI.DATA.TIMEOUT}'
+          parameters:
+            - name: httpproxy
+              value: '{$MERAKI.HTTP_PROXY}'
+            - name: organizationId
+              value: '{$ORGANIZATION_ID}'
+            - name: token
+              value: '{$MERAKI.TOKEN}'
+            - name: url
+              value: '{$MERAKI.API.URL}'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: b2c3d4e5f6a74b8c9d0e1f2a3b4c5d6e
+          name: 'Device uplinks data item errors'
+          type: DEPENDENT
+          key: meraki.get.org.uplinks.errors
+          value_type: TEXT
+          description: 'Item for gathering errors of the org-level device uplinks item.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: meraki.get.org.uplinks
+          tags:
+            - tag: component
+              value: error
+          triggers:
+            - uuid: c3d4e5f6a7b84c9d0e1f2a3b4c5d6e7f
+              expression: 'length(last(/Cisco Meraki organization by HTTP/meraki.get.org.uplinks.errors))>0'
+              name: 'Meraki: There are errors in ''Get all devices uplinks'' metric'
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: d4e5f6a7b8c94d0e1f2a3b4c5d6e7f8a
+          name: 'Get all devices availabilities'
+          type: SCRIPT
+          key: meraki.get.org.availabilities
+          delay: '{$MERAKI.GET.STATUS.INTERVAL}'
+          history: '0'
+          value_type: TEXT
+          params: |
+            var params = JSON.parse(value);
+
+            var request = new HttpRequest();
+
+            request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
+            request.addHeader('User-Agent: ZabbixServer/1.3 Zabbix');
+
+            function hasHeader(headers, name) {
+            	if (typeof headers !== 'object' || headers === null) {
+            		return false;
+            	}
+
+            	var target = name.toLowerCase();
+            	
+            	for (var key in headers) {
+            		if (key.toLowerCase() === target) {
+            			return true;
+            		}
+            	}
+
+            	return false;
+            }
+
+            function parseTime(timeString) {
+            	var match = timeString.match(/^(\d+)([h|m|s])$/);
+            	if (match) {
+            		var value = parseInt(match[1], 10);
+            		var unit = match[2];
+
+            		switch (unit) {
+            			case 'h':
+            				return value * 3600;
+            			case 'm':
+            				return value * 60;
+            			case 's':
+            				return value;
+            			default:
+            				return 0;
+            		}
+            	}
+
+            	return 0;
+            };
+
+            var response,
+            	error_msg = '',
+            	availabilities = [],
+            	timespan;
+
+            function getHttpData(url) {
+            	var startTime = new Date().getTime();
+            	var maxWait = parseInt(timespan, 10) * 1000;
+            	var waitFor = 1000;
+
+            	while (true) {
+            		response = request.get(url);
+            		Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+
+            		var status = request.getStatus();
+
+            		if (response !== null) {
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+            			}
+            		}
+
+            		if (status === 429 && response && response.errors && Array.isArray(response.errors) &&
+            			response.errors.indexOf("API rate limit exceeded for organization") !== -1) {
+            			var now = new Date().getTime();
+            			var headers = request.getHeaders(false);
+
+            			if (hasHeader(headers, 'Retry-After')) {
+            				var retryAfter = headers['Retry-After'];
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');
+            				waitFor = parseInt(retryAfter) * 1000;
+            			}
+            			else {
+            				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. No Retry-After header. Retrying after 1 second.');
+            			}
+            			if (now - startTime + waitFor > maxWait) {
+            				throw 'Failed to receive data: API rate limit exceeded and retry timeout reached.';
+            			}
+            			Zabbix.sleep(waitFor);
+            			continue;
+            		}
+
+            		if (status !== 200) {
+            			if (response.errors) {
+            				throw response.errors.join(', ');
+            			}
+            			else {
+            				throw 'Failed to receive data: invalid response status code.';
+            			}
+            		}
+
+            		if (typeof (response) !== 'object' || response === null) {
+            			throw 'Cannot process response data: received data is not an object.';
+            		}
+
+            		return response;
+            	}
+            };
+
+            try {
+
+            	if (params.token === '{' + '$MERAKI.TOKEN}') {
+            		throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
+            	}
+
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
+
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
+
+            	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
+            		request.setProxy(params.httpproxy);
+            	}
+
+            	timespan = parseTime('{$MERAKI.GET.STATUS.INTERVAL}');
+
+            	availabilities = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/availabilities');
+
+            } catch (error) {
+            	error_msg = error;
+            };
+
+            return JSON.stringify({
+            	'data': availabilities,
+            	'error': error_msg.toString()
+            });
+          description: 'Item for gathering availability status for all devices in the organization.'
+          timeout: '{$MERAKI.DATA.TIMEOUT}'
+          parameters:
+            - name: httpproxy
+              value: '{$MERAKI.HTTP_PROXY}'
+            - name: organizationId
+              value: '{$ORGANIZATION_ID}'
+            - name: token
+              value: '{$MERAKI.TOKEN}'
+            - name: url
+              value: '{$MERAKI.API.URL}'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: e5f6a7b8c9d04e1f2a3b4c5d6e7f8a9b
+          name: 'Device availabilities item errors'
+          type: DEPENDENT
+          key: meraki.get.org.availabilities.errors
+          value_type: TEXT
+          description: 'Item for gathering errors of the org-level device availabilities item.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: meraki.get.org.availabilities
+          tags:
+            - tag: component
+              value: error
+          triggers:
+            - uuid: f6a7b8c9d0e14f2a3b4c5d6e7f8a9b0c
+              expression: 'length(last(/Cisco Meraki organization by HTTP/meraki.get.org.availabilities.errors))>0'
+              name: 'Meraki: There are errors in ''Get all devices availabilities'' metric'
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: availability
         - uuid: 25f8f61ddf964f39b39cc38b23b017b9
           name: 'Get list of adaptive policy aggregate statistics'
           type: SCRIPT
@@ -1541,7 +1326,7 @@ zabbix_export:
             var request = new HttpRequest();
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
-            request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
+            request.addHeader('User-Agent: ZabbixServer/1.3 Zabbix');
             
             var response,
             	error_msg = '',
@@ -1699,7 +1484,7 @@ zabbix_export:
             var request = new HttpRequest();
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
-            request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
+            request.addHeader('User-Agent: ZabbixServer/1.3 Zabbix');
             
             var response,
             	error_msg = '',
@@ -1878,7 +1663,7 @@ zabbix_export:
             var request = new HttpRequest();
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
-            request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
+            request.addHeader('User-Agent: ZabbixServer/1.3 Zabbix');
             
             var response,
             	error_msg = '',
@@ -2050,7 +1835,7 @@ zabbix_export:
             var request = new HttpRequest();
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
-            request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
+            request.addHeader('User-Agent: ZabbixServer/1.3 Zabbix');
             
             var response,
             	error_msg = '',
@@ -2220,7 +2005,7 @@ zabbix_export:
             var request = new HttpRequest();
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
-            request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
+            request.addHeader('User-Agent: ZabbixServer/1.3 Zabbix');
             
             var response,
             	error_msg = '',
@@ -2430,7 +2215,7 @@ zabbix_export:
             var request = new HttpRequest();
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
-            request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
+            request.addHeader('User-Agent: ZabbixServer/1.3 Zabbix');
             
             var response,
             	error_msg = '',
@@ -2956,6 +2741,217 @@ zabbix_export:
             - tag: component
               value: policy
       discovery_rules:
+        - uuid: a7b8c9d0e1f24a3b4c5d6e7f8a9b0c1d
+          name: 'Device uplinks discovery'
+          type: DEPENDENT
+          key: meraki.org.uplinks.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#IP}'
+                value: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}'
+              - macro: '{#IP}'
+                value: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#UPLINK}'
+                value: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
+              - macro: '{#UPLINK}'
+                value: '{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          item_prototypes:
+            - uuid: b8c9d0e1f2a34b4c5d6e7f8a9b0c1d2e
+              name: 'Device [{#SERIAL}]: Uplink [{#IP}]: [{#UPLINK}]: Latency'
+              type: DEPENDENT
+              key: 'meraki.device.latency[{#SERIAL},{#IP},{#UPLINK}]'
+              value_type: FLOAT
+              units: s
+              description: |
+                Latency of the device uplink.
+                Network: {#NETWORK.ID}.
+                Device serial: {#SERIAL}.
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.uplinksLL[?(@.serial == ''{#SERIAL}'' && @.ip == ''{#IP}'' && @.uplink== ''{#UPLINK}'')].timeSeries.[0].latencyMs.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-1000'
+                - type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+              master_item:
+                key: meraki.get.org.uplinks
+              tags:
+                - tag: component
+                  value: network
+                - tag: ip
+                  value: '{#IP}'
+                - tag: network
+                  value: '{#NETWORK.ID}'
+                - tag: serial-number
+                  value: '{#SERIAL}'
+                - tag: uplink
+                  value: '{#UPLINK}'
+              trigger_prototypes:
+                - uuid: c9d0e1f2a3b44c5d6e7f8a9b0c1d2e3f
+                  expression: 'min(/Cisco Meraki organization by HTTP/meraki.device.latency[{#SERIAL},{#IP},{#UPLINK}],#3)>{$MERAKI.DEVICE.LATENCY}'
+                  name: 'Meraki: Device [{#SERIAL}]: Uplink [{#IP}]: [{#UPLINK}]: latency > {$MERAKI.DEVICE.LATENCY}'
+                  priority: WARNING
+                  tags:
+                    - tag: scope
+                      value: performance
+            - uuid: d0e1f2a3b4c54d6e7f8a9b0c1d2e3f4a
+              name: 'Device [{#SERIAL}]: Uplink [{#IP}]: [{#UPLINK}]: Loss, %'
+              type: DEPENDENT
+              key: 'meraki.device.loss.pct[{#SERIAL},{#IP},{#UPLINK}]'
+              value_type: FLOAT
+              units: '%'
+              description: |
+                Loss percent of the device uplink.
+                Network: {#NETWORK.ID}.
+                Device serial: {#SERIAL}.
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.uplinksLL[?(@.serial == ''{#SERIAL}'' && @.ip == ''{#IP}'' && @.uplink== ''{#UPLINK}'')].timeSeries.[0].lossPercent.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-1'
+              master_item:
+                key: meraki.get.org.uplinks
+              tags:
+                - tag: component
+                  value: network
+                - tag: ip
+                  value: '{#IP}'
+                - tag: network
+                  value: '{#NETWORK.ID}'
+                - tag: serial-number
+                  value: '{#SERIAL}'
+                - tag: uplink
+                  value: '{#UPLINK}'
+              trigger_prototypes:
+                - uuid: e1f2a3b4c5d64e7f8a9b0c1d2e3f4a5b
+                  expression: 'min(/Cisco Meraki organization by HTTP/meraki.device.loss.pct[{#SERIAL},{#IP},{#UPLINK}],#3)>{$MERAKI.DEVICE.LOSS}'
+                  name: 'Meraki: Device [{#SERIAL}]: Uplink [{#IP}]: [{#UPLINK}]: loss > {$MERAKI.DEVICE.LOSS}%'
+                  priority: WARNING
+                  tags:
+                    - tag: scope
+                      value: performance
+          graph_prototypes:
+            - uuid: f2a3b4c5d6e74f8a9b0c1d2e3f4a5b6c
+              name: 'Device [{#SERIAL}]: Uplink [{#IP}]: [{#UPLINK}]: Latency'
+              ymin_type_1: FIXED
+              graph_items:
+                - color: 199C0D
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.device.latency[{#SERIAL},{#IP},{#UPLINK}]'
+            - uuid: a3b4c5d6e7f84a9b0c1d2e3f4a5b6c7d
+              name: 'Device [{#SERIAL}]: Uplink [{#IP}]: [{#UPLINK}]: Loss'
+              ymin_type_1: FIXED
+              graph_items:
+                - color: 199C0D
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.device.loss.pct[{#SERIAL},{#IP},{#UPLINK}]'
+          master_item:
+            key: meraki.get.org.uplinks
+          lld_macro_paths:
+            - lld_macro: '{#IP}'
+              path: $.ip
+            - lld_macro: '{#NETWORK.ID}'
+              path: $.networkId
+            - lld_macro: '{#SERIAL}'
+              path: $.serial
+            - lld_macro: '{#UPLINK}'
+              path: $.uplink
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.uplinksLL
+        - uuid: b4c5d6e7f8a94b0c1d2e3f4a5b6c7d8e
+          name: 'Device availability discovery'
+          type: DEPENDENT
+          key: meraki.org.devices.status.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#DEVICE.NAME}'
+                value: '{$MERAKI.DEVICE.NAME.MATCHES}'
+              - macro: '{#DEVICE.NAME}'
+                value: '{$MERAKI.DEVICE.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#STATUS}'
+                value: '{$MERAKI.DEVICE.STATUS.MATCHES}'
+              - macro: '{#STATUS}'
+                value: '{$MERAKI.DEVICE.STATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          item_prototypes:
+            - uuid: c5d6e7f8a9b04c1d2e3f4a5b6c7d8e9f
+              name: 'Device [{#SERIAL}]: Status'
+              type: DEPENDENT
+              key: 'meraki.device.status[{#SERIAL}]'
+              description: |
+                Device operational status.
+                Network: {#NETWORK.ID}.
+              valuemap:
+                name: 'Device status'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.serial == ''{#SERIAL}'')].status.first()'
+                  error_handler: DISCARD_VALUE
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      switch (value) {
+                      	case 'offline':
+                      		return 0
+                      	case 'online':
+                      		return 1
+                      	case 'dormant':
+                      		return 2
+                      	case 'alerting':
+                      		return 3
+                      	default:
+                      		return 10
+                      }
+              master_item:
+                key: meraki.get.org.availabilities
+              tags:
+                - tag: component
+                  value: health
+                - tag: serial-number
+                  value: '{#SERIAL}'
+              trigger_prototypes:
+                - uuid: d6e7f8a9b0c14d2e3f4a5b6c7d8e9f0a
+                  expression: 'last(/Cisco Meraki organization by HTTP/meraki.device.status[{#SERIAL}])=3'
+                  name: 'Meraki: Device [{#SERIAL}]: Status is alerting'
+                  priority: WARNING
+                  tags:
+                    - tag: scope
+                      value: availability
+                - uuid: e7f8a9b0c1d24e3f4a5b6c7d8e9f0a1b
+                  expression: 'last(/Cisco Meraki organization by HTTP/meraki.device.status[{#SERIAL}])=0'
+                  name: 'Meraki: Device [{#SERIAL}]: Status is offline'
+                  priority: AVERAGE
+                  tags:
+                    - tag: scope
+                      value: availability
+          master_item:
+            key: meraki.get.org.availabilities
+          lld_macro_paths:
+            - lld_macro: '{#DEVICE.NAME}'
+              path: $.name
+            - lld_macro: '{#NETWORK.ID}'
+              path: '$.network.id'
+            - lld_macro: '{#SERIAL}'
+              path: $.serial
+            - lld_macro: '{#STATUS}'
+              path: $.status
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data
         - uuid: 596c6122c6244dee83e3b55e30e4fda0
           name: 'Administrators discovery'
           type: DEPENDENT
@@ -4010,6 +4006,42 @@ zabbix_export:
         - tag: target
           value: cisco-meraki-dashboard
       macros:
+        - macro: '{$MERAKI.DEVICE.LATENCY}'
+          value: '0.15'
+          description: 'Devices uplink latency threshold, in seconds.'
+        - macro: '{$MERAKI.DEVICE.LOSS}'
+          value: '15'
+          description: 'Devices uplink loss threshold, in percent.'
+        - macro: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}'
+          value: '^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$'
+          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.NOT_MATCHES}'
+          value: ^null$
+          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.DEVICE.NAME.MATCHES}'
+          value: '.+'
+          description: 'Filter of discoverable devices by name.'
+        - macro: '{$MERAKI.DEVICE.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered devices by name.'
+        - macro: '{$MERAKI.DEVICE.STATUS.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable device statuses.'
+        - macro: '{$MERAKI.DEVICE.STATUS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered device statuses.'
+        - macro: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}'
+          value: ^null$
+          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.GET.STATUS.INTERVAL}'
+          value: '300'
+          description: 'Update interval for device availability polling.'
+        - macro: '{$MERAKI.UPLINK.LL.TIMESPAN}'
+          value: '180'
+          description: 'Timespan in seconds for getting device uplinks loss and quality stats. Must be between 1 and 86400 seconds.'
         - macro: '{$MERAKI.ADMIN.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable admins in organization.'
@@ -4377,6 +4409,19 @@ zabbix_export:
                       name: reference
                       value: AAAAD
       valuemaps:
+        - uuid: 24967dff65a048578eae18b2485908cd
+          name: 'Device status'
+          mappings:
+            - value: '0'
+              newvalue: offline
+            - value: '1'
+              newvalue: online
+            - value: '2'
+              newvalue: dormant
+            - value: '3'
+              newvalue: alerting
+            - value: '10'
+              newvalue: unknown
         - uuid: ec79f04ded684421b644b38500fe8b26
           name: 'Boolean format'
           mappings:
