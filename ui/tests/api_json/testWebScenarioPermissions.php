@@ -119,8 +119,8 @@ class testWebScenarioPermissions extends CAPITest {
 				]
 			],
 			'roles' => [
-				['name' => 'perm.ht.super-admin.role', 'type' => USER_TYPE_SUPER_ADMIN],
-				['name' => 'perm.ht.admin.role', 'type' => USER_TYPE_ZABBIX_ADMIN],
+				['name' => 'perm.ht.super-admin.role', 'type' => USER_TYPE_SUPER_ADMIN, 'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]],
+				['name' => 'perm.ht.admin.role', 'type' => USER_TYPE_ZABBIX_ADMIN, 'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]],
 				['name' => 'perm.ht.user.role', 'type' => USER_TYPE_ZABBIX_USER, 'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]]
 			],
 			'users' => [
