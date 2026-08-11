@@ -124,9 +124,7 @@ class TabIndicators {
 	 */
 	activateIndicators() {
 		for (const element of this.form.querySelectorAll('#' + this.tabs_id + ' a')) {
-			console.log(this.getIndicatorNameByElement(element));
 			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(element));
-			console.log(indicator_item);
 
 			if (indicator_item instanceof TabIndicatorItem) {
 				indicator_item

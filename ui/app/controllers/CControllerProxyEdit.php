@@ -79,6 +79,12 @@ class CControllerProxyEdit extends CController {
 
 	protected function doAction(): void {
 		if ($this->proxy !== null) {
+			$apm = array_merge(self::getApmDefaults(), array_intersect_key($this->proxy, array_flip([
+				'data_collection_status',
+				'max_messages_per_second',
+				'additional_resource_attributes'
+			])));
+
 			$data = [
 				'proxyid' => $this->proxy['proxyid'],
 				'ms_proxy_group' => $this->proxy['proxyGroup']
@@ -105,7 +111,10 @@ class CControllerProxyEdit extends CController {
 					'tls_psk' => DB::getDefault('proxy', 'tls_psk'),
 					'tls_issuer' => $this->proxy['tls_issuer'],
 					'tls_subject' => $this->proxy['tls_subject'],
-					'custom_timeouts' => (int) $this->proxy['custom_timeouts']
+					'custom_timeouts' => (int) $this->proxy['custom_timeouts'],
+					'data_collection_status' => $apm['data_collection_status'],
+					'max_messages_per_second' => $apm['max_messages_per_second'],
+					'additional_resource_attributes' => $apm['additional_resource_attributes'],
 				]
 			];
 
@@ -166,7 +175,7 @@ class CControllerProxyEdit extends CController {
 					'timeout_telnet_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
 					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
 					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
-				]
+				] + self::getApmDefaults()
 			];
 		}
 
@@ -186,5 +195,13 @@ class CControllerProxyEdit extends CController {
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	private static function getApmDefaults(): array {
+		return [
+			'data_collection_status' => PROXY_APM_STATUS_NOT_CONFIGURED,
+			'max_messages_per_second' => 0,
+			'additional_resource_attributes' => [],
+		];
 	}
 }

@@ -38,7 +38,7 @@ $table = (new CTable())
 	->setColumns($header_columns);
 
 $options = [
-	'attribute_types' => $data['attribute_types'],
+	'signal_types' => $data['signal_types'],
 	'field_name' => $data['field_name'],
 	'has_inline_validation' => $data['has_inline_validation'],
 	'readonly' => $data['readonly']

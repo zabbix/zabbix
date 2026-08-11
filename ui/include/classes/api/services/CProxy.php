@@ -378,7 +378,7 @@ class CProxy extends CApiService {
 				if (array_key_exists('apm', $upd_proxy)) {
 					$proxy['apm'] = json_decode($proxy['apm'], true);
 
-					if ($proxy['apm'][0]['data_collection_status'] === PROXY_APM_DESABLED
+					if ($proxy['apm'][0]['data_collection_status'] === PROXY_APM_STATUS_NOT_CONFIGURED
 							&& $proxy['apm'][0]['max_messages_per_second'] != 0) {
 						$proxy['apm'][0]['max_messages_per_second'] = 0;
 					}
@@ -711,17 +711,17 @@ class CProxy extends CApiService {
 			'hosts' =>					['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'apm' =>					['type' => API_OBJECTS, 'fields' => [
-				'data_collection_status' =>			['type' => API_INT32, 'in' => implode(',', [PROXY_APM_DESABLED, PROXY_APM_ENABLED])],
+			'apm' =>					['type' => API_OBJECT, 'fields' => [
+				'data_collection_status' =>			['type' => API_INT32, 'in' => implode(',', [PROXY_APM_STATUS_NOT_CONFIGURED, PROXY_APM_STATUS_CONFIGURED])],
 				'max_messages_per_second' => 		['type' => API_MULTIPLE, 'rules' => [
-														['if' => static fn(array $data): bool => $data['data_collection_status'] == PROXY_APM_ENABLED, 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => 0],
+														['if' => static fn(array $data): bool => $data['data_collection_status'] == PROXY_APM_STATUS_CONFIGURED, 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => 0],
 														['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'additional_resource_attributes' =>	['type' => API_MULTIPLE, 'rules' => [
-														['if' => static fn(array $data): bool => $data['data_collection_status'] == PROXY_APM_ENABLED, 'type' => API_OBJECTS, 'uniq' => [['signal_type', 'key'], ['key']], 'fields' => [
+														['if' => static fn(array $data): bool => $data['data_collection_status'] == PROXY_APM_STATUS_CONFIGURED, 'type' => API_OBJECTS, 'uniq' => [['signal_type', 'key'], ['key']], 'fields' => [
 															'key' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 															'value' => 			['type' => API_STRING_UTF8],
-															'signal_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [APM_SIGNAL_TYPE_TRACES, APM_SIGNAL_TYPE_METRICS, APM_SIGNAL_TYPE_LOGS])]
+															'signal_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [PROXY_APM_ATTR_SIGNAL_TYPE_TRACES, PROXY_APM_ATTR_SIGNAL_TYPE_METRICS, PROXY_APM_ATTR_SIGNAL_TYPE_LOGS])]
 
 														]],
 														['else' => true, 'type' => API_UNEXPECTED]

@@ -1031,7 +1031,7 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 function renderProxyApmAttrRow($index, array $attribute, array $options = []): array {
 	$fields_row = (new CRow([
 		(new CCol(
-			(new CTextAreaFlexible($options['field_name'].'['.$index.'][name]', $attribute['name']))
+			(new CTextAreaFlexible($options['field_name'].'['.$index.'][key]', $attribute['key']))
 				->setErrorContainer($options['has_inline_validation'] ? 'attr_name_'.$index.'_error_container' : null)
 				->setErrorLabel($options['has_inline_validation'] ? _('Name') : null)
 				->setAttribute('placeholder', _('name'))
@@ -1047,11 +1047,11 @@ function renderProxyApmAttrRow($index, array $attribute, array $options = []): a
 				->setReadonly($options['readonly'])
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(
-			(new CSelect($options['field_name'].'['.$index.'][type]'))
+			(new CSelect($options['field_name'].'['.$index.'][signal_type]'))
 				->setErrorContainer($options['has_inline_validation'] ? 'attr_type_'.$index.'_error_container' : null)
 				->setErrorLabel($options['has_inline_validation'] ? _('Type') : null)
-				->setValue($attribute['type'])
-				->addOptions(CSelect::createOptionsFromArray($options['attribute_types']))
+				->setValue($attribute['signal_type'])
+				->addOptions(CSelect::createOptionsFromArray($options['signal_types']))
 				->setReadonly($options['readonly'])
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(

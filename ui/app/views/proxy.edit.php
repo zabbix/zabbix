@@ -249,66 +249,59 @@ $apm_tab = (new CFormGrid())
 		(new CLabel([
 			_('Data collection enabled'),
 			makeHelpIcon(_('To enable OpenTelemetry data collection set up Proxy configuration file first.'))
-		], 'apm_status')),
+		], 'data_collection_status')),
 		new CFormField(
-			(new CCheckBox('apm_status'))
-				->setUncheckedValue('0')
-				->setChecked(false),
+			(new CCheckBox('data_collection_status'))
+				->setUncheckedValue(PROXY_APM_STATUS_NOT_CONFIGURED)
+				->setChecked($data['form']['data_collection_status'] === PROXY_APM_STATUS_CONFIGURED),
 		)
 	])
 	->addItem([
-		(new CLabel([_('Max messages per second')], 'apm_quota_mode'))
+		(new CLabel([_('Max messages per second')], 'quota_mode'))
 			->setAsteriskMark()
-			->addClass('js-apm-quota-mode')
-			->addClass('display-none'),
+			->addClass('js-apm-quota-mode'),
 		(new CFormField([
-			(new CRadioButtonList('apm_quota_mode', PROXY_APM_QUOTA_UNLIMITED))
-				->addValue(_('Unlimited'), PROXY_APM_QUOTA_UNLIMITED)
-				->addValue(_('Custom'), PROXY_APM_QUOTA_CUSTOM)
+			(new CRadioButtonList('quota_mode', $data['form']['max_messages_per_second'] === 0
+				? PROXY_APM_QUOTA_MODE_UNLIMITED
+				: PROXY_APM_QUOTA_MODE_CUSTOM
+			))
+				->addValue(_('Unlimited'), PROXY_APM_QUOTA_MODE_UNLIMITED)
+				->addValue(_('Custom'), PROXY_APM_QUOTA_MODE_CUSTOM)
 				->setModern(),
 			(new CDiv())
 				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-				->addClass('js-apm-quota-custom')
-				->addClass('display-none'),
-			(new CTextBox('apm_quota', '0'))
+				->addClass('js-apm-quota-mode-custom'),
+			(new CTextBox('max_messages_per_second', $data['form']['max_messages_per_second']))
 				->setType('number')
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->addClass('js-apm-quota-custom')
-				->addClass('display-none'),
+				->addClass('js-apm-quota-mode-custom'),
 		]))
 			->addClass('js-apm-quota-mode')
-			->addClass('display-none')
 			->addStyle('height: 24px;')
 	])
 	->addItem(
 		(new CFormField(
 			(new CTag('h4', true, _('Process')))->addClass('input-section-header')
-		))
-			->addClass('js-apm-attributes')
-			->addClass('display-none'),
+		))->addClass('js-apm-attributes'),
 	)
 	->addItem([
-		(new CLabel([_('Add resource attributes')], 'apm_attributes'))
-			->addClass('js-apm-attributes')
-			->addClass('display-none'),
+		(new CLabel([_('Add resource attributes')], 'additional_resource_attributes'))
+			->addClass('js-apm-attributes'),
 		(new CFormField(
 			(new CDiv(new CPartial('proxy.apm.attributes', [
 				'source' => 'proxy',
-				'attributes' => [['name' => '', 'value' => '', 'type' => 1]],
-				'field_name' => 'apm_attributes',
+				'attributes' => [['key' => '', 'value' => '', 'signal_type' => PROXY_APM_ATTR_SIGNAL_TYPE_TRACES]],
+				'field_name' => 'additional_resource_attributes',
 				'tabs_id' => 'proxy-tabs',
 				'attr_tab_id' => 'proxy-apm-tab',
 				'has_inline_validation' => true,
-				'attribute_types' => [
-					PROXY_APM_ATTR_TYPE_TRACES => _('Traces'),
-					PROXY_APM_ATTR_TYPE_METRICS => _('Metrics'),
-					PROXY_APM_ATTR_TYPE_LOGS => _('Logs')
+				'signal_types' => [
+					PROXY_APM_ATTR_SIGNAL_TYPE_TRACES => _('Traces'),
+					PROXY_APM_ATTR_SIGNAL_TYPE_METRICS => _('Metrics'),
+					PROXY_APM_ATTR_SIGNAL_TYPE_LOGS => _('Logs')
 				]
-			])))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		))
-			->addClass('js-apm-attributes')
-			->addClass('display-none')
+			])))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		))->addClass('js-apm-attributes')
 	]);
 
 // Timeouts tab.
