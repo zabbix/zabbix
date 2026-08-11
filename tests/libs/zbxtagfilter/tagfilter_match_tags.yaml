@@ -663,7 +663,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Match tags with matching event tags (8)
+test case: Match tags with matching event tags (20)
 in:
   eval_type: and/or
   match_tags:
