@@ -51,6 +51,12 @@ static int	rtc_parse_options_server(const char *opt, zbx_uint32_t *code, struct 
 		return SUCCEED;
 	}
 
+	if (0 == strncmp(opt, ZBX_PERMISSIONS_REBUILD, ZBX_CONST_STRLEN(ZBX_PERMISSIONS_REBUILD)))
+	{
+		*code = ZBX_RTC_PERMISSIONS_REBUILD;
+		return SUCCEED;
+	}
+
 	if (0 == strncmp(opt, ZBX_HA_REMOVE_NODE, ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE)))
 	{
 		param = opt + ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE);
@@ -488,6 +494,9 @@ int	rtc_process_request_ex_server(zbx_rtc_t *rtc, zbx_uint32_t code, const unsig
 			return SUCCEED;
 		case ZBX_RTC_PROXYPOLLER_PROCESS:
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_PROXYPOLLER, 0, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
+			return SUCCEED;
+		case ZBX_RTC_PERMISSIONS_REBUILD:
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_PERMISSIONS_REBUILD, NULL, 0);
 			return SUCCEED;
 	}
 
