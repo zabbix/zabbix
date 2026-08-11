@@ -15,15 +15,6 @@
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
-// Defaults matching the dev-mode Vault instance from the class docblock below; only used when
-// bootstrap.php (or the environment it's generated from) does not already provide these.
-if (!defined('PHPUNIT_HASHICORP_ADDRESS')) {
-	define('PHPUNIT_HASHICORP_ADDRESS', 'http://localhost:8200');
-}
-if (!defined('PHPUNIT_HASHICORP_ROOT_TOKEN_ID')) {
-	define('PHPUNIT_HASHICORP_ROOT_TOKEN_ID', 'root');
-}
-
 /**
  * Test suite for HashiCorp Vault integration: DB credentials retrieval by Zabbix server, and
  * resolution of Vault secret macros (a separate feature, exercised by
@@ -31,8 +22,8 @@ if (!defined('PHPUNIT_HASHICORP_ROOT_TOKEN_ID')) {
  *
  * This test suite does not manage the Vault instance's lifecycle: it expects a HashiCorp Vault
  * dev-mode instance, started independently (e.g. from the official "hashicorp/vault" Docker image,
- * see https://hub.docker.com/r/hashicorp/vault), to already be running and reachable at VAULT_ADDR
- * with the VAULT_ROOT_TOKEN root token before this suite executes, for example:
+ * see https://hub.docker.com/r/hashicorp/vault), to already be running and reachable at PHPUNIT_HASHICORP_ADDRESS
+ * with the PHPUNIT_HASHICORP_ROOT_TOKEN_ID root token before this suite executes, for example:
  *
  *   sudo docker run --cap-add=IPC_LOCK \
  *       --name vault \
@@ -58,8 +49,6 @@ if (!defined('PHPUNIT_HASHICORP_ROOT_TOKEN_ID')) {
  */
 class testHashicorpVault extends CIntegrationTest {
 
-	const VAULT_ADDR = PHPUNIT_HASHICORP_ADDRESS;
-	const VAULT_ROOT_TOKEN = PHPUNIT_HASHICORP_ROOT_TOKEN_ID;
 	const VAULT_ROLE_NAME = 'zbx-it-role-'.PHPUNIT_PORT_PREFIX;
 	const VAULT_POLICY_NAME = 'zbx-it-policy-'.PHPUNIT_PORT_PREFIX;
 	const VAULT_SECRET_PATH = 'zabbix/'.PHPUNIT_PORT_PREFIX.'/db';
@@ -91,18 +80,14 @@ class testHashicorpVault extends CIntegrationTest {
 	 * up. Disabled by default, similarly to PHPUNIT_SAML_TESTS_ENABLED.
 	 *
 	 * If the tests are not enabled the suite is marked skipped (rather than failed).
-	 *
-	 * @throws PHPUnit_Framework_SkippedTestError    if PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED is not enabled
 	 */
-	private static function skipTestIfVaultTestsAreDisabled(): void {
-		if (defined('PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED') && PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED) {
-			return;
-		}
-
-		self::markTestSkipped('HashiCorp Vault integration tests are disabled. Define '.
+	protected function onBeforeTestSuite() {
+		if (!defined('PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED') || !PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED) {
+			self::markTestSuiteSkipped('HashiCorp Vault integration tests are disabled. Define '.
 				'PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED as true in bootstrap.php to enable them, and start a Vault '.
 				'instance independently before running this test suite, see the class docblock.'
-		);
+			);
+		}
 	}
 
 	/**
@@ -118,7 +103,7 @@ class testHashicorpVault extends CIntegrationTest {
 	 * @throws Exception    on failure to communicate with Vault
 	 */
 	private static function vaultRequest($method, $path, $data = null, $token = null) {
-		$curl = curl_init(self::VAULT_ADDR.$path);
+		$curl = curl_init(PHPUNIT_HASHICORP_ADDRESS.$path);
 		curl_setopt_array($curl, [
 			CURLOPT_CUSTOMREQUEST => $method,
 			CURLOPT_HTTPHEADER => ['X-Vault-Token: '.$token, 'Content-Type: application/json'],
@@ -147,12 +132,12 @@ class testHashicorpVault extends CIntegrationTest {
 	 * @return array
 	 */
 	private static function vaultRoleAccessors($role_name) {
-		$accessors = self::vaultRequest('GET', '/v1/auth/token/accessors?list=true', null, self::VAULT_ROOT_TOKEN);
+		$accessors = self::vaultRequest('GET', '/v1/auth/token/accessors?list=true', null, PHPUNIT_HASHICORP_ROOT_TOKEN_ID);
 		$matching = [];
 
 		foreach ($accessors['body']['data']['keys'] ?? [] as $accessor) {
 			$lookup = self::vaultRequest('POST', '/v1/auth/token/lookup-accessor', ['accessor' => $accessor],
-					self::VAULT_ROOT_TOKEN
+					PHPUNIT_HASHICORP_ROOT_TOKEN_ID
 			);
 
 			if (($lookup['body']['data']['meta']['role_name'] ?? null) === $role_name) {
@@ -172,7 +157,7 @@ class testHashicorpVault extends CIntegrationTest {
 	private static function vaultRevokeAccessors($accessors) {
 		foreach ($accessors as $accessor) {
 			self::vaultRequest('POST', '/v1/auth/token/revoke-accessor', ['accessor' => $accessor],
-					self::VAULT_ROOT_TOKEN
+					PHPUNIT_HASHICORP_ROOT_TOKEN_ID
 			);
 		}
 	}
@@ -228,8 +213,6 @@ class testHashicorpVault extends CIntegrationTest {
 	 * naturally repeatable, enabling the AppRole auth method, is explicitly guarded below.
 	 */
 	public function prepareData() {
-		self::skipTestIfVaultTestsAreDisabled();
-
 		global $DB;
 
 		// Store the credentials of the database used by the test environment as a Vault secret,
@@ -239,7 +222,7 @@ class testHashicorpVault extends CIntegrationTest {
 				'username' => $DB['USER'],
 				'password' => $DB['PASSWORD']
 			]
-		], self::VAULT_ROOT_TOKEN);
+		], PHPUNIT_HASHICORP_ROOT_TOKEN_ID);
 
 		// A separate, unrelated secret used only by the Vault secret macro test below - see the
 		// VAULT_MACRO_SECRET_PATH comment for why it can't just reuse VAULT_SECRET_PATH.
@@ -247,18 +230,18 @@ class testHashicorpVault extends CIntegrationTest {
 			'data' => [
 				self::VAULT_MACRO_SECRET_KEY => self::VAULT_MACRO_SECRET_VALUE
 			]
-		], self::VAULT_ROOT_TOKEN);
+		], PHPUNIT_HASHICORP_ROOT_TOKEN_ID);
 
 		self::vaultRequest('PUT', '/v1/sys/policy/'.self::VAULT_POLICY_NAME, [
 			'policy' => 'path "secret/data/'.self::VAULT_SECRET_PATH.'" { capabilities = ["read"] }'.
 					"\n".'path "secret/data/'.self::VAULT_MACRO_SECRET_PATH.'" { capabilities = ["read"] }'
-		], self::VAULT_ROOT_TOKEN);
+		], PHPUNIT_HASHICORP_ROOT_TOKEN_ID);
 
 		// Enabling an already-enabled auth method errors out, so check first.
-		$auth_methods = self::vaultRequest('GET', '/v1/sys/auth', null, self::VAULT_ROOT_TOKEN);
+		$auth_methods = self::vaultRequest('GET', '/v1/sys/auth', null, PHPUNIT_HASHICORP_ROOT_TOKEN_ID);
 
 		if (!isset($auth_methods['body']['approle/'])) {
-			self::vaultRequest('POST', '/v1/sys/auth/approle', ['type' => 'approle'], self::VAULT_ROOT_TOKEN);
+			self::vaultRequest('POST', '/v1/sys/auth/approle', ['type' => 'approle'], PHPUNIT_HASHICORP_ROOT_TOKEN_ID);
 		}
 
 		// A role POST to an already-existing role name overwrites its configuration in place.
@@ -267,22 +250,22 @@ class testHashicorpVault extends CIntegrationTest {
 			'token_ttl' => '20s',
 			'token_max_ttl' => '1h',
 			'secret_id_ttl' => '1h'
-		], self::VAULT_ROOT_TOKEN);
+		], PHPUNIT_HASHICORP_ROOT_TOKEN_ID);
 
 		$role = self::vaultRequest('GET', '/v1/auth/approle/role/'.self::VAULT_ROLE_NAME.'/role-id', null,
-				self::VAULT_ROOT_TOKEN
+				PHPUNIT_HASHICORP_ROOT_TOKEN_ID
 		);
 		self::$role_id = $role['body']['data']['role_id'];
 
 		$secret = self::vaultRequest('POST', '/v1/auth/approle/role/'.self::VAULT_ROLE_NAME.'/secret-id', [],
-				self::VAULT_ROOT_TOKEN
+				PHPUNIT_HASHICORP_ROOT_TOKEN_ID
 		);
 		self::$secret_id = $secret['body']['data']['secret_id'];
 
 		$token = self::vaultRequest('POST', '/v1/auth/token/create', [
 			'policies' => [self::VAULT_POLICY_NAME],
 			'ttl' => '1h'
-		], self::VAULT_ROOT_TOKEN);
+		], PHPUNIT_HASHICORP_ROOT_TOKEN_ID);
 		self::$static_token = $token['body']['auth']['client_token'];
 
 		// Create a host and trapper item. They will be used only to prove that the server was
@@ -360,7 +343,7 @@ class testHashicorpVault extends CIntegrationTest {
 				'DBUser' => [],
 				'DBPassword' => [],
 				'Vault' => 'HashiCorp',
-				'VaultURL' => self::VAULT_ADDR,
+				'VaultURL' => PHPUNIT_HASHICORP_ADDRESS,
 				'VaultDBPath' => self::VAULT_DB_PATH,
 				'VaultToken' => self::$static_token
 			]
@@ -413,7 +396,7 @@ class testHashicorpVault extends CIntegrationTest {
 				'DBUser' => [],
 				'DBPassword' => [],
 				'Vault' => 'HashiCorp',
-				'VaultURL' => self::VAULT_ADDR,
+				'VaultURL' => PHPUNIT_HASHICORP_ADDRESS,
 				'VaultDBPath' => self::VAULT_DB_PATH,
 				'VaultAppRoleID' => self::$role_id,
 				'VaultAppSecretID' => self::$secret_id
@@ -475,7 +458,7 @@ class testHashicorpVault extends CIntegrationTest {
 	public function testHashicorpVault_missingTokenAndAppRoleId() {
 		$this->startServerAndExpectVaultError([
 			'Vault' => 'HashiCorp',
-			'VaultURL' => self::VAULT_ADDR,
+			'VaultURL' => PHPUNIT_HASHICORP_ADDRESS,
 			'VaultDBPath' => self::VAULT_DB_PATH
 		], 'either "VaultToken" or "VaultAppRoleID" configuration parameter should be defined');
 	}
@@ -483,7 +466,7 @@ class testHashicorpVault extends CIntegrationTest {
 	public function testHashicorpVault_appRoleIdWithoutSecretId() {
 		$this->startServerAndExpectVaultError([
 			'Vault' => 'HashiCorp',
-			'VaultURL' => self::VAULT_ADDR,
+			'VaultURL' => PHPUNIT_HASHICORP_ADDRESS,
 			'VaultDBPath' => self::VAULT_DB_PATH,
 			'VaultAppRoleID' => self::$role_id
 		], '"VaultAppRoleID" is defined but "VaultAppSecretID" is not defined');
@@ -492,7 +475,7 @@ class testHashicorpVault extends CIntegrationTest {
 	public function testHashicorpVault_tokenAndAppRoleIdBothDefined() {
 		$this->startServerAndExpectVaultError([
 			'Vault' => 'HashiCorp',
-			'VaultURL' => self::VAULT_ADDR,
+			'VaultURL' => PHPUNIT_HASHICORP_ADDRESS,
 			'VaultDBPath' => self::VAULT_DB_PATH,
 			'VaultToken' => self::$static_token,
 			'VaultAppRoleID' => self::$role_id
@@ -504,7 +487,7 @@ class testHashicorpVault extends CIntegrationTest {
 	public function testHashicorpVault_tokenAndAppSecretIdBothDefined() {
 		$this->startServerAndExpectVaultError([
 			'Vault' => 'HashiCorp',
-			'VaultURL' => self::VAULT_ADDR,
+			'VaultURL' => PHPUNIT_HASHICORP_ADDRESS,
 			'VaultDBPath' => self::VAULT_DB_PATH,
 			'VaultToken' => self::$static_token,
 			'VaultAppSecretID' => self::$secret_id
@@ -516,7 +499,7 @@ class testHashicorpVault extends CIntegrationTest {
 	public function testHashicorpVault_invalidAppRoleCredentials() {
 		$this->startServerAndExpectVaultError([
 			'Vault' => 'HashiCorp',
-			'VaultURL' => self::VAULT_ADDR,
+			'VaultURL' => PHPUNIT_HASHICORP_ADDRESS,
 			'VaultDBPath' => self::VAULT_DB_PATH,
 			'VaultAppRoleID' => self::$role_id,
 			'VaultAppSecretID' => '00000000-0000-0000-0000-000000000000'
