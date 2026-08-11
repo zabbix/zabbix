@@ -1509,14 +1509,6 @@ button {
   .btn:link, .btn:visited {
     color: #ffffff; }
 
-.btn-alt.create_cloud_proxy_btn {
-  display: inline-block;
-  box-sizing: border-box; }
-  .btn-alt.create_cloud_proxy_btn:hover {
-    color: #ffffff; }
-  .btn-alt.create_cloud_proxy_btn:not(:hover) {
-    color: #0275b8; }
-
 .btn-icon {
   border-radius: max(0px, calc(var(--button-border-radius) - 2px));
   display: inline-block;
@@ -7960,6 +7952,14 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     bottom: 1px;
     margin-left: 2px;
     font-size: 12px; }
+
+.link-cloud {
+  display: inline-block;
+  box-sizing: border-box; }
+  .link-cloud:hover {
+    color: #ffffff; }
+  .link-cloud:not(:hover) {
+    color: #0275b8; }
 
 .disabled {
   cursor: default !important;

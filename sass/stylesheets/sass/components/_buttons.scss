@@ -196,19 +196,6 @@ button {
 	@extend %button;
 	@extend %button-alt-colors;
 	@extend %button-disabled;
-
-	&.create_cloud_proxy_btn {
-		display: inline-block;
-		box-sizing: border-box;
-
-		&:hover {
-			color: $btn-color;
-		}
-
-		&:not(:hover) {
-			color: $btn-alt-color;
-		}
-	}
 }
 
 .btn-grey {
