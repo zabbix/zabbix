@@ -3991,7 +3991,8 @@ output {
     output.msg-warning::before {
       content: ""; }
   output.msg-global {
-    max-width: 475px;
+    max-width: fit-content;
+    min-width: 475px;
     margin: 5% auto 0; }
   output.msg-global-footer {
     position: fixed;
@@ -8151,6 +8152,8 @@ label input[type="radio"] {
 input {
   font-family: var(--font-stack);
   font-size: 1em; }
+  input[type="password"] {
+    --font-stack: var(--font-stack-mono); }
   input[type="file"] {
     padding: 1px; }
 
@@ -8340,7 +8343,7 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
 
 .setup-container {
   background-color: #2b2b2b;
-  width: 766px;
+  width: 816px;
   height: 420px;
   margin: 0 auto;
   margin-top: 5%;
@@ -8384,7 +8387,7 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   .setup-right-body h1 {
     margin: 25% 0 .4em; }
   .setup-right-body .table-forms-td-left label {
-    max-width: 170px; }
+    max-width: 180px; }
 
 .setup-title {
   margin: 109px 0 16px 0;

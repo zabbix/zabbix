@@ -52,6 +52,7 @@ class CImportReferencer {
 	protected $httptests = [];
 	protected $httpsteps = [];
 	protected $dashboards = [];
+	protected $global_regexes = [];
 
 	protected $db_template_groups;
 	protected $db_host_groups;
@@ -82,6 +83,7 @@ class CImportReferencer {
 	protected $db_dashboards;
 	protected $db_dashboard_pages;
 	protected $db_widgets;
+	protected $db_global_regexes;
 
 	/**
 	 * Get template group ID by group UUID.
@@ -963,6 +965,27 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get global regexp ID by regex name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findGlobalRegexidByName(string $name): ?string {
+		if ($this->db_global_regexes === null) {
+			$this->selectGlobalRegexes();
+		}
+
+		foreach ($this->db_global_regexes as $regexpid => $global_regex) {
+			if ($global_regex['name'] === $name) {
+				return $regexpid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Add template group names that need association with a database group ID.
 	 *
 	 * @param array $groups
@@ -1311,6 +1334,15 @@ class CImportReferencer {
 	 */
 	public function addDashboards(array $dashboards): void {
 		$this->dashboards = $dashboards;
+	}
+
+	/**
+	 * Add global regexes names that need association with a database regexp ID.
+	 *
+	 * @param array $global_regexes
+	 */
+	public function addGlobalRegexes(array $global_regexes): void {
+		$this->global_regexes = $global_regexes;
 	}
 
 	/**
@@ -2181,5 +2213,24 @@ class CImportReferencer {
 		unset($dashboard);
 
 		$this->dashboards = [];
+	}
+
+	/**
+	 * Select global regex IDs for previously added global regex names.
+	 */
+	protected function selectGlobalRegexes(): void {
+		$this->db_global_regexes = [];
+
+		if (!$this->global_regexes) {
+			return;
+		}
+
+		$this->db_global_regexes = API::Regexp()->get([
+			'output' => ['regexpid', 'name'],
+			'filter' => ['name' => array_keys($this->global_regexes)],
+			'preservekeys' => true
+		]);
+
+		$this->global_regexes = [];
 	}
 }
