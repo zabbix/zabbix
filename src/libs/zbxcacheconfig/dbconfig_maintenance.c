@@ -1739,12 +1739,13 @@ static void	host_event_maintenance_clean(void *data)
  *                                                                            *
  * Purpose: append matching maintenances to query                             *
  *                                                                            *
- * Parameters: query        - [IN/OUT]                                        *
- *             maintenances - [IN]                                            *
+ * Parameters: query          - [IN/OUT]                                      *
+ *             maintenances   - [IN]                                          *
+ *             maintenanceids - [IN] locked maintenanceids                    *
  *                                                                            *
  ******************************************************************************/
 static void	append_query_maintenances(zbx_event_suppress_query_t *query,
-		zbx_vector_dc_maintenance_ptr_t *maintenances)
+		zbx_vector_dc_maintenance_ptr_t *maintenances, const zbx_vector_uint64_t *maintenanceids)
 {
 	int					i;
 	zbx_uint64_pair_t			pair;
@@ -1756,6 +1757,12 @@ static void	append_query_maintenances(zbx_event_suppress_query_t *query,
 
 		if (ZBX_MAINTENANCE_RUNNING != maintenance->state)
 			continue;
+
+		if (NULL != maintenanceids && FAIL == zbx_vector_uint64_bsearch(maintenanceids,
+				maintenance->maintenanceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			continue;
+		}
 
 		pair.first = maintenance->maintenanceid;
 
@@ -1929,7 +1936,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_q
 		if (NULL != (maintenances_for_trigger = (zbx_dc_maintenances_for_trigger_t *)zbx_hashset_search(
 				&config->maintenances_for_triggers, &query->triggerid)))
 		{
-			append_query_maintenances(query, &maintenances_for_trigger->maintenances);
+			append_query_maintenances(query, &maintenances_for_trigger->maintenances, maintenanceids);
 		}
 
 		for (j = 0; j < query->hostids.values_num; j++)
@@ -1937,7 +1944,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_q
 			if (NULL != (host_event_maintenance = (zbx_host_event_maintenance_t *)zbx_hashset_search(
 					&host_event_maintenances, &query->hostids.values[j])))
 			{
-				append_query_maintenances(query, &host_event_maintenance->maintenances);
+				append_query_maintenances(query, &host_event_maintenance->maintenances, NULL);
 			}
 		}
 
