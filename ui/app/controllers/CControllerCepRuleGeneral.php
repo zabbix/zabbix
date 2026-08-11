@@ -157,8 +157,8 @@ abstract class CControllerCepRuleGeneral extends CController {
 						]]
 					],
 					['db cep_operation_condition.operator', 'required',
-						'in' => [TAG_OPERATOR_EXISTS, TAG_OPERATOR_EQUAL, TAG_OPERATOR_LIKE,
-							TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_NOT_LIKE,
+						'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_LIKE,
+							CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_NOT_LIKE,
 							CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO
 						],
 						'when' => ['type',
@@ -169,7 +169,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'value' => ['db cep_operation_condition.value', 'required',
 					'when' => [
 						['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]],
-						['operator', 'not_in' => [TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_EXISTS]]
+						['operator', 'not_in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]]
 					]
 				]
 			]]
