@@ -35,9 +35,6 @@ void	zbx_mock_test_entry(void **state)
 	const char		*ip, *dns, *value;
 	int			i, rows_written, expected_rows, count;
 	zbx_list_iterator_t	li;
-	/* fixed service fields written for every row; safe to hardcode since */
-	/* pb_discovery_check_age() only purges rows already in pb->discovery */
-	/* (empty here) and runs once, in zbx_pb_discovery_close() below     */
 	zbx_uint64_t		druleid = 1, dcheckid = 1;
 	int			port = 80, status = DOBJECT_STATUS_UP, clock = 1234567890;
 

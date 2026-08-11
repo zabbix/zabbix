@@ -12,26 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-/*
- * Module-specific stubs for the zbxproxybuffer cmocka tests.
- *
- * DB access (zbx_db_select/execute/begin/commit/...), exit() and file I/O are handled by the
- * existing tests/zbxmockdb.c, zbxmockexit.c mocks (linked from libzbxmockdata.a, activated by the
- * --wrap flags below) - they fail the test on any unexpected call instead of silently succeeding.
- *
- * What remains here is only what has no existing mock, proven by unresolved symbols at link time:
- *   - libzbxproxybuffer.a calls the zbx_db_insert_*()/zbx_db_get_maxid_num() family directly (not
- *     through --wrap; that layer lives in libzbxdbhigh, which these tests do not link). All of the
- *     tested code paths run in ZBX_PB_MODE_MEMORY, so these are never actually reached - fail loudly
- *     if that assumption ever breaks.
- *   - zbx_dc_get_nextid()/zbx_dc_config_*(): the config cache is not linked; nextid is a real
- *     stateful counter used by the tests, the rest are unreachable in these tests.
- *   - zbx_init_library_nix()/zbx_backtrace(): required by libzbxmocktest.a; avoids linking libzbxnix.
- *   - __wrap___zbx_shmem_malloc(): deterministic allocation-failure injection for
- *     pb_discovery_add_row_mem()/pb_autoreg_add_row_mem() - the only way to reach their
- *     allocation-failure branches without guessing buffer sizes/allocator chunk overhead.
- */
-
 #include "zbx_pb_mock_stubs.h"
 
 #include "zbxmocktest.h"
