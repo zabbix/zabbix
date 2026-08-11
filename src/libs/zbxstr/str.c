@@ -382,56 +382,6 @@ int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charli
 
 /******************************************************************************
  *                                                                            *
- * Purpose: iterates over a list of delimiter separated values                *
- *                                                                            *
- * Parameters: list      - [IN/OUT] list of delimited values                  *
- *             delimiter - [IN]                                               *
- *             token     - [IN/OUT] start of the current token                *
- *             token_len - [IN/OUT] length of the current token               *
- *                                                                            *
- * Return value: SUCCEED - a token was returned                               *
- *               FAIL    - end of list, no more tokens                        *
- *                                                                            *
- * Comments: where 'list' on input - position to continue iterating from      *
- *           (initially the start of the list);                               *
- *           Initializing token to NULL indicates the first iteration         *
- *           on output - advanced past the returned token, ready for the      *
- *           next call                                                        *
- *                                                                            *
- ******************************************************************************/
-int	zbx_str_list_next(const char **list, const char delimiter, const char **token, size_t *token_len)
-{
-	const char	*end;
-
-	if ('\0' == **list)
-	{
-		if (NULL == *token || delimiter != (*token)[*token_len])
-			return FAIL;
-
-		*token = *list;
-		*token_len = 0;
-
-		return SUCCEED;
-	}
-
-	*token = *list;
-
-	if (NULL != (end = strchr(*list, delimiter)))
-	{
-		*token_len = (size_t)(end - *list);
-		*list = end + 1;
-	}
-	else
-	{
-		*token_len = strlen(*list);
-		*list += *token_len;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: checks if string is contained in list of delimited strings        *
  *                                                                            *
  * Parameters: list      - [IN] strings a,b,ccc,ddd                           *
