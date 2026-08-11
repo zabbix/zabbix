@@ -375,7 +375,7 @@ class CControllerHostPrototypeEdit extends CController {
 			]);
 
 			$data['ms_proxy_group'] = $proxy_groups
-				? CArrayHelper::renameObjectsKeys($proxy_groups, ['proxy_groupid', 'id'])
+				? CArrayHelper::renameObjectsKeys($proxy_groups, ['proxy_groupid' => 'id'])
 				: [[
 					'id' => $data['parent_host']['proxy_groupid'],
 					'name' => _('Inaccessible proxy'),
