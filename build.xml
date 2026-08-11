@@ -696,6 +696,7 @@
 		<exec executable="${db-check-command}" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--analyze"/>
+			<arg line="--silent"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--port=${dbport}"/>
 			<arg line="--user=${dbuser}"/>

@@ -67,9 +67,16 @@ class CPopupButtonElement extends CElement {
 		// Sometimes menu is not summoning from the first time.
 		for ($i = 0; $i < 2; $i++) {
 			try {
-				$this->click(true);
+				for ($n = 0; $n < 2; $n++) {
+					try {
+						$this->click(true)->waitUntilAttributesPresent(['aria-expanded' => 'true'], 1);
+					}
+					catch (Exception $e) {
+						// Code is not missing here.
+					}
+				}
 
-				$menu = $query->waitUntilVisible()->one(false);
+				$menu = $query->waitUntilVisible(2)->one(false);
 				if ($menu->isValid()) {
 					return $menu;
 				}
