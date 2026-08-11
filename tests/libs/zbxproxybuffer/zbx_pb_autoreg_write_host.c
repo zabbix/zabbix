@@ -19,6 +19,7 @@
 
 #include "zbxcommon.h"
 #include "zbxalgo.h"
+#include "zbxcomms.h"
 #include "zbxjson.h"
 #include "zbxmutexs.h"
 #include "zbxproxybuffer.h"
@@ -33,8 +34,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_pb_autoreg_t	*row;
 	const char		*host, *ip, *dns, *host_metadata;
 	int			i, rows_written, expected_rows, count, port, flags;
-	/* ZBX_TCP_SEC_UNENCRYPTED (zbxcomms.h not included, avoid pulling in libzbxcomms) */
-	int			connection_type = 1;
+	int			connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 	zbx_list_iterator_t	li;
 	struct zbx_json		j;
 	zbx_uint64_t		lastid = 0;

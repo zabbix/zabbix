@@ -35,7 +35,7 @@ void	zbx_mock_test_entry(void **state)
 	const char		*ip, *dns, *err;
 	int			i, rows_written, expected_rows, count, fail_alloc_at;
 	zbx_uint64_t		druleid = 1;
-	int			status = 1, clock = 1234567890;
+	int			status = DOBJECT_STATUS_DOWN, clock = 1234567890;
 
 	ZBX_UNUSED(state);
 

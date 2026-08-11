@@ -39,7 +39,7 @@ void	zbx_mock_test_entry(void **state)
 	/* pb_discovery_check_age() only purges rows already in pb->discovery */
 	/* (empty here) and runs once, in zbx_pb_discovery_close() below     */
 	zbx_uint64_t		druleid = 1, dcheckid = 1;
-	int			port = 80, status = 0, clock = 1234567890;
+	int			port = 80, status = DOBJECT_STATUS_UP, clock = 1234567890;
 
 	ZBX_UNUSED(state);
 
