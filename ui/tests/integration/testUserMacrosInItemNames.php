@@ -23,8 +23,10 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * @backup hosts,globalmacro
  */
 class testUserMacrosInItemNames extends CIntegrationTest {
-	/** Maximum number of iterations to wait for NDJSON export files to appear. */
-	private const WAIT_EXPORT_FILE_ITERATIONS = 30;
+	/** Maximum time in seconds to wait for NDJSON export files to appear. */
+	private const WAIT_EXPORT_FILE_TIMEOUT = 30;
+	/** Polling interval in microseconds. */
+	private const WAIT_EXPORT_FILE_INTERVAL = 100000;
 	private const HOSTNAME1 = 'test_user_macros_in_item_names1';
 	private const HOSTNAME2 = 'test_user_macros_in_item_names2';
 	private const HOSTNAME_EXPORT = 'test_ndjson_export_macros';
@@ -334,7 +336,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 
 		try {
 			$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-			$this->prepareExportDir($export_dir);
+			$this->cleanupNdjsonExportFiles();
 			// Send values one hour apart to flush trends and create a problem event.
 			$this->sendSenderValues([
 				['host' => self::HOSTNAME_EXPORT, 'key' => 'macro.export.test', 'value' => '3',
@@ -373,7 +375,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	}
 
 	private function cleanupNdjsonExportFiles(): void {
-		// Remove NDJSON files created by this test run.
 		$export_dir = self::getExportDir();
 
 		foreach (glob($export_dir . '/*.ndjson') as $file) {
@@ -420,22 +421,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['globalmacroids']);
 	}
 
-	private function prepareExportDir($export_dir) {
-		if (!is_dir($export_dir)) {
-			if (!mkdir($export_dir, 0777, true) && !is_dir($export_dir)) {
-				throw new Exception('Failed to create export directory: ' . $export_dir);
-			}
-		}
-
-		if (!chmod($export_dir, 0777)) {
-			throw new Exception('Failed to set permissions on export directory: ' . $export_dir);
-		}
-
-		foreach (glob($export_dir . '/*.ndjson') as $file) {
-			@unlink($file);
-		}
-	}
-
 	/**
 	 * Iterate over NDJSON files of a given type in a directory, yielding each decoded line.
 	 *
@@ -462,7 +447,9 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	}
 
 	private function waitForExportFile($dir, $type) {
-		for ($i = 0; $i < self::WAIT_EXPORT_FILE_ITERATIONS; $i++) {
+		$deadline = microtime(true) + self::WAIT_EXPORT_FILE_TIMEOUT;
+
+		do {
 			$files = glob($dir . '/' . $type . '*.ndjson');
 
 			foreach ($files as $file) {
@@ -471,8 +458,9 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 				}
 			}
 
-			sleep(1);
+			usleep(self::WAIT_EXPORT_FILE_INTERVAL);
 		}
+		while (microtime(true) < $deadline);
 
 		$this->fail('Export file "' . $type . '*.ndjson" not found or empty in ' . $dir);
 	}
@@ -546,7 +534,8 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	private function assertExportNameResolved($dir, $type, $itemid, $expected_name) {
 		$found = false;
 
-		$this->iterateNdjsonFiles($dir, $type, function ($data, $file, $type) use ($itemid, $expected_name, &$found) {
+		$this->iterateNdjsonFiles($dir, $type, function ($data, $file, $type) use ($itemid, $expected_name,
+				&$found) {
 			if (!is_array($data) || !isset($data['itemid'])) {
 				return;
 			}
