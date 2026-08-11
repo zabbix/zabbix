@@ -234,17 +234,7 @@ $form
 	->addItem($check_template_default)
 	->addItem($uniqueness_template)
 	->addItem($host_source_template)
-	->addItem($name_source_template)
-	->addItem(
-		(new CScriptTag('
-			drule_edit_popup.init('.json_encode([
-				'druleid' => $data['drule']['druleid'],
-				'dchecks' => array_values($data['drule']['dchecks']),
-				'drule' => $data['drule'],
-				'can_select_server_for_discovery_by' => $can_select_server_for_discovery_by
-			], JSON_THROW_ON_ERROR).');
-		'))->setOnDocumentReady()
-	);
+	->addItem($name_source_template);
 
 if ($data['drule']['druleid']) {
 	$buttons = [
@@ -290,7 +280,8 @@ $output = [
 			'rules' => $data['js_validation_rules'],
 			'clone_rules' => $data['js_clone_validation_rules'],
 			'dchecks' => array_values($data['drule']['dchecks']),
-			'drule' => $data['drule']
+			'drule' => $data['drule'],
+			'can_select_server_for_discovery_by' => $can_select_server_for_discovery_by
 		]).');',
 	'dialogue_class' => 'modal-popup-large'
 ];
