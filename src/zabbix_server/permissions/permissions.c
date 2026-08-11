@@ -13,18 +13,10 @@
 **/
 
 #include "permissions.h"
-#include "zbxcommon.h"
-#include "zbxalgo.h"
-#include "zbxnum.h"
 #include "zbxhash.h"
-#include "zbxcrypto.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxthreads.h"
-#include "zbxipcservice.h"
-#include "zbxcomms.h"
 #include "zbxdbwrap.h"
 
 static pid_t	rebuild_pid = ZBX_THREAD_HANDLE_NULL;
@@ -352,7 +344,6 @@ void	zbx_permissions_rebuild_start(void)
 	(void)zbx_db_close();
 
 	pid_t	pid;
-	int	ret;
 
 	switch (pid = zbx_fork())
 	{
