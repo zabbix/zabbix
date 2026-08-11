@@ -521,9 +521,9 @@ class testRole extends CAPITest {
 				]
 			],
 			[
-				'bulk create default "api.access" for USER_TYPE_SUPER_ADMIN' => ['api.access' => (string) ZBX_ROLE_RULE_ENABLED],
+				'bulk create default "api.access" for USER_TYPE_SUPER_ADMIN' => ['api.access' => (string) ZBX_ROLE_RULE_DISABLED],
 				'bulk create default "api.access" for USER_TYPE_ZABBIX_USER' => ['api.access' => (string) ZBX_ROLE_RULE_DISABLED],
-				'bulk create default "api.access" for USER_TYPE_ZABBIX_ADMIN' => ['api.access' => (string) ZBX_ROLE_RULE_ENABLED]
+				'bulk create default "api.access" for USER_TYPE_ZABBIX_ADMIN' => ['api.access' => (string) ZBX_ROLE_RULE_DISABLED]
 			]
 		];
 	}
