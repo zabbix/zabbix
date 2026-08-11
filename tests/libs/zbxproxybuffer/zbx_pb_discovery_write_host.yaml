@@ -9,16 +9,6 @@ in:
 out:
   rows: 1
 ---
-# Regression tests for ZBX-26469: when pb_discovery_add_row_mem() runs out of
-# proxy memory buffer space partway through copying a row, the fields it has
-# not assigned yet still hold the source row pointers left there by memcpy().
-# Unless they are reset, pb_list_free_discovery() frees pointers owned by the
-# caller with the shared memory deallocator.
-#
-# "fail_alloc_at" fails the Nth shared memory allocation made while the two
-# queued rows are flushed by zbx_pb_discovery_close(): 1 - the row itself,
-# 2 - ip, 3 - dns, 4 - value, 5 - error. The first row is discarded, the
-# second one must still be written correctly.
 test case: ip allocation fails while adding row to memory buffer
 in:
   ip: "192.168.3.17"

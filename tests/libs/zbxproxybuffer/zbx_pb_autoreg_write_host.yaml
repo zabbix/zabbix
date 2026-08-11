@@ -167,3 +167,43 @@ in:
   fail_alloc_at: 6
 out:
   rows: 1
+---
+# pb_autoreg_check_age() coverage: the first row is backdated by stale_offset seconds.
+# offline_buffer is kept large enough that the purge loop does not evict it, so the
+# second write's check_age() call falls through to the max_age gate instead and forces
+# a fallback to database mode ("cached records are too old"). The first row stays in
+# the memory buffer (it was already committed before the fallback); the second row is
+# written straight to the database, so the memory row count stays at 1.
+test case: second write falls back to database once first row exceeds max_age
+in:
+  host: "staleagent"
+  ip: "10.20.30.40"
+  dns: "staleagent.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  age: 5
+  offline_buffer: 100
+  stale_offset: 10
+out:
+  rows: 1
+  state: 0
+---
+# same clocks as above but age is larger than stale_offset, so the row must NOT be
+# considered too old - both rows stay buffered in memory.
+test case: second write stays in memory when row is within max_age
+in:
+  host: "freshagent"
+  ip: "10.20.30.41"
+  dns: "freshagent.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 2
+  age: 100
+  offline_buffer: 100
+  stale_offset: 10
+out:
+  rows: 2
+  state: 1
