@@ -14,6 +14,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
+require_once __DIR__.'/../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
 
 /**
  * @required-components server
@@ -506,8 +507,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return [
 			'description' => $description,
 			'item' => self::tqItem(
-				APM_SIGNAL_TYPE_METRICS,
-				APM_METRICS_POINT_GAUGE,
+				CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+				CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
 				[
 					self::qcol('MetricName')
 				],
@@ -590,8 +591,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Minimal traces test',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_TRACES,
-					APM_METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					[],
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
@@ -604,8 +605,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Minimal logs test',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_LOGS,
-					APM_METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS,
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					[],
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
@@ -618,8 +619,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Minimal metrics sum test',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_METRICS,
-					APM_METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					[],
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
@@ -632,8 +633,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Minimal metrics gauge test',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_METRICS,
-					APM_METRICS_POINT_GAUGE,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
 					[],
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
@@ -646,8 +647,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Minimal metrics histogram test',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_METRICS,
-					APM_METRICS_POINT_HISTOGRAM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
 					[],
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
@@ -660,8 +661,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Minimal metrics exponential histogram test',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_METRICS,
-					APM_METRICS_POINT_EXPHISTOGRAM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM,
 					[],
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
@@ -674,8 +675,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Traces all columns test with EXPRESSION evaltype',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_TRACES,
-					APM_METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					[
 						self::qcol('Timestamp'),
 						self::qcol('TraceId'),
@@ -760,8 +761,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Logs all columns test with AND evaltype',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_LOGS,
-					APM_METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS,
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					[
 						self::qcol('Timestamp'),
 						self::qcol('TraceId'),
@@ -842,8 +843,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Metrics sum all columns test with OR evaltype',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_METRICS,
-					APM_METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					[
 						self::qcol('ResourceAttributes', 'host.name'),
 						self::qcol('ResourceSchemaUrl'),
@@ -931,8 +932,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Metrics gauge all columns test with AND_OR evaltype',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_METRICS,
-					APM_METRICS_POINT_GAUGE,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
 					[
 						self::qcol('ResourceAttributes', 'host.name'),
 						self::qcol('ResourceSchemaUrl'),
@@ -1008,8 +1009,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Metrics histogram all columns test with AND_OR evaltype',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_METRICS,
-					APM_METRICS_POINT_HISTOGRAM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
 					[
 						self::qcol('ResourceAttributes', 'host.name'),
 						self::qcol('ResourceSchemaUrl'),
@@ -1101,8 +1102,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Metrics exponential histogram all columns test with AND evaltype',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_METRICS,
-					APM_METRICS_POINT_EXPHISTOGRAM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM,
 					[
 						self::qcol('ResourceAttributes', 'host.name'),
 						self::qcol('ResourceSchemaUrl'),
@@ -1258,8 +1259,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Time bucket test #1: no gap, no overlap',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_TRACES,
-					APM_METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					[],
 					[
 						self::qagg('', AGGREGATE_COUNT, 'cnt'),
@@ -1311,8 +1312,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Grouping test #1',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_TRACES,
-					APM_METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					[
 						self::qcol('SpanName')
 					],
@@ -1400,8 +1401,8 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			[
 				'description' => 'Attributes test',
 				'item' => self::tqItem(
-					APM_SIGNAL_TYPE_TRACES,
-					APM_METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					[
 						self::qcol('SpanName'),
 						self::qcol('SpanAttributes', 'k1'),
