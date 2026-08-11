@@ -473,7 +473,7 @@ class CItem extends CItemGeneral {
 		self::prepareItemsForApi($items, false);
 
 		foreach ($items as &$item) {
-			if (array_key_exists('query', $item)) {
+			if (array_key_exists('query', $item) && $item['query']) {
 				$item['query'] = CItemTypeTelemetryQuery::convertFilterExpressionToFormula($item['query']);
 			}
 

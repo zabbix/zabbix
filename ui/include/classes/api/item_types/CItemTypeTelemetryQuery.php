@@ -330,17 +330,19 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @return array
 	 */
 	public static function convertFilterExpressionToFormula(array $query): array {
-		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-			$i = 0;
-
-			foreach ($query['filter']['conditions'] as &$condition) {
-				$condition['formulaid'] = num2letter($i);
-				$i++;
-			}
-			unset($condition);
-
-			CConditionHelper::replaceConditionIds($query['filter']['formula'], $query['filter']['conditions']);
+		if ($query['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+			return $query;
 		}
+
+		$i = 0;
+
+		foreach ($query['filter']['conditions'] as &$condition) {
+			$condition['formulaid'] = num2letter($i);
+			$i++;
+		}
+		unset($condition);
+
+		CConditionHelper::replaceConditionIds($query['filter']['formula'], $query['filter']['conditions']);
 
 		return $query;
 	}
@@ -352,14 +354,16 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @return array
 	 */
 	public static function convertFilterFormulaToExpression(array $query): array {
-		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-			CConditionHelper::replaceFormulaIds($query['filter']['formula'], $query['filter']['conditions']);
-
-			foreach ($query['filter']['conditions'] as &$condition) {
-				unset($condition['formulaid']);
-			}
-			unset($condition);
+		if ($query['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+			return $query;
 		}
+
+		CConditionHelper::replaceFormulaIds($query['filter']['formula'], $query['filter']['conditions']);
+
+		foreach ($query['filter']['conditions'] as &$condition) {
+			unset($condition['formulaid']);
+		}
+		unset($condition);
 
 		return $query;
 	}
