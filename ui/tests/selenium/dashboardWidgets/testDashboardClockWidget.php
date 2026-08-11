@@ -198,7 +198,6 @@ class testDashboardClockWidget extends testWidgets {
 			'Name' => '',
 			'Refresh interval' => 'Default (15 minutes)',
 			'Time type' => 'Local time',
-			'Time zone' => 'Local default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga'),
 			'Clock type' => 'Analog',
 			'id:show_header' => true
 		]);
@@ -216,7 +215,7 @@ class testDashboardClockWidget extends testWidgets {
 		}
 
 		// Check that it's possible to select host items, when time type is "Host Time".
-		$fields = ['Type', 'Show header', 'Name', 'Refresh interval', 'Time type', 'Clock type'];
+		$fields = ['Type', 'Show header', 'Name', 'Refresh interval', 'Time type', 'Time zone', 'Clock type'];
 
 		foreach (['Local time', 'Server time', 'Host time'] as $type) {
 			$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
