@@ -243,6 +243,7 @@ class testDashboardClockWidget extends CWebTest {
 			 * while - (0) length parameter - specifies how many elements will be removed.
 			 */
 			if ($type === 'Host time') {
+				$form->getField('Item')->waitUntilVisible();
 				array_splice($fields, 4, 0, ['Item']);
 				$form->checkValue(['Item' => '']);
 				$form->isRequired('Item');
@@ -312,7 +313,7 @@ class testDashboardClockWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Time type changed to Server time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Server time')
+						'Time type' => 'Server time'
 					]
 				]
 			],
@@ -322,7 +323,7 @@ class testDashboardClockWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Time type changed to Local time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time')
+						'Time type' => 'Local time'
 					]
 				]
 			],
@@ -332,7 +333,7 @@ class testDashboardClockWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Clock',
-						'Time type' => CFormElement::RELOADABLE_FILL('Server time'),
+						'Time type' => 'Server time',
 						'Refresh interval' => '10 seconds',
 						'Name' => 'Time type and refresh interval changed'
 					]
@@ -373,7 +374,7 @@ class testDashboardClockWidget extends CWebTest {
 						'Show header' => true,
 						'Name' => 'Updated_name',
 						'Refresh interval' => '10 minutes',
-						'Time type' => CFormElement::RELOADABLE_FILL('Server time')
+						'Time type' => 'Server time'
 					]
 				]
 			],
@@ -385,7 +386,7 @@ class testDashboardClockWidget extends CWebTest {
 						'Show header' => false,
 						'Name' => 'ClockWithoutItem',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time')
+						'Time type' => 'Host time'
 					],
 					'Error message' => [
 						'Invalid parameter "Item": cannot be empty.'
@@ -398,7 +399,7 @@ class testDashboardClockWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Time type with item',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Item' => 'Item for clock widget'
 					]
 				]
@@ -409,7 +410,7 @@ class testDashboardClockWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Update item',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Item' => 'Item for clock widget 2'
 					]
 				]
@@ -422,8 +423,9 @@ class testDashboardClockWidget extends CWebTest {
 						'Show header' => true,
 						'Name' => 'HostTimeClock',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Item' => 'Item for clock widget'
+==== BASE ====
 					]
 				]
 			],
@@ -435,7 +437,7 @@ class testDashboardClockWidget extends CWebTest {
 						'Show header' => true,
 						'Name' => 'LocalTimeClock123',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time')
+						'Time type' => 'Local time'
 					]
 				]
 			],
@@ -448,7 +450,7 @@ class testDashboardClockWidget extends CWebTest {
 						'Show header' => true,
 						'Name' => '1233212',
 						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time')
+						'Time type' => 'Local time'
 					]
 				]
 			]
@@ -644,7 +646,7 @@ class testDashboardClockWidget extends CWebTest {
 			$form->fill([
 				'Name' => 'Widget to be cancelled',
 				'Refresh interval' => '10 minutes',
-				'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+				'Time type' => 'Host time',
 				'Item' => 'Item for clock widget 2'
 			]);
 		}
