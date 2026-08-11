@@ -120,18 +120,6 @@ class CMaintenanceHelper {
 		return '';
 	}
 
-	/**
-	 * Round maintenance time period down to whole minutes.
-	 *
-	 * @param string $period
-	 * @return int
-	 */
-	public static function normalizeTimePeriod(string $period): int {
-		$period = timeUnitToSeconds($period);
-
-		return $period - $period % SEC_PER_MIN;
-	}
-
 	public static function getNextIndexedName(string $base_name): string {
 		$maintenances = API::Maintenance()->get([
 			'output' => ['name'],

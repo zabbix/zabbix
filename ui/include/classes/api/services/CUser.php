@@ -443,7 +443,7 @@ class CUser extends CApiService {
 			'autologin' =>					['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>						['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
-			'default_maintenance_period' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [5 * SEC_PER_MIN, CMaintenanceHelper::MAX_TIMEPERIOD]), 'length' => DB::getFieldLength('users', 'default_maintenance_period'), 'default' => DB::getDefault('users', 'default_maintenance_period')],
+			'default_maintenance_period' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [5 * SEC_PER_MIN, CMaintenanceHelper::MAX_TIMEPERIOD]), 'length' => DB::getFieldLength('users', 'default_maintenance_period')],
 			'refresh' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
 			'theme' =>						['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'rows_per_page' =>				['type' => API_INT32, 'in' => '1:999999'],
@@ -1302,10 +1302,11 @@ class CUser extends CApiService {
 				continue;
 			}
 
-			$period = CMaintenanceHelper::normalizeTimePeriod($user['default_maintenance_period']);
+			$period = timeUnitToSeconds($user['default_maintenance_period']);
+			$period_normalized = $period - $period % SEC_PER_MIN;
 
-			if ($period !== timeUnitToSeconds($user['default_maintenance_period'])) {
-				$user['default_maintenance_period'] = $period.'s';
+			if ($period_normalized != $period) {
+				$user['default_maintenance_period'] = $period_normalized.'s';
 			}
 		}
 		unset($user);
