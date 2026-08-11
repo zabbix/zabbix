@@ -87,7 +87,11 @@ class testHashicorpVault extends CIntegrationTest {
 				'PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED as true in bootstrap.php to enable them, and start a Vault '.
 				'instance independently before running this test suite, see the class docblock.'
 			);
+
+			return;
 		}
+
+		parent::onBeforeTestSuite();
 	}
 
 	/**
