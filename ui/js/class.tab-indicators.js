@@ -817,20 +817,20 @@ class ProxyEncryptionTabIndicatorItem extends TabIndicatorItem {
 
 class ProxyApmTabIndicatorItem extends TabIndicatorItem {
 
-	#apm_status;
+	#data_collection_status;
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 
-		this.#apm_status = document.querySelector('[name="apm_status"]');
+		this.#data_collection_status = document.querySelector('[name="data_collection_status"]');
 	}
 
 	getValue() {
-		return this.#apm_status?.checked ?? false;
+		return this.#data_collection_status?.checked ?? false;
 	}
 
 	initObserver(element) {
-		this.#apm_status?.addEventListener('change', () => this.addAttributes());
+		this.#data_collection_status?.addEventListener('change', () => this.addAttributes());
 	}
 }
 
