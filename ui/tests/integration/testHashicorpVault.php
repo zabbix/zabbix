@@ -135,8 +135,14 @@ class testHashicorpVault extends CIntegrationTest {
 			throw new Exception('Failed to communicate with Vault at path "'.$path.'".');
 		}
 
+		// PHP 8.4 deprecates the bare $http_response_header variable in favor of this function;
+		// fall back to it for older PHP versions where the function does not exist yet.
+		$headers = function_exists('http_get_last_response_headers')
+			? http_get_last_response_headers()
+			: $http_response_header;
+
 		$status = 0;
-		foreach ($http_response_header as $header) {
+		foreach ($headers as $header) {
 			if (preg_match('#^HTTP/\S+\s+(\d{3})#', $header, $matches)) {
 				$status = (int) $matches[1];
 			}
