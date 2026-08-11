@@ -52,7 +52,7 @@ class CControllerApmDbUpdate extends CController {
 				['string', 'length' => 255],
 				['string', 'length' => 255, 'in' => [''],
 					'when' => [$status_configured, ['ssl_key_file', 'in' => ['']]],
-					'messages' => ['in' => 'Must be empty, if previous field is not specified.']
+					'messages' => ['in' => _('Must be empty, if previous field is not specified.')]
 				]
 			]
 		]];
