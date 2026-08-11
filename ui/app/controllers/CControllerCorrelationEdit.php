@@ -107,7 +107,6 @@ class CControllerCorrelationEdit extends CController {
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Event correlation rules'));
 		$this->setResponse($response);
