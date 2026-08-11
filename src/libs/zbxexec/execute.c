@@ -415,7 +415,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 
 	ret = zbx_read_from_pipe(hRead, &buffer, &buf_size, &offset, timeout, error, max_error_len);
 
-	if (TIMEOUT_ERROR != ret)
+	if (SUCCEED == ret)
 	{
 		_ftime(&current_time);
 		if (0 < (timeout -= zbx_get_timediff_ms(&start_time, &current_time)) &&
