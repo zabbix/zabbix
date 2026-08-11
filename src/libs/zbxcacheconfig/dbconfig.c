@@ -17059,14 +17059,14 @@ void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uin
 
 char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision)
 {
-	char	*apm_config = NULL;
+	char	*apm_config = old_config;
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	if (NULL == old_config || *revision < config->revision.settings_table)
 	{
 		if (NULL != dc_local()->apm_config)
-			apm_config = zbx_strdup(old_config, dc_local()->apm_config);
+			apm_config = zbx_strdup(apm_config, dc_local()->apm_config);
 
 		*revision = config->revision.settings_table;
 	}
