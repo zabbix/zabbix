@@ -440,7 +440,6 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) >= window->capacity)
 	{
 		cep_window_unlock(window);
-
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_EVICTED, tasks);
 	}
 	else
@@ -449,9 +448,8 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, ctx->event));
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
-		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
-
 		cep_window_unlock(window);
+		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
 	}
 
 	if (0 != (opmask & CEP_FLAG(ZBX_CEP_OP_CLOSE_WINDOW)))
@@ -732,7 +730,6 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) >= window->capacity)
 	{
 		cep_window_unlock(window);
-
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_EVICTED, tasks);
 	}
 	else
@@ -754,8 +751,8 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 		if (0 != start_time)
 			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
 
-		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
 		cep_window_unlock(window);
+		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
 	}
 
 	if (0 != (opmask & CEP_FLAG(ZBX_CEP_OP_CLOSE_WINDOW)))
@@ -893,7 +890,6 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) >= window->capacity)
 	{
 		cep_window_unlock(window);
-
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_EVICTED, tasks);
 	}
 	else
@@ -902,9 +898,8 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
-
-		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
 		cep_window_unlock(window);
+		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
 	}
 
 	if (0 != (opmask & CEP_FLAG(ZBX_CEP_OP_CLOSE_WINDOW)))
