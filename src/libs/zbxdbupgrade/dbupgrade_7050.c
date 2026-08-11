@@ -1026,7 +1026,7 @@ static int	DBpatch_7050077(void)
 
 static int	DBpatch_7050078(void)
 {
-	const zbx_db_field_t	field = {"apm", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"apm", "{}", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
