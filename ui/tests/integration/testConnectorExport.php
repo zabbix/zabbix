@@ -20,11 +20,12 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * Test suite for Connector tag filtering with macro resolution.
  *
  * @required-components server
- * @backup connector,connector_tag,hosts,items,hostmacro
  */
 class testConnectorExport extends CIntegrationTest {
-
-	private const WAIT_PAYLOAD_ITERATIONS = 30;
+	private const WAIT_PAYLOAD_TIMEOUT = 30;
+	private const WAIT_PAYLOAD_INTERVAL = 100000;
+	private const WAIT_RECEIVER_TIMEOUT = 5;
+	private const WAIT_RECEIVER_INTERVAL = 100000;
 
 	private static $hostid = null;
 	private static $itemid = null;
@@ -53,11 +54,13 @@ class testConnectorExport extends CIntegrationTest {
 		if ($socket === false) {
 			throw new Exception("Failed to create temporary socket: $errstr ($errno)");
 		}
+
 		$addr = stream_socket_get_name($socket, false);
 		fclose($socket);
 		if ($addr === false) {
 			throw new Exception('Failed to get local socket address');
 		}
+
 		$pos = strrpos($addr, ':');
 		if ($pos === false) {
 			throw new Exception('Failed to parse port from socket address: ' . $addr);
@@ -69,11 +72,7 @@ class testConnectorExport extends CIntegrationTest {
 	 * Start the temporary HTTP receiver.
 	 */
 	private function startReceiver(): void {
-		self::$temp_dir = sys_get_temp_dir()
-			. '/zabbix_connector_test_'
-			. getmypid()
-			. '_'
-			. uniqid();
+		self::$temp_dir = sys_get_temp_dir() . '/zabbix_connector_test_' . getmypid() . '_' . uniqid();
 		if (!mkdir(self::$temp_dir, 0777, true) && !is_dir(self::$temp_dir)) {
 			throw new Exception('Failed to create temporary directory: ' . self::$temp_dir);
 		}
@@ -93,6 +92,7 @@ class testConnectorExport extends CIntegrationTest {
 		if (!is_array($env)) {
 			$env = [];
 		}
+
 		$env['ZABBIX_CONNECTOR_TEST_OUTPUT'] = self::$output_file;
 
 		$cmd = escapeshellarg($php_binary)
@@ -107,16 +107,21 @@ class testConnectorExport extends CIntegrationTest {
 			throw new Exception('Failed to start HTTP receiver process');
 		}
 
+		$deadline = microtime(true) + self::WAIT_RECEIVER_TIMEOUT;
 		$started = false;
-		for ($i = 0; $i < 10; $i++) {
+
+		do {
 			$socket = @fsockopen('127.0.0.1', self::$receiver_port, $errno, $errstr, 1);
+
 			if ($socket !== false) {
 				fclose($socket);
 				$started = true;
 				break;
 			}
-			usleep(200000);
+
+			usleep(self::WAIT_RECEIVER_INTERVAL);
 		}
+		while (microtime(true) < $deadline);
 
 		if (!$started) {
 			$stderr = file_get_contents(self::$temp_dir . '/receiver_stderr.log');
@@ -160,13 +165,22 @@ class testConnectorExport extends CIntegrationTest {
 	 * Wait for Connector payload to arrive at the receiver.
 	 */
 	private function waitForPayload(): array {
-		for ($i = 0; $i < self::WAIT_PAYLOAD_ITERATIONS; $i++) {
+		$deadline = microtime(true) + self::WAIT_PAYLOAD_TIMEOUT;
+
+		/*
+		 * The Connector Worker does not log successful HTTP delivery, while the
+		 * payload is written asynchronously by the external HTTP receiver.
+		 */
+		do {
 			if (file_exists(self::$output_file) && filesize(self::$output_file) > 0) {
 				$content = file_get_contents(self::$output_file);
+
 				if ($content !== false) {
 					$lines = array_values(array_filter(explode("\n", $content), 'strlen'));
+
 					foreach ($lines as $line) {
 						$data = json_decode($line, true);
+
 						if (is_array($data)
 							&& isset($data['itemid'])
 							&& (string)$data['itemid'] === (string)self::$itemid
@@ -176,8 +190,10 @@ class testConnectorExport extends CIntegrationTest {
 					}
 				}
 			}
-			sleep(1);
+
+			usleep(self::WAIT_PAYLOAD_INTERVAL);
 		}
+		while (microtime(true) < $deadline);
 
 		$stderr = '';
 		$stderr_file = self::$temp_dir . '/receiver_stderr.log';
@@ -188,9 +204,7 @@ class testConnectorExport extends CIntegrationTest {
 			}
 		}
 
-		$msg = 'Connector payload not received within '
-			. self::WAIT_PAYLOAD_ITERATIONS
-			. ' seconds';
+		$msg = 'Connector payload not received within ' . self::WAIT_PAYLOAD_TIMEOUT . ' seconds';
 		if ($stderr !== '') {
 			$msg .= ". Receiver stderr: $stderr";
 		}
@@ -231,7 +245,10 @@ class testConnectorExport extends CIntegrationTest {
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'trapper_hosts' => '0.0.0.0/0,::/0',
 				'tags' => [
-					['tag' => 'transmitted', 'value' => '{$CON}']
+					[
+						'tag' => 'transmitted',
+						'value' => '{$CON}'
+					]
 				]
 			]);
 			$this->assertArrayHasKey('itemids', $response['result']);
@@ -241,31 +258,30 @@ class testConnectorExport extends CIntegrationTest {
 			$response = $this->call('connector.create', [
 				'name' => $connector_name,
 				'url' => 'http://127.0.0.1:' . self::$receiver_port . '/v1/history',
-				'data_type' => 0,
-				'item_value_type' => 127,
-				'tags_evaltype' => 0,
+				'data_type' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES,
+				'item_value_type' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64,
+				'tags_evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 				'tags' => [
-					['tag' => 'transmitted', 'value' => 'connector', 'operator' => 0]
+					[
+						'tag' => 'transmitted',
+						'value' => 'connector',
+						'operator' => CONDITION_OPERATOR_EQUAL
+					]
 				],
-				'authtype' => 0,
+				'authtype' => ZBX_HTTP_AUTH_NONE,
 				'max_attempts' => 1,
 				'attempt_interval' => '5s',
 				'timeout' => '3s',
-				'verify_peer' => 0,
-				'verify_host' => 0,
-				'status' => 1
+				'verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
+				'verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'status' => ZBX_CONNECTOR_STATUS_ENABLED
 			]);
 			$this->assertArrayHasKey('connectorids', $response['result']);
 			self::$connectorid = $response['result']['connectorids'][0];
 
 			$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-			$this->waitForLogLineToBePresent(
-				self::COMPONENT_SERVER,
-				'finished forced reloading of the configuration cache',
-				true,
-				60,
-				1
-			);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'finished forced reloading of the configuration cache', true, 60, 1);
 
 			if (false === file_put_contents(self::$output_file, '')) {
 				throw new Exception('Failed to initialize receiver output file');
@@ -292,6 +308,7 @@ class testConnectorExport extends CIntegrationTest {
 				if (!isset($tag['tag'], $tag['value'])) {
 					continue;
 				}
+
 				if ($tag['tag'] === 'transmitted' && $tag['value'] === 'connector') {
 					$tag_found = true;
 					break;
@@ -312,20 +329,35 @@ class testConnectorExport extends CIntegrationTest {
 			try {
 				if (self::$connectorid !== null) {
 					$this->call('connector.delete', [self::$connectorid]);
-					self::$connectorid = null;
-				}
-				if (self::$itemid !== null) {
-					$this->call('item.delete', [self::$itemid]);
-					self::$itemid = null;
-				}
-				if (self::$hostid !== null) {
-					$this->call('host.delete', [self::$hostid]);
-					self::$hostid = null;
 				}
 			}
 			finally {
-				$this->stopReceiver();
-				$this->cleanupTempDir();
+				self::$connectorid = null;
+
+				try {
+					if (self::$itemid !== null) {
+						$this->call('item.delete', [self::$itemid]);
+					}
+				}
+				finally {
+					self::$itemid = null;
+
+					try {
+						if (self::$hostid !== null) {
+							$this->call('host.delete', [self::$hostid]);
+						}
+					}
+					finally {
+						self::$hostid = null;
+
+						try {
+							$this->stopReceiver();
+						}
+						finally {
+							$this->cleanupTempDir();
+						}
+					}
+				}
 			}
 		}
 
