@@ -311,16 +311,16 @@ class testDashboardTopHostsWidget extends testWidgets {
 		}
 
 		foreach (['Host name', 'Text'] as $data) {
-			$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL($data)]);
-
+			$column_form->fill(['Data' => $data]);
+			$column_form->getField('Item name')->waitUntilNotVisible();
 			$column_default_fields['Data']['value'] = ($data === 'Host name') ? 'Host name' : 'Text';
 			$column_default_fields['Text']['visible'] = $data === 'Text';
 			$column_default_fields['Text']['enabled'] = $data === 'Text';
 			$this->checkFieldsAttributes($column_default_fields, $column_form);
 		}
 
-		// Check hintboxes.
-		$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL('Item value')]);
+		$column_form->fill(['Data' => 'Item value']);
+		$column_form->getField('Item name')->waitUntilVisible();
 
 		// Adding those fields new info icons appear.
 		$warning_visibility = [
