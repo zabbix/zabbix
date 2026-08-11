@@ -86,22 +86,22 @@ class testHashicorpVault extends CIntegrationTest {
 	private static $vault_macro_itemid;
 
 	/**
-	 * Check test precondition: pre-existing Vault instance (see class docblock) is reachable.
-	 * Does not start, stop or otherwise manage the instance.
+	 * Check test precondition: HashiCorp Vault integration tests are explicitly enabled, since they
+	 * require a pre-existing Vault instance (see class docblock) that most local/CI runs won't have
+	 * up. Disabled by default, similarly to PHPUNIT_SAML_TESTS_ENABLED.
 	 *
-	 * If the Vault instance is not reachable the test is marked skipped (rather than failed).
+	 * If the tests are not enabled the suite is marked skipped (rather than failed).
 	 *
-	 * @throws PHPUnit_Framework_SkippedTestError    if Vault is not reachable
+	 * @throws PHPUnit_Framework_SkippedTestError    if PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED is not enabled
 	 */
-	private static function skipTestIfVaultIsNotAvailable(): void {
-		$context = stream_context_create(['http' => ['timeout' => 2]]);
-
-		if (@file_get_contents(self::VAULT_ADDR.'/v1/sys/health', false, $context) !== false) {
+	private static function skipTestIfVaultTestsAreDisabled(): void {
+		if (defined('PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED') && PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED) {
 			return;
 		}
 
-		self::markTestSkipped('HashiCorp Vault instance at "'.self::VAULT_ADDR.'" is not reachable. It must be '.
-				'started independently before running this test suite, see the class docblock.'
+		self::markTestSkipped('HashiCorp Vault integration tests are disabled. Define '.
+				'PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED as true in bootstrap.php to enable them, and start a Vault '.
+				'instance independently before running this test suite, see the class docblock.'
 		);
 	}
 
@@ -234,7 +234,7 @@ class testHashicorpVault extends CIntegrationTest {
 	 * naturally repeatable, enabling the AppRole auth method, is explicitly guarded below.
 	 */
 	public function prepareData() {
-		self::skipTestIfVaultIsNotAvailable();
+		self::skipTestIfVaultTestsAreDisabled();
 
 		global $DB;
 
