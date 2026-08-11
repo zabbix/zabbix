@@ -118,35 +118,26 @@ class testHashicorpVault extends CIntegrationTest {
 	 * @throws Exception    on failure to communicate with Vault
 	 */
 	private static function vaultRequest($method, $path, $data = null, $token = null) {
-		$context = stream_context_create([
-			'http' => [
-				'method' => $method,
-				'header' => "X-Vault-Token: $token\r\nContent-Type: application/json\r\n",
-				// json_encode() renders an empty PHP array as "[]", but Vault requires a JSON
-				// object ("{}") for empty request bodies; casting to stdClass forces the latter.
-				'content' => ($data !== null) ? json_encode($data ?: new stdClass()) : '',
-				'ignore_errors' => true
-			]
+		$curl = curl_init(self::VAULT_ADDR.$path);
+		curl_setopt_array($curl, [
+			CURLOPT_CUSTOMREQUEST => $method,
+			CURLOPT_HTTPHEADER => ['X-Vault-Token: '.$token, 'Content-Type: application/json'],
+			CURLOPT_RETURNTRANSFER => true,
+			// json_encode() renders an empty PHP array as "[]", but Vault requires a JSON
+			// object ("{}") for empty request bodies; casting to stdClass forces the latter.
+			CURLOPT_POSTFIELDS => ($data !== null) ? json_encode($data ?: new stdClass()) : ''
 		]);
 
-		$body = @file_get_contents(self::VAULT_ADDR.$path, false, $context);
+		$body = curl_exec($curl);
 
 		if ($body === false) {
+			curl_close($curl);
+
 			throw new Exception('Failed to communicate with Vault at path "'.$path.'".');
 		}
 
-		// PHP 8.4 deprecates the bare $http_response_header variable in favor of this function;
-		// fall back to it for older PHP versions where the function does not exist yet.
-		$headers = function_exists('http_get_last_response_headers')
-			? http_get_last_response_headers()
-			: $http_response_header;
-
-		$status = 0;
-		foreach ($headers as $header) {
-			if (preg_match('#^HTTP/\S+\s+(\d{3})#', $header, $matches)) {
-				$status = (int) $matches[1];
-			}
-		}
+		$status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		curl_close($curl);
 
 		return ['status' => $status, 'body' => ($body !== '' ? json_decode($body, true) : null)];
 	}
