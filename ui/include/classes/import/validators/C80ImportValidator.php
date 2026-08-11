@@ -3831,15 +3831,15 @@ class C80ImportValidator extends CImportValidatorGeneral {
 
 	private static function getTelemetryQueryFieldSchema(): array {
 		$signal_type = [
-			CXmlConstantValue::APM_SIGNAL_TYPE_TRACES => CXmlConstantName::APM_SIGNAL_TYPE_TRACES,
-			CXmlConstantValue::APM_SIGNAL_TYPE_METRICS => CXmlConstantName::APM_SIGNAL_TYPE_METRICS,
-			CXmlConstantValue::APM_SIGNAL_TYPE_LOGS => CXmlConstantName::APM_SIGNAL_TYPE_LOGS
+			CXmlConstantValue::TQ_SIGNAL_TYPE_TRACES => CXmlConstantName::TQ_SIGNAL_TYPE_TRACES,
+			CXmlConstantValue::TQ_SIGNAL_TYPE_METRICS => CXmlConstantName::TQ_SIGNAL_TYPE_METRICS,
+			CXmlConstantValue::TQ_SIGNAL_TYPE_LOGS => CXmlConstantName::TQ_SIGNAL_TYPE_LOGS
 		];
 		$metrics_point_type = [
-			CXmlConstantValue::APM_METRICS_POINT_TYPE_SUM => CXmlConstantName::APM_METRICS_POINT_TYPE_SUM,
-			CXmlConstantValue::APM_METRICS_POINT_TYPE_GAUGE => CXmlConstantName::APM_METRICS_POINT_TYPE_GAUGE,
-			CXmlConstantValue::APM_METRICS_POINT_TYPE_HISTOGRAM => CXmlConstantName::APM_METRICS_POINT_TYPE_HISTOGRAM,
-			CXmlConstantValue::APM_METRICS_POINT_TYPE_EXPHISTOGRAM => CXmlConstantName::APM_METRICS_POINT_TYPE_EXPHISTOGRAM
+			CXmlConstantValue::TQ_METRICS_POINT_TYPE_SUM => CXmlConstantName::TQ_METRICS_POINT_TYPE_SUM,
+			CXmlConstantValue::TQ_METRICS_POINT_TYPE_GAUGE => CXmlConstantName::TQ_METRICS_POINT_TYPE_GAUGE,
+			CXmlConstantValue::TQ_METRICS_POINT_TYPE_HISTOGRAM => CXmlConstantName::TQ_METRICS_POINT_TYPE_HISTOGRAM,
+			CXmlConstantValue::TQ_METRICS_POINT_TYPE_EXPHISTOGRAM => CXmlConstantName::TQ_METRICS_POINT_TYPE_EXPHISTOGRAM
 		];
 		$aggregated_function = [
 			CXmlConstantValue::AGGREGATE_MIN => CXmlConstantName::MIN,
@@ -3888,9 +3888,9 @@ class C80ImportValidator extends CImportValidatorGeneral {
 		];
 
 		return [
-			'signal_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::APM_SIGNAL_TYPE_TRACES, 'in' => $signal_type],
+			'signal_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TQ_SIGNAL_TYPE_TRACES, 'in' => $signal_type],
 			'metric_point_type' =>		['type' => XML_MULTIPLE, 'rules' => [
-				['if' => ['tag' => 'signal_type', 'in' => [CXmlConstantValue::APM_SIGNAL_TYPE_METRICS => CXmlConstantName::APM_SIGNAL_TYPE_METRICS]], 'type' => XML_STRING, 'default' => CXmlConstantValue::APM_METRICS_POINT_TYPE_SUM, 'in' => $metrics_point_type],
+				['if' => ['tag' => 'signal_type', 'in' => [CXmlConstantValue::TQ_SIGNAL_TYPE_METRICS => CXmlConstantName::TQ_SIGNAL_TYPE_METRICS]], 'type' => XML_STRING, 'default' => CXmlConstantValue::TQ_METRICS_POINT_TYPE_SUM, 'in' => $metrics_point_type],
 				['else' => true, 'type' => XML_IGNORE_TAG]
 			]],
 			'columns' => 				['type' => XML_INDEXED_ARRAY, 'prefix' => 'column', 'rules' => [

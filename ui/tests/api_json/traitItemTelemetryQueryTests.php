@@ -14,6 +14,9 @@
 **/
 
 
+require_once __DIR__.'/../../include/classes/api/item_types/CItemType.php';
+require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
+
 /**
  * Telemetry Query item and item prototype tests data.
  */
@@ -35,11 +38,11 @@ trait traitItemTelemetryQueryTests {
 						[
 							'name' => 'template item',
 							'key_' => 'template_item_telemetry_query',
-							'type' => ITEM_TYPE_TELEMETRY_QUERY,
+							'type' => 24,
 							'delay' => '1m',
 							'value_type' => ITEM_VALUE_TYPE_UINT64,
 							'query' => [
-								'signal_type' => APM_SIGNAL_TYPE_TRACES,
+								'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 								'columns' => [],
 								'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 								'filter' => [
@@ -64,7 +67,7 @@ trait traitItemTelemetryQueryTests {
 							'delay' => '1m',
 							'value_type' => ITEM_VALUE_TYPE_UINT64,
 							'query' => [
-								'signal_type' => APM_SIGNAL_TYPE_TRACES,
+								'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 								'columns' => [],
 								'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 								'filter' => [
@@ -103,7 +106,7 @@ trait traitItemTelemetryQueryTests {
 									'delay' => '1m',
 									'value_type' => ITEM_VALUE_TYPE_UINT64,
 									'query' => [
-										'signal_type' => APM_SIGNAL_TYPE_TRACES,
+										'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 										'columns' => [],
 										'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 										'filter' => [
@@ -133,7 +136,7 @@ trait traitItemTelemetryQueryTests {
 									'type' => ITEM_TYPE_TELEMETRY_QUERY,
 									'value_type' => ITEM_VALUE_TYPE_UINT64,
 									'query' => [
-										'signal_type' => APM_SIGNAL_TYPE_TRACES,
+										'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 										'columns' => [],
 										'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 										'filter' => [
@@ -157,7 +160,7 @@ trait traitItemTelemetryQueryTests {
 				'lookback_limit' => '{#M}',
 				'granularity' => '{#M}',
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
@@ -174,7 +177,7 @@ trait traitItemTelemetryQueryTests {
 				'lookback_limit' => '{$M}',
 				'granularity' => '{$M}',
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
@@ -186,7 +189,7 @@ trait traitItemTelemetryQueryTests {
 		yield 'duplicates in "query.aggregated_columns[].column" when "query.aggregated_columns[].alias" are unique' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [
 						['column' => 'Timestamp']
 					],
@@ -203,7 +206,7 @@ trait traitItemTelemetryQueryTests {
 		yield 'duplicate "query.filter.conditions[].column"' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 					'filter' => [
@@ -222,8 +225,8 @@ trait traitItemTelemetryQueryTests {
 		yield '"query.columns[].attribute_key" for complex "query.columns[].column"' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_METRICS,
-					'metric_point_type' => APM_METRICS_POINT_SUM,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					'columns' => [
 						['column' => 'ResourceAttributes', 'attribute_key' => 'attr1']
 					],
@@ -237,7 +240,7 @@ trait traitItemTelemetryQueryTests {
 		yield 'empty "query.columns[].attribute_key" for non complex "query.columns[].column"' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [
 						['column' => 'TraceId', 'attribute_key' => '']
 					],
@@ -251,7 +254,7 @@ trait traitItemTelemetryQueryTests {
 		yield '"query.aggregated_columns[].parameters" set to single value array' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [10], 'alias' => 'time']
@@ -265,7 +268,7 @@ trait traitItemTelemetryQueryTests {
 		yield 'serialized "query" longer than 64Kb fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['function' => AGGREGATE_COUNT, 'alias' => str_repeat('A', 65535)]
@@ -280,7 +283,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'value_type' => ITEM_VALUE_TYPE_BINARY,
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
@@ -304,7 +307,7 @@ trait traitItemTelemetryQueryTests {
 		yield 'no "query.aggregated_columns" fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [['column' => 'Timestamp']],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
@@ -315,7 +318,7 @@ trait traitItemTelemetryQueryTests {
 		yield 'undefined "query.filter" fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']]
 				]
@@ -326,7 +329,7 @@ trait traitItemTelemetryQueryTests {
 		yield '"evaltype" not expression and "query.filter.formula" fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 					'filter' => [
@@ -344,7 +347,7 @@ trait traitItemTelemetryQueryTests {
 		yield '"query.filter.formula" more conditions than "query.filter.conditions" fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 					'filter' => [
@@ -362,7 +365,7 @@ trait traitItemTelemetryQueryTests {
 		yield '"query.filter.formula" less conditions than "query.filter.conditions" fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 					'filter' => [
@@ -381,7 +384,7 @@ trait traitItemTelemetryQueryTests {
 		yield '"query.filter.formula" non existing conditions in "query.filter.conditions" fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 					'filter' => [
@@ -400,7 +403,7 @@ trait traitItemTelemetryQueryTests {
 		yield '"query.filter.conditions" not unique "formulaid" fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 					'filter' => [
@@ -419,7 +422,7 @@ trait traitItemTelemetryQueryTests {
 		yield '"query.columns[].attribute_key" for non complex "query.columns[].column" fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []],
 					'columns' => [
@@ -433,7 +436,7 @@ trait traitItemTelemetryQueryTests {
 		yield '"query.aggregated_columns[].parameters" set to single invalid value array fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [200], 'alias' => 'time']
@@ -447,7 +450,7 @@ trait traitItemTelemetryQueryTests {
 		yield '"query.aggregated_columns[].parameters" set to multiple values array fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [2, 10], 'alias' => 'time']
@@ -461,7 +464,7 @@ trait traitItemTelemetryQueryTests {
 		yield 'duplicates in "query.columns[].column" and "query.aggregated_columns[].alias" fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [
 						['column' => 'TraceId']
 					],
@@ -477,7 +480,7 @@ trait traitItemTelemetryQueryTests {
 		yield 'duplicates in complex "query.columns[].column","query.columns[].attribute_key" and "query.aggregated_columns[].alias" fail' => [
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [
 						['column' => 'SpanAttributes', 'attribute_key' => 'attr']
 					],
@@ -499,6 +502,19 @@ trait traitItemTelemetryQueryTests {
 				'granularity' => '{#M}'
 			],
 			null
+		];
+
+		yield '"query.signal_type" change validate "query.aggregated_columns[].column" not by database value' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			'Invalid parameter "/1/query/aggregated_columns/1/column": value must be one of "ScopeDroppedAttrCount", "StartTimeUnix", "TimeUnix", "Value".'
 		];
 	}
 
@@ -524,7 +540,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'name' => 'Telemetry query updated query',
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [
 						['column' => 'ScopeVersion'],
 						['column' => 'ScopeName']
@@ -549,6 +565,19 @@ trait traitItemTelemetryQueryTests {
 		yield '"query" empty fail' => [
 			['query' => ''],
 			'Invalid parameter "/1/query": an array is expected.'
+		];
+
+		yield '"query.signal_type" change validate "query.aggregated_columns[].column" not by database value' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			'Invalid parameter "/1/query/aggregated_columns/1/column": value must be one of "ScopeDroppedAttrCount", "StartTimeUnix", "TimeUnix", "Value".'
 		];
 	}
 
@@ -580,7 +609,7 @@ trait traitItemTelemetryQueryTests {
 			[
 				'query' => [
 					'query' => [
-						'signal_type' => APM_SIGNAL_TYPE_TRACES,
+						'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 						'columns' => [],
 						'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
 						'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]

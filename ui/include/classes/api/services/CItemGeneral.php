@@ -315,11 +315,11 @@ abstract class CItemGeneral extends CApiService {
 					$item += array_intersect_key($db_item, array_flip(['publickey', 'privatekey']));
 				}
 
-				if ($db_item['type'] == ITEM_TYPE_TELEMETRY_QUERY && array_key_exists('query', $item)) {
-					$db_item['query'] = $item['query'];
-				}
-
-				$api_input_rules['fields'] += $item_type::getUpdateValidationRules($db_item);
+				$api_input_rules['fields'] += $item_type::getUpdateValidationRules(
+					$db_item['type'] == ITEM_TYPE_TELEMETRY_QUERY && array_key_exists('query', $item)
+						? ['query' => $item['query']] + $db_item
+						: $db_item
+				);
 			}
 
 			$api_input_rules['fields'] += CItemType::getDefaultValidationRules();

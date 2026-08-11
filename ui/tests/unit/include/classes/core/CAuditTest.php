@@ -94,8 +94,8 @@ class CAuditTest extends TestCase {
 			[
 				'type' => ITEM_TYPE_TELEMETRY_QUERY,
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'metric_point_type' => APM_METRICS_POINT_SUM,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					'columns' => [
 						['column' => 'column 1', 'attribute_key' => ''],
 						['column' => 'column 2', 'attribute_key' => 'attr']
@@ -404,8 +404,8 @@ class CAuditTest extends TestCase {
 			CAudit::ACTION_UPDATE,
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [
 						['column' => 'Timestamp', 'attribute_key' => '']
 					],
@@ -421,8 +421,8 @@ class CAuditTest extends TestCase {
 			],
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [
 						['column' => 'Timestamp', 'attribute_key' => ''],
 						['column' => 'SpanId', 'attribute_key' => '']
@@ -446,8 +446,8 @@ class CAuditTest extends TestCase {
 			CAudit::ACTION_UPDATE,
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => '', 'function' => AGGREGATE_COUNT, 'alias' => 'total'],
@@ -462,8 +462,8 @@ class CAuditTest extends TestCase {
 			],
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => '', 'function' => AGGREGATE_COUNT, 'alias' => 'total'],
@@ -486,8 +486,8 @@ class CAuditTest extends TestCase {
 			CAudit::ACTION_UPDATE,
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => '', 'function' => AGGREGATE_COUNT, 'alias' => 'total'],
@@ -502,8 +502,8 @@ class CAuditTest extends TestCase {
 			],
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => '', 'function' => AGGREGATE_COUNT, 'alias' => 'total']
@@ -528,8 +528,8 @@ class CAuditTest extends TestCase {
 			CAudit::ACTION_UPDATE,
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => '', 'function' => AGGREGATE_PCTILE, 'parameters' => ['10'], 'alias' => '']
@@ -543,8 +543,8 @@ class CAuditTest extends TestCase {
 			],
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => '', 'function' => AGGREGATE_PCTILE, 'parameters' => ['5'], 'alias' => '']
@@ -566,8 +566,8 @@ class CAuditTest extends TestCase {
 			CAudit::ACTION_UPDATE,
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => '', 'function' => AGGREGATE_MIN, 'alias' => '']
@@ -581,8 +581,8 @@ class CAuditTest extends TestCase {
 			],
 			[
 				'query' => [
-					'signal_type' => APM_SIGNAL_TYPE_TRACES,
-					'metric_point_type' => APM_SIGNAL_TYPE_TRACES,
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => '', 'function' => AGGREGATE_PCTILE, 'parameters' => ['10'], 'alias' => '']
