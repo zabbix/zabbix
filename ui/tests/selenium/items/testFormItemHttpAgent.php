@@ -1251,7 +1251,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$this->zbxTestWaitForPageToLoad();
 			$dialog = COverlayDialogElement::find()->one()->waitUntilready();
 			$dialog->getFooter()->query('button:Update')->one()->click();
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item updated');
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Item updated');
 			$dialog->ensureNotPresent();
 		}
 

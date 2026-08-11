@@ -288,9 +288,7 @@ class testDashboardGraphWidget extends testWidgets {
 		foreach ($tabs as $tab) {
 			$form->selectTab($tab);
 			if ($tab === 'Overrides') {
-				$button = $form->query('button:Add new override')->one()->click();
-				// Remove border radius from button element.
-				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$button]);
+				$form->query('button:Add new override')->one()->click();
 			}
 
 			$this->page->removeFocus();
@@ -2934,7 +2932,7 @@ class testDashboardGraphWidget extends testWidgets {
 
 		// Check hint next to the "Data set label" field.
 		$form->getLabel('Data set label')->query('xpath:./button[@data-hintbox]')->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+		$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->one();
 		$this->assertEquals('Also used as legend label for aggregated data sets.', $hint->getText());
 
 		$this->fillForm($input_data, $form);

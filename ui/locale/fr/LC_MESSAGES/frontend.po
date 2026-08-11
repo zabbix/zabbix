@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-06-15 20:46+0000\n"
+"PO-Revision-Date: 2026-07-27 18:55+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -134,8 +134,8 @@ msgstr[1] "%1$s actions"
 msgctxt "screen reader"
 msgid "%1$s action have been taken"
 msgid_plural "%1$s actions have been taken"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s action a été réalisée"
+msgstr[1] "%1$s actions ont été réalisées"
 
 #: jsLoader.php:321
 #, c-format
@@ -989,7 +989,7 @@ msgstr "Ajouter depuis le modèle"
 
 #: app/controllers/CControllerFavoriteDelete.php:65 include/html.inc.php:178
 msgid "Add graph to Favorite graphs widget"
-msgstr ""
+msgstr "Ajouter le graphique au widget Graphiques favoris"
 
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
@@ -1012,7 +1012,7 @@ msgstr "Ajouter un élément"
 
 #: app/controllers/CControllerFavoriteDelete.php:64 include/html.inc.php:177
 msgid "Add map to Favorite maps widget"
-msgstr ""
+msgstr "Ajouter la carte au widget Cartes préférées"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -4373,7 +4373,7 @@ msgstr "Indicateur de changement"
 
 #: include/classes/html/CMacroValue.php:163
 msgid "Change macro value type"
-msgstr ""
+msgstr "Modifier le type de valeur de la macro"
 
 #: app/views/administration.mediatype.edit.php:157
 #: app/views/administration.user.edit.php:209 app/views/mediatype.edit.php:214
@@ -4654,7 +4654,7 @@ msgstr "Fermer le constructeur d'expression"
 
 #: jsLoader.php:321
 msgid "Close modal window"
-msgstr ""
+msgstr "Fermer la fenêtre modale"
 
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
@@ -4663,7 +4663,7 @@ msgstr "Fermer le nouvel événement"
 
 #: include/func.inc.php:1690 jsLoader.php:221
 msgid "Close notification"
-msgstr ""
+msgstr "Fermer la notification"
 
 #: app/views/correlation.edit.php:247
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -4693,7 +4693,7 @@ msgstr "Replier"
 #: include/classes/html/CSectionCollapsible.php:41 jsLoader.php:333
 #: jsLoader.php:338
 msgid "Collapse section"
-msgstr ""
+msgstr "Réduire la section"
 
 #: app/partials/layout.htmlpage.aside.php:40
 msgid "Collapse sidebar"
@@ -5826,7 +5826,7 @@ msgstr "Le tableau de bord \"%1$s\" est utilisé dans le rapport \"%2$s\"."
 
 #: app/views/monitoring.dashboard.view.php:122
 msgid "Dashboard actions"
-msgstr ""
+msgstr "Tableau de bord des actions"
 
 #: app/controllers/CControllerDashboardUpdate.php:218
 #: app/controllers/CControllerTemplateDashboardUpdate.php:190
@@ -6186,7 +6186,7 @@ msgstr "Authentification par défaut"
 
 #: include/classes/html/CTabFilter.php:169
 msgid "Default filter tab"
-msgstr ""
+msgstr "Onglet de filtre par défaut"
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
@@ -6741,7 +6741,7 @@ msgstr "Élément dépendant"
 
 #: include/triggers.inc.php:2023 widgets/trigover/includes/ViewHelper.php:94
 msgid "Dependent trigger"
-msgstr ""
+msgstr "Déclencheur dépendant"
 
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
@@ -7601,7 +7601,7 @@ msgstr "Editer le tableau de bord"
 
 #: jsLoader.php:479
 msgid "Edit filter properties"
-msgstr ""
+msgstr "Modifier les propriétés du filtre"
 
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
@@ -7622,7 +7622,7 @@ msgstr "Éditer un widget"
 
 #: jsLoader.php:183
 msgid "Edit widget settings"
-msgstr ""
+msgstr "Modifier les paramètres du widget"
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -8017,7 +8017,7 @@ msgstr "Anglais (en_US)"
 
 #: include/html.inc.php:201
 msgid "Enter full screen mode"
-msgstr ""
+msgstr "Passer en mode plein écran"
 
 #: app/partials/monitoring.host.filter.php:51
 #: app/partials/monitoring.host.filter.php:202
@@ -8306,7 +8306,7 @@ msgstr "Existe"
 
 #: include/classes/html/CHtmlPage.php:113 include/html.inc.php:192
 msgid "Exit full screen mode"
-msgstr ""
+msgstr "Quitter le mode plein écran"
 
 #: app/views/js/monitoring.problem.view.js.php:230
 #: include/classes/html/CFormFieldsetCollapsible.php:45
@@ -8324,7 +8324,7 @@ msgstr "Substituer les macros"
 #: include/classes/html/CSectionCollapsible.php:44 jsLoader.php:332
 #: jsLoader.php:337
 msgid "Expand section"
-msgstr ""
+msgstr "Développer la section"
 
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
@@ -9001,7 +9001,7 @@ msgstr "Aller à la dernière page, %1$s"
 
 #: include/classes/html/CTabFilter.php:387
 msgid "Go to next filter tab"
-msgstr ""
+msgstr "Passer à l'onglet de filtre suivant"
 
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
@@ -9020,7 +9020,7 @@ msgstr "Aller à la page %1$s, page actuelle"
 
 #: include/classes/html/CTabFilter.php:400
 msgid "Go to previous filter tab"
-msgstr ""
+msgstr "Aller à l'onglet de filtre précédent"
 
 #: include/classes/helpers/CPagerHelper.php:199
 #, c-format
@@ -12758,7 +12758,7 @@ msgstr "Liste les instances d'objet des compteurs de performances Windows. Retou
 
 #: include/classes/html/CTabFilter.php:382
 msgid "List of open filter tabs"
-msgstr ""
+msgstr "Liste des onglets de filtre ouverts"
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
@@ -13932,11 +13932,11 @@ msgstr "Le plus critiques des services enfants"
 
 #: include/classes/html/CFilter.php:254 include/classes/html/CTabFilter.php:332
 msgid "Move time range backward"
-msgstr ""
+msgstr "Reculer la plage temporelle"
 
 #: include/classes/html/CFilter.php:259 include/classes/html/CTabFilter.php:339
 msgid "Move time range forward"
-msgstr ""
+msgstr "Avancer la plage temporelle"
 
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
@@ -15594,7 +15594,7 @@ msgstr "Ouvrir l'URL"
 #: app/views/popup.generic.php:460 include/classes/html/CHtmlPage.php:175
 #: jsLoader.php:322
 msgid "Open Zabbix documentation in a new tab"
-msgstr ""
+msgstr "Ouvrir la documentation de Zabbix dans un nouvel onglet"
 
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
@@ -15606,7 +15606,7 @@ msgstr "Ouvrir le journal"
 
 #: jsLoader.php:184
 msgid "Open widget actions"
-msgstr ""
+msgstr "Ouvrir le widget des actions"
 
 #: include/httptest.inc.php:414
 msgid "Opera"
@@ -16198,7 +16198,7 @@ msgstr "Modèles parent"
 
 #: include/triggers.inc.php:2023 widgets/trigover/includes/ViewHelper.php:94
 msgid "Parent trigger"
-msgstr ""
+msgstr "Déclencheur parent"
 
 #: app/partials/trigger.edit.trigger.tab.php:32
 msgid "Parent triggers"
@@ -16787,17 +16787,17 @@ msgstr "Problème résolu"
 #: include/actions.inc.php:1724
 msgctxt "screen reader"
 msgid "Problem severity changed"
-msgstr ""
+msgstr "La gravité du problème a changé"
 
 #: include/actions.inc.php:1714
 msgctxt "screen reader"
 msgid "Problem severity decreased"
-msgstr ""
+msgstr "La gravité du problème a diminué"
 
 #: include/actions.inc.php:1719
 msgctxt "screen reader"
 msgid "Problem severity increased"
-msgstr ""
+msgstr "La gravité du problème a augmenté"
 
 #: app/views/usergroup.edit.php:273
 msgid "Problem tag filter"
@@ -17576,7 +17576,7 @@ msgstr "Retirer du groupe d'hôte"
 
 #: app/controllers/CControllerFavoriteCreate.php:54 include/html.inc.php:169
 msgid "Remove graph from the Favorite graphs widget"
-msgstr ""
+msgstr "Supprimer le graphique du widget Graphiques favoris"
 
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
@@ -17588,7 +17588,7 @@ msgstr "Supprimer les tags d'hôte"
 
 #: app/controllers/CControllerFavoriteCreate.php:53 include/html.inc.php:168
 msgid "Remove map from the Favorite maps widget"
-msgstr ""
+msgstr "Supprimer la carte du widget Cartes préférées"
 
 #: widgets/favgraphs/views/widget.view.php:43
 #: widgets/favmaps/views/widget.view.php:42
@@ -18727,7 +18727,7 @@ msgstr "Sélectionnez le SLA pour afficher le rapport SLA."
 
 #: include/classes/html/CDateSelector.php:198
 msgid "Select date"
-msgstr ""
+msgstr "Sélectionner une date"
 
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
@@ -19190,7 +19190,7 @@ msgstr "Afficher la fonction d'agrégation"
 
 #: include/events.inc.php:755
 msgid "Show all tags"
-msgstr ""
+msgstr "Afficher tous les tags"
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
@@ -19241,7 +19241,7 @@ msgstr "Afficher les lignes"
 
 #: include/classes/html/CHtmlPage.php:146
 msgid "Show main menu"
-msgstr ""
+msgstr "Afficher le menu principal"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
