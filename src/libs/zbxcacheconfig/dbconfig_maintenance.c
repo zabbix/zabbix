@@ -1711,7 +1711,6 @@ static int	dc_maintenance_match_event_name(const zbx_dc_maintenance_t *maintenan
 			if (FAIL == zbx_strmatch_condition(event_name, mt_eventname->value, mt_eventname->op))
 			{
 				neg_cond_status = 0;
-				break;
 			}
 		}
 		else if (ZBX_CONDITION_OPERATOR_LIKE == mt_eventname->op)
