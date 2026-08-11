@@ -223,11 +223,11 @@ class testDashboardClockWidget extends testWidgets {
 			/**
 			 * If the clock widgets type equals to "Host time", then additional field appears - 'Item',
 			 * which requires to select item of the "Host", in this case array_splice function allows us to put
-			 * this fields name into the array. Positive offset (5) starts from the beginning of the array,
+			 * this fields name into the array. Positive offset (6) starts from the beginning of the array,
 			 * while - (0) length parameter - specifies how many elements will be removed.
 			 */
 			if ($type === 'Host time') {
-				array_splice($fields, 5, 0, ['Item']);
+				array_splice($fields, 6, 0, ['Item']);
 				$form->checkValue(['Item' => '']);
 				$form->isRequired('Item');
 			}
