@@ -14,7 +14,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
-require_once __DIR__.'/../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
+require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
 
 /**
  * @required-components server
