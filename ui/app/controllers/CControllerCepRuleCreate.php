@@ -167,7 +167,8 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 							]
 						]
 					],
-					'tags' => ['array', 'required', 'not_empty', 'field' => ['string', 'not_empty'],
+					'tags' => ['array', 'required', 'not_empty',
+						'field' => ['db cep_window.tags', 'not_empty'],
 						'when' => ['group_by_tags', 'in' => [CCepRuleHelper::GROUP_BY_YES]]
 					],
 					'event_count_tag_enabled' => ['integer', 'required', 'in' => [0, 1],

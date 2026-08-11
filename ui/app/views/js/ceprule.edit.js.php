@@ -206,28 +206,21 @@ window.ceprule_edit_popup = new class {
 			const class_list = e.target.classList;
 
 			if (class_list.contains('js-submit')) {
-				if (class_list.contains('js-submit-force')) {
-					const $target = jQuery(e.target);
-					const item = {
-						label: <?= json_encode(_('Force update')) ?>,
-						clickCallback: () => this.#submit(true)
-					};
-					const options = {
-						position: {at: 'left bottom', my: 'left top', of: $target},
-						closeCallback: () => { $target.focus(); }
-					};
-
-					$target.menuPopup([{items: [item]}], jQuery(e), options);
-				}
-				else {
-					this.#submit(false);
-				}
+				this.#submit();
 			}
 			else if (class_list.contains('js-delete')) {
-				window.confirm(<?= json_encode('Delete complex event processing rule?') ?>) && this.#delete();
+				if (window.confirm(<?= json_encode('Delete complex event processing rule?') ?>)) {
+					this.#delete();
+				}
+				else {
+					this.#overlay.unsetLoading();
+				}
 			}
 			else if (class_list.contains('js-clone')) {
 				this.#clone();
+			}
+			else if (class_list.contains('js-reset-time-windows')) {
+				this.#resetTimeWindwos();
 			}
 		});
 	}
@@ -337,6 +330,37 @@ window.ceprule_edit_popup = new class {
 			});
 	}
 
+	#resetTimeWindwos() {
+		this.#removePopupMessages();
+		fetch(zabbixUrl({action: 'ceprule.resettimewindows'}), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json; charset=UTF-8'},
+			body: JSON.stringify({
+				cepruleids: [this.form.findFieldByName('cepruleid').getValue()],
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
+			})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				if ('success' in response) {
+					const message_box = makeMessageBox('good', response.success.messages, response.success.title)[0];
+
+					this.form_element.parentNode.insertBefore(message_box, this.form_element);
+				}
+				else {
+					throw new Error();
+				}
+			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => {
+				this.#overlay.unsetLoading();
+			});
+	}
+
 	#clone() {
 		this.form.findFieldByName('cepruleid')._field.remove();
 		this.#removePopupMessages();
@@ -361,10 +385,9 @@ window.ceprule_edit_popup = new class {
 		this.form.reload(this.#rules_for_clone);
 	}
 
-	#submit(force_sumbit) {
+	#submit() {
 		const fields = this.form.getAllValues();
 		fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>;
-		fields._cep_rule_reset = force_sumbit ? 1 : 0;
 
 		this.#removePopupMessages();
 		this.form.validateSubmit(fields)
@@ -516,7 +539,15 @@ window.ceprule_edit_popup = new class {
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
 				tag_value: '',
-				tags: [{tag: '$STATUS.CODE', operator: <?= TAG_OPERATOR_EQUAL ?>, value: '1'}]
+				filter: {
+					evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
+					conditions: [{
+						type: <?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>,
+						tag: '',
+						operator: <?= CONDITION_OPERATOR_YES ?>,
+						value: ''
+					}]
+				}
 			};
 		}
 
@@ -534,14 +565,6 @@ window.ceprule_edit_popup = new class {
 					action: (overlay) => {
 						const form = ceprule_operation_edit_popup.form;
 						const fields = form.getAllValues();
-
-						for (const tag_index in fields.tags) {
-							const {tag, value} = fields.tags[tag_index];
-
-							if (tag === '' && value === '') {
-								delete fields.tags[tag_index];
-							}
-						}
 
 						form.validateSubmit(fields)
 							.then((result) => {
@@ -635,10 +658,11 @@ window.ceprule_edit_popup = new class {
 		if ([
 			<?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>,
 			<?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>,
-			<?= CCepRuleHelper::OP_COPY_FIRST ?>,
-			<?= CCepRuleHelper::OP_COPY_LAST ?>,
+			<?= CCepRuleHelper::OP_UNSUPPRESS ?>,
+			<?= CCepRuleHelper::OP_CLONE_FIRST ?>,
+			<?= CCepRuleHelper::OP_CLONE_LAST ?>,
 			<?= CCepRuleHelper::OP_DISCARD ?>,
-			<?= CCepRuleHelper::OP_CLOSE ?>
+			<?= CCepRuleHelper::OP_CLOSE_EVENT ?>
 		].includes(operation_type)) {
 			arguments_str = '';
 		}
@@ -673,16 +697,19 @@ window.ceprule_edit_popup = new class {
 			arguments_str = `${operation.tag}:${operation.tag_value}`;
 		}
 
-		const tags_input_html = Object.values(operation.tags).map((tag, tag_index) => (new Template(`
-			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][tag]"
-				type="hidden" value="#{tag}"/>
-			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][operator]"
-				type="hidden" value="#{operator}"/>
-			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][value]"
-				type="hidden" value="#{value}"/>
-		`)).evaluate(tag)).join('');
+		const conditions_input_html = Object.values(operation.filter.conditions)
+			.map((condition, condition_index) => (new Template(`
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][type]"
+					type="hidden" value="#{type}"/>
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][tag]"
+					type="hidden" value="#{tag}"/>
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][operator]"
+					type="hidden" value="#{operator}"/>
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][value]"
+					type="hidden" value="#{value}"/>
+			`)).evaluate(condition)).join('');
 
-		const template_args = {execute_when_str, label_str, arguments_str, tags_input_html, ...operation};
+		const template_args = {execute_when_str, label_str, arguments_str, conditions_input_html, ...operation};
 		const row = this.#operation_row_template.evaluateToElement(template_args);
 		const error_container_id = `ceprule-operations-${template_args.sortorder}-error-container`;
 		const rows = new DocumentFragment();

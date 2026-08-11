@@ -34,13 +34,18 @@ else {
 		[
 			'title' => _('Update'),
 			'class' => 'js-submit',
-			'withChevron' => 'js-submit-force',
 			'keepOpen' => true,
 			'isSubmit' => true
 		],
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
+			'keepOpen' => true,
+			'isSubmit' => false
+		],
+		[
+			'title' => _('Reset time windows'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-reset-time-windows']),
 			'keepOpen' => true,
 			'isSubmit' => false
 		],
@@ -105,7 +110,10 @@ $form = (new CForm())
 		))
 		->addItem((new CTemplateTag('ceprule-operation-row-template'))->addItem(
 			(new CRow([
-				(new CCol())->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CCol([
+					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+					(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)
+				]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CCol([
 					_('Execute when'),
 					' #{execute_when_str} : #{label_str}',
@@ -114,11 +122,11 @@ $form = (new CForm())
 				[
 					(new CButtonLink(_('Edit')))->addClass('js-operation-edit'),
 					(new CButtonLink(_('Remove')))->addClass('js-operation-remove'),
-					'#{*tags_input_html}',
+					'#{*conditions_input_html}',
 					(new CVar('operations[#{sortorder}][sortorder]', '#{sortorder}'))->removeId(),
 					(new CVar('operations[#{sortorder}][execute_when]', '#{execute_when}'))->removeId(),
 					(new CVar('operations[#{sortorder}][type]', '#{type}'))->removeId(),
-					(new CVar('operations[#{sortorder}][evaltype]', '#{evaltype}'))->removeId(),
+					(new CVar('operations[#{sortorder}][filter][evaltype]', '#{filter.evaltype}'))->removeId(),
 					(new CVar('operations[#{sortorder}][event_name]', '#{event_name}'))->removeId(),
 					(new CVar('operations[#{sortorder}][tag]', '#{tag}'))->removeId(),
 					(new CVar('operations[#{sortorder}][new_tag]', '#{new_tag}'))->removeId(),

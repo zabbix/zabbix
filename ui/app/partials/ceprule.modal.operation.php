@@ -24,26 +24,31 @@ foreach (CCepRuleHelper::getOperationExecuteWhenStrings() as $value => $name) {
 	$execute_when->addOption(new CSelectOption($value, $name));
 }
 
-$events_operations = new CSelectOptionGroup(_('Events'));
-$tags_operations = new CSelectOptionGroup(_('Tags'));
+$events_operations = new CSelectOptionGroup(_('Event'));
+$tags_operations = new CSelectOptionGroup(_('Tag'));
+$window_operations = new CSelectOptionGroup(_('Window'));
 $labels = CCepRuleHelper::getOperationLabelStrings();
 
-$events_group_opts = [CCepRuleHelper::OP_SET_NAME, CCepRuleHelper::OP_CLOSE, CCepRuleHelper::OP_DISCARD,
+$events_group_opts = [CCepRuleHelper::OP_SET_NAME, CCepRuleHelper::OP_CLOSE_EVENT, CCepRuleHelper::OP_DISCARD,
 	CCepRuleHelper::OP_SET_SEVERITY, CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY,
-	CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_COPY_LAST, CCepRuleHelper::OP_COPY_FIRST
+	CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_UNSUPPRESS, CCepRuleHelper::OP_CLONE_LAST,
+	CCepRuleHelper::OP_CLONE_FIRST
 ];
 
 foreach ($labels as $option => $label) {
-	$is_events_group = in_array($option, $events_group_opts);
-	$option = new CSelectOption($option, $label);
-	$option->setExtra('is_events_group', $is_events_group);
+	$optgroupid = 'optgroup_tags';
+	$optgroup = $tags_operations;
 
-	if ($is_events_group) {
-		$events_operations->addOption($option);
+	if (in_array($option, $events_group_opts)) {
+		$optgroupid = 'optgroup_events';
+		$optgroup = $events_operations;
 	}
-	else {
-		$tags_operations->addOption($option);
+	else if ($option == CCepRuleHelper::OP_CLOSE_WINDOW) {
+		$optgroupid = 'optgroup_window';
+		$optgroup = $window_operations;
 	}
+
+	$optgroup->addOption((new CSelectOption($option, $label))->setExtra('optgroupid', $optgroupid));
 }
 
 (new CForm())
@@ -53,17 +58,22 @@ foreach ($labels as $option => $label) {
 	->addVar('window_type', '0')
 	->addClass(ZBX_STYLE_DISPLAY_NONE)
 	->addItem((new CFormGrid())
-		->addItem((new CTemplateTag('ceprule-operation-tag-template'))
+		->addItem((new CTemplateTag('ceprule-operation-condition-tag-template'))
 			->addItem((new CRow())
 				->setAttribute('data-row_index', '#{row_index}')
+				->addItem((new CCol(_('Tag')))
+					->addClass('js-filter-tag-label')
+					->addClass(ZBX_STYLE_RIGHT)
+					->addClass(ZBX_STYLE_VISIBILITY_HIDDEN)
+				)
 				->addItem((new CCol())
-					->addItem((new CTextBox('tags[#{row_index}][tag]', '#{tag}'))
-						->setAttribute('is', 'z-cep-tagsuggest')
-						->setAttribute('placeholder', _('tag or $'))
+					->addItem((new CTextBox('filter[conditions][#{row_index}][tag]', '#{tag}'))
+						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+						->setAttribute('placeholder', _('tag'))
 					)
 				)
 				->addItem((new CCol())
-					->addItem((new CSelect('tags[#{row_index}][operator]'))
+					->addItem((new CSelect('filter[conditions][#{row_index}][operator]'))
 						->setValue('#{operator}')
 						->addOptions(CSelect::createOptionsFromArray([
 							TAG_OPERATOR_EXISTS => _('Exists'),
@@ -73,15 +83,54 @@ foreach ($labels as $option => $label) {
 							TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
 							TAG_OPERATOR_NOT_LIKE => _('Does not contain')
 						]))
+					)
+					->addItem((new CCol())
+						->addItem((new CTextBox('filter[conditions][#{row_index}][value]', '#{value}'))
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+							->setAttribute('placeholder', _('value'))
+						)
+					)
+					->addItem((new CCol())
+						->addItem((new CButtonLink(_('Remove')))->addClass('js-tag-remove'))
+						->addItem((new CVar('filter[conditions][#{row_index}][type]', '#{type}')))
+					)
+				)
+			)
+		)
+		->addItem((new CTemplateTag('ceprule-operation-condition-property-template'))
+			->addItem((new CRow())
+				->setAttribute('data-row_index', '#{row_index}')
+				->addItem((new CCol(_('Property')))
+					->addClass('js-filter-property-label')
+					->addClass(ZBX_STYLE_RIGHT)
+					->addClass(ZBX_STYLE_VISIBILITY_HIDDEN)
 				)
 				->addItem((new CCol())
-					->addItem((new CTextBox('tags[#{row_index}][value]', '#{value}'))
-						->setAttribute('placeholder', _('value'))
+					->addItem((new CSelect('filter[conditions][#{row_index}][type]'))
+						->addClass('js-property-type-select')
+						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+						->setValue('#{type}')
+						->addOptions(CSelect::createOptionsFromArray([
+							ZBX_CONDITION_TYPE_EVENT_OPEN => _('Problem opened'),
+							ZBX_CONDITION_TYPE_EVENT_SYMPTOM => _('Symptom'),
+							ZBX_CONDITION_TYPE_EVENT_FIRST => _('First'),
+							ZBX_CONDITION_TYPE_EVENT_LAST => _('Last'),
+							ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => _('Supressed'),
+							ZBX_CONDITION_TYPE_EVENT_COPIED => _('Cloned')
+						]))
+					)
+				)
+				->addItem(new CCol(_('Equals')))
+				->addItem((new CCol())
+					->addItem((new CRadioButtonList('filter[conditions][#{row_index}][operator]', CONDITION_OPERATOR_YES))
+						->addValue(_('True'), CONDITION_OPERATOR_YES)
+						->addValue(_('False'), CONDITION_OPERATOR_NO)
+						->setModern()
 					)
 				)
 				->addItem((new CCol())
-					->addItem((new CButtonLink(_('Remove')))->addClass('js-tag-remove'))
-				))
+					->addItem((new CButtonLink(_('Remove')))->addClass('js-property-remove'))
+				)
 			)
 		)
 		->addItem(new CLabel(_('Execute when'), 'ceprule-operation-execute-when-label'))
@@ -91,8 +140,8 @@ foreach ($labels as $option => $label) {
 				->setFocusableElementId('ceprule-operation-execute-when-label')
 				->setId('ceprule-operation-execute-when')
 		))
-		->addItem(new CLabel('Event tags'))
-		->addItem(new CFormField((new CRadioButtonList('evaltype', TAG_EVAL_TYPE_AND_OR))
+		->addItem(new CLabel('Event tag/property filter'))
+		->addItem(new CFormField((new CRadioButtonList('filter[evaltype]', TAG_EVAL_TYPE_AND_OR))
 			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
 			->addValue(_('Or'), TAG_EVAL_TYPE_OR)
 			->setModern(true)
@@ -100,12 +149,14 @@ foreach ($labels as $option => $label) {
 		->addItem(new CFormField(
 			(new CTable())
 				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
-				->setId('ceprule-operation-tags-table')
+				->setId('ceprule-operation-filter-table')
+				->setHeader(['', 'Name', 'Type', 'Value', ''])
 				->setAttribute('data-field-type', 'set')
-				->setAttribute('data-field-name', 'tags')
-				->addItem((new CTag('tfoot', true))->addItem((new CCol(
-					(new CButtonLink(_('Add')))->addClass('js-tag-add')
-				))->setColSpan(4)))
+				->setAttribute('data-field-name', 'filter[conditions]')
+				->addItem((new CTag('tfoot', true))->addItem((new CCol([
+					(new CButtonLink(_('Add tag')))->addClass('js-add-tag'),
+					(new CButtonLink(_('Add property')))->addClass('js-add-property')
+				]))->setColSpan(4)))
 		))
 		->addItem(new CLabel('Operation', 'ceprule-operation-type-label'))
 		->addItem((new CFormField())
@@ -114,6 +165,7 @@ foreach ($labels as $option => $label) {
 				->setId('ceprule-operation-type')
 				->addOptionGroup($events_operations)
 				->addOptionGroup($tags_operations)
+				->addOptionGroup($window_operations)
 			)
 			->addItem(new CObject('&nbsp;'))
 			->addItem((new CTextBox('event_name'))

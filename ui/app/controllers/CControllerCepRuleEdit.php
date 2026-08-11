@@ -95,8 +95,8 @@ class CControllerCepRuleEdit extends CController {
 			$ceprules = API::CepRule()->get([
 				'cep_ruleids' => $cepruleid,
 				'output' => ['cep_ruleid', 'name', 'description', 'window_type', 'status', 'stop', 'sortorder'],
-				'selectOperations' => ['sortorder', 'execute_when', 'type', 'evaltype', 'event_name', 'tag', 'new_tag',
-					'tag_value', 'severity', 'tags', 'suppress_duration'],
+				'selectOperations' => ['sortorder', 'execute_when', 'filter', 'type', 'event_name', 'severity',
+					'suppress_duration', 'tag', 'new_tag', 'tag_value'],
 				'selectFilter' => ['eval_formula', 'evaltype', 'conditions'],
 				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host',
 					'group_by_tags', 'event_count_tag', 'tags']
@@ -122,7 +122,6 @@ class CControllerCepRuleEdit extends CController {
 		$ceprule = $ceprules[0];
 
 		$ceprule['window'] += DB::getDefaults('cep_window');
-
 
 		// Unlimited capacity's default value is "0".
 		$ceprule['window']['capacity_enabled'] = $ceprule['window']['capacity'] != 0;
@@ -203,21 +202,11 @@ class CControllerCepRuleEdit extends CController {
 				)],
 				'when' => ['window_type', 'in' => [$window_type]]
 			], array_keys(CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE)),
-			'tags' => ['objects', 'fields' => [
-				'tag' => ['db cep_operation_condition.tag', 'required', 'not_empty'],
-				'operator' => ['db cep_operation_condition.operator', 'required', 'in' => [TAG_OPERATOR_EXISTS,
-					TAG_OPERATOR_EQUAL, TAG_OPERATOR_LIKE, TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_NOT_EQUAL,
-					TAG_OPERATOR_NOT_LIKE
-				]],
-				'value' => ['db cep_operation_condition.value', 'required']
-			]],
+			'filter' => ['object', 'fields' => CControllerCepRuleGeneral::getOperationFilterValidationFields()],
 			'type' => array_map(fn(int $execute_when) => ['db cep_operation.type', 'required',
 				'in' => CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN[$execute_when],
 				'when' => ['execute_when', 'in' => [$execute_when]]
 			], array_keys(CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN)),
-			'evaltype' => ['db cep_operation.evaltype', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR,
-				CONDITION_EVAL_TYPE_OR
-			]],
 			'event_name' => ['db cep_operation.event_name', 'required', 'not_empty', 'when' => ['type',
 				'in' => [CCepRuleHelper::OP_SET_NAME]
 			]],

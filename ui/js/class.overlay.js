@@ -553,10 +553,6 @@ Overlay.prototype.makeButton = function(obj) {
 				.prop('disabled', true)
 				.siblings(':not(.js-cancel)')
 					.prop('disabled', true);
-
-			if (obj.withChevron) {
-				e.target.closest('.btn-split').querySelector(`.${obj.withChevron}`).disabled = true;
-			}
 		}
 
 		if (obj.action && obj.action(this) !== false) {
@@ -570,25 +566,14 @@ Overlay.prototype.makeButton = function(obj) {
 		e.preventDefault();
 	}.bind(this));
 
-	if (obj.withChevron) {
-		$button = jQuery('<ul>', {class: 'btn-split'})
-			.append(jQuery('<li>', {html: $button}))
-			.append(jQuery('<li>', {html: jQuery('<button>', {
-				type: 'button',
-				class: `zi-chevron-down-small ${obj.withChevron}`
-			})}));
-	}
-
 	if (obj.class) {
-		obj.withChevron
-			? $button.find('button').addClass(obj.class)
-			: $button.addClass(obj.class);
+		$button.addClass(obj.class);
 	}
 
 	if (obj.enabled === false) {
-		obj.withChevron
-			? $button.find('button').prop('disabled', true).data('disabled', true)
-			: $button.prop('disabled', true).data('disabled', true);
+		$button
+			.prop('disabled', true)
+			.data('disabled', true);
 	}
 
 	return $button;

@@ -78,6 +78,7 @@ $url = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $table = (new CTableInfo())
+	->setId('ceprule-list-table')
 	->setHeader([
 		(new CColHeader((new CCheckBox('all_items'))->onClick(
 			sprintf('checkAll("%s", "all_items", "cepruleids")', $form->getName())
@@ -155,8 +156,8 @@ foreach ($data['ceprules'] as $ceprule) {
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass('js-toggle-disabled')
 				->setAttribute('data-action', $ceprule['status'] == ZBX_CORRELATION_ENABLED
-					? 'correlation.disable'
-					: 'correlation.enable'
+					? 'ceprule.disable'
+					: 'ceprule.enable'
 				)
 				->setAttribute('data-id', 'legacy-'.$ceprule['correlationid']),
 			$ceprule['error'] ? makeErrorIcon($ceprule['error']) : ''

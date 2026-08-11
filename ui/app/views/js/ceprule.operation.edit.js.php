@@ -40,12 +40,16 @@ window.ceprule_operation_edit_popup = new class {
 	/** @type {Template} */
 	#tag_template;
 
+	/** @type {Template} */
+	#property_template;
+
 	init({rules, operation, overlay, window_type, operation_types_by_execute_when, execute_when_by_window_type}) {
 		this.#operation_types_by_execute_when = operation_types_by_execute_when;
 		this.#execute_when_for_window_type = execute_when_by_window_type[window_type];
 
 		this.#overlay = overlay;
-		this.#tag_template = new Template(window['ceprule-operation-tag-template'].innerHTML);
+		this.#tag_template = new Template(window['ceprule-operation-condition-tag-template'].innerHTML);
+		this.#property_template = new Template(window['ceprule-operation-condition-property-template'].innerHTML);
 
 		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 		this.#setValues({...operation, window_type: String(window_type)});
@@ -53,6 +57,8 @@ window.ceprule_operation_edit_popup = new class {
 		this.#initActions();
 
 		this.form = new CForm(this.form_element, rules);
+		this.#updateAvailablePropertyTypes();
+		this.#updateHoistedLabelsView();
 
 		this.#setAvailableOperationOptions();
 		window['ceprule-operation-execute-when'].dispatchEvent(new Event('change'));
@@ -71,27 +77,70 @@ window.ceprule_operation_edit_popup = new class {
 		}, {capture: true});
 
 		this.form_element.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-tag-add')) {
-				this.#addTagRow({tag: '', operator: <?= TAG_OPERATOR_EQUAL ?>, value: ''});
+			if (e.target.classList.contains('js-add-tag')) {
+				this.#addTagRow({
+					type: <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>,
+					tag: '',
+					operator: <?= TAG_OPERATOR_EQUAL ?>,
+					value: ''
+				});
+			}
+			else if (e.target.classList.contains('js-add-property')) {
+				this.#addPropertyRow({
+					type: this.#nextAvailablePropertyType(),
+					operator: <?= CONDITION_OPERATOR_YES ?>
+				});
+
+				this.#updateAvailablePropertyTypes();
 			}
 			else if (e.target.classList.contains('js-tag-remove')) {
 				e.target.closest('tr').remove();
+				this.form.discoverAllFields();
+			}
+			else if (e.target.classList.contains('js-property-remove')) {
+				e.target.closest('tr').remove();
+				this.form.discoverAllFields();
+				this.#updateAvailablePropertyTypes();
 			}
 		});
 	}
 
-	#addTagRow(tag) {
-		const row_index = this.form_element.querySelectorAll('#ceprule-operation-tags-table tbody tr').length;
+	#addPropertyRow(property) {
+		const row_index = this.form_element.querySelectorAll('#ceprule-operation-filter-table tbody tr').length;
+		const last_tag = window['ceprule-operation-filter-table'].querySelector('.js-filter-tag-label:last-child');
 
-		this.form_element.querySelector('#ceprule-operation-tags-table tbody')
-			.insertAdjacentElement('beforeend', this.#buildTagRow(tag, row_index));
-		this.form_element.querySelector('#ceprule-operation-tags-table tbody')
+		this.form_element.querySelector('#ceprule-operation-filter-table tbody')
+			.insertAdjacentElement('beforeend', this.#buildPropertyRow(property, row_index));
+		this.form_element.querySelector('#ceprule-operation-filter-table tbody')
 			.insertAdjacentHTML('beforeend', `<tr><td class="<?= ZBX_STYLE_ERROR_CONTAINER ?>"></td></tr>`);
+	}
+
+	#addTagRow(tag) {
+		const row_index = this.form_element.querySelectorAll('#ceprule-operation-filter-table tbody tr').length;
+		const first_property = window['ceprule-operation-filter-table']
+			.querySelector('.js-filter-property-label:first-child');
+
+		const row = this.#buildTagRow(tag, row_index);
+		const row_errors = (new Template(`<tr><td class="<?= ZBX_STYLE_ERROR_CONTAINER ?>"></td></tr>`))
+			.evaluateToElement();
+
+		if (first_property) {
+			const target = first_property.closest('tr');
+
+			target.insertAdjacentElement('beforebegin', row);
+			target.insertAdjacentElement('beforebegin', row_errors);
+		}
+		else {
+			const target = this.form_element.querySelector('#ceprule-operation-filter-table tbody');
+
+			target.insertAdjacentElement('beforeend', row);
+			target.insertAdjacentElement('beforeend', row_errors);
+		}
 	}
 
 	#buildTagRow(tag, row_index) {
 		const tag_row = this.#tag_template.evaluateToElement({...tag, row_index});
-		const textbox = tag_row.querySelector(`[name="tags[${row_index}][value]"]`);
+		const textbox = tag_row.querySelector(`[name="filter[conditions][${row_index}][value]"]`);
 		const on_operator_change = value => {
 			const hidden = [<?= TAG_OPERATOR_EXISTS ?>, <?= TAG_OPERATOR_NOT_EXISTS ?>].includes(value);
 
@@ -105,11 +154,84 @@ window.ceprule_operation_edit_popup = new class {
 		return tag_row;
 	}
 
+	#buildPropertyRow(property, row_index) {
+		const property_row = this.#property_template.evaluateToElement({...property, row_index});
+
+		property_row.querySelector('z-select').addEventListener('change', () => this.#updateAvailablePropertyTypes());
+
+		return property_row;
+	}
+
+	#nextAvailablePropertyType() {
+		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
+		const all_property_types = execute_when == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>
+			? [
+				<?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>,
+				<?= ZBX_CONDITION_TYPE_EVENT_SYMPTOM ?>,
+				<?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>,
+				<?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>
+			]
+			: [
+				<?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>,
+				<?= ZBX_CONDITION_TYPE_EVENT_SYMPTOM ?>,
+				<?= ZBX_CONDITION_TYPE_EVENT_FIRST ?>,
+				<?= ZBX_CONDITION_TYPE_EVENT_LAST ?>,
+				<?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>,
+				<?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>
+			];
+		const used_property_types = this.#getActivePropertyTypes();
+		const available_types = all_property_types.filter(type => !used_property_types.includes(type));
+
+		if (available_types.length) {
+			return available_types[0];
+		}
+
+		throw 'No available property types';
+	}
+
+	#getActivePropertyTypes() {
+		const conditions = this.form.findFieldByName('filter[conditions]').getValue();
+
+		return Object.values(conditions).map(condition => Number(condition.type));
+	}
+
+	#updateAvailablePropertyTypes() {
+		// if (window.x){debugger;}
+		const used_property_types = this.#getActivePropertyTypes();
+		// let has_enabled_option = false;
+
+		this.form_element.querySelectorAll('.js-property-type-select').forEach(zselect => {
+			const options = zselect.options.map(option => {
+				const is_value_option = zselect.value === option.value;
+				const is_disabled = !is_value_option && used_property_types.includes(Number(option.value));
+
+				// has_enabled_option |= !is_disabled;
+
+				return {...option, is_disabled}
+			});
+
+			zselect.clearOptions();
+			zselect.addOptions(options);
+			zselect.init();
+		});
+
+		// this.form_element.querySelector('.js-add-property').disabled = !has_enabled_option;
+	}
+
+	#updateHoistedLabelsView() {
+		window['ceprule-operation-filter-table'].querySelectorAll('.js-filter-tag-label')
+			.forEach((label, index) => label.classList.toggle('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', index != 0));
+
+		window['ceprule-operation-filter-table'].querySelectorAll('.js-filter-property-label')
+			.forEach((label, index) => label.classList.toggle('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', index != 0));
+	}
+
 	#setAvailableOperationOptions() {
 		const type = Number(this.form.findFieldByName('type').getValue());
 		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
 		const zselect = window['ceprule-operation-type'];
 		const events_options = [];
+		const window_options = [];
 		const tags_options = [];
 		const enable_if_allowed = (option) => {
 			option.is_disabled = !this.#operation_types_by_execute_when[execute_when].includes(Number(option.value));
@@ -117,12 +239,22 @@ window.ceprule_operation_edit_popup = new class {
 
 		zselect.options.forEach(option => {
 			enable_if_allowed(option);
-			option.extra.is_events_group ? events_options.push(option) : tags_options.push(option);
+
+			if (option.extra.optgroupid === 'optgroup_events') {
+				events_options.push(option);
+			}
+			else if (option.extra.optgroupid === 'optgroup_window') {
+				window_options.push(option);
+			}
+			else if (option.extra.optgroupid === 'optgroup_tags') {
+				tags_options.push(option);
+			}
 		});
 
 		zselect.clearOptions();
 		zselect.addOptionGroup({label: <?= json_encode(_('Events')) ?>, options: events_options});
 		zselect.addOptionGroup({label: <?= json_encode(_('Tags')) ?>, options: tags_options});
+		zselect.addOptionGroup({label: <?= json_encode(_('Window')) ?>, options: window_options});
 		zselect.value = type;
 
 		// Select first enabled option, if previous selection got disabled.
@@ -134,12 +266,14 @@ window.ceprule_operation_edit_popup = new class {
 	}
 
 	#setValues(operation) {
-		if (operation.tags === undefined) {
-			operation.tags = {0: {tag: '', operator: <?= TAG_OPERATOR_EQUAL ?>, value: ''}};
-		}
-
-		for (const tag of Object.values(operation.tags)) {
-			this.#addTagRow(tag);
+		for (const condition of Object.values(operation.filter.conditions || {})) {
+			if (condition.type == <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>
+					|| condition.type == <?= ZBX_CONDITION_TYPE_EVENT_TAG ?>) {
+				this.#addTagRow(condition);
+			}
+			else {
+				this.#addPropertyRow(condition);
+			}
 		}
 
 		this.form_element.querySelector(`[name="type"]`).value = operation.type;
@@ -153,8 +287,8 @@ window.ceprule_operation_edit_popup = new class {
 		this.form_element.querySelectorAll(`[name="severity"]`).forEach(node => {
 			node.checked = node.value === operation.severity;
 		});
-		this.form_element.querySelectorAll(`[name="evaltype"]`).forEach(node => {
-			node.checked = node.value === operation.evaltype;
+		this.form_element.querySelectorAll(`[name="filter[evaltype]"]`).forEach(node => {
+			node.checked = node.value == operation.filter.evaltype;
 		});
 		this.form_element.querySelector(`[name="event_name"]`).value = operation.event_name;
 
@@ -187,12 +321,13 @@ window.ceprule_operation_edit_popup = new class {
 		tag_rename.style.display = 'none';
 
 		if ([
-			<?= CCepRuleHelper::OP_COPY_FIRST ?>,
-			<?= CCepRuleHelper::OP_COPY_LAST ?>,
+			<?= CCepRuleHelper::OP_CLONE_FIRST ?>,
+			<?= CCepRuleHelper::OP_CLONE_LAST ?>,
+			<?= CCepRuleHelper::OP_UNSUPPRESS ?>,
 			<?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>,
 			<?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>,
 			<?= CCepRuleHelper::OP_DISCARD ?>,
-			<?= CCepRuleHelper::OP_CLOSE ?>
+			<?= CCepRuleHelper::OP_CLOSE_EVENT ?>
 		].includes(value)) {
 			return;
 		}
@@ -250,207 +385,3 @@ window.ceprule_operation_edit_popup = new class {
 		this.#setAvailableOperationOptions();
 	}
 };
-
-if (window.customElements.get('z-cep-tagsuggest') === undefined) {
-	class ZCepTagsuggest extends HTMLInputElement {
-
-		/** @type {Array} */
-		#property_tags = ['$IS.COPIED', '$IS.FIRST', '$IS.LAST', '$IS.OPEN', '$IS.SYMPTOM'];
-
-		/** @type {Function} */
-		#handler;
-
-		/** @type {HTMLElement} */
-		#suggestion_container;
-
-		/** @type {Number} */
-		#highlighted_index = -1;
-
-		/** @type {Number} */
-		#suggestions_debounce;
-
-		/** @type {String} */
-		#last_value;
-
-		constructor() {
-			super();
-			this.setAttribute('autocomplete', 'off');
-			this.#handler = this.#onEvent.bind(this);
-			this.#suggestion_container = this.#buildSuggestionsContainer();
-		}
-
-		#buildSuggestionsContainer() {
-			const node = (new Template(`
-				<div class="multiselect-available">
-					<ul class="multiselect-suggest" aria-hidden="true"></ul>
-				</div>
-			`)).evaluateToElement();
-
-			node.addEventListener('mouseover', (e) => {
-				const tag = e.target.dataset?.tag;
-
-				if (tag !== undefined) {
-					node.querySelectorAll('li')
-						.forEach(li => li.classList.toggle('suggest-hover', tag === li.dataset.tag));
-				}
-			});
-
-			node.addEventListener('mousedown', (e) => {
-				this.#select((e.target instanceof HTMLLIElement) ? e.target : e.target.closest('li'));
-			});
-
-			return node;
-		}
-
-		#onEvent(e) {
-			if (e instanceof FocusEvent) {
-				if (e.type === 'focusout') {
-					this.#hideSuggestions();
-				}
-				else if (e.type === 'focusin') {
-					this.#triggerSuggestions(e.target.value);
-				}
-			}
-			else if (e instanceof KeyboardEvent) {
-				if (e.type === 'keyup') {
-					this.#triggerSuggestions(e.target.value);
-				}
-				else if (e.type === 'keydown' && this.#suggestion_container.isConnected) {
-					const items = this.#suggestion_container.querySelectorAll('li');
-
-					switch (e.key) {
-						case 'ArrowDown':
-							e.preventDefault();
-							this.#highlight(Math.min(this.#highlighted_index + 1, items.length - 1));
-							break;
-						case 'ArrowUp':
-							e.preventDefault();
-							this.#highlight(Math.max(this.#highlighted_index - 1, 0));
-							break;
-						case 'Enter':
-							if (this.#highlighted_index >= 0 && items[this.#highlighted_index]) {
-								e.preventDefault();
-								this.#select(items[this.#highlighted_index]);
-							}
-							break;
-					}
-				}
-			}
-			else if (e.type === 'scroll' || e.type === 'resize') {
-				this.#hideSuggestions();
-			}
-		}
-
-		#triggerSuggestions(value) {
-			if (value === this.#last_value) {
-				return;
-			}
-			else {
-				this.#last_value = value;
-			}
-
-			if (!value.startsWith('$')) {
-				return this.#hideSuggestions();
-			}
-
-			clearTimeout(this.#suggestions_debounce);
-
-			const matcher = tag => tag.startsWith(value) && tag !== value;
-			const suggestions = this.#property_tags.filter(matcher);
-			const show = () => this.#showSuggestions(suggestions, value.length);
-
-			suggestions.length
-				? this.#suggestions_debounce = setTimeout(show, 50)
-				: this.#hideSuggestions();
-		}
-
-		#showSuggestions(suggestions, match_position) {
-			const ul = this.#suggestion_container.querySelector('ul');
-
-			suggestions.sort()
-				.map((suggestion, index) => (new Template(`
-					<li data-tag="#{tag}"><span class="suggest-found">#{match}</span>#{unmatch}</li>
-				`)).evaluateToElement({
-					tag: suggestion,
-					match: suggestion.substr(0, match_position),
-					unmatch: suggestion.substr(match_position)
-				}))
-				.map((node, index) => ul.children[index] !== undefined
-					? ul.children[index].replaceWith(node)
-					: ul.append(node)
-				);
-
-			while (ul.children.length > suggestions.length) {
-				ul.children[ul.children.length - 1].remove();
-			}
-
-			this.#positionSuggestions();
-			this.#highlight(0);
-
-			!this.#suggestion_container.isConnected && document.body.append(this.#suggestion_container);
-		}
-
-		#positionSuggestions() {
-			const box = this.#suggestion_container;
-			const rect = this.getBoundingClientRect();
-			const gap = 2;
-			const box_height = box.offsetHeight;
-			const space_below = window.innerHeight - rect.bottom - gap;
-			const space_above = rect.top - gap;
-
-			if (box_height <= space_below || space_below >= space_above) {
-				box.style.marginTop = '';
-				box.style.top = `${rect.bottom + gap + window.scrollY}px`;
-			}
-			else {
-				box.style.marginTop = `${-(box_height + gap)}px`;
-				box.style.top = `${rect.top + window.scrollY}px`;
-			}
-
-			box.style.width = `${rect.width}px`;
-			box.style.left = `${rect.left + window.scrollX}px`;
-		}
-
-		#hideSuggestions() {
-			this.#last_value = null;
-			clearTimeout(this.#suggestions_debounce);
-			this.#suggestion_container.isConnected && this.#suggestion_container.remove();
-		}
-
-		#highlight(index) {
-			this.#suggestion_container.querySelectorAll('li').forEach((item, i) => {
-				item.classList.toggle('suggest-hover', i === index);
-			});
-
-			this.#highlighted_index = index;
-		}
-
-		#select(li) {
-			this.value = li.dataset.tag;
-			setTimeout(() => this.focus());
-			this.#hideSuggestions();
-		}
-
-		connectedCallback() {
-			this.addEventListener('keydown', this.#handler);
-			this.addEventListener('keyup', this.#handler);
-			this.addEventListener('focusin', this.#handler);
-			this.addEventListener('focusout', this.#handler);
-
-			window.addEventListener('resize', this.#handler);
-			window.addEventListener('scroll', this.#handler, {capture: true, passive: true});
-		}
-
-		disconnectedCallback() {
-			this.removeEventListener('keydown', this.#handler);
-			this.removeEventListener('keyup', this.#handler);
-			this.removeEventListener('focusin', this.#handler);
-			this.removeEventListener('focusout', this.#handler);
-
-			window.removeEventListener('resize', this.#handler);
-			window.removeEventListener('scroll', this.#handler, {capture: true, passive: true});
-		}
-	}
-
-	window.customElements.define('z-cep-tagsuggest', ZCepTagsuggest, {extends: 'input'});
-}

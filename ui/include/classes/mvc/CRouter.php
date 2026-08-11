@@ -73,6 +73,7 @@ class CRouter {
 		'ceprule.edit'								=> [CControllerCepRuleEdit::class,									'layout.json',			'ceprule.edit'],
 		'ceprule.enable'							=> [CControllerCepRuleEnable::class,								'layout.json',			null],
 		'ceprule.list'								=> [CControllerCepRuleList::class,									'layout.htmlpage',		'ceprule.list'],
+		'ceprule.resettimewindows'					=> [CControllerCepRuleResetTimeWindows::class,						'layout.json',			null],
 		'ceprule.update'							=> [CControllerCepRuleUpdate::class,								'layout.json',			null],
 		'connector.create'							=> [CControllerConnectorCreate::class,								'layout.json',			null],
 		'connector.delete'							=> [CControllerConnectorDelete::class,								'layout.json',			null],
