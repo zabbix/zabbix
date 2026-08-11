@@ -1741,7 +1741,7 @@ static void	host_event_maintenance_clean(void *data)
  *                                                                            *
  * Parameters: query          - [IN/OUT]                                      *
  *             maintenances   - [IN]                                          *
- *             maintenanceids - [IN] locked maintenanceids                    *
+ *             maintenanceids - [IN] sorted locked maintenanceids             *
  *                                                                            *
  ******************************************************************************/
 static void	append_query_maintenances(zbx_event_suppress_query_t *query,
@@ -1790,7 +1790,7 @@ static void	append_query_maintenances(zbx_event_suppress_query_t *query,
  * Parameters: event_queries  - [IN/OUT] in - event data                      *
  *                                       out - running maintenances for each  *
  *                                            event                           *
- *             maintenanceids - [IN] the maintenances to process              *
+ *             maintenanceids - [IN] sorted maintenances to process           *
  *                                                                            *
  * Return value: SUCCEED - at least one matching maintenance was found        *
  *                                                                            *

@@ -2294,8 +2294,9 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 		time_t		now;
 
 		/* get maintenance data and save it in database */
-		if (SUCCEED == zbx_dc_get_event_maintenances(&event_queries, maintenanceids) &&
-				SUCCEED == zbx_db_lock_maintenanceids(maintenanceids))
+		/* zbx_db_lock_maintenanceids() sorts maintenanceids vector */
+		if (SUCCEED == zbx_db_lock_maintenanceids(maintenanceids) &&
+				SUCCEED == zbx_dc_get_event_maintenances(&event_queries, maintenanceids))
 		{
 			zbx_db_insert_prepare(&db_insert_es, "event_suppress", "event_suppressid", "eventid",
 					"maintenanceid", "suppress_until", (char *)NULL);
@@ -2313,15 +2314,6 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 				for (int i = 0; i < query->maintenances.values_num; i++)
 				{
-					/* when locking maintenances not-locked (deleted) maintenance ids */
-					/* are removed from the maintenanceids vector                   */
-					if (FAIL == zbx_vector_uint64_bsearch(maintenanceids,
-							query->maintenances.values[i].first,
-							ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-					{
-						continue;
-					}
-
 					zbx_db_insert_add_values(&db_insert_es, __UINT64_C(0), query->eventid,
 							query->maintenances.values[i].first,
 							(int)query->maintenances.values[i].second);
