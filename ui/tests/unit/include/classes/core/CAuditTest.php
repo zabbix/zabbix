@@ -441,6 +441,47 @@ class CAuditTest extends TestCase {
 				'item.query.columns[1]' => [CAudit::DETAILS_ACTION_DELETE]
 			]
 		];
+		yield '"item.query.columns" delete all columns' => [
+			CAudit::RESOURCE_ITEM,
+			CAudit::ACTION_UPDATE,
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [
+						['column' => '', 'function' => AGGREGATE_COUNT, 'alias' => 'total']
+					],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'formula' => '',
+						'conditions' => []
+					]
+				]
+			],
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [
+						['column' => 'Timestamp', 'attribute_key' => ''],
+						['column' => 'SpanId', 'attribute_key' => '']
+					],
+					'aggregated_columns' => [
+						['column' => '', 'function' => AGGREGATE_COUNT, 'alias' => 'total']
+					],
+					'filter' => [
+						'evaltype' => 0,
+						'formula' => '',
+						'conditions' => []
+					]
+				]
+			],
+			[
+				'item.query.columns[1]' => [CAudit::DETAILS_ACTION_DELETE],
+				'item.query.columns[2]' => [CAudit::DETAILS_ACTION_DELETE]
+			]
+		];
 		yield '"item.query.aggregated_columns[1].alias" change from "min" to "minimum"' => [
 			CAudit::RESOURCE_ITEM,
 			CAudit::ACTION_UPDATE,
