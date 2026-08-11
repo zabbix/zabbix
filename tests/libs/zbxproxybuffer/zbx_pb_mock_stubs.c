@@ -75,62 +75,56 @@ void	zbx_dc_config_clean_items(void *items, int *errcodes, size_t num)
 	fail_msg("unexpected zbx_dc_config_clean_items() call - not exercised by these tests");
 }
 
+/* no-op mocks: most tests in this suite force ZBX_PB_MODE_MEMORY and never reach the
+ * database write path, but pb_autoreg_write_host()/pb_discovery_close() fall through to
+ * it unconditionally once a fallback-to-database transition happens mid-call, so these
+ * need to behave, not fail - callers here don't inspect db_insert content afterwards. */
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 {
 	ZBX_UNUSED(self);
 	ZBX_UNUSED(table);
-
-	fail_msg("unexpected zbx_db_insert_prepare() call - these tests force ZBX_PB_MODE_MEMORY");
 }
 
 void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 {
 	ZBX_UNUSED(self);
-
-	fail_msg("unexpected zbx_db_insert_add_values() call - these tests force ZBX_PB_MODE_MEMORY");
 }
 
 int	zbx_db_insert_execute(zbx_db_insert_t *self)
 {
 	ZBX_UNUSED(self);
 
-	fail_msg("unexpected zbx_db_insert_execute() call - these tests force ZBX_PB_MODE_MEMORY");
-
-	return FAIL;
+	return SUCCEED;
 }
 
 void	zbx_db_insert_clean(zbx_db_insert_t *self)
 {
 	ZBX_UNUSED(self);
-
-	fail_msg("unexpected zbx_db_insert_clean() call - these tests force ZBX_PB_MODE_MEMORY");
 }
 
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field)
 {
 	ZBX_UNUSED(self);
 	ZBX_UNUSED(field);
-
-	fail_msg("unexpected zbx_db_insert_autoincrement() call - these tests force ZBX_PB_MODE_MEMORY");
 }
 
 zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self)
 {
 	ZBX_UNUSED(self);
 
-	fail_msg("unexpected zbx_db_insert_get_lastid() call - these tests force ZBX_PB_MODE_MEMORY");
-
 	return 0;
 }
 
+static zbx_uint64_t	pb_mock_maxid = 1;
+
 zbx_uint64_t	zbx_db_get_maxid_num(const char *table, int num)
 {
+	zbx_uint64_t	id = pb_mock_maxid;
+
 	ZBX_UNUSED(table);
-	ZBX_UNUSED(num);
+	pb_mock_maxid += (zbx_uint64_t)num;
 
-	fail_msg("unexpected zbx_db_get_maxid_num() call - these tests force ZBX_PB_MODE_MEMORY");
-
-	return 0;
+	return id;
 }
 
 int	zbx_db_is_null(const char *field)

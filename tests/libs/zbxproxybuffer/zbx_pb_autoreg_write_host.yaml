@@ -171,9 +171,11 @@ out:
 # pb_autoreg_check_age() coverage: the first row is backdated by stale_offset seconds.
 # offline_buffer is kept large enough that the purge loop does not evict it, so the
 # second write's check_age() call falls through to the max_age gate instead and forces
-# a fallback to database mode ("cached records are too old"). The first row stays in
-# the memory buffer (it was already committed before the fallback); the second row is
-# written straight to the database, so the memory row count stays at 1.
+# a fallback to database mode ("cached records are too old"). pd_fallback_to_database()
+# always clears the memory buffer on transition (pb_flush() only persists to the database
+# first when pb->mode != ZBX_PB_MODE_MEMORY, but always clears regardless of mode), so the
+# first row is dropped, not carried over; the second row is written straight to the
+# database, leaving the memory row count at 0.
 test case: second write falls back to database once first row exceeds max_age
 in:
   host: "staleagent"
@@ -187,7 +189,7 @@ in:
   offline_buffer: 100
   stale_offset: 10
 out:
-  rows: 1
+  rows: 0
   state: 0
 ---
 # same clocks as above but age is larger than stale_offset, so the row must NOT be
