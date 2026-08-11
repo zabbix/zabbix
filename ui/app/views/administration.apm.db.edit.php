@@ -82,7 +82,7 @@ $apm_tab = (new CFormGrid())
 		(new CFormField([
 			(new CPassBox('password'))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-			makeWarningIcon(_('The previous password was cleared due to a url change. Please enter the new password.'))
+			makeWarningIcon(_('The previous password was cleared due to a URL change. Please enter the new password.'))
 				->addClass('js-password-warning'),
 			(new CButton('change_password', _('Change password')))
 				->addClass(ZBX_STYLE_BTN_GREY)
