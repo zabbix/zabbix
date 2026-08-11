@@ -333,7 +333,6 @@ static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 
 		zbx_vector_mw_task_ptr_append(&symptom_tasks, tasks->values[i]);
 
-		zbx_vector_uint64_append(&eventids, event->eventid);
 		zbx_vector_uint64_append(&eventids, event->cause_eventid);
 	}
 
@@ -353,11 +352,6 @@ static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 			const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)symptom_tasks.values[i];
 			zbx_cep_event_t			*event = task->event;
 
-			if (FAIL == zbx_vector_uint64_bsearch(&eventids, event->eventid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			{
-				continue;
-			}
 			if (FAIL == zbx_vector_uint64_bsearch(&eventids, event->cause_eventid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
