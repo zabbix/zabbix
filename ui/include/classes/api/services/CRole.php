@@ -141,8 +141,6 @@ class CRole extends CApiService {
 
 		$this->validateCreate($roles);
 
-		self::addFieldDefaultsByType($roles);
-
 		$ins_roles = [];
 
 		foreach ($roles as $role) {
@@ -238,15 +236,6 @@ class CRole extends CApiService {
 
 		$this->checkDuplicates($roles);
 		$this->checkRules($roles);
-	}
-
-	private static function addFieldDefaultsByType(array &$roles): void {
-		foreach ($roles as &$role) {
-			if ($role['type'] == USER_TYPE_ZABBIX_USER) {
-				$role['rules'] += ['api.access' => ZBX_ROLE_RULE_DISABLED];
-			}
-		}
-		unset($role);
 	}
 
 	/**
@@ -953,7 +942,7 @@ class CRole extends CApiService {
 			'modules' => [],
 			'modules.default_access' => ZBX_ROLE_RULE_ENABLED,
 			'api' => [],
-			'api.access' => ZBX_ROLE_RULE_ENABLED,
+			'api.access' => ZBX_ROLE_RULE_DISABLED,
 			'api.mode' => ZBX_ROLE_RULE_API_MODE_DENY,
 			'actions' => [],
 			'actions.default_access' => ZBX_ROLE_RULE_ENABLED,
