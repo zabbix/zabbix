@@ -323,6 +323,13 @@ class CItemPrototype extends CItemGeneral {
 		$items = $this->unsetExtraFields($items, ['name_upper']);
 
 		self::prepareItemsForApi($items, false);
+
+		foreach ($items as &$item) {
+			if (array_key_exists('query', $item)) {
+				$item['query'] = CItemTypeTelemetryQuery::convertFilterExpressionToFormula($item['query']);
+			}
+		}
+		unset($item);
 	}
 
 	/**

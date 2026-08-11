@@ -407,6 +407,8 @@ abstract class CItemGeneral extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
+				$item['query'] = $item_type::convertFilterFormulaToExpression($item['query']);
+
 				if (strlen($item_type::prepareQueryFieldForDb($item['query']))
 						> DB::getFieldLength('items', 'query')) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
@@ -2873,7 +2875,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if (array_key_exists('query', $item)) {
-			$item['query'] = CItemTypeTelemetryQuery::prepareQueryFieldForApi($item['query'], $sortorder);
+			$item['query'] = CItemTypeTelemetryQuery::prepareQueryFieldForApi($item['query']);
 		}
 	}
 

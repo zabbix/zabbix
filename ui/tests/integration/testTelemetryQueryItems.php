@@ -1466,7 +1466,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			'key_' => self::ITEM_KEY,
 			'type' => ITEM_TYPE_TELEMETRY_QUERY,
 			'value_type' => self::ITEM_VALUE_TYPE,
-			'timeout' => '3s',
+			'timeout' => '3s'
 		], $item_fields));
 
 		$this->assertArrayHasKey('itemids', $response['result']);

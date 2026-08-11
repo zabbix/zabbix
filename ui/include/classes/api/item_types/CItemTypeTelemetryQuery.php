@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 class CItemTypeTelemetryQuery extends CItemType {
 
 	/**
@@ -199,7 +200,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 */
 	public static function validateAggregatedColumns(array $item, string $path, ?string &$error): bool {
 		foreach ($item['query']['aggregated_columns'] as $i => $column) {
-			if ($column['function'] == AGGREGATE_PCTILE && count($column['parameters']) != 1) {
+			if ($column['function'] == AGGREGATE_PCTILE && count($column['parameters']) > 1) {
 				$error = _s('Invalid parameter "%1$s": %2$s.',
 					$path.'/query/aggregated_columns/'.($i + 1).'/parameters',
 					_s('maximum number of array elements is %1$s', 1)
@@ -292,15 +293,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @param array $query  Array for "item.query" configuration
 	 */
 	public static function prepareQueryFieldForDb(array $query): string {
-		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-			CConditionHelper::replaceFormulaIds($query['filter']['formula'], $query['filter']['conditions']);
-
-			foreach ($query['filter']['conditions'] as &$condition) {
-				unset($condition['formulaid']);
-			}
-			unset($condition);
-		}
-
 		foreach ($query['aggregated_columns'] as &$column) {
 			if ($column['function'] == AGGREGATE_PCTILE) {
 				// Server expects "query.aggregated_columns[].parameters" to be stored as array of strings.
@@ -315,11 +307,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 	/**
 	 * Deserialize "item.query" field from JSON string for API output.
 	 *
-	 * @param string $query        JSON encoded string with "item.query" configuration
-	 * @param bool   $db_notation  Set to false to convert "item.query.filter.formula" from "{0} or {1}" like notation
-	 *                             to "A or B" with additional key "formulaid" set for each condition.
+	 * @param string $query               JSON encoded string with "item.query" configuration
 	 */
-	public static function prepareQueryFieldForApi(string $query, bool $db_notation): array {
+	public static function prepareQueryFieldForApi(string $query): array {
 		if ($query === '') {
 			return [];
 		}
@@ -330,7 +320,17 @@ class CItemTypeTelemetryQuery extends CItemType {
 			return [];
 		}
 
-		if (!$db_notation && $query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+		return $query;
+	}
+
+	/**
+	 * Convert "query.filter" from expression (database, audit log: "{0} or {1}") to formula (API: "A or B").
+	 *
+	 * @param array $query  Item "query" configuration.
+	 * @return array
+	 */
+	public static function convertFilterExpressionToFormula(array $query): array {
+		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 			$i = 0;
 
 			foreach ($query['filter']['conditions'] as &$condition) {
@@ -340,6 +340,25 @@ class CItemTypeTelemetryQuery extends CItemType {
 			unset($condition);
 
 			CConditionHelper::replaceConditionIds($query['filter']['formula'], $query['filter']['conditions']);
+		}
+
+		return $query;
+	}
+
+	/**
+	 * Convert "query.filter" from formula (API: "A or B") to expression (database, audit log: "{0} or {1}").
+	 *
+	 * @param array $query  Item "query" configuration.
+	 * @return array
+	 */
+	public static function convertFilterFormulaToExpression(array $query): array {
+		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			CConditionHelper::replaceFormulaIds($query['filter']['formula'], $query['filter']['conditions']);
+
+			foreach ($query['filter']['conditions'] as &$condition) {
+				unset($condition['formulaid']);
+			}
+			unset($condition);
 		}
 
 		return $query;

@@ -473,6 +473,10 @@ class CItem extends CItemGeneral {
 		self::prepareItemsForApi($items, false);
 
 		foreach ($items as &$item) {
+			if (array_key_exists('query', $item)) {
+				$item['query'] = CItemTypeTelemetryQuery::convertFilterExpressionToFormula($item['query']);
+			}
+
 			// Items share table with item prototypes. Therefore remove item unrelated fields.
 			unset($item['discover']);
 		}
