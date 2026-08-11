@@ -425,7 +425,6 @@ class testDashboardClockWidget extends CWebTest {
 						'Refresh interval' => '30 seconds',
 						'Time type' => 'Host time',
 						'Item' => 'Item for clock widget'
-==== BASE ====
 					]
 				]
 			],
