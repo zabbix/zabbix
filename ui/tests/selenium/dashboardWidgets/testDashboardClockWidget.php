@@ -198,6 +198,7 @@ class testDashboardClockWidget extends testWidgets {
 			'Name' => '',
 			'Refresh interval' => 'Default (15 minutes)',
 			'Time type' => 'Local time',
+			'Time zone' => 'Local default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga'),
 			'Clock type' => 'Analog',
 			'id:show_header' => true
 		]);
