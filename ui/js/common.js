@@ -1169,6 +1169,14 @@ function objectSetDeepValue(object, path, value) {
 		if (!Object.hasOwn(tmp, key)) {
 			tmp[key] = Object.create(null);
 		}
+		else if (tmp[key] === null) {
+			if (value === null) {
+				return object;
+			}
+			else {
+				throw Error('Trying to set value to null object.');
+			}
+		}
 
 		if (typeof tmp[key] !== 'object') {
 			throw Error('Invalid path. Node is not an Object.');

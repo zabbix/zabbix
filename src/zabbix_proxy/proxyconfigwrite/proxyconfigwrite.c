@@ -2459,7 +2459,7 @@ out:
 void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
 		const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, const char *server)
+		const char *config_ssl_key_location, const char *server, int *vault_ret)
 {
 	struct zbx_json_parse		jp_config, jp_kvs_paths = {0};
 	int				ret, locked = 0;
@@ -2537,7 +2537,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 			{
 				zbx_dc_sync_kvs_paths(&jp_kvs_paths, config_vault, config_source_ip,
 						config_ssl_ca_location, config_ssl_cert_location,
-						config_ssl_key_location);
+						config_ssl_key_location, vault_ret);
 			}
 		}
 		else

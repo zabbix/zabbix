@@ -68,6 +68,7 @@ This template has been tested on:
 |{$SW.NAME.NOT_MATCHES}|<p>Used in Software blade discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$LICENSE.EXPIRY.WARN}|<p>Number of days until the license expires.</p>|`7`|
 |{$LICENSE.CONTROL}|<p>Used in Software blade discovery. Can be overridden on the host or linked template level.</p>|`1`|
+|{$SNMP.UPTIME.WARN}|<p>Uptime threshold above which the restart problem auto-resolves.</p>|`10m`|
 
 ### Items
 
@@ -122,7 +123,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |Check Point: Device has been replaced|<p>The device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#2) and length(last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
 |Check Point: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.name,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.name,#2) and length(last(/Check Point Next Generation Firewall by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|Check Point: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.uptime)<10m`|Info|**Manual close**: Yes|
+|Check Point: Device has been restarted|<p>The uptime counter has decreased, which indicates that the device has been restarted.<br>A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.<br>The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.</p>|`change(/Check Point Next Generation Firewall by SNMP/system.uptime)<0 and last(/Check Point Next Generation Firewall by SNMP/system.uptime,#2)<42949672.96-(lastclock(/Check Point Next Generation Firewall by SNMP/system.uptime)-lastclock(/Check Point Next Generation Firewall by SNMP/system.uptime,#2))`|Info|**Manual close**: Yes|
 |Check Point: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Check Point Next Generation Firewall by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}`|Warning||
 |Check Point: Load average is too high|<p>The load average per CPU is too high. The system may be slow to respond.</p>|`min(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg1,5m)/last(/Check Point Next Generation Firewall by SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN} and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg5)>0 and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg15)>0`|Average||
 |Check Point: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Check Point Next Generation Firewall by SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}`|Average||

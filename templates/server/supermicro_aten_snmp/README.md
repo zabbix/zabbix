@@ -32,6 +32,7 @@ Refer to the vendor documentation.
 |{$TEMP_CRIT_LOW}||`5`|
 |{$TEMP_WARN}||`50`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
+|{$SNMP.UPTIME.WARN}|<p>Uptime threshold above which the "Host has been restarted" problem auto-resolves.</p>|`10m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
 
@@ -56,7 +57,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Supermicro Aten: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Supermicro Aten by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Supermicro Aten: No SNMP data collection</li></ul>|
+|Supermicro Aten: Host has been restarted|<p>The uptime counter has decreased, which indicates that the host has been restarted.<br>A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.<br>The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.</p>|`(last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0],#2))) or (last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/Supermicro Aten by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/Supermicro Aten by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/Supermicro Aten by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/Supermicro Aten by SNMP/system.net.uptime[sysUpTime.0],#2)))`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Supermicro Aten: No SNMP data collection</li></ul>|
 |Supermicro Aten: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Supermicro Aten by SNMP/system.name,#1)<>last(/Supermicro Aten by SNMP/system.name,#2) and length(last(/Supermicro Aten by SNMP/system.name))>0`|Info|**Manual close**: Yes|
 |Supermicro Aten: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Supermicro Aten by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Supermicro Aten: Unavailable by ICMP ping</li></ul>|
 |Supermicro Aten: Unavailable by ICMP ping|<p>Last three attempts returned timeout. Please check device connectivity.</p>|`max(/Supermicro Aten by SNMP/icmpping,#3)=0`|High||

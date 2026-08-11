@@ -24,7 +24,7 @@ zabbix_export:
         Use this template if you can't find the template for specific vendor or device family.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -759,7 +759,7 @@ zabbix_export:
           description: 'Warning threshold of ICMP packet loss in %.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             section_name: Thresholds
             label: 'Threshold of ICMP packet loss'
             description: 'Warning threshold of ICMP packet loss in %. In the range from 0 to 100 inclusive.'
@@ -769,7 +769,7 @@ zabbix_export:
           description: 'Warning threshold of the average ICMP response time in seconds.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             section_name: Thresholds
             label: 'Threshold of the average ICMP response'
             description: 'Warning threshold of the average ICMP response time in seconds. No less than 0.'
@@ -778,7 +778,7 @@ zabbix_export:
           value: '2'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -786,7 +786,7 @@ zabbix_export:
           value: '95'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
             description: 'In the range from 0 to 100 inclusive.'
@@ -795,7 +795,7 @@ zabbix_export:
           value: '1'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Other
             label: 'Interfaces control'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -803,7 +803,7 @@ zabbix_export:
           value: '^.*'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Filter for network interface by adminstatus'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
@@ -811,42 +811,42 @@ zabbix_export:
           description: 'Ignore down(2) administrative status'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Filter for network interface by adminstatus (exclude)'
         - macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '.*'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Filter for network interfaces by alias'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Filter for network interfaces by alias (exclude)'
         - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Filter for network interfaces by description'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Filter for network interfaces by description (exclude)'
         - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '^.*$'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Filters
             label: 'Filter for network interface by name'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
@@ -854,7 +854,7 @@ zabbix_export:
           description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Filter for network interface by name (exclude)'
             description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
@@ -862,7 +862,7 @@ zabbix_export:
           value: '^.*$'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Filter for network interface by status'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
@@ -870,21 +870,21 @@ zabbix_export:
           description: 'Ignore notPresent(6)'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Filter for network interface by status (exclude)'
         - macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Filter for network interfaces by type'
         - macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Filter for network interfaces by type (exclude)'
         - macro: '{$SNMP.TIMEOUT}'
@@ -896,6 +896,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'Time interval for the SNMP availability trigger.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '2'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
       dashboards:
         - uuid: fa7619be2ccf481db4f7a334b380e2ab
           name: 'Network interfaces'
@@ -1534,11 +1543,20 @@ zabbix_export:
               newvalue: unknown
   triggers:
     - uuid: 536fafc0bb664fcb8b4c8acc18fe5c29
-      expression: '(last(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Network Generic Device by SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: |
+        (last(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0],#2)))
+        or (last(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/Network Generic Device by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/Network Generic Device by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/Network Generic Device by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/Network Generic Device by SNMP/system.net.uptime[sysUpTime.0],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
+        or last(/Network Generic Device by SNMP/system.net.uptime[sysUpTime.0])>{$SNMP.UPTIME.WARN}
       name: 'Network Generic Device: Host has been restarted'
-      event_name: 'Network Generic Device: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'Network Generic Device: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       dependencies:
         - name: 'Network Generic Device: No SNMP data collection'
