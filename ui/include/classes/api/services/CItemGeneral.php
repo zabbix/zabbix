@@ -403,7 +403,7 @@ abstract class CItemGeneral extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
-				if ($item['query']['filter'] && !$item_type::validateFilter($item, $path, $error)) {
+				if (!$item_type::validateFilter($item, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
