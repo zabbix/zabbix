@@ -1741,7 +1741,7 @@ static void	host_event_maintenance_clean(void *data)
  *                                                                            *
  * Parameters: query          - [IN/OUT]                                      *
  *             maintenances   - [IN]                                          *
- *             maintenanceids - [IN] sorted locked maintenanceids             *
+ *             maintenanceids - [IN] sorted vector of locked maintenance ids  *
  *                                                                            *
  ******************************************************************************/
 static void	append_query_maintenances(zbx_event_suppress_query_t *query,
@@ -1790,7 +1790,7 @@ static void	append_query_maintenances(zbx_event_suppress_query_t *query,
  * Parameters: event_queries  - [IN/OUT] in - event data                      *
  *                                       out - running maintenances for each  *
  *                                            event                           *
- *             maintenanceids - [IN] sorted maintenances to process           *
+ *             maintenanceids - [IN] sorted vector of maintenances to process *
  *                                                                            *
  * Return value: SUCCEED - at least one matching maintenance was found        *
  *                                                                            *
@@ -2000,6 +2000,8 @@ int	zbx_dc_get_running_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 	}
 
 	UNLOCK_CACHE;
+
+	zbx_vector_uint64_sort(maintenanceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	return (0 != maintenanceids->values_num ? SUCCEED : FAIL);
 }

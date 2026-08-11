@@ -489,7 +489,6 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 
 		zbx_db_begin();
 
-		/* zbx_db_lock_maintenanceids() sorts maintenanceids vector */
 		if (0 != maintenanceids.values_num && SUCCEED == zbx_db_lock_maintenanceids(&maintenanceids))
 			zbx_dc_get_event_maintenances(&event_queries, &maintenanceids);
 
