@@ -204,8 +204,6 @@ class CTrigger extends CTriggerGeneral {
 
 		// maintenanceids
 		if ($options['maintenanceids'] !== null) {
-			zbx_value2array($options['maintenanceids']);
-
 			$sqlParts['join']['mt'] = ['table' => 'maintenance_trigger', 'using' => 'triggerid'];
 			$sqlParts['where'][] = dbConditionInt('mt.maintenanceid', $options['maintenanceids']);
 
@@ -529,6 +527,7 @@ class CTrigger extends CTriggerGeneral {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Filters.
+			'maintenanceids' =>         ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],

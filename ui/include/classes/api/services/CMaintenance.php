@@ -1368,9 +1368,9 @@ class CMaintenance extends CApiService {
 				'output' => ['maintenance_triggerid', 'maintenanceid', 'triggerid'],
 				'filter' => ['maintenanceid' => $target_maintenanceids['triggers']]
 			];
-			$db_triggers = DBselect(DB::makeSql('maintenance_trigger', $options));
+			$resource = DBselect(DB::makeSql('maintenance_trigger', $options));
 
-			while ($db_trigger = DBfetch($db_triggers)) {
+			while ($db_trigger = DBfetch($resource)) {
 				$db_maintenances[$db_trigger['maintenanceid']]['triggers'][$db_trigger['maintenance_triggerid']] = [
 					'maintenance_triggerid' => $db_trigger['maintenance_triggerid'],
 					'triggerid' => $db_trigger['triggerid']
@@ -1407,9 +1407,9 @@ class CMaintenance extends CApiService {
 			'output' => ['maintenance_eventnameid', 'maintenanceid', 'value', 'operator'],
 			'filter' => ['maintenanceid' => $maintenanceids]
 		];
-		$db_event_names = DBselect(DB::makeSql('maintenance_eventname', $options));
+		$resource = DBselect(DB::makeSql('maintenance_eventname', $options));
 
-		while ($db_event_name = DBfetch($db_event_names)) {
+		while ($db_event_name = DBfetch($resource)) {
 			$db_maintenances[$db_event_name['maintenanceid']]['event_names']
 					[$db_event_name['maintenance_eventnameid']] = [
 				'maintenance_eventnameid' => $db_event_name['maintenance_eventnameid'],
