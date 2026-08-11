@@ -78,8 +78,3 @@ type AgentOptions struct {
 
 	Plugins map[string]any `conf:"optional"`
 }
-
-// ProfilerDirectory returns the configured profiler directory.
-func (a *AgentOptions) ProfilerDirectory() string {
-	return a.ProfilerDir
-}
