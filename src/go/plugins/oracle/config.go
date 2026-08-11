@@ -16,9 +16,11 @@ package oracle
 
 import (
 	"path/filepath"
+	"strconv"
 
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
 
@@ -33,17 +35,17 @@ type Session struct {
 
 	// Service name that identifies a database instance
 	Service string `conf:"optional"`
+
+	ConnectionTimeout string `conf:"name=ConnectionTimeout,optional"`
 }
 
 // PluginOptions option from the config file.
 type PluginOptions struct {
-	// ConnectTimeout is the maximum time in seconds for waiting when a connection has to be established.
-	// Default value equals to the global timeout.
-	ConnectTimeout int `conf:"optional,range=1:30"`
+	// Deprecated old timeout value kept for compatibility.
+	LegacyConnectionTimeout int `conf:"name=ConnectTimeout,optional,range=1:30"`
 
-	// CallTimeout is the maximum time in seconds for waiting when a request has to be done.
-	// Default value equals to the global agent timeout.
-	CallTimeout int `conf:"optional,range=1:30"`
+	// Deprecated old timeout value kept for compatibility.
+	LegacyItemTimeout int `conf:"name=CallTimeout,optional,range=1:30"`
 
 	// KeepAlive is a time to wait before unused connections will be closed.
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
@@ -73,12 +75,28 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 
 	p.options.setCustomQueriesPathDefault()
 
-	if p.options.ConnectTimeout == 0 {
-		p.options.ConnectTimeout = global.Timeout
+	if p.options.LegacyConnectionTimeout != 0 {
+		log.Debugf("'Plugins.Oracle.ConnectTimeout' is deprecated")
+
+		if p.options.Default.ConnectionTimeout == "" {
+			p.options.Default.ConnectionTimeout = strconv.Itoa(p.options.LegacyConnectionTimeout)
+		}
 	}
 
-	if p.options.CallTimeout == 0 {
-		p.options.CallTimeout = global.Timeout
+	if p.options.LegacyItemTimeout != 0 {
+		log.Debugf("'Plugins.Oracle.CallTimeout' is deprecated")
+	}
+
+	if p.options.Default.ConnectionTimeout == "" {
+		p.options.Default.ConnectionTimeout = strconv.Itoa(global.Timeout)
+	}
+
+	if p.options.LegacyConnectionTimeout == 0 {
+		p.options.LegacyConnectionTimeout = global.Timeout
+	}
+
+	if p.options.LegacyItemTimeout == 0 {
+		p.options.LegacyItemTimeout = global.Timeout
 	}
 }
 
@@ -90,6 +108,44 @@ func (p *Plugin) Validate(options any) error { //nolint:revive
 	err := conf.UnmarshalStrict(options, &opts)
 	if err != nil {
 		return errs.Wrap(err, "failed to unmarshal configuration options")
+	}
+
+	for k, s := range opts.Sessions {
+		if s.ConnectionTimeout != "" {
+			ct, err := strconv.Atoi(s.ConnectionTimeout)
+			if err != nil {
+				return errs.Errorf(
+					"connection timeout '%v' must be an integer for session %s",
+					s.ConnectionTimeout,
+					k,
+				)
+			}
+
+			if ct < 1 || ct > 30 {
+				return errs.Errorf(
+					"connection timeout '%v' for session %s must be between 1 and 30",
+					s.ConnectionTimeout,
+					k,
+				)
+			}
+		}
+	}
+
+	if opts.Default.ConnectionTimeout != "" {
+		t, err := strconv.Atoi(opts.Default.ConnectionTimeout)
+		if err != nil {
+			return errs.Errorf(
+				"default connection timeout '%v' must be an integer",
+				opts.Default.ConnectionTimeout,
+			)
+		}
+
+		if t < 1 || t > 30 {
+			return errs.Errorf(
+				"default connection timeout '%v' must be between 1 and 30",
+				opts.Default.ConnectionTimeout,
+			)
+		}
 	}
 
 	if opts.CustomQueriesEnabled && opts.CustomQueriesPath != "" && !filepath.IsAbs(opts.CustomQueriesPath) {

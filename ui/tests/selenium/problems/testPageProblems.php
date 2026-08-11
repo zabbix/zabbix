@@ -430,7 +430,7 @@ class testPageProblems extends CWebTest {
 		);
 
 		// Check Problems table layout.
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$this->assertEquals(['Time', 'Severity', 'Host', 'Problem'], $table->getSortableHeaders()->asText());
 
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
@@ -1882,7 +1882,7 @@ class testPageProblems extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1');
 		$form = CFilterElement::find()->one()->getForm();
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 
 		if (array_key_exists('Tags', $data)) {
 			$form->fill(['id:evaltype_0' => $data['Tags']['Type']]);
@@ -2010,7 +2010,7 @@ class testPageProblems extends CWebTest {
 				else {
 					$arrow->one()->click();
 					$dependency_dialog = $this->query($dialog_selector)->one()->waitUntilVisible();
-					$this->assertEquals("Depends on\n".$dependency, $dependency_dialog->getText());
+					$this->assertEquals("Dependent trigger\n".$dependency, $dependency_dialog->getText());
 					$dependency_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 					$dependency_dialog->waitUntilNotPresent();
 				}
@@ -2255,12 +2255,12 @@ class testPageProblems extends CWebTest {
 	 *
 	 * @onAfter removeSavedLayout
 	 */
-	public function testPageProblems_OperationalData($data){
+	public function testPageProblems_OperationalData($data) {
 		$this->page->login()->open(self::URL.'&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
 
 		$form->fill($data['filter'])->submit();
-		$this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 
 		// Set operational data in Problem column.
 		if (array_key_exists('header_settings', $data)) {
@@ -2272,7 +2272,7 @@ class testPageProblems extends CWebTest {
 			$this->updateColumnList($data['update_colmuns']);
 		}
 
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$column = (array_key_exists('header_settings', $data)) ? 'Problem' : 'Operational data';
 		$problem_name = (array_key_exists('header_settings', $data) && $data['custom data'] !== '')
 			? $data['filter']['Problem'].' ('.$data['custom data'].')'
@@ -2331,7 +2331,7 @@ class testPageProblems extends CWebTest {
 
 		// Check table contents before filtering. Set false "Show timeline" because it makes table complicated.
 		$this->changeLayoutFromHeader(['Time' => ['Show timeline' => false]]);
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$start_rows_count = $table->getRows()->count();
 		$this->assertDatatableStats($start_rows_count);
 		$start_contents = $this->getDatatableColumnData('Problem');

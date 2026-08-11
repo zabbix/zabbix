@@ -168,7 +168,7 @@ class testZBX6663 extends CLegacyWebTest {
 			$form->fill(['Name' => $zbx_data['host']]);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
-			$table = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+			$table = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 			if (isset($zbx_data['discoveryRule'])) {
 				$table->findRow('Name', $zbx_data['host'])->getColumn('Discovery')->query('link:Discovery')->one()->click();
@@ -187,9 +187,11 @@ class testZBX6663 extends CLegacyWebTest {
 			$this->query('button:Reset')->one()->click();
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$form->fill(['Name' => $zbx_data['template']]);
+			$table = $this->query('id:datatable-templates')->asDatatable()->one();
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
-			$table = $this->query('id:templates')->asDatatable()->one()->waitUntilReady();
+			$table->waitUntilReloaded();
+			$table->waitUntilRowsCount(1);
 
 			if (isset($zbx_data['discoveryRule'])) {
 				$table->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();

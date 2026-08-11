@@ -236,7 +236,7 @@ class CMacroValue extends CDiv {
 		]))
 			->addClass($dropdown_btn_class)
 			->setAttribute('disabled', $this->readonly ? 'disabled' : null)
-			->setAttribute('aria-label', _('Change type'))
+			->setAttribute('aria-label', _('Change macro value type'))
 			->setAttribute('data-skip-from-submit', $this->getAttribute('data-skip-from-submit'));
 
 		$this->removeAttribute('data-skip-from-submit');
