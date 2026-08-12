@@ -5814,8 +5814,6 @@ z-textarea-flexible {
     border-radius: var(--input-border-radius); }
     z-textarea-flexible textarea[readonly]:focus {
       border-color: #000000; }
-  z-textarea-flexible[disabled] {
-    vertical-align: top; }
 
 .widget-field-sparkline {
   display: grid;
