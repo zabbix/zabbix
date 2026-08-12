@@ -7831,7 +7831,8 @@ return [
 			'value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048
+				'length' => 2048,
+				'default' => ''
 			]
 		]
 	],
