@@ -264,7 +264,7 @@ $form_list
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow(_('URL (after login)'),[
+	->addRow(_('URL (after login)'), [
 		(new CTextAreaFlexible('url', $data['url']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('users', 'url'))

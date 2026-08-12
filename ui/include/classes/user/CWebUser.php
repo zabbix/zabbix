@@ -91,15 +91,13 @@ class CWebUser {
 	}
 
 	/**
-	 * Returns the proper URL for redirection according to User profile settings in user role
+	 * Returns the appropriate redirect URL based on the user's profile settings in User role or User settings.
 	 *
-	 * @return string
+	 * @return array
 	 *
 	 * @throws APIException
 	 */
-	public static function getRedirectUrl(): string {
-		CMessageHelper::clear();
-
+	public static function getRedirectUrl(): array {
 		$validator = new CFrontendActionValidator();
 
 		$roles = API::Role()->get([
@@ -111,34 +109,31 @@ class CWebUser {
 		$user_url = self::$data['url'];
 		$role_url = $roles ? $roles[0]['rules']['profile.redirect.url'] : '';
 		$enforce = $roles && $roles[0]['rules']['profile.redirect.enforce'] != 0;
+		$redirect = ['url' => $role_url, 'error' => false];
 
 		if ($enforce) {
 			if ($role_url === '' || $validator->validate($role_url)) {
-				return $role_url;
+				return $redirect;
 			}
 
-			CMessageHelper::addError(_('Invalid redirect URL.'));
-
-			return '';
+			return ['url' => '', 'error' => true];
 		}
 
 		if ($user_url !== '') {
 			if ($validator->validate($user_url)) {
-				return $user_url;
+				$redirect['url'] = $user_url;
+
+				return $redirect;
 			}
 
-			CMessageHelper::addError(_('Invalid redirect URL.'));
+			$redirect['error'] = true;
 		}
 
 		if ($role_url === '' || $validator->validate($role_url)) {
-			return $role_url;
+			return $redirect;
 		}
 
-		if ($user_url === '') {
-			CMessageHelper::addError(_('Invalid redirect URL.'));
-		}
-
-		return '';
+		return ['url' => '', 'error' => true];
 	}
 
 	public static function checkAuthentication(string $sessionid): bool {

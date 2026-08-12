@@ -95,31 +95,37 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), g
 		redirect($mfa_url->toString());
 	}
 
-	try {
-		$redirect = array_filter([$request, CWebUser::getRedirectUrl(), CMenuHelper::getFirstUrl()]);
+	CMessageHelper::clear();
 
-		$response = new CControllerResponseRedirect(
-			new CUrl(reset($redirect))
-		);
+	$redirect = CWebUser::getRedirectUrl();
 
-		$response->redirect();
+	if ($redirect['error']) {
+		CMessageHelper::addError(_('Invalid redirect URL.'));
 	}
-	catch (APIException $e) {
-		error($e->getMessage());
-	}
+
+	$redirect = array_filter([$request, $redirect['url'], CMenuHelper::getFirstUrl()]);
+
+	$response = new CControllerResponseRedirect(
+		new CUrl(reset($redirect))
+	);
+
+	$response->redirect();
 }
 
 if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
-	try {
-		$response = new CControllerResponseRedirect(
-			new CUrl(CWebUser::getRedirectUrl() ? : CMenuHelper::getFirstUrl())
-		);
+	CMessageHelper::clear();
 
-		$response->redirect();
+	$redirect = CWebUser::getRedirectUrl();
+
+	if ($redirect['error']) {
+		CMessageHelper::addError(_('Invalid redirect URL.'));
 	}
-	catch (APIException $e) {
-		error($e->getMessage());
-	}
+
+	$response = new CControllerResponseRedirect(
+		new CUrl($redirect['url'] ? : CMenuHelper::getFirstUrl())
+	);
+
+	$response->redirect();
 }
 
 $messages = get_and_clear_messages();

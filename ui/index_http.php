@@ -64,7 +64,15 @@ if ($http_user) {
 				'auth' => CWebUser::$data['sessionid']
 			];
 
-			$redirect = array_filter([$request, CWebUser::getRedirectUrl(), CMenuHelper::getFirstUrl()]);
+			CMessageHelper::clear();
+
+			$redirect = CWebUser::getRedirectUrl();
+
+			if ($redirect['error']) {
+				CMessageHelper::addError(_('Invalid redirect URL.'));
+			}
+
+			$redirect = array_filter([$request, $redirect['url'], CMenuHelper::getFirstUrl()]);
 
 			$response = new CControllerResponseRedirect(
 				new CUrl(reset($redirect))
