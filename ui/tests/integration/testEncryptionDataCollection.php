@@ -1354,13 +1354,11 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		$start_time = time();
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
-		// With OpenSSL, a cipher mismatch does not produce a fatal alert on the wire: the agent
-		// (accepting side) fails to select a shared cipher from the ClientHello and closes the
-		// connection without completing the handshake. The server (connecting side, whose log
-		// this waits on) sees this as an unclean EOF; zbx_tls_connect() logs OpenSSL's exact
-		// reason via its "End of zbx_tls_connect():FAIL error:'...'" debug trace. Verified
-		// empirically with `openssl s_server`/`s_client` using these exact cipher strings.
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'unexpected eof while reading', true, 30);
+		// The agent's ServerActive setting makes it open its own active-checks connection back to
+		// the server; the server's own zbx_tls_accept() is what actually hits the mismatch (no
+		// shared cipher while processing the ClientHello) and logs it on COMPONENT_SERVER,
+		// confirmed against a real run's server log.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'no shared cipher', true, 30);
 
 		$data = $this->call('history.get', [
 			'itemids'   => self::$itemids['enc_agent:agent.ping'],
@@ -1844,11 +1842,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		$start_time = time();
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
-		// The agent (accepting side) sends a fatal "handshake_failure" alert when it finds no
-		// shared cipher; the server (connecting side, whose log this waits on) receives it and
-		// logs GnuTLS's exact alert name via zbx_tls_connect()'s "End of zbx_tls_connect():FAIL
-		// error:'...'" debug trace.
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'Handshake failed', true, 30);
+		// The agent's ServerActive setting makes it open its own active-checks connection back to
+		// the server, so (mirroring the confirmed OpenSSL counterpart) it's the server's own
+		// zbx_tls_accept() that locally fails to negotiate a shared GnuTLS priority during the
+		// handshake and logs it on COMPONENT_SERVER -- not a fatal alert received from the peer.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
+			'No supported cipher suites have been found',
+			'Could not negotiate a supported cipher suite'
+		], true, 30);
 
 		$data = $this->call('history.get', [
 			'itemids'   => self::$itemids['enc_agent:agent.ping'],
