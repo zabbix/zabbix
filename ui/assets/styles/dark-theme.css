@@ -4845,6 +4845,14 @@ section {
   .status-container [class^="status-"][data-hintbox='1'] {
     cursor: pointer; }
 
+.status-list-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 3px; }
+  .status-list-wrapper .status-green, .status-list-wrapper .status-grey {
+    margin-top: 1px;
+    margin-bottom: 1px; }
+
 .status-na-bg,
 .status-info-bg,
 .status-warning-bg,
@@ -5508,7 +5516,7 @@ section {
   display: flex;
   flex-wrap: wrap;
   gap: 2px 3px; }
-  .tags-wrapper .tag, .tags-wrapper .status-green, .tags-wrapper .status-grey {
+  .tags-wrapper .tag {
     margin-top: 1px;
     margin-bottom: 1px; }
   .tags-wrapper.form-field .tag {

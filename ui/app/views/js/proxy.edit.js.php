@@ -93,7 +93,7 @@ window.proxy_edit_popup = new class {
 		const $proxy_group = jQuery('#proxy_groupid').multiSelect('getData');
 		const has_selection = $proxy_group.length > 0;
 
-		if (has_selection && this.warnings?.length) {
+		if (has_selection && this.warnings.length) {
 			this.#removePopupMessages();
 
 			const message_box = makeMessageBox('warning', this.warnings, null, true, false)[0];
