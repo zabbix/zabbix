@@ -53,7 +53,6 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  * Purpose: read data from pipe                                               *
  *                                                                            *
  * Parameters: hRead         - [IN] a handle to the device                    *
- *             hProcess      - [IN] a handle to the child process             *
  *             buf           - [IN/OUT] a pointer to the buffer               *
  *             buf_size      - [IN] buffer size                               *
  *             offset        - [IN/OUT] current position in the buffer        *
@@ -64,11 +63,10 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  * Return value: SUCCEED, FAIL or TIMEOUT_ERROR if timeout reached            *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_read_from_pipe(HANDLE hRead, HANDLE hProcess, char **buf, size_t *buf_size, size_t *offset,
+static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t *offset,
 			int timeout_ms, char *error, size_t max_error_len)
 {
 	DWORD		in_buf_size = 0, read_bytes = 0;
-	DWORD		process_code = STILL_ACTIVE;
 	struct _timeb	start_time, current_time;
 	char 		tmp_buf[ZBX_EXEC_PIPE_SIZE];
 
@@ -78,22 +76,10 @@ static int	zbx_read_from_pipe(HANDLE hRead, HANDLE hProcess, char **buf, size_t 
 	{
 		_ftime(&current_time);
 		if (zbx_get_timediff_ms(&start_time, &current_time) >= timeout_ms)
-		{
-			if (0 == GetExitCodeProcess(hProcess, &process_code))
-				process_code = STILL_ACTIVE;
-
-			zabbix_log(LOG_LEVEL_WARNING,
-					"[zbx_execute] pipe timeout: offset=%zu pending=%lu "
-					"timeout_ms=%d process_code=%lu",
-				*offset, (unsigned long)in_buf_size, timeout_ms, (unsigned long)process_code);
 			return TIMEOUT_ERROR;
-		}
 
 		if (MAX_EXECUTE_OUTPUT_LEN <= *offset + in_buf_size)
 		{
-			zabbix_log(LOG_LEVEL_WARNING,
-					"[zbx_execute] pipe output limit: offset=%zu pending=%lu limit=%zu",
-				*offset, (unsigned long)in_buf_size, (size_t)MAX_EXECUTE_OUTPUT_LEN);
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 			zbx_snprintf(error, max_error_len, "Command output exceeded limit of %d KB",
@@ -108,9 +94,6 @@ static int	zbx_read_from_pipe(HANDLE hRead, HANDLE hProcess, char **buf, size_t 
 
 			if (0 == ReadFile(hRead, tmp_buf, to_read, &read_bytes, NULL))
 			{
-				zabbix_log(LOG_LEVEL_WARNING,
-						"[zbx_execute] ReadFile failed: error=%lu offset=%zu pending=%lu",
-					(unsigned long)GetLastError(), *offset, (unsigned long)in_buf_size);
 				zabbix_log(LOG_LEVEL_ERR, "cannot read command output: %s",
 						zbx_strerror_from_system(GetLastError()));
 				return FAIL;
@@ -129,11 +112,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, HANDLE hProcess, char **buf, size_t 
 		Sleep(20);	/* milliseconds */
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] PeekNamedPipe failed: error=%lu offset=%zu",
-			(unsigned long)GetLastError(), *offset);
-
 	return SUCCEED;
-#undef ZBX_PIPE_READ_BUFFER_SIZE
 }
 
 #else	/* not _WINDOWS */
@@ -435,16 +414,10 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	if (FAIL == ret)
 		goto close;
 
-	zabbix_log(LOG_LEVEL_WARNING,
-			"[zbx_execute] started command=\"%s\" pid=%lu timeout=%d dir=%s",
-			cmd, (unsigned long)pi.dwProcessId, timeout, NULL != dir ? dir : "<current>");
-
 	_ftime(&start_time);
 	timeout *= 1000;
 
-	ret = zbx_read_from_pipe(hRead, pi.hProcess, &buffer, &buf_size, &offset, timeout, error, max_error_len);
-	zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] read result=%d offset=%zu error=\"%s\"",
-			ret, offset, error);
+	ret = zbx_read_from_pipe(hRead, &buffer, &buf_size, &offset, timeout, error, max_error_len);
 
 	if (SUCCEED == ret)
 	{
@@ -452,19 +425,14 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 		int	wait_timeout = timeout - zbx_get_timediff_ms(&start_time, &current_time);
 		DWORD	wait_result;
 
-		zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] waiting process: remaining_ms=%d", wait_timeout);
-
 		if (0 < (timeout = wait_timeout) && WAIT_TIMEOUT ==
 				(wait_result = WaitForSingleObject(pi.hProcess, (DWORD)timeout)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] process wait timed out");
 			ret = TIMEOUT_ERROR;
 		}
 		else if (WAIT_OBJECT_0 != (wait_result = WaitForSingleObject(pi.hProcess, 0)) ||
 				0 == GetExitCodeProcess(pi.hProcess, &code))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] process wait result=%lu exit_code_read_failed=%d",
-				(unsigned long)wait_result, 0 == GetExitCodeProcess(pi.hProcess, &code));
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
 			else
@@ -474,8 +442,6 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 		}
 		else if (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != code)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] process exited with code=%lu",
-				(unsigned long)code);
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
 			else
@@ -483,9 +449,6 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 
 			ret = FAIL;
 		}
-		else
-			zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] process completed with code=%lu",
-				(unsigned long)code);
 	}
 
 	CloseHandle(pi.hProcess);
@@ -507,9 +470,6 @@ close:
 
 	if (NULL != hRead)
 		CloseHandle(hRead);
-
-	zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] final result=%d offset=%zu error=\"%s\"",
-			ret, offset, error);
 
 	zbx_free(cmd);
 	zbx_free(wcmd);
