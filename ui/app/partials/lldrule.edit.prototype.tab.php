@@ -33,7 +33,8 @@ if (!empty($lldrule['templates'])) {
 
 if ($lldrule['discovered']) {
 	$discovered_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'lldrule.prototype.edit')
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'lldrule.prototype.edit')
 		->setArgument('parent_discoveryid', $lldrule['discoveryData']['lldruleid'])
 		->setArgument('itemid', $lldrule['discoveryData']['parent_itemid'])
 		->setArgument('context', 'host')
