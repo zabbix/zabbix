@@ -219,6 +219,8 @@ class testFormServicesSla extends CWebTest {
 		$this->checkTableElements($downtimes_table_elements, $downtimes_table);
 
 		$downtimes_table->query('button:Add')->one()->click();
+		$downtime_start = date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00';
+
 		$downtimes_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$this->assertEquals('New excluded downtime', $downtimes_dialog->getTitle());
 
@@ -229,7 +231,7 @@ class testFormServicesSla extends CWebTest {
 
 		$downtime_default_values = [
 			'Name' => '',
-			'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
+			'Start time' => $downtime_start,
 			'id:duration_days' => '0',
 			'name:duration_hours' => '1',
 			'name:duration_minutes' => '0'
@@ -262,7 +264,7 @@ class testFormServicesSla extends CWebTest {
 				'field' => 'id:start_time',
 				'maxlength' => 16,
 				'placeholder' => 'YYYY-MM-DD hh:mm',
-				'value' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00'
+				'value' => $downtime_start
 			],
 			[
 				'field' => 'id:duration_days',
@@ -287,7 +289,7 @@ class testFormServicesSla extends CWebTest {
 
 		$table_data = [
 			[
-				'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
+				'Start time' => $downtime_start,
 				'Duration' => '1h',
 				'Name' => '!@#$%^&*()_+123Zabbix',
 				'Action' => 'Edit Remove'
