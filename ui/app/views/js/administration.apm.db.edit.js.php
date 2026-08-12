@@ -25,9 +25,6 @@ const view = new class {
 	/** @type {Object<string, *>} */
 	#rules = {};
 
-	/** @type {Object<string, *>} */
-	#default_values = {};
-
 	/** @type {HTMLFormElement|null} */
 	#form_element = null;
 
@@ -61,9 +58,8 @@ const view = new class {
 	/** @type {HTMLButtonElement|null} */
 	#change_ssl_key_password_btn = null;
 
-	init({rules, default_values}) {
+	init({rules}) {
 		this.#rules = rules;
-		this.#default_values = default_values;
 
 		this.#form_element = document.getElementById('apm-form');
 		this.#form = new CForm(this.#form_element, this.#rules);
@@ -96,7 +92,7 @@ const view = new class {
 		this.#change_password_btn?.addEventListener('click', e => {
 			this.#password_changed = this.#password_input?.value !== '';
 
-			this.#password_input?.removeAttribute('hidden');
+			this.#updateDisplayState([this.#password_input], true);
 			this.#password_input?.focus();
 
 			e.target.hidden = true;
@@ -105,7 +101,7 @@ const view = new class {
 		this.#change_ssl_key_password_btn?.addEventListener('click', e => {
 			this.#ssl_key_password_changed = this.#ssl_key_password_input?.value !== '';
 
-			this.#ssl_key_password_input?.removeAttribute('hidden');
+			this.#updateDisplayState([this.#ssl_key_password_input], true);
 			this.#ssl_key_password_input?.focus();
 
 			e.target.hidden = true;
@@ -117,17 +113,24 @@ const view = new class {
 	}
 
 	#getAllValues() {
-		const values = this.#form.getAllValues();
-		const authentication_type = this.#getFormField('authentication_type')?.querySelector('input:checked');
+		/** @type {Object<string, any>} */
+		let values = this.#form.getAllValues();
 
-		return {
-			...values,
-			url: values.url.replace(/^[\x00-\x20]+|[\x00-\x20]+$|[\r\n\t]+/g, ''),
-			status: parseInt(values.status),
-			authentication_type: parseInt(authentication_type?.value ?? this.#default_values.authentication_type),
-			ssl_verify_peer: parseInt(values.ssl_verify_peer),
-			ssl_verify_host: parseInt(values.ssl_verify_host)
-		};
+		for (const field of ['status', 'ssl_verify_peer', 'ssl_verify_host']) {
+			if (field in values) {
+				values[field] = parseInt(values[field]);
+			}
+		}
+
+		if (values.status === APM_GLOBAL_DB_STATUS_CONFIGURED) {
+			const url = values.url?.replace(/^[\x00-\x20]+|[\x00-\x20]+$|[\r\n\t]+/g, '') ?? '';
+			const auth_type_input = this.#getFormField('authentication_type')?.querySelector('input:checked');
+			const authentication_type = parseInt(auth_type_input?.value ?? APM_GLOBAL_DB_AUTHTYPE_PASSWORD);
+
+			return {...values, url, authentication_type};
+		}
+
+		return values;
 	}
 
 	#updateForm({initial_values}) {
@@ -145,32 +148,33 @@ const view = new class {
 			...document.querySelectorAll('.js-auth-type'),
 			...document.querySelectorAll('.js-db-type'),
 			...document.querySelectorAll('.js-database'),
-		], show_fields);
+		], show_fields, true);
 
 		this.#updateDisplayState([
 			...document.querySelectorAll('.js-username'),
 			...document.querySelectorAll('.js-password')
-		], show_user_fields);
+		], show_user_fields, true);
 
 		this.#updateDisplayState([
 			...document.querySelectorAll('.js-vault-path')
-		], show_vault_path);
+		], show_vault_path, true);
 
 		this.#updateDisplayState([
 			...document.querySelectorAll('.js-ssl-verify-peer'),
 			...document.querySelectorAll('.js-ssl-cert-file'),
 			...document.querySelectorAll('.js-ssl-key-file'),
 			...document.querySelectorAll('.js-ssl-key-password')
-		], show_ssl_fields);
+		], show_ssl_fields, true);
 
 		this.#updateDisplayState([
 			...document.querySelectorAll('.js-ssl-ca-location'),
 			...document.querySelectorAll('.js-ssl-verify-host')
-		], show_ssl_verify_peer_fields);
+		], show_ssl_verify_peer_fields, true);
 
 		const show_change_password_btn = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
 			&& values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD
-			&& !this.#url_changed && !this.#password_changed;
+			&& !this.#url_changed
+			&& !this.#password_changed;
 
 		this.#password_warning?.setAttribute('hidden', '');
 
@@ -181,9 +185,11 @@ const view = new class {
 				this.#password_warning?.removeAttribute('hidden');
 			}
 
-			this.#password_input.toggleAttribute('hidden', show_change_password_btn);
+			this.#updateDisplayState([this.#password_input], !show_change_password_btn);
+		}
 
-			this.#change_password_btn?.toggleAttribute('hidden', !show_change_password_btn);
+		if (this.#change_password_btn !== null) {
+			this.#updateDisplayState([this.#change_password_btn], show_change_password_btn);
 		}
 
 		const show_change_ssl_key_password_btn = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
@@ -191,22 +197,31 @@ const view = new class {
 			&& !this.#ssl_key_password_changed;
 
 		if (this.#ssl_key_password_input !== null) {
-			this.#ssl_key_password_input.toggleAttribute('hidden', show_change_ssl_key_password_btn);
-
-			this.#change_ssl_key_password_btn?.toggleAttribute('hidden', !show_change_ssl_key_password_btn);
+			this.#updateDisplayState([this.#ssl_key_password_input], !show_change_ssl_key_password_btn);
 		}
 
-		this.#url_changed = false;
-		this.#password_changed = false;
+		if (this.#change_ssl_key_password_btn !== null) {
+			this.#updateDisplayState([this.#change_ssl_key_password_btn], show_change_ssl_key_password_btn);
+		}
 	}
 
 	#getFormField(name) {
 		return this.#form.findFieldByName(name)?.getField();
 	}
 
-	#updateDisplayState(elements, display) {
+	#updateDisplayState(elements, display, update_disabled_state = false) {
 		for (const element of elements) {
 			element?.toggleAttribute('hidden', !display);
+
+			if (update_disabled_state) {
+				this.#updateDisabledState(element?.querySelectorAll('input'), !display);
+			}
+		}
+	}
+
+	#updateDisabledState(elements, disabled) {
+		for (const element of elements) {
+			element?.toggleAttribute('disabled', disabled);
 		}
 	}
 
@@ -235,9 +250,9 @@ const view = new class {
 		e.preventDefault();
 		this.#setLoadingStatus('js-submit');
 		clearMessages();
-		const fields = this.#getAllValues();
+		const values = this.#getAllValues();
 
-		this.#form.validateSubmit(fields)
+		this.#form.validateSubmit(values)
 			.then(result => {
 				if (!result) {
 					this.#unsetLoadingStatus();
@@ -250,7 +265,7 @@ const view = new class {
 				fetch(url.toString(), {
 					method: 'POST',
 					headers: {'Content-Type': 'application/json'},
-					body: JSON.stringify(fields)
+					body: JSON.stringify(values)
 				})
 					.then(response => response.json())
 					.then(response => {

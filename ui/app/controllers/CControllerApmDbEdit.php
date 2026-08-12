@@ -28,31 +28,11 @@ class CControllerApmDbEdit extends CController {
 		return true;
 	}
 
-	public static function getDefaultValues(): array {
-		return [
-			'status' => 0,
-			'url' => '',
-			'authentication_type' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD,
-			'username' => '',
-			'password' => '',
-			'vault_path' => '',
-			'db' => '',
-			'ssl_verify_peer' => 0,
-			'ssl_ca_location' => '',
-			'ssl_verify_host' => 0,
-			'ssl_cert_file' => '',
-			'ssl_key_file' => '',
-			'ssl_key_password' => ''
-		];
-	}
-
 	protected function doAction(): void {
-		$default_values = self::getDefaultValues();
 		$settings = API::Settings()->get(['output' => ['apm_global_db']]);
 
 		$response = new CControllerResponseData([
-			'default_values' => $default_values,
-			'values' => array_merge($default_values, $settings['apm_global_db']),
+			'values' => $settings['apm_global_db'],
 			'js_validation_rules' => (new CFormValidator(CControllerApmDbUpdate::getValidationRules()))
 				->getRules()
 		]);

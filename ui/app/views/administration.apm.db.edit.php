@@ -182,8 +182,7 @@ $html_page
 
 (new CScriptTag(
 	'view.init('.json_encode([
-		'rules' => $data['js_validation_rules'],
-		'default_values' => $data['default_values']
+		'rules' => $data['js_validation_rules']
 	]).');'
 ))
 	->setOnDocumentReady()
