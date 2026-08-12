@@ -19,7 +19,7 @@
 #include "zbxlog.h"
 
 /* the size of temporary buffer used to read from output stream */
-#define PIPE_BUFFER_SIZE	4096
+#define PIPE_BUFFER_SIZE	65536
 
 #ifdef _WINDOWS
 
@@ -102,7 +102,9 @@ static int	zbx_read_from_pipe(HANDLE hRead, HANDLE hProcess, char **buf, size_t 
 
 		if (0 != in_buf_size)
 		{
-			if (0 == ReadFile(hRead, tmp_buf, sizeof(tmp_buf) - 1, &read_bytes, NULL))
+			DWORD	to_read = MIN(in_buf_size, sizeof(tmp_buf) - 1);
+
+			if (0 == ReadFile(hRead, tmp_buf, to_read, &read_bytes, NULL))
 			{
 				zabbix_log(LOG_LEVEL_WARNING,
 						"[zbx_execute] ReadFile failed: error=%lu offset=%zu pending=%lu",
@@ -113,10 +115,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, HANDLE hProcess, char **buf, size_t 
 			}
 
 			if (NULL != buf)
-			{
-				tmp_buf[read_bytes] = '\0';
-				zbx_strcpy_alloc(buf, buf_size, offset, tmp_buf);
-			}
+				zbx_str_memcpy_alloc(buf, buf_size, offset, tmp_buf, read_bytes);
 
 			in_buf_size = 0;
 			continue;
@@ -367,7 +366,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	sa.lpSecurityDescriptor = NULL;
 
 	/* create a pipe for the child process's STDOUT */
-	if (0 == CreatePipe(&hRead, &hWrite, &sa, 0))
+	if (0 == CreatePipe(&hRead, &hWrite, &sa, PIPE_BUFFER_SIZE))
 	{
 		zbx_snprintf(error, max_error_len, "unable to create a pipe: %s",
 				zbx_strerror_from_system(GetLastError()));
