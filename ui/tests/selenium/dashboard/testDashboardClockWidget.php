@@ -234,7 +234,7 @@ class testDashboardClockWidget extends CWebTest {
 		$fields = ['Type', 'Name', 'Refresh interval', 'Time type'];
 
 		foreach (['Local time', 'Server time', 'Host time'] as $type) {
-			$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
+			$form->fill(['Time type' => $type]);
 
 			/**
 			 * If the clock widgets type equals to "Host time", then additional field appears - 'Item',
