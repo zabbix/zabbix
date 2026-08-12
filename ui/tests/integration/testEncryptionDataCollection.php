@@ -685,11 +685,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		$start_time = time();
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-			'certificate revoked',
-			'failed to accept an incoming connection',
-			'TLS handshake'
-		], true, 30);
+		// zbx_tls_connect() logs the peer certificate verification failure on the server (the
+		// connecting side here) via its "End of zbx_tls_connect():FAIL error:'...'" debug trace.
+		// The two TLS libraries word a revoked-certificate rejection differently.
+		$revoked_line = ('gnutls' === $this->detectTLSLibrary())
+			? 'certificate chain is revoked'
+			: 'certificate revoked';
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, $revoked_line, true, 30);
 
 		// No history must have been collected during this test run
 		$data = $this->call('history.get', [
@@ -1351,14 +1354,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		$start_time = time();
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-			'no shared cipher',
-			'no cipher can be selected',
-			'handshake failure',
-			'SSL_accept() failed',
-			'failed to accept an incoming connection',
-			'zbx_tls_accept(): handshake'
-		], true, 30);
+		// The agent (accepting side) rejects the ClientHello with a fatal TLS alert; the server
+		// (connecting side, whose log this waits on) receives it and logs OpenSSL's exact alert
+		// reason via zbx_tls_connect()'s "End of zbx_tls_connect():FAIL error:'...'" debug trace.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sslv3 alert handshake failure', true, 30);
 
 		$data = $this->call('history.get', [
 			'itemids'   => self::$itemids['enc_agent:agent.ping'],
@@ -1842,14 +1841,11 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		$start_time = time();
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-			'no shared cipher',
-			'no cipher can be selected',
-			'handshake failure',
-			'SSL_accept() failed',
-			'failed to accept an incoming connection',
-			'zbx_tls_accept(): handshake'
-		], true, 30);
+		// The agent (accepting side) sends a fatal "handshake_failure" alert when it finds no
+		// shared cipher; the server (connecting side, whose log this waits on) receives it and
+		// logs GnuTLS's exact alert name via zbx_tls_connect()'s "End of zbx_tls_connect():FAIL
+		// error:'...'" debug trace.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'Handshake failed', true, 30);
 
 		$data = $this->call('history.get', [
 			'itemids'   => self::$itemids['enc_agent:agent.ping'],
