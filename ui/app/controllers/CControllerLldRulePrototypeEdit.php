@@ -120,10 +120,6 @@ class CControllerLldRulePrototypeEdit extends CController
 				$ret = false;
 				error(_s('Incorrect value for "%1$s" field.', 'parent_discoveryid'));
 			}
-			elseif (!$this->hasInput('itemid') && !$this->hasInput('hostid')) {
-				$ret = false;
-				error(_s('Incorrect value for "%1$s" field.', 'hostid'));
-			}
 		}
 
 		if (!$ret) {
@@ -152,8 +148,7 @@ class CControllerLldRulePrototypeEdit extends CController
 			$host = API::Host()->get([
 				'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'flags', 'status'],
 				'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
-				'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
-				'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
+				'itemids' => [$this->getInput('itemid', $this->getInput('parent_discoveryid'))]
 			]);
 
 			if (!$host) {
@@ -171,8 +166,7 @@ class CControllerLldRulePrototypeEdit extends CController
 		else {
 			$template = API::Template()->get([
 				'output' => ['templateid', 'name', 'flags', 'proxyid'],
-				'templateids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
-				'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
+				'itemids' => [$this->getInput('itemid', $this->getInput('parent_discoveryid'))]
 			]);
 
 			if (!$template) {

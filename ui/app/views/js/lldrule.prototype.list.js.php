@@ -69,7 +69,7 @@ const view = new class {
 
 		document.querySelector('.js-create-item')?.addEventListener('click', () => {
 			ZABBIX.PopupManager.open('lldrule.prototype.edit',
-				{hostid: this.#hostid, parent_discoveryid: this.#parent_discoveryid, context: this.#context}
+				{parent_discoveryid: this.#parent_discoveryid, context: this.#context}
 			);
 		});
 	}
