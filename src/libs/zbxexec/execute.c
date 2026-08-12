@@ -469,7 +469,8 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 		}
 		else if (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != code)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] process exited with code=%lu", (unsigned long)code);
+			zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] process exited with code=%lu",
+				(unsigned long)code);
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
 			else
