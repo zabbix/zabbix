@@ -224,15 +224,18 @@
 			.trigger('change');
 
 		item_form.custom_timeout.addEventListener('change', () => {
-			if (item_form.custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>) {
-				item_form.timeout.disabled = false;
-				item_form.timeout.style.display = '';
-				item_form.inherited_timeout.style.display = 'none';
+			const custom_timeout_enabled = item_form.custom_timeout.querySelector(':checked').value
+				== <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>;
+			const timeout_inaccessible = document.getElementById('js-item-timeout-inaccessible');
+
+			item_form.timeout.disabled = !custom_timeout_enabled;
+			item_form.timeout.style.display = custom_timeout_enabled ? '' : 'none';
+
+			if (timeout_inaccessible !== null) {
+				timeout_inaccessible.style.display = custom_timeout_enabled ? 'none' : '';
 			}
 			else {
-				item_form.timeout.disabled = true;
-				item_form.timeout.style.display = 'none';
-				item_form.inherited_timeout.style.display = '';
+				item_form.inherited_timeout.style.display = custom_timeout_enabled ? 'none' : '';
 			}
 		});
 
@@ -423,7 +426,7 @@
 		 * Otherwise a check is performed to see that key names matching so far are of the same type.
 		 * Else type is undetermined (null).
 		 *
-		 * @param {string}  key_part           Key name part entered.
+		 * @param {string}  key_part		   Key name part entered.
 		 * @param {boolean} set_to_field=true  Pass False to perform background lookup, not updating input states.
 		 * @return {void}
 		 */

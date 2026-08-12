@@ -780,6 +780,7 @@ if (hasRequest('form')) {
 	$default_timeout = DB::getDefault('items', 'timeout');
 	$data['custom_timeout'] = (int) getRequest('custom_timeout', $data['timeout'] !== $default_timeout);
 	$data['inherited_timeouts'] = getInheritedTimeouts($host['proxyid']);
+	$data['timeout_inaccessible'] = $data['inherited_timeouts']['source'] === 'inaccessible';
 	$data['can_edit_source_timeouts'] = $data['inherited_timeouts']['source'] === 'proxy'
 		? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 		: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);

@@ -758,6 +758,7 @@ $item_tab->addItem([
  * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
  */
 $edit_source_timeouts_link = null;
+$custom_timeout_enabled = $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
 
 if ($data['can_edit_source_timeouts']
 		&& (!$readonly || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)) {
@@ -787,7 +788,17 @@ $item_tab->addItem([
 			->setReadonly($readonly)
 			->setModern(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('inherited_timeout', $data['inherited_timeout'], true))->setWidth(ZBX_TEXTAREA_TINY_WIDTH),
+		$data['timeout_inaccessible']
+			? (new CSpan(makeWarningIcon(
+			_('The timeout value is unavailable because it is configured on a proxy that you do not have permission to.')
+		)))
+			->addClass($custom_timeout_enabled ? ZBX_STYLE_DISPLAY_NONE : null)
+			->setId('js-item-timeout-inaccessible')
+		: null,
+		(new CTextBox('inherited_timeout', $data['inherited_timeout']))
+			->setReadonly(true)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->addClass($custom_timeout_enabled || $data['timeout_inaccessible'] ? ZBX_STYLE_DISPLAY_NONE : null),
 		(new CTextBox('timeout', $data['timeout'], $readonly))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired(),
