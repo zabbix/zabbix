@@ -22,4 +22,12 @@ in:
 out:
   worker_count: 0
   addref_count: 1
+---
+test case: two workers created, correct pid
+in:
+  worker_count: 2
+  pid: 100
+out:
+  worker_count: 2
+  addref_count: 3
 ...

@@ -46,13 +46,13 @@ struct zbx_ipc_client
 	zbx_uint32_t		refcount;
 };
 
-int	__wrap_zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeout, zbx_ipc_client_t **client,
-		zbx_ipc_message_t **message);
+int	__wrap_zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeout,
+			zbx_ipc_client_t **client, zbx_ipc_message_t **message);
 __pid_t	__wrap_getppid (void);
 void	__wrap_zbx_ipc_client_close(zbx_ipc_client_t *client);
 
-int	__wrap_zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeout, zbx_ipc_client_t **client,
-		zbx_ipc_message_t **message)
+int	__wrap_zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeout,
+			zbx_ipc_client_t **client, zbx_ipc_message_t **message)
 {
 	ZBX_UNUSED(service);
 	ZBX_UNUSED(timeout);
@@ -100,14 +100,14 @@ void	zbx_mock_test_entry(void **state)
 	expected_worker_count = zbx_mock_get_parameter_int("out.worker_count");
 
 	connector_init_manager(&manager, worker_cnt);
-	
+
 	if (NULL == manager.workers)
 		fail_msg("connector_init_manager() workers init: Failed to init manager.workers");
 
 	zbx_mock_assert_int_eq("connector_init_manager() worker forks:",manager.worker_fork_count, worker_cnt);
 
 	zbx_ipc_service_recv(&service, &timeout, &client, &message);
-	
+
 	for (int i = 0; i < worker_cnt; i++)
 	{
 		connector_register_worker(&manager, client, message);
@@ -120,7 +120,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	connector_destroy_manager(&manager);
-	
+
 	zbx_mock_assert_ptr_eq("connector_destroy_manager() workers ptr:", NULL, manager.workers);
 	zbx_mock_assert_int_eq("connector_destroy_manager() refcount value:", 1, client->refcount);
 
