@@ -235,10 +235,10 @@ class CMaintenance extends CApiService {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Filters.
-			'triggerids' =>         ['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'triggerids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			// Output.
-			'selectTriggers' =>     ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CTrigger::OUTPUT_FIELDS), 'default' => null],
-			'selectEventNames' =>   ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['operator', 'value']), 'default' => null]
+			'selectTriggers' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CTrigger::OUTPUT_FIELDS), 'default' => null],
+			'selectEventNames' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['operator', 'value']), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -1337,9 +1337,9 @@ class CMaintenance extends CApiService {
 				'output' => ['maintenance_groupid', 'maintenanceid', 'groupid'],
 				'filter' => ['maintenanceid' => $target_maintenanceids['groups']]
 			];
-			$db_groups = DBselect(DB::makeSql('maintenances_groups', $options));
+			$resource = DBselect(DB::makeSql('maintenances_groups', $options));
 
-			while ($db_group = DBfetch($db_groups)) {
+			while ($db_group = DBfetch($resource)) {
 				$db_maintenances[$db_group['maintenanceid']]['groups'][$db_group['maintenance_groupid']] = [
 					'maintenance_groupid' => $db_group['maintenance_groupid'],
 					'groupid' => $db_group['groupid']
@@ -1353,9 +1353,9 @@ class CMaintenance extends CApiService {
 				'output' => ['maintenance_hostid', 'maintenanceid', 'hostid'],
 				'filter' => ['maintenanceid' => $target_maintenanceids['hosts']]
 			];
-			$db_hosts = DBselect(DB::makeSql('maintenances_hosts', $options));
+			$resource = DBselect(DB::makeSql('maintenances_hosts', $options));
 
-			while ($db_host = DBfetch($db_hosts)) {
+			while ($db_host = DBfetch($resource)) {
 				$db_maintenances[$db_host['maintenanceid']]['hosts'][$db_host['maintenance_hostid']] = [
 					'maintenance_hostid' => $db_host['maintenance_hostid'],
 					'hostid' => $db_host['hostid']
