@@ -20,6 +20,10 @@ class CControllerCepRuleList extends CController {
 		$this->disableCsrfValidation();
 	}
 
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'sort' =>			'in name,status,sortorder',
@@ -39,10 +43,6 @@ class CControllerCepRuleList extends CController {
 		}
 
 		return $ret;
-	}
-
-	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
 	}
 
 	protected function doAction(): void {

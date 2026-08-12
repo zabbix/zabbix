@@ -20,7 +20,7 @@ class CControllerCepRuleDisable extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
 	}
 
 	protected function checkInput(): bool {
