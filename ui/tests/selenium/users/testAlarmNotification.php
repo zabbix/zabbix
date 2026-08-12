@@ -25,6 +25,8 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
  * @backup profiles
  *
  * @onBefore prepareAlarmData
+ *
+ * @onAfterEach closeAndAcknowledgeEvents
  */
 class testAlarmNotification extends CWebTest {
 
@@ -222,7 +224,6 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check Alarm notification overlay dialog layout.
 	 *
-	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter openResetedPage
 	 */
 	public function testAlarmNotification_Layout() {
@@ -292,6 +293,7 @@ class testAlarmNotification extends CWebTest {
 				// Check that after clicking second time on already Snoozed button, it doesn't change status.
 				for ($i = 0; $i <=1; $i++) {
 					$alarm_dialog->query($selector)->one()->click();
+					$this->page->refresh()->waitUntilReady();
 					$this->assertTrue($alarm_dialog->query($selector)->exists());
 					$this->assertEquals($class.'-off', $alarm_dialog->query($selector)->one()->getAttribute('class'));
 				}
@@ -314,7 +316,7 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
-	 * @onAfter closeAndAcknowledgeEvents
+	 *
 	 * @onAfter deleteEvents
 	 */
 	public function testAlarmNotification_CheckColorChange() {
@@ -443,8 +445,6 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that correct problems displayed in alarm notification overlay.
-	 *
-	 * @onAfter closeAndAcknowledgeEvents
 	 *
 	 * @dataProvider getDisplayedProblemsData
 	 */
@@ -608,13 +608,14 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check notification display after changing user Frontend notification settings.
 	 *
-	 * @onBefore resetTriggerSeverities
-	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter deleteEvents
 	 *
 	 * @dataProvider getNotificationSettingsData
 	 */
 	public function testAlarmNotification_NotificationSettings($data) {
+		// Delete old setting whatever it was.
+		DBexecute('DELETE FROM profiles WHERE source='.zbx_dbstr('triggers.severities').' AND userid=1');
+
 		// Set checked trigger severity in messaging settings.
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 		$form = $this->query('id:user-form')->asForm()->one();
@@ -665,21 +666,6 @@ class testAlarmNotification extends CWebTest {
 	 */
 	protected function deleteEvents() {
 		DB::delete('events', ['eventid' => self::$eventids]);
-	}
-
-	/**
-	 * Update Frontend notifications settings, set all severities checkboxes => true.
-	 */
-	protected function resetTriggerSeverities() {
-		// Delete old setting whatever it was.
-		DBexecute('DELETE FROM profiles WHERE source='.zbx_dbstr('triggers.severities').' AND userid=1');
-
-		// Insert new row where value_str field means that all severities are checked.
-		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
-				' VALUES (9950, 1, '.zbx_dbstr('web.messages').', '.
-				zbx_dbstr('a:6:{i:0;s:1:"1";i:1;s:1:"1";i:2;s:1:"1";i:3;s:1:"1";i:4;s:1:"1";i:5;s:1:"1";}').', '.
-				zbx_dbstr('triggers.severities').', 3)'
-		);
 	}
 
 	/**
