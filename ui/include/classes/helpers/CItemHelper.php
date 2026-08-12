@@ -86,6 +86,18 @@ class CItemHelper extends CItemGeneralHelper {
 			$parent_template = $parent_templates['templates'][$item['valuemap']['hostid']];
 			$item['valuemap']['prefix'] = $parent_template['name'].NAME_DELIMITER;
 		}
+		elseif ($item['discovered'] && $item['valuemap']) {
+			$parent_item_prototype = API::ItemPrototype()->get([
+				'output' => ['itemid', 'templateid'],
+				'itemids' => $item['discoveryData']['parent_itemid']
+			]);
+
+			$parent_templates = getItemParentTemplates($parent_item_prototype, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+			if (array_key_exists($item['valuemap']['hostid'], $parent_templates['templates'])) {
+				$parent_template = $parent_templates['templates'][$item['valuemap']['hostid']];
+				$item['valuemap']['prefix'] = $parent_template['name'].NAME_DELIMITER;
+			}
+		}
 
 		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
 			$item = static::addDelayWithFlexibleIntervals($update_interval_parser, $item);
