@@ -167,7 +167,7 @@ class testTelnetChecks extends CIntegrationTest {
 		$deadline = time() + self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
 
 		while (!file_exists(self::$mock_log_file) && time() < $deadline) {
-			sleep(3);
+			usleep(100000); // 100 ms
 		}
 
 		if (!file_exists(self::$mock_log_file)) {
