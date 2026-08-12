@@ -156,12 +156,6 @@ class CControllerLldRulePrototypeEdit extends CController
 			}
 
 			$this->host = reset($host);
-
-			// Sort interfaces to be listed starting with one selected as 'main'.
-			CArrayHelper::sort($this->host['interfaces'], [
-				['field' => 'main', 'order' => ZBX_SORT_DOWN],
-				['field' => 'interfaceid','order' => ZBX_SORT_UP]
-			]);
 		}
 		else {
 			$template = API::Template()->get([
@@ -225,6 +219,13 @@ class CControllerLldRulePrototypeEdit extends CController
 
 	public function doAction(): void {
 		$host = $this->getInput('context') === 'host' ? $this->host : $this->template;
+
+		// Sort interfaces to be listed starting with one selected as 'main'.
+		CArrayHelper::sort($host['interfaces'], [
+			['field' => 'main', 'order' => ZBX_SORT_DOWN],
+			['field' => 'interfaceid','order' => ZBX_SORT_UP]
+		]);
+
 		[$lldrule, $inherited_timeouts] = $this->getLldRuleData($host);
 
 		$data = [
