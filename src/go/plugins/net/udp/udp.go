@@ -78,7 +78,7 @@ func init() {
 
 	impl.udpListen4Path = udpListenIPv4FileLocation
 	impl.udp6ListenPath = udpListenIPv6FileLocation
-	impl.SetHandleTimeout(true)
+	impl.SetForceEffectiveTimeoutExtension(true)
 }
 
 // Export function that implements plugin.Exporter interface.

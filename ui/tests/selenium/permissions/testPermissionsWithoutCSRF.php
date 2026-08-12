@@ -372,7 +372,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM drules',
 					'link' => 'zabbix.php?action=discovery.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF discovery create'
+					],
+					'secondary_dialog' => [
+						'field' => 'id:dcheckList',
+						'fill' => []
+					]
 				]
 			],
 			// #27 Discovery update.
@@ -447,14 +454,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'link' => 'zabbix.php?action=regex.edit&regexpid=2'
+					'link' => 'zabbix.php?action=popup&popup=regex.edit&regexpid=2'
 				]
 			],
 			// #35 Regular expression create.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'link' => 'zabbix.php?action=regex.edit',
+					'link' => 'zabbix.php?action=popup&popup=regex.edit',
 					'fields' => [
 						'id:name' => 'CSRF regex test name',
 						'id:expressions_0_expression' => 'abc'

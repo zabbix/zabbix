@@ -141,9 +141,11 @@
 						.setFields(['templateid', 'httpTests'])
 						.setRenderer('web'),
 					new CDataTableColumn('vendor', <?= json_encode(_('Vendor')); ?>)
-						.setFields(['vendor_name']),
+						.setFields(['vendor_name'])
+						.setRenderer(CDataTableColumn.RENDERER_TEXT),
 					new CDataTableColumn('version', <?= json_encode(_('Version')); ?>)
-						.setFields(['vendor_version']),
+						.setFields(['vendor_version'])
+						.setRenderer(CDataTableColumn.RENDERER_TEXT),
 					new CDataTableColumn('linked_templates', <?= json_encode(_('Linked templates')); ?>)
 						.setFields(['parentTemplates'])
 						.setRenderer('linked_templates'),
@@ -164,7 +166,7 @@
 				.setStorageIdx(storage_idx)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setCellRenderer('name', ({cell_data, cell_inner}) => {
+				.setCellRenderer('name', ({cell_data, cell}) => {
 					const [templateid, name] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
@@ -176,9 +178,9 @@
 					edit_link.setAttribute('href', url.toString())
 					edit_link.textContent = name;
 
-					cell_inner.appendChild(edit_link);
+					cell.appendChild(edit_link);
 				})
-				.setCellRenderer('hosts', ({cell_data, cell_inner, response}) => {
+				.setCellRenderer('hosts', ({cell_data, cell, response}) => {
 					const [templateid, editable_hosts] = cell_data;
 					const {allowed_ui_conf_hosts} = response;
 
@@ -194,21 +196,21 @@
 						item_link.setAttribute('href', url.toString());
 						item_link.textContent = <?= json_encode(_('Hosts')); ?>;
 
-						cell_inner.appendChild(item_link);
+						cell.appendChild(item_link);
 					}
 					else {
-						cell_inner.innerHTML += <?= json_encode(_('Hosts')); ?>;
+						cell.innerHTML += <?= json_encode(_('Hosts')); ?>;
 					}
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
 				})
-				.setCellRenderer('items', ({cell_data, cell_inner}) => {
+				.setCellRenderer('items', ({cell_data, cell}) => {
 					const [templateid, items] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
@@ -221,17 +223,17 @@
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Items')); ?>;
 
-					cell_inner.appendChild(item_link);
+					cell.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
 				})
-				.setCellRenderer('triggers', ({cell_data, cell_inner}) => {
+				.setCellRenderer('triggers', ({cell_data, cell}) => {
 					const [templateid, triggers] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
@@ -244,17 +246,17 @@
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Triggers')); ?>;
 
-					cell_inner.appendChild(item_link);
+					cell.appendChild(item_link);
 
 					if (triggers > 0) {
 						const count = document.createElement('sup');
 						count.textContent = triggers;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
 				})
-				.setCellRenderer('graphs', ({cell_data, cell_inner}) => {
+				.setCellRenderer('graphs', ({cell_data, cell}) => {
 					const [templateid, graphs] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
@@ -267,17 +269,17 @@
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Graphs')); ?>;
 
-					cell_inner.appendChild(item_link);
+					cell.appendChild(item_link);
 
 					if (graphs > 0) {
 						const count = document.createElement('sup');
 						count.textContent = graphs;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
 				})
-				.setCellRenderer('dashboards', ({cell_data, cell_inner}) => {
+				.setCellRenderer('dashboards', ({cell_data, cell}) => {
 					const [templateid, dashboards] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
@@ -289,17 +291,17 @@
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Dashboards')); ?>;
 
-					cell_inner.appendChild(item_link);
+					cell.appendChild(item_link);
 
 					if (dashboards > 0) {
 						const count = document.createElement('sup');
 						count.textContent = dashboards;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
 				})
-				.setCellRenderer('discovery', ({cell_data, cell_inner}) => {
+				.setCellRenderer('discovery', ({cell_data, cell}) => {
 					const [templateid, discovery_rules] = cell_data;
 
 					const url = new URL('host_discovery.php', location.href);
@@ -311,17 +313,17 @@
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Discovery')); ?>;
 
-					cell_inner.appendChild(item_link);
+					cell.appendChild(item_link);
 
 					if (discovery_rules > 0) {
 						const count = document.createElement('sup');
 						count.textContent = discovery_rules;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
 				})
-				.setCellRenderer('web', ({cell_data, cell_inner}) => {
+				.setCellRenderer('web', ({cell_data, cell}) => {
 					const [templateid, http_tests] = cell_data;
 
 					const url = new URL('httpconf.php', location.href);
@@ -333,17 +335,17 @@
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Web')); ?>;
 
-					cell_inner.appendChild(item_link);
+					cell.appendChild(item_link);
 
 					if (http_tests > 0) {
 						const count = document.createElement('sup');
 						count.textContent = http_tests;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						cell.innerHTML += ' ';
+						cell.appendChild(count);
 					}
 				})
-				.setCellRenderer('linked_templates', ({cell_data, cell_inner, response}) => {
+				.setCellRenderer('linked_templates', ({cell_data, cell, response}) => {
 					const [parent_templates] = cell_data;
 					const {max_in_table} = response;
 					const length = Math.min(max_in_table, parent_templates.length);
@@ -362,26 +364,26 @@
 							template_link.setAttribute('href', url.toString());
 							template_link.textContent = template.name;
 
-							cell_inner.appendChild(template_link);
+							cell.appendChild(template_link);
 						}
 						else {
 							const template_link = document.createElement('span');
 							template_link.classList.add(ZBX_STYLE_GREY);
 							template_link.textContent = template.name;
 
-							cell_inner.appendChild(template_link);
+							cell.appendChild(template_link);
 						}
 
 						if (i < length - 1) {
-							cell_inner.innerHTML += ', ';
+							cell.innerHTML += ', ';
 						}
 					}
 
 					if (parent_templates.length > max_in_table) {
-						cell_inner.innerHTML += ' &hellip;';
+						cell.innerHTML += ' &hellip;';
 					}
 				})
-				.setCellRenderer('linked_to_templates', ({cell_data, cell_inner, response}) => {
+				.setCellRenderer('linked_to_templates', ({cell_data, cell, response}) => {
 					const [templates] = cell_data;
 					const {max_in_table} = response;
 					const length = Math.min(max_in_table, templates.length);
@@ -400,23 +402,23 @@
 							template_link.setAttribute('href', url.toString());
 							template_link.textContent = template.name;
 
-							cell_inner.appendChild(template_link);
+							cell.appendChild(template_link);
 						}
 						else {
 							const template_link = document.createElement('span');
 							template_link.classList.add(ZBX_STYLE_GREY);
 							template_link.textContent = template.name;
 
-							cell_inner.appendChild(template_link);
+							cell.appendChild(template_link);
 						}
 
 						if (i < length - 1) {
-							cell_inner.innerHTML += ', ';
+							cell.innerHTML += ', ';
 						}
 					}
 
 					if (templates.length > max_in_table) {
-						cell_inner.innerHTML += ' &hellip;';
+						cell.innerHTML += ' &hellip;';
 					}
 				})
 				.on(CMessageHelper.EVENT_MESSAGE, e => {

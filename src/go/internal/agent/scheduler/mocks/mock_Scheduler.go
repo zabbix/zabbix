@@ -90,7 +90,7 @@ func (_c *Scheduler_FinishTask_Call) RunAndReturn(run func(task scheduler.Perfor
 }
 
 // PerformTask provides a mock function for the type Scheduler
-func (_mock *Scheduler) PerformTask(key string, timeout time.Duration, clientID uint64) (*string, error) {
+func (_mock *Scheduler) PerformTask(key string, timeout time.Duration, legacyTimeout bool, clientID uint64) (*string, error) {
 	ret := _mock.Called(key, timeout, clientID)
 
 	if len(ret) == 0 {

@@ -592,6 +592,8 @@ input {
 	}
 
 	&[type="password"] {
+		--font-stack: var(--font-stack-mono);
+
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
@@ -927,7 +929,7 @@ select {
 // Installation.
 .setup-container {
 	background-color: $ui-bg-color;
-	width: 766px;
+	width: 816px;
 	height: 420px;
 	margin: 0 auto;
 	margin-top: 5%;
@@ -992,7 +994,7 @@ select {
 
 	.table-forms-td-left {
 		label {
-			max-width: 170px;
+			max-width: 180px;
 		}
 	}
 
@@ -1724,18 +1726,6 @@ select {
 
 td.inactive-bg {
 	@extend .inactive-bg;
-}
-
-// Filter checkboxes.
-.table-forms-second-column {
-	display: inline-block;
-	width: 50%;
-	min-width: 200px;
-	text-align: right;
-
-	.second-column-label {
-		padding: 0 10px;
-	}
 }
 
 // Event status colors.
