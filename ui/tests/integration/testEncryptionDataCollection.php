@@ -1048,8 +1048,12 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_libgnutls(): void {
-		$this->updateHostCertTLS('enc_agent',  'CN=ZabbixTestCA', 'CN=zabbix_agent');
-		$this->updateHostCertTLS('enc_agent2', 'CN=ZabbixTestCA', 'CN=zabbix_agent2');
+		// enc_agent2's TLS update is deliberately deferred until enc_agent's flow is fully
+		// confirmed below. If both hosts were updated up front, the server could start polling
+		// both concurrently and their log lines could interleave in either order, racing the
+		// incremental log reads. Serializing the two hosts removes that race outright: agent2's
+		// checks cannot start until this test tells it to, so there is nothing to interleave.
+		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
 		// Agent 1
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -1067,6 +1071,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			'No agent data collected in libgnutls test');
 
 		// Agent 2
+		$this->updateHostCertTLS('enc_agent2', 'CN=ZabbixTestCA', 'CN=zabbix_agent2');
+
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent2": interface became available',
 			'resuming Zabbix agent checks on host "enc_agent2": connection restored'
