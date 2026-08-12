@@ -249,7 +249,10 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 		if ($this->host && $this->host['status'] != HOST_STATUS_TEMPLATE
 				&& $this->getInput('test_with', self::TEST_WITH_SERVER) == self::TEST_WITH_PROXY) {
-			return bccomp($this->getInput('proxyid', 0), $this->host['proxyid']) == 0;
+			$proxyid = $this->getInput('proxyid', 0);
+
+			return bccomp($proxyid, $this->host['proxyid']) == 0
+				|| !CProxyHelper::resolveProxyOption($proxyid)['inaccessible'];
 		}
 
 		return true;
