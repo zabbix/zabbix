@@ -85,6 +85,11 @@ window.maintenance_edit = new class {
 			$hostids.on('change', () => this.#updateMultiselect($hostids));
 			this.#updateMultiselect($hostids);
 
+			const $triggerids = $('#triggerids_');
+
+			$triggerids.on('change', () => this.#updateMultiselect($triggerids));
+			this.#updateMultiselect($triggerids);
+
 			// Update form field state according to the form data.
 			document.getElementById('maintenance_type').addEventListener('change', () => this.#update());
 			this.form.findFieldByName('timeperiods').setButtonOnBlur('js-add', 'maintenance-timeperiod-edit');

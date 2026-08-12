@@ -145,9 +145,15 @@ class CControllerMaintenanceEdit extends CController {
 
 			$db_triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description'],
+				'selectHosts' => ['name'],
 				'maintenanceids' => $data['maintenanceid'],
 				'editable' => true
 			]);
+
+			foreach ($db_triggers as &$trigger) {
+				$trigger['description'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
+			}
+			unset($trigger);
 
 			$data += [
 				'hosts_ms' => CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']),
@@ -255,13 +261,19 @@ class CControllerMaintenanceEdit extends CController {
 						foreach (CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']) as $host) {
 							$data['hosts_ms'][$host['id']] = $host;
 						}
+
+						CArrayHelper::sort($data['hosts_ms'], ['name']);
 						break;
 
 					case 'trigger':
-						foreach (CArrayHelper::renameObjectsKeys($db_triggers, ['triggerid' => 'id',
-								'description' => 'name']) as $trigger) {
-							$data['triggers_ms'][$trigger['id']] = $trigger;
+						foreach ($db_triggers as $trigger) {
+							$data['triggers_ms'][$trigger['triggerid']] = [
+								'id' => $trigger['triggerid'],
+								'name' => $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description']
+							];
 						}
+
+						CArrayHelper::sort($data['triggers_ms'], ['name']);
 						break;
 
 					case 'event_name':
