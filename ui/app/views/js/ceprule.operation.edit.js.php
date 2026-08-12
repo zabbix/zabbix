@@ -256,9 +256,21 @@ window.ceprule_operation_edit_popup = new class {
 			}
 		});
 
+		const sorter = (option_left, option_right) => {
+			if (option_left.label === option_right.label) {
+				return 0;
+			}
+
+			return option_left.label > option_right.label ? 1 : -1;
+		};
+
+		events_options.sort(sorter);
+		tags_options.sort(sorter);
+		window_options.sort(sorter);
+
 		zselect.clearOptions();
-		zselect.addOptionGroup({label: <?= json_encode(_('Events')) ?>, options: events_options});
-		zselect.addOptionGroup({label: <?= json_encode(_('Tags')) ?>, options: tags_options});
+		zselect.addOptionGroup({label: <?= json_encode(_('Event')) ?>, options: events_options});
+		zselect.addOptionGroup({label: <?= json_encode(_('Tag')) ?>, options: tags_options});
 		zselect.addOptionGroup({label: <?= json_encode(_('Window')) ?>, options: window_options});
 		zselect.value = type;
 
