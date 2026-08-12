@@ -1728,18 +1728,6 @@ td.inactive-bg {
 	@extend .inactive-bg;
 }
 
-// Filter checkboxes.
-.table-forms-second-column {
-	display: inline-block;
-	width: 50%;
-	min-width: 200px;
-	text-align: right;
-
-	.second-column-label {
-		padding: 0 10px;
-	}
-}
-
 // Event status colors.
 .problem-unack-fg {
 	color: $problem-unack-fg-color;
