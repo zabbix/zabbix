@@ -161,6 +161,12 @@ class CControllerLldRulePrototypeEdit extends CController
 			}
 
 			$this->host = reset($host);
+
+			// Sort interfaces to be listed starting with one selected as 'main'.
+			CArrayHelper::sort($this->host['interfaces'], [
+				['field' => 'main', 'order' => ZBX_SORT_DOWN],
+				['field' => 'interfaceid','order' => ZBX_SORT_UP]
+			]);
 		}
 		else {
 			$template = API::Template()->get([
