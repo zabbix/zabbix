@@ -305,32 +305,40 @@ class CCepRuleHelper {
 	}
 
 	public static function getConditionDescription(array $ceprule_condition): array {
-		[$argument_1, $argument_2] = match((int) $ceprule_condition['type']) {
-			self::CONDITION_EVENT_NAME => [$ceprule_condition['event_name'], null],
-			self::CONDITION_SEVERITY => [CSeverityHelper::getName($ceprule_condition['severity']), null],
-			self::CONDITION_HOST => [$ceprule_condition['host'], null],
-			self::CONDITION_HOST_GROUP => [$ceprule_condition['host_group'], null],
-			self::CONDITION_TIME_PERIOD => [$ceprule_condition['time_period'], null],
-			self::CONDITION_TAG => match ($ceprule_condition['operator']) {
-				CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS => [$ceprule_condition['tag'], null],
-				default => [$ceprule_condition['tag'], $ceprule_condition['tag_value']]
-			}
-		};
+		$type_name = CCepRuleHelper::getConditionLabel($ceprule_condition['type']);
+		$operator_name = mb_strtolower(CCepRuleHelper::getConditionOperatorLabel($ceprule_condition['operator']));
 
-		$result = [
-			CCepRuleHelper::getConditionLabel($ceprule_condition['type']),
-			' ',
-			italic($argument_1),
-			' ',
-			mb_strtolower(CCepRuleHelper::getConditionOperatorLabel($ceprule_condition['operator']))
-		];
-
-		if ($argument_2 !== null) {
-			$result[] = ' ';
-			$result[] = italic($argument_2);
+		if (self::CONDITION_EVENT_NAME == $ceprule_condition['type']) {
+			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['event_name'])];
 		}
-
-		return $result;
+		elseif (self::CONDITION_SEVERITY == $ceprule_condition['type']) {
+			return [$type_name, ' ', $operator_name, ' ',
+				italic(CSeverityHelper::getName($ceprule_condition['severity']))
+			];
+		}
+		elseif (self::CONDITION_HOST == $ceprule_condition['type']) {
+			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['host'])];
+		}
+		elseif (self::CONDITION_HOST_GROUP == $ceprule_condition['type']) {
+			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['host_group'])];
+		}
+		elseif (self::CONDITION_TIME_PERIOD == $ceprule_condition['type']) {
+			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['time_period'])];
+		}
+		elseif (self::CONDITION_TAG == $ceprule_condition['type']) {
+			if ($ceprule_condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS
+					|| $ceprule_condition['operator'] == CONDITION_OPERATOR_EXISTS) {
+				return [$type_name, ' ', italic($ceprule_condition['tag']), ' ', $operator_name];
+			}
+			else {
+				return [$type_name, ' ', italic($ceprule_condition['tag']), ' ', $operator_name, ' ',
+					italic($ceprule_condition['tag_value'])
+				];
+			}
+		}
+		else {
+			throw new Exception('Unknown condition type');
+		}
 	}
 
 	public static function getOperationExecuteWhenStrings(): array {
