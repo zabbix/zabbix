@@ -473,6 +473,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		}
 		unset($step);
 
+		$monitored_by_server = $this->host['status'] != HOST_STATUS_TEMPLATE
+			&& $this->host['monitored_by'] == ZBX_MONITORED_BY_SERVER;
+
 		if (in_array($this->item_type, $this->items_support_proxy)) {
 			if (array_key_exists('proxyid', $data)) {
 				$proxyid = $data['proxyid'];
@@ -484,7 +487,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				$proxyid = 0;
 			}
 
-			if (array_key_exists('test_with', $data)) {
+			if ($monitored_by_server) {
+				$test_with = self::TEST_WITH_SERVER;
+			}
+			elseif (array_key_exists('test_with', $data)) {
 				$test_with = $data['test_with'];
 			}
 			else {
@@ -551,7 +557,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'inputs' => $inputs,
 			'test_with' => $test_with,
 			'ms_proxy' => $ms_proxy,
-			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy) && !$ms_proxy_inaccessible,
+			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy) && !$ms_proxy_inaccessible
+				&& !$monitored_by_server,
 			'interface_address_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['address']
 			),
