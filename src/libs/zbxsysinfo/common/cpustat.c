@@ -1337,7 +1337,7 @@ int	get_cpus(zbx_vector_uint64_pair_t *vector)
 			pair.second = get_cpu_status(cpu->h_status[index]);
 		}
 		else
-			pair.second = ZBX_CPU_STATUS_UNKNOWN;
+			pair.second = ZBX_CPU_STATUS_OFFLINE;
 #else
 		pair.first = idx - 1;
 		pair.second = get_cpu_perf_counter_status(pcpus->cpu_counter[idx]->status);
