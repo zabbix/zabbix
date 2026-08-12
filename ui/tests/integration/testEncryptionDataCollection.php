@@ -418,6 +418,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderOpensslPassiveCert(): array {
+		if ('openssl' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with OpenSSL; skipping passive agent cert test.');
+		}
+
 		$c = self::generateCertificates();
 		return [
 			self::COMPONENT_SERVER => [
@@ -456,10 +460,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_opensslPassiveAgentCert(): void {
-		if ('openssl' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with OpenSSL; skipping passive agent cert test.');
-		}
-
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -491,6 +491,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderOpensslAgent2Cert(): array {
+		if ('openssl' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with OpenSSL; skipping Agent 2 cert test.');
+		}
+
 		$c = self::generateCertificates();
 		return [
 			self::COMPONENT_SERVER => [
@@ -530,10 +534,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_opensslAgent2Cert(): void {
-		if ('openssl' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with OpenSSL; skipping Agent 2 cert test.');
-		}
-
 		$this->updateHostCertTLS('enc_agent2', 'CN=ZabbixTestCA', 'CN=zabbix_agent2');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -709,6 +709,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderOpensslCipherCert(): array {
+		if ('openssl' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with OpenSSL; skipping TLSCipherCert13 test.');
+		}
+
 		$c = self::generateCertificates();
 		return [
 			self::COMPONENT_SERVER => [
@@ -752,10 +756,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_opensslCipherCert(): void {
-		if ('openssl' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with OpenSSL; skipping TLSCipherCert13 test.');
-		}
-
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -781,6 +781,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderOpensslCipherPSK(): array {
+		if ('openssl' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with OpenSSL; skipping TLSCipherPSK13 test.');
+		}
+
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel'        => 4,
@@ -817,10 +821,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_opensslCipherPSK(): void {
-		if ('openssl' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with OpenSSL; skipping TLSCipherPSK13 test.');
-		}
-
 		$this->updateHostPSKTLS('enc_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -846,6 +846,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderOpensslCipherAll(): array {
+		if ('openssl' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with OpenSSL; skipping TLSCipherAll13 test.');
+		}
+
 		$c = self::generateCertificates();
 		return [
 			self::COMPONENT_SERVER => [
@@ -895,10 +899,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_opensslCipherAll(): void {
-		if ('openssl' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with OpenSSL; skipping TLSCipherAll13 test.');
-		}
-
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -982,16 +982,18 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderLibgnutls(): array {
-		$c       = self::generateCertificates();
-		$isGnutls = ('gnutls' === $this->detectTLSLibrary());
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with GnuTLS; skipping libgnutls test.');
+		}
 
-		// GnuTLS priority strings are only valid when the binaries are compiled against GnuTLS.
-		// Passing them to an OpenSSL build makes TLS initialisation fail: for the C agent the
-		// listener child exits after logging "started [listener #1]" (startup check still passes,
-		// but the interface never becomes available); for Agent 2 the whole process exits before
-		// writing its PID file, so waitForStartup() times out.  Only set the cipher strings when
-		// GnuTLS is actually in use; the test body will call markTestSkipped() on OpenSSL builds.
-		$config = [
+		$c = self::generateCertificates();
+
+		// Zabbix Agent 2 is always built against OpenSSL regardless of which TLS library the
+		// server/agentd binaries were compiled with (see src/go/pkg/tls/tls.go, which #errors out
+		// on HAVE_GNUTLS), so it must not receive GnuTLS priority strings as TLSCipherCert/
+		// TLSCipherAll -- doing so makes Agent 2 fail to initialise TLS and its process exits
+		// before writing its PID file, so waitForStartup() times out.
+		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel'        => 4,
 				'UnreachablePeriod' => 5,
@@ -999,7 +1001,9 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'UnreachableDelay'  => 1,
 				'TLSCAFile'         => $c['ca_crt'],
 				'TLSCertFile'       => $c['server_crt'],
-				'TLSKeyFile'        => $c['server_key']
+				'TLSKeyFile'        => $c['server_key'],
+				'TLSCipherCert'     => self::GNUTLS_CIPHER_CERT,
+				'TLSCipherAll'      => self::GNUTLS_CIPHER_ALL
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
@@ -1011,7 +1015,9 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'          => $c['agent_crt'],
 				'TLSKeyFile'           => $c['agent_key'],
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
-				'TLSServerCertSubject' => 'CN=zabbix_server'
+				'TLSServerCertSubject' => 'CN=zabbix_server',
+				'TLSCipherCert'        => self::GNUTLS_CIPHER_CERT,
+				'TLSCipherAll'         => self::GNUTLS_CIPHER_ALL
 			],
 			self::COMPONENT_AGENT2 => [
 				'Hostname'             => 'enc_agent2',
@@ -1026,17 +1032,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSServerCertSubject' => 'CN=zabbix_server'
 			]
 		];
-
-		if ($isGnutls) {
-			$config[self::COMPONENT_SERVER]['TLSCipherCert'] = self::GNUTLS_CIPHER_CERT;
-			$config[self::COMPONENT_SERVER]['TLSCipherAll']  = self::GNUTLS_CIPHER_ALL;
-			$config[self::COMPONENT_AGENT]['TLSCipherCert']  = self::GNUTLS_CIPHER_CERT;
-			$config[self::COMPONENT_AGENT]['TLSCipherAll']   = self::GNUTLS_CIPHER_ALL;
-			$config[self::COMPONENT_AGENT2]['TLSCipherCert'] = self::GNUTLS_CIPHER_CERT;
-			$config[self::COMPONENT_AGENT2]['TLSCipherAll']  = self::GNUTLS_CIPHER_ALL;
-		}
-
-		return $config;
 	}
 
 	/**
@@ -1050,10 +1045,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_libgnutls(): void {
-		if ('gnutls' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with GnuTLS; skipping libgnutls test.');
-		}
-
 		$this->updateHostCertTLS('enc_agent',  'CN=ZabbixTestCA', 'CN=zabbix_agent');
 		$this->updateHostCertTLS('enc_agent2', 'CN=ZabbixTestCA', 'CN=zabbix_agent2');
 
@@ -1094,6 +1085,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderOpensslCipherCertAES256(): array {
+		if ('openssl' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with OpenSSL; skipping AES-256 TLSCipherCert13 test.');
+		}
+
 		$c = self::generateCertificates();
 		return [
 			self::COMPONENT_SERVER => [
@@ -1137,10 +1132,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_opensslCipherCertAES256(): void {
-		if ('openssl' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with OpenSSL; skipping AES-256 TLSCipherCert13 test.');
-		}
-
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -1166,6 +1157,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderOpensslCipherPSKChacha(): array {
+		if ('openssl' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with OpenSSL; skipping CHACHA20 TLSCipherPSK13 test.');
+		}
+
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel'        => 4,
@@ -1203,10 +1198,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_opensslCipherPSKChacha(): void {
-		if ('openssl' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with OpenSSL; skipping CHACHA20 TLSCipherPSK13 test.');
-		}
-
 		$this->updateHostPSKTLS('enc_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -1232,6 +1223,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderOpensslCipherAllAES256(): array {
+		if ('openssl' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with OpenSSL; skipping AES-256 TLSCipherAll13 test.');
+		}
+
 		$c = self::generateCertificates();
 		return [
 			self::COMPONENT_SERVER => [
@@ -1279,10 +1274,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_opensslCipherAllAES256(): void {
-		if ('openssl' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with OpenSSL; skipping AES-256 TLSCipherAll13 test.');
-		}
-
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -1308,6 +1299,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderOpensslCipherMismatch(): array {
+		if ('openssl' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with OpenSSL; skipping cipher mismatch test.');
+		}
+
 		$c = self::generateCertificates();
 		return [
 			self::COMPONENT_SERVER => [
@@ -1353,10 +1348,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_opensslCipherMismatch(): void {
-		if ('openssl' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with OpenSSL; skipping cipher mismatch test.');
-		}
-
 		$start_time = time();
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
@@ -1386,6 +1377,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderGnutlsCertTLS13(): array {
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS TLS 1.2+1.3 test.');
+		}
+
 		$c = self::generateCertificates();
 		return [
 			self::COMPONENT_SERVER => [
@@ -1428,10 +1423,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_gnutlsCertTLS13(): void {
-		if ('gnutls' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS TLS 1.2+1.3 test.');
-		}
-
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -1457,6 +1448,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderGnutlsPSK(): array {
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS PSK test.');
+		}
+
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel'        => 4,
@@ -1491,10 +1486,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_gnutlsPSK(): void {
-		if ('gnutls' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS PSK test.');
-		}
-
 		$this->updateHostPSKTLS('enc_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -1520,6 +1511,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderGnutlsCertAES256(): array {
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS AES-256 test.');
+		}
+
 		$c = self::generateCertificates();
 		return [
 			self::COMPONENT_SERVER => [
@@ -1562,10 +1557,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_gnutlsCertAES256(): void {
-		if ('gnutls' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS AES-256 test.');
-		}
-
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -1592,6 +1583,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderGnutlsPSKTLS13(): array {
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS PSK TLS 1.2+1.3 test.');
+		}
+
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel'        => 4,
@@ -1628,10 +1623,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_gnutlsPSKTLS13(): void {
-		if ('gnutls' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS PSK TLS 1.2+1.3 test.');
-		}
-
 		$this->updateHostPSKTLS('enc_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -1658,6 +1649,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderGnutlsAll(): array {
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS TLSCipherAll test.');
+		}
+
 		$c = self::generateCertificates();
 		return [
 			self::COMPONENT_SERVER => [
@@ -1704,10 +1699,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_gnutlsAll(): void {
-		if ('gnutls' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS TLSCipherAll test.');
-		}
-
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -1734,6 +1725,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderGnutlsPSKAES256(): array {
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS PSK AES-256 test.');
+		}
+
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel'        => 4,
@@ -1770,10 +1765,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_gnutlsPSKAES256(): void {
-		if ('gnutls' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS PSK AES-256 test.');
-		}
-
 		$this->updateHostPSKTLS('enc_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -1800,6 +1791,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderGnutlsCipherMismatch(): array {
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS cipher mismatch test.');
+		}
+
 		$c = self::generateCertificates();
 		return [
 			self::COMPONENT_SERVER => [
@@ -1844,10 +1839,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_gnutlsCipherMismatch(): void {
-		if ('gnutls' !== $this->detectTLSLibrary()) {
-			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS cipher mismatch test.');
-		}
-
 		$start_time = time();
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
