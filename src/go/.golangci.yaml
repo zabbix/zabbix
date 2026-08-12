@@ -169,6 +169,7 @@ linters:
           - maintidx
           - revive
           - wrapcheck
+          - wsl_v5
         path: _test\.go
     paths:
       - third_party$

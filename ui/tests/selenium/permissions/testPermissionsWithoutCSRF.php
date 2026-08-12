@@ -372,7 +372,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM drules',
 					'link' => 'zabbix.php?action=discovery.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF discovery create'
+					],
+					'secondary_dialog' => [
+						'field' => 'id:dcheckList',
+						'fill' => []
+					]
 				]
 			],
 			// #27 Discovery update.
