@@ -478,7 +478,8 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 			ret = FAIL;
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "[zbx_execute] process completed with code=%lu", (unsigned long)code);
+			zabbix_log(LOG_LEVEL_DEBUG, "[zbx_execute] process completed with code=%lu",
+				(unsigned long)code);
 	}
 
 	CloseHandle(pi.hProcess);
