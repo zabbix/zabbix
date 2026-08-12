@@ -15,8 +15,8 @@
 package mysql
 
 import (
-	"context"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/omeid/go-yarn"
@@ -43,7 +43,9 @@ type Plugin struct {
 var impl Plugin
 
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
+//
+//nolint:gocyclo,cyclop // it's an export method, they are supposed to be heavy
+func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvider) (any, error) {
 	if key == keyCustomQuery && !p.options.CustomQueriesEnabled {
 		return nil, errs.Errorf("key %q is disabled", keyCustomQuery)
 	}
@@ -68,7 +70,19 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(uri, params)
+	connectionTimeout, err := p.getConnectionTimeout(params)
+	if err != nil {
+		return nil, err
+	}
+
+	if ctx.LegacyTimeout() {
+		ctx = plugin.OverrideTimeout(ctx, time.Now(), p.options.LegacyItemTimeout)
+	}
+
+	p.Tracef("query timeout set to: %d", ctx.Timeout())
+	p.Tracef("connection timeout set to: %d", connectionTimeout)
+
+	conn, err := p.connMgr.GetConnection(uri, params, connectionTimeout)
 	if err != nil {
 		// Special logic of processing connection errors should be used if mysql.ping is requested
 		// because it must return pingFailed if any error occurred.
@@ -81,7 +95,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorConnectionFailed.Wrap(err)
 	}
 
-	result, err := handleMetric(context.Background(), conn, params, extraParams...)
+	result, err := handleMetric(ctx, conn, params, extraParams...)
 	if err != nil {
 		p.Errf(err.Error())
 
@@ -94,11 +108,9 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 // Start implements the Runner interface and performs initialization when plugin is activated.
 func (p *Plugin) Start() {
 	options := &connectionManagerOptions{
-		keepAlive:      time.Duration(p.options.KeepAlive) * time.Second,
-		connectTimeout: time.Duration(p.options.Timeout) * time.Second,
-		callTimeout:    time.Duration(p.options.CallTimeout) * time.Second,
-		queryStorage:   p.setCustomQuery(),
-		logger:         p.Logger,
+		keepAlive:    time.Duration(p.options.KeepAlive) * time.Second,
+		queryStorage: p.setCustomQuery(),
+		logger:       p.Logger,
 	}
 
 	p.connMgr = NewConnManager(options)
@@ -123,4 +135,20 @@ func (p *Plugin) setCustomQuery() yarn.Yarn {
 func (p *Plugin) Stop() {
 	p.connMgr.Destroy()
 	p.connMgr = nil
+}
+
+func (p *Plugin) getConnectionTimeout(params map[string]string) (int, error) {
+	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
+	if err != nil {
+		p.Tracef("failed to convert parameter connection timeout %s", err.Error())
+
+		connectionTimeout, err = strconv.Atoi(p.options.Default.ConnectionTimeout)
+		if err != nil {
+			p.Tracef("failed to convert default connection timeout %s", err.Error())
+
+			return 0, errs.New("failed to get connection timeout")
+		}
+	}
+
+	return connectionTimeout, nil
 }

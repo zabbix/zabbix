@@ -89,16 +89,20 @@ class CControllerUserDeviceDelete extends CController {
 		$only_local_device = false;
 
 		if ($this->device !== null) {
+			$data = ['uuid' => $this->device['uuid']];
+
+			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+				$data['force'] = $this->getInput('force', 0) == 1;
+			}
+
 			try {
-				$result = API::Device()->offboard([
-					'uuid' => $this->device['uuid'],
-					'force' => $this->getInput('force', 0) == 1
-				]);
+				$result = API::Device()->offboard($data);
 			}
 			catch (Exception $e) {
 				error($e->getMessage());
 
-				if ($e->getCode() == ZBX_API_ERROR_NO_EXTERNAL_ENTITY) {
+				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN &&
+						$e->getCode() == ZBX_API_ERROR_NO_EXTERNAL_ENTITY) {
 					$only_local_device = true;
 				}
 			}

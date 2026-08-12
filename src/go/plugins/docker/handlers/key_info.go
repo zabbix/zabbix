@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -74,10 +75,10 @@ type info struct {
 	Warnings           []string `json:"Warnings"`
 }
 
-func keyInfoHandler(client *http.Client, query string, _ ...string) (string, error) {
+func keyInfoHandler(ctx plugin.ContextProvider, client *http.Client, query string, _ ...string) (string, error) {
 	var data info
 
-	body, err := queryDockerAPI(client, query)
+	body, err := queryDockerAPI(ctx, client, query)
 	if err != nil {
 		return "", err
 	}

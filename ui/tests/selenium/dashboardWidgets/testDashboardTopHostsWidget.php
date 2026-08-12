@@ -1741,6 +1741,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		// Take a screenshot to test draggable object position of columns.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
+			COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertScreenshot($form->query('id:list_columns')->waitUntilPresent()->one(), 'Top hosts columns');
 		}
 
@@ -2852,7 +2853,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				}
 
 				$this->assertMessage(TEST_BAD, null, $data['column_error']);
-				$this->query('xpath://div/h4[text()="'.$dialog_title.'"]/../button[@title="Close"]')->one()->click();
+				$this->query('xpath://div/h4[text()="'.$dialog_title.'"]/../button[@aria-label="Close modal window"]')->one()->click();
 			}
 
 			$column_form->waitUntilNotVisible();

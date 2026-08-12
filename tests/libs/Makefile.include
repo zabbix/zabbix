@@ -201,7 +201,7 @@ else
 ZBX_IPMI_LIB =
 endif
 
-include ../grouped-libs.mk.inc
+include $(top_srcdir)/tests/libs/grouped-libs.mk.inc
 
 if SERVER
 ANY_GROUPED_LIBS = $(SERVER_GROUPED_LIBS)

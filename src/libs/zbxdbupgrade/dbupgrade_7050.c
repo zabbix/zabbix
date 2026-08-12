@@ -1163,6 +1163,35 @@ static int	DBpatch_7050087(void)
 	return DBcreate_index("device", "device_2", "uuid", 1);
 }
 
+static int	DBpatch_7050088(void)
+{
+	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("regexps", &field);
+}
+
+static int	DBpatch_7050089(void)
+{
+	const zbx_db_field_t	field = {"expression", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("expressions", &field, NULL);
+}
+
+static int	DBpatch_7050090(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 1  - REGEX_TYPE_CONTAINS_ANY_SUBSTRING   */
+	if (ZBX_DB_OK > zbx_db_execute("update expressions set exp_delimiter='' where expression_type<>1"
+			" and exp_delimiter<>''"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1257,5 +1286,8 @@ DBPATCH_ADD(7050084, 0, 1)
 DBPATCH_ADD(7050085, 0, 1)
 DBPATCH_ADD(7050086, 0, 1)
 DBPATCH_ADD(7050087, 0, 1)
+DBPATCH_ADD(7050088, 0, 1)
+DBPATCH_ADD(7050089, 0, 1)
+DBPATCH_ADD(7050090, 0, 1)
 
 DBPATCH_END()

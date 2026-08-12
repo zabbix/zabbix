@@ -39,7 +39,9 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 			hostnameItem = options.HostnameItem
 		}
 
-		taskResult, err = taskManager.PerformTask(hostnameItem, time.Second*time.Duration(options.Timeout), agent.LocalChecksClientID)
+		taskResult, err = taskManager.PerformTask(
+			hostnameItem, time.Second*time.Duration(options.Timeout), false, agent.LocalChecksClientID,
+		)
 		if err != nil {
 			if len(options.HostnameItem) == 0 {
 				return fmt.Errorf("cannot get system hostname using \"%s\" item as default for \"HostnameItem\" configuration parameter: %s", hostnameItem, err.Error())

@@ -122,6 +122,7 @@ class CDocHelper {
 	const POPUP_ACKNOWLEDGMENT_EDIT =							'acknowledgment#updating-problems';
 	const POPUP_CONNECTOR_EDIT =								'config/export/streaming#configuration';
 	const POPUP_DASHBOARD_IMPORT =								'xml_export_import/dashboards#importing';
+	const POPUP_REGEXP_IMPORT =									'xml_export_import/global_regexes#importing';
 	const POPUP_HOST_IMPORT =									'xml_export_import/hosts#importing';
 	const POPUP_HTTP_STEP_EDIT =								'web_monitoring#configuring-steps';
 	const POPUP_MAPS_IMPORT =									'xml_export_import/maps#importing';

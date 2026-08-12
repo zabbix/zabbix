@@ -4247,6 +4247,12 @@ return [
 				'type' => DB::FIELD_TYPE_TEXT,
 				'length' => 65535,
 				'default' => ''
+			],
+			'description' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
 			]
 		]
 	],
@@ -4268,7 +4274,7 @@ return [
 			'expression' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => ''
 			],
 			'expression_type' => [

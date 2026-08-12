@@ -1509,6 +1509,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_ipc_async_socket_t	rtc;
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_VAULT_NEW_TOKEN};
 
 	zbx_get_program_type_cb = trapper_args_in->zbx_get_program_type_cb_arg;
 
@@ -1530,7 +1531,8 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_rtc_subscribe(process_type, process_num, NULL, 0, trapper_args_in->config_comms->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs),
+			trapper_args_in->config_comms->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -1556,8 +1558,16 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
 		{
-			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+			if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
+			{
+				trapper_args_in->config_vault->token =
+						zbx_strdup(trapper_args_in->config_vault->token,
+						(const char *)rtc_data);
+			}
+			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				goto out;
+
+			zbx_free(rtc_data);
 		}
 
 		if (TIMEOUT_ERROR == ret)

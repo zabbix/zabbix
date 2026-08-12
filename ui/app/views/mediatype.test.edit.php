@@ -106,7 +106,7 @@ switch ($data['type']) {
 	case MEDIA_TYPE_PUSH:
 		$form_grid
 			->addItem([
-				(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
+				(new CLabel(_('Send to'), 'sendto_deviceuuids__ms'))->setAsteriskMark(),
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'sendto_deviceuuids[]',
