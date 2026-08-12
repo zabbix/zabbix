@@ -80,7 +80,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, HANDLE hProcess, char **buf, size_t 
 			if (0 == GetExitCodeProcess(hProcess, &process_code))
 				process_code = STILL_ACTIVE;
 
-			zabbix_log(LOG_LEVEL_DEBUG,
+			zabbix_log(LOG_LEVEL_WARNING,
 					"[zbx_execute] pipe timeout: offset=%zu pending=%lu "
 					"timeout_ms=%d process_code=%lu",
 				*offset, (unsigned long)in_buf_size, timeout_ms, (unsigned long)process_code);
@@ -89,7 +89,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, HANDLE hProcess, char **buf, size_t 
 
 		if (MAX_EXECUTE_OUTPUT_LEN <= *offset + in_buf_size)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG,
+			zabbix_log(LOG_LEVEL_WARNING,
 					"[zbx_execute] pipe output limit: offset=%zu pending=%lu limit=%zu",
 				*offset, (unsigned long)in_buf_size, (size_t)MAX_EXECUTE_OUTPUT_LEN);
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
@@ -104,7 +104,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, HANDLE hProcess, char **buf, size_t 
 		{
 			if (0 == ReadFile(hRead, tmp_buf, sizeof(tmp_buf) - 1, &read_bytes, NULL))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG,
+				zabbix_log(LOG_LEVEL_WARNING,
 						"[zbx_execute] ReadFile failed: error=%lu offset=%zu pending=%lu",
 					(unsigned long)GetLastError(), *offset, (unsigned long)in_buf_size);
 				zabbix_log(LOG_LEVEL_ERR, "cannot read command output: %s",
@@ -125,7 +125,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, HANDLE hProcess, char **buf, size_t 
 		Sleep(20);	/* milliseconds */
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[zbx_execute] PeekNamedPipe failed: error=%lu offset=%zu",
+	zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] PeekNamedPipe failed: error=%lu offset=%zu",
 			(unsigned long)GetLastError(), *offset);
 
 	return SUCCEED;
@@ -430,7 +430,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	if (FAIL == ret)
 		goto close;
 
-	zabbix_log(LOG_LEVEL_DEBUG,
+	zabbix_log(LOG_LEVEL_WARNING,
 			"[zbx_execute] started command=\"%s\" pid=%lu timeout=%d dir=%s",
 			cmd, (unsigned long)pi.dwProcessId, timeout, NULL != dir ? dir : "<current>");
 
@@ -438,7 +438,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	timeout *= 1000;
 
 	ret = zbx_read_from_pipe(hRead, pi.hProcess, &buffer, &buf_size, &offset, timeout, error, max_error_len);
-	zabbix_log(LOG_LEVEL_DEBUG, "[zbx_execute] read result=%d offset=%zu error=\"%s\"",
+	zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] read result=%d offset=%zu error=\"%s\"",
 			ret, offset, error);
 
 	if (SUCCEED == ret)
@@ -447,18 +447,18 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 		int	wait_timeout = timeout - zbx_get_timediff_ms(&start_time, &current_time);
 		DWORD	wait_result;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "[zbx_execute] waiting process: remaining_ms=%d", wait_timeout);
+		zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] waiting process: remaining_ms=%d", wait_timeout);
 
 		if (0 < (timeout = wait_timeout) && WAIT_TIMEOUT ==
 				(wait_result = WaitForSingleObject(pi.hProcess, (DWORD)timeout)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "[zbx_execute] process wait timed out");
+			zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] process wait timed out");
 			ret = TIMEOUT_ERROR;
 		}
 		else if (WAIT_OBJECT_0 != (wait_result = WaitForSingleObject(pi.hProcess, 0)) ||
 				0 == GetExitCodeProcess(pi.hProcess, &code))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "[zbx_execute] process wait result=%lu exit_code_read_failed=%d",
+			zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] process wait result=%lu exit_code_read_failed=%d",
 				(unsigned long)wait_result, 0 == GetExitCodeProcess(pi.hProcess, &code));
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
@@ -469,7 +469,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 		}
 		else if (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != code)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "[zbx_execute] process exited with code=%lu", (unsigned long)code);
+			zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] process exited with code=%lu", (unsigned long)code);
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
 			else
@@ -478,7 +478,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 			ret = FAIL;
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "[zbx_execute] process completed with code=%lu",
+			zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] process completed with code=%lu",
 				(unsigned long)code);
 	}
 
@@ -502,7 +502,7 @@ close:
 	if (NULL != hRead)
 		CloseHandle(hRead);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[zbx_execute] final result=%d offset=%zu error=\"%s\"",
+	zabbix_log(LOG_LEVEL_WARNING, "[zbx_execute] final result=%d offset=%zu error=\"%s\"",
 			ret, offset, error);
 
 	zbx_free(cmd);
