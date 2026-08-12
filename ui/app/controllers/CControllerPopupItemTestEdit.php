@@ -558,7 +558,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'test_with' => $test_with,
 			'ms_proxy' => $ms_proxy,
 			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy) && !$ms_proxy_inaccessible
-				&& !$monitored_by_server,
+				&& !($monitored_by_server && !CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)),
 			'interface_address_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['address']
 			),
