@@ -37,7 +37,8 @@ class CControllerLldRuleUpdate extends CControllerLldRuleUpdateGeneral {
 			['db items.type', 'not_in' => [ITEM_TYPE_NESTED],
 				'when' => [
 					['context', 'in' => ['host']],
-					['host_discovered', 'in' => [0]]
+					['host_discovered', 'in' => [0]],
+					['discovered', 'in' => [0]]
 				]
 			]
 		];

@@ -206,7 +206,8 @@ class CControllerLldRuleEdit extends CController
 
 		$types = array_intersect_key(item_type2str(), array_flip(CControllerLldRuleUpdateGeneral::getItemTypes()));
 
-		if ($this->getInput('context') === 'host' && !($this->host['flags'] & ZBX_FLAG_DISCOVERY_CREATED)) {
+		if (!$lldrule['discovered_lld'] &&
+				$this->getInput('context') === 'host' && !($this->host['flags'] & ZBX_FLAG_DISCOVERY_CREATED)) {
 			$types = array_diff_key($types, array_flip([ITEM_TYPE_NESTED]));
 		}
 
