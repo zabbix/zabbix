@@ -23,9 +23,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'mediatypeid' => ['db media_type.mediatypeid', 'required'],
-			'type' => ['db media_type.type', 'required',
-				'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]
-			],
+			'type' => ['db media_type.type', 'required', 'in' => CMediatypeHelper::getSupportedMediaTypes()],
 			'name' => ['db media_type.name', 'required', 'not_empty'],
 			'provider' => ['db media_type.provider', 'in' => array_keys(CMediatypeHelper::getEmailProviders()),
 				'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL]]
@@ -107,6 +105,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				]
 			],
 			'redirection_url' => ['db media_type_oauth.redirection_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
@@ -129,6 +128,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				]
 			],
 			'authorization_url' => ['db media_type_oauth.authorization_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
@@ -137,6 +137,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				'messages' => ['not_empty' => _('Invalid OAuth configuration')]
 			],
 			'token_url' => ['db media_type_oauth.token_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
@@ -208,7 +209,10 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				'when' => ['type', 'in' => [MEDIA_TYPE_WEBHOOK]]
 			],
 			'event_menu_url' =>	['db media_type.event_menu_url', 'required', 'not_empty',
-				// 'use' => [CHtmlUrlValidator::class, ['allow_event_tags_macro' => true, 'allow_user_macro' => false]],
+				'use' => [CUrlValidator::class, [
+					'event_tags_macro' => true,
+					'schemes' => CSettingsHelper::getAllowedUriSchemes()
+				]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_WEBHOOK]],
 					['show_event_menu', 'in' => [ZBX_EVENT_MENU_SHOW]]
@@ -246,7 +250,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				'message' => ['db media_type_message.message']
 			]],
 			'maxsessions' => ['db media_type.maxsessions', 'min' => 0, 'max' => 100,
-				'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK]]
+				'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK, MEDIA_TYPE_PUSH]]
 			],
 			'maxattempts' => ['db media_type.maxattempts', 'min' => 1, 'max' => 100],
 			'attempt_interval' => ['db media_type.attempt_interval', 'required', 'not_empty',

@@ -97,12 +97,33 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		return $result;
 	}
 
+	/**
+	 * Validation rules to check if all data is correct to open test edit form.
+	 */
+	public static function getValidationRules(bool $allow_lld_macro): array {
+		return ['object', 'fields' => [
+			'type' => ['db items.type', 'required', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
+				ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_HTTPTEST, ITEM_TYPE_DEPENDENT,
+				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+			]],
+			'key' => ['db items.key_', 'required', 'not_empty', 'use' => [CItemKey::class, []], 'when' => [
+				['type', 'in' => self::$item_types_has_key_mandatory]
+			]],
+			'params_f' => ['db items.params', 'required', 'not_empty',
+				'use' => [CCalcFormulaValidator::class, ['lldmacros' => $allow_lld_macro]],
+				'when' => ['type', 'in' => [ITEM_TYPE_CALCULATED]]
+			],
+			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules(allow_lld_macro: true)
+		]];
+	}
+
 	private function checkTestInputs(): bool {
 		$testable_item_types = self::getTestableItemTypes((string) $this->getInput('hostid', '0'));
 		$this->item_type = $this->hasInput('item_type') ? (int) $this->getInput('item_type') : -1;
 		$this->test_type = (int) $this->getInput('test_type');
-		$this->is_item_testable = in_array($this->item_type, $testable_item_types)
-			&& $this->item_type != ITEM_TYPE_NESTED;
+		$this->is_item_testable = in_array($this->item_type, $testable_item_types);
 
 		// Check if key is valid for item types it's mandatory.
 		if (in_array($this->item_type, self::$item_types_has_key_mandatory)) {
@@ -195,7 +216,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		// Get item and host properties and values from cache.
 		$data = $this->getInput('data', []);
 		if (array_key_exists('macros', $data)) {
-			$data['macros'] = json_decode($data['macros'], true);
+			$data['macros'] = array_combine(
+				array_column($data['macros'], 'name'),
+				array_column($data['macros'], 'value')
+			);
 		}
 
 		$inputs = $this->getItemTestProperties($this->getInputAll());
@@ -515,7 +539,13 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'show_warning' => $show_warning,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'js_validation_rules' => (new CFormValidator(
+				CControllerPopupItemTestSend::getValidationRules())
+			)->getRules(),
+			'js_validation_rules_get_value' => (new CFormValidator(
+				CControllerPopupItemTestGetValue::getValidationRules())
+			)->getRules()
 		]));
 	}
 }

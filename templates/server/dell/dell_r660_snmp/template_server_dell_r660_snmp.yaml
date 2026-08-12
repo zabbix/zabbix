@@ -25,7 +25,7 @@ zabbix_export:
         This is a template for monitoring DELL PowerEdge R660 servers with iDRAC version 7 (and later) via Zabbix SNMP agent that works without any external scripts.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Server hardware'
       items:
@@ -499,10 +499,6 @@ zabbix_export:
             2 - unknown
           valuemap:
             name: zabbix.host.available
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
           tags:
             - tag: component
               value: health

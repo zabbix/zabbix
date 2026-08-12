@@ -9,7 +9,7 @@
 	text-align: center;
 	cursor: pointer;
 	border: 1px solid;
-	border-radius: 2px;
+	border-radius: var(--button-border-radius);
 
 	@if $ui-transitions {
 		transition: color $ui-controls-transition-duration ease-out,
@@ -207,6 +207,8 @@ button {
 .btn-icon {
 	@extend %button;
 	@extend %button-icon-colors;
+
+	border-radius: #{"max(0px, calc(var(--button-border-radius) - 2px))"};
 
 	display: inline-block;
 	line-height: 24px;

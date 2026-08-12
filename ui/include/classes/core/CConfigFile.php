@@ -77,6 +77,37 @@ class CConfigFile {
 		include($this->configFile);
 		ob_end_clean();
 
+		if (isset($DB['VAULT']) && $DB['VAULT'] == CVaultHashiCorp::NAME) {
+			if (!array_key_exists('VAULT_URL', $DB)) {
+				self::exception('Configuration parameter VAULT_URL is missing.');
+			}
+			elseif (!array_key_exists('VAULT_DB_PATH', $DB)) {
+				self::exception('Configuration parameter VAULT_DB_PATH is missing.');
+			}
+			elseif (!array_key_exists('VAULT_TOKEN', $DB) || $DB['VAULT_TOKEN'] === '') {
+				if ((!array_key_exists('VAULT_APP_ROLE_ID', $DB) || $DB['VAULT_APP_ROLE_ID'] === '')
+						&& (!array_key_exists('VAULT_APP_SECRET_ID', $DB) || $DB['VAULT_APP_SECRET_ID'] === '')) {
+					self::exception('Configuration parameter VAULT_TOKEN is missing.');
+				}
+				elseif (!array_key_exists('VAULT_APP_ROLE_ID', $DB) || $DB['VAULT_APP_ROLE_ID'] === '') {
+					self::exception('Configuration parameter VAULT_APP_ROLE_ID is missing.');
+				}
+				elseif (!array_key_exists('VAULT_APP_SECRET_ID', $DB) || $DB['VAULT_APP_SECRET_ID'] === '') {
+					self::exception('Configuration parameter VAULT_APP_SECRET_ID is missing.');
+				}
+			}
+
+			$vault = new CVaultHashiCorp($DB['VAULT_URL'], $DB['VAULT_PREFIX'] ?? '', $DB['VAULT_DB_PATH'],
+				$DB['VAULT_TOKEN'] ?? '', $DB['VAULT_APP_ROLE_ID'] ?? '', $DB['VAULT_APP_SECRET_ID'] ?? ''
+			);
+
+			if (!$vault->validateParameters()) {
+				$errors = $vault->getErrors();
+
+				self::exception(reset($errors));
+			}
+		}
+
 		if (!isset($DB['TYPE'])) {
 			self::exception('DB type is not set.');
 		}
@@ -167,6 +198,14 @@ class CConfigFile {
 
 		if (isset($DB['VAULT_TOKEN'])) {
 			$this->config['DB']['VAULT_TOKEN'] = $DB['VAULT_TOKEN'];
+		}
+
+		if (isset($DB['VAULT_APP_ROLE_ID'])) {
+			$this->config['DB']['VAULT_APP_ROLE_ID'] = $DB['VAULT_APP_ROLE_ID'];
+		}
+
+		if (isset($DB['VAULT_APP_SECRET_ID'])) {
+			$this->config['DB']['VAULT_APP_SECRET_ID'] = $DB['VAULT_APP_SECRET_ID'];
 		}
 
 		if (isset($DB['VAULT_CACHE'])) {
@@ -290,6 +329,10 @@ class CConfigFile {
 			}
 		}
 
+		if (isset($NO_AUTH_DEBUG_MODE)) {
+			$this->config['NO_AUTH_DEBUG_MODE'] = $NO_AUTH_DEBUG_MODE;
+		}
+
 		$this->makeGlobal();
 
 		return $this->config;
@@ -297,7 +340,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY_PROVIDERS, $SSO,
-			$ZBX_SERVER_TLS, $ZBX_FEATURE_FLAGS;
+			$ZBX_SERVER_TLS, $ZBX_FEATURE_FLAGS, $NO_AUTH_DEBUG_MODE;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -308,6 +351,7 @@ class CConfigFile {
 		$SSO = $this->config['SSO'];
 		$ZBX_FEATURE_FLAGS = $this->config['ZBX_FEATURE_FLAGS'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
+		$NO_AUTH_DEBUG_MODE = $this->config['NO_AUTH_DEBUG_MODE'];
 	}
 
 	public function save() {
@@ -375,6 +419,8 @@ $DB[\'VAULT_URL\']		= \''.addcslashes($this->config['DB']['VAULT_URL'], "'\\").'
 $DB[\'VAULT_PREFIX\']		= \''.addcslashes($this->config['DB']['VAULT_PREFIX'], "'\\").'\';
 $DB[\'VAULT_DB_PATH\']		= \''.addcslashes($this->config['DB']['VAULT_DB_PATH'], "'\\").'\';
 $DB[\'VAULT_TOKEN\']		= \''.addcslashes($this->config['DB']['VAULT_TOKEN'], "'\\").'\';
+$DB[\'VAULT_APP_ROLE_ID\']	= \''.addcslashes($this->config['DB']['VAULT_APP_ROLE_ID'], "'\\").'\';
+$DB[\'VAULT_APP_SECRET_ID\']	= \''.addcslashes($this->config['DB']['VAULT_APP_SECRET_ID'], "'\\").'\';
 $DB[\'VAULT_CERT_FILE\']		= \''.addcslashes($this->config['DB']['VAULT_CERT_FILE'], "'\\").'\';
 $DB[\'VAULT_KEY_FILE\']		= \''.addcslashes($this->config['DB']['VAULT_KEY_FILE'], "'\\").'\';
 // Uncomment to bypass local caching of credentials.
@@ -449,7 +495,7 @@ $SSO[\'CERT_STORAGE\']		= \'database\';
 //$ZBX_FEATURE_FLAGS[\'modules_config_enabled\'] = true;
 
 // Uncomment and set to desired values to disable editing of specific media types.
-// Possible values: \'email\', \'script\', \'sms\', \'webhook\'. One or more values can be set.
+// Possible values: \'email\', \'script\', \'sms\', \'webhook\', \'push\'. One or more values can be set.
 //$ZBX_FEATURE_FLAGS[\'media_type_denylist\'] = [];
 
 $ZBX_SERVER_TLS[\'ACTIVE\'] = '.($this->config['ZBX_SERVER_TLS']['ACTIVE'] ? 'true' : 'false').';
@@ -473,7 +519,8 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			MEDIA_TYPE_EMAIL => 'email',
 			MEDIA_TYPE_EXEC => 'script',
 			MEDIA_TYPE_SMS => 'sms',
-			MEDIA_TYPE_WEBHOOK => 'webhook'
+			MEDIA_TYPE_WEBHOOK => 'webhook',
+			MEDIA_TYPE_PUSH => 'push'
 		];
 
 		if (array_diff($media_type_denylist, $type_flag)) {
@@ -506,6 +553,8 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			'VAULT_PREFIX' => '',
 			'VAULT_DB_PATH' => '',
 			'VAULT_TOKEN' => '',
+			'VAULT_APP_ROLE_ID' => '',
+			'VAULT_APP_SECRET_ID' => '',
 			'VAULT_CERT_FILE' => '',
 			'VAULT_KEY_FILE' => '',
 			'VAULT_CACHE' => false
@@ -530,6 +579,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			'CERTIFICATE_ISSUER' => '',
 			'CERTIFICATE_SUBJECT' => ''
 		];
+		$this->config['NO_AUTH_DEBUG_MODE'] = false;
 	}
 
 	/**

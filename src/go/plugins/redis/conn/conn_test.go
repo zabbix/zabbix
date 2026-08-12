@@ -32,14 +32,14 @@ var unitLogger = log.New("unit test logger") //nolint:gochecknoglobals // logger
 func TestManager_closeUnused(t *testing.T) {
 	t.Parallel()
 
-	connMgr := NewManager(unitLogger, 1*time.Microsecond, 30*time.Second, HouseKeeperInterval*time.Second)
+	connMgr := NewManager(unitLogger, 1*time.Microsecond, HouseKeeperInterval*time.Second)
 
 	t.Cleanup(func() {
 		connMgr.Destroy()
 	})
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
-	_, _ = connMgr.create(createConnKey(u, map[string]string{}))
+	_, _ = connMgr.create(createConnKey(u, map[string]string{}), 30)
 
 	t.Run("Unused connections should have been deleted", func(t *testing.T) {
 		t.Parallel()
@@ -55,14 +55,14 @@ func TestManager_closeUnused(t *testing.T) {
 func TestManager_closeAll(t *testing.T) {
 	t.Parallel()
 
-	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
+	connMgr := NewManager(unitLogger, 300*time.Second, HouseKeeperInterval*time.Second)
 
 	t.Cleanup(func() {
 		connMgr.Destroy()
 	})
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
-	_, _ = connMgr.create(createConnKey(u, map[string]string{}))
+	_, _ = connMgr.create(createConnKey(u, map[string]string{}), 30)
 
 	t.Run("All connections should have been deleted", func(t *testing.T) {
 		t.Parallel()
@@ -80,7 +80,7 @@ func TestManager_create(t *testing.T) {
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 
-	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
+	connMgr := NewManager(unitLogger, 300*time.Second, HouseKeeperInterval*time.Second)
 
 	t.Cleanup(func() {
 		connMgr.Destroy()
@@ -119,7 +119,7 @@ func TestManager_create(t *testing.T) {
 				}
 			}()
 
-			got, err := connMgr.create(tt.args.u)
+			got, err := connMgr.create(tt.args.u, 30)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Manager.create() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -137,7 +137,7 @@ func TestManager_get(t *testing.T) {
 
 	u, _ := uri.New("tcp://127.0.0.1", nil)
 
-	connMgr := NewManager(unitLogger, 300*time.Second, 30*time.Second, HouseKeeperInterval*time.Second)
+	connMgr := NewManager(unitLogger, 300*time.Second, HouseKeeperInterval*time.Second)
 
 	t.Cleanup(func() {
 		connMgr.Destroy()

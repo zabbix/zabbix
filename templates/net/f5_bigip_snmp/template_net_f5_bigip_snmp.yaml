@@ -17,7 +17,7 @@ zabbix_export:
       wizard_ready: 'YES'
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.0-6
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -378,11 +378,16 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 551fd3b77d144ed58f138865e4862901
-              expression: 'last(/F5 Big-IP by SNMP/bigip.uptime)<10m'
+              expression: 'change(/F5 Big-IP by SNMP/bigip.uptime)<0 and last(/F5 Big-IP by SNMP/bigip.uptime,#2)<42949672.96-(lastclock(/F5 Big-IP by SNMP/bigip.uptime)-lastclock(/F5 Big-IP by SNMP/bigip.uptime,#2))'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/F5 Big-IP by SNMP/bigip.uptime)>{$SNMP.UPTIME.WARN}'
               name: 'F5 Big-IP: Host has been restarted'
-              event_name: 'F5 Big-IP: {HOST.NAME} has been restarted (uptime < 10m)'
+              event_name: 'F5 Big-IP: {HOST.NAME} has been restarted'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: |
+                The uptime counter has decreased, which indicates that the host has been restarted.
+                A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+                The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -393,10 +398,6 @@ zabbix_export:
           key: 'zabbix[host,snmp,available]'
           valuemap:
             name: 'SNMP available'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: network
@@ -3103,6 +3104,15 @@ zabbix_export:
             section_name: Other
             label: 'SNMP agent availability interval'
             description: 'The time interval for SNMP agent availability trigger expression.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the restart problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '16'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the restart problem auto-resolves.'
       dashboards:
         - uuid: 43de1fe7767e4cbaaedef55aeaf9f2ba
           name: 'Network interfaces'

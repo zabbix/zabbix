@@ -9,28 +9,28 @@
 		display: inline-block;
 		padding: 0;
 
+		&:nth-child(1 of &:not([hidden])) {
+			border-top-left-radius: var(--input-border-radius);
+			border-bottom-left-radius: var(--input-border-radius);
+
+			label {
+				border-top-left-radius: calc(var(--input-border-radius) - 1px);
+				border-bottom-left-radius: calc(var(--input-border-radius) - 1px);
+			}
+		}
+
+		&:nth-last-child(1 of &:not([hidden])) {
+			border-top-right-radius: var(--input-border-radius);
+			border-bottom-right-radius: var(--input-border-radius);
+
+			label {
+				border-top-right-radius: calc(var(--input-border-radius) - 1px);
+				border-bottom-right-radius: calc(var(--input-border-radius) - 1px);
+			}
+		}
+
 		&:not(:last-child) {
 			margin-right: -1px;
-		}
-
-		&:first-child {
-			border-top-left-radius: 3px;
-			border-bottom-left-radius: 3px;
-
-			label {
-				border-top-left-radius: 2px;
-				border-bottom-left-radius: 2px;
-			}
-		}
-
-		&:last-child {
-			border-top-right-radius: 3px;
-			border-bottom-right-radius: 3px;
-
-			label {
-				border-top-right-radius: 2px;
-				border-bottom-right-radius: 2px;
-			}
 		}
 	}
 

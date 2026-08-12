@@ -39,7 +39,7 @@ class CControllerBannerUpdate extends CController {
 	protected function doAction(): void {
 		$lastcheck = time();
 		$number_of_attempts = $this->getInput('number_of_attempts');
-		$previous_check_data = CSettingsHelper::getBannerData() + ['lastcheck_success' => 0];
+		$previous_check_data = CBannerHelper::getData() + ['lastcheck_success' => 0];
 
 		if ($number_of_attempts > 0) {
 			$delay = self::NEXTCHECK_DELAY_ON_FAIL;
@@ -56,22 +56,22 @@ class CControllerBannerUpdate extends CController {
 
 		$banners = $this->getInput('banners');
 		foreach ($banners as &$banner) {
-			foreach ($banner['content'] ?? [] as $lang => $text) {
-				$banner['content'][$lang] = $parsedown->text($text);
+			if (array_key_exists('content', $banner) && is_array($banner['content'])) {
+				foreach ($banner['content'] as $lang => $text) {
+					$banner['content'][$lang] = $parsedown->text($text);
+				}
 			}
 		}
 		unset($banner);
 
-		$settings = [
-			'banner_data' => [
-				'lastcheck' => $lastcheck,
-				'lastcheck_success' => $lastcheck_success,
-				'nextcheck' => $nextcheck,
-				'banners' => $banners
-			]
+		$banner_data = [
+			'lastcheck' => $lastcheck,
+			'lastcheck_success' => $lastcheck_success,
+			'nextcheck' => $nextcheck,
+			'banners' => $banners
 		];
 
-		CSettings::updatePrivate($settings);
+		CProfile::update('web.banner.data', json_encode($banner_data), PROFILE_TYPE_STR);
 
 		$output = [
 			'banners' => $banners,

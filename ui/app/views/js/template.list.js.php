@@ -111,7 +111,7 @@
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
-			this.datatable = new CDataTable(document.getElementById('templates'), data_provider)
+			this.datatable = new CDataTable(document.getElementById('datatable-templates'), data_provider)
 				.setColumns([
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setFields(['templateid', 'name'])
@@ -151,7 +151,8 @@
 						.setFields(['templates'])
 						.setRenderer('linked_to_templates'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
-					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
+					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
+					new CDataTableColumnCustomText('custom_text', <?= json_encode(_('Custom text')); ?>)
 				])
 				.setPage(page)
 				.setFilter(filter)

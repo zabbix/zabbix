@@ -31,7 +31,6 @@ class CControllerDiscoveryCheckEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'update' =>					'in 1',
-			'dcheckid' =>				'string',
 			'type' =>					'in '.implode(',', array_keys(discovery_check_type2str())),
 			'ports' =>					'string|not_empty|db dchecks.ports',
 			'snmp_community' =>			'string|not_empty|db dchecks.snmp_community',
@@ -44,7 +43,8 @@ class CControllerDiscoveryCheckEdit extends CController {
 			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
 			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.implode(',', array_keys(getSnmpV3PrivProtocols())),
 			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase',
-			'allow_redirect' =>			'db dchecks.allow_redirect|in 0,1'
+			'allow_redirect' =>			'db dchecks.allow_redirect|in 0,1',
+			'dchecks' =>				'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -69,7 +69,8 @@ class CControllerDiscoveryCheckEdit extends CController {
 	protected function doAction(): void {
 		$data = array_merge([
 			'type' => self::DEFAULT_TYPE,
-			'ports' => svc_default_port(self::DEFAULT_TYPE)
+			'ports' => svc_default_port(self::DEFAULT_TYPE),
+			'dchecks' => []
 		], $this->getInputAll());
 
 		$params = array_intersect_key($data, DB::getSchema('dchecks')['fields']);
@@ -77,9 +78,12 @@ class CControllerDiscoveryCheckEdit extends CController {
 
 		$output = [
 			'title' => _('Discovery check'),
-			'dcheckid' => $data['dcheckid'],
 			'params' => $params + DB::getDefaults('dchecks'),
 			'update' => $this->getInput('update', 0),
+			'dchecks' => $data['dchecks'],
+			'js_validation_rules' => (new CFormValidator(
+				CControllerDiscoveryCheckCheck::getValidationRules()
+			))->getRules(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -60,7 +60,7 @@ class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup 
 	onInit() {
 		super.onInit();
 
-		const column_options = this.getColumnConfig().getColumnOptions();
+		const column_options = this.getColumn().getColumnOptions();
 		const {show_item_key} = column_options;
 
 		const input = this.getField('show_item_key');
@@ -68,7 +68,7 @@ class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup 
 		input.addEventListener('input', e => {
 			e.stopPropagation();
 
-			this.getColumnConfig().setColumnOptions({
+			this.getColumn().setColumnOptions({
 				...column_options,
 				show_item_key: e.target.checked
 			});
