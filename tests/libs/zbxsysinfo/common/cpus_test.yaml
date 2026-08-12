@@ -5,7 +5,7 @@ in:
   h_first_1: 0
   h_count_1: 0
 out:
-  status_1: "unknown"
+  status_1: "offline"
 ---
 test case: "[item-level] 2 CPUs: 1-st - empty history, 2-nd - not yet full history, not wrapped - online"
 in:
@@ -17,7 +17,7 @@ in:
   h_count_2: 205
   last_sample_2: "online"
 out:
-  status_1: "unknown"
+  status_1: "offline"
   status_2: "online"
 ---
 test case: "[item-level] 2 CPUs: full history, not wrapped, 1-st - online, 2-nd - offline"
