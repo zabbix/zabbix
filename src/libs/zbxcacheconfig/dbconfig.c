@@ -220,12 +220,6 @@ void	zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
 
-static zbx_uint32_t	denyitemtypes_mask = 0;
-static zbx_uint32_t	get_denyitemtypes_mask(void)
-{
-	return denyitemtypes_mask;
-}
-
 zbx_dc_config_t		*config = NULL;
 zbx_dc_config_private_t	config_private;
 
@@ -1887,7 +1881,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location)
+		const char *config_ssl_key_location, int *vault_ret)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -1918,11 +1912,15 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 			}
 		}
 		else if (FAIL == zbx_vault_get_kvs(dc_kvs_path->path, &kvs, config_vault, config_source_ip,
-				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
+				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+				vault_ret, &error))
 		{
 			if (NULL == dc_kvs_path->last_error || 0 != strcmp(dc_kvs_path->last_error, error))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
+				int	log_level = (NULL != vault_ret && FAIL == *vault_ret) ?
+						LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
+
+				zabbix_log(log_level, "cannot get secrets for path \"%s\": %s",
 						dc_kvs_path->path, error);
 			}
 			START_SYNC;
@@ -3622,21 +3620,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		old_poller_type = item->poller_type;
 		old_nextcheck = item->nextcheck;
 
-		if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), item->type))
+		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
-			zbx_timespec_t	ts = {(int)now, 0};
-
-			item->nextcheck = 0;
-			item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
-			item->poller_type = ZBX_NO_POLLER;
-
-			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
-					"Item type is denied by the \"DenyItemTypes\" configuration parameter.");
-		}
-		else if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
-		{
-			unsigned char	state = ITEM_STATE_NORMAL;
-
 			DCitem_poller_type_update(item, host, flags);
 
 			if (SUCCEED == zbx_is_counted_in_item_queue(item->type, item->key))
@@ -3659,19 +3644,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 					if (0 == host->proxyid)
 					{
 						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								(state = ITEM_STATE_NOTSUPPORTED), error);
+								ITEM_STATE_NOTSUPPORTED, error);
 					}
 					zbx_free(error);
 				}
-			}
-
-			if (ITEM_STATE_NOTSUPPORTED != state &&
-					0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), old_type))
-			{
-				AGENT_RESULT	r = {0};
-				zbx_timespec_t	ts = {(int)now, 0};
-
-				zbx_dc_add_history(item->itemid, item->value_type, 0, &r, &ts, state, NULL);
 			}
 		}
 		else
@@ -3686,8 +3662,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		{
 			zbx_timespec_t	ts = {(int)now, 0};
 
-			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED,
-					"Nested LLD rule type is supported only for discovered LLD rules or hosts.");
+			zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+					ITEM_STATE_NOTSUPPORTED, "Nested LLD rule type is supported only for discovered"
+							" LLD rules or hosts.");
 		}
 
 		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
@@ -9051,8 +9028,7 @@ static void	config_unlock_shmem_on_oom(void)
  *                                                                            *
  ******************************************************************************/
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
-		zbx_uint64_t conf_cache_size, const char *hostname, zbx_uint32_t config_denyitemtypes_mask,
-		char **error)
+		zbx_uint64_t conf_cache_size, const char *hostname, char **error)
 {
 	int	i, ret;
 
@@ -9060,7 +9036,6 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 
 	get_program_type_cb = get_program_type;
 	get_config_forks_cb = get_config_forks;
-	denyitemtypes_mask = config_denyitemtypes_mask;
 
 	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto fail;
@@ -10467,11 +10442,8 @@ int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 		zbx_hashset_iter_reset(&dc_host->items, &iter);
 		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 		{
-			if (ITEM_TYPE_ZABBIX_ACTIVE == ref->item->type &&
-					0 == ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), ref->item->type))
-			{
+			if (ITEM_TYPE_ZABBIX_ACTIVE == ref->item->type)
 				num++;
-			}
 		}
 	}
 
@@ -10496,9 +10468,6 @@ void	zbx_dc_config_get_active_items_by_hostid(zbx_dc_item_t *items, zbx_uint64_t
 		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 		{
 			if (ITEM_TYPE_ZABBIX_ACTIVE != ref->item->type)
-				continue;
-
-			if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), ref->item->type))
 				continue;
 
 			DCget_item(&items[j], ref->item);
@@ -15589,13 +15558,6 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextchec
 			zabbix_log(LOG_LEVEL_WARNING, "cannot perform check now for itemid [" ZBX_FS_UI64 "]"
 					": item is not in cache", itemids->values[i]);
 
-			proxyid = 0;
-		}
-		else if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask(), dc_item->type))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot perform check now for item \"%s\" on host \"%s\""
-					": item type is denied by the \"DenyItemTypes\" configuration parameter.",
-					dc_item->key, dc_host->host);
 			proxyid = 0;
 		}
 		else if (ZBX_JAN_2038 == dc_item->nextcheck)
