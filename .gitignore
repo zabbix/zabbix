@@ -381,6 +381,7 @@ tests/libs/zbxvariant/zbx_variant_compare
 tests/libs/zbxvariant/zbx_variant_to_value_type
 tests/libs/zbxxml/zbx_json_to_xml
 tests/libs/zbxxml/zbx_xml_to_json
+tests/zabbix_server/connector/connector_manager_test
 tests/zabbix_server/lld/lld_compare_entries
 tests/zabbix_server/lld/lld_entry_create
 tests/zabbix_server/lld/lld_rule_merge_exported_macros

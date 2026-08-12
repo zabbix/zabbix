@@ -87,6 +87,7 @@ AC_DEFUN([CONF_TESTS],
 			tests/libs/zbxodbc/Makefile
 			tests/libs/zbxip/Makefile
 			tests/zabbix_server/Makefile
+			tests/zabbix_server/connector/Makefile
 			tests/zabbix_server/pinger/Makefile
 			tests/zabbix_server/service/Makefile
 			tests/zabbix_server/trapper/Makefile
