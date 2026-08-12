@@ -113,6 +113,7 @@ $html_page->show();
 		'filter' => $data['filter'],
 		'filter_defaults' => $data['filter_defaults'],
 		'filter_options' => $data['filter_options'],
+		'highlight_row_enabled' => $data['highlight_row_enabled'],
 		'layout_mode' => $web_layout_mode,
 		'page' => $data['page'],
 		'refresh_interval' => $data['refresh_interval'],

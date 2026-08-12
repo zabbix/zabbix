@@ -271,7 +271,8 @@
 						.setFields(['hostid', 'httpTests'])
 						.setRenderer('web'),
 					new CDataTableColumn('interface', <?= json_encode(_('Interface')); ?>)
-						.setFields(['interface']),
+						.setFields(['interface'])
+						.setRenderer('interface'),
 					new CDataTableColumn('proxy', <?= json_encode(_('Proxy')); ?>)
 						.setFields(['monitored_by', 'proxyid', 'proxy_groupid', 'assigned_proxyid', 'proxy',
 							'proxy_group', 'assigned_proxy'])
@@ -307,7 +308,7 @@
 				.setStorageIdx(storage_idx)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, cell, cell_inner}) => {
+				.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, cell}) => {
 					const [object_id, data_actions] = cell_data;
 
 					if (!object_id) {
@@ -332,8 +333,6 @@
 					label.setAttribute('for', input_id);
 					label.appendChild(document.createElement('span'));
 
-					cell.classList.add(CDataTable.ZBX_STYLE_CELL_CHECKBOX);
-
 					const button = document.createElement('button');
 					button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE);
 					button.setAttribute('data-menu-popup', JSON.stringify({
@@ -343,9 +342,14 @@
 					button.setAttribute('aria-expanded', 'false');
 					button.setAttribute('aria-haspopup', 'true');
 
-					cell_inner.append(checkbox, label, button);
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					flex_wrapper.append(checkbox, label, button);
+
+					cell.classList.add(CDataTable.ZBX_STYLE_CELL_CHECKBOX);
+					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('name', ({cell_data, cell_inner}) => {
+				.setCellRenderer('name', ({cell_data, cell}) => {
 					const [hostid, name, discovery, flags, maintenance, status] = cell_data;
 
 					if (flags == ZBX_FLAG_DISCOVERY_CREATED) {
@@ -362,14 +366,14 @@
 								discovery_rule_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_ORANGE);
 								discovery_rule_link.setAttribute('href', host_prototype_url.toString());
 
-								cell_inner.appendChild(discovery_rule_link);
+								cell.appendChild(discovery_rule_link);
 							}
 							else {
 								const discovery_rule = document.createElement('span');
 								discovery_rule.classList.add(ZBX_STYLE_ORANGE);
 								discovery_rule.textContent = discovery.rule.name;
 
-								cell_inner.appendChild(discovery_rule);
+								cell.appendChild(discovery_rule);
 							}
 						}
 						else {
@@ -377,10 +381,10 @@
 							discovery_rule.classList.add(ZBX_STYLE_ORANGE);
 							discovery_rule.textContent = <?= json_encode(_('Inaccessible discovery rule')); ?>;
 
-							cell_inner.appendChild(discovery_rule);
+							cell.appendChild(discovery_rule);
 						}
 
-						cell_inner.innerHTML += NAME_DELIMITER;
+						cell.innerHTML += NAME_DELIMITER;
 					}
 
 					const url = new URL('zabbix.php', location.href);
@@ -388,11 +392,15 @@
 					url.searchParams.set('popup', 'host.edit');
 					url.searchParams.set('hostid', hostid);
 
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 					const edit_link = document.createElement('a');
+					edit_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					edit_link.setAttribute('href', url.toString())
 					edit_link.textContent = name;
 
-					cell_inner.appendChild(edit_link);
+					flex_wrapper.appendChild(edit_link);
 
 					if (maintenance && status == HOST_STATUS_MONITORED) {
 						const maintenance_icon = document.createElement('button');
@@ -422,10 +430,12 @@
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 
-						cell_inner.appendChild(maintenance_icon);
+						flex_wrapper.appendChild(maintenance_icon);
 					}
+
+					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('items', ({cell_data, cell_inner}) => {
+				.setCellRenderer('items', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
@@ -434,21 +444,26 @@
 					url.searchParams.set('filter_hostids[0]', hostid);
 					url.searchParams.set('context', 'host');
 
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 					const item_link = document.createElement('a');
+					item_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Items')); ?>;
 
-					cell_inner.appendChild(item_link);
+					flex_wrapper.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						flex_wrapper.appendChild(count);
 					}
+
+					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('triggers', ({cell_data, cell_inner}) => {
+				.setCellRenderer('triggers', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
@@ -457,21 +472,26 @@
 					url.searchParams.set('filter_hostids[0]', hostid);
 					url.searchParams.set('context', 'host');
 
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 					const item_link = document.createElement('a');
+					item_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Triggers')); ?>;
 
-					cell_inner.appendChild(item_link);
+					flex_wrapper.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						flex_wrapper.appendChild(count);
 					}
+
+					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('graphs', ({cell_data, cell_inner}) => {
+				.setCellRenderer('graphs', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
@@ -480,21 +500,26 @@
 					url.searchParams.set('filter_hostids[0]', hostid);
 					url.searchParams.set('context', 'host');
 
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 					const item_link = document.createElement('a');
+					item_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Graphs')); ?>;
 
-					cell_inner.appendChild(item_link);
+					flex_wrapper.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						flex_wrapper.appendChild(count);
 					}
+
+					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('discovery', ({cell_data, cell_inner}) => {
+				.setCellRenderer('discovery', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
 
 					const url = new URL('host_discovery.php', location.href);
@@ -502,21 +527,26 @@
 					url.searchParams.set('filter_hostids[0]', hostid);
 					url.searchParams.set('context', 'host');
 
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 					const item_link = document.createElement('a');
+					item_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Discovery')); ?>;
 
-					cell_inner.appendChild(item_link);
+					flex_wrapper.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						flex_wrapper.appendChild(count);
 					}
+
+					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('web', ({cell_data, cell_inner}) => {
+				.setCellRenderer('web', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
 
 					const url = new URL('httpconf.php', location.href);
@@ -524,21 +554,39 @@
 					url.searchParams.set('filter_hostids[0]', hostid);
 					url.searchParams.set('context', 'host');
 
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 					const item_link = document.createElement('a');
+					item_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					item_link.setAttribute('href', url.toString());
 					item_link.textContent = <?= json_encode(_('Web')); ?>;
 
-					cell_inner.appendChild(item_link);
+					flex_wrapper.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
+						flex_wrapper.appendChild(count);
 					}
+
+					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('status', ({cell_data, cell_inner}) => {
+				.setCellRenderer('interface', ({cell_data, cell}) => {
+					const [host_port] = cell_data;
+
+					const overflow_ellipsis = document.createElement('span');
+					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					overflow_ellipsis.innerHTML = host_port;
+
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					flex_wrapper.appendChild(overflow_ellipsis);
+
+					cell.appendChild(flex_wrapper);
+				})
+				.setCellRenderer('status', ({cell_data, cell}) => {
 					const [hostid, status, disabled_by_lld] = cell_data;
 					const is_monitored = status == HOST_STATUS_MONITORED;
 
@@ -575,7 +623,7 @@
 						}
 					});
 
-					cell_inner.appendChild(status_link);
+					cell.appendChild(status_link);
 
 					if (disabled_by_lld != 0) {
 						const description_icon = document.createElement('button');
@@ -589,16 +637,16 @@
 						description_icon.setAttribute('data-hintbox-static', '1');
 						description_icon.setAttribute('aria-expanded', 'false');
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(description_icon);
+						cell.innerHTML += ' ';
+						cell.appendChild(description_icon);
 					}
 				})
-				.setCellRenderer('availability', ({cell_data, cell_inner}) => {
+				.setCellRenderer('availability', ({cell_data, cell}) => {
 					const [availability] = cell_data;
 
-					cell_inner.innerHTML = availability;
+					cell.innerHTML = availability;
 				})
-				.setCellRenderer('proxy', ({cell_data, cell_inner, response}) => {
+				.setCellRenderer('proxy', ({cell_data, cell, response}) => {
 					const [monitored_by, proxyid, proxy_groupid, assigned_proxyid, proxy, proxy_group,
 						assigned_proxy] = cell_data;
 
@@ -622,10 +670,10 @@
 							proxy_link.classList.add(ZBX_STYLE_GREY);
 							proxy_link.textContent = proxy.name;
 
-							cell_inner.appendChild(proxy_link);
+							cell.appendChild(proxy_link);
 						}
 						else {
-							cell_inner.innerHTML = proxy.name;
+							cell.innerHTML = escapeHtml(proxy.name);
 						}
 					}
 					else if (monitored_by == ZBX_MONITORED_BY_PROXY_GROUP) {
@@ -641,14 +689,14 @@
 							proxy_group_link.classList.add(ZBX_STYLE_GREY);
 							proxy_group_link.textContent = proxy_group.name;
 
-							cell_inner.appendChild(proxy_group_link);
+							cell.appendChild(proxy_group_link);
 						}
 						else {
-							cell_inner.innerHTML = proxy_group.name;
+							cell.innerHTML = escapeHtml(proxy_group.name);
 						}
 
 						if (assigned_proxyid != 0) {
-							cell_inner.innerHTML += NAME_DELIMITER;
+							cell.innerHTML += NAME_DELIMITER;
 
 							if (can_edit_proxies) {
 								proxy_url.searchParams.set('proxyid', assigned_proxyid);
@@ -659,21 +707,19 @@
 								proxy_link.classList.add(ZBX_STYLE_GREY);
 								proxy_link.textContent = assigned_proxy.name;
 
-								cell_inner.appendChild(proxy_link);
+								cell.appendChild(proxy_link);
 							}
 							else {
-								cell_inner.innerHTML += assigned_proxy.name;
+								cell.innerHTML += escapeHtml(assigned_proxy.name);
 							}
 						}
 					}
 				})
-				.setCellRenderer('templates', ({cell_data, cell_inner, response}) => {
+				.setCellRenderer('templates', ({cell_data, cell, response}) => {
 					const [templates] = cell_data;
 					const {max_in_table} = response;
 					const max_in_table_exceeded = templates.length > max_in_table;
 					const visible_templates = Object.values(templates).slice(0, max_in_table);
-
-					cell_inner.classList.add('wrap');
 
 					visible_templates.forEach(({templateid, name, parentTemplates, editable}, i) => {
 						const element = editable ? document.createElement('a') : document.createElement('span');
@@ -688,13 +734,13 @@
 							element.setAttribute('href', url.toString());
 						}
 
-						element.classList.add('grey');
-						element.textContent = name;
+						element.classList.add(ZBX_STYLE_GREY);
+						element.textContent = String(name);
 
-						cell_inner.appendChild(element);
+						cell.appendChild(element);
 
 						if (parentTemplates.length > 0) {
-							cell_inner.innerHTML += ' (';
+							cell.innerHTML += ' (';
 
 							parentTemplates.forEach(({templateid, name, editable}, j) => {
 								const element = editable ? document.createElement('a') : document.createElement('span');
@@ -709,29 +755,29 @@
 									element.setAttribute('href', url.toString());
 								}
 
-								element.classList.add('grey');
+								element.classList.add(ZBX_STYLE_GREY);
 								element.textContent = name;
 
-								cell_inner.appendChild(element);
+								cell.appendChild(element);
 
 								if (j < parentTemplates.length - 1) {
-									cell_inner.innerHTML += ', ';
+									cell.innerHTML += ', ';
 								}
 							});
 
-							cell_inner.innerHTML += ')';
+							cell.innerHTML += ')';
 						}
 
 						if (i < visible_templates.length - 1) {
-							cell_inner.innerHTML += ', ';
+							cell.innerHTML += ', ';
 						}
 					});
 
 					if (max_in_table_exceeded) {
-						cell_inner.innerHTML += ' &hellip;';
+						cell.innerHTML += ' &hellip;';
 					}
 				})
-				.setCellRenderer('info', ({cell_data, cell_inner}) => {
+				.setCellRenderer('info', ({cell_data, cell}) => {
 					const [info_icons] = cell_data;
 
 					const info = document.createElement('div');
@@ -739,9 +785,9 @@
 
 					info_icons.forEach(icon => info.innerHTML += icon);
 
-					cell_inner.appendChild(info);
+					cell.appendChild(info);
 				})
-				.setCellRenderer('encryption', ({cell_data, cell_inner}) => {
+				.setCellRenderer('encryption', ({cell_data, cell}) => {
 					const [tls_accept, tls_connect] = cell_data;
 
 					if (tls_connect == HOST_ENCRYPTION_NONE
@@ -757,7 +803,7 @@
 						encryption.classList.add(ZBX_STYLE_STATUS_CONTAINER);
 						encryption.appendChild(none);
 
-						cell_inner.appendChild(encryption);
+						cell.appendChild(encryption);
 					}
 					else {
 						const in_encryption = document.createElement('span');
@@ -821,7 +867,7 @@
 						encryption.innerHTML += ' ';
 						encryption.appendChild(out_encryption);
 
-						cell_inner.appendChild(encryption);
+						cell.appendChild(encryption);
 					}
 				})
 				.on(CMessageHelper.EVENT_MESSAGE, e => {

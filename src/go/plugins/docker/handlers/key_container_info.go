@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -126,12 +127,14 @@ type resources struct {
 	IOMaximumBandwidth uint64 `json:"IOMaximumBandwidth"`
 }
 
-func keyContainerInfoHandler(client *http.Client, query string, args ...string) (string, error) {
+func keyContainerInfoHandler(
+	ctx plugin.ContextProvider, client *http.Client, query string, args ...string,
+) (string, error) {
 	if len(args) != 1 {
 		return "", errs.WrapConst(errs.New("info must be either 'full' or 'short'"), zbxerr.ErrorInvalidParams)
 	}
 
-	body, err := queryDockerAPI(client, query)
+	body, err := queryDockerAPI(ctx, client, query)
 	if err != nil {
 		return "", err
 	}

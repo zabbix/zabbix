@@ -1163,43 +1163,71 @@ static int	DBpatch_7050087(void)
 	return DBcreate_index("device", "device_2", "uuid", 1);
 }
 
-
 static int	DBpatch_7050088(void)
+{
+	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("regexps", &field);
+}
+
+static int	DBpatch_7050089(void)
+{
+	const zbx_db_field_t	field = {"expression", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("expressions", &field, NULL);
+}
+
+static int	DBpatch_7050090(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 1  - REGEX_TYPE_CONTAINS_ANY_SUBSTRING   */
+	if (ZBX_DB_OK > zbx_db_execute("update expressions set exp_delimiter='' where expression_type<>1"
+			" and exp_delimiter<>''"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050091(void)
 {
 	const zbx_db_field_t	field = {"timeout_telemetry_query", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_7050089(void)
+static int	DBpatch_7050092(void)
 {
 	const zbx_db_field_t	field = {"query", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050090(void)
+static int	DBpatch_7050093(void)
 {
 	const zbx_db_field_t	field = {"time_shift", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050091(void)
+static int	DBpatch_7050094(void)
 {
 	const zbx_db_field_t	field = {"lookback_limit", "10m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050092(void)
+static int	DBpatch_7050095(void)
 {
 	const zbx_db_field_t	field = {"granularity", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050093(void)
+static int	DBpatch_7050096(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str)"
 			" values ('timeout_telemetry_query', %d, '3s')", ZBX_SETTING_TYPE_STR))
@@ -1310,5 +1338,8 @@ DBPATCH_ADD(7050090, 0, 1)
 DBPATCH_ADD(7050091, 0, 1)
 DBPATCH_ADD(7050092, 0, 1)
 DBPATCH_ADD(7050093, 0, 1)
+DBPATCH_ADD(7050094, 0, 1)
+DBPATCH_ADD(7050095, 0, 1)
+DBPATCH_ADD(7050096, 0, 1)
 
 DBPATCH_END()

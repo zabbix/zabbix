@@ -25,6 +25,8 @@ $DB['VAULT_URL']		= '';
 $DB['VAULT_PREFIX']		= '';
 $DB['VAULT_DB_PATH']		= '';
 $DB['VAULT_TOKEN']		= '';
+$DB['VAULT_APP_ROLE_ID']	= '';
+$DB['VAULT_APP_SECRET_ID']	= '';
 $DB['VAULT_CERT_FILE']		= '';
 $DB['VAULT_KEY_FILE']		= '';
 // Uncomment to bypass local caching of credentials.
