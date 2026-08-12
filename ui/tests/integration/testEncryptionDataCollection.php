@@ -1354,10 +1354,13 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		$start_time = time();
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
-		// The agent (accepting side) rejects the ClientHello with a fatal TLS alert; the server
-		// (connecting side, whose log this waits on) receives it and logs OpenSSL's exact alert
-		// reason via zbx_tls_connect()'s "End of zbx_tls_connect():FAIL error:'...'" debug trace.
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sslv3 alert handshake failure', true, 30);
+		// With OpenSSL, a cipher mismatch does not produce a fatal alert on the wire: the agent
+		// (accepting side) fails to select a shared cipher from the ClientHello and closes the
+		// connection without completing the handshake. The server (connecting side, whose log
+		// this waits on) sees this as an unclean EOF; zbx_tls_connect() logs OpenSSL's exact
+		// reason via its "End of zbx_tls_connect():FAIL error:'...'" debug trace. Verified
+		// empirically with `openssl s_server`/`s_client` using these exact cipher strings.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'unexpected eof while reading', true, 30);
 
 		$data = $this->call('history.get', [
 			'itemids'   => self::$itemids['enc_agent:agent.ping'],
