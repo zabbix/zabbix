@@ -422,15 +422,12 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	if (SUCCEED == ret)
 	{
 		_ftime(&current_time);
-		int	wait_timeout = timeout - zbx_get_timediff_ms(&start_time, &current_time);
-		DWORD	wait_result;
-
-		if (0 < (timeout = wait_timeout) && WAIT_TIMEOUT ==
-				(wait_result = WaitForSingleObject(pi.hProcess, (DWORD)timeout)))
+		if (0 < (timeout -= zbx_get_timediff_ms(&start_time, &current_time)) &&
+				WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout))
 		{
 			ret = TIMEOUT_ERROR;
 		}
-		else if (WAIT_OBJECT_0 != (wait_result = WaitForSingleObject(pi.hProcess, 0)) ||
+		else if (WAIT_OBJECT_0 != WaitForSingleObject(pi.hProcess, 0) ||
 				0 == GetExitCodeProcess(pi.hProcess, &code))
 		{
 			if ('\0' != *buffer)
