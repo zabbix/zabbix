@@ -17,8 +17,9 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
+#include "zbxalgo.h"
+#include "zbxjson.h"
 #include "../../../../src/libs/zbxsysinfo/common/cpustat.c"
-#include "../../../../src/libs/zbxsysinfo/common/cpu.c"
 #include "../../../../src/libs/zbxsysinfo/common/stats.h"
 
 static ZBX_SINGLE_CPU_STAT_DATA	test_cpus[3];
