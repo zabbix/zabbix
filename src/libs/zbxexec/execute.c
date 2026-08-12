@@ -18,6 +18,10 @@
 #include "zbxthreads.h"
 #include "zbxlog.h"
 
+#ifdef _WINDOWS
+#include <stdio.h>
+#endif
+
 /* the size of temporary buffer used to read from output stream */
 #define PIPE_BUFFER_SIZE	4096
 
@@ -61,10 +65,11 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  * Return value: SUCCEED, FAIL or TIMEOUT_ERROR if timeout reached            *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t *offset, int timeout_ms,
-			char *error, size_t max_error_len)
+static int	zbx_read_from_pipe(HANDLE hRead, HANDLE hProcess, char **buf, size_t *buf_size, size_t *offset,
+			int timeout_ms, char *error, size_t max_error_len)
 {
-	DWORD		in_buf_size, read_bytes;
+	DWORD		in_buf_size = 0, read_bytes = 0;
+	DWORD		process_code = STILL_ACTIVE;
 	struct _timeb	start_time, current_time;
 	char 		tmp_buf[PIPE_BUFFER_SIZE];
 
@@ -74,10 +79,19 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 	{
 		_ftime(&current_time);
 		if (zbx_get_timediff_ms(&start_time, &current_time) >= timeout_ms)
+		{
+			if (0 == GetExitCodeProcess(hProcess, &process_code))
+				process_code = STILL_ACTIVE;
+
+			fprintf(stderr, "[zbx_execute] pipe timeout: offset=%zu pending=%lu timeout_ms=%d process_code=%lu\n",
+				*offset, (unsigned long)in_buf_size, timeout_ms, (unsigned long)process_code);
 			return TIMEOUT_ERROR;
+		}
 
 		if (MAX_EXECUTE_OUTPUT_LEN <= *offset + in_buf_size)
 		{
+			fprintf(stderr, "[zbx_execute] pipe output limit: offset=%zu pending=%lu limit=%zu\n",
+				*offset, (unsigned long)in_buf_size, (size_t)MAX_EXECUTE_OUTPUT_LEN);
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 			zbx_snprintf(error, max_error_len, "Command output exceeded limit of %d KB",
@@ -90,6 +104,8 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 		{
 			if (0 == ReadFile(hRead, tmp_buf, sizeof(tmp_buf) - 1, &read_bytes, NULL))
 			{
+				fprintf(stderr, "[zbx_execute] ReadFile failed: error=%lu offset=%zu pending=%lu\n",
+					(unsigned long)GetLastError(), *offset, (unsigned long)in_buf_size);
 				zabbix_log(LOG_LEVEL_ERR, "cannot read command output: %s",
 						zbx_strerror_from_system(GetLastError()));
 				return FAIL;
@@ -107,6 +123,9 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 
 		Sleep(20);	/* milliseconds */
 	}
+
+	fprintf(stderr, "[zbx_execute] PeekNamedPipe failed: error=%lu offset=%zu\n",
+			(unsigned long)GetLastError(), *offset);
 
 	return SUCCEED;
 }
@@ -410,22 +429,34 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	if (FAIL == ret)
 		goto close;
 
+	fprintf(stderr, "[zbx_execute] started command=\"%s\" pid=%lu timeout=%d dir=%s\n",
+			cmd, (unsigned long)pi.dwProcessId, timeout, NULL != dir ? dir : "<current>");
+
 	_ftime(&start_time);
 	timeout *= 1000;
 
-	ret = zbx_read_from_pipe(hRead, &buffer, &buf_size, &offset, timeout, error, max_error_len);
+	ret = zbx_read_from_pipe(hRead, pi.hProcess, &buffer, &buf_size, &offset, timeout, error, max_error_len);
+	fprintf(stderr, "[zbx_execute] read result=%d offset=%zu error=\"%s\"\n", ret, offset, error);
 
 	if (SUCCEED == ret)
 	{
 		_ftime(&current_time);
-		if (0 < (timeout -= zbx_get_timediff_ms(&start_time, &current_time)) &&
-				WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout))
+		int	wait_timeout = timeout - zbx_get_timediff_ms(&start_time, &current_time);
+		DWORD	wait_result;
+
+		fprintf(stderr, "[zbx_execute] waiting process: remaining_ms=%d\n", wait_timeout);
+
+		if (0 < (timeout = wait_timeout) && WAIT_TIMEOUT ==
+				(wait_result = WaitForSingleObject(pi.hProcess, (DWORD)timeout)))
 		{
+			fprintf(stderr, "[zbx_execute] process wait timed out\n");
 			ret = TIMEOUT_ERROR;
 		}
-		else if (WAIT_OBJECT_0 != WaitForSingleObject(pi.hProcess, 0) ||
+		else if (WAIT_OBJECT_0 != (wait_result = WaitForSingleObject(pi.hProcess, 0)) ||
 				0 == GetExitCodeProcess(pi.hProcess, &code))
 		{
+			fprintf(stderr, "[zbx_execute] process wait result=%lu exit_code_read_failed=%d\n",
+				(unsigned long)wait_result, 0 == GetExitCodeProcess(pi.hProcess, &code));
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
 			else
@@ -435,6 +466,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 		}
 		else if (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != code)
 		{
+			fprintf(stderr, "[zbx_execute] process exited with code=%lu\n", (unsigned long)code);
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
 			else
@@ -442,6 +474,8 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 
 			ret = FAIL;
 		}
+		else
+			fprintf(stderr, "[zbx_execute] process completed with code=%lu\n", (unsigned long)code);
 	}
 
 	CloseHandle(pi.hProcess);
@@ -463,6 +497,8 @@ close:
 
 	if (NULL != hRead)
 		CloseHandle(hRead);
+
+	fprintf(stderr, "[zbx_execute] final result=%d offset=%zu error=\"%s\"\n", ret, offset, error);
 
 	zbx_free(cmd);
 	zbx_free(wcmd);
