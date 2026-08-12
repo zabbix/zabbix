@@ -505,7 +505,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	int				rules_num = 0;
 	zbx_cep_config_handle_t		hconfig;
 	zbx_cep_event_context_t		event_ctx = {.db_event = db_event, .event = cep_event_addref(event),
-						.pos = CEP_POS_LAST};
+						.pos = CEP_POS_LAST, .sync_flags = CEP_SYNC_IGNORE};
 	int				corr_ret;
 
 	/* cep config returns NULL handle if there are no cep rules to process */

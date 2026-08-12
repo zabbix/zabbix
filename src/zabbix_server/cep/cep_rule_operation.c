@@ -1131,9 +1131,14 @@ zbx_uint64_t	cep_rule_event_context_execute_ops(const zbx_cep_rule_t *rule, zbx_
 		cep_event_handle_set(ctx->hevent, event);
 		cep_cache_release(&cep);
 
-		zbx_mw_task_t	*t = cep_create_task_sync_event(ctx->hevent, ctx->sync_flags);
+		/* there is no need for a sync task for new events since all event changes */
+		/* are still to be committed to database                                   */
+		if (0 != (ctx->sync_flags & CEP_SYNC_IGNORE))
+		{
+			zbx_mw_task_t	*t = cep_create_task_sync_event(ctx->hevent, ctx->sync_flags);
 
-		zbx_vector_mw_task_ptr_append(tasks, t);
+			zbx_vector_mw_task_ptr_append(tasks, t);
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() opmask:%x", __func__, opmask);
