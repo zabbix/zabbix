@@ -74,7 +74,8 @@ if ($lldrule['itemid']) {
 		'title' => _('Test'),
 		'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 		'keepOpen' => true,
-		'isSubmit' => false
+		'isSubmit' => false,
+		'enabled' => !$lldrule['discovered']
 	];
 
 	$buttons[] = [

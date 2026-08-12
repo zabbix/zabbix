@@ -2190,6 +2190,9 @@ function getMainItemFieldNames(array $input): array {
 		case ZBX_FLAG_DISCOVERY_CREATED:
 		case ZBX_FLAG_DISCOVERY_RULE_CREATED:
 			return ['status'];
+
+		default:
+			return [];
 	}
 }
 

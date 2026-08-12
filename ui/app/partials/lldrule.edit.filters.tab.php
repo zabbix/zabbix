@@ -96,6 +96,7 @@ $formgrid
 						(new CSelect('conditions[#{rowNum}][operator]'))
 							->setValue('#{operator}')
 							->addClass('js-operator')
+							->setReadonly($readonly)
 							->addOptions($operators),
 						(new CDiv(
 							(new CTextAreaFlexible('conditions[#{rowNum}][value]', '#{value}'))

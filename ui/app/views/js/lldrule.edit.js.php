@@ -23,6 +23,7 @@
 window.lldrule_edit = new class {
 
 	#dialogue;
+	#discovered;
 	#footer;
 	#form;
 	#form_element;
@@ -39,6 +40,7 @@ window.lldrule_edit = new class {
 		this.#form = new CForm(this.#form_element, rules);
 		this.#footer = this.#overlay.$dialogue.$footer[0];
 		this.#testable_item_types = testable_item_types;
+		this.#discovered = lldrule.discovered;
 
 		this.#initEvents();
 		this.#initPopupListeners();
@@ -130,7 +132,11 @@ window.lldrule_edit = new class {
 	}
 
 	#isTestableItem() {
-		const key = this.#form_element.querySelector('[name="key"]').value
+		if (this.#discovered) {
+			return false;
+		}
+
+		const key = this.#form_element.querySelector('[name="key"]').value;
 		const type = parseInt(this.#form_element.querySelector('[name="type"]').value, 10);
 
 		return type == <?= ITEM_TYPE_SIMPLE ?>
@@ -154,6 +160,7 @@ window.lldrule_edit = new class {
 		}
 		else {
 			this.#overlay.unsetLoading();
+			this.#update();
 		}
 	}
 
@@ -178,6 +185,7 @@ window.lldrule_edit = new class {
 			.then((result) => {
 				if (!result) {
 					this.#overlay.unsetLoading();
+					this.#update();
 					return;
 				}
 
