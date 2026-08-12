@@ -185,7 +185,7 @@ static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, s
 		zbx_timespec_t *ts, int config_timeout)
 {
 	char	*info = NULL, *ext = NULL;
-	int	ret;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -215,7 +215,16 @@ static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, s
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
 
-	zbx_process_command_results(jp);
+	if (SUCCEED == ret)
+	{
+		zbx_process_command_results(jp);
+	}
+
+	if (CONFIG_ERROR == ret)
+	{
+		/* set response as succeed so agent will not retry with the same non-existing host */
+		ret = SUCCEED;
+	}
 
 	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 

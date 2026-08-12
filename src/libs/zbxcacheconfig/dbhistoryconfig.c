@@ -1215,6 +1215,33 @@ int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock,
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host identifier by name with host information                 *
+ *                                                                            *
+ * Parameters: host     - [IN] host name                                      *
+ *             sock     - [IN] connection socket                              *
+ *             hostid   - [OUT] host identifier                               *
+ *             hostinfo - [OUT] host information                              *
+ *             redirect - [OUT] host redirection data (optional)              *
+ *                                                                            *
+ * Return value: SUCCEED         - host found                                 *
+ *               SUCCEED_PARTIAL - redirection data was specified and host is *
+ *                                 not monitored by the this instance         *
+ *               FAIL            - host not found                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_config_get_hostid_by_name_with_host_info(const char *host, const zbx_socket_t *sock,
+		zbx_uint64_t *hostid, zbx_comms_redirect_t *redirect, zbx_history_recv_host_t *hostinfo)
+{
+	int			ret;
+
+	if (SUCCEED == (ret = dc_config_get_host_by_name(host, sock, ZBX_ITEM_GET_HOSTINFO, hostinfo, redirect)))
+		*hostid = hostinfo->hostid;
+
+	return ret;
+}
+
 
 #undef ZBX_CONNECTOR_STATUS_ENABLED
 

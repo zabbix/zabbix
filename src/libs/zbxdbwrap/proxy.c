@@ -1698,6 +1698,8 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 	zbx_uint64_t		hostid;
 	size_t			token_alloc = 0;
 	zbx_host_rights_t	rights = {0};
+	zbx_history_recv_host_t hostinfo;
+	char			*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1705,7 +1707,6 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		ret = SUCCEED;
 		goto out;
 	}
 
@@ -1733,7 +1734,7 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 		if (SUCCEED != peek_hostkey_host(&jp_data, tmp, sizeof(tmp), info))
 		{
 			if (NULL == *info)
-				ret = SUCCEED;
+				ret = CONFIG_ERROR;
 			goto out;
 		}
 	}
@@ -1746,11 +1747,17 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 		}
 	}
 
-	if (FAIL == (ret = zbx_dc_config_get_hostid_by_name(tmp, sock, &hostid, &redirect)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, tmp, sizeof(tmp), NULL))
 	{
+		*info = zbx_dsprintf(*info, "cannot find \"%s\" token", ZBX_PROTO_TAG_HOST);
+		goto out;
+	}
+
+	if (FAIL == (ret = zbx_dc_config_get_hostid_by_name_with_host_info(tmp, sock, &hostid, &redirect, &hostinfo)))
+	{
+		/* return CONFIG_ERROR to prevent command to be proceed because of non-existing host */
+		ret = CONFIG_ERROR;
 		*info = zbx_dsprintf(*info, "unknown host '%s'", tmp);
-		/* send success response so agent will not retry upload with the same non-existing host */
-		ret = SUCCEED;
 		goto out;
 	}
 
@@ -1763,6 +1770,13 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 		*info = zbx_strdup(NULL, j.buffer);
 		zbx_json_free(&j);
 
+		goto out;
+	}
+
+	if (FAIL == zbx_host_check_permissions(&hostinfo, sock, &error))
+	{
+		ret = FAIL;
+		zbx_free(error);
 		goto out;
 	}
 
