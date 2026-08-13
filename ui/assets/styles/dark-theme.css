@@ -3991,9 +3991,13 @@ output {
     output.msg-warning::before {
       content: ""; }
   output.msg-global {
-    max-width: fit-content;
+    display: inline-grid;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 5dvh;
+    width: min-content;
     min-width: 475px;
-    margin: 5% auto 0; }
+    max-width: 80dvw; }
   output.msg-global-footer {
     position: fixed;
     bottom: 0;
