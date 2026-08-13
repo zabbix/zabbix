@@ -209,7 +209,7 @@ class testScriptManualInput extends CIntegrationTest {
 		$response = $this->call('script.execute', [
 			'hostid'      => self::$hostid,
 			'scriptid'    => self::$scriptids[$script_index],
-			'manualinput' => $manualinput,
+			'manualinput' => $manualinput
 		]);
 	}
 
@@ -274,7 +274,7 @@ class testScriptManualInput extends CIntegrationTest {
 		return [
 			[0, 'abcdefghijklmnopqrstuvwxyz', "Your mindmacro has been expanded\n"],
 			[1, 'abcdefghijklmnopqrstuvwxyz', "Your abcdefghijklmnopqrstuvwxyz has been expanded\n"],
-			[2, 'macro',                      "Your macro has been expanded\n"],
+			[2, 'macro',                      "Your macro has been expanded\n"]
 		];
 	}
 
@@ -286,7 +286,7 @@ class testScriptManualInput extends CIntegrationTest {
 		return [
 			[1, '5h0uld n0t m4tch a ^[a-z]+$ pattern',	"Provided script user input failed validation."],
 			[2, 'orcam', 					"Provided script user input failed validation."],
-			[2, null,					"Script takes user input, but none was provided."],
+			[2, null,					"Script takes user input, but none was provided."]
 		];
 	}
 }
