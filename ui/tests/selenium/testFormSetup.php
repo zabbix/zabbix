@@ -342,6 +342,13 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, 'PreInstall_'.$db_parameters['Database type']);
 	}
 
+	/**
+	 * This test case overwrites configuration file, so it is restored right after the test case and not at the
+	 * end of the test suite. Otherwise the frontend keeps serving the overwritten configuration until PHP
+	 * revalidates the cached file.
+	 *
+	 * @backupConfig
+	 */
 	public function testFormSetup_installSection() {
 		$this->openSpecifiedSection('Install');
 		$this->checkPageTextElements('Install', 'Configuration file "conf/zabbix.conf.php" created.');
