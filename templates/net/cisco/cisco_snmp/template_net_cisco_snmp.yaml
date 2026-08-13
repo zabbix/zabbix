@@ -38,7 +38,7 @@ zabbix_export:
           - Device: C2911, C7600
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-4
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -170,7 +170,7 @@ zabbix_export:
         - uuid: e64d32fe956f481eb6a3899f8c1e09d9
           name: 'Cisco IOS: SNMP walk temperature sensors'
           type: SNMP_AGENT
-          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.3.1.2,1.3.6.1.4.1.9.9.13.1.3.1.3,1.3.6.1.4.1.9.9.13.1.3.1.6]'
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.3.1.2,1.3.6.1.4.1.9.9.13.1.3.1.3,1.3.6.1.4.1.9.9.13.1.3.1.4,1.3.6.1.4.1.9.9.13.1.3.1.6]'
           key: sensor.temp.walk
           history: '0'
           value_type: TEXT
@@ -1423,16 +1423,25 @@ zabbix_export:
               expression: |
                 avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
                 or
+                (avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{#SNMP.TEMP.THRESHOLD} and {#SNMP.TEMP.THRESHOLD}>0)
+                or
                 last(/Cisco IOS by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                 or
                 last(/Cisco IOS by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+              recovery_expression: |
+                avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3
+                and
+                (avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{#SNMP.TEMP.THRESHOLD}-3 or {#SNMP.TEMP.THRESHOLD}<=0)
               name: 'Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold'
               event_name: 'Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              description: |
+                This trigger uses temperature sensor values as well as temperature sensor status if available.
+                It fires either above the user-configurable {$TEMP_CRIT} macro, or above the vendor-defined threshold
+                reported by the device itself (`ciscoEnvMonTemperatureThreshold`). A device-reported value of 0 means
+                the device does not report a threshold for this test point, so that check is skipped.
               tags:
                 - tag: scope
                   value: availability
@@ -1455,10 +1464,15 @@ zabbix_export:
                   expression: |
                     avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
                     or
+                    (avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{#SNMP.TEMP.THRESHOLD} and {#SNMP.TEMP.THRESHOLD}>0)
+                    or
                     last(/Cisco IOS by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                     or
                     last(/Cisco IOS by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
-                  recovery_expression: 'max(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  recovery_expression: |
+                    avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3
+                    and
+                    (avg(/Cisco IOS by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{#SNMP.TEMP.THRESHOLD}-3 or {#SNMP.TEMP.THRESHOLD}<=0)
               tags:
                 - tag: scope
                   value: availability
@@ -1471,6 +1485,9 @@ zabbix_export:
               parameters:
                 - '{#SNMPVALUE}'
                 - 1.3.6.1.4.1.9.9.13.1.3.1.2
+                - '0'
+                - '{#SNMP.TEMP.THRESHOLD}'
+                - 1.3.6.1.4.1.9.9.13.1.3.1.4
                 - '0'
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1534,7 +1551,7 @@ zabbix_export:
           description: 'Warning threshold of ICMP packet loss in %.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Thresholds
             label: 'Threshold of ICMP packet loss'
             description: 'Warning threshold of ICMP packet loss in %. In the range from 0 to 100 inclusive.'
@@ -1544,7 +1561,7 @@ zabbix_export:
           description: 'Warning threshold of the average ICMP response time in seconds.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Thresholds
             label: 'Threshold of the average ICMP response'
             description: 'Warning threshold of the average ICMP response time in seconds. No less than 0.'
@@ -1554,7 +1571,7 @@ zabbix_export:
           description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
             description: 'Warning threshold of error packet rate. No less than 0.'
@@ -1564,7 +1581,7 @@ zabbix_export:
           description: 'Used as a threshold in the interface utilization trigger.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
             description: 'Used as a threshold in the interface utilization trigger. In the range from 0 to 100 inclusive.'
@@ -1574,7 +1591,7 @@ zabbix_export:
           description: 'Link status trigger will be fired only for interfaces where the context macro equals "1".'
           config:
             type: CHECKBOX
-            priority: '22'
+            priority: '23'
             label: 'Interfaces control'
             description: 'Fire a trigger when the interface operational status changes to "Link down".'
             options:
@@ -1594,7 +1611,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'Filter network interface by adminstatus'
             description: 'Regex string to include discovered interface by adminstatus.'
@@ -1603,7 +1620,7 @@ zabbix_export:
           description: 'Ignore `down(2)` administrative status'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'Filter network interface by adminstatus (exclude)'
             description: 'Regex string to exclude discovered interface by adminstatus.'
@@ -1612,7 +1629,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Filters
             label: 'Filter network interface by alias'
             description: 'Regex string to include discovered interface by alias.'
@@ -1621,7 +1638,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Filters
             label: 'Filter network interface by alias (exclude)'
             description: 'Regex string to exclude discovered interface by alias.'
@@ -1630,7 +1647,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'Filter network interface by description'
             description: 'Regex string to include discovered interface by description.'
@@ -1639,7 +1656,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'Filter network interface by description (exclude)'
             description: 'Regex string to exclude discovered interface by description.'
@@ -1648,7 +1665,7 @@ zabbix_export:
           description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Filter for network interface by name'
             description: 'Regex string to include discovered interface by name.'
@@ -1657,7 +1674,7 @@ zabbix_export:
           description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Filter for network interface by name (exclude)'
             description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
@@ -1666,7 +1683,7 @@ zabbix_export:
           description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'Filter network interface by status'
             description: 'Regex string to include discovered interface by status.'
@@ -1675,7 +1692,7 @@ zabbix_export:
           description: 'Ignore `notPresent(6)`'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Filter network interface by status (exclude)'
             description: 'Regex string to exclude discovered interface by status.'
@@ -1684,7 +1701,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Filters
             label: 'Filter network interface by type'
             description: 'Regex string to include discovered interface by type.'
@@ -1693,7 +1710,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '37'
             section_name: Filters
             label: 'Filter network interface by type (exclude)'
             description: 'Regex string to exclude discovered interface by type.'
@@ -1742,6 +1759,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'Time interval for the SNMP availability trigger.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '20'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
           description: 'Critical threshold for temperature.'
@@ -2488,7 +2514,7 @@ zabbix_export:
       wizard_ready: 'YES'
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-4
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -2598,7 +2624,7 @@ zabbix_export:
         - uuid: 9620c1de761246e1806fda680ede7bba
           name: 'Cisco IOS: SNMP walk temperature sensors'
           type: SNMP_AGENT
-          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.3.1.2,1.3.6.1.4.1.9.9.13.1.3.1.3,1.3.6.1.4.1.9.9.13.1.3.1.6]'
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.3.1.2,1.3.6.1.4.1.9.9.13.1.3.1.3,1.3.6.1.4.1.9.9.13.1.3.1.4,1.3.6.1.4.1.9.9.13.1.3.1.6]'
           key: sensor.temp.walk
           history: '0'
           value_type: TEXT
@@ -3272,16 +3298,25 @@ zabbix_export:
               expression: |
                 avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
                 or
+                (avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{#SNMP.TEMP.THRESHOLD} and {#SNMP.TEMP.THRESHOLD}>0)
+                or
                 last(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                 or
                 last(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+              recovery_expression: |
+                avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3
+                and
+                (avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{#SNMP.TEMP.THRESHOLD}-3 or {#SNMP.TEMP.THRESHOLD}<=0)
               name: 'Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold'
               event_name: 'Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              description: |
+                This trigger uses temperature sensor values as well as temperature sensor status if available.
+                It fires either above the user-configurable {$TEMP_CRIT} macro, or above the vendor-defined threshold
+                reported by the device itself (`ciscoEnvMonTemperatureThreshold`). A device-reported value of 0 means
+                the device does not report a threshold for this test point, so that check is skipped.
               tags:
                 - tag: scope
                   value: availability
@@ -3304,10 +3339,15 @@ zabbix_export:
                   expression: |
                     avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
                     or
+                    (avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{#SNMP.TEMP.THRESHOLD} and {#SNMP.TEMP.THRESHOLD}>0)
+                    or
                     last(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                     or
                     last(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
-                  recovery_expression: 'max(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  recovery_expression: |
+                    avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3
+                    and
+                    (avg(/Cisco IOS prior to 12.0_3_T by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{#SNMP.TEMP.THRESHOLD}-3 or {#SNMP.TEMP.THRESHOLD}<=0)
               tags:
                 - tag: scope
                   value: availability
@@ -3320,6 +3360,9 @@ zabbix_export:
               parameters:
                 - '{#SNMPVALUE}'
                 - 1.3.6.1.4.1.9.9.13.1.3.1.2
+                - '0'
+                - '{#SNMP.TEMP.THRESHOLD}'
+                - 1.3.6.1.4.1.9.9.13.1.3.1.4
                 - '0'
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3385,7 +3428,7 @@ zabbix_export:
           description: 'Warning threshold of ICMP packet loss in %.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Thresholds
             label: 'Threshold of ICMP packet loss'
             description: 'Warning threshold of ICMP packet loss in %. In the range from 0 to 100 inclusive.'
@@ -3395,7 +3438,7 @@ zabbix_export:
           description: 'Warning threshold of the average ICMP response time in seconds.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Thresholds
             label: 'Threshold of the average ICMP response'
             description: 'Warning threshold of the average ICMP response time in seconds. No less than 0.'
@@ -3454,6 +3497,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'Time interval for the SNMP availability trigger.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '20'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
           description: 'Critical threshold for temperature.'
@@ -3582,7 +3634,7 @@ zabbix_export:
       wizard_ready: 'YES'
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-4
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -3703,7 +3755,7 @@ zabbix_export:
         - uuid: 7568839f76854edca01234fb707e1558
           name: 'Cisco IOS: SNMP walk temperature sensors'
           type: SNMP_AGENT
-          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.3.1.2,1.3.6.1.4.1.9.9.13.1.3.1.3,1.3.6.1.4.1.9.9.13.1.3.1.6]'
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.3.1.2,1.3.6.1.4.1.9.9.13.1.3.1.3,1.3.6.1.4.1.9.9.13.1.3.1.4,1.3.6.1.4.1.9.9.13.1.3.1.6]'
           key: sensor.temp.walk
           history: '0'
           value_type: TEXT
@@ -4886,16 +4938,25 @@ zabbix_export:
               expression: |
                 avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
                 or
+                (avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{#SNMP.TEMP.THRESHOLD} and {#SNMP.TEMP.THRESHOLD}>0)
+                or
                 last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                 or
                 last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+              recovery_expression: |
+                avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3
+                and
+                (avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{#SNMP.TEMP.THRESHOLD}-3 or {#SNMP.TEMP.THRESHOLD}<=0)
               name: 'Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold'
               event_name: 'Cisco IOS: {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              description: |
+                This trigger uses temperature sensor values as well as temperature sensor status if available.
+                It fires either above the user-configurable {$TEMP_CRIT} macro, or above the vendor-defined threshold
+                reported by the device itself (`ciscoEnvMonTemperatureThreshold`). A device-reported value of 0 means
+                the device does not report a threshold for this test point, so that check is skipped.
               tags:
                 - tag: scope
                   value: availability
@@ -4918,10 +4979,15 @@ zabbix_export:
                   expression: |
                     avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
                     or
+                    (avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{#SNMP.TEMP.THRESHOLD} and {#SNMP.TEMP.THRESHOLD}>0)
+                    or
                     last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                     or
                     last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
-                  recovery_expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  recovery_expression: |
+                    avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3
+                    and
+                    (avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{#SNMP.TEMP.THRESHOLD}-3 or {#SNMP.TEMP.THRESHOLD}<=0)
               tags:
                 - tag: scope
                   value: availability
@@ -4934,6 +5000,9 @@ zabbix_export:
               parameters:
                 - '{#SNMPVALUE}'
                 - 1.3.6.1.4.1.9.9.13.1.3.1.2
+                - '0'
+                - '{#SNMP.TEMP.THRESHOLD}'
+                - 1.3.6.1.4.1.9.9.13.1.3.1.4
                 - '0'
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -4999,7 +5068,7 @@ zabbix_export:
           description: 'Warning threshold of ICMP packet loss in %.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Thresholds
             label: 'Threshold of ICMP packet loss'
             description: 'Warning threshold of ICMP packet loss in %. In the range from 0 to 100 inclusive.'
@@ -5009,7 +5078,7 @@ zabbix_export:
           description: 'Warning threshold of the average ICMP response time in seconds.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Thresholds
             label: 'Threshold of the average ICMP response'
             description: 'Warning threshold of the average ICMP response time in seconds. No less than 0.'
@@ -5019,7 +5088,7 @@ zabbix_export:
           description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
             description: 'Warning threshold of error packet rate. No less than 0.'
@@ -5029,7 +5098,7 @@ zabbix_export:
           description: 'Used as a threshold in the interface utilization trigger.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
             description: 'Used as a threshold in the interface utilization trigger. In the range from 0 to 100 inclusive.'
@@ -5039,7 +5108,7 @@ zabbix_export:
           description: 'Link status trigger will be fired only for interfaces where the context macro equals "1".'
           config:
             type: CHECKBOX
-            priority: '22'
+            priority: '23'
             label: 'Interfaces control'
             description: 'Fire a trigger when the interface operational status changes to "Link down".'
             options:
@@ -5059,7 +5128,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'Filter network interface by adminstatus'
             description: 'Regex string to include discovered interface by adminstatus.'
@@ -5068,7 +5137,7 @@ zabbix_export:
           description: 'Ignore `down(2)` administrative status'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'Filter network interface by adminstatus (exclude)'
             description: 'Regex string to exclude discovered interface by adminstatus.'
@@ -5077,7 +5146,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Filters
             label: 'Filter network interface by alias'
             description: 'Regex string to include discovered interface by alias.'
@@ -5086,7 +5155,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Filters
             label: 'Filter network interface by alias (exclude)'
             description: 'Regex string to exclude discovered interface by alias.'
@@ -5095,7 +5164,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'Filter network interface by description'
             description: 'Regex string to include discovered interface by description.'
@@ -5104,7 +5173,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'Filter network interface by description (exclude)'
             description: 'Regex string to exclude discovered interface by description.'
@@ -5113,7 +5182,7 @@ zabbix_export:
           description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Filter for network interface by name'
             description: 'Regex string to include discovered interface by name.'
@@ -5122,7 +5191,7 @@ zabbix_export:
           description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Filter for network interface by name (exclude)'
             description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
@@ -5131,7 +5200,7 @@ zabbix_export:
           description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'Filter network interface by status'
             description: 'Regex string to include discovered interface by status.'
@@ -5140,7 +5209,7 @@ zabbix_export:
           description: 'Ignore `notPresent(6)`'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Filter network interface by status (exclude)'
             description: 'Regex string to exclude discovered interface by status.'
@@ -5149,7 +5218,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Filters
             label: 'Filter network interface by type'
             description: 'Regex string to include discovered interface by type.'
@@ -5158,7 +5227,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '37'
             section_name: Filters
             label: 'Filter network interface by type (exclude)'
             description: 'Regex string to exclude discovered interface by type.'
@@ -5207,6 +5276,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'Time interval for the SNMP availability trigger.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '20'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
           description: 'Critical threshold for temperature.'
@@ -5928,11 +6006,20 @@ zabbix_export:
               newvalue: unknown
   triggers:
     - uuid: b98092ddf87247ff91710e2f310dbfb9
-      expression: '(last(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco IOS by SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: |
+        (last(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0],#2)))
+        or (last(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/Cisco IOS by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/Cisco IOS by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/Cisco IOS by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/Cisco IOS by SNMP/system.net.uptime[sysUpTime.0],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
+        or last(/Cisco IOS by SNMP/system.net.uptime[sysUpTime.0])>{$SNMP.UPTIME.WARN}
       name: 'Cisco IOS: Host has been restarted'
-      event_name: 'Cisco IOS: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'Cisco IOS: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       dependencies:
         - name: 'Cisco IOS: No SNMP data collection'
@@ -5941,11 +6028,20 @@ zabbix_export:
         - tag: scope
           value: notice
     - uuid: f278b8b4eb784107a6d8d3e8437e8a66
-      expression: '(last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco IOS prior to 12.0_3_T by SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: |
+        (last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0],#2)))
+        or (last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/Cisco IOS prior to 12.0_3_T by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/Cisco IOS prior to 12.0_3_T by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/Cisco IOS prior to 12.0_3_T by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/Cisco IOS prior to 12.0_3_T by SNMP/system.net.uptime[sysUpTime.0],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
+        or last(/Cisco IOS prior to 12.0_3_T by SNMP/system.net.uptime[sysUpTime.0])>{$SNMP.UPTIME.WARN}
       name: 'Cisco IOS: Host has been restarted'
-      event_name: 'Cisco IOS: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'Cisco IOS: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       dependencies:
         - name: 'Cisco IOS: No SNMP data collection'
@@ -5954,11 +6050,20 @@ zabbix_export:
         - tag: scope
           value: notice
     - uuid: 806f54999d064eb68a3f46a0d84ee4df
-      expression: '(last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: |
+        (last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0],#2)))
+        or (last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.net.uptime[sysUpTime.0],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
+        or last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.net.uptime[sysUpTime.0])>{$SNMP.UPTIME.WARN}
       name: 'Cisco IOS: Host has been restarted'
-      event_name: 'Cisco IOS: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'Cisco IOS: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       dependencies:
         - name: 'Cisco IOS: No SNMP data collection'

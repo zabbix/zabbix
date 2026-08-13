@@ -176,7 +176,7 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 		}
 	}
 
-	if ('\0' != *ssl_key_password)
+	if (NULL != ssl_key_password && '\0' != *ssl_key_password)
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD, ssl_key_password)))
 		{
@@ -360,11 +360,14 @@ int	zbx_http_req(const char *url, const char *header, long timeout, const char *
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER,
-			(headers_slist = curl_slist_append(headers_slist, header)))))
+	if (NULL != header)
 	{
-		*error = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
-		goto clean;
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER,
+				(headers_slist = curl_slist_append(headers_slist, header)))))
+		{
+			*error = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
+			goto clean;
+		}
 	}
 
 	if (SUCCEED != zbx_curl_setopt_https(easyhandle, error))
@@ -413,6 +416,225 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: POSTs a JSON-RPC 2.0 request over HTTP(S), optionally with mTLS,  *
+ *          and returns the response body opened as JSON                      *
+ *                                                                            *
+ * Parameters: url               - [IN] non-empty, caller must validate       *
+ *             ca_file           - [IN] optional, https:// only               *
+ *             crl_file          - [IN] optional, https:// only               *
+ *             cert_file         - [IN] optional, https:// only (mTLS)        *
+ *             key_file          - [IN] optional, https:// only (mTLS)        *
+ *             connect_to_value  - [IN] optional CURLOPT_CONNECT_TO value     *
+ *             payload           - [IN] JSON-RPC request body                 *
+ *             request           - [IN] method name, for log messages only    *
+ *             service_name      - [IN] name of the remote endpoint, for      *
+ *                                       log messages only                    *
+ *             timeout           - [IN]                                       *
+ *             body_data         - [OUT] raw response body, caller frees      *
+ *             jp_body           - [OUT] response body opened as JSON         *
+ *             err_kind          - [OUT] set only if this function fails      *
+ *                                                                            *
+ * Return value:  SUCCEED - request performed, response is a valid            *
+ *                          JSON-RPC 2.0 envelope                             *
+ *                FAIL    - otherwise, see *err_kind for the failure class    *
+ *                                                                            *
+ * Comments: does not inspect the JSON-RPC "result"/"error" members of the    *
+ *           response, that part is request-specific and left to the caller   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl_file, const char *cert_file,
+		const char *key_file, const char *connect_to_value, const char *payload, const char *request,
+		const char *service_name, long timeout, char **body_data, struct zbx_json_parse *jp_body,
+		zbx_http_jsonrpc_error_t *err_kind)
+{
+#define ZBX_HTTPS_SCHEME	"https://"
+
+	zbx_http_response_t	body = {0}, response_header = {0};
+	CURL			*curl = NULL;
+	CURLcode		err;
+	CURLoption		opt;
+	struct curl_slist	*headers = NULL, *connect_to = NULL;
+	char			*error_curl = NULL, errbuf[CURL_ERROR_SIZE], jsonrpc[ZBX_MAX_UINT64_LEN];
+	long			http_code = 0;
+	int			ret = FAIL;
+
+	*body_data = NULL;
+	*err_kind = ZBX_HTTP_JSONRPC_ERR_CONNECT;
+
+	if (NULL == (curl = curl_easy_init()))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to initialize cURL library");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_http_prepare_callbacks(curl, &response_header, &body, zbx_curl_ignore_cb,
+			zbx_curl_write_cb, errbuf, &error_curl))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s",
+				ZBX_NULL2EMPTY_STR(error_curl));
+		goto out;
+	}
+
+	headers = curl_slist_append(headers, "Content-Type: application/json");
+
+	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, url)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, payload)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDSIZE, strlen(payload))) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT, timeout)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: %s.", (int)opt,
+				curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL HTTPS options: %s",
+				ZBX_NULL2EMPTY_STR(error_curl));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error_curl))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL SSL version: %s",
+				ZBX_NULL2EMPTY_STR(error_curl));
+		goto out;
+	}
+
+	/*
+	 * Connection mode is selected by URL scheme and TLS files:
+	 * - http:// uses unencrypted HTTP;
+	 * - https:// uses TLS with the default CA trust store;
+	 * - https:// with ca_file overrides the CA trust store;
+	 * - https:// with crl_file enables certificate revocation checks;
+	 * - https:// with ca_file, cert_file and key_file uses mTLS.
+	 */
+	if (0 == zbx_strncasecmp(url, ZBX_HTTPS_SCHEME, ZBX_CONST_STRLEN(ZBX_HTTPS_SCHEME)))
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			goto out;
+		}
+
+		if (NULL != ca_file && CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, ca_file)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			goto out;
+		}
+
+		if (NULL != crl_file && CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CRLFILE, crl_file)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			goto out;
+		}
+
+		if ((NULL != cert_file && CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT,
+				cert_file))) ||
+				(NULL != key_file &&
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, key_file))))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			goto out;
+		}
+	}
+
+	if (NULL != connect_to_value)
+	{
+		connect_to = curl_slist_append(connect_to, connect_to_value);
+
+		if (NULL == connect_to)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to prepare CURLOPT_CONNECT_TO value");
+			goto out;
+		}
+
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECT_TO, connect_to)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			goto out;
+		}
+	}
+
+	if (CURLE_OK != (err = curl_easy_perform(curl)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to %s: %s", service_name, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to obtain %s response code: %s", service_name,
+				curl_easy_strerror(err));
+		*err_kind = ZBX_HTTP_JSONRPC_ERR_INVALID_RESPONSE;
+		goto out;
+	}
+
+	*err_kind = ZBX_HTTP_JSONRPC_ERR_INVALID_RESPONSE;
+
+	if (ZBX_MAX_RECV_2KB_DATA_SIZE < body.offset)
+	{
+		body.data[ZBX_MAX_RECV_2KB_DATA_SIZE] = '\0';
+		zabbix_log(LOG_LEVEL_WARNING, "%s returned too large response body for %s request: size:"
+				ZBX_FS_SIZE_T " body:'%s'", service_name, request, (zbx_fs_size_t)body.offset,
+				body.data);
+		goto out;
+	}
+
+	if (200 > http_code || 300 <= http_code)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s returned HTTP %ld: %s", service_name, http_code,
+				ZBX_NULL2EMPTY_STR(body.data));
+		goto out;
+	}
+
+	if (NULL == body.data || FAIL == zbx_json_open(body.data, jp_body))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid %s response body: %s", service_name,
+				ZBX_NULL2EMPTY_STR(body.data));
+		goto out;
+	}
+
+	if (FAIL == zbx_json_value_by_name(jp_body, "jsonrpc", jsonrpc, sizeof(jsonrpc), NULL))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "missing JSON-RPC version in %s response body: %s", service_name,
+				ZBX_NULL2EMPTY_STR(body.data));
+		goto out;
+	}
+
+	if (0 != strcmp(jsonrpc, "2.0"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid JSON-RPC version in %s response body: %s,"
+				" expected 2.0", service_name, jsonrpc);
+		goto out;
+	}
+
+	*body_data = body.data;
+	body.data = NULL;
+	ret = SUCCEED;
+out:
+	curl_slist_free_all(connect_to);
+	curl_slist_free_all(headers);
+	if (NULL != curl)
+		curl_easy_cleanup(curl);
+	zbx_free(error_curl);
+	zbx_free(body.data);
+	zbx_free(response_header.data);
+
+	return ret;
+
+#undef ZBX_HTTPS_SCHEME
 }
 
 static const char	*zbx_request_string(int result)

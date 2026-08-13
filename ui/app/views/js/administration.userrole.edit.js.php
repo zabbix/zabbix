@@ -53,6 +53,22 @@
 				.getElementById('service-write-access')
 				.addEventListener('change', () => this.serviceWriteAccessChange());
 
+			const devices_access_checkbox = document.getElementById('devices.access');
+
+			if (devices_access_checkbox !== null) {
+				devices_access_checkbox.addEventListener('change', () => {
+					this.updateAccessUiElementsFieldsGroup(this.form.findFieldByName('type').getValue());
+				});
+			}
+
+			const device_manage_own_checkbox = document.getElementById('devices.actions.manage_own');
+
+			if (device_manage_own_checkbox !== null) {
+				device_manage_own_checkbox.addEventListener('change', () => {
+					this.updateAccessUiElementsFieldsGroup(this.form.findFieldByName('type').getValue());
+				});
+			}
+
 			this.updateServicesWriteAccessFields();
 
 			jQuery('#service_write_list_')
@@ -77,6 +93,8 @@
 
 			this.form_element
 				.querySelector('.form-actions .js-clone')?.addEventListener('click', () => this.clone(rules_create));
+
+			this.updateAccessUiElementsFieldsGroup(this.form.findFieldByName('type').getValue());
 		}
 
 		updateAccessUiElementsFieldsGroup(user_type) {
@@ -96,7 +114,7 @@
 				CRoleHelper::UI_SERVICES_SLA_REPORT => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_INVENTORY_OVERVIEW => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_INVENTORY_HOSTS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::UI_REPORTS_SYSTEM_INFO => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_REPORTS_SYSTEM_INFO => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_REPORTS_TOP_TRIGGERS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_REPORTS_AUDIT => USER_TYPE_SUPER_ADMIN,
@@ -126,6 +144,7 @@
 				CRoleHelper::UI_ADMINISTRATION_USER_ROLES => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_USERS => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_API_TOKENS => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_SCRIPTS => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_QUEUE => USER_TYPE_SUPER_ADMIN,
@@ -141,22 +160,44 @@
 				CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::ACTIONS_MANAGE_SLA => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::ACTIONS_EDIT_OWN_MEDIA => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::ACTIONS_EDIT_USER_MEDIA => USER_TYPE_SUPER_ADMIN
+				CRoleHelper::ACTIONS_EDIT_USER_MEDIA => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::DEVICES_ACCESS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::DEVICES_ACTIONS_MANAGE_USER => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS => USER_TYPE_ZABBIX_USER
 			], JSON_FORCE_OBJECT) ?>;
+
+			const default_unchecked = <?= json_encode([
+				CRoleHelper::DEVICES_ACCESS,
+				CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN,
+				CRoleHelper::DEVICES_ACTIONS_MANAGE_USER,
+				CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS
+			]) ?>;
 
 			for (const [id, value] of Object.entries(access_min)) {
 				const checkbox = document.getElementById(id);
 
-				if (user_type < value) {
+				if (!checkbox) {
+					continue;
+				}
+
+				if (user_type < value || value == -1) {
 					checkbox.readOnly = true;
 					checkbox.checked = false;
 				}
 				else {
 					if (checkbox.readOnly) {
-						checkbox.checked = true;
+						checkbox.checked = !default_unchecked.includes(id);
 					}
 					checkbox.readOnly = false;
 				}
+			}
+
+			const device_manage_own_checkbox = document.getElementById('devices.actions.manage_own');
+
+			if (this.form.findFieldByName('devices_access')?.getValue() == 0 && device_manage_own_checkbox) {
+				device_manage_own_checkbox.checked = false;
+				device_manage_own_checkbox.readOnly = true;
 			}
 
 			const access_max = <?= json_encode([
@@ -165,6 +206,11 @@
 
 			for (const [id, value] of Object.entries(access_max)) {
 				const checkbox = document.getElementById(id);
+
+				if (!checkbox) {
+					continue;
+				}
+
 				checkbox.readOnly = (user_type > value);
 
 				if (checkbox.readOnly) {

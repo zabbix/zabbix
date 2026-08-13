@@ -41,12 +41,13 @@ Refer to the vendor documentation.
 |{$BIGIP.FS.FREE.WARN.MIN}|<p>The warning threshold of the file system utilization in %.</p>|`10`|
 |{$BIGIP.TEMP.HIGH}|<p>The critical threshold of the temperature in °C</p>|`50`|
 |{$BIGIP.TEMP.WARN}|<p>The warning threshold of the temperature in °C</p>|`45`|
+|{$SNMP.UPTIME.WARN}|<p>Uptime threshold above which the restart problem auto-resolves.</p>|`10m`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]|
 |Chassis serial number|<p>MIB: F5-BIGIP-SYSTEM-MIB</p><p>Serial number</p>|SNMP agent|bigip.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Hardware model name|<p>MIB: RFC1213-MIB</p><p>A textual description of the entity.  This value</p><p>should include the full name and version</p><p>identification of the system's hardware type,</p><p>software operating-system, and networking</p><p>software.  It is mandatory that this only contain</p><p>printable ASCII characters.</p>|SNMP agent|bigip.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Contact|<p>MIB: RFC1213-MIB</p><p>The textual identification of the contact person</p><p>for this managed node, together with information</p><p>on how to contact this person.</p>|SNMP agent|bigip.contact<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
@@ -73,7 +74,7 @@ Refer to the vendor documentation.
 |----|-----------|----------|--------|--------------------------------|
 |F5 Big-IP: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/F5 Big-IP by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
 |F5 Big-IP: Chassis has been replaced|<p>Chassis serial number has changed. Acknowledge to close the problem manually.</p>|`last(/F5 Big-IP by SNMP/bigip.serialnumber,#1)<>last(/F5 Big-IP by SNMP/bigip.serialnumber,#2) and length(last(/F5 Big-IP by SNMP/bigip.serialnumber))>0`|Info|**Manual close**: Yes|
-|F5 Big-IP: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/F5 Big-IP by SNMP/bigip.uptime)<10m`|Info|**Manual close**: Yes|
+|F5 Big-IP: Host has been restarted|<p>The uptime counter has decreased, which indicates that the host has been restarted.<br>A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.<br>The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.</p>|`change(/F5 Big-IP by SNMP/bigip.uptime)<0 and last(/F5 Big-IP by SNMP/bigip.uptime,#2)<42949672.96-(lastclock(/F5 Big-IP by SNMP/bigip.uptime)-lastclock(/F5 Big-IP by SNMP/bigip.uptime,#2))`|Info|**Manual close**: Yes|
 |F5 Big-IP: Cluster not in sync||`count(/F5 Big-IP by SNMP/bigip.failover,10m,"ne","3")>8 and count(/F5 Big-IP by SNMP/bigip.failover,10m,"ne","4")>6`|Warning|**Manual close**: Yes|
 |F5 Big-IP: The device is inconsistent with the device group|<p>The device is inconsistent with the device group, requires user intervention</p>|`last(/F5 Big-IP by SNMP/bigip.syncstatus)=4`|Warning|**Manual close**: Yes|
 |F5 Big-IP: Changes have been made on the device not sync|<p>Changes have been made on the device not sync to the device group, requires user intervention</p>|`last(/F5 Big-IP by SNMP/bigip.syncstatus)=2`|Warning|**Manual close**: Yes|

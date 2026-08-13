@@ -29,7 +29,6 @@ $form_list = (new CFormList())
 	->addRow(_('Use custom event status colors'), (new CCheckBox('custom_color'))
 		->setUncheckedValue(EVENT_CUSTOM_COLOR_DISABLED)
 		->setChecked($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
-		->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow((new CLabel(_('Unacknowledged PROBLEM events'), 'problem_unack_color'))->setAsteriskMark(), [
 		(new CColorPicker('problem_unack_color'))

@@ -52,11 +52,6 @@ final class CSettingsSchema {
 			'column' => 'value_int',
 			'default' => 1
 		],
-		'banner_data' => [
-			'column' => 'value_str',
-			'default' => '',
-			'length' => 65535
-		],
 		'blink_period' => [
 			'column' => 'value_str',
 			'default' => '2m',
@@ -108,6 +103,11 @@ final class CSettingsSchema {
 			'column' => 'value_str',
 			'default' => 'system',
 			'length' => 50
+		],
+		'device_link_timeout' => [
+			'column' => 'value_str',
+			'default' => '60s',
+			'length' => 32
 		],
 		'disabled_usrgrpid' => [
 			'column' => 'value_usrgrpid'
@@ -408,6 +408,11 @@ final class CSettingsSchema {
 			'column' => 'value_str',
 			'default' => '',
 			'length' => 65535
+		],
+		'serverid' => [
+			'column' => 'value_str',
+			'default' => '',
+			'length' => 36
 		],
 		'session_key' => [
 			'column' => 'value_str',
