@@ -311,7 +311,7 @@ class CDRule extends CApiService {
 		// Check proxy IDs.
 		if ($proxyids) {
 			$db_proxies = API::Proxy()->get([
-				'output' => ['proxyid'],
+				'output' => [],
 				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
@@ -479,7 +479,7 @@ class CDRule extends CApiService {
 		// Check proxy IDs.
 		if ($proxyids) {
 			$db_proxies = API::Proxy()->get([
-				'output' => ['proxyid'],
+				'output' => [],
 				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);

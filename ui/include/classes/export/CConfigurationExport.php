@@ -687,7 +687,7 @@ class CConfigurationExport {
 		}
 
 		$accessible_proxyids = API::Proxy()->get([
-			'output' => ['proxyid'],
+			'output' => [],
 			'proxyids' => array_keys($proxyids),
 			'preservekeys' => true
 		]);
@@ -729,7 +729,7 @@ class CConfigurationExport {
 		}
 
 		$accessible_proxy_groupids = API::ProxyGroup()->get([
-			'output' => ['proxy_groupid'],
+			'output' => [],
 			'proxy_groupids' => array_keys($proxy_groupids),
 			'preservekeys' => true
 		]);

@@ -2158,33 +2158,31 @@ class CHost extends CHostGeneral {
 				continue;
 			}
 
-			if (array_key_exists('monitored_by', $host)) {
-				if (bccomp($host['monitored_by'], $db_hosts[$host['hostid']]['monitored_by']) != 0
-						&& $db_hosts[$host['hostid']]['monitored_by'] != ZBX_MONITORED_BY_SERVER) {
-					$monitored_by_upd[$host['hostid']] = true;
+			if (array_key_exists('monitored_by', $host)
+					&& bccomp($host['monitored_by'], $db_hosts[$host['hostid']]['monitored_by']) != 0
+					&& $db_hosts[$host['hostid']]['monitored_by'] != ZBX_MONITORED_BY_SERVER) {
+				$monitored_by_upd[$host['hostid']] = true;
 
-					if ($db_hosts[$host['hostid']]['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
-						$proxyids[$host['hostid']] = $db_hosts[$host['hostid']]['proxyid'];
-					}
-					elseif ($db_hosts[$host['hostid']]['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-						$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
-					}
+				if ($db_hosts[$host['hostid']]['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+					$proxyids[$host['hostid']] = $db_hosts[$host['hostid']]['proxyid'];
+				}
+				elseif ($db_hosts[$host['hostid']]['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+					$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
 				}
 			}
 
+
 			if (!array_key_exists($host['hostid'], $monitored_by_upd)) {
-				if (array_key_exists('proxyid', $host)) {
-					if (bccomp($host['proxyid'], $db_hosts[$host['hostid']]['proxyid']) != 0
-							&& $db_hosts[$host['hostid']]['proxyid'] != 0) {
-						$proxyids[$host['hostid']] = $db_hosts[$host['hostid']]['proxyid'];
-					}
+				if (array_key_exists('proxyid', $host)
+						&& bccomp($host['proxyid'], $db_hosts[$host['hostid']]['proxyid']) != 0
+						&& $db_hosts[$host['hostid']]['proxyid'] != 0) {
+					$proxyids[$host['hostid']] = $db_hosts[$host['hostid']]['proxyid'];
 				}
 
-				if (array_key_exists('proxy_groupid', $host)) {
-					if (bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0
-							&& $db_hosts[$host['hostid']]['proxy_groupid'] != 0) {
-						$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
-					}
+				if (array_key_exists('proxy_groupid', $host)
+						&& bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0
+						&& $db_hosts[$host['hostid']]['proxy_groupid'] != 0) {
+					$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
 				}
 			}
 		}

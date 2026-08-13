@@ -3325,7 +3325,7 @@ class CAction extends CApiService {
 		$proxyids = array_keys($proxyids);
 
 		$proxies = API::Proxy()->get([
-			'output' => ['proxyid'],
+			'output' => [],
 			'proxyids' => $proxyids,
 			'preservekeys' => true
 		]);
