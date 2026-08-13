@@ -1580,7 +1580,7 @@ static void	cep_config_update_handle(zbx_cep_config_t *cep_config, zbx_uint64_t 
 {
 	pthread_mutex_lock(&cep_config->lock);
 
-	if (cep_config->revision == revision)
+	if (0 == cep_config->revision || cep_config->revision == revision)
 	{
 		if (NULL != cep_config->handle)
 			cep_config_handle_release(cep_config->handle);
@@ -1743,7 +1743,8 @@ zbx_cep_config_handle_t	zbx_cep_config_open(void)
  ******************************************************************************/
 void	zbx_cep_config_close(zbx_cep_config_handle_t handle)
 {
-	cep_config_handle_release(handle);
+	if (NULL != handle)
+		cep_config_handle_release(handle);
 }
 
 /******************************************************************************
@@ -1773,6 +1774,9 @@ const zbx_vector_cep_rule_ptr_t	*zbx_cep_config_get_rules(zbx_cep_config_handle_
 zbx_cep_rule_t	*zbx_cep_config_get_rule(zbx_cep_config_handle_t handle, zbx_uint64_t ruleid)
 {
 	zbx_cep_rule_ref_t	*ref;
+
+	if (NULL == handle)
+		return NULL;
 
 	if (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_search(&handle->index, &ruleid)))
 		return ref->rule;

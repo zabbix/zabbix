@@ -99,11 +99,25 @@ static void	cep_db_write_event(const zbx_cep_event_t *event, zbx_dbconn_t *db, z
  *                                                                            *
  ******************************************************************************/
 static void	cep_db_write_problem(const zbx_cep_event_t *event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_problem,
-		zbx_db_insert_t *db_insert_tag)
+		zbx_db_insert_t *db_insert_tag, const zbx_vector_uint64_t *ref_eventids)
 {
+	zbx_uint64_t	cause_eventid = event->cause_eventid;
+
+	if (0 != cause_eventid && FAIL == zbx_vector_uint64_bsearch(ref_eventids, cause_eventid,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+	{
+		zbx_cep_t	*cep;
+
+		cause_eventid = 0;
+
+		cep_cache_acquire(&cep);
+		cep_set_event_cause(cep, event->eventid, cause_eventid);
+		cep_cache_release(&cep);
+	}
+
 	zbx_db_insert_add_values(db_insert_problem, event->eventid, event->origin.source, event->origin.object,
 			event->origin.objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name),
-			event->severity, event->cause_eventid, (int)event->flags);
+			event->severity, cause_eventid, (int)event->flags);
 
 	if (0 == event->tags.values_num)
 		return;
@@ -249,9 +263,11 @@ static void	cep_db_write_events(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t
  *                                                                            *
  * Parameters: db     - [IN]  database connection                             *
  *             tasks  - [IN]  list of tasks containing events                 *
+ *             ref_eventids - [IN] referenced eventids                        *
  *                                                                            *
  ******************************************************************************/
-static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks)
+static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks,
+		const zbx_vector_uint64_t *ref_eventids)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
@@ -274,7 +290,10 @@ static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 		/* trigger event might have been changed by CEP - need to commit from cache                  */
 		/* while other (internal) event tags are not cached - need to commit from received db_event  */
 		if (EVENT_SOURCE_TRIGGERS == task->db_event->source)
-			cep_db_write_problem(task->event, db, &db_insert_problem, &db_insert_problem_tag);
+		{
+			cep_db_write_problem(task->event, db, &db_insert_problem, &db_insert_problem_tag,
+					ref_eventids);
+		}
 		else
 			cep_db_write_db_problem(task->db_event, db, &db_insert_problem, &db_insert_problem_tag);
 	}
@@ -302,19 +321,19 @@ static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
  *                                                                            *
  * Parameters: db     - [IN]  database connection                             *
  *             tasks  - [IN]  list of tasks containing events                 *
+ *             ref_eventids - [IN] referenced eventids                        *
  *                                                                            *
  ******************************************************************************/
-static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks)
+static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks,
+		const zbx_vector_uint64_t *ref_eventids)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
 	int				symptoms_num = 0;
 	zbx_vector_mw_task_ptr_t	symptom_tasks;
-	zbx_vector_uint64_t		eventids;
 
 	zbx_vector_mw_task_ptr_create(&symptom_tasks);
 	zbx_vector_mw_task_ptr_reserve(&symptom_tasks, (size_t)tasks->values_num);
-	zbx_vector_uint64_create(&eventids);
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
@@ -332,8 +351,6 @@ static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 			continue;
 
 		zbx_vector_mw_task_ptr_append(&symptom_tasks, tasks->values[i]);
-
-		zbx_vector_uint64_append(&eventids, event->cause_eventid);
 	}
 
 	if (0 != symptom_tasks.values_num)
@@ -342,17 +359,12 @@ static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 
 		zbx_dbconn_prepare_insert(db, &db_insert, "event_symptom", "eventid", "cause_eventid", (char *)NULL);
 
-		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		zbx_dbconn_lock_ids_pk(db, "events", "eventid", &eventids);
-
 		for (int i = 0; i < symptom_tasks.values_num; i++)
 		{
 			const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)symptom_tasks.values[i];
 			zbx_cep_event_t			*event = task->event;
 
-			if (FAIL == zbx_vector_uint64_bsearch(&eventids, event->cause_eventid,
+			if (FAIL == zbx_vector_uint64_bsearch(ref_eventids, event->cause_eventid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
 					continue;
@@ -367,7 +379,6 @@ static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 	}
 
 	zbx_vector_mw_task_ptr_destroy(&symptom_tasks);
-	zbx_vector_uint64_destroy(&eventids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() symptoms:%d", __func__, symptoms_num);
 }
@@ -378,21 +389,20 @@ static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
  *                                                                            *
  * Parameters: db     - [IN]  database connection                             *
  *             tasks  - [IN]  list of tasks containing recovery events        *
+ *             ref_eventids - [IN] referenced eventids                        *
  *                                                                            *
  ******************************************************************************/
-static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks)
+static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks,
+		const zbx_vector_uint64_t *ref_eventids)
 {
 	zbx_db_insert_t				db_insert_event_recovery = {0};
 	zbx_vector_cep_db_event_recovery_t	recoveries;
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 	int					recoveries_num = 0;
-	zbx_vector_uint64_t			eventids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
-	zbx_vector_uint64_create(&eventids);
-	zbx_vector_uint64_reserve(&eventids, (size_t)tasks->values_num);
 	zbx_vector_cep_db_event_recovery_create(&recoveries);
 
 	for (int i = 0; i < tasks->values_num; i++)
@@ -416,17 +426,11 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 			};
 
 			zbx_vector_cep_db_event_recovery_append(&recoveries, recovery_local);
-			zbx_vector_uint64_append(&eventids, task->eventids.values[j]);
 		}
 	}
 
 	if (0 != recoveries.values_num)
 	{
-		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		zbx_dbconn_lock_ids_pk(db, "events", "eventid", &eventids);
-
 		recoveries_num = recoveries.values_num;
 
 		zbx_vector_cep_db_event_recovery_sort(&recoveries, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -438,7 +442,7 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		{
 			zbx_cep_db_event_recovery_t	*recovery = &recoveries.values[i];
 
-			if (FAIL == zbx_vector_uint64_bsearch(&eventids, recovery->p_eventid,
+			if (FAIL == zbx_vector_uint64_bsearch(ref_eventids, recovery->p_eventid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
 				continue;
@@ -486,7 +490,6 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 	}
 
 	zbx_vector_cep_db_event_recovery_destroy(&recoveries);
-	zbx_vector_uint64_destroy(&eventids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() recovered problems:%d", __func__, recoveries_num);
 }
@@ -670,8 +673,33 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 	zbx_dbconn_t			*db;
 	zbx_vector_trigger_diff_ptr_t	trigger_diffs;
 	int				ret;
+	zbx_vector_uint64_t		ref_eventids;
 
 	zbx_vector_trigger_diff_ptr_create(&trigger_diffs);
+	zbx_vector_uint64_create(&ref_eventids);
+
+	for (int i = 0; i < tasks->values_num; i++)
+	{
+		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
+
+		if (CEP_EVENT_CLOSE == task->event_op)
+		{
+			for (int j = 0; j < task->eventids.values_num; j++)
+				zbx_vector_uint64_append(&ref_eventids, task->eventids.values[j]);
+		}
+		else if (CEP_EVENT_OPEN == task->event_op)
+		{
+			if (EVENT_SOURCE_TRIGGERS == task->db_event->source &&
+					EVENT_OBJECT_TRIGGER != task->db_event->object)
+			{
+				if (0 != task->event->cause_eventid)
+					zbx_vector_uint64_append(&ref_eventids, task->event->cause_eventid);
+			}
+		}
+	}
+
+	zbx_vector_uint64_sort(&ref_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&ref_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	db = zbx_dbconn_pool_acquire_connection(dbpool);
 
@@ -680,9 +708,12 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 		zbx_dbconn_begin(db);
 
 		cep_db_write_events(db, tasks);
-		cep_db_write_problems(db, tasks);
-		cep_db_write_symptoms(db, tasks);
-		cep_db_write_event_recovery(db, tasks);
+
+		zbx_dbconn_lock_ids_pk(db, "events", "eventid", &ref_eventids);
+
+		cep_db_write_problems(db, tasks, &ref_eventids);
+		cep_db_write_symptoms(db, tasks, &ref_eventids);
+		cep_db_write_event_recovery(db, tasks, &ref_eventids);
 		cep_db_write_event_suppress(db, tasks);
 		cep_db_write_trigger_rtdata(db, tasks, &trigger_diffs);
 	}
@@ -696,6 +727,7 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 		zbx_dc_config_triggers_apply_changes(trigger_diffs.values, trigger_diffs.values_num);
 	}
 
+	zbx_vector_uint64_destroy(&ref_eventids);
 	zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diffs, zbx_trigger_diff_free);
 	zbx_vector_trigger_diff_ptr_destroy(&trigger_diffs);
 }
