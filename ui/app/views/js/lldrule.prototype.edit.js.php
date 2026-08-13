@@ -233,7 +233,10 @@ window.lldrule_prototype_edit = new class {
 				}
 			})
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
-			.finally(() => this.#overlay.unsetLoading());
+			.finally(() => {
+				this.#overlay.unsetLoading();
+				this.#update();
+			});
 
 	}
 
