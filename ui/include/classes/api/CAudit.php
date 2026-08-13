@@ -519,8 +519,7 @@ class CAudit {
 		'usergroup.hostgroup_rights' => 'rights',
 		'usergroup.templategroup_rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
-		'usergroup.users' => 'users_groups',
-		'proxy.apm' => 'proxy'
+		'usergroup.users' => 'users_groups'
 	];
 
 	/**
@@ -608,6 +607,7 @@ class CAudit {
 		'mediatype.message_templates' => 'mediatype_messageid',
 		'mediatype.parameters' => 'mediatype_paramid',
 		'proxy.hosts' => 'hostid',
+		'proxy.apm.additional_resource_attributes' => null,
 		'regexp.expressions' => 'expressionid',
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',
