@@ -86,6 +86,26 @@ Reload user parameters from the configuration file
 .RE
 .RS 4
 .TP 4
+\fBperiodic_prof_enable\fR
+Enable periodic profiling
+.RE
+.RS 4
+.TP 4
+\fBperiodic_prof_disable\fR
+Disable periodic profiling
+.RE
+.RS 4
+.TP 4
+\fBperiodic_prof_execute\fR
+Write profiles after a 5-second sample
+.RE
+.RS 4
+.TP 4
+\fBperiodic_prof_set_interval\fR \fIseconds\fR
+Set profiling interval
+.RE
+.RS 4
+.TP 4
 \fBlog_level_increase\fR
 Increase log level
 .RE
