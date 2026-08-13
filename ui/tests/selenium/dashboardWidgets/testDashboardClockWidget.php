@@ -228,7 +228,7 @@ class testDashboardClockWidget extends testWidgets {
 			 */
 			if ($type === 'Host time') {
 				$form->getField('Item')->waitUntilVisible();
-				array_splice($fields, 5, 0, ['Item']);
+				array_splice($fields, 5, 1, ['Item']);
 				$form->checkValue(['Item' => '']);
 				$form->isRequired('Item');
 			}
