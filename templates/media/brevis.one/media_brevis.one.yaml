@@ -18,136 +18,165 @@ zabbix_export:
           value: 'true'
         - name: text
           value: '{ALERT.MESSAGE}'
+        - name: tls_verify
+          value: '{$HTTP.TLS.VERIFY:"Brevis.one"}'
         - name: username
           value: '<PLACE USERNAME>'
       status: DISABLED
       script: |
+        const CTlsConfig = function (raw_value) {
+        	raw_value = String(raw_value).trim().toLowerCase();
+        
+        	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+        		raw_value = 'full';
+        	}
+        
+        	this.options = {
+        		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+        		SSLVerifyHost: (raw_value === 'full')
+        	};
+        
+        	this.enabled = (raw_value !== 'none');
+        
+        	this.checkURL = function (url) {
+        		if (this.enabled && !/^https:\/\//i.test(url)) {
+        			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+        			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+        		}
+        
+        		return url;
+        	};
+        }
+        
+        
         var BrevisOne = {
-            params: [],
+        	params: [],
         
-            addParam: function (name, value) {
-                BrevisOne.params.push(name + '=' + encodeURIComponent(value));
-            },
+        	addParam: function (name, value) {
+        		BrevisOne.params.push(name + '=' + encodeURIComponent(value));
+        	},
         
-            setProxy: function (HTTPProxy) {
-                BrevisOne.HTTPProxy = HTTPProxy;
-            },
+        	setProxy: function (HTTPProxy) {
+        		BrevisOne.HTTPProxy = HTTPProxy;
+        	},
         
-            setPayload: function (params) {
-                var parts = params.send_to.split(':'),
-                    defaultValues = {
-                        ring: 'true',
-                        flash: 'true',
-                        telauto: 'false'
-                    };
+        	setPayload: function (params) {
+        		var parts = params.send_to.split(':'),
+        			defaultValues = {
+        				ring: 'true',
+        				flash: 'true',
+        				telauto: 'false'
+        			};
         
-                BrevisOne.addParam('username', params.username);
-                BrevisOne.addParam('password', params.password);
-                BrevisOne.addParam('text', params.text);
+        		BrevisOne.addParam('username', params.username);
+        		BrevisOne.addParam('password', params.password);
+        		BrevisOne.addParam('text', params.text);
         
-                if (parts.length > 1) {
-                    BrevisOne.addParam('mode', parts[0]);
-                    BrevisOne.addParam('to', parts[1]);
-                }
-                else {
-                    BrevisOne.addParam('to', parts[0]);
-                }
+        		if (parts.length > 1) {
+        			BrevisOne.addParam('mode', parts[0]);
+        			BrevisOne.addParam('to', parts[1]);
+        		}
+        		else {
+        			BrevisOne.addParam('to', parts[0]);
+        		}
         
-                Object.keys(defaultValues)
-                    .forEach(function (key) {
-                        if (params[key] && params[key].trim() && params[key].toLowerCase() === defaultValues[key]) {
-                            BrevisOne.addParam(key, defaultValues[key]);
-                        }
-                    });
-            },
+        		Object.keys(defaultValues)
+        			.forEach(function (key) {
+        				if (params[key] && params[key].trim() && params[key].toLowerCase() === defaultValues[key]) {
+        					BrevisOne.addParam(key, defaultValues[key]);
+        				}
+        			});
+        	},
         
-            request: function () {
-                var response,
-                    request = new HttpRequest(),
-                    data = '?' + BrevisOne.params.join('&');
+        	request: function () {
+        		var response,
+        			request = new HttpRequest(tls.options),
+        			data = '?' + BrevisOne.params.join('&');
         
-                request.addHeader('Content-Type: multipart/form-data');
+        		request.addHeader('Content-Type: multipart/form-data');
         
-                if (typeof BrevisOne.HTTPProxy !== 'undefined' && BrevisOne.HTTPProxy !== '') {
-                    request.setProxy(BrevisOne.HTTPProxy);
-                }
+        		if (typeof BrevisOne.HTTPProxy !== 'undefined' && BrevisOne.HTTPProxy !== '') {
+        			request.setProxy(BrevisOne.HTTPProxy);
+        		}
         
-                Zabbix.log(4, '[ BrevisOne Webhook ] Sending request.');
+        		Zabbix.log(4, '[ BrevisOne Webhook ] Sending request.');
         
-                response = request.post(params.endpoint + data);
+        		response = request.post(tls.checkURL(params.endpoint) + data);
         
-                Zabbix.log(4, '[ BrevisOne Webhook ] Received response with status code ' +
-                    request.getStatus() + '\n' + response);
+        		Zabbix.log(4, '[ BrevisOne Webhook ] Received response with status code ' +
+        			request.getStatus() + '\n' + response);
         
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    var message = 'Request failed with status code ' + request.getStatus();
+        		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+        			var message = 'Request failed with status code ' + request.getStatus();
         
-                    if (response) {
-                        message += ': ' + response;
-                    }
+        			if (response) {
+        				message += ': ' + response;
+        			}
         
-                    throw message + '. Check debug log for more information.';
-                }
-            }
+        			throw message + '. Check debug log for more information.';
+        		}
+        	}
         };
         
         try {
-            var params = JSON.parse(value);
+        	var params = JSON.parse(value);
+        	var tls = new CTlsConfig(params.tls_verify);
         
-            ['endpoint', 'password', 'username', 'text', 'send_to'].forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                        || !params[field].trim()) {
-                    throw 'Required parameter is not set: "' + field + '".';
-                }
-            });
+        	['endpoint', 'password', 'username', 'text', 'send_to'].forEach(function (field) {
+        		if (typeof params !== 'object' || typeof params[field] === 'undefined'
+        				|| !params[field].trim()) {
+        			throw 'Required parameter is not set: "' + field + '".';
+        		}
+        	});
         
-            if (params.send_to === '{ALERT.SENDTO}') {
-                throw 'Required parameter is not set: "send_to".';
-            }
+        	if (params.send_to === '{ALERT.SENDTO}') {
+        		throw 'Required parameter is not set: "send_to".';
+        	}
         
-            BrevisOne.setProxy(params.HTTPProxy);
-            BrevisOne.setPayload(params);
-            BrevisOne.request();
+        	BrevisOne.setProxy(params.HTTPProxy);
+        	BrevisOne.setPayload(params);
+        	BrevisOne.request();
         
-            return 'OK';
+        	return 'OK';
         }
         catch (error) {
-            Zabbix.log(3, '[ BrevisOne Webhook ] ERROR: ' + error);
-            throw 'Sending failed: ' + error;
+        	Zabbix.log(3, '[ BrevisOne Webhook ] ERROR: ' + error);
+        	throw 'Sending failed: ' + error;
         }
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM
-          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          subject: 'Problem: {EVENT.NAME}'
           message: |
-            [{EVENT.STATUS}] {EVENT.NAME}
-            Started at {EVENT.TIME} on {EVENT.DATE}
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
             Host: {HOST.NAME}
             Severity: {EVENT.SEVERITY}
             Operational data: {EVENT.OPDATA}
-            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
-            [{EVENT.STATUS}] {EVENT.NAME}
-            Resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
             Host: {HOST.NAME}
             Severity: {EVENT.SEVERITY}
-            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: UPDATE
-          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
           message: |
-            [{EVENT.STATUS}] {EVENT.NAME}
-            
             {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
             {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
         - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
-            Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}
             Discovery rule: {DISCOVERY.RULE.NAME}
             
             Device IP: {DISCOVERY.DEVICE.IPADDRESS}
@@ -163,6 +192,53 @@ zabbix_export:
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |
-            Autoregistration: {HOST.HOST}
+            Host name: {HOST.HOST}
             Host IP: {HOST.IP}
             Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
+        - event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+        - event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
