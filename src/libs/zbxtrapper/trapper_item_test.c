@@ -146,7 +146,7 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 
 static int	process_zero_pollers_items(zbx_dc_item_t *item, zbx_get_config_forks_f get_config_forks, char **info)
 {
-	unsigned char	proc_type, itemtype_nonpoller, snmp_oid_type = 0;
+	unsigned char	proc_type, snmp_oid_type = 0;
 
 	switch (item->type)
 	{
@@ -202,8 +202,8 @@ static int	process_zero_pollers_items(zbx_dc_item_t *item, zbx_get_config_forks_
 #		undef ZBX_SNMP_OID_TYPE_GET
 	}
 
-	if (ZBX_NO_POLLER != zbx_poller_by_item(item->type, item->key, snmp_oid_type, get_config_forks, &proc_type,
-			&itemtype_nonpoller) || 0 != itemtype_nonpoller)
+	if (ZBX_NO_POLLER != zbx_poller_by_item(item->type, item->key, snmp_oid_type, get_config_forks, &proc_type) ||
+			ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
 	{
 		return SUCCEED;
 	}
