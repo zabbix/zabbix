@@ -273,6 +273,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Local network',
+						// Update interval is changed to avoid the "This field cannot be empty." error appearing first.
 						'Update interval' => '2h'
 					],
 					'Checks' => [['default' => true]],
@@ -304,7 +305,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Validation priority for SNMPv1'
+						'Name' => 'Text in port for SNMPv1'
 					],
 					'Checks' => [
 						[
@@ -340,7 +341,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Negative port for SNMPv3'
+						'Name' => 'Negative port for SNMPv2'
 					],
 					'Checks' => [
 						[
@@ -376,7 +377,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Validation priority for SNMPv3'
+						'Name' => 'Validation fields for SNMPv3'
 					],
 					'Checks' => [
 						[
@@ -443,24 +444,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Validation fields for SNMPv3'
-					],
-					'Checks' => [
-						[
-							'Check type' => 'SNMPv3 agent',
-							'Port range' => 'text',
-							'SNMP OID' => 'test',
-							'inline_errors' => ['Port range' => 'Incorrect port range.']
-						]
-					]
-				]
-			],
-			// #11.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Validation authPriv for SNMPv3'
+						'Name' => 'Validation authNoPriv for SNMPv3'
 					],
 					'Checks' => [
 						[
@@ -471,7 +455,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #12.
+			// #11.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -490,7 +474,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #13.
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -506,7 +490,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #14.
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -525,12 +509,12 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #15.
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Validation priority for Zabbix agent'
+						'Name' => 'Validation for Zabbix agent'
 					],
 					'Checks' => [
 						[
@@ -544,20 +528,38 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #15.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => '',
+						'IP range' => '',
+						'Update interval' => '',
+						'Discovery by' => 'Proxy'
+					],
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'IP range' => 'This field cannot be empty.',
+						'Update interval' => 'This field cannot be empty.',
+						'id:dcheckList' => 'This field cannot be empty.',
+						'xpath:.//div[@id="proxyid"]/..' => 'This field cannot be empty.'
+					]
+				]
+			],
 			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Validation for Zabbix agent'
+						'Name' => 'Numbers in IP range and text in Update interval',
+						'IP range' => 12345,
+						'Update interval' => 'text'
 					],
-					'Checks' => [
-						[
-							'Check type' => 'Zabbix agent',
-							'Port range' => 'test',
-							'Key' => 'test',
-							'inline_errors' => ['Port range' => 'Incorrect port range.']
-						]
+					'Checks' => [['default' => true]],
+					'inline_errors' => [
+						'IP range' => 'Incorrect address starting from "12345".',
+						'Update interval' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -566,11 +568,15 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty IP range',
-						'IP range' => ''
+						'Name' => 'Text and special symbols in IP range and Update interval',
+						'IP range' => 'Text 😀',
+						'Update interval' => '😀'
 					],
 					'Checks' => [['default' => true]],
-					'inline_errors' => ['IP range' => 'This field cannot be empty.']
+					'inline_errors' => [
+						'IP range' => 'Incorrect address starting from "Text 😀".',
+						'Update interval' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #18.
@@ -578,38 +584,18 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Numbers in IP range',
-						'IP range' => 12345
+						'Name' => 'Wrong IPV4 in IP range and negative Update interval',
+						'IP range' => '192.168.4.300-305',
+						'Update interval' => -1
 					],
 					'Checks' => [['default' => true]],
-					'inline_errors' => ['IP range' => 'Incorrect address starting from "12345".']
+					'inline_errors' => [
+						'IP range' => 'Incorrect address starting from "192.168.4.300-305".',
+						'Update interval' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #19.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Text in IP range',
-						'IP range' => 'Text 😀'
-					],
-					'Checks' => [['default' => true]],
-					'inline_errors' => ['IP range' => 'Incorrect address starting from "Text 😀".']
-				]
-			],
-			// #20.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Wrong IPV4 in IP range',
-						'IP range' => '192.168.4.300-305'
-					],
-					'Checks' => [['default' => true]],
-					'inline_errors' => ['IP range' => 'Incorrect address starting from "192.168.4.300-305".']
-				]
-			],
-			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -621,7 +607,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'inline_errors' => ['IP range' => 'IP range "192.168.4.0/5" exceeds "65536" address limit.']
 				]
 			],
-			// #22.
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -633,19 +619,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'inline_errors' => ['IP range' => 'Incorrect address starting from "/111".']
 				]
 			],
-			// #23.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Wrong IPV4 mask in IP range _3',
-						'IP range' => '192.168.4.0/129'
-					],
-					'Checks' => [['default' => true]],
-					'inline_errors' => ['IP range' => 'Incorrect address starting from "/129".']
-				]
-			],
-			// #24.
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -659,7 +633,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #25.
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -671,68 +645,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'inline_errors' => ['IP range' => 'Incorrect address starting from "/130".']
 				]
 			],
-			// #26.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => ''
-					],
-					'inline_errors' => [
-						'Name' => 'This field cannot be empty.',
-						'id:dcheckList' => 'This field cannot be empty.' // Checks field.
-					]
-				]
-			],
-			// #27.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty interval validation',
-						'Update interval' => ''
-					],
-					'Checks' => [['default' => true]],
-					'inline_errors' => ['Update interval' => 'This field cannot be empty.']
-				]
-			],
-			// #28.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Text interval validation',
-						'Update interval' => 'text'
-					],
-					'Checks' => [['default' => true]],
-					'inline_errors' => ['Update interval' => 'A time unit is expected.']
-				]
-			],
-			// #29.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Special symbols in interval validation',
-						'Update interval' => '😀'
-					],
-					'Checks' => [['default' => true]],
-					'inline_errors' => ['Update interval' => 'A time unit is expected.']
-				]
-			],
-			// #30.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Negative interval validation',
-						'Update interval' => -1
-					],
-					'Checks' => [['default' => true]],
-					'inline_errors' => ['Update interval' => 'A time unit is expected.']
-				]
-			],
-			// #31.
+			// #23.
 			[
 				[
 					'fields' => [
@@ -741,7 +654,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #32.
+			// #24.
 			[
 				[
 					'fields' => [
@@ -755,7 +668,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #33.
+			// #25.
 			[
 				[
 					'fields' => [
@@ -765,7 +678,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #34.
+			// #26.
 			[
 				[
 					'fields' => [
@@ -775,7 +688,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #35.
+			// #27.
 			[
 				[
 					'fields' => [
@@ -785,7 +698,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #36.
+			// #28.
 			[
 				[
 					'fields' => [
@@ -795,7 +708,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #37.
+			// #29.
 			[
 				[
 					'fields' => [
@@ -805,7 +718,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #38.
+			// #30.
 			[
 				[
 					'fields' => [
@@ -820,7 +733,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #39.
+			// #31.
 			[
 				[
 					'fields' => [
@@ -858,7 +771,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #40.
+			// #32.
 			[
 				[
 					'fields' => [
@@ -886,7 +799,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #41.
+			// #33.
 			[
 				[
 					'fields' => [
@@ -931,7 +844,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #42.
+			// #34.
 			[
 				[
 					'trim' => true,
@@ -963,7 +876,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #43.
+			// #35.
 			[
 				[
 					'check_radio_labels' => true,
@@ -1031,7 +944,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	public function getCreateData() {
 		return [
-			// #44.
+			// #36.
 			[
 				[
 					'fields' => [
@@ -1064,7 +977,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	public function getUpdateData() {
 		return [
-			// #44.
+			// #37.
 			[
 				[
 					'fields' => [

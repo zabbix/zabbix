@@ -61,10 +61,8 @@ class CDataTable {
 	static ZBX_STYLE_CELL = 'cell';
 	static ZBX_STYLE_CELL_BG = 'cell-bg';
 	static ZBX_STYLE_CELL_BG_HOVER = 'cell-bg-hover';
-	static ZBX_STYLE_CELL_INNER = 'cell-inner';
 	static ZBX_STYLE_CELL_HEADER = 'cell-header';
 	static ZBX_STYLE_CELL_HEADER_LINK = 'cell-header-link';
-	static ZBX_STYLE_CELL_HEADER_RESIZER = 'cell-header-resizer';
 	static ZBX_STYLE_CELL_DATA = 'cell-data';
 	static ZBX_STYLE_CELL_ERROR = 'cell-error';
 	static ZBX_STYLE_CELL_CONTEXT = 'cell-context';
@@ -73,8 +71,10 @@ class CDataTable {
 	static ZBX_STYLE_CELL_RESIZING = 'cell-resizing';
 	static ZBX_STYLE_CELL_CHECKBOX = 'cell-checkbox';
 
-	static ZBX_STYLE_LINK_HEADER = 'header-link';
-	static ZBX_STYLE_LINK_HEADER_SORTED = 'header-link-sorted';
+	static ZBX_STYLE_HEADER_NAME = 'header-name';
+	static ZBX_STYLE_HEADER_LINK = 'header-link';
+	static ZBX_STYLE_HEADER_RESIZER = 'header-resizer';
+	static ZBX_STYLE_HEADER_LINK_SORTED = 'header-link-sorted';
 
 	/**
 	 * Delay in milliseconds before `#resize_click_count` is reset.
@@ -100,6 +100,16 @@ class CDataTable {
 	 * @type {number}
 	 */
 	static COLUMN_TOGGLE_INITIAL_MIN_WIDTH = 150;
+
+	/**
+	 * @type {number}
+	 */
+	static COLUMN_MIN_ALLOWED_CALC_WIDTH = 200;
+
+	/**
+	 * @type {number}
+	 */
+	static COLUMN_MAX_ALLOWED_CALC_WIDTH = 400;
 
 	/**
 	 * @type {number}
@@ -203,6 +213,20 @@ class CDataTable {
 	#scrollbar_inner = null;
 
 	/**
+	 * Determines whether scroll was triggered from header or not.
+	 *
+	 * @type {boolean}
+	 */
+	#header_scroll = false;
+
+	/**
+	 * Stores temporary reference to the toggled column.
+	 *
+	 * @type {null}
+	 */
+	#toggled_column = null;
+
+	/**
 	 * Observer instance that monitors changes in the body dimensions.
 	 * Ensures the scrollbar inner width is recalculated when the content layout changes.
 	 *
@@ -236,6 +260,8 @@ class CDataTable {
 	 * @type {CDataProvider}
 	 */
 	#data_provider;
+
+	#body_scroll_left = 0;
 
 	#form_name = null;
 
@@ -277,9 +303,11 @@ class CDataTable {
 	#visible_columns = [];
 
 	#option_defaults = {
+		enabled: true,
 		checked: false,
 		onRender: () => {},
 		onChange: () => {},
+		onSave: () => {},
 		isChanged: function () {
 			return this.checked;
 		},
@@ -302,6 +330,8 @@ class CDataTable {
 	#options_handlers = {};
 
 	#user_configs = [];
+
+	#calculated_overrides = ['width'];
 
 	/**
 	 * Elements in this queue are all removed at the same time, once new data is ready to be rendered.
@@ -384,13 +414,13 @@ class CDataTable {
 					const icon = document.createElement('span');
 
 					const header_link = document.createElement('a');
-					header_link.classList.add(CDataTable.ZBX_STYLE_LINK_HEADER);
+					header_link.classList.add(CDataTable.ZBX_STYLE_HEADER_LINK);
 
 					if (this.#sort_field === sort_field) {
 						sort_order = sort_order === ZBX_SORT_UP ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
 						icon.classList.add(sort_order === ZBX_SORT_UP ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
-						header_link.classList.add(CDataTable.ZBX_STYLE_LINK_HEADER_SORTED);
+						header_link.classList.add(CDataTable.ZBX_STYLE_HEADER_LINK_SORTED);
 					}
 
 					header_link.setAttribute('href', 'javascript:void(0);');
@@ -405,13 +435,14 @@ class CDataTable {
 					cell.appendChild(header_link);
 				}
 				else if (column.getId() !== this.#checkbox_id) {
-					const cell_inner = this.#templates.cell_inner_span.evaluateToElement();
-					cell_inner.textContent = column.getName();
+					const header_name = document.createElement('div');
+					header_name.classList.add(CDataTable.ZBX_STYLE_HEADER_NAME);
+					header_name.textContent = column.getName();
 
-					cell.appendChild(cell_inner);
+					cell.appendChild(header_name);
 				}
 
-				if (column.getOptionsPopupHandler()) {
+				if (column.isShowOptionsPopup() && column.getOptionsPopupHandler()) {
 					const icon = document.createElement('span');
 					icon.classList.add(column.getOptionsPopupHandleIcon());
 
@@ -431,7 +462,7 @@ class CDataTable {
 					if (this.#options_popup?.getColumn().getColumnIndex() == column.getColumnIndex()) {
 						context_handle.classList.add(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
 
-						this.#options_popup.setHandle(context_handle);
+						this.#options_popup?.setHandle(context_handle);
 					}
 
 					cell.appendChild(context_handle);
@@ -455,6 +486,7 @@ class CDataTable {
 				label.appendChild(document.createElement('span'));
 
 				cell.classList.add(CDataTable.ZBX_STYLE_CELL_CHECKBOX);
+
 				cell.append(checkbox, label);
 			}
 		};
@@ -465,19 +497,19 @@ class CDataTable {
 
 		this.setRowRenderer('default', this.renderDataCells);
 
-		this.setCellRenderer(CDataTableColumn.RENDERER_HTML, ({cell_data, cell_inner}) => {
-			cell_inner.innerHTML = cell_data.filter(Boolean).join('');
+		this.setCellRenderer(CDataTableColumn.RENDERER_HTML, ({cell_data, cell}) => {
+			cell.innerHTML = cell_data.filter(Boolean).join('');
 		});
 
-		this.setCellRenderer(CDataTableColumn.RENDERER_ELEMENT, ({cell_data, cell_inner}) => {
-			cell_inner.append(...cell_data.filter(Boolean));
+		this.setCellRenderer(CDataTableColumn.RENDERER_ELEMENT, ({cell_data, cell}) => {
+			cell.append(...cell_data.filter(Boolean));
 		});
 
-		this.setCellRenderer(CDataTableColumn.RENDERER_TEXT, ({cell_data, cell_inner}) => {
-			cell_inner.textContent = cell_data.filter(Boolean).join('');
+		this.setCellRenderer(CDataTableColumn.RENDERER_TEXT, ({cell_data, cell}) => {
+			cell.textContent = cell_data.filter(Boolean).join('');
 		});
 
-		this.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, cell, cell_inner}) => {
+		this.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, cell}) => {
 			const [object_id, data_actions] = cell_data;
 
 			if (!object_id) {
@@ -504,10 +536,10 @@ class CDataTable {
 
 			cell.classList.add(CDataTable.ZBX_STYLE_CELL_CHECKBOX);
 
-			cell_inner.append(checkbox, label);
+			cell.append(checkbox, label);
 		});
 
-		this.setCellRenderer('tagvalue', ({column, cell_data, cell_inner}) => {
+		this.setCellRenderer('tagvalue', ({column, cell_data, cell}) => {
 			const column_options = column.getColumnOptions();
 
 			let [tags] = cell_data;
@@ -516,7 +548,13 @@ class CDataTable {
 				return;
 			}
 
-			tags = tags.filter(tag => tag.tag === column_options['tag_name']);
+			const tag_name = column_options['tag_name'] ?? '';
+			if (String(tag_name).length > 0) {
+				tags = tags.filter(tag => tag.tag === tag_name && String(tag.value).length > 0);
+			}
+
+			cell.innerHTML = '';
+
 			if (tags.length == 0) {
 				return;
 			}
@@ -555,13 +593,13 @@ class CDataTable {
 				tags_wrapper.appendChild(tag_label);
 			}
 
-			cell_inner.appendChild(tags_wrapper);
+			cell.appendChild(tags_wrapper);
 		});
 
-		this.setCellRenderer('tags', ({column, cell_data, cell_inner, response}) => {
+		this.setCellRenderer('tags', ({column, cell_data, cell, response}) => {
 			let [tags] = cell_data;
 
-			if (!tags) {
+			if (!tags || tags.length == 0) {
 				return;
 			}
 
@@ -728,14 +766,15 @@ class CDataTable {
 				tags_wrapper.appendChild(more_tags);
 			}
 
-			cell_inner.appendChild(tags_wrapper);
+			cell.innerHTML = '';
+			cell.appendChild(tags_wrapper);
 		});
 
-		this.setCellRenderer('custom_text', ({column, cell_data, cell_inner}) => {
+		this.setCellRenderer('custom_text', ({column, cell_data, cell}) => {
 			const column_index = column.getColumnIndex();
 			const [custom_text] = cell_data;
 
-			cell_inner.textContent = custom_text ? (custom_text[column_index] ?? '') : '';
+			cell.textContent = custom_text ? (custom_text[column_index] ?? '') : '';
 		});
 
 		this.setOptionsHandler(CDataTableColumn.TABLE_OPTIONS, CDataTableOptionsPopupTableOptions);
@@ -748,12 +787,6 @@ class CDataTable {
 			`),
 			cell: new Template(`
 				<div class="${CDataTable.ZBX_STYLE_CELL}"></div>
-			`),
-			cell_inner: new Template(`
-				<div class="${CDataTable.ZBX_STYLE_CELL_INNER}"></div>
-			`),
-			cell_inner_span: new Template(`
-				<span class="${CDataTable.ZBX_STYLE_CELL_INNER}"></span>
 			`),
 			row: new Template(`
 				<div class="${CDataTable.ZBX_STYLE_ROW}"></div>
@@ -809,6 +842,7 @@ class CDataTable {
 
 		this.#header = document.createElement('div');
 		this.#header.classList.add(CDataTable.ZBX_STYLE_HEADER);
+		this.#header.addEventListener('scroll', this.onHeaderScroll);
 
 		if (this.#sticky_header) {
 			this.#header.classList.add(CDataTable.ZBX_STYLE_HEADER_STICKY);
@@ -974,20 +1008,8 @@ class CDataTable {
 		return this;
 	}
 
-	setResizable(resizable) {
-		this.#resizable = resizable;
-
-		return this;
-	}
-
 	isCustomizable() {
 		return this.#customizable;
-	}
-
-	setCustomizable(customizable) {
-		this.#customizable = customizable;
-
-		return this;
 	}
 
 	setPage(page) {
@@ -996,6 +1018,9 @@ class CDataTable {
 		return this;
 	}
 
+	/**
+	 * @returns {Object<string, *>}
+	 */
 	getFilter() {
 		return {...this.#filter};
 	}
@@ -1018,18 +1043,10 @@ class CDataTable {
 		return this;
 	}
 
-	getDefaultSortField() {
-		return this.#default_sort_field;
-	}
-
 	setDefaultSortField(default_sort_field) {
 		this.#default_sort_field = default_sort_field;
 
 		return this;
-	}
-
-	getDefaultSortOrder() {
-		return this.#default_sort_order;
 	}
 
 	setDefaultSortOrder(default_sort_order) {
@@ -1048,10 +1065,6 @@ class CDataTable {
 		return this;
 	}
 
-	getSortOrder() {
-		return this.#sort_order;
-	}
-
 	setSortOrder(sort_order) {
 		this.#sort_order = sort_order;
 
@@ -1066,10 +1079,6 @@ class CDataTable {
 		this.#sticky_header = sticky_header;
 
 		return this;
-	}
-
-	isStickyFooter() {
-		return this.#sticky_footer;
 	}
 
 	setStickyFooter(sticky_footer) {
@@ -1117,30 +1126,21 @@ class CDataTable {
 			return;
 		}
 
-		if (!column.isResized()) {
-			column.setWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
-		}
-
 		column.setVisible(visible);
 
 		const overrides = column.getOverrides();
 		column.setOverrides({...overrides, visible});
 
-		this.#options_popup_updated = true;
-
 		this.updateUserConfig();
 
-		this.dispatchEvent(CDataTable.EVENT_INIT, {reset: true});
+		this.#toggled_column = visible
+			? column
+			: this.#visible_columns.at(this.#visible_columns.indexOf(column) - 1) ?? this.#visible_columns.at(0);
+
+		this.#options_popup_updated = true;
+
+		this.dispatchEvent(CDataTable.EVENT_INIT);
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
-
-		requestAnimationFrame(() => {
-			const header_cell = column.getHeaderCell();
-			if (header_cell === null) {
-				return;
-			}
-
-			this.#scrollBodyToTarget(header_cell.target);
-		});
 	}
 
 	onColumnsSort(e) {
@@ -1169,6 +1169,8 @@ class CDataTable {
 		this.updateUserConfig()
 			.getData()
 			.then(response => {
+				this.#options_popup_updated = true;
+
 				this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
 				this.dispatchEvent(CDataTable.EVENT_SAVE);
 			});
@@ -1182,7 +1184,7 @@ class CDataTable {
 			return null;
 		}
 
-		const duplicate_column = this.#duplicateColumn(column, column.diff(), true);
+		const duplicate_column = this.#duplicateColumn(column, column.diff());
 
 		for (let i = this.#columns.indexOf(duplicate_column); i < this.#columns.length; i++) {
 			this.#columns[i].setOrder(i + 1);
@@ -1196,7 +1198,7 @@ class CDataTable {
 			onSuccess: () => {
 				requestAnimationFrame(() => {
 					const header_cell = this.getColumn(duplicate_column.getColumnIndex())?.getHeaderCell();
-					if (header_cell) {
+					if (header_cell !== null) {
 						this.#scrollBodyToTarget(header_cell.target);
 
 						header_cell.target.focus();
@@ -1224,7 +1226,7 @@ class CDataTable {
 		}
 
 		const header_cell = column.getHeaderCell();
-		if (header_cell) {
+		if (header_cell !== null) {
 			header_cell.target.remove();
 		}
 
@@ -1254,10 +1256,15 @@ class CDataTable {
 			return;
 		}
 
-		column.setName(name);
+		column.setName(name === '' ? column.getDefaults().getName() : name);
 
-		const cell_inner = column.getHeaderCell().target.querySelector(`.${CDataTable.ZBX_STYLE_CELL_INNER}`);
-		cell_inner.textContent = name;
+		const header_cell = column.getHeaderCell();
+		if (header_cell !== null) {
+			const header_name = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_HEADER_NAME}`);
+			if (header_name !== null) {
+				header_name.textContent = column.getName();
+			}
+		}
 	}
 
 	onColumnReset(e) {
@@ -1268,17 +1275,18 @@ class CDataTable {
 			return;
 		}
 
-		if (column.getDefaults().getWidth() == 'auto') {
-			column.resetWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
-		}
-		else {
-			column.resetWidth();
-
-			this.#applyColumnWidths();
-			this.#calculateColumnWidth(column);
-		}
+		const overrides = column.getOverrides();
+		column.resetWidth(overrides.width ?? null);
 
 		this.#applyColumnWidths();
+
+		if (!overrides.width) {
+			this.#calculateColumnWidth(column);
+			this.#applyColumnWidths();
+		}
+
+		this.#handleScrollbar();
+
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
 
 		this.#resize_click_count = 0;
@@ -1286,6 +1294,7 @@ class CDataTable {
 
 	onReset() {
 		this.#resetColumns();
+		this.updateUserConfig();
 
 		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
@@ -1304,8 +1313,9 @@ class CDataTable {
 	}
 
 	onInit(e) {
-		const {loading, check_changes, force_load, reset} = {
+		const {loading, loading_fadein, check_changes, force_load, reset} = {
 			loading: true,
+			loading_fadein: false,
 			check_changes: true,
 			force_load: false,
 			reset: false,
@@ -1315,9 +1325,11 @@ class CDataTable {
 		if (loading) {
 			this.#element.classList.add(ZBX_STYLE_LOADING);
 
-			if (this.#initialized) {
+			if (loading_fadein) {
 				this.#element.classList.add(ZBX_STYLE_LOADING_FADEIN);
 			}
+
+			this.#options_popup?.getElement()?.classList.add(ZBX_STYLE_LOADING);
 		}
 
 		const {onSuccess, onError, onFinally} = {
@@ -1355,6 +1367,10 @@ class CDataTable {
 				onSuccess(response);
 			})
 			.catch(error => {
+				if (window.unloading) {
+					return;
+				}
+
 				if (error.name != 'AbortError') {
 					CMessageHelper.error(this.#element, [error.message], error.name);
 				}
@@ -1409,7 +1425,9 @@ class CDataTable {
 
 		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
-		column.setResized(false);
+		for (const visible_column of this.#visible_columns) {
+			visible_column.setResized(true);
+		}
 
 		this.#resizing = true;
 		this.#resize_column_index = column_index;
@@ -1512,10 +1530,10 @@ class CDataTable {
 			return;
 		}
 
-		const {column_index, column_options} = e.detail;
+		const {column_index, column_options, reset = false} = e.detail;
 		const column = this.getColumn(column_index);
 
-		if (!deepCompare(column.getColumnOptions(), column_options)) {
+		if (reset || !deepCompare(column.getColumnOptions(), column_options)) {
 			column.setColumnOptions(column_options);
 
 			this.#renderColumnDataCells(column);
@@ -1524,11 +1542,13 @@ class CDataTable {
 
 			requestAnimationFrame(() => {
 				const header_cell = column.getHeaderCell();
-				if (header_cell) {
+				if (header_cell !== null) {
 					this.#scrollBodyToTarget(header_cell.target);
 				}
 			});
 		}
+
+		this.updateUserConfig();
 
 		this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_UPDATE, e.detail);
 	}
@@ -1566,7 +1586,8 @@ class CDataTable {
 		this.#element.appendChild(this.#options_popup.getElement());
 
 		this.#options_popup.position();
-		this.#options_popup.getElement().focus();
+		this.#options_popup.resize();
+		this.#options_popup.getElement().focus({preventScroll: true});
 	}
 
 	onOptionsPopupClose() {
@@ -1598,13 +1619,19 @@ class CDataTable {
 	}
 
 	onScroll() {
-		this.#header.scrollLeft = this.#body.scrollLeft;
+		const left = this.#body_scroll_left;
 
-		if (this.#scrollbar) {
-			this.#scrollbar.scrollLeft = this.#body.scrollLeft;
+		if (this.#header_scroll) {
+			this.#header_scroll = false;
+		}
+		else {
+			this.#header.scrollTo({left});
 		}
 
+		this.#scrollbar?.scrollTo({left});
+
 		this.#updateTableOptionsButtonPosition();
+		this.#applyLastColumnPadding();
 
 		if (this.#options_popup_updated) {
 			this.#options_popup_updated = false;
@@ -1615,13 +1642,26 @@ class CDataTable {
 		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 	}
 
-	onBodyScroll = () => {
+	onHeaderScroll = e => {
+		if (!this.isUserInteracting()) {
+			return;
+		}
+
+		this.#header_scroll = true;
+
+		this.#body.scrollTo({left: e.target.scrollLeft});
+	}
+
+	onBodyScroll = e => {
+		this.#body_scroll_left = e.target.scrollLeft;
+
 		this.dispatchEvent(CDataTable.EVENT_SCROLL);
 	}
 
 	onScrollbarScroll = () => {
-		this.#header.scrollLeft = this.#scrollbar.scrollLeft;
-		this.#body.scrollLeft = this.#scrollbar.scrollLeft;
+		const left = this.#scrollbar.scrollLeft;
+
+		this.#body.scrollTo({left});
 	}
 
 	onPagerSelect = e => {
@@ -1808,10 +1848,7 @@ class CDataTable {
 			return;
 		}
 
-		const cell_inner = this.#templates.cell_inner.evaluateToElement();
-
-		data_cell.target.innerHTML = '';
-		data_cell.target.appendChild(cell_inner);
+		const cell = data_cell.target;
 
 		try {
 			this.#cell_renderers[renderer].call(this, {
@@ -1820,8 +1857,7 @@ class CDataTable {
 				row,
 				row_index,
 				cell_data: cell_data || [],
-				cell: data_cell.target,
-				cell_inner,
+				cell,
 				response
 			});
 		} catch (error) {
@@ -1829,8 +1865,12 @@ class CDataTable {
 
 			data_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_ERROR);
 
-			cell_inner.textContent = error.message;
+			cell.textContent = error.message;
 		}
+	}
+
+	isUserInteracting() {
+		return this.#element.querySelectorAll(':focus-visible').length > 0 || isUserInteracting();
 	}
 
 	#initColumns() {
@@ -1877,7 +1917,7 @@ class CDataTable {
 		this.#columns = this.#columns.filter(column => {
 			if (column.isDuplicate()) {
 				const header_cell = column.getHeaderCell();
-				if (header_cell) {
+				if (header_cell !== null) {
 					this.#element_remove_queue.push(header_cell.target);
 
 					column.setHeaderCell(null);
@@ -1995,7 +2035,7 @@ class CDataTable {
 					continue;
 				}
 
-				this.#options[id].checked = value == 1;
+				this.#options[id].checked = value === 1;
 			}
 		}
 	}
@@ -2101,9 +2141,6 @@ class CDataTable {
 		}
 		this.#element_remove_queue = [];
 
-		this.#header.scrollTo({left: 0});
-		this.#body.scrollTo({left: 0});
-
 		for (const column of this.getStickyColumns()) {
 			const header_cell = column.getHeaderCell();
 			if (!header_cell) {
@@ -2115,6 +2152,9 @@ class CDataTable {
 		}
 	}
 
+	/**
+	 * @param {Object<string, *>} response
+	 */
 	#renderBody(response) {
 		if ('error' in response) {
 			this.#renderEmptyState();
@@ -2137,7 +2177,9 @@ class CDataTable {
 			this.#renderRows(response);
 
 			for (const [, option] of Object.entries(this.#options)) {
-				option.onRender(option);
+				if (option.enabled) {
+					option.onRender(option);
+				}
 			}
 		}
 
@@ -2145,20 +2187,34 @@ class CDataTable {
 	}
 
 	#afterRender(response) {
-		this.#calculateColumnWidths(response);
-		this.#handleScrollbar();
+		this.#calculateColumnWidths();
 
 		this.#pager.update(response);
 
+		this.#unlockHeight();
+
+		this.#element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
+
+		this.#options_popup?.getElement()?.classList.remove(ZBX_STYLE_LOADING);
+
 		requestAnimationFrame(() => {
-			requestAnimationFrame(() => {
-				this.#options_popup?.position();
-			});
+			if (this.#toggled_column !== null) {
+				this.#options_popup_updated = true;
+
+				this.#scrollBodyToTarget(this.#toggled_column?.getHeaderCell()?.target);
+
+				this.#toggled_column = null;
+			} else {
+				const scroll_to = {left: this.#body_scroll_left};
+
+				this.#header.scrollTo(scroll_to);
+				this.#body.scrollTo(scroll_to);
+			}
 
 			this.#initCheckBoxRange();
-			this.#unlockHeight();
-
-			this.#element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
+			this.#handleScrollbar();
+			this.#applyLastColumnPadding();
+			this.#updateTableOptionsButtonPosition();
 		});
 	}
 
@@ -2167,7 +2223,7 @@ class CDataTable {
 
 		if (this.#resizable && column.isResizable()) {
 			const resize_handle = document.createElement('div');
-			resize_handle.classList.add(CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER);
+			resize_handle.classList.add(CDataTable.ZBX_STYLE_HEADER_RESIZER);
 
 			this.#bindColumnResizeEvent(column, resize_handle);
 
@@ -2206,28 +2262,26 @@ class CDataTable {
 		this.#columns = this.#columns.sort((left, right) => left.getOrder() - right.getOrder());
 	}
 
-	#duplicateColumn(column, user_column = {}, duplicate_name = false) {
+	#duplicateColumn(column, user_column = {}) {
 		const defaults = column.getDefaults()
 			.clone()
 			.setDuplicate(false)
 			.setSpan(1)
 			.setVisible(user_column.visible || true);
 
+		const name = defaults.getName();
+
+		const duplicate_count = this.#columns
+			.filter(column => column.getName().replace(/\s*\(\d+\)$/g, '') === name)
+			.length;
+
+		defaults.setName(`${name} (${duplicate_count})`);
+
 		const duplicate_column = defaults.clone()
 			.setColumnIndex(this.#columns.length)
 			.setDefaults(defaults)
 			.setDuplicate(true)
 			.merge(user_column);
-
-		if (duplicate_name) {
-			const name = column.getName().replace(/\s*\(\d+\)$/g, '');
-
-			const duplicate_count = this.#columns
-				.filter(column => column.getName().replace(/\s*\(\d+\)$/g, '') === name)
-				.length;
-
-			duplicate_column.setName(`${name} (${duplicate_count})`);
-		}
 
 		const start = this.#columns.indexOf(column) + 1;
 		this.#columns.splice(start, 0, duplicate_column);
@@ -2252,27 +2306,42 @@ class CDataTable {
 		return min_width;
 	}
 
-	#calculateColumnWidths(response) {
-		this.#row_spacer_width = '0px';
+	#resetCalculatedOverrides(column) {
+		const overrides = column.getOverrides();
 
-		this.#applyColumnWidths();
-
-		for (const column of this.#visible_columns.filter(column => column.getWidth() === 'max-content')) {
-			this.#calculateColumnWidth(column);
+		for (const override of this.#calculated_overrides) {
+			if (override in overrides) {
+				delete overrides[override];
+			}
 		}
 
+		column.setOverrides(overrides);
+	}
+
+	#calculateColumnWidths() {
+		for (const column of this.#columns.filter(column => !column.isResized())) {
+			this.#resetCalculatedOverrides(column);
+
+			column.setWidth(column.getDefaults().getWidth());
+		}
+
+		this.#row_spacer_width = '0px';
 		this.#applyColumnWidths();
 
-		if ('data' in response && response.data.length > 0) {
-			for (const column of this.#visible_columns) {
+		requestAnimationFrame(() => {
+			for (const column of this.#visible_columns.filter(column => column.getWidth() !== 'auto')) {
 				this.#calculateColumnWidth(column);
 			}
 
 			this.#applyColumnWidths();
-		}
 
-		this.#row_spacer_width = 'auto';
-		this.#applyColumnWidths();
+			for (const column of this.#visible_columns.filter(column => column.getWidth() === 'auto')) {
+				this.#calculateColumnWidth(column);
+			}
+
+			this.#row_spacer_width = 'auto';
+			this.#applyColumnWidths();
+		});
 	}
 
 	#calculateColumnWidth(column) {
@@ -2280,24 +2349,44 @@ class CDataTable {
 			return;
 		}
 
-		let min_width = this.#getColumnMinWidth(column);
-		if (this.#customizable && this.#visible_columns.at(-1) === column) {
-			min_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
+		const overrides = column.getOverrides();
+
+		const min_width = this.#getColumnMinWidth(column);
+
+		let header_width = Math.floor(column.getHeaderCell()?.target.getBoundingClientRect().width ?? 0);
+		if (!('width' in overrides) && this.#visible_columns.length > 2
+				&& this.#visible_columns.at(-1) === column && column.getDefaults().getWidth() !== 'auto') {
+			header_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
 		}
 
-		const header_width = column.getHeaderCell()?.target.getBoundingClientRect().width ?? 0;
-		const data_width = column.getDataCells().at(0)?.target.getBoundingClientRect().width ?? 0;
+		const data_width = Math.floor(column.getDataCells().at(0)?.target.getBoundingClientRect().width ?? 0);
 
-		let width = Math.ceil(Math.max(min_width, header_width, data_width));
+		let width = Math.max(min_width, header_width, data_width);
 
-		column.setWidth(`${width}px`);
+		if (column.getWidth() === 'max-content') {
+			width += 2;
+		}
+
+		const default_width = column.getDefaults().getWidth();
+
+		if (default_width === 'max-content') {
+			width = Math.min(width, CDataTable.COLUMN_MAX_ALLOWED_CALC_WIDTH);
+		}
+		else if (default_width === 'auto') {
+			width = Math.max(width, CDataTable.COLUMN_MIN_ALLOWED_CALC_WIDTH);
+		}
+
+		const calculated_width = `${width}px`;
+
+		column.setWidth(calculated_width)
+			.setOverrides({...overrides, width: calculated_width});
 	}
 
 	#renderHeaderCells() {
 		for (const column of this.#columns) {
 			const header_cell = column.getHeaderCell();
 
-			if (header_cell) {
+			if (header_cell !== null) {
 				header_cell.target.remove();
 
 				column.setHeaderCell(null);
@@ -2397,7 +2486,7 @@ class CDataTable {
 			return;
 		}
 
-		table_options.style.right = `${-this.#body.scrollLeft}px`;
+		table_options.style.right = `${Math.min(0, -this.#body.scrollLeft)}px`;
 		table_options.classList.remove(ZBX_STYLE_HIDDEN);
 	}
 
@@ -2479,18 +2568,23 @@ class CDataTable {
 	}
 
 	onWindowResize = () => {
-		this.getData().then(response => {
-			for (const column of this.#visible_columns.filter(column => !column.isResized())) {
-				column.resetWidth();
-			}
+		this.#calculateColumnWidths();
 
-			this.#calculateColumnWidths(response);
+		requestAnimationFrame(() => {
 			this.#handleScrollbar();
 		});
+
+		this.#options_popup?.position();
+		this.#options_popup?.resize();
+	}
+
+	onWindowBeforeUnload = () => {
+		window.unloading = true;
 	}
 
 	onWrapperScroll = () => {
 		this.#options_popup?.position();
+		this.#options_popup?.resize();
 	}
 
 	#bindEvents() {
@@ -2503,6 +2597,8 @@ class CDataTable {
 				.on(CPager.EVENT_SELECT, this.onPagerSelect)
 				.on(CPager.EVENT_STATE_CHANGE, this.onPagerStateChange);
 		}
+
+		window.addEventListener('beforeunload', this.onWindowBeforeUnload);
 
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.addEventListener('scroll', this.onWrapperScroll);
 
@@ -2535,6 +2631,7 @@ class CDataTable {
 		}
 
 		window.removeEventListener('resize', this.onWindowResize);
+		window.removeEventListener('beforeunload', this.onWindowBeforeUnload);
 
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.removeEventListener('scroll', this.onWrapperScroll);
 
@@ -2560,7 +2657,7 @@ class CDataTable {
 		this.#user_configs[index] = this.getConfig();
 
 		this.#updateUserProfile(JSON.stringify(this.#user_configs[index]), [index])
-			.finally(() => window.location.reload(true));
+			.finally(() => window.location.reload());
 	}
 
 	onTabfilterDelete = e => {
@@ -2582,6 +2679,11 @@ class CDataTable {
 
 	#bindColumnResizeEvent(column, resizer) {
 		resizer.addEventListener('pointerdown', e => {
+			// Continue only, if left mouse button.
+			if (e.which !== 1) {
+				return false;
+			}
+
 			resizer.setPointerCapture(e.pointerId);
 
 			this.dispatchEvent(CDataTable.EVENT_COLUMN_RESIZE_START, {
@@ -2620,7 +2722,7 @@ class CDataTable {
 	}
 
 	/**
-	 * @returns {Promise<any>}
+	 * @returns {Promise<any>|void}
 	 */
 	#updateUserProfile(value, idx2) {
 		if (!this.#storage_idx) {
@@ -2693,11 +2795,7 @@ class CDataTable {
 	}
 
 	#handleScrollbar() {
-		const total_column_width = this.#columns
-			.filter(column => column.getHeaderCell())
-			.reduce((width, column) => width + column.getHeaderCell().target.offsetWidth, 0);
-
-		if (total_column_width - 2 <= this.#body.clientWidth) {
+		if (this.#body.scrollWidth === this.#element.clientWidth) {
 			this.#body_resize_observer?.disconnect();
 			this.#body_resize_observer = null;
 
@@ -2717,7 +2815,6 @@ class CDataTable {
 
 		if (this.#scrollbar) {
 			this.#updateScrollbarInnerWidth();
-			this.#applyLastColumnPadding();
 
 			return;
 		}
@@ -2727,7 +2824,6 @@ class CDataTable {
 
 		this.#bindScrollbarEvents();
 		this.#updateScrollbarInnerWidth();
-		this.#applyLastColumnPadding();
 
 		this.#element.insertBefore(this.#scrollbar, this.#footer);
 	}
@@ -2745,12 +2841,13 @@ class CDataTable {
 			return;
 		}
 
-		const header_resizer = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER}`);
+		const header_resizer = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_HEADER_RESIZER}`);
+		const header_cell_rect = header_cell.target.getBoundingClientRect();
 		const element_rect = this.#element.getBoundingClientRect();
 
-		const right_edge = header_cell.target.getBoundingClientRect().right - element_rect.left + 1;
-		const right_boundary = element_rect.width - table_options_button.clientWidth;
-		const right_offset = right_edge > right_boundary || this.#body.scrollWidth > element_rect.width
+		const right_edge = header_cell_rect.right - element_rect.left - 1;
+		const right_boundary = this.#element.clientWidth - table_options_button.clientWidth;
+		const right_offset = right_edge > right_boundary
 			? Math.max(0, Math.min(table_options_button.clientWidth, right_edge - right_boundary))
 			: 0;
 
