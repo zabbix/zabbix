@@ -155,6 +155,8 @@ Threshold macros could be used with a context to fine tune threshold for differe
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
+|Get month cost|<p>Collects Oracle month cost.</p>|Dependent item|oci_cost.month.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.monthly_cost_history`</p></li></ul>|
+|Daily average cost|<p>Oracle daily average cost.</p>|Calculated|oci_cost.daily.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Usage, get data|<p>Master item to get usage info.</p>|Script|oci_cost.usage.get|
 |Budgets, get data|<p>Master item to get budget info.</p>|Script|oci_cost.budget.get|
 |Total: Hourly cost|<p>The hourly cost of the total.</p>|Dependent item|oci_cost.usage.total.cost.hourly<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.hourly.items[*].computedAmount.sum()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -182,6 +184,19 @@ Threshold macros could be used with a context to fine tune threshold for differe
 |OCI Costs: Current day costs exceeded previous|<p>Current day costs exceeded previous.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.usage.total.cost.daily.delta.percentage)>{$OCI.COST.TOTAL.DAILY.DELTA.PERCENTAGE.WARN}`|Warning|**Manual close**: Yes|
 |OCI Costs: Number of compartments has changed|<p>Number of compartments has changed.</p>|`change(/Oracle Cloud Costs by HTTP/oci_cost.compartment.count)<>0`|Info|**Manual close**: Yes|
 |OCI Costs: Number of regions has changed|<p>Number of regions has changed.</p>|`change(/Oracle Cloud Costs by HTTP/oci_cost.region.count)<>0`|Warning|**Manual close**: Yes|
+
+### LLD rule Month discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month discovery|<p>Discovers month cost history.</p>|Dependent item|oci_cost.month.discovery|
+
+### Item prototypes for Month discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month [{#OCI.MONTH}]: Get data|<p>Collects month cost history.</p>|Dependent item|oci_cost.month.cost.data.get[{#OCI.MONTH}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.month=="{#OCI.MONTH}")].first()`</p></li></ul>|
+|Month [{#OCI.MONTH}]: Total cost|<p>Oracle `{#OCI.MONTH}` month total cost.</p>|Dependent item|oci_cost.month.total.cost[{#OCI.MONTH}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cost`</p></li></ul>|
 
 ### LLD rule Budget discovery
 

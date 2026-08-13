@@ -14,7 +14,6 @@
 
 #include "zbxcfg.h"
 
-#include "zbxcommon.h"
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxfile.h"
@@ -1083,103 +1082,6 @@ int	zbx_cfg_prepare_bridge_adapter_connect_to(const char *url, const char *conne
 	ret = SUCCEED;
 out:
 	zbx_free(url_host);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parse and validate list of item types                             *
- *                                                                            *
- * Parameters:  itemtypes     - [IN] comma delimited list of item type names  *
- *              itemtype_mask - [OUT] item types mask                         *
- *              error         - [OUT] error message with invalid token value  *
- *                                                                            *
- * Return value: SUCCEED - valid configuration                                *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: empty tokens (delimiters without a value, e.g. a leading,        *
- *           trailing or doubled comma) and duplicate item types are         *
- *           treated as invalid configuration.                               *
- *                                                                            *
- ******************************************************************************/
-int	zbx_parse_item_types(const char *itemtypes, zbx_uint32_t *itemtype_mask, char **error)
-{
-	typedef struct
-	{
-		const char	*name;
-		zbx_item_type_t	type;
-	}
-	zbx_item_type_name_t;
-
-	const zbx_item_type_name_t	item_type_names[] = ZBX_ITEM_TYPE_NAME;
-	const char			*token = NULL, *list = itemtypes;
-	size_t				token_len;
-	zbx_uint32_t			mask = 0;
-	int				ret = SUCCEED;
-
-	if (NULL == itemtypes)
-	{
-		if (NULL != itemtype_mask)
-			*itemtype_mask = mask;
-
-		return SUCCEED;
-	}
-
-	while (SUCCEED == zbx_str_list_next(&list, ',', &token, &token_len))
-	{
-		int		i;
-		zbx_uint32_t	bit;
-
-		if (0 == token_len)
-		{
-			if (NULL != error)
-				*error = zbx_dsprintf(NULL, "empty item type value");
-
-			ret = FAIL;
-			break;
-		}
-
-		for (i = 0; NULL != item_type_names[i].name; i++)
-		{
-			if (strlen(item_type_names[i].name) == token_len &&
-					0 == strncmp(token, item_type_names[i].name, token_len))
-			{
-				break;
-			}
-		}
-
-		if (NULL == item_type_names[i].name)
-		{
-			if (NULL != error)
-			{
-				*error = zbx_dsprintf(NULL, "unknown item type \"%.*s\"", (int)token_len,
-						token);
-			}
-
-			ret = FAIL;
-			break;
-		}
-
-		bit = (zbx_uint32_t)(1u << item_type_names[i].type);
-
-		if (0 != (mask & bit))
-		{
-			if (NULL != error)
-			{
-				*error = zbx_dsprintf(NULL, "duplicate item type \"%.*s\"", (int)token_len,
-						token);
-			}
-
-			ret = FAIL;
-			break;
-		}
-
-		mask |= bit;
-	}
-
-	if (SUCCEED == ret && NULL != itemtype_mask)
-		*itemtype_mask = mask;
 
 	return ret;
 }
