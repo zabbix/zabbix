@@ -107,13 +107,13 @@ window.ceprule_edit_popup = new class {
 
 	#initTemplates() {
 		this.#condition_row_template_value = new Template(
-			`<div class="text">#{name} #{operator} <em>#{value}</em>.</div>`
+			`<div class="text">#{name} #{operator} <em>#{value}</em></div>`
 		);
 		this.#condition_row_template_tag = new Template(
-			`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em>.</div>`
+			`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em></div>`
 		);
 		this.#condition_row_template_tag_exists = new Template(
-			`<div class="text">#{name} <em>#{tag_name}</em> #{operator}.</div>`
+			`<div class="text">#{name} <em>#{tag_name}</em> #{operator}</div>`
 		);
 		this.#condition_row_template = new Template(window['ceprule-condition-row-template'].innerHTML);
 		this.#operation_row_template = new Template(window['ceprule-operation-row-template'].innerHTML);
