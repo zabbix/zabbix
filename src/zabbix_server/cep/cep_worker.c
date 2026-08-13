@@ -1016,6 +1016,9 @@ static void	cep_worker_expect_events(zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_vector_db_event_t	db_events;
 
+	if (0 == tasks->values_num)
+		return;
+
 	zbx_vector_db_event_create(&db_events);
 
 	for (int i = 0; i < tasks->values_num; i++)
@@ -1089,12 +1092,14 @@ void	*cep_worker_entry(void *args)
 					break;
 				case CEP_TASK_EVENT:
 					cep_worker_process_task_event(worker, (zbx_cep_task_event_t *)task, &tasks);
+					cep_worker_expect_events(&tasks);
 					break;
 				case CEP_TASK_COMMIT:
 					cep_worker_process_task_commit(worker, (zbx_cep_task_commit_t *)task);
 					break;
 				case CEP_TASK_WINDOW:
 					cep_worker_process_task_window((zbx_cep_task_window_t *)task, &tasks);
+					cep_worker_expect_events(&tasks);
 					break;
 				case CEP_TASK_RULE_RESET:
 					cep_worker_process_task_rule_reset((zbx_cep_task_rule_reset_t *)task);
@@ -1113,7 +1118,6 @@ void	*cep_worker_entry(void *args)
 			cep_queue_push_completed((zbx_cep_queue_t *)worker->base.queue, task);
 			if (0 != tasks.values_num)
 			{
-				cep_worker_expect_events(&tasks);
 				cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
 				zbx_vector_mw_task_ptr_clear(&tasks);
 			}
