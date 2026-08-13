@@ -376,6 +376,16 @@ abstract class CControllerPopupItemTest extends CController {
 	 * @return array
 	 */
 	protected function getItemTestProperties(array $input, bool $for_server = false): array {
+		if ($for_server && in_array($this->item_type, $this->items_support_proxy)
+				&& (!array_key_exists('timeout', $input) || $input['timeout'] === '')
+				&& $this->getInput('test_with', self::TEST_WITH_SERVER) == self::TEST_WITH_PROXY) {
+			$global_timeouts = getInheritedTimeouts('0');
+
+			if (array_key_exists($this->item_type, $global_timeouts['timeouts'])) {
+				$input['timeout'] = $global_timeouts['timeouts'][$this->item_type];
+			}
+		}
+
 		$data_host = [];
 		$data_item = [
 			'value_type' => (int) $input['value_type']
