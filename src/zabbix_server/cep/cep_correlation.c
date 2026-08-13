@@ -610,7 +610,6 @@ static void	correlation_add_close_new_task(zbx_vector_mw_task_ptr_t *tasks, cons
 	zbx_db_event	*close_event;
 
 	close_event = cep_create_close_event(db_event);
-	cep_event_expect(close_event);
 
 	task = cep_create_task_event_by_correlation(close_event, result->eventid,
 			result->correlationid, db_event->eventid);
@@ -677,7 +676,6 @@ static void	correlation_add_close_old_tasks(zbx_dbconn_t *db, zbx_uint64_t c_eve
 			continue;
 
 		db_event = zbx_create_trigger_event(&triggers[index], result->clock, result->ns, TRIGGER_VALUE_OK);
-		cep_event_expect(db_event);
 		task = cep_create_task_event_by_correlation(db_event, result->eventid, result->correlationid,
 				c_eventid);
 		zbx_vector_mw_task_ptr_append(tasks, task);

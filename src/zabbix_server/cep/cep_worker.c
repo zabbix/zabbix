@@ -991,19 +991,9 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 	zbx_vector_mw_task_ptr_destroy(&event_tasks);
 }
 
-static void	cep_worker_process_task_window(zbx_cep_worker_t *worker, zbx_cep_task_window_t *task)
+static void	cep_worker_process_task_window(zbx_cep_task_window_t *task, zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_vector_mw_task_ptr_t	tasks;
-
-	zbx_vector_mw_task_ptr_create(&tasks);
-
-	cep_window_process(task->window, task->now, &tasks);
-
-	zbx_mw_queue_lock(worker->base.queue);
-	cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
-	zbx_mw_queue_unlock(worker->base.queue);
-
-	zbx_vector_mw_task_ptr_destroy(&tasks);
+	cep_window_process(task->window, task->now, tasks);
 }
 
 /******************************************************************************
@@ -1020,6 +1010,26 @@ static void	cep_worker_process_task_rule_reset(zbx_cep_task_rule_reset_t *task)
 	cep_window_pool_acquire(&pool);
 	cep_window_pool_reset_rule(pool, task->ruleid);
 	cep_window_pool_release(&pool);
+}
+
+static void	cep_worker_expect_events(zbx_vector_mw_task_ptr_t *tasks)
+{
+	zbx_vector_db_event_t	db_events;
+
+	zbx_vector_db_event_create(&db_events);
+
+	for (int i = 0; i < tasks->values_num; i++)
+	{
+		if (CEP_TASK_EVENT != tasks->values[i]->type)
+			continue;
+
+		zbx_vector_db_event_append(&db_events, ((zbx_cep_task_event_t *)tasks->values[i])->db_event);
+	}
+
+	if (0 != db_events.values_num)
+		cep_events_expect(db_events.values, db_events.values_num);
+
+	zbx_vector_db_event_destroy(&db_events);
 }
 
 /******************************************************************************
@@ -1084,7 +1094,7 @@ void	*cep_worker_entry(void *args)
 					cep_worker_process_task_commit(worker, (zbx_cep_task_commit_t *)task);
 					break;
 				case CEP_TASK_WINDOW:
-					cep_worker_process_task_window(worker, (zbx_cep_task_window_t *)task);
+					cep_worker_process_task_window((zbx_cep_task_window_t *)task, &tasks);
 					break;
 				case CEP_TASK_RULE_RESET:
 					cep_worker_process_task_rule_reset((zbx_cep_task_rule_reset_t *)task);
@@ -1103,6 +1113,7 @@ void	*cep_worker_entry(void *args)
 			cep_queue_push_completed((zbx_cep_queue_t *)worker->base.queue, task);
 			if (0 != tasks.values_num)
 			{
+				cep_worker_expect_events(&tasks);
 				cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
 				zbx_vector_mw_task_ptr_clear(&tasks);
 			}
