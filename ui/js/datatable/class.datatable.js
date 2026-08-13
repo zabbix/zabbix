@@ -404,8 +404,7 @@ class CDataTable {
 			default: ({column, cell}) => {
 				if (column.isSortable()) {
 					const sort_field = column.getSortField() || column.getId();
-
-					let sort_order = this.#sort_order;
+					const sort_order = this.#sort_order === ZBX_SORT_UP ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
 					const label = document.createElement('span');
 					label.classList.add('name');
@@ -417,8 +416,6 @@ class CDataTable {
 					header_link.classList.add(CDataTable.ZBX_STYLE_HEADER_LINK);
 
 					if (this.#sort_field === sort_field) {
-						sort_order = sort_order === ZBX_SORT_UP ? ZBX_SORT_DOWN : ZBX_SORT_UP;
-
 						icon.classList.add(sort_order === ZBX_SORT_UP ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 						header_link.classList.add(CDataTable.ZBX_STYLE_HEADER_LINK_SORTED);
 					}
@@ -1009,7 +1006,7 @@ class CDataTable {
 	}
 
 	isCustomizable() {
-		return this.#customizable;
+		return this.#customizable && (this.#columns.length > 0 || this.#options.length > 0);
 	}
 
 	setPage(page) {
@@ -1822,7 +1819,7 @@ class CDataTable {
 			row.appendChild(data_cell.target);
 		}
 
-		if (this.#customizable) {
+		if (this.isCustomizable()) {
 			this.createRowSpacer(row);
 		}
 
@@ -1964,7 +1961,7 @@ class CDataTable {
 	}
 
 	#setUserConfig(tabfilter_idx) {
-		if (!this.#customizable && !this.#resizable) {
+		if (!this.isCustomizable() && !this.#resizable) {
 			return;
 		}
 
@@ -2393,7 +2390,7 @@ class CDataTable {
 			}
 		}
 
-		if (this.#customizable) {
+		if (this.isCustomizable()) {
 			this.createRowSpacer(this.#header);
 			this.#createTableOptionsButton();
 		}
@@ -2403,7 +2400,7 @@ class CDataTable {
 
 			column.setHeaderCell(header_cell);
 
-			if (this.#customizable) {
+			if (this.isCustomizable()) {
 				const row_spacer = this.findRowSpacer(this.#header);
 
 				this.#header.insertBefore(header_cell.target, row_spacer);
@@ -2413,7 +2410,7 @@ class CDataTable {
 			}
 		}
 
-		if (this.#customizable) {
+		if (this.isCustomizable()) {
 			this.#updateTableOptionsButtonPosition();
 		}
 	}
@@ -2421,7 +2418,7 @@ class CDataTable {
 	#applyColumnWidths() {
 		const column_widths = this.#visible_columns.map(column => column.getWidth());
 
-		if (this.#customizable) {
+		if (this.isCustomizable()) {
 			column_widths.push(this.#row_spacer_width);
 		}
 
@@ -2477,7 +2474,7 @@ class CDataTable {
 	}
 
 	#updateTableOptionsButtonPosition() {
-		if (!this.#customizable) {
+		if (!this.isCustomizable()) {
 			return;
 		}
 
@@ -2829,15 +2826,19 @@ class CDataTable {
 	}
 
 	#applyLastColumnPadding() {
-		if (!this.#customizable) {
+		if (!this.isCustomizable()) {
 			return;
 		}
 
 		const column = this.#visible_columns.at(-1);
+		if (!column) {
+			return;
+		}
+
 		const header_cell = column.getHeaderCell();
 		const table_options_button = this.#findTableOptionsButton();
 
-		if (!column || !header_cell || !table_options_button) {
+		if (!header_cell || !table_options_button) {
 			return;
 		}
 

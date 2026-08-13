@@ -81,7 +81,7 @@ class CPager {
 		this.#element.querySelector(`.${ZBX_STYLE_PAGER_CONTAINER}`)?.remove();
 		this.#element.querySelector(`.${ZBX_STYLE_TABLE_STATS}`)?.remove();
 
-		if (this.#page != page) {
+		if (page > 0 && this.#page !== page) {
 			this.#page = page;
 
 			this.dispatchEvent(CPager.EVENT_STATE_CHANGE, {page});

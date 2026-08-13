@@ -219,7 +219,9 @@
 
 	.datatable-header {
 		display: grid;
+		height: calc(var(--datatable-row-height) + 1px);
 		overflow: hidden;
+		background-color: $ui-bg-color;
 		border-top-left-radius: var(--surface-border-radius);
 		border-top-right-radius: var(--surface-border-radius);
 

@@ -382,6 +382,32 @@ define('HOST_STATUS_MONITORED',		0);
 define('HOST_STATUS_NOT_MONITORED',	1);
 define('HOST_STATUS_TEMPLATE',		3);
 
+define('APM_ATTR_EVAL_TYPE_AND_OR',	0);
+define('APM_ATTR_EVAL_TYPE_OR',		2);
+
+define('APM_ATTR_OPERATOR_LIKE',		0);
+define('APM_ATTR_OPERATOR_EQUAL',		1);
+define('APM_ATTR_OPERATOR_NOT_LIKE',	2);
+define('APM_ATTR_OPERATOR_NOT_EQUAL',	3);
+define('APM_ATTR_OPERATOR_EXISTS',		4);
+define('APM_ATTR_OPERATOR_NOT_EXISTS',	5);
+
+define('APM_TRACE_STATUS_OK',		0);
+define('APM_TRACE_STATUS_ERROR',	1);
+define('APM_TRACE_STATUS_UNSET',	2);
+
+define('APM_METRIC_TYPE_COUNTER',	0);
+define('APM_METRIC_TYPE_GAUGE',		1);
+define('APM_METRIC_TYPE_HISTOGRAM',	2);
+define('APM_METRIC_TYPE_SUMMARY',	3);
+
+define('APM_LOG_SEVERITY_TRACE',	0);
+define('APM_LOG_SEVERITY_DEBUG',	1);
+define('APM_LOG_SEVERITY_INFO',		2);
+define('APM_LOG_SEVERITY_WARNING',	3);
+define('APM_LOG_SEVERITY_ERROR',	4);
+define('APM_LOG_SEVERITY_FATAL',	5);
+
 define('PROXY_OPERATING_MODE_ACTIVE',	0);
 define('PROXY_OPERATING_MODE_PASSIVE',	1);
 
@@ -2081,6 +2107,7 @@ define('ZBX_STYLE_FORM_SUBFIELD', 'form-subfield');
 define('ZBX_STYLE_FORM_FIELDS_HINT', 'form-fields-hint');
 define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
 define('ZBX_STYLE_FORM_SUBMIT_HIDDEN', 'form-submit-hidden');
+define('ZBX_STYLE_FORM_ROW', 'form_row');
 define('ZBX_STYLE_FORMATED_GROUP', 'formated-group');
 define('ZBX_STYLE_FORMATED_TEXT', 'formated-text');
 define('ZBX_STYLE_GREEN', 'green');
@@ -2407,6 +2434,7 @@ define('ZBX_ICON_LINK_EXTERNAL_SMALL', 'zi-link-external-small');
 define('ZBX_ICON_LOCK', 'zi-lock');
 define('ZBX_ICON_MENU', 'zi-menu');
 define('ZBX_ICON_MONITORING', 'zi-monitoring');
+define('ZBX_ICON_APM', 'zi-apm');
 define('ZBX_ICON_MINIMIZE', 'zi-minimize');
 define('ZBX_ICON_MORE', 'zi-more');
 define('ZBX_ICON_PAUSE', 'zi-pause');

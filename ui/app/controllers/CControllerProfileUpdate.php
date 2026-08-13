@@ -88,9 +88,12 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.device.list.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
-				case 'web.monitoring.problem.datatable':
-				case 'web.monitoring.latest.datatable':
+				case 'web.apm.logs.datatable':
+				case 'web.apm.metrics.datatable':
+				case 'web.apm.traces.datatable':
 				case 'web.monitoring.hosts.datatable':
+				case 'web.monitoring.latest.datatable':
+				case 'web.monitoring.problem.datatable':
 				case 'web.hosts.datatable':
 				case 'web.templates.datatable':
 				case 'web.banner.dismissed_ids':
@@ -114,9 +117,12 @@ class CControllerProfileUpdate extends CController {
 				case 'web.dashboard.last_widget_type':
 				case 'web.dashboard.widget.geomap.default_view':
 				case 'web.dashboard.widget.geomap.severity_filter':
-				case 'web.monitoring.problem.datatable':
-				case 'web.monitoring.latest.datatable':
+				case 'web.apm.logs.datatable':
+				case 'web.apm.metrics.datatable':
+				case 'web.apm.traces.datatable':
 				case 'web.monitoring.hosts.datatable':
+				case 'web.monitoring.latest.datatable':
+				case 'web.monitoring.problem.datatable':
 				case 'web.hosts.datatable':
 				case 'web.templates.datatable':
 				case 'web.banner.dismissed_ids':
@@ -158,9 +164,12 @@ class CControllerProfileUpdate extends CController {
 				break;
 			case 'web.dashboard.widget.geomap.default_view':
 			case 'web.dashboard.widget.geomap.severity_filter':
-			case 'web.monitoring.problem.datatable':
-			case 'web.monitoring.latest.datatable':
+			case 'web.apm.logs.datatable':
+			case 'web.apm.metrics.datatable':
+			case 'web.apm.traces.datatable':
 			case 'web.monitoring.hosts.datatable':
+			case 'web.monitoring.latest.datatable':
+			case 'web.monitoring.problem.datatable':
 			case 'web.hosts.datatable':
 			case 'web.templates.datatable':
 				$value_str = $this->getInput('value_str');

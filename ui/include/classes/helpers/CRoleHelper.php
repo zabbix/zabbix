@@ -25,6 +25,9 @@ class CRoleHelper {
 	public const UI_MONITORING_LATEST_DATA = 'ui.monitoring.latest_data';
 	public const UI_MONITORING_MAPS = 'ui.monitoring.maps';
 	public const UI_MONITORING_DISCOVERY = 'ui.monitoring.discovery';
+	public const UI_APM_TRACES = 'ui.apm.traces';
+	public const UI_APM_METRICS = 'ui.apm.metrics';
+	public const UI_APM_LOGS = 'ui.apm.logs';
 	public const UI_INVENTORY_OVERVIEW = 'ui.inventory.overview';
 	public const UI_INVENTORY_HOSTS = 'ui.inventory.hosts';
 	public const UI_REPORTS_SYSTEM_INFO = 'ui.reports.system_info';
@@ -89,6 +92,7 @@ class CRoleHelper {
 
 	public const UI_SECTION_DASHBOARDS = 'ui.dashboards';
 	public const UI_SECTION_MONITORING = 'ui.monitoring';
+	public const UI_SECTION_APM = 'ui.apm';
 	public const UI_SECTION_SERVICES = 'ui.services';
 	public const UI_SECTION_INVENTORY = 'ui.inventory';
 	public const UI_SECTION_REPORTS = 'ui.reports';
@@ -256,6 +260,9 @@ class CRoleHelper {
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules = array_merge($rules, [
 				self::UI_MONITORING_DISCOVERY,
+				self::UI_APM_TRACES,
+				self::UI_APM_METRICS,
+				self::UI_APM_LOGS,
 				self::UI_SERVICES_SLA,
 				self::UI_REPORTS_SCHEDULED_REPORTS,
 				self::UI_REPORTS_SYSTEM_INFO,
@@ -352,6 +359,7 @@ class CRoleHelper {
 		$sections = [
 			self::UI_SECTION_DASHBOARDS => _('Dashboards'),
 			self::UI_SECTION_MONITORING => _('Monitoring'),
+			self::UI_SECTION_APM => _('APM'),
 			self::UI_SECTION_SERVICES => _('Services'),
 			self::UI_SECTION_INVENTORY => _('Inventory'),
 			self::UI_SECTION_REPORTS => _('Reports')
@@ -399,6 +407,19 @@ class CRoleHelper {
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels += [self::UI_MONITORING_DISCOVERY => _('Discovery')];
+				}
+
+				return $labels;
+
+			case self::UI_SECTION_APM:
+				$labels = [];
+
+				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [
+						self::UI_APM_TRACES => _('Traces'),
+						self::UI_APM_METRICS => _('Metrics'),
+						self::UI_APM_LOGS => _('Logs')
+					];
 				}
 
 				return $labels;
