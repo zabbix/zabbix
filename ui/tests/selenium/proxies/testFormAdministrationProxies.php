@@ -78,7 +78,8 @@ class testFormAdministrationProxies extends CWebTest {
 				'timeout_ssh_agent' => '300s',
 				'timeout_telnet_agent' => '300s',
 				'timeout_script' => '300s',
-				'timeout_browser' => '300s'
+				'timeout_browser' => '300s',
+				'timeout_telemetry_query' => '300s'
 			],
 			[
 				'name' => self::CHANGE_PASSIVE_PROXY,
@@ -100,7 +101,8 @@ class testFormAdministrationProxies extends CWebTest {
 				'timeout_ssh_agent' => '300s',
 				'timeout_telnet_agent' => '300s',
 				'timeout_script' => '300s',
-				'timeout_browser' => '300s'
+				'timeout_browser' => '300s',
+				'timeout_telemetry_query' => '300s'
 			]
 		]);
 	}
@@ -547,7 +549,7 @@ class testFormAdministrationProxies extends CWebTest {
 
 				// Available timeouts list.
 				$timeouts = ['Zabbix agent', 'Simple check', 'SNMP agent', 'External check', 'Database monitor',
-						'HTTP agent', 'SSH agent', 'TELNET agent', 'Script', 'Browser'
+						'HTTP agent', 'SSH agent', 'TELNET agent', 'Script', 'Browser', 'Telemetry query'
 				];
 
 				// Every timeout has mandatory status.
