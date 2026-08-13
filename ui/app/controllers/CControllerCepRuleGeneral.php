@@ -162,7 +162,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 						]
 					]
 				],
-				'value' => ['db cep_operation_condition.value', 'required',
+				'value' => ['db cep_operation_condition.tag_value', 'required',
 					'when' => [
 						['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]],
 						['operator', 'not_in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]]

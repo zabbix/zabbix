@@ -291,7 +291,7 @@ class CCepRule extends CApiService {
 
 		if ($operation_ruleids) {
 			$filter_options = [
-				'output' => ['cep_operationid', 'type', 'operator', 'tag', 'value'],
+				'output' => ['cep_operationid', 'type', 'operator', 'tag', 'tag_value'],
 				'filter' => ['cep_operationid' => array_keys($operation_ruleids)]
 			];
 			$resource = DBselect(DB::makeSql('cep_operation_condition', $filter_options));
@@ -785,8 +785,8 @@ class CCepRule extends CApiService {
 				'value' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'type', 'in' => implode(',', [
 												ZBX_CONDITION_TYPE_EVENT_TAG_VALUE
-											])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_operation_condition', 'value')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation_condition', 'value')]
+											])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_operation_condition', 'tag_value')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation_condition', 'tag_value')]
 				]]
 									]
 			]
@@ -1217,7 +1217,7 @@ class CCepRule extends CApiService {
 	private static function getOperationConditionId(array $condition, array $db_conditions): ?string {
 		$condition += [
 			'tag' => DB::getDefault('cep_operation_condition', 'tag'),
-			'value' => DB::getDefault('cep_operation_condition', 'value')
+			'value' => DB::getDefault('cep_operation_condition', 'tag_value')
 		];
 
 		foreach ($db_conditions as $db_condition) {
@@ -1416,7 +1416,7 @@ class CCepRule extends CApiService {
 		}
 
 		$options = [
-			'output' => ['cep_operation_conditionid', 'cep_operationid', 'type', 'tag', 'operator', 'value'],
+			'output' => ['cep_operation_conditionid', 'cep_operationid', 'type', 'tag', 'operator', 'tag_value'],
 			'filter' => ['cep_operationid' => array_keys($db_operations)]
 		];
 		$resource = DBselect(DB::makeSql('cep_operation_condition', $options));

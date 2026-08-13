@@ -10642,7 +10642,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '0'
+				'default' => '10m'
 			],
 			'capacity' => [
 				'null' => false,
@@ -10704,7 +10704,8 @@ return [
 			'group_by' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10
+				'length' => 10,
+				'default' => '0'
 			],
 			'groupid' => [
 				'null' => true,
@@ -10731,7 +10732,8 @@ return [
 			'nextcheck' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
@@ -10865,7 +10867,7 @@ return [
 				'length' => 255,
 				'default' => ''
 			],
-			'value' => [
+			'tag_value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
