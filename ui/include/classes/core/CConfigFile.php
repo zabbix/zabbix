@@ -699,7 +699,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$results = [];
 
 		$url_validator = new CUrlValidator(['schemes' => ['http', 'https']]);
-		$https_url_validator = new CurlValidator(['schemes' => ['https']]);
+		$https_url_validator = new CUrlValidator(['schemes' => ['https']]);
 
 		foreach ($providers as $i => $provider) {
 			$path = ($i + 1).'/';
