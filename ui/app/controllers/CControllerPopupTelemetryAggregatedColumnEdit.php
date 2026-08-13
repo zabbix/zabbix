@@ -73,7 +73,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
 				]
 			],
-			'metric_point_type' => ['integer',
+			'metric_point_type' => ['integer', 'required',
 				'in' => [
 					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
@@ -86,11 +86,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 					AGGREGATE_PCTILE
 				]
 			],
-			'column' => ['string', 'required', 'not_empty',
-				'when' => ['function', 'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM,
-					AGGREGATE_PCTILE
-				]]
-			],
+			'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_AGGREGATED_COLUMNS),
 			'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100,
 				'when' => ['function', 'in' => [AGGREGATE_PCTILE]]
 			],
@@ -119,6 +115,11 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 		$data['columns'] = CTelemetryHelper::getAggregatedColumnOptions($data['signal_type'],
 			$data['metric_point_type']
 		);
+
+		if ($data['column'] !== '' && !array_key_exists($data['column'], $data['columns'])) {
+			$data['columns'][$data['column']] = $data['column'];
+		}
+
 		$data['functions'] = CTelemetryHelper::getFunctionLabels();
 
 		$this->setResponse(new CControllerResponseData($data));

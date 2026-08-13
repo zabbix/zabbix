@@ -277,13 +277,13 @@ window.item_edit_form = new class {
 		this.field.value_type.addEventListener('change', this.#valueTypeChangeHandler.bind(this));
 		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
 		this.field.signal_type.addEventListener('change', () => {
-			this.#resetTelemetryColumns();
+			this.#refreshTelemetryColumns();
 			this.updateFieldsVisibility();
 		});
 
 		for (const radio of this.field.metric_point_type) {
 			radio.addEventListener('change', () => {
-				this.#resetTelemetryColumns();
+				this.#refreshTelemetryColumns();
 				this.updateFieldsVisibility();
 			});
 		}
@@ -317,7 +317,10 @@ window.item_edit_form = new class {
 		for (const id of ['aggregated-columns-table', 'conditions-table']) {
 			this.form_element.querySelector(`#${id}`).addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-remove-row')) {
-					e.target.closest('tr').remove();
+					const row = e.target.closest('tr');
+
+					this.#removeRelatedErrorContainer(row);
+					row.remove();
 
 					this.updateFieldsVisibility();
 				}
@@ -599,8 +602,16 @@ window.item_edit_form = new class {
 	}
 
 	#populateColumnSelect(select) {
+		const value = select.value;
+		const names = this.#getTelemetryColumns();
+
 		select.clearOptions();
-		select.addOptions(this.#getTelemetryColumns().map((name) => ({value: name, label: name})));
+		select.addOptions(names.map((name) => ({value: name, label: name})));
+
+		if (value !== null && value !== '' && !names.includes(value)) {
+			select.addOption({value: value, label: value});
+		}
+
 		select.preselectHightlighted();
 	}
 
@@ -634,9 +645,20 @@ window.item_edit_form = new class {
 		this.label.columns_error.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !has_missing_key);
 	}
 
-	#resetTelemetryColumns() {
-		for (const id of ['columns-table', 'aggregated-columns-table', 'conditions-table']) {
-			this.form_element.querySelectorAll(`#${id} tbody tr.form_row`).forEach((row) => row.remove());
+	#refreshTelemetryColumns() {
+		for (const select of this.form_element.querySelectorAll('#columns-table tbody .js-column')) {
+			this.#populateColumnSelect(select);
+			this.#toggleAttributeKey(select);
+		}
+
+		this.#updateColumnsIndicator();
+	}
+
+	#removeRelatedErrorContainer(row) {
+		const next_sibling = row.nextElementSibling;
+
+		if (next_sibling !== null && next_sibling.classList.contains('error-container-row')) {
+			next_sibling.remove();
 		}
 	}
 
@@ -716,6 +738,8 @@ window.item_edit_form = new class {
 		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);
 
 		if (existing !== null) {
+			this.#removeRelatedErrorContainer(existing);
+
 			existing.insertAdjacentHTML('afterend', html);
 			existing.remove();
 		}

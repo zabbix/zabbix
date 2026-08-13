@@ -410,7 +410,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
-			'signal_type' => ['integer',
+			'signal_type' => ['integer', 'required',
 				'in' => [
 					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
@@ -418,7 +418,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
-			'metric_point_type' => ['integer',
+			'metric_point_type' => ['integer', 'required',
 				'in' => [
 					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
@@ -433,7 +433,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 			'columns' => ['objects', 'uniq' => ['column', 'attribute_key'],
 				'messages' => ['uniq' => _('Column and key name combination is not unique.')],
 				'fields' => [
-					'column' => ['string', 'required', 'not_empty'],
+					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_COLUMNS),
 					'attribute_key' => ['string', 'required', 'not_empty',
 						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 					]
@@ -452,11 +452,9 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 							AGGREGATE_PCTILE
 						]
 					],
-					'column' => ['string', 'required', 'not_empty',
-						'when' => ['function', 'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM,
-							AGGREGATE_PCTILE
-						]]
-					],
+					'column' => CTelemetryHelper::getColumnValidationRules(
+						CTelemetryHelper::SECTION_AGGREGATED_COLUMNS
+					),
 					'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100,
 						'when' => ['function', 'in' => [AGGREGATE_PCTILE]]
 					],
@@ -479,7 +477,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 			'conditions' => ['objects', 'uniq' => ['formulaid'],
 				'fields' => [
 					'formulaid' => ['string', 'required', 'not_empty'],
-					'column' => ['string', 'required', 'not_empty'],
+					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_CONDITIONS),
 					'attribute_key' => ['string', 'required', 'not_empty',
 						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 					],

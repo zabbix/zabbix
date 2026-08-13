@@ -733,10 +733,12 @@ $formgrid
 							->setEnabled(!$readonly)
 						))->setColSpan(3)
 					)),
-				new CTemplateTag('aggregated-column-row-tmpl',
+				new CTemplateTag('aggregated-column-row-tmpl', [
 					(new CRow([
 						[
-							new CVar('aggregated_columns[#{row_index}][column]', '#{column}'),
+							(new CInput('hidden', 'aggregated_columns[#{row_index}][column]', '#{column}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setErrorContainer('aggregated_columns-#{row_index}-error-container'),
 							new CVar('aggregated_columns[#{row_index}][function]', '#{function}'),
 							new CVar('aggregated_columns[#{row_index}][percentile]', '#{percentile}'),
 							new CVar('aggregated_columns[#{row_index}][alias]', '#{alias}'),
@@ -747,8 +749,14 @@ $formgrid
 							(new CButtonLink(_('Edit')))->addClass('js-edit-row')->setEnabled(!$readonly),
 							(new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)
 						])))
-					]))->addClass('form_row')->setAttribute('data-row_index', '#{row_index}')
-				)
+					]))->addClass('form_row')->setAttribute('data-row_index', '#{row_index}'),
+					(new CRow())
+						->addClass('error-container-row')
+						->addItem((new CCol())
+							->setId('aggregated_columns-#{row_index}-error-container')
+							->setColSpan(3)
+						)
+				])
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
@@ -795,11 +803,13 @@ $formgrid
 							->setEnabled(!$readonly)
 						))->setColSpan(3)
 					)),
-				new CTemplateTag('condition-row-tmpl',
+				new CTemplateTag('condition-row-tmpl', [
 					(new CRow([
 						[
 							new CVar('conditions[#{row_index}][formulaid]', '#{formulaid}'),
-							new CVar('conditions[#{row_index}][column]', '#{column}'),
+							(new CInput('hidden', 'conditions[#{row_index}][column]', '#{column}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setErrorContainer('conditions-#{row_index}-error-container'),
 							new CVar('conditions[#{row_index}][attribute_key]', '#{attribute_key}'),
 							new CVar('conditions[#{row_index}][operator]', '#{operator}'),
 							new CVar('conditions[#{row_index}][value]', '#{value}'),
@@ -807,8 +817,14 @@ $formgrid
 						],
 						'#{name}',
 						(new CCol((new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)))
-					]))->addClass('form_row')->setAttribute('data-row_index', '#{row_index}')
-				)
+					]))->addClass('form_row')->setAttribute('data-row_index', '#{row_index}'),
+					(new CRow())
+						->addClass('error-container-row')
+						->addItem((new CCol())
+							->setId('conditions-#{row_index}-error-container')
+							->setColSpan(3)
+						)
+				])
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

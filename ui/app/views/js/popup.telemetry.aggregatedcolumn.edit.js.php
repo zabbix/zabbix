@@ -27,6 +27,8 @@ window.telemetry_aggregated_column_popup = new class {
 		this.function.addEventListener('change', () => this.#updateFieldVisibility());
 
 		this.#updateFieldVisibility();
+
+		this.form.validateChanges(['column'], true);
 	}
 
 	#updateFieldVisibility() {

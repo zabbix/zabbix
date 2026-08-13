@@ -105,6 +105,83 @@ class CTelemetryHelper {
 	}
 
 	/**
+	 * Validation rules restricting the column name of the given section to the names allowed for the selected
+	 * signal/metric type. One rule set per signal type, and per metric point type for metrics, so that together
+	 * they cover every selection. Intended as the "column" field rules of a "columns", "aggregated_columns" or
+	 * "conditions" row, and of the aggregated column popup.
+	 *
+	 * @return array
+	 */
+	public static function getColumnValidationRules(string $section): array {
+		$function_when = $section === self::SECTION_AGGREGATED_COLUMNS
+			? [['function', 'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PCTILE]]]
+			: [];
+
+		return [
+			['string', 'required', 'not_empty',
+				'in' => self::getSectionColumns($section, CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES),
+				'messages' => ['in' => _('This column is not available for the selected category.')],
+				'when' => [
+					['../signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES]],
+					...$function_when
+				]
+			],
+			['string', 'required', 'not_empty',
+				'in' => self::getSectionColumns($section, CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS),
+				'messages' => ['in' => _('This column is not available for the selected category.')],
+				'when' => [
+					['../signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS]],
+					...$function_when
+				]
+			],
+			['string', 'required', 'not_empty',
+				'in' => self::getSectionColumns($section, CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM
+				),
+				'messages' => ['in' => _('This column is not available for the selected metric points.')],
+				'when' => [
+					['../signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS]],
+					['../metric_point_type', 'in' => [CItemTypeTelemetryQuery::METRICS_POINT_SUM]],
+					...$function_when
+				]
+			],
+			['string', 'required', 'not_empty',
+				'in' => self::getSectionColumns($section, CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE
+				),
+				'messages' => ['in' => _('This column is not available for the selected metric points.')],
+				'when' => [
+					['../signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS]],
+					['../metric_point_type', 'in' => [CItemTypeTelemetryQuery::METRICS_POINT_GAUGE]],
+					...$function_when
+				]
+			],
+			['string', 'required', 'not_empty',
+				'in' => self::getSectionColumns($section, CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM
+				),
+				'messages' => ['in' => _('This column is not available for the selected metric points.')],
+				'when' => [
+					['../signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS]],
+					['../metric_point_type', 'in' => [CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM]],
+					...$function_when
+				]
+			],
+			['string', 'required', 'not_empty',
+				'in' => self::getSectionColumns($section, CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
+				),
+				'messages' => ['in' => _('This column is not available for the selected metric points.')],
+				'when' => [
+					['../signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS]],
+					['../metric_point_type', 'in' => [CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM]],
+					...$function_when
+				]
+			]
+		];
+	}
+
+	/**
 	 * Display labels for the aggregation functions, keyed by AGGREGATE_* constants.
 	 *
 	 * @return array
