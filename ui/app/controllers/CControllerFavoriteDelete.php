@@ -61,15 +61,20 @@ class CControllerFavoriteDelete extends CController {
 		$result = CFavorite::remove($profile[$object], $objectid, $object);
 		$result = DBend($result);
 
+		$aria_label = $object === 'sysmapid' ? _('Add map to Favorite maps widget')
+			: _('Add graph to Favorite graphs widget');
+
 		if ($result) {
 			$data['main_block'] = '
 				var addrm_fav = document.getElementById("addrm_fav");
 
 				if (addrm_fav !== null) {
-					addrm_fav.title = "'._('Add to favorites').'";
+					addrm_fav.setAttribute("aria-label", '.json_encode($aria_label).');
+					addrm_fav.setAttribute("data-hintbox-contents", '.json_encode(_('Add to favorites')).');
 					addrm_fav.onclick = () => add2favorites("'.$object.'", "'.$objectid.'");
 					addrm_fav.classList.add("'.ZBX_ICON_STAR.'");
 					addrm_fav.classList.remove("'.ZBX_ICON_STAR_FILLED.'");
+					hintBox.hideHint(addrm_fav, true);
 				}
 				else {
 					ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {

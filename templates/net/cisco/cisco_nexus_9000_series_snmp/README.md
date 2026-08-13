@@ -62,7 +62,7 @@ This template has been tested on:
 |{$TEMP_CRIT_LOW}|<p>Critical threshold of the low temperature in °C.</p>|`5`|
 |{$TEMP_WARN}|<p>Warning threshold of the temperature in °C.</p>|`50`|
 |{$TEMP_CRIT}|<p>Critical threshold of the temperature in °C.</p>|`60`|
-|{$ENT_CLASS.NOT_MATCHES}|<p>The filter excludes chassis (3) class from Serial discovery. The chassis (3) are polled with a regular item.</p>|`3`|
+|{$ENT_CLASS.NOT_MATCHES}|<p>The filter excludes chassis (3) and sensor (8) classes from Serial discovery. The chassis (3) is polled with a regular item; sensors (8) never report a serial number, which otherwise breaks filter evaluation.</p>|`3\|8`|
 |{$ENT_SN.MATCHES}|<p>The filter retrieves only existing serial number strings.</p>|`.+`|
 |{$PSU.PROBLEM.STATES}|<p>The PSU states list for average trigger priority.</p>|`^(1\|4\|5\|6\|7\|9\|10\|11\|12)$`|
 
@@ -247,14 +247,14 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Temperature sensors discovery|<p>The discovery of temperature sensors from CISCO-ENTITY-SENSOR-MIB and ENTITY-MIB. The sensors that have celsius (8) `entSensorType` are discovered. The scale of gathered values is taken from the `entSensorScale` and applied in item preprocessing.</p>|SNMP agent|temperature.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `4h`</p></li></ul>|
+|Temperature sensors discovery|<p>The discovery of temperature sensors from CISCO-ENTITY-SENSOR-MIB and ENTITY-MIB. The sensors that have celsius (8) `entSensorType` are discovered. The scale of gathered values is taken from the `entSensorScale` and the precision from `entSensorPrecision`, both applied in item preprocessing.</p>|SNMP agent|temperature.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `4h`</p></li></ul>|
 
 ### Item prototypes for Temperature sensors discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |{#SNMPVALUE}: Temperature sensor status|<p>MIB: CISCO-ENTITY-SENSOR-MIB.</p><p>The object name: entSensorStatus.</p><p>This variable indicates the present operational status of the sensor.</p><p>Possible values:</p><p>-  ok (1): means the agent can read the sensor value;</p><p>-  unavailable (2): means that the agent presently can not report the sensor value;</p><p>-  nonoperational (3) means that the agent believes the sensor is broken. The sensor could have a hard failure (e.g., disconnected wire), or a soft failure (e.g., out-of-range, jittery, or wildly fluctuating readings).</p>|SNMP agent|sensor.temp.status[{#SNMPINDEX}]|
-|{#SNMPVALUE}: Temperature|<p>MIB: CISCO-ENTITY-SENSOR-MIB.</p><p>The object name: entSensorValue.</p><p>This variable reports the most recent measurement seen by the sensor.</p>|SNMP agent|sensor.temp.value[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `{#SENSOR_SCALE}`</p></li></ul>|
+|{#SNMPVALUE}: Temperature|<p>MIB: CISCO-ENTITY-SENSOR-MIB.</p><p>The object name: entSensorValue.</p><p>This variable reports the most recent measurement seen by the sensor.</p>|SNMP agent|sensor.temp.value[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `{#SENSOR_SCALE}`</p></li><li><p>Custom multiplier: `{#SENSOR_PRECISION}`</p></li></ul>|
 
 ### Trigger prototypes for Temperature sensors discovery
 

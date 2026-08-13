@@ -590,13 +590,6 @@ class testGeneric extends CWebTest {
 			],
 			[
 				[
-					'url' => 'zabbix.php?action=regex.edit',
-					'title' => 'Configuration of regular expressions',
-					'header' => 'Regular expressions'
-				]
-			],
-			[
-				[
 					'url' => 'zabbix.php?action=trigdisplay.edit',
 					'title' => 'Configuration of trigger displaying options',
 					'header' => 'Trigger displaying options'

@@ -59,7 +59,7 @@ static void	dbconfig_prof_enable(const unsigned char *data)
 void	*zbx_dbconfig_thread(void *args)
 {
 	double				sec = 0.0;
-	int				sleeptime = 1, nextcheck = 0,
+	int				nextcheck = 0,
 					secrets_reload = 0, cache_reload = 0;
 	zbx_ipc_async_socket_t		rtc;
 	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
@@ -68,6 +68,7 @@ void	*zbx_dbconfig_thread(void *args)
 	int				server_num = info->server_num;
 	int				process_num = info->process_num;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SECRETS_RELOAD,
+							ZBX_RTC_VAULT_NEW_TOKEN,
 							ZBX_RTC_PROF_ENABLE, ZBX_RTC_PROF_DISABLE};
 	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)unit_args->args.args;
 
@@ -93,7 +94,7 @@ void	*zbx_dbconfig_thread(void *args)
 			dbconfig_args_in->proxyconfig_frequency);
 	zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 			dbconfig_args_in->config_ssl_ca_location, dbconfig_args_in->config_ssl_cert_location,
-			dbconfig_args_in->config_ssl_key_location);
+			dbconfig_args_in->config_ssl_key_location, NULL);
 	zbx_supervisor_update_activity("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			unit_args->name, (sec = zbx_time() - sec), dbconfig_args_in->config_confsyncer_frequency);
 
@@ -111,11 +112,18 @@ void	*zbx_dbconfig_thread(void *args)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
+		int		vault_ret = SUCCEED;
+		int		sleeptime = MAX(0, nextcheck - (int)time(NULL));
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			switch (rtc_cmd)
 			{
+				case ZBX_RTC_VAULT_NEW_TOKEN:
+					dbconfig_args_in->config_vault->token =
+						zbx_strdup(dbconfig_args_in->config_vault->token,
+								(const char *)rtc_data);
+					break;
 				case ZBX_RTC_CONFIG_CACHE_RELOAD:
 					if (0 == cache_reload)
 					{
@@ -180,7 +188,14 @@ void	*zbx_dbconfig_thread(void *args)
 			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 					dbconfig_args_in->config_ssl_ca_location,
 					dbconfig_args_in->config_ssl_cert_location,
-					dbconfig_args_in->config_ssl_key_location);
+					dbconfig_args_in->config_ssl_key_location, &vault_ret);
+
+			if (SUCCEED != vault_ret && NULL != dbconfig_args_in->config_vault->token)
+			{
+				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
+						(unsigned char *)dbconfig_args_in->config_vault->token,
+						(zbx_uint32_t)strlen(dbconfig_args_in->config_vault->token) + 1);
+			}
 
 			zbx_dc_config_get_hostids_by_revision(revision, &hostids);
 			zbx_dbconfig_worker_send_ids(&hostids);
@@ -204,7 +219,15 @@ void	*zbx_dbconfig_thread(void *args)
 			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 					dbconfig_args_in->config_ssl_ca_location,
 					dbconfig_args_in->config_ssl_cert_location,
-					dbconfig_args_in->config_ssl_key_location);
+					dbconfig_args_in->config_ssl_key_location, &vault_ret);
+
+			if (SUCCEED != vault_ret && NULL != dbconfig_args_in->config_vault->token)
+			{
+				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
+					(unsigned char *)dbconfig_args_in->config_vault->token,
+					(zbx_uint32_t)strlen(dbconfig_args_in->config_vault->token) + 1);
+			}
+
 			secrets_reload = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the secrets");
 		}

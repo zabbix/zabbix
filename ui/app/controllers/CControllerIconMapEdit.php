@@ -27,10 +27,21 @@ class CControllerIconMapEdit extends CController {
 	}
 
 	protected function checkInput() {
-		$ret = $this->validateInput(['object', 'fields' => [
-			'iconmapid' => [],
-			'iconmap' => []
-		]]);
+		$rules = ['object', 'fields' => [
+			'iconmapid' => ['db icon_map.iconmapid'],
+			'iconmap' => ['object', 'fields' => [
+				'name' => ['string'],
+				'mappings' => ['objects', 'fields' => [
+					'inventory_link' => ['string'],
+					'expression' => ['string'],
+					'iconid' => ['db icon_mapping.iconid'],
+					'sortorder' => ['integer']
+				]],
+				'default_iconid' => ['db icon_map.default_iconid']
+			]]
+		]];
+
+		$ret = $this->validateInput($rules, true);
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());

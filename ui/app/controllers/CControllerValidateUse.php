@@ -27,7 +27,7 @@ class CControllerValidateUse extends CController {
 			'validations' => ['objects', 'required', 'not_empty',
 				'fields' => [
 					'field' => ['string', 'required'],
-					'value' => ['string'],
+					'value' => ['string', 'required'],
 					'class' => ['string', 'required', 'not_empty'],
 					'options' => ['array'],
 					'error_msg' => ['string']

@@ -195,6 +195,8 @@ class CDateSelector extends CTag {
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_CALENDAR)
 				->setEnabled($this->enabled && !$this->readonly)
+				->setAttribute('aria-label', _('Select date'))
+				->setAttribute('aria-expanded', 'false')
 				->onClick('toggleCalendar(this, "'.zbx_formatDomId($this->name).'", "'.$this->date_format.'");'));
 
 		return parent::toString($destroy);
