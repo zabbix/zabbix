@@ -49,10 +49,12 @@ class CAction extends CApiService {
 		EVENT_SOURCE_DISCOVERY => [
 			ZBX_CONDITION_TYPE_DHOST_IP, ZBX_CONDITION_TYPE_DSERVICE_TYPE, ZBX_CONDITION_TYPE_DSERVICE_PORT,
 			ZBX_CONDITION_TYPE_DSTATUS, ZBX_CONDITION_TYPE_DUPTIME, ZBX_CONDITION_TYPE_DVALUE, ZBX_CONDITION_TYPE_DRULE,
-			ZBX_CONDITION_TYPE_DCHECK, ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_PROXY_GROUP, ZBX_CONDITION_TYPE_DOBJECT
+			ZBX_CONDITION_TYPE_DCHECK, ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_PROXY_GROUP,
+			ZBX_CONDITION_TYPE_DOBJECT
 		],
 		EVENT_SOURCE_AUTOREGISTRATION => [
-			ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_PROXY_GROUP, ZBX_CONDITION_TYPE_HOST_NAME, ZBX_CONDITION_TYPE_HOST_METADATA
+			ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_PROXY_GROUP, ZBX_CONDITION_TYPE_HOST_NAME,
+			ZBX_CONDITION_TYPE_HOST_METADATA
 		],
 		EVENT_SOURCE_INTERNAL => [
 			ZBX_CONDITION_TYPE_HOST_GROUP, ZBX_CONDITION_TYPE_HOST, ZBX_CONDITION_TYPE_TEMPLATE,
@@ -2219,8 +2221,7 @@ class CAction extends CApiService {
 
 			case EVENT_SOURCE_AUTOREGISTRATION:
 				$value_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_PROXY], 'type' => API_ID, 'flags' => API_REQUIRED],
-					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_PROXY_GROUP], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_PROXY_GROUP])], 'type' => API_ID, 'flags' => API_REQUIRED],
 					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_HOST_NAME, ZBX_CONDITION_TYPE_HOST_METADATA])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')]
 				];
 				$operator_rules = [
@@ -2626,8 +2627,8 @@ class CAction extends CApiService {
 		self::checkTriggersPermissions($actions);
 		self::checkDRulesPermissions($actions);
 		self::checkDChecksPermissions($actions);
-		self::checkProxiesPermissions($actions);
 		self::checkProxyGroupsPermissions($actions);
+		self::checkProxiesPermissions($actions);
 		self::checkServicesPermissions($actions);
 	}
 
@@ -3336,7 +3337,7 @@ class CAction extends CApiService {
 	 *
 	 * @param array $actions
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given host groups.
+	 * @throws APIException if the user doesn't have write permissions for the given proxy groups.
 	 */
 	private static function checkProxyGroupsPermissions(array $actions): void {
 		$proxy_groupids = [];
