@@ -96,7 +96,7 @@ void	zbx_mock_test_entry(void **state)
 	int				worker_cnt, expected_worker_count, expected_refcount;
 	__pid_t				pid;
 	zbx_timespec_t			timeout = {0, 0};
-	zbx_thread_ipmi_manager_args	ipmi_manager_args = 
+	zbx_thread_ipmi_manager_args	ipmi_manager_args =
 	{
 		.config_timeout = 0,
 		.config_unavailable_delay = 0,
