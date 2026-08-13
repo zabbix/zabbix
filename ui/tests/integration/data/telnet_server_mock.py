@@ -80,7 +80,7 @@ class ClientHandler(threading.Thread):
         return line
 
     def handle(self):
-        # Ask the client to suppress go-ahead; the reply (IAC WILL/WONT SGA) is consumed transparently
+        # Ask the client to suppress go-ahead; the reply (IAC WILL/WON'T SGA) is consumed transparently
         # by telnet_read() on the client side and is never visible in the lines read below. This just
         # exercises the option-negotiation branch of telnet_read().
         self.conn.sendall(bytes([IAC, DO, SGA]))
