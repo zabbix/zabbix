@@ -3300,7 +3300,7 @@ static void	make_item_unsupported(ZBX_DC_ITEM *item, unsigned char proc_type)
 {
 	time_t		now = time(NULL);
 	zbx_timespec_t	ts = {now, 0};
-	char		*msg = zbx_dsprintf(NULL, "\"%s\" are disabled in configuration",
+	char		*msg = zbx_dsprintf(NULL, "\"%s\" is disabled in configuration",
 			get_process_type_string(proc_type));
 
 	zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);

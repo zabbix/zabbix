@@ -208,8 +208,7 @@ static int	process_zero_pollers_items(zbx_dc_item_t *item, zbx_get_config_forks_
 		return SUCCEED;
 	}
 
-	*info = zbx_dsprintf(NULL, "Cannot perform request: \"%s\" is set to 0 in configuration.",
-			get_process_type_string(proc_type));
+	*info = zbx_dsprintf(NULL, "\"%s\" is disabled in configuration", get_process_type_string(proc_type));
 
 	return FAIL;
 }
