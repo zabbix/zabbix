@@ -45,7 +45,7 @@ zabbix_export:
         6. Set the host wizard configuration fields `Ribbon SBC CE name` and `Ribbon SBC password` with the name of CE.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -171,6 +171,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             
             var Ribbon = {
             	params: {},
@@ -190,10 +215,12 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
             	},
             
             	getRequest: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Ribbon.tls.options);
             
             		if (typeof Ribbon.params.http_proxy !== 'undefined' && Ribbon.params.http_proxy !== '') {
             			request.setProxy(Ribbon.params.http_proxy);
@@ -320,6 +347,8 @@ zabbix_export:
               value: '{$RIBBON.PROXY}'
             - name: server_name
               value: '{$RIBBON.CE.NAME}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC SWe CE"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -1654,11 +1683,27 @@ zabbix_export:
         - tag: target
           value: ribbon-swe-ce
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Ribbon SBC SWe CE", e.g. {$HTTP.TLS.VERIFY:"Ribbon SBC SWe CE"}.'
+          config:
+            type: LIST
+            priority: '5'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$RIBBON.CE.NAME}'
           description: 'Ribbon SBC CE name.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             label: 'Ribbon SBC CE name'
             description: 'Set the Ribbon SBC CE name here.'
         - macro: '{$RIBBON.CPU.UTIL.CRIT}'
@@ -1666,7 +1711,7 @@ zabbix_export:
           description: 'The threshold of CPU usage in percent.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'Warning CPU usage threshold'
             description: 'Set the CPU usage threshold in percent. In the range from 0 to 100 inclusive.'
@@ -1676,7 +1721,7 @@ zabbix_export:
           description: 'The threshold of disk usage in percent.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Thresholds
             label: 'Warning disk usage threshold'
             description: 'Set the disk usage threshold in percent. In the range from 0 to 100 inclusive.'
@@ -1686,7 +1731,7 @@ zabbix_export:
           description: 'Sets the regex string of file system names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Include file system name filter'
             description: 'Regex string to include file system by names.'
@@ -1695,7 +1740,7 @@ zabbix_export:
           description: 'Sets the regex string of file system names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Exclude file system name filter'
             description: 'Regex string to exclude file system by names.'
@@ -1704,7 +1749,7 @@ zabbix_export:
           description: 'Sets the regex string of management port names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Include management port name filter'
             description: 'Regex string to include management port by names.'
@@ -1713,7 +1758,7 @@ zabbix_export:
           description: 'Sets the regex string of management port names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Exclude management port name filter'
             description: 'Regex string to exclude management port by names.'
@@ -1722,7 +1767,7 @@ zabbix_export:
           description: 'The threshold of memory usage in percent.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Thresholds
             label: 'Warning memory usage threshold'
             description: 'Set the memory usage threshold in percent. In the range from 0 to 100 inclusive.'
@@ -1732,7 +1777,7 @@ zabbix_export:
           description: 'Sets the regex string of monitor port names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Include monitor port name filter'
             description: 'Regex string to include monitor port by names.'
@@ -1741,7 +1786,7 @@ zabbix_export:
           description: 'Sets the regex string of monitor port names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Exclude monitor port name filter'
             description: 'Regex string to exclude monitor port by names.'
@@ -1750,7 +1795,7 @@ zabbix_export:
           description: 'Sets the regex string of packet port names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Include packet port name filter'
             description: 'Regex string to include packet port by names.'
@@ -1759,7 +1804,7 @@ zabbix_export:
           description: 'Sets the regex string of packet port names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Exclude packet port name filter'
             description: 'Regex string to exclude packet port by names.'
@@ -1776,7 +1821,7 @@ zabbix_export:
           description: 'The threshold of packet port usage in percent.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Thresholds
             label: 'Warning packet port usage threshold'
             description: 'Set the packet port usage threshold in percent. In the range from 0 to 100 inclusive.'
@@ -1793,7 +1838,7 @@ zabbix_export:
           description: 'Sets the regex string of port redundancy group names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Include port redundancy group name filter'
             description: 'Regex string to include port redundancy group by names.'
@@ -1802,7 +1847,7 @@ zabbix_export:
           description: 'Sets the regex string of port redundancy group names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Exclude port redundancy group name filter'
             description: 'Regex string to exclude port redundancy group by names.'
@@ -1811,7 +1856,7 @@ zabbix_export:
           description: 'The threshold of swap usage in percent.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Thresholds
             label: 'Warning swap usage threshold'
             description: 'Set the swap usage threshold in percent. In the range from 0 to 100 inclusive.'
@@ -2447,7 +2492,7 @@ zabbix_export:
         5. Set the host wizard configuration fields `Ribbon SBC user` and `Ribbon SBC password` with the login and password of the user created earlier.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -2758,6 +2803,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             
             var Ribbon = {
             	params: {},
@@ -2777,10 +2847,12 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
             	},
             
             	getRequest: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Ribbon.tls.options);
             
             		if (typeof Ribbon.params.http_proxy !== 'undefined' && Ribbon.params.http_proxy !== '') {
             			request.setProxy(Ribbon.params.http_proxy);
@@ -2883,6 +2955,8 @@ zabbix_export:
               value: '{$RIBBON.PASSWORD}'
             - name: proxy
               value: '{$RIBBON.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC SWe Core"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -4185,12 +4259,28 @@ zabbix_export:
         - tag: target
           value: ribbon-swe-core
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Ribbon SBC SWe Core", e.g. {$HTTP.TLS.VERIFY:"Ribbon SBC SWe Core"}.'
+          config:
+            type: LIST
+            priority: '5'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$RIBBON.CE.DISCOVERY.HW.TYPE.MATCHES}'
           value: '.*'
           description: 'Sets the regex string of call engine hardware types to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Include call engine hardware type filter'
             description: 'Regex string to include call engine by hardware types.'
@@ -4199,7 +4289,7 @@ zabbix_export:
           description: 'Sets the regex string of call engine hardware types to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Exclude call engine hardware type filter'
             description: 'Regex string to exclude call engine by hardware types.'
@@ -4208,7 +4298,7 @@ zabbix_export:
           description: 'Sets the regex string of call engine names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Include call engine name filter'
             description: 'Regex string to include call engine by names.'
@@ -4217,7 +4307,7 @@ zabbix_export:
           description: 'Sets the regex string of call engine names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Exclude call engine name filter'
             description: 'Regex string to exclude call engine by names.'
@@ -4226,7 +4316,7 @@ zabbix_export:
           description: 'Sets the regex string of call engine roles to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Include call engine role type filter'
             description: 'Regex string to include call engine by roles.'
@@ -4235,7 +4325,7 @@ zabbix_export:
           description: 'Sets the regex string of call engine roles to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Exclude call engine role type filter'
             description: 'Regex string to exclude call engine by roles.'
@@ -4244,7 +4334,7 @@ zabbix_export:
           description: 'The threshold of DNS errors in percent.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'Warning DNS errors percentage threshold'
             description: 'Threshold of DNS errors in percent to trigger warning. In the range from 0 to 100 inclusive.'
@@ -4254,7 +4344,7 @@ zabbix_export:
           description: 'The threshold of DNS errors.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Thresholds
             label: 'Warning DNS errors threshold'
             description: 'Threshold of DNS errors to trigger warning. No less than 0.'
@@ -4264,7 +4354,7 @@ zabbix_export:
           description: 'Sets the regex string of DNS group names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Include DNS group name filter'
             description: 'Regex string to include DNS group by names.'
@@ -4273,7 +4363,7 @@ zabbix_export:
           description: 'Sets the regex string of DNS group names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Exclude DNS group name filter'
             description: 'Regex string to exclude DNS group by names.'
@@ -4282,7 +4372,7 @@ zabbix_export:
           description: 'The threshold of DNS timeouts in percent.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Thresholds
             label: 'Warning DNS timeouts percentage threshold'
             description: 'Threshold of DNS timeouts in percent to trigger warning. In the range from 0 to 100 inclusive.'
@@ -4292,7 +4382,7 @@ zabbix_export:
           description: 'Sets the regex string of license names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Include license name filter'
             description: 'Regex string to include license by names.'
@@ -4301,7 +4391,7 @@ zabbix_export:
           description: 'Sets the regex string of license names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Exclude license name filter'
             description: 'Regex string to exclude license by names.'
@@ -4325,7 +4415,7 @@ zabbix_export:
           description: 'Sets the regex string of sync module names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Include sync module name filter'
             description: 'Regex string to include sync module by names.'
@@ -4334,7 +4424,7 @@ zabbix_export:
           description: 'Sets the regex string of sync module names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Exclude sync module name filter'
             description: 'Regex string to exclude sync module by names.'
@@ -4343,7 +4433,7 @@ zabbix_export:
           description: 'Sets the regex string of trunk group names to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Include Trunk group name filter'
             description: 'Regex string to include trunk group by names.'
@@ -4352,7 +4442,7 @@ zabbix_export:
           description: 'Sets the regex string of trunk group names to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Exclude Trunk group name filter'
             description: 'Regex string to exclude trunk group by names.'
