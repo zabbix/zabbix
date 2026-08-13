@@ -4338,7 +4338,7 @@ int	zbx_dbsync_prepare_cep_operation_condition(zbx_dbsync_t *sync)
 	zbx_dcsync_sql_start(sync);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select cep_operation_conditionid,cep_operationid,type,operator,tag,value"
+			"select cep_operation_conditionid,cep_operationid,type,operator,tag,tag_value"
 			" from cep_operation_condition");
 
 	dbsync_prepare(sync, 6, NULL);

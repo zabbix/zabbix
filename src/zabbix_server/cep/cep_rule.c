@@ -154,8 +154,10 @@ static int	cep_operation_condition_eval_state(const zbx_cep_op_condition_t *cond
 {
 	int	ret = (state == condition->args.state.value ? 1 : 0);
 
-	if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+	if (ZBX_CONDITION_OPERATOR_NO == condition->operator)
 		ret = !ret;
+	else if (ZBX_CONDITION_OPERATOR_YES != condition->operator)
+		return 0;
 
 	return ret;
 }
