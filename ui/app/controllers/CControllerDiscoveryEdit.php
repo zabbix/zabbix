@@ -131,7 +131,7 @@ class CControllerDiscoveryEdit extends CController {
 		$data = [
 			'drule' => $this->drule,
 			'discovery_by' => ($this->drule['proxyid'] != 0
-					|| ($this->drule['proxyid'] === 0 && !$can_select_server_for_discovery_by))
+					|| ($this->drule['proxyid'] == 0 && !$can_select_server_for_discovery_by))
 				? ZBX_DISCOVERY_BY_PROXY
 				: ZBX_DISCOVERY_BY_SERVER,
 			'ms_proxy' => [],

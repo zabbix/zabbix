@@ -82,8 +82,6 @@ class TabIndicators {
 				return HOST_DISCOVERY;
 			case !!HOST_PROTOTYPE:
 				return HOST_PROTOTYPE;
-			case !!PROXY:
-				return PROXY;
 			case !!ITEM:
 				return ITEM;
 			case !!ITEM_PROTOTYPE:
@@ -855,7 +853,7 @@ class ProxyAccessListTabIndicatorItem extends TabIndicatorItem {
 		const proxy_group_mode = document.querySelector('[name="proxy_group_mode"]:checked');
 
 		if (proxy_group_mode !== null
-			&& proxy_group_mode.value != ProxyAccessListTabIndicatorItem.PROXY_GROUP_MODE_DENY) {
+				&& proxy_group_mode.value != ProxyAccessListTabIndicatorItem.PROXY_GROUP_MODE_DENY) {
 			return true;
 		}
 
@@ -873,9 +871,7 @@ class ProxyAccessListTabIndicatorItem extends TabIndicatorItem {
 			const target_node = document.getElementById(id);
 
 			if (target_node !== null) {
-				const observer = new MutationObserver(() => {
-					this.addAttributes();
-				});
+				const observer = new MutationObserver(() => this.addAttributes());
 
 				observer.observe(target_node, {
 					childList: true,

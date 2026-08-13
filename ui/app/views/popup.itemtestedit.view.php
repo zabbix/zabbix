@@ -291,7 +291,8 @@ if ($data['is_item_testable']) {
 		(new CFormField([
 			(new CRadioButtonList('test_with', (int) $data['test_with']))
 				->addValue(_('Server'), CControllerPopupItemTest::TEST_WITH_SERVER,
-					disabled: !CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING))
+					disabled: !CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+				)
 				->addValue(_('Proxy'), CControllerPopupItemTest::TEST_WITH_PROXY)
 				->setReadonly(!$data['proxies_enabled'])
 				->setModern(),

@@ -17,9 +17,9 @@
 class CProxyHelper {
 
 	/**
-	 * Resolves a proxy ID into a display-safe representation, respecting the current user's proxy permissions
+	 * Resolves a proxy ID into a display-safe representation, respecting the current user's proxy permissions.
 	 *
-	 * @param string $proxyid  ID of the proxy to resolve
+	 * @param string $proxyid  ID of the proxy to resolve.
 	 *
 	 * @return array
 	 */
@@ -53,8 +53,8 @@ class CProxyHelper {
 	/**
 	 * Builds HTML badges for Proxy Allow List for the specified user.
 	 *
-	 * @param array $all_proxies  all proxues not assigned to a proxy group
-	 * @param array $user_groups  user groups the corrent user belongs to
+	 * @param array $all_proxies  All proxues not assigned to a proxy group.
+	 * @param array $user_groups  User groups the corrent user belongs to.
 	 *
 	 * @return array
 	 */
@@ -67,8 +67,8 @@ class CProxyHelper {
 	/**
 	 * Builds HTML badges for Proxy Group Allow List for the specified user.
 	 *
-	 * @param array $all_proxy_groups  all proxy groups
-	 * @param array $user_groups       user groups the corrent user belongs to
+	 * @param array $all_proxy_groups  All proxy groups.
+	 * @param array $user_groups       User groups the corrent user belongs to.
 	 *
 	 * @return array
 	 */
@@ -83,15 +83,13 @@ class CProxyHelper {
 	/**
 	 * Builds a default access indicator for cases when access applies to all objects.
 	 *
-	 * @param int $mode  access mode (PROXY_MODE_ALLOW or PROXY_MODE_DENY)
+	 * @param int $mode  Access mode (PROXY_MODE_ALLOW or PROXY_MODE_DENY).
 	 *
 	 * @return array
 	 */
 	public static function getDefaultAccessHtml(int $mode): array {
 		return [
-			(new CSpan(_('All')))->addClass(
-					$mode == PROXY_MODE_ALLOW ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-				)
+			(new CSpan(_('All')))->addClass($mode == PROXY_MODE_ALLOW ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY)
 		];
 	}
 
@@ -111,7 +109,7 @@ class CProxyHelper {
 		foreach ($user_groups as $user_group) {
 			$object_ids = array_column($user_group[$object_key], $id_key);
 
-			if ((int) $user_group[$mode_key] == PROXY_MODE_ALLOW) {
+			if ($user_group[$mode_key] == PROXY_MODE_ALLOW) {
 				$has_allow_list = true;
 				$result_allow_ids = array_merge($result_allow_ids, $object_ids);
 			}
@@ -188,10 +186,7 @@ class CProxyHelper {
 		if ($objects['more'] > 0) {
 			$objects_list[] = (new CButton('plus_more', _s('+ %1$d more', $objects['more'])))
 				->addClass(ZBX_STYLE_BTN_PLUS_MORE)
-				->setHint(
-					$all_entities,
-					ZBX_STYLE_HINTBOX_WRAP.' '.'status-list-wrapper'
-				);
+				->setHint($all_entities, ZBX_STYLE_HINTBOX_WRAP.' '.'status-list-wrapper');
 		}
 
 		return $objects_list;

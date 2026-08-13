@@ -443,7 +443,7 @@ class CMultiSelect extends CTag {
 					$autocomplete_parameters['has_devices_access'] = 1;
 				}
 
-				if (array_key_exists('without_proxy_group', $parameters)) {
+				if (array_key_exists('without_proxy_group', $parameters) && $parameters['without_proxy_group']) {
 					$popup_parameters['without_proxy_group'] = '1';
 					$autocomplete_parameters['without_proxy_group'] = true;
 				}

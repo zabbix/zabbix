@@ -104,7 +104,8 @@ $host_tab->addRow(
 	(new CDiv([
 		(new CRadioButtonList('monitored_by', (int) $data['monitored_by']))
 			->addValue(_('Server'), ZBX_MONITORED_BY_SERVER,
-				disabled: !CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING))
+				disabled: !CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+			)
 			->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
 			->addValue(_('Proxy group'), ZBX_MONITORED_BY_PROXY_GROUP)
 			->setModern(),
