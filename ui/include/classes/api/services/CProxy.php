@@ -444,7 +444,7 @@ class CProxy extends CApiService {
 
 				$apm_fields[$i + 1] = [
 					'signal_type' => $fields['signal_type'],
-					'key' => (string) ($fields['key']),
+					'key' => (string) ($fields['key'])
 				];
 
 				if (array_key_exists('value', $fields)) {
@@ -462,13 +462,13 @@ class CProxy extends CApiService {
 			$default_apm = [
 				'additional_resource_attributes' => [],
 				'data_collection_status' => 0,
-				'max_messages_per_second' => 0,
+				'max_messages_per_second' => 0
 			];
 
 			$default_attributes = [
 				'signal_type' => [],
 				'key' => 0,
-				'value' => 0,
+				'value' => 0
 			];
 
 			$proxy['apm'] = array_merge($default_apm, $proxy['apm']);
