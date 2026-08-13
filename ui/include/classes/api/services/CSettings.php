@@ -105,10 +105,9 @@ class CSettings extends CApiService {
 
 	private static function normalizeAffectedObjects(array &$db_settings, bool $has_write_only = true): void {
 		if (array_key_exists('apm_global_db', $db_settings)) {
-			$db_settings['apm_global_db']
-					= $db_settings['apm_global_db'] === CSettingsSchema::getDefault('apm_global_db')
-				? self::APM_GLOBAL_DB_DEFAULT
-				: json_decode($db_settings['apm_global_db'], true);
+			$db_apm_global_db = json_decode($db_settings['apm_global_db'], true);
+
+			$db_settings['apm_global_db'] = $db_apm_global_db ?: self::APM_GLOBAL_DB_DEFAULT;
 
 			if (!$has_write_only) {
 				unset($db_settings['apm_global_db']['password'], $db_settings['apm_global_db']['ssl_key_password']);
@@ -394,7 +393,7 @@ class CSettings extends CApiService {
 				&& $settings['apm_global_db']['authentication_type'] != $db_apm_global_db['authentication_type'];
 
 			$url_changed = array_key_exists('url', $settings['apm_global_db'])
-				&& strcasecmp($settings['apm_global_db']['url'], $db_apm_global_db['url']) != 0;
+				&& $settings['apm_global_db']['url'] !== $db_apm_global_db['url'];
 
 			$username_flags = API_NOT_EMPTY;
 			$password_flags = 0;
