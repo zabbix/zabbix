@@ -1112,7 +1112,7 @@ static void	cep_db_sync_event_tags_table(zbx_dbconn_t *db, const char *table, co
 	zbx_vector_uint64_t			deleteids;
 	zbx_db_insert_t				db_insert;
 
-	if (0 == events_num && 0 == eventids->values_num)
+	if (0 == events_num || 0 == eventids->values_num)
 		return;
 
 	zbx_vector_uint64_create(&deleteids);
@@ -1354,40 +1354,43 @@ static void	cep_db_update_events_suppress(zbx_dbconn_t *db, const zbx_vector_cep
 	zbx_dbconn_prepare_insert(db, &db_insert, "event_suppress", "event_suppressid", "eventid", "cep_ruleid",
 		"suppress_until", NULL);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select event_suppressid,eventid,cep_ruleid,suppress_until"
-			" from event_suppress"
-			" where cep_ruleid is not null and");
-
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid",  eventids.values,
-			eventids.values_num);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by eventid");
-
-	result = zbx_dbconn_select(db, "%s", sql);
-	sql_offset = 0;
-
-	while (NULL != (row = zbx_db_fetch(result)))
+	if (0 < eventids.values_num)
 	{
-		zbx_cep_event_suppress_t	sup_local;
-		zbx_uint64_t	eventid;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select event_suppressid,eventid,cep_ruleid,suppress_until"
+				" from event_suppress"
+				" where cep_ruleid is not null and");
 
-		ZBX_STR2UINT64(eventid, row[1]);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid",  eventids.values,
+				eventids.values_num);
 
-		while (events[index]->eventid != eventid)
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by eventid");
+
+		result = zbx_dbconn_select(db, "%s", sql);
+		sql_offset = 0;
+
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			cep_db_update_event_suppress(db, &sql, &sql_alloc, &sql_offset, &db_insert, events[index],
-					&suppress, &deleteids);
-			zbx_vector_cep_event_suppress_clear(&suppress);
-			index++;
-		}
+			zbx_cep_event_suppress_t	sup_local;
+			zbx_uint64_t	eventid;
 
-		ZBX_STR2UINT64(sup_local.event_suppressid, row[0]);
-		ZBX_STR2UINT64(sup_local.ruleid, row[2]);
-		sup_local.suppress_until = atoi(row[3]);
-		zbx_vector_cep_event_suppress_append(&suppress, sup_local);
+			ZBX_STR2UINT64(eventid, row[1]);
+
+			while (events[index]->eventid != eventid)
+			{
+				cep_db_update_event_suppress(db, &sql, &sql_alloc, &sql_offset, &db_insert,
+						events[index], &suppress, &deleteids);
+				zbx_vector_cep_event_suppress_clear(&suppress);
+				index++;
+			}
+
+			ZBX_STR2UINT64(sup_local.event_suppressid, row[0]);
+			ZBX_STR2UINT64(sup_local.ruleid, row[2]);
+			sup_local.suppress_until = atoi(row[3]);
+			zbx_vector_cep_event_suppress_append(&suppress, sup_local);
+		}
+		zbx_db_free_result(result);
 	}
-	zbx_db_free_result(result);
 
 	for (;index < events_num; index++)
 	{
