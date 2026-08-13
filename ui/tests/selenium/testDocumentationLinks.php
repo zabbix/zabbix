@@ -2715,7 +2715,7 @@ class testDocumentationLinks extends CWebTest {
 			// #1 Edit shape form.
 			[
 				[
-					'element' => 'xpath://div[contains(@style, "top: 82px")]',
+					'element' => 'xpath://div[contains(@style, "top: 63px")]',
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
 				]
 			],
@@ -2723,7 +2723,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'element' => [
-						'xpath://div[contains(@class, "sysmap_iconid_19")]',
+						'xpath://div[contains(@class, "sysmap_iconid_20")]',
 						'xpath://div[contains(@class, "sysmap_iconid_7")]'
 					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#selecting-elements'
@@ -2733,8 +2733,8 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'element' => [
-						'xpath://div[contains(@style, "top: 258px")]',
-						'xpath://div[contains(@style, "top: 82px")]'
+						'xpath://div[contains(@style, "top: 297px")]',
+						'xpath://div[contains(@style, "top: 63px")]'
 					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
 				]

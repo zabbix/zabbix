@@ -18,7 +18,6 @@
 #include "zbxmockutil.h"
 
 #include "../../src/libs/zbxipmi/ipmi_manager.c"
-// #include "../../src/zabbix_server/server.c"
 #include "zbxipcservice.h"
 #include "zbxtime.h"
 #include "zbxalgo.h"
