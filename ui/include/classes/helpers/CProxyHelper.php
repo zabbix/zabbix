@@ -190,7 +190,7 @@ class CProxyHelper {
 				->addClass(ZBX_STYLE_BTN_PLUS_MORE)
 				->setHint(
 					$all_entities,
-					ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_TAGS_WRAPPER
+					ZBX_STYLE_HINTBOX_WRAP.' '.'status-list-wrapper'
 				);
 		}
 
