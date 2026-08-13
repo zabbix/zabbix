@@ -94,16 +94,14 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 
 			if (0 == ReadFile(hRead, tmp_buf, to_read, &read_bytes, NULL))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot read command output: %s",
+				zbx_snprintf(error, max_error_len, "cannot read command output: %s",
 						zbx_strerror_from_system(GetLastError()));
+				zabbix_log(LOG_LEVEL_ERR, "%s", error);
 				return FAIL;
 			}
 
 			if (NULL != buf)
-			{
 				zbx_str_memcpy_alloc(buf, buf_size, offset, tmp_buf, read_bytes);
-				(*buf)[*offset] = '\0';
-			}
 
 			in_buf_size = 0;
 			continue;
