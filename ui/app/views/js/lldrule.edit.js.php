@@ -23,7 +23,6 @@
 window.lldrule_edit = new class {
 
 	#dialogue;
-	#discovered;
 	#footer;
 	#form;
 	#form_element;
@@ -40,7 +39,6 @@ window.lldrule_edit = new class {
 		this.#form = new CForm(this.#form_element, rules);
 		this.#footer = this.#overlay.$dialogue.$footer[0];
 		this.#testable_item_types = testable_item_types;
-		this.#discovered = lldrule.discovered;
 
 		this.#initEvents();
 		this.#initPopupListeners();
@@ -132,10 +130,6 @@ window.lldrule_edit = new class {
 	}
 
 	#isTestableItem() {
-		if (this.#discovered) {
-			return false;
-		}
-
 		const key = this.#form_element.querySelector('[name="key"]').value;
 		const type = parseInt(this.#form_element.querySelector('[name="type"]').value, 10);
 

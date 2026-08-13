@@ -23,7 +23,6 @@
 window.lldrule_prototype_edit = new class {
 
 	#dialogue;
-	#discovered;
 	#test_rules;
 	#footer;
 	#form;
@@ -44,7 +43,6 @@ window.lldrule_prototype_edit = new class {
 		this.#test_rules = test_rules;
 		this.#testable_item_types = testable_item_types;
 		this.#return_url = return_url;
-		this.#discovered = lldrule.discovered;
 
 		this.#initEvents();
 		this.#initPopupListeners();
@@ -134,10 +132,6 @@ window.lldrule_prototype_edit = new class {
 	}
 
 	#isTestableItem() {
-		if (this.#discovered) {
-			return false;
-		}
-
 		const key = this.#form_element.querySelector('[name="key"]').value
 		const type = parseInt(this.#form_element.querySelector('[name="type"]').value, 10);
 
