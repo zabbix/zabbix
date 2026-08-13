@@ -233,7 +233,10 @@ class CItemHelper extends CItemGeneralHelper {
 				'snmp_oid',
 
 				// SSH item type specific fields.
-				'publickey', 'privatekey'
+				'publickey', 'privatekey',
+
+				// Telemetry query
+				'time_shift', 'lookback_limit', 'granularity', 'query'
 			],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value'],
