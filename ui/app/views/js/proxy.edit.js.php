@@ -241,16 +241,19 @@ window.proxy_edit_popup = new class {
 			fields.clone_proxyid = this.clone_proxyid;
 		}
 
-		if ('quota_mode' in fields) {
-			delete fields.quota_mode;
-		}
-
 		if (fields.data_collection_status === PROXY_APM_STATUS_NOT_CONFIGURED) {
 			for (const field of ['max_messages_per_second', 'additional_resource_attributes']) {
 				if (field in fields) {
 					delete fields[field];
 				}
 			}
+		}
+		else if ('quota_mode' in fields) {
+			if (fields.quota_mode === PROXY_APM_QUOTA_MODE_UNLIMITED) {
+				fields.max_messages_per_second = 0;
+			}
+
+			delete fields.quota_mode;
 		}
 
 		const curl = new Curl('zabbix.php');
