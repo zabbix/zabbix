@@ -58,7 +58,7 @@ class CControllerProxyEdit extends CController {
 			$db_proxies = API::Proxy()->get([
 				'output' => ['proxyid', 'name', 'proxy_groupid', 'local_address', 'local_port', 'operating_mode',
 					'allowed_addresses', 'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
-					'tls_subject', 'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check',
+					'tls_subject', 'apm', 'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check',
 					'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
 					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'compatibility'
 				],
@@ -79,11 +79,7 @@ class CControllerProxyEdit extends CController {
 
 	protected function doAction(): void {
 		if ($this->proxy !== null) {
-			$apm = array_merge(self::getApmDefaults(), array_intersect_key($this->proxy, array_flip([
-				'data_collection_status',
-				'max_messages_per_second',
-				'additional_resource_attributes'
-			])));
+			$apm = array_merge(self::getApmDefaults(), json_decode($this->proxy['apm'], true));
 
 			$data = [
 				'proxyid' => $this->proxy['proxyid'],

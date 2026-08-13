@@ -238,6 +238,14 @@ $encryption_tab
 		))->addClass('js-tls-subject')
 	]);
 
+if (!$data['form']['additional_resource_attributes']) {
+	$data['form']['additional_resource_attributes'][] = [
+		'key' => '',
+		'value' => '',
+		'signal_type' => PROXY_APM_ATTR_SIGNAL_TYPE_TRACES
+	];
+}
+
 // APM tab.
 $apm_tab = (new CFormGrid())
 	->addItem(
@@ -290,7 +298,7 @@ $apm_tab = (new CFormGrid())
 		(new CFormField(
 			(new CDiv(new CPartial('proxy.apm.attributes', [
 				'source' => 'proxy',
-				'attributes' => [['key' => '', 'value' => '', 'signal_type' => PROXY_APM_ATTR_SIGNAL_TYPE_TRACES]],
+				'attributes' => $data['form']['additional_resource_attributes'],
 				'field_name' => 'additional_resource_attributes',
 				'tabs_id' => 'proxy-tabs',
 				'attr_tab_id' => 'proxy-apm-tab',
@@ -539,5 +547,7 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
+
+$output['data'] = $data;
 
 echo json_encode($output);
