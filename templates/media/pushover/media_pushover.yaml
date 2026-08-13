@@ -36,6 +36,8 @@ zabbix_export:
           value: '60'
         - name: title
           value: '{ALERT.SUBJECT}'
+        - name: tls_verify
+          value: '{$HTTP.TLS.VERIFY:"Pushover"}'
         - name: token
           value: '<PUSHOVER TOKEN HERE>'
         - name: triggerid
@@ -49,120 +51,146 @@ zabbix_export:
       status: DISABLED
       max_sessions: '0'
       script: |
+        const CTlsConfig = function (raw_value) {
+        	raw_value = String(raw_value).trim().toLowerCase();
+        
+        	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+        		raw_value = 'full';
+        	}
+        
+        	this.options = {
+        		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+        		SSLVerifyHost: (raw_value === 'full')
+        	};
+        
+        	this.enabled = (raw_value !== 'none');
+        
+        	this.checkURL = function (url) {
+        		if (this.enabled && !/^https:\/\//i.test(url)) {
+        			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+        			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+        		}
+        
+        		return url;
+        	};
+        }
+        
+        
         try {
-            var params = JSON.parse(value),
-                request = new HttpRequest(),
-                data,
-                response,
-                severities = [
-                    {name: 'not_classified', color: '#97AAB3'},
-                    {name: 'information', color: '#7499FF'},
-                    {name: 'warning', color: '#FFC859'},
-                    {name: 'average', color: '#FFA059'},
-                    {name: 'high', color: '#E97659'},
-                    {name: 'disaster', color: '#E45959'},
-                    {name: 'resolved', color: '#009900'},
-                    {name: 'default', color: '#000000'}
-                ],
-                priority;
+        	var params = JSON.parse(value),
+        	tls = new CTlsConfig(params.tls_verify),
+        		request = new HttpRequest(tls.options),
+        		data,
+        		response,
+        		severities = [
+        			{name: 'not_classified', color: '#97AAB3'},
+        			{name: 'information', color: '#7499FF'},
+        			{name: 'warning', color: '#FFC859'},
+        			{name: 'average', color: '#FFA059'},
+        			{name: 'high', color: '#E97659'},
+        			{name: 'disaster', color: '#E45959'},
+        			{name: 'resolved', color: '#009900'},
+        			{name: 'default', color: '#000000'}
+        		],
+        		priority;
         
-            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                request.setProxy(params.HTTPProxy);
-            }
+        	if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
+        		request.setProxy(params.HTTPProxy);
+        	}
         
-            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
-                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
-            }
+        	if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+        		throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
+        	}
         
-            if (params.event_value !== '0' && params.event_value !== '1'
-                && (params.event_source === '0' || params.event_source === '3')) {
-                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
-            }
+        	if (params.event_value !== '0' && params.event_value !== '1'
+        		&& (params.event_source === '0' || params.event_source === '3')) {
+        		throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+        	}
         
-            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
-                params.event_nseverity = '7';
-            }
+        	if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+        		params.event_nseverity = '7';
+        	}
         
-            if (params.event_value === '0') {
-                params.event_nseverity = '6';
-            }
+        	if (params.event_value === '0') {
+        		params.event_nseverity = '6';
+        	}
         
-            priority = params['priority_' + severities[params.event_nseverity].name] || params.priority_default;
+        	priority = params['priority_' + severities[params.event_nseverity].name] || params.priority_default;
         
-            if (isNaN(priority) || priority < -2 || priority > 2) {
-                throw '"priority" should be -2..2';
-            }
+        	if (isNaN(priority) || priority < -2 || priority > 2) {
+        		throw '"priority" should be -2..2';
+        	}
         
-            if (params.event_source === '0' && isNaN(params.triggerid)) {
-                throw 'field "triggerid" is not a number';
-            }
+        	if (params.event_source === '0' && isNaN(params.triggerid)) {
+        		throw 'field "triggerid" is not a number';
+        	}
         
-            if (isNaN(params.eventid)) {
-                throw 'field "eventid" is not a number';
-            }
+        	if (isNaN(params.eventid)) {
+        		throw 'field "eventid" is not a number';
+        	}
         
-            if (typeof params.message !== 'string' || params.message.trim() === '') {
-                throw 'field "message" cannot be empty';
-            }
+        	if (typeof params.message !== 'string' || params.message.trim() === '') {
+        		throw 'field "message" cannot be empty';
+        	}
         
-            data = {
-                token: params.token,
-                user: params.user,
-                title: params.title,
-                message: params.message,
-                url: (params.event_source === '0') 
-                    ? params.url + '/tr_events.php?triggerid=' + params.triggerid + '&eventid=' + params.eventid
-                    : params.url,
-                url_title: params.url_title,
-                priority: priority
-            };
+        	data = {
+        		token: params.token,
+        		user: params.user,
+        		title: params.title,
+        		message: params.message,
+        		url: (params.event_source === '0')
+        			? params.url + '/tr_events.php?triggerid=' + params.triggerid + '&eventid=' + params.eventid
+        			: params.url,
+        		url_title: params.url_title,
+        		priority: priority
+        	};
         
-            if (priority == 2) {
-                if (isNaN(params.retry) || params.retry < 30) {
-                    throw 'field "retry" should be a number with value of at least 30 if "priority" is set to 2';
-                }
+        	if (priority == 2) {
+        		if (isNaN(params.retry) || params.retry < 30) {
+        			throw 'field "retry" should be a number with value of at least 30 if "priority" is set to 2';
+        		}
         
-                if (isNaN(params.expire) || params.expire > 10800) {
-                    throw 'field "expire" should be a number with value of at most 10800 if "priority" is set to 2';
-                }
+        		if (isNaN(params.expire) || params.expire > 10800) {
+        			throw 'field "expire" should be a number with value of at most 10800 if "priority" is set to 2';
+        		}
         
-                data.retry = params.retry;
-                data.expire = params.expire;
-            }
+        		data.retry = params.retry;
+        		data.expire = params.expire;
+        	}
         
-            data = JSON.stringify(data);
-            Zabbix.log(4, '[ Pushover Webhook ] Sending request: ' + params.endpoint + '\n' + data);
+        	data = JSON.stringify(data);
+        	Zabbix.log(4, '[ Pushover Webhook ] Sending request: ' + params.endpoint + '\n' + data);
         
-            request.addHeader('Content-Type: application/json');
-            response = request.post(params.endpoint, data);
+        	request.addHeader('Content-Type: application/json');
+        	response = request.post(tls.checkURL(params.endpoint), data);
         
-            Zabbix.log(4, '[ Pushover Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
+        	Zabbix.log(4, '[ Pushover Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
         
-            if (response !== null) {
-                try {
-                    response = JSON.parse(response);
-                }
-                catch (error) {
-                    Zabbix.log(4, '[ Pushover Webhook ] Failed to parse response received from Pushover');
-                    response = null;
-                }
-            }
+        	if (response !== null) {
+        		try {
+        			response = JSON.parse(response);
+        		}
+        		catch (error) {
+        			Zabbix.log(4, '[ Pushover Webhook ] Failed to parse response received from Pushover');
+        			response = null;
+        		}
+        	}
         
-            if (request.getStatus() != 200 || response === null || typeof response !== 'object' || response.status !== 1) {
-                if (response !== null && typeof response === 'object' && typeof response.errors === 'object'
-                        && typeof response.errors[0] === 'string') {
-                    throw response.errors[0];
-                }
-                else {
-                    throw 'Unknown error. Check debug log for more information.';
-                }
-            }
+        	if (request.getStatus() != 200 || response === null || typeof response !== 'object' || response.status !== 1) {
+        		if (response !== null && typeof response === 'object' && typeof response.errors === 'object'
+        				&& typeof response.errors[0] === 'string') {
+        			throw response.errors[0];
+        		}
+        		else {
+        			throw 'Unknown error. Check debug log for more information.';
+        		}
+        	}
         
-            return 'OK';
+        	return 'OK';
         }
         catch (error) {
-            Zabbix.log(4, '[ Pushover Webhook ] Pushover notification failed: ' + error);
-            throw 'Pushover notification failed: ' + error;
+        	Zabbix.log(4, '[ Pushover Webhook ] Pushover notification failed: ' + error);
+        	throw 'Pushover notification failed: ' + error;
         }
       description: |
         Please refer to setup guide here: https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/pushover
@@ -185,9 +213,8 @@ zabbix_export:
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
-            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
             Problem name: {EVENT.NAME}
-            Problem duration: {EVENT.DURATION}
             Host: {HOST.NAME}
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
@@ -222,3 +249,50 @@ zabbix_export:
             Host name: {HOST.HOST}
             Host IP: {HOST.IP}
             Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
+        - event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+        - event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
