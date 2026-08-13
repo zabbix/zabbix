@@ -1634,9 +1634,9 @@ static int	DBpatch_7050139(void)
 static int	DBpatch_7050140(void)
 {
 	const zbx_db_table_t	table =
-			{"cep_group_event", "cep_groupid_eventid", 0,
+			{"cep_group_event", "cep_group_eventid", 0,
 				{
-					{"cep_groupid_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"cep_group_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"cep_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{0}
@@ -1694,20 +1694,12 @@ static int	DBpatch_7050147(void)
 
 static int	DBpatch_7050148(void)
 {
-	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
-			ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("event_suppress", 4, &field);
-}
-
-static int	DBpatch_7050149(void)
-{
 	const zbx_db_field_t	field = {"details", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("acknowledges", &field);
 }
 
-static int	DBpatch_7050150(void)
+static int	DBpatch_7050149(void)
 {
 	const zbx_db_field_t	field = {"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
@@ -1870,6 +1862,5 @@ DBPATCH_ADD(7050146, 0, 1)
 DBPATCH_ADD(7050147, 0, 1)
 DBPATCH_ADD(7050148, 0, 1)
 DBPATCH_ADD(7050149, 0, 1)
-DBPATCH_ADD(7050150, 0, 1)
 
 DBPATCH_END()
