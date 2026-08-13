@@ -1,0 +1,33 @@
+---
+test case: no writers created, correct pid
+in:
+  worker_count: 0
+  pid: 100
+out:
+  worker_count: 0
+  addref_count: 1
+---
+test case: one writer created, correct pid
+in:
+  worker_count: 1
+  pid: 100
+out:
+  worker_count: 1
+  addref_count: 2
+---
+test case: one writer created, incorrect pid
+in:
+  worker_count: 1
+  pid: 50
+out:
+  worker_count: 0
+  addref_count: 1
+---
+test case: two writers created, correct pid
+in:
+  worker_count: 2
+  pid: 100
+out:
+  worker_count: 2
+  addref_count: 3
+...

@@ -65,6 +65,7 @@ AC_DEFUN([CONF_TESTS],
 			tests/libs/zbxfile/Makefile
 			tests/libs/zbxhistory/Makefile
 			tests/libs/zbxicmpping/Makefile
+			tests/libs/zbxipmi/Makefile
 			tests/libs/zbxjson/Makefile
 			tests/libs/zbxmodules/Makefile
 			tests/libs/zbxnum/Makefile
@@ -87,10 +88,12 @@ AC_DEFUN([CONF_TESTS],
 			tests/libs/zbxodbc/Makefile
 			tests/libs/zbxip/Makefile
 			tests/zabbix_server/Makefile
+			tests/zabbix_server/connector/Makefile
+			tests/zabbix_server/lld/Makefile
 			tests/zabbix_server/pinger/Makefile
+			tests/zabbix_server/reporter/Makefile
 			tests/zabbix_server/service/Makefile
 			tests/zabbix_server/trapper/Makefile
-			tests/zabbix_server/lld/Makefile
 			tests/mocks/Makefile
 			tests/mocks/configcache/Makefile
 			tests/mocks/valuecache/Makefile

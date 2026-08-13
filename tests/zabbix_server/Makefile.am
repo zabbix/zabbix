@@ -2,4 +2,6 @@ SUBDIRS = \
 	pinger \
 	service \
 	trapper \
-	lld
+	lld \
+	connector \
+	reporter
