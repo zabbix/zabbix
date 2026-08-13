@@ -322,10 +322,16 @@ class CCepRule extends CApiService {
 
 		$cep_ruleids = DB::insert('cep_rule', $cep_rules);
 
+		$ins_cep_rule_rtdata = [];
+
 		foreach ($cep_rules as &$cep_rule) {
 			$cep_rule['cep_ruleid'] = array_shift($cep_ruleids);
+
+			$ins_cep_rule_rtdata[] = ['cep_ruleid' => $cep_rule['cep_ruleid']];
 		}
 		unset($cep_rule);
+
+		DB::insertBatch('cep_rule_rtdata', $ins_cep_rule_rtdata, false);
 
 		self::updateFilter($cep_rules);
 		self::updateWindow($cep_rules);

@@ -72,8 +72,8 @@ foreach (CCepRuleHelper::getConditionTagOperators() as $value => $name) {
 				->addValue('Does not exist', CONDITION_OPERATOR_NOT_EXISTS)
 				->addValue('In', CONDITION_OPERATOR_IN)
 				->addValue('Not in', CONDITION_OPERATOR_NOT_IN)
-				->addValue('is greater than or equals', CONDITION_OPERATOR_MORE_EQUAL)
-				->addValue('is less than or equals', CONDITION_OPERATOR_LESS_EQUAL)
+				->addValue('Is greater than or equals', CONDITION_OPERATOR_MORE_EQUAL)
+				->addValue('Is less than or equals', CONDITION_OPERATOR_LESS_EQUAL)
 			)
 		])
 		->addItem([

@@ -141,11 +141,16 @@ window.ceprule_operation_edit_popup = new class {
 	#buildTagRow(tag, row_index) {
 		const tag_row = this.#tag_template.evaluateToElement({...tag, row_index});
 		const textbox = tag_row.querySelector(`[name="filter[conditions][${row_index}][value]"]`);
+		const type = tag_row.querySelector(`[name="filter[conditions][${row_index}][type]"]`);
 		const on_operator_change = value => {
-			const hidden = [<?= TAG_OPERATOR_EXISTS ?>, <?= TAG_OPERATOR_NOT_EXISTS ?>].includes(value);
+			const operator_has_value = !([<?= CONDITION_OPERATOR_EXISTS ?>, <?= CONDITION_OPERATOR_NOT_EXISTS ?>]
+				.includes(value));
 
-			textbox.style.display = hidden ? 'none' : '';
-			textbox.style.disabled = hidden;
+			textbox.style.display = operator_has_value ? '' : 'none';
+			textbox.style.disabled = !operator_has_value;
+			type.value = operator_has_value
+				? <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>
+				: <?= ZBX_CONDITION_TYPE_EVENT_TAG ?>;
 		};
 
 		tag_row.querySelector('z-select').addEventListener('change', e => on_operator_change(Number(e.target.value)));
@@ -251,9 +256,21 @@ window.ceprule_operation_edit_popup = new class {
 			}
 		});
 
+		const sorter = (option_left, option_right) => {
+			if (option_left.label === option_right.label) {
+				return 0;
+			}
+
+			return option_left.label > option_right.label ? 1 : -1;
+		};
+
+		events_options.sort(sorter);
+		tags_options.sort(sorter);
+		window_options.sort(sorter);
+
 		zselect.clearOptions();
-		zselect.addOptionGroup({label: <?= json_encode(_('Events')) ?>, options: events_options});
-		zselect.addOptionGroup({label: <?= json_encode(_('Tags')) ?>, options: tags_options});
+		zselect.addOptionGroup({label: <?= json_encode(_('Event')) ?>, options: events_options});
+		zselect.addOptionGroup({label: <?= json_encode(_('Tag')) ?>, options: tags_options});
 		zselect.addOptionGroup({label: <?= json_encode(_('Window')) ?>, options: window_options});
 		zselect.value = type;
 

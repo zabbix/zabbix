@@ -16,12 +16,7 @@
 #ceprule-operations-table,
 #ceprule-filter-conditions {
 	.text {
-		@extend %space-pre-wrap;
-	}
-}
-
-#ceprule-list-table {
-	td {
-		@extend %space-pre-wrap;
+		word-break: break-word;
+		white-space: break-spaces;
 	}
 }

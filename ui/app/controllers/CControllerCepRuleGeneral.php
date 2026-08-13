@@ -48,10 +48,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 					$is_exists_operator = $condition['operator'] == CONDITION_OPERATOR_EXISTS
 						|| $condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS;
 
-					if ($is_exists_operator) {
-						$condition['tag_value'] = '';
-					}
-
 					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG && !$is_exists_operator) {
 						$condition['type'] = CCepRuleHelper::CONDITION_TAG_VALUE;
 					}
@@ -126,7 +122,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SET_SEVERITY]
 			]],
-			'suppress_duration' => ['string', 'required', 'not_empty',
+			'suppress_duration' => ['string', 'required',
 				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
 			],
@@ -157,8 +153,8 @@ abstract class CControllerCepRuleGeneral extends CController {
 						]]
 					],
 					['db cep_operation_condition.operator', 'required',
-						'in' => [TAG_OPERATOR_EXISTS, TAG_OPERATOR_EQUAL, TAG_OPERATOR_LIKE,
-							TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_NOT_LIKE,
+						'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_LIKE,
+							CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_NOT_LIKE,
 							CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO
 						],
 						'when' => ['type',
@@ -169,7 +165,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'value' => ['db cep_operation_condition.value', 'required',
 					'when' => [
 						['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]],
-						['operator', 'not_in' => [TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_EXISTS]]
+						['operator', 'not_in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]]
 					]
 				]
 			]]

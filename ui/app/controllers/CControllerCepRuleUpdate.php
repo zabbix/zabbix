@@ -22,7 +22,7 @@ class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
 	}
 
 	public static function getValidationRules(): array {

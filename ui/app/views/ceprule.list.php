@@ -78,7 +78,6 @@ $url = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $table = (new CTableInfo())
-	->setId('ceprule-list-table')
 	->setHeader([
 		(new CColHeader((new CCheckBox('all_items'))->onClick(
 			sprintf('checkAll("%s", "all_items", "cepruleids")', $form->getName())
@@ -146,9 +145,9 @@ foreach ($data['ceprules'] as $ceprule) {
 					->getUrl()
 				),
 			_('Event correlation'),
-			$conditions,
+			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
 			'',
-			$operations,
+			(new CCol($operations))->addClass(ZBX_STYLE_WORDBREAK),
 			'',
 			'',
 			(new CLink($ceprule['status'] == ZBX_CORRELATION_ENABLED ? _('Enabled') : _('Disabled')))
@@ -172,9 +171,9 @@ foreach ($data['ceprules'] as $ceprule) {
 				->setArgument('cepruleid', $ceprule['cepruleid'])
 				->getUrl()),
 			_('Complex event processing'),
-			$conditions,
+			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
 			CCepRuleHelper::getWindowLabelString($ceprule),
-			$operations,
+			(new CCol($operations))->addClass(ZBX_STYLE_WORDBREAK),
 			$make_stop_indicator($ceprule),
 			$ceprule['sortorder'],
 			(new CLink($ceprule['status'] == CCepRuleHelper::STATUS_ENABLED ? _('Enabled') : _('Disabled')))
