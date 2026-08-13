@@ -1707,5 +1707,6 @@ zbx_uint64_t	zbx_dc_get_cache_size(void);
 zbx_uint64_t	zbx_dc_config_get_config_revision(void);
 
 unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type,
-		zbx_get_config_forks_f	get_config_forks, unsigned char *proc_poller);
+		zbx_get_config_forks_f	get_config_forks, unsigned char *proc_poller,
+		unsigned char *itemtype_nonpoller);
 #endif

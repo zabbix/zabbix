@@ -485,8 +485,10 @@ static int	cmp_key_id(const char *key_1, const char *key_2)
 }
 
 unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type,
-		zbx_get_config_forks_f	get_config_forks, unsigned char *proc_poller)
+		zbx_get_config_forks_f get_config_forks, unsigned char *proc_poller, unsigned char *itemtype_nonpoller)
 {
+	*itemtype_nonpoller = 0;
+
 	switch (type)
 	{
 		case ITEM_TYPE_SIMPLE:
@@ -560,6 +562,8 @@ unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned c
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
+		default:
+			*itemtype_nonpoller = 1;
 	}
 
 	return ZBX_NO_POLLER;
@@ -801,7 +805,7 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
 {
-	unsigned char	poller_type, proc_poller;
+	unsigned char	poller_type, proc_poller, itemtype_nonpoller;
 	unsigned char	snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO; /* oid type is only used by ITEM_TYPE_SNMP*/
 
 	if (HOST_MONITORED_BY_SERVER != dc_host->monitored_by &&
@@ -814,7 +818,8 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 	if (ITEM_TYPE_SNMP == dc_item->type)
 		snmp_oid_type = dc_item->itemtype.snmpitem->snmp_oid_type;
 
-	poller_type = zbx_poller_by_item(dc_item->type, dc_item->key, snmp_oid_type, get_config_forks_cb, &proc_poller);
+	poller_type = zbx_poller_by_item(dc_item->type, dc_item->key, snmp_oid_type, get_config_forks_cb, &proc_poller,
+			&itemtype_nonpoller);
 
 	if (0 != (flags & ZBX_HOST_UNREACHABLE))
 	{
@@ -3295,13 +3300,16 @@ static void	make_item_unsupported(ZBX_DC_ITEM *item, unsigned char poller_type)
 
 static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
 {
-	unsigned char	prc_poller, snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
+	unsigned char	proc_poller, itemtype_nonpoller, snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
 
 	if (ITEM_TYPE_SNMP == item->type)
 		snmp_oid_type = item->itemtype.snmpitem->snmp_oid_type;
 
-	if (ZBX_NO_POLLER == zbx_poller_by_item(item->type, item->key, snmp_oid_type, get_config_forks_cb, &prc_poller))
-		make_item_unsupported(item, prc_poller);
+	if (ZBX_NO_POLLER == zbx_poller_by_item(item->type, item->key, snmp_oid_type, get_config_forks_cb,
+			&proc_poller, &itemtype_nonpoller) && 0 == itemtype_nonpoller)
+	{
+		make_item_unsupported(item, proc_poller);
+	}
 }
 
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_new_config_t synced,
