@@ -235,7 +235,8 @@ class CControllerMaintenanceEdit extends CController {
 				'triggerids' => $event['objectid'],
 				'selectHosts' => ['hostid', 'name'],
 				'selectHostGroups' => ['groupid', 'name'],
-				'selectItems' => ['hostid']
+				'selectItems' => ['hostid'],
+				'editable' => true
 			]);
 
 			if ($db_triggers) {
