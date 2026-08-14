@@ -142,6 +142,20 @@ class CControllerUsergroupEdit extends CController {
 			}
 		}
 
+		CArrayHelper::sort($data['tag_filters'], ['name']);
+
+		$tag_filters_badges = $data['tag_filters'];
+
+		foreach ($tag_filters_badges as $key => $group) {
+			$tags = $group['tags'];
+
+			if (!$tags || (count($tags) == 1 && $tags[key($tags)]['tag'] === '')) {
+				unset($tag_filters_badges[$key]);
+			}
+		}
+
+		$data['tag_filters_badges'] = CTagHelper::getTagsHtml($tag_filters_badges, ZBX_TAG_OBJECT_HOST_GROUP);
+
 		$data['ms_proxy'] = $this->hasInput('usrgrpid')
 			? CArrayHelper::renameObjectsKeys(API::Proxy()->get([
 				'output' => ['proxyid', 'name'],
@@ -159,19 +173,7 @@ class CControllerUsergroupEdit extends CController {
 			: [];
 
 		CArrayHelper::sort($data['ms_proxy_group'], ['name']);
-		CArrayHelper::sort($data['tag_filters'], ['name']);
 
-		$tag_filters_badges = $data['tag_filters'];
-
-		foreach ($tag_filters_badges as $key => $group) {
-			$tags = $group['tags'];
-
-			if (!$tags || (count($tags) == 1 && $tags[key($tags)]['tag'] === '')) {
-				unset($tag_filters_badges[$key]);
-			}
-		}
-
-		$data['tag_filters_badges'] = CTagHelper::getTagsHtml($tag_filters_badges, ZBX_TAG_OBJECT_HOST_GROUP);
 		$data['users_ms'] = $this->getUsersMs();
 		$data['can_update_group'] = !$this->hasInput('usrgrpid') || !API::User()->get([
 			'output' => [],

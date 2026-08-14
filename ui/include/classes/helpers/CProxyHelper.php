@@ -24,7 +24,7 @@ class CProxyHelper {
 	 * @return array
 	 */
 	public static function resolveProxyOption(string $proxyid): array {
-		if ($proxyid === '0') {
+		if ($proxyid == 0) {
 			return [];
 		}
 
