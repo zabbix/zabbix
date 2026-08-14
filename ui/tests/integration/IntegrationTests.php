@@ -91,9 +91,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
 		$suite->addTestSuite('testDataCollection');
-		if (strtoupper((string) getenv('ENCRYPTION')) !== 'NONE') {
-			$suite->addTestSuite('testEncryptionDataCollection');
-		}
+		$suite->addTestSuite('testEncryptionDataCollection');
 		$suite->addTestSuite('testBinaryAndJSONValueTypesDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
