@@ -378,6 +378,10 @@ switch ($data['popup_type']) {
 				array_pop($description);
 			}
 
+			if (!array_key_exists('state', $trigger)) {
+				$trigger['state'] = null;
+			}
+
 			$table->addRow([
 				$check_box,
 				$description,
