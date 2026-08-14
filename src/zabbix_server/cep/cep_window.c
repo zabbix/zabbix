@@ -269,12 +269,6 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule, zbx_cep_w
 
 	zbx_vector_cep_window_sync_entry_create(&window->sync);
 
-	zbx_cep_window_sync_entry_t	sync_local = {
-			.type = CEP_WINDOW_SYNC_CREATE
-	};
-
-	zbx_vector_cep_window_sync_entry_append(&window->sync, sync_local);
-
 	return window;
 }
 
@@ -848,7 +842,6 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 	cep_window_pool_enqueue(pool, window);
 	cep_window_pool_release(&pool);
 
-	cep_window_sync_entry_submit(window, tasks);
 	cep_window_release(window);
 out:
 	zbx_free(error);
@@ -1383,6 +1376,12 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 			zbx_hashset_remove_direct(&pool->windows, ref);
 			return NULL;
 		}
+
+		zbx_cep_window_sync_entry_t	sync_local = {
+			.type = CEP_WINDOW_SYNC_CREATE
+		};
+
+		zbx_vector_cep_window_sync_entry_append(&ref->window->sync, sync_local);
 	}
 
 	return cep_window_addref(ref->window);
