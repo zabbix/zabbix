@@ -94,11 +94,11 @@ window.ceprule_edit_popup = new class {
 		this.form.findFieldByName('operations').setButtonOnBlur('js-operation-add', 'ceprule.operation.edit');
 
 		this.#handleFilterChanged();
+		this.#handleOptgroupTagChange.call(window['ceprule-window-groupby-opt-tag']);
+		this.#handleWindowTypeChanged(Number(ceprule.window_type));
+
 		window['ceprule-window-counttag-toggle'].dispatchEvent(new Event('change'));
 		window['ceprule-window-capacity-toggle'].dispatchEvent(new Event('change'));
-		window['ceprule-window-groupby-opt-tag'].dispatchEvent(new Event('change'));
-
-		this.#handleWindowTypeChanged();
 
 		window.requestAnimationFrame(() => {
 			this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE);
@@ -187,12 +187,18 @@ window.ceprule_edit_popup = new class {
 			window['ceprule-window-capacity'].disabled = !enabled;
 		});
 
-		window['ceprule-window-groupby-opt-tag'].addEventListener('change', (e) => {
-			window['ceprule-window-groupby-tag'].style.display = e.target.checked ? '' : 'none';
-			jQuery(window['ceprule-window-groupby-tag']).multiSelect(e.target.checked ? 'enable' : 'disable');
+		window['ceprule-window-groupby-opt-tag']
+			.addEventListener('change', e => this.#handleOptgroupTagChange.call(e.target));
+
+		window['ceprule-window-groupby-opt-host'].addEventListener('change', e => {
+			this.form.findFieldByName('window[group_by_tags]').setChanged();
+		});
+		window['ceprule-window-groupby-opt-group'].addEventListener('change', e => {
+			this.form.findFieldByName('window[group_by_tags]').setChanged();
 		});
 
-		window['ceprule-window-type'].addEventListener('change', () => this.#handleWindowTypeChanged());
+		window['ceprule-window-type']
+			.addEventListener('change', e => this.#handleWindowTypeChanged(Number(e.target.value)));
 
 		new CSortable(window['ceprule-operations-table'].querySelector('tbody'), {
 			selector_span: ':not(.error-container-row)',
@@ -226,15 +232,12 @@ window.ceprule_edit_popup = new class {
 		});
 	}
 
-	#handleWindowTypeChanged() {
-		const type = Number(this.form.findFieldByName('window_type').getValue());
+	#handleOptgroupTagChange() {
+		window['ceprule-window-groupby-tag'].style.display = this.checked ? '' : 'none';
+		jQuery(window['ceprule-window-groupby-tag']).multiSelect(this.checked ? 'enable' : 'disable');
+	}
 
-		if (this.form.findFieldByName('window[group_by_host]').hasChanged()
-				|| this.form.findFieldByName('window[group_by_host_group]').hasChanged()
-				|| this.form.findFieldByName('window[group_by_tags]').hasChanged()) {
-			this.form.validateChanges(['window[group_by_tags]']);
-		}
-
+	#handleWindowTypeChanged(type) {
 		window['ceprule-operations-label']
 			.classList.toggle('form-label-asterisk', type != <?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>);
 
@@ -292,6 +295,15 @@ window.ceprule_edit_popup = new class {
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
 		}
+
+		const group_field_names = ['window[group_by_host]', 'window[group_by_host_group]', 'window[group_by_tags]'];
+
+		if (group_field_names.find(name => this.form.findFieldByName(name).hasChanged())) {
+			group_field_names.forEach(name => this.form.findFieldByName(name).setChanged());
+			this.form.validateChanges(group_field_names);
+		}
+
+		this.#handleOptgroupTagChange.call(window['ceprule-window-groupby-opt-tag']);
 	}
 
 	#delete() {
