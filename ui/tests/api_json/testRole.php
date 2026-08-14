@@ -505,7 +505,7 @@ class testRole extends CAPITest {
 			]
 		];
 
-		yield '"api.access" default is set according to role user type' => [
+		yield '"api.access" is disabled by default' => [
 			[
 				[
 					'name' => 'bulk create default "api.access" for USER_TYPE_SUPER_ADMIN',
