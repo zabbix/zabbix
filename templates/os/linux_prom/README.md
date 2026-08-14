@@ -28,7 +28,7 @@ Zabbix version: 8.0 and higher.
 This template has been tested on:
 - node_exporter 0.17.0
 - node_exporter 0.18.1
-- node_exporter 1.17.0
+- node_exporter 1.9.0
 
 ## Configuration
 

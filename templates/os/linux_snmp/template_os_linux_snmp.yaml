@@ -63,7 +63,7 @@ zabbix_export:
         You can also try to use `snmpconf`: http://www.net-snmp.org/wiki/index.php/TUT:snmpd_configuration.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -1891,6 +1891,7 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.walk.data[dskEntry.{#SNMPINDEX}]'
+              history: '0'
               value_type: TEXT
               description: |
                 MIB: UCD-SNMP-MIB

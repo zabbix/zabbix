@@ -138,7 +138,7 @@ zabbix_export:
           name: 'Get node_exporter metrics'
           type: HTTP_AGENT
           key: node_exporter.get
-          history: 1h
+          history: '0'
           value_type: TEXT
           url: 'http://{$NODE_EXPORTER_HOST}:{$NODE_EXPORTER_PORT}/metrics'
           tags:
