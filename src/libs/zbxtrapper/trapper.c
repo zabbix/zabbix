@@ -1160,6 +1160,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to,
 		zbx_ipc_async_socket_t *rtc)
 {
+#define ZBX_NON_JSON_LOG_INTERVAL	5
 	int			ret = SUCCEED;
 	static double		last_log_time;
 	double			now;
@@ -1177,7 +1178,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	{
 		now = zbx_time();
 
-		if (5 <= now - last_log_time)
+		if (ZBX_NON_JSON_LOG_INTERVAL <= now - last_log_time)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "trapper got non-JSON data from \"%s\""
 					" (legacy protocols are not supported)", sock->peer);
@@ -1198,7 +1199,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 
 		return FAIL;
 	}
-
 
 	if (SUCCEED != zbx_json_open(s, &jp))
 	{
@@ -1334,6 +1334,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	}
 
 	return ret;
+#undef ZBX_NON_JSON_LOG_INTERVAL
 }
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
