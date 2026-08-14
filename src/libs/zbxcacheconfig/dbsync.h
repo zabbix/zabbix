@@ -270,7 +270,7 @@ int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync);
 
 int	zbx_dbsync_prepare_cep_rule(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_cep_condition(zbx_dbsync_t *sync);
-int	zbx_dbsync_prepare_cep_window(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_cep_rule_window(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_cep_window_condition(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_cep_operation(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_cep_operation_condition(zbx_dbsync_t *sync);

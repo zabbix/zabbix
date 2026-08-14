@@ -1459,7 +1459,7 @@ static int	DBpatch_7050119(void)
 static int	DBpatch_7050120(void)
 {
 	const zbx_db_table_t	table =
-			{"cep_window", "cep_ruleid", 0,
+			{"cep_rule_window", "cep_ruleid", 0,
 				{
 					{"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -1481,29 +1481,29 @@ static int	DBpatch_7050120(void)
 
 static int	DBpatch_7050121(void)
 {
-	return DBcreate_index("cep_window", "cep_window_1", "cep_ruleid", 0);
+	return DBcreate_index("cep_rule_window", "cep_rule_window_1", "cep_ruleid", 0);
 }
 
 static int	DBpatch_7050122(void)
 {
 	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
-	return DBadd_foreign_key("cep_window", 1, &field);
+	return DBadd_foreign_key("cep_rule_window", 1, &field);
 }
 
 static int	DBpatch_7050123(void)
 {
-	return DBcreate_changelog_insert_trigger("cep_window", "cep_ruleid");
+	return DBcreate_changelog_insert_trigger("cep_rule_window", "cep_ruleid");
 }
 
 static int	DBpatch_7050124(void)
 {
-	return DBcreate_changelog_update_trigger("cep_window", "cep_ruleid");
+	return DBcreate_changelog_update_trigger("cep_rule_window", "cep_ruleid");
 }
 
 static int	DBpatch_7050125(void)
 {
-	return DBcreate_changelog_delete_trigger("cep_window", "cep_ruleid");
+	return DBcreate_changelog_delete_trigger("cep_rule_window", "cep_ruleid");
 }
 
 static int	DBpatch_7050126(void)
@@ -1608,9 +1608,9 @@ static int	DBpatch_7050137(void)
 static int	DBpatch_7050138(void)
 {
 	const zbx_db_table_t	table =
-			{"cep_group", "cep_groupid", 0,
+			{"cep_window", "cep_windowid", 0,
 				{
-					{"cep_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"cep_windowid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"group_by", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
@@ -1628,16 +1628,15 @@ static int	DBpatch_7050138(void)
 
 static int	DBpatch_7050139(void)
 {
-	return DBcreate_index("cep_group", "cep_group_1", "cep_ruleid", 0);
+	return DBcreate_index("cep_window", "cep_window_1", "cep_ruleid", 0);
 }
 
 static int	DBpatch_7050140(void)
 {
 	const zbx_db_table_t	table =
-			{"cep_group_event", "cep_group_eventid", 0,
+			{"cep_window_event", "cep_windowid,eventid", 0,
 				{
-					{"cep_group_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"cep_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"cep_windowid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{0}
 				},
@@ -1649,7 +1648,7 @@ static int	DBpatch_7050140(void)
 
 static int	DBpatch_7050141(void)
 {
-	return DBcreate_index("cep_group_event", "cep_group_event_1", "cep_groupid,cep_groupid_eventid", 0);
+	return DBcreate_index("cep_window_event", "cep_window_event_1", "eventid", 0);
 }
 
 static int	DBpatch_7050142(void)

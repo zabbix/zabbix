@@ -7877,7 +7877,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	if (FAIL == zbx_dbsync_prepare_cep_condition(&cep_condition_sync))
 		goto out;
 
-	if (FAIL == zbx_dbsync_prepare_cep_window(&cep_window_sync))
+	if (FAIL == zbx_dbsync_prepare_cep_rule_window(&cep_window_sync))
 		goto out;
 
 	if (FAIL == zbx_dbsync_prepare_cep_operation(&cep_operation_sync))

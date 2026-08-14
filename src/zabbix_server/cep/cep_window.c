@@ -510,6 +510,7 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
 		cep_window_sync_entry_log_event_add(window, zbx_cep_event_handle_eventid(ctx->hevent));
+		cep_window_sync_entry_submit(window, tasks);
 
 		cep_window_unlock(window);
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
@@ -519,6 +520,7 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 	{
 		cep_window_lock(window);
 		cep_window_close(rule, window, tasks);
+		cep_window_sync_entry_submit(window, tasks);
 		cep_window_unlock(window);
 	}
 
@@ -823,6 +825,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
 		cep_window_sync_entry_log_event_add(window, zbx_cep_event_handle_eventid(ctx->hevent));
+		cep_window_sync_entry_submit(window, tasks);
 
 		if (0 != start_time)
 			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
@@ -836,6 +839,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 		/* if the window is still empty until the next processing time, it will be removed */
 		cep_window_lock(window);
 		cep_window_close(rule, window, tasks);
+		cep_window_sync_entry_submit(window, tasks);
 		cep_window_unlock(window);
 	}
 
@@ -985,6 +989,7 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
 		cep_window_sync_entry_log_event_add(window, zbx_cep_event_handle_eventid(ctx->hevent));
+		cep_window_sync_entry_submit(window, tasks);
 
 		cep_window_unlock(window);
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
@@ -994,6 +999,7 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 	{
 		cep_window_lock(window);
 		cep_window_close(rule, window, tasks);
+		cep_window_sync_entry_submit(window, tasks);
 		atomic_store(&window->nextcheck, (zbx_uint64_t)time(NULL));
 		cep_window_unlock(window);
 	}
@@ -1544,12 +1550,13 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	pool->next_windowid = zbx_dbconn_get_maxid_num(db, "cep_group", 1);
+	pool->next_windowid = zbx_dbconn_get_maxid_num(db, "cep_window", 1);
 
 	hconfig = zbx_cep_config_open();
 
-	result = zbx_dbconn_select(db, "select cep_groupid,cep_ruleid,group_by,groupid,hostid,tags,tags_value,nextcheck"
-					" from cep_group");
+	result = zbx_dbconn_select(db,
+		"select cep_windowid,cep_ruleid,group_by,groupid,hostid,tags,tags_value,nextcheck"
+		" from cep_window");
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1587,8 +1594,6 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 		win_local.window = ref->window;
 
 		zbx_hashset_insert(windows, &win_local, sizeof(win_local));
-
-		zbx_cep_rule_release(rule);
 	}
 	zbx_db_free_result(result);
 
@@ -1623,8 +1628,8 @@ static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = zbx_dbconn_select(db, "select cep_groupid,eventid from cep_group_event"
-					" order by cep_groupid,cep_group_eventid");
+	result = zbx_dbconn_select(db, "select cep_windowid,eventid from cep_window_event"
+					" order by cep_windowid,eventid");
 
 	cep_cache_acquire(&cep);
 

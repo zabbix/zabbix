@@ -4267,7 +4267,7 @@ out:
 	return ret;
 }
 
-int	zbx_dbsync_prepare_cep_window(zbx_dbsync_t *sync)
+int	zbx_dbsync_prepare_cep_rule_window(zbx_dbsync_t *sync)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -4278,7 +4278,7 @@ int	zbx_dbsync_prepare_cep_window(zbx_dbsync_t *sync)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select cep_ruleid,type,duration,capacity,script,group_by_host_group,"
 				"group_by_host,group_by_tags,tags,event_count_tag"
-			" from cep_window");
+			" from cep_rule_window");
 
 	dbsync_prepare(sync, 10, NULL);
 

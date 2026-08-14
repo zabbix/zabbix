@@ -1786,9 +1786,9 @@ static int	cep_window_sync_entry_compare(const void *a1, const void *a2)
 static void	cep_db_sync_window_destroy(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
 		zbx_cep_window_t *window)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_group_event where cep_groupid="
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_window_event where cep_windowid="
 			ZBX_FS_UI64 ";\n", window->windowid);
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_group where cep_groupid="
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_window where cep_windowid="
 			ZBX_FS_UI64 ";\n", window->windowid);
 	zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL);
 }
@@ -1801,7 +1801,7 @@ static int	cep_db_sync_window_create(zbx_dbconn_t *db, zbx_db_insert_t *db_inser
 
 	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_group))
 	{
-		zbx_dbconn_prepare_insert(db, db_insert_group, "cep_group", "cep_groupid", "cep_ruleid", "group_by",
+		zbx_dbconn_prepare_insert(db, db_insert_group, "cep_window", "cep_windowid", "cep_ruleid", "group_by",
 				"groupid", "hostid", "tags", "tags_value", "nextcheck", NULL);
 	}
 
@@ -1823,7 +1823,7 @@ static int	cep_db_sync_window_create(zbx_dbconn_t *db, zbx_db_insert_t *db_inser
 static void	cep_db_window_sync_event_remove(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
 		zbx_uint64_t windowid, zbx_uint64_t eventid)
 {
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_group_event where cep_groupid=" ZBX_FS_UI64
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_window_event where cep_windowid=" ZBX_FS_UI64
 			" and eventid=" ZBX_FS_UI64 ";\n", windowid, eventid);
 	zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL);
 }
@@ -1833,7 +1833,8 @@ static void	cep_db_window_sync_event_add(zbx_dbconn_t *db, zbx_db_insert_t *db_i
 {
 	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_group_event))
 	{
-		zbx_dbconn_prepare_insert(db, db_insert_group_event, "cep_group_event", "cep_groupid", "eventid", NULL);
+		zbx_dbconn_prepare_insert(db, db_insert_group_event, "cep_window_event", "cep_windowid", "eventid",
+				NULL);
 	}
 
 	zbx_db_insert_add_values(db_insert_group_event, windowid, eventid);
