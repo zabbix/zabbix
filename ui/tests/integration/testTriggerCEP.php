@@ -86,7 +86,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const SKIP_UNSUPPRESS_WAIT = true;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
-	const SKIP_SERVICES_TESTS = false;
+	const SKIP_SERVICES_TESTS = null;
 
 	// Set to true to run the CEP window scenarios alone, so a debugging run starts at the windows instead of at
 	// the hundred correlation and trigger scenarios that come before them: every test with "Cep" in its name is
@@ -6171,6 +6171,7 @@ HEREDOC;
 		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
 		$this->assertCepStatEquals('cache', 'events', 0);
 		$this->assertCepStatEquals('cache', 'objects', 0);
+		$this->assertCepNoWindows();
 	}
 
 	/**
@@ -8896,6 +8897,7 @@ HEREDOC;
 			$this->waitForNoOpenProblems($all, 'after the paired burst');
 			$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 			$this->assertCepStatEquals('cache', 'events', 0);
+			$this->assertCepNoWindows();
 		}
 		finally {
 			// The sequence closed every problem itself; only the rule must not survive it.
@@ -8964,6 +8966,7 @@ HEREDOC;
 			$this->waitForNoOpenProblems($triggerids, 'after the closing up wave');
 			$this->waitForParentsValue($triggerids, TRIGGER_VALUE_FALSE);
 			$this->assertCepStatEquals('cache', 'events', 0);
+			$this->assertCepNoWindows();
 		}
 		finally {
 			// The sequence closed every problem itself; only the rule must not survive it.
@@ -9076,9 +9079,11 @@ HEREDOC;
 		$this->waitForNoOpenProblems($triggerids, 'close by window correlation');
 		$this->waitForParentsValue($triggerids, TRIGGER_VALUE_FALSE);
 
-		// Nothing is left cached once every problem of every trigger is closed.
+		// Nothing is left cached once every problem of every trigger is closed, and the windows the rule
+		// closed are gone with the events they held.
 		$this->assertCepStatEquals('cache', 'events', 0);
 		$this->assertCepStatEquals('cache', 'objects', 0);
+		$this->assertCepNoWindows();
 
 		if ($check_services) {
 			$this->waitForServicesStatus(ZBX_SEVERITY_OK);
@@ -11197,6 +11202,7 @@ HEREDOC;
 		// problem is open in the system at this point, so cache.events must drain back to zero.
 		$this->assertCepStatEquals('cache', 'events', 0);
 		$this->assertCepStatEquals('cache', 'objects', 0);
+		$this->assertCepNoWindows();
 		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'diaginfo=cep');
 	}
 
@@ -15967,6 +15973,7 @@ HEREDOC;
 		if ($wait_cep_drained) {
 			$this->assertCepStatEquals('cache', 'events', 0);
 			$this->assertCepStatEquals('cache', 'objects', 0);
+			$this->assertCepNoWindows();
 		}
 	}
 
@@ -16391,7 +16398,8 @@ HEREDOC;
 			},
 			['single' => false, 'state' => 0],
 			null,
-			// Surface up to 10 still-open problems to help diagnose why the cache did not drain.
+			// Surface up to 10 still-open problems to help diagnose why the counter did not settle: an open
+			// problem is what keeps an event cached, and a cached event what keeps its window alive.
 			function () use ($group, $name, $expected) {
 				$response = $this->call('problem.get', [
 					'object' => EVENT_OBJECT_TRIGGER,
@@ -16413,6 +16421,18 @@ HEREDOC;
 						'. Open problems (max 10): '.json_encode($response['result']);
 			}
 		);
+	}
+
+	/**
+	 * Poll the zabbix["cep"] statistics until no CEP window is left in the window pool.
+	 *
+	 * A window exists only as long as it holds events, so this belongs beside the assertions that the cache
+	 * drained: with nothing cached no window can be holding anything, and an emptied window is dropped from
+	 * the pool at its next examination (see cep_window_pool_remove_window()). That examination is what the
+	 * polling waits out - a window that survives it is one the scenario left behind.
+	 */
+	private function assertCepNoWindows(): void {
+		$this->assertCepStatEquals('windows', 'total', 0);
 	}
 
 	public static function clearData(): void {

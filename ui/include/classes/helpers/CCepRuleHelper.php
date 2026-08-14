@@ -209,6 +209,7 @@ class CCepRuleHelper {
 			self::OP_CLOSE_WINDOW
 		],
 		self::WHEN_WINDOW_CLOSED => [
+			self::OP_SET_NAME,
 			self::OP_CLOSE_EVENT,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,
@@ -227,8 +228,6 @@ class CCepRuleHelper {
 		],
 		self::WHEN_PATTERN_MATCHED => [
 			self::OP_DISCARD,
-			self::OP_COPY_FIRST,
-			self::OP_COPY_LAST,
 			self::OP_CLOSE_EVENT,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,
