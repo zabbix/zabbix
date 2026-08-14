@@ -1065,8 +1065,8 @@ zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_
 	zbx_cep_acknowledge_t	ack = {0};
 	zbx_uint64_t		opmask = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64 " operations:%d", __func__, rule->ruleid,
-			rule->operations.values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64 " operations:%d when:%d", __func__, rule->ruleid,
+			rule->operations.values_num, execute_when);
 
 	for (int i = 0; i < rule->operations.values_num; i++)
 	{
@@ -1130,7 +1130,7 @@ zbx_uint64_t	cep_rule_event_context_execute_ops(const zbx_cep_rule_t *rule, zbx_
 
 		/* there is no need for a sync task for new events since all event changes */
 		/* are still to be committed to database                                   */
-		if (0 != (ctx->sync_flags & CEP_SYNC_IGNORE))
+		if (0 == (ctx->sync_flags & CEP_SYNC_IGNORE))
 		{
 			zbx_mw_task_t	*t = cep_create_task_sync_event(ctx->hevent, ctx->sync_flags);
 
