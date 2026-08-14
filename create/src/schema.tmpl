@@ -2375,7 +2375,7 @@ FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
 CHANGELOG	|24
 
-TABLE|cep_window|cep_ruleid|ZBX_DATA
+TABLE|cep_rule_window|cep_ruleid|ZBX_DATA
 FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0			|1|cep_rule	|cep_ruleid	|RESTRICT
 FIELD		|type		|t_integer	|'1'	|NOT NULL	|0
 FIELD		|duration	|t_varchar(255)	|'10m'	|NOT NULL	|0
@@ -2389,8 +2389,8 @@ FIELD		|event_count_tag|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
 CHANGELOG	|25
 
-TABLE|cep_group|cep_groupid|0
-FIELD		|cep_groupid	|t_id		|	|NOT NULL	|0
+TABLE|cep_window|cep_windowid|0
+FIELD		|cep_windowid	|t_id		|	|NOT NULL	|0
 FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0
 FIELD		|group_by	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|groupid	|t_id		|	|NULL		|0
@@ -2400,9 +2400,11 @@ FIELD		|tags_value	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
 
-TABLE|cep_group_event|cep_groupid,eventid|0
-FIELD		|cep_groupid	|t_id		|	|NOT NULL	|0
+TABLE|cep_window_event|cep_windowid,eventid|0
+FIELD		|cep_windowid	|t_id		|	|NOT NULL	|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0
+INDEX		|1		|eventid
+
 
 TABLE|cep_operation|cep_operationid|ZBX_DATA
 FIELD		|cep_operationid|t_id		|	|NOT NULL	|0
