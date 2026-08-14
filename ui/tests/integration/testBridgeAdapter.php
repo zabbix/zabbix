@@ -132,6 +132,17 @@ class testBridgeAdapter extends CIntegrationTest {
 	private static array $severity_actionids = [];
 
 	public function serverConfigurationProvider(): array {
+		if (self::detectTLSLibrary() === 'none') {
+			return [
+				self::COMPONENT_SERVER => [
+					'DebugLevel' => 4,
+					'LogFileSize' => 20,
+					'EnableMobileDevices' => 1,
+					'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
+				]
+			];
+		}
+
 		self::$cert_base_dir = self::generateCertificates();
 		$base_dir = self::$cert_base_dir;
 
@@ -740,7 +751,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	}
 
 	public static function startBridgeAdapterMock(): void {
-		self::startBridgeAdapterMockInternal();
+		self::startBridgeAdapterMockInternal([], self::detectTLSLibrary() !== 'none');
 	}
 
 	public static function startBridgeAdapterMockWithNotifyError(): void {

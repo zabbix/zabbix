@@ -328,26 +328,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	// =========================================================================
 
 	/**
-	 * Determine which TLS library the server/agent binaries were built with.
-	 *
-	 * Mirrors the ENCRYPTION handling in build.xml's "with.encryption" property: GNUTLS, NONE, or
-	 * default to OpenSSL. Read directly from the environment (same as IntegrationTests::suite() reading
-	 * DB/HISTORY_STORAGE) rather than inferred from the binary, since server.c embeds the literal string
-	 * "GnuTLS or OpenSSL" in its config-validation errors precisely when built WITHOUT either library,
-	 * which made a strings/grep-based detection misidentify a no-TLS build as GnuTLS.
-	 */
-	private function detectTLSLibrary(): string {
-		switch (strtoupper((string) getenv('ENCRYPTION'))) {
-			case 'GNUTLS':
-				return 'gnutls';
-			case 'NONE':
-				return 'none';
-			default:
-				return 'openssl';
-		}
-	}
-
-	/**
 	 * Run zabbix_sender with certificate TLS options and return true when the
 	 * server reports "processed: 1".
 	 */

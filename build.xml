@@ -962,6 +962,7 @@
 	<target name="test-integration">
 		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<env key="UBSAN_OPTIONS" value="print_stacktrace=1:suppressions=../tests/ubsan.supp"/>
+			<env key="LSAN_OPTIONS" value="suppressions=${basedir}/tests/lsan.supp"/>
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
 			<arg line="--do-not-cache-result"/>

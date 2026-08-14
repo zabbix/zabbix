@@ -191,6 +191,10 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function agentConfigurationProviderTLS() {
+		if ($this->detectTLSLibrary() === 'none') {
+			$this->markTestSkipped('Server compiled without TLS support; skipping TLS data collection test.');
+		}
+
 		self::$certBaseDirAgent = self::generateCertificates();
 		$baseDir = self::$certBaseDirAgent;
 		return [
@@ -430,6 +434,10 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function proxyConfigurationProvider() {
+	if ($this->detectTLSLibrary() === 'none') {
+		$this->markTestSkipped('Server compiled without TLS support; skipping TLS data collection test.');
+	}
+
 	self::$certBaseDirProxy = self::generateCertificates();
 	$baseDir = self::$certBaseDirProxy;
 
