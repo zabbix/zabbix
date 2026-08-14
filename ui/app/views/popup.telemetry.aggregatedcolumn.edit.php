@@ -45,7 +45,7 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Percentage'), 'percentile'))->setAsteriskMark()->setId('js-percentile-label'),
 		(new CFormField(
-			(new CTextBox('percentile', $data['percentile']))
+			(new CTextBox('percentile', $data['percentile'], false, 7))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		))->setId('js-percentile-field')

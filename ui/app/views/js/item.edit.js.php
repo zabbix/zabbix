@@ -743,9 +743,17 @@ window.item_edit_form = new class {
 
 	#addAggregatedColumnRow(data) {
 		const tbody = this.form_element.querySelector('#aggregated-columns-table tbody');
-		const label = this.telemetry_function_labels[data.function];
-		const function_label = data.column === '' ? label : `${label}(${data.column})`;
+		const func = parseInt(data.function, 10);
 		const percentile = data.percentile ?? '';
+		let function_label = this.telemetry_function_labels[func];
+
+		if (func === <?= AGGREGATE_PCTILE ?>) {
+			function_label += `(${data.column}, ${percentile})`;
+		}
+		else if (func !== <?= AGGREGATE_COUNT ?>) {
+			function_label += `(${data.column})`;
+		}
+
 		const source = document.getElementById('aggregated-column-row-tmpl').innerHTML;
 		const html = new Template(source).evaluate({...data, function_label, percentile});
 		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);

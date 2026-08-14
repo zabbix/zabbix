@@ -95,7 +95,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 				]
 			],
 			'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_AGGREGATED_COLUMNS),
-			'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100,
+			'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
 				'when' => ['function', 'in' => [AGGREGATE_PCTILE]]
 			],
 			'alias' => $alias_rules
