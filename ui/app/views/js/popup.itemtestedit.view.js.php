@@ -62,7 +62,7 @@ window.itemtestedit_view_popup = new class {
 
 	#initEvents() {
 		this.#form.findFieldByName('not_supported')?.getField().addEventListener('change', (e) => {
-			const get_value_checked = this.#form.findFieldByName('get_value').getField().checked;
+			const get_value_checked = this.#form.findFieldByName('get_value').getValue() === 1;
 
 			$(this.#form.findFieldByName('value').getField())
 				.multilineInput(get_value_checked || e.target.checked ? 'setReadOnly' : 'unsetReadOnly');
@@ -95,7 +95,7 @@ window.itemtestedit_view_popup = new class {
 			return;
 		}
 
-		const get_value_checked = this.#form.findFieldByName('get_value').getField().checked;
+		const get_value_checked = this.#form.findFieldByName('get_value').getValue() === 1;
 
 		for (const element of this.#form_element.querySelectorAll('#test_with input')) {
 			element.disabled = !get_value_checked;
@@ -323,7 +323,7 @@ window.itemtestedit_view_popup = new class {
 	#submit() {
 		this.#removePopupMessages();
 		this.#cleanPreviousTestResults();
-		const fields = this.#getFormFields(this.#form.findFieldByName('get_value')?.getField().checked ? true : false);
+		const fields = this.#getFormFields(this.#form.findFieldByName('get_value').getValue() === 1);
 
 		this.#form.lock();
 		this.#setLoading();

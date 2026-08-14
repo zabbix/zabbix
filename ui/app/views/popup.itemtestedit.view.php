@@ -328,6 +328,13 @@ if ($data['is_item_testable']) {
 			->addStyle('text-align: right;')
 	]);
 }
+else {
+	$form->addItem(
+		(new CInput('hidden', 'get_value', 0))
+			->setAttribute('data-field-type', 'hidden')
+			->removeId()
+	);
+}
 
 $form_grid->addItem([
 	new CLabel([
