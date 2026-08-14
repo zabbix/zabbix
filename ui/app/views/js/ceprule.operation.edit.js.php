@@ -21,7 +21,6 @@
 
 window.ceprule_operation_edit_popup = new class {
 
-
 	/** @type {Object} */
 	#execute_when_for_window_type;
 
@@ -72,7 +71,7 @@ window.ceprule_operation_edit_popup = new class {
 
 	#initActions() {
 		this.form_element.addEventListener('change', (e) => {
-			e.target.id === 'ceprule-operation-execute-when' && this.#handleExecuteWhenChanged(e.target.value);
+			e.target.id === 'ceprule-operation-execute-when' && this.#handleExecuteWhenChanged();
 			e.target.id === 'ceprule-operation-type' && this.#handleOperationTypeChanged(e.target.value);
 		}, {capture: true});
 
@@ -86,16 +85,20 @@ window.ceprule_operation_edit_popup = new class {
 				});
 			}
 			else if (e.target.classList.contains('js-add-property')) {
-				this.#addPropertyRow({
-					type: this.#nextAvailablePropertyType(),
-					operator: <?= CONDITION_OPERATOR_YES ?>
-				});
+				const type = this.#nextAvailablePropertyType();
 
-				this.#updateAvailablePropertyTypes();
+				if (type !== undefined) {
+					this.#addPropertyRow({type, operator: <?= CONDITION_OPERATOR_YES ?>});
+					this.#updateAvailablePropertyTypes();
+				}
+				else {
+					throw 'No available property types';
+				}
 			}
 			else if (e.target.classList.contains('js-tag-remove')) {
 				e.target.closest('tr').remove();
 				this.form.discoverAllFields();
+				this.#updateAvailablePropertyTypes();
 			}
 			else if (e.target.classList.contains('js-property-remove')) {
 				e.target.closest('tr').remove();
@@ -103,6 +106,12 @@ window.ceprule_operation_edit_popup = new class {
 				this.#updateAvailablePropertyTypes();
 			}
 		});
+	}
+
+	#nextAvailablePropertyType() {
+		const [available] = this.#getPropertyTypes();
+
+		return available[0];
 	}
 
 	#addPropertyRow(property) {
@@ -167,8 +176,18 @@ window.ceprule_operation_edit_popup = new class {
 		return property_row;
 	}
 
-	#nextAvailablePropertyType() {
+	#getPropertyTypesForm() {
+		this.form.discoverAllFields();
+
 		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
+		const conditions = this.form.findFieldByName('filter[conditions]').getValue();
+		const used_property_types = Object.values(conditions).map(condition => Number(condition.type));
+
+		return {execute_when, used_property_types};
+	}
+
+	#getPropertyTypes() {
+		const {execute_when, used_property_types} = this.#getPropertyTypesForm();
 		const all_property_types = execute_when == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>
 			? [
 				<?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>,
@@ -184,43 +203,28 @@ window.ceprule_operation_edit_popup = new class {
 				<?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>,
 				<?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>
 			];
-		const used_property_types = this.#getActivePropertyTypes();
-		const available_types = all_property_types.filter(type => !used_property_types.includes(type));
 
-		if (available_types.length) {
-			return available_types[0];
-		}
+		const unused_property_types = all_property_types.filter(type => !used_property_types.includes(type));
 
-		throw 'No available property types';
-	}
-
-	#getActivePropertyTypes() {
-		const conditions = this.form.findFieldByName('filter[conditions]').getValue();
-
-		return Object.values(conditions).map(condition => Number(condition.type));
+		return [unused_property_types, used_property_types, all_property_types];
 	}
 
 	#updateAvailablePropertyTypes() {
-		// if (window.x){debugger;}
-		const used_property_types = this.#getActivePropertyTypes();
-		// let has_enabled_option = false;
+		const [available, unavailable, all] = this.#getPropertyTypes();
 
-		this.form_element.querySelectorAll('.js-property-type-select').forEach(zselect => {
-			const options = zselect.options.map(option => {
-				const is_value_option = zselect.value === option.value;
-				const is_disabled = !is_value_option && used_property_types.includes(Number(option.value));
-
-				// has_enabled_option |= !is_disabled;
-
-				return {...option, is_disabled}
-			});
-
+		this.form_element.querySelectorAll('.js-property-type-select')
+			.forEach(zselect => {
+				const options = zselect.options.map(option => (
+					{...option,
+						is_disabled: (unavailable.includes(Number(option.value))
+							|| !all.includes(Number(option.value)))
+							&& zselect.value !== option.value
+					}
+			));
 			zselect.clearOptions();
 			zselect.addOptions(options);
 			zselect.init();
 		});
-
-		// this.form_element.querySelector('.js-add-property').disabled = !has_enabled_option;
 	}
 
 	#updateHoistedLabelsView() {
@@ -398,7 +402,8 @@ window.ceprule_operation_edit_popup = new class {
 		}
 	}
 
-	#handleExecuteWhenChanged(value) {
+	#handleExecuteWhenChanged() {
 		this.#setAvailableOperationOptions();
+		this.#updateAvailablePropertyTypes();
 	}
 };
