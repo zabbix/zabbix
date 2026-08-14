@@ -703,9 +703,13 @@ class CConfigurationExport {
 		$db_proxies = array_column($db_proxies, null, 'proxyid');
 
 		foreach ($hosts as &$host) {
-			$host['proxy'] = ($host['proxyid'] != 0 && array_key_exists($host['proxyid'], $db_proxies))
-				? ['name' => $db_proxies[$host['proxyid']]['name']]
-				: [];
+			if ($host['proxyid'] != 0 && array_key_exists($host['proxyid'], $db_proxies)) {
+				$host['proxy'] = ['name' => $db_proxies[$host['proxyid']]['name']];
+			}
+			else {
+				$host['proxy'] = [];
+				$host['monitored_by'] = ZBX_MONITORED_BY_SERVER;
+			}
 		}
 		unset($host);
 
@@ -745,10 +749,13 @@ class CConfigurationExport {
 		$db_proxy_groups = array_column($db_proxy_groups, null, 'proxy_groupid');
 
 		foreach ($hosts as &$host) {
-			$host['proxy_group'] = $host['proxy_groupid'] != 0
-					&& array_key_exists($host['proxy_groupid'], $db_proxy_groups)
-				? ['name' => $db_proxy_groups[$host['proxy_groupid']]['name']]
-				: [];
+			if ($host['proxy_groupid'] != 0 && array_key_exists($host['proxy_groupid'], $db_proxy_groups)) {
+				$host['proxy_group'] = ['name' => $db_proxy_groups[$host['proxy_groupid']]['name']];
+			}
+			else {
+				$host['proxy_group'] = [];
+				$host['monitored_by'] = ZBX_MONITORED_BY_SERVER;
+			}
 		}
 		unset($host);
 
