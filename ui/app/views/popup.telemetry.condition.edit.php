@@ -63,9 +63,11 @@ $form_grid = (new CFormGrid())
 		new CFormField($operator)
 	])
 	->addItem([
-		(new CLabel(_('Attribute value'), 'value'))->setId('js-value-label'),
+		(new CLabel(_('Attribute value'), 'value'))->setAsteriskMark()->setId('js-value-label'),
 		(new CFormField(
-			(new CTextBox('value', $data['value']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextBox('value', $data['value']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
 		))->setId('js-value-field')
 	]);
 
