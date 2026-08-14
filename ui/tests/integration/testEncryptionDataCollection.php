@@ -118,6 +118,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData(): void {
+		if ($this->detectTLSLibrary() === 'none') {
+			throw new Exception('Server compiled without TLS support; skipping encryption tests.');
+		}
+
 		$agent_port  = $this->getConfigurationValue(self::COMPONENT_AGENT,  'ListenPort');
 		$agent2_port = $this->getConfigurationValue(self::COMPONENT_AGENT2, 'ListenPort');
 
@@ -330,7 +334,11 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		$out = shell_exec('strings '.escapeshellarg(PHPUNIT_BINARY_DIR.'zabbix_server').
 			' 2>/dev/null | grep -Ei "^GnuTLS|^OpenSSL" | head -3');
 
-		return ($out !== null && stripos($out, 'gnutls') !== false) ? 'gnutls' : 'openssl';
+		if ($out === null || trim($out) === '') {
+			return 'none';
+		}
+
+		return (stripos($out, 'gnutls') !== false) ? 'gnutls' : 'openssl';
 	}
 
 	/**
