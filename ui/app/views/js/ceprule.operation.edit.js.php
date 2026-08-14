@@ -83,6 +83,7 @@ window.ceprule_operation_edit_popup = new class {
 					operator: <?= TAG_OPERATOR_EQUAL ?>,
 					value: ''
 				});
+				this.#updateHoistedLabelsView();
 			}
 			else if (e.target.classList.contains('js-add-property')) {
 				const type = this.#nextAvailablePropertyType();
@@ -90,6 +91,7 @@ window.ceprule_operation_edit_popup = new class {
 				if (type !== undefined) {
 					this.#addPropertyRow({type, operator: <?= CONDITION_OPERATOR_YES ?>});
 					this.#updateAvailablePropertyTypes();
+					this.#updateHoistedLabelsView();
 				}
 				else {
 					throw 'No available property types';
@@ -99,11 +101,13 @@ window.ceprule_operation_edit_popup = new class {
 				e.target.closest('tr').remove();
 				this.form.discoverAllFields();
 				this.#updateAvailablePropertyTypes();
+				this.#updateHoistedLabelsView();
 			}
 			else if (e.target.classList.contains('js-property-remove')) {
 				e.target.closest('tr').remove();
 				this.form.discoverAllFields();
 				this.#updateAvailablePropertyTypes();
+				this.#updateHoistedLabelsView();
 			}
 		});
 	}
