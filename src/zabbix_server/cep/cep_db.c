@@ -1783,16 +1783,6 @@ static int	cep_window_sync_entry_compare(const void *a1, const void *a2)
 	return 0;
 }
 
-static void	cep_db_sync_window_destroy(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_cep_window_t *window)
-{
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_window_event where cep_windowid="
-			ZBX_FS_UI64 ";\n", window->windowid);
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_window where cep_windowid="
-			ZBX_FS_UI64 ";\n", window->windowid);
-	zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL);
-}
-
 static int	cep_db_sync_window_create(zbx_dbconn_t *db, zbx_db_insert_t *db_insert_group,
 		zbx_cep_window_t *window)
 {
@@ -1820,14 +1810,6 @@ static int	cep_db_sync_window_create(zbx_dbconn_t *db, zbx_db_insert_t *db_inser
 	return ret;
 }
 
-static void	cep_db_window_sync_event_remove(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_uint64_t windowid, zbx_uint64_t eventid)
-{
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_window_event where cep_windowid=" ZBX_FS_UI64
-			" and eventid=" ZBX_FS_UI64 ";\n", windowid, eventid);
-	zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL);
-}
-
 static void	cep_db_window_sync_event_add(zbx_dbconn_t *db, zbx_db_insert_t *db_insert_group_event,
 		zbx_uint64_t windowid, zbx_uint64_t eventid)
 {
@@ -1841,9 +1823,13 @@ static void	cep_db_window_sync_event_add(zbx_dbconn_t *db, zbx_db_insert_t *db_i
 }
 
 static void	cep_db_sync_window(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_db_insert_t *db_insert_group, zbx_db_insert_t *db_insert_group_event, zbx_cep_window_sync_t *sync)
+		zbx_db_insert_t *db_insert_group, zbx_db_insert_t *db_insert_group_event,
+		zbx_vector_uint64_t *delete_windowids, zbx_cep_window_sync_t *sync)
 {
-	zbx_uint64_t	last_eventid = 0;
+	zbx_uint64_t		last_eventid = 0;
+	zbx_vector_uint64_t	eventids;
+
+	zbx_vector_uint64_create(&eventids);
 
 	for (int i = 0; i < sync->log.values_num; i++)
 	{
@@ -1852,15 +1838,14 @@ static void	cep_db_sync_window(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, 
 		switch (entry->type)
 		{
 			case CEP_WINDOW_SYNC_DESTROY:
-				cep_db_sync_window_destroy(db, sql, sql_alloc, sql_offset, sync->window);
+				zbx_vector_uint64_append(delete_windowids, sync->window->windowid);
 				return;
 			case CEP_WINDOW_SYNC_CREATE:
 				if (FAIL == cep_db_sync_window_create(db, db_insert_group, sync->window))
 					return;
 				break;
 			case CEP_WINDOW_SYNC_EVENT_REMOVE:
-				cep_db_window_sync_event_remove(db, sql, sql_alloc, sql_offset, sync->window->windowid,
-						entry->eventid);
+				zbx_vector_uint64_append(&eventids, entry->eventid);
 				last_eventid = entry->eventid;
 				break;
 			case CEP_WINDOW_SYNC_EVENT_ADD:
@@ -1873,6 +1858,19 @@ static void	cep_db_sync_window(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, 
 
 		}
 	}
+
+	if (0 != eventids.values_num)
+	{
+		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_window_event where cep_windowid="
+				ZBX_FS_UI64 " and", sync->window->windowid);
+		zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, "eventid", eventids.values, eventids.values_num);
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+	}
+
+	zbx_vector_uint64_destroy(&eventids);
 }
 
 void	cep_db_sync_windows(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
@@ -1912,15 +1910,32 @@ void	cep_db_sync_windows(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 
 	do
 	{
-		size_t		sql_offset = 0;
-		zbx_db_insert_t	db_insert_group = {0}, db_insert_group_event = {0};
+		size_t			sql_offset = 0;
+		zbx_db_insert_t		db_insert_group = {0}, db_insert_group_event = {0};
+		zbx_vector_uint64_t	delete_windowids;
+
+		zbx_vector_uint64_create(&delete_windowids);
 
 		zbx_dbconn_begin(db);
 
 		for (int i = 0; i < syncs.values_num; i++)
 		{
 			cep_db_sync_window(db, &sql, &sql_alloc, &sql_offset, &db_insert_group, &db_insert_group_event,
-				&syncs.values[i]);
+				&delete_windowids, &syncs.values[i]);
+		}
+
+		if (0 != delete_windowids.values_num)
+		{
+			zbx_vector_uint64_sort(&delete_windowids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&delete_windowids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from cep_window_event where");
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "cep_windowid",
+					delete_windowids.values, delete_windowids.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\ndelete from cep_window where");
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "cep_windowid",
+					delete_windowids.values, delete_windowids.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 
 		zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
@@ -1936,6 +1951,8 @@ void	cep_db_sync_windows(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 			zbx_db_insert_execute(&db_insert_group_event);
 			zbx_db_insert_clean(&db_insert_group_event);
 		}
+
+		zbx_vector_uint64_destroy(&delete_windowids);
 	}
 	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
 
