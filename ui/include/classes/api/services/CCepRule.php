@@ -1250,7 +1250,7 @@ class CCepRule extends CApiService {
 			'SELECT cr.cep_ruleid,cr.name,cr.evaltype,cr.formula,cr.stop,cr.sortorder,cr.description,cr.status,'.
 				dbConditionCoalesce('cw.type', CCepRuleHelper::WINDOW_NONE, 'window_type').
 			' FROM cep_rule cr'.
-			' LEFT JOIN cep_window cw ON cr.cep_ruleid=cw.cep_ruleid'.
+			' LEFT JOIN cep_rule_window cw ON cr.cep_ruleid=cw.cep_ruleid'.
 			' WHERE '.dbConditionId('cr.cep_ruleid', array_column($cep_rules, 'cep_ruleid'))
 		), 'cep_ruleid');
 
