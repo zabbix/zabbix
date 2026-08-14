@@ -1521,7 +1521,7 @@ class CMaintenance extends CApiService {
 	}
 
 	private static function addRelatedTriggers(array $options, array &$result): void {
-		if ($options['selectTriggers'] === null || $options['selectTriggers'] === API_OUTPUT_COUNT) {
+		if ($options['selectTriggers'] === null) {
 			return;
 		}
 
