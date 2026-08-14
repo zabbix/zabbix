@@ -668,7 +668,7 @@ class CMaintenance extends CApiService {
 		return $maintenances;
 	}
 
-	private static function checkAnyTargetSpecified(array $maintenances, array $db_maintenances = null): void {
+	private static function checkAnyTargetSpecified(array $maintenances, ?array $db_maintenances = null): void {
 		foreach ($maintenances as $maintenance) {
 			$target_types = $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL
 				? ['groups', 'hosts', 'triggers']
