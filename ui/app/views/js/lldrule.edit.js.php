@@ -290,8 +290,9 @@ window.lldrule_edit = new class {
 						action
 					},
 					callback: ({data, event}) => {
-						const field = this.#form.findFieldByName('itemid')
-						if (!field || data.action_parameters.itemid === field.value) {
+						const field = this.#form.findFieldByName('itemid');
+
+						if (!field || data.action_parameters.itemid === field.getValue()) {
 							return;
 						}
 
