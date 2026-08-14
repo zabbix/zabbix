@@ -82,21 +82,11 @@ class CItemHelper extends CItemGeneralHelper {
 			'lldmacros' => false
 		]);
 
-		if ($item['templated'] && $item['valuemap']) {
-			$parent_template = $parent_templates['templates'][$item['valuemap']['hostid']];
-			$item['valuemap']['prefix'] = $parent_template['name'].NAME_DELIMITER;
-		}
-		elseif ($item['discovered'] && $item['valuemap']) {
-			$parent_item_prototype = API::ItemPrototype()->get([
-				'output' => ['itemid', 'templateid'],
-				'itemids' => $item['discoveryData']['parent_itemid']
-			]);
-
-			$parent_templates = getItemParentTemplates($parent_item_prototype, ZBX_FLAG_DISCOVERY_PROTOTYPE);
-			if (array_key_exists($item['valuemap']['hostid'], $parent_templates['templates'])) {
-				$parent_template = $parent_templates['templates'][$item['valuemap']['hostid']];
-				$item['valuemap']['prefix'] = $parent_template['name'].NAME_DELIMITER;
-			}
+		// The prefix will be added to a value mapping only for inherited items and item prototypes, or for items
+		// created from inherited item prototypes.
+		if ($item['valuemap'] && bccomp($item['valuemap']['hostid'], $item['hostid']) != 0) {
+			$templates = API::Template()->get(['output' => ['name'], 'templateids' => $item['valuemap']['hostid']]);
+			$item['valuemap']['prefix'] = $templates[0]['name'].NAME_DELIMITER;
 		}
 
 		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
