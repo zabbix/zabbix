@@ -6123,8 +6123,8 @@ HEREDOC;
 		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
 
 		// CEP cached one event per opened problem (one per trigger).
-		$this->assertCepStatEquals('tasks', 'cached_events', count($keys));
-		$this->assertCepStatEquals('tasks', 'cached_objects', count($keys));
+		$this->assertCepStatEquals('cache', 'events', count($keys));
+		$this->assertCepStatEquals('cache', 'objects', count($keys));
 	}
 
 	/**
@@ -6162,8 +6162,8 @@ HEREDOC;
 
 		// CEP processed the recovered events (one per trigger).
 		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
-		$this->assertCepStatEquals('tasks', 'cached_events', 0);
-		$this->assertCepStatEquals('tasks', 'cached_objects', 0);
+		$this->assertCepStatEquals('cache', 'events', 0);
+		$this->assertCepStatEquals('cache', 'objects', 0);
 	}
 
 	/**
@@ -8888,7 +8888,7 @@ HEREDOC;
 			// OK although its expression never turned false.
 			$this->waitForNoOpenProblems($all, 'after the paired burst');
 			$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-			$this->assertCepStatEquals('tasks', 'cached_events', 0);
+			$this->assertCepStatEquals('cache', 'events', 0);
 		}
 		finally {
 			// The sequence closed every problem itself; only the rule must not survive it.
@@ -8956,7 +8956,7 @@ HEREDOC;
 			$this->waitForAllTriggerEventCounts($triggerids, 8);
 			$this->waitForNoOpenProblems($triggerids, 'after the closing up wave');
 			$this->waitForParentsValue($triggerids, TRIGGER_VALUE_FALSE);
-			$this->assertCepStatEquals('tasks', 'cached_events', 0);
+			$this->assertCepStatEquals('cache', 'events', 0);
 		}
 		finally {
 			// The sequence closed every problem itself; only the rule must not survive it.
@@ -9006,8 +9006,8 @@ HEREDOC;
 
 		// CEP processed the opened problem events and is holding one per trigger.
 		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
-		$this->assertCepStatEquals('tasks', 'cached_events', count($keys));
-		$this->assertCepStatEquals('tasks', 'cached_objects', count($keys));
+		$this->assertCepStatEquals('cache', 'events', count($keys));
+		$this->assertCepStatEquals('cache', 'objects', count($keys));
 	}
 
 	/**
@@ -9033,8 +9033,8 @@ HEREDOC;
 
 		// Two cached events per trigger now, but still one object per trigger.
 		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
-		$this->assertCepStatEquals('tasks', 'cached_events', 2 * count($keys));
-		$this->assertCepStatEquals('tasks', 'cached_objects', count($keys));
+		$this->assertCepStatEquals('cache', 'events', 2 * count($keys));
+		$this->assertCepStatEquals('cache', 'objects', count($keys));
 	}
 
 	/**
@@ -9070,8 +9070,8 @@ HEREDOC;
 		$this->waitForParentsValue($triggerids, TRIGGER_VALUE_FALSE);
 
 		// Nothing is left cached once every problem of every trigger is closed.
-		$this->assertCepStatEquals('tasks', 'cached_events', 0);
-		$this->assertCepStatEquals('tasks', 'cached_objects', 0);
+		$this->assertCepStatEquals('cache', 'events', 0);
+		$this->assertCepStatEquals('cache', 'objects', 0);
 
 		if ($check_services) {
 			$this->waitForServicesStatus(ZBX_SEVERITY_OK);
@@ -11184,9 +11184,9 @@ HEREDOC;
 		$this->waitForOpenProblemCount($all, 0);
 
 		// Removing the host must also drop the discovered items' problem events from the CEP cache: no other
-		// problem is open in the system at this point, so cached_events must drain back to zero.
-		$this->assertCepStatEquals('tasks', 'cached_events', 0);
-		$this->assertCepStatEquals('tasks', 'cached_objects', 0);
+		// problem is open in the system at this point, so cache.events must drain back to zero.
+		$this->assertCepStatEquals('cache', 'events', 0);
+		$this->assertCepStatEquals('cache', 'objects', 0);
 		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'diaginfo=cep');
 	}
 
@@ -15953,10 +15953,10 @@ HEREDOC;
 		$this->assertTriggersValueAndState($triggerids, TRIGGER_VALUE_FALSE, 'trigger after recovery');
 
 		// With no open problems left, CEP should have drained its cached events back to zero.
-		// Skip when other problems may still be open elsewhere in the system (cached_events is global).
+		// Skip when other problems may still be open elsewhere in the system (cache.events is global).
 		if ($wait_cep_drained) {
-			$this->assertCepStatEquals('tasks', 'cached_events', 0);
-			$this->assertCepStatEquals('tasks', 'cached_objects', 0);
+			$this->assertCepStatEquals('cache', 'events', 0);
+			$this->assertCepStatEquals('cache', 'objects', 0);
 		}
 	}
 
