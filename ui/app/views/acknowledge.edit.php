@@ -171,10 +171,15 @@ $form_list
 			->addClass('js-operation-checkbox')
 			->setChecked($data['close_problem'])
 			->setEnabled($data['allowed_close'] && $data['problem_can_be_closed'])
-	)
-	->addRow('',
+	);
+
+if ($data['allowed_edit_maintenance'] && $data['problem_severity_can_be_changed']) {
+	$form_list->addRow('',
 		(new CLink(_n('Suppress trigger', 'Suppress triggers', $selected_events), $maintenance_url))
-	)
+	);
+}
+
+$form_list
 	->addRow('',
 		(new CDiv(''))->setId('operations-count-error-container')
 	);
