@@ -240,7 +240,7 @@ $buttons = [
 			->addClass('js-massenable-item')
 			->addClass('js-no-chkbxrange')
 			->setEnabled(!$data['is_parent_discovered'])
-			->setAttribute('data-disabled', $data['is_parent_discovered'])
+			->setAttribute('data-disabled', $data['is_parent_discovered'] ? 1 : null)
 	],
 	[
 		'content' => (new CSimpleButton(_('Create disabled')))
@@ -248,7 +248,7 @@ $buttons = [
 			->addClass('js-massdisable-item')
 			->addClass('js-no-chkbxrange')
 			->setEnabled(!$data['is_parent_discovered'])
-			->setAttribute('data-disabled', $data['is_parent_discovered'])
+			->setAttribute('data-disabled', $data['is_parent_discovered'] ? 1 : null)
 	],
 	[
 		'content' => (new CSimpleButton(_('Delete')))
