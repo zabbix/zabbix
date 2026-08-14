@@ -40,7 +40,8 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 										AGGREGATE_PCTILE
 									]),
 			'percentile' =>			'string',
-			'alias' =>				'string'
+			'alias' =>				'string',
+			'existing_aliases' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -63,7 +64,14 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 			|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
-	private static function getValidationRules(): array {
+	private static function getValidationRules(array $existing_aliases): array {
+		$alias_rules = ['string', 'required', 'not_empty'];
+
+		if ($existing_aliases) {
+			$alias_rules['not_in'] = $existing_aliases;
+			$alias_rules['messages'] = ['not_in' => _('Alias is not unique.')];
+		}
+
 		return ['object', 'fields' => [
 			'row_index' => ['integer', 'required'],
 			'signal_type' => ['integer', 'required',
@@ -90,7 +98,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 			'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100,
 				'when' => ['function', 'in' => [AGGREGATE_PCTILE]]
 			],
-			'alias' => ['string', 'required', 'not_empty']
+			'alias' => $alias_rules
 		]];
 	}
 
@@ -106,7 +114,9 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 			'function' => (int) $this->getInput('function', (string) AGGREGATE_COUNT),
 			'percentile' => $this->getInput('percentile', ''),
 			'alias' => $this->getInput('alias', ''),
-			'js_validation_rules' => (new CFormValidator(self::getValidationRules()))->getRules(),
+			'js_validation_rules' => (new CFormValidator(
+				self::getValidationRules($this->getInput('existing_aliases', []))
+			))->getRules(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

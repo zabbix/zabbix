@@ -666,13 +666,22 @@ window.item_edit_form = new class {
 		}
 	}
 
+	#getExistingAliases(exclude_row = null) {
+		const rows = this.form_element.querySelectorAll('#aggregated-columns-table tr.form_row');
+
+		return [...rows]
+			.filter((row) => row !== exclude_row)
+			.map((row) => row.querySelector(`[name="aggregated_columns[${row.dataset.row_index}][alias]"]`).value);
+	}
+
 	#openAggregatedColumnModal(trigger, row = null) {
 		const signal_type = this.field.signal_type.value;
 		const metric_point_type = [...this.field.metric_point_type].find((radio) => radio.checked).value;
 
 		const parameters = {
 			signal_type: signal_type,
-			metric_point_type: metric_point_type
+			metric_point_type: metric_point_type,
+			existing_aliases: this.#getExistingAliases(row)
 		};
 
 		if (row !== null) {
