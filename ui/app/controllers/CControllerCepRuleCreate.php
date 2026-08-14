@@ -105,13 +105,13 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 					'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 				]
 			]],
-			'window_type' => ['db cep_window.type', 'required', 'in' => [CCepRuleHelper::WINDOW_NONE,
+			'window_type' => ['db cep_rule_window.type', 'required', 'in' => [CCepRuleHelper::WINDOW_NONE,
 				CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
 				CCepRuleHelper::WINDOW_PATTERN_MATCH
 			]],
 			'window' => ['object', 'required',
 				'fields' => [
-					'duration' => ['db cep_window.duration', 'required', 'not_empty',
+					'duration' => ['db cep_rule_window.duration', 'required', 'not_empty',
 						'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_YEAR, 'min' => 1, 'usermacros' => true,
 							'lldmacros' => false, 'accept_zero' => false, 'with_year' => false
 						]],
@@ -126,7 +126,7 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 							CCepRuleHelper::WINDOW_PATTERN_MATCH
 						]]
 					],
-					'capacity' => ['db cep_window.capacity', 'required', 'not_empty',
+					'capacity' => ['db cep_rule_window.capacity', 'required', 'not_empty',
 						'use' => [CNumberValidator::class, ['min' => 1, 'max' => ZBX_MAX_INT64, 'with_float' => false,
 							'usermacros' => true, 'lldmacros' => false
 						]],
@@ -168,16 +168,16 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 						]
 					],
 					'tags' => ['array', 'required', 'not_empty',
-						'field' => ['db cep_window.tags', 'not_empty'],
+						'field' => ['db cep_rule_window.tags', 'not_empty'],
 						'when' => ['group_by_tags', 'in' => [CCepRuleHelper::GROUP_BY_YES]]
 					],
 					'event_count_tag_enabled' => ['integer', 'required', 'in' => [0, 1],
 						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]]
 					],
-					'event_count_tag' => ['db cep_window.event_count_tag', 'required', 'not_empty',
+					'event_count_tag' => ['db cep_rule_window.event_count_tag', 'required', 'not_empty',
 						'when' => ['event_count_tag_enabled', 'in' => [1]]
 					],
-					'script' => ['db cep_window.script', 'required', 'not_empty',
+					'script' => ['db cep_rule_window.script', 'required', 'not_empty',
 						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]]
 					]
 				],
