@@ -289,7 +289,8 @@ $form->addItem(
 							'srcfld1' => 'triggerid',
 							'dstfrm' => $form->getName(),
 							'dstfld1' => 'triggerids_',
-							'editable' => true
+							'editable' => true,
+							'templated' => false
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
