@@ -232,14 +232,10 @@
 			item_form.timeout.style.display = custom_timeout_enabled ? '' : 'none';
 
 			if (timeout_inaccessible !== null) {
-				timeout_inaccessible.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>,
-					custom_timeout_enabled
-				);
+				timeout_inaccessible.classList.toggle(ZBX_STYLE_DISPLAY_NONE, custom_timeout_enabled);
 			}
 			else {
-				item_form.inherited_timeout.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>,
-					custom_timeout_enabled
-				);
+				item_form.inherited_timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, custom_timeout_enabled);
 			}
 		});
 

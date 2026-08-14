@@ -789,7 +789,9 @@ $item_tab->addItem([
 			->setModern(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$data['timeout_inaccessible']
-			? (new CSpan(makeWarningIcon(_('The timeout value is unavailable because it is configured on a proxy that you do not have permission to.'))))
+			? (new CSpan(makeWarningIcon(
+				_('The timeout value is unavailable because it is configured on a proxy that you do not have permission to.')
+			)))
 				->addClass($custom_timeout_enabled ? ZBX_STYLE_DISPLAY_NONE : null)
 				->setId('js-item-timeout-inaccessible')
 			: null,
