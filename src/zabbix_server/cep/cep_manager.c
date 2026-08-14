@@ -622,6 +622,7 @@ static int	cep_manager_commit_task(zbx_cep_manager_t *manager, zbx_mw_task_t *ta
 			cep_manager_block_task_on_event(manager, (zbx_cep_task_t *)task, task_ack->eventid);
 			break;
 		case CEP_TASK_RULE_ERROR:
+		case CEP_TASK_WINDOW_SYNC:
 			break;
 		case CEP_TASK_WINDOW:
 		case CEP_TASK_RULE_RESET:
@@ -761,22 +762,6 @@ static void	cep_manager_load_window_groups(zbx_dbconn_pool_t *dbpool)
 
 	cep_window_pool_acquire(&pool);
 	cep_window_pool_load(pool, dbpool);
-	cep_window_pool_release(&pool);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: save window groups from the window pool                           *
- *                                                                            *
- * Parameters: dbpool - [IN] database connection pool                         *
- *                                                                            *
- ******************************************************************************/
-static void	cep_manager_save_window_groups(zbx_dbconn_pool_t *dbpool)
-{
-	zbx_cep_window_pool_t	*pool;
-
-	cep_window_pool_acquire(&pool);
-	cep_window_pool_save(pool, dbpool);
 	cep_window_pool_release(&pool);
 }
 
@@ -1003,7 +988,6 @@ void	*zbx_cep_manager_thread(void *args)
 	if (SUCCEED != ZBX_EXIT_STATUS())
 		zbx_rtc_unsubscribe_service(cep_args->config_timeout, ZBX_IPC_SERVICE_CEP);
 
-	cep_manager_save_window_groups(unit_args->shared->dbpool);
 	cep_manager_free(manager);
 
 	zbx_deinit_regexp_env();

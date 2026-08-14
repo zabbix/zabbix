@@ -30,7 +30,8 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 
-ZBX_PTR_VECTOR_IMPL(cep_window_ptr, zbx_cep_window_t *)
+ZBX_PTR_VECTOR_LITE_IMPL(cep_window_ptr, zbx_cep_window_t *)
+ZBX_VECTOR_LITE_IMPL(cep_window_sync_entry, zbx_cep_window_sync_entry_t)
 
 static zbx_hash_t	cep_window_ref_hash(const void *a)
 {
@@ -133,6 +134,8 @@ void	cep_window_release(zbx_cep_window_t *window)
 	zbx_free(window->js_script);
 	zbx_free(window->js_code);
 
+	zbx_vector_cep_window_sync_entry_destroy(&window->sync);
+
 	pthread_mutex_destroy(&window->lock);
 
 	zbx_free(window);
@@ -224,16 +227,18 @@ out:
  *                                                                            *
  * Parameters: rule - [IN] cep rule the window is created for                 *
  *             ref  - [IN] reference linking window back to its owner         *
+ *             windowid - [IN]                                                *
  *                                                                            *
  * Return value: created cep window                                           *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule, zbx_cep_window_ref_t *ref)
+static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule, zbx_cep_window_ref_t *ref, zbx_uint64_t windowid)
 {
 	zbx_cep_window_t	*window;
 	int			err;
 
 	window = (zbx_cep_window_t *)zbx_malloc(NULL, sizeof(zbx_cep_window_t));
+	window->windowid = windowid;
 	window->ruleid = rule->ruleid;
 	window->type = rule->window->type;
 	window->ref = ref;
@@ -262,17 +267,72 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule, zbx_cep_w
 
 	window->refcount = 1;
 
+	zbx_vector_cep_window_sync_entry_create(&window->sync);
+
+	zbx_cep_window_sync_entry_t	sync_local = {
+			.type = CEP_WINDOW_SYNC_CREATE
+	};
+
+	zbx_vector_cep_window_sync_entry_append(&window->sync, sync_local);
+
 	return window;
 }
 
-static void	cep_window_lock(zbx_cep_window_t *window)
+void	cep_window_lock(zbx_cep_window_t *window)
 {
 	pthread_mutex_lock(&window->lock);
 }
 
-static void	cep_window_unlock(zbx_cep_window_t *window)
+void	cep_window_unlock(zbx_cep_window_t *window)
 {
 	pthread_mutex_unlock(&window->lock);
+}
+
+static void	cep_window_sync_entry_log_destroy(zbx_cep_window_t *window)
+{
+	zbx_cep_window_sync_entry_t	sync_local = {
+		.type = CEP_WINDOW_SYNC_DESTROY
+	};
+
+	zbx_vector_cep_window_sync_entry_append(&window->sync, sync_local);
+}
+
+static void	cep_window_sync_entry_log_event_add(zbx_cep_window_t *window, zbx_uint64_t eventid)
+{
+	zbx_cep_window_sync_entry_t	sync_local = {
+		.type = CEP_WINDOW_SYNC_EVENT_ADD,
+		.eventid = eventid
+	};
+
+	zbx_vector_cep_window_sync_entry_append(&window->sync, sync_local);
+}
+
+static void	cep_window_sync_entry_log_event_remove(zbx_cep_window_t *window, zbx_uint64_t eventid)
+{
+	zbx_cep_window_sync_entry_t	sync_local = {
+		.type = CEP_WINDOW_SYNC_EVENT_REMOVE,
+		.eventid = eventid
+	};
+
+	zbx_vector_cep_window_sync_entry_append(&window->sync, sync_local);
+}
+
+static void	cep_window_sync_entry_submit(zbx_cep_window_t *window, zbx_vector_mw_task_ptr_t *tasks)
+{
+	if (0 == window->sync.values_num)
+		return;
+
+	zbx_mw_task_t	*task = cep_create_task_window_sync(cep_window_addref(window));
+
+	zbx_vector_mw_task_ptr_append(tasks, task);
+}
+
+void	cep_window_sync_detach(zbx_cep_window_t *window, zbx_vector_cep_window_sync_entry_t *sync)
+{
+	cep_window_lock(window);
+	zbx_vector_cep_window_sync_entry_append_array(sync, window->sync.values, window->sync.values_num);
+	zbx_vector_cep_window_sync_entry_clear(&window->sync);
+	cep_window_unlock(window);
 }
 
 /******************************************************************************
@@ -358,6 +418,7 @@ static void	cep_window_close(const zbx_cep_rule_t *rule, zbx_cep_window_t *windo
 				.hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_pop(&window->hevents),
 				.pos = cep_window_event_pos(i, events_num)};
 
+		cep_window_sync_entry_log_event_remove(window, zbx_cep_event_handle_eventid(ctx.hevent));
 		(void)cep_rule_event_context_execute_ops(rule, &ctx, ZBX_CEP_WHEN_WINDOW_CLOSED, tasks);
 		cep_event_context_clear(&ctx);
 	}
@@ -448,6 +509,8 @@ void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_
 			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, ctx->event));
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
+		cep_window_sync_entry_log_event_add(window, zbx_cep_event_handle_eventid(ctx->hevent));
+
 		cep_window_unlock(window);
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
 	}
@@ -494,6 +557,8 @@ static zbx_uint64_t	cep_window_evict_expired(zbx_cep_window_t *window, zbx_cep_r
 		}
 
 		zbx_queue_ptr_pop(&window->hevents);
+		cep_window_sync_entry_log_event_remove(window, zbx_cep_event_handle_eventid(h));
+
 		zbx_cep_event_handle_release(h);
 		cep_event_context_clear(&ctx);
 	}
@@ -529,9 +594,16 @@ void	cep_window_sliding_process(zbx_cep_window_t *window, time_t now, zbx_vector
 
 	if (NULL == (rule = zbx_cep_config_get_rule(hconfig, window->ruleid)))
 	{
+		cep_window_lock(window);
+
 		cep_window_pool_acquire(&pool);
 		cep_window_pool_remove_window(pool, window);
 		cep_window_pool_release(&pool);
+
+		cep_window_sync_entry_log_destroy(window);
+		cep_window_sync_entry_submit(window, tasks);
+
+		cep_window_unlock(window);
 
 		goto out;
 	}
@@ -565,9 +637,11 @@ void	cep_window_sliding_process(zbx_cep_window_t *window, time_t now, zbx_vector
 	else
 	{
 		cep_window_pool_remove_window(pool, window);
+		cep_window_sync_entry_log_destroy(window);
 	}
 	cep_window_pool_release(&pool);
 
+	cep_window_sync_entry_submit(window, tasks);
 	cep_window_unlock(window);
 out:
 	zbx_cep_config_close(hconfig);
@@ -748,6 +822,8 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 		}
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
+		cep_window_sync_entry_log_event_add(window, zbx_cep_event_handle_eventid(ctx->hevent));
+
 		if (0 != start_time)
 			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
 
@@ -768,6 +844,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 	cep_window_pool_enqueue(pool, window);
 	cep_window_pool_release(&pool);
 
+	cep_window_sync_entry_submit(window, tasks);
 	cep_window_release(window);
 out:
 	zbx_free(error);
@@ -801,9 +878,16 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 
 	if (NULL == (rule = zbx_cep_config_get_rule(hconfig, window->ruleid)))
 	{
+		cep_window_lock(window);
+
 		cep_window_pool_acquire(&pool);
 		cep_window_pool_remove_window(pool, window);
 		cep_window_pool_release(&pool);
+
+		cep_window_sync_entry_log_destroy(window);
+		cep_window_sync_entry_submit(window, tasks);
+
+		cep_window_unlock(window);
 
 		goto out;
 	}
@@ -841,9 +925,11 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	else
 	{
 		cep_window_pool_remove_window(pool, window);
+		cep_window_sync_entry_log_destroy(window);
 	}
 	cep_window_pool_release(&pool);
 
+	cep_window_sync_entry_submit(window, tasks);
 	cep_window_unlock(window);
 out:
 	zbx_cep_config_close(hconfig);
@@ -898,6 +984,8 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 			atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
+		cep_window_sync_entry_log_event_add(window, zbx_cep_event_handle_eventid(ctx->hevent));
+
 		cep_window_unlock(window);
 		opmask = cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_ADDED, tasks);
 	}
@@ -1054,9 +1142,16 @@ void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_t
 
 	if (NULL == (rule = zbx_cep_config_get_rule(hconfig, window->ruleid)))
 	{
+		cep_window_lock(window);
+
 		cep_window_pool_acquire(&pool);
 		cep_window_pool_remove_window(pool, window);
 		cep_window_pool_release(&pool);
+
+		cep_window_sync_entry_log_destroy(window);
+		cep_window_sync_entry_submit(window, tasks);
+
+		cep_window_unlock(window);
 
 		goto out;
 	}
@@ -1093,8 +1188,11 @@ enqueue:
 	else
 	{
 		cep_window_pool_remove_window(pool, window);
+		cep_window_sync_entry_log_destroy(window);
 	}
 	cep_window_pool_release(&pool);
+
+	cep_window_sync_entry_submit(window, tasks);
 	cep_window_unlock(window);
 out:
 	if (NULL != rule)
@@ -1149,6 +1247,7 @@ struct zbx_cep_window_pool
 	zbx_hashset_t			windows;
 	zbx_binary_heap_t		alarm_queue;
 	zbx_vector_cep_window_ptr_t	tick_queue;
+	zbx_uint64_t			next_windowid;
 };
 
 static int	cep_window_compare_by_nextcheck(const void *a1, const void *a2)
@@ -1270,7 +1369,7 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 		if (NULL != ref_local.tag_value)
 			ref->tag_value = zbx_strdup(NULL, ref_local.tag_value);
 
-		ref->window = cep_window_create(rule, ref);
+		ref->window = cep_window_create(rule, ref, pool->next_windowid++);
 
 		if (SUCCEED != cep_window_get_limits(rule, &ref->window->duration, &ref->window->capacity, error))
 		{
@@ -1297,6 +1396,7 @@ void	cep_window_pool_remove_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t
 		return;
 
 	zbx_hashset_remove_direct(&pool->windows, window->ref);
+	window->ref = NULL;
 	window->location = CEP_LOCATION_REMOVED;
 }
 
@@ -1414,80 +1514,12 @@ void	cep_window_pool_enqueue(zbx_cep_window_pool_t *pool, zbx_cep_window_t *wind
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: save cep window pool's groups and their assigned events to        *
- *          database                                                          *
- *                                                                            *
- * Parameters: pool   - [IN] cep window pool to save                          *
- *             dbpool - [IN] database connection pool to acquire connection   *
- *                      from                                                  *
- *                                                                            *
- ******************************************************************************/
-void	cep_window_pool_save(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool)
-{
-	zbx_dbconn_t		*db;
-	zbx_db_insert_t		db_insert_groups;
-	zbx_db_insert_t		db_insert_events;
-	zbx_uint64_t		groupid;
-	zbx_hashset_iter_t	iter;
-	zbx_cep_window_ref_t	*ref;
-
-	if (0 == pool->windows.num_data)
-		return;
-
-	db = zbx_dbconn_pool_acquire_connection(dbpool);
-
-	zbx_dbconn_prepare_insert(db, &db_insert_groups, "cep_group", "cep_groupid", "cep_ruleid", "group_by",
-			"groupid", "hostid", "tags", "tags_value", "nextcheck", NULL);
-	zbx_dbconn_prepare_insert(db, &db_insert_events, "cep_group_event", "cep_group_eventid", "cep_groupid",
-			"eventid", NULL);
-
-	groupid = zbx_dbconn_get_maxid_num(db, "cep_group", pool->windows.num_data);
-
-	zbx_hashset_iter_reset(&pool->windows, &iter);
-	while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zbx_db_insert_add_values(&db_insert_groups, groupid, ref->ruleid, ref->group_by, ref->hostgroupid,
-				ref->hostid, ZBX_NULL2EMPTY_STR(ref->tag), ZBX_NULL2EMPTY_STR(ref->tag_value),
-				(int)ref->window->nextcheck);
-
-		while (SUCCEED != zbx_queue_ptr_empty(&ref->window->hevents))
-		{
-			zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_queue_ptr_pop(&ref->window->hevents);
-
-			zbx_db_insert_add_values(&db_insert_events, __UINT64_C(0), groupid,
-					zbx_cep_event_handle_eventid(h));
-
-			zbx_cep_event_handle_release(h);
-		}
-
-		groupid++;
-	}
-
-	zbx_db_insert_autoincrement(&db_insert_events, "cep_group_eventid");
-
-	do
-	{
-		zbx_dbconn_begin(db);
-
-		zbx_db_insert_execute(&db_insert_groups);
-		zbx_db_insert_execute(&db_insert_events);
-	}
-	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
-
-	zbx_db_insert_clean(&db_insert_groups);
-	zbx_db_insert_clean(&db_insert_events);
-
-	zbx_dbconn_pool_release_connection(dbpool, db);
-}
-
 typedef struct
 {
-	zbx_uint64_t		groupid;
+	zbx_uint64_t		windowid;
 	zbx_cep_window_t	*window;
 }
-zbx_cep_window_group_t;
+zbx_cep_db_window_t;
 
 /******************************************************************************
  *                                                                            *
@@ -1497,17 +1529,22 @@ zbx_cep_window_group_t;
  *             db      - [IN] database connection to query                    *
  *             windows - [OUT] map from database group id to loaded window    *
  *                      for resolving group events afterward                  *
+ *             delete_windowids - [OUT] ids of windows without rules to       *
+ *                                       delete                               *
  *                                                                            *
  * Comments: Windows referencing a rule that no longer exists are skipped.    *
  *                                                                            *
  ******************************************************************************/
-static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn_t *db, zbx_hashset_t *windows)
+static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn_t *db, zbx_hashset_t *windows,
+		zbx_vector_uint64_t *delete_windowids)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_cep_config_handle_t	hconfig;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	pool->next_windowid = zbx_dbconn_get_maxid_num(db, "cep_group", 1);
 
 	hconfig = zbx_cep_config_open();
 
@@ -1517,12 +1554,17 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_cep_window_ref_t	ref_local = {0}, *ref;
-		zbx_cep_window_group_t	group_local;
+		zbx_cep_db_window_t	win_local;
 		zbx_cep_rule_t		*rule;
 
+		ZBX_STR2UINT64(win_local.windowid, row[0]);
 		ZBX_STR2UINT64(ref_local.ruleid, row[1]);
+
 		if (NULL == (rule = zbx_cep_config_get_rule(hconfig, ref_local.ruleid)))
+		{
+			zbx_vector_uint64_append(delete_windowids, win_local.windowid);
 			continue;
+		}
 
 		ref_local.group_by = atoi(row[2]);
 
@@ -1539,13 +1581,12 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 		}
 
 		ref = zbx_hashset_insert(&pool->windows, &ref_local, sizeof(ref_local));
-		ref->window = cep_window_create(rule,  ref);
+		ref->window = cep_window_create(rule,  ref, win_local.windowid);
 		ref->window->nextcheck = atoi(row[7]);
 
-		ZBX_STR2UINT64(group_local.groupid, row[0]);
-		group_local.window = ref->window;
+		win_local.window = ref->window;
 
-		zbx_hashset_insert(windows, &group_local, sizeof(group_local));
+		zbx_hashset_insert(windows, &win_local, sizeof(win_local));
 
 		zbx_cep_rule_release(rule);
 	}
@@ -1563,17 +1604,21 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
  * Parameters: groups - [IN] map from database group id to loaded window,     *
  *                      used to attach events to their windows                *
  *             db     - [IN] database connection to query                     *
+ *             delete_windowids - [OUT] ids of windows without rules to       *
+ *                                       delete                               *
+ *             delete_windowids - [OUT] ids of orphaned events to delete      *
  *                                                                            *
  * Comments: Rows referencing a group id not present in groups, or an         *
  *           eventid with no corresponding event handle, are skipped.         *
  *                                                                            *
  ******************************************************************************/
-static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db)
+static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db,
+		zbx_vector_uint64_t *delete_windowids, zbx_vector_uint64_t *delete_eventids)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_cep_t		*cep;
-	zbx_cep_window_group_t	*group = NULL;
+	zbx_cep_db_window_t	*window = NULL;
 	zbx_uint64_t		events_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1585,23 +1630,29 @@ static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		zbx_uint64_t		groupid, eventid;
+		zbx_uint64_t		windowid, eventid;
 		zbx_cep_event_handle_t	h;
 
-		ZBX_STR2UINT64(groupid, row[0]);
+		ZBX_STR2UINT64(windowid, row[0]);
 
-		if (NULL == group || group->groupid != groupid)
+		if (NULL == window || window->windowid != windowid)
 		{
-			if (NULL == (group = zbx_hashset_search(groups, &groupid)))
+			if (NULL == (window = zbx_hashset_search(groups, &windowid)))
+			{
+				zbx_vector_uint64_append(delete_windowids, windowid);
 				continue;
+			}
 		}
 
 		ZBX_STR2UINT64(eventid, row[1]);
 		if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, eventid)))
+		{
+			zbx_vector_uint64_append(delete_eventids, eventid);
 			continue;
+		}
 
 		events_num++;
-		zbx_queue_ptr_push(&group->window->hevents, h);
+		zbx_queue_ptr_push(&window->window->hevents, h);
 	}
 	zbx_db_free_result(result);
 
@@ -1625,14 +1676,20 @@ void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool
 	zbx_dbconn_t		*db;
 	zbx_hashset_iter_t	iter;
 	zbx_cep_window_ref_t	*ref;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0;
 
 	db = zbx_dbconn_pool_acquire_connection(dbpool);
 
 	do
 	{
-		zbx_hashset_t	groups;
+		size_t			sql_offset = 0;
+		zbx_hashset_t		windows;
+		zbx_vector_uint64_t	delete_windowids, delete_eventids;
 
-		zbx_hashset_create(&groups, 100, ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_hashset_create(&windows, 100, ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_create(&delete_windowids);
+		zbx_vector_uint64_create(&delete_eventids);
 
 		/* clear the hashset in the case loading was retried beacuse of database connection failure */
 		zbx_hashset_iter_reset(&pool->windows, &iter);
@@ -1641,10 +1698,41 @@ void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool
 
 		zbx_dbconn_begin(db);
 
-		cep_window_pool_load_windows(pool, db, &groups);
-		cep_window_pool_load_events(&groups, db);
+		cep_window_pool_load_windows(pool, db, &windows, &delete_windowids);
+		cep_window_pool_load_events(&windows, db, &delete_windowids, &delete_eventids);
 
-		zbx_hashset_destroy(&groups);
+		if (0 != delete_eventids.values_num)
+		{
+			zbx_vector_uint64_sort(&delete_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&delete_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from cep_window_event where");
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", delete_eventids.values,
+					delete_eventids.values_num);
+			zbx_dbconn_execute(db, "%s", sql);
+		}
+
+		if (0 != delete_windowids.values_num)
+		{
+			zbx_vector_uint64_sort(&delete_windowids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&delete_windowids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			sql_offset = 0;
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from cep_window_event where");
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "cep_windowid",
+					delete_windowids.values, delete_windowids.values_num);
+			zbx_dbconn_execute(db, "%s", sql);
+
+			sql_offset = 0;
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from cep_window where");
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "cep_windowid",
+					delete_windowids.values, delete_windowids.values_num);
+			zbx_dbconn_execute(db, "%s", sql);
+		}
+
+		zbx_hashset_destroy(&windows);
+		zbx_vector_uint64_destroy(&delete_windowids);
+		zbx_vector_uint64_destroy(&delete_eventids);
 	}
 	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
 
@@ -1652,10 +1740,7 @@ void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool
 	while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
 		cep_window_pool_enqueue(pool, ref->window);
 
-	while (ZBX_DB_DOWN == zbx_dbconn_execute(db, "truncate table cep_group_event"))
-		;
-	while (ZBX_DB_DOWN == zbx_dbconn_execute(db, "truncate table cep_group"))
-		;
+	zbx_free(sql);
 
 	zbx_dbconn_pool_release_connection(dbpool, db);
 }

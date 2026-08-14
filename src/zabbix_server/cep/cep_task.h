@@ -39,6 +39,7 @@ typedef enum
 	CEP_TASK_ADD_TAGS,
 	CEP_TASK_SYNC_EVENT,
 	CEP_TASK_WINDOW,
+	CEP_TASK_WINDOW_SYNC,
 	CEP_TASK_ACKNOWLEDGE,
 	CEP_TASK_RULE_ERROR,
 	CEP_TASK_RULE_RESET
@@ -124,6 +125,13 @@ zbx_cep_task_window_t;
 typedef struct
 {
 	zbx_cep_task_t		base;
+	zbx_cep_window_t	*window;
+}
+zbx_cep_task_window_sync_t;
+
+typedef struct
+{
+	zbx_cep_task_t		base;
 	zbx_uint64_t		ruleid;
 	zbx_uint64_t		eventid;
 	struct zbx_json		details;
@@ -145,6 +153,7 @@ typedef struct
 }
 zbx_cep_task_rule_reset_t;
 
+
 zbx_mw_task_t	*cep_create_task_remote(zbx_ipc_client_t *client, zbx_ipc_message_t *message, unsigned char *response,
 		zbx_uint32_t response_len);
 zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event);
@@ -157,6 +166,7 @@ zbx_mw_task_t	*cep_create_task_commit(zbx_vector_mw_task_ptr_t *tasks);
 zbx_mw_task_t	*cep_create_task_add_tags(zbx_vector_event_tags_t *event_tags, zbx_vector_uint64_t *eventids);
 zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t hevent, zbx_uint32_t flags);
 zbx_mw_task_t	*cep_create_task_window(zbx_cep_window_t *window, time_t now);
+zbx_mw_task_t	*cep_create_task_window_sync(zbx_cep_window_t *window);
 zbx_mw_task_t	*cep_create_task_acknowledge(zbx_cep_acknowledge_t *ack, zbx_uint64_t ruleid, zbx_uint64_t eventid);
 zbx_mw_task_t	*cep_create_task_rule_error(zbx_uint64_t ruleid, char *error);
 zbx_mw_task_t	*cep_create_task_rule_reset(zbx_uint64_t ruleid);

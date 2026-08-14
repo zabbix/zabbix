@@ -16,6 +16,7 @@
 #include "cep.h"
 #include "cep_api.h"
 #include "cep_task.h"
+#include "zabbix_server/cep/cep_window.h"
 #include "zbx_cep.h"
 
 #include "zbx_trigger_constants.h"
@@ -1761,3 +1762,189 @@ void	cep_db_update_rule_errors(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_ta
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+typedef struct
+{
+	zbx_cep_window_t			*window;
+	zbx_vector_cep_window_sync_entry_t	log;
+}
+zbx_cep_window_sync_t;
+
+ZBX_VECTOR_LITE_DECL(cep_window_sync, zbx_cep_window_sync_t)
+ZBX_VECTOR_LITE_IMPL(cep_window_sync, zbx_cep_window_sync_t)
+
+static int	cep_window_sync_entry_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_window_sync_entry_t	*e1 = (const zbx_cep_window_sync_entry_t *)a1;
+	const zbx_cep_window_sync_entry_t	*e2 = (const zbx_cep_window_sync_entry_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(e1->eventid, e2->eventid);
+	ZBX_RETURN_IF_NOT_EQUAL(e1->type, e2->type);
+
+	return 0;
+}
+
+static void	cep_db_sync_window_destroy(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		zbx_cep_window_t *window)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_group_event where cep_groupid="
+			ZBX_FS_UI64 ";\n", window->windowid);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_group where cep_groupid="
+			ZBX_FS_UI64 ";\n", window->windowid);
+	zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL);
+}
+
+static int	cep_db_sync_window_create(zbx_dbconn_t *db, zbx_db_insert_t *db_insert_group,
+		zbx_cep_window_t *window)
+{
+	zbx_cep_window_ref_t	*ref;
+	int			ret = FAIL;
+
+	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_group))
+	{
+		zbx_dbconn_prepare_insert(db, db_insert_group, "cep_group", "cep_groupid", "cep_ruleid", "group_by",
+				"groupid", "hostid", "tags", "tags_value", "nextcheck", NULL);
+	}
+
+	cep_window_lock(window);
+
+	if (NULL != (ref = window->ref))
+	{
+		zbx_db_insert_add_values(db_insert_group, window->windowid, ref->ruleid, ref->group_by,
+				ref->hostgroupid, ref->hostid, ZBX_NULL2EMPTY_STR(ref->tag),
+				ZBX_NULL2EMPTY_STR(ref->tag_value), (int)window->nextcheck);
+		ret = SUCCEED;
+	}
+
+	cep_window_unlock(window);
+
+	return ret;
+}
+
+static void	cep_db_window_sync_event_remove(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		zbx_uint64_t windowid, zbx_uint64_t eventid)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_group_event where cep_groupid=" ZBX_FS_UI64
+			" and eventid=" ZBX_FS_UI64 ";\n", windowid, eventid);
+	zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL);
+}
+
+static void	cep_db_window_sync_event_add(zbx_dbconn_t *db, zbx_db_insert_t *db_insert_group_event,
+		zbx_uint64_t windowid, zbx_uint64_t eventid)
+{
+	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_group_event))
+	{
+		zbx_dbconn_prepare_insert(db, db_insert_group_event, "cep_group_event", "cep_groupid", "eventid", NULL);
+	}
+
+	zbx_db_insert_add_values(db_insert_group_event, windowid, eventid);
+}
+
+static void	cep_db_sync_window(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		zbx_db_insert_t *db_insert_group, zbx_db_insert_t *db_insert_group_event, zbx_cep_window_sync_t *sync)
+{
+	zbx_uint64_t	last_eventid = 0;
+
+	for (int i = 0; i < sync->log.values_num; i++)
+	{
+		const zbx_cep_window_sync_entry_t	*entry = &sync->log.values[i];
+
+		switch (entry->type)
+		{
+			case CEP_WINDOW_SYNC_DESTROY:
+				cep_db_sync_window_destroy(db, sql, sql_alloc, sql_offset, sync->window);
+				return;
+			case CEP_WINDOW_SYNC_CREATE:
+				if (FAIL == cep_db_sync_window_create(db, db_insert_group, sync->window))
+					return;
+				break;
+			case CEP_WINDOW_SYNC_EVENT_REMOVE:
+				cep_db_window_sync_event_remove(db, sql, sql_alloc, sql_offset, sync->window->windowid,
+						entry->eventid);
+				last_eventid = entry->eventid;
+				break;
+			case CEP_WINDOW_SYNC_EVENT_ADD:
+				if (entry->eventid != last_eventid)
+				{
+					cep_db_window_sync_event_add(db, db_insert_group_event, sync->window->windowid,
+							entry->eventid);
+				}
+				break;
+
+		}
+	}
+}
+
+void	cep_db_sync_windows(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
+{
+	zbx_vector_cep_window_sync_t	syncs;
+	zbx_cep_window_t		*window = NULL;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
+
+	zbx_vector_cep_window_sync_create(&syncs);
+
+	for (int i = 0; i < tasks->values_num; i++)
+	{
+		zbx_cep_task_window_sync_t	*task = (zbx_cep_task_window_sync_t *)tasks->values[i];
+
+		if (task->window != window)
+		{
+			zbx_cep_window_sync_t	sync_local  = {
+				.window = task->window
+			};
+
+			zbx_vector_cep_window_sync_entry_create(&sync_local.log);
+			zbx_vector_cep_window_sync_append(&syncs, sync_local);
+
+			window = task->window;
+		}
+
+		cep_window_sync_detach(task->window, &syncs.values[syncs.values_num - 1].log);
+	}
+
+	for (int i = 0; i < syncs.values_num; i++)
+		zbx_vector_cep_window_sync_entry_sort(&syncs.values[i].log, cep_window_sync_entry_compare);
+
+	zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(dbpool);
+
+	do
+	{
+		size_t		sql_offset = 0;
+		zbx_db_insert_t	db_insert_group = {0}, db_insert_group_event = {0};
+
+		zbx_dbconn_begin(db);
+
+		for (int i = 0; i < syncs.values_num; i++)
+		{
+			cep_db_sync_window(db, &sql, &sql_alloc, &sql_offset, &db_insert_group, &db_insert_group_event,
+				&syncs.values[i]);
+		}
+
+		zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
+
+		if (SUCCEED == zbx_db_insert_is_prepared(&db_insert_group))
+		{
+			zbx_db_insert_execute(&db_insert_group);
+			zbx_db_insert_clean(&db_insert_group);
+		}
+
+		if (SUCCEED == zbx_db_insert_is_prepared(&db_insert_group_event))
+		{
+			zbx_db_insert_execute(&db_insert_group_event);
+			zbx_db_insert_clean(&db_insert_group_event);
+		}
+	}
+	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
+
+	zbx_dbconn_pool_release_connection(dbpool, db);
+
+	for (int i = 0; i < syncs.values_num; i++)
+		zbx_vector_cep_window_sync_entry_destroy(&syncs.values[i].log);
+	zbx_vector_cep_window_sync_destroy(&syncs);
+
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}

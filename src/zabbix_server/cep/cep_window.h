@@ -33,9 +33,29 @@ zbx_cep_location_t;
 
 typedef struct zbx_cep_window_ref zbx_cep_window_ref_t;
 
+/* the ordering reflects the syncing priority */
+typedef enum
+{
+	CEP_WINDOW_SYNC_DESTROY,	/* remove window and skip rest of updates */
+	CEP_WINDOW_SYNC_CREATE,		/* window must be created before events can be added/removed */
+	CEP_WINDOW_SYNC_EVENT_REMOVE,	/* event removal will swallow adding of the same event */
+	CEP_WINDOW_SYNC_EVENT_ADD
+}
+zbx_cep_window_sync_type_t;
+
+typedef struct
+{
+	zbx_cep_window_sync_type_t	type;
+	zbx_uint64_t			eventid;
+}
+zbx_cep_window_sync_entry_t;
+
+ZBX_VECTOR_LITE_DECL(cep_window_sync_entry, zbx_cep_window_sync_entry_t)
+
 typedef struct
 {
 	zbx_uint64_t		ruleid;
+	zbx_uint64_t		windowid;
 
 	int			type;
 	int			duration;
@@ -43,6 +63,7 @@ typedef struct
 
 	/* window location and access_num are read/written only within window pool lock */
 	zbx_cep_location_t	location;
+
 	int			access_num;	/* number of workers adding events,                      */
 						/* window cannot be removed while events are being added */
 
@@ -54,6 +75,8 @@ typedef struct
 	char			*js_code;
 	int			js_codelen;
 
+	zbx_vector_cep_window_sync_entry_t	sync;
+
 	zbx_atomic_uint64_t	nextcheck;
 	zbx_atomic_uint32_t	refcount;
 	zbx_cep_window_ref_t	*ref;
@@ -61,7 +84,7 @@ typedef struct
 }
 zbx_cep_window_t;
 
-ZBX_PTR_VECTOR_DECL(cep_window_ptr, zbx_cep_window_t *)
+ZBX_PTR_VECTOR_LITE_DECL(cep_window_ptr, zbx_cep_window_t *)
 
 struct zbx_cep_window_ref
 {
@@ -77,6 +100,9 @@ struct zbx_cep_window_ref
 
 zbx_cep_window_t	*cep_window_addref(zbx_cep_window_t *window);
 void	cep_window_release(zbx_cep_window_t *window);
+void	cep_window_sync_detach(zbx_cep_window_t *window, zbx_vector_cep_window_sync_entry_t *sync);
+void	cep_window_lock(zbx_cep_window_t *window);
+void	cep_window_unlock(zbx_cep_window_t *window);
 
 zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, const zbx_cep_rule_t *rule,
 		zbx_cep_event_context_t *ctx);
@@ -119,7 +145,6 @@ int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now,
 		zbx_vector_cep_window_ptr_t *windows);
 void	cep_window_pool_reset_rule(zbx_cep_window_pool_t *pool, zbx_uint64_t ruleid);
 void	cep_window_pool_enqueue(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
-void	cep_window_pool_save(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool);
 void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool);
 
 void	cep_window_pool_get_stats(zbx_cep_window_pool_t *pool, zbx_cep_window_pool_stats_t *stats);

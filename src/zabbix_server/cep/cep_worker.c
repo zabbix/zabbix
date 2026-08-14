@@ -845,6 +845,16 @@ static int	cep_task_rule_error_compare(const void *a1, const void *a2)
 	return 0;
 }
 
+static int	cep_task_win_sync_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_task_window_sync_t	*ws1 = *(const zbx_cep_task_window_sync_t * const *)a1;
+	const zbx_cep_task_window_sync_t	*ws2 = *(const zbx_cep_task_window_sync_t * const *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(ws1->window, ws2->window);
+
+	return 0;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: commit queued finished tasks                                      *
@@ -854,13 +864,14 @@ static int	cep_task_rule_error_compare(const void *a1, const void *a2)
  ******************************************************************************/
 static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_task_commit_t *task)
 {
-	zbx_vector_mw_task_ptr_t	event_tasks, add_tags_tasks, sync_tasks, ack_tasks, rule_tasks;
+	zbx_vector_mw_task_ptr_t	event_tasks, add_tags_tasks, sync_tasks, ack_tasks, rule_tasks, win_tasks;
 
 	zbx_vector_mw_task_ptr_create(&event_tasks);
 	zbx_vector_mw_task_ptr_create(&add_tags_tasks);
 	zbx_vector_mw_task_ptr_create(&sync_tasks);
 	zbx_vector_mw_task_ptr_create(&ack_tasks);
 	zbx_vector_mw_task_ptr_create(&rule_tasks);
+	zbx_vector_mw_task_ptr_create(&win_tasks);
 
 	for (int i = 0; i < task->tasks.values_num; i++)
 	{
@@ -880,6 +891,9 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 				break;
 			case CEP_TASK_RULE_ERROR:
 				zbx_vector_mw_task_ptr_append(&rule_tasks, task->tasks.values[i]);
+				break;
+			case CEP_TASK_WINDOW_SYNC:
+				zbx_vector_mw_task_ptr_append(&win_tasks, task->tasks.values[i]);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported task %d in commit",
@@ -984,6 +998,14 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 		cep_db_update_rule_errors(worker->dbpool, &rule_tasks);
 	}
 
+	if (0 != win_tasks.values_num)
+	{
+		zbx_vector_mw_task_ptr_sort(&win_tasks, cep_task_win_sync_compare);
+		cep_db_sync_windows(worker->dbpool, &win_tasks);
+	}
+
+
+	zbx_vector_mw_task_ptr_destroy(&win_tasks);
 	zbx_vector_mw_task_ptr_destroy(&rule_tasks);
 	zbx_vector_mw_task_ptr_destroy(&ack_tasks);
 	zbx_vector_mw_task_ptr_destroy(&sync_tasks);
@@ -1107,6 +1129,7 @@ void	*cep_worker_entry(void *args)
 				case CEP_TASK_SYNC_EVENT:
 				case CEP_TASK_ACKNOWLEDGE:
 				case CEP_TASK_RULE_ERROR:
+				case CEP_TASK_WINDOW_SYNC:
 					/* nop tasks, contains data for commit */
 					break;
 				default:
