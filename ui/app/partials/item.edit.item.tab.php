@@ -684,35 +684,46 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('columns-table')
-					->setAttribute('data-field-type', 'set')
-					->setAttribute('data-field-name', 'columns')
 					->setHeader(['', _('Name'), '', ''])
 					->setFooter(new CRow(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')->setEnabled(!$readonly)
 						))->setColSpan(4)
 					)),
-				new CTemplateTag('column-row-tmpl',
+				new CTemplateTag('column-row-tmpl', [
 					(new CRow([
 						(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CSelect('columns[#{rowNum}][column]'))
 							->addClass('js-column')
 							->setValue('#{column}')
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+							->setErrorLabel(_('Name'))
+							->setErrorContainer('columns_#{rowNum}_error_container')
 							->setReadonly($readonly),
 						(new CTextBox('columns[#{rowNum}][attribute_key]', '#{attribute_key}', $readonly))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 							->setAttribute('placeholder', _('Key name'))
+							->setErrorLabel(_('Key name'))
+							->setErrorContainer('columns_#{rowNum}_error_container')
 							->addClass('js-attribute-key'),
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')->setEnabled(!$readonly)
 						))
 							->addClass(ZBX_STYLE_RIGHT)
 							->addStyle('width: 100%;')
-					]))->addClass('form_row')
-				)
+					]))->addClass('form_row'),
+					(new CRow([
+						new CCol(),
+						(new CCol())
+							->setId('columns_#{rowNum}_error_container')
+							->addClass(ZBX_STYLE_ERROR_CONTAINER)
+							->setColSpan(3)
+					]))->addClass('error-container-row')
+				])
 			]))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'columns')
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('js-item-columns-field')
@@ -725,8 +736,6 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('aggregated-columns-table')
-					->setAttribute('data-field-type', 'set')
-					->setAttribute('data-field-name', 'aggregated_columns')
 					->setHeader([_('Function'), _('Alias'), _('Actions')])
 					->setFooter(new CRow(
 						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-aggregated-column')
@@ -738,10 +747,12 @@ $formgrid
 						[
 							(new CInput('hidden', 'aggregated_columns[#{row_index}][column]', '#{column}'))
 								->setAttribute('data-field-type', 'hidden')
-								->setErrorContainer('aggregated_columns-#{row_index}-error-container'),
+								->setErrorContainer('aggregated_columns_#{row_index}_error_container'),
 							new CVar('aggregated_columns[#{row_index}][function]', '#{function}'),
 							new CVar('aggregated_columns[#{row_index}][percentile]', '#{percentile}'),
-							new CVar('aggregated_columns[#{row_index}][alias]', '#{alias}'),
+							(new CInput('hidden', 'aggregated_columns[#{row_index}][alias]', '#{alias}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setErrorContainer('aggregated_columns_#{row_index}_error_container'),
 							'#{function_label}'
 						],
 						'#{alias}',
@@ -750,14 +761,16 @@ $formgrid
 							(new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)
 						])))
 					]))->addClass('form_row')->setAttribute('data-row_index', '#{row_index}'),
-					(new CRow())
-						->addClass('error-container-row')
-						->addItem((new CCol())
-							->setId('aggregated_columns-#{row_index}-error-container')
+					(new CRow([
+						(new CCol())
+							->setId('aggregated_columns_#{row_index}_error_container')
+							->addClass(ZBX_STYLE_ERROR_CONTAINER)
 							->setColSpan(3)
-						)
+					]))->addClass('error-container-row')
 				])
 			]))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'aggregated_columns')
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('js-item-aggregated-columns-field')
@@ -795,8 +808,6 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('conditions-table')
-					->setAttribute('data-field-type', 'set')
-					->setAttribute('data-field-name', 'conditions')
 					->setHeader([_('Label'), _('Name'), _('Action')])
 					->setFooter(new CRow(
 						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-condition')
@@ -806,10 +817,12 @@ $formgrid
 				new CTemplateTag('condition-row-tmpl', [
 					(new CRow([
 						[
-							new CVar('conditions[#{row_index}][formulaid]', '#{formulaid}'),
+							(new CInput('hidden', 'conditions[#{row_index}][formulaid]', '#{formulaid}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setErrorContainer('conditions_#{row_index}_error_container'),
 							(new CInput('hidden', 'conditions[#{row_index}][column]', '#{column}'))
 								->setAttribute('data-field-type', 'hidden')
-								->setErrorContainer('conditions-#{row_index}-error-container'),
+								->setErrorContainer('conditions_#{row_index}_error_container'),
 							new CVar('conditions[#{row_index}][attribute_key]', '#{attribute_key}'),
 							new CVar('conditions[#{row_index}][operator]', '#{operator}'),
 							new CVar('conditions[#{row_index}][value]', '#{value}'),
@@ -818,14 +831,16 @@ $formgrid
 						'#{name}',
 						(new CCol((new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)))
 					]))->addClass('form_row')->setAttribute('data-row_index', '#{row_index}'),
-					(new CRow())
-						->addClass('error-container-row')
-						->addItem((new CCol())
-							->setId('conditions-#{row_index}-error-container')
+					(new CRow([
+						(new CCol())
+							->setId('conditions_#{row_index}_error_container')
+							->addClass(ZBX_STYLE_ERROR_CONTAINER)
 							->setColSpan(3)
-						)
+					]))->addClass('error-container-row')
 				])
 			]))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'conditions')
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('js-item-conditions-field')

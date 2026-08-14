@@ -109,6 +109,9 @@ window.item_edit_form = new class {
 		this.form.findFieldByName('interfaceid')?.setChanged();
 		this.form.findFieldByName('type').setChanged();
 		this.form.validateChanges(['interfaceid', 'type']);
+
+		this.form.findFieldByName('aggregated_columns')
+			.setButtonOnBlur('js-add-aggregated-column', 'telemetry-aggregated-column');
 	}
 
 	initForm(field_switches) {
@@ -190,6 +193,7 @@ window.item_edit_form = new class {
 			sortable: true,
 			sortable_options: {
 				target: 'tbody',
+				selector_span: ':not(.error-container-row)',
 				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				freeze_end: 1,
 				enable_sorting: !this.form_readonly
@@ -752,7 +756,7 @@ window.item_edit_form = new class {
 		const config = this.telemetry_columns_config;
 		const tbody = this.form_element.querySelector('#conditions-table tbody');
 		const is_complex = config.complex.includes(data.column);
-		const key_part = is_complex ? data.attribute_key : '';
+		const key_part = is_complex ? `.${data.attribute_key}` : '';
 		const value_part = parseInt(data.operator, 10) === <?= CONDITION_OPERATOR_EXISTS ?> ? '' : ` ${data.value}`;
 		const source = document.getElementById('condition-row-tmpl').innerHTML;
 		const html = new Template(source).evaluate({

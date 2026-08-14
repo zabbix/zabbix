@@ -89,12 +89,17 @@ class CTelemetryHelper {
 			foreach ($signal_types as $signal_type) {
 				if ($signal_type == CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS) {
 					foreach ($metric_point_types as $metric_point_type) {
-						$config[$section][$signal_type][$metric_point_type] =
-							self::getSectionColumns($section, $signal_type, $metric_point_type);
+						$names = self::getSectionColumns($section, $signal_type, $metric_point_type);
+						sort($names);
+
+						$config[$section][$signal_type][$metric_point_type] = $names;
 					}
 				}
 				else {
-					$config[$section][$signal_type] = self::getSectionColumns($section, $signal_type);
+					$names = self::getSectionColumns($section, $signal_type);
+					sort($names);
+
+					$config[$section][$signal_type] = $names;
 				}
 			}
 		}
