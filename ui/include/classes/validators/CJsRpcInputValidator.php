@@ -341,6 +341,7 @@ class CJsRpcInputValidator {
 				$rules = ['type' => API_OBJECT, 'fields' => $head_rules['fields'] + [
 					'real_hosts' => ['type' => API_INT32],
 					'templated' => ['type' => API_INT32],
+					'editable' => ['type' => API_INT32],
 
 					// Options not relevant to trigger API and are not passed either.
 					'with_triggers' => ['type' => API_INT32],
