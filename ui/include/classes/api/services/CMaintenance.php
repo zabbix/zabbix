@@ -685,7 +685,10 @@ class CMaintenance extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
-				continue;
+				if ($maintenance['maintenance_type']
+						== $db_maintenances[$maintenance['maintenanceid']]['maintenance_type']) {
+					continue;
+				}
 			}
 
 			$maintenance_targets += $db_maintenances === null
@@ -1316,20 +1319,19 @@ class CMaintenance extends CApiService {
 			$target_types = $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL
 				? ['groups', 'hosts', 'triggers']
 				: ['groups', 'hosts'];
+			$db_maintenance = $db_maintenances[$maintenance['maintenanceid']];
+			$is_type_changed = $maintenance['maintenance_type'] != $db_maintenance['maintenance_type'];
 
-			if (array_intersect_key($maintenance, array_flip($target_types))) {
+			if ($is_type_changed || array_intersect_key($maintenance, array_flip($target_types))) {
 				foreach ($target_types as $target_type) {
 					$target_maintenanceids[$target_type][] = $maintenance['maintenanceid'];
 					$db_maintenances[$maintenance['maintenanceid']][$target_type] = [];
 				}
 			}
 
-			$db_maintenance = $db_maintenances[$maintenance['maintenanceid']];
-
 			if (!array_key_exists('triggers', $db_maintenances[$maintenance['maintenanceid']])
 					&& (array_key_exists('triggers', $maintenance)
-						|| ($maintenance['maintenance_type'] != $db_maintenance['maintenance_type']
-							&& $maintenance['maintenance_type'] != MAINTENANCE_TYPE_NORMAL))) {
+						|| ($is_type_changed && $maintenance['maintenance_type'] != MAINTENANCE_TYPE_NORMAL))) {
 				$target_maintenanceids['triggers'][] = $maintenance['maintenanceid'];
 
 				$db_maintenances[$maintenance['maintenanceid']]['triggers'] = [];

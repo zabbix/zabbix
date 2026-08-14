@@ -1912,6 +1912,13 @@ class testMaintenance extends CAPITest {
 					'event_names' => [['value' => 'Problem']]
 				],
 				'expected_error' => 'Invalid parameter "/1/event_names": should be empty.'
+			],
+			'No host group or host when changing trigger-only maintenance to no data collection' => [
+				'request_data' => [
+					'maintenanceid' => 60006,
+					'maintenance_type' => MAINTENANCE_TYPE_NODATA
+				],
+				'expected_error' => 'At least one host group or host must be selected.'
 			]
 		];
 	}
