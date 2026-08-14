@@ -47,12 +47,9 @@ struct zbx_ipc_client
 	zbx_uint32_t		refcount;
 };
 
-
-
 int	__wrap_zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeout,
 			zbx_ipc_client_t **client, zbx_ipc_message_t **message);
 __pid_t	__wrap_getppid (void);
-
 void	__wrap_zbx_ipc_client_close(zbx_ipc_client_t *client);
 
 int	__wrap_zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeout,
@@ -87,6 +84,22 @@ static int	mock_get_config_forks(unsigned char process_type)
 	return zbx_mock_get_parameter_int("in.worker_count");
 }
 
+static void destroy_manager( zbx_lld_manager_t *manager)
+{
+	int i;
+
+	for (i = 0; i < manager->workers.values_num;i++)
+	{
+		zbx_free(manager->workers.values[i]);
+	}
+
+	zbx_vector_lld_worker_ptr_destroy(&manager->workers);
+	zbx_queue_ptr_destroy(&manager->free_workers);
+	zbx_binary_heap_destroy(&manager->rule_queue);
+	zbx_hashset_destroy(&manager->rule_index);
+	zbx_hashset_destroy(&manager->workers_client);
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_ipc_service_t		service;
@@ -96,7 +109,7 @@ void	zbx_mock_test_entry(void **state)
 	int				worker_cnt, expected_worker_count, expected_refcount;
 	__pid_t				pid;
 	zbx_timespec_t			timeout = {1, 0};
-	zbx_thread_lld_manager_args	lld_manager_args =
+	zbx_thread_lld_manager_args	lld_manager_args=
 	{
 		.get_process_forks_cb_arg = mock_get_config_forks
 	};
@@ -114,9 +127,9 @@ void	zbx_mock_test_entry(void **state)
 	lld_manager_init(&manager, lld_manager_args.get_process_forks_cb_arg);
 
 	if (NULL == manager.workers.values && 0 != worker_cnt)
-		fail_msg("lld_init_manager() workers init: Failed to init manager.workers");
+		fail_msg("lld_manager_init() workers init: Failed to init manager.workers");
 
-	zbx_mock_assert_int_eq("connector_init_manager() worker forks:",manager.workers.values_num, worker_cnt);
+	zbx_mock_assert_int_eq("lld_manager_init() worker forks:",manager.workers.values_num, worker_cnt);
 
 	zbx_ipc_service_recv(&service, &timeout, &client, &message);
 
@@ -125,10 +138,12 @@ void	zbx_mock_test_entry(void **state)
 		lld_register_worker(&manager, client, message);
 	}
 
-	zbx_mock_assert_int_eq("connector_register_worker() worker count:", expected_worker_count,
+	zbx_mock_assert_int_eq("lld_register_worker() worker count:", expected_worker_count,
 			manager.next_worker_index);
-	zbx_mock_assert_int_eq("connector_register_worker() refcount value:", expected_refcount,
+	zbx_mock_assert_int_eq("lld_register_worker() refcount value:", expected_refcount,
 			client->refcount);
+
+	destroy_manager(&manager);
 
 	zbx_free(message);
 	zbx_free(client);

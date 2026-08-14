@@ -47,8 +47,6 @@ struct zbx_ipc_client
 	zbx_uint32_t		refcount;
 };
 
-
-
 int	__wrap_zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, char **error);
 int	__wrap_zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeout,
 			zbx_ipc_client_t **client, zbx_ipc_message_t **message);
@@ -93,7 +91,25 @@ void	__wrap_zbx_ipc_client_close(zbx_ipc_client_t *client)
 static int	mock_get_config_forks(unsigned char process_type)
 {
 	ZBX_UNUSED(process_type);
-	return zbx_mock_get_parameter_int("in.worker_count");
+	return zbx_mock_get_parameter_int("in.writer_count");
+}
+
+static void destroy_manager( zbx_rm_t *manager)
+{
+	int i;
+
+	for (i = 0; i < manager->writers.values_num;i++)
+	{
+		zbx_free(manager->writers.values[i]);
+	}
+
+	zbx_vector_ptr_destroy(&manager->writers);
+	zbx_queue_ptr_destroy(&manager->free_writers);
+	zbx_binary_heap_destroy(&manager->report_queue);
+	zbx_hashset_destroy(&manager->batches);
+	zbx_hashset_destroy(&manager->reports);
+	zbx_vector_uint64_destroy(&manager->flush_queue);
+	zbx_list_destroy(&manager->job_queue);
 }
 
 void	zbx_mock_test_entry(void **state)
@@ -102,7 +118,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_ipc_client_t		*client;
 	zbx_ipc_message_t		*message;
 	zbx_rm_t			manager;
-	int				worker_cnt, expected_worker_count, expected_refcount;
+	int				writer_cnt, expected_writer_count, expected_refcount;
 	__pid_t				pid;
 	zbx_timespec_t			timeout = {1, 0};
 	zbx_thread_report_manager_args	report_manager_args =
@@ -116,28 +132,30 @@ void	zbx_mock_test_entry(void **state)
 	message->data = (unsigned char *)&pid;
 
 	pid = zbx_mock_get_parameter_int("in.pid");
-	worker_cnt = report_manager_args.get_process_forks_cb_arg(1);
+	writer_cnt = report_manager_args.get_process_forks_cb_arg(1);
 	expected_refcount = zbx_mock_get_parameter_int("out.addref_count");
-	expected_worker_count = zbx_mock_get_parameter_int("out.worker_count");
+	expected_writer_count = zbx_mock_get_parameter_int("out.writer_count");
 
 	rm_init(&manager, report_manager_args.get_process_forks_cb_arg, NULL);
 
-	if (NULL == manager.writers.values && 0 != worker_cnt)
-		fail_msg("lld_init_manager() workers init: Failed to init manager.workers");
+	if (NULL == manager.writers.values && 0 != writer_cnt)
+		fail_msg("rm_init() writer init: Failed to init manager.writers");
 
-	zbx_mock_assert_int_eq("connector_init_manager() worker forks:",manager.writers.values_num, worker_cnt);
+	zbx_mock_assert_int_eq("rm_init() writer forks:",manager.writers.values_num, writer_cnt);
 
 	zbx_ipc_service_recv(&service, &timeout, &client, &message);
 
-	for (int i = 0; i < worker_cnt; i++)
+	for (int i = 0; i < writer_cnt; i++)
 	{
 		rm_register_writer(&manager, client, message);
 	}
 
-	zbx_mock_assert_int_eq("connector_register_worker() worker count:", expected_worker_count,
+	zbx_mock_assert_int_eq("rm_register_writer() writer count:", expected_writer_count,
 			manager.next_writer_index);
-	zbx_mock_assert_int_eq("connector_register_worker() refcount value:", expected_refcount,
+	zbx_mock_assert_int_eq("rm_register_writer() refcount value:", expected_refcount,
 			client->refcount);
+
+	destroy_manager(&manager);
 
 	zbx_free(message);
 	zbx_free(client);
