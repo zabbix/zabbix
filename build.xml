@@ -122,6 +122,7 @@
 		<property name="phpunit_hashicorp_root_token_id" value="${PHPUNIT_HASHICORP_ROOT_TOKEN_ID}"/>
 
 		<!-- HashiCorp settings -->
+		<replace file="ui/tests/bootstrap.php" token="'PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED', false" value="'PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED', true"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_HASHICORP_ADDRESS}" value="${phpunit_hashicorp_address}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_HASHICORP_ROOT_TOKEN_ID}" value="${phpunit_hashicorp_root_token_id}"/>
 	</target>
