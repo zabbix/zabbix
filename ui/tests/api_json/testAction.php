@@ -86,7 +86,7 @@ class testAction extends CAPITest {
 				]
 			],
 			'roles' => [
-				['name' => 'r1', 'type' => USER_TYPE_ZABBIX_ADMIN]
+				['name' => 'r1', 'type' => USER_TYPE_ZABBIX_ADMIN, 'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]]
 			],
 			'user_groups' => [
 				[

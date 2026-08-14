@@ -83,7 +83,11 @@ class testDRule extends CAPITest {
 			],
 			'roles' => [
 				['name' => 'perm.user.role', 'type' => USER_TYPE_ZABBIX_USER],
-				['name' => 'perm.admin.role', 'type' => USER_TYPE_ZABBIX_ADMIN]
+				[
+					'name' => 'perm.admin.role',
+					'type' => USER_TYPE_ZABBIX_ADMIN,
+					'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
+				]
 			],
 			'users' => [
 				[
