@@ -91,6 +91,7 @@ window.ceprule_edit_popup = new class {
 
 		this.#initActions();
 		this.form = new CForm(this.form_element, rules);
+		this.form.findFieldByName('operations').setButtonOnBlur('js-operation-add', 'ceprule.operation.edit');
 
 		this.#handleFilterChanged();
 		window['ceprule-window-counttag-toggle'].dispatchEvent(new Event('change'));
