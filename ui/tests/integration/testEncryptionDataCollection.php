@@ -328,17 +328,23 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	// =========================================================================
 
 	/**
-	 * Detect whether the Zabbix server binary was linked against GnuTLS or OpenSSL.
+	 * Determine which TLS library the server/agent binaries were built with.
+	 *
+	 * Mirrors the ENCRYPTION handling in build.xml's "with.encryption" property: GNUTLS, NONE, or
+	 * default to OpenSSL. Read directly from the environment (same as IntegrationTests::suite() reading
+	 * DB/HISTORY_STORAGE) rather than inferred from the binary, since server.c embeds the literal string
+	 * "GnuTLS or OpenSSL" in its config-validation errors precisely when built WITHOUT either library,
+	 * which made a strings/grep-based detection misidentify a no-TLS build as GnuTLS.
 	 */
 	private function detectTLSLibrary(): string {
-		$out = shell_exec('strings '.escapeshellarg(PHPUNIT_BINARY_DIR.'zabbix_server').
-			' 2>/dev/null | grep -Ei "^GnuTLS|^OpenSSL" | head -3');
-
-		if ($out === null || trim($out) === '') {
-			return 'none';
+		switch (strtoupper((string) getenv('ENCRYPTION'))) {
+			case 'GNUTLS':
+				return 'gnutls';
+			case 'NONE':
+				return 'none';
+			default:
+				return 'openssl';
 		}
-
-		return (stripos($out, 'gnutls') !== false) ? 'gnutls' : 'openssl';
 	}
 
 	/**
