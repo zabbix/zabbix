@@ -691,7 +691,7 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 		else if (CEP_EVENT_OPEN == task->event_op)
 		{
 			if (EVENT_SOURCE_TRIGGERS == task->db_event->source &&
-					EVENT_OBJECT_TRIGGER != task->db_event->object)
+					EVENT_OBJECT_TRIGGER == task->db_event->object)
 			{
 				if (0 != task->event->cause_eventid)
 					zbx_vector_uint64_append(&ref_eventids, task->event->cause_eventid);
