@@ -307,7 +307,8 @@ class testTriggerCEP extends CIntegrationTest {
 	// The close window scenario (see prepareDataCepWindowCloseWindowOperations()) performs the same close window
 	// operation from every execution point that may decide an id has recovered: on a pattern match, where a script
 	// reports one and the window therefore ends at the examination that follows the "up" value rather than at the
-	// value itself; when the "up" event occurs, where the window is closed by an event it holds; and when the "up"
+	// value itself; when the "up" event is added to the window, where it is closed by an event it holds; and when
+	// the "up"
 	// event is evicted, where it is closed by an event that did not fit into it. Every window type is run from
 	// every execution point it has - both event driven ones for a simple, a tag correlation and a cause and
 	// symptom window, all three for a pattern match window - so that no combination of the two is left untried.
@@ -2253,7 +2254,8 @@ class testTriggerCEP extends CIntegrationTest {
 	 * nothing is evicted and the group is never reset while the events are being sent.
 	 *
 	 * The only operations the rule has are the ones that recover the scenario, the same pair as the other
-	 * windowed flavours (see buildCloseOnUpCepRuleParams()): "close window" when an event occurs, restricted to
+	 * windowed flavours (see buildCloseOnUpCepRuleParams()): "close window" when an event is added to the window,
+	 * restricted to
 	 * the "up" events by a tag exists condition on CEP_STATE_TAG_UP - a tag only an "up" event carries because
 	 * its name is resolved from the item value - and "close" when the window closes, which closes every event
 	 * that window held. Neither of them is reached while the "down" values are being sent, so the ranking they
@@ -2289,7 +2291,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$operations = [
 			[
 				'sortorder' => 0,
-				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_ADDED,
 				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
 				'filter' => [
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -2299,7 +2301,7 @@ class testTriggerCEP extends CIntegrationTest {
 			[
 				'sortorder' => 1,
 				'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
-				'type' => CCepRuleHelper::OP_CLOSE
+				'type' => CCepRuleHelper::OP_CLOSE_EVENT
 			]
 		];
 
@@ -2420,7 +2422,7 @@ class testTriggerCEP extends CIntegrationTest {
 			[
 				'sortorder' => 0,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
-				'type' => CCepRuleHelper::OP_COPY_FIRST,
+				'type' => CCepRuleHelper::OP_CLONE_FIRST,
 				'filter' => [
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [[
@@ -2469,7 +2471,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'script' => "return cep_get_events().length > 0 ? 'true' : 'false';"
 		];
 
-		$operations = $this->buildWindowNoneOperations([[CCepRuleHelper::OP_COPY_FIRST, []]],
+		$operations = $this->buildWindowNoneOperations([[CCepRuleHelper::OP_CLONE_FIRST, []]],
 			CCepRuleHelper::WHEN_PATTERN_MATCHED
 		);
 
@@ -2603,8 +2605,8 @@ HEREDOC;
 		];
 
 		$operations = $this->buildWindowNoneOperations([
-			[CCepRuleHelper::OP_COPY_FIRST, []],
-			[CCepRuleHelper::OP_COPY_LAST, []]
+			[CCepRuleHelper::OP_CLONE_FIRST, []],
+			[CCepRuleHelper::OP_CLONE_LAST, []]
 		], CCepRuleHelper::WHEN_PATTERN_MATCHED);
 
 		// The "up" value ends the window. Every event that occurs reaches this execution point, so the condition
@@ -2612,7 +2614,7 @@ HEREDOC;
 		// window it just opened and the pattern would never be collected at all.
 		$operations[] = [
 			'sortorder' => count($operations),
-			'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			'execute_when' => CCepRuleHelper::WHEN_EVENT_ADDED,
 			'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
 			'filter' => [
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -2693,12 +2695,12 @@ HEREDOC;
 
 	/**
 	 * Prepare the flavour of the close window scenario that has a pattern match window but performs its close
-	 * window operation when an "up" event occurs, so the window of that window type is ended by an arriving
+	 * window operation when an "up" event is added to it, so the window of that window type is ended by an arriving
 	 * event and not by its own script, see prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowPatternCloseWindowOnEvent() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
-			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT, CCepRuleHelper::WHEN_EVENT_OCCURRED
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT, CCepRuleHelper::WHEN_EVENT_ADDED
 		);
 	}
 
@@ -2710,7 +2712,7 @@ HEREDOC;
 	public function prepareDataCepWindowPatternCloseWindowOnEventWithEvictClose() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
 			self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_EVENT_EVICTED
 		);
 	}
 
@@ -2740,13 +2742,14 @@ HEREDOC;
 
 	/**
 	 * Prepare the simple window flavour of the close window scenario, whose close window operation is performed
-	 * when an "up" event occurs. A simple window has no matching of its own, so this and the eviction flavour
+	 * when an "up" event is added to it. A simple window has no matching of its own, so this and the eviction
+	 * flavour
 	 * below are the only execution points it can be closed from, see
 	 * prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowSimpleCloseWindow() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
-			self::CEP_RULE_WINDOW_SIMPLE_CLOSE, CCepRuleHelper::WHEN_EVENT_OCCURRED
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE, CCepRuleHelper::WHEN_EVENT_ADDED
 		);
 	}
 
@@ -2757,7 +2760,7 @@ HEREDOC;
 	public function prepareDataCepWindowSimpleCloseWindowWithEvictClose() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
 			self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_EVENT_EVICTED
 		);
 	}
 
@@ -2785,11 +2788,11 @@ HEREDOC;
 
 	/**
 	 * Prepare the tag correlation flavour of the close window scenario, whose close window operation is
-	 * performed when an "up" event occurs, see prepareDataCepWindowCloseWindowOperations().
+	 * performed when an "up" event is added to it, see prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowTagCloseWindow() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
-			self::CEP_RULE_WINDOW_TAG_CLOSE, CCepRuleHelper::WHEN_EVENT_OCCURRED
+			self::CEP_RULE_WINDOW_TAG_CLOSE, CCepRuleHelper::WHEN_EVENT_ADDED
 		);
 	}
 
@@ -2800,7 +2803,7 @@ HEREDOC;
 	public function prepareDataCepWindowTagCloseWindowWithEvictClose() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
 			self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_EVENT_EVICTED
 		);
 	}
 
@@ -2829,13 +2832,14 @@ HEREDOC;
 
 	/**
 	 * Prepare the cause and symptom flavour of the close window scenario, whose close window operation is
-	 * performed when an "up" event occurs - and singles that event out by the rank its window has just given it
+	 * performed when an "up" event is added to it - and singles that event out by the rank its window has just
+	 * given it
 	 * (the "event symptom" operation condition) instead of by a tag the event carries, which is something only
 	 * this window type can be asked, see prepareDataCepWindowCloseWindowOperations().
 	 */
 	public function prepareDataCepWindowCauseSymptomCloseWindow() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-			self::CEP_RULE_WINDOW_CAUSE_CLOSE, CCepRuleHelper::WHEN_EVENT_OCCURRED
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE, CCepRuleHelper::WHEN_EVENT_ADDED
 		);
 	}
 
@@ -2847,7 +2851,7 @@ HEREDOC;
 	public function prepareDataCepWindowCauseSymptomCloseWindowWithEvictClose() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 			self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_CAUSE_CLOSE),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_EVENT_EVICTED
 		);
 	}
 
@@ -2894,7 +2898,7 @@ HEREDOC;
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowDiscardDown() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
-			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DISCARD, CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DISCARD, CCepRuleHelper::WHEN_EVENT_ADDED,
 			CCepRuleHelper::WHEN_WINDOW_CLOSED, true
 		);
 	}
@@ -2905,7 +2909,7 @@ HEREDOC;
 	 */
 	public function prepareDataCepWindowTagCloseWindowDiscardDown() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
-			self::CEP_RULE_WINDOW_TAG_CLOSE_DISCARD, CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			self::CEP_RULE_WINDOW_TAG_CLOSE_DISCARD, CCepRuleHelper::WHEN_EVENT_ADDED,
 			CCepRuleHelper::WHEN_WINDOW_CLOSED, true
 		);
 	}
@@ -2917,7 +2921,7 @@ HEREDOC;
 	 */
 	public function prepareDataCepWindowCauseSymptomCloseWindowDiscardDown() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-			self::CEP_RULE_WINDOW_CAUSE_CLOSE_DISCARD, CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_DISCARD, CCepRuleHelper::WHEN_EVENT_ADDED,
 			CCepRuleHelper::WHEN_WINDOW_CLOSED, true
 		);
 	}
@@ -2957,7 +2961,7 @@ HEREDOC;
 	public function prepareDataCepWindowPatternCloseWindowOnEventSingleService() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
 			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_WINDOW_CLOSED, false, true
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_WINDOW_CLOSED, false, true
 		);
 	}
 
@@ -2967,7 +2971,7 @@ HEREDOC;
 	public function prepareDataCepWindowPatternCloseWindowOnEventWithEvictCloseSingleService() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
 			self::buildSingleServiceRuleName(self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT)),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, true
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, true
 		);
 	}
 
@@ -2999,7 +3003,7 @@ HEREDOC;
 	public function prepareDataCepWindowSimpleCloseWindowSingleService() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
 			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_WINDOW_CLOSED, false, true
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_WINDOW_CLOSED, false, true
 		);
 	}
 
@@ -3009,7 +3013,7 @@ HEREDOC;
 	public function prepareDataCepWindowSimpleCloseWindowWithEvictCloseSingleService() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
 			self::buildSingleServiceRuleName(self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE)),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, true
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, true
 		);
 	}
 
@@ -3039,7 +3043,7 @@ HEREDOC;
 	public function prepareDataCepWindowTagCloseWindowSingleService() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
 			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_WINDOW_CLOSED, false, true
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_WINDOW_CLOSED, false, true
 		);
 	}
 
@@ -3049,7 +3053,7 @@ HEREDOC;
 	public function prepareDataCepWindowTagCloseWindowWithEvictCloseSingleService() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
 			self::buildSingleServiceRuleName(self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE)),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, true
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, true
 		);
 	}
 
@@ -3079,7 +3083,7 @@ HEREDOC;
 	public function prepareDataCepWindowCauseSymptomCloseWindowSingleService() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_CAUSE_CLOSE),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_WINDOW_CLOSED, false, true
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_WINDOW_CLOSED, false, true
 		);
 	}
 
@@ -3089,7 +3093,7 @@ HEREDOC;
 	public function prepareDataCepWindowCauseSymptomCloseWindowWithEvictCloseSingleService() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 			self::buildSingleServiceRuleName(self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_CAUSE_CLOSE)),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, true
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, true
 		);
 	}
 
@@ -3148,7 +3152,7 @@ HEREDOC;
 	 */
 	public function prepareDataCepWindowPatternCloseWindowOnEventDoubleRule() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
-			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT, CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT, CCepRuleHelper::WHEN_EVENT_ADDED,
 			CCepRuleHelper::WHEN_WINDOW_CLOSED, false, false, true
 		);
 	}
@@ -3159,7 +3163,7 @@ HEREDOC;
 	public function prepareDataCepWindowPatternCloseWindowOnEventWithEvictCloseDoubleRule() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
 			self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true
 		);
 	}
 
@@ -3188,7 +3192,7 @@ HEREDOC;
 	 */
 	public function prepareDataCepWindowSimpleCloseWindowDoubleRule() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
-			self::CEP_RULE_WINDOW_SIMPLE_CLOSE, CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE, CCepRuleHelper::WHEN_EVENT_ADDED,
 			CCepRuleHelper::WHEN_WINDOW_CLOSED, false, false, true
 		);
 	}
@@ -3199,7 +3203,7 @@ HEREDOC;
 	public function prepareDataCepWindowSimpleCloseWindowWithEvictCloseDoubleRule() {
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
 			self::buildEvictCloseRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE),
-			CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true
+			CCepRuleHelper::WHEN_EVENT_ADDED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true
 		);
 	}
 
@@ -3238,7 +3242,7 @@ HEREDOC;
 	 *     match as soon as the window it is given holds an "up" event, so the operation is not caused by an event
 	 *     at all - a pattern window is examined once a second, so the window is closed at the first examination
 	 *     after the "up" event landed in it;
-	 *   - WHEN_EVENT_OCCURRED, which every window type has: the operation is performed by the "up" event itself,
+	 *   - WHEN_EVENT_ADDED, which every window type has: the operation is performed by the "up" event itself,
 	 *     restricted to those events by its condition. The new event is already in the window when the operation
 	 *     runs, so it closes the window it has just entered - immediately, without waiting for the window to be
 	 *     examined, which is what tells this flavour from the one above when both have the same window type;
@@ -3387,7 +3391,7 @@ HEREDOC;
 		// An evicted event was never taken into a window and therefore never ranked, so the eviction flavour of
 		// this window type keeps the tag condition of the others alone.
 		$close_window_condition = $window_type === CCepRuleHelper::WINDOW_CAUSE_SYMPTOM
-				&& $execute_when == CCepRuleHelper::WHEN_EVENT_OCCURRED
+				&& $execute_when == CCepRuleHelper::WHEN_EVENT_ADDED
 			? [
 				'filter' => [
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -3415,7 +3419,7 @@ HEREDOC;
 			$operations[] = [
 				'sortorder' => 0,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
-				'type' => CCepRuleHelper::OP_CLOSE
+				'type' => CCepRuleHelper::OP_CLOSE_EVENT
 			] + $up_condition;
 		}
 
@@ -3432,7 +3436,7 @@ HEREDOC;
 		$operations[] = [
 			'sortorder' => 2,
 			'execute_when' => $close_when,
-			'type' => CCepRuleHelper::OP_CLOSE
+			'type' => CCepRuleHelper::OP_CLOSE_EVENT
 		];
 
 		if ($discard_down) {
@@ -3637,7 +3641,8 @@ HEREDOC;
 	 * grouped by the 'service' tag and outlasting the whole scenario (CEP_RULE_WINDOW_CAPACITY_DURATION), so what a
 	 * window holds is exactly the events of its id and only the operations may end it - given the two operations
 	 * that make what a window holds visible from the outside:
-	 *   - "close window" when an "up" event occurs, restricted to those events by a tag exists condition on
+	 *   - "close window" when an "up" event is added to the window, restricted to those events by a tag exists
+	 *     condition on
 	 *     CEP_STATE_TAG_UP, a tag only an "up" event carries because its name is resolved from the item value;
 	 *   - "close" when the window closes, which reaches every event that window held.
 	 *
@@ -3681,7 +3686,7 @@ HEREDOC;
 		$operations = [
 			[
 				'sortorder' => 0,
-				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_ADDED,
 				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
 				'filter' => [
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -3691,7 +3696,7 @@ HEREDOC;
 			[
 				'sortorder' => 1,
 				'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
-				'type' => CCepRuleHelper::OP_CLOSE
+				'type' => CCepRuleHelper::OP_CLOSE_EVENT
 			]
 		];
 
@@ -3763,7 +3768,8 @@ HEREDOC;
 	/**
 	 * Prepare the rule of the scenario that gives a window limits it cannot resolve
 	 * (runEventAssessmentTestCepWindowUnresolvedLimits()): the very rule of the reset and delete scenarios - one
-	 * window per id, grouped by the 'service' tag, "close window" when an "up" event occurs and "close" when the
+	 * window per id, grouped by the 'service' tag, "close window" when an "up" event is added to it and "close"
+	 * when the
 	 * window closes, see prepareDataCepWindowHeldProblemsOperations() - whose window limits are the user macros
 	 * CEP_WINDOW_DURATION_MACRO and CEP_WINDOW_CAPACITY_MACRO with neither macro created.
 	 *
@@ -3820,7 +3826,7 @@ HEREDOC;
 		$operations = [
 			[
 				'sortorder' => 0,
-				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_ADDED,
 				'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
 				'filter' => [
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -3830,7 +3836,7 @@ HEREDOC;
 			[
 				'sortorder' => 1,
 				'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
-				'type' => CCepRuleHelper::OP_CLOSE
+				'type' => CCepRuleHelper::OP_CLOSE_EVENT
 			]
 		];
 
@@ -3974,7 +3980,7 @@ HEREDOC;
 			[
 				'sortorder' => 1,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
-				'type' => CCepRuleHelper::OP_CLOSE
+				'type' => CCepRuleHelper::OP_CLOSE_EVENT
 			],
 			[
 				'sortorder' => 2,
@@ -3990,7 +3996,7 @@ HEREDOC;
 			[
 				'sortorder' => 3,
 				'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
-				'type' => CCepRuleHelper::OP_CLOSE
+				'type' => CCepRuleHelper::OP_CLOSE_EVENT
 			]
 		];
 
@@ -4089,7 +4095,8 @@ HEREDOC;
 			// Nothing but a "close window" operation ever closes a window - the duration running out evicts what
 			// a simple, a tag correlation and a pattern match window hold rather than closing it - so the window
 			// closed execution point is only reached by a rule that asks for it. This one asks for it
-			// unconditionally and as the event occurs, so every event closes the window it has just entered and
+			// unconditionally and as the event is added to the window, so every event closes the window it has just
+			// entered and
 			// the operations above are performed for it right there: the shortest path from an event to that
 			// execution point, and the same one for every window type.
 			//
@@ -4097,7 +4104,7 @@ HEREDOC;
 			// within a rule is the order of one execution point, and this one is the only operation of its own.
 			$operations[] = [
 				'sortorder' => count($operations),
-				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_ADDED,
 				'type' => CCepRuleHelper::OP_CLOSE_WINDOW
 			];
 		}
@@ -4757,7 +4764,7 @@ HEREDOC;
 	 * window. The window is one hour long with no capacity limit, so nothing is evicted during the run.
 	 *
 	 * The operations are:
-	 *   - Execute when "Event occurred": "Close window", restricted to the "up" events by its condition;
+	 *   - Execute when "Event added": "Close window", restricted to the "up" events by its condition;
 	 *   - Execute when "Window closed": "Close".
 	 *
 	 * The new event is already in the window when the close-window operation runs, so an event closes the
@@ -4823,7 +4830,7 @@ HEREDOC;
 			'operations' => [
 				[
 					'sortorder' => 0,
-					'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+					'execute_when' => CCepRuleHelper::WHEN_EVENT_ADDED,
 					'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -4833,7 +4840,7 @@ HEREDOC;
 				[
 					'sortorder' => 1,
 					'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
-					'type' => CCepRuleHelper::OP_CLOSE
+					'type' => CCepRuleHelper::OP_CLOSE_EVENT
 				]
 			]
 		];
@@ -9667,7 +9674,8 @@ HEREDOC;
 
 	/**
 	 * The same close window scenario with the same pattern match window, whose close window operation is this
-	 * time performed when an event occurs, restricted to the "up" events, while its script never reports a match:
+	 * time performed when an event is added to it, restricted to the "up" events, while its script never reports
+	 * a match:
 	 * a pattern match window must honour the arrival execution point as well, so the "up" event closes the window
 	 * it has just entered without the window ever being matched against - see
 	 * runEventAssessmentTestCepWindowCloseWindow().
@@ -10309,7 +10317,8 @@ HEREDOC;
 
 	/**
 	 * The same close window scenario with a tag correlation window, whose close window operation is performed
-	 * when an event occurs, restricted to the "up" events: the operation is performed by the event itself, which
+	 * when an event is added to it, restricted to the "up" events: the operation is performed by the event itself,
+	 * which
 	 * is already in the window of its id when it runs, so it closes the window it has just entered and both
 	 * events that window held. The window type is all that differs from
 	 * testTriggerCEP_CepWindowPatternCloseWindowOnEvent, and closing a window from an arriving event must not
@@ -10494,7 +10503,8 @@ HEREDOC;
 
 	/**
 	 * The same close window scenario with a cause and symptom window, whose close window operation is performed
-	 * when an event occurs - restricted this time not by a tag of the event but by the rank the window itself gave
+	 * when an event is added to it - restricted this time not by a tag of the event but by the rank the window
+	 * itself gave
 	 * it: the "down" event of an id becomes the cause of its window and the "up" event that follows it becomes a
 	 * symptom, and it is being a symptom that the operation acts on. A window is therefore ended by what its own
 	 * ranking says about the event that entered it, and closing it closes the cause and the symptom together - see
