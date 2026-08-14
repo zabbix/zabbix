@@ -93,7 +93,7 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		$proxy_names = [];
 
 		foreach ($proxy_groups as $proxy_group) {
-			foreach ($proxy_group['proxies'] ?? [] as $proxy) {
+			foreach ($proxy_group['proxies'] as $proxy) {
 				if (in_array($proxy['proxyid'], $proxyids)) {
 					$proxy_names[$proxy['proxyid']] = $proxy['name'];
 				}

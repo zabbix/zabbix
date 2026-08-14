@@ -158,6 +158,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	if (monitored_by === null) {
 		return false;
 	}
+
 	const updateFieldsVisibility = () => {
 		const value = monitored_by.querySelector('input[name="monitored_by"]:checked').value;
 
