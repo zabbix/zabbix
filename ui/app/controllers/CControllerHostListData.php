@@ -73,6 +73,7 @@ class CControllerHostListData extends CControllerDataTable {
 
 		$proxyids = null;
 		$proxy_groupids = null;
+		$monitored_by = null;
 
 		switch ($filter['monitored_by']) {
 			case ZBX_MONITORED_BY_SERVER:
@@ -81,19 +82,21 @@ class CControllerHostListData extends CControllerDataTable {
 				break;
 
 			case ZBX_MONITORED_BY_PROXY:
-				$proxyids = $filter['proxyids'] ?: array_keys(API::Proxy()->get([
-					'output' => [],
-					'preservekeys' => true
-				]));
-				$proxy_groupids = 0;
+				if ($filter['proxyids']) {
+					$proxyids = $filter['proxyids'];
+				}
+				else {
+					$monitored_by = ZBX_MONITORED_BY_PROXY;
+				}
 				break;
 
 			case ZBX_MONITORED_BY_PROXY_GROUP:
-				$proxyids = 0;
-				$proxy_groupids = $filter['proxy_groupids'] ?: array_keys(API::ProxyGroup()->get([
-					'output' => [],
-					'preservekeys' => true
-				]));
+				if ($filter['proxyids']) {
+					$proxy_groupids = $filter['proxy_groupids'];
+				}
+				else {
+					$monitored_by = ZBX_MONITORED_BY_PROXY_GROUP;
+				}
 				break;
 		}
 
@@ -117,6 +120,7 @@ class CControllerHostListData extends CControllerDataTable {
 				'dns' => $filter['dns'] === '' ? null : $filter['dns']
 			],
 			'filter' => [
+				'monitored_by' => $monitored_by,
 				'port' => $filter['port'] === '' ? null : $filter['port'],
 				'status' => $filter['status'] == -1 ? null : $filter['status']
 			]
