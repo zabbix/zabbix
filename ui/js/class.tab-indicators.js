@@ -904,12 +904,9 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const form_rows = [...document.querySelectorAll(
-				'#conditions tbody .form_row > td > z-textarea-flexible.js-macro'
-			)]
-			.filter(el => el.value !== '');
-
-		return [...form_rows].filter((row) => !row.readOnly || row.dataset.discovered).length;
+		return [...document.querySelectorAll('#conditions tbody .form_row > td > z-textarea-flexible.js-macro')]
+			.filter(el => el.value !== '')
+			.length;
 	}
 
 	initObserver() {
