@@ -1747,12 +1747,6 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 		}
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, tmp, sizeof(tmp), NULL))
-	{
-		*info = zbx_dsprintf(*info, "cannot find \"%s\" token", ZBX_PROTO_TAG_HOST);
-		goto out;
-	}
-
 	if (FAIL == (ret = zbx_dc_config_get_hostid_by_name_with_host_info(tmp, sock, &hostid, &redirect, &hostinfo)))
 	{
 		/* return CONFIG_ERROR to prevent command to be proceed because of non-existing host */
