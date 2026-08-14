@@ -33,14 +33,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 										CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
 										CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
 									]),
-			'row_index' =>			'required|int32',
-			'column' =>				'string',
-			'attribute_key' =>		'string',
-			'operator' =>			'in '.implode(',', [
-										CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-										CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS
-									]),
-			'value' =>				'string'
+			'row_index' =>			'required|int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -108,10 +101,10 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			'metric_point_type' => (int) $this->getInput('metric_point_type',
 				(string) CItemTypeTelemetryQuery::METRICS_POINT_SUM
 			),
-			'column' => $this->getInput('column', ''),
-			'attribute_key' => $this->getInput('attribute_key', ''),
-			'operator' => (int) $this->getInput('operator', (string) CONDITION_OPERATOR_EQUAL),
-			'value' => $this->getInput('value', ''),
+			'column' => '',
+			'attribute_key' => '',
+			'operator' => CONDITION_OPERATOR_EQUAL,
+			'value' => '',
 			'js_validation_rules' => (new CFormValidator(self::getValidationRules()))->getRules(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
