@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
  * @backup sessions
  *
  * @backupConfig
+ *
+ * @onAfter waitUntilConfigRestored
  */
 class testFormSetup extends CWebTest {
 
@@ -342,13 +344,6 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, 'PreInstall_'.$db_parameters['Database type']);
 	}
 
-	/**
-	 * This test case overwrites configuration file, so it is restored right after the test case and not at the
-	 * end of the test suite. Otherwise the frontend keeps serving the overwritten configuration until PHP
-	 * revalidates the cached file.
-	 *
-	 * @backupConfig
-	 */
 	public function testFormSetup_installSection() {
 		$this->openSpecifiedSection('Install');
 		$this->checkPageTextElements('Install', 'Configuration file "conf/zabbix.conf.php" created.');
@@ -1012,5 +1007,14 @@ class testFormSetup extends CWebTest {
 		// Uncheck the Database TLS encryption and verify that Verify database certificate field is hidden.
 		$tls_encryption->uncheck();
 		$this->assertFalse($verify_certificate->isDisplayed());
+	}
+
+	/**
+	 * Wait for frontend to get the restored config from zabbix.conf.php file. Otherwise the next tests are
+	 * executed with the configuration file written by the setup form, where Zabbix server name and Zabbix
+	 * server address are empty.
+	 */
+	public static function waitUntilConfigRestored() {
+		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 	}
 }
