@@ -1324,8 +1324,12 @@ class CMaintenance extends CApiService {
 				}
 			}
 
-			if ($maintenance['maintenance_type'] != $db_maintenances[$maintenance['maintenanceid']]['maintenance_type']
-					&& $maintenance['maintenance_type'] != MAINTENANCE_TYPE_NORMAL) {
+			$db_maintenance = $db_maintenances[$maintenance['maintenanceid']];
+
+			if (!array_key_exists('triggers', $db_maintenances[$maintenance['maintenanceid']])
+					&& (array_key_exists('triggers', $maintenance)
+						|| ($maintenance['maintenance_type'] != $db_maintenance['maintenance_type']
+							&& $maintenance['maintenance_type'] != MAINTENANCE_TYPE_NORMAL))) {
 				$target_maintenanceids['triggers'][] = $maintenance['maintenanceid'];
 
 				$db_maintenances[$maintenance['maintenanceid']]['triggers'] = [];
@@ -1385,17 +1389,11 @@ class CMaintenance extends CApiService {
 		foreach ($maintenances as $maintenance) {
 			$db_maintenance = $db_maintenances[$maintenance['maintenanceid']];
 
-			if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL) {
-				if (array_key_exists('event_names', $maintenance)) {
-					$maintenanceids[] = $maintenance['maintenanceid'];
-					$db_maintenances[$maintenance['maintenanceid']]['event_names'] = [];
-				}
-			}
-			else {
-				if ($maintenance['maintenance_type'] != $db_maintenance['maintenance_type']) {
-					$maintenanceids[] = $maintenance['maintenanceid'];
-					$db_maintenances[$maintenance['maintenanceid']]['event_names'] = [];
-				}
+			if (array_key_exists('event_names', $maintenance)
+					|| ($maintenance['maintenance_type'] != $db_maintenance['maintenance_type']
+						&& $maintenance['maintenance_type'] != MAINTENANCE_TYPE_NORMAL)) {
+				$maintenanceids[] = $maintenance['maintenanceid'];
+				$db_maintenances[$maintenance['maintenanceid']]['event_names'] = [];
 			}
 		}
 
