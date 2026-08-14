@@ -4,6 +4,9 @@ New features:
 ..F....... [ZBXNEXT-10732] implemented update for the Help URL path (scernisenko)
 
 Bug fixes:
+.........T [ZBX-23057] fixed memory fragmentation trigger and added RSS overhead triggers in Redis by Zabbix agent 2 template (mruszczyk)
+.D........ [ZBX-27746] removed unsupported discovery worker targets and preprocessing worker profiling targets from Zabbix server and proxy help messages and man pages (rtrizna)
+.........T [ZBX-27791] added multiplier to percent_used metric in Ceph by Zabbix agent 2 template (mruszczyk)
 .........T [ZBX-27646] removed MS Teams webhook in default data (egordymov)
 .........T [ZBX-25042] removed DISCARD option for SNMP status items (kflorowski)
 .........T [ZBX-25663] added node name macro to RabbitMQ node templates (abrosimovs)
@@ -1554,6 +1557,9 @@ New features:
 ..F....... [ZBXNEXT-10732] implemented update for the Help URL path (scernisenko)
 
 Bug fixes:
+.........T [ZBX-23057] fixed memory fragmentation trigger and added RSS overhead triggers in Redis by Zabbix agent 2 template (mruszczyk)
+.D........ [ZBX-27746] removed unsupported discovery worker targets and preprocessing worker profiling targets from Zabbix server and proxy help messages and man pages (rtrizna)
+.........T [ZBX-27791] added multiplier to percent_used metric in Ceph by Zabbix agent 2 template (mruszczyk)
 .........T [ZBX-27646] removed MS Teams webhook in default data (egordymov)
 .........T [ZBX-25042] removed DISCARD option for SNMP status items (kflorowski)
 .........T [ZBX-25663] added node name macro to RabbitMQ node templates (abrosimovs)
