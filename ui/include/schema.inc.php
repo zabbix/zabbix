@@ -10622,7 +10622,7 @@ return [
 			]
 		]
 	],
-	'cep_window' => [
+	'cep_rule_window' => [
 		'key' => 'cep_ruleid',
 		'fields' => [
 			'cep_ruleid' => [
@@ -10642,7 +10642,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '0'
+				'default' => '10m'
 			],
 			'capacity' => [
 				'null' => false,
@@ -10688,10 +10688,10 @@ return [
 			]
 		]
 	],
-	'cep_group' => [
-		'key' => 'cep_groupid',
+	'cep_window' => [
+		'key' => 'cep_windowid',
 		'fields' => [
-			'cep_groupid' => [
+			'cep_windowid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
@@ -10704,7 +10704,8 @@ return [
 			'group_by' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10
+				'length' => 10,
+				'default' => '0'
 			],
 			'groupid' => [
 				'null' => true,
@@ -10731,19 +10732,15 @@ return [
 			'nextcheck' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
-	'cep_group_event' => [
-		'key' => 'cep_group_eventid',
+	'cep_window_event' => [
+		'key' => 'cep_windowid,eventid',
 		'fields' => [
-			'cep_group_eventid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'cep_groupid' => [
+			'cep_windowid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
@@ -10851,13 +10848,13 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '25'
+				'default' => '29'
 			],
 			'operator' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '12'
+				'default' => '10'
 			],
 			'tag' => [
 				'null' => false,
@@ -10865,7 +10862,7 @@ return [
 				'length' => 255,
 				'default' => ''
 			],
-			'value' => [
+			'tag_value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,

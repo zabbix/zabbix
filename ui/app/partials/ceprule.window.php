@@ -24,7 +24,7 @@ $tags = (new CMultiSelect([
 	'name' => 'window[tags]',
 	'data' => array_map(fn (string $name) => ['id' => $name, 'name' => $name], $data['window']['tags']),
 	'placeholder' => _('tag names'),
-	'maxlength' => DB::getFieldLength('cep_window', 'tags'),
+	'maxlength' => DB::getFieldLength('cep_rule_window', 'tags'),
 	'add_post_js' => false
 ]))
 	->setId('ceprule-window-groupby-tag')

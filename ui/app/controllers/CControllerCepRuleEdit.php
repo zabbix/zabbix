@@ -110,7 +110,7 @@ class CControllerCepRuleEdit extends CController {
 					'conditions' => []
 				],
 				'window_type' => CCepRuleHelper::WINDOW_NONE,
-				'window' => ['tags' => []] + DB::getDefaults('cep_window'),
+				'window' => ['tags' => []] + DB::getDefaults('cep_rule_window'),
 				'operations' => []
 			]];
 		}
@@ -121,7 +121,7 @@ class CControllerCepRuleEdit extends CController {
 
 		$ceprule = $ceprules[0];
 
-		$ceprule['window'] += DB::getDefaults('cep_window');
+		$ceprule['window'] += DB::getDefaults('cep_rule_window');
 
 		// Unlimited capacity's default value is "0".
 		$ceprule['window']['capacity_enabled'] = $ceprule['window']['capacity'] != 0;
@@ -171,7 +171,12 @@ class CControllerCepRuleEdit extends CController {
 				$condition['type'] = CCepRuleHelper::CONDITION_TAG;
 			}
 
-			$condition['tag_operator'] = $condition['operator'];
+			if ($condition['type'] == CCepRuleHelper::CONDITION_TIME_PERIOD) {
+				$condition['tag_operator'] = CONDITION_OPERATOR_EQUAL;
+			}
+			else {
+				$condition['tag_operator'] = $condition['operator'];
+			}
 
 			return $condition;
 		}, $conditions);

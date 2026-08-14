@@ -478,7 +478,7 @@ window.ceprule_edit_popup = new class {
 				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 				host_group: '',
 				host: '',
-				severity: '<?= TRIGGER_SEVERITY_INFORMATION ?>',
+				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag_operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 				tag: '',
 				tag_value: '',
