@@ -264,11 +264,11 @@ class CConfigurationImport {
 				}
 			}
 
-			if (array_key_exists('proxy', $host) && $host['proxy']) {
+			if ($host['proxy']) {
 				$proxy_refs[$host['proxy']['name']] = [];
 			}
 
-			if (array_key_exists('proxy_group', $host) && $host['proxy_group']) {
+			if ($host['proxy_group']) {
 				$proxy_group_refs[$host['proxy_group']['name']] = [];
 			}
 		}
