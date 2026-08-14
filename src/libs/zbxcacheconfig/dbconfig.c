@@ -3296,16 +3296,12 @@ static void	dc_item_value_type_update(int found, ZBX_DC_ITEM *item, zbx_item_val
 	}
 }
 
-static void	make_item_unsupported(ZBX_DC_ITEM *item, unsigned char proc_type)
+static void	make_item_unsupported(ZBX_DC_ITEM *item, const char *msg)
 {
 	time_t		now = time(NULL);
-	zbx_timespec_t	ts = {now, 0};
-	char		*msg = zbx_dsprintf(NULL, "\"%s\" is disabled in configuration",
-			get_process_type_string(proc_type));
+	zbx_timespec_t	ts = {(int)now, 0};
 
 	zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
-
-	zbx_free(msg);
 }
 
 static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
@@ -3318,7 +3314,11 @@ static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
 	if (ZBX_NO_POLLER == zbx_poller_by_item(item->type, item->key, snmp_oid_type, get_config_forks_cb, &proc_type)
 			&& ZBX_PROCESS_TYPE_UNKNOWN != proc_type)
 	{
-		make_item_unsupported(item, proc_type);
+		char	msg[MAX_STRING_LEN];
+
+		zbx_snprintf(msg, sizeof(msg),
+				"\"%s\" is disabled in configuration", get_process_type_string(proc_type));
+		make_item_unsupported(item, msg);
 	}
 }
 
