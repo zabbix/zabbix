@@ -24,7 +24,7 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		$user_group['proxies'] = zbx_toObject($user_group['proxyids'], 'proxyid');
 		$user_group['proxy_groups'] = zbx_toObject($user_group['proxy_groupids'], 'proxy_groupid');
 
-		unset($user_group['userids'], $user_group['proxyids'], $user_group['proxyids'], $user_group['proxy_groupids']);
+		unset($user_group['userids'], $user_group['proxyids'], $user_group['proxy_groupids']);
 
 		return $user_group;
 	}
