@@ -119,7 +119,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 */
 	public function prepareData(): void {
 		if ($this->detectTLSLibrary() === 'none') {
-			throw new Exception('Server compiled without TLS support; skipping encryption tests.');
+			$this->markTestSkipped('Server compiled without TLS support; skipping encryption tests.');
 		}
 
 		$agent_port  = $this->getConfigurationValue(self::COMPONENT_AGENT,  'ListenPort');
