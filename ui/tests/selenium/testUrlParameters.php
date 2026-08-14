@@ -607,15 +607,7 @@ class testUrlParameters extends CLegacyWebTest {
 						[
 							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&parent_discoveryid={template_lldid}'.
 									'&context=template',
-							'text_not_present' => 'Discovery prototype',
-							'fatal_error' => true,
-							'text_present' => [
-								'Controller: popup',
-								'action: popup',
-								'context: template',
-								'parent_discoveryid: ',
-								'popup: lldrule.prototype.edit'
-							]
+							'text_present' => 'New discovery prototype'
 						],
 						// Context = template, validate parent_discoveryid.
 						[
@@ -770,15 +762,7 @@ class testUrlParameters extends CLegacyWebTest {
 						[
 							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&parent_discoveryid={host_lldid}'.
 									'&context=host',
-							'text_not_present' => 'Discovery prototype',
-							'fatal_error' => true,
-							'text_present' => [
-								'Controller: popup',
-								'action: popup',
-								'context: host',
-								'parent_discoveryid: ',
-								'popup: lldrule.prototype.edit'
-							]
+							'text_present' => 'New discovery prototype'
 						],
 						// Context = host, validate parent_discoveryid.
 						[
