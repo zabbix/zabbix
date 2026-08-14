@@ -428,7 +428,7 @@ class CAudit {
 		'ceprule.filter.conditions' => 'cep_condition',
 		'ceprule.operations' => 'cep_operation',
 		'ceprule.operations.tags' => 'cep_operation_condition',
-		'ceprule.window' => 'cep_window',
+		'ceprule.window' => 'cep_rule_window',
 		'connector.tags' => 'connector_tag',
 		'connector.tags' => 'connector_tag',
 		'correlation.filter' => 'correlation',

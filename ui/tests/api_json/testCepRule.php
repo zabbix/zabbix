@@ -1799,7 +1799,7 @@ class testCepRule extends CAPITest {
 					],
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
-						'duration' => '{$'.str_repeat('M', DB::getFieldLength('cep_window', 'duration')).'}'
+						'duration' => '{$'.str_repeat('M', DB::getFieldLength('cep_rule_window', 'duration')).'}'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window/duration": value is too long.'
@@ -1884,7 +1884,7 @@ class testCepRule extends CAPITest {
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
 						'duration' => '{$DURATION}',
-						'capacity' => '{$'.str_repeat('M', DB::getFieldLength('cep_window', 'capacity')).'}'
+						'capacity' => '{$'.str_repeat('M', DB::getFieldLength('cep_rule_window', 'capacity')).'}'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window/capacity": value is too long.'
