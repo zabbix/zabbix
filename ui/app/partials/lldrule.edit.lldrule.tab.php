@@ -88,13 +88,15 @@ $formgrid
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('items', 'url'))
 				->setReadonly($readonly)
+				->setErrorContainer('url-error-container')
 				->setAriaRequired(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CSimpleButton(_('Parse')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->addClass('js-parseurl')
-				->setEnabled(!$readonly)
-		]))->setId('js-item-url-field')
+				->setEnabled(!$readonly),
+			(new CDiv())->setId('url-error-container')
+		]))->setId('js-item-url-field'),
 	])
 	->addItem([
 		(new CLabel(_('Query fields')))->setId('js-item-query-fields-label'),
