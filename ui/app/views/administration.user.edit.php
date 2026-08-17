@@ -412,7 +412,7 @@ if ($data['roleid']) {
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->addClass('rules-status-container')
 		)
-		->addRow(_('Proxy Groups'), (new CDiv($data['proxy_groups_list']))
+		->addRow(_('Proxy groups'), (new CDiv($data['proxy_groups_list']))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->addClass('rules-status-container')
 		)
