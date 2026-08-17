@@ -1730,7 +1730,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 	char		*field, *field_esc = NULL, **field_names = NULL, *data, *value_out = NULL,
 			delim[ZBX_MAX_BYTES_IN_UTF8_CHAR], quote[ZBX_MAX_BYTES_IN_UTF8_CHAR];
 	struct zbx_json	json;
-	size_t		data_len, delim_sz = 1, quote_sz = 0, step;
+	size_t		data_len, delim_sz = 1, quote_sz = 0, step, field_esc_alloc = 0, field_esc_offset = 0;
 	int		ret = SUCCEED;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
@@ -1898,7 +1898,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 					field = data;
 
 				*data_next = '\0';
-				field_esc = zbx_dsprintf(field_esc, "%s%s", ZBX_NULL2EMPTY_STR(field_esc), field);
+				zbx_strcpy_alloc(&field_esc, &field_esc_alloc, &field_esc_offset, field);
 				field = NULL;
 				data = data_next;
 			}
@@ -1910,7 +1910,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 
 				if (NULL != field_esc)
 				{
-					field_esc = zbx_dsprintf(field_esc, "%s%s", field_esc,
+					zbx_strcpy_alloc(&field_esc, &field_esc_alloc, &field_esc_offset,
 							ZBX_NULL2EMPTY_STR(field));
 					field = field_esc;
 				}
