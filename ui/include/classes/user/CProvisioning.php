@@ -325,7 +325,7 @@ class CProvisioning {
 			}
 			elseif (!$match) {
 				$regex = preg_quote($provision_group['name'], '/');
-				$regex = '/'.str_replace('\\*', '.*', $regex).'/';
+				$regex = '/^'.str_replace('\\*', '.*', $regex).'$/';
 				$match = false;
 
 				foreach ($group_names as $group_name) {

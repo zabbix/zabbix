@@ -969,7 +969,7 @@ zabbix_export:
           - [Cloud Run](https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z#gcp-run)
       vendor:
         name: Zabbix
-        version: 8.0-6
+        version: 8.0-7
       groups:
         - name: Templates/Cloud
       items:
@@ -1500,6 +1500,8 @@ zabbix_export:
           tags:
             - tag: component
               value: environment
+            - tag: component
+              value: gce
         - uuid: c4f17331815345bcb0ac6ea98413b2b5
           name: 'Project quotas get'
           type: DEPENDENT
@@ -2508,7 +2510,7 @@ zabbix_export:
           host_prototypes:
             - uuid: cb22d82a12814afb8ba833c649d575c4
               host: '{#GCE.INSTANCE.ID}'
-              name: '{#GCE.INSTANCE.NAME}'
+              name: 'GCE - {#GCE.INSTANCE.NAME}'
               group_links:
                 - group:
                     name: 'Virtual machines'
@@ -12982,10 +12984,24 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
+        - uuid: 307a854507ee40bf8d9060640697fd83
+          name: 'GCP annual cost'
+          type: CALCULATED
+          key: gcp.annual.cost
+          value_type: FLOAT
+          params: 'sum(last_foreach(//gcp.cost.monthly[*]))'
+          description: 'GCP annual cost.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: cost
         - uuid: 5cc3faa82f404b38b513948f333f3d7c
           name: 'Authorization errors check'
           type: DEPENDENT

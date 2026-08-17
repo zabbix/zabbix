@@ -155,6 +155,8 @@ Threshold macros could be used with a context to fine tune threshold for differe
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
+|Get month cost|<p>Collects Oracle month cost.</p>|Dependent item|oci_cost.month.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.monthly_cost_history`</p></li></ul>|
+|Daily average cost|<p>Oracle daily average cost.</p>|Calculated|oci_cost.daily.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Usage, get data|<p>Master item to get usage info.</p>|Script|oci_cost.usage.get|
 |Budgets, get data|<p>Master item to get budget info.</p>|Script|oci_cost.budget.get|
 |Total: Hourly cost|<p>The hourly cost of the total.</p>|Dependent item|oci_cost.usage.total.cost.hourly<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.hourly.items[*].computedAmount.sum()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -182,6 +184,19 @@ Threshold macros could be used with a context to fine tune threshold for differe
 |OCI Costs: Current day costs exceeded previous|<p>Current day costs exceeded previous.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.usage.total.cost.daily.delta.percentage)>{$OCI.COST.TOTAL.DAILY.DELTA.PERCENTAGE.WARN}`|Warning|**Manual close**: Yes|
 |OCI Costs: Number of compartments has changed|<p>Number of compartments has changed.</p>|`change(/Oracle Cloud Costs by HTTP/oci_cost.compartment.count)<>0`|Info|**Manual close**: Yes|
 |OCI Costs: Number of regions has changed|<p>Number of regions has changed.</p>|`change(/Oracle Cloud Costs by HTTP/oci_cost.region.count)<>0`|Warning|**Manual close**: Yes|
+
+### LLD rule Month discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month discovery|<p>Discovers month cost history.</p>|Dependent item|oci_cost.month.discovery|
+
+### Item prototypes for Month discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month [{#OCI.MONTH}]: Get data|<p>Collects month cost history.</p>|Dependent item|oci_cost.month.cost.data.get[{#OCI.MONTH}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.month=="{#OCI.MONTH}")].first()`</p></li></ul>|
+|Month [{#OCI.MONTH}]: Total cost|<p>Oracle `{#OCI.MONTH}` month total cost.</p>|Dependent item|oci_cost.month.total.cost[{#OCI.MONTH}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cost`</p></li></ul>|
 
 ### LLD rule Budget discovery
 
@@ -523,11 +538,18 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
 |{$OCI.HTTP.TIMEOUT}|<p>Set an HTTP request timeout.</p>|`30s`|
 
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get compute instances|<p>Get compute instances.</p>|Script|oci.compute.get|
+|Compute instances count|<p>Get the total count of compute instances.</p>|Dependent item|oci.compute.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li></ul>|
+
 ### LLD rule Compute instances discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Compute instances discovery|<p>Discover compute instances.</p>|Script|oci.compute.discovery|
+|Compute instances discovery|<p>Discover compute instances.</p>|Dependent item|oci.compute.discovery|
 
 ### LLD rule Virtual cloud networks discovery
 
@@ -634,7 +656,7 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |State|<p>The current state of the instance.</p>|Script|oci.compute.state.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get VNICs|<p>Gets information about all virtual network interface cards attached to the instance.</p>|Script|oci.compute.vnic.get|
 |Get compute metrics|<p>Gets compute instance metrics.</p>|Script|oci.compute.metrics.get|
-|CPU utilization, in %|<p>Activity level from the CPU. Expressed as a percentage of the total time.</p>|Dependent item|oci.compute.cpu.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CpuUtilization`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU utilization, in %|<p>Activity level from the CPU. Expressed as a percentage of the total time.</p>|Dependent item|oci.compute.cpu.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CpuUtilization`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li></ul>|
 |Memory utilization, in %|<p>Space currently in use, measured in pages. Expressed as a percentage of used pages.</p>|Dependent item|oci.compute.mem.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MemoryUtilization`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Memory allocation stalls|<p>Number of times page reclaim was called directly.</p>|Dependent item|oci.compute.mem.stalls<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MemoryAllocationStalls`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Load average|<p>Average system load calculated over a 1-minute period. Expressed as a number of processes.</p>|Dependent item|oci.compute.load.avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LoadAverage`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|

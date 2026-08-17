@@ -360,11 +360,14 @@ int	zbx_http_req(const char *url, const char *header, long timeout, const char *
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER,
-			(headers_slist = curl_slist_append(headers_slist, header)))))
+	if (NULL != header)
 	{
-		*error = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
-		goto clean;
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER,
+				(headers_slist = curl_slist_append(headers_slist, header)))))
+		{
+			*error = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
+			goto clean;
+		}
 	}
 
 	if (SUCCEED != zbx_curl_setopt_https(easyhandle, error))

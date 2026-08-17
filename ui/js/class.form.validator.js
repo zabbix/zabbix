@@ -457,7 +457,7 @@ class CFormValidator {
 			}
 
 			if (rule_set.type === 'objects' || rule_set.type === 'array') {
-				if (data[field] !== null) {
+				if (this.#isTypeObject(data) && field in data && data[field] !== null) {
 					Object.entries(data[field]).forEach(([key, value]) => {
 						scanObject(value, field_path + '/' + key);
 
@@ -468,20 +468,30 @@ class CFormValidator {
 				}
 			}
 			else if (rule_set.type === 'object') {
-				if (data[field] !== null) {
-					scanObject(data[field], field_path);
+				if (this.#isTypeObject(data)) {
+					scanObject(field in data ? data[field] : null, field_path);
 				}
 			}
-			else if (['id', 'integer', 'float', 'string'].includes(rule_set.type)) {
-				checkUse(rule_set, field_path);
+			else if (['id', 'integer', 'float', 'string'].includes(rule_set.type) && this.#isTypeObject(data)
+					&& field in data) {
+				if (!when_paths.length) {
+					checkUse(rule_set, field_path);
+				}
+				else {
+					const when_match = when_paths.every((when_path, index) => {
+						const when_rules = {...rule_set.when[index]};
+						delete when_rules[0];
+
+						return when_path in when_fields_data
+							&& this.#checkValue(when_rules, when_fields_data[when_path]);
+					});
+
+					when_match && checkUse(rule_set, field_path);
+				}
 			}
 		};
 
 		const scanObject = (data, field_path) => {
-			if (!this.#isTypeObject(data)) {
-				return;
-			}
-
 			const rule_sets = getRuleSetsByPath(field_path);
 
 			rule_sets.forEach(rule_set => {
@@ -489,9 +499,7 @@ class CFormValidator {
 
 				if ('fields' in rule_set) {
 					Object.entries(rule_set.fields).forEach(([field, rule_sets]) => {
-						if (field in data) {
-							rule_sets.forEach(rule_set => checkField(rule_set, field, data, field_path + '/' + field));
-						}
+						rule_sets.forEach(rule_set => checkField(rule_set, field, data, field_path + '/' + field));
 					});
 				}
 			});
@@ -618,14 +626,16 @@ class CFormValidator {
 	 */
 	#validateDelayed() {
 		const delayed_checks = this.#use_checks.filter((check) => {
-			let are_all_fields_valid = true;
+			if (check.value === null) {
+				return false;
+			}
 
 			// If at least one of involved field has error, ?action=validate check is skipped.
 			if (check.path in this.#errors && this.#errors[check.path].some((error) => error.message !== '')) {
-				are_all_fields_valid = false;
+				return false;
 			}
 
-			return are_all_fields_valid;
+			return true;
 		});
 
 		const use_validations = delayed_checks.map((check) => {
@@ -839,15 +849,28 @@ class CFormValidator {
 
 		const findRelatedFieldPaths = (lookup_field_path) => {
 			const scan = (lookup_rule_path, rules, current_rule_path) => {
-				const current_field_name = current_rule_path.split('/').at(-1);
 				let related_fields = [];
+
+				const getFieldNameByRefPath = (ref_field_path, current_rule_path) => {
+					let name_parts = 1;
+
+					while (ref_field_path.startsWith('../')) {
+						ref_field_path = ref_field_path.substring(3);
+						name_parts++;
+					}
+
+					return current_rule_path.split('/').splice(-name_parts).join('/');
+				}
 
 				Object.entries(rules).forEach(([rule_key, rule_value]) => {
 					if (rule_key === 'when') {
 						rule_value.forEach((when) => {
 							// Add fields that relates on current lookup field.
 							if (lookup_rule_path === this.#getFieldAbsolutePath(when[0], current_rule_path)) {
-								related_fields.push(this.#getFieldAbsolutePath(current_field_name, lookup_field_path));
+								related_fields.push(this.#getFieldAbsolutePath(
+									getFieldNameByRefPath(when[0], current_rule_path),
+									lookup_field_path
+								));
 							}
 						});
 					}
@@ -957,6 +980,7 @@ class CFormValidator {
 		};
 
 		let subset = Object.create(null);
+		fields_to_validate.sort();
 
 		fields_to_validate.forEach((field_path) => {
 			const parts = field_path.split('/').slice(1);

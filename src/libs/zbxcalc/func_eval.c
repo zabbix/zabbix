@@ -2400,8 +2400,8 @@ static int	evaluate_FORECAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 	{
 		zbx_timespec_t	zero_time;
 
-		double	*t = (double *)zbx_malloc(t, (size_t)values.values_num * sizeof(double));
-		double	*x = (double *)zbx_malloc(x, (size_t)values.values_num * sizeof(double));
+		double	*t = (double *)zbx_malloc(NULL, (size_t)values.values_num * sizeof(double));
+		double	*x = (double *)zbx_malloc(NULL, (size_t)values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
