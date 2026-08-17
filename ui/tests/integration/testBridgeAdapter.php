@@ -709,7 +709,9 @@ class testBridgeAdapter extends CIntegrationTest {
 		}
 	}
 
-	private static function startBridgeAdapterMockInternal(array $extra_args = [], bool $tls = true): void {
+	private static function startBridgeAdapterMockInternal(array $extra_args = [], ?bool $tls = null): void {
+		$tls ??= (self::detectTLSLibrary() !== 'none');
+
 		self::$adapter_log_file = PHPUNIT_COMPONENT_DIR.'bridge_adapter_mock_'.self::getAdapterRunId().'.log';
 		self::$adapter_pid_file = PHPUNIT_COMPONENT_DIR.'bridge_adapter_mock_'.self::getAdapterRunId().'.pid';
 
@@ -751,7 +753,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	}
 
 	public static function startBridgeAdapterMock(): void {
-		self::startBridgeAdapterMockInternal([], self::detectTLSLibrary() !== 'none');
+		self::startBridgeAdapterMockInternal();
 	}
 
 	public static function startBridgeAdapterMockWithNotifyError(): void {
