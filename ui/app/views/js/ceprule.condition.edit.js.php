@@ -57,6 +57,10 @@ window.ceprule_condition_edit_popup = new class {
 	}
 
 	#setValues(condition) {
+		if (condition.tag_operator === '') {
+			condition.tag_operator = '<?= CONDITION_OPERATOR_EQUAL ?>';
+		}
+
 		this.form_element.querySelectorAll('[name]').forEach(node => {
 			if (node.type === 'radio') {
 				node.checked = node.value === condition[node.name];
