@@ -324,9 +324,15 @@ JAVASCRIPT;
 			$delay = timeUnitToSeconds($item['delay']);
 
 			if ($delay == 0 && ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
-					|| $item['type'] == ITEM_TYPE_DEPENDENT || ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-						&& strncmp($item['key'], 'mqtt.get', 8) == 0))) {
-				$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+					|| $item['type'] == ITEM_TYPE_DEPENDENT || $item['type'] == ITEM_TYPE_NESTED
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key'], 'mqtt.get', 8) == 0))) {
+
+				if ($item['flags'] & ZBX_FLAG_DISCOVERY_RULE || $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+					$item['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
+				}
+				else {
+					$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+				}
 			}
 		}
 
