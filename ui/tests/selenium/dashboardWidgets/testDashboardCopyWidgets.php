@@ -792,6 +792,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 				// Check that no inaccessible widgets are present on the pasted page.
 				$dashboard->selectPage($page_name, 2);
+				$dashboard->waitUntilReady();
 				$this->assertFalse($dashboard->query($inaccessible_xpath)->one(false)->isValid());
 				break;
 		}
