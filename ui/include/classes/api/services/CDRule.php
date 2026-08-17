@@ -195,7 +195,10 @@ class CDRule extends CApiService {
 		}
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['druleid']], 'fields' => [
-			'proxyid' =>	['type' => API_ID]
+			'proxyid' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => static fn(): bool => !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING), 'type' => API_ID, 'flags' => API_REQUIRED],
+								['else' => true, 'type' => API_ID]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $drules, '/', $error)) {
@@ -678,7 +681,7 @@ class CDRule extends CApiService {
 			]);
 
 			foreach ($proxyids as $i => $proxyid) {
-				if ($proxyid > 0 && !array_key_exists($proxyid, $db_proxies)) {
+				if (($proxyid == 0 && !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)) || ($proxyid > 0 && !array_key_exists($proxyid, $db_proxies))) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
 					));
