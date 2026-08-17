@@ -288,10 +288,11 @@
 			color: $font-color;
 			user-select: none;
 			background-color: $ui-bg-color;
+			border-radius: 0 var(--surface-border-radius) 0 0;
 
 			.datatable-options-link {
 				margin-right: 0;
-				border-radius: 0 var(--surface-border-radius) 0 0;
+				border-radius: inherit;
 
 				&:not(:hover):not(:focus):not(.datatable-options-link-opened) {
 					border-left-color: $ui-border-color;
