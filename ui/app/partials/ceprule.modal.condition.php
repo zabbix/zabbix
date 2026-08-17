@@ -78,7 +78,8 @@ foreach (CCepRuleHelper::getConditionTagOperators() as $value => $name) {
 		])
 		->addItem([
 			(new CLabel('Event name', 'ceprule-condition-event-name'))->setAsteriskMark(),
-			(new CFormField((new CTextBox('event_name'))
+			(new CFormField((new CTextAreaFlexible('event_name'))
+				->setMaxlength(DB::getFieldLength('cep_condition', 'event_name'))
 				->setId('ceprule-condition-event-name')
 				->setAttribute('placeholder', 'event name')
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_EVENT_NAME)
