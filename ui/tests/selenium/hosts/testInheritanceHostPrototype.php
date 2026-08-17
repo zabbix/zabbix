@@ -480,6 +480,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				$this->zbxTestClickButtonMultiselect('group_links_');
 				$this->zbxTestLaunchOverlayDialog('Host groups');
 				$this->zbxTestClickLinkTextWait($data['hostgroup']);
+				COverlayDialogElement::find(1)->waitUntilNotPresent();
 			}
 			if (array_key_exists('group_prototype', $data)) {
 				$this->zbxTestInputClearAndTypeByXpath('//*[@name="group_prototypes[0][name]"]', $data['group_prototype']);
@@ -492,6 +493,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			COverlayDialogElement::find(1)->waitUntilReady()->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
+			COverlayDialogElement::find(1)->waitUntilNotPresent();
 		}
 
 		// Change inventory mode.
@@ -500,7 +502,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
 		}
 
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 
 		if (array_key_exists('error_inline', $data)) {
