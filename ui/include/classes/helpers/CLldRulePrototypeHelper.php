@@ -62,7 +62,7 @@ class CLldRulePrototypeHelper extends CItemGeneralHelper {
 			$item = static::addDelayWithFlexibleIntervals($update_interval_parser, $item);
 		}
 		else {
-			$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+			$item['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
 			$item['delay_flex'] = [];
 		}
 
