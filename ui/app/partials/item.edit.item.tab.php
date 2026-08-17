@@ -704,6 +704,7 @@ $formgrid
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 							->setAttribute('placeholder', _('Key name'))
+							->setAttribute('data-notrim', '')
 							->setErrorLabel(_('Key name'))
 							->setErrorContainer('columns_#{rowNum}_error_container')
 							->addClass('js-attribute-key'),
@@ -823,9 +824,13 @@ $formgrid
 							(new CInput('hidden', 'conditions[#{row_index}][column]', '#{column}'))
 								->setAttribute('data-field-type', 'hidden')
 								->setErrorContainer('conditions_#{row_index}_error_container'),
-							new CVar('conditions[#{row_index}][attribute_key]', '#{attribute_key}'),
+							(new CInput('hidden', 'conditions[#{row_index}][attribute_key]', '#{attribute_key}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-notrim', ''),
 							new CVar('conditions[#{row_index}][operator]', '#{operator}'),
-							new CVar('conditions[#{row_index}][value]', '#{value}'),
+							(new CInput('hidden', 'conditions[#{row_index}][value]', '#{value}'))
+								->setAttribute('data-field-type', 'hidden')
+								->setAttribute('data-notrim', ''),
 							'#{formulaid}'
 						],
 						'#{name}',

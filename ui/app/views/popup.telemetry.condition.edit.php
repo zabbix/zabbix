@@ -55,6 +55,7 @@ $form_grid = (new CFormGrid())
 		(new CFormField(
 			(new CTextBox('attribute_key', $data['attribute_key']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('data-notrim', '')
 				->setAriaRequired()
 		))->setId('js-key-field')
 	])
@@ -67,6 +68,7 @@ $form_grid = (new CFormGrid())
 		(new CFormField(
 			(new CTextBox('value', $data['value']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('data-notrim', '')
 				->setAriaRequired()
 		))->setId('js-value-field')
 	]);
