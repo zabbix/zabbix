@@ -121,14 +121,14 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 	this.node = document.createElement('div');
 	this.node.style.display = 'none';
 	this.node.hidden = true;
-	this.node.className = 'overlay-dialogue notif';
+	this.node.className = `${ZBX_STYLE_OVERLAY_DIALOGUE} notif`;
 
 	this.btn_close = document.createElement('button');
-	this.btn_close.setAttribute('title', locale['S_CLOSE']);
+	this.btn_close.setAttribute('title', t('S_CLOSE'));
 	this.btn_close.setAttribute('type', 'button');
 	this.btn_close.className = 'btn-overlay-close';
 
-	header.className = 'overlay-dialogue-header cursor-move';
+	header.className = `${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER} cursor-move`;
 	this.node.appendChild(header);
 
 	header.appendChild(controls);
@@ -278,7 +278,7 @@ ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_st
 	else {
 		this.btn_mute.renderState(true);
 		this.btn_mute.disabled = true;
-		this.btn_mute.title = locale['S_CANNOT_SUPPORT_NOTIFICATION_AUDIO'];
+		this.btn_mute.title = t['S_CANNOT_SUPPORT_NOTIFICATION_AUDIO'];
 	}
 
 	const list_node = this.list_node;

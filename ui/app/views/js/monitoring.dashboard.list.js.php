@@ -30,7 +30,7 @@
 
 		#initEvents () {
 			document.querySelector(`.${ZBX_STYLE_HEADER_CONTROLS} .js-import`)
-				.addEventListener('click', () => this.#import());
+				?.addEventListener('click', () => this.#import());
 		}
 
 		#import() {

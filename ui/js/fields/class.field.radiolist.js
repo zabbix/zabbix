@@ -55,4 +55,33 @@ class CFieldRadioList extends CField {
 		super.focusErrorField();
 		this._field.focus();
 	}
+
+	lock() {
+		let res = false;
+
+		for (const input of Object.values(this._radiobuttons)) {
+			if (!input.disabled) {
+				input.dataset.formDisabled = '';
+				input.disabled = true;
+				res = true;
+			}
+		}
+
+		return res;
+	}
+
+	unlock() {
+		let res = false;
+
+		for (const input of Object.values(this._radiobuttons)) {
+			if ('formDisabled' in input.dataset) {
+				input.disabled = false;
+				delete input.dataset.formDisabled;
+
+				res = true;
+			}
+		}
+
+		return res;
+	}
 }

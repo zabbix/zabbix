@@ -780,7 +780,7 @@ static int	add_serveractive_host_sender_cb(const zbx_vector_addr_ptr_t *addrs, z
 	{
 		zbx_error("error parsing the \"ServerActive\" parameter: maximum destination limit of %d has been"
 				" exceeded", MAXIMUM_WAIT_OBJECTS);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 	destinations = (zbx_send_destinations_t *)zbx_realloc(destinations,
@@ -886,7 +886,7 @@ static void	zbx_load_config(const char *config_file_in)
 					add_serveractive_host_sender_cb, NULL, NULL, &error))
 			{
 				zbx_error("%s", error);
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 		}
 	}
@@ -940,14 +940,14 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 			case 'h':
 				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
-				exit(EXIT_SUCCESS);
+				zbx_exit(EXIT_SUCCESS);
 			case 'V':
 				zbx_print_version(title_message);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				printf("\n");
 				zbx_tls_version();
 #endif
-				exit(EXIT_SUCCESS);
+				zbx_exit(EXIT_SUCCESS);
 			case 'I':
 				if (NULL == config_source_ip)
 					config_source_ip = zbx_strdup(config_source_ip, zbx_optarg);
@@ -992,7 +992,7 @@ static void	parse_commandline(int argc, char **argv)
 				{
 					zbx_error("Invalid timeout, valid range %d:%d seconds",
 							CONFIG_SENDER_TIMEOUT_MIN, CONFIG_SENDER_TIMEOUT_MAX);
-					exit(EXIT_FAILURE);
+					zbx_exit(EXIT_FAILURE);
 				}
 				break;
 			case 'g':
@@ -1040,7 +1040,7 @@ static void	parse_commandline(int argc, char **argv)
 #elif defined(HAVE_GNUTLS)
 				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
 						" Zabbix sender was compiled with GnuTLS");
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 #endif
 				break;
 			case 'B':
@@ -1060,12 +1060,12 @@ static void	parse_commandline(int argc, char **argv)
 			case 'B':
 				zbx_error("TLS parameters cannot be used: Zabbix sender was compiled without TLS"
 						" support");
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 				break;
 #endif
 			default:
 				zbx_print_usage(zbx_progname, usage_message);
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -1081,7 +1081,7 @@ static void	parse_commandline(int argc, char **argv)
 				zbx_error("option \"-p\" used with invalid port number \"%s\", valid port numbers are"
 						" %d-%d", ZABBIX_SERVER_PORT, (int)MIN_ZABBIX_PORT,
 						(int)MAX_ZABBIX_PORT);
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 		}
 		else
@@ -1091,7 +1091,7 @@ static void	parse_commandline(int argc, char **argv)
 				add_serveractive_host_sender_cb, NULL, NULL, &error))
 		{
 			zbx_error("%s", error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -1121,7 +1121,7 @@ static void	parse_commandline(int argc, char **argv)
 	}
 
 	if (1 == fatal)
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 
 	/* check for mutually exclusive options    */
 
@@ -1304,7 +1304,7 @@ static void	parse_commandline(int argc, char **argv)
 		zbx_error("either '-c' or '-z' option must be specified");
 		zbx_print_usage(zbx_progname, usage_message);
 		printf("Try '%s --help' for more information.\n", zbx_progname);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (0 < opt_count['c'])
@@ -1357,7 +1357,7 @@ static void	parse_commandline(int argc, char **argv)
 	{
 		zbx_error("too few or mutually exclusive options used");
 		zbx_print_usage(zbx_progname, usage_message);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	/* Parameters which are not option values are invalid. The check relies on zbx_getopt_internal() which */
@@ -1367,7 +1367,7 @@ static void	parse_commandline(int argc, char **argv)
 		for (i = zbx_optind; i < argc; i++)
 			zbx_error("invalid parameter \"%s\"", argv[i]);
 
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -1429,7 +1429,7 @@ static int	send_data(zbx_thread_sendval_args *sendval_args, int ret, struct zbx_
 	sendval_args->json = NULL;
 
 	*buffer_count = 0;
-	zbx_json_clean(*json);
+	zbx_json_free(*json);
 	zbx_free(*json);
 
 	return ret;
@@ -1447,7 +1447,7 @@ int	main(int argc, char **argv)
 
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
+	zbx_init_library_common(zabbix_log_impl, zbx_get_log_level_impl, get_zbx_progname, zbx_backtrace);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif
@@ -1466,21 +1466,21 @@ int	main(int argc, char **argv)
 	{
 		zbx_error("cannot create locks: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, syslog_app_name, NULL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #if defined(_WINDOWS)
 	if (SUCCEED != zbx_socket_start(&error))
 	{
 		zbx_error(error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))

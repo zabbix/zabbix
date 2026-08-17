@@ -50,11 +50,11 @@ Additional points to consider:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ETCD.HOST}|<p>The hostname or IP address of the `etcd` API endpoint.</p>||
-|{$ETCD.PORT}|<p>The port of the `etcd` API endpoint.</p>|`2379`|
-|{$ETCD.SCHEME}|<p>The request scheme which may be `http` or `https`.</p>|`http`|
-|{$ETCD.USER}|||
-|{$ETCD.PASSWORD}|||
+|{$ETCD.HOST}|<p>Etcd API host.</p>||
+|{$ETCD.PORT}|<p>Etcd API port.</p>|`2379`|
+|{$ETCD.SCHEME}|<p>Etcd HTTP scheme.</p>|`http`|
+|{$ETCD.USER}|<p>Etcd username.</p>||
+|{$ETCD.PASSWORD}|<p>Etcd password.</p>||
 |{$ETCD.LEADER.CHANGES.MAX.WARN}|<p>The maximum number of leader changes.</p>|`5`|
 |{$ETCD.PROPOSAL.FAIL.MAX.WARN}|<p>The maximum number of proposal failures.</p>|`2`|
 |{$ETCD.HTTP.FAIL.MAX.WARN}|<p>The maximum number of HTTP request failures.</p>|`2`|

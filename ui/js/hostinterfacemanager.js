@@ -480,7 +480,7 @@ class HostInterfaceManager {
 
 	makeReadonly() {
 		[...document.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_ROW)].forEach((row) => {
-			[...row.querySelectorAll('input, z-select')].map((element) => {
+			[...row.querySelectorAll('input, z-select, z-textarea-flexible')].map((element) => {
 				element.readOnly = true;
 			});
 

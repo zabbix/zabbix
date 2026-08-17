@@ -96,6 +96,10 @@ class CConfiguration extends CApiService {
 		'dashboards' => [
 			'createMissing' => CDashboard::ACCESS_RULES['create'],
 			'updateExisting' => CDashboard::ACCESS_RULES['update']
+		],
+		'global_regexes' => [
+			'createMissing' => CRegexp::ACCESS_RULES['create'],
+			'updateExisting' => CRegexp::ACCESS_RULES['update']
 		]
 	];
 
@@ -141,7 +145,8 @@ class CConfiguration extends CApiService {
 				'template_groups' =>	['type' => API_IDS],
 				'host_groups' => 		['type' => API_IDS],
 				'templates' =>			['type' => API_IDS],
-				'dashboards' =>			['type' => API_IDS]
+				'dashboards' =>			['type' => API_IDS],
+				'global_regexes' => 	['type' => API_IDS]
 			]]
 		]];
 
@@ -279,6 +284,10 @@ class CConfiguration extends CApiService {
 				'dashboards' =>				['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
+				]],
+				'global_regexes' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]]
 			]]
 		]];
@@ -334,7 +343,8 @@ class CConfiguration extends CApiService {
 							'templateDashboards' => _('No permissions to import template dashboards.'),
 							'triggers' => _('No permissions to import triggers.'),
 							'valueMaps' => _('No permissions to import value maps.'),
-							'dashboards' => _('No permissions to import dashboards.')
+							'dashboards' => _('No permissions to import dashboards.'),
+							'global_regexes' => _('No permissions to import global regexes.')
 						}
 					);
 				}
@@ -419,7 +429,8 @@ class CConfiguration extends CApiService {
 			'host_groups' => ['uuid', 'name'],
 			'template_groups' => ['uuid', 'name'],
 			'templates' => ['uuid', 'template'],
-			'dashboards' => ['name']
+			'dashboards' => ['name'],
+			'global_regexes' => ['name']
 		];
 
 		foreach ($entities as $entity => $search_fields) {
@@ -494,6 +505,19 @@ class CConfiguration extends CApiService {
 					$db_dashboards = API::Dashboard()->get($options);
 
 					$imported_ids['dashboards'] = array_keys($db_dashboards);
+					break;
+
+				case 'global_regexes':
+
+					$db_global_regexes = API::Regexp()->get([
+						'output' => [],
+						'filter' => [
+							'name' => $data['name']
+						],
+						'preservekeys' => true
+					]);
+
+					$imported_ids['global_regexes'] = array_keys($db_global_regexes);
 					break;
 
 				default:

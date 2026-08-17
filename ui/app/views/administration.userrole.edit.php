@@ -28,7 +28,6 @@ $html_page = (new CHtmlPage())
 $csrf_token = CCsrfTokenHelper::get('userrole');
 
 $form = (new CForm())
-	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('userrole-form')
 	->setName('user_role_form')
@@ -39,13 +38,14 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $data['name'], $data['readonly'], DB::getFieldLength('role', 'name')))
+			(new CTextAreaFlexible('name', $data['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('role', 'name'))
+				->setReadonly($data['readonly'])
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
-				->setAttribute('maxlength', DB::getFieldLength('role', 'name'))
 		)
-]);
+	]);
 
 if ($data['readonly'] || $data['is_own_role']) {
 	$form_grid->addItem([
@@ -96,13 +96,13 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 				(new CCheckBox('ui[]', $first_rule_key))
 					->setId($first_rule_key)
 					->setChecked(
-						array_key_exists($first_rule_key, $data['rules']['ui'])
-						&& $data['rules']['ui'][$first_rule_key]
+						array_key_exists($first_rule_key, $data['rules']['ui']) && $data['rules']['ui'][$first_rule_key]
 					)
 					->setReadonly($data['readonly'])
 			)
 		]);
-	} else {
+	}
+	else {
 		$ui = [];
 		foreach ($data['labels']['rules'][$section_key] as $rule_key => $rule_label) {
 			$ui[] = [
@@ -178,12 +178,12 @@ $form_grid
 			->addStyle('display: none;'),
 		(new CFormField([
 			new CHorList([
-				(new CTextBox('service_write_tag_tag', $data['rules']['service_write_tag']['tag']))
+				(new CTextAreaFlexible('service_write_tag_tag', $data['rules']['service_write_tag']['tag']))
 					->setId('service-write-tag-tag')
 					->setAttribute('data-error-container', 'service-write-tag-tag-error-container')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-				(new CTextBox('service_write_tag_value', $data['rules']['service_write_tag']['value']))
+				(new CTextAreaFlexible('service_write_tag_value', $data['rules']['service_write_tag']['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			]),
@@ -224,12 +224,12 @@ $form_grid
 			->addStyle('display: none;'),
 		(new CFormField([
 			new CHorList([
-				(new CTextBox('service_read_tag_tag', $data['rules']['service_read_tag']['tag']))
+				(new CTextAreaFlexible('service_read_tag_tag', $data['rules']['service_read_tag']['tag']))
 					->setId('service-read-tag-tag')
 					->setAttribute('data-error-container', 'service-read-tag-tag-error-container')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-				(new CTextBox('service_read_tag_value', $data['rules']['service_read_tag']['value']))
+				(new CTextAreaFlexible('service_read_tag_value', $data['rules']['service_read_tag']['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			]),
@@ -241,60 +241,64 @@ $form_grid
 			->addStyle('display: none;')
 	]);
 
-$form_grid->addItem(
-	(new CFormField(
-		(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
-	))
-		->setAttribute('data-field-type', 'array')
-		->setAttribute('data-field-name', 'modules')
-);
-
-$modules = [];
-
-foreach ($data['labels']['modules'] as $moduleid => $module_name) {
-	$module = new CDiv(
-		(new CCheckBox('modules['.$moduleid.']', 1))
-			->setChecked(
-				array_key_exists($moduleid, $data['rules']['modules'])
-					? $data['rules']['modules'][$moduleid]
-					: !array_key_exists($moduleid, $data['disabled_moduleids'])
-			)
-			->setReadonly($data['readonly'])
-			->setLabel($module_name)
-			->setUncheckedValue(0)
+if ($data['rules']['modules_config_enabled']) {
+	$form_grid->addItem(
+		(new CFormField(
+			(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
+		))
+			->setAttribute('data-field-type', 'array')
+			->setAttribute('data-field-name', 'modules')
 	);
 
-	if (array_key_exists($moduleid, $data['disabled_moduleids'])) {
-		$module->addItem((new CSpan([' (', _('Disabled'), ')']))->addClass(ZBX_STYLE_RED));
+	$modules = [];
+
+	foreach ($data['labels']['modules'] as $moduleid => $module_name) {
+		$module = new CDiv(
+			(new CCheckBox('modules['.$moduleid.']', 1))
+				->setChecked(
+					array_key_exists($moduleid, $data['rules']['modules'])
+						? $data['rules']['modules'][$moduleid]
+						: !array_key_exists($moduleid, $data['disabled_moduleids'])
+				)
+				->setReadonly($data['readonly'])
+				->setLabel($module_name)
+				->setUncheckedValue(0)
+		);
+
+		if (array_key_exists($moduleid, $data['disabled_moduleids'])) {
+			$module->addItem((new CSpan([' (', _('Disabled'), ')']))->addClass(ZBX_STYLE_RED));
+		}
+
+		$modules[] = $module;
 	}
 
-	$modules[] = $module;
-}
+	if ($modules) {
+		$form_grid->addItem(
+			new CFormField($modules)
+		);
+	}
+	else {
+		$form_grid->addItem(
+			new CFormField(
+				new CLabel(_('No enabled modules found.'))
+			)
+		);
+	}
 
-if ($modules) {
-	$form_grid->addItem(
-		new CFormField($modules)
-	);
-}
-else {
-	$form_grid->addItem(
-		new CFormField(
-			new CLabel(_('No enabled modules found.'))
-		)
-	);
+	$form_grid
+		->addItem([
+			new CLabel(_('Default access to new modules'), $data['readonly'] ? '' : 'modules.default_access'),
+			new CFormField(
+				(new CCheckBox('modules_default_access', 1))
+					->setId('modules.default_access')
+					->setChecked($data['rules']['modules.default_access'])
+					->setReadonly($data['readonly'])
+					->setUncheckedValue(0)
+			)
+		]);
 }
 
 $form_grid
-	->addItem([
-		new CLabel(_('Default access to new modules'), $data['readonly'] ? '' : 'modules.default_access'),
-		new CFormField(
-			(new CCheckBox('modules_default_access', 1))
-				->setId('modules.default_access')
-				->setChecked($data['rules']['modules.default_access'])
-				->setReadonly($data['readonly'])
-				->setUncheckedValue(0)
-		)
-	])
 	->addItem(
 		new CFormField(
 			(new CTag('h4', true, _('Access to API')))->addClass('input-section-header')
@@ -345,31 +349,85 @@ $form_grid
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->addClass('js-userrole-ms')
 		)
-	)
-	->addItem(
-		new CFormField(
-			(new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')
+	);
+
+if (CSettingsHelper::isMobileDevicesEnabled()) {
+	$form_grid
+		->addItem(
+			new CFormField(
+				(new CTag('h4', true, _('Devices')))->addClass('input-section-header')
+			)
 		)
-);
+		->addItem([
+			new CLabel(_('Enabled'), $data['readonly'] ? '' : CRoleHelper::DEVICES_ACCESS),
+			new CFormField(
+				(new CCheckBox('devices_access', 1))
+					->setId('devices.access')
+					->setChecked($data['rules'][CRoleHelper::DEVICES_ACCESS])
+					->setReadonly($data['readonly'])
+					->setUncheckedValue(0)
+			)
+		]);
+
+	$devices_actions = [];
+	foreach ($data['labels']['devices_actions'] as $action => $label) {
+		$devices_actions[] = (new CDiv(
+			(new CCheckBox('devices_actions[]', $action))
+				->setId($action)
+				->setChecked(array_key_exists($action, $data['rules']['devices.actions'])
+					&& $data['rules']['devices.actions'][$action]
+				)
+				->setReadonly($data['readonly'])
+				->setLabel($label)
+		))
+			->addClass(ZBX_STYLE_NOWRAP);
+	}
+
+	$form_grid->addItem([
+		new CLabel(_('Device actions'), ''),
+		(new CFormField($devices_actions))
+			->setAttribute('data-field-type', 'array')
+			->setAttribute('data-field-name', 'devices_actions')
+	]);
+
+	$form_grid->addItem([
+		new CLabel(_('Default access to new device actions'),
+			$data['readonly'] ? '' : CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS
+		),
+		new CFormField(
+			(new CCheckBox('devices_actions_default_access', 1))
+				->setId('devices.actions.default_access')
+				->setChecked($data['rules'][CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS])
+				->setReadonly($data['readonly'])
+				->setUncheckedValue(0)
+		)
+	]);
+}
 
 $actions = [];
 foreach ($data['labels']['actions'] as $action => $label) {
 	$actions[] = (new CDiv(
 		(new CCheckBox('actions[]', $action))
 			->setId($action)
-			->setChecked(array_key_exists($action, $data['rules']['actions'])&& $data['rules']['actions'][$action])
+			->setChecked(array_key_exists($action, $data['rules']['actions']) && $data['rules']['actions'][$action])
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 	))
 		->addClass(ZBX_STYLE_NOWRAP);
 }
 
-$form_grid->addItem(
-	[(new CFormField($actions))
-		->setAttribute('data-field-type', 'array')
-		->setAttribute('data-field-name', 'actions')
-	]
-);
+$form_grid
+	->addItem(
+		new CFormField(
+			(new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')
+		)
+	)
+	->addItem(
+		[(new CFormField($actions))
+			->setAttribute('data-field-type', 'array')
+			->setAttribute('data-field-name', 'actions')
+		]
+	);
 
 $form_grid->addItem([
 	new CLabel(_('Default access to new actions'), $data['readonly'] ? '' : 'actions.default_access'),

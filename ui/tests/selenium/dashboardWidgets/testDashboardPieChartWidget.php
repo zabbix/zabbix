@@ -189,7 +189,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		$this->assertEquals('Add widget', $dialog->getTitle());
 
 		// Check modal Help and Close buttons.
-		foreach (['xpath:.//*[@title="Help"]', 'xpath:.//button[@title="Close"]'] as $selector) {
+		foreach (['xpath:.//*[@aria-label="Open Zabbix documentation in a new tab"]', 'xpath:.//button[@aria-label="Close modal window"]'] as $selector) {
 			$this->assertTrue($dialog->query($selector)->one()->isClickable());
 		}
 
@@ -1288,7 +1288,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			$legend_name = CTestArrayHelper::get($data, 'expected_dataset_name', $legend_name);
 
 			// Locate sector for checking.
-			$sector = $widget->query('xpath:.//*[contains(@data-hintbox-contents, '.
+			$sector = $widget->query('xpath:.//*[contains(@data-hintbox-html, '.
 					CXPathHelper::escapeQuotes($legend_name).')]/*[@class="svg-pie-chart-arc"]')->one();
 
 			// Assert sector fill color.

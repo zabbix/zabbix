@@ -28,7 +28,7 @@ zabbix_export:
         The user must be included in the Administrators group.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -1402,7 +1402,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Nextcloud: Version'
-                  width: '6'
+                  width: '18'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1411,72 +1411,91 @@ zabbix_export:
                         key: nextcloud.serverinfo.version
                     - type: INTEGER
                       name: show.0
-                      value: '4'
+                      value: '2'
                     - type: INTEGER
                       name: show.1
-                      value: '3'
-                    - type: INTEGER
-                      name: show.2
-                      value: '2'
-                - type: graph
-                  name: 'Nextcloud: Active users'
-                  'y': '2'
-                  width: '72'
-                  height: '6'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Nextcloud by HTTP'
-                        name: 'Nextcloud: Active users'
-                    - type: STRING
-                      name: reference
-                      value: AAAAA
-                - type: graph
+                      value: '4'
+                - type: svggraph
                   name: 'Nextcloud: CPU load'
-                  'y': '8'
-                  width: '72'
+                  'y': '2'
+                  width: '36'
                   height: '6'
                   fields:
-                    - type: GRAPH
-                      name: graphid.0
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 81C784
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: FFD54F
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: FF5722
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
                       value:
                         host: 'Nextcloud by HTTP'
-                        name: 'Nextcloud: CPU load'
+                        key: nextcloud.serverinfo.cpu.avg.1m
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Nextcloud by HTTP'
+                        key: nextcloud.serverinfo.cpu.avg.5m
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'Nextcloud by HTTP'
+                        key: nextcloud.serverinfo.cpu.avg.15m
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
                     - type: STRING
                       name: reference
                       value: AAAAB
-                - type: graph
-                  name: 'Nextcloud: Database size'
-                  'y': '14'
-                  width: '72'
+                - type: svggraph
+                  name: 'Nextcloud: Active users'
+                  'y': '8'
+                  width: '36'
                   height: '6'
                   fields:
-                    - type: GRAPH
-                      name: graphid.0
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 81C784
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: FFD54F
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: FF5722
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
                       value:
                         host: 'Nextcloud by HTTP'
-                        name: 'Nextcloud: Database: size'
-                    - type: STRING
-                      name: reference
-                      value: AAAAC
-                - type: graph
-                  name: 'Nextcloud: Memory utilization'
-                  'y': '20'
-                  width: '72'
-                  height: '6'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
+                        key: nextcloud.serverinfo.active_users.last5m
+                    - type: ITEM
+                      name: ds.0.itemids.1
                       value:
                         host: 'Nextcloud by HTTP'
-                        name: 'Nextcloud: Memory utilization'
+                        key: nextcloud.serverinfo.active_users.last1h
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'Nextcloud by HTTP'
+                        key: nextcloud.serverinfo.active_users.last24hours
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
                     - type: STRING
                       name: reference
-                      value: AAAAD
+                      value: AAAAA
                 - type: item
                   name: 'Nextcloud: Web server'
-                  x: '6'
+                  x: '18'
                   width: '18'
                   fields:
                     - type: ITEM
@@ -1486,17 +1505,14 @@ zabbix_export:
                         key: nextcloud.serverinfo.apps.webserver
                     - type: INTEGER
                       name: show.0
-                      value: '4'
+                      value: '2'
                     - type: INTEGER
                       name: show.1
-                      value: '3'
-                    - type: INTEGER
-                      name: show.2
-                      value: '2'
+                      value: '4'
                 - type: item
                   name: 'Nextcloud: Free space'
-                  x: '24'
-                  width: '12'
+                  x: '36'
+                  width: '18'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1505,17 +1521,62 @@ zabbix_export:
                         key: nextcloud.serverinfo.freespace
                     - type: INTEGER
                       name: show.0
-                      value: '4'
+                      value: '2'
                     - type: INTEGER
                       name: show.1
-                      value: '3'
+                      value: '4'
+                - type: svggraph
+                  name: 'Nextcloud: Memory utilization'
+                  x: '36'
+                  'y': '2'
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: FF5722
                     - type: INTEGER
-                      name: show.2
-                      value: '2'
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Nextcloud by HTTP'
+                        key: nextcloud.serverinfo.mem.pused
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
+                - type: svggraph
+                  name: 'Nextcloud: Database size'
+                  x: '36'
+                  'y': '8'
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: FF5722
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Nextcloud by HTTP'
+                        key: nextcloud.serverinfo.db.size
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: item
                   name: 'Nextcloud: Database'
-                  x: '36'
-                  width: '36'
+                  x: '54'
+                  width: '18'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1524,34 +1585,126 @@ zabbix_export:
                         key: nextcloud.serverinfo.db.version
                     - type: INTEGER
                       name: show.0
-                      value: '4'
+                      value: '2'
                     - type: INTEGER
                       name: show.1
-                      value: '3'
-                    - type: INTEGER
-                      name: show.2
-                      value: '2'
+                      value: '4'
             - name: 'Nextcloud: Users'
               widgets:
-                - type: graphprototype
-                  name: 'Nextcloud: User quota usage'
-                  width: '72'
-                  height: '24'
+                - type: topitems
+                  name: 'Nextcloud: Users by storage usage'
+                  width: '25'
+                  height: '6'
                   fields:
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'User* Location'
                     - type: INTEGER
-                      name: columns
+                      name: layout
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Nextcloud by HTTP'
-                        name: 'Nextcloud: User "{#NEXTCLOUD.USER}": Quota, history'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '0'
+                - type: topitems
+                  name: 'Nextcloud: Users last login'
+                  'y': '6'
+                  width: '25'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'User* Last login'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '0'
+                - type: honeycomb
+                  name: 'Nextcloud: User quota utilization'
+                  x: '25'
+                  width: '47'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'User*: Quota used space, in %'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("User\s\"(.*)\".*", \1)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
                     - type: STRING
                       name: reference
                       value: AAAAE
                     - type: INTEGER
-                      name: rows
-                      value: '4'
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '80'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                - type: honeycomb
+                  name: 'Nextcloud user: Status'
+                  x: '25'
+                  'y': '6'
+                  width: '47'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'User*: Status'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("User\s\"(.*)\".*", \1)}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAP
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '20'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
       valuemaps:
         - uuid: b0913f72fb804d5ab9ef0e9ce13dc61a
           name: Boolean

@@ -20,6 +20,6 @@
 #include "zbxcachehistory.h"
 
 void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);
+		zbx_history_sync_stats_t *stats);
 
 #endif

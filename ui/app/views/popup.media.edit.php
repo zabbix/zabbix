@@ -70,22 +70,22 @@ $form_grid = (new CFormGrid())
 			->setAsteriskMark()
 			->addClass('js-field-sendto'),
 		(new CFormField(
-			(new CTextBox('sendto', $data['form']['sendto'], $data['provisioned'] == CUser::PROVISION_STATUS_YES,
-				DB::getFieldLength('media', 'sendto')
-			))
+			(new CTextAreaFlexible('sendto', $data['form']['sendto']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('media', 'sendto'))
+				->setReadonly($data['provisioned'] == CUser::PROVISION_STATUS_YES)
 				->setAriaRequired()
 		))->addClass('js-field-sendto')
 	])
 	->addItem([
 		(new CLabel(_('Send to')))
 			->setAsteriskMark()
-			->addClass('js-field-sendto-emails'),
+			->addClass('js-field-sendto-list'),
 		(new CFormField([
 			(new CTable())
-				->setId('sendto_emails')
+				->setId('sendto_list')
 				->setAttribute('data-field-type', 'array')
-				->setAttribute('data-field-name', 'sendto_emails')
+				->setAttribute('data-field-name', 'sendto_list')
 				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
 				->setFooter(
 					(new CCol(
@@ -95,18 +95,49 @@ $form_grid = (new CFormGrid())
 					))->setColspan(2),
 					'dynamic-row-control'
 				),
-			(new CTemplateTag('sendto-emails-row-tmpl'))->addItem(
+			(new CTemplateTag('sendto-list-row-tmpl'))->addItem(
 				(new CRow([
-					(new CTextBox('sendto_emails[#{rowNum}]', '#{email}',
-						$data['provisioned'] == CUser::PROVISION_STATUS_YES
-					))
+					(new CTextAreaFlexible('sendto_list[#{rowNum}]', '#{value}'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setReadonly($data['provisioned'] == CUser::PROVISION_STATUS_YES)
 						->setAriaRequired(),
 					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						->setEnabled($data['provisioned'] == CUser::PROVISION_STATUS_NO)
 				]))->addClass('form_row')
 			)
-		]))->addClass('js-field-sendto-emails')
+		]))->addClass('js-field-sendto-list')
+	])
+	->addItem([
+		(new CLabel(_('Send to')))
+			->setAsteriskMark()
+			->addClass('js-field-sendto-devices'),
+		(new CFormField([
+			(new CRadioButtonList('sendto_active_devices', $data['form']['sendto_active_devices']))
+				->addValue(_('Active devices'), 1)
+				->addValue(_('Selected devices'), 0)
+				->setReadonly($data['provisioned'] == CUser::PROVISION_STATUS_YES)
+				->setModern()
+		]))->addClass('js-field-sendto-devices')
+	])
+	->addItem([
+		'',
+		(new CFormField([
+			(new CMultiSelect([
+				'name' => 'sendto_deviceuuids[]',
+				'object_name' => 'devices',
+				'readonly' => $data['provisioned'] == CUser::PROVISION_STATUS_YES,
+				'data' => $data['form']['sendto_device_data'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'devices',
+						'srcfld1' => 'uuid',
+						'dstfrm' => 'media-form',
+						'dstfld1' => 'sendto_deviceuuids_',
+						'userid' => $data['userid']
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))->addClass('js-field-sendto-devices')
 	])
 	->addItem([
 		(new CLabel(_('When active'), 'period'))->setAsteriskMark(),
@@ -135,17 +166,7 @@ $form_grid = (new CFormGrid())
 		)
 	]);
 
-$form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('
-			media_edit_popup.init('.json_encode([
-				'rules' => $data['js_validation_rules'],
-				'mediatypes' => $data['mediatypes'],
-				'sendto_emails' => $data['form']['sendto_emails']
-			]).');
-		'))->setOnDocumentReady()
-	);
+$form->addItem($form_grid);
 
 $output = [
 	'header' => $data['is_edit'] ? _('Media') : _('New media'),
@@ -158,7 +179,12 @@ $output = [
 			'action' => 'media_edit_popup.submit();'
 		]
 	],
-	'script_inline' => $this->readJsFile('popup.media.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('popup.media.edit.js.php').
+		'media_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'mediatypes' => $data['mediatypes'],
+			'sendto_list' => $data['form']['sendto_list']
+		]).');'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

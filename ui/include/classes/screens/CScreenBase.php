@@ -226,20 +226,6 @@ class CScreenBase {
 				];
 				break;
 
-			case SCREEN_RESOURCE_PROBLEM:
-				$this->required_parameters += [
-					'screenid'			=> false,
-					'action'			=> false,
-					'groupid'			=> false,
-					'hostid'			=> false,
-					'pageFile'			=> false,
-					'profileIdx'		=> true,
-					'profileIdx2'		=> true,
-					'timeline'			=> true,
-					'page'				=> true
-				];
-				break;
-
 			case SCREEN_RESOURCE_HISTORY:
 				$this->required_parameters += [
 					'screenid'			=> true,

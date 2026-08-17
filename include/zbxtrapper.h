@@ -34,7 +34,7 @@ typedef int	(*zbx_trapper_process_request_func_t)(const char *request, zbx_socke
 
 typedef struct
 {
-	zbx_config_comms_args_t			*config_comms;
+	const zbx_config_comms_args_t		*config_comms;
 	zbx_config_vault_t			*config_vault;
 	zbx_get_program_type_f			zbx_get_program_type_cb_arg;
 	const char				*progname;
@@ -54,6 +54,8 @@ typedef struct
 	const char				*config_webdriver_url;
 	zbx_trapper_process_request_func_t	trapper_process_request_func_cb;
 	zbx_autoreg_update_host_func_t		autoreg_update_host_cb;
+	const char				*config_bridge_adapter_url;
+	const char				*config_bridge_adapter_connect_to;
 }
 zbx_thread_trapper_args;
 

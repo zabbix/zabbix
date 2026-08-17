@@ -232,6 +232,10 @@ window.host_wizard_edit = new class {
 	#form_update_locked = false;
 	#pending_form_update = false;
 
+	#last_input_changed = null;
+
+	#confirm_dialogue_close = false;
+
 	async init({templates, linked_templates, wizard_show_welcome, source_host, agent_script_server_host, csrf_token}) {
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
@@ -247,39 +251,52 @@ window.host_wizard_edit = new class {
 		this.#overlay = overlays_stack.getById('host.wizard.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
 
-		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange.bind(this));
+		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange);
 
-		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
-		this.#dialogue.addEventListener('focusout', this.#onInputBlur.bind(this));
+		this.#dialogue.addEventListener('input', this.#onInputChange);
+		this.#dialogue.addEventListener('focusout', this.#onInputBlur);
 		this.#dialogue.addEventListener('mousedown', () => this.#form_update_locked = true);
 		this.#dialogue.addEventListener('mouseup', () => {
 			this.#form_update_locked = false;
 
 			if (this.#pending_form_update) {
 				this.#pending_form_update = false;
-				this.#updateForm(null);
+				this.#updateForm(this.#last_input_changed ?? this.#inputNameToInputPath(this.#last_input_changed));
+				this.#last_input_changed = null;
 			}
 		});
 
-		this.#dialogue.addEventListener('dialogue.cancel', () => {
-			if (this.#getCurrentStep() === this.STEP_COMPLETE) {
-				overlayDialogueDestroy(this.#overlay.dialogueid);
+		this.#dialogue.addEventListener('dialogue.close', e => {
+			if (!this.#confirm_dialogue_close) {
+				return;
+			}
 
-				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
-					redirect_latest: false
-				}}));
+			// Bypass the popup manager.
+			e.stopImmediatePropagation();
+
+			if (this.#getCurrentStep() === this.STEP_COMPLETE) {
+				// Allow closing the dialogue gracefully before the submission.
+				setTimeout(() => {
+					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
+						redirect_latest: false
+					}}));
+				});
+
+				return;
+			}
+
+			// Do not close the dialogue.
+			e.preventDefault();
+
+			if (this.#show_cancel_screen) {
+				this.#show_cancel_screen = false;
+
+				this.#gotoStep(this.#current_step);
 			}
 			else {
-				if (this.#show_cancel_screen) {
-					this.#show_cancel_screen = false;
+				this.#show_cancel_screen = true;
 
-					this.#gotoStep(this.#current_step);
-				}
-				else {
-					this.#show_cancel_screen = true;
-
-					this.#renderCancelScreen();
-				}
+				this.#renderCancelScreen();
 			}
 		});
 
@@ -301,6 +318,8 @@ window.host_wizard_edit = new class {
 
 			if (target.classList.contains('js-cancel')) {
 				if (this.#data.selected_template === null) {
+					this.#confirm_dialogue_close = false;
+
 					overlayDialogueDestroy(this.#overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
 				}
 
@@ -316,6 +335,8 @@ window.host_wizard_edit = new class {
 			}
 
 			if (target.classList.contains('js-cancel-yes')) {
+				this.#confirm_dialogue_close = false;
+
 				overlayDialogueDestroy(this.#overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
 			}
 		});
@@ -346,6 +367,8 @@ window.host_wizard_edit = new class {
 
 							ZABBIX.PopupManager.setReturnUrl(return_url.href);
 						}
+
+						this.#confirm_dialogue_close = false;
 
 						overlayDialogueDestroy(this.#overlay.dialogueid);
 
@@ -514,7 +537,7 @@ window.host_wizard_edit = new class {
 				field_with_error.scrollIntoView({block: 'center', behavior: 'auto'});
 			}
 			else {
-				this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = 0;
+				this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`).scrollTop = 0;
 			}
 		});
 	}
@@ -1065,7 +1088,8 @@ window.host_wizard_edit = new class {
 	}
 
 	#removeMessageBoxes() {
-		this.#dialogue.querySelectorAll('.overlay-dialogue-body .msg-bad').forEach(message_box => message_box.remove());
+		this.#dialogue.querySelectorAll(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY} .msg-bad`)
+			.forEach(message_box => message_box.remove());
 	}
 
 	#updateStepsQueue() {
@@ -1186,7 +1210,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#updateForm(path, new_value, old_value) {
-		if (this.#form_update_locked) {
+		if (this.#form_update_locked || this.#show_cancel_screen) {
 			this.#pending_form_update = true;
 
 			return;
@@ -1194,7 +1218,7 @@ window.host_wizard_edit = new class {
 
 		const step = this.#getCurrentStep();
 
-		const scroll_top = this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop;
+		const scroll_top = this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`).scrollTop;
 		const step_init = path === undefined;
 
 		switch (step) {
@@ -1221,7 +1245,8 @@ window.host_wizard_edit = new class {
 
 				if ((step_init || path === 'selected_template') && this.#getSelectedTemplate()) {
 					this.#updateProgress();
-					this.#overlay.has_custom_cancel = true;
+
+					this.#confirm_dialogue_close = true;
 				}
 
 				if (path === 'show_info_by_template') {
@@ -1246,7 +1271,11 @@ window.host_wizard_edit = new class {
 					);
 				}
 
-				this.#dialogue.querySelector('.js-groups-description').hidden = this.#data.host === null;
+				const groups_description = this.#dialogue.querySelector('.js-groups-description');
+
+				if (groups_description) {
+					groups_description.hidden = this.#data.host === null;
+				}
 
 				break;
 
@@ -1442,7 +1471,7 @@ window.host_wizard_edit = new class {
 
 		requestAnimationFrame(() => {
 			if (path) {
-				this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top;
+				this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`).scrollTop = scroll_top;
 			}
 			else if (step_init) {
 				this.#overlay.recoverFocus();
@@ -1989,7 +2018,7 @@ window.host_wizard_edit = new class {
 		return Promise.reject();
 	}
 
-	#onFormDataChange(path, new_value, old_value) {
+	#onFormDataChange = (path, new_value, old_value) => {
 		if (this.#data_update_locked) {
 			return;
 		}
@@ -2000,7 +2029,9 @@ window.host_wizard_edit = new class {
 		this.#updateFieldsAsterisk();
 	}
 
-	#onInputChange({target}) {
+	#onInputChange = ({target}) => {
+		this.#last_input_changed = target.name;
+
 		if (!target.name) {
 			return;
 		}
@@ -2012,7 +2043,7 @@ window.host_wizard_edit = new class {
 		this.#setValueByName(this.#data, target.name, value);
 	}
 
-	#onInputBlur({target}) {
+	#onInputBlur = ({target}) => {
 		if (!target.name) {
 			return;
 		}
@@ -2215,10 +2246,16 @@ window.host_wizard_edit = new class {
 				message: `${type === 'error' && messages.length > 1 ? '- ' : ''}${message}`
 			});
 
-			if (field.parentElement.classList.contains(ZBX_STYLE_FORM_FIELD)) {
+			const parent = field.parentElement;
+
+			if (parent.classList.contains(ZBX_STYLE_FORM_FIELD)) {
 				field.parentNode.insertBefore(message_element, field.nextSibling);
-			} else {
-				field.parentElement.parentNode.insertBefore(message_element, field.parentElement.nextSibling);
+			}
+			else if (parent.parentElement.classList.contains('<?= CMacroValue::ZBX_STYLE_MACRO_INPUT_GROUP ?>')) {
+				parent.parentElement.parentNode.insertBefore(message_element, parent.parentElement.nextSibling);
+			}
+			else {
+				parent.parentNode.insertBefore(message_element, parent.nextSibling);
 			}
 		});
 	}

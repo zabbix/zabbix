@@ -651,11 +651,7 @@ function getMenuPopupDashboard(options, trigger_element) {
 				label: t('Create new report'),
 				clickCallback: function() {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-					PopUp('popup.scheduledreport.edit', {dashboardid: options.dashboardid}, {
-						dialogue_class: 'modal-popup-generic',
-						trigger_element
-					});
+					ZABBIX.PopupManager.open('scheduledreport.edit', {dashboardid: options.dashboardid});
 				}
 			});
 		}
@@ -763,7 +759,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		url = new Curl('zabbix.php');
 		url.setArgument('action', 'popup');
 		url.setArgument('popup', 'acknowledge.edit');
-		url.setArgument('eventid', options.eventid);
+		url.setArgument('eventids[]', options.eventid);
 
 		sections.push({
 			label: t('Actions'),
@@ -1015,7 +1011,7 @@ function getMenuPopupItem(options) {
 		items.push({
 			label: t('Values'),
 			url: url.getUrl(),
-			disabled: !options.history && !options.trends
+			disabled: !options.history
 		});
 
 		url = new Curl('history.php');
@@ -1025,7 +1021,7 @@ function getMenuPopupItem(options) {
 		items.push({
 			label: t('500 latest values'),
 			url: url.getUrl(),
-			disabled: !options.history && !options.trends
+			disabled: !options.history
 		});
 
 		sections.push({
@@ -1760,7 +1756,7 @@ jQuery(function($) {
 			// Close other action menus and prevent focus jumping before opening a new popup.
 			$('.menu-popup-top').menuPopup('close', null, false);
 
-			$opener.attr('aria-expanded', 'true');
+			event.target.setAttribute('aria-expanded', 'true');
 
 			let $menu_popup = $('<ul>', {
 				'role': 'menu',
@@ -1771,6 +1767,11 @@ jQuery(function($) {
 			// Add custom class, if specified.
 			if ('class' in options) {
 				$menu_popup.addClass(options.class);
+			}
+
+			// Add dynamic ID, if specified.
+			if ('id' in options) {
+				$menu_popup.prop('id', options.id);
 			}
 
 			$opener.data({

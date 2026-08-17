@@ -69,20 +69,20 @@ static void	dc_add_proxy_history(zbx_pb_history_data_t *handle, const zbx_dc_his
 
 	if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		switch (h->value_type)
+		switch (h->entry.value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
+				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL64, h->entry.value.dbl);
 				pvalue = buffer;
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
+				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, h->entry.value.ui64);
 				pvalue = buffer;
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_JSON:
-				pvalue = h->value.str;
+				pvalue = h->entry.value.str;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -96,7 +96,7 @@ static void	dc_add_proxy_history(zbx_pb_history_data_t *handle, const zbx_dc_his
 		pvalue = "";
 	}
 
-	zbx_pb_history_write_value(handle, h->itemid, h->state, pvalue, &h->ts, flags, now);
+	zbx_pb_history_write_value(handle, h->entry.itemid, h->state, pvalue, &h->entry.ts, flags, now);
 }
 
 /******************************************************************************
@@ -115,19 +115,19 @@ static void	dc_add_proxy_history_meta(zbx_pb_history_data_t *handle, const zbx_d
 
 	if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		switch (h->value_type)
+		switch (h->entry.value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
+				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL64, h->entry.value.dbl);
 				pvalue = buffer;
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
+				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, h->entry.value.ui64);
 				pvalue = buffer;
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
-				pvalue = h->value.str;
+				pvalue = h->entry.value.str;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -140,7 +140,7 @@ static void	dc_add_proxy_history_meta(zbx_pb_history_data_t *handle, const zbx_d
 		pvalue = "";
 	}
 
-	zbx_pb_history_write_meta_value(handle, h->itemid, h->state, pvalue, &h->ts, flags, h->lastlogsize,
+	zbx_pb_history_write_meta_value(handle, h->entry.itemid, h->state, pvalue, &h->entry.ts, flags, h->lastlogsize,
 			h->mtime, 0, 0, 0, "", now);
 }
 
@@ -159,7 +159,7 @@ static void	dc_add_proxy_history_log(zbx_pb_history_data_t *handle, const zbx_dc
 
 	if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		zbx_log_value_t *log = h->value.log;
+		zbx_log_value_t *log = h->entry.value.log;
 
 		if (0 != (h->flags & ZBX_DC_FLAG_META))
 		{
@@ -174,9 +174,9 @@ static void	dc_add_proxy_history_log(zbx_pb_history_data_t *handle, const zbx_dc
 			mtime = 0;
 		}
 
-		zbx_pb_history_write_meta_value(handle, h->itemid, h->state, log->value, &h->ts, flags, lastlogsize,
-				mtime, log->timestamp, log->logeventid, log->severity, ZBX_NULL2EMPTY_STR(log->source),
-				now);
+		zbx_pb_history_write_meta_value(handle, h->entry.itemid, h->state, log->value, &h->entry.ts, flags,
+				lastlogsize, mtime, log->timestamp, log->logeventid, log->severity,
+				ZBX_NULL2EMPTY_STR(log->source), now);
 	}
 	else
 	{
@@ -184,8 +184,8 @@ static void	dc_add_proxy_history_log(zbx_pb_history_data_t *handle, const zbx_dc
 
 		flags = ZBX_PROXY_HISTORY_FLAG_META | ZBX_PROXY_HISTORY_FLAG_NOVALUE;
 
-		zbx_pb_history_write_meta_value(handle, h->itemid, h->state, "", &h->ts, flags, h->lastlogsize,
-				h->mtime, 0, 0, 0, "", now);
+		zbx_pb_history_write_meta_value(handle, h->entry.itemid, h->state, "", &h->entry.ts, flags,
+				h->lastlogsize, h->mtime, 0, 0, 0, "", now);
 	}
 }
 
@@ -196,7 +196,8 @@ static void	dc_add_proxy_history_log(zbx_pb_history_data_t *handle, const zbx_dc
  ******************************************************************************/
 static void	dc_add_proxy_history_notsupported(zbx_pb_history_data_t *handle, const zbx_dc_history_t *h, time_t now)
 {
-	zbx_pb_history_write_value(handle, h->itemid, h->state, ZBX_NULL2EMPTY_STR(h->value.err), &h->ts, 0, now);
+	zbx_pb_history_write_value(handle, h->entry.itemid, h->state, ZBX_NULL2EMPTY_STR(h->entry.value.err),
+			&h->entry.ts, 0, now);
 }
 
 /******************************************************************************
@@ -234,7 +235,7 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 		if (0 != (h->flags & ZBX_DC_FLAG_UNDEF))
 			continue;
 
-		switch (h->value_type)
+		switch (h->entry.value_type)
 		{
 			case ITEM_VALUE_TYPE_LOG:
 				dc_add_proxy_history_log(handle, h, now);
@@ -288,7 +289,7 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 	zbx_vector_uint64_reserve(&itemids, (size_t)history_num);
 
 	for (i = 0; i < history_num; i++)
-		zbx_vector_uint64_append(&itemids, history[i].itemid);
+		zbx_vector_uint64_append(&itemids, history[i].entry.itemid);
 
 	items = (zbx_history_sync_item_t *)zbx_malloc(NULL, sizeof(zbx_history_sync_item_t) * (size_t)history_num);
 	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
@@ -300,36 +301,36 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 	{
 		if (SUCCEED != errcodes[i])
 		{
-			zbx_hc_clear_item_middle(history[i].itemid);
+			zbx_hc_clear_item_middle(history[i].entry.itemid);
 			continue;
 		}
 
 		if (ITEM_STATUS_ACTIVE != items[i].status || HOST_STATUS_MONITORED != items[i].host.status)
 		{
-			zbx_hc_clear_item_middle(history[i].itemid);
+			zbx_hc_clear_item_middle(history[i].entry.itemid);
 			continue;
 		}
 
 		zbx_item_diff_t		*diff = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t));
 		zbx_dc_history_t	*h = &history[i];
 
-		diff->itemid = h->itemid;
+		diff->itemid = h->entry.itemid;
 		diff->flags = ZBX_FLAGS_ITEM_DIFF_UNSET;
 
 		if (items[i].state != h->state)
 		{
 			diff->state = h->state;
-			diff->error = (ITEM_STATE_NOTSUPPORTED == h->state ? h->value.err : "");
+			diff->error = (ITEM_STATE_NOTSUPPORTED == h->state ? h->entry.value.err : "");
 			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
 			zbx_sha512_hash(diff->error, diff->error_hash);
 		}
 		else if (ITEM_STATE_NOTSUPPORTED == h->state)
 		{
-			zbx_sha512_hash(h->value.err, diff->error_hash);
+			zbx_sha512_hash(h->entry.value.err, diff->error_hash);
 
 			if (0 != memcmp(items[i].error_hash, diff->error_hash, sizeof(items[i].error_hash)))
 			{
-				diff->error = h->value.err;
+				diff->error = h->entry.value.err;
 				diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
 			}
 		}
@@ -374,7 +375,7 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 }
 
 void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
+		zbx_history_sync_stats_t *stats)
 {
 	ZBX_UNUSED(events_cbs);
 	ZBX_UNUSED(rtc);
@@ -386,7 +387,6 @@ void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs, zbx_ipc_
 	zbx_dc_history_t		history[ZBX_HC_SYNC_MAX];
 	double				sec1, sec2;
 
-	ZBX_UNUSED(config_history_storage_pipelines);
 	zbx_vector_hc_item_ptr_create(&history_items);
 	zbx_vector_hc_item_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
 	zbx_vector_item_diff_ptr_create(&item_diff);

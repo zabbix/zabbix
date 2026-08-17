@@ -29,8 +29,7 @@ $html_page = (new CHtmlPage())
 $lang_select = (new CSelect('default_lang'))
 	->setId('default_lang')
 	->setValue($data['default_lang'])
-	->setFocusableElementId('label-default-lang')
-	->setAttribute('autofocus', 'autofocus');
+	->setFocusableElementId('label-default-lang');
 
 $all_locales_available = true;
 
@@ -82,7 +81,6 @@ $gui_tab = (new CFormList())
 			->setFocusableElementId('label-default-theme')
 			->setValue($data['default_theme'])
 			->addOptions(CSelect::createOptionsFromArray(APP::getThemes()))
-			->setAttribute('autofocus', 'autofocus')
 			->setId('default_theme')
 	)
 	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),
@@ -143,20 +141,24 @@ $gui_tab = (new CFormList())
 $gui_view = (new CTabView())
 	->addTab('gui', _('GUI'), $gui_tab)
 	->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		[new CButton('resetDefaults', _('Reset defaults'))]
+		(new CSubmit('', _('Update')))->addClass('js-submit'),
+		[(new CButton('', _('Reset defaults')))->addClass('js-reset-defaults')]
 	));
 
 $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('gui')))->removeId())
 	->setId('gui-form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'gui.update')
-		->getUrl()
-	)
 	->addItem($gui_view);
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag(
+	'view.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'default_values' => $data['default_values']
+	]).')'))
+	->setOnDocumentReady()
 	->show();

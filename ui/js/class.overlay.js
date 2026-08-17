@@ -43,7 +43,6 @@ function Overlay({
 	this._position = position;
 	this._position_fix = position_fix;
 	this.element = trigger_element;
-	this.has_custom_cancel = false;
 
 	this.headerid = `overlay-dialogue-header-title-${this.dialogueid}`;
 
@@ -55,7 +54,7 @@ function Overlay({
 	}
 
 	this.$dialogue = jQuery('<div>', {
-		'class': 'overlay-dialogue modal',
+		'class': `${ZBX_STYLE_OVERLAY_DIALOGUE} modal`,
 		'data-dialogueid': this.dialogueid,
 		'role': 'dialog',
 		'aria-modal': 'true',
@@ -63,12 +62,13 @@ function Overlay({
 	});
 
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
-	this.$dialogue.$head = jQuery('<div>', {class: 'overlay-dialogue-header'});
+	this.$dialogue.$head = jQuery('<div>', {class: ZBX_STYLE_OVERLAY_DIALOGUE_HEADER});
 	this.$dialogue.$head.$header = jQuery('<h4>', {id: this.headerid});
-	this.$dialogue.$head.$close_button = jQuery('<button>', {class: 'btn-overlay-close', title: t('S_CLOSE')});
-	this.$dialogue.$body = jQuery('<div>', {class: 'overlay-dialogue-body'});
+	this.$dialogue.$head.$close_button = jQuery('<button>', {class: 'btn-overlay-close',
+		'aria-label': t('Close modal window')});
+	this.$dialogue.$body = jQuery('<div>', {class: ZBX_STYLE_OVERLAY_DIALOGUE_BODY});
 	this.$dialogue.$debug = jQuery('<pre>', {class: 'debug-output'});
-	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
+	this.$dialogue.$footer = jQuery('<div>', {class: ZBX_STYLE_OVERLAY_DIALOGUE_FOOTER});
 	this.$dialogue.$script = jQuery('<script>');
 
 	this.$dialogue.$head.append(this.$dialogue.$head.$header, this.$dialogue.$head.$close_button);
@@ -131,14 +131,7 @@ Overlay.prototype._initListeners = function() {
 		close_button_click: e => {
 			e.preventDefault();
 
-			if (this.has_custom_cancel) {
-				this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
-					dialogueid: this.dialogueid
-				}}));
-			}
-			else {
-				overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
-			}
+			overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
 		},
 		form_submit: e => {
 			e.preventDefault();
@@ -318,63 +311,50 @@ Overlay.prototype._cancelFixPositionOnAnimationFrame = function() {
 };
 
 /**
- * Determines element to place focus on and focuses it if found.
+ * Find the primary focusable element of the dialogue.
+ *
+ * @returns {HTMLElement|null}
  */
-Overlay.prototype.recoverFocus = function() {
-	if (this.$btn_focus) {
-		this.$btn_focus[0].focus({preventScroll: true});
-		return;
+Overlay.prototype.getFocusableElement = function() {
+	if (this.$btn_focus !== null && !this.$btn_focus[0].disabled) {
+		return this.$btn_focus[0];
 	}
 
-	if (jQuery('[autofocus=autofocus]', this.$dialogue).length) {
-		jQuery('[autofocus=autofocus]', this.$dialogue)[0]?.focus({preventScroll: true});
+	const autofocus_element = this.$dialogue[0].querySelector('[autofocus]');
+
+	if (autofocus_element !== null && !autofocus_element.disabled && isVisible(autofocus_element)) {
+		return autofocus_element;
 	}
-	else if (jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).length) {
-		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue)[0]?.focus({preventScroll: true});
+
+	const parents = [this.$dialogue.$body, this.$dialogue.$footer, this.$dialogue.$head, this.$dialogue.$controls];
+
+	for (const $parent of parents) {
+		if ($parent.length === 0 || !isVisible($parent[0])) {
+			continue;
+		}
+
+		const focusable_element = Focuser.getFocusableElement($parent[0]);
+
+		if (focusable_element !== null) {
+			return focusable_element;
+		}
 	}
-	else {
-		jQuery(':focusable:first', this.$dialogue)[0]?.focus({preventScroll: true});
-	}
+
+	return null;
 };
 
 /**
- * Binds keyboard events to contain focus within dialogue window.
+ * Focus and preselect the primary focusable element of the dialogue, mimicking the autofocus behavior.
+ */
+Overlay.prototype.recoverFocus = function() {
+	Focuser.focus(this.getFocusableElement());
+};
+
+/**
+ * Prevent the focus from running away from the dialogue window.
  */
 Overlay.prototype.containFocus = function() {
-	var focusable = jQuery(':focusable', this.$dialogue);
-
-	focusable.off('keydown.containFocus');
-
-	if (focusable.length > 1) {
-		var first_focusable = focusable.filter(':first:not([disabled])'),
-			last_focusable = focusable.filter(':last:not([disabled])');
-
-		first_focusable
-			.on('keydown.containFocus', function(e) {
-				// TAB and SHIFT
-				if (e.which == 9 && e.shiftKey) {
-					last_focusable[0].focus();
-					return false;
-				}
-			});
-
-		last_focusable
-			.on('keydown.containFocus', function(e) {
-				// TAB and not SHIFT
-				if (e.which == 9 && !e.shiftKey) {
-					first_focusable[0].focus();
-					return false;
-				}
-			});
-	}
-	else {
-		focusable
-			.on('keydown.containFocus', function(e) {
-				if (e.which == 9) {
-					return false;
-				}
-			});
-	}
+	Focuser.containFocus(this.$dialogue[0]);
 };
 
 /**
@@ -469,6 +449,15 @@ Overlay.prototype.unmount = function() {
 
 		wrapper.scrollTo(this._wrapper_scroll_x, this._wrapper_scroll_y);
 	}
+
+	const unmount_event = new CEventHubEvent({
+		descriptor: {
+			context: EVENT_CONTEXT_OVERLAY,
+			event: EVENT_UNMOUNT
+		}
+	});
+
+	ZABBIX.EventHub.publish(unmount_event);
 };
 
 /**
@@ -491,7 +480,7 @@ Overlay.prototype.mount = function() {
 
 	if (this._is_draggable) {
 		this.$dialogue.draggable({
-			handle: '.overlay-dialogue-header',
+			handle: `.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER}`,
 			cancel: 'a, button',
 			start: this._listeners.drag_start,
 			stop: this._listeners.drag_stop
@@ -570,14 +559,7 @@ Overlay.prototype.makeButton = function(obj) {
 			this._block_cancel_action = true;
 
 			if (!obj.keepOpen) {
-				if (this.has_custom_cancel) {
-					this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
-						dialogueid: this.dialogueid
-					}}));
-				}
-				else {
-					overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
-				}
+				overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
 			}
 		}
 
@@ -753,7 +735,7 @@ Overlay.prototype.setProperties = function(properties) {
 			case 'doc_url':
 				this.unsetProperty(name);
 				this.$dialogue.$head.$header[0].insertAdjacentHTML('afterend', `
-					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${value}"></a>
+					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" aria-label="${t('Open Zabbix documentation in a new tab')}" href="${value}"></a>
 				`);
 				break;
 

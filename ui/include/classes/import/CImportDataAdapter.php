@@ -431,6 +431,29 @@ class CImportDataAdapter {
 	}
 
 	/**
+	 * Get global regexes from the imported data.
+	 *
+	 * @return array
+	 */
+	public function getGlobalRegexes(): array {
+		$global_regexes = [];
+
+		if (array_key_exists('global_regexes', $this->data)) {
+			foreach ($this->data['global_regexes'] as $global_regex) {
+				foreach ($global_regex['expressions'] as &$expression) {
+					$expression['expression_type'] = $expression['type'];
+					unset($expression['type']);
+				}
+				unset($expression);
+
+				$global_regexes[$global_regex['name']] = $global_regex;
+			}
+		}
+
+		return $global_regexes;
+	}
+
+	/**
 	 * Format discovery rule.
 	 *
 	 * @param array  $discovery_rule

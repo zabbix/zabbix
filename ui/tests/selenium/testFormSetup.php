@@ -20,6 +20,8 @@ require_once __DIR__.'/behaviors/CTableBehavior.php';
 /**
  * @backup sessions
  *
+ * @onBefore deleteConfFile
+ *
  * @backupConfig
  */
 class testFormSetup extends CWebTest {
@@ -36,6 +38,10 @@ class testFormSetup extends CWebTest {
 		];
 	}
 
+	protected function deleteConfFile() {
+		unlink(__DIR__.'/../../conf/zabbix.conf.php');
+	}
+
 	/**
 	 * @backup settings
 	 */
@@ -47,11 +53,11 @@ class testFormSetup extends CWebTest {
 		$this->checkSections('Welcome');
 		$form = $this->query('xpath://form')->asForm()->one();
 		$language_field = $form->getField('Default language');
-		$this->assertEquals('English (en_GB)', $language_field->getValue());
+		$this->assertEquals('English (en_US)', $language_field->getValue());
 		$hint_text = 'You are not able to choose some of the languages, because locales for them are not installed '.
 				'on the web server.';
 		$this->assertEquals($hint_text, $this->query('xpath://button[@data-hintbox]')->one()
-				->getAttribute('data-hintbox-contents'));
+				->getAttribute('data-hintbox-html'));
 		$this->checkButtons('first section');
 
 		$this->assertScreenshot($form, 'Welcome_En');
@@ -84,7 +90,6 @@ class testFormSetup extends CWebTest {
 			'PHP databases support',
 			'PHP bcmath',
 			'PHP mbstring',
-			'PHP option "mbstring.func_overload"',
 			'PHP sockets',
 			'PHP gd',
 			'PHP gd PNG support',
@@ -124,6 +129,7 @@ class testFormSetup extends CWebTest {
 			'User' => 'zabbix',
 			'Password' => ''
 		];
+
 		$fields['Database host'] = ($db_parameters['Database type'] === 'PostgreSQL') ?
 				'localhost' : $db_parameters['Database host'];
 		$text = 'Please create database manually, and set the configuration parameters for connection to this database. '.
@@ -162,6 +168,16 @@ class testFormSetup extends CWebTest {
 					// Check that Database Schema and Database TLS encryption fields are visible.
 					$schema_field = $form->getField('Database schema');
 					$this->assertEquals(255, $schema_field->getAttribute('maxlength'));
+
+					// Check hint for database host field.
+					$hint_text = "Enter one or more values as host:port or [host]:port (IPv6), separated by commas.\n".
+							'If no port is specified, the "Database port" value is used.';
+
+					$form->getLabel('Database host')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
+					$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilPresent()->one();
+					$this->assertEquals($hint_text, $hint->getText());
+					$hint->close();
+
 					$this->checkTlsFieldsLayout();
 					break;
 			}
@@ -256,6 +272,8 @@ class testFormSetup extends CWebTest {
 
 	/**
 	 * @backup settings
+	 *
+	 * @onAfter deleteConfFile
 	 */
 	public function testFormSetup_settingsSection() {
 		// Open the Pre-installation summary section.
@@ -307,9 +325,9 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
 		// Complete the setup and check in DB that the default timezone was applied.
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Finish')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Finish')->waitUntilVisible()->one()->click();
 
 		$db_values = CDBHelper::getColumn('SELECT name, value_str FROM settings WHERE name IN (\'default_theme\','.
 				' \'default_timezone\') ORDER BY name', 'value_str'
@@ -325,7 +343,7 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Back')->one()->click();
 
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
-		$this->query('id:zbx_server_name')->one()->fill('Zabbix server name');
+		$this->query('id:zbx_server_name')->waitUntilVisible()->one()->fill('Zabbix server name');
 		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		$db_parameters = $this->getDbParameters();
 		$text = 'Please check configuration parameters. If all is correct, press "Next step" button, or "Back" button '.
@@ -378,6 +396,9 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, 'PreInstall_'.$db_parameters['Database type']);
 	}
 
+	/**
+	 * @onAfter deleteConfFile
+	 */
 	public function testFormSetup_installSection() {
 		$this->openSpecifiedSection('Install');
 		$this->checkPageTextElements('Install', 'Configuration file "conf/zabbix.conf.php" created.');
@@ -871,10 +892,6 @@ class testFormSetup extends CWebTest {
 		$this->assertEquals("Welcome to\nZabbix ".ZABBIX_EXPORT_VERSION, $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
-
-		// Cancel setup form update.
-		$this->query('button:Cancel')->one()->click()->waitUntilStalled();
-		$this->assertStringContainsString('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
 	}
 
 	/**
@@ -902,7 +919,6 @@ class testFormSetup extends CWebTest {
 		switch ($section) {
 			case 'first section':
 				$buttons = [
-					'Cancel' => true,
 					'Back' => false,
 					'Next step' => true
 				];
@@ -910,7 +926,6 @@ class testFormSetup extends CWebTest {
 
 			case 'last section':
 				$buttons = [
-					'Cancel' => false,
 					'Back' => false,
 					'Finish' => true
 				];
@@ -918,7 +933,6 @@ class testFormSetup extends CWebTest {
 
 			case 'middle section':
 				$buttons = [
-					'Cancel' => true,
 					'Back' => true,
 					'Next step' => true
 				];
@@ -926,7 +940,6 @@ class testFormSetup extends CWebTest {
 
 			case 'russian':
 				$buttons = [
-					'Отмена' => true,
 					'Назад' => false,
 					'Далее' => true
 				];

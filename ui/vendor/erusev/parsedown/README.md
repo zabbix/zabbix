@@ -1,71 +1,79 @@
-> I also make [Caret](https://caret.io?ref=parsedown) - a Markdown editor for Mac and PC.
+# Parsedown
 
-## Parsedown
+[![Total Downloads](https://poser.pugx.org/erusev/parsedown/d/total.svg)](https://packagist.org/packages/erusev/parsedown)
+[![Version](https://poser.pugx.org/erusev/parsedown/v/stable.svg)](https://packagist.org/packages/erusev/parsedown)
+[![License](https://poser.pugx.org/erusev/parsedown/license.svg)](https://packagist.org/packages/erusev/parsedown)
 
-[![Build Status](https://img.shields.io/travis/erusev/parsedown/master.svg?style=flat-square)](https://travis-ci.org/erusev/parsedown)
-<!--[![Total Downloads](http://img.shields.io/packagist/dt/erusev/parsedown.svg?style=flat-square)](https://packagist.org/packages/erusev/parsedown)-->
+Better Markdown Parser in PHP — <a href="https://parsedown.org/demo">demo</a>
 
-Better Markdown Parser in PHP
+## Features
 
-[Demo](http://parsedown.org/demo) |
-[Benchmarks](http://parsedown.org/speed) |
-[Tests](http://parsedown.org/tests/) |
-[Documentation](https://github.com/erusev/parsedown/wiki/)
+- One file
+- No dependencies
+- [Super fast](http://parsedown.org/speed)
+- Extensible
+- [GitHub flavored](https://github.github.com/gfm)
+- [Tested](http://parsedown.org/tests/) in PHP 7.1+
+- [Markdown Extra extension](https://github.com/erusev/parsedown-extra)
 
-### Features
+## Installation
 
-* One File
-* No Dependencies
-* Super Fast
-* Extensible
-* [GitHub flavored](https://help.github.com/articles/github-flavored-markdown)
-* Tested in 5.3 to 7.1 and in HHVM
-* [Markdown Extra extension](https://github.com/erusev/parsedown-extra)
+Install the [composer package]:
 
-### Installation
+```sh
+composer require erusev/parsedown
+```
 
-Include `Parsedown.php` or install [the composer package](https://packagist.org/packages/erusev/parsedown).
+Or download the [latest release] and include `Parsedown.php`
 
-### Example
+[composer package]: https://packagist.org/packages/erusev/parsedown "The Parsedown package on packagist.org"
+[latest release]: https://github.com/erusev/parsedown/releases/latest "The latest release of Parsedown"
 
-``` php
+## Example
+
+```php
 $Parsedown = new Parsedown();
 
 echo $Parsedown->text('Hello _Parsedown_!'); # prints: <p>Hello <em>Parsedown</em>!</p>
 ```
 
+You can also parse inline markdown only:
+
+```php
+echo $Parsedown->line('Hello _Parsedown_!'); # prints: Hello <em>Parsedown</em>!
+```
+
 More examples in [the wiki](https://github.com/erusev/parsedown/wiki/) and in [this video tutorial](http://youtu.be/wYZBY8DEikI).
 
-### Security
+## Security
 
 Parsedown is capable of escaping user-input within the HTML that it generates. Additionally Parsedown will apply sanitisation to additional scripting vectors (such as scripting link destinations) that are introduced by the markdown syntax itself.
 
 To tell Parsedown that it is processing untrusted user-input, use the following:
+
 ```php
-$parsedown = new Parsedown;
-$parsedown->setSafeMode(true);
+$Parsedown->setSafeMode(true);
 ```
 
 If instead, you wish to allow HTML within untrusted user-input, but still want output to be free from XSS it is recommended that you make use of a HTML sanitiser that allows HTML tags to be whitelisted, like [HTML Purifier](http://htmlpurifier.org/).
 
 In both cases you should strongly consider employing defence-in-depth measures, like [deploying a Content-Security-Policy](https://scotthelme.co.uk/content-security-policy-an-introduction/) (a browser security feature) so that your page is likely to be safe even if an attacker finds a vulnerability in one of the first lines of defence above.
 
-#### Security of Parsedown Extensions
-
 Safe mode does not necessarily yield safe results when using extensions to Parsedown. Extensions should be evaluated on their own to determine their specific safety against XSS.
 
-### Escaping HTML
-> ⚠️  **WARNING:** This method isn't safe from XSS!
+## Escaping HTML
 
-If you wish to escape HTML **in trusted input**, you can use the following:
+> WARNING: This method is not safe from XSS!
+
+If you wish to escape HTML in trusted input, you can use the following:
+
 ```php
-$parsedown = new Parsedown;
-$parsedown->setMarkupEscaped(true);
+$Parsedown->setMarkupEscaped(true);
 ```
 
-Beware that this still allows users to insert unsafe scripting vectors, such as links like `[xss](javascript:alert%281%29)`.
+Beware that this still allows users to insert unsafe scripting vectors, ex: `[xss](javascript:alert%281%29)`.
 
-### Questions
+## Questions
 
 **How does Parsedown work?**
 
@@ -79,8 +87,12 @@ It passes most of the CommonMark tests. Most of the tests that don't pass deal w
 
 **Who uses it?**
 
-[Laravel Framework](https://laravel.com/), [Bolt CMS](http://bolt.cm/), [Grav CMS](http://getgrav.org/), [Herbie CMS](http://www.getherbie.org/), [Kirby CMS](http://getkirby.com/), [October CMS](http://octobercms.com/), [Pico CMS](http://picocms.org), [Statamic CMS](http://www.statamic.com/), [phpDocumentor](http://www.phpdoc.org/), [RaspberryPi.org](http://www.raspberrypi.org/), [Symfony demo](https://github.com/symfony/symfony-demo) and [more](https://packagist.org/packages/erusev/parsedown/dependents).
+[Laravel Framework](https://laravel.com/), [Bolt CMS](http://bolt.cm/), [Grav CMS](http://getgrav.org/), [Herbie CMS](http://www.getherbie.org/), [Kirby CMS](http://getkirby.com/), [October CMS](http://octobercms.com/), [Pico CMS](http://picocms.org), [Statamic CMS](http://www.statamic.com/), [phpDocumentor](http://www.phpdoc.org/), [RaspberryPi.org](http://www.raspberrypi.org/), [Symfony Demo](https://github.com/symfony/demo) and [more](https://packagist.org/packages/erusev/parsedown/dependents).
 
 **How can I help?**
 
 Use it, star it, share it and if you feel generous, [donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=528P3NZQMP8N2).
+
+**What else should I know?**
+
+I also make [Nota](https://nota.md/) — a notes app designed for local Markdown files.

@@ -19,7 +19,7 @@ class CControllerPopupImport extends CController {
 	protected function checkInput() {
 		$fields = [
 			'import' => 'in 1',
-			'rules_preset' => 'required|in host,template,mediatype,map,dashboard',
+			'rules_preset' => 'required|in host,template,mediatype,map,dashboard,regex',
 			'rules' => 'array'
 		];
 
@@ -55,6 +55,9 @@ class CControllerPopupImport extends CController {
 			case 'dashboard':
 				return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
 					&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+
+			case 'regex':
+				return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 		}
 	}
 
@@ -138,7 +141,12 @@ class CControllerPopupImport extends CController {
 				$rules = [
 					'dashboards' => ['updateExisting' => true, 'createMissing' => true]
 				];
+				break;
 
+			case 'regex':
+				$rules = [
+					'global_regexes' => ['updateExisting' => true, 'createMissing' => true]
+				];
 				break;
 		}
 
@@ -206,7 +214,7 @@ class CControllerPopupImport extends CController {
 				'rules' => $rules,
 				'rules_preset' => $this->getInput('rules_preset'),
 				'advanced_config' => in_array($this->getInput('rules_preset'), ['host', 'template']),
-				'submit_compare' => in_array($this->getInput('rules_preset'), ['template', 'dashboard']),
+				'submit_compare' => in_array($this->getInput('rules_preset'), ['template', 'dashboard', 'regex']),
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]

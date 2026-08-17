@@ -32,9 +32,9 @@ func generateBenchLogFile(lines int) string {
 
 	for i := range lines {
 		if i%10 == 0 {
-			sb.WriteString(fmt.Sprintf("2025-01-01 10:00:%02d [ERROR] Critical failure %d\n", i%60, i))
+			fmt.Fprintf(&sb, "2025-01-01 10:00:%02d [ERROR] Critical failure %d\n", i%60, i)
 		} else {
-			sb.WriteString(fmt.Sprintf("2025-01-01 10:00:%02d [INFO] Normal operation %d\n", i%60, i))
+			fmt.Fprintf(&sb, "2025-01-01 10:00:%02d [INFO] Normal operation %d\n", i%60, i)
 		}
 	}
 
@@ -166,7 +166,7 @@ func BenchmarkParser_Splitter(b *testing.B) {
 	var sb strings.Builder
 
 	for i := range 1000 {
-		sb.WriteString(fmt.Sprintf("field1:field2:field3:data%d\n", i))
+		fmt.Fprintf(&sb, "field1:field2:field3:data%d\n", i)
 	}
 
 	content := sb.String()

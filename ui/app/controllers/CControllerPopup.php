@@ -34,7 +34,7 @@ class CControllerPopup extends CController {
 	 */
 	private string $action;
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 
 		$this->supported_popups = [
@@ -56,7 +56,9 @@ class CControllerPopup extends CController {
 			'module.edit' => _('Module edit'),
 			'proxy.edit' => _('Proxy edit'),
 			'proxygroup.edit' => _('Proxy group edit'),
+			'regex.edit' => _('Configuration of regular expressions'),
 			'templategroup.edit' => _('Template group edit'),
+			'scheduledreport.edit' => _('Scheduled report edit'),
 			'script.edit' => _('Script edit'),
 			'service.edit' => _('Service edit'),
 			'sla.edit' => _('SLA edit'),
@@ -67,7 +69,7 @@ class CControllerPopup extends CController {
 		];
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'popup' => 'required|in '.implode(',', array_keys($this->supported_popups))
 		];
@@ -85,6 +87,28 @@ class CControllerPopup extends CController {
 			$this->popup_controller = new $popup_controller_class;
 
 			$ret = $this->popup_controller->checkInput();
+
+			if (!$ret) {
+				$response = $this->popup_controller->getResponse();
+
+				if ($response instanceof CControllerResponseData) {
+					$data = $response->getData();
+
+					if (array_key_exists('main_block', $data)) {
+						$main_block = json_decode($data['main_block'], true);
+
+						if (array_key_exists('error', $main_block)) {
+							if (array_key_exists('title', $main_block['error'])) {
+								CMessageHelper::setErrorTitle($main_block['error']['title']);
+							}
+
+							foreach ($main_block['error']['messages'] as $message) {
+								CMessageHelper::addError($message);
+							}
+						}
+					}
+				}
+			}
 		}
 
 		if (!$ret) {
@@ -94,11 +118,11 @@ class CControllerPopup extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->popup_controller->checkPermissions();
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'popup' => [
 				'action' => $this->action,

@@ -173,13 +173,6 @@ class testGeneric extends CWebTest {
 			],
 			[
 				[
-					'url' => 'zabbix.php?action=scheduledreport.edit',
-					'title' => 'Scheduled reports',
-					'header' => 'Scheduled reports'
-				]
-			],
-			[
-				[
 					'url' => 'zabbix.php?action=availabilityreport.list',
 					'title' => 'Availability report',
 					'header' => 'Availability report'
@@ -591,13 +584,6 @@ class testGeneric extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=regex.list',
-					'title' => 'Configuration of regular expressions',
-					'header' => 'Regular expressions'
-				]
-			],
-			[
-				[
-					'url' => 'zabbix.php?action=regex.edit',
 					'title' => 'Configuration of regular expressions',
 					'header' => 'Regular expressions'
 				]

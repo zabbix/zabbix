@@ -16,6 +16,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $form = (new CForm())
@@ -46,7 +47,7 @@ foreach (DASHBOARD_DISPLAY_PERIODS as $period) {
 	$display_period_select->addOption(new CSelectOption($period, secondsToPeriod($period)));
 }
 
-$form_list->addRow(new CLabel(_('Page display period'), 'display_period'), $display_period_select);
+$form_list->addRow(new CLabel(_('Slideshow interval'), 'display_period'), $display_period_select);
 
 $form->addItem($form_list);
 

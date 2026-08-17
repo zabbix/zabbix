@@ -31,7 +31,7 @@ zabbix_export:
         2. Enter the admin token into the `API token` field.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-5
       groups:
         - name: Templates/Applications
       items:
@@ -129,7 +129,7 @@ zabbix_export:
             			}
             
             			Object.keys(request.getHeaders()).forEach(function(key) {
-            				if (key.indexOf('openai') === 0) {
+            				if (key.toLowerCase().indexOf('openai') === 0) {
             					OpenAI.headers[key] = request.getHeaders()[key];
             				}
             			});
@@ -287,7 +287,7 @@ zabbix_export:
             			}
             
             			Object.keys(request.getHeaders()).forEach(function(key) {
-            				if (key.indexOf('openai') === 0) {
+            				if (key.toLowerCase().indexOf('openai') === 0) {
             					OpenAI.headers[key] = request.getHeaders()[key];
             				}
             			});
@@ -347,6 +347,76 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: 7741109573444ed8b3d9389e5ce9db09
+          name: 'Daily project count'
+          type: DEPENDENT
+          key: openai.daily.project.count
+          units: '!projects'
+          description: 'Total daily project count.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var getField = function (data, path, separator, default_value) {
+                  	if (typeof separator === 'undefined') {
+                  		separator = '.';
+                  	}
+                  	var steps = path.split(separator);
+                  	for (var step_index = 0; step_index < steps.length; step_index++) {
+                  		var step = steps[step_index];
+                  		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+                  			if (typeof default_value === 'undefined') {
+                  				throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
+                  			}
+                  			return default_value;
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  };
+                  
+                  try {
+                  	var data,
+                  		costs,
+                  		projects,
+                  		loop_index,
+                  		result_index,
+                  		results,
+                  		project_id;
+                  
+                  	data = JSON.parse(value);
+                  
+                  	costs = getField(data, 'costs', '.', []);
+                  
+                  	projects = {};
+                  
+                  	for (loop_index = 0; loop_index < costs.length; loop_index++) {
+                  		results = getField(costs[loop_index], 'results', '.', []);
+                  
+                  		for (result_index = 0; result_index < results.length; result_index++) {
+                  			project_id = getField(results[result_index], 'project_id', '.', '');
+                  
+                  			if (project_id !== '') {
+                  				projects[project_id] = true;
+                  			}
+                  		}
+                  	}
+                  
+                  	return Object.keys(projects).length;
+                  
+                  } catch (error) {
+                  	Zabbix.log(3, '[ OpenAI ] ERROR: ' + error);
+                  
+                  	return JSON.stringify({error: error.toString()});
+                  }
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: openai.costs_data.get
+          tags:
+            - tag: component
+              value: cost
         - uuid: 2b6389a3066e4a99a7b6e7635cdbca95
           name: 'Total daily expenses'
           type: DEPENDENT
@@ -473,7 +543,7 @@ zabbix_export:
             			}
             
             			Object.keys(request.getHeaders()).forEach(function(key) {
-            				if (key.indexOf('openai') === 0) {
+            				if (key.toLowerCase().indexOf('openai') === 0) {
             					OpenAI.headers[key] = request.getHeaders()[key];
             				}
             			});
@@ -1158,41 +1228,38 @@ zabbix_export:
       dashboards:
         - uuid: ca4bba8a3a8f4ec1b9c5b50d6608eb69
           name: 'OpenAI Platform: General'
-          auto_start: 'NO'
           pages:
-            - name: General
+            - name: 'OpenAI: Usage & Cost'
               widgets:
-                - type: clock
-                  name: Today
-                  width: '24'
-                  height: '4'
-                  fields:
-                    - type: INTEGER
-                      name: clock_type
-                      value: '1'
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '3'
-                - type: problems
-                  'y': '4'
-                  width: '72'
-                  height: '7'
+                - type: item
+                  name: 'Daily cost'
+                  width: '8'
+                  hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: reference
-                      value: NPDJE
-                - type: item
-                  name: 'Expenses for the previous day'
-                  x: '24'
-                  width: '24'
-                  height: '4'
-                  fields:
+                      name: bg_color
+                      value: 0A466A
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '30'
+                    - type: STRING
+                      name: description
+                      value: DAILY
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: 9FCBE4
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '2'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '20'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -1201,18 +1268,114 @@ zabbix_export:
                     - type: INTEGER
                       name: show.0
                       value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '1'
+                    - type: INTEGER
+                      name: show.3
+                      value: '5'
                     - type: STRING
-                      name: units
-                      value: $
+                      name: sparkline.color
+                      value: '091825'
+                    - type: STRING
+                      name: sparkline.time_period.from
+                      value: now-1d
+                    - type: STRING
+                      name: sparkline.time_period.to
+                      value: now
+                    - type: INTEGER
+                      name: sparkline.width
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: '360000'
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '100'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: '500000'
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '250'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 9F0000
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '500'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: D40000
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '1000'
+                    - type: INTEGER
+                      name: time_bold
+                      value: '1'
+                    - type: STRING
+                      name: time_color
+                      value: F3F4F7
+                    - type: INTEGER
+                      name: time_h_pos
+                      value: '2'
+                    - type: INTEGER
+                      name: time_size
+                      value: '10'
+                    - type: INTEGER
+                      name: time_v_pos
+                      value: '2'
+                    - type: STRING
+                      name: units_color
+                      value: 9FCBE4
                     - type: INTEGER
                       name: units_pos
                       value: '0'
+                    - type: INTEGER
+                      name: units_size
+                      value: '20'
+                    - type: STRING
+                      name: value_color
+                      value: F3F4F7
+                    - type: INTEGER
+                      name: value_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
                 - type: item
-                  name: 'ChatGPT Version'
-                  x: '48'
-                  width: '24'
-                  height: '4'
+                  name: Version
+                  'y': '2'
+                  width: '8'
+                  hide_header: 'YES'
                   fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 0A466A
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '30'
+                    - type: STRING
+                      name: description
+                      value: VERSION
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: 9FCBE4
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '2'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '20'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -1222,413 +1385,680 @@ zabbix_export:
                       name: show.0
                       value: '2'
                     - type: INTEGER
-                      name: units_show
+                      name: show.1
+                      value: '1'
+                    - type: STRING
+                      name: units_color
+                      value: 9FCBE4
+                    - type: INTEGER
+                      name: units_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: units_size
+                      value: '20'
+                    - type: STRING
+                      name: value_color
+                      value: F3F4F7
+                    - type: INTEGER
+                      name: value_h_pos
                       value: '0'
                     - type: INTEGER
                       name: value_size
-                      value: '30'
-            - name: 'Project statistics'
-              widgets:
-                - type: honeycomb
-                  name: 'Input tokens'
-                  width: '36'
+                      value: '25'
+                - type: svggraph
+                  name: 'Model text tokens (i/o)'
+                  'y': '4'
+                  width: '18'
                   height: '5'
                   fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Input tokens'
                     - type: INTEGER
-                      name: item_tags.0.operator
-                      value: '1'
+                      name: ds.0.aggregate_function
+                      value: '7'
                     - type: STRING
-                      name: item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: project
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[(.*)\]\:.*", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAA
+                      name: ds.0.aggregate_interval
+                      value: 1h
                     - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: honeycomb
-                  name: 'Input audio tokens'
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Input audio tokens'
-                    - type: INTEGER
-                      name: item_tags.0.operator
-                      value: '1'
-                    - type: STRING
-                      name: item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: project
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[(.*)\]\:.*", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAC
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: honeycomb
-                  name: 'Input cached tokens'
-                  'y': '10'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Input cached tokens'
-                    - type: INTEGER
-                      name: item_tags.0.operator
-                      value: '1'
-                    - type: STRING
-                      name: item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: project
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[(.*)\]\:.*", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAE
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: honeycomb
-                  name: 'Daily expenses'
-                  'y': '15'
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Daily expenses'
-                    - type: INTEGER
-                      name: item_tags.0.operator
-                      value: '1'
-                    - type: STRING
-                      name: item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: project
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[(.*)\]\:.*", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAG
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
+                      name: ds.0.approximation
                       value: '4'
                     - type: STRING
-                      name: secondary_label_position
-                      value: '0'
-                    - type: STRING
-                      name: secondary_label_units
-                      value: $
-                - type: honeycomb
-                  name: 'Output tokens'
-                  x: '36'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Output tokens'
+                      name: ds.0.color
+                      value: 0A466A
                     - type: INTEGER
-                      name: item_tags.0.operator
+                      name: ds.0.fill
                       value: '1'
                     - type: STRING
-                      name: item_tags.0.tag
+                      name: ds.0.items.0
+                      value: '*: Input tokens'
+                    - type: INTEGER
+                      name: ds.0.item_tags.0.operator
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.item_tags.0.tag
                       value: component
                     - type: STRING
-                      name: item_tags.0.value
+                      name: ds.0.item_tags.0.value
+                      value: model
+                    - type: INTEGER
+                      name: ds.0.item_tags_evaltype
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 1h
+                    - type: INTEGER
+                      name: ds.1.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.color
+                      value: D40000
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.1.invert_values
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: '*: Output tokens'
+                    - type: INTEGER
+                      name: ds.1.item_tags.0.operator
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: ds.1.item_tags.0.value
+                      value: model
+                    - type: INTEGER
+                      name: ds.1.item_tags_evaltype
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.1.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: MTIVO
+                    - type: STRING
+                      name: time_period.from
+                      value: now-1d
+                    - type: STRING
+                      name: time_period.to
+                      value: now
+                - type: problemsbysv
+                  'y': '9'
+                  width: '8'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: OAIPS
+                    - type: INTEGER
+                      name: severities.0
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '5'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '1'
+                    - type: INTEGER
+                      name: severities.4
+                      value: '0'
+                    - type: INTEGER
+                      name: severities.5
+                      value: '2'
+                    - type: INTEGER
+                      name: show_opdata
+                      value: '1'
+                    - type: INTEGER
+                      name: show_suppressed
+                      value: '1'
+                - type: svggraph
+                  name: 'Daily cost (global)'
+                  x: '8'
+                  width: '46'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 1h
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: INTEGER
+                      name: ds.0.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.color
+                      value: 0A466A
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '5'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Daily project count'
+                    - type: INTEGER
+                      name: ds.0.item_tags.0.operator
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: ds.0.item_tags.0.value
+                      value: cost
+                    - type: INTEGER
+                      name: ds.0.item_tags_evaltype
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.type
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 1h
+                    - type: INTEGER
+                      name: ds.1.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.color
+                      value: 9FCBE4
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '5'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Total daily expenses'
+                    - type: INTEGER
+                      name: ds.1.item_tags.0.operator
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: ds.1.item_tags.0.value
+                      value: cost
+                    - type: INTEGER
+                      name: ds.1.item_tags_evaltype
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.1.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: OPAID
+                - type: problems
+                  name: 'Problem report'
+                  x: '8'
+                  'y': '9'
+                  width: '64'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: highlight_row
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: OAIPR
+                    - type: INTEGER
+                      name: severities.0
+                      value: '0'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '1'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.4
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.5
+                      value: '5'
+                    - type: INTEGER
+                      name: show_opdata
+                      value: '1'
+                    - type: INTEGER
+                      name: show_suppressed
+                      value: '1'
+                    - type: INTEGER
+                      name: show_symptoms
+                      value: '1'
+                    - type: INTEGER
+                      name: show_tags
+                      value: '3'
+                - type: svggraph
+                  name: 'Model audio tokens (i/o)'
+                  x: '18'
+                  'y': '4'
+                  width: '18'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 1h
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.color
+                      value: 0A466A
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '5'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: '*: Input audio tokens'
+                    - type: INTEGER
+                      name: ds.0.item_tags.0.operator
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: ds.0.item_tags.0.value
+                      value: model
+                    - type: INTEGER
+                      name: ds.0.item_tags_evaltype
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 1h
+                    - type: INTEGER
+                      name: ds.1.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.color
+                      value: D40000
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.1.invert_values
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: '*: Output audio tokens'
+                    - type: INTEGER
+                      name: ds.1.item_tags.0.operator
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: ds.1.item_tags.0.value
+                      value: model
+                    - type: INTEGER
+                      name: ds.1.item_tags_evaltype
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.1.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: MAIVO
+                    - type: STRING
+                      name: time_period.from
+                      value: now-1d
+                    - type: STRING
+                      name: time_period.to
+                      value: now
+                - type: svggraph
+                  name: 'Project text tokens (i/o)'
+                  x: '36'
+                  'y': '4'
+                  width: '18'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 1h
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.color
+                      value: 0A466A
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '5'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: '*: Input tokens'
+                    - type: INTEGER
+                      name: ds.0.item_tags.0.operator
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: ds.0.item_tags.0.value
                       value: project
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[(.*)\]\:.*", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAB
                     - type: INTEGER
-                      name: secondary_label_decimal_places
+                      name: ds.0.item_tags_evaltype
                       value: '0'
-                - type: honeycomb
-                  name: 'Output audio tokens'
-                  x: '36'
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Output audio tokens'
                     - type: INTEGER
-                      name: item_tags.0.operator
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 1h
+                    - type: INTEGER
+                      name: ds.1.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.color
+                      value: D40000
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.1.invert_values
                       value: '1'
                     - type: STRING
-                      name: item_tags.0.tag
+                      name: ds.1.items.0
+                      value: '*: Output tokens'
+                    - type: INTEGER
+                      name: ds.1.item_tags.0.operator
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.item_tags.0.tag
                       value: component
                     - type: STRING
-                      name: item_tags.0.value
+                      name: ds.1.item_tags.0.value
                       value: project
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[(.*)\]\:.*", \1)}'
+                    - type: INTEGER
+                      name: ds.1.item_tags_evaltype
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.1.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
                     - type: STRING
                       name: reference
-                      value: AAAAD
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: honeycomb
-                  name: 'Model request number'
-                  x: '36'
-                  'y': '10'
-                  width: '36'
-                  height: '5'
+                      value: PTIVO
+                    - type: STRING
+                      name: time_period.from
+                      value: now-1d
+                    - type: STRING
+                      name: time_period.to
+                      value: now
+                - type: svggraph
+                  name: 'Daily cost (project)'
+                  x: '54'
+                  width: '18'
+                  height: '4'
                   fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Model request number'
                     - type: INTEGER
-                      name: item_tags.0.operator
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 1h
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.color
+                      value: D40000
+                    - type: INTEGER
+                      name: ds.0.fill
                       value: '1'
                     - type: STRING
-                      name: item_tags.0.tag
+                      name: ds.0.items.0
+                      value: '*: Daily expenses'
+                    - type: INTEGER
+                      name: ds.0.item_tags.0.operator
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.item_tags.0.tag
                       value: component
                     - type: STRING
-                      name: item_tags.0.value
+                      name: ds.0.item_tags.0.value
+                      value: cost
+                    - type: INTEGER
+                      name: ds.0.item_tags_evaltype
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: OPAID
+                - type: svggraph
+                  name: 'Project audio tokens (i/o)'
+                  x: '54'
+                  'y': '4'
+                  width: '18'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 1h
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.color
+                      value: 0A466A
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '5'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: '*: Input audio tokens'
+                    - type: INTEGER
+                      name: ds.0.item_tags.0.operator
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: ds.0.item_tags.0.value
                       value: project
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[(.*)\]\:.*", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAF
                     - type: INTEGER
-                      name: secondary_label_decimal_places
+                      name: ds.0.item_tags_evaltype
                       value: '0'
-            - name: 'Model statistics'
-              widgets:
-                - type: honeycomb
-                  name: 'Input tokens'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Input tokens'
                     - type: INTEGER
-                      name: item_tags.0.operator
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '7'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 1h
+                    - type: INTEGER
+                      name: ds.1.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.color
+                      value: D40000
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.1.invert_values
                       value: '1'
                     - type: STRING
-                      name: item_tags.0.tag
+                      name: ds.1.items.0
+                      value: '*: Output audio tokens'
+                    - type: INTEGER
+                      name: ds.1.item_tags.0.operator
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.item_tags.0.tag
                       value: component
                     - type: STRING
-                      name: item_tags.0.value
-                      value: model
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[.+?\/(.*)\]\:.*", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAH
+                      name: ds.1.item_tags.0.value
+                      value: project
                     - type: INTEGER
-                      name: secondary_label_decimal_places
+                      name: ds.1.item_tags_evaltype
                       value: '0'
-                - type: honeycomb
-                  name: 'Input audio tokens'
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Input audio tokens'
                     - type: INTEGER
-                      name: item_tags.0.operator
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.transparency
                       value: '1'
-                    - type: STRING
-                      name: item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: model
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[.+?\/(.*)\]\:.*", \1)}'
+                    - type: INTEGER
+                      name: ds.1.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
                     - type: STRING
                       name: reference
-                      value: AAAAJ
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: honeycomb
-                  name: 'Input cached tokens'
-                  'y': '10'
-                  width: '36'
-                  height: '5'
-                  fields:
+                      value: PAIVO
                     - type: STRING
-                      name: bg_color
-                      value: 64B5F6
+                      name: time_period.from
+                      value: now-1d
                     - type: STRING
-                      name: items.0
-                      value: '*Input cached tokens'
-                    - type: INTEGER
-                      name: item_tags.0.operator
-                      value: '1'
-                    - type: STRING
-                      name: item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: model
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[.+?\/(.*)\]\:.*", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAL
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: honeycomb
-                  name: 'Output tokens'
-                  x: '36'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Output tokens'
-                    - type: INTEGER
-                      name: item_tags.0.operator
-                      value: '1'
-                    - type: STRING
-                      name: item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: model
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[.+?\/(.*)\]\:.*", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAI
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: honeycomb
-                  name: 'Output audio tokens'
-                  x: '36'
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Output audio tokens'
-                    - type: INTEGER
-                      name: item_tags.0.operator
-                      value: '1'
-                    - type: STRING
-                      name: item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: model
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[.+?\/(.*)\]\:.*", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAK
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: honeycomb
-                  name: 'Model request number'
-                  x: '36'
-                  'y': '10'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 64B5F6
-                    - type: STRING
-                      name: items.0
-                      value: '*Model request number'
-                    - type: INTEGER
-                      name: item_tags.0.operator
-                      value: '1'
-                    - type: STRING
-                      name: item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: model
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^\[.+?\/(.*)\]\:.*", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAM
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
+                      name: time_period.to
+                      value: now
   graphs:
     - uuid: 6177a93fb8fa4dc4934a88be88f51838
       name: 'Total daily expenses'

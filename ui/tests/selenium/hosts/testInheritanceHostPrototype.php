@@ -66,10 +66,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Check layout at Host tab.
 		$this->zbxTestAssertElementPresentXpath('//label[text()="Parent discovery rules"]/../..//'.
 				'a[contains(@href, "&hostid='.$host_prototype.'") and contains(@href, "&parent_discoveryid='.$discovery_id.'")]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/input[@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="name"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="host"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/z-textarea-flexible[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/z-textarea-flexible[@readonly]');
 		$interface = CDBHelper::getValue('SELECT interfaceid'.
 				' FROM interface'.
 				' WHERE hostid IN ('.
@@ -460,6 +460,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		if (array_key_exists('cloned_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('host', $data['cloned_name']);
+			// Remove focus to avoid inline error "This object already exists." appearing from the original clone name.
+			$this->query('id:host')->one()->removeFocus();
 		}
 		if (array_key_exists('cloned_visible_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('name', $data['cloned_visible_name']);
@@ -476,6 +478,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				$this->zbxTestClickButtonMultiselect('group_links_');
 				$this->zbxTestLaunchOverlayDialog('Host groups');
 				$this->zbxTestClickLinkTextWait($data['hostgroup']);
+				COverlayDialogElement::find(1)->waitUntilNotPresent();
 			}
 			if (array_key_exists('group_prototype', $data)) {
 				$this->zbxTestInputClearAndTypeByXpath('//*[@name="group_prototypes[0][name]"]', $data['group_prototype']);
@@ -488,6 +491,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			COverlayDialogElement::find(1)->waitUntilReady()->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
+			COverlayDialogElement::find(1)->waitUntilNotPresent();
 		}
 
 		// Change inventory mode.
@@ -496,10 +500,12 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
 		}
 
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog->getFooter()->query('button:Add')->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 
 		if (array_key_exists('error_inline', $data)) {
+			$dialog->waitUntilTextPresent(array_values($data['error_inline'])[0]);
+
 			$this->assertInlineError($dialog->waitUntilReady()->asForm(), $data['error_inline']);
 		}
 		else {

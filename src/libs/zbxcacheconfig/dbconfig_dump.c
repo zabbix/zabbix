@@ -50,10 +50,11 @@ static void	DCdump_config(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  %s", config->config->severity_name[i]);
 
 	zabbix_log(LOG_LEVEL_TRACE, "housekeeping:");
-	zabbix_log(LOG_LEVEL_TRACE, "  events, mode:%d period:[trigger:%d internal:%d autoreg:%d discovery:%d]",
+	zabbix_log(LOG_LEVEL_TRACE, "  events, mode:%d period:[trigger:%d internal:%d autoreg:%d"
+			" discovery:%d service:%d]",
 			config->config->hk.events_mode, config->config->hk.events_trigger,
 			config->config->hk.events_internal, config->config->hk.events_autoreg,
-			config->config->hk.events_discovery);
+			config->config->hk.events_discovery, config->config->hk.events_service);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  audit, mode:%d period:%d", config->config->hk.audit_mode,
 			config->config->hk.audit);
@@ -67,6 +68,11 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "  history, mode:%d global:%d period:%d", config->config->hk.history_mode,
 			config->config->hk.history_global, config->config->hk.history);
 
+	zabbix_log(LOG_LEVEL_TRACE, "  history, overrides: %d, %d, %d, %d, %d, %d",
+			config->config->hk.history_override[0], config->config->hk.history_override[1],
+			config->config->hk.history_override[2], config->config->hk.history_override[3],
+			config->config->hk.history_override[4], config->config->hk.history_override[5]);
+
 	zabbix_log(LOG_LEVEL_TRACE, "  trends, mode:%d global:%d period:%d", config->config->hk.trends_mode,
 			config->config->hk.trends_global, config->config->hk.trends);
 
@@ -74,6 +80,7 @@ static void	DCdump_config(void)
 
 	zabbix_log(LOG_LEVEL_TRACE, "  auditlog_enabled: %d", config->config->auditlog_enabled);
 	zabbix_log(LOG_LEVEL_TRACE, "  auditlog_mode: %d", config->config->auditlog_mode);
+	zabbix_log(LOG_LEVEL_TRACE, "  enable_mobile_devices: %d", config->config->enable_mobile_devices);
 
 	zabbix_log(LOG_LEVEL_TRACE, "item timeouts:");
 	zabbix_log(LOG_LEVEL_TRACE, "  agent:%s", config->config->item_timeouts.agent);
@@ -1648,7 +1655,7 @@ static void	DCdump_host_proxy_index(void)
 void	DCdump_configuration(void)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:" ZBX_FS_UI64 ") ===",
-			get_dc_config()->revision.config);
+			dc_config_get_config_revision());
 
 	zabbix_log(LOG_LEVEL_TRACE, "  autoreg_tls_revision:" ZBX_FS_UI64, get_dc_config()->revision.autoreg_tls);
 

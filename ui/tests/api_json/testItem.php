@@ -849,6 +849,83 @@ class testItem extends CAPITest {
 			[
 				'request_data' => [
 					'hostid' => '50009',
+					'name' => 'Trapper item 2',
+					'key_' => 'trapper_item_2',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_TRAPPER,
+					'trapper_hosts' => ''
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'name' => 'Trapper item 3',
+					'key_' => 'trapper_item_3',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_TRAPPER,
+					'trapper_hosts' => 'localhost'
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'name' => 'Trapper item with empty trapper_hosts',
+					'key_' => 'httpagent_item_1',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
+					'trapper_hosts' => 'localhost',
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'name' => 'HTTP agent without trapper_hosts',
+					'key_' => 'http_item_1',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'name' => 'HTTP agent with empty trapper_hosts',
+					'key_' => 'http_item_2',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
+					'trapper_hosts' => '',
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'name' => 'HTTP agent with localhost trapper_hosts',
+					'key_' => 'http_item_3',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
+					'trapper_hosts' => 'localhost',
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
 					'name' => 'Test mqtt with wrong key and 0 delay',
 					'key_' => 'mqt.get[5]',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -870,7 +947,7 @@ class testItem extends CAPITest {
 			return;
 		}
 
-		$match_fields = ['uuid', 'hostid', 'name', 'key_', 'type', 'delay'];
+		$match_fields = ['uuid', 'hostid', 'name', 'key_', 'type', 'delay', 'trapper_hosts'];
 		$requests = zbx_toArray($request_data);
 
 		foreach ($requests as $request_data) {
@@ -879,6 +956,14 @@ class testItem extends CAPITest {
 			if ($request_data['type'] === ITEM_TYPE_ZABBIX_ACTIVE
 					&& substr($request_data['key_'], 0, 8) === 'mqtt.get') {
 				$request_data['delay'] = CTestArrayHelper::get($request_data, 'delay', '0');
+			}
+
+			if ($request_data['type'] === ITEM_TYPE_TRAPPER || $request_data['type'] === ITEM_TYPE_HTTPAGENT
+					&& array_key_exists('allow_traps', $request_data)
+					&& $request_data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON) {
+				if (!array_key_exists('trapper_hosts', $request_data)) {
+					$request_data['trapper_hosts'] = '{$TRAPPER.ALLOWED_HOSTS}';
+				}
 			}
 
 			if (!array_key_exists('delay', $request_data)) {
@@ -891,6 +976,10 @@ class testItem extends CAPITest {
 
 			foreach ($match_fields as $field) {
 				if ($field === 'uuid' && !array_key_exists($field, $request_data)) {
+					continue;
+				}
+
+				if (!array_key_exists($field, $request_data)) {
 					continue;
 				}
 
@@ -1089,6 +1178,78 @@ class testItem extends CAPITest {
 				$this->assertSame($db_item, $optional_updates, 'Should match expected update values');
 			}
 		}
+	}
+
+	public static function getItemUpdateFromNonTrapper() {
+		return [
+			'Update to trapper without trapper_hosts' => [
+				'initial' => [
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE
+				],
+				'update' => [
+					'type' => ITEM_TYPE_TRAPPER
+				],
+				'expected_trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
+			],
+			'Update to trapper with empty trapper_hosts' => [
+				'initial' => [
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE
+				],
+				'update' => [
+					'type' => ITEM_TYPE_TRAPPER,
+					'trapper_hosts' => ''
+				],
+				'expected_trapper_hosts' => ''
+			],
+			'Update to httpagent with allow_traps without trapper_hosts' => [
+				'initial' => [
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE
+				],
+				'update' => [
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
+					'url' => 'test.com',
+					'delay' => '1m'
+				],
+				'expected_trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
+			],
+			'Update to httpagent with allow_traps and trapper_hosts' => [
+				'initial' => [
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE
+				],
+				'update' => [
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
+					'trapper_hosts' => 'localhost',
+					'url' => 'test.com',
+					'delay' => '1m'
+				],
+				'expected_trapper_hosts' => 'localhost'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getItemUpdateFromNonTrapper
+	 */
+	public function testItem_UpdateFromNonTrapper($initial, $update, $expected_trapper_hosts) {
+		$itemid = $this->call('item.create', array_merge([
+			'hostid' => '50009',
+			'name' => 'Transition test item',
+			'key_' => 'transition.test.' . uniqid(),
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'delay' => '30s'
+		], $initial))['result']['itemids'][0];
+
+		$update['itemid'] = $itemid;
+
+		$this->call('item.update', $update);
+
+		$db_item = CDBHelper::getRow(
+			'SELECT trapper_hosts FROM items WHERE '.dbConditionId('itemid', [$itemid])
+		);
+
+		$this->assertSame(strval($expected_trapper_hosts), $db_item['trapper_hosts']);
 	}
 
 	public static function getItemDeleteData() {

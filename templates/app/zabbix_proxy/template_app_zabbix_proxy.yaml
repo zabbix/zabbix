@@ -24,7 +24,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -1505,7 +1505,6 @@ zabbix_export:
       dashboards:
         - uuid: cd580518d9d5434296a1ed9701b71a77
           name: 'Remote Zabbix proxy health'
-          auto_start: 'NO'
           pages:
             - name: Performance
               widgets:
@@ -2427,7 +2426,7 @@ zabbix_export:
         Link this template to the local Zabbix proxy host.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -3546,7 +3545,6 @@ zabbix_export:
       dashboards:
         - uuid: c12bdb602db645a292d0cbba39d58e9f
           name: 'Zabbix proxy health'
-          auto_start: 'NO'
           pages:
             - name: Performance
               widgets:
@@ -4500,7 +4498,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -5978,7 +5976,6 @@ zabbix_export:
       dashboards:
         - uuid: 707ef24a70ff433eb28a70cd0f78bf66
           name: 'Zabbix proxy health'
-          auto_start: 'NO'
           pages:
             - name: Performance
               widgets:
@@ -6900,7 +6897,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -8381,7 +8378,6 @@ zabbix_export:
       dashboards:
         - uuid: df9b385da30a4a049516fdfb75d7d958
           name: 'Zabbix proxy health'
-          auto_start: 'NO'
           pages:
             - name: Performance
               widgets:

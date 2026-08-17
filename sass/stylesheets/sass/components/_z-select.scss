@@ -24,7 +24,7 @@ z-select {
 		word-break: break-all;
 		white-space: pre;
 		cursor: default;
-		border-radius: 0;
+		border-radius: var(--input-border-radius);
 
 		@extend %form-input-style;
 		@extend %webkit-scrollbar;
@@ -67,6 +67,8 @@ z-select {
 		overflow-y: auto;
 		border: 1px solid;
 		box-shadow: 0 6px 10px 0 $action-shadow-color;
+		border-bottom-left-radius: var(--input-border-radius);
+		border-bottom-right-radius: var(--input-border-radius);
 
 		@extend %form-input-style;
 		@extend %webkit-scrollbar;

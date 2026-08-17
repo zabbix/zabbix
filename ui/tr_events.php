@@ -59,7 +59,7 @@ $events = API::Event()->get([
 		'cause_eventid'
 	],
 	'selectAcknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity',
-		'suppress_until'
+		'suppress_until', 'maintenanceid'
 	],
 	'selectTags' => ['tag', 'value'],
 	'source' => EVENT_SOURCE_TRIGGERS,
@@ -75,16 +75,15 @@ if (!$events) {
 $event = reset($events);
 
 $event['comments'] = ($trigger['comments'] !== '')
-	? CMacrosResolverHelper::resolveTriggerDescription(
-		[
+	? CMacrosResolverHelper::resolveEventDescriptions(
+		[$event['eventid'] => [
 			'triggerid' => $trigger['triggerid'],
 			'expression' => $trigger['expression'],
 			'comments' => $trigger['comments'],
 			'clock' => $event['clock'],
 			'ns' => $event['ns']
-		],
-		['events' => true]
-	)
+		]]
+	)[$event['eventid']]['comments']
 	: '';
 
 if ($event['r_eventid'] != 0) {
@@ -105,19 +104,16 @@ if ($event['r_eventid'] != 0) {
 }
 
 if ($trigger['opdata'] !== '') {
-	$event['opdata'] = (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
-		[
+	$event['opdata'] = (new CCol(CMacrosResolverHelper::resolveEventOpdatas(
+		[$event['eventid'] => [
 			'triggerid' => $trigger['triggerid'],
 			'expression' => $trigger['expression'],
 			'opdata' => $trigger['opdata'],
 			'clock' => $event['clock'],
 			'ns' => $event['ns']
-		],
-		[
-			'events' => true,
-			'html' => true
-		]
-	)))->addClass('opdata');
+		]],
+		['html' => true]
+	)[$event['eventid']]['opdata']))->addClass('opdata');
 }
 else {
 	$db_items = API::Item()->get([
@@ -129,6 +125,7 @@ else {
 }
 
 $actions = getEventDetailsActions($event);
+
 $users = API::User()->get([
 	'output' => ['username', 'name', 'surname'],
 	'userids' => array_keys($actions['userids']),
@@ -137,6 +134,11 @@ $users = API::User()->get([
 $mediatypes = API::Mediatype()->get([
 	'output' => ['maxattempts'],
 	'mediatypeids' => array_keys($actions['mediatypeids']),
+	'preservekeys' => true
+]);
+$maintenances = API::Maintenance()->get([
+	'output' => ['name'],
+	'maintenanceids' => array_keys($actions['maintenanceids']),
 	'preservekeys' => true
 ]);
 
@@ -152,31 +154,32 @@ $allowed = [
 	'rank_change' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
 ];
 
-/*
- * Display
- */
 require_once dirname(__FILE__).'/include/views/js/tr_events.js.php';
 
 $event_tab = (new CDiv([
 	new CDiv([
 		(new CSection(make_trigger_details($trigger, $event['eventid'])))
 			->setId(SECTION_HAT_TRIGGERDETAILS)
-			->setHeader(new CTag('h4', true, _('Trigger details'))),
+			->setHeader(new CTag('h4', true, _('Trigger details')))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE),
 		(new CSection(make_event_details($event, $allowed)))
 			->setId(SECTION_HAT_EVENTDETAILS)
 			->setHeader(new CTag('h4', true, _('Event details')))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	]),
 	new CDiv([
-		(new CSectionCollapsible(makeEventDetailsActionsTable($actions, $users, $mediatypes)))
+		(new CSectionCollapsible(makeEventDetailsActionsTable($actions, $users, $mediatypes, $maintenances)))
 			->setId(SECTION_HAT_EVENTACTIONS)
 			->setHeader(new CTag('h4', true, _('Actions')))
 			->setProfileIdx('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state')
-			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state', true)),
+			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state', true))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE),
 		(new CSectionCollapsible(make_small_eventlist($event, $allowed)))
 			->setId(SECTION_HAT_EVENTLIST)
 			->setHeader(new CTag('h4', true, _('Event list [previous 20]')))
 			->setProfileIdx('web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state')
 			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state', true))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	])
 ]))
 	->addClass(ZBX_STYLE_COLUMNS)

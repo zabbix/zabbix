@@ -15,6 +15,7 @@
 #include "zbxcommon.h"
 #include "zbxpreprocbase.h"
 
+#include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"

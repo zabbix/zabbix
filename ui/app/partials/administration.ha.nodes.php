@@ -23,6 +23,7 @@ $nodes_table = (new CTableInfo())
 	->setHeader([_('Name'), _('Address'), _('Last access'), _('Status')])
 	->setHeadingColumn(0)
 	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER)
+	->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_FOOTER);
 
 if ($data['ha_cluster_enabled']) {

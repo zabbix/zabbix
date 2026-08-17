@@ -28,7 +28,7 @@ zabbix_export:
         * Accepts seconds or time unit with suffix (e.g., 30s, 1m, 2h, 1d) and, optionally, one or more custom intervals, all separated by semicolons.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -861,7 +861,6 @@ zabbix_export:
         - uuid: 8f39eba3462b479190222e737befca7c
           name: 'RDAP overview'
           display_period: '3600'
-          auto_start: 'NO'
           pages:
             - widgets:
                 - type: honeycomb

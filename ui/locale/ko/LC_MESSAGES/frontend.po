@@ -145,6 +145,12 @@ msgstr "%1$s 자"
 msgid "%1$s characters remaining"
 msgstr "%1$s 자 남음"
 
+#: app/views/administration.housekeeping.edit.php:165
+#: app/views/administration.housekeeping.edit.php:166
+#, c-format
+msgid "%1$s data storage period"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
@@ -1656,6 +1662,11 @@ msgstr "호 배경"
 msgid "Arc size"
 msgstr "호 크기"
 
+#: jsLoader.php:267
+#, c-format
+msgid "Are you sure you want to delete %1$s? This action cannot be undone."
+msgstr ""
+
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
 msgstr "이 필터를 삭제하시겠습니까?"
@@ -1789,6 +1800,11 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
 msgstr "적어도 1개의 호스트 그룹 혹은 호스트가 선택되어 있을 필요가 있습니다."
+
+#: app/controllers/CControllerGraphPrototypeCreate.php:116
+#: app/controllers/CControllerGraphPrototypeUpdate.php:118
+msgid "At least one item must be a prototype"
+msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
@@ -2560,6 +2576,13 @@ msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
 msgstr[0] "모듈을 추가할 수 없습니다: %1$s."
 
+#: app/controllers/CControllerGraphCreate.php:111
+#: app/controllers/CControllerGraphPrototypeCreate.php:121
+#: app/controllers/CControllerGraphPrototypeUpdate.php:123
+#: app/controllers/CControllerGraphUpdate.php:113
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr ""
+
 #: include/classes/api/services/CGraph.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
@@ -2605,6 +2628,10 @@ msgstr "스크립트를 추가할 수 없습니다"
 #: widgets/navtree/views/navtreeitem.edit.php:72
 msgid "Cannot add submaps. Max depth reached."
 msgstr "서브맵을 추가할 수 없습니다. 최대 계층에 도달하였습니다."
+
+#: app/controllers/CControllerPopupScheduledReportSubscriptionCheck.php:85
+msgid "Cannot add subscription"
+msgstr ""
 
 #: app/controllers/CControllerTemplateCreate.php:49
 #: app/controllers/CControllerTemplateCreate.php:171
@@ -4643,6 +4670,11 @@ msgstr "웹 시나리오를 갱신할 수 없음"
 msgid "Cannot update web scenario step"
 msgstr "웹 시나리오 단계를 업데이트할 수 없음"
 
+#: include/classes/core/CConfigFile.php:192
+#, c-format
+msgid "Cannot use both %1$s and %2$s at the same time."
+msgstr ""
+
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
 msgstr "대문자소문자의 구별"
@@ -4686,6 +4718,10 @@ msgstr "센터"
 #: include/views/configuration.host.prototype.edit.php:505
 msgid "Certificate"
 msgstr "인증서"
+
+#: app/views/js/monitoring.latest.view.js.php:211
+msgid "Change"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:78
 #: app/partials/monitoring.latest.view.html.php:91 include/items.inc.php:1577
@@ -4981,6 +5017,15 @@ msgstr "원하는 크기로 클릭하고 드래그합니다."
 msgid "Click to view or edit"
 msgstr "보거나 수정하려면 클릭하세요."
 
+#: app/views/administration.housekeeping.edit.php:165
+msgid "ClickHouse"
+msgstr ""
+
+#: include/classes/api/managers/history/CClickHouseStorage.php:118
+#, c-format
+msgid "ClickHouse error: %1$s."
+msgstr ""
+
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
 msgstr "클라이언트 ID"
@@ -5140,6 +5185,14 @@ msgstr "색상"
 
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
+msgstr ""
+
+#: jsLoader.php:304
+msgid "Column list"
+msgstr ""
+
+#: jsLoader.php:273
+msgid "Column name"
 msgstr ""
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
@@ -6232,6 +6285,10 @@ msgstr "사용자 정의 사이즈"
 msgid "Custom templates are not supported."
 msgstr ""
 
+#: jsLoader.php:270
+msgid "Customize table"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6824,6 +6881,10 @@ msgstr "선택한 템플릿과 데이터를 삭제하시겠습니까? (경고: �
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "템플릿과 데이터를 삭제하시겠습니까? (경고: 링크되어 있는 모든 호스트에서 데이터가 삭제됩니다!)"
 
+#: jsLoader.php:275
+msgid "Delete column"
+msgstr ""
+
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
 msgstr "현재 액션을 삭제하시겠습니까?"
@@ -6898,6 +6959,10 @@ msgstr "존재하지 않는 경우에 삭제"
 #: app/views/administration.regex.edit.php:160
 msgid "Delete regular expression?"
 msgstr "정규표현식을 삭제하시겠습니까?"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:160
+msgid "Delete scheduled report?"
+msgstr ""
 
 #: app/views/administration.script.edit.php:389
 msgid "Delete script?"
@@ -8109,6 +8174,10 @@ msgstr "맵을 위한 \"name\"의 값 \"%1$s\"이 중복되었습니다."
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "\"%2$s\" 맵에 대한 사용자 그룹에 \"usrgrpid\" \"%1$s\"가 중복되었습니다."
 
+#: jsLoader.php:274
+msgid "Duplicate column"
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
 #, c-format
@@ -8212,6 +8281,10 @@ msgstr "발효일"
 #: app/partials/hostmacros.inherited.list.html.php:50
 msgid "Effective value"
 msgstr "실효값"
+
+#: app/views/administration.housekeeping.edit.php:166
+msgid "Elasticsearch"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -8623,6 +8696,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:609
@@ -9243,6 +9320,66 @@ msgstr "항목 \"%1$s\"은 문자열이 아닙니다."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "항목 \"%1$s\"가 입력되어 있지 않습니다."
+
+#: include/classes/data/CTriggerConditionFunctionData.php:275
+#: include/classes/data/CTriggerConditionFunctionData.php:298
+#: include/classes/data/CTriggerConditionFunctionData.php:321
+#: include/classes/data/CTriggerConditionFunctionData.php:344
+#: include/classes/data/CTriggerConditionFunctionData.php:367
+#: include/classes/data/CTriggerConditionFunctionData.php:441
+#: include/classes/data/CTriggerConditionFunctionData.php:466
+#: include/classes/data/CTriggerConditionFunctionData.php:490
+#: include/classes/data/CTriggerConditionFunctionData.php:513
+#: include/classes/data/CTriggerConditionFunctionData.php:537
+#: include/classes/data/CTriggerConditionFunctionData.php:560
+#: include/classes/data/CTriggerConditionFunctionData.php:584
+#: include/classes/data/CTriggerConditionFunctionData.php:608
+#: include/classes/data/CTriggerConditionFunctionData.php:632
+#: include/classes/data/CTriggerConditionFunctionData.php:655
+#: include/classes/data/CTriggerConditionFunctionData.php:678
+#: include/classes/data/CTriggerConditionFunctionData.php:732
+#: include/classes/data/CTriggerConditionFunctionData.php:755
+#: include/classes/data/CTriggerConditionFunctionData.php:779
+#: include/classes/data/CTriggerConditionFunctionData.php:802
+#: include/classes/data/CTriggerConditionFunctionData.php:825
+#: include/classes/data/CTriggerConditionFunctionData.php:905
+#: include/classes/data/CTriggerConditionFunctionData.php:929
+#: include/classes/data/CTriggerConditionFunctionData.php:952
+#: include/classes/data/CTriggerConditionFunctionData.php:975
+#: include/classes/data/CTriggerConditionFunctionData.php:1043
+#: include/classes/data/CTriggerConditionFunctionData.php:1115
+#: include/classes/data/CTriggerConditionFunctionData.php:1139
+#: include/classes/data/CTriggerConditionFunctionData.php:1165
+#: include/classes/data/CTriggerConditionFunctionData.php:1213
+#: include/classes/data/CTriggerConditionFunctionData.php:1236
+#: include/classes/data/CTriggerConditionFunctionData.php:1259
+#: include/classes/data/CTriggerConditionFunctionData.php:1283
+#: include/classes/data/CTriggerConditionFunctionData.php:1306
+#: include/classes/data/CTriggerConditionFunctionData.php:1329
+#: include/classes/data/CTriggerConditionFunctionData.php:1352
+#: include/classes/data/CTriggerConditionFunctionData.php:1376
+#: include/classes/data/CTriggerConditionFunctionData.php:1399
+#: include/classes/data/CTriggerConditionFunctionData.php:1423
+#: include/classes/data/CTriggerConditionFunctionData.php:1446
+#: include/classes/data/CTriggerConditionFunctionData.php:1543
+#: include/classes/data/CTriggerConditionFunctionData.php:1618
+#: include/classes/data/CTriggerConditionFunctionData.php:1742
+#: include/classes/data/CTriggerConditionFunctionData.php:1766
+#: include/classes/data/CTriggerConditionFunctionData.php:1808
+#: include/classes/data/CTriggerConditionFunctionData.php:1832
+#: include/classes/data/CTriggerConditionFunctionData.php:1857
+#: include/classes/data/CTriggerConditionFunctionData.php:1881
+#: include/classes/data/CTriggerConditionFunctionData.php:1905
+#: include/classes/data/CTriggerConditionFunctionData.php:1929
+#: include/classes/data/CTriggerConditionFunctionData.php:1952
+#: include/classes/data/CTriggerConditionFunctionData.php:1975
+#: include/classes/data/CTriggerConditionFunctionData.php:2021
+#: include/classes/data/CTriggerConditionFunctionData.php:2163
+#: include/classes/data/CTriggerConditionFunctionData.php:2376
+#: include/classes/data/CTriggerConditionFunctionData.php:2400
+#: include/classes/data/CTriggerConditionFunctionData.php:2470
+msgid "Field \"Last of\" cannot be empty when \"Time shift\" is not empty."
+msgstr ""
 
 #: include/forms.inc.php:1495 include/forms.inc.php:1530
 #: include/views/js/item.preprocessing.js.php:154
@@ -11051,6 +11188,10 @@ msgstr "%2$s 미만의 하위 서비스가 %1$s 이하인 경우"
 msgid "If less than %2$s of child services have %1$s status or below"
 msgstr "하위 서비스의 %2$s 미만이 %1$s 이하의 상태인 경우"
 
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
+msgstr ""
+
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
 msgstr "사용자 그룹이 지정되지 않은 경우 메일링 목록에 사용자가 한 명 이상 포함되어야 합니다."
@@ -11550,6 +11691,12 @@ msgstr ""
 msgid "Incorrect characters used for template name."
 msgstr ""
 
+#: include/classes/core/CConfigFile.php:215
+#: include/classes/core/CConfigFile.php:411
+#, c-format
+msgid "Incorrect configuration %1$s: %2$s."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
 msgstr "현재 암호가 잘못됨."
@@ -11584,6 +11731,16 @@ msgstr "업로드된 파일이 올바르지 않습니다."
 #: include/triggers.inc.php:768
 msgid "Incorrect function is used"
 msgstr "잘못된 함수가 이용되어 있습니다."
+
+#: include/classes/core/CConfigFile.php:211
+#: include/classes/core/CConfigFile.php:219
+#: include/classes/core/CConfigFile.php:557
+#: include/classes/core/CConfigFile.php:563
+#: include/classes/core/CConfigFile.php:569
+#: include/classes/core/CConfigFile.php:579
+#, c-format
+msgid "Incorrect history storage configuration %1$s: %2$s."
+msgstr ""
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -12123,12 +12280,20 @@ msgstr "계승한 매크로와 호스트 매크로"
 msgid "Inherited and host prototype macros"
 msgstr "상속 및 호스트 프로토타입 매크로"
 
+#: jsLoader.php:260
+msgid "Inherited and host prototype tag"
+msgstr ""
+
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
 msgstr ""
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
+msgstr ""
+
+#: jsLoader.php:262
+msgid "Inherited and item prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:231
@@ -12153,6 +12318,10 @@ msgstr ""
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
+msgstr ""
+
+#: jsLoader.php:264
+msgid "Inherited and trigger prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:232
@@ -12459,6 +12628,10 @@ msgstr "메일 주소 \"%1$s\"가 올바르지 않습니다."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"의 미디어 타입의 메일 주소가 올바르지 않습니다."
+
+#: app/controllers/CControllerPopupTriggerExprCheck.php:61
+msgid "Invalid function"
+msgstr ""
 
 #: app/controllers/CControllerHostGroupCreate.php:31
 #: app/controllers/CControllerHostGroupUpdate.php:34
@@ -12785,6 +12958,11 @@ msgstr ""
 #: app/controllers/CControllerTemplateCreate.php:102
 #: app/controllers/CControllerTemplateUpdate.php:104
 msgid "Invalid range."
+msgstr ""
+
+#: app/controllers/CControllerDataTable.php:59
+#: app/controllers/CControllerDataTable.php:138
+msgid "Invalid request"
 msgstr ""
 
 #: include/classes/core/CJsonRpc.php:205
@@ -13732,6 +13910,10 @@ msgstr ""
 msgid "List of block devices and their type. Returns JSON"
 msgstr "블록 장치 및 유형 목록. 반환 JSON"
 
+#: include/classes/data/CItemData.php:1724
+msgid "List of block devices with detailed information. Returns JSON"
+msgstr ""
+
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
 msgstr ""
@@ -13751,6 +13933,10 @@ msgstr "마운트된 파일 시스템 및 유형 목록. 반환 JSON"
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "마운트된 파일 시스템, 해당 유형, 디스크 공간 및 inode 통계 목록입니다. 반환 JSON"
+
+#: include/classes/data/CItemData.php:1266
+msgid "List of network interfaces with detailed information. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
@@ -14143,6 +14329,21 @@ msgstr "수동 작성자: %1$s"
 #: include/actions.inc.php:1987
 msgid "Manually closed"
 msgstr "수동 클로즈 완료"
+
+#: app/controllers/CControllerProblemViewData.php:472
+#: include/actions.inc.php:1660 include/actions.inc.php:1661
+#: include/actions.inc.php:1698 include/actions.inc.php:2195
+#: include/html.inc.php:1135
+msgid "Manually suppressed"
+msgstr ""
+
+#: app/controllers/CControllerProblemViewData.php:475
+#: include/actions.inc.php:1674 include/actions.inc.php:1675
+#: include/actions.inc.php:1698 include/actions.inc.php:2200
+#: include/actions.inc.php:2201 include/blocks.inc.php:692
+#: widgets/problems/includes/WidgetProblems.php:280
+msgid "Manually unsuppressed"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: include/classes/data/CWidgetsData.php:110
@@ -15370,6 +15571,10 @@ msgstr "새 LDAP 서버"
 msgid "New MFA method"
 msgstr "새 MFA 방식"
 
+#: app/views/oauth.edit.php:254
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "새 SLA"
@@ -15503,6 +15708,11 @@ msgstr "새 프록시 그룹"
 msgid "New regular expression"
 msgstr "정규표현식 작성"
 
+#: app/views/js/reports.scheduledreport.edit.js.php:99
+#: app/views/reports.scheduledreport.edit.php:250
+msgid "New scheduled report"
+msgstr ""
+
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
 msgid "New script"
@@ -15566,6 +15776,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr "다음 대시보드"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15579,6 +15793,10 @@ msgstr "다음 페이지"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "다음 스텝"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -16284,6 +16502,12 @@ msgstr "상속되지 않은 항목"
 msgid "Not linked"
 msgstr ""
 
+#: app/views/item.list.php:233 app/views/item.list.php:234
+#: include/classes/helpers/CItemHelper.php:386
+#: include/classes/helpers/CItemHelper.php:416
+msgid "Not stored"
+msgstr ""
+
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.latest.filter.php:191
@@ -16438,6 +16662,10 @@ msgstr "회차 수"
 #: include/views/configuration.httpconf.list.php:143
 msgid "Number of steps"
 msgstr "스텝 수"
+
+#: jsLoader.php:291
+msgid "Number of tags"
+msgstr ""
 
 #: app/partials/administration.system.info.php:60
 msgid "Number of templates"
@@ -17553,6 +17781,12 @@ msgstr "온라인 프록시의 비율. 부동소수점을 반환합니다."
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 msgstr "가상 머신이 준비되었지만 물리적 CPU에서 실행되도록 예약할 수 없는 시간 비율, \"url\" - VMware 서비스 URL, \"uuid\" - VMware 가상 머신 전역 고유 식별자, \"instance\" - CPU 인스턴스"
+
+#: include/classes/graph/CSvgGraph.php:1764
+#: include/classes/graphdraw/CLineGraphDraw.php:1620
+#, c-format
+msgid "Percentile %1$s: %2$s"
+msgstr ""
 
 #: graphs.php:50 include/views/configuration.graph.edit.php:154
 #: widgets/svggraph/includes/WidgetForm.php:87
@@ -19031,6 +19265,10 @@ msgstr "리셋 확인"
 msgid "Reset defaults"
 msgstr "기본값으로 설정"
 
+#: jsLoader.php:305
+msgid "Reset layout"
+msgstr ""
+
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
 msgstr "초기 보기로 재설정"
@@ -19762,6 +20000,10 @@ msgstr[0] "예약 보고서 삭제됨"
 msgid "Scheduled report disabled"
 msgid_plural "Scheduled reports disabled"
 msgstr[0] "예약 보고서 비활성화"
+
+#: app/controllers/CControllerPopup.php:60
+msgid "Scheduled report edit"
+msgstr ""
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
@@ -20533,6 +20775,10 @@ msgstr "헤더 표시"
 msgid "Show hosts in maintenance"
 msgstr "메인터넌스중 호스트 보이기"
 
+#: jsLoader.php:281
+msgid "Show item key"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
 #: include/views/js/monitoring.sysmaps.js.php:813
@@ -20660,6 +20906,10 @@ msgstr "타임스탬프 표시"
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
 msgstr "모든 값 표시"
+
+#: jsLoader.php:285
+msgid "Show trigger expression"
+msgstr ""
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -21397,6 +21647,10 @@ msgstr "다음까지 억제"
 msgid "Suppressed"
 msgstr "억제됨"
 
+#: include/actions.inc.php:2241 include/html.inc.php:1134
+msgid "Suppressed by maintenance"
+msgstr ""
+
 #: include/actions.inc.php:2019 include/html.inc.php:1000
 #, c-format
 msgid "Suppressed till: %1$s"
@@ -21559,6 +21813,10 @@ msgstr "테이블\"%1$s\"는 존재하지 않습니다."
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "테이블\"%1$s\"에 항목 이름 \"%2$s\"가 존재하지 않습니다."
 
+#: jsLoader.php:303
+msgid "Table options"
+msgstr ""
+
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
 #: app/controllers/CControllerActionOperationCheck.php:228
@@ -21616,6 +21874,10 @@ msgstr "태그 명"
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:61
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
+msgstr ""
+
+#: jsLoader.php:292
+msgid "Tag name display"
 msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
@@ -22058,6 +22320,10 @@ msgstr ""
 msgid "The client secret registered within the authorization server."
 msgstr ""
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "복제된 호스트에는 \"비밀 텍스트\" 유형의 사용자 정의 매크로가 포함되어 있습니다. 이러한 매크로의 값과 유형이 재설정되었습니다."
@@ -22290,6 +22556,10 @@ msgstr "이 설정은 숫자 데이터에만 적용됩니다."
 #: widgets/tophosts/views/column.edit.php:196
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "이 설정은 숫자 데이터에만 적용됩니다. 숫자가 아닌 데이터는 항상 기록에서 가져옵니다."
+
+#: app/views/administration.housekeeping.edit.php:145
+msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
+msgstr ""
 
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
@@ -22687,6 +22957,11 @@ msgctxt "compact table header"
 msgid "Total"
 msgstr "합계"
 
+#: include/classes/debug/CProfiler.php:172
+#, c-format
+msgid "Total ClickHouse time: %1$s"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
@@ -22761,6 +23036,10 @@ msgstr "0 으로 처리"
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "추세 기능 캐시 통계입니다. 유효한 매개변수는 다음과 같습니다: all, hit, phits, misses, pmisses, items, pitems 및 request."
 
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162
 #: app/partials/monitoring.latest.view.html.php:74
@@ -22776,6 +23055,11 @@ msgstr "추세 기능 캐시 통계입니다. 유효한 매개변수는 다음�
 #: widgets/tophosts/views/column.edit.php:206
 msgid "Trends"
 msgstr "트렌드"
+
+#: app/partials/item.edit.item.tab.php:774
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -23440,6 +23724,10 @@ msgstr "장애 인지를 취소."
 msgid "Unexpected HTTP response status code."
 msgstr ""
 
+#: app/views/mediatype.edit.php:166
+msgid "Unexpected access token update time."
+msgstr ""
+
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
 msgid "Unexpected macro \"%1$s\""
@@ -23698,6 +23986,10 @@ msgstr "억제해제"
 msgid "Unsuppressed"
 msgstr "억제해제됨"
 
+#: include/actions.inc.php:2257
+msgid "Unsuppressed by maintenance"
+msgstr ""
+
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
 #, c-format
@@ -23878,6 +24170,11 @@ msgstr "Zabbix서버 프로세스의 가동시간(초)."
 #: include/actions.inc.php:61
 msgid "Uptime/Downtime"
 msgstr "업타임/다운타임"
+
+#: app/partials/administration.system.info.php:328
+#, c-format
+msgid "Use %1$s instead"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
@@ -24863,6 +25160,18 @@ msgstr "값 매핑"
 msgid "Value must be greater than %1$s."
 msgstr ""
 
+#: include/classes/validators/CFormValidator.php:1089
+#: include/classes/validators/CFormValidator.php:1147 jsLoader.php:435
+#, c-format
+msgid "Value must be greater than or equal to %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1095
+#: include/classes/validators/CFormValidator.php:1153 jsLoader.php:434
+#, c-format
+msgid "Value must be less than or equal to %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:1033
 #: include/classes/validators/CFormValidator.php:1042
 #, c-format
@@ -25277,6 +25586,10 @@ msgstr ""
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "위젯은 더 이상 사용되지 않습니다."
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
@@ -25715,6 +26028,10 @@ msgstr "데이터베이스가 정상으로 동작하지 않습니다. 잠시 기
 
 #: app/views/host.wizard.edit.php:1044
 msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
+msgstr ""
+
+#: jsLoader.php:307
+msgid "Your table settings will be reset to default and duplicated columns will be removed."
 msgstr ""
 
 #: include/page_header.php:122
@@ -26796,6 +27113,10 @@ msgstr "존재하지 않음"
 msgid "does not match"
 msgstr "일치하지 않음"
 
+#: jsLoader.php:268
+msgid "duplicate"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() - 오일러 수를 반환합니다."
@@ -26900,6 +27221,10 @@ msgstr "fuzzytime() - 항목 값(타임스탬프)과 Zabbix 서버 타임스탬�
 #: include/classes/validators/CApiInputValidator.php:3317
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
 msgstr "지리적 좌표(쉼표로 구분된 위도 및 경도 값)가 필요함"
+
+#: app/views/item.edit.php:224 app/views/item.edit.php:228
+msgid "global housekeeping settings"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
@@ -27059,6 +27384,11 @@ msgstr "요소의 수가 올바르지 않습니다"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "\"%1$s\"부터 잘못된 표현"
+
+#: include/classes/core/CConfigFile.php:212
+#: include/classes/core/CConfigFile.php:220
+msgid "incorrect format"
+msgstr ""
 
 #: jsLoader.php:298
 msgid "incorrect item value type"
@@ -28466,6 +28796,14 @@ msgstr "값 %1$s는 이미 존재합니다"
 #, c-format
 msgid "value contains unescaped character at position %1$d"
 msgstr "값의 %1$d 위치에 이스케이프되지 않은 문자가 포함되어 있음"
+
+#: include/classes/validators/CNumberValidator.php:74
+msgid "value is not a valid floating point number"
+msgstr ""
+
+#: include/classes/validators/CNumberValidator.php:77
+msgid "value is not a valid integer"
+msgstr ""
 
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:101
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:107

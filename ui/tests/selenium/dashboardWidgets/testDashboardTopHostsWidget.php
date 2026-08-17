@@ -369,7 +369,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'id:sparkline_time_period_data_source' => ['value' => 'Custom', 'labels' => ['Dashboard', 'Widget', 'Custom'],
 				'visible' => false, 'enabled' => false
 			],
-			'id:sparkline_time_period_reference' => ['value' => '', 'visible' => false],
+			'id:sparkline_time_period_reference' => ['value' => '', 'visible' => false, 'enabled' => false],
 			'id:sparkline_time_period_from' => ['value' => 'now-1h', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255,
 				'visible' => false, 'enabled' => false
 			],
@@ -409,7 +409,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 		}
 
 		foreach (['Host name', 'Text'] as $data) {
-			$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL($data)]);
+			$column_form->fill(['Data' => $data]);
+			$column_form->getField('Item name')->waitUntilNotVisible();
 			$required_fields = ($data === 'Host name') ? ['Name'] : ['Name', 'Text'];
 			$column_default_fields['Data']['value'] = ($data === 'Host name') ? 'Host name' : 'Text';
 			$column_default_fields['Text']['visible'] = $data === 'Text';
@@ -422,7 +423,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 			$this->assertEquals($required_fields, $column_form->getRequiredLabels());
 		}
 
-		$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL('Item value')]);
+		$column_form->fill(['Data' => 'Item value']);
+		$column_form->getField('Item name')->waitUntilVisible();
 
 		// 'Sparkline' displayed fields when Display => Sparkline option is set.
 		$sparkline_fields = ['id:sparkline_width', 'id:sparkline_fill', self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]',
@@ -1741,6 +1743,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		// Take a screenshot to test draggable object position of columns.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
+			COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertScreenshot($form->query('id:list_columns')->waitUntilPresent()->one(), 'Top hosts columns');
 		}
 
@@ -2812,8 +2815,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 		foreach ($data['column_fields'] as $column) {
 			// Open the Column configuration add or column update dialog depending on the action type.
 			$selector = ($action === 'create') ? 'id:add' : 'xpath:(.//button[@name="edit"])['.$column_count.']';
+			$dialog_title = ($action === 'update') ? 'Update column' : 'New column';
 			$form->query($selector)->waitUntilClickable()->one()->click();
-			$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
+			$column_overlay = COverlayDialogElement::get($dialog_title);
+			$column_form = $column_overlay->asForm();
 
 			// Fill Thresholds values.
 			if (array_key_exists('Thresholds', $column)) {
@@ -2833,7 +2838,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 				$column_form->fill($column);
 			}
 
-			$column_form->submit();
+			// waitUntilClickable is required because selecting an item in "Item name" briefly disables the submit button.
+			$column_overlay->getFooter()->query('button', ($action === 'update') ? 'Update' : 'Add')
+					->waitUntilClickable()->one()->click();
 
 			// Updating top host several columns, change it count number.
 			if ($action === 'update') {
@@ -2848,8 +2855,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				}
 
 				$this->assertMessage(TEST_BAD, null, $data['column_error']);
-				$selector = ($action === 'update') ? 'Update column' : 'New column';
-				$this->query('xpath://div/h4[text()="'.$selector.'"]/../button[@title="Close"]')->one()->click();
+				$this->query('xpath://div/h4[text()="'.$dialog_title.'"]/../button[@aria-label="Close modal window"]')->one()->click();
 			}
 
 			$column_form->waitUntilNotVisible();

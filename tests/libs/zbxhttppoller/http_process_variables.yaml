@@ -1,0 +1,1327 @@
+---
+test case: 'plain literal stored without response data'
+in:
+  key: '{myvar}'
+  value: 'hello'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
+test case: 'plain literal stored when data is present'
+in:
+  key: '{myvar}'
+  value: 'hello'
+  data: 'some response data'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
+test case: 'value with whitespace stored literally'
+in:
+  key: '{myvar}'
+  value: 'hello world'
+out:
+  return: SUCCEED
+  macro_value: 'hello world'
+---
+test case: 'value with special characters stored literally'
+in:
+  key: '{myvar}'
+  value: '!@#$%^'
+out:
+  return: SUCCEED
+  macro_value: '!@#$%^'
+---
+test case: 'value containing curly braces stored literally'
+in:
+  key: '{myvar}'
+  value: '{not_a_macro}'
+out:
+  return: SUCCEED
+  macro_value: '{not_a_macro}'
+---
+test case: 'numeric string stored literally'
+in:
+  key: '{myvar}'
+  value: '12345'
+out:
+  return: SUCCEED
+  macro_value: '12345'
+---
+test case: 'key missing opening brace fails'
+in:
+  key: 'myvar}'
+  value: 'hello'
+out:
+  return: FAIL
+---
+test case: 'key missing closing brace fails'
+in:
+  key: '{myvar'
+  value: 'hello'
+out:
+  return: FAIL
+---
+test case: 'key without braces fails'
+in:
+  key: 'myvar'
+  value: 'hello'
+out:
+  return: FAIL
+---
+test case: 'minimal key with empty name passes'
+in:
+  key: '{}'
+  value: 'hello'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
+test case: 'regex: prefix with null data'
+in:
+  key: '{myvar}'
+  value: 'regex:(.*)'
+out:
+  return: SUCCEED
+---
+test case: 'regex prefix stored literally when data is null'
+in:
+  key: '{myvar}'
+  value: 'regex:(captured)'
+out:
+  return: SUCCEED
+  macro_value: 'regex:(captured)'
+---
+test case: 'regex: extracts first capture group from response data'
+in:
+  key: '{myvar}'
+  value: 'regex:(world)'
+  data: 'hello world'
+out:
+  return: SUCCEED
+  macro_value: 'world'
+---
+test case: 'regex no match with data fails'
+in:
+  key: '{myvar}'
+  value: 'regex:(xyz_not_present)'
+  data: 'hello world'
+out:
+  return: FAIL
+---
+test case: 'regex pattern without capture group fails'
+in:
+  key: '{myvar}'
+  value: 'regex:hello'
+  data: 'hello world'
+out:
+  return: FAIL
+---
+test case: 'regex multiple capture groups returns first group'
+in:
+  key: '{myvar}'
+  value: 'regex:(hell)(lo)'
+  data: 'helllo'
+out:
+  return: SUCCEED
+  macro_value: 'hell'
+---
+test case: 'regex extracts digit sequence from data'
+in:
+  key: '{myvar}'
+  value: 'regex:([0-9]+)'
+  data: 'value=42'
+out:
+  return: SUCCEED
+  macro_value: '42'
+---
+test case: 'regex greedy wildcard captures entire string'
+in:
+  key: '{myvar}'
+  value: 'regex:(.*)'
+  data: 'full string'
+out:
+  return: SUCCEED
+  macro_value: 'full string'
+---
+test case: 'regex on empty data captures empty string'
+in:
+  key: '{myvar}'
+  value: 'regex:(.*)'
+  data: ''
+out:
+  return: SUCCEED
+  macro_value: ''
+---
+test case: 'regex match in the middle of data'
+in:
+  key: '{myvar}'
+  value: 'regex:(is)'
+  data: 'this is a test'
+out:
+  return: SUCCEED
+  macro_value: 'is'
+---
+test case: 'jsonpath: prefix with null data'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.key'
+out:
+  return: SUCCEED
+---
+test case: 'jsonpath prefix stored literally when data is null'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.name'
+out:
+  return: SUCCEED
+  macro_value: 'jsonpath:$.name'
+---
+test case: 'jsonpath extracts string value from JSON'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.name'
+  data: '{"name":"zabbix"}'
+out:
+  return: SUCCEED
+  macro_value: 'zabbix'
+---
+test case: 'jsonpath extracts value from nested JSON object'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.outer.inner'
+  data: '{"outer":{"inner":"deep"}}'
+out:
+  return: SUCCEED
+  macro_value: 'deep'
+---
+test case: 'jsonpath extracts numeric value as string'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.count'
+  data: '{"count":42}'
+out:
+  return: SUCCEED
+  macro_value: '42'
+---
+test case: 'jsonpath extracts boolean true as string'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.active'
+  data: '{"active":true}'
+out:
+  return: SUCCEED
+  macro_value: 'true'
+---
+test case: 'jsonpath non-existent key fails'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.missing'
+  data: '{"name":"zabbix"}'
+out:
+  return: FAIL
+---
+test case: 'jsonpath on invalid JSON fails'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.key'
+  data: 'not valid json'
+out:
+  return: FAIL
+---
+test case: 'jsonpath on empty JSON object fails for missing key'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.key'
+  data: '{}'
+out:
+  return: FAIL
+---
+test case: 'xmlxpath: prefix with null data'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://node'
+out:
+  return: SUCCEED
+---
+test case: 'xmlxpath prefix stored literally when data is null'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://root'
+out:
+  return: SUCCEED
+  macro_value: 'xmlxpath://root'
+---
+test case: 'xmlxpath extracts text content of element'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath:/root/text()'
+  data: '<?xml version="1.0"?><root>hello</root>'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
+test case: 'xmlxpath extracts nested element text content'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath:/root/child/text()'
+  data: '<?xml version="1.0"?><root><child>nested</child></root>'
+out:
+  return: SUCCEED
+  macro_value: 'nested'
+---
+test case: 'xmlxpath string() function returns element text'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath:string(/root)'
+  data: '<?xml version="1.0"?><root>hello</root>'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
+test case: 'xmlxpath non-existent element returns empty nodeset and fails'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://missing'
+  data: '<?xml version="1.0"?><root>hello</root>'
+out:
+  return: FAIL
+---
+test case: 'xmlxpath text() on empty element returns empty nodeset and fails'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://empty/text()'
+  data: '<?xml version="1.0"?><root><empty/></root>'
+out:
+  return: FAIL
+---
+test case: 'xmlxpath on invalid XML fails'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://root'
+  data: 'not valid xml'
+out:
+  return: FAIL
+---
+test case: 'regex: anchored at start extracts prefix'
+in:
+  key: '{myvar}'
+  value: 'regex:^(start[^ ]*)'
+  data: 'startvalue rest'
+out:
+  return: SUCCEED
+  macro_value: 'startvalue'
+---
+test case: 'regex: anchored at end extracts suffix'
+in:
+  key: '{myvar}'
+  value: 'regex:(end)$'
+  data: 'reach the end'
+out:
+  return: SUCCEED
+  macro_value: 'end'
+---
+test case: 'regex: character class extracts word'
+in:
+  key: '{myvar}'
+  value: 'regex:([A-Za-z]+)'
+  data: 'hello 123'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
+test case: 'regex: non-whitespace sequence extracts first token'
+in:
+  key: '{myvar}'
+  value: 'regex:([^ ]+)'
+  data: 'first second third'
+out:
+  return: SUCCEED
+  macro_value: 'first'
+---
+test case: 'regex: URL query parameter extraction'
+in:
+  key: '{myvar}'
+  value: 'regex:value=([^&]+)'
+  data: 'key=x&value=42&end=y'
+out:
+  return: SUCCEED
+  macro_value: '42'
+---
+test case: 'regex: zero-or-more quantifier captures empty string'
+in:
+  key: '{myvar}'
+  value: 'regex:(a*)'
+  data: 'bbb'
+out:
+  return: SUCCEED
+  macro_value: ''
+---
+test case: 'regex: fixed-width digit group'
+in:
+  key: '{myvar}'
+  value: 'regex:([0-9][0-9][0-9][0-9])'
+  data: 'year 2024 here'
+out:
+  return: SUCCEED
+  macro_value: '2024'
+---
+test case: 'regex: anchored-start no match fails'
+in:
+  key: '{myvar}'
+  value: 'regex:^(missing)'
+  data: 'not at start missing'
+out:
+  return: FAIL
+---
+test case: 'jsonpath: first element of JSON array'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.items[0]'
+  data: '{"items":["alpha","beta","gamma"]}'
+out:
+  return: SUCCEED
+  macro_value: 'alpha'
+---
+test case: 'jsonpath: second element of JSON array'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.items[1]'
+  data: '{"items":["alpha","beta","gamma"]}'
+out:
+  return: SUCCEED
+  macro_value: 'beta'
+---
+test case: 'jsonpath: float value returned as string'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.pi'
+  data: '{"pi":3.14}'
+out:
+  return: SUCCEED
+  macro_value: '3.14'
+---
+test case: 'jsonpath: boolean false returned as string'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.flag'
+  data: '{"flag":false}'
+out:
+  return: SUCCEED
+  macro_value: 'false'
+---
+test case: 'jsonpath: integer zero returned as string'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.count'
+  data: '{"count":0}'
+out:
+  return: SUCCEED
+  macro_value: '0'
+---
+test case: 'jsonpath: empty string value'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.msg'
+  data: '{"msg":""}'
+out:
+  return: SUCCEED
+  macro_value: ''
+---
+test case: 'jsonpath: nested object in array'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.items[0].name'
+  data: '{"items":[{"name":"first"},{"name":"second"}]}'
+out:
+  return: SUCCEED
+  macro_value: 'first'
+---
+test case: 'jsonpath: out-of-bounds array index fails'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.items[9]'
+  data: '{"items":["only"]}'
+out:
+  return: FAIL
+---
+test case: 'xmlxpath: attribute value extraction via string()'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath:string(//item/@id)'
+  data: '<?xml version="1.0"?><root><item id="123"/></root>'
+out:
+  return: SUCCEED
+  macro_value: '123'
+---
+test case: 'xmlxpath: element selected by attribute predicate'
+in:
+  key: '{myvar}'
+  value: "xmlxpath://item[@id='1']/text()"
+  data: '<?xml version="1.0"?><root><item id="1">match</item><item id="2">no</item></root>'
+out:
+  return: SUCCEED
+  macro_value: 'match'
+---
+test case: 'xmlxpath: first element of multiple siblings'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://item[1]/text()'
+  data: '<?xml version="1.0"?><root><item>first</item><item>second</item></root>'
+out:
+  return: SUCCEED
+  macro_value: 'first'
+---
+test case: 'xmlxpath: three-level deep element text'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://a/b/c/text()'
+  data: '<?xml version="1.0"?><root><a><b><c>deep</c></b></a></root>'
+out:
+  return: SUCCEED
+  macro_value: 'deep'
+---
+test case: 'xmlxpath: predicate on non-matching attribute fails'
+in:
+  key: '{myvar}'
+  value: "xmlxpath://item[@id='99']/text()"
+  data: '<?xml version="1.0"?><root><item id="1">only</item></root>'
+out:
+  return: FAIL
+---
+# ===========================================================================
+# Static (plain) variable edge cases — empty values, whitespace, special chars
+# ===========================================================================
+test case: 'static: empty value stored as empty string without data'
+in:
+  key: '{var}'
+  value: ''
+out:
+  return: SUCCEED
+  macro_value: ''
+---
+test case: 'static: empty value stored as empty string when data is present'
+in:
+  key: '{var}'
+  value: ''
+  data: 'some response body'
+out:
+  return: SUCCEED
+  macro_value: ''
+---
+test case: 'static: whitespace-only value preserved exactly'
+in:
+  key: '{var}'
+  value: '   '
+out:
+  return: SUCCEED
+  macro_value: '   '
+---
+test case: 'static: leading whitespace preserved'
+in:
+  key: '{var}'
+  value: '  leading'
+out:
+  return: SUCCEED
+  macro_value: '  leading'
+---
+test case: 'static: trailing whitespace preserved'
+in:
+  key: '{var}'
+  value: 'trailing  '
+out:
+  return: SUCCEED
+  macro_value: 'trailing  '
+---
+test case: 'static: backslash in value stored literally'
+in:
+  key: '{path}'
+  value: 'C:\Users\admin'
+out:
+  return: SUCCEED
+  macro_value: 'C:\Users\admin'
+---
+test case: 'static: equals sign in value stored literally'
+in:
+  key: '{pair}'
+  value: 'key=value'
+out:
+  return: SUCCEED
+  macro_value: 'key=value'
+---
+test case: 'static: URL value with colon not treated as prefix'
+in:
+  key: '{url}'
+  value: 'https://example.com/path?q=1'
+out:
+  return: SUCCEED
+  macro_value: 'https://example.com/path?q=1'
+---
+test case: 'static: percent-encoded value stored literally'
+in:
+  key: '{encoded}'
+  value: 'hello%20world%3D42'
+out:
+  return: SUCCEED
+  macro_value: 'hello%20world%3D42'
+---
+test case: 'static: percent sign alone stored literally'
+in:
+  key: '{pct}'
+  value: '100%'
+out:
+  return: SUCCEED
+  macro_value: '100%'
+---
+test case: 'static: HTML entities stored literally'
+in:
+  key: '{html}'
+  value: '<b>bold</b> &amp; <i>italic</i>'
+out:
+  return: SUCCEED
+  macro_value: '<b>bold</b> &amp; <i>italic</i>'
+---
+test case: 'static: pipe ampersand hash stored literally'
+in:
+  key: '{chars}'
+  value: 'a|b&c#d'
+out:
+  return: SUCCEED
+  macro_value: 'a|b&c#d'
+---
+test case: 'static: URL path with query and fragment stored literally'
+in:
+  key: '{path}'
+  value: '/api/v1?token=abc#section'
+out:
+  return: SUCCEED
+  macro_value: '/api/v1?token=abc#section'
+---
+test case: 'static: macro function syntax stored literally (not a recognised prefix)'
+in:
+  key: '{newvar}'
+  value: '{{myvar}.btoa()}'
+out:
+  return: SUCCEED
+  macro_value: '{{myvar}.btoa()}'
+---
+# Prefix case-sensitivity: only exact lowercase prefixes are recognised
+test case: 'static: REGEX: uppercase not treated as regex prefix'
+in:
+  key: '{var}'
+  value: 'REGEX:(.+)'
+out:
+  return: SUCCEED
+  macro_value: 'REGEX:(.+)'
+---
+test case: 'static: Regex: mixed-case not treated as regex prefix'
+in:
+  key: '{var}'
+  value: 'Regex:(.+)'
+out:
+  return: SUCCEED
+  macro_value: 'Regex:(.+)'
+---
+test case: 'static: regex without colon not treated as regex prefix'
+in:
+  key: '{var}'
+  value: 'regex(.+)'
+out:
+  return: SUCCEED
+  macro_value: 'regex(.+)'
+---
+test case: 'static: regex with space before colon not treated as regex prefix'
+in:
+  key: '{var}'
+  value: 'regex :(.+)'
+out:
+  return: SUCCEED
+  macro_value: 'regex :(.+)'
+---
+test case: 'static: JSONPATH: uppercase not treated as jsonpath prefix'
+in:
+  key: '{var}'
+  value: 'JSONPATH:$.key'
+out:
+  return: SUCCEED
+  macro_value: 'JSONPATH:$.key'
+---
+test case: 'static: XMLXPATH: uppercase not treated as xmlxpath prefix'
+in:
+  key: '{var}'
+  value: 'XMLXPATH://root'
+out:
+  return: SUCCEED
+  macro_value: 'XMLXPATH://root'
+---
+test case: 'static: value with only a forward slash'
+in:
+  key: '{sep}'
+  value: '/'
+out:
+  return: SUCCEED
+  macro_value: '/'
+---
+test case: 'static: single character value'
+in:
+  key: '{flag}'
+  value: 'Y'
+out:
+  return: SUCCEED
+  macro_value: 'Y'
+---
+# ===========================================================================
+# Regex: stored as literal vs extracted — pairs showing value change with data
+# ===========================================================================
+test case: 'regex: session token — stored literally without data'
+in:
+  key: '{session}'
+  value: 'regex:session=([a-zA-Z0-9]+)'
+out:
+  return: SUCCEED
+  macro_value: 'regex:session=([a-zA-Z0-9]+)'
+---
+test case: 'regex: session token — extracted from Set-Cookie header when data provided'
+in:
+  key: '{session}'
+  value: 'regex:session=([a-zA-Z0-9]+)'
+  data: 'Set-Cookie: session=abc123XYZ; Path=/; HttpOnly'
+out:
+  return: SUCCEED
+  macro_value: 'abc123XYZ'
+---
+test case: 'regex: host ID — stored literally without data'
+in:
+  key: '{hostid}'
+  value: 'regex:hostid is ([0-9]+)'
+out:
+  return: SUCCEED
+  macro_value: 'regex:hostid is ([0-9]+)'
+---
+test case: 'regex: host ID — extracted from page body when data provided'
+in:
+  key: '{hostid}'
+  value: 'regex:hostid is ([0-9]+)'
+  data: 'The current hostid is 1024 in this system'
+out:
+  return: SUCCEED
+  macro_value: '1024'
+---
+test case: 'regex: version string — stored literally without data'
+in:
+  key: '{ver}'
+  value: 'regex:version ([0-9]+\.[0-9]+\.[0-9]+)'
+out:
+  return: SUCCEED
+  macro_value: 'regex:version ([0-9]+\.[0-9]+\.[0-9]+)'
+---
+test case: 'regex: version string major.minor.patch — extracted when data provided'
+in:
+  key: '{ver}'
+  value: 'regex:version ([0-9]+\.[0-9]+\.[0-9]+)'
+  data: 'Server version 7.2.1 is running'
+out:
+  return: SUCCEED
+  macro_value: '7.2.1'
+---
+test case: 'regex: query-string token — extracted when data provided'
+in:
+  key: '{token}'
+  value: 'regex:token=([^&\r\n]+)'
+  data: 'action=login&token=secret_abc&redirect=/'
+out:
+  return: SUCCEED
+  macro_value: 'secret_abc'
+---
+test case: 'regex: quoted JSON string value — extracted when data provided'
+in:
+  key: '{hostname}'
+  value: 'regex:"hostname":"([^"]+)"'
+  data: '{"id":1,"hostname":"zabbix-server","status":"active"}'
+out:
+  return: SUCCEED
+  macro_value: 'zabbix-server'
+---
+test case: 'regex: numeric ID from JSON-like content — extracted when data provided'
+in:
+  key: '{id}'
+  value: 'regex:"id":([0-9]+)'
+  data: '{"id":42,"name":"host"}'
+out:
+  return: SUCCEED
+  macro_value: '42'
+---
+test case: 'regex: alternation — matches first alternative'
+in:
+  key: '{status}'
+  value: 'regex:(active|inactive|pending)'
+  data: 'current status: active'
+out:
+  return: SUCCEED
+  macro_value: 'active'
+---
+test case: 'regex: alternation — matches second alternative when first absent'
+in:
+  key: '{status}'
+  value: 'regex:(active|inactive|pending)'
+  data: 'current status: inactive'
+out:
+  return: SUCCEED
+  macro_value: 'inactive'
+---
+test case: 'regex: non-capturing outer group extracts inner group'
+in:
+  key: '{val}'
+  value: 'regex:(?:prefix_)([0-9]+)'
+  data: 'value: prefix_999 end'
+out:
+  return: SUCCEED
+  macro_value: '999'
+---
+test case: 'regex: shorthand digit class \d+ extracts number'
+in:
+  key: '{count}'
+  value: 'regex:count=(\d+)'
+  data: 'count=77 items found'
+out:
+  return: SUCCEED
+  macro_value: '77'
+---
+test case: 'regex: shorthand word class \w+ extracts identifier'
+in:
+  key: '{key}'
+  value: 'regex:key=(\w+)'
+  data: 'key=HelloWorld other=x'
+out:
+  return: SUCCEED
+  macro_value: 'HelloWorld'
+---
+test case: 'regex: data contains braces and parens — pattern still matches'
+in:
+  key: '{val}'
+  value: 'regex:value=([0-9]+)'
+  data: '{func(value=42)}'
+out:
+  return: SUCCEED
+  macro_value: '42'
+---
+test case: 'regex: data contains pipe — alternation in pattern matches correctly'
+in:
+  key: '{choice}'
+  value: 'regex:(foo|bar)'
+  data: 'result: bar | something else'
+out:
+  return: SUCCEED
+  macro_value: 'bar'
+---
+test case: 'regex: first of multiple capture groups returned'
+in:
+  key: '{first}'
+  value: 'regex:([a-z]+)=([0-9]+)'
+  data: 'key=123'
+out:
+  return: SUCCEED
+  macro_value: 'key'
+---
+test case: 'regex: empty data — (.*) captures empty string'
+in:
+  key: '{empty}'
+  value: 'regex:(.*)'
+  data: ''
+out:
+  return: SUCCEED
+  macro_value: ''
+---
+test case: 'regex: empty data — ([a-z]*) captures empty string (zero-or-more)'
+in:
+  key: '{empty}'
+  value: 'regex:([a-z]*)'
+  data: ''
+out:
+  return: SUCCEED
+  macro_value: ''
+---
+test case: 'regex: empty data — (.+) fails because at least one char required'
+in:
+  key: '{var}'
+  value: 'regex:(.+)'
+  data: ''
+out:
+  return: FAIL
+---
+test case: 'regex: no match on non-empty data fails'
+in:
+  key: '{var}'
+  value: 'regex:NOTPRESENT([0-9]+)'
+  data: 'completely different content here'
+out:
+  return: FAIL
+---
+test case: 'regex: case-sensitive — uppercase pattern does not match lowercase data'
+in:
+  key: '{var}'
+  value: 'regex:(HELLO)'
+  data: 'hello world'
+out:
+  return: FAIL
+---
+# ===========================================================================
+# JSONPath: stored as literal vs extracted — pairs showing value change
+# ===========================================================================
+test case: 'jsonpath: host URL — stored literally without data'
+in:
+  key: '{url}'
+  value: 'jsonpath:$.host_url'
+out:
+  return: SUCCEED
+  macro_value: 'jsonpath:$.host_url'
+---
+test case: 'jsonpath: host URL — extracted from JSON response when data provided'
+in:
+  key: '{url}'
+  value: 'jsonpath:$.host_url'
+  data: '{"host_url":"https://myhost.example.com"}'
+out:
+  return: SUCCEED
+  macro_value: 'https://myhost.example.com'
+---
+test case: 'jsonpath: null JSON value returned as string "null"'
+in:
+  key: '{val}'
+  value: 'jsonpath:$.key'
+  data: '{"key":null}'
+out:
+  return: SUCCEED
+  macro_value: 'null'
+---
+test case: 'jsonpath: empty string JSON value returned as empty string'
+in:
+  key: '{val}'
+  value: 'jsonpath:$.msg'
+  data: '{"msg":""}'
+out:
+  return: SUCCEED
+  macro_value: ''
+---
+test case: 'jsonpath: negative integer returned as string'
+in:
+  key: '{diff}'
+  value: 'jsonpath:$.diff'
+  data: '{"diff":-5}'
+out:
+  return: SUCCEED
+  macro_value: '-5'
+---
+test case: 'jsonpath: floating-point number returned as string'
+in:
+  key: '{pi}'
+  value: 'jsonpath:$.pi'
+  data: '{"pi":3.14}'
+out:
+  return: SUCCEED
+  macro_value: '3.14'
+---
+test case: 'jsonpath: three-level nested key extracted'
+in:
+  key: '{leaf}'
+  value: 'jsonpath:$.a.b.c'
+  data: '{"a":{"b":{"c":"deep_value"}}}'
+out:
+  return: SUCCEED
+  macro_value: 'deep_value'
+---
+test case: 'jsonpath: third element of array'
+in:
+  key: '{third}'
+  value: 'jsonpath:$.items[2]'
+  data: '{"items":["alpha","beta","gamma","delta"]}'
+out:
+  return: SUCCEED
+  macro_value: 'gamma'
+---
+test case: 'jsonpath: string with backslash in JSON value'
+in:
+  key: '{path}'
+  value: 'jsonpath:$.path'
+  data: '{"path":"C:\\\\Users\\\\admin"}'
+out:
+  return: SUCCEED
+  macro_value: 'C:\\Users\\admin'
+---
+test case: 'jsonpath: indented/formatted JSON still parsed correctly'
+in:
+  key: '{name}'
+  value: 'jsonpath:$.name'
+  data: "{\"id\": 1,\n  \"name\": \"zabbix\"\n}"
+out:
+  return: SUCCEED
+  macro_value: 'zabbix'
+---
+test case: 'jsonpath: object nested in array element extracted'
+in:
+  key: '{name}'
+  value: 'jsonpath:$.hosts[0].name'
+  data: '{"hosts":[{"name":"server1","id":1},{"name":"server2","id":2}]}'
+out:
+  return: SUCCEED
+  macro_value: 'server1'
+---
+test case: 'jsonpath: missing key in non-empty JSON fails'
+in:
+  key: '{missing}'
+  value: 'jsonpath:$.absent'
+  data: '{"present":"value"}'
+out:
+  return: FAIL
+---
+test case: 'jsonpath: invalid jsonpath expression fails'
+in:
+  key: '{var}'
+  value: 'jsonpath:not_a_jsonpath'
+  data: '{"key":"val"}'
+out:
+  return: FAIL
+---
+# ===========================================================================
+# XMLXPath: stored as literal vs extracted — pairs showing value change
+# ===========================================================================
+test case: 'xmlxpath: status path — stored literally without data'
+in:
+  key: '{status}'
+  value: 'xmlxpath://host/response/status'
+out:
+  return: SUCCEED
+  macro_value: 'xmlxpath://host/response/status'
+---
+test case: 'xmlxpath: element text via /text() at three levels'
+in:
+  key: '{status}'
+  value: 'xmlxpath://host/response/status/text()'
+  data: '<?xml version="1.0"?><host><response><status>OK</status></response></host>'
+out:
+  return: SUCCEED
+  macro_value: 'OK'
+---
+test case: 'xmlxpath: text() on element with &amp; entity preserves XML-encoded form'
+in:
+  key: '{val}'
+  value: 'xmlxpath://node/text()'
+  data: '<?xml version="1.0"?><root><node>rock &amp; roll</node></root>'
+out:
+  return: SUCCEED
+  macro_value: 'rock &amp; roll'
+---
+test case: 'xmlxpath: text() on element with &lt; entity preserves XML-encoded form'
+in:
+  key: '{val}'
+  value: 'xmlxpath://node/text()'
+  data: '<?xml version="1.0"?><root><node>a &lt; b</node></root>'
+out:
+  return: SUCCEED
+  macro_value: 'a &lt; b'
+---
+test case: 'xmlxpath: attribute extraction via string()'
+in:
+  key: '{id}'
+  value: 'xmlxpath:string(//item/@id)'
+  data: '<?xml version="1.0"?><root><item id="99"/></root>'
+out:
+  return: SUCCEED
+  macro_value: '99'
+---
+test case: 'xmlxpath: string() on element returns text without tags'
+in:
+  key: '{val}'
+  value: 'xmlxpath:string(//value)'
+  data: '<?xml version="1.0"?><root><value>extracted</value></root>'
+out:
+  return: SUCCEED
+  macro_value: 'extracted'
+---
+test case: 'xmlxpath: four-level deep element text'
+in:
+  key: '{val}'
+  value: 'xmlxpath://a/b/c/d/text()'
+  data: '<?xml version="1.0"?><root><a><b><c><d>deep</d></c></b></a></root>'
+out:
+  return: SUCCEED
+  macro_value: 'deep'
+---
+test case: 'xmlxpath: multiple matching nodes serialised consecutively'
+in:
+  key: '{all}'
+  value: 'xmlxpath://item/text()'
+  data: '<?xml version="1.0"?><root><item>first</item><item>second</item></root>'
+out:
+  return: SUCCEED
+  macro_value: 'firstsecond'
+---
+test case: 'xmlxpath: CDATA section content extracted via text()'
+in:
+  key: '{val}'
+  value: 'xmlxpath://node/text()'
+  data: '<?xml version="1.0"?><root><node><![CDATA[raw <b>content</b>]]></node></root>'
+out:
+  return: SUCCEED
+  macro_value: '<![CDATA[raw <b>content</b>]]>'
+---
+test case: 'xmlxpath: normalize-space strips leading and trailing whitespace'
+in:
+  key: '{val}'
+  value: 'xmlxpath:normalize-space(//node)'
+  data: '<?xml version="1.0"?><root><node>  hello world  </node></root>'
+out:
+  return: SUCCEED
+  macro_value: 'hello world'
+---
+test case: 'xmlxpath: element selected by attribute predicate'
+in:
+  key: '{val}'
+  value: "xmlxpath://item[@type='primary']/text()"
+  data: '<?xml version="1.0"?><root><item type="secondary">no</item><item type="primary">yes</item></root>'
+out:
+  return: SUCCEED
+  macro_value: 'yes'
+---
+test case: 'xmlxpath: numeric text content extracted'
+in:
+  key: '{port}'
+  value: 'xmlxpath://server/port/text()'
+  data: '<?xml version="1.0"?><config><server><port>8080</port></server></config>'
+out:
+  return: SUCCEED
+  macro_value: '8080'
+---
+test case: 'xmlxpath: missing element fails'
+in:
+  key: '{val}'
+  value: 'xmlxpath://absent/text()'
+  data: '<?xml version="1.0"?><root><present>x</present></root>'
+out:
+  return: FAIL
+---
+test case: 'xmlxpath: invalid XML fails'
+in:
+  key: '{val}'
+  value: 'xmlxpath://node'
+  data: 'this is not xml at all'
+out:
+  return: FAIL
+---
+# ===========================================================================
+# Multi-variable scenarios: dynamic types with data showing actual extraction
+# ===========================================================================
+test case: 'multi-var: regex and jsonpath both extract from same JSON response'
+in:
+  variables:
+    - key: '{id}'
+      value: 'regex:"id":([0-9]+)'
+    - key: '{name}'
+      value: 'jsonpath:$.name'
+  data: '{"id":42,"name":"zabbix"}'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{id}'
+      value: '42'
+    - key: '{name}'
+      value: 'zabbix'
+---
+test case: 'multi-var: two regex patterns extract different parts of same data'
+in:
+  variables:
+    - key: '{user}'
+      value: 'regex:user=([a-z]+)'
+    - key: '{token}'
+      value: 'regex:token=([A-Z0-9]+)'
+  data: 'user=alice&token=XK9R&session=z'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{user}'
+      value: 'alice'
+    - key: '{token}'
+      value: 'XK9R'
+---
+test case: 'multi-var: static variable preserved alongside dynamic extraction'
+in:
+  variables:
+    - key: '{base}'
+      value: 'https://example.com'
+    - key: '{id}'
+      value: 'regex:id=([0-9]+)'
+  data: 'redirect: id=7 ok'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{base}'
+      value: 'https://example.com'
+    - key: '{id}'
+      value: '7'
+---
+test case: 'multi-var: all three prefix types stored literally when no data'
+in:
+  variables:
+    - key: '{hostid}'
+      value: 'regex:hostid is ([0-9]+)'
+    - key: '{url}'
+      value: 'jsonpath:$.host_url'
+    - key: '{status}'
+      value: 'xmlxpath://host/response/status'
+    - key: '{username}'
+      value: 'Alexei'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{hostid}'
+      value: 'regex:hostid is ([0-9]+)'
+    - key: '{url}'
+      value: 'jsonpath:$.host_url'
+    - key: '{status}'
+      value: 'xmlxpath://host/response/status'
+    - key: '{username}'
+      value: 'Alexei'
+---
+test case: 'doc example: {username}=Alexei plain literal without response data'
+in:
+  key: '{username}'
+  value: 'Alexei'
+out:
+  return: SUCCEED
+  macro_value: 'Alexei'
+---
+test case: 'doc example: {password}=kj3h5kJ34bd plain literal without response data'
+in:
+  key: '{password}'
+  value: 'kj3h5kJ34bd'
+out:
+  return: SUCCEED
+  macro_value: 'kj3h5kJ34bd'
+---
+test case: 'doc example: {hostid}=regex:hostid is ([0-9]+) extracts id from response'
+in:
+  key: '{hostid}'
+  value: 'regex:hostid is ([0-9]+)'
+  data: 'hostid is 42'
+out:
+  return: SUCCEED
+  macro_value: '42'
+---
+test case: 'doc example: {hostid}=regex:hostid is ([0-9]+) stored literally when data is null'
+in:
+  key: '{hostid}'
+  value: 'regex:hostid is ([0-9]+)'
+out:
+  return: SUCCEED
+  macro_value: 'regex:hostid is ([0-9]+)'
+---
+test case: 'doc example: {url}=jsonpath:$.host_url extracts URL from JSON response'
+in:
+  key: '{url}'
+  value: 'jsonpath:$.host_url'
+  data: '{"host_url":"https://example.com"}'
+out:
+  return: SUCCEED
+  macro_value: 'https://example.com'
+---
+test case: 'doc example: {url}=jsonpath:$.host_url stored literally when data is null'
+in:
+  key: '{url}'
+  value: 'jsonpath:$.host_url'
+out:
+  return: SUCCEED
+  macro_value: 'jsonpath:$.host_url'
+---
+test case: 'doc example: {status}=xmlxpath://host/response/status/text() extracts text from XML response'
+in:
+  key: '{status}'
+  value: 'xmlxpath://host/response/status/text()'
+  data: '<?xml version="1.0"?><host><response><status>OK</status></response></host>'
+out:
+  return: SUCCEED
+  macro_value: 'OK'
+---
+test case: 'doc example: {status}=xmlxpath://host/response/status stored literally when data is null'
+in:
+  key: '{status}'
+  value: 'xmlxpath://host/response/status'
+out:
+  return: SUCCEED
+  macro_value: 'xmlxpath://host/response/status'
+---
+test case: 'doc example: {newvar}={{myvar}.btoa()} stored literally (not a recognized extraction prefix)'
+in:
+  key: '{newvar}'
+  value: '{{myvar}.btoa()}'
+out:
+  return: SUCCEED
+  macro_value: '{{myvar}.btoa()}'
+---
+test case: 'static variable after regex variable both stored when data is null'
+in:
+  variables:
+    - key: '{hostid}'
+      value: 'regex:hostid is ([0-9]+)'
+    - key: '{BASE_URL}'
+      value: 'https://example.com'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{hostid}'
+      value: 'regex:hostid is ([0-9]+)'
+    - key: '{BASE_URL}'
+      value: 'https://example.com'
+---
+test case: 'static variable after jsonpath variable both stored when data is null'
+in:
+  variables:
+    - key: '{url}'
+      value: 'jsonpath:$.host_url'
+    - key: '{username}'
+      value: 'Alexei'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{url}'
+      value: 'jsonpath:$.host_url'
+    - key: '{username}'
+      value: 'Alexei'
+---
+test case: 'static variable after xmlxpath variable both stored when data is null'
+in:
+  variables:
+    - key: '{status}'
+      value: 'xmlxpath://host/response/status'
+    - key: '{password}'
+      value: 'kj3h5kJ34bd'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{status}'
+      value: 'xmlxpath://host/response/status'
+    - key: '{password}'
+      value: 'kj3h5kJ34bd'
+---
+test case: 'multiple dynamic variables followed by static all stored when data is null'
+in:
+  variables:
+    - key: '{hostid}'
+      value: 'regex:hostid is ([0-9]+)'
+    - key: '{url}'
+      value: 'jsonpath:$.host_url'
+    - key: '{status}'
+      value: 'xmlxpath://host/response/status'
+    - key: '{username}'
+      value: 'Alexei'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{hostid}'
+      value: 'regex:hostid is ([0-9]+)'
+    - key: '{url}'
+      value: 'jsonpath:$.host_url'
+    - key: '{status}'
+      value: 'xmlxpath://host/response/status'
+    - key: '{username}'
+      value: 'Alexei'
+...

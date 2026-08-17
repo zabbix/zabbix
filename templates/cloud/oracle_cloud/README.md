@@ -1,4 +1,309 @@
 
+# Oracle Cloud Costs by HTTP
+
+## Overview
+
+This template monitors Oracle Cloud Infrastructure (OCI) costs and budgets.
+
+For communication with OCI, this template utilizes script items which execute HTTP `GET` requests.
+
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Oracle Cloud Infrastructure
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+## Required setup
+
+For this template to work, it needs authentication details to use in requests. To acquire this information, see
+the following steps:
+
+1. Log into your administrator account in Oracle Cloud Console.
+
+2. Create a new user that will be used by Zabbix for monitoring. Optionally, create a new group and assign the monitoring user to this group.
+
+3. Create a new security policy and assign a previously created user or group to it.
+
+4. This policy will contain a set of rules that will give monitoring user/group access to specific resources in your
+OCI. Make sure to add the following rules to the policy:
+
+    ```
+    Allow group 'zabbix_api' to read usage-reports in tenancy
+    Allow group 'zabbix_api' to read usage-budgets in tenancy
+    ```
+    In the example above, the name of the monitoring group is `zabbix_api`. In your setup, replace it with the
+name of your monitoring user/group.
+
+5. Generate an API key pair for your monitoring user - open your monitoring user profile and on the left side,
+press `API keys` and then, `Add API key` (if generating a new key pair, do not forget to save the private key).
+
+6. After this, Oracle Cloud Console will provide additional information that is required for access, such as:
+
+    * Tenancy OCID;
+
+    * User OCID;
+
+    * Fingerprint;
+
+    * Region.
+
+    > Save this information somewhere or keep this window open. This information will be required in later steps.
+
+7. In Zabbix, create a new host and assign this template to it (Oracle Cloud Costs by HTTP).
+
+8. Open the `Macros` section of the host you created and set the following user macro values according to the
+OCI configuration file (from step #6):
+
+    * `{$OCI.API.TENANCY}` - set the tenancy OCID value;
+
+    * `{$OCI.API.USER}` - set the user OCID value;
+
+    * `{$OCI.API.FINGERPRINT}` - set the fingerprint value;
+
+    * `{$OCI.API.PRIVATE.KEY}` - copy and paste the contents of private key file here.
+
+9. After the authentication credentials are entered, you need to identify the OCI API endpoints that match your
+region (as provided by Oracle Cloud Console in step #6).
+To do so, you can use the OCI [API Reference and Endpoints](https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/api/#/) list, where each API service has a dedicated page with the respective API endpoints.
+
+    The required API service endpoints are:
+
+   * [Budgets API](https://docs.oracle.com/en-us/iaas/api/#/en/budgets/20190111/);
+
+   * [Usage API](https://docs.oracle.com/en-us/iaas/api/#/en/usage/20200107/);
+
+10. When the API endpoints are identified, you need to set them in Zabbix as user macros to the host that the
+template is attached to (similarly to step #8):
+
+    * `{$OCI.API.BUDGET.HOST}` - Budgets API endpoint, for example, `usage.eu-stockholm-1.oraclecloud.com`;
+
+    * `{$OCI.API.USAGE.HOST}` - Usage API endpoint, for example, `usageapi.eu-stockholm-1.oraclecloud.com`;
+
+    > IMPORTANT! API Endpoint URLs need to be entered without the HTTP scheme (`https://`).
+
+11. Once you've completed adding the host to Zabbix, and it will automatically discover budgets, services, compartments and region and monitor their cost related metrics.
+
+## Optional setup
+
+### LLD resource filtering
+
+All discoveries has include and exclude filters to avoid discovering unwanted or unnecessary entities.
+
+### HTTP proxy usage
+
+If needed, you can specify an HTTP proxy for the template by changing the value of the `{$OCI.HTTP.PROXY}` user
+macro.
+
+### Custom OK HTTP response
+
+If using a proxy, the returned OK HTTP response could change from "200" to a different value.
+In that case, please adjust the user macro `{$OCI.HTTP.RETURN.CODE.OK}`.
+
+### LLD filter value changing
+
+LLD filter values and trigger threshold values can be changed with the respective user macros.
+
+### Threshold macros
+
+Threshold macros could be used with a context to fine tune threshold for different services, compartments, region and budgets.
+
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
+|{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200", but can vary, for example, if a proxy is used.</p>|`200`|
+|{$OCI.SCRIPT.TIMEOUT}|<p>Set a JavaScript timeout.</p>|`10s`|
+|{$OCI.API.TENANCY}|<p>OCID of tenancy.</p>||
+|{$OCI.API.USER}|<p>OCID of user.</p>||
+|{$OCI.API.PRIVATE.KEY}|<p>Entire private key for API access.</p>||
+|{$OCI.API.FINGERPRINT}|<p>Fingerprint of private key.</p>||
+|{$OCI.API.USAGE.HOST}|<p>Host for OCI usage API endpoint.</p>||
+|{$OCI.API.BUDGET.HOST}|<p>Host for OCI budget API endpoint.</p>||
+|{$OCI.COST.BUDGET.DISCOVERY.STATE.MATCHES}|<p>Sets the regex string of budget states to allow in discovery.</p>|`.*`|
+|{$OCI.COST.BUDGET.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of budget states to exclude in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.COST.BUDGET.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of budget names to allow in discovery.</p>|`.*`|
+|{$OCI.COST.BUDGET.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of budget names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.COST.SERVICE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of service names to allow in discovery.</p>|`.*`|
+|{$OCI.COST.SERVICE.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of service names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.COST.REGION.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of region names to allow in discovery.</p>|`.*`|
+|{$OCI.COST.REGION.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of region names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.COST.COMPARTMENT.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of compartment names to allow in discovery.</p>|`.*`|
+|{$OCI.COST.COMPARTMENT.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of compartment names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.COST.SERVICE.MONTHLY.DELTA.PERCENTAGE.WARN}|<p>Service warning threshold for current month percentage excess, comparing to previous. Could be used with a context to define specific service.</p>|`110`|
+|{$OCI.COST.SERVICE.DAILY.DELTA.PERCENTAGE.WARN}|<p>Service warning threshold for current day percentage excess, comparing to previous. Could be used with a context to define specific service.</p>|`125`|
+|{$OCI.COST.REGION.MONTHLY.DELTA.PERCENTAGE.WARN}|<p>Region warning threshold for current month percentage excess, comparing to previous. Could be used with a context to define specific region.</p>|`110`|
+|{$OCI.COST.REGION.DAILY.DELTA.PERCENTAGE.WARN}|<p>Region warning threshold for current day percentage excess, comparing to previous. Could be used with a context to define specific region.</p>|`125`|
+|{$OCI.COST.COMPARTMENT.MONTHLY.DELTA.PERCENTAGE.WARN}|<p>Compartment warning threshold for current month percentage excess, comparing to previous. Could be used with a context to define specific compartment.</p>|`110`|
+|{$OCI.COST.COMPARTMENT.DAILY.DELTA.PERCENTAGE.WARN}|<p>Compartment warning threshold for current day percentage excess, comparing to previous. Could be used with a context to define specific compartment.</p>|`125`|
+|{$OCI.COST.TOTAL.MONTHLY.DELTA.PERCENTAGE.WARN}|<p>Total warning threshold for current month percentage excess, comparing to previous.</p>|`105`|
+|{$OCI.COST.TOTAL.DAILY.DELTA.PERCENTAGE.WARN}|<p>Total warning threshold for current day percentage excess, comparing to previous.</p>|`110`|
+|{$OCI.COST.BUDGET.PERCENTAGE.WARN}|<p>Budget warning threshold for spend percentage excess. Could be used with a context to define specific budget.</p>|`80`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get month cost|<p>Collects Oracle month cost.</p>|Dependent item|oci_cost.month.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.monthly_cost_history`</p></li></ul>|
+|Daily average cost|<p>Oracle daily average cost.</p>|Calculated|oci_cost.daily.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Usage, get data|<p>Master item to get usage info.</p>|Script|oci_cost.usage.get|
+|Budgets, get data|<p>Master item to get budget info.</p>|Script|oci_cost.budget.get|
+|Total: Hourly cost|<p>The hourly cost of the total.</p>|Dependent item|oci_cost.usage.total.cost.hourly<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.hourly.items[*].computedAmount.sum()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Total: Monthly cost, current|<p>The current month total cost of the total.</p>|Dependent item|oci_cost.usage.total.cost.monthly.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.current_month.items[*].computedAmount.sum()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Total: Monthly cost, previous|<p>The previous month total cost of the service.</p>|Dependent item|oci_cost.usage.total.cost.monthly.previous<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.prev_month.items[*].computedAmount.sum()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Total: Daily cost, current|<p>The current day total cost.</p>|Dependent item|oci_cost.usage.total.cost.daily.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.current_day.items[*].computedAmount.sum()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Total: Daily cost, previous|<p>The previous day total cost of the service.</p>|Dependent item|oci_cost.usage.total.cost.daily.previous<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.prev_day.items[*].computedAmount.sum()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Total: Monthly delta|<p>The monthly delta of the total.</p>|Calculated|oci_cost.usage.total.cost.monthly.delta<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Total: Monthly delta, in percentage|<p>The monthly total delta for the service, in percentage.</p>|Calculated|oci_cost.usage.total.cost.monthly.delta.percentage<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Total: Daily delta|<p>The daily delta of the total.</p>|Calculated|oci_cost.usage.total.cost.daily.delta<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Total: Daily delta, in percentage|<p>The daily delta for the total, in percentage.</p>|Calculated|oci_cost.usage.total.cost.daily.delta.percentage<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service: Count|<p>Number of services.</p>|Dependent item|oci_cost.service.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.hourly.items`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>JSON Path: `$[*].length()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Compartment: Count|<p>Number of compartments.</p>|Dependent item|oci_cost.compartment.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.hourly.items`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>JSON Path: `$[*].length()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Region: Count|<p>Number of regions.</p>|Dependent item|oci_cost.region.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.hourly.items`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>JSON Path: `$[*].length()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Budget: Total amount|<p>The amount sum of all budgets.</p>|Dependent item|oci_cost.budget.amount.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.budgets[*].amount.sum()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Budget: Total actual spend|<p>The actual spend sum of all budgets.</p>|Dependent item|oci_cost.budget.actual.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.budgets[*].actualSpend.sum()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Budget: Total forecasted spend|<p>The forecasted spend sum of all budgets.</p>|Dependent item|oci_cost.budget.forecast.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.budgets[*].forecastedSpend.sum()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Budget: Total actual spend, in percentage|<p>The actual total spend for the current budget cycle, expressed in percentage.</p>|Calculated|oci_cost.budget.actual.percentage.total<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OCI Costs: Current month costs exceeded previous|<p>Current month costs exceeded previous.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.usage.total.cost.monthly.delta.percentage)>{$OCI.COST.TOTAL.MONTHLY.DELTA.PERCENTAGE.WARN}`|Warning|**Manual close**: Yes|
+|OCI Costs: Current day costs exceeded previous|<p>Current day costs exceeded previous.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.usage.total.cost.daily.delta.percentage)>{$OCI.COST.TOTAL.DAILY.DELTA.PERCENTAGE.WARN}`|Warning|**Manual close**: Yes|
+|OCI Costs: Number of compartments has changed|<p>Number of compartments has changed.</p>|`change(/Oracle Cloud Costs by HTTP/oci_cost.compartment.count)<>0`|Info|**Manual close**: Yes|
+|OCI Costs: Number of regions has changed|<p>Number of regions has changed.</p>|`change(/Oracle Cloud Costs by HTTP/oci_cost.region.count)<>0`|Warning|**Manual close**: Yes|
+
+### LLD rule Month discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month discovery|<p>Discovers month cost history.</p>|Dependent item|oci_cost.month.discovery|
+
+### Item prototypes for Month discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month [{#OCI.MONTH}]: Get data|<p>Collects month cost history.</p>|Dependent item|oci_cost.month.cost.data.get[{#OCI.MONTH}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.month=="{#OCI.MONTH}")].first()`</p></li></ul>|
+|Month [{#OCI.MONTH}]: Total cost|<p>Oracle `{#OCI.MONTH}` month total cost.</p>|Dependent item|oci_cost.month.total.cost[{#OCI.MONTH}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cost`</p></li></ul>|
+
+### LLD rule Budget discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Budget discovery|<p>Discover budget in your tenancy.</p>|Dependent item|oci_cost.budget.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.budgets`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for Budget discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Budget [{#NAME}]: State|<p>The current state of the budget.</p>|Dependent item|oci_cost.budget.state[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.budgets[?(@.id == '{#ID}')].lifecycleState.first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Budget [{#NAME}]: Amount|<p>The amount of the budget.</p>|Dependent item|oci_cost.budget.amount[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.budgets[?(@.id == '{#ID}')].amount.first()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Budget [{#NAME}]: Actual spend|<p>The actual spend for the current budget cycle.</p>|Dependent item|oci_cost.budget.actual[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.budgets[?(@.id == '{#ID}')].actualSpend.first()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Budget [{#NAME}]: Forecasted spend|<p>The forecasted spend by the end of the current budget cycle.</p>|Dependent item|oci_cost.budget.forecast[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.budgets[?(@.id == '{#ID}')].forecastedSpend.first()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Budget [{#NAME}]: Forecast spend, in percentage|<p>The forecast spend for the current budget cycle, expressed in percentage.</p>|Calculated|oci_cost.budget.forecast.percentage[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Budget [{#NAME}]: Actual spend, in percentage|<p>The actual spend for the current budget cycle, expressed in percentage.</p>|Calculated|oci_cost.budget.actual.percentage[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for Budget discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OCI Costs: Budget become inactive|<p>Budget is not in active state.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.budget.state[{#ID}])<>1`|Warning|**Manual close**: Yes|
+|OCI Costs: Budget forecast spend amount too big|<p>Budget forecast spent amount exceed threshold.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.budget.forecast.percentage[{#ID}])>{$OCI.COST.BUDGET.PERCENTAGE.WARN:"{#ID}"}`|Warning|**Manual close**: Yes|
+|OCI Costs: Budget spend amount too big|<p>Budget spent amount exceed threshold.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.budget.actual.percentage[{#ID}])>{$OCI.COST.BUDGET.PERCENTAGE.WARN:"{#ID}"}`|Warning|**Manual close**: Yes|
+
+### LLD rule Service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Service discovery|<p>Discover services in your tenancy.</p>|Dependent item|oci_cost.usage.service.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.hourly.items`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for Service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Service [{#NAME}]: Hourly cost|<p>The hourly cost of the service.</p>|Dependent item|oci_cost.usage.service.cost.hourly[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#NAME}]: Monthly cost, current|<p>The current monthly cost of the service.</p>|Dependent item|oci_cost.usage.service.cost.monthly.current[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#NAME}]: Monthly cost, previous|<p>The previous monthly cost of the service.</p>|Dependent item|oci_cost.usage.service.cost.monthly.previous[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Service [{#NAME}]: Daily cost, current|<p>The current daily cost of the service.</p>|Dependent item|oci_cost.usage.service.cost.daily.current[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#NAME}]: Daily cost, previous|<p>The previous daily cost of the service.</p>|Dependent item|oci_cost.usage.service.cost.daily.previous[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#NAME}]: Monthly delta|<p>The monthly delta of the service.</p>|Calculated|oci_cost.usage.service.cost.monthly.delta[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#NAME}]: Monthly delta, in percentage|<p>The monthly delta for the service, in percentage.</p>|Calculated|oci_cost.usage.service.cost.monthly.delta.percentage[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#NAME}]: Daily delta|<p>The daily delta of the service.</p>|Calculated|oci_cost.usage.service.cost.daily.delta[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#NAME}]: Daily delta, in percentage|<p>The daily delta for the service, in percentage.</p>|Calculated|oci_cost.usage.service.cost.daily.delta.percentage[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for Service discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OCI Costs: Current month costs for service exceeded previous|<p>Current month costs for service exceeded previous.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.usage.service.cost.monthly.delta.percentage[{#NAME}])>{$OCI.COST.SERVICE.MONTHLY.DELTA.PERCENTAGE.WARN:"{#NAME}"}`|Warning|**Manual close**: Yes|
+|OCI Costs: Current day costs exceeded previous|<p>Current day costs exceeded previous.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.usage.service.cost.daily.delta.percentage[{#NAME}])>{$OCI.COST.SERVICE.DAILY.DELTA.PERCENTAGE.WARN:"{#NAME}"}`|Warning|**Manual close**: Yes|
+
+### LLD rule Region discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Region discovery|<p>Discover regions in your tenancy.</p>|Dependent item|oci_cost.usage.region.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.hourly.items`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for Region discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Region [{#NAME}]: Hourly cost|<p>The hourly cost of the region.</p>|Dependent item|oci_cost.usage.region.cost.hourly[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Region [{#NAME}]: Monthly cost, current|<p>The current monthly cost of the region.</p>|Dependent item|oci_cost.usage.region.cost.monthly.current[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Region [{#NAME}]: Monthly cost, previous|<p>The previous monthly cost of the region.</p>|Dependent item|oci_cost.usage.region.cost.monthly.previous[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Region [{#NAME}]: Daily cost, current|<p>The current daily cost of the region.</p>|Dependent item|oci_cost.usage.region.cost.daily.current[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Region [{#NAME}]: Daily cost, previous|<p>The previous daily cost of the region.</p>|Dependent item|oci_cost.usage.region.cost.daily.previous[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Region [{#NAME}]: Monthly delta|<p>The monthly delta of the region.</p>|Calculated|oci_cost.usage.region.cost.monthly.delta[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Region [{#NAME}]: Daily delta|<p>The daily delta of the region.</p>|Calculated|oci_cost.usage.region.cost.daily.delta[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Region [{#NAME}]: Monthly delta, in percentage|<p>The monthly delta for the region, in percentage.</p>|Calculated|oci_cost.usage.region.cost.monthly.delta.percentage[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Region [{#NAME}]: Daily delta, in percentage|<p>The daily delta for the region, in percentage.</p>|Calculated|oci_cost.usage.region.cost.daily.delta.percentage[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for Region discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OCI Costs: Current month costs for region exceeded previous|<p>Current month costs for region exceeded previous.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.usage.region.cost.monthly.delta.percentage[{#NAME}])>{$OCI.COST.REGION.MONTHLY.DELTA.PERCENTAGE.WARN:"{#NAME}"}`|Warning|**Manual close**: Yes|
+|OCI Costs: Current day costs exceeded previous|<p>Current day costs exceeded previous.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.usage.region.cost.daily.delta.percentage[{#NAME}])>{$OCI.COST.REGION.DAILY.DELTA.PERCENTAGE.WARN:"{#NAME}"}`|Warning|**Manual close**: Yes|
+
+### LLD rule Compartment discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Compartment discovery|<p>Discover compartments in your tenancy.</p>|Dependent item|oci_cost.usage.compartment.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.hourly.items`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for Compartment discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Compartment [{#NAME}]: Hourly cost|<p>The hourly cost of the compartment.</p>|Dependent item|oci_cost.usage.compartment.cost.hourly[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Compartment [{#NAME}]: Monthly cost, current|<p>The current monthly cost of the compartment.</p>|Dependent item|oci_cost.usage.compartment.cost.monthly.current[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Compartment [{#NAME}]: Monthly cost, previous|<p>The previous monthly cost of the compartment.</p>|Dependent item|oci_cost.usage.compartment.cost.monthly.previous[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Compartment [{#NAME}]: Daily cost, current|<p>The current daily cost of the compartment.</p>|Dependent item|oci_cost.usage.compartment.cost.daily.current[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Compartment [{#NAME}]: Daily cost, previous|<p>The previous daily cost of the compartment.</p>|Dependent item|oci_cost.usage.compartment.cost.daily.previous[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Compartment [{#NAME}]: Monthly delta|<p>The monthly delta of the compartment.</p>|Calculated|oci_cost.usage.compartment.cost.monthly.delta[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Compartment [{#NAME}]: Daily delta|<p>The daily delta of the compartment.</p>|Calculated|oci_cost.usage.compartment.cost.daily.delta[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Compartment [{#NAME}]: Monthly delta, in percentage|<p>The monthly delta for the compartment, in percentage.</p>|Calculated|oci_cost.usage.compartment.cost.monthly.delta.percentage[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Compartment [{#NAME}]: Daily delta, in percentage|<p>The daily delta for the compartment, in percentage.</p>|Calculated|oci_cost.usage.compartment.cost.daily.delta.percentage[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for Compartment discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OCI Costs: Current month costs for compartment exceeded previous|<p>Current month costs for compartment exceeded previous.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.usage.compartment.cost.monthly.delta.percentage[{#NAME}])>{$OCI.COST.COMPARTMENT.MONTHLY.DELTA.PERCENTAGE.WARN:"{#NAME}"}`|Warning|**Manual close**: Yes|
+|OCI Costs: Current day costs exceeded previous|<p>Current day costs exceeded previous.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.usage.compartment.cost.daily.delta.percentage[{#NAME}])>{$OCI.COST.COMPARTMENT.DAILY.DELTA.PERCENTAGE.WARN:"{#NAME}"}`|Warning|**Manual close**: Yes|
+
 # Oracle Cloud by HTTP
 
 ## Overview
@@ -18,7 +323,9 @@ and resources, such as:
 
 * OCI Boot Volumes.
 
-For communication with OCI, this template utilizes script items which execute HTTP `GET` and `POST` requests. 
+* OCI Load Balancers.
+
+For communication with OCI, this template utilizes script items which execute HTTP `GET` and `POST` requests.
 `POST` requests are required for OCI Monitoring API as it utilizes Monitoring Query Language (MQL) which uses an
 HTTP request body for queries.
 
@@ -51,7 +358,7 @@ the following steps:
 
 4. This policy will contain a set of rules that will give monitoring user/group access to specific resources in your
 OCI. Make sure to add the following rules to the policy:
-  
+
     ```
     Allow group 'zabbix_api' to read metrics in tenancy
     Allow group 'zabbix_api' to read instances in tenancy
@@ -62,10 +369,11 @@ OCI. Make sure to add the following rules to the policy:
     Allow group 'zabbix_api' to read objectstorage-namespaces in tenancy
     Allow group 'zabbix_api' to read buckets in tenancy
     Allow group 'zabbix_api' to read autonomous-databases in tenancy
+    Allow group 'zabbix_api' to read load-balancers in tenancy
     ```
     In the example above, the name of the monitoring group is `zabbix_api`. In your setup, replace it with the
 name of your monitoring user/group.
-    
+
     In some cases, these rules might not be enough for the monitoring user to be able to access all resources in your
 environment. To fix that, replace the previous rules with this single rule:
     ```
@@ -74,15 +382,15 @@ environment. To fix that, replace the previous rules with this single rule:
 
 5. Generate an API key pair for your monitoring user - open your monitoring user profile and on the left side,
 press `API keys` and then, `Add API key` (if generating a new key pair, do not forget to save the private key).
-  
+
 6. After this, Oracle Cloud Console will provide additional information that is required for access, such as:
 
     * Tenancy OCID;
-      
+
     * User OCID;
-      
+
     * Fingerprint;
-      
+
     * Region.
 
     > Save this information somewhere or keep this window open. This information will be required in later steps.
@@ -93,27 +401,29 @@ press `API keys` and then, `Add API key` (if generating a new key pair, do not f
 OCI configuration file (from step #6):
 
     * `{$OCI.API.TENANCY}` - set the tenancy OCID value;
-      
+
     * `{$OCI.API.USER}` - set the user OCID value;
-      
+
     * `{$OCI.API.FINGERPRINT}` - set the fingerprint value;
-      
+
     * `{$OCI.API.PRIVATE.KEY}` - copy and paste the contents of private key file here.
 
 9. After the authentication credentials are entered, you need to identify the OCI API endpoints that match your
 region (as provided by Oracle Cloud Console in step #6).
 To do so, you can use the OCI [API Reference and Endpoints](https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/api/#/) list, where each API service has a dedicated page with the respective API endpoints.
 
-   The required API service endpoints are:
-  
+    The required API service endpoints are:
+
    * [Core Services API](https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/api/#/en/iaas/20160918/);
-  
+
    * [Database Service API](https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/api/#/en/database/20160918/);
-  
+
    * [Object Storage Service API](https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/api/#/en/objectstorage/20160918/);
-  
+
    * [Monitoring API](https://docs.public.oneportal.content.oci.oraclecloud.com/en-us/iaas/api/#/en/monitoring/20180401/).
-        
+
+   * [Load Balancing API](https://docs.oracle.com/en-us/iaas/api/#/en/loadbalancer/20170115/).
+
 10. When the API endpoints are identified, you need to set them in Zabbix as user macros to the host that the
 template is attached to (similarly to step #8):
 
@@ -124,16 +434,18 @@ template is attached to (similarly to step #8):
     * `{$OCI.API.OBJECT.STORAGE.HOST}` - Object Storage Service API endpoint, for example, `objectstorage.eu-stockholm-1.oraclecloud.com`;
 
     * `{$OCI.API.TELEMETRY.HOST}` - Monitoring API endpoint, for example, `telemetry.eu-stockholm-1.oraclecloud.com`;
-                            
+
+    * `{$OCI.API.LOAD.BALANCER.HOST}` - Load Balancer API endpoint, for example, `iaas.eu-stockholm-1.oraclecloud.com`;
+
     > IMPORTANT! API Endpoint URLs need to be entered without the HTTP scheme (`https://`).
-                            
+
 11. Once you've completed adding the host to Zabbix, and it will automatically discover services and monitor them.
 
 ## Optional setup
 
 ### LLD resource filtering by free-form tags of OCI resources
 
-Every LLD rule has pre-added filtering options to avoid discovering unwanted resources, such as terminated OCI 
+Every LLD rule has pre-added filtering options to avoid discovering unwanted resources, such as terminated OCI
 compute instances. Most of these filters use specific service item names and states, and values of these filters
 are defined by the user macros `{$....MATCHES}` and `{$....NOT_MATCHES}`.
 
@@ -152,7 +464,7 @@ Find "Compute instances discovery" and open it.
 
 3. Under "LLD macros", add a new macro that will represent this location group tag, for example:
 `{#LOCATION_GROUP}` `$.tags.location_group`.
-                                                                                            
+
 4. Under the "Filters" tab, there will already be filters regarding the compute instance name and state.
 Click "Add" to add a new filter and define the previously created LLD macro and add a matching pattern and
 value, for example, `{#LOCATION_GROUP}` `matches` `eu-north-*`.
@@ -160,7 +472,7 @@ value, for example, `{#LOCATION_GROUP}` `matches` `eu-north-*`.
 5. The next time `Compute instances discovery` is executed, it will only discover OCI compute instances that
 have the free-form tag `location_group` that matches the regex of `eu-north-*`. You can also experiment with
 the LLD filter pattern matching value to receive different matching results for a specified value.
-  
+
 ### HTTP proxy usage
 
 If needed, you can specify an HTTP proxy for the template by changing the value of the `{$OCI.HTTP.PROXY}` user
@@ -184,12 +496,14 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |{$OCI.API.TELEMETRY.HOST}|<p>Host for OCI Monitoring API endpoint.</p>||
 |{$OCI.API.OBJECT.STORAGE.HOST}|<p>Host for OCI Object Storage API endpoint.</p>||
 |{$OCI.API.AUTONOMOUS.DB.HOST}|<p>Host for OCI Autonomous Database API endpoint.</p>||
+|{$OCI.API.LOAD.BALANCER.HOST}|<p>Host for OCI Load Balancer API endpoint.</p>||
 |{$OCI.API.COMPARTMENT.COMPUTE}|<p>Compartment OCIDs for compute instances. Can be a single value or a comma separated list of values.</p>||
 |{$OCI.API.COMPARTMENT.VCN}|<p>Compartment OCIDs for virtual cloud networks. Can be a single value or a comma separated list of values.</p>||
 |{$OCI.API.COMPARTMENT.VOLUME.BLOCK}|<p>Compartment OCIDs for block volumes. Can be a single value or a comma separated list of values.</p>||
 |{$OCI.API.COMPARTMENT.VOLUME.BOOT}|<p>Compartment OCIDs for boot volumes. Can be a single value or a comma separated list of values.</p>||
 |{$OCI.API.COMPARTMENT.OBJECT.STORAGE}|<p>Compartment OCIDs for object storage buckets. Can be a single value or a comma separated list of values.</p>||
 |{$OCI.API.COMPARTMENT.AUTONOMOUS.DB}|<p>Compartment OCIDs for autonomous databases. Can be a single value or a comma separated list of values.</p>||
+|{$OCI.API.COMPARTMENT.LOAD.BALANCER}|<p>Compartment OCIDs for load balancers. Can be a single value or a comma separated list of values.</p>||
 |{$OCI.API.TENANCY}|<p>OCID of tenancy.</p>||
 |{$OCI.API.USER}|<p>OCID of user.</p>||
 |{$OCI.API.PRIVATE.KEY}|<p>Entire private key for API access.</p>||
@@ -216,14 +530,26 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |{$OCI.AUTONOMOUS.DB.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of autonomous database states to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$OCI.AUTONOMOUS.DB.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of autonomous database names to allow in discovery.</p>|`.*`|
 |{$OCI.AUTONOMOUS.DB.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of autonomous database names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.LOAD.BALANCER.DISCOVERY.STATE.MATCHES}|<p>Sets the regex string of load balancer states to allow in discovery.</p>|`.*`|
+|{$OCI.LOAD.BALANCER.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of load balancer states to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.LOAD.BALANCER.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of load balancer names to allow in discovery.</p>|`.*`|
+|{$OCI.LOAD.BALANCER.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of load balancer names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
+|{$OCI.HTTP.TIMEOUT}|<p>Set an HTTP request timeout.</p>|`30s`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get compute instances|<p>Get compute instances.</p>|Script|oci.compute.get|
+|Compute instances count|<p>Get the total count of compute instances.</p>|Dependent item|oci.compute.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li></ul>|
 
 ### LLD rule Compute instances discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Compute instances discovery|<p>Discover compute instances.</p>|Script|oci.compute.discovery|
+|Compute instances discovery|<p>Discover compute instances.</p>|Dependent item|oci.compute.discovery|
 
 ### LLD rule Virtual cloud networks discovery
 
@@ -254,6 +580,12 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Autonomous database discovery|<p>Discover autonomous databases.</p>|Script|oci.object.autonomous.db.discovery|
+
+### LLD rule Load balancer discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Load balancer discovery|<p>Discover load balancers.</p>|Script|oci.object.lb.discovery|
 
 # Oracle Cloud Compute by HTTP
 
@@ -304,6 +636,7 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
+|{$OCI.HTTP.TIMEOUT}|<p>Set an HTTP request timeout.</p>|`30s`|
 |{$OCI.COMPUTE.VNIC.DISCOVERY.STATE.MATCHES}|<p>Sets the regex string of VNIC states to allow in discovery.</p>|`.*`|
 |{$OCI.COMPUTE.VNIC.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of VNIC states to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$OCI.COMPUTE.VNIC.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of VNIC names to allow in discovery.</p>|`.*`|
@@ -323,7 +656,7 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |State|<p>The current state of the instance.</p>|Script|oci.compute.state.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get VNICs|<p>Gets information about all virtual network interface cards attached to the instance.</p>|Script|oci.compute.vnic.get|
 |Get compute metrics|<p>Gets compute instance metrics.</p>|Script|oci.compute.metrics.get|
-|CPU utilization, in %|<p>Activity level from the CPU. Expressed as a percentage of the total time.</p>|Dependent item|oci.compute.cpu.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CpuUtilization`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU utilization, in %|<p>Activity level from the CPU. Expressed as a percentage of the total time.</p>|Dependent item|oci.compute.cpu.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CpuUtilization`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li></ul>|
 |Memory utilization, in %|<p>Space currently in use, measured in pages. Expressed as a percentage of used pages.</p>|Dependent item|oci.compute.mem.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MemoryUtilization`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Memory allocation stalls|<p>Number of times page reclaim was called directly.</p>|Dependent item|oci.compute.mem.stalls<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MemoryAllocationStalls`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Load average|<p>Average system load calculated over a 1-minute period. Expressed as a number of processes.</p>|Dependent item|oci.compute.load.avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LoadAverage`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -429,6 +762,7 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
+|{$OCI.HTTP.TIMEOUT}|<p>Set an HTTP request timeout.</p>|`30s`|
 
 ### Items
 
@@ -501,6 +835,7 @@ The LLD filter values and trigger threshold values can be changed with the respe
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
+|{$OCI.HTTP.TIMEOUT}|<p>Set an HTTP request timeout.</p>|`30s`|
 |{$OCI.AUTONOMOUS.DB.CPU.UTIL.WARN}|<p>Sets the percentage threshold for creating a "warning" severity event about CPU resource utilization.</p>|`75`|
 |{$OCI.AUTONOMOUS.DB.CPU.UTIL.HIGH}|<p>Sets the percentage threshold for creating a "high" severity event about CPU resource utilization.</p>|`90`|
 |{$OCI.AUTONOMOUS.DB.STORAGE.UTIL.WARN}|<p>Sets the percentage threshold for creating a "warning" severity event about storage resource utilization.</p>|`75`|
@@ -614,6 +949,7 @@ LLD filter values and trigger threshold values can be changed with respective us
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
+|{$OCI.HTTP.TIMEOUT}|<p>Set an HTTP request timeout.</p>|`30s`|
 
 ### Items
 
@@ -670,7 +1006,7 @@ This template is not meant to be used independently. A host with the `Oracle Clo
 discover OCI boot volumes automatically, create host prototypes for each discovered
 boot volume, and apply it this template.
 
-If needed, you can specify an HTTP proxy for the template to use by changing the value of the 
+If needed, you can specify an HTTP proxy for the template to use by changing the value of the
 `{$OCI.HTTP.PROXY}` user macro.
 
 If using a proxy, the returned OK HTTP response could change from "200" to a different value. In that case,
@@ -685,6 +1021,7 @@ LLD filter values and trigger threshold values can be changed with respective us
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
+|{$OCI.HTTP.TIMEOUT}|<p>Set an HTTP request timeout.</p>|`30s`|
 
 ### Items
 
@@ -707,6 +1044,199 @@ LLD filter values and trigger threshold values can be changed with respective us
 |----|-----------|----------|--------|--------------------------------|
 |OCI Boot Volume: Boot volume terminated or faulty|<p>Boot volume state is "terminated"/"terminating" or "faulty".</p>|`min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) >= 4`|High||
 |OCI Boot Volume: Boot volume state unknown|<p>Boot volume state is unknown.</p>|`min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) = 0`|Warning|**Depends on**:<br><ul><li>OCI Boot Volume: Boot volume terminated or faulty</li></ul>|
+
+# Oracle Cloud Load Balancer by HTTP
+
+## Overview
+
+This template monitors Oracle Cloud Infrastructure (OCI) load balancer resources.
+
+This template is not meant to be used independently, but together with Oracle Cloud by HTTP as a template for
+LLD host prototypes.
+
+For communication with OCI, this template utilizes script items which execute HTTP `GET` and `POST` requests.
+`POST` requests are required for OCI Monitoring API as it utilizes Monitoring Query Language (MQL) which uses
+the HTTP request body for queries.
+
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Oracle Cloud Infrastructure
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+This template is not meant to be used independently. A host with the `Oracle Cloud by HTTP` template will
+discover OCI load balancers automatically, create host prototypes for each discovered load balancer, and apply
+it to this template.
+
+If needed, you can specify an HTTP proxy for the template to use by changing the value of the
+`{$OCI.HTTP.PROXY}` user macro.
+
+If using a proxy, the returned OK HTTP response could change from "200" to a different value. In that case,
+please adjust the user macro `{$OCI.HTTP.RETURN.CODE.OK}`.
+
+The LLD filter values and trigger threshold values can be changed with the respective user macros.
+
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
+|{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200", but can vary, for example, if a proxy is used.</p>|`200`|
+|{$OCI.HTTP.TIMEOUT}|<p>Set an HTTP request timeout.</p>|`30s`|
+|{$OCI.LOAD.BALANCER.LISTENER.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of load balancer listener names to allow in discovery.</p>|`.*`|
+|{$OCI.LOAD.BALANCER.LISTENER.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of load balancer listener names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.LOAD.BALANCER.LISTENER.DISCOVERY.PORT.MATCHES}|<p>Sets the regex string of load balancer listener ports to allow in discovery.</p>|`.*`|
+|{$OCI.LOAD.BALANCER.LISTENER.DISCOVERY.PORT.NOT_MATCHES}|<p>Sets the regex string of load balancer listener ports to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.LOAD.BALANCER.BACKEND_SET.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of load balancer backend set names to allow in discovery.</p>|`.*`|
+|{$OCI.LOAD.BALANCER.BACKEND_SET.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of load balancer backend set names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.LOAD.BALANCER.BACKEND_SET.DISCOVERY.POLICY.MATCHES}|<p>Sets the regex string of load balancer backend set policy to allow in discovery.</p>|`.*`|
+|{$OCI.LOAD.BALANCER.BACKEND_SET.DISCOVERY.POLICY.NOT_MATCHES}|<p>Sets the regex string of load balancer backend set policy to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.LOAD.BALANCER.BACKEND.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of load balancer backend set backend names to allow in discovery.</p>|`.*`|
+|{$OCI.LOAD.BALANCER.BACKEND.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of load balancer backend set backend names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$OCI.LOAD.BALANCER.BACKEND.DISCOVERY.PORT.MATCHES}|<p>Sets the regex string of load balancer backend set backend ports to allow in discovery.</p>|`.*`|
+|{$OCI.LOAD.BALANCER.BACKEND.DISCOVERY.PORT.NOT_MATCHES}|<p>Sets the regex string of load balancer backend set backend ports to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get data|<p>Gets the load balancer data.</p>|Script|oci.lb.data.get|
+|Get health data|<p>Gets the load balancer health data.</p>|Script|oci.lb.data.health.get|
+|Get metrics|<p>Gets the load balancer metrics.</p>|Script|oci.lb.metrics.get|
+|Load balancer: Name|<p>Name of the load balancer.</p>|Dependent item|oci.lb.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.displayName`</p></li><li><p>Discard unchanged with heartbeat: `24h`</p></li></ul>|
+|Load balancer: State|<p>The current state of the load balancer.</p>|Dependent item|oci.lb.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lifecycleState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Shape: Name|<p>Shape name of the load balancer.</p>|Dependent item|oci.lb.shape.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.shapeName`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Shape: Bandwidth, min|<p>Minimum bandwidth set for shape of the load balancer.</p>|Dependent item|oci.lb.shape.bandwidth.min<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.shapeDetails.minimumBandwidthInMbps`</p></li><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Shape: Bandwidth, max|<p>Maximum bandwidth set for shape of the load balancer.</p>|Dependent item|oci.lb.shape.bandwidth.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.shapeDetails.maximumBandwidthInMbps`</p></li><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Load balancer: Health|<p>The current overall health status of the load balancer.</p>|Dependent item|oci.lb.health.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Backend sets: Count|<p>The total number of backend sets associated with this load balancer.</p>|Dependent item|oci.lb.backend.sets.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalBackendSetCount`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend sets: State: Unknown|<p>The total number of backend sets that are currently in the `UNKNOWN` health state.</p>|Dependent item|oci.lb.backend.sets.unknown.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.unknownStateBackendSetNames.length()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend sets: State: Warning|<p>The total number of backend sets that are currently in the `WARNING` health state.</p>|Dependent item|oci.lb.backend.sets.warning.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.warningStateBackendSetNames.length()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend sets: State: Critical|<p>The total number of backend sets that are currently in the `CRITICAL` health state.</p>|Dependent item|oci.lb.backend.sets.critical.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.criticalStateBackendSetNames.length()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Connections: Handled|<p>Number of handled connections by the load balancer.</p>|Dependent item|oci.lb.metrics.connections.handled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.HandledConnections`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Connections: Accepted|<p>Number of accepted connections by the load balancer.</p>|Dependent item|oci.lb.metrics.connections.accepted<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.AcceptedConnections`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Connections: Active|<p>Number of active connections to the load balancer.</p>|Dependent item|oci.lb.metrics.connections.active<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ActiveConnections`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Connections: Closed|<p>Number of closed connections by the load balancer.</p>|Dependent item|oci.lb.metrics.connections.closed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ClosedConnections`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SSL: Connections: Active|<p>Number of active SSL connections.</p>|Dependent item|oci.lb.metrics.connections.active_ssl<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ActiveSSLConnections`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SSL: Handshakes: Accepted|<p>Number of accepted SSL handshakes by the load balancer.</p>|Dependent item|oci.lb.metrics.handshake.accepted_ssl<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.AcceptedSSLHandshake`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SSL: Handshakes: Failed|<p>Number of failed SSL handshakes.</p>|Dependent item|oci.lb.metrics.handshake.failed_ssl<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.FailedSSLHandshake`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SSL: Failed client certificate verifications|<p>Number of failed client SSL certificate verifications.</p>|Dependent item|oci.lb.metrics.certificate.failed_ssl<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.FailedSSLClientCertVerify`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Networking: Bytes received|<p>Bytes received by the load balancer.</p>|Dependent item|oci.lb.metrics.bytes.in<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.BytesReceived`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Networking: Bytes sent|<p>Bytes sent by the load balancer.</p>|Dependent item|oci.lb.metrics.bytes.out<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.BytesSent`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Networking: Peak bandwidth|<p>Displays the load balancer's peak bandwidth for the duration.</p>|Dependent item|oci.lb.metrics.bandwidth.peak<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.PeakBandwidth`</p></li><li><p>Custom multiplier: `1000000`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Networking: Response time first byte|<p>Displays the load balancer's first byte response time (TCP only).</p>|Dependent item|oci.lb.metrics.time.response<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ResponseTimeFirstByte`</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OCI Load Balancer: State has changed|<p>Load balancer state has changed.</p>|`last(/Oracle Cloud Load Balancer by HTTP/oci.lb.state,#1)<>last(/Oracle Cloud Load Balancer by HTTP/oci.lb.state,#2)`|Info|**Manual close**: Yes|
+|OCI Load Balancer: Backend set count has changed|<p>Backend set count has changed.</p>|`last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.sets.count,#1)<>last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.sets.count,#2) and length(last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.sets.count))>0`|Info|**Manual close**: Yes|
+
+### LLD rule Listener discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Listener discovery|<p>Discover the load balancer's listeners.</p>|Dependent item|oci.lb.listener.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.listeners`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for Listener discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Listener [{#LISTENER.NAME}]: Get data|<p>Get the raw data for the discovered load balancer listener.</p>|Dependent item|oci.lb.listener.get[{#LISTENER.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.listeners.["{#LISTENER.NAME}"]`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Listener [{#LISTENER.NAME}]: Port|<p>The communication port for the listener.</p>|Dependent item|oci.lb.listener.port["{#LISTENER.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.port`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Listener [{#LISTENER.NAME}]: Protocol|<p>The protocol on which the listener accepts connection requests.</p>|Dependent item|oci.lb.listener.protocol["{#LISTENER.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.protocol`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Trigger prototypes for Listener discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OCI Load Balancer: Listener [{#LISTENER.NAME}]: Listener port changed|<p>Port for the listener has changed.</p>|`last(/Oracle Cloud Load Balancer by HTTP/oci.lb.listener.port["{#LISTENER.NAME}"],#1)<>last(/Oracle Cloud Load Balancer by HTTP/oci.lb.listener.port["{#LISTENER.NAME}"],#2) and length(last(/Oracle Cloud Load Balancer by HTTP/oci.lb.listener.port["{#LISTENER.NAME}"]))>0`|Info|**Manual close**: Yes|
+|OCI Load Balancer: Listener [{#LISTENER.NAME}]: Listener protocol changed|<p>Protocol for the listener has changed.</p>|`last(/Oracle Cloud Load Balancer by HTTP/oci.lb.listener.protocol["{#LISTENER.NAME}"],#1)<>last(/Oracle Cloud Load Balancer by HTTP/oci.lb.listener.protocol["{#LISTENER.NAME}"],#2) and length(last(/Oracle Cloud Load Balancer by HTTP/oci.lb.listener.protocol["{#LISTENER.NAME}"]))>0`|Info|**Manual close**: Yes|
+
+### LLD rule Backend sets discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Backend sets discovery|<p>Discover the load balancer's backend sets.</p>|Dependent item|oci.lb.backend.sets.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.backendSets`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for Backend sets discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Backend set [{#BACKEND.SET.NAME}]: Get metrics|<p>Gets the backend set metrics.</p>|Script|oci.lb.backend.set.metrics.get[{#BACKEND.SET.NAME}]|
+|Backend set [{#BACKEND.SET.NAME}]: Backend servers: Total|<p>Number of backend servers in the backend set.</p>|Dependent item|oci.lb.backend.set.backend.servers[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.BackendServers`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Backend servers: Unhealthy|<p>Number of unhealthy backend servers in the backend set.</p>|Dependent item|oci.lb.backend.set.backend.servers.unhealthy[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.UnHealthyBackendServers`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Bytes sent|<p>Number of bytes sent across all backend servers.</p>|Dependent item|oci.lb.backend.set.bytes.sent[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.BytesSent`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Bytes received|<p>Number of bytes received across all backend servers.</p>|Dependent item|oci.lb.backend.set.bytes.received[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.BytesReceived`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Inbound requests|<p>Number of incoming client requests to the backend set.</p>|Dependent item|oci.lb.backend.set.http.requests[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.HttpRequests`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Responses: Total|<p>Number of responses across all backend servers.</p>|Dependent item|oci.lb.backend.set.http.responses[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.HttpResponses`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Responses: Average HTTP response time|<p>Average response time of backend servers. HTTP only.</p>|Dependent item|oci.lb.backend.set.response.http[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ResponseTimeHttpHeader`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Responses: Average TCP response time|<p>Average response time of backend servers. TCP only.</p>|Dependent item|oci.lb.backend.set.response.tcp[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ResponseTimeFirstByte`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Backend timeouts|<p>Number of timeouts across all backend servers.</p>|Dependent item|oci.lb.backend.set.backend.timeouts[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.BackendTimeouts`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Responses: Invalid header|<p>Number of invalid header responses across all backend servers.</p>|Dependent item|oci.lb.backend.set.response.invalid[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.InvalidHeaderResponses`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Responses: HTTP 200|<p>Number of HTTP 200 responses.</p>|Dependent item|oci.lb.backend.set.response.200[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.HttpResponses200`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Responses: HTTP 2xx|<p>Number of HTTP 2xx responses.</p>|Dependent item|oci.lb.backend.set.response.2xx[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.HttpResponses2xx`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Responses: HTTP 3xx|<p>Number of HTTP 3xx responses.</p>|Dependent item|oci.lb.backend.set.response.3xx[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.HttpResponses3xx`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Responses: HTTP 4xx|<p>Number of HTTP 4xx responses.</p>|Dependent item|oci.lb.backend.set.response.4xx[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.HttpResponses4xx`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Responses: HTTP 5xx|<p>Number of HTTP 5xx responses.</p>|Dependent item|oci.lb.backend.set.response.5xx[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.HttpResponses5xx`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Responses: HTTP 502|<p>Number of HTTP 502 responses.</p>|Dependent item|oci.lb.backend.set.response.502[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.HttpResponses502`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Responses: HTTP 504|<p>Number of HTTP 504 responses.</p>|Dependent item|oci.lb.backend.set.response.504[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.HttpResponses504`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Connections: Active|<p>Number of active connections from the load balancer to all backend servers.</p>|Dependent item|oci.lb.backend.set.connections.active[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ActiveConnections`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Connections: Keep-alive|<p>Number of keep-alive connections.</p>|Dependent item|oci.lb.backend.set.connections.keepalive[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.KeepaliveConnections`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Connections: Closed|<p>Number of closed connections.</p>|Dependent item|oci.lb.backend.set.connections.closed[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ClosedConnections`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Get health data|<p>Gets the backend set health data.</p>|Script|oci.lb.backend.set.health.get[{#BACKEND.SET.NAME}]|
+|Backend set [{#BACKEND.SET.NAME}]: Backend set health|<p>Overall health status of the backend set.</p>|Dependent item|oci.lb.backend.set.health[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Get data|<p>Gets the raw data for the discovered load balancer backend set.</p>|Dependent item|oci.lb.backend.set.get[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.backendSets.["{#BACKEND.SET.NAME}"]`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Policy|<p>Policy for the backend set.</p>|Dependent item|oci.lb.backend.set.policy[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.policy`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Number of backends|<p>Total number of backends in the backend set.</p>|Dependent item|oci.lb.backend.set.total[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.backends.length()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Health checker: Port|<p>Port for the backend set health checker.</p>|Dependent item|oci.lb.backend.set.health.port[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.healthChecker.port`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Trigger prototypes for Backend sets discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OCI Load Balancer: Backend set [{#BACKEND.SET.NAME}]: Backend set policy changed|<p>Policy for the backend set has changed.</p>|`last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.set.policy[{#BACKEND.SET.NAME}],#1)<>last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.set.policy[{#BACKEND.SET.NAME}],#2) and length(last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.set.policy[{#BACKEND.SET.NAME}]))>0`|Info|**Manual close**: Yes|
+|OCI Load Balancer: Backend set [{#BACKEND.SET.NAME}]: Number of backends changed|<p>Total count of backends in the backend set has changed.</p>|`last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.set.total[{#BACKEND.SET.NAME}],#1)<>last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.set.total[{#BACKEND.SET.NAME}],#2) and length(last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.set.total[{#BACKEND.SET.NAME}]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>OCI Load Balancer: Backend set [{#BACKEND.SET.NAME}]: No backends configured</li></ul>|
+|OCI Load Balancer: Backend set [{#BACKEND.SET.NAME}]: No backends configured|<p>There are no configured backends for the backend set.</p>|`last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.set.total[{#BACKEND.SET.NAME}],#1)=0`|Warning||
+
+### LLD rule Backends discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Backends discovery|<p>Discover backends of a backend set.</p>|Nested|oci.lb.backend.discovery[{#BACKEND.SET.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.backends`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for Backends discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Get health data|<p>Gets the backend health data.</p>|Script|oci.lb.backend.health.get[{#BACKEND.SET.NAME}/{#BACKEND.NAME}]|
+|Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Backend health|<p>The general health status of the specified backend server as reported by the primary and standby load balancers.</p>|Dependent item|oci.lb.backend.health[{#BACKEND.SET.NAME}/{#BACKEND.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Get data|<p>Get the raw data for the discovered load balancer backend.</p>|Dependent item|oci.lb.backend.get[{#BACKEND.SET.NAME}/{#BACKEND.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Drain status|<p>Whether the load balancer should drain this server. Servers marked "drain" receive no new incoming traffic.</p>|Dependent item|oci.lb.backend.drain[{#BACKEND.SET.NAME}/{#BACKEND.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.drain`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Backup status|<p>Whether the load balancer should treat this server as a backup unit.</p><p>If true, the load balancer forwards no ingress traffic to this backend server unless all other backend servers not marked as "backup" fail the health check policy.</p>|Dependent item|oci.lb.backend.backup[{#BACKEND.SET.NAME}/{#BACKEND.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.backup`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Offline status|<p>Whether the load balancer should treat this server as offline. Offline servers receive no incoming traffic.</p>|Dependent item|oci.lb.backend.offline[{#BACKEND.SET.NAME}/{#BACKEND.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.offline`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Weight|<p>The load balancing policy weight assigned to the server.</p><p>Backend servers with a higher weight receive a larger proportion of incoming traffic.</p><p>For example, a server weighted '3' receives 3 times the number of new connections as a server weighted '1'.</p>|Dependent item|oci.lb.backend.weight[{#BACKEND.SET.NAME}/{#BACKEND.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.weight`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Max connections|<p>The maximum number of simultaneous connections the load balancer can make to the backend.</p><p>If this is not set or set to 0 then the maximum number of simultaneous connections the load balancer can make to the backend is unlimited.</p>|Dependent item|oci.lb.backend.connections.max[{#BACKEND.SET.NAME}/{#BACKEND.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxConnections`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Trigger prototypes for Backends discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OCI Load Balancer: Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Health in unknown state|<p>Backend is in `UNKNOWN` health state.</p>|`last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.health[{#BACKEND.SET.NAME}/{#BACKEND.NAME}])<2`|Info|**Depends on**:<br><ul><li>OCI Load Balancer: Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Health in warning state</li></ul>|
+|OCI Load Balancer: Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Health in warning state|<p>Backend is in `WARNING` health state.</p>|`last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.health[{#BACKEND.SET.NAME}/{#BACKEND.NAME}])=3`|Warning|**Depends on**:<br><ul><li>OCI Load Balancer: Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Health in critical state</li></ul>|
+|OCI Load Balancer: Backend set [{#BACKEND.SET.NAME}]: Backend [{#BACKEND.NAME}]: Health in critical state|<p>Backend is in `CRITICAL` health state.</p>|`last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.health[{#BACKEND.SET.NAME}/{#BACKEND.NAME}])=4`|High||
 
 # Oracle Cloud Networking by HTTP
 
@@ -755,6 +1285,7 @@ LLD filter values and trigger threshold values can be changed with respective us
 |----|-----------|-------|
 |{$OCI.HTTP.PROXY}|<p>Set an HTTP proxy for OCI API requests if needed.</p>||
 |{$OCI.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200",  but can vary, for example, if a proxy is used.</p>|`200`|
+|{$OCI.HTTP.TIMEOUT}|<p>Set an HTTP request timeout.</p>|`30s`|
 |{$OCI.VCN.SUBNET.DISCOVERY.STATE.MATCHES}|<p>Sets the regex string of VCN subnet states to allow in discovery.</p>|`.*`|
 |{$OCI.VCN.SUBNET.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of VCN subnet states to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$OCI.VCN.SUBNET.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of VCN subnet names to allow in discovery.</p>|`.*`|

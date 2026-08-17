@@ -414,7 +414,7 @@ class CSVGPie {
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_CONTAINER}`)
 			.data(this.#pieGenerator(is), key)
-			.attr('data-hintbox-contents', d => this.#getHint(d.data))
+			.attr('data-hintbox-html', d => this.#getHint(d.data))
 			.each((d, index, nodes) => {
 				const sector = nodes[index];
 

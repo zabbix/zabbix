@@ -79,6 +79,23 @@ class CHousekeepingHelper {
 	}
 
 	/**
+	 * Get array of value types supported by housekeeper trends.
+	 *
+	 * @return array
+	 */
+	public static function getValueTypesWithTrends(): array {
+		$value_types_with_trends = [];
+
+		foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $value_type) {
+			if (Manager::History()->getDataSourceType($value_type) == ZBX_HISTORY_SOURCE_SQL) {
+				$value_types_with_trends[] = $value_type;
+			}
+		}
+
+		return $value_types_with_trends;
+	}
+
+	/**
 	 * @return array
 	 */
 	public static function getWarnings(): array {

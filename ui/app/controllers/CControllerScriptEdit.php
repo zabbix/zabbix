@@ -185,7 +185,16 @@ class CControllerScriptEdit extends CController {
 
 		$data['is_global_scripts_enabled'] = CSettingsHelper::isGlobalScriptsEnabled();
 
-		$response = new CControllerResponseData($data);
+		$create_rules = (new CFormValidator(CControllerScriptCreate::getValidationRules()))->getRules();
+		$rules = $this->hasInput('scriptid')
+			? (new CFormValidator(CControllerScriptUpdate::getValidationRules()))->getRules()
+			: $create_rules;
+
+		$response = new CControllerResponseData([
+			'form' => $data,
+			'js_validation_rules' => $rules,
+			'js_clone_validation_rules' => $create_rules
+		]);
 		$response->setTitle(_('Configuration of scripts'));
 		$this->setResponse($response);
 	}

@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 use Facebook\WebDriver\WebDriverKeys;
@@ -31,14 +32,15 @@ use Facebook\WebDriver\WebDriverKeys;
 class testUserRolesPermissions extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
+	 * Attach MessageBehavior, TableBehavior and DatatableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			CTableBehavior::class,
+			CDatatableBehavior::class
 		];
 	}
 
@@ -292,7 +294,7 @@ class testUserRolesPermissions extends CWebTest {
 					'list_link' => 'sysmaps.php',
 					'action_link' => 'zabbix.php?action=map.view&sysmapid=1',
 					'action' => 'Create and edit maps',
-					'check_links' => ['sysmap.php?sysmapid=1', 'sysmaps.php?form=Create+map']
+					'check_links' => ['sysmap.php?sysmapid=1', 'sysmaps.php?form=create']
 				]
 			],
 			// Dashboard creation/edit.
@@ -330,9 +332,9 @@ class testUserRolesPermissions extends CWebTest {
 						'Cancel'
 					],
 					'list_link' => 'zabbix.php?action=scheduledreport.list',
-					'action_link' => 'zabbix.php?action=scheduledreport.edit&reportid=',
+					'action_link' => 'zabbix.php?action=popup&popup=scheduledreport.edit&reportid=',
 					'action' => 'Manage scheduled reports',
-					'check_links' => ['zabbix.php?action=scheduledreport.edit']
+					'check_links' => ['zabbix.php?action=popup&popup=scheduledreport.edit']
 				]
 			]
 		];
@@ -364,6 +366,14 @@ class testUserRolesPermissions extends CWebTest {
 
 			foreach ($data['form_button'] as $text) {
 				$this->assertTrue($this->query('button', $text)->one()->isEnabled(($text === 'Cancel') ? true : $action_status));
+			}
+
+			// For modal overlay form pages, click Cancel to properly close the overlay before navigating away.
+			// This prevents Chrome from logging a SEVERE console error about blocking the beforeunload dialog.
+			if (in_array('Cancel', $data['form_button'])) {
+				$this->query('button:Cancel')->one()->click();
+				COverlayDialogElement::ensureNotPresent();
+				$this->page->waitUntilReady();
 			}
 
 			if ($action_status) {
@@ -472,7 +482,8 @@ class testUserRolesPermissions extends CWebTest {
 
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-			$row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag');
+			$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
+			$row = $table->findRow('Problem', 'Test trigger with tag');
 			$row->getColumn('Update')->query('link:Update')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
@@ -482,7 +493,7 @@ class testUserRolesPermissions extends CWebTest {
 			// Check that problem actions works after they were turned on.
 			if ($action_status === false) {
 				$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-				$row->getColumn('Update')->query('link:Update')->waitUntilCLickable()->one()->click();
+				$row->getColumn('Update')->query('link:Update')->waitUntilClickable()->one()->click();
 				COverlayDialogElement::find()->waitUntilReady()->one();
 
 				if ($data['activityid'] === 'message') {
@@ -490,8 +501,11 @@ class testUserRolesPermissions extends CWebTest {
 					$dialog->query('button:Update')->one()->click();
 					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
-					$row->getColumn('Actions')->query("xpath:.//button[".
-							CXPathHelper::fromClass('zi-alert-with-content')."]")->one()->click();
+					$table->waitUntilReady()->invalidate();
+
+					// Variable row cannot be reused here as it becomes stalled in the problems page.
+					$table->findRow('Problem', 'Test trigger with tag')->getColumn('Actions')->query("xpath:.//button[".
+							CXPathHelper::fromClass('zi-alert-with-content')."]")->one()->scrollIntoView(50)->click();
 					$message_hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
 					$value = $message_hint->query('class:list-table')->asTable()->one()->getRow(0)->getColumn($data['column'])->getText();
 					$this->assertEquals($data['value'], $value);
@@ -506,6 +520,8 @@ class testUserRolesPermissions extends CWebTest {
 					$dialog->query('button:Update')->one()->click();
 					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
+					$table->waitUntilReady();
+					$row->invalidate();
 					$status = $row->getColumn($data['column'])->getText();
 					$this->assertEquals($data['value'], $status);
 				}
@@ -541,7 +557,7 @@ class testUserRolesPermissions extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&name=Problem trap>150 [Cause]');
 
 		// Check context menu 'Mark as cause' & 'Mark selected as symptoms' options accessibility.
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		$table->query('link', 'Problem trap>150 [Cause]')->waitUntilVisible()->one()->click();
 		$context_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 
@@ -564,7 +580,7 @@ class testUserRolesPermissions extends CWebTest {
 		COverlayDialogElement::closeAll();
 
 		// Check 'Convert to cause' checkbox state via mass update form.
-		$this->selectTableRows();
+		$this->selectDatatableRows();
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 		$this->assertTrue(COverlayDialogElement::find()->waitUntilReady()->one()->asForm()
 				->getField('Convert to cause')->isEnabled($data['state'])
@@ -590,7 +606,7 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			// Problem page.
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-			$problem_row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', $problem);
+			$problem_row = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady()->findRow('Problem', $problem);
 			$this->assertEquals($action_status, $problem_row->getColumn('Update')->query('xpath:.//*[text()="Update"]')
 					->one()->isAttributePresent('href'));
 
@@ -620,7 +636,7 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'link' => 'zabbix.php?action=problem.view',
-					'selector' => 'xpath:(//a[@class="link-action wordbreak" and text()="ЗАББИКС Сервер"])[1]'
+					'selector' => 'xpath:(//a[@class="link-action overflow-ellipsis" and text()="ЗАББИКС Сервер"])[1]'
 				]
 			],
 			// Dashboard problem widget.
@@ -849,7 +865,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Action log',
 						'Notifications'
 					],
-					'link' => ['zabbix.php?action=auditlog.list']
+					'link' => ['zabbix.php?action=auditlog.list', 'zabbix.php?action=auditlog.csv']
 				]
 			],
 			[
@@ -1680,11 +1696,12 @@ class testUserRolesPermissions extends CWebTest {
 		$this->query('id:filter_tags_0_operator')->asDropdown()->waitUntilVisible()->one()->fill('Does not exist');
 
 		// Apply filter in order to see the list of available services.
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->query('name:filter_set')->waitUntilClickable()->one()->click();
+		$table->waitUntilReloaded();
 		$this->page->waituntilReady();
 
 		$this->assertTableDataColumn($column_content, 'Name');
-		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Check buttons are not visible for user with no permissions, otherwise, check edit permissions per service.
 		if ($data['role_config']['Read-write access to services'] === 'None') {
@@ -1788,13 +1805,12 @@ class testUserRolesPermissions extends CWebTest {
 		// Login and select host group for testing.
 		$this->page->userLogin($data['user'], 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$table->waitUntilReloaded();
+		$table = $this->query('id:datatable-latest')->asDatatable()->one()->waitUntilReady();
 
-		$selected_count = $this->query('id:selected_count')->one();
+		$selected_count = $this->query('class:selected-item-count')->one()->waitUntilVisible();
 		$select_all = $this->query('id:all_items')->asCheckbox()->one();
 
 		foreach ($data['test_cases'] as $test_case) {
@@ -1896,12 +1912,12 @@ class testUserRolesPermissions extends CWebTest {
 		// Login and select host group for testing.
 		$this->page->userLogin($data['user'], 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=latest.view&filter_reset=1')->waitUntilReady();
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
+		$table->waitUntilReady()->invalidate();
 
 		foreach ($data['test_cases'] as $test_case) {
 			// Disabled "Execute now" option in context menu.

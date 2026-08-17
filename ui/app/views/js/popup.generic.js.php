@@ -103,6 +103,21 @@ window.popup_generic = {
 		});
 	},
 
+	initUsersFilter() {
+		const overlay = overlays_stack.end();
+
+		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
+			jQuery(ms).on('change', {overlay: overlay}, function (e) {
+				const users = jQuery(this).multiSelect('getData');
+				const parameters = {userid: users.length > 0 ? users[0].id : undefined};
+
+				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
+					dialogueid: e.data.overlay.dialogueid
+				});
+			});
+		});
+	},
+
 	initHelpItems() {
 		$('#itemtype').on('change', (e) => {
 			reloadPopup(e.target.closest('form'));

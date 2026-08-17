@@ -18,6 +18,7 @@
 
 #include "../events/events.h"
 
+#include "zbx_rtc_constants.h"
 #include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxlog.h"
@@ -330,7 +331,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to lld manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	lld_register_worker(&lld_socket);
@@ -364,7 +365,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 		{
 			if (ZBX_IS_RUNNING())
 				zabbix_log(LOG_LEVEL_CRIT, "cannot read LLD manager service request");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -415,9 +416,15 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 				zbx_ipc_socket_write(&lld_socket, ZBX_IPC_LLD_DONE, NULL, 0);
 				processed_num++;
 				break;
+			case ZBX_RTC_SHUTDOWN:
+				zbx_set_exiting_with_succeed();
+				break;
 		}
 
 		zbx_ipc_message_clean(&message);
+#ifdef HAVE_MALLOC_TRIM
+		zbx_malloc_trim(time(NULL), 0, ZBX_MEBIBYTE * 8);
+#endif
 	}
 
 	if (0 != lld_value.item.itemid)

@@ -64,6 +64,8 @@
 				change_psk.addEventListener('click', () => {
 					this.#psk_required.value = 1;
 					this.#updateFormFields();
+
+					document.getElementById('tls_psk_identity').focus();
 				});
 			}
 		}

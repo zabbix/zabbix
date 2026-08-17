@@ -80,7 +80,7 @@ static void	key_path_free(zbx_keys_path_t *keys_path)
 static void	get_macro_secrets(const zbx_vector_keys_path_ptr_t *keys_paths, struct zbx_json *j,
 		const zbx_config_vault_t *config_vault, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location)
+		const char *config_ssl_key_location, int *vault_ret)
 {
 	zbx_kvs_t	kvs;
 
@@ -97,9 +97,15 @@ static void	get_macro_secrets(const zbx_vector_keys_path_ptr_t *keys_paths, stru
 		zbx_hashset_iter_t	iter;
 
 		if (FAIL == zbx_vault_get_kvs(keys_path->path, &kvs, config_vault, config_source_ip,
-				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
+				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, vault_ret,
+				&error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", keys_path->path, error);
+			int	log_level = (NULL != vault_ret && FAIL == *vault_ret) ?
+					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
+
+			zabbix_log(log_level, "cannot get secrets for path \"%s\": %s",
+					keys_path->path, error);
+
 			zbx_free(error);
 			continue;
 		}
@@ -738,7 +744,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_has
 	if (-1 == fld_type || -1 == fld_key || -1 == fld_master_itemid)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_json_addobject(j, table->table);
@@ -1212,7 +1218,7 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, struct zbx_json *j, zbx_proxyconfig_status_t *status,
 		zbx_uint64_t proxy_secrets_provider, zbx_uint64_t proxy_revision, zbx_uint64_t macro_revision,
-		char **error)
+		int *vault_ret, char **error)
 {
 #define ZBX_PROXYCONFIG_SYNC_HOSTS		0x0001
 #define ZBX_PROXYCONFIG_SYNC_GMACROS		0x0002
@@ -1278,7 +1284,7 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		if (SUCCEED == global_macros)
 			flags |= ZBX_PROXYCONFIG_SYNC_GMACROS;
 
-		if(0 != macro_hostids.values_num)
+		if (0 != macro_hostids.values_num)
 			flags |= ZBX_PROXYCONFIG_SYNC_HMACROS;
 
 		/* config sync is required because of possible proxy timeout changes overriding global timeouts */
@@ -1452,7 +1458,7 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		if (ZBX_PROXY_SECRETS_PROVIDER_SERVER == proxy_secrets_provider)
 		{
 			get_macro_secrets(&keys_paths, j, config_vault, config_source_ip, config_ssl_ca_location,
-					config_ssl_cert_location, config_ssl_key_location);
+					config_ssl_cert_location, config_ssl_key_location, vault_ret);
 		}
 	}
 
@@ -1496,7 +1502,7 @@ out:
 int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
 		zbx_proxyconfig_status_t *status, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **error)
+		const char *config_ssl_key_location, int *vault_ret, char **error)
 {
 	int			ret = FAIL;
 	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1], *failover_delay = NULL;
@@ -1584,7 +1590,8 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 				hostmap_sync, proxy_hostmap_revision, hostmap_revision, failover_delay,
 				&del_hostproxyids, config_vault, config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location, j, status,
-				(zbx_uint64_t)cfg.proxy_secrets_provider, proxy_revision, macro_revision, error)))
+				(zbx_uint64_t)cfg.proxy_secrets_provider, proxy_revision, macro_revision,
+				vault_ret, error)))
 		{
 			goto out;
 		}
@@ -1632,7 +1639,7 @@ out:
 void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location)
+		const char *config_ssl_key_location, int *vault_ret)
 {
 	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
@@ -1676,7 +1683,8 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &status, config_vault, config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			vault_ret, &error))
 	{
 		(void)zbx_send_response_ext(sock, FAIL, error, NULL, flags, config_timeout);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",

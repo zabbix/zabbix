@@ -40,6 +40,7 @@
 #define	ZBX_CFG_ENVVAR_USE	0
 #define	ZBX_CFG_ENVVAR_IGNORE	1
 
+#define ZBX_AGENT_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
 #define ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
 #define ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY	5
 
@@ -80,6 +81,9 @@ int	zbx_parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int optional, 
 
 int	zbx_check_cfg_feature_int(const char *parameter, int value, const char *feature);
 int	zbx_check_cfg_feature_str(const char *parameter, const char *value, const char *feature);
+int	zbx_cfg_validate_bridge_adapter_url(const char *url, char **error);
+int	zbx_cfg_prepare_bridge_adapter_connect_to(const char *url, const char *connect_to, char **curl_connect_to,
+		char **error);
 
 typedef int	(*add_serveractive_host_f)(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data);
 int	zbx_set_data_destination_hosts(const char *str, unsigned short port, const char *name,

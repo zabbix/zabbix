@@ -66,6 +66,10 @@ More on metrics and used API methods:
 
   - [Cloud Run](https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z#gcp-run)
 
+  - [Cloud Storage](https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z#gcp-storage)
+
+  - [Cloud Load Balancing](https://docs.cloud.google.com/monitoring/api/metrics_gcp_i_o#gcp-loadbalancing)
+
 
 ### Macros used
 
@@ -109,6 +113,16 @@ More on metrics and used API methods:
 |{$GCP.CLOUD.RUN.SERVICE.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud Run services by name.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.CLOUD.RUN.SERVICE.CONDITION.MATCHES}|<p>The filter to include GCP Cloud Run services by condition.</p>|`.*`|
 |{$GCP.CLOUD.RUN.SERVICE.CONDITION.NOT_MATCHES}|<p>The filter to exclude GCP Cloud Run services by condition.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.BUCKET.NAME.MATCHES}|<p>The filter to include GCP Cloud Storage buckets by name.</p>|`.*`|
+|{$GCP.BUCKET.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud Storage buckets by name.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.LB.NAME.MATCHES}|<p>The filter to include load balancers by name.</p>|`.*`|
+|{$GCP.LB.NAME.NOT_MATCHES}|<p>The filter to exclude load balancers by name.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.LB.SCHEME.MATCHES}|<p>The filter to include load balancers by scheme.</p>|`.*`|
+|{$GCP.LB.SCHEME.NOT_MATCHES}|<p>The filter to exclude load balancers by scheme.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.LB.PROTOCOL.MATCHES}|<p>The filter to include load balancers by protocol.</p>|`.*`|
+|{$GCP.LB.PROTOCOL.NOT_MATCHES}|<p>The filter to exclude load balancers by protocol.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.LB.SCOPE.MATCHES}|<p>The filter to include load balancers by scope.</p>|`.*`|
+|{$GCP.LB.SCOPE.NOT_MATCHES}|<p>The filter to exclude load balancers by scope.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
@@ -128,6 +142,11 @@ More on metrics and used API methods:
 |Container-optimized GCE instances count|<p>GCP Compute Engine: count of instances with Container-Optimized OS used.</p>|Dependent item|gcp.gce.instances.cos_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.i_type == 'container-optimized')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Project quotas get|<p>GCP Compute Engine resource quotas available for the particular project.</p>|Dependent item|gcp.gce.quotas.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Cloud Run service total|<p>GCP Cloud Run services total count.</p>|Dependent item|gcp.run.service.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Cloud Storage buckets get|<p>GCP Cloud Storage: Buckets get.</p>|Dependent item|gcp.storage.buckets.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Cloud Storage buckets total|<p>GCP Cloud Storage buckets total count.</p>|Dependent item|gcp.storage.buckets.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Load balancers (forwarding rules) get|<p>GCP Application Load Balancing forwarding rules.</p>|Dependent item|gcp.lb.forwarding_rules.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Global load balancers total|<p>GCP Application Load Balancing global forwarding rules total count.</p>|Dependent item|gcp.lb.forwarding_rules.global.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.scope=="global")].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Regional load balancers total|<p>GCP Application Load Balancing regional forwarding rules total count.</p>|Dependent item|gcp.lb.forwarding_rules.regional.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.scope=="regional")].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Triggers
 
@@ -187,6 +206,18 @@ More on metrics and used API methods:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |GCP Cloud Run: Service discovery|<p>GCP Cloud Run services discovery.</p>|Dependent item|gcp.run.service.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP Cloud Storage: Buckets discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP Cloud Storage: Buckets discovery|<p>GCP Cloud Storage: Buckets discovery.</p>|Dependent item|gcp.storage.buckets.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP Application Load Balancing: Load balancer discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP Application Load Balancing: Load balancer discovery|<p>Discovers GCP forwarding rules representing Load Balancers</p><p>using the Compute Engine aggregated forwardingRules API.</p><p></p><p>The discovery automatically creates monitored hosts for:</p><p>  - Global external Application Load Balancers</p><p>  - Regional external Application Load Balancers</p><p>  - Internal Application Load Balancers</p><p>It also supports discovery of Network Load Balancers.</p>|Dependent item|gcp.lb.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 # GCP Compute Engine Instance by HTTP
 
@@ -858,6 +889,344 @@ This template will be automatically connected to discovered entities with all th
 |GCP Cloud Run Service: Too many HTTP request failures|<p>Too many requests failed on service with the `5xx` HTTP code.</p>|`min(/GCP Cloud Run Service by HTTP/gcp.run.request.5xx.rate,5m)>{$GCP.HTTP.FAIL.MAX.WARN}`|Warning||
 |GCP Cloud Run Service: Request latency is too high|<p>Fires when latency exceeds the threshold `{$GCP.REQUEST.LATENCY.WARN}`ms.</p>|`min(/GCP Cloud Run Service by HTTP/gcp.run.request.latency,5m)>{$GCP.REQUEST.LATENCY.WARN}`|Warning|**Manual close**: Yes|
 |GCP Cloud Run Service: No active container instances|<p>There are no active container instances for the service. This may indicate that the service is not receiving traffic or there is an issue with scaling.</p>|`max(/GCP Cloud Run Service by HTTP/gcp.run.active.container.count,15m)=0`|Warning|**Manual close**: Yes|
+
+# GCP Cloud Storage Bucket by HTTP
+
+## Overview
+
+This template is designed to monitor Google Cloud Platform Cloud Storage buckets using Zabbix.
+
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- GCP Cloud Storage
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$GCP.PROJECT.ID}|<p>GCP project ID.</p>||
+|{$GCP.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`15s`|
+|{$GCP.TIME.WINDOW}|<p>Time interval for data requests.</p><p>Supported usage types:</p><p>- Default update interval for most items.</p><p>- Minimal time window for data requested in Monitoring Query Language REST API request.</p>|`1h`|
+|{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$GCS.BUCKET.SIZE.MAX}|<p>GCP Cloud Storage bucket size threshold (in bytes). Default is 1TB.</p>|`1T`|
+|{$GCS.BUCKET.SIZE.GROWTH.MAX}|<p>GCP Cloud Storage bucket size growth threshold (in bytes per hour). Default is 10GB.</p>|`10G`|
+|{$GCS.OBJECT.COUNT.MAX}|<p>GCP Cloud Storage bucket object count threshold. Default is 1M objects.</p>|`1000000`|
+|{$GCS.EGRESS.MAX}|<p>GCP Cloud Storage bucket egress traffic threshold (in bytes per 5m). Default is 100MB.</p>|`104857600`|
+|{$GCS.INGRESS.MAX}|<p>GCP Cloud Storage bucket ingress traffic threshold (in bytes per 5m). Default is 100MB.</p>|`104857600`|
+|{$GCS.API.ERROR.MAX}|<p>GCP Cloud Storage bucket API error rate threshold (per 5m). Default is 50.</p>|`50`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get bucket storage info|<p>GCP Cloud Storage bucket raw metric data.</p>|HTTP agent|gcp.storage.bucket.metrics.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Bucket size|<p>GCP Cloud Storage bucket total size.</p>|Dependent item|gcp.storage.bucket.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..size.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Bucket objects total count|<p>Cloud Storage bucket total object count.</p>|Dependent item|gcp.storage.bucket.objects.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..objects.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get bucket network traffic|<p>GCP Cloud Storage bucket raw traffic data.</p>|HTTP agent|gcp.storage.bucket.network.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Bucket sent bytes|<p>Outgoing network traffic from the bucket.</p>|Dependent item|gcp.storage.bucket.network.sent_bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$..sent.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Bucket received bytes|<p>Incoming network traffic to the bucket.</p>|Dependent item|gcp.storage.bucket.network.received_bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$..received.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get bucket API metric|<p>GCP Cloud Storage bucket API raw metric data.</p>|HTTP agent|gcp.storage.bucket.requests.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Successful request count|<p>Number of `2xx` requests reaching the service.</p>|Dependent item|gcp.storage.bucket.request.2xx<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.r2xx`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|Client error request count|<p>Number of `4xx` requests reaching the service.</p>|Dependent item|gcp.storage.bucket.request.4xx<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.r4xx`</p></li></ul>|
+|Server error request count|<p>Number of `5xx` requests reaching the service.</p>|Dependent item|gcp.storage.bucket.request.5xx<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.r5xx`</p></li></ul>|
+|Total requests|<p>Number of all requests reaching the service.</p>|Calculated|gcp.storage.bucket.request.total<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Error rate|<p>Rate of failed requests reaching the service.</p>|Calculated|gcp.storage.bucket.request.error.rate<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|Success rate|<p>Rate of successful requests reaching the service.</p>|Calculated|gcp.storage.bucket.request.success.rate<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `100`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|GCP Cloud Storage: GCP API is failing (bucket metrics)|<p>No data received from GCP API for the last 30 minutes. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.metrics.get,30m)=1`|High|**Manual close**: Yes|
+|GCP Cloud Storage: Bucket size is too large|<p>Bucket size exceeds the configured threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.size,1h)>{$GCS.BUCKET.SIZE.MAX}`|Warning||
+|GCP Cloud Storage: Rapid storage growth detected|<p>Bucket size growth rate exceeds the configured threshold.</p>|`change(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.size)>{$GCS.BUCKET.SIZE.GROWTH.MAX}`|Warning|**Manual close**: Yes|
+|GCP Cloud Storage: Bucket object count is too high|<p>Number of objects in the bucket exceeds the configured limit.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.objects.count,1h)>{$GCS.OBJECT.COUNT.MAX}`|Warning||
+|GCP Cloud Storage: No objects in bucket|<p>No objects have been stored in the bucket for the last 24 hours.</p>|`max(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.objects.count,24h)=0`|Info|**Manual close**: Yes|
+|GCP Cloud Storage: GCP API is failing (bucket network traffic)|<p>No data received from GCP API for the last 30 minutes. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.get,30m)=1`|High|**Manual close**: Yes|
+|GCP Cloud Storage: High egress traffic|<p>Outgoing network traffic from the bucket exceeds the threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.sent_bytes,5m)>{$GCS.EGRESS.MAX}`|Warning||
+|GCP Cloud Storage: High ingress traffic|<p>Incoming network traffic to the bucket exceeds the threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.received_bytes,5m)>{$GCS.INGRESS.MAX}`|Info||
+|GCP Cloud Storage: GCP API is failing (bucket requests)|<p>No data received from GCP API for the last 30 minutes. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.requests.get,30m)=1`|High|**Manual close**: Yes|
+|GCP Cloud Storage: High API error rate|<p>GCP Cloud Storage bucket API error rate exceeds the configured threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.request.error.rate,5m)>{$GCS.API.ERROR.MAX}`|Average||
+
+# GCP Application Load Balancer by HTTP
+
+## Overview
+
+This template is designed to monitor GCP Application Load Balancing using Zabbix.
+
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- GCP Application Load Balancing
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$GCP.PROJECT.ID}|<p>GCP project ID.</p>||
+|{$GCP.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`15s`|
+|{$GCP.TIME.WINDOW}|<p>Time interval for data requests.</p><p>Supported usage types:</p><p>- Default update interval for most items.</p><p>- Minimal time window for data requested in Monitoring Query Language REST API request.</p>|`1h`|
+|{$GCP.PROXY}|<p>HTTP proxy. If this macro is empty, then no proxy is used.</p>||
+|{$GCP.APP.LB.TYPE.PREFIX}|<p>Metric prefix for load balancer type.</p><p>Possible values:</p><p>- `https` for global external load balancers</p><p>- `https/external/regional` for regional external load balancers</p><p>- `https/internal` for internal load balancers</p>||
+|{$GCP.APP.LB.P95.LATENCY.MAX}|<p>Sets the maximum latency threshold for alerts.</p>|`1000`|
+|{$GCP.APP.LB.NODATA.TIME}|<p>Time threshold for no data trigger.</p>|`30m`|
+|{$GCP.APP.LB.SUCCESS.RATE.WARN}|<p>Warning severity threshold for request success rate (%).</p>|`95`|
+|{$GCP.APP.LB.SUCCESS.RATE.AVERAGE}|<p>Average severity threshold for request success rate (%).</p>|`90`|
+|{$GCP.APP.LB.SUCCESS.RATE.HIGH}|<p>High severity threshold for request success rate (%).</p>|`75`|
+|{$GCP.APP.LB.RESPONSE.CODE.MATCHES}|<p>Filter to include HTTP response codes for discovery.</p>|`.*`|
+|{$GCP.APP.LB.RESPONSE.CODE.NOT_MATCHES}|<p>Filter to exclude HTTP response codes for discovery.</p>|`CHANGE_IF_NEEDED`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Request bytes count|<p>Request bytes count for the application load balancer.</p>|HTTP agent|gcp.app.lb.request.bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Response bytes count|<p>Response bytes count for the application load balancer.</p>|HTTP agent|gcp.app.lb.response.bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Average latency|<p>Average latencies for the application load balancer.</p>|HTTP agent|gcp.app.lb.average.latency<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|P95 latency|<p>P95 latencies for the application load balancer.</p>|HTTP agent|gcp.app.lb.p95.latency<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Request success rate|<p>Request success rate calculated based on the ratio of successful requests (HTTP response codes 2xx and 3xx) to total requests.</p>|HTTP agent|gcp.app.lb.success.rate<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Total average request rate|<p>Total average request rate for the application load balancer.</p>|HTTP agent|gcp.app.lb.request.rate<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Request rates by response code|<p>Request rates by response code for the application load balancer.</p>|HTTP agent|gcp.app.lb.requests.count<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|GCP Application Load Balancer: High P95 latency|<p>The 95th percentile latency is above {$GCP.APP.LB.P95.LATENCY.MAX}ms (avg over 5 minutes).</p>|`avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.p95.latency,5m) > {$GCP.APP.LB.P95.LATENCY.MAX}`|Average|**Manual close**: Yes|
+|GCP Application Load Balancer: Request success rate is below warning threshold|<p>Request success rate has dropped below {$GCP.APP.LB.SUCCESS.RATE.WARN}%.<br><br>This may indicate elevated client or backend errors.</p>|`avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.success.rate,5m)<{$GCP.APP.LB.SUCCESS.RATE.WARN} and avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.request.rate,5m)>0`|Warning|**Manual close**: Yes|
+|GCP Application Load Balancer: Request success rate is critically low|<p>Request success rate has dropped below {$GCP.APP.LB.SUCCESS.RATE.AVERAGE}%.<br><br>Users are likely experiencing failed requests.</p>|`avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.success.rate,5m)<{$GCP.APP.LB.SUCCESS.RATE.AVERAGE} and avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.request.rate,5m)>1`|Average|**Manual close**: Yes|
+|GCP Application Load Balancer: Request success rate indicates major outage|<p>Request success rate has dropped below {$GCP.APP.LB.SUCCESS.RATE.HIGH}%.<br><br>Severe service degradation or outage is likely occurring.</p>|`avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.success.rate,5m)<{$GCP.APP.LB.SUCCESS.RATE.HIGH} and avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.request.rate,5m)>5`|High|**Manual close**: Yes|
+|GCP Application Load Balancer: No request rate data|<p>No request rate data received for `{$GCP.APP.LB.NODATA.TIME}`. The load balancer may not be receiving traffic or there may be an issue with data collection.</p>|`nodata(/GCP Application Load Balancer by HTTP/gcp.app.lb.requests.count,{$GCP.APP.LB.NODATA.TIME})=1`|Warning|**Manual close**: Yes|
+
+### LLD rule Response code discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Response code discovery|<p>Discovery of HTTP response codes for the application load balancer.</p>|Dependent item|gcp.app.lb.request.count.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `2h`</p></li></ul>|
+
+### Item prototypes for Response code discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Requests rate: HTTP {#RESPONSE_CODE}|<p>Request rate for HTTP `{#RESPONSE_CODE}` responses.</p>|Dependent item|gcp.app.lb.request.count[{#RESPONSE_CODE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `2h`</p></li></ul>|
+
+# GCP Cost Monitoring by HTTP
+
+## Overview
+
+This template monitors Google Cloud Platform (GCP) billing costs using the BigQuery API via Zabbix.
+It works without any external scripts and uses the script items.
+
+The template retrieves cost data aggregated by service and project from Cloud Billing data exported to BigQuery.
+Two master items (monthly and daily) drive all dependent items and LLD discoveries, minimizing the number of BigQuery API calls.
+
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Google Cloud Platform
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Enable Cloud Billing export to BigQuery in the Google Cloud Console (needs to be done by someone with cost admin permissions).
+See [Export Cloud Billing data to BigQuery](https://cloud.google.com/billing/docs/how-to/export-data-bigquery).
+2. Create a service account in the GCP project that hosts the billing export dataset.
+More on [managing service accounts](https://cloud.google.com/iam/docs/creating-managing-service-accounts).
+3. Grant the service account the `BigQuery Data Viewer` role on the billing export dataset.
+4. Grant `bigquery.jobs.create` permission on the billing project to the service account.
+5. Create and download a JSON key for the service account.
+More on [service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+6. Link this template to a Zabbix host.
+7. Configure the macros: `{$GCP.CLIENT.EMAIL}`, `{$GCP.PRIVATE.KEY.ID}`, `{$GCP.PRIVATE.KEY}`, `{$GCP.COST.BIGQUERY.TABLE}`.
+
+**Notes**
+
+  - `{$GCP.COST.BIGQUERY.TABLE}` must be in the format `project_id.dataset_id.table_id` (no backticks).
+  - If this template is co-hosted with `GCP by HTTP`, the auth macros are shared — configure them once at the host level.
+  - To reduce BigQuery query costs, lower `{$GCP.COST.BILLING.MONTH}` (e.g. to `3`).
+
+More on metrics and used API methods:
+
+  - [BigQuery API](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query)
+  - [Cloud Billing export schema](https://cloud.google.com/billing/docs/how-to/bq-schema)
+
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$GCP.CLIENT.EMAIL}|<p>Service account client e-mail.</p>||
+|{$GCP.PRIVATE.KEY.ID}|<p>Service account private key ID.</p>||
+|{$GCP.PRIVATE.KEY}|<p>Service account private key data.</p>||
+|{$GCP.COST.BIGQUERY.TABLE}|<p>BigQuery billing export table path in the format: project_id.dataset_id.table_id.</p>||
+|{$GCP.BILLING.PROJECT.ID}|<p>GCP project ID where BigQuery jobs are created. If empty, the project from {$GCP.COST.BIGQUERY.TABLE} is used. Set this when the service account lacks bigquery.jobs.create on the billing export project.</p>||
+|{$GCP.COST.BILLING.MONTH}|<p>Number of months of historical data to retrieve from BigQuery. Maximum 24.</p>|`11`|
+|{$GCP.AUTH.FREQUENCY}|<p>The update interval for the GCP Cost Authorization item, which also equals to the access token regeneration request frequency.</p><p>The GCP Access Token is available for 1 hour (3600 seconds) after the generation request.</p>|`45m`|
+|{$GCP.COST.SERVICE.MATCHES}|<p>Filter to include discovered services by name.</p>|`.*`|
+|{$GCP.COST.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered services by name.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.COST.PROJECT.ID.MATCHES}|<p>Filter to include discovered projects by ID.</p>|`.*`|
+|{$GCP.COST.PROJECT.ID.NOT_MATCHES}|<p>Filter to exclude discovered projects by ID.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.COST.REGION.MATCHES}|<p>Filter to include discovered regions.</p>|`.*`|
+|{$GCP.COST.REGION.NOT_MATCHES}|<p>Filter to exclude discovered regions.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.COST.DAILY.MAX}|<p>Daily cost alert threshold.</p>|`1000`|
+|{$GCP.COST.MONTHLY.MAX}|<p>Monthly cost alert threshold.</p>|`10000`|
+|{$GCP.COST.SPIKE.FACTOR}|<p>Multiplier used to detect a cost spike. Daily cost exceeding avg * factor triggers an alert.</p>|`1.5`|
+|{$GCP.COST.WEEKLY.CHANGE.WARN}|<p>Week-over-week cost increase alert threshold (percentage).</p>|`20`|
+|{$GCP.COST.MONTHLY.CHANGE.WARN}|<p>Month-over-month cost increase alert threshold (percentage).</p>|`20`|
+|{$GCP.COST.PROJECT.MONTHLY.MAX}|<p>Per-project monthly cost alert threshold.</p>|`5000`|
+|{$GCP.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
+|{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP annual cost|<p>GCP annual cost.</p>|Calculated|gcp.annual.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined.</p><p>Returns a signed authorization token with 1 hour lifetime; it is required only once, and is used for all the dependent script items.</p><p>Check the template documentation for the details.</p>|Script|gcp.cost.authorization|
+|Authorization errors check|<p>A list of errors from authorization requests.</p>|Dependent item|gcp.cost.auth.err.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li></ul>|
+|Get monthly costs|<p>Get raw monthly cost data aggregated by service and project from the BigQuery billing export.</p>|Dependent item|gcp.get.monthly.costs<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get daily costs|<p>Get raw daily cost data for the last 31 days aggregated by service from the BigQuery billing export.</p>|Dependent item|gcp.get.daily.costs<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Billing currency|<p>Currency code reported by the BigQuery billing export (e.g. USD, EUR). Used as units on all billing summary items.</p>|Dependent item|gcp.cost.currency<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.currency`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `24h`</p></li></ul>|
+|Yesterday cost|<p>Total cost for the most recent complete billing day.</p>|Dependent item|gcp.cost.yesterday<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.daily_total`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Service count|<p>Number of GCP services with billing activity on the most recent complete day.</p>|Dependent item|gcp.cost.service.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.service_count`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Daily avg|<p>Average daily cost over the last 7 billing days.</p>|Calculated|gcp.cost.daily.avg|
+|Monthly avg|<p>Average daily cost over the last 30 days.</p>|Calculated|gcp.cost.monthly.avg|
+|Monthly cost change|<p>Month-over-month cost change as a percentage. Not set when there is no prior month data.</p>|Dependent item|gcp.cost.monthly.change.pct<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_change_pct`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Weekly cost change|<p>Week-over-week cost change as a percentage. Not set when there is no prior week data.</p>|Dependent item|gcp.cost.weekly.change.pct<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.weekly_delta_pct`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get monthly costs errors|<p>A list of errors from API requests.</p>|Dependent item|gcp.get.monthly.costs.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get daily costs errors|<p>A list of errors from API requests.</p>|Dependent item|gcp.get.daily.costs.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Monthly cost: Current month|<p>Monthly billing total for the current month.</p>|Dependent item|gcp.cost.monthly.summary.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Monthly cost: Previous month|<p>Monthly billing total for the previous month.</p>|Dependent item|gcp.cost.monthly.summary.previous<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Daily cost: Yesterday|<p>Billing total for yesterday.</p>|Dependent item|gcp.cost.daily.summary.yesterday<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Weekly cost: Current week|<p>Billing total for the current week.</p>|Dependent item|gcp.cost.weekly.summary.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Weekly cost: Previous week|<p>Billing total for the previous week.</p>|Dependent item|gcp.cost.weekly.summary.previous<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|GCP Cost: Authorization has failed|<p>GCP Cost: Authorization has failed.<br>Check the authorization parameters and GCP API availability from a network segment, where Zabbix-server/proxy is located.</p>|`length(last(/GCP Cost Monitoring by HTTP/gcp.cost.auth.err.check)) > 0`|Average||
+|GCP Cost: No billing data received|<p>No billing data has been received in the last 24 hours.</p>|`nodata(/GCP Cost Monitoring by HTTP/gcp.get.monthly.costs,24h)=1`|Info|**Manual close**: Yes|
+|GCP Cost: Daily cost exceeds threshold|<p>Total daily cost has exceeded the configured threshold.</p>|`min(/GCP Cost Monitoring by HTTP/gcp.cost.yesterday,1h)>{$GCP.COST.DAILY.MAX}`|Warning|**Manual close**: Yes|
+|GCP Cost: Cost spike detected|<p>Daily cost significantly exceeds the 7-day historical average.</p>|`last(/GCP Cost Monitoring by HTTP/gcp.cost.yesterday)>avg(/GCP Cost Monitoring by HTTP/gcp.cost.yesterday,7d)*{$GCP.COST.SPIKE.FACTOR}`|Average|**Manual close**: Yes|
+|GCP Cost: Monthly cost increased significantly|<p>The current month's total cost exceeds the prior month by more than the configured threshold.</p>|`min(/GCP Cost Monitoring by HTTP/gcp.cost.monthly.change.pct,1h)>{$GCP.COST.MONTHLY.CHANGE.WARN}`|Warning|**Manual close**: Yes|
+|GCP Cost: Weekly cost increased significantly|<p>The current week's total cost exceeds the prior week by more than the configured threshold.</p>|`min(/GCP Cost Monitoring by HTTP/gcp.cost.weekly.change.pct,1h)>{$GCP.COST.WEEKLY.CHANGE.WARN}`|Warning|**Manual close**: Yes|
+|GCP Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/GCP Cost Monitoring by HTTP/gcp.get.monthly.costs.errors))>0`|Average||
+|GCP Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/GCP Cost Monitoring by HTTP/gcp.get.daily.costs.errors))>0`|Average||
+|GCP Cost: Monthly cost exceeds threshold|<p>Monthly billing cost has exceeded the configured threshold.</p>|`min(/GCP Cost Monitoring by HTTP/gcp.cost.monthly.summary.current,1h)>{$GCP.COST.MONTHLY.MAX}`|Average|**Manual close**: Yes|
+
+### LLD rule GCP monthly costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP monthly costs discovery|<p>Discovery of total monthly costs per billing month.</p>|Dependent item|gcp.cost.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_costs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP monthly costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month ["{#GCP.COST.MONTH}"] total cost|<p>Total billing cost for month {#GCP.COST.MONTH}.</p>|Dependent item|gcp.cost.monthly["{#GCP.COST.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP monthly costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP monthly costs by service discovery|<p>Discovery of monthly costs by service and billing month.</p>|Dependent item|gcp.cost.service.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_service_costs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP monthly costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Service ["{#GCP.COST.SERVICE.NAME}"]: Month ["{#GCP.COST.MONTH}"] cost|<p>Monthly cost for service {#GCP.COST.SERVICE.NAME} in month {#GCP.COST.MONTH}.</p>|Dependent item|gcp.cost.service.monthly["{#GCP.COST.SERVICE.NAME}","{#GCP.COST.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP monthly costs by project discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP monthly costs by project discovery|<p>Discovery of monthly costs by project and billing month.</p>|Dependent item|gcp.cost.project.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_project_costs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP monthly costs by project discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Project ["{#GCP.COST.PROJECT.ID}"]: Month ["{#GCP.COST.MONTH}"] cost|<p>Monthly cost for project {#GCP.COST.PROJECT.ID} in month {#GCP.COST.MONTH}.</p>|Dependent item|gcp.cost.project.monthly["{#GCP.COST.PROJECT.ID}","{#GCP.COST.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Trigger prototypes for GCP monthly costs by project discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|GCP Cost: Project [{#GCP.COST.PROJECT.ID}]: Monthly cost exceeds threshold|<p>Monthly cost for project {#GCP.COST.PROJECT.ID} has exceeded the configured threshold.</p>|`min(/GCP Cost Monitoring by HTTP/gcp.cost.project.monthly["{#GCP.COST.PROJECT.ID}","{#GCP.COST.MONTH}"],1h)>{$GCP.COST.PROJECT.MONTHLY.MAX}`|Warning|**Manual close**: Yes|
+
+### LLD rule GCP daily costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP daily costs by service discovery|<p>Discovery of daily costs by service for the most recent complete billing day.</p>|Dependent item|gcp.cost.daily.service.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.daily_by_service`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP daily costs by service discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Service ["{#GCP.COST.SERVICE.NAME}"]: Daily cost|<p>Daily cost for service {#GCP.COST.SERVICE.NAME} for the most recent complete billing day.</p>|Dependent item|gcp.cost.daily.service["{#GCP.COST.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP monthly costs by region discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP monthly costs by region discovery|<p>Discovery of monthly costs by region and billing month.</p>|Dependent item|gcp.cost.region.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_region_costs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP monthly costs by region discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Region ["{#GCP.COST.REGION}"]: Month ["{#GCP.COST.MONTH}"] cost|<p>Monthly cost for region {#GCP.COST.REGION} in month {#GCP.COST.MONTH}.</p>|Dependent item|gcp.cost.region.monthly["{#GCP.COST.REGION}","{#GCP.COST.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP daily costs by region discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP daily costs by region discovery|<p>Discovery of daily costs by region for the most recent complete billing day.</p>|Dependent item|gcp.cost.daily.region.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.daily_by_region`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for GCP daily costs by region discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Region ["{#GCP.COST.REGION}"]: Daily cost|<p>Daily cost for region {#GCP.COST.REGION} for the most recent complete billing day.</p>|Dependent item|gcp.cost.daily.region["{#GCP.COST.REGION}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ## Feedback
 

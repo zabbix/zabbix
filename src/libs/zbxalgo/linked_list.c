@@ -522,7 +522,7 @@ void	zbx_list_init_pool(zbx_list_t *list, int slots_num)
 	if (NULL != list->item_pool)
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("memory pool has been already initialized");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	list->item_pool = list_item_pool_create(list, slots_num);

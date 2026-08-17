@@ -309,14 +309,16 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	public static function getFilterData() {
 		return [
-			// #0.
+			// #0. Row count is retrieved via API because it changes when templates in this group are added or removed.
 			[
 				[
 					'filter' => [
 						'Template groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 114
+					'api_filter' => [
+						'templateGroupids' => ['Templates/Databases']
+					]
 				]
 			],
 			// #1.
@@ -508,7 +510,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #12.
+			// #12. Row count is retrieved via API because it changes when templates in this group are added or removed.
 			[
 				[
 					'filter' => [
@@ -516,7 +518,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Dependent item'
 					],
 					'context' => 'template',
-					'rows' => 33
+					'api_filter' => [
+						'templateGroupids' => ['Templates/Operating systems'],
+						'filter' => ['type' => ITEM_TYPE_DEPENDENT]
+					]
 				]
 			],
 			// #13.
@@ -605,10 +610,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'&filter_type=-1&filter_delay=&filter_lifetime=&filter_snmp_oid='.
 				'&filter_state=-1&filter_status=-1&filter_set=1&context='.$context);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$table = $this->query(self::SELECTOR)->asTable()->one();
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
-		$table = $this->query(self::SELECTOR)->asTable()->one();
 
 		if (array_key_exists('expected', $data)) {
 			$this->assertTableDataColumn($data['expected'], 'Name', self::SELECTOR);
@@ -617,6 +623,20 @@ class testPageLowLevelDiscovery extends CWebTest {
 		if (array_key_exists('rows', $data)) {
 			$this->assertEquals($data['rows'], $table->getRows()->count());
 		}
+
+		// Use API to get the expected row count dynamically, as the number of LLD rules in template can change.
+		if (array_key_exists('api_filter', $data)) {
+			$groups = CDataHelper::call('templategroup.get', [
+				'output' => ['groupid'],
+				'filter' => ['name' => $data['api_filter']['templateGroupids']]
+			]);
+			unset($data['api_filter']['templateGroupids']);
+			$this->assertEquals(CDataHelper::call('discoveryrule.get', [
+				'groupids' => array_column($groups, 'groupid'),
+				'templated' => true,
+				'countOutput' => true
+			] + $data['api_filter']), $table->getRows()->count());
+		}
 	}
 
 	private function massChangeStatus($action) {
@@ -624,6 +644,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->query('id:all_items')->asCheckbox()->one()->check();
 		$this->query('button', $action)->one()->click();
 		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
 		$string = ($table->getRows()->count() == 1) ? 'Discovery rule ' : 'Discovery rules ';
 		$this->assertEquals($string.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
 		CMessageElement::find()->one()->close();

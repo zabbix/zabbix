@@ -50,13 +50,18 @@
 			}
 			else if (type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>) {
 				['params_0_not_supported', 'params_1_not_supported'].forEach(function(name) {
-					const node = $preprocessing[0].querySelector(`input[name^="preprocessing[${num}][${name}]"]`);
+					const node = $preprocessing[0]
+						.querySelector(`input[name^="preprocessing[${num}][${name}]"],
+							z-textarea-flexible[name^="preprocessing[${num}][${name}]"]`);
 					node && params.push(node.value);
 				});
 			}
 			else {
 				['params_0', 'params_1', 'params_2'].forEach(function(name) {
-					const node = $preprocessing[0].querySelector(`input[name^="preprocessing[${num}][${name}]"]`);
+
+					const node = $preprocessing[0]
+						.querySelector(`input[name^="preprocessing[${num}][${name}]"],
+							z-textarea-flexible[name^="preprocessing[${num}][${name}]"]`);
 
 					if (node && !node.disabled) {
 						let value = node.value;
@@ -97,7 +102,7 @@
 			jQuery(':disabled', $form).removeAttr('disabled');
 		}
 
-		form_data = $form.serializeJSON();
+		form_data = getFormFields($form[0]);
 		delete $form;
 
 		const timeout = 'custom_timeout' in form_data
@@ -280,7 +285,7 @@
 	 */
 	function openItemTestDialog(step_nums, show_final_result, get_value, trigger_element, step_obj_nr) {
 		var $row = jQuery(trigger_element)
-					.closest('.preprocessing-list-item, .preprocessing-list-foot, .overlay-dialogue-footer'),
+					.closest(`.preprocessing-list-item, .preprocessing-list-foot, .${ZBX_STYLE_OVERLAY_DIALOGUE_FOOTER}`),
 			item_properties = getItemTestProperties('form[name="itemForm"]'),
 			cached_values = $row.data('test-data') || [];
 
@@ -291,7 +296,7 @@
 			delete cached_values.interface_details;
 		}
 
-		PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
+		const overlay = PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
 			steps: getPreprocessingSteps(step_nums),
 			hostid: <?= $data['hostid'] ?>,
 			test_type: <?= $data['preprocessing_test_type'] ?>,
@@ -300,5 +305,9 @@
 			get_value: get_value ? 1 : 0,
 			data: cached_values
 		}), {dialogueid: 'item-test', dialogue_class: 'modal-popup-generic', trigger_element});
+
+		overlay.$dialogue[0].addEventListener('itemtest.close', (e) => {
+			$row.data('test-data', e.detail);
+		});
 	}
 </script>

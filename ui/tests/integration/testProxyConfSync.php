@@ -908,7 +908,7 @@ class testProxyConfSync extends CIntegrationTest
 
 		$sync_lines1 = preg_replace(
 			[
-				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ zbx_dc_sync_configuration\(\) /",
+				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ \[configuration syncer #1\] zbx_dc_sync_configuration\(\) /",
 				"/\s+/",
 				"/-?[0-9]+bytes/",
 				"/:sql:[0-9]+\.[0-9]+sync:[0-9]+\.[0-9]+sec/",
@@ -1264,7 +1264,7 @@ class testProxyConfSync extends CIntegrationTest
 			'expressions' => [
 				[
 					'expression' => '.*',
-					'expression_type' => EXPRESSION_TYPE_FALSE,
+					'expression_type' => REGEX_TYPE_NOT_MATCHES_REGEX,
 					'case_sensitive' => 1
 				]
 			]
@@ -1281,7 +1281,7 @@ class testProxyConfSync extends CIntegrationTest
 			'expressions' => [
 				[
 					'expression' => '.*a',
-					'expression_type' => EXPRESSION_TYPE_TRUE,
+					'expression_type' => REGEX_TYPE_MATCHES_REGEX,
 					'case_sensitive' => 1
 				]
 			]

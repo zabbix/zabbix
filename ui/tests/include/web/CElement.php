@@ -262,18 +262,27 @@ class CElement extends CBaseElement implements IWaitable {
 	public function getText() {
 		try {
 			if (!$this->isVisible()) {
-				return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+				return $this->getAllText();
 			}
 		}
 		catch (StaleElementReferenceException $exception) {
 			$this->reload();
 
 			if (!$this->isVisible()) {
-				return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+				return $this->getAllText();
 			}
 		}
 
 		return parent::getText();
+	}
+
+	/**
+	 * Get text of element including text of non-visible parts of the element.
+	 *
+	 * @return string
+	 */
+	public function getAllText() {
+		return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
 	}
 
 	/**
@@ -695,6 +704,10 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asTable($options);
 		}
 
+		if ($tag === 'z-textarea-flexible') {
+			return $this->asTextareaFlexible($options);
+		}
+
 		if ($tag === 'input') {
 			$type = $this->getAttribute('type');
 			if ($type === 'checkbox' || $type === 'radio') {
@@ -708,7 +721,7 @@ class CElement extends CBaseElement implements IWaitable {
 		$attribute = $this->getAttribute('class');
 		if ($attribute) {
 			$class = explode(' ', $attribute);
-			if (in_array('multiselect-control', $class)) {
+			if (in_array('multiselect-control', $class) || in_array('multiselect', $class)) {
 				return $this->asMultiselect($options);
 			}
 
@@ -730,6 +743,14 @@ class CElement extends CBaseElement implements IWaitable {
 
 			if (in_array('macro-input-group', $class)) {
 				return $this->asInputGroup($options);
+			}
+
+			if (in_array('fields-group', $class)) {
+				return $this->asElement($options);
+			}
+
+			if (in_array('datatable', $class)) {
+				return $this->asDatatableGroup($options);
 			}
 		}
 
@@ -819,10 +840,24 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
-	 * Scroll the element to the visible position.
+	 * Scroll the element to the visible position. In datatables element can be covered by the datatable-options button
+	 * or the horizontal scrollbar, and still be considered visible by Selenium. Therefore, it is possible to scroll by
+	 * the $additional_scroll amount of pixels to make sure the element is really visible.
+	 *
+	 * @param int $additional_scroll  number of px that is required to scroll after element has been scrolled into view.
+	 *
+	 * @return $this
 	 */
-	public function scrollIntoView() {
-		CElementQuery::getDriver()->executeScript('arguments[0].scrollIntoView({behavior:\'instant\',block:\'end\',inline:\'nearest\'});', [$this]);
+	public function scrollIntoView($additional_scroll = null) {
+		CElementQuery::getDriver()->executeScript('arguments[0].scrollIntoView({behavior:\'instant\',block:\'end\',inline:\'nearest\'});',
+				[$this]
+		);
+
+		if ($additional_scroll) {
+			CElementQuery::getDriver()->executeScript('document.querySelector(".wrapper").scrollBy(0, '.$additional_scroll.');',
+					[$this]
+			);
+		}
 
 		return $this;
 	}

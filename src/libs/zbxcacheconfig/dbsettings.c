@@ -22,6 +22,8 @@
 #include "zbxtime.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
+#include "zbxhistory.h"
+#include "zbxjson.h"
 
 #define UPDATE_REVISION(revision, name, format, target, source)							\
 	do													\
@@ -46,14 +48,18 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"auditlog_mode",		ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"1"},
 	{"authentication_type",		ZBX_SETTING_TYPE_INT, 		0,			"0"},
 	{"autoreg_tls_accept",		ZBX_SETTING_TYPE_INT, 		ZBX_SERVER | ZBX_PROXY,	"1"},
+	{"banner_data",			ZBX_SETTING_TYPE_STR, 		0,			""},
 	{"blink_period",		ZBX_SETTING_TYPE_STR, 		0,			"2m"},
 	{"compress_older",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		"7d"},
 	{"compression_status",		ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"0"},
 	{"connect_timeout",		ZBX_SETTING_TYPE_STR, 		0,			"3s"},
 	{"custom_color",		ZBX_SETTING_TYPE_INT, 		0,			"0"},
 	{"db_extension",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		""},
+	{ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT, ZBX_SETTING_TYPE_INT, 	0,			""},
+	{ZBX_SETTINGS_DBPOOL_MAX_IDLE,	ZBX_SETTING_TYPE_INT, 		0,			""},
+	{ZBX_SETTINGS_DBPOOL_MAX_OPEN,	ZBX_SETTING_TYPE_INT, 		0,			""},
 	/* dbversion_status is used only directly */
-	{"dbversion_status",		ZBX_SETTING_TYPE_STR, 		0,			""},
+	{"dbversion_status",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		""},
 	{"default_inventory_mode",	ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"-1"},
 	{"default_lang",		ZBX_SETTING_TYPE_STR, 		0,			"en_US"},
 	{"default_theme",		ZBX_SETTING_TYPE_STR, 		0,			"blue-theme"},
@@ -125,7 +131,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"script_timeout",		ZBX_SETTING_TYPE_STR, 		0,			"60s"},
 	{"search_limit",		ZBX_SETTING_TYPE_INT, 		0,			"1000"},
 	{"server_check_interval",	ZBX_SETTING_TYPE_INT, 		0,			"10"},
-	{"server_status",		ZBX_SETTING_TYPE_STR, 		0,			""},
+	{"server_status",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		""},
 	{"session_key",			ZBX_SETTING_TYPE_STR, 		0,			""},
 	{"severity_color_0",		ZBX_SETTING_TYPE_STR, 		0,			"97AAB3"},
 	{"severity_color_1",		ZBX_SETTING_TYPE_STR, 		0,			"7499FF"},
@@ -154,6 +160,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"timeout_ssh_agent",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_telnet_agent",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_zabbix_agent",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
+	{"device_link_timeout",		ZBX_SETTING_TYPE_STR, 		0,			"60s"},
 	{"uri_valid_schemes",		ZBX_SETTING_TYPE_STR, 		0,	"http,https,ftp,file,mailto,tel,ssh"},
 	{"url",				ZBX_SETTING_TYPE_STR, 		0,			""},
 	{"validate_uri_schemes",	ZBX_SETTING_TYPE_INT, 		0,			"1"},
@@ -457,6 +464,40 @@ static void	store_str_setting(const zbx_setting_value_t *values, const char *nam
 	}
 }
 
+static int	setting_get_server_status_enable_mobile_devices(const zbx_setting_value_t *values,
+		int defaults_log_level)
+{
+	const char		*ptr;
+	const char		*value_str = NULL;
+	struct zbx_json_parse	jp, jp_configuration;
+
+	if (SUCCEED != setting_get_str(values, "server_status", defaults_log_level, &value_str))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get server status value, mobile devices will be disabled");
+		return 0;
+	}
+
+	if ('\0' == *value_str)
+		return 0;
+
+	if (SUCCEED != zbx_json_open(value_str, &jp))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid server status value: %s", value_str);
+		return 0;
+	}
+
+	if (SUCCEED != zbx_json_brackets_by_name(&jp, "configuration", &jp_configuration))
+		return 0;
+
+	if (NULL == (ptr = zbx_json_pair_by_name(&jp_configuration, "enable_mobile_devices")))
+		return 0;
+
+	if (ZBX_JSON_TYPE_TRUE == zbx_json_valuetype(ptr))
+		return 1;
+
+	return 0;
+}
+
 static int	store_hk_setting(const zbx_setting_value_t *values, const char *name, int non_zero, int value_min,
 		int defaults_log_level, int *value, zbx_uint64_t revision)
 {
@@ -484,6 +525,52 @@ static int	store_hk_setting(const zbx_setting_value_t *values, const char *name,
 	return SUCCEED;
 }
 
+static void	update_hk_history_overrides(const char *history_status)
+{
+	zbx_json_parse_t	jp;
+
+	if ('\0' == *history_status)
+		return;
+
+	if (SUCCEED != zbx_json_open(history_status, &jp))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot parse dbversion_status");
+		return;
+	}
+
+	for (const char *p = zbx_json_next(&jp, NULL); NULL != p; p = zbx_json_next(&jp, p))
+	{
+		zbx_json_parse_t	jp_db, jp_types;
+
+		if (SUCCEED != zbx_json_brackets_open(p, &jp_db))
+			continue;
+
+		if (SUCCEED != zbx_json_brackets_by_name(&jp_db, "value_types", &jp_types))
+			continue;
+
+		for (const char *pt = zbx_json_next(&jp_types, NULL); NULL != pt; pt = zbx_json_next(&jp_types, pt))
+		{
+			zbx_json_parse_t	jp_type;
+			char			ttl[MAX_ID_LEN], type[64];
+			int			value_type;
+
+			if (SUCCEED != zbx_json_brackets_open(pt, &jp_type))
+				continue;
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_type, "ttl", ttl, sizeof(ttl), NULL))
+				continue;
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_type, "type", type, sizeof(type), NULL))
+				continue;
+
+			if (FAIL == (value_type = zbx_history_value_type_from_str(type)))
+				continue;
+
+			get_dc_config()->config->hk.history_override[value_type] = atoi(ttl);
+		}
+	}
+}
+
 static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uint64_t revision,
 		int defaults_log_level)
 {
@@ -504,6 +591,15 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 	store_int_setting(values, "auditlog_mode", defaults_log_level, &config->config->auditlog_mode, revision);
 	store_int_setting(values, "autoreg_tls_accept", defaults_log_level, &config->config->autoreg_tls_accept,
 			revision);
+
+	value_int = setting_get_server_status_enable_mobile_devices(values, defaults_log_level);
+
+	if (config->config->enable_mobile_devices != value_int)
+	{
+		UPDATE_REVISION(revision, "enable_mobile_devices", "%d", config->config->enable_mobile_devices,
+				value_int);
+		config->config->enable_mobile_devices = value_int;
+	}
 
 	if (SUCCEED == setting_get_str(values, "compress_older", defaults_log_level, &value_str))
 	{
@@ -639,6 +735,12 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 		config->config->hk.history_mode = value_int;
 	}
 
+	if (0 == found && SUCCEED == setting_get_str(values, "dbversion_status", defaults_log_level,
+			&value_str))
+	{
+		update_hk_history_overrides(value_str);
+	}
+
 	/* housekeeper settings for services */
 
 	if (SUCCEED != setting_get_int(values, "hk_services_mode", defaults_log_level, &value_int))
@@ -734,7 +836,6 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 			revision);
 	store_str_setting(values, "severity_name_5", found, defaults_log_level, &config->config->severity_name[5],
 			revision);
-
 	store_int_setting(values, "snmptrap_logging", defaults_log_level, &config->config->snmptrap_logging, revision);
 
 	store_str_setting(values, "timeout_browser", found, defaults_log_level, &config->config->item_timeouts.browser,

@@ -151,6 +151,11 @@ class CConfigurationImportcompare {
 						]
 					]
 				]
+			],
+			'global_regexes' => [
+				'options' => $this->getOptions('global_regexes'),
+				'uuid' => false,
+				'unique' => ['name']
 			]
 		];
 	}
@@ -476,7 +481,10 @@ class CConfigurationImportcompare {
 			elseif ($unique_value instanceof Closure) {
 				$result[] = call_user_func($unique_value, $entity, $entity_key);
 			}
-			else {
+			elseif (is_int($unique_key) && array_key_exists($unique_value, $entity)) {
+				$result[] = $entity[$unique_value];
+			}
+			elseif (array_key_exists($unique_key, $entity)) {
 				$result[] = $entity[$unique_value];
 			}
 		}

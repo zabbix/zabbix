@@ -37,8 +37,6 @@ typedef union
 	/* length prefixed (4 bytes) binary data */
 	void			*bin;
 
-	char			*json;
-
 	zbx_vector_var_t	*vector;
 
 	/* null terminated error message */
@@ -59,7 +57,6 @@ struct zbx_variant
 #define ZBX_VARIANT_BIN		4
 #define ZBX_VARIANT_VECTOR	5
 #define ZBX_VARIANT_ERR		6
-#define ZBX_VARIANT_JSON	7
 
 void		zbx_variant_clear(zbx_variant_t *value);
 void		zbx_variant_set_none(zbx_variant_t *value);
@@ -67,7 +64,6 @@ void		zbx_variant_set_str(zbx_variant_t *value, char *text);
 void		zbx_variant_set_dbl(zbx_variant_t *value, double value_dbl);
 void		zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t value_ui64);
 void		zbx_variant_set_bin(zbx_variant_t *value, void *value_bin);
-void		zbx_variant_set_json(zbx_variant_t *value, char *value_json);
 void		zbx_variant_set_error(zbx_variant_t *value, char *error);
 void		zbx_variant_set_dbl_vector(zbx_variant_t *value, zbx_vector_dbl_t *dbl_vector);
 
@@ -90,15 +86,5 @@ int		zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, c
 
 void		zbx_variant_set_vector(zbx_variant_t *value, zbx_vector_var_t *vector);
 int		zbx_vector_var_get_type(zbx_vector_var_t *v);
-
-typedef union
-{
-	double		dbl;
-	zbx_uint64_t	ui64;
-	char		*str;
-	char		*err;
-	zbx_log_value_t	*log;
-}
-zbx_history_value_t;
 
 #endif

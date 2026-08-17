@@ -61,6 +61,13 @@ class CControllerPopupGeneric extends CController {
 	const POPUPS_HAVING_TEMPLATE_FILTER = ['template_items', 'template_triggers'];
 
 	/**
+	 * Popups having user filter selector.
+	 *
+	 * @array
+	 */
+	const POPUPS_HAVING_USER_FILTER = ['devices'];
+
+	/**
 	 * General properties for supported dialog types.
 	 *
 	 * @var array
@@ -101,6 +108,13 @@ class CControllerPopupGeneric extends CController {
 	 * @var array
 	 */
 	protected $templateids = [];
+
+	/**
+	 * Users set in filter.
+	 *
+	 * @var array
+	 */
+	protected $userids = [];
 
 	/**
 	 * Either Host filter need to be filled to load results.
@@ -534,6 +548,18 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name')
 				]
+			],
+			'devices' => [
+				'title' => _('Active devices'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'uuid',
+				'form' => [
+					'name' => 'devices_form',
+					'id' => 'devices_form'
+				],
+				'table_columns' => [
+					_('Name')
+				]
 			]
 		];
 	}
@@ -559,6 +585,7 @@ class CControllerPopupGeneric extends CController {
 			'templategroup' =>						'string',
 			'hostid' =>								'db hosts.hostid',
 			'templateid' =>							'db hosts.hostid',
+			'userid' =>								'db users.userid',
 			'host' =>								'string',
 			'parent_discoveryid' =>					'db items.itemid',
 			'templates' =>							'string|not_empty',
@@ -569,6 +596,7 @@ class CControllerPopupGeneric extends CController {
 			'excludeids' =>							'array',
 			'disableids' =>							'array',
 			'only_hostid' =>						'db hosts.hostid',
+			'only_userid' =>						'db users.userid',
 			'monitored_hosts' =>					'in 1',
 			'templated_hosts' =>					'in 1',
 			'real_hosts' =>							'in 1',
@@ -606,7 +634,8 @@ class CControllerPopupGeneric extends CController {
 			'host_pattern_multiple' =>				'in 1',
 			'hide_host_filter' =>					'in 1',
 			'resolve_macros' =>						'in 1',
-			'exclude_provisioned' =>				'in 1'
+			'exclude_provisioned' =>				'in 1',
+			'has_devices_access' =>					'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -735,6 +764,28 @@ class CControllerPopupGeneric extends CController {
 			}
 
 			$this->templateids = array_keys($templates);
+		}
+
+		$user_options = [];
+
+		if ($this->hasInput('only_userid')) {
+			$user_options['userids'] = $this->getInput('only_userid');
+		}
+		elseif ($this->hasInput('userid')) {
+			$user_options['userids'] = $this->getInput('userid');
+		}
+
+		if ($user_options) {
+			$users = API::User()->get([
+				'output' => [],
+				'preservekeys' => true
+			] + $user_options);
+
+			if (!$users) {
+				return false;
+			}
+
+			$this->userids = array_keys($users);
 		}
 
 		// Check discovery rule permissions.
@@ -979,6 +1030,44 @@ class CControllerPopupGeneric extends CController {
 						'srcfld1' => 'hostid',
 						'dstfld1' => 'popup_template'
 					] + $template_options
+				],
+				'add_post_js' => false
+			];
+		}
+
+		// User multiselect.
+		if (in_array($this->source_table, self::POPUPS_HAVING_USER_FILTER)) {
+			$src_name = 'users';
+
+			$users = $this->userids
+				? API::User()->get([
+					'output' => ['userid', 'username', 'name', 'surname'],
+					'userids' => $this->userids
+				])
+				: [];
+
+			foreach ($users as &$user) {
+				$user['name'] = getUserFullname($user);
+				$user['id'] = $user['userid'];
+				unset($user['userid']);
+			}
+
+			$this->userids = array_column($users, 'id');
+
+			$filter['users'] = [
+				'multiple' => false,
+				'name' => 'popup_user',
+				'object_name' => $src_name,
+				'data' => array_values($users),
+				'selectedLimit' => 1,
+				'disabled' => $this->hasInput('only_userid'),
+				'popup' => [
+					'parameters' => [
+						'srctbl' => $src_name,
+						'srcfld1' => 'userid',
+						'srcfld2' => 'fullname',
+						'dstfld1' => 'popup_user'
+					]
 				],
 				'add_post_js' => false
 			];
@@ -1285,6 +1374,19 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->hasInput('exclude_provisioned')) {
 					$options['filter']['userdirectoryid'] = 0;
+				}
+
+				if ($this->hasInput('has_devices_access')) {
+					$roles = API::Role()->get([
+						'output' => ['roleid'],
+						'selectRules' => [CRoleHelper::DEVICES_ACCESS]
+					]);
+
+					$roles = array_filter($roles, static fn($role) =>
+						$role['rules'][CRoleHelper::DEVICES_ACCESS] == 1
+					);
+
+					$options['filter']['roleid'] = array_column($roles, 'roleid');
 				}
 
 				$records = API::User()->get($options);
@@ -1874,6 +1976,26 @@ class CControllerPopupGeneric extends CController {
 						'id' => $inventory_field['nr'],
 						'name' => $inventory_field['title']
 					];
+				}
+				break;
+
+			case 'devices':
+				$records = [];
+
+				if (CSettingsHelper::isMobileDevicesEnabled()) {
+					$options = [
+						'output' => ['uuid', 'name'],
+						'filter' => ['status' => ZBX_DEVICE_STATUS_ACTIVATED]
+					];
+
+					if ($this->userids) {
+						$options['userids'] = $this->userids;
+					}
+
+					$devices = API::Device()->get($options);
+					$records = array_combine(array_column($devices, 'uuid'), $devices);
+					CArrayHelper::sort($records, ['name']);
+					$records = CArrayHelper::renameObjectsKeys($records, ['uuid' => 'id']);
 				}
 				break;
 		}

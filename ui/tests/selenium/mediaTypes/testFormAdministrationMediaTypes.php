@@ -161,7 +161,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->assertEquals(['Media type', 'Message templates', 'Options'], $form->getTabs());
 
 		// Check available media type types.
-		$this->assertEquals(['Email', 'SMS', 'Script', 'Webhook'], $form->getField('Type')->getOptions()->asText());
+		$this->assertEquals(['Email', 'Push', 'SMS', 'Script', 'Webhook'], $form->getField('Type')->getOptions()->asText());
 
 		// Check common fields in Media type and Options tabs. Message templates are covered in separate test.
 		$tabs = [
@@ -289,7 +289,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Menu entry name' => 255,
 						'Menu entry URL' => 2048
 					],
-					'mandatory' => ['Script', 'Timeout', 'Menu entry name', 'Menu entry URL']
+					'mandatory' => ['Script', 'Timeout']
 				]
 			]
 		];
@@ -454,7 +454,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					$form->query('button:Configure')->one()->click();
 					$oauth_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 					$oauth_form = $oauth_overlay->asForm();
-					$this->assertEquals('New oauth', $oauth_overlay->getTitle());
+					$this->assertEquals('New OAuth', $oauth_overlay->getTitle());
 
 					// Check that "Copy" button is enabled and displayed.
 					$this->assertTrue($oauth_form->query('xpath:.//button[contains(@class, "zi-copy")]')->one()->isClickable());
@@ -602,16 +602,27 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				);
 				$script_dialog->query('button:Cancel')->one()->click();
 
-				// Check that Menu entry fields are enabled only when "Include event menu entry" is set.
-				$this->assertEquals(2, $this->query('id', ['event_menu_name', 'event_menu_url'])->all()
-						->filter(new CElementFilter(CElementFilter::ATTRIBUTES_PRESENT, ['disabled']))->count()
-				);
+				// Check that Menu entry fields are enabled and mandatory only when "Include event menu entry" is set.
+				foreach (['Menu entry name', 'Menu entry URL'] as $menu_field) {
+					$this->assertFalse($form->getField($menu_field)->isEnabled(), 'Field '.$menu_field.
+							' is enabled, but should be disabled.'
+					);
+					$this->assertFalse($form->isRequired($menu_field), 'Field '.$menu_field.
+							' marked as mandatory when disabled.'
+					);
+				}
 
 				$form->getField('Include event menu entry')->fill(true);
 
-				$this->assertEquals(2, $this->query('id', ['event_menu_name', 'event_menu_url'])->all()
-						->filter(new CElementFilter(CElementFilter::ATTRIBUTES_NOT_PRESENT, ['disabled']))->count()
-				);
+				foreach (['Menu entry name', 'Menu entry URL'] as $menu_field) {
+					$this->assertTrue($form->getField($menu_field)->isEnabled(), 'Field '.$menu_field.
+							' is disabled, but should be enabled.'
+					);
+					$this->assertTrue($form->isRequired($menu_field), 'Field '.$menu_field.
+							' not marked as mandatory when enabled.'
+					);
+				}
+
 				break;
 		}
 
@@ -907,7 +918,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'SMTP server port' => '99999'
 					],
 					'inline_errors' => [
-						'SMTP server port' => 'This value must be no greater than "65535".'
+						'SMTP server port' => 'Value must be less than or equal to 65535.'
 					]
 				]
 			],
@@ -1036,7 +1047,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Attempts' => 0
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1051,7 +1062,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Attempts' => ''
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1066,7 +1077,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Attempts' => 101
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no greater than "100".'
+						'Attempts' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -1081,7 +1092,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Attempts' => 'æų'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1096,7 +1107,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Attempts' => '☺'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1232,7 +1243,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'id:maxsessions' => 101
 					],
 					'inline_errors' => [
-						'id:maxsessions' => 'This value must be no greater than "100".'
+						'id:maxsessions' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -1941,31 +1952,56 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 	/**
 	 * Check scenarios when warning tooltip does or doesn't appear.
-	 * Possible values:
+	 * Possible values for tokens_status parameter:
 	 * 		0 - (default) Both tokens contain invalid value;
 	 * 		1 - Access token contain valid value;
 	 * 		2 - Refresh token contain valid value;
 	 * 		3 - Both tokens contain valid value.
 	 */
-	public function testFormAdministrationMediaTypes_TokenStatus() {
+	public function testFormAdministrationMediaTypes_WarningTooltip() {
 		$this->page->login()->open(self::URL)->waitUntilReady();
 
 		foreach (['Generic SMTP OAuth', 'Gmail OAuth', 'Gmail relay OAuth', 'Office365 OAuth'] as $name) {
 			foreach ([0, 1, 2, 3] as $tokens_status) {
-				DBexecute('UPDATE media_type_oauth SET tokens_status='.$tokens_status.' WHERE mediatypeid='.
-						self::$mediatypeids[$name]
-				);
-				$this->query('link', $name)->waitUntilClickable()->one()->click();
-				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+				// Change the status of the corresponding mediatype token.
+				CDataHelper::call('mediatype.update', [
+					'mediatypeid' => self::$mediatypeids[$name],
+					'access_token' => 'test',
+					'refresh_token' => 'test',
+					'access_expires_in' => 3599,
+					'tokens_status' => $tokens_status
+				]);
 
-				if ($tokens_status === 0 || $tokens_status === 1) {
-					$this->checkHint($form, 'zi-i-negative', 'Refresh token is invalid or outdated.');
-				}
-				else {
-					$this->assertFalse($form->query('xpath://button[contains(@class, "zi-i-negative")]')->one(false)->isValid());
-				}
+				// Check warning presence based on time access token was updated. '2147483647' - maximal valid unix time.
+				foreach (['2147483647', time()] as $access_token_updated) {
+					CDataHelper::call('mediatype.update', [
+						'mediatypeid' => self::$mediatypeids[$name],
+						'access_token_updated' => $access_token_updated
+					]);
 
-				COverlayDialogElement::find()->one()->close();
+					$this->query('link', $name)->waitUntilClickable()->one()->click();
+					$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+
+					// There will be two warning hints when refresh token is invalid and access token has "unexpected update time".
+					$warning = ($tokens_status === 0 || $tokens_status === 1)
+						? ($access_token_updated === '2147483647'
+							? "Refresh token is invalid or outdated.\nUnexpected access token update time."
+							: 'Refresh token is invalid or outdated.')
+						: ($access_token_updated === '2147483647'
+							? 'Unexpected access token update time.'
+							: null);
+
+					if ($warning !== null) {
+						$this->checkHint($form, 'zi-i-negative', $warning);
+					}
+					else {
+						$this->assertFalse($form->query('xpath://button[contains(@class, "zi-i-negative")]')->one(false)
+								->isValid()
+						);
+					}
+
+					COverlayDialogElement::find()->one()->close();
+				}
 			}
 		}
 	}

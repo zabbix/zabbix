@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbx_rtc_constants.h"
 #include "zbxalerter.h"
 #include "alerter_defs.h"
 
@@ -982,11 +983,13 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb, uint64_t alert_usrgrpid)
 				" and m.mediatypeid=mt.mediatypeid"
 				" and m.active=%d"
 				" and mt.status=%d"
+				" and mt.type<>%d"
 				" and mt.type<>%d",
 				alert_usrgrpid,
 				MEDIA_STATUS_ACTIVE,
 				MEDIA_TYPE_STATUS_ACTIVE,
-				MEDIA_TYPE_WEBHOOK);
+				MEDIA_TYPE_WEBHOOK,
+				MEDIA_TYPE_PUSH);
 
 	zbx_vector_uint64_create(&mediatypeids);
 	zbx_vector_am_media_ptr_create(&medias);
@@ -1080,7 +1083,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize alert loader: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
@@ -1113,7 +1116,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 			zabbix_log(LOG_LEVEL_CRIT, "cannot read alert syncer request");
 			am_db_clear(&amdb);
 			zbx_db_close();
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -1131,6 +1134,9 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 					break;
 				case ZBX_IPC_ALERTER_RESULTS:
 					results_num = am_db_flush_results(&amdb.mediatypes, message->data);
+					break;
+				case ZBX_RTC_SHUTDOWN:
+					zbx_set_exiting_with_succeed();
 					break;
 				default:
 					zabbix_log(LOG_LEVEL_WARNING, "unrecognized message in alert syncer %u",

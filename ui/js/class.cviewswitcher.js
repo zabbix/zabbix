@@ -206,6 +206,9 @@ CViewSwitcher.prototype = {
 			case 'z-select':
 				obj.style.display = 'inline-grid';
 				break
+			case 'z-textarea-flexible':
+				obj.style.display = 'inline-grid';
+				break
 			default:
 				obj.style.display = 'inline';
 		}

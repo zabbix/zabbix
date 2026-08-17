@@ -17,8 +17,6 @@ require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup hosts
  */
@@ -53,8 +51,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Check layout at Host tab.
 		$this->zbxTestAssertElementValue('host', $name);
 		$this->zbxTestAssertElementValue('name', $visible_name);
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/input[@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/z-textarea-flexible[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/z-textarea-flexible[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_1_useip_1" and text()="IP"]/../input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_1_useip_0" and text()="DNS"]/../input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
@@ -189,7 +187,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'Host name' => 'Host prototype with existen visible {#NAME}',
+						'Host name' => 'Host prototype with existing visible {#NAME}',
 						'Host groups' => 'Discovered hosts',
 						'Visible name' => 'Host prototype visible name'
 					],
@@ -304,11 +302,11 @@ class testFormHostPrototype extends CLegacyWebTest {
 			}
 		}
 
-		$this->page->removeFocus();
-
 		if (CTestArrayHelper::get($data, 'submit')) {
-			$dialog->getFooter()->query('button:Add')->one()->click();
+			$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		}
+
+		$this->page->removeFocus();
 
 		// Check the results in frontend.
 		$this->assertInlineError($form, $data['inline_errors']);
@@ -342,7 +340,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'Host name' => 'Host prototype with existen visible {#NAME}',
+						'Host name' => 'Host prototype with existing visible {#NAME}',
 						'Visible name' => 'Host prototype visible name'
 					],
 					'inline_errors' => [
@@ -520,10 +518,11 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$this->zbxTestInputTypeWait('host', $data['name']);
 
 		if (array_key_exists('visible_name', $data)) {
-			$this->zbxTestInputType('name', $data['visible_name']);
+			$form->fill(['Visible name' => $data['visible_name']]);
 		}
 
 		if (array_key_exists('checkbox', $data)) {
@@ -924,8 +923,11 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change name and visible name.
 		$this->zbxTestInputTypeOverwrite('host', $data['name']);
+		// Remove focus, so the inline validation error disappears and the dialog layout is not shifted later.
+		$this->page->removeFocus();
+
 		if (array_key_exists('visible_name', $data)) {
-			$this->zbxTestInputType('name', $data['visible_name']);
+			$dialog->query('id:name')->one()->fill($data['visible_name']);
 		}
 		// Change status.
 		if (array_key_exists('checkbox', $data)) {
@@ -934,10 +936,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Change host group.
 		if (array_key_exists('hostgroup', $data)) {
 			$this->zbxTestClickXpathWait('//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
-			$this->zbxTestMultiselectClear('group_links_');
-			$this->zbxTestClickButtonMultiselect('group_links_');
-			$this->zbxTestLaunchOverlayDialog('Host groups');
-			$this->zbxTestClickLinkTextWait($data['hostgroup']);
+			$dialog->asForm()->getField('Host groups')->asMultiselect()->select($data['hostgroup']);
 		}
 		// Change host group prototype.
 		if (array_key_exists('group_prototype', $data)) {
@@ -981,10 +980,12 @@ class testFormHostPrototype extends CLegacyWebTest {
 	private function checkFormFields($data) {
 		if (array_key_exists('visible_name', $data)) {
 			$this->zbxTestClickLinkTextWait($data['visible_name']);
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestAssertElementValue('name', $data['visible_name']);
 		}
 		else {
 			$this->zbxTestClickLinkTextWait($data['name']);
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestAssertElementValue('host', $data['name']);
 		}
 
@@ -1042,9 +1043,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $host]);
+		$table = $this->query('class:datatable')->asDatatable()->one();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $host)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 
 		$this->zbxTestClickLinkTextWait($discovery_rule);
 		$this->zbxTestClickLinkTextWait('Host prototypes');

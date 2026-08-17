@@ -80,7 +80,7 @@ type CounterPathElements struct {
 func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 	ObjectsNames = make(map[string]string)
 
-	locNames, err := win32.PdhEnumObject()
+	locNames, err := win32.PdhEnumObject(false)
 	if err != nil {
 		return err
 	}

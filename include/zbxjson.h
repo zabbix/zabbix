@@ -266,6 +266,11 @@
 #define ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND	"alert.send"
 #define ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST	"item.test"
 #define ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE	"expressions.evaluate"
+#define ZBX_PROTO_VALUE_DEVICE_INIT		"device.init"
+#define ZBX_PROTO_VALUE_DEVICE_OFFBOARD		"device.offboard"
+#define ZBX_PROTO_VALUE_DEVICE_DEACTIVATE	"device.deactivate"
+#define ZBX_PROTO_VALUE_DEVICE_NOTIFY		"device.notify"
+#define ZBX_PROTO_VALUE_MEDIA_TEST		"media.test"
 
 #define ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED	"enabled"
 #define ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED	"disabled"
@@ -329,7 +334,7 @@ const char	*zbx_json_strerror(void);
 void	zbx_json_init(struct zbx_json *j, size_t allocate);
 void	zbx_json_initarray(struct zbx_json *j, size_t allocate);
 void	zbx_json_init_with(struct zbx_json *j, const char *src, size_t len);
-void	zbx_json_clean(struct zbx_json *j);
+void	zbx_json_reset(struct zbx_json *j);
 void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);
@@ -363,6 +368,7 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc, zbx_json_type_t *type);
 void		zbx_json_escape(char **string);
 int		zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
+char		*zbx_json_raw_value_by_path_dyn(const struct zbx_json_parse *jp, const char *path);
 zbx_json_type_t	zbx_json_valuetype(const char *p);
 struct zbx_json	*zbx_json_clone(const struct zbx_json *src);
 
@@ -425,6 +431,6 @@ int	zbx_jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index,
 int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, const zbx_jsonobj_t *obj);
 zbx_jsonobj_t	*zbx_jsonobj_get_value(const zbx_jsonobj_t *obj, const char *name);
 void	zbx_jsonobj_remove_value(zbx_jsonobj_t *obj, const char *name);
-zbx_int64_t	zbx_json_validate_ext(const char *start, char **error);
+int	zbx_json_validate_ext(const char *start, char **error);
 
 #endif /* ZABBIX_ZJSON_H */

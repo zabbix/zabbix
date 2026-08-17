@@ -377,7 +377,11 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 
 	log.Infof("using configuration file: %s", configPath)
 
-	if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+	err = keyaccess.LoadRules(
+		agent.Options.AllowKey, agent.Options.DenyKey,
+		agent.Options.AllowKeyRegexp, agent.Options.DenyKeyRegexp,
+	)
+	if err != nil {
 		return errs.Wrap(err, "Failed to load key access rules")
 	}
 
@@ -681,7 +685,10 @@ func prepareMetricPrintManager(verbose bool, pluginSysOpt agent.PluginSystemOpti
 		return nil, zbxerr.New("failed to initialize logger").Wrap(err)
 	}
 
-	err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey)
+	err = keyaccess.LoadRules(
+		agent.Options.AllowKey, agent.Options.DenyKey,
+		agent.Options.AllowKeyRegexp, agent.Options.DenyKeyRegexp,
+	)
 	if err != nil {
 		return nil, zbxerr.New("failed to load key access rules").Wrap(err)
 	}

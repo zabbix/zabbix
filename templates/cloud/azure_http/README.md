@@ -5,7 +5,7 @@
 
 - This template is designed to monitor Microsoft Azure by HTTP.
 - It works without any external scripts and uses the script item.
-- Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
+- Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, PostgreSQL servers, Backup Job vaults, Sentinel workspaces, and Container apps.
 
 ## Included Monitoring Templates
 
@@ -22,6 +22,7 @@
 - *Azure Cost Management by HTTP*
 - *Azure Backup Jobs by HTTP*
 - *Azure Sentinel by HTTP*
+- *Azure Container Apps by HTTP*
 
 ## Requirements
 
@@ -51,58 +52,63 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
-|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
-|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
-|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
-|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
-|{$AZURE.VM.NAME.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
-|{$AZURE.VM.NAME.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.VM.LOCATION.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
-|{$AZURE.VM.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SCALESET.NAME.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`.*`|
-|{$AZURE.SCALESET.NAME.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SCALESET.LOCATION.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`.*`|
-|{$AZURE.SCALESET.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SQL.INST.NAME.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`.*`|
-|{$AZURE.SQL.INST.NAME.NOT.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SQL.INST.LOCATION.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`.*`|
-|{$AZURE.SQL.INST.LOCATION.NOT.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.VAULT.NAME.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`.*`|
-|{$AZURE.VAULT.NAME.NOT.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.VAULT.LOCATION.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`.*`|
-|{$AZURE.VAULT.LOCATION.NOT.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.STORAGE.ACC.NAME.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
-|{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.STORAGE.ACC.LOCATION.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
-|{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SUBSCRIPTION.ID}|<p>Azure Subscription ID used to scope all API requests.</p>||
+|{$AZURE.TENANT.ID}|<p>Azure Tenant (Directory) ID used for authentication.</p>||
+|{$AZURE.APP.ID}|<p>Client (Application) ID of the Azure service principal.</p>||
+|{$AZURE.PASSWORD}|<p>Client secret of the Azure service principal used for API authentication.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>Maximum time to wait for Azure API responses before request fails.</p>|`15s`|
+|{$AZURE.PROXY}|<p>HTTP proxy used for Azure API requests (leave empty to connect directly).</p>||
+|{$AZURE.VM.NAME.MATCHES}|<p>Regex string to include discovered virtual machines by name.</p>|`.*`|
+|{$AZURE.VM.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered virtual machines by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.VM.LOCATION.MATCHES}|<p>Regex string to include discovered virtual machine locations by name.</p>|`.*`|
+|{$AZURE.VM.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered virtual machine locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SCALESET.NAME.MATCHES}|<p>Regex string to include discovered VM scale sets by name.</p>|`.*`|
+|{$AZURE.SCALESET.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered VM scale sets by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SCALESET.LOCATION.MATCHES}|<p>Regex string to include discovered VM scale set locations by name.</p>|`.*`|
+|{$AZURE.SCALESET.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered VM scale set locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SQL.INST.NAME.MATCHES}|<p>Regex string to include discovered Azure SQL managed instances by name.</p>|`.*`|
+|{$AZURE.SQL.INST.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered Azure SQL managed instances by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SQL.INST.LOCATION.MATCHES}|<p>Regex string to include discovered Azure SQL managed instance locations by name.</p>|`.*`|
+|{$AZURE.SQL.INST.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered Azure SQL managed instance locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.VAULT.NAME.MATCHES}|<p>Regex string to include discovered Azure Vaults by name.</p>|`.*`|
+|{$AZURE.VAULT.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered Azure Vaults by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.VAULT.LOCATION.MATCHES}|<p>Regex string to include discovered Azure Vault locations by name.</p>|`.*`|
+|{$AZURE.VAULT.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered Azure Vault locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.STORAGE.ACC.NAME.MATCHES}|<p>Regex string to include discovered storage accounts by name.</p>|`.*`|
+|{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered storage accounts by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.STORAGE.ACC.LOCATION.MATCHES}|<p>Regex string to include discovered storage account locations by name.</p>|`.*`|
+|{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered storage account locations by name.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.STORAGE.ACC.AVAILABILITY}|<p>The warning threshold of the storage account availability.</p>|`70`|
 |{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY}|<p>The warning threshold of the storage account blob services availability.</p>|`70`|
 |{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY}|<p>The warning threshold of the storage account table services availability.</p>|`70`|
-|{$AZURE.RESOURCE.GROUP.MATCHES}|<p>This macro is used in discovery rules.</p>|`.*`|
-|{$AZURE.RESOURCE.GROUP.NOT.MATCHES}|<p>This macro is used in discovery rules.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MYSQL.DB.NAME.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`.*`|
-|{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MYSQL.DB.LOCATION.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`.*`|
-|{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.PGSQL.DB.NAME.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`.*`|
-|{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.PGSQL.DB.LOCATION.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`.*`|
-|{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.NAME.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`.*`|
-|{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.LOCATION.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`.*`|
-|{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`^System$`|
-|{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`.*`|
-|{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`.*`|
-|{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.WORKSPACE.NAME.MATCHES}|<p>This macro is used in workspace discovery rule.</p>|`.*`|
-|{$AZURE.WORKSPACE.NAME.NOT.MATCHES}|<p>This macro is used in workspace discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.WORKSPACE.LOCATION.MATCHES}|<p>This macro is used in workspace discovery rule.</p>|`.*`|
-|{$AZURE.WORKSPACE.LOCATION.NOT.MATCHES}|<p>This macro is used in workspace discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.RESOURCE.GROUP.MATCHES}|<p>Regex string to include discovered resource groups by name.</p>|`.*`|
+|{$AZURE.RESOURCE.GROUP.NOT.MATCHES}|<p>Regex string to exclude discovered resource groups by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MYSQL.DB.NAME.MATCHES}|<p>Regex string to include discovered MySQL servers by name.</p>|`.*`|
+|{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered MySQL servers by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MYSQL.DB.LOCATION.MATCHES}|<p>Regex string to include discovered MySQL server locations by name.</p>|`.*`|
+|{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered MySQL server locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.PGSQL.DB.NAME.MATCHES}|<p>Regex string to include discovered PostgreSQL servers by name.</p>|`.*`|
+|{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered PostgreSQL servers by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.PGSQL.DB.LOCATION.MATCHES}|<p>Regex string to include discovered PostgreSQL server locations by name.</p>|`.*`|
+|{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered PostgreSQL server locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.NAME.MATCHES}|<p>Regex string to include discovered MSSQL databases by name.</p>|`.*`|
+|{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered MSSQL databases by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.LOCATION.MATCHES}|<p>Regex string to include discovered MSSQL database locations by name.</p>|`.*`|
+|{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered MSSQL database locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}|<p>Regex string to exclude discovered MSSQL database locations by SKU type.</p>|`^System$`|
+|{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}|<p>Regex string to include discovered Cosmos DB accounts by name.</p>|`.*`|
+|{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered Cosmos DB accounts by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}|<p>Regex string to include discovered Cosmos DB account locations by name.</p>|`.*`|
+|{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered Cosmos DB account locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.WORKSPACE.NAME.MATCHES}|<p>Regex string to include discovered workspace by name.</p>|`.*`|
+|{$AZURE.WORKSPACE.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered workspace by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.WORKSPACE.LOCATION.MATCHES}|<p>Regex string to include discovered workspace locations by name.</p>|`.*`|
+|{$AZURE.WORKSPACE.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered workspace locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.CONT_APP.NAME.MATCHES}|<p>This macro is used in Azure Container App discovery rule.</p>|`.*`|
+|{$AZURE.CONT_APP.NAME.NOT.MATCHES}|<p>This macro is used in Azure Container App discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.CONT_APP.LOCATION.MATCHES}|<p>This macro is used in Azure Container App discovery rule.</p>|`.*`|
+|{$AZURE.CONT_APP.LOCATION.NOT.MATCHES}|<p>This macro is used in Azure Container App discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.DISCOVERY.INTERVAL}|<p>Azure resource discovery interval. Could be used with context.</p>|`1h`|
 
 ### Items
 
@@ -112,6 +118,7 @@ This template has been tested on:
 |Get errors|<p>A list of errors from API requests.</p>|Dependent item|azure.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get storage accounts|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.storage.acc|
 |Get storage accounts errors|<p>The errors from API requests.</p>|Dependent item|azure.get.storage.acc.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Virtual machine count|<p>Get the total count of virtual machines.</p>|Dependent item|azure.get.vm.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Triggers
 
@@ -238,6 +245,12 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Azure Workspace discovery|<p>The list of Azure workspaces provided by the subscription.</p>|Dependent item|azure.workspace.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### LLD rule Azure Container App discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure Container App discovery|<p>The list of Azure Container apps provided by the subscription.</p>|Script|azure.container_app.discovery<p>**Preprocessing**</p><ul><li><p>Does not match regular expression: `ERROR`</p><p>⛔️Custom on fail: Set error to: `Errors in discovery script. Check logs for more info.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 # Azure VM Scale Set by HTTP
 
@@ -1206,6 +1219,17 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.BUDGET.MONTH}|<p>Threshold for Azure monthly budget limit.</p>|`10000`|
+|{$AZURE.BILLING.MONTH.HIGH}|<p>Threshold for high Azure monthly billing.</p>|`15000`|
+|{$AZURE.BILLING.MONTH.WARN}|<p>Warning threshold for Azure monthly billing.</p>|`10000`|
+|{$AZURE.SERVICE.COST.TOP.HIGH}|<p>Threshold for high Azure top service cost.</p>|`400`|
+|{$AZURE.SERVICE.COST.TOP.WARN}|<p>Warning threshold for Azure top service cost.</p>|`200`|
+|{$AZURE.ACCOUNT.COST.DAILY.HIGH}|<p>Threshold for high Azure account daily cost.</p>|`400`|
+|{$AZURE.ACCOUNT.COST.DAILY.WARN}|<p>Warning threshold for Azure account daily cost.</p>|`200`|
+|{$AZURE.REGION.COST.DAILY.HIGH}|<p>Threshold for high Azure region daily cost.</p>|`400`|
+|{$AZURE.REGION.COST.DAILY.WARN}|<p>Warning threshold for Azure region daily cost.</p>|`200`|
+|{$AZURE.SERVICE.COST.DAILY.HIGH}|<p>Threshold for high Azure service daily cost.</p>|`400`|
+|{$AZURE.SERVICE.COST.DAILY.WARN}|<p>Warning threshold for Azure service daily cost.</p>|`200`|
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
@@ -1224,6 +1248,37 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
+|Get region and subscription daily data|<p>Collects Azure region and subscription daily cost data.</p>|Dependent item|azure.region.subscription.daily.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get service daily data|<p>Collects Azure service daily cost data.</p>|Dependent item|azure.service.daily.total.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get region and subscription yearly data|<p>Collects Azure region and account yearly cost data.</p>|Dependent item|azure.region.subscription.yearly.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get service yearly data|<p>Collects Azure service yearly cost data.</p>|Dependent item|azure.service.yearly.total.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get total months|<p>Collects Azure monthly cost data.</p>|Dependent item|azure.month.cost.total.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get service daily cost|<p>Collects daily Azure service data.</p>|Dependent item|azure.service.daily.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.services`</p></li></ul>|
+|Get accounts daily cost|<p>Collects daily Azure account data.</p>|Dependent item|azure.account.daily.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.accounts`</p></li></ul>|
+|Get regions daily cost|<p>Collects daily Azure region data.</p>|Dependent item|azure.regions.daily.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.regions`</p></li></ul>|
+|Get service type daily cost|<p>Collects data for each service type cost within a day:</p><p>ai_ml - `ai` and `machine learning` services</p><p>analytics - `data analysis` and `reporting` services</p><p>compute - `virtual machines` and `app runtime` services</p><p>containers - `container` services</p><p>databases - `database` services</p><p>storage - `storage` services</p><p>networking - `networking`, `routing`, and `connectivity` services</p><p>security - `security`, `identity`, and `protection` services</p><p>dev_tools - `developer tools` services</p><p>identity - `identity` and `access management` services</p><p>integration - `integration` `messaging` services</p><p>iot - `iot` services</p><p>mgmt - `monitoring`, `governance`, and `management` services</p><p>media - `media` streaming and delivery services</p><p>migration - `migration` and data transfer services</p><p>mixed_reality - `mixed` and `augmented` reality services</p><p>mobile - `mobile` backend and `real-time` communication services</p><p>hybrid - `hybrid` and `multicloud` connectivity services</p><p>web - `web` hosting and `application` hosting services</p><p>vdi - `virtual desktop` and `remote workspace` services</p>|Dependent item|azure.service.type.daily.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.categories`</p></li></ul>|
+|Azure monthly budget delta|<p>Calculates current Azure monthly budget delta compared to previous month.</p>|Calculated|azure.monthly.delta.budget<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure monthly delta, in percent|<p>Calculates current Azure monthly delta, in percent, compared to previous month.</p>|Calculated|azure.monthly.delta.percent<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure monthly delta|<p>Calculates current Azure monthly delta compared to previous month.</p>|Calculated|azure.monthly.delta<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get Azure monthly compare|<p>Azure monthly cost comparison.</p>|Dependent item|azure.monthly.compare.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_comparison`</p></li></ul>|
+|Get Azure daily top service|<p>Azure daily top service data.</p>|Dependent item|azure.daily.top.service.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.top_services`</p></li></ul>|
+|Azure daily service count|<p>Azure daily service count.</p>|Dependent item|azure.daily.service.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.service_count_daily`</p></li></ul>|
+|Azure monthly average cost|<p>Azure monthly average cost.</p>|Calculated|azure.monthly.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure daily average cost|<p>Azure daily average cost in one week.</p>|Calculated|azure.daily.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure daily total cost|<p>Azure daily total cost.</p>|Dependent item|azure.daily.total.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+|Azure Q1 delta|<p>Difference in cost between `Q2` and `Q1`.</p>|Calculated|azure.q1.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure Q2 delta|<p>Difference in cost between `Q3` and `Q2`.</p>|Calculated|azure.q2.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure Q3 delta|<p>Difference in cost between `Q4` and `Q3`.</p>|Calculated|azure.q3.delta.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure quarterly trend cost|<p>Average quarterly cost change across the year based on `Q1`, `Q2` and `Q3` deltas. Shows whether spending is steadily increasing, decreasing, or staying stable over time.</p>|Calculated|azure.quarterly.trend.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get service type yearly cost|<p>Collects data for each service type cost within a year:</p><p>ai_ml - `ai` and `machine learning` services</p><p>analytics - `data analysis` and `reporting` services</p><p>compute - `virtual machines` and `app runtime` services</p><p>containers - `container` services</p><p>databases - `database` services</p><p>storage - `storage` services</p><p>networking - `networking`, `routing`, and `connectivity` services</p><p>security - `security`, `identity`, and `protection` services</p><p>dev_tools - `developer tools` services</p><p>identity - `identity` and `access management` services</p><p>integration - `integration` `messaging` services</p><p>iot - `iot` services</p><p>mgmt - `monitoring`, `governance`, and `management` services</p><p>media - `media` streaming and delivery services</p><p>migration - `migration` and data transfer services</p><p>mixed_reality - `mixed` and `augmented` reality services</p><p>mobile - `mobile` backend and `real-time` communication services</p><p>hybrid - `hybrid` and `multicloud` connectivity services</p><p>web - `web` hosting and `application` hosting services</p><p>vdi - `virtual desktop` and `remote workspace` services</p>|Dependent item|azure.service.type.yearly.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.type`</p></li></ul>|
+|Get subscription yearly cost|<p>Collects cost data for Azure subscription within a yearly gap.</p>|Dependent item|azure.subscription.yearly.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.subscriptions`</p></li></ul>|
+|Get region yearly cost|<p>Collects cost data for each region within a yearly gap.</p>|Dependent item|azure.region.yearly.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.regions`</p></li></ul>|
+|Get service yearly cost|<p>Collects cost data for each service within a yearly gap.</p>|Dependent item|azure.service.yearly.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.services`</p></li></ul>|
+|Annual cost|<p>Azure total annual cost.</p>|Calculated|azure.annual.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Q1 cost total|<p>Total Q1 cost.</p>|Dependent item|azure.first.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q1`</p></li></ul>|
+|Q2 cost total|<p>Total Q2 cost.</p>|Dependent item|azure.second.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q2`</p></li></ul>|
+|Q3 cost total|<p>Total Q3 cost.</p>|Dependent item|azure.third.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q3`</p></li></ul>|
+|Q4 cost total|<p>Total Q4 cost.</p>|Dependent item|azure.fourth.quarter.cost<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.q4`</p></li></ul>|
 |Get monthly costs|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.monthly.costs|
 |Get daily costs|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.daily.costs|
 |Azure Cost: Get monthly costs errors|<p>A list of errors from API requests.</p>|Dependent item|azure.get.monthly.costs.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -1236,11 +1291,172 @@ This template has been tested on:
 |Azure Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Cost Management by HTTP/azure.get.monthly.costs.errors))>0`|Average||
 |Azure Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Cost Management by HTTP/azure.get.daily.costs.errors))>0`|Average||
 
+### LLD rule Azure daily service cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure daily service cost discovery|<p>Collects daily Azure service cost data.</p>|Dependent item|azure.daily.service.cost.discovery|
+
+### Item prototypes for Azure daily service cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure service [{#AZURE.SERVICE.NAME}]: Get daily data|<p>Collects daily Azure `{#AZURE.SERVICE.NAME}` service data.</p>|Dependent item|azure.daily.service.cost.preprocessed.get["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AZURE.SERVICE.NAME}")].first()`</p></li></ul>|
+|Azure service [{#AZURE.SERVICE.NAME}]: Daily cost|<p>Collects daily Azure `{#AZURE.SERVICE.NAME}` service cost.</p>|Dependent item|azure.daily.service.cost["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### Trigger prototypes for Azure daily service cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure service daily cost warning|<p>Azure service daily cost is above warning threshold `{$AZURE.SERVICE.COST.DAILY.WARN}`. Please monitor service usage and investigate cost increase trends.</p>|`last(/Azure Cost Management by HTTP/azure.daily.service.cost["{#AZURE.SERVICE.NAME}"]) >= {$AZURE.SERVICE.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>Azure service daily cost high</li></ul>|
+|Azure service daily cost high|<p>Azure service daily cost has exceeded high threshold `{$AZURE.SERVICE.COST.DAILY.HIGH}`. Immediate investigation of service spending is recommended.</p>|`last(/Azure Cost Management by HTTP/azure.daily.service.cost["{#AZURE.SERVICE.NAME}"]) >= {$AZURE.SERVICE.COST.DAILY.HIGH}`|High||
+
+### LLD rule Azure daily account cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure daily account cost discovery|<p>Collects daily Azure account cost data.</p>|Dependent item|azure.daily.account.cost.discovery|
+
+### Item prototypes for Azure daily account cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure subscription [{#AZURE.SUBSCRIPTION.ID}]: Get daily data|<p>Collects daily Azure `{#AZURE.SUBSCRIPTION.ID}` account data.</p>|Dependent item|azure.daily.account.cost.preprocessed.get["{#AZURE.SUBSCRIPTION.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.subscription_id=="{#AZURE.SUBSCRIPTION.ID}")].first()`</p></li></ul>|
+|Azure subscription [{#AZURE.SUBSCRIPTION.ID}]: Daily cost|<p>Collects daily Azure `{#AZURE.SUBSCRIPTION.ID}` account cost.</p>|Dependent item|azure.daily.account.cost["{#AZURE.SUBSCRIPTION.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### Trigger prototypes for Azure daily account cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure account daily cost warning|<p>Azure `{#AZURE.SUBSCRIPTION.ID}` subscription daily cost is above warning threshold `{$AZURE.ACCOUNT.COST.DAILY.WARN}`. Please monitor account spending and investigate cost increase trends.</p>|`last(/Azure Cost Management by HTTP/azure.daily.account.cost["{#AZURE.SUBSCRIPTION.ID}"]) >= {$AZURE.ACCOUNT.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>Azure account daily cost high</li></ul>|
+|Azure account daily cost high|<p>Azure `{#AZURE.SUBSCRIPTION.ID}` subscription daily cost has exceeded high threshold `{$AZURE.ACCOUNT.COST.DAILY.HIGH}`. Immediate investigation of account spending is recommended.</p>|`last(/Azure Cost Management by HTTP/azure.daily.account.cost["{#AZURE.SUBSCRIPTION.ID}"]) >= {$AZURE.ACCOUNT.COST.DAILY.HIGH}`|High||
+
+### LLD rule Azure daily region cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure daily region cost discovery|<p>Collects daily Azure region cost data.</p>|Dependent item|azure.daily.region.cost.discovery|
+
+### Item prototypes for Azure daily region cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure region [{#AZURE.REGION.NAME}]: Get daily data|<p>Collects daily Azure `{#AZURE.REGION.NAME}` region data.</p>|Dependent item|azure.daily.region.cost.preprocessed.get["{#AZURE.REGION.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.region=="{#AZURE.REGION.NAME}")].first()`</p></li></ul>|
+|Azure region [{#AZURE.REGION.NAME}]: Daily cost|<p>Collects daily Azure `{#AZURE.REGION.NAME}` region cost.</p>|Dependent item|azure.daily.region.cost["{#AZURE.REGION.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### Trigger prototypes for Azure daily region cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure region daily cost warning|<p>Azure region `{#AZURE.REGION.NAME}` daily cost is above warning threshold `{$AZURE.REGION.COST.DAILY.WARN}`. Please monitor region spending and investigate cost increase trends.</p>|`last(/Azure Cost Management by HTTP/azure.daily.region.cost["{#AZURE.REGION.NAME}"]) >= {$AZURE.REGION.COST.DAILY.WARN}`|Warning|**Depends on**:<br><ul><li>Azure region daily cost high</li></ul>|
+|Azure region daily cost high|<p>Azure region `{#AZURE.REGION.NAME}` daily cost has exceeded high threshold `{$AZURE.REGION.COST.DAILY.HIGH}`. Immediate investigation of region spending is recommended.</p>|`last(/Azure Cost Management by HTTP/azure.daily.region.cost["{#AZURE.REGION.NAME}"]) >= {$AZURE.REGION.COST.DAILY.HIGH}`|High||
+
+### LLD rule Azure daily service type costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure daily service type costs discovery|<p>Collects daily Azure service type data.</p>|Dependent item|azure.daily.service.type.costs.discovery|
+
+### Item prototypes for Azure daily service type costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Get daily data|<p>Collects daily Azure service `{#AZURE.SERVICE.TYPE}` type data.</p>|Dependent item|azure.daily.service.type.preprocessed.get["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.category=="{#AZURE.SERVICE.TYPE}")].first()`</p></li></ul>|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Daily cost|<p>Collects daily Azure service `{#AZURE.SERVICE.TYPE}` type cost.</p>|Dependent item|azure.service.type.daily.cost["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Daily count|<p>Collects daily Azure service `{#AZURE.SERVICE.TYPE}` type count.</p>|Dependent item|azure.service.type.daily.count["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.service_count`</p></li></ul>|
+
+### LLD rule Azure monthly compare discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure monthly compare discovery|<p>Collects monthly data that compares current to previous months.</p>|Dependent item|azure.monthly.compare.discovery|
+
+### Item prototypes for Azure monthly compare discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month [{#AZURE.MONTH.DATE}]: Type [{#AZURE.MONTH.TYPE}]: Get data|<p>Collects Azure cost data for `{#AZURE.MONTH.DATE}` month with `{#AZURE.MONTH.TYPE}` monthly type.</p>|Dependent item|azure.monthly.compare.type.preprocessed.get["{#AZURE.MONTH.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.type=="{#AZURE.MONTH.TYPE}")].first()`</p></li></ul>|
+|Month [{#AZURE.MONTH.DATE}]: Type [{#AZURE.MONTH.TYPE}]: Total cost|<p>Total `{#AZURE.MONTH.TYPE}` `{#AZURE.MONTH.DATE}` monthly cost.</p>|Dependent item|azure.monthly.compare.type.cost["{#AZURE.MONTH.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### LLD rule Azure daily top service cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure daily top service cost discovery|<p>Collects Azure top service data.</p>|Dependent item|azure.daily.top.service.cost.discovery|
+
+### Item prototypes for Azure daily top service cost discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure top service [{#AZURE.SERVICE.NAME}]: Get data|<p>Collects daily Azure top service `{#AZURE.SERVICE.NAME}` data.</p>|Dependent item|azure.daily.top.service.preprocessed.get["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AZURE.SERVICE.NAME}")].first()`</p></li></ul>|
+|Azure top service [{#AZURE.SERVICE.NAME}]: Daily cost|<p>Collects daily Azure top service `{#AZURE.SERVICE.NAME}` cost.</p>|Dependent item|azure.daily.top.service.cost["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+|Azure top service [{#AZURE.SERVICE.NAME}]: Daily cost, in percent|<p>Collects daily Azure top service `{#AZURE.SERVICE.NAME}` cost.</p>|Dependent item|azure.daily.top.service.percent["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.percent`</p></li></ul>|
+
+### Trigger prototypes for Azure daily top service cost discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure top daily service cost warning|<p>Azure top service `{#AZURE.SERVICE.NAME}` cost is above warning threshold `{$AZURE.SERVICE.COST.TOP.WARN}`. Please monitor service usage and investigate cost increase trends.</p>|`last(/Azure Cost Management by HTTP/azure.daily.top.service.cost["{#AZURE.SERVICE.NAME}"]) >= {$AZURE.SERVICE.COST.TOP.WARN}`|Warning|**Depends on**:<br><ul><li>Azure top daily service cost high</li></ul>|
+|Azure top daily service cost high|<p>Azure top service `{#AZURE.SERVICE.NAME}` cost has exceeded high threshold `{$AZURE.SERVICE.COST.TOP.HIGH}`. Immediate investigation of service spending is recommended.</p>|`last(/Azure Cost Management by HTTP/azure.daily.top.service.cost["{#AZURE.SERVICE.NAME}"]) >= {$AZURE.SERVICE.COST.TOP.HIGH}`|High||
+
+### LLD rule Azure yearly service type costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure yearly service type costs discovery|<p>Collects yearly Azure service type data.</p>|Dependent item|azure.yearly.service.type.costs.discovery|
+
+### Item prototypes for Azure yearly service type costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Get yearly data|<p>Collects yearly Azure service `{#AZURE.SERVICE.TYPE}` type data.</p>|Dependent item|azure.yearly.service.type.preprocessed.get["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.category=="{#AZURE.SERVICE.TYPE}")].first()`</p></li></ul>|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Yearly cost|<p>Collects yearly Azure service `{#AZURE.SERVICE.TYPE}` type cost.</p>|Dependent item|azure.service.type.yearly.cost["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+|Azure service type [{#AZURE.SERVICE.TYPE}]: Yearly count|<p>Collects yearly Azure service `{#AZURE.SERVICE.TYPE}` type count.</p>|Dependent item|azure.service.type.yearly.count["{#AZURE.SERVICE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.service_count`</p></li></ul>|
+
+### LLD rule Azure yearly subscription costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure yearly subscription costs discovery|<p>Collects yearly Azure subscription data.</p>|Dependent item|azure.yearly.subscription.costs.discovery|
+
+### Item prototypes for Azure yearly subscription costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure subscription [{#AZURE.SUBSCRIPTION.ID}]: Get yearly data|<p>Collects yearly Azure `{#AZURE.SUBSCRIPTION.ID}` subscription ID data.</p>|Dependent item|azure.yearly.subscription.preprocessed.get["{#AZURE.SUBSCRIPTION.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.subscription_id=="{#AZURE.SUBSCRIPTION.ID}")].first()`</p></li></ul>|
+|Azure subscription [{#AZURE.SUBSCRIPTION.ID}]: Yearly cost|<p>Collects yearly Azure `{#AZURE.SUBSCRIPTION.ID}` subscription ID total cost.</p>|Dependent item|azure.yearly.subscription.yearly.cost["{#AZURE.SUBSCRIPTION.ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### LLD rule Azure yearly region costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure yearly region costs discovery|<p>Collects yearly Azure region data.</p>|Dependent item|azure.yearly.region.costs.discovery|
+
+### Item prototypes for Azure yearly region costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure region [{#AZURE.REGION.NAME}]: Get yearly data|<p>Collects yearly Azure `{#AZURE.REGION.NAME}` region data.</p>|Dependent item|azure.yearly.region.preprocessed.get["{#AZURE.REGION.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.region=="{#AZURE.REGION.NAME}")].first()`</p></li></ul>|
+|Azure region [{#AZURE.REGION.NAME}]: Yearly cost|<p>Collects yearly Azure `{#AZURE.REGION.NAME}` region total cost.</p>|Dependent item|azure.yearly.region.yearly.cost["{#AZURE.REGION.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
+### LLD rule Azure yearly service costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure yearly service costs discovery|<p>Collects yearly Azure service data.</p>|Dependent item|azure.yearly.service.costs.discovery|
+
+### Item prototypes for Azure yearly service costs discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure service [{#AZURE.SERVICE.NAME}]: Get yearly data|<p>Collects yearly Azure `{#AZURE.SERVICE.NAME}` service data.</p>|Dependent item|azure.yearly.service.preprocessed.get["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.service=="{#AZURE.SERVICE.NAME}")].first()`</p></li></ul>|
+|Azure service [{#AZURE.SERVICE.NAME}]: Yearly cost|<p>Collects yearly Azure `{#AZURE.SERVICE.NAME}` service total cost.</p>|Dependent item|azure.yearly.service.yearly.cost["{#AZURE.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cost`</p></li></ul>|
+
 ### LLD rule Azure daily costs by services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Azure daily costs by services discovery|<p>Discovery of daily costs by services.</p>|Dependent item|azure.daily.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Azure daily costs by services discovery|<p>Discovery of daily costs by services.</p>|Dependent item|azure.daily.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cost.data`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Item prototypes for Azure daily costs by services discovery
 
@@ -1295,6 +1511,15 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Month ["{#AZURE.BILLING.MONTH}"] cost|<p>The monthly cost.</p>|Dependent item|azure.monthly.cost["{#AZURE.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### Trigger prototypes for Azure monthly costs discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure monthly billing warning|<p>Azure `{#AZURE.BILLING.MONTH}` month cost is above warning threshold `{$AZURE.BILLING.MONTH.WARN}`. Please monitor cost trends and investigate recent usage increases.</p>|`last(/Azure Cost Management by HTTP/azure.monthly.cost["{#AZURE.BILLING.MONTH}"]) >= {$AZURE.BILLING.MONTH.WARN}`|Warning|**Depends on**:<br><ul><li>Azure monthly billing high</li></ul>|
+|Azure monthly billing high|<p>Azure `{#AZURE.BILLING.MONTH}` month cost has exceeded high threshold `{$AZURE.BILLING.MONTH.HIGH}`. Immediate cost investigation is recommended.</p>|`last(/Azure Cost Management by HTTP/azure.monthly.cost["{#AZURE.BILLING.MONTH}"]) >= {$AZURE.BILLING.MONTH.HIGH}`|High||
+|Azure monthly billing budget warning 80%|<p>Azure `{#AZURE.BILLING.MONTH}` month cost has reached 80% of the defined budget `{$AZURE.BUDGET.MONTH}`. Please monitor spending to avoid budget overrun.</p>|`last(/Azure Cost Management by HTTP/azure.monthly.cost["{#AZURE.BILLING.MONTH}"]) >= {$AZURE.BUDGET.MONTH}*0.8`|Warning|**Depends on**:<br><ul><li>Azure monthly billing budget exceeded 100%</li></ul>|
+|Azure monthly billing budget exceeded 100%|<p>Azure `{#AZURE.BILLING.MONTH}` month cost has reached or exceeded the full budget `{$AZURE.BUDGET.MONTH}`. Immediate cost control actions are recommended.</p>|`last(/Azure Cost Management by HTTP/azure.monthly.cost["{#AZURE.BILLING.MONTH}"]) >= {$AZURE.BUDGET.MONTH}`|High||
 
 # Azure SQL Managed Instance by HTTP
 
@@ -1596,6 +1821,142 @@ This template has been tested on:
 |Azure Sentinel: Watchlist total has changed.|<p>The number of watchlists has changed.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)<>0`|Warning|**Manual close**: Yes|
 |Azure Sentinel: Watchlist was disabled.|<p>The number of canceled watchlists has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.canceled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)=0`|Warning|**Manual close**: Yes|
 |Azure Sentinel: Watchlist has failed.|<p>The number of failed watchlists has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.failed)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)=0`|Warning|**Manual close**: Yes|
+
+# Azure Container Apps by HTTP
+
+## Overview
+
+This template is designed to monitor Microsoft Azure Container Apps via HTTP.
+It works without any external scripts and uses the script item.
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Azure Container Apps
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
+|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
+|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
+|{$AZURE.RESOURCE.ID}|<p>Microsoft Azure container app resource ID.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$AZURE.CONTAINER_APP.JVM.METRICS}|<p>Enable Java virtual machine metric collection. Useful for container apps with Java development stack.</p>|`false`|
+|{$AZURE.CONTAINER_APP.CPU.WARN}|<p>Warning threshold for CPU utilization.</p>|`75`|
+|{$AZURE.CONTAINER_APP.CPU.CRIT}|<p>Critical threshold for CPU utilization.</p>|`90`|
+|{$AZURE.CONTAINER_APP.MEMORY.WARN}|<p>Warning threshold for memory utilization.</p>|`75`|
+|{$AZURE.CONTAINER_APP.MEMORY.CRIT}|<p>Critical threshold for memory utilization.</p>|`90`|
+|{$AZURE.CONTAINER_APP.GPU.WARN}|<p>Warning threshold for GPU utilization.</p>|`75`|
+|{$AZURE.CONTAINER_APP.GPU.CRIT}|<p>Critical threshold for GPU utilization.</p>|`90`|
+|{$AZURE.CONTAINER_APP.REBOOT.WARN}|<p>Threshold for amount of reboots per minute for a replica.</p>|`1`|
+|{$AZURE.CONTAINER_APP.RESPONSE.WARN}|<p>Threshold for average response time threshold, in milliseconds.</p>|`5000`|
+|{$AZURE.CONTAINER_APP.GC.ACTIONS.WARN}|<p>Threshold for amount of Java garbage collectors.</p>|`10`|
+|{$AZURE.CONTAINER_APP.GC.DURATION.WARN}|<p>Threshold for duration of Java garbage collectors, in milliseconds.</p>|`500`|
+|{$AZURE.CONTAINER_APP.THREAD.COUNT.WARN}|<p>Threshold for amount of threads in Java virtual machine.</p>|`500`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get data|<p>Gathers data of the Azure container app.</p>|Script|azure.container_app.data.get|
+|Get data, errors|<p>A list of errors from API requests.</p>|Dependent item|azure.container_app.data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Provisioning state|<p>The provisioning state of the container app.</p><p>0 - Unknown</p><p>1 - In progress</p><p>2 - Succeeded</p><p>3 - Failed</p><p>4 - Canceled</p><p>5 - Deleting</p>|Dependent item|azure.container_app.provisioning.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.overview.properties.provisioningState`</p><p>⛔️Custom on fail: Set value to: `Unknown`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Running status|<p>The current state of the container app.</p><p>0 - Unknown</p><p>1 - Progressing (container app is transitioning between Stopped and Running)</p><p>2 - Running</p><p>3 - Stopped</p><p>4 - Suspended</p><p>5 - Ready</p>|Dependent item|azure.container_app.running.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.overview.properties.runningStatus`</p><p>⛔️Custom on fail: Set value to: `Unknown`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Cores: Usage|<p>CPU consumed by the container app, in cores.</p>|Dependent item|azure.container_app.cores.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.UsageNanoCores`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1e-09`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Memory: Used|<p>Container app working set memory used, in bytes.</p>|Dependent item|azure.container_app.memory.bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.WorkingSetBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Network: Transmitted bytes|<p>Bytes transmitted by the container app.</p>|Dependent item|azure.container_app.bytes.tx<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.TxBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Network: Received bytes|<p>Bytes received by the container app.</p>|Dependent item|azure.container_app.bytes.rx<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.RxBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Requests: Processed|<p>Requests processed.</p>|Dependent item|azure.container_app.requests.processed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.Requests`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replica: Restarts|<p>The number of times the replica has restarted since the last check.</p>|Dependent item|azure.container_app.restart.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.RestartCount`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li>Simple change</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replica: Count|<p>Number of replicas.</p>|Dependent item|azure.container_app.replica.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.Replicas`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|GPU: Utilization|<p>GPU utilization, in percent.</p>|Dependent item|azure.container_app.utilization.gpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.GpuUtilizationPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Cores: Reserved, for revisions|<p>Number of reserved cores for container app revisions.</p>|Dependent item|azure.container_app.cores.reserved.revisions<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.CoresQuotaUsed`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Cores: Reserved, total|<p>Number of total reserved cores for the container app.</p>|Dependent item|azure.container_app.cores.reserved.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.TotalCoresQuotaUsed`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Connection timeouts|<p>Total connection timeouts.</p>|Dependent item|azure.container_app.connection.timeouts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyConnectTimeouts`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Requests: Retries|<p>Total request retries.</p>|Dependent item|azure.container_app.requests.retries<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyRequestRetries`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Requests: Timed out|<p>Total requests that timed out waiting for a response.</p>|Dependent item|azure.container_app.requests.timeouts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyRequestTimeouts`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Requests: Pending|<p>Total requests pending a connection pool connection.</p>|Dependent item|azure.container_app.requests.pending<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyRequestsPendingConnectionPool`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Ejected hosts|<p>Number of currently ejected hosts.</p>|Dependent item|azure.container_app.ejection.hosts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyEjectedHosts`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Ejections, aborted|<p>Number of ejections aborted due to the max ejection %.</p>|Dependent item|azure.container_app.ejection.aborted<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyEjectionsAborted`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Response time|<p>Average response time per status code.</p>|Dependent item|azure.container_app.response.time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResponseTime`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU: Utilization|<p>CPU utilization, in percent.</p>|Dependent item|azure.container_app.utilization.cpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.CpuPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Memory: Utilization|<p>Memory utilization, in percent.</p>|Dependent item|azure.container_app.utilization.memory<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.MemoryPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure container Apps: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Container Apps by HTTP/azure.container_app.data.errors))>0`|Average||
+|Azure container Apps: Azure container app failed|<p>The resource failed.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=3`|High||
+|Azure container Apps: Azure container app is canceled|<p>The resource is in the Canceled state.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=4`|Average||
+|Azure container Apps: Azure container app is being deleted|<p>The resource deletion process is happening.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=5`|High||
+|Azure container Apps: Azure container app is in unknown state|<p>The resource state is Unknown.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=0`|Warning||
+|Azure container Apps: Azure container app stopped|<p>The resource stopped.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=3`|High||
+|Azure container Apps: Azure container app suspended|<p>The resource is suspended.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=4`|Average||
+|Azure container Apps: Azure container app progressing|<p>The resource is transitioning between Stopped and Running states.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=1`|Warning||
+|Azure container Apps: Azure container app status is unknown|<p>The status of the resource is Unknown.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=0`|Warning||
+|Azure container Apps: Replica reboots too often|<p>A container app replica is restarting repeatedly within a defined time window.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.restart.count,3m)>{$AZURE.CONTAINER_APP.REBOOT.WARN}`|Warning||
+|Azure container Apps: GPU utilization is high|<p>GPU usage has exceeded the warning threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: GPU utilization is critical</li></ul>|
+|Azure container Apps: GPU utilization is critical|<p>GPU usage has reached a critical threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.CRIT}`|Average||
+|Azure container Apps: Container response time is too high|<p>The average response time of the container app has exceeded the acceptable limit.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.response.time,3m)>{$AZURE.CONTAINER_APP.RESPONSE.WARN}`|Warning||
+|Azure container Apps: CPU utilization is high|<p>CPU usage has exceeded the warning threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: CPU utilization is critical</li></ul>|
+|Azure container Apps: CPU utilization is critical|<p>CPU usage has reached a critical threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.CRIT}`|Average||
+|Azure container Apps: Memory utilization is high|<p>Memory consumption has exceeded the warning threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: Memory utilization is critical</li></ul>|
+|Azure container Apps: Memory utilization is critical|<p>Memory usage has reached a critical threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.CRIT}`|Average||
+
+### LLD rule Java metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Java metrics discovery|<p>Java metric discovery based on the `{$AZURE.CONTAINER_APP.JVM.METRICS}` macro.</p>|Script|azure.container_app.jvm_metrics.discovery|
+
+### Item prototypes for Java metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|JVM: Memory: Used, total{#SINGLETON}|<p>Total amount of memory used by heap or non-heap (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.used.total[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryTotalUsed`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Memory: Committed, total{#SINGLETON}|<p>Total amount of memory guaranteed to be available for heap or non-heap (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.committed.total[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryTotalCommitted`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Memory: Limit, total{#SINGLETON}|<p>Total amount of maximum obtainable memory for heap or non-heap (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.limit.total[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryTotalLimit`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Memory: Used{#SINGLETON}|<p>Amount of memory used by each pool (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.used[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryUsed`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Memory: Committed{#SINGLETON}|<p>Amount of memory guaranteed to be available for each pool (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.committed[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryCommitted`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Memory: Limit{#SINGLETON}|<p>Amount of maximum obtainable memory for each pool (in bytes).</p>|Dependent item|azure.container_app.jvm.memory.limit[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmMemoryLimit`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: GC: Actions{#SINGLETON}|<p>Count of JVM garbage collection actions.</p>|Dependent item|azure.container_app.jvm.gc.actions[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmGcCount`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: GC: Duration{#SINGLETON}|<p>Duration of JVM garbage collection actions (in milliseconds).</p>|Dependent item|azure.container_app.jvm.gc.duration[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmGcDuration`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Threads{#SINGLETON}|<p>Number of executing platform threads.</p>|Dependent item|azure.container_app.jvm.thread.count[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmThreadCount`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Buffers: Usage{#SINGLETON}|<p>Amount of memory used by buffers, such as direct memory (in bytes).</p>|Dependent item|azure.container_app.jvm.buffers.usage[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmBufferMemoryUsage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Buffers: Limit{#SINGLETON}|<p>Amount of total memory capacity of buffers (in bytes).</p>|Dependent item|azure.container_app.jvm.buffers.limit[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmBufferMemoryLimit`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|JVM: Buffers: Count{#SINGLETON}|<p>Number of buffers in the memory pool.</p>|Dependent item|azure.container_app.jvm.buffers.count[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.JvmBufferCount`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for Java metrics discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure container Apps: Garbage collector action count is high|<p>Garbage collection is running too frequently.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.gc.actions[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.GC.ACTIONS.WARN}`|Warning||
+|Azure container Apps: Garbage collector duration is high|<p>Garbage collection duration has exceeded the warning threshold.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.gc.duration[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.GC.DURATION.WARN}`|Warning||
+|Azure container Apps: JVM thread amount is high|<p>Active JVM thread count has exceeded the warning threshold.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.thread.count[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.THREAD.COUNT.WARN}`|Warning||
 
 ## Feedback
 

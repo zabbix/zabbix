@@ -25,6 +25,7 @@
 #include "zbxtagfilter.h"
 #include "zbxpgservice.h"
 #include "zbxalgo.h"
+#include "zbxtypes_ext.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -94,8 +95,9 @@ typedef struct
 }
 zbx_dc_interface2_t;
 
-#define ZBX_ITEM_REQUIRES_PREPROCESSING_NO	0
-#define ZBX_ITEM_REQUIRES_PREPROCESSING_YES	1
+#define ZBX_ITEM_PREPROCESSING_NONE	0
+#define ZBX_ITEM_PREPROCESSING_REGULAR	1
+#define ZBX_ITEM_PREPROCESSING_PRIORITY	2
 
 typedef struct
 {
@@ -557,6 +559,10 @@ typedef struct
 	int	trends_global;
 	int	history_mode;
 	int	history_global;
+
+	/* History overrides by external database settings, like ClickHouse table TTL. */
+	/* Overrides all history housekeeping settings for a value type if not 0.      */
+	int	history_override[ITEM_VALUE_TYPE_COUNT];
 }
 zbx_config_hk_t;
 
@@ -583,6 +589,7 @@ typedef struct
 	int		auditlog_enabled;
 	int		auditlog_mode;
 	int		proxy_secrets_provider;
+	int		enable_mobile_devices;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
@@ -607,6 +614,7 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER		__UINT64_C(0x0000000000000800)
 #define ZBX_CONFIG_FLAGS_ALERT_USRGRPID			__UINT64_C(0x0000000000001000)
 #define ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION		__UINT64_C(0x0000000000002000)
+#define ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES		__UINT64_C(0x0000000000004000)
 
 typedef struct
 {
@@ -890,7 +898,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		int proxyconfig_frequency);
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location);
+		const char *config_ssl_key_location, int *vault_ret);
 void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
 		zbx_uint64_t conf_cache_size, const char *hostname, char **error);
@@ -907,28 +915,6 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid);
 
 int	zbx_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request);
 
-/* zbx_dc_get_history_log_value() */
-#define ZBX_DC_REQUEST_ITEM_LOG_DATE		201
-#define ZBX_DC_REQUEST_ITEM_LOG_TIME		202
-#define ZBX_DC_REQUEST_ITEM_LOG_AGE		203
-#define ZBX_DC_REQUEST_ITEM_LOG_SOURCE		204
-#define ZBX_DC_REQUEST_ITEM_LOG_SEVERITY	205
-#define ZBX_DC_REQUEST_ITEM_LOG_NSEVERITY	206
-#define ZBX_DC_REQUEST_ITEM_LOG_EVENTID		207
-#define ZBX_DC_REQUEST_ITEM_LOG_TIMESTAMP	208
-
-typedef enum
-{
-	ZBX_VALUE_PROPERTY_VALUE,
-	ZBX_VALUE_PROPERTY_TIME,
-	ZBX_VALUE_PROPERTY_DATE,
-	ZBX_VALUE_PROPERTY_AGE,
-	ZBX_VALUE_PROPERTY_TIMESTAMP
-}
-zbx_expr_db_item_value_property_t;
-
-int	zbx_dc_get_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
-		const char *tz);
 int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **replace_to);
 
 int	zbx_dc_get_host_host(zbx_uint64_t itemid, char **replace_to);
@@ -974,6 +960,7 @@ typedef struct zbx_hc_data
 	zbx_history_value_t	value;
 	zbx_uint64_t		lastlogsize;
 	zbx_timespec_t		ts;
+	unsigned int		sz_value;
 	int			mtime;
 	unsigned char		value_type;
 	unsigned char		flags;
@@ -1249,7 +1236,12 @@ zbx_session_t;
 
 typedef struct
 {
-	zbx_uint64_t	config;			/* configuration cache revision, increased every sync */
+	/* without lockless uint64 atomics use zbx_uint64_t and always lock cache before accessing it */
+#if ATOMIC_LLONG_LOCK_FREE == 2
+	zbx_atomic_uint64_t	config;		/* configuration cache revision, increased every sync */
+#else
+	zbx_uint64_t	config;
+#endif
 	zbx_uint64_t	expression;		/* global expression revision */
 	zbx_uint64_t	autoreg_tls;		/* autoregistration tls revision */
 	zbx_uint64_t	drules;			/* drules revision */
@@ -1409,6 +1401,7 @@ int	zbx_dc_um_shared_handle_reacquire(zbx_dc_um_shared_handle_t *old_handle, zbx
 zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_copy(zbx_dc_um_shared_handle_t *handle);
 void	zbx_dc_um_shared_handle_release(zbx_dc_um_shared_handle_t *handle);
 
+int	zbx_dc_get_host_proxyid_by_name(const char *host, zbx_uint64_t *proxyid);
 int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
 int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
 
@@ -1450,6 +1443,8 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 /* special item key used for ICMP pings with retry options */
 #define ZBX_SERVER_ICMPPINGRETRY_KEY	"icmppingretry"
 
+int	zbx_dc_drule_get_values(zbx_dc_drule_t *dc_drule);
+int	zbx_dc_dcheck_get_uniq(const zbx_uint64_t dcheckid, unsigned char *uniq);
 void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *nextcheck);
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
 int	zbx_dc_drule_revisions_get(zbx_uint64_t *rev_last, zbx_vector_uint64_pair_t *revisions);
@@ -1514,7 +1509,7 @@ zbx_maintenance_type_t;
 
 #define ZBX_RECALC_TIME_PERIOD_HISTORY	1
 #define ZBX_RECALC_TIME_PERIOD_TRENDS	2
-void	zbx_recalc_time_period(time_t *ts_from, int table_group);
+void	zbx_recalc_time_period(time_t *ts_from, int table_group, unsigned char value_type);
 
 /* vps tracker */
 typedef struct
@@ -1665,8 +1660,6 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *groups, zbx_hashset_t *proxies, zbx_uint
 
 int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		zbx_comms_redirect_t *redirect);
-int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
-		zbx_comms_redirect_t *redirect);
 
 int	zbx_dc_get_proxy_group_hostmap_revision(zbx_uint64_t proxy_groupid, zbx_uint64_t *hostmap_revision);
 void	zbx_dc_set_proxy_failover_delay(const char *failover_delay);
@@ -1711,4 +1704,5 @@ int	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxe
 
 zbx_uint64_t	zbx_dc_get_cache_size(void);
 
+zbx_uint64_t	zbx_dc_config_get_config_revision(void);
 #endif

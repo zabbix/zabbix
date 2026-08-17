@@ -250,6 +250,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 *        string $data['itemid']
+	 *        string $data['backurl']
 	 *        bool   $data['combined']  (optional) is item aggregated using combined function or not
 	 *
 	 * @return array|null
@@ -269,18 +270,21 @@ class CControllerMenuPopup extends CController {
 			$is_executable = false;
 
 			if ($db_item['type'] != ITEM_TYPE_HTTPTEST) {
-				$is_writable = CWebUser::getType() == USER_TYPE_SUPER_ADMIN
-					? true
-					: (bool) API::Host()->get([
-						'output' => ['hostid'],
-						'hostids' => $db_item['hostid'],
-						'editable' => true
-					]);
+				$is_writable = CWebUser::getType() == USER_TYPE_SUPER_ADMIN || (bool) API::Host()->get([
+					'output' => ['hostid'],
+					'hostids' => $db_item['hostid'],
+					'editable' => true
+				]);
 			}
 
 			if (in_array($db_item['type'], checkNowAllowedTypes())) {
-				$is_executable = $is_writable ? true : CWebUser::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW);
+				$is_executable = $is_writable || CWebUser::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW);
 			}
+
+			[
+				'keep_history' => $keep_history,
+				'keep_trends' => $keep_trends
+			] = CItemHelper::getStoragePeriods((int) $db_item['value_type'], $db_item['history'], $db_item['trends']);
 
 			return [
 				'type' => 'item',
@@ -292,11 +296,10 @@ class CControllerMenuPopup extends CController {
 				'hostid' => $db_item['hostid'],
 				'host' => $db_item['hosts'][0]['host'],
 				'triggers' => $db_item['triggers'],
-				'showGraph' => ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT
-					|| $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64
-				),
-				'history' => $db_item['history'] != 0,
-				'trends' => $db_item['trends'] != 0,
+				// A strict comparison with zero is required here because the $keep_* variables may have a null value.
+				'showGraph' => in_array($db_item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+						&& ($keep_history !== 0 || $keep_trends !== 0),
+				'history' => $keep_history !== 0,
 				'isDiscovery' => $db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 				'isExecutable' => $is_executable,
 				'isWriteable' => $is_writable,
@@ -367,8 +370,10 @@ class CControllerMenuPopup extends CController {
 	 * @return array
 	 */
 	private static function sanitizeMapElementUrls(array $urls): array {
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
 		foreach ($urls as &$url) {
-			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
+			if (!$url_validator->validate($url['url'])) {
 				$url['url'] = 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');';
 			}
 		}
@@ -916,6 +921,8 @@ class CControllerMenuPopup extends CController {
 	}
 
 	private static function addUrls(array $menu_data, array $urls): array {
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
 		$fields = ['scriptid', 'manualinput', 'manualinput_prompt', 'manualinput_validator_type',
 			'manualinput_validator', 'manualinput_default_value'
 		];
@@ -931,7 +938,7 @@ class CControllerMenuPopup extends CController {
 				? '_blank'
 				: '';
 
-			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
+			if ($url_validator->validate($url['url'])) {
 				$menu_data_parameters += [
 					'url' => $url['url'],
 					'target' => $target

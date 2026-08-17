@@ -18,7 +18,7 @@ class CWidgetScatterPlot extends CWidget {
 	static DATASET_TYPE_SINGLE_ITEM = 0;
 
 	/**
-	 * @type {CSvgGraph|null}
+	 * @type {CScatterPlot|null}
 	 */
 	#graph = null;
 
@@ -76,10 +76,13 @@ class CWidgetScatterPlot extends CWidget {
 	}
 
 	getUpdateRequestData() {
-		const request_data = super.getUpdateRequestData();
+		const request_data = {
+			...super.getUpdateRequestData(),
+			unique_id: this.getUniqueId()
+		};
 
 		for (const [dataset_key, dataset] of request_data.fields.ds.entries()) {
-			if (dataset.dataset_type != CWidgetSvgGraph.DATASET_TYPE_SINGLE_ITEM) {
+			if (dataset.dataset_type != CWidgetScatterPlot.DATASET_TYPE_SINGLE_ITEM) {
 				continue;
 			}
 
@@ -126,9 +129,6 @@ class CWidgetScatterPlot extends CWidget {
 			}
 
 			this.#initGraph({
-				sbox: false,
-				graph_type: GRAPH_TYPE_SCATTER_PLOT,
-				min_period: 60,
 				...response.svg_options.data
 			});
 		}
@@ -204,7 +204,7 @@ class CWidgetScatterPlot extends CWidget {
 
 	#initGraph(options) {
 		this.#svg = this._body.querySelector('svg');
-		this.#graph = new CSvgGraph(this.#svg, this, options);
+		this.#graph = new CScatterPlot(this.#svg, this, options);
 
 		this.#activateGraph();
 	}

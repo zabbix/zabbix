@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -72,6 +73,8 @@ type containerState struct {
 //
 //nolint:tagliatelle // Docker API uses non-standard naming conventions
 type hostConfig struct {
+	resources
+
 	Binds           []string `json:"Binds"`
 	ContainerIDFile string   `json:"ContainerIDFile"`
 	NetworkMode     string   `json:"NetworkMode"`
@@ -92,8 +95,6 @@ type hostConfig struct {
 	ShmSize         int64             `json:"ShmSize"`
 	Sysctls         map[string]string `json:"Sysctls"`
 	Runtime         string            `json:"Runtime"`
-
-	resources
 }
 
 // resources contains container's resources.
@@ -126,12 +127,14 @@ type resources struct {
 	IOMaximumBandwidth uint64 `json:"IOMaximumBandwidth"`
 }
 
-func keyContainerInfoHandler(client *http.Client, query string, args ...string) (string, error) {
+func keyContainerInfoHandler(
+	ctx plugin.ContextProvider, client *http.Client, query string, args ...string,
+) (string, error) {
 	if len(args) != 1 {
 		return "", errs.WrapConst(errs.New("info must be either 'full' or 'short'"), zbxerr.ErrorInvalidParams)
 	}
 
-	body, err := queryDockerAPI(client, query)
+	body, err := queryDockerAPI(ctx, client, query)
 	if err != nil {
 		return "", err
 	}

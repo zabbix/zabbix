@@ -39,7 +39,7 @@ class CHostDashboard extends CApiService {
 			'excludeSearch' =>			['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// Output.
-			'output' =>					['type' => API_OUTPUT, 'flags' => API_NOT_EMPTY, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'selectPages' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['dashboard_pageid', 'name', 'display_period', 'widgets']), 'default' => null],
 			'countOutput' =>			['type' => API_BOOLEAN, 'default' => false],
 			'groupCount' =>				['type' => API_BOOLEAN, 'default' => false],

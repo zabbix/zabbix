@@ -2664,7 +2664,7 @@ class CAction extends CApiService {
 	 * @throws APIException
 	 */
 	private static function checkFilter(array $actions): void {
-		$condition_formula_parser = new CConditionFormula();
+		$condition_formula_parser = new CConditionFormulaParser();
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
 		foreach ($actions as $i => $action) {
@@ -2677,7 +2677,7 @@ class CAction extends CApiService {
 			if ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 				$condition_formula_parser->parse($action['filter']['formula']);
 
-				$constants = array_column($condition_formula_parser->constants, 'value', 'value');
+				$constants = array_column($condition_formula_parser->getConstants(), 'value', 'value');
 
 				if (count($action['filter']['conditions']) != count($constants)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,

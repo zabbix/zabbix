@@ -31,8 +31,8 @@ Metrics are collected by JMX.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$TOMCAT.USER}|<p>User for JMX</p>||
-|{$TOMCAT.PASSWORD}|<p>Password for JMX</p>||
+|{$TOMCAT.USER}|<p>Tomcat JMX user.</p>||
+|{$TOMCAT.PASSWORD}|<p>Tomcat JMX password.</p>||
 |{$TOMCAT.LLD.FILTER.REQUEST_PROCESSOR.MATCHES}|<p>Filter for discoverable global request processors.</p>|`.*`|
 |{$TOMCAT.LLD.FILTER.REQUEST_PROCESSOR.NOT_MATCHES}|<p>Filter to exclude global request processors.</p>|`CHANGE_IF_NEEDED`|
 |{$TOMCAT.LLD.FILTER.MANAGER.MATCHES}|<p>Filter for discoverable managers.</p>|`.*`|

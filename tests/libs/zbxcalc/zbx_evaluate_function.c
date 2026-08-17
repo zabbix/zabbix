@@ -41,6 +41,8 @@ int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time
 
 void	__wrap_zbx_recalc_time_period(time_t *ts_from, int table_group);
 
+zbx_uint64_t	__wrap_zbx_history_get_trends_flags(void);
+
 int	__wrap_zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
 		zbx_macro_resolv_func_t resolver, va_list args)
 {
@@ -87,6 +89,11 @@ void	__wrap_zbx_recalc_time_period(time_t *ts_from, int table_group)
 	ZBX_UNUSED(ts_from);
 }
 
+zbx_uint64_t	__wrap_zbx_history_get_trends_flags(void)
+{
+	return 0xFF;
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	int			err, expected_ret, returned_ret;
@@ -98,6 +105,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	handle;
 	zbx_variant_t		returned_value;
 	zbx_dc_evaluate_item_t	evaluate_item;
+	zbx_history_selector_t	selector = {0};
 
 	ZBX_UNUSED(state);
 
@@ -132,7 +140,7 @@ void	zbx_mock_test_entry(void **state)
 	evaluate_item.key_orig = item.key_orig;
 
 	if (SUCCEED != (returned_ret = zbx_evaluate_function(&returned_value, &evaluate_item, function, params, &ts,
-			&error)))
+			&selector, &error)))
 	{
 		printf("zbx_evaluate_function returned error: %s\n", error);
 		zbx_free(error);

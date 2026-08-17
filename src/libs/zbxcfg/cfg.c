@@ -19,6 +19,7 @@
 #include "zbxfile.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
+#include "zbxregexp.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxwin32.h"
@@ -746,7 +747,7 @@ error:
 	zbx_free(envvar_value);
 
 	if (0 == noexit)
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 
 	return FAIL;
 #undef ZBX_MAX_INCLUDE_LEVEL
@@ -924,6 +925,163 @@ fail:
 	zbx_vector_addr_ptr_destroy(&cluster_addrs);
 	zbx_vector_addr_ptr_clear_ext(&addrs, zbx_addr_free);
 	zbx_vector_addr_ptr_destroy(&addrs);
+
+	return ret;
+}
+
+static int	bridge_adapter_parse_url_hostport(const char *url, char **host, unsigned short *port, char **error)
+{
+	char	*parsed = NULL, *host_start, *port_start, *host_tmp = NULL, *host_validate = NULL;
+	size_t	host_alloc = 0, host_offset = 0;
+	unsigned short	host_port;
+	int	ret = FAIL;
+
+	if (SUCCEED != zbx_iregexp_sub(url,
+			"^(https?)://(\\[[^]]+\\]|[^:/?#]+)(?::([0-9]+))?/rpc$",
+			"\\1\n\\2\n\\3", &parsed) || NULL == parsed)
+	{
+		goto fail;
+	}
+
+	if (0 == zbx_strncasecmp(parsed, "http\n", ZBX_CONST_STRLEN("http\n")))
+	{
+		*port = 80;
+		host_start = parsed + ZBX_CONST_STRLEN("http\n");
+	}
+	else if (0 == zbx_strncasecmp(parsed, "https\n", ZBX_CONST_STRLEN("https\n")))
+	{
+		*port = 443;
+		host_start = parsed + ZBX_CONST_STRLEN("https\n");
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto fail;
+	}
+
+	if (NULL == (port_start = strchr(host_start, '\n')))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto fail;
+	}
+
+	zbx_strncpy_alloc(host, &host_alloc, &host_offset, host_start, (size_t)(port_start - host_start));
+	port_start++;
+
+	host_tmp = zbx_strdup(NULL, *host);
+
+	if (SUCCEED != zbx_parse_serveractive_element(host_tmp, &host_validate, &host_port, 0))
+		goto fail;
+
+	if (FAIL == zbx_is_supported_ip(host_validate) &&
+			FAIL == zbx_is_rfc_extended_hostname(host_validate))
+		goto fail;
+
+	if ('\0' != *port_start && (SUCCEED != zbx_is_ushort(port_start, port) || 0 == *port))
+		goto fail;
+
+	ret = SUCCEED;
+	goto out;
+
+fail:
+	*error = zbx_dsprintf(NULL, "invalid \"BridgeAdapterURL\" configuration parameter: %s", url);
+
+out:
+	zbx_free(parsed);
+	zbx_free(host_tmp);
+	zbx_free(host_validate);
+
+	return ret;
+}
+
+static int	bridge_adapter_validate_connect_to(const char *connect_to, char **error)
+{
+	char		*connect_to_tmp = NULL, *host = NULL;
+	unsigned short	port = 0;
+	int		ret = FAIL;
+
+	connect_to_tmp = zbx_strdup(NULL, connect_to);
+
+	if (SUCCEED != zbx_parse_serveractive_element(connect_to_tmp, &host, &port, 0) || 0 == port ||
+			(FAIL == zbx_is_supported_ip(host) && FAIL == zbx_is_rfc_extended_hostname(host)))
+	{
+		goto fail;
+	}
+
+	ret = SUCCEED;
+	goto out;
+
+fail:
+	*error = zbx_dsprintf(NULL, "\"BridgeAdapterConnectTo\" must be in \"host:port\" format: %s",
+			connect_to);
+
+out:
+	zbx_free(connect_to_tmp);
+	zbx_free(host);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validates BridgeAdapterURL configuration parameter                *
+ *                                                                            *
+ * Parameters: url   - [IN] BridgeAdapterURL value, must not be NULL          *
+ *             error - [OUT] error message, must not be NULL                  *
+ *                                                                            *
+ * Return value: SUCCEED - valid configuration parameter value                *
+ *               FAIL    - invalid configuration parameter value              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cfg_validate_bridge_adapter_url(const char *url, char **error)
+{
+	char		*host = NULL;
+	unsigned short	port;
+	int		ret;
+
+	ret = bridge_adapter_parse_url_hostport(url, &host, &port, error);
+
+	zbx_free(host);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepares CURLOPT_CONNECT_TO value that redirects the              *
+ *          BridgeAdapterURL host:port to BridgeAdapterConnectTo              *
+ *                                                                            *
+ * Parameters: url             - [IN] BridgeAdapterURL value, must not be     *
+ *                                    NULL                                    *
+ *             connect_to      - [IN] BridgeAdapterConnectTo value            *
+ *             curl_connect_to - [OUT] allocated "host:port:connect-to"       *
+ *                                     string in curl CONNECT_TO format       *
+ *             error           - [OUT] error message, must not be NULL        *
+ *                                                                            *
+ * Return value: SUCCEED - value prepared successfully                        *
+ *               FAIL    - url or connect_to is invalid                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cfg_prepare_bridge_adapter_connect_to(const char *url, const char *connect_to, char **curl_connect_to,
+		char **error)
+{
+	char			*url_host = NULL;
+	size_t			curl_connect_to_alloc = 0, curl_connect_to_offset = 0;
+	unsigned short		url_port;
+	int			ret = FAIL;
+
+	if (SUCCEED != bridge_adapter_parse_url_hostport(url, &url_host, &url_port, error))
+		goto out;
+
+	if (SUCCEED != bridge_adapter_validate_connect_to(connect_to, error))
+		goto out;
+
+	zbx_snprintf_alloc(curl_connect_to, &curl_connect_to_alloc, &curl_connect_to_offset, "%s:%hu:%s",
+			url_host, url_port, connect_to);
+
+	ret = SUCCEED;
+out:
+	zbx_free(url_host);
 
 	return ret;
 }

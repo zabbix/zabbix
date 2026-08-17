@@ -39,6 +39,6 @@
 	->addItem(
 		(new CTableInfo())->addRow(
 			new CImg('chart4.php?triggerid='.$data['trigger']['triggerid'])
-		)
+		)->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	)
 	->show();
