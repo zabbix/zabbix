@@ -593,10 +593,10 @@ window.item_edit_form = new class {
 	}
 
 	#getTelemetryColumns() {
-		const signal_type = parseInt(this.field.signal_type.value, 10);
-		if (signal_type === this.telemetry_signal_type_metrics) {
-			const metric_point_type = parseInt([...this.field.metric_point_type]
-				.find((radio) => radio.checked).value, 10);
+		const signal_type = this.field.signal_type.value;
+
+		if (signal_type == this.telemetry_signal_type_metrics) {
+			const metric_point_type = this.form_element.querySelector('[name="metric_point_type"]:checked').value;
 
 			return this.telemetry_columns_config.columns[signal_type][metric_point_type];
 		}
@@ -676,7 +676,7 @@ window.item_edit_form = new class {
 
 	#openAggregatedColumnModal(trigger, row = null) {
 		const signal_type = this.field.signal_type.value;
-		const metric_point_type = [...this.field.metric_point_type].find((radio) => radio.checked).value;
+		const metric_point_type = this.form_element.querySelector('[name="metric_point_type"]:checked').value;
 
 		const parameters = {
 			signal_type: signal_type,
@@ -723,7 +723,7 @@ window.item_edit_form = new class {
 		}
 
 		const signal_type = this.field.signal_type.value;
-		const metric_point_type = [...this.field.metric_point_type].find((radio) => radio.checked).value;
+		const metric_point_type = this.form_element.querySelector('[name="metric_point_type"]:checked').value;
 
 		const overlay = PopUp('popup.telemetry.condition.edit', {
 			signal_type: signal_type,
@@ -809,7 +809,7 @@ window.item_edit_form = new class {
 			return;
 		}
 
-		const is_metrics = parseInt(this.field.signal_type.value, 10) === this.telemetry_signal_type_metrics;
+		const is_metrics = this.field.signal_type.value == this.telemetry_signal_type_metrics;
 		const switcher = globalAllObjForViewSwitcher['type'];
 
 		// "Metric points" is shown only for "Metrics".
