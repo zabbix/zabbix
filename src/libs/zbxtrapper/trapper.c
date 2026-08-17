@@ -185,7 +185,7 @@ static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, s
 		zbx_timespec_t *ts, int config_timeout)
 {
 	char	*info = NULL, *ext = NULL;
-	int	ret = FAIL;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

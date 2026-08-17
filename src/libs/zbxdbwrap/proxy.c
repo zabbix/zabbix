@@ -1695,7 +1695,6 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 	int			ret = FAIL, version;
 	char			*token = NULL;
 	zbx_session_t		*session;
-	zbx_uint64_t		hostid;
 	size_t			token_alloc = 0;
 	zbx_host_rights_t	rights = {0};
 	zbx_history_recv_host_t hostinfo;
@@ -1747,7 +1746,7 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 		}
 	}
 
-	if (FAIL == (ret = zbx_dc_config_get_hostid_by_name_with_host_info(tmp, sock, &hostid, &redirect, &hostinfo)))
+	if (FAIL == (ret = zbx_dc_config_get_hostinfo(tmp, sock, &redirect, &hostinfo)))
 	{
 		/* return CONFIG_ERROR to prevent command to be proceed because of non-existing host */
 		ret = CONFIG_ERROR;
@@ -1770,7 +1769,17 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 	if (FAIL == zbx_host_check_permissions(&hostinfo, sock, &error))
 	{
 		ret = FAIL;
-		zbx_free(error);
+
+		if (NULL != error)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+			zbx_free(error);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "unknown permissions error for host \"%s\"", hostinfo.host);
+		}
+
 		goto out;
 	}
 
@@ -1779,7 +1788,7 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 		if (NULL == token)
 			session = NULL;
 		else
-			session = zbx_dc_get_or_create_session(hostid, token, ZBX_SESSION_TYPE_DATA);
+			session = zbx_dc_get_or_create_session(hostinfo.hostid, token, ZBX_SESSION_TYPE_DATA);
 
 		ret = process_history_data_by_itemids(rtc, sock, agent_item_validator, &rights, &jp_data, session, NULL,
 				info, ZBX_ITEM_GET_DEFAULT, "agent");
