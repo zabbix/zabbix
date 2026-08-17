@@ -1551,7 +1551,6 @@ static void	cep_sync_operation_conditions(zbx_cep_config_t *cep_config, zbx_dbsy
 			case ZBX_CONDITION_TYPE_EVENT_SYMPTOM:
 			case ZBX_CONDITION_TYPE_EVENT_COPIED:
 			case ZBX_CONDITION_TYPE_EVENT_SUPPRESSED:
-				op_condition->args.state.value = atoi(row[5]);
 				break;
 		}
 	}

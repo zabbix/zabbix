@@ -152,7 +152,7 @@ static int	cep_operation_condition_eval_tag_value(const zbx_cep_op_condition_t *
 
 static int	cep_operation_condition_eval_state(const zbx_cep_op_condition_t *condition, int state)
 {
-	int	ret = (state == condition->args.state.value ? 1 : 0);
+	int	ret = state;
 
 	if (ZBX_CONDITION_OPERATOR_NO == condition->operator)
 		ret = !ret;
