@@ -631,23 +631,29 @@ $formgrid
 						(new CRadioButtonList("delay_flex[#{rowNum}][type]", ITEM_DELAY_FLEXIBLE))
 							->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
 							->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
+							->setReadonly($lldrule['discovered_lld'])
 							->setModern(),
 						[
 							(new CTextBox("delay_flex[#{rowNum}][delay]", '#{delay}'))
 								->setErrorContainer("delay_flex-#{rowNum}-error-container")
 								->setAttribute('data-error-label', _('Interval'))
-								->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT),
+								->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT)
+								->setReadonly($lldrule['discovered_lld']),
 							(new CTextBox("delay_flex[#{rowNum}][schedule]", '#{schedule}'))
 								->setErrorContainer("delay_flex-#{rowNum}-error-container")
 								->setAttribute('data-error-label', _('Interval'))
 								->addClass(ZBX_STYLE_DISPLAY_NONE)
 								->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
+								->setReadonly($lldrule['discovered_lld'])
 						],
 						(new CTextBox("delay_flex[#{rowNum}][period]", '#{period}'))
 							->setErrorContainer("delay_flex-#{rowNum}-error-container")
 							->setAttribute('data-error-label', _('Period'))
-							->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL),
-						(new CButtonLink(_('Remove')))->addClass('element-table-remove')
+							->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
+							->setReadonly($lldrule['discovered_lld']),
+						(new CButtonLink(_('Remove')))
+							->addClass('element-table-remove')
+							->setEnabled(!$lldrule['discovered_lld'])
 					]))->addClass('form_row'),
 					(new CRow())
 						->addClass('error-container-row')
