@@ -195,7 +195,7 @@ class CDRule extends CApiService {
 		}
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['druleid']], 'fields' => [
-			'proxyid' =>	['type' => API_ID, 'flags' => API_ALLOW_NULL]
+			'proxyid' =>	['type' => API_ID]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $drules, '/', $error)) {
@@ -267,15 +267,7 @@ class CDRule extends CApiService {
 			}
 
 			if (array_key_exists('proxyid', $drule)) {
-				if (!zbx_is_int($drule['proxyid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxyid'], 'proxyid')
-					);
-				}
-
-				if ($drule['proxyid'] > 0) {
-					$proxyids[] = $drule['proxyid'];
-				}
+				$proxyids[] = $drule['proxyid'];
 			}
 
 			if (array_key_exists('dchecks', $drule) && $drule['dchecks']) {
@@ -308,22 +300,7 @@ class CDRule extends CApiService {
 			);
 		}
 
-		// Check proxy IDs.
-		if ($proxyids) {
-			$db_proxies = API::Proxy()->get([
-				'output' => [],
-				'proxyids' => $proxyids,
-				'preservekeys' => true
-			]);
-
-			foreach ($proxyids as $i => $proxyid) {
-				if (!array_key_exists($proxyid, $db_proxies)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
-					));
-				}
-			}
-		}
+		self::checkProxies($proxyids);
 	}
 
 	/**
@@ -341,7 +318,7 @@ class CDRule extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['druleid']], 'fields' => [
 			'druleid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'proxyid' =>	['type' => API_ID, 'flags' => API_ALLOW_NULL]
+			'proxyid' =>	['type' => API_ID]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $drules, '/', $error)) {
@@ -431,15 +408,7 @@ class CDRule extends CApiService {
 			}
 
 			if (array_key_exists('proxyid', $drule)) {
-				if (!zbx_is_int($drule['proxyid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxyid'], 'proxyid')
-					);
-				}
-
-				if ($drule['proxyid'] > 0) {
-					$proxyids[] = $drule['proxyid'];
-				}
+				$proxyids[] = $drule['proxyid'];
 			}
 
 			if (array_key_exists('dchecks', $drule)) {
@@ -476,22 +445,7 @@ class CDRule extends CApiService {
 			}
 		}
 
-		// Check proxy IDs.
-		if ($proxyids) {
-			$db_proxies = API::Proxy()->get([
-				'output' => [],
-				'proxyids' => $proxyids,
-				'preservekeys' => true
-			]);
-
-			foreach ($proxyids as $i => $proxyid) {
-				if (!array_key_exists($proxyid, $db_proxies)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
-					));
-				}
-			}
-		}
+		self::checkProxies($proxyids);
 
 		self::addAffectedObjects($drules, $db_drules);
 
@@ -714,6 +668,24 @@ class CDRule extends CApiService {
 
 				if ($equal) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Checks should be unique.'));
+				}
+			}
+		}
+	}
+
+	private static function checkProxies(array $proxyids): void {
+		if ($proxyids) {
+			$db_proxies = API::Proxy()->get([
+				'output' => [],
+				'proxyids' => $proxyids,
+				'preservekeys' => true
+			]);
+
+			foreach ($proxyids as $i => $proxyid) {
+				if ($proxyid > 0 && !array_key_exists($proxyid, $db_proxies)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
+					));
 				}
 			}
 		}
