@@ -168,12 +168,6 @@ class CControllerLldRulePrototypeEdit extends CController
 			}
 
 			$this->template = reset($template);
-			$this->template += [
-				'hostid' => $this->template['templateid'],
-				'proxyid' => 0,
-				'status' => HOST_STATUS_TEMPLATE,
-				'interfaces' => []
-			];
 		}
 
 		$options = [
@@ -217,14 +211,48 @@ class CControllerLldRulePrototypeEdit extends CController
 		return true;
 	}
 
-	public function doAction(): void {
-		$host = $this->getInput('context') === 'host' ? $this->host : $this->template;
+	/**
+	 * Get host data.
+	 *
+	 * @return array
+	 */
+	protected function getHost(): array {
+		$host = $this->host;
 
+		if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+			$host['proxyid'] = $host['assigned_proxyid'];
+		}
+		unset($host['monitored_by'], $host['assigned_proxyid']);
+
+		$host['interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
 		// Sort interfaces to be listed starting with one selected as 'main'.
 		CArrayHelper::sort($host['interfaces'], [
 			['field' => 'main', 'order' => ZBX_SORT_DOWN],
 			['field' => 'interfaceid','order' => ZBX_SORT_UP]
 		]);
+
+		return $host;
+	}
+
+	/**
+	 * Get template data.
+	 *
+	 * @return array
+	 */
+	protected function getTemplate(): array {
+		$template = $this->template;
+		$template += [
+			'hostid' => $this->template['templateid'],
+			'proxyid' => 0,
+			'status' => HOST_STATUS_TEMPLATE,
+			'interfaces' => []
+		];
+
+		return $template;
+	}
+
+	public function doAction(): void {
+		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
 
 		[$lldrule, $inherited_timeouts] = $this->getLldRuleData($host);
 
@@ -239,7 +267,7 @@ class CControllerLldRulePrototypeEdit extends CController
 			'lldrule' => $lldrule,
 			'inherited_timeouts' => $inherited_timeouts,
 			'readonly' => $lldrule['templated'] || $lldrule['discovered_lld'],
-			'can_edit_source_timeouts' => ($this->host && $this->host['proxyid'])
+			'can_edit_source_timeouts' => $host['proxyid']
 				? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 				: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL),
 			'types' => array_intersect_key(item_type2str(), array_flip(CControllerLldRuleUpdateGeneral::getItemTypes())),

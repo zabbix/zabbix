@@ -19,20 +19,14 @@
  * @var array    $data
  */
 
+$interface = array_key_exists($data['interfaceid'], $data['interfaces'])
+	? $data['interfaces'][$data['interfaceid']]
+	: [];
 
 if ($data['discovered']) {
 	(new CInput('hidden', 'interfaceid', $data['interfaceid']))
 		->setAttribute('data-field-type', 'hidden')
 		->show();
-
-	$interface = null;
-
-	foreach ($data['interfaces'] as $host_interface) {
-		if ($host_interface['interfaceid'] === $data['interfaceid']) {
-			$interface = $host_interface;
-			break;
-		}
-	}
 
 	$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
 	$select_interface = new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true);
