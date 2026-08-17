@@ -143,7 +143,8 @@ window.item_edit_form = new class {
 			signal_type: this.form_element.querySelector('[name="signal_type"]'),
 			metric_point_type: this.form_element.querySelectorAll('[name="metric_point_type"]'),
 			evaltype: this.form_element.querySelector('[name="evaltype"]'),
-			formula: this.form_element.querySelector('[name="formula"]')
+			formula: this.form_element.querySelector('[name="formula"]'),
+			expression: this.form_element.querySelector('#expression')
 		};
 		this.label = {
 			value_type_hint: this.form_element.querySelector('[for="label-value-type"] .js-hint'),
@@ -834,9 +835,34 @@ window.item_edit_form = new class {
 		const is_custom_expression = parseInt(this.field.evaltype.value, 10) === CONDITION_EVAL_TYPE_EXPRESSION;
 
 		this.field.formula.style.display = is_custom_expression ? '' : 'none';
+		this.field.expression.style.display = is_custom_expression ? 'none' : '';
+
+		if (!is_custom_expression) {
+			this.field.expression.innerHTML = getConditionFormula(this.#getTelemetryConditions(),
+				parseInt(this.field.evaltype.value, 10)
+			);
+		}
 
 		this.#updateTelemetryIndicators();
 		this.#updateColumnsIndicator();
+	}
+
+	#getTelemetryConditions() {
+		const conditions = [];
+
+		for (const row of this.form_element.querySelectorAll('#conditions-table tbody [data-row_index]')) {
+			const row_index = row.dataset.row_index;
+			const formulaid = row.querySelector(`[name="conditions[${row_index}][formulaid]"]`).value;
+			const column = row.querySelector(`[name="conditions[${row_index}][column]"]`).value;
+			const attribute_key = row.querySelector(`[name="conditions[${row_index}][attribute_key]"]`).value;
+
+			conditions.push({
+				id: formulaid,
+				type: `${column}.${attribute_key}`
+			});
+		}
+
+		return conditions;
 	}
 
 	#updateTelemetryIndicators() {

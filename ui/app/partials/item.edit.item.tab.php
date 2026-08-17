@@ -792,13 +792,14 @@ $formgrid
 					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 					->setReadonly($readonly)
 			))->addClass(ZBX_STYLE_CELL),
-			(new CDiv(
+			(new CDiv([
+				(new CSpan(''))->setId('expression'),
 				(new CTextBox('formula', $item['formula'], $readonly))
 					->setId('formula')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->addClass(ZBX_STYLE_MONOSPACE_FONT)
 					->setAttribute('placeholder', 'A or (B and C) ...')
-			))
+			]))
 				->addClass(ZBX_STYLE_CELL)
 				->addClass(ZBX_STYLE_CELL_EXPRESSION)
 		]))->setId('js-item-evaltype-field')
