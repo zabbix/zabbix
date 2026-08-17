@@ -418,7 +418,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 					['signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS]]
 				]
 			],
-			'columns' => ['objects', 'uniq' => ['column', 'attribute_key'],
+			'columns' => ['objects', 'required', 'uniq' => ['column', 'attribute_key'],
 				'messages' => ['uniq' => _('Column and key name combination is not unique.')],
 				'fields' => [
 					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_COLUMNS),
@@ -435,7 +435,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 					'uniq' => _('Alias is not unique.')
 				],
 				'fields' => [
-					'function' => ['integer',
+					'function' => ['integer', 'required',
 						'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM,
 							AGGREGATE_PCTILE
 						]
@@ -450,7 +450,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
-			'evaltype' => ['integer',
+			'evaltype' => ['integer', 'required',
 				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
 					CONDITION_EVAL_TYPE_EXPRESSION
 				],
@@ -462,7 +462,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 					['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 				]
 			],
-			'conditions' => ['objects', 'uniq' => ['formulaid'],
+			'conditions' => ['objects', 'required', 'uniq' => ['formulaid'],
 				'fields' => [
 					'formulaid' => ['string', 'required', 'not_empty'],
 					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_CONDITIONS),

@@ -32,7 +32,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
 				]
 			],
-			'metric_point_type' => ['integer',
+			'metric_point_type' => ['integer', 'required',
 				'in' => [
 					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
