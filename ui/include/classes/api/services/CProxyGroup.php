@@ -407,12 +407,6 @@ class CProxyGroup extends CApiService {
 	}
 
 	private static function unlinkFromUserGroups(array $proxy_groupids): void {
-		$proxy_groupids = array_fill_keys($proxy_groupids, true);
-
-		if (!$proxy_groupids) {
-			return;
-		}
-
 		$db_usrgrps = [];
 
 		$resource = DBselect(
@@ -422,7 +416,7 @@ class CProxyGroup extends CApiService {
 			' WHERE ugpg.usrgrpid IN ('.
 				'SELECT DISTINCT ugpg2.usrgrpid'.
 				' FROM usrgrp_proxy_group ugpg2'.
-				' WHERE '.dbConditionId('ugpg2.proxy_groupid', array_keys($proxy_groupids)).
+				' WHERE '.dbConditionId('ugpg2.proxy_groupid', $proxy_groupids).
 			')'
 		);
 
@@ -449,7 +443,7 @@ class CProxyGroup extends CApiService {
 				$upd_user_group = false;
 
 				foreach ($db_usrgrp['proxy_groups'] as $proxy_group) {
-					if (array_key_exists($proxy_group['proxy_groupid'], $proxy_groupids)) {
+					if (in_array($proxy_group['proxy_groupid'], $proxy_groupids)) {
 						$upd_user_group = true;
 						break;
 					}
@@ -468,7 +462,7 @@ class CProxyGroup extends CApiService {
 				$indexes[$db_usrgrpid] = array_key_last($usrgrps);
 
 				foreach ($db_usrgrp['proxy_groups'] as $proxy_group) {
-					if (!array_key_exists($proxy_group['proxy_groupid'], $proxy_groupids)) {
+					if (!in_array($proxy_group['proxy_groupid'], $proxy_groupids)) {
 						$usrgrps[$indexes[$db_usrgrpid]]['proxy_groups'][] = [
 							'proxy_groupid' => $proxy_group['proxy_groupid']
 						];
