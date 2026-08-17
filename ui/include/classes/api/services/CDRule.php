@@ -266,9 +266,7 @@ class CDRule extends CApiService {
 				);
 			}
 
-			if (array_key_exists('proxyid', $drule)) {
-				$proxyids[] = $drule['proxyid'];
-			}
+			$proxyids[] = array_key_exists('proxyid', $drule) ? $drule['proxyid'] : 0;
 
 			if (array_key_exists('dchecks', $drule) && $drule['dchecks']) {
 				$this->validateDChecks($drule['dchecks']);
@@ -407,9 +405,7 @@ class CDRule extends CApiService {
 				);
 			}
 
-			if (array_key_exists('proxyid', $drule)) {
-				$proxyids[] = $drule['proxyid'];
-			}
+			$proxyids[] = array_key_exists('proxyid', $drule) ? $drule['proxyid'] : 0;
 
 			if (array_key_exists('dchecks', $drule)) {
 				if ($drule['dchecks']) {
