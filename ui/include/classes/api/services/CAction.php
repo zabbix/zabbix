@@ -184,14 +184,40 @@ class CAction extends CApiService {
 					' AND p.hgsetid IS NULL'.
 			')';
 
-			// Check permissions of proxies used in filter conditions.
+			// Check permissions for proxies used in filter conditions.
 			$sqlParts['where'][] = 'NOT EXISTS ('.
-				'SELECT NULL'.
-				' FROM conditions c'.
+				'SELECT NULL FROM conditions c'.
 				' JOIN proxy p ON '.zbx_dbcast_2bigint('c.value').'=p.proxyid'.
 				' WHERE a.actionid=c.actionid'.
 					' AND c.conditiontype='.ZBX_CONDITION_TYPE_PROXY.
-					' AND NOT ('.CApiUserGroupHelper::getProxyPermissionsCondition('p').')'.
+					' AND NOT ('.
+						CApiUserGroupHelper::getProxyPermissionsCondition('p').
+					')'.
+			')';
+
+			// Check permissions for discovery rules used in filter conditions.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL FROM conditions c'.
+				' JOIN drules dr ON '.zbx_dbcast_2bigint('c.value').'=dr.druleid'.
+				' JOIN proxy p ON dr.proxyid=p.proxyid'.
+				' WHERE a.actionid=c.actionid'.
+					' AND c.conditiontype='.ZBX_CONDITION_TYPE_DRULE.
+					' AND NOT ('.
+						CApiUserGroupHelper::getProxyPermissionsCondition('p').
+					')'.
+			')';
+
+			// Check permissions for discovery checks used in filter conditions.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL FROM conditions c'.
+				' JOIN dchecks dc ON '.zbx_dbcast_2bigint('c.value').'=dc.dcheckid'.
+				' JOIN drules dr ON dc.druleid=dr.druleid'.
+				' JOIN proxy p ON dr.proxyid=p.proxyid'.
+				' WHERE a.actionid=c.actionid'.
+					' AND c.conditiontype='.ZBX_CONDITION_TYPE_DCHECK.
+					' AND NOT ('.
+						CApiUserGroupHelper::getProxyPermissionsCondition('p').
+					')'.
 			')';
 
 			// Check permissions of user groups mentioned for "send message" operations.
