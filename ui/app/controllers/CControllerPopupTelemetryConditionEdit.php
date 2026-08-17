@@ -115,10 +115,8 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 		$data = [
 			'action' => $this->getAction(),
 			'row_index' => $this->getInput('row_index'),
-			'signal_type' => (int) $this->getInput('signal_type'),
-			'metric_point_type' => (int) $this->getInput('metric_point_type',
-				(string) CItemTypeTelemetryQuery::METRICS_POINT_SUM
-			),
+			'signal_type' => $this->getInput('signal_type'),
+			'metric_point_type' => $this->getInput('metric_point_type'),
 			'column' => '',
 			'attribute_key' => '',
 			'operator' => CONDITION_OPERATOR_EQUAL,

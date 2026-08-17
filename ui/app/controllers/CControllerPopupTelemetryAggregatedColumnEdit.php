@@ -120,12 +120,10 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 		$data = [
 			'action' => $this->getAction(),
 			'row_index' => $this->getInput('row_index'),
-			'signal_type' => (int) $this->getInput('signal_type'),
-			'metric_point_type' => (int) $this->getInput('metric_point_type',
-				(string) CItemTypeTelemetryQuery::METRICS_POINT_SUM
-			),
+			'signal_type' => $this->getInput('signal_type'),
+			'metric_point_type' => $this->getInput('metric_point_type'),
 			'column' => $this->getInput('column', ''),
-			'function' => (int) $this->getInput('function', (string) AGGREGATE_COUNT),
+			'function' => $this->getInput('function', AGGREGATE_COUNT),
 			'percentile' => $this->getInput('percentile', ''),
 			'alias' => $this->getInput('alias', ''),
 			'js_validation_rules' => (new CFormValidator(
