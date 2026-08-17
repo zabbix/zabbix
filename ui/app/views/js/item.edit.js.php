@@ -775,7 +775,7 @@ window.item_edit_form = new class {
 		const config = this.telemetry_columns_config;
 		const tbody = this.form_element.querySelector('#conditions-table tbody');
 		const is_complex = config.complex.includes(data.column);
-		const key_part = is_complex ? `.${data.attribute_key}` : '';
+		const key_part = is_complex ? ` ${data.attribute_key}` : '';
 		const value_part = parseInt(data.operator, 10) === <?= CONDITION_OPERATOR_EXISTS ?> ? '' : ` ${data.value}`;
 		const source = document.getElementById('condition-row-tmpl').innerHTML;
 		const html = new Template(source).evaluate({
