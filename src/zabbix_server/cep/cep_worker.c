@@ -1053,7 +1053,7 @@ static void	cep_worker_expect_events(zbx_vector_mw_task_ptr_t *tasks)
 
 	zbx_vector_db_event_destroy(&db_events);
 }
-
+#include "zbxlog.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: event processor thread entry point                                *
@@ -1070,7 +1070,7 @@ void	*cep_worker_entry(void *args)
 	zbx_cep_worker_t		*worker = (zbx_cep_worker_t *)args;
 	char				*error = NULL;
 	zbx_vector_mw_task_ptr_t	tasks;
-
+zbx_set_log_level(LOG_LEVEL_DEBUG);
 	zbx_supervisor_update_activity("%s starting", worker->base.name);
 
 	zbx_init_regexp_env();

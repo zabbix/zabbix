@@ -623,7 +623,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	void		*buffer;
 	volatile int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() param:%s", __func__, param);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() param:%s script '%s'", __func__, param, script);
 
 	zbx_timespec(&es->env->start_time);
 	es->env->http_req_objects = 0;
