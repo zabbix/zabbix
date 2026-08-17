@@ -17,19 +17,28 @@
 
 window.telemetry_condition_popup = new class {
 
+	#overlay;
+	#dialogue;
+	#form_element;
+	#form;
+	#complex_columns;
+	#operators;
+	#column;
+	#operator;
+
 	init({rules}) {
-		this.overlay = overlays_stack.end();
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.form = new CForm(this.form_element, rules);
+		this.#overlay = overlays_stack.end();
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
 
-		this.complex_columns = <?= json_encode(CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME) ?>;
-		this.operators = <?= json_encode(CTelemetryHelper::getConditionOperators()) ?>;
-		this.column = this.form_element.querySelector('#column');
-		this.operator = this.form_element.querySelectorAll('[name="operator"]');
+		this.#complex_columns = <?= json_encode(CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME) ?>;
+		this.#operators = <?= json_encode(CTelemetryHelper::getConditionOperators()) ?>;
+		this.#column = this.#form_element.querySelector('#column');
+		this.#operator = this.#form_element.querySelectorAll('[name="operator"]');
 
-		this.column.addEventListener('change', () => this.#updateFieldVisibility());
-		for (const radio of this.operator) {
+		this.#column.addEventListener('change', () => this.#updateFieldVisibility());
+		for (const radio of this.#operator) {
 			radio.addEventListener('change', () => this.#updateFieldVisibility());
 		}
 
@@ -38,12 +47,12 @@ window.telemetry_condition_popup = new class {
 
 	#updateFieldVisibility() {
 		const display_none = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
-		const is_complex = this.complex_columns.includes(this.column.value);
+		const is_complex = this.#complex_columns.includes(this.#column.value);
 
-		const allowed_operators = is_complex ? this.operators.complex : this.operators.simple;
+		const allowed_operators = is_complex ? this.#operators.complex : this.#operators.simple;
 		let has_checked = false;
 
-		for (const radio of this.operator) {
+		for (const radio of this.#operator) {
 			const hidden = !allowed_operators.includes(parseInt(radio.value, 10));
 
 			radio.closest('li').hidden = hidden;
@@ -56,37 +65,37 @@ window.telemetry_condition_popup = new class {
 		}
 
 		if (!has_checked) {
-			[...this.operator]
+			[...this.#operator]
 				.find((radio) => parseInt(radio.value, 10) === <?= CONDITION_OPERATOR_EQUAL ?>)
 				.checked = true;
 		}
 
-		const operator = [...this.operator].find((radio) => radio.checked).value;
+		const operator = [...this.#operator].find((radio) => radio.checked).value;
 		const is_exists = parseInt(operator, 10) === <?= CONDITION_OPERATOR_EXISTS ?>;
 
-		this.form_element.querySelector('#js-key-field').classList.toggle(display_none, !is_complex);
-		this.form_element.querySelector('#js-key-label').classList.toggle(display_none, !is_complex);
+		this.#form_element.querySelector('#js-key-field').classList.toggle(display_none, !is_complex);
+		this.#form_element.querySelector('#js-key-label').classList.toggle(display_none, !is_complex);
 
-		this.form_element.querySelector('#js-value-field').classList.toggle(display_none, is_exists);
-		this.form_element.querySelector('#js-value-label').classList.toggle(display_none, is_exists);
+		this.#form_element.querySelector('#js-value-field').classList.toggle(display_none, is_exists);
+		this.#form_element.querySelector('#js-value-label').classList.toggle(display_none, is_exists);
 	}
 
 	submit() {
-		const fields = this.form.getAllValues();
+		const fields = this.#form.getAllValues();
 
-		this.form.validateSubmit(fields)
+		this.#form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
-					this.overlay.unsetLoading();
+					this.#overlay.unsetLoading();
 
 					return;
 				}
 
-				const is_complex = this.complex_columns.includes(fields.column);
+				const is_complex = this.#complex_columns.includes(fields.column);
 				const operator = parseInt(fields.operator, 10);
 
-				overlayDialogueDestroy(this.overlay.dialogueid);
-				this.dialogue.dispatchEvent(new CustomEvent('telemetry_condition.submit', {
+				overlayDialogueDestroy(this.#overlay.dialogueid);
+				this.#dialogue.dispatchEvent(new CustomEvent('telemetry_condition.submit', {
 					detail: {
 						row_index: fields.row_index,
 						column: fields.column,
