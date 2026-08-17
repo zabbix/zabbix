@@ -678,7 +678,7 @@ $formgrid
 			_('Columns'),
 			(new CSpan(makeErrorIcon(_('Complex columns require a key name.'))))
 				->addClass('js-columns-error')
-				->addClass(ZBX_STYLE_DISPLAY_NONE)
+				->addStyle('display: none;')
 		], 'columns-table'))->setId('js-item-columns-label'),
 		(new CFormField(
 			(new CDiv([
@@ -898,10 +898,10 @@ $formgrid
 			_('Lookback limit'),
 			(new CSpan(makeWarningIcon(_('Data gaps are possible.'))))
 				->addClass('js-lookback-limit-hint')
-				->addClass(ZBX_STYLE_DISPLAY_NONE),
+				->addStyle('display: none;'),
 			(new CSpan(makeWarningIcon(_('Should not be less than the aggregation size, data will be incomplete.'))))
 				->addClass('js-lookback-limit-error')
-				->addClass(ZBX_STYLE_DISPLAY_NONE)
+				->addStyle('display: none;')
 		], 'lookback_limit'))->setAsteriskMark()->setId('js-item-lookback-limit-label'),
 		(new CFormField(
 			(new CTextBox('lookback_limit', $item['lookback_limit'], $readonly))
@@ -914,7 +914,7 @@ $formgrid
 			_('Aggregation size'),
 			(new CSpan(makeWarningIcon(_('Data will likely overlap.'))))
 				->addClass('js-granularity-hint')
-				->addClass(ZBX_STYLE_DISPLAY_NONE)
+				->addStyle('display: none;')
 		], 'granularity'))->setAsteriskMark()->setId('js-item-granularity-label'),
 		(new CFormField(
 			(new CTextBox('granularity', $item['granularity'], $readonly))

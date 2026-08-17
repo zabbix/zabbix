@@ -46,7 +46,6 @@ window.telemetry_condition_popup = new class {
 	}
 
 	#updateFieldVisibility() {
-		const display_none = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 		const is_complex = this.#complex_columns.includes(this.#column.value);
 
 		const allowed_operators = is_complex ? this.#operators.complex : this.#operators.simple;
@@ -73,11 +72,11 @@ window.telemetry_condition_popup = new class {
 		const operator = [...this.#operator].find((radio) => radio.checked).value;
 		const is_exists = parseInt(operator, 10) === <?= CONDITION_OPERATOR_EXISTS ?>;
 
-		this.#form_element.querySelector('#js-key-field').classList.toggle(display_none, !is_complex);
-		this.#form_element.querySelector('#js-key-label').classList.toggle(display_none, !is_complex);
+		this.#form_element.querySelector('#js-key-field').style.display = is_complex ? '' : 'none';
+		this.#form_element.querySelector('#js-key-label').style.display = is_complex ? '' : 'none';
 
-		this.#form_element.querySelector('#js-value-field').classList.toggle(display_none, is_exists);
-		this.#form_element.querySelector('#js-value-label').classList.toggle(display_none, is_exists);
+		this.#form_element.querySelector('#js-value-field').style.display = is_exists ? 'none' : '';
+		this.#form_element.querySelector('#js-value-label').style.display = is_exists ? 'none' : '';
 	}
 
 	submit() {

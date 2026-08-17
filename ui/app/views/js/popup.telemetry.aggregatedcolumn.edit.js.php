@@ -41,12 +41,11 @@ window.telemetry_aggregated_column_popup = new class {
 		const func = parseInt(this.#function.value, 10);
 		const is_count = func === <?= AGGREGATE_COUNT ?>;
 		const is_percentile = func === <?= AGGREGATE_PCTILE ?>;
-		const display_none = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 
-		this.#form_element.querySelector('#js-column-field').classList.toggle(display_none, is_count);
-		this.#form_element.querySelector('#js-column-label').classList.toggle(display_none, is_count);
-		this.#form_element.querySelector('#js-percentile-field').classList.toggle(display_none, !is_percentile);
-		this.#form_element.querySelector('#js-percentile-label').classList.toggle(display_none, !is_percentile);
+		this.#form_element.querySelector('#js-column-field').style.display = is_count ? 'none' : '';
+		this.#form_element.querySelector('#js-column-label').style.display = is_count ? 'none' : '';
+		this.#form_element.querySelector('#js-percentile-field').style.display = is_percentile ? '' : 'none';
+		this.#form_element.querySelector('#js-percentile-label').style.display = is_percentile ? '' : 'none';
 	}
 
 	submit() {

@@ -623,7 +623,7 @@ window.item_edit_form = new class {
 		const is_complex = this.telemetry_columns_config.complex.includes(select.value);
 		const attribute_key = select.closest('tr').querySelector('.js-attribute-key');
 
-		attribute_key.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !is_complex);
+		attribute_key.style.display = is_complex ? '' : 'none';
 
 		if (!is_complex) {
 			attribute_key.value = '';
@@ -646,7 +646,7 @@ window.item_edit_form = new class {
 			}
 		}
 
-		this.label.columns_error.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !has_missing_key);
+		this.label.columns_error.style.display = has_missing_key ? '' : 'none';
 	}
 
 	#refreshTelemetryColumns() {
@@ -832,7 +832,7 @@ window.item_edit_form = new class {
 		// The formula field is shown only for the "Custom expression" calculation type.
 		const is_custom_expression = parseInt(this.field.evaltype.value, 10) === CONDITION_EVAL_TYPE_EXPRESSION;
 
-		this.field.formula.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !is_custom_expression);
+		this.field.formula.style.display = is_custom_expression ? '' : 'none';
 
 		this.#updateTelemetryIndicators();
 		this.#updateColumnsIndicator();
@@ -855,9 +855,9 @@ window.item_edit_form = new class {
 		const data_gaps = !lookback_too_small && delay !== null && lookback_limit !== null && lookback_limit < delay;
 		const data_overlap = delay !== null && granularity !== null && granularity > delay;
 
-		this.label.lookback_limit_error.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !lookback_too_small);
-		this.label.lookback_limit_hint.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !data_gaps);
-		this.label.granularity_hint.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !data_overlap);
+		this.label.lookback_limit_error.style.display = lookback_too_small ? '' : 'none';
+		this.label.lookback_limit_hint.style.display = data_gaps ? '' : 'none';
+		this.label.granularity_hint.style.display = data_overlap ? '' : 'none';
 	}
 
 	#parseTimeToSeconds(value) {
