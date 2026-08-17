@@ -1548,11 +1548,13 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 		zbx_cep_window_ref_t	ref_local = {0}, *ref;
 		zbx_cep_db_window_t	win_local;
 		zbx_cep_rule_t		*rule;
+		int			duration, capacity;
 
 		ZBX_STR2UINT64(win_local.windowid, row[0]);
 		ZBX_STR2UINT64(ref_local.ruleid, row[1]);
 
-		if (NULL == (rule = zbx_cep_config_get_rule(hconfig, ref_local.ruleid)))
+		if (NULL == (rule = zbx_cep_config_get_rule(hconfig, ref_local.ruleid)) ||
+				SUCCEED != cep_window_get_limits(rule, &duration, &capacity, NULL))
 		{
 			zbx_vector_uint64_append(delete_windowids, win_local.windowid);
 			continue;
@@ -1575,6 +1577,8 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 		ref = zbx_hashset_insert(&pool->windows, &ref_local, sizeof(ref_local));
 		ref->window = cep_window_create(rule,  ref, win_local.windowid);
 		ref->window->nextcheck = atoi(row[7]);
+		ref->window->capacity = capacity;
+		ref->window->duration = duration;
 
 		win_local.window = ref->window;
 
@@ -1617,6 +1621,9 @@ static void	cep_window_load_events(zbx_cep_window_t *window, zbx_vector_cep_even
 		zbx_queue_ptr_push(&window->hevents, events->values[i].hevent);
 
 	window->next_index = events->values[events->values_num - 1].index + 1;
+
+	if (ZBX_CEP_WINDOW_CAUSAL == window->type)
+		window->flags = CEP_WINDOW_FLAGS_SYMPTOM_TAG_SET;
 
 	zbx_vector_cep_event_handle_index_clear(events);
 }
