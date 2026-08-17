@@ -17,34 +17,45 @@
 class CControllerPopupTelemetryConditionEdit extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'signal_type' =>		'required|in '.implode(',', [
-										CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
-										CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
-										CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
-									]),
-			'metric_point_type' =>	'in '.implode(',', [
-										CItemTypeTelemetryQuery::METRICS_POINT_SUM,
-										CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
-										CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
-										CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
-									]),
-			'row_index' =>			'required|int32'
-		];
+	private static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'row_index' => ['integer', 'required'],
+			'signal_type' => ['integer', 'required',
+				'in' => [
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
+				]
+			],
+			'metric_point_type' => ['integer',
+				'in' => [
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
+				]
+			]
+		]];
+	}
 
-		$ret = $this->validateInput($fields);
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				], JSON_THROW_ON_ERROR)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)]))
+					->disableView()
 			);
 		}
 
@@ -56,7 +67,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
-	private static function getValidationRules(): array {
+	private static function getFormValidationRules(): array {
 		$complex_columns = CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME;
 		$operators = CTelemetryHelper::getConditionOperators();
 
@@ -82,8 +93,12 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 				'when' => ['column', 'in' => $complex_columns]
 			],
 			'operator' => [
-				['integer', 'required', 'in' => $operators['complex'], 'when' => ['column', 'in' => $complex_columns]],
-				['integer', 'required', 'in' => $operators['simple'], 'when' => ['column', 'not_in' => $complex_columns]]
+				['integer', 'required', 'in' => $operators['complex'],
+					'when' => ['column', 'in' => $complex_columns]
+				],
+				['integer', 'required', 'in' => $operators['simple'],
+					'when' => ['column', 'not_in' => $complex_columns]
+				]
 			],
 			'value' => ['string', 'required', 'not_empty',
 				'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
@@ -105,7 +120,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			'attribute_key' => '',
 			'operator' => CONDITION_OPERATOR_EQUAL,
 			'value' => '',
-			'js_validation_rules' => (new CFormValidator(self::getValidationRules()))->getRules(),
+			'js_validation_rules' => (new CFormValidator(self::getFormValidationRules()))->getRules(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

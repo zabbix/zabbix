@@ -17,42 +17,56 @@
 class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'signal_type' =>		'required|in '.implode(',', [
-										CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
-										CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
-										CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
-									]),
-			'metric_point_type' =>	'in '.implode(',', [
-										CItemTypeTelemetryQuery::METRICS_POINT_SUM,
-										CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
-										CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
-										CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
-									]),
-			'row_index' =>			'required|int32',
-			'column' =>				'string',
-			'function' =>			'in '.implode(',', [
-										AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM,
-										AGGREGATE_PCTILE
-									]),
-			'percentile' =>			'string',
-			'alias' =>				'string',
-			'existing_aliases' =>	'array'
-		];
+	private static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'edit' => ['integer', 'in' => [1]],
+			'row_index' => ['integer', 'required'],
+			'signal_type' => ['integer', 'required',
+				'in' => [
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
+				]
+			],
+			'metric_point_type' => ['integer',
+				'in' => [
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
+				]
+			],
+			'existing_aliases' => ['array', 'field' => ['string']],
+			'function' => ['integer', 'required',
+				'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM,
+					AGGREGATE_PCTILE
+				],
+				'when' => ['edit', 'in' => [1]]
+			],
+			'column' => ['string', 'required', 'when' => ['edit', 'in' => [1]]],
+			'percentile' => ['string', 'required', 'when' => ['edit', 'in' => [1]]],
+			'alias' => ['string', 'required', 'when' => ['edit', 'in' => [1]]]
+		]];
+	}
 
-		$ret = $this->validateInput($fields);
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				], JSON_THROW_ON_ERROR)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)]))
+					->disableView()
 			);
 		}
 
@@ -64,7 +78,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 			|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
-	private static function getValidationRules(array $existing_aliases): array {
+	private static function getFormValidationRules(array $existing_aliases): array {
 		$alias_rules = ['string', 'required', 'not_empty'];
 
 		if ($existing_aliases) {
@@ -115,7 +129,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 			'percentile' => $this->getInput('percentile', ''),
 			'alias' => $this->getInput('alias', ''),
 			'js_validation_rules' => (new CFormValidator(
-				self::getValidationRules($this->getInput('existing_aliases', []))
+				self::getFormValidationRules($this->getInput('existing_aliases', []))
 			))->getRules(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
