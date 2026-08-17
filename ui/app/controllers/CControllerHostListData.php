@@ -324,12 +324,13 @@ class CControllerHostListData extends CControllerDataTable {
 			}
 
 			$inaccessible_proxy = ['name' => _('Inaccessible proxy'), 'inaccessible' => true];
+			$inaccessible_proxy_group = ['name' => _('Inaccessible proxy group'), 'inaccessible' => true];
 
 			$host['proxy'] = array_key_exists('proxyid', $host) && $host['proxyid']
 				? ($proxies[$host['proxyid']] ?? $inaccessible_proxy) + ['proxyid' => $host['proxyid']]
 				: null;
 			$host['proxy_group'] = array_key_exists('proxy_groupid', $host) && $host['proxy_groupid']
-				? ($proxy_groups[$host['proxy_groupid']] ?? $inaccessible_proxy)
+				? ($proxy_groups[$host['proxy_groupid']] ?? $inaccessible_proxy_group)
 					+ ['proxy_groupid' => $host['proxy_groupid']]
 				: null;
 			$host['assigned_proxy'] = array_key_exists('assigned_proxyid', $host) && $host['assigned_proxyid']

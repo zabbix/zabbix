@@ -350,7 +350,7 @@ class CControllerHostEdit extends CController {
 				$data['ms_proxy_group'] = [
 					[
 						'id' => $proxy_groupid,
-						'name' => _('Inaccessible proxy'),
+						'name' => _('Inaccessible proxy group'),
 						'inaccessible' => true
 					]
 				];

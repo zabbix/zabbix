@@ -224,7 +224,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				$host['proxy_group'] = $db_proxy_groups
 					? $db_proxy_groups[0]
-					: ['name' => _('Inaccessible proxy'), 'inaccessible' => true];
+					: ['name' => _('Inaccessible proxy group'), 'inaccessible' => true];
 			}
 		}
 
