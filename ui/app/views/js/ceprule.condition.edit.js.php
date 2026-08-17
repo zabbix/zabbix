@@ -150,7 +150,7 @@ window.ceprule_condition_edit_popup = new class {
 
 			field.style.display = is_visible ? '' : 'none';
 			field.previousElementSibling.style.display = is_visible ? '' : 'none';
-			field.querySelector('input').disabled = !is_visible;
+			field.querySelectorAll('input').forEach(node => node.disabled = !is_visible);
 		});
 	}
 
