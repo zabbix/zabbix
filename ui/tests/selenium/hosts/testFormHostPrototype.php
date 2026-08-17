@@ -933,10 +933,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Change host group.
 		if (array_key_exists('hostgroup', $data)) {
 			$this->zbxTestClickXpathWait('//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
-			$this->zbxTestMultiselectClear('group_links_');
-			$this->zbxTestClickButtonMultiselect('group_links_');
-			$this->zbxTestLaunchOverlayDialog('Host groups');
-			$this->zbxTestClickLinkTextWait($data['hostgroup']);
+			$this->query('id:group_links_')->asMultiselect()->one()->fill($data['hostgroup']);
 		}
 		// Change host group prototype.
 		if (array_key_exists('group_prototype', $data)) {
@@ -980,10 +977,12 @@ class testFormHostPrototype extends CLegacyWebTest {
 	private function checkFormFields($data) {
 		if (array_key_exists('visible_name', $data)) {
 			$this->zbxTestClickLinkTextWait($data['visible_name']);
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestAssertElementValue('name', $data['visible_name']);
 		}
 		else {
 			$this->zbxTestClickLinkTextWait($data['name']);
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestAssertElementValue('host', $data['name']);
 		}
 
@@ -1041,9 +1040,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $host]);
+		$table = $this->query('class:datatable')->asDatatable()->one();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('class:datatable')->waitUntilReady()->asDatatable()->one()->findRow('Name', $host)->getColumn('Discovery')
-				->query('link:Discovery')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $host)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 
 		$this->zbxTestClickLinkTextWait($discovery_rule);
 		$this->zbxTestClickLinkTextWait('Host prototypes');

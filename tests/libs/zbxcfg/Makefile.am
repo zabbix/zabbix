@@ -10,13 +10,12 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 CFG_LIBS = \
-	$(CFG_DEPS) \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
 CFG_BRIDGE_LIBS = \
-	$(CFG_DEPS) \
-	$(REGEXP_DEPS) \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
@@ -28,6 +27,7 @@ CFG_WRAP_FLAGS = \
 	-Wl,--wrap=close \
 	-Wl,--wrap=lseek \
 	-Wl,--wrap=fstat \
+	-Wl,--wrap=__fxstat \
 	-Wl,--wrap=stat \
 	-Wl,--wrap=exit
 

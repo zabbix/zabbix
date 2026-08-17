@@ -98,7 +98,9 @@ window.mediatype_edit_popup = new class {
 
 		event_menu.onchange = () => {
 			const event_menu_name = this.form_element.querySelector('#event_menu_name');
+			const event_menu_name_label = this.form_element.querySelector('#webhook_url_name_label');
 			const event_menu_url = this.form_element.querySelector('#event_menu_url');
+			const event_menu_url_label = this.form_element.querySelector('#webhook_event_menu_url_label');
 
 			if (event_menu.checked) {
 				event_menu_name.classList.remove('js-inactive');
@@ -112,6 +114,9 @@ window.mediatype_edit_popup = new class {
 				event_menu_name.disabled = true;
 				event_menu_url.disabled = true;
 			}
+
+			event_menu_name_label.classList.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', event_menu.checked);
+			event_menu_url_label.classList.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', event_menu.checked);
 		}
 
 		this.form_element.querySelector('#js-oauth-configure').addEventListener('click', () => {

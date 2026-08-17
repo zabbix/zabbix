@@ -349,42 +349,7 @@ $form_grid
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->addClass('js-userrole-ms')
 		)
-	)
-	->addItem(
-		new CFormField(
-			(new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')
-		)
 	);
-
-$actions = [];
-foreach ($data['labels']['actions'] as $action => $label) {
-	$actions[] = (new CDiv(
-		(new CCheckBox('actions[]', $action))
-			->setId($action)
-			->setChecked(array_key_exists($action, $data['rules']['actions']) && $data['rules']['actions'][$action])
-			->setReadonly($data['readonly'])
-			->setLabel($label)
-	))
-		->addClass(ZBX_STYLE_NOWRAP);
-}
-
-$form_grid->addItem(
-	[(new CFormField($actions))
-		->setAttribute('data-field-type', 'array')
-		->setAttribute('data-field-name', 'actions')
-	]
-);
-
-$form_grid->addItem([
-	new CLabel(_('Default access to new actions'), $data['readonly'] ? '' : 'actions.default_access'),
-	new CFormField(
-		(new CCheckBox('actions_default_access', 1))
-			->setId('actions.default_access')
-			->setChecked($data['rules']['actions.default_access'])
-			->setReadonly($data['readonly'])
-			->setUncheckedValue(0)
-	)
-]);
 
 if (CSettingsHelper::isMobileDevicesEnabled()) {
 	$form_grid
@@ -438,6 +403,42 @@ if (CSettingsHelper::isMobileDevicesEnabled()) {
 		)
 	]);
 }
+
+$actions = [];
+foreach ($data['labels']['actions'] as $action => $label) {
+	$actions[] = (new CDiv(
+		(new CCheckBox('actions[]', $action))
+			->setId($action)
+			->setChecked(array_key_exists($action, $data['rules']['actions']) && $data['rules']['actions'][$action])
+			->setReadonly($data['readonly'])
+			->setLabel($label)
+	))
+		->addClass(ZBX_STYLE_NOWRAP);
+}
+
+$form_grid
+	->addItem(
+		new CFormField(
+			(new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')
+		)
+	)
+	->addItem(
+		[(new CFormField($actions))
+			->setAttribute('data-field-type', 'array')
+			->setAttribute('data-field-name', 'actions')
+		]
+	);
+
+$form_grid->addItem([
+	new CLabel(_('Default access to new actions'), $data['readonly'] ? '' : 'actions.default_access'),
+	new CFormField(
+		(new CCheckBox('actions_default_access', 1))
+			->setId('actions.default_access')
+			->setChecked($data['rules']['actions.default_access'])
+			->setReadonly($data['readonly'])
+			->setUncheckedValue(0)
+	)
+]);
 
 $cancel_button = (new CRedirectButton(_('Cancel'),
 	(new CUrl('zabbix.php'))

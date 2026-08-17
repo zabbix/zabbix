@@ -3946,7 +3946,7 @@ abstract class testFormPreprocessing extends CWebTest {
 			COverlayDialogElement::find()->one()->waitUntilReady();
 		}
 		else {
-			$form->query('button:Clone')->waitUntilPresent()->one()->click();
+			$form->query('button:Clone')->waitUntilPresent()->one()->click()->waitUntilNotVisible();
 		}
 
 		$form->invalidate();

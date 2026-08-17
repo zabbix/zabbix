@@ -6568,9 +6568,244 @@ zabbix_export:
         the LLD filter pattern matching value to receive different matching results for a specified value.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
+      items:
+        - uuid: 7f400097756a46d289efb537847c6064
+          name: 'Compute instances count'
+          type: DEPENDENT
+          key: oci.compute.count
+          description: 'Get the total count of compute instances.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.length()
+          master_item:
+            key: oci.compute.get
+          tags:
+            - tag: component
+              value: compute
+        - uuid: 91168cc6ec454b5f805b025e4ac85dc9
+          name: 'Get compute instances'
+          type: SCRIPT
+          key: oci.compute.get
+          delay: 1h
+          history: '0'
+          value_type: TEXT
+          params: |
+            function validateZabbixParams(required_params, all_params) {
+            	required_params.forEach(function (field) {
+            		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            }
+            
+            function prepareCompartments(compartments, tenancy) {
+            	if (typeof compartments === 'undefined' || compartments === '') {
+            		return [tenancy];
+            	} else {
+            		return compartments.split(',')
+            	}
+            }
+            
+            function oracleCloudInfra(service, action, params) {
+            	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
+            	this.request = new HttpRequest();
+            
+            	this.hash = function (string) {
+            		return sha256(string);
+            	};
+            
+            	this.sign = function (string) {
+            		return sign('sha256', params['private_key'], string);
+            	};
+            
+            	this.encode = function (hash) {
+            		var hex_arr = hash.match(/.{1,2}/g),
+            			u_int8_array = new Uint8Array(hex_arr.length);
+            
+            		hex_arr.forEach(function (hex, idx) {
+            			u_int8_array[idx] = parseInt(hex, 16);
+            		});
+            
+            		return btoa(u_int8_array);
+            	};
+            
+            	this.getDate = function () {
+            		var weekday_short_list = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            			month_short_list = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'],
+            			today = new Date();
+            
+            		return weekday_short_list[today.getUTCDay()] + ', ' + today.getUTCDate() + ' ' + month_short_list[today.getUTCMonth()] + ' ' + today.getUTCFullYear() + ' ' + today.getUTCHours() + ':' + today.getUTCMinutes() + ':' + today.getUTCSeconds() + ' GMT';
+            	};
+            
+            	this.executeRequest = function (http_method, api_path, api_params, mql, namespace, raw_body) {
+            		if (raw_body === null || typeof raw_body === 'undefined') {
+            			raw_body = false;
+            		}
+            
+            		var headers = '(request-target) date host',
+            			content_type_header = 'content-type: application/json',
+            			date_header = 'date: ' + this.getDate(),
+            			host_header = 'host: ' + params['api_host'],
+            			request_target = '(request-target): ' + http_method + ' ' + api_path + api_params,
+            			signing_string = request_target + '\n' + date_header + '\n' + host_header,
+            			req_headers = [content_type_header, date_header];
+            
+            		if (http_method === 'post') {
+            			var body;
+            
+            			if (!raw_body) {
+            				body = JSON.stringify({
+            					namespace: namespace,
+            					query: mql
+            				});
+            			} else {
+            				body = JSON.stringify(mql);
+            			}
+            
+            			headers = headers + ' x-content-sha256 content-type content-length';
+            			var body_header = 'x-content-sha256: ' + this.encode(this.hash(body)),
+            				body_length_header = 'content-length: ' + body.length;
+            
+            			signing_string = signing_string + '\n' + body_header + '\n' + content_type_header + '\n' + body_length_header;
+            			req_headers.push(body_header, body_length_header);
+            		}
+            
+            		var signature = this.encode(this.sign(signing_string));
+            
+            		req_headers.push('Authorization: Signature version="1",keyId="' + params['tenancy_ocid'] + '/' + params['user_ocid'] + '/' + params['fingerprint'] + '",algorithm="rsa-sha256",headers="' + headers + '",signature="' + signature + '"');
+            		for (var header = 0, headerLength = req_headers.length; header < headerLength; header++) {
+            			this.request.addHeader(req_headers[header]);
+            		}
+            
+            		if (params['http_proxy']) {
+            			this.request.setProxy(params['http_proxy']);
+            			Zabbix.log(4, this.zabbix_log_prefix + ' Using http proxy: ' + params['http_proxy']);
+            		}
+            
+            		var response;
+            
+            		if (http_method === 'post') {
+            			var api_rate_limit_exceeded = false;
+            
+            			do {
+            				response = this.request.post('https://' + params['api_host'] + api_path + api_params, body);
+            				if (service === 'Billing') {
+            					Zabbix.log(1, 'response: ' + response);
+            				}
+            
+            				try {
+            					if (JSON.parse(response)['code'] === 'TooManyRequests') {
+            						api_rate_limit_exceeded = true;
+            						Zabbix.sleep(1000);
+            					} else {
+            						api_rate_limit_exceeded = false;
+            					}
+            				} catch (error) {
+            					Zabbix.log(3, this.zabbix_log_prefix + ' Could not parse the response: ' + JSON.stringify(response));
+            					throw 'Could not parse the response. See logs for more information.';
+            				}
+            			} while (api_rate_limit_exceeded);
+            		} else {
+            			response = this.request.get('https://' + params['api_host'] + api_path + api_params);
+            		}
+            
+            		this.request.clearHeader();
+            
+            		if (this.request.getStatus() === parseInt(params['http_status_code'])) {
+            			return response;
+            		} else {
+            			Zabbix.log(3, this.zabbix_log_prefix + ' Unexpected HTTP response code: ' + this.request.getStatus());
+            			throw 'Unexpected HTTP response code: ' + this.request.getStatus();
+            		}
+            	};
+            
+            	this.extractData = function (http_method, data, keys, compartment) {
+            		try {
+            			data = JSON.parse(data);
+            		} catch (error) {
+            			Zabbix.log(3, this.zabbix_log_prefix + ' Could not parse the received JSON object: ' + data);
+            			throw 'Could not parse received JSON object. See logs for more information.';
+            		}
+            
+            		if (typeof keys == 'object') {
+            			var return_buffer = [];
+            
+            			for (var data_obj = 0, data_length = data.length; data_obj < data_length; data_obj++) {
+            				var object_buffer = {};
+            
+            				for (var key = 0, keys_length = keys.length; key < keys_length; key++) {
+            					if (data[data_obj][keys[key]] || data[data_obj][keys[key]] == null) {
+            						object_buffer[keys[key].match(/^[a-z]+$|[A-Z][a-z]+$/)[0].toLowerCase()] = data[data_obj][keys[key]];
+            					} else {
+            						Zabbix.log(3, this.zabbix_log_prefix + ' Received an unexpected JSON object. Could not get value for key "' + keys[key] + '" in JSON: ' + JSON.stringify(data[data_obj]));
+            						throw 'Received an unexpected JSON object. See logs for more information.';
+            					}
+            				}
+            				if (typeof compartment != 'undefined' && compartment != '') {
+            					object_buffer['compartment'] = compartment;
+            				}
+            
+            				return_buffer.push(object_buffer);
+            			}
+            
+            			return return_buffer;
+            		}
+            
+            		try {
+            			if (http_method === 'get') {
+            				return data[keys];
+            			} else {
+            				if (data.length === 0) {
+            					return 0;
+            				}
+            				data = data[0][keys];
+            
+            				return data[data.length - 1]['value'];
+            			}
+            		} catch (error) {
+            			Zabbix.log(3, this.zabbix_log_prefix + ' Could not find key "' + keys + '" in JSON: ' + JSON.stringify(data));
+            			throw 'Could not find required key in JSON object. See logs for more information.';
+            		}
+            	};
+            }
+            
+            
+            var params = JSON.parse(value);
+            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'http_status_code'], params);
+            var oci = new oracleCloudInfra('Compute', 'Get instances', params);
+            var compartments = prepareCompartments(params['compartment_ocid'], params['tenancy_ocid']);
+            
+            var buffer = [];
+            compartments.forEach(function (compartment) {
+            	Array.prototype.push.apply(buffer, oci.extractData('get', oci.executeRequest('get', '/20160918/instances', '?compartmentId=' + encodeURIComponent(compartment)), ['id', 'displayName', 'lifecycleState', 'freeformTags', 'availabilityDomain'], compartment));
+            })
+            return JSON.stringify(buffer);
+          description: 'Get compute instances.'
+          timeout: '{$OCI.HTTP.TIMEOUT}'
+          parameters:
+            - name: api_host
+              value: '{$OCI.API.CORE.HOST}'
+            - name: compartment_ocid
+              value: '{$OCI.API.COMPARTMENT.COMPUTE}'
+            - name: fingerprint
+              value: '{$OCI.API.FINGERPRINT}'
+            - name: http_proxy
+              value: '{$OCI.HTTP.PROXY}'
+            - name: http_status_code
+              value: '{$OCI.HTTP.RETURN.CODE.OK}'
+            - name: private_key
+              value: '{$OCI.API.PRIVATE.KEY}'
+            - name: tenancy_ocid
+              value: '{$OCI.API.TENANCY}'
+            - name: user_ocid
+              value: '{$OCI.API.USER}'
+          tags:
+            - tag: component
+              value: raw
       discovery_rules:
         - uuid: 72fa6dfedfd8497298c5930f48594e72
           name: 'Block volumes discovery'
@@ -7090,200 +7325,8 @@ zabbix_export:
               path: $.state
         - uuid: ea4bbd0e9737406693aa0051cf861115
           name: 'Compute instances discovery'
-          type: SCRIPT
+          type: DEPENDENT
           key: oci.compute.discovery
-          delay: 1h
-          params: |
-            function validateZabbixParams(required_params, all_params) {
-            	required_params.forEach(function (field) {
-            		if (typeof all_params !== 'object' || typeof all_params[field] === 'undefined' || all_params[field] === '') {
-            			throw 'Required param is not set: ' + field + '.';
-            		}
-            	});
-            }
-            
-            function prepareCompartments(compartments, tenancy) {
-            	if (typeof compartments === 'undefined' || compartments === '') {
-            		return [tenancy];
-            	} else {
-            		return compartments.split(',')
-            	}
-            }
-            
-            function oracleCloudInfra(service, action, params) {
-            	this.zabbix_log_prefix = '[ OCI ] [ ' + service + ' ] [ ' + action + ' ]';
-            	this.request = new HttpRequest();
-            
-            	this.hash = function (string) {
-            		return sha256(string);
-            	};
-            
-            	this.sign = function (string) {
-            		return sign('sha256', params['private_key'], string);
-            	};
-            
-            	this.encode = function (hash) {
-            		var hex_arr = hash.match(/.{1,2}/g),
-            			u_int8_array = new Uint8Array(hex_arr.length);
-            
-            		hex_arr.forEach(function (hex, idx) {
-            			u_int8_array[idx] = parseInt(hex, 16);
-            		});
-            
-            		return btoa(u_int8_array);
-            	};
-            
-            	this.getDate = function () {
-            		var weekday_short_list = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-            			month_short_list = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'],
-            			today = new Date();
-            
-            		return weekday_short_list[today.getUTCDay()] + ', ' + today.getUTCDate() + ' ' + month_short_list[today.getUTCMonth()] + ' ' + today.getUTCFullYear() + ' ' + today.getUTCHours() + ':' + today.getUTCMinutes() + ':' + today.getUTCSeconds() + ' GMT';
-            	};
-            
-            	this.executeRequest = function (http_method, api_path, api_params, mql, namespace, raw_body) {
-            		if (raw_body === null || typeof raw_body === 'undefined') {
-            			raw_body = false;
-            		}
-            
-            		var headers = '(request-target) date host',
-            			content_type_header = 'content-type: application/json',
-            			date_header = 'date: ' + this.getDate(),
-            			host_header = 'host: ' + params['api_host'],
-            			request_target = '(request-target): ' + http_method + ' ' + api_path + api_params,
-            			signing_string = request_target + '\n' + date_header + '\n' + host_header,
-            			req_headers = [content_type_header, date_header];
-            
-            		if (http_method === 'post') {
-            			var body;
-            
-            			if (!raw_body) {
-            				body = JSON.stringify({
-            					namespace: namespace,
-            					query: mql
-            				});
-            			} else {
-            				body = JSON.stringify(mql);
-            			}
-            
-            			headers = headers + ' x-content-sha256 content-type content-length';
-            			var body_header = 'x-content-sha256: ' + this.encode(this.hash(body)),
-            				body_length_header = 'content-length: ' + body.length;
-            
-            			signing_string = signing_string + '\n' + body_header + '\n' + content_type_header + '\n' + body_length_header;
-            			req_headers.push(body_header, body_length_header);
-            		}
-            
-            		var signature = this.encode(this.sign(signing_string));
-            
-            		req_headers.push('Authorization: Signature version="1",keyId="' + params['tenancy_ocid'] + '/' + params['user_ocid'] + '/' + params['fingerprint'] + '",algorithm="rsa-sha256",headers="' + headers + '",signature="' + signature + '"');
-            		for (var header = 0, headerLength = req_headers.length; header < headerLength; header++) {
-            			this.request.addHeader(req_headers[header]);
-            		}
-            
-            		if (params['http_proxy']) {
-            			this.request.setProxy(params['http_proxy']);
-            			Zabbix.log(4, this.zabbix_log_prefix + ' Using http proxy: ' + params['http_proxy']);
-            		}
-            
-            		var response;
-            
-            		if (http_method === 'post') {
-            			var api_rate_limit_exceeded = false;
-            
-            			do {
-            				response = this.request.post('https://' + params['api_host'] + api_path + api_params, body);
-            				if (service === 'Billing') {
-            					Zabbix.log(1, 'response: ' + response);
-            				}
-            
-            				try {
-            					if (JSON.parse(response)['code'] === 'TooManyRequests') {
-            						api_rate_limit_exceeded = true;
-            						Zabbix.sleep(1000);
-            					} else {
-            						api_rate_limit_exceeded = false;
-            					}
-            				} catch (error) {
-            					Zabbix.log(3, this.zabbix_log_prefix + ' Could not parse the response: ' + JSON.stringify(response));
-            					throw 'Could not parse the response. See logs for more information.';
-            				}
-            			} while (api_rate_limit_exceeded);
-            		} else {
-            			response = this.request.get('https://' + params['api_host'] + api_path + api_params);
-            		}
-            
-            		this.request.clearHeader();
-            
-            		if (this.request.getStatus() === parseInt(params['http_status_code'])) {
-            			return response;
-            		} else {
-            			Zabbix.log(3, this.zabbix_log_prefix + ' Unexpected HTTP response code: ' + this.request.getStatus());
-            			throw 'Unexpected HTTP response code: ' + this.request.getStatus();
-            		}
-            	};
-            
-            	this.extractData = function (http_method, data, keys, compartment) {
-            		try {
-            			data = JSON.parse(data);
-            		} catch (error) {
-            			Zabbix.log(3, this.zabbix_log_prefix + ' Could not parse the received JSON object: ' + data);
-            			throw 'Could not parse received JSON object. See logs for more information.';
-            		}
-            
-            		if (typeof keys == 'object') {
-            			var return_buffer = [];
-            
-            			for (var data_obj = 0, data_length = data.length; data_obj < data_length; data_obj++) {
-            				var object_buffer = {};
-            
-            				for (var key = 0, keys_length = keys.length; key < keys_length; key++) {
-            					if (data[data_obj][keys[key]] || data[data_obj][keys[key]] == null) {
-            						object_buffer[keys[key].match(/^[a-z]+$|[A-Z][a-z]+$/)[0].toLowerCase()] = data[data_obj][keys[key]];
-            					} else {
-            						Zabbix.log(3, this.zabbix_log_prefix + ' Received an unexpected JSON object. Could not get value for key "' + keys[key] + '" in JSON: ' + JSON.stringify(data[data_obj]));
-            						throw 'Received an unexpected JSON object. See logs for more information.';
-            					}
-            				}
-            				if (typeof compartment != 'undefined' && compartment != '') {
-            					object_buffer['compartment'] = compartment;
-            				}
-            
-            				return_buffer.push(object_buffer);
-            			}
-            
-            			return return_buffer;
-            		}
-            
-            		try {
-            			if (http_method === 'get') {
-            				return data[keys];
-            			} else {
-            				if (data.length === 0) {
-            					return 0;
-            				}
-            				data = data[0][keys];
-            
-            				return data[data.length - 1]['value'];
-            			}
-            		} catch (error) {
-            			Zabbix.log(3, this.zabbix_log_prefix + ' Could not find key "' + keys + '" in JSON: ' + JSON.stringify(data));
-            			throw 'Could not find required key in JSON object. See logs for more information.';
-            		}
-            	};
-            }
-            
-            
-            var params = JSON.parse(value);
-            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'http_status_code'], params);
-            var oci = new oracleCloudInfra('Compute', 'Get instances', params);
-            var compartments = prepareCompartments(params['compartment_ocid'], params['tenancy_ocid']);
-            
-            var buffer = [];
-            compartments.forEach(function (compartment) {
-            	Array.prototype.push.apply(buffer, oci.extractData('get', oci.executeRequest('get', '/20160918/instances', '?compartmentId=' + encodeURIComponent(compartment)), ['id', 'displayName', 'lifecycleState', 'freeformTags', 'availabilityDomain'], compartment));
-            })
-            return JSON.stringify(buffer);
           filter:
             evaltype: AND
             conditions:
@@ -7322,24 +7365,10 @@ zabbix_export:
                   value: '{#COMPARTMENT}'
                 - tag: oci-compute-name
                   value: '{#NAME}'
-          timeout: '{$OCI.HTTP.TIMEOUT}'
-          parameters:
-            - name: api_host
-              value: '{$OCI.API.CORE.HOST}'
-            - name: compartment_ocid
-              value: '{$OCI.API.COMPARTMENT.COMPUTE}'
-            - name: fingerprint
-              value: '{$OCI.API.FINGERPRINT}'
-            - name: http_proxy
-              value: '{$OCI.HTTP.PROXY}'
-            - name: http_status_code
-              value: '{$OCI.HTTP.RETURN.CODE.OK}'
-            - name: private_key
-              value: '{$OCI.API.PRIVATE.KEY}'
-            - name: tenancy_ocid
-              value: '{$OCI.API.TENANCY}'
-            - name: user_ocid
-              value: '{$OCI.API.USER}'
+                - tag: target
+                  value: oci-compute
+          master_item:
+            key: oci.compute.get
           lld_macro_paths:
             - lld_macro: '{#COMPARTMENT}'
               path: $.compartment
@@ -8808,7 +8837,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Cloud
       items:
@@ -9052,9 +9081,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - 'return Math.round(value * 100) / 100;'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: oci.compute.metrics.get
           tags:
@@ -12272,7 +12298,7 @@ zabbix_export:
         Threshold macros could be used with a context to fine tune threshold for different services, compartments, region and budgets.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -12613,6 +12639,36 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: 40de2d949f0147859171849a2ceeab8d
+          name: 'Daily average cost'
+          type: CALCULATED
+          key: oci_cost.daily.average.cost
+          value_type: FLOAT
+          params: 'avg(//oci_cost.usage.total.cost.daily.current, 1w)'
+          description: 'Oracle daily average cost.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: billing
+        - uuid: 1dcf71b9ba0445eca41bd82a8484d2f7
+          name: 'Get month cost'
+          type: DEPENDENT
+          key: oci_cost.month.cost.get
+          history: '0'
+          value_type: TEXT
+          description: 'Collects Oracle month cost.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.usage.monthly_cost_history
+          master_item:
+            key: oci_cost.usage.get
+          tags:
+            - tag: component
+              value: raw
         - uuid: 13641e6cf5c44e089bd323f74d7b4d41
           name: 'Region: Count'
           type: DEPENDENT
@@ -12938,6 +12994,99 @@ zabbix_export:
             	}
             }
             
+            function fetchMonthlyCosts(months_back, result_key, error_label, cost_field, group_by) {
+            	try {
+            		var monthly_cost_array = [],
+            			current_month = new Date();
+            
+            		current_month.setUTCDate(1);
+            		current_month.setUTCHours(0, 0, 0, 0);
+            
+            		var start_month = new Date(Date.UTC(
+            			current_month.getUTCFullYear(),
+            			current_month.getUTCMonth() - (months_back - 1),
+            			1
+            		));
+            
+            		var end_month = new Date(Date.UTC(
+            			current_month.getUTCFullYear(),
+            			current_month.getUTCMonth() + 1,
+            			1
+            		));
+            
+            		var body = {
+            			granularity: 'MONTHLY',
+            			tenantId: params['tenancy_ocid'],
+            			timeUsageStarted: start_month.toISOString(),
+            			timeUsageEnded: end_month.toISOString(),
+            			queryType: 'COST',
+            			isAggregateByTime: 'false',
+            			compartmentDepth: '7'
+            		};
+            
+            		if (group_by && group_by.length > 0) {
+            			body.groupBy = group_by;
+            		}
+            
+            		var response = JSON.parse(
+            			oci.executeRequest('post', '/20200107/usage', '', body, '', true)
+            		);
+            
+            		var monthly_costs = {};
+            
+            		if (response && response.items) {
+            			response.items.forEach(function( item ) {
+            				var month = item.timeUsageStarted
+            					? item.timeUsageStarted.substring(0, 7)
+            					: '';
+            
+            				if (!month) {
+            
+            					return;
+            				}
+            
+            				if (!monthly_costs[month]) {
+            					monthly_costs[month] = {
+            						cost: 0,
+            						currency: ''
+            					};
+            				}
+            
+            				if (item[cost_field] !== undefined && item[cost_field] !== null) {
+            					monthly_costs[month].cost += Number(item[cost_field]);
+            				}
+            
+            				if (item.currency && item.currency.trim() !== '') {
+            					monthly_costs[month].currency = item.currency;
+            				}
+            			});
+            		}
+            
+            		for (var i = months_back - 1; i >= 0; i--) {
+            			var month_start = new Date(Date.UTC(
+            				current_month.getUTCFullYear(),
+            				current_month.getUTCMonth() - i,
+            				1
+            			));
+            
+            			var month = month_start.toISOString().substring(0, 7);
+            
+            			monthly_cost_array.push({
+            				month: month,
+            				cost: monthly_costs[month] ? Number(monthly_costs[month].cost) : 0,
+            				currency: monthly_costs[month] ? monthly_costs[month].currency : ''
+            			});
+            		}
+            
+            		result.usage[result_key] = monthly_cost_array;
+            	}
+            	catch (error) {
+            		result.errors.push(error_label + ': ' + error);
+            
+            		result.usage[result_key] = null;
+            	}
+            }
+            
             var required_fields = [
             		'compartmentName',
             		'service',
@@ -12969,6 +13118,7 @@ zabbix_export:
             fetchUsage('DAILY', today_start, tomorrow_start, 'current_day', 'current_day_usage');
             fetchUsage('MONTHLY', month_previous_start, month_current_start, 'prev_month', 'prev_month_usage');
             fetchUsage('MONTHLY', month_current_start, today_start, 'current_month', 'current_month_usage');
+            fetchMonthlyCosts(12, 'monthly_cost_history', 'monthly_cost_history_usage', 'attributedCost', []);
             
             return JSON.stringify(result);
           description: 'Master item to get usage info.'
@@ -13405,6 +13555,53 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+        - uuid: 5f21a704cc1d44989a7c10b2226f02de
+          name: 'Month discovery'
+          type: DEPENDENT
+          key: oci_cost.month.discovery
+          description: 'Discovers month cost history.'
+          item_prototypes:
+            - uuid: 7a6ed8050cff4efca8d7f9567467e4e7
+              name: 'Month [{#OCI.MONTH}]: Get data'
+              type: DEPENDENT
+              key: 'oci_cost.month.cost.data.get[{#OCI.MONTH}]'
+              history: '0'
+              value_type: CHAR
+              description: 'Collects month cost history.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.[?(@.month=="{#OCI.MONTH}")].first()'
+              master_item:
+                key: oci_cost.month.cost.get
+              tags:
+                - tag: month
+                  value: '{#OCI.MONTH}'
+            - uuid: 1ed9b406170b4a56b84927a34b522f81
+              name: 'Month [{#OCI.MONTH}]: Total cost'
+              type: DEPENDENT
+              key: 'oci_cost.month.total.cost[{#OCI.MONTH}]'
+              value_type: FLOAT
+              units: '{#OCI.CURRENCY}'
+              description: 'Oracle `{#OCI.MONTH}` month total cost.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.cost
+              master_item:
+                key: 'oci_cost.month.cost.data.get[{#OCI.MONTH}]'
+              tags:
+                - tag: component
+                  value: billing
+                - tag: month
+                  value: '{#OCI.MONTH}'
+          master_item:
+            key: oci_cost.month.cost.get
+          lld_macro_paths:
+            - lld_macro: '{#OCI.CURRENCY}'
+              path: $.currency
+            - lld_macro: '{#OCI.MONTH}'
+              path: $.month
         - uuid: 72fa5b0c8b454bcc9801d6377674c158
           name: 'Compartment discovery'
           type: DEPENDENT
