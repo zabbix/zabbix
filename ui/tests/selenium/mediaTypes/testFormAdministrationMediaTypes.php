@@ -262,7 +262,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Menu entry name' => 255,
 						'Menu entry URL' => 2048
 					],
-					'mandatory' => ['Script', 'Timeout', 'Menu entry name', 'Menu entry URL']
+					'mandatory' => ['Script', 'Timeout']
 				]
 			]
 		];
@@ -438,16 +438,27 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				);
 				$script_dialog->query('button:Cancel')->one()->click();
 
-				// Check that Menu entry fields are enabled only when "Include event menu entry" is set.
-				$this->assertEquals(2, $this->query('id', ['event_menu_name', 'event_menu_url'])->all()
-						->filter(new CElementFilter(CElementFilter::ATTRIBUTES_PRESENT, ['disabled']))->count()
-				);
+				// Check that Menu entry fields are enabled and mandatory only when "Include event menu entry" is set.
+				foreach (['Menu entry name', 'Menu entry URL'] as $menu_field) {
+					$this->assertFalse($form->getField($menu_field)->isEnabled(), 'Field '.$menu_field.
+							' is enabled, but should be disabled.'
+					);
+					$this->assertFalse($form->isRequired($menu_field), 'Field '.$menu_field.
+							' marked as mandatory when disabled.'
+					);
+				}
 
 				$form->getField('Include event menu entry')->fill(true);
 
-				$this->assertEquals(2, $this->query('id', ['event_menu_name', 'event_menu_url'])->all()
-						->filter(new CElementFilter(CElementFilter::ATTRIBUTES_NOT_PRESENT, ['disabled']))->count()
-				);
+				foreach (['Menu entry name', 'Menu entry URL'] as $menu_field) {
+					$this->assertTrue($form->getField($menu_field)->isEnabled(), 'Field '.$menu_field.
+							' is disabled, but should be enabled.'
+					);
+					$this->assertTrue($form->isRequired($menu_field), 'Field '.$menu_field.
+							' not marked as mandatory when enabled.'
+					);
+				}
+
 				break;
 		}
 

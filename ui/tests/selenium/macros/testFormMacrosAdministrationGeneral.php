@@ -108,13 +108,12 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 	}
 
 	private function saveGlobalMacros($confirmation = false) {
-		$button = $this->query('button:Update')->one()->click();
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		if ($confirmation) {
 			$this->zbxTestAcceptAlert();
 		}
-		$button->waitUntilStalled();
-
 		$this->page->waitUntilReady();
+		CMessageElement::find()->one();
 		$this->zbxTestCheckHeader('Macros');
 		$this->zbxTestTextPresent('Macros');
 		$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);
@@ -825,6 +824,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		// Press revert button and save the changes and make sure that changes were reverted.
 		$value_field->getRevertButton()->click();
 		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 		// Check that no macro value changes took place.
 		$this->assertEquals('******', $this->getValueField($data['macro_fields']['macro'])->getValue());
 		$this->assertEquals($old_values, CDBHelper::getRow($sql));

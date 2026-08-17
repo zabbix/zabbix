@@ -17,6 +17,9 @@ require_once 'vendor/autoload.php';
 
 require_once __DIR__.'/../CElement.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+use Facebook\WebDriver\Exception\TimeoutException;
+
 /**
  * Color picker element.
  */
@@ -85,8 +88,26 @@ class CColorPickerElement extends CElement {
 	 * @return CElement
 	 */
 	public function open() {
-		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
-		return (new CElementQuery('id:color_picker'))->waitUntilVisible()->one();
+		$button = $this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one();
+
+		/*
+		 * The color picker closes itself on any scroll event. WebDriver scrolls the button into view when clicking
+		 * it, and that scroll can dismiss the just-opened dialog. Scroll the button into view first to minimise the
+		 * click scroll; if the dialog still gets dismissed, click again (button is in view, so it does not scroll).
+		 */
+		$button->scrollIntoView();
+		$button->click();
+
+		$popup = new CElementQuery('id:color_picker');
+
+		try {
+			return $popup->waitUntilVisible(3)->one();
+		}
+		catch (TimeoutException $exception) {
+			$button->click();
+
+			return $popup->waitUntilVisible()->one();
+		}
 	}
 
 	/**

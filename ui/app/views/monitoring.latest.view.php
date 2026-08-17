@@ -88,7 +88,6 @@ $html_page->show();
 		'refresh_data' => $data['refresh_data'],
 		'refresh_interval' => $data['refresh_interval'],
 		'checkbox_object' => 'itemids',
-		'filter_set' => $data['mandatory_filter_set'] || $data['subfilter_set'],
 		'layout_mode' => $web_layout_mode
 	]).');
 '))

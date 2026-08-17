@@ -169,7 +169,7 @@ func (c *MemoryCache) insertResult(result *AgentData) {
 		}
 	}
 	if index == -1 {
-		c.Warningf("cache is full and cannot cannot find a value to replace, adding new instead")
+		c.Warningf("cache is full and cannot find a value to replace, adding new instead")
 		c.addResult(result)
 		return
 	}
