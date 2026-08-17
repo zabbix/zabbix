@@ -76,7 +76,22 @@ class testTriggerCEP extends CIntegrationTest {
 	//     it must be is caught as it happens rather than as a total that never comes out, so this is the one to
 	//     use when a failure has to be pinned to a value.
 	const CEP_CLOSE_WINDOW_BATCH_FILL = true;
+	// Everything the suite does with a server that was stopped and started hangs on this one switch, and it costs
+	// enough to be off by default - a restart is seconds of waiting for every scenario that takes one:
+	//   - the *Restart tests of the trigger and correlation scenarios, which are their non-restart siblings driven
+	//     against a freshly started server, are skipped entirely (see skipIfRestartTestsDisabled());
+	//   - the CEP window scenarios stop and start the server in the middle of themselves instead, at the point where
+	//     their windows are holding what the rest of the scenario acts on: everything after that point is driven
+	//     against the windows the server loaded back from the database rather than the ones it had open all along, and
+	//     not one assertion of those scenarios changes for it - a window that came back without the events it held,
+	//     without the room it had left, or without knowing what it had ranked, fails the very steps that pass without
+	//     a restart. See maybeRestartServerMidScenario() for where they take it and which ones do not.
 	const SKIP_RESTART_TESTS = true;
+	// How much room a scenario leaves for that restart inside the lifetime of the windows it lands among: the window
+	// durations of the scenarios that take one are counted in seconds, and a window whose duration ran out while the
+	// server was down would be gone for a reason the scenario is not about. Only added when the restarts are turned
+	// on, so the durations are what they always were without them - see getRestartWindowAllowance().
+	const CEP_RESTART_WINDOW_ALLOWANCE = 20;
 	// The windowless CEP scenario suppresses its events for a while and can then wait for that suppression to
 	// run out again (see waitForCepWindowNoneUnsuppressed()). That wait is the slowest part of the scenario by
 	// far - the suppression period plus the once-a-minute timer pass that clears expired suppressions - so it
@@ -372,17 +387,6 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_TAG_RESET = self::CEP_RULE_NAME_PREFIX.'window tag reset';
 	const CEP_RULE_WINDOW_CAUSE_RESET = self::CEP_RULE_NAME_PREFIX.'window cause reset';
 	const CEP_RULE_WINDOW_PATTERN_RESET = self::CEP_RULE_NAME_PREFIX.'window pattern reset';
-	// The reset scenario is additionally run with the server restarted between the reset and everything the reset is
-	// read from: the windows of a rule are stored ones (cep_window and cep_window_event) that the server loads back
-	// at startup, so only a restart tells a reset that emptied the pool from a reset that emptied the store as well -
-	// see runEventAssessmentTestCepWindowReset(). One window type is enough for that, the store being the same for
-	// all of them, and it is the simple one.
-	const CEP_RULE_WINDOW_SIMPLE_RESET_RESTART = self::CEP_RULE_NAME_PREFIX.'window simple reset restart';
-	// The windows of that flavour have to be alive on both sides of the stop and start, so they are given a duration
-	// outlasting the whole scenario instead of the three seconds the reset flavours above run with - a restart takes
-	// longer than that, and a window whose duration ran out during it would be gone for a reason the scenario is not
-	// about.
-	const CEP_RULE_WINDOW_RESET_RESTART_DURATION = '30s';
 	// The delete scenario is run over the same rule of every window type, differing only in how the rule is taken
 	// away: deleting it must do to its windows what resetting it does, and it additionally takes the rule itself, so
 	// nothing opens a window again and what those windows held is the last thing the rule ever holds - see
@@ -3581,17 +3585,6 @@ HEREDOC;
 	}
 
 	/**
-	 * Prepare the flavour of the reset scenario the server is restarted in the middle of: the same simple window rule,
-	 * with a window duration that outlasts the whole scenario so the stop and start cannot be what its windows are
-	 * gone by - see prepareDataCepWindowHeldProblemsOperations() and runEventAssessmentTestCepWindowReset().
-	 */
-	public function prepareDataCepWindowSimpleResetRestart() {
-		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_SIMPLE,
-			self::CEP_RULE_WINDOW_SIMPLE_RESET_RESTART, null, self::CEP_RULE_WINDOW_RESET_RESTART_DURATION
-		);
-	}
-
-	/**
 	 * Prepare the simple window flavour of the delete scenario, see prepareDataCepWindowHeldProblemsOperations().
 	 */
 	public function prepareDataCepWindowSimpleDelete() {
@@ -3691,7 +3684,11 @@ HEREDOC;
 		$this->deleteCepCorrelations();
 
 		$window = [
-			'duration' => $duration === null ? 3 : $duration,
+			// The restarts of these scenarios land while the windows are supposed to be holding their problems (a
+			// reset or a delete that arrives at an empty window says nothing about either), so the time a stop and a
+			// start takes is added to the duration when they are turned on - and nothing changes when they are not,
+			// see getRestartWindowAllowance().
+			'duration' => $duration === null ? 3 + static::getRestartWindowAllowance() : $duration,
 			// Every event must be held: both scenarios are about what a window has in it when it is taken away, so
 			// nothing may be evicted for not fitting.
 			'capacity' => 0,
@@ -10806,29 +10803,6 @@ HEREDOC;
 		}
 	}
 
-	/**
-	 * The same reset scenario with the server stopped and started between the reset and the values the reset is read
-	 * from: the windows a reset throws away are stored ones the server loads back at startup, so a reset that only
-	 * emptied the window pool would come back with the restart and close what it had been holding after all - and
-	 * the rule has to go on working across the restart, opening its windows again and closing what they hold.
-	 *
-	 * Unlike the *Restart variants of the trigger scenarios this one is not the same assertion after a fresh start,
-	 * so it is not skipped with them (SKIP_RESTART_TESTS): nothing else in the suite reads what a reset left in the
-	 * database - see runEventAssessmentTestCepWindowReset().
-	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleResetRestart$)
-	 * @depends testPrepareTriggerCEP_LLDDiscovery
-	 */
-	public function testTriggerCEP_CepWindowSimpleResetRestart() {
-		$this->prepareDataCepWindowSimpleResetRestart();
-
-		try {
-			$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_SIMPLE_RESET_RESTART, true);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
-	}
-
 	/* Deletion of a rule - test that the windows of each window type are thrown away with it, and stay away */
 
 	/**
@@ -12415,6 +12389,10 @@ HEREDOC;
 	 * Nothing is open afterwards. The trigger itself is still in problem state (its expression is unchanged),
 	 * so a value matching neither "down" nor "up" is sent at the end to bring it back to OK for the tests
 	 * that follow.
+	 *
+	 * The server is stopped and started between step 1 and step 2 unless the restarts are turned off: everything
+	 * evicted below is then evicted from a window the server loaded back from the database, which has to have come
+	 * back with the event it was holding and with the one place it has - see maybeRestartServerMidScenario().
 	 */
 	private function runEventAssessmentTestCepWindowCapacity(): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
@@ -12441,6 +12419,14 @@ HEREDOC;
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 		$this->waitForOpenProblemCountByTag($all, 'service', $first, 1);
 
+		// 1a. Stop and start the server with the one place of the window taken, unless the restarts are turned off:
+		//     everything below is then evicted from a window the server loaded back from the database, so it has to
+		//     have come back both with the event it was holding and with the one place it has - a window short of
+		//     either would take the values of step 2 instead of evicting them.
+		$this->maybeRestartServerMidScenario();
+
+		$this->waitForOpenProblemCount($all, 1);
+
 		// 2. Every further "down" opens a problem that does not fit into the window and is suppressed and
 		//    closed as it is evicted, so the count returns to the one problem the window holds.
 		$evicted = 0;
@@ -12464,7 +12450,7 @@ HEREDOC;
 
 		// Only the evicted events were suppressed; the one the window held was closed with the window, which
 		// suppresses nothing.
-		$this->waitForSuppressedEventCount($triggerid, ++$evicted);
+		$this->waitForSuppressedEventCount($triggerid, $evicted);
 	}
 
 	/**
@@ -12486,6 +12472,10 @@ HEREDOC;
 	 *
 	 * After the "up" of every id nothing is left open, and closing the last problem of a trigger is what puts
 	 * the trigger itself back to OK, so no recovery value is needed.
+	 *
+	 * The server is stopped and started between step 1 and step 2 unless the restarts are turned off: the window the
+	 * second value of that id does not fit into is then the one the server loaded back from the database, so both what
+	 * it holds and the room left in it have to have come back with it - see maybeRestartServerMidScenario().
 	 */
 	private function runEventAssessmentTestCepWindowCapacityPerService(): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
@@ -12512,6 +12502,14 @@ HEREDOC;
 		$this->waitForOpenProblemCount($all, 1);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 		$this->waitForOpenProblemCountByTag($all, 'service', $first, 1);
+
+		// 1a. Stop and start the server with that one place taken, unless the restarts are turned off: the window the
+		//     second value of the id runs into is then the one the server loaded back from the database, and it has to
+		//     have come back with the event it was holding as well as with the one place it has - a window short of
+		//     either would take that value instead of evicting it, and both problems of the id would stay open.
+		$this->maybeRestartServerMidScenario();
+
+		$this->waitForOpenProblemCount($all, 1);
 
 		// 2. A second value with the same id goes to that same window, which has no place left, so this one
 		//    does not fit: the id ends up with two problem events of which only the first one - the one the
@@ -12777,10 +12775,14 @@ HEREDOC;
 	 * value being verified before the next one goes out, so the duration grows with both. Nothing is waited for on
 	 * it, so it is generous: the rules are deleted once the flavour is done, taking their windows with them, and a
 	 * window that lasts longer than needed costs nothing.
+	 *
+	 * The scenario stops and starts the server in the middle of itself when the restarts are turned on, and the
+	 * windows have to be there when it comes back, so the time that takes is added to the duration as well - see
+	 * getRestartWindowAllowance().
 	 */
 	private static function getCloseWindowDuration(bool $single_service = false): string {
 		return (120 + 30 * count(static::getCloseWindowServices($single_service))
-				* static::getCloseWindowEventCount($single_service)).'s';
+				* static::getCloseWindowEventCount($single_service) + static::getRestartWindowAllowance()).'s';
 	}
 
 	/**
@@ -12795,6 +12797,12 @@ HEREDOC;
 	 *      problems the window held and the "up" problem that ended it;
 	 *   3. the ids whose "up" value has not been sent are untouched: their windows have seen no "up" event, so they
 	 *      are not closed and their problems are still open.
+	 *
+	 * Between step 1 and step 2 the server is stopped and started, unless the restarts are turned off: the windows
+	 * every "up" value below ends are then the ones the server loaded back from the database, holding the problems
+	 * they were given before the shutdown, and steps 2 and 3 have to come out the same either way - a window that came
+	 * back without them would close nothing but its "up" event and leave every "down" problem of its id open. See
+	 * maybeRestartServerMidScenario().
 	 *
 	 * The pattern match flavour is not tied to the value that ends the window: its window is examined once a
 	 * second, so the closing follows the "up" value rather than accompanying it - which is why every step of this
@@ -12963,6 +12971,16 @@ HEREDOC;
 			}
 		}
 
+		// Every window of the rule is full now and none of them has closed anything yet, which is where the restarts
+		// stop and start the server: the "up" values below then end windows the server loaded back from the database,
+		// and every problem those windows have been holding since before the shutdown has to be closed with them just
+		// the same. The restart is left out when the restarts are turned off, and the windows are given room for it
+		// when they are not - see maybeRestartServerMidScenario() and getCloseWindowDuration().
+		$this->maybeRestartServerMidScenario();
+
+		// The restart closes nothing on its way down or up, so what is open going into step 2 is what step 1 left.
+		$this->waitForOpenProblemCount($all, $open);
+
 		// 2. The "up" of an id ends that id's window, and every problem of the id is closed with it. A pattern
 		//    window whose script rejected what it was handed would throw instead of reporting a match, and the
 		//    server keeps that message on the rule, so it is reported here rather than leaving the problems simply
@@ -13058,14 +13076,15 @@ HEREDOC;
 	 * The scenario is the same for every window type: what a window holds is not what tells the types apart, so a
 	 * reset must take it away from all of them alike.
 	 *
-	 * $restart stops and starts the server between step 2 and step 3, which is what makes the reset of that flavour
-	 * more than an emptied window pool: a window and the events in it are rows of cep_window and cep_window_event
-	 * that the server loads back at startup, so a reset that had left them behind would come back with the restart
-	 * and step 4 would find the first "down" problems in a window again - which is exactly what the eventids of step
-	 * 1 catch. Everything after the restart is the scenario unchanged, so passing it also means the rule went on
-	 * working across the stop and start: it opened its windows again and closed what they held.
+	 * Between step 2 and step 3 the server is stopped and started, unless the restarts are turned off - and here what
+	 * has to come back is nothing: a window and the events in it are rows of cep_window and cep_window_event that the
+	 * server loads back at startup, so a reset that had emptied the window pool without emptying those tables would be
+	 * undone by the restart, and step 4 would find the first "down" problems in a window again. That is exactly what
+	 * the eventids of step 1 catch. The rest of the scenario is unchanged either way, so passing it with the restarts
+	 * on also means the rule went on working across a stop and start: it opened its windows again and closed what they
+	 * held - see maybeRestartServerMidScenario().
 	 */
-	private function runEventAssessmentTestCepWindowReset(string $rule_name, bool $restart = false): void {
+	private function runEventAssessmentTestCepWindowReset(string $rule_name): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
 		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
 		$all = [$triggerid];
@@ -13111,21 +13130,16 @@ HEREDOC;
 		$this->resetCepRule($rule_name);
 		$this->waitForCepTasksDrained();
 
+		// 2a. Stop and start the server with the reset behind it: the windows of a rule are stored, and the server
+		//     loads them back with the events they held, so a reset that took them out of the window pool without
+		//     taking them out of the database is a reset the restart undoes. Everything the reset is read from
+		//     happens after this point, so an undone reset shows up exactly as no reset at all would - in step 4.
+		$this->maybeRestartServerMidScenario();
+
 		// A window is discarded by a reset, not closed: the "close" operation of a closing window is not performed
-		// for the events it held, so the problems are exactly as they were.
+		// for the events it held, so the problems are exactly as they were - and neither stopping nor starting the
+		// server closes anything either, whether a window came back holding them or nothing came back at all.
 		$this->waitForOpenProblemCount($all, $open);
-
-		if ($restart) {
-			// 2a. The restart flavour: the windows of a rule are stored, and the server loads them back with the
-			//     events they held when it starts, so a reset that took them out of the window pool without taking
-			//     them out of the database is a reset the restart undoes. Everything the reset is read from happens
-			//     after this point, so an undone reset shows up exactly as no reset at all would - in step 4.
-			$this->maybeRestartServer(true);
-
-			// Coming back up may not change what is open either: a window that returned would be holding these
-			// problems again, but only a closing window closes what it holds and starting the server closes nothing.
-			$this->waitForOpenProblemCount($all, $open);
-		}
 
 		// 3. A second "down" value per id. A reset rule is an empty one, not a broken one, so every id gets a new
 		//    window and the problem of its second "down" is the one that window holds.
@@ -13201,6 +13215,12 @@ HEREDOC;
 	 *
 	 * The scenario is the same for every window type: what a window holds is not what tells the types apart, so
 	 * deleting a rule must take it away from all of them alike.
+	 *
+	 * Between step 2 and step 3 the server is stopped and started, unless the restarts are turned off, and this is
+	 * where "thrown away" becomes "and stay away": the windows of a rule are rows the server loads back at startup, so
+	 * one that was only taken out of the window pool would be there again afterwards - holding the problems of step 1,
+	 * with no rule left to belong to - and step 4 would find them closed after all. See
+	 * maybeRestartServerMidScenario().
 	 */
 	private function runEventAssessmentTestCepWindowDelete(string $rule_name): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
@@ -13256,8 +13276,15 @@ HEREDOC;
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 		$this->waitForCepTasksDrained();
 
+		// 2a. Stop and start the server with the delete behind it, unless the restarts are turned off. The windows of
+		//     a rule are rows of cep_window and cep_window_event that the server loads back at startup, so this is
+		//     what "and stay away" comes to: a window that was only taken out of the window pool would be there again
+		//     afterwards - holding the problems of step 1 - and there is no rule left for it to belong to.
+		$this->maybeRestartServerMidScenario();
+
 		// The windows went away with the rule rather than being closed: the "close" operation of a closing window is
-		// not performed for the events they held, so the problems are exactly as they were.
+		// not performed for the events they held, so the problems are exactly as they were - and nothing about
+		// stopping and starting the server closes a problem either.
 		$this->waitForOpenProblemCount($all, $open);
 
 		// 3. A second "down" value per id. There is no rule left to assess them, so no window takes them and their
@@ -13639,6 +13666,12 @@ HEREDOC;
 	 *
 	 * The scenario then recovers the way the other windowed flavours do: the "up" value closes the window it
 	 * enters and the window closes every event it held, which is every problem the scenario opened.
+	 *
+	 * The server is stopped and started once the first value has opened the window and become the cause of the group,
+	 * unless the restarts are turned off: the two values after it are then ranked by a window the server loaded back
+	 * from the database, and they have to become symptoms of that very cause with the count in its tag carrying on -
+	 * a window that came back knowing nothing of its group would start one of its own, which the re-check after every
+	 * value catches - see maybeRestartServerMidScenario().
 	 */
 	private function runEventAssessmentTestCepWindowCauseSymptom(): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
@@ -13667,6 +13700,19 @@ HEREDOC;
 
 			// The first value only opens the cause; every one after it adds a symptom to it.
 			$this->waitForCepCauseSymptomEvents($triggerid, $open - 1);
+
+			if ($open == 1) {
+				// Stop and start the server with nothing in the window but the cause of the group, unless the
+				// restarts are turned off: everything ranked after this is ranked by a window the server loaded back
+				// from the database, so it has to have come back knowing which event it had made the cause - the
+				// values below must join that group rather than start one of their own, and the count of them the
+				// cause carries in its tag must go on where it left off. The re-check right here is what says the
+				// restart itself ranked and closed nothing.
+				$this->maybeRestartServerMidScenario();
+
+				$this->waitForOpenProblemCount($all, $open);
+				$this->waitForCepCauseSymptomEvents($triggerid, 0);
+			}
 		}
 
 		// The "up" value joins the very same window as one more event and closes it, and the closing window
@@ -15165,6 +15211,52 @@ HEREDOC;
 		}
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
+	}
+
+	/**
+	 * Stop and start the server in the middle of a CEP window scenario, or do nothing at all when the restarts are
+	 * turned off (SKIP_RESTART_TESTS). The scenarios call this where their windows are holding what the rest of them
+	 * acts on, so everything after the call is driven against the windows the server loaded back from the database:
+	 * a window is a row of cep_window and every event in it a row of cep_window_event, and what a scenario asserts
+	 * afterwards is exactly what it asserts without a restart - the events the window still holds close with it, the
+	 * room it has left still limits what fits into it, and the group it had ranked is still the group. A window that
+	 * came back short of any of that fails those steps.
+	 *
+	 * The scenarios that take one and where:
+	 *   - the close window family, between filling every window and the "up" values that end them
+	 *     (runEventAssessmentTestCepWindowCloseWindow());
+	 *   - the capacity family, between filling every window and the values that must no longer fit into one
+	 *     (runEventAssessmentTestCepWindowCapacity() and runEventAssessmentTestCepWindowCapacityPerService());
+	 *   - the cause and symptom flavour, once the cause of the group has been ranked and before the events that must
+	 *     join it (runEventAssessmentTestCepWindowCauseSymptom());
+	 *   - the reset and delete flavours, after the rule was reset or deleted, where what must come back is nothing
+	 *     (runEventAssessmentTestCepWindowReset() and runEventAssessmentTestCepWindowDelete()).
+	 *
+	 * The scenarios that do not, all for the same reason - what they read is a matter of seconds, and a restart is
+	 * seconds long: the operations flavours that wait for an eviction and the capacity discarding one that waits for
+	 * a window to run out (their durations have to stay short enough for the wait that follows), the delete during a
+	 * sleeping script, and the pattern flavours counting the copies of an examination that repeats once a second.
+	 * The windowless scenarios have no window to bring back at all.
+	 */
+	private function maybeRestartServerMidScenario(): void {
+		if (static::SKIP_RESTART_TESTS) {
+			return;
+		}
+
+		// What the windows hold has to be in the database before the server is stopped: the rows of a window are
+		// written by the sync tasks of that window, and an event that had not been stored yet would be missing from
+		// the window that comes back for a reason that is not the restart.
+		$this->waitForCepTasksDrained();
+		$this->maybeRestartServer(true);
+	}
+
+	/**
+	 * The seconds a scenario adds to the duration of its windows to leave room for the restart it takes in the middle
+	 * of itself, or none when the restarts are turned off - see CEP_RESTART_WINDOW_ALLOWANCE and
+	 * maybeRestartServerMidScenario().
+	 */
+	private static function getRestartWindowAllowance(): int {
+		return static::SKIP_RESTART_TESTS ? 0 : static::CEP_RESTART_WINDOW_ALLOWANCE;
 	}
 
 	/**
