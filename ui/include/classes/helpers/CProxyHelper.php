@@ -89,7 +89,9 @@ class CProxyHelper {
 	 */
 	public static function getDefaultAccessHtml(int $mode): array {
 		return [
-			(new CSpan(_('All')))->addClass($mode == PROXY_MODE_ALLOW ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY)
+			$mode == PROXY_MODE_ALLOW
+				? (new CSpan(_('All')))->addClass(ZBX_STYLE_STATUS_GREEN)
+				: (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY)
 		];
 	}
 
@@ -151,16 +153,18 @@ class CProxyHelper {
 		$list = [];
 
 		foreach ($all_by_id as $object_id => $object_name) {
-			$list[] = [
-				'name' => $object_name,
-				'mode' => array_key_exists($object_id, $allowed_lookup) ? PROXY_MODE_ALLOW : PROXY_MODE_DENY
-			];
+			if (array_key_exists($object_id, $allowed_lookup)) {
+				$list[] = [
+					'name' => $object_name,
+					'mode' => PROXY_MODE_ALLOW
+				];
+			}
 		}
 
 		return [
 			'list' => $list,
 			'mode' => PROXY_MODE_DENY,
-			'more' => max(0, $total_objects - CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE))
+			'more' => max(0, count($list) - CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE))
 		];
 	}
 
