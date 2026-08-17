@@ -33,9 +33,6 @@
 ZBX_PTR_VECTOR_LITE_IMPL(cep_window_ptr, zbx_cep_window_t *)
 ZBX_VECTOR_LITE_IMPL(cep_window_sync_entry, zbx_cep_window_sync_entry_t)
 
-static void	cep_window_pool_reset_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window,
-		time_t time_created);
-
 static zbx_hash_t	cep_window_ref_hash(const void *a)
 {
 	const zbx_cep_window_ref_t	*ref = (const zbx_cep_window_ref_t *)a;
@@ -922,12 +919,10 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	/* window was closed - 're-create' it */
 	if (window->time_created + window->duration <= now)
 	{
-		time_t	time_created = window->time_created;
+		while (window->time_created + window->duration <= now)
+			window->time_created += window->duration;
 
-		while (time_created + window->duration <= now)
-			time_created += window->duration;
-
-		cep_window_pool_reset_window(pool, window, time_created);
+		window->flags = CEP_WINDOW_FLAGS_NONE;
 	}
 
 	if (0 != zbx_queue_ptr_values_num(&window->hevents) || 0 != window->access_num)
@@ -1802,16 +1797,6 @@ void	cep_window_pool_get_stats(zbx_cep_window_pool_t *pool, zbx_cep_window_pool_
 	stats->windows_num = pool->windows.num_data;
 	stats->alarms_num = pool->alarm_queue.elems_num;
 	stats->ticks_num = pool->tick_queue.values_num;
-}
-
-static void	cep_window_pool_reset_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window, time_t time_created)
-{
-	window->flags = CEP_WINDOW_FLAGS_NONE;
-	window->windowid = pool->next_windowid++;
-	window->time_created = time_created;
-
-	zbx_vector_cep_window_sync_entry_clear(&window->sync);
-	cep_window_sync_entry_log_create(window);
 }
 
 /******************************************************************************
