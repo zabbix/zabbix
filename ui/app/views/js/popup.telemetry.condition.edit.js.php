@@ -35,13 +35,13 @@ window.telemetry_condition_popup = new class {
 
 		for (const name of ['column', 'operator']) {
 			this.#form.findFieldByName(name).getField()
-				.addEventListener('change', () => this.#updateFieldVisibility());
+				.addEventListener('change', () => this.#update());
 		}
 
-		this.#updateFieldVisibility();
+		this.#update();
 	}
 
-	#updateFieldVisibility() {
+	#update() {
 		const operator_field = this.#form.findFieldByName('operator');
 		const operator_element = operator_field.getField();
 		const is_complex = this.#complex_columns.includes(this.#form.findFieldByName('column').getValue());

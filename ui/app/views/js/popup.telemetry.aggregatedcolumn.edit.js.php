@@ -29,14 +29,14 @@ window.telemetry_aggregated_column_popup = new class {
 		this.#form = new CForm(this.#form_element, rules);
 
 		this.#form.findFieldByName('function').getField()
-			.addEventListener('change', () => this.#updateFieldVisibility());
+			.addEventListener('change', () => this.#update());
 
-		this.#updateFieldVisibility();
+		this.#update();
 
 		this.#form.validateChanges(['column'], true);
 	}
 
-	#updateFieldVisibility() {
+	#update() {
 		const func = this.#form.findFieldByName('function').getValue();
 		const is_count = func === '<?= AGGREGATE_COUNT ?>';
 		const is_percentile = func === '<?= AGGREGATE_PCTILE ?>';
