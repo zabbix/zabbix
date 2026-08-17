@@ -123,7 +123,8 @@ class CControllerProxyUpdate extends CController {
 							PROXY_APM_ATTR_SIGNAL_TYPE_LOGS]
 					]
 				],
-				'when' => [['data_collection_status', 'in' => [PROXY_APM_STATUS_CONFIGURED]]]
+				'when' => [['data_collection_status', 'in' => [PROXY_APM_STATUS_CONFIGURED]]],
+				'messages' => ['uniq' => _('Attribute name and type is not unique.')]
 			],
 			'custom_timeouts' => ['db proxy.custom_timeouts',
 				'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]
