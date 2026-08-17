@@ -1347,30 +1347,6 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'query' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'length' => 65535,
-				'default' => ''
-			],
-			'time_shift' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '15s'
-			],
-			'lookback_limit' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '10m'
-			],
-			'granularity' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '15s'
-			],
 			'discover' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -1400,6 +1376,30 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '0'
+			],
+			'query' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
+			],
+			'time_shift' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '15s'
+			],
+			'lookback_limit' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '10m'
+			],
+			'granularity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '15s'
 			]
 		]
 	],
