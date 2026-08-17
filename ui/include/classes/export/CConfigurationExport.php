@@ -686,15 +686,15 @@ class CConfigurationExport {
 			}
 		}
 
-		$accessible_proxyids = API::Proxy()->get([
+		$accessible_proxies = API::Proxy()->get([
 			'output' => ['name'],
 			'proxyids' => array_keys($proxyids),
 			'preservekeys' => true
 		]);
 
 		foreach ($hosts as &$host) {
-			if ($host['proxyid'] != 0 && array_key_exists($host['proxyid'], $accessible_proxyids)) {
-				$host['proxy'] = ['name' => $accessible_proxyids[$host['proxyid']]['name']];
+			if ($host['proxyid'] != 0 && array_key_exists($host['proxyid'], $accessible_proxies)) {
+				$host['proxy'] = ['name' => $accessible_proxies[$host['proxyid']]['name']];
 			}
 			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
 				$host['proxy'] = [];
@@ -725,15 +725,15 @@ class CConfigurationExport {
 			}
 		}
 
-		$accessible_proxy_groupids = API::ProxyGroup()->get([
+		$accessible_proxy_groups = API::ProxyGroup()->get([
 			'output' => ['name'],
 			'proxy_groupids' => array_keys($proxy_groupids),
 			'preservekeys' => true
 		]);
 
 		foreach ($hosts as &$host) {
-			if ($host['proxy_groupid'] != 0 && array_key_exists($host['proxy_groupid'], $accessible_proxy_groupids)) {
-				$host['proxy_group'] = ['name' => $accessible_proxy_groupids[$host['proxy_groupid']]['name']];
+			if ($host['proxy_groupid'] != 0 && array_key_exists($host['proxy_groupid'], $accessible_proxy_groups)) {
+				$host['proxy_group'] = ['name' => $accessible_proxy_groups[$host['proxy_groupid']]['name']];
 			}
 			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
 				$host['proxy_group'] = [];
