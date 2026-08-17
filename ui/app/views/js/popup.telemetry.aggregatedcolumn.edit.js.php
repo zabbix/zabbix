@@ -21,7 +21,6 @@ window.telemetry_aggregated_column_popup = new class {
 	#dialogue;
 	#form_element;
 	#form;
-	#function;
 
 	init({rules}) {
 		this.#overlay = overlays_stack.end();
@@ -29,8 +28,8 @@ window.telemetry_aggregated_column_popup = new class {
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 		this.#form = new CForm(this.#form_element, rules);
 
-		this.#function = this.#form_element.querySelector('#function');
-		this.#function.addEventListener('change', () => this.#updateFieldVisibility());
+		this.#form.findFieldByName('function').getField()
+			.addEventListener('change', () => this.#updateFieldVisibility());
 
 		this.#updateFieldVisibility();
 
@@ -38,9 +37,9 @@ window.telemetry_aggregated_column_popup = new class {
 	}
 
 	#updateFieldVisibility() {
-		const func = parseInt(this.#function.value, 10);
-		const is_count = func === <?= AGGREGATE_COUNT ?>;
-		const is_percentile = func === <?= AGGREGATE_PCTILE ?>;
+		const func = this.#form.findFieldByName('function').getValue();
+		const is_count = func === '<?= AGGREGATE_COUNT ?>';
+		const is_percentile = func === '<?= AGGREGATE_PCTILE ?>';
 
 		this.#form_element.querySelector('#js-column-field').style.display = is_count ? 'none' : '';
 		this.#form_element.querySelector('#js-column-label').style.display = is_count ? 'none' : '';

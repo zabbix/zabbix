@@ -23,8 +23,6 @@ window.telemetry_condition_popup = new class {
 	#form;
 	#complex_columns;
 	#operators;
-	#column;
-	#operator;
 
 	init({rules, complex_columns, condition_operators}) {
 		this.#overlay = overlays_stack.end();
@@ -34,43 +32,34 @@ window.telemetry_condition_popup = new class {
 
 		this.#complex_columns = complex_columns;
 		this.#operators = condition_operators;
-		this.#column = this.#form_element.querySelector('#column');
-		this.#operator = this.#form_element.querySelectorAll('[name="operator"]');
 
-		this.#column.addEventListener('change', () => this.#updateFieldVisibility());
-		for (const radio of this.#operator) {
-			radio.addEventListener('change', () => this.#updateFieldVisibility());
+		for (const name of ['column', 'operator']) {
+			this.#form.findFieldByName(name).getField()
+				.addEventListener('change', () => this.#updateFieldVisibility());
 		}
 
 		this.#updateFieldVisibility();
 	}
 
 	#updateFieldVisibility() {
-		const is_complex = this.#complex_columns.includes(this.#column.value);
-
+		const operator_field = this.#form.findFieldByName('operator');
+		const operator_element = operator_field.getField();
+		const is_complex = this.#complex_columns.includes(this.#form.findFieldByName('column').getValue());
 		const allowed_operators = is_complex ? this.#operators.complex : this.#operators.simple;
-		let has_checked = false;
 
-		for (const radio of this.#operator) {
-			const hidden = !allowed_operators.includes(parseInt(radio.value, 10));
-
-			radio.closest('li').hidden = hidden;
-
-			if (hidden && radio.checked) {
-				radio.checked = false;
-			}
-
-			has_checked = has_checked || radio.checked;
+		for (const radio of operator_element.querySelectorAll('input[type="radio"]')) {
+			radio.closest('li').hidden = true;
 		}
 
-		if (!has_checked) {
-			[...this.#operator]
-				.find((radio) => parseInt(radio.value, 10) === <?= CONDITION_OPERATOR_EQUAL ?>)
-				.checked = true;
+		for (const operator of allowed_operators) {
+			operator_element.querySelector(`input[value="${operator}"]`).closest('li').hidden = false;
 		}
 
-		const operator = [...this.#operator].find((radio) => radio.checked).value;
-		const is_exists = parseInt(operator, 10) === <?= CONDITION_OPERATOR_EXISTS ?>;
+		if (operator_element.querySelector('input[type="radio"]:checked').closest('li').hidden) {
+			operator_element.querySelector('input[value="<?= CONDITION_OPERATOR_EQUAL ?>"]').checked = true;
+		}
+
+		const is_exists = operator_field.getValue() === '<?= CONDITION_OPERATOR_EXISTS ?>';
 
 		this.#form_element.querySelector('#js-key-field').style.display = is_complex ? '' : 'none';
 		this.#form_element.querySelector('#js-key-label').style.display = is_complex ? '' : 'none';
