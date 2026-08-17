@@ -143,13 +143,14 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 void	cep_window_pool_remove_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
 int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now,
 		zbx_vector_cep_window_ptr_t *windows);
-void	cep_window_pool_reset_rule(zbx_cep_window_pool_t *pool, zbx_uint64_t ruleid);
 void	cep_window_pool_enqueue(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
 void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool);
 
 void	cep_window_pool_get_stats(zbx_cep_window_pool_t *pool, zbx_cep_window_pool_stats_t *stats);
 
 void	cep_window_pool_dump(zbx_cep_window_pool_t *pool);
+
+void	cep_remove_windows_by_rule(zbx_uint64_t ruleid, zbx_vector_mw_task_ptr_t *tasks);
 
 #endif
 

@@ -1468,22 +1468,6 @@ int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now, zbx_vect
 	return windows->values_num;
 }
 
-void	cep_window_pool_reset_rule(zbx_cep_window_pool_t *pool, zbx_uint64_t ruleid)
-{
-	zbx_hashset_iter_t	iter;
-	zbx_cep_window_ref_t	*ref;
-
-	zbx_hashset_iter_reset(&pool->windows, &iter);
-	while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (ref->ruleid == ruleid)
-		{
-			ref->window->location = CEP_LOCATION_REMOVED;
-			zbx_hashset_iter_remove(&iter);
-		}
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: remove all cep windows belonging to a rule from the pool          *
@@ -1832,5 +1816,50 @@ void	cep_window_pool_dump(zbx_cep_window_pool_t *pool)
 	zbx_hashset_iter_reset(&pool->windows, &iter);
 	while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
 		cep_window_ref_dump("  ", ref);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove all cep windows belonging to a specific rule               *
+ *                                                                            *
+ * Parameters: ruleid - [IN] identifier of the rule whose windows are         *
+ *                            removed                                         *
+ *             tasks  - [IN/OUT] created tasks to handle window updates in db *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_remove_windows_by_rule(zbx_uint64_t ruleid, zbx_vector_mw_task_ptr_t *tasks)
+{
+	zbx_cep_window_pool_t		*pool;
+	zbx_hashset_iter_t		iter;
+	zbx_cep_window_ref_t		*ref;
+	zbx_vector_cep_window_ptr_t	windows;
+
+	zbx_vector_cep_window_ptr_create(&windows);
+
+	cep_window_pool_acquire(&pool);
+	zbx_hashset_iter_reset(&pool->windows, &iter);
+	while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (ref->ruleid == ruleid)
+			zbx_vector_cep_window_ptr_append(&windows, cep_window_addref(ref->window));
+	}
+	cep_window_pool_release(&pool);
+
+	for (int i = 0; i < windows.values_num; i++)
+	{
+		cep_window_lock(windows.values[i]);
+		cep_window_pool_acquire(&pool);
+		cep_window_pool_remove_window(pool, windows.values[i]);
+		cep_window_pool_release(&pool);
+
+		cep_window_sync_entry_log_destroy(windows.values[i]);
+		cep_window_sync_entry_submit(windows.values[i], tasks);
+
+		cep_window_unlock(windows.values[i]);
+	}
+
+	for (int i = 0; i < windows.values_num; i++)
+		cep_window_release(windows.values[i]);
+	zbx_vector_cep_window_ptr_destroy(&windows);
 }
 

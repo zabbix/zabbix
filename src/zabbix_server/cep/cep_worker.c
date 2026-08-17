@@ -1022,16 +1022,13 @@ static void	cep_worker_process_task_window(zbx_cep_task_window_t *task, zbx_vect
  *                                                                            *
  * Purpose: process rule reset task                                           *
  *                                                                            *
- * Parameters: task - [IN] rule reset task                                    *
+ * Parameters: task  - [IN] rule reset task                                   *
+ *             tasks - [OUT] new tasks to be queued                           *
  *                                                                            *
  ******************************************************************************/
-static void	cep_worker_process_task_rule_reset(zbx_cep_task_rule_reset_t *task)
+static void	cep_worker_process_task_rule_reset(zbx_cep_task_rule_reset_t *task, zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_cep_window_pool_t	*pool;
-
-	cep_window_pool_acquire(&pool);
-	cep_window_pool_reset_rule(pool, task->ruleid);
-	cep_window_pool_release(&pool);
+	cep_remove_windows_by_rule(task->ruleid, tasks);
 }
 
 static void	cep_worker_expect_events(zbx_vector_mw_task_ptr_t *tasks)
@@ -1124,7 +1121,7 @@ void	*cep_worker_entry(void *args)
 					cep_worker_expect_events(&tasks);
 					break;
 				case CEP_TASK_RULE_RESET:
-					cep_worker_process_task_rule_reset((zbx_cep_task_rule_reset_t *)task);
+					cep_worker_process_task_rule_reset((zbx_cep_task_rule_reset_t *)task, &tasks);
 					break;
 				case CEP_TASK_SYNC_EVENT:
 				case CEP_TASK_ACKNOWLEDGE:
