@@ -31,12 +31,12 @@
 #include "mocks/valuecache/valuecache_mock.h"
 #include "../../../src/libs/zbxtrends/trends.h"
 
-/* DEV-4972: nodata() on a proxied item in lazy mode also consults the proxy's suppression window        */
+/* nodata() on a proxied item in lazy mode also consults the proxy's suppression window                  */
 /* (zbx_dc_get_proxy_nodata_win) and the history cache tail state (zbx_hc_is_itemid_cached_and_normal(), */
 /* fixed in cachehistory.c) to decide whether it might still be waiting on data still in transit from    */
 /* the proxy. zbx_dc_get_proxy_nodata_win() is wrapped (there is no lightweight way to fake a proxy's    */
 /* real DC config cache state here), but zbx_hc_is_itemid_cached_and_normal() itself is NOT wrapped -    */
-/* instead a real, minimal history cache is initialised (zbx_init_database_cache()) and a real tail      */
+/* instead a real, minimal history cache is initialized (zbx_init_database_cache()) and a real tail      */
 /* record is pushed into it through the actual production write path (zbx_dc_add_history_variant() +     */
 /* zbx_dc_flush_history()), so evaluate_NODATA() ends up calling the real, unmodified fixed function.    */
 /* zbx_hashset_search() itself is deliberately left unwrapped for this reason too - wrapping it would    */
@@ -57,7 +57,7 @@ static int	get_optional_parameter_int(const char *path, int default_value)
 	return atoi(value);
 }
 
-/* mirrors zbx_mock_str_to_value_type()'s pattern (tests/zbxmockutil.c) so item state reads as a name */
+/* Mirrors zbx_mock_str_to_value_type()'s pattern (tests/zbxmockutil.c) so item state reads as a name */
 /* in the yaml (e.g. "ITEM_STATE_NOTSUPPORTED") instead of an opaque 0/1 integer.                     */
 static unsigned char	str_to_item_state(const char *str)
 {
@@ -82,9 +82,10 @@ static unsigned char	get_optional_item_state(const char *path, unsigned char def
 	return str_to_item_state(value);
 }
 
-/* reads a yaml sequence of flag names (e.g. "[ZBX_PROXY_SUPPRESS_ACTIVE, ZBX_PROXY_SUPPRESS_MORE]") */
-/* and ORs them together via name_to_bit, so multi-bit fields read as names instead of an opaque     */
-/* combined integer. An absent key or an empty list both mean "no flags set".                        */
+/* Reads a yaml sequence of flag names (e.g. "[ZBX_PROXY_SUPPRESS_ACTIVE, ZBX_PROXY_SUPPRESS_MORE]") */
+/* and ORs them together via a function passed in 'name_to_bit' argument, so multi-bit fields read   */
+/* as names instead of an opaque combined integer. An absent key or an empty list both mean          */
+/* "no flags set".                                                                                   */
 static unsigned char	get_optional_flag_list(const char *path, unsigned char (*name_to_bit)(const char *))
 {
 	zbx_mock_handle_t	handle, element;
@@ -167,8 +168,8 @@ static void	zbx_dummy_history_sync(int *values_num, int *triggers_num, const zbx
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initializes a minimal, real history cache so that the fixed      *
- *          zbx_hc_is_itemid_cached_and_normal() can be exercised unwrapped  *
+ * Purpose: Initializes a minimal, real history cache so that the fixed       *
+ *          zbx_hc_is_itemid_cached_and_normal() can be exercised unwrapped.  *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_vcmock_ensure_history_cache(void)
@@ -176,18 +177,18 @@ static void	zbx_vcmock_ensure_history_cache(void)
 	char		*error = NULL;
 	zbx_uint64_t	trends_cache_size = 0;
 
-	if (SUCCEED != zbx_init_database_cache(get_program_type, zbx_dummy_history_sync, 1024 * 1024, 1024 * 1024,
+	if (SUCCEED != zbx_init_database_cache(get_program_type, zbx_dummy_history_sync, ZBX_MEBIBYTE, ZBX_MEBIBYTE,
 			&trends_cache_size, &error))
 	{
-		fail_msg("Cannot initialise history cache: %s", ZBX_NULL2EMPTY_STR(error));
+		fail_msg("Cannot initialize history cache: %s", ZBX_NULL2EMPTY_STR(error));
 	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: pushes a history cache tail record for itemid through the        *
- *          production write path (zbx_dc_add_history_variant() +           *
- *          zbx_dc_flush_history())                                         *
+ * Purpose: Pushes a history cache tail record for itemid through the         *
+ *          production write path (zbx_dc_add_history_variant() +             *
+ *          zbx_dc_flush_history()).                                          *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_vcmock_push_history_tail(zbx_uint64_t itemid, unsigned char value_type, zbx_timespec_t ts,
@@ -226,10 +227,10 @@ int	__wrap_zbx_dc_get_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t
 	return SUCCEED;
 }
 
-/* zbx_dc_flush_history()'s VPS (values-per-second licensing) accounting step reads the separate DC    */
+/* zbx_dc_flush_history()'s VPS (values-per-second) accounting step reads the separate DC              */
 /* config cache singleton (get_dc_config()), which a lightweight history-cache-only test has no        */
 /* reason to bootstrap - it is pure telemetry, not part of the nodata()/is_itemid_cached_and_normal()  */
-/* decision logic under test here, so it is stubbed out rather than initialising a second subsystem.   */
+/* decision logic under test here, so it is stubbed out rather than initializing a second subsystem.   */
 void	__wrap_zbx_vps_monitor_add_collected(zbx_uint64_t values_num)
 {
 	ZBX_UNUSED(values_num);
@@ -237,8 +238,8 @@ void	__wrap_zbx_vps_monitor_add_collected(zbx_uint64_t values_num)
 
 /* evalfunc.c is linked as a single translation unit, so the symbols referenced by the other function */
 /* evaluators it contains (baseline/trend/macro substitution) must resolve even though this suite     */
-/* only ever exercises evaluate_NODATA() at runtime - stub them out rather than pulling in those       */
-/* subsystems for real.                                                                               */
+/* only ever exercises evaluate_NODATA() at runtime - stub them out rather than pulling in those      */
+/* subsystems for real (returns FAIL, since none of this suite's cases exercise these paths).         */
 int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time_t now, const char *period,
 		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values,
 		zbx_vector_uint64_t *index, char **error);
@@ -266,13 +267,13 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *
 	ZBX_UNUSED(dc_item);
 	ZBX_UNUSED(alert);
 	ZBX_UNUSED(ack);
+	ZBX_UNUSED(service_alarm);
+	ZBX_UNUSED(service);
 	ZBX_UNUSED(tz);
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(macro_type);
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
-	ZBX_UNUSED(service_alarm);
-	ZBX_UNUSED(service);
 
 	return SUCCEED;
 }
@@ -281,6 +282,7 @@ int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
 {
 	ZBX_UNUSED(itemid);
 	*seconds = zbx_vcmock_get_ts().sec - 600;
+
 	return SUCCEED;
 }
 
@@ -294,12 +296,10 @@ int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time
 	ZBX_UNUSED(period);
 	ZBX_UNUSED(season_num);
 	ZBX_UNUSED(season_unit);
-	ZBX_UNUSED(error);
 	ZBX_UNUSED(skip);
 	ZBX_UNUSED(baseline_get_data_values);
 	ZBX_UNUSED(baseline_get_data_index);
-
-	fail_msg("baseline() is out of scope for the nodata()-proxied test suite");
+	ZBX_UNUSED(error);
 
 	return FAIL;
 }
@@ -352,8 +352,8 @@ void	zbx_mock_test_entry(void **state)
 	{
 		unsigned char	tail_flags;
 
-		/* the real zbx_hc_is_itemid_cached_and_normal() always dereferences the history cache */
-		/* singleton, so it must exist even for the "nothing cached for this item" scenario     */
+		/* The real zbx_hc_is_itemid_cached_and_normal() always dereferences the history cache */
+		/* singleton, so it must exist even for the "nothing cached for this item" scenario.   */
 		zbx_vcmock_ensure_history_cache();
 
 		if (0 != get_optional_parameter_int("in.tail_exists", 0))
@@ -390,7 +390,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == expected_ret)
 	{
-		const char		*expected_value;
+		const char	*expected_value;
 
 		handle = zbx_mock_get_parameter_handle("out.value");
 
@@ -406,6 +406,7 @@ void	zbx_mock_test_entry(void **state)
 
 		zbx_mock_assert_double_eq("function result", atof(expected_value), returned_value.data.dbl);
 	}
+
 	if (SUCCEED == returned_ret)
 		zbx_variant_clear(&returned_value);
 

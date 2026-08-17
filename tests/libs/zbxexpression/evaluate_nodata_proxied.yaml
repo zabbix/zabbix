@@ -1,5 +1,5 @@
 ---
-test case: DEV-4972 - proxied nodata(5m) no longer sticks forever on a metadata-only (NOVALUE) cached tail (covers log entries with metadata but no value, and preprocessing discarding the value)
+test case: proxied nodata(5m) no longer sticks forever on a metadata-only (NOVALUE) cached tail (covers log entries with metadata but no value, and preprocessing discarding the value)
 in:
   history:
   - itemid: 1
@@ -8,7 +8,6 @@ in:
     - value: 1
       ts: 2017-01-10 09:00:00.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -21,7 +20,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: DEV-4972 - proxied nodata(5m) no longer sticks forever on a stale real-value tail from before the window
+test case: proxied nodata(5m) no longer sticks forever on a stale real-value tail from before the window
 in:
   history:
   - itemid: 1
@@ -30,7 +29,6 @@ in:
     - value: 1
       ts: 2017-01-10 09:00:00.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -43,7 +41,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=no_tail offset=0
+test case: proxy+lazy period=5m flags=0 tail=no_tail offset=0
 in:
   history:
   - itemid: 1
@@ -52,7 +50,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -65,7 +62,28 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=unsupported_fresh offset=0
+test case: proxy+lazy period=5m flags=0 tail=no_tail history=boundary_exact (stale history value as late as possible, exactly period seconds before "time")
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2020-06-15 11:55:00.000000000 +00:00
+  time: 2020-06-15 12:00:00.000000000 +00:00
+  params: '5m'
+  proxyid: 1
+  proxy_flags: []
+  proxy_lastaccess_age: 0
+  tail_exists: 0
+  tail_state: ITEM_STATE_NORMAL
+  tail_flags: []
+  tail_ts_offset: 0
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: proxy+lazy period=5m flags=0 tail=unsupported_fresh offset=0
 in:
   history:
   - itemid: 1
@@ -74,7 +92,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -87,7 +104,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=unsupported_stale offset=400
+test case: proxy+lazy period=5m flags=0 tail=unsupported_stale offset=400
 in:
   history:
   - itemid: 1
@@ -96,7 +113,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -109,7 +125,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=novalue_fresh offset=0
+test case: proxy+lazy period=5m flags=0 tail=novalue_fresh offset=0
 in:
   history:
   - itemid: 1
@@ -118,7 +134,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -131,7 +146,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=novalue_boundary offset=300
+test case: proxy+lazy period=5m flags=0 tail=novalue_boundary offset=300
 in:
   history:
   - itemid: 1
@@ -140,7 +155,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -153,7 +167,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=novalue_stale offset=400
+test case: proxy+lazy period=5m flags=0 tail=novalue_stale offset=400
 in:
   history:
   - itemid: 1
@@ -162,7 +176,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -175,7 +188,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=realvalue_fresh offset=0
+test case: proxy+lazy period=5m flags=0 tail=realvalue_fresh offset=0
 in:
   history:
   - itemid: 1
@@ -184,7 +197,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -197,7 +209,7 @@ out:
   return: FAIL
   error: 'historical data transfer from proxy is still in progress'
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=realvalue_boundary_exact offset=300
+test case: proxy+lazy period=5m flags=0 tail=realvalue_boundary_exact offset=300
 in:
   history:
   - itemid: 1
@@ -206,7 +218,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -219,7 +230,7 @@ out:
   return: FAIL
   error: 'historical data transfer from proxy is still in progress'
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=realvalue_boundary_in1 offset=299
+test case: proxy+lazy period=5m flags=0 tail=realvalue_boundary_in1 offset=299
 in:
   history:
   - itemid: 1
@@ -228,7 +239,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -241,7 +251,7 @@ out:
   return: FAIL
   error: 'historical data transfer from proxy is still in progress'
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=realvalue_boundary_out1 offset=301
+test case: proxy+lazy period=5m flags=0 tail=realvalue_boundary_out1 offset=301
 in:
   history:
   - itemid: 1
@@ -250,7 +260,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -263,7 +272,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=realvalue_far_stale offset=3000
+test case: proxy+lazy period=5m flags=0 tail=realvalue_far_stale offset=3000
 in:
   history:
   - itemid: 1
@@ -272,7 +281,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -285,7 +293,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: matrix - proxy+lazy period=5m flags=0 tail=realvalue_future offset=-60
+test case: proxy+lazy period=5m flags=0 tail=realvalue_future offset=-60
 in:
   history:
   - itemid: 1
@@ -294,7 +302,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -307,7 +314,7 @@ out:
   return: FAIL
   error: 'historical data transfer from proxy is still in progress'
 ---
-test case: matrix - lastaccess_ext period=5m age=60 flags=0 boundary=exact offset=360
+test case: lastaccess_ext period=5m age=60 flags=0 boundary=exact offset=360
 in:
   history:
   - itemid: 1
@@ -316,7 +323,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -329,7 +335,7 @@ out:
   return: FAIL
   error: 'historical data transfer from proxy is still in progress'
 ---
-test case: matrix - lastaccess_ext period=5m age=60 flags=0 boundary=just_outside offset=361
+test case: lastaccess_ext period=5m age=60 flags=0 boundary=just_outside offset=361
 in:
   history:
   - itemid: 1
@@ -338,7 +344,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: []
@@ -351,7 +356,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: matrix - param validation params='0'
+test case: param validation params='0'
 in:
   history:
   - itemid: 1
@@ -360,7 +365,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '0'
   proxyid: 0
   proxy_flags: []
@@ -373,7 +377,7 @@ out:
   return: FAIL
   error: 'invalid second parameter'
 ---
-test case: matrix - param validation params='abc'
+test case: param validation params='abc'
 in:
   history:
   - itemid: 1
@@ -382,7 +386,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: 'abc'
   proxyid: 0
   proxy_flags: []
@@ -395,7 +398,7 @@ out:
   return: FAIL
   error: 'invalid second parameter'
 ---
-test case: matrix - early-exit - recent value in window short-circuits suppression
+test case: early-exit - recent value in window short-circuits suppression
 in:
   history:
   - itemid: 1
@@ -406,7 +409,6 @@ in:
     - value: 2
       ts: 2020-06-15 12:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '5m'
   proxyid: 1
   proxy_flags: [ZBX_PROXY_SUPPRESS_ACTIVE]
@@ -419,7 +421,7 @@ out:
   return: SUCCEED
   value: 0
 ---
-test case: matrix - early-exit - not enough data since item creation
+test case: early-exit - not enough data since item creation
 in:
   history:
   - itemid: 1
@@ -428,7 +430,6 @@ in:
     - value: 1
       ts: 2000-01-01 00:00:00.000000000 +00:00
   time: 2020-06-15 12:00:00.000000000 +00:00
-  function: nodata
   params: '601'
   proxyid: 0
   proxy_flags: []
