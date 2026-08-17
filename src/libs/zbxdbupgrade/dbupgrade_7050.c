@@ -1287,7 +1287,6 @@ static int	DBpatch_7050102(void)
 	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_2", "proxy_groupid", 0);
 }
 
-
 #endif
 
 DBPATCH_START(7050)

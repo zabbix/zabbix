@@ -54,7 +54,7 @@ class CProxyHelper {
 	 * Builds HTML badges for Proxy Allow List for the specified user.
 	 *
 	 * @param array $all_proxies  All proxues not assigned to a proxy group.
-	 * @param array $user_groups  User groups the corrent user belongs to.
+	 * @param array $user_groups  User groups the current user belongs to.
 	 *
 	 * @return array
 	 */
@@ -68,7 +68,7 @@ class CProxyHelper {
 	 * Builds HTML badges for Proxy Group Allow List for the specified user.
 	 *
 	 * @param array $all_proxy_groups  All proxy groups.
-	 * @param array $user_groups       User groups the corrent user belongs to.
+	 * @param array $user_groups       User groups the current user belongs to.
 	 *
 	 * @return array
 	 */
