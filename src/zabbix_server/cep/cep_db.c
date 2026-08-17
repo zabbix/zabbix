@@ -1811,15 +1811,15 @@ static int	cep_db_sync_window_create(zbx_dbconn_t *db, zbx_db_insert_t *db_inser
 }
 
 static void	cep_db_window_sync_event_add(zbx_dbconn_t *db, zbx_db_insert_t *db_insert_group_event,
-		zbx_uint64_t windowid, zbx_uint64_t eventid)
+		zbx_uint64_t windowid, zbx_uint64_t eventid, zbx_uint64_t index)
 {
 	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_group_event))
 	{
 		zbx_dbconn_prepare_insert(db, db_insert_group_event, "cep_window_event", "cep_windowid", "eventid",
-				NULL);
+				"event_index", NULL);
 	}
 
-	zbx_db_insert_add_values(db_insert_group_event, windowid, eventid);
+	zbx_db_insert_add_values(db_insert_group_event, windowid, eventid, index);
 }
 
 static void	cep_db_sync_window(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
@@ -1852,7 +1852,7 @@ static void	cep_db_sync_window(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, 
 				if (entry->eventid != last_eventid)
 				{
 					cep_db_window_sync_event_add(db, db_insert_group_event, sync->window->windowid,
-							entry->eventid);
+							entry->eventid, entry->index);
 				}
 				break;
 

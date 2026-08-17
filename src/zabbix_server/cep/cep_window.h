@@ -47,6 +47,7 @@ typedef struct
 {
 	zbx_cep_window_sync_type_t	type;
 	zbx_uint64_t			eventid;
+	zbx_uint64_t			index;
 }
 zbx_cep_window_sync_entry_t;
 
@@ -70,6 +71,9 @@ typedef struct
 	time_t			time_created;
 	zbx_queue_ptr_t		hevents;
 	unsigned char		flags;
+
+
+	zbx_uint64_t		next_index;
 
 	char			*js_script;
 	char			*js_code;
