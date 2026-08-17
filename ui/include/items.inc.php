@@ -2284,7 +2284,7 @@ function getTypeItemFieldNames(array $input): array {
 		case ITEM_TYPE_TELEMETRY_QUERY:
 			return $input['templateid'] == 0
 				? ['query', 'time_shift', 'lookback_limit', 'granularity', 'timeout', 'delay']
-				: ['delay'];
+				: ['time_shift', 'lookback_limit', 'granularity', 'delay'];
 
 		case ITEM_TYPE_NESTED:
 			return [];

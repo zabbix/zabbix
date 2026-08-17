@@ -889,7 +889,7 @@ $formgrid
 	->addItem([
 		(new CLabel(_('Time shift'), 'time_shift'))->setAsteriskMark()->setId('js-item-time-shift-label'),
 		(new CFormField(
-			(new CTextBox('time_shift', $item['time_shift'], $readonly))
+			(new CTextBox('time_shift', $item['time_shift'], $item['discovered']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		))->setId('js-item-time-shift-field')
@@ -905,7 +905,7 @@ $formgrid
 				->addStyle('display: none;')
 		], 'lookback_limit'))->setAsteriskMark()->setId('js-item-lookback-limit-label'),
 		(new CFormField(
-			(new CTextBox('lookback_limit', $item['lookback_limit'], $readonly))
+			(new CTextBox('lookback_limit', $item['lookback_limit'], $item['discovered']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		))->setId('js-item-lookback-limit-field')
@@ -918,7 +918,7 @@ $formgrid
 				->addStyle('display: none;')
 		], 'granularity'))->setAsteriskMark()->setId('js-item-granularity-label'),
 		(new CFormField(
-			(new CTextBox('granularity', $item['granularity'], $readonly))
+			(new CTextBox('granularity', $item['granularity'], $item['discovered']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		))->setId('js-item-granularity-field')
