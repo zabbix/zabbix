@@ -41,7 +41,7 @@
 				->setAttribute('placeholder', 'A or (B and C) ...')
 		]))->addClass(ZBX_STYLE_CELL)
 	]))
-	->addItem(new CLabel(_('Conditions'), 'ceprule-filter-conditions-add'))
+	->addItem(new CLabel(_('Conditions')))
 	->addItem((new CFormField())
 		->addItem((new CDiv())
 			->setAttribute('data-field-type', 'set')
@@ -58,7 +58,6 @@
 				->addItem((new CTag('tfoot', true))
 					->addItem((new CCol(
 						(new CButtonLink(_('Add')))->addClass('js-condition-add')
-							->setId('ceprule-filter-conditions-add')
 					))->setColSpan(4))
 				)
 			)
