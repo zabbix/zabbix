@@ -1861,13 +1861,18 @@ static void	cep_db_sync_window(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, 
 
 	if (0 != eventids.values_num)
 	{
+		char	*query = NULL;
+		size_t	query_alloc = 0, query_offset = 0;
+
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from cep_window_event where cep_windowid="
-				ZBX_FS_UI64 " and", sync->window->windowid);
-		zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, "eventid", eventids.values, eventids.values_num);
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+		zbx_snprintf_alloc(&query, &query_alloc, &query_offset, "delete from cep_window_event"
+				" where cep_windowid=" ZBX_FS_UI64 " and", sync->window->windowid);
+
+		zbx_dbconn_prepare_multiple_query(db, query, "eventid", &eventids, sql, sql_alloc, sql_offset);
+
+		zbx_free(query);
 	}
 
 	zbx_vector_uint64_destroy(&eventids);
@@ -1929,13 +1934,11 @@ void	cep_db_sync_windows(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 			zbx_vector_uint64_sort(&delete_windowids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_vector_uint64_uniq(&delete_windowids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from cep_window_event where");
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "cep_windowid",
-					delete_windowids.values, delete_windowids.values_num);
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\ndelete from cep_window where");
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "cep_windowid",
-					delete_windowids.values, delete_windowids.values_num);
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			zbx_dbconn_prepare_multiple_query(db, "delete from cep_window_event where", "cep_windowid",
+					&delete_windowids, &sql, &sql_alloc, &sql_offset);
+
+			zbx_dbconn_prepare_multiple_query(db, "delete from cep_window where", "cep_windowid",
+					&delete_windowids, &sql, &sql_alloc, &sql_offset);
 		}
 
 		zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
