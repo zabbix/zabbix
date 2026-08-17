@@ -26,14 +26,14 @@ window.telemetry_condition_popup = new class {
 	#column;
 	#operator;
 
-	init({rules}) {
+	init({rules, complex_columns, condition_operators}) {
 		this.#overlay = overlays_stack.end();
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 		this.#form = new CForm(this.#form_element, rules);
 
-		this.#complex_columns = <?= json_encode(CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME) ?>;
-		this.#operators = <?= json_encode(CTelemetryHelper::getConditionOperators()) ?>;
+		this.#complex_columns = complex_columns;
+		this.#operators = condition_operators;
 		this.#column = this.#form_element.querySelector('#column');
 		this.#operator = this.#form_element.querySelectorAll('[name="operator"]');
 

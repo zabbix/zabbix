@@ -115,6 +115,8 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 			$data['metric_point_type']
 		);
 		$data['operators'] = CTelemetryHelper::getOperatorLabels();
+		$data['complex_columns'] = CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME;
+		$data['condition_operators'] = CTelemetryHelper::getConditionOperators();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

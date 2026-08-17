@@ -79,7 +79,9 @@ $output = [
 	'header' => _('New condition'),
 	'script_inline' => getPagePostJs().$this->readJsFile('popup.telemetry.condition.edit.js.php').
 		'telemetry_condition_popup.init('.json_encode([
-			'rules' => $data['js_validation_rules']
+			'rules' => $data['js_validation_rules'],
+			'complex_columns' => $data['complex_columns'],
+			'condition_operators' => $data['condition_operators']
 		]).');',
 	'body' => $form->toString(),
 	'buttons' => [

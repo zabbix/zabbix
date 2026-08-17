@@ -32,7 +32,6 @@ const ITEM_TYPE_SNMP = <?= ITEM_TYPE_SNMP ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
 const ITEM_TYPE_TELEMETRY_QUERY = <?= ITEM_TYPE_TELEMETRY_QUERY ?>;
-const APM_SIGNAL_TYPE_METRICS = <?= CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS ?>;
 const CONDITION_EVAL_TYPE_EXPRESSION = <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
 const ZBX_PROPERTY_OWN = <?= ZBX_PROPERTY_OWN ?>;
@@ -50,12 +49,13 @@ window.item_edit_form = new class {
 		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly,
 		testable_item_types, type_with_key_select, value_type_keys, source, return_url, history_override,
 		history_override_hint_html, storage_value_types, telemetry_columns_config, telemetry_function_labels,
-		telemetry_operator_labels
+		telemetry_operator_labels, telemetry_signal_type_metrics
 	}) {
 		this.actions = actions;
 		this.telemetry_columns_config = telemetry_columns_config;
 		this.telemetry_function_labels = telemetry_function_labels;
 		this.telemetry_operator_labels = telemetry_operator_labels;
+		this.telemetry_signal_type_metrics = telemetry_signal_type_metrics;
 		this.form_data = form_data;
 		this.form_readonly = readonly;
 		this.host = host;
@@ -594,7 +594,7 @@ window.item_edit_form = new class {
 
 	#getTelemetryColumns() {
 		const signal_type = parseInt(this.field.signal_type.value, 10);
-		if (signal_type === APM_SIGNAL_TYPE_METRICS) {
+		if (signal_type === this.telemetry_signal_type_metrics) {
 			const metric_point_type = parseInt([...this.field.metric_point_type]
 				.find((radio) => radio.checked).value, 10);
 
@@ -809,7 +809,7 @@ window.item_edit_form = new class {
 			return;
 		}
 
-		const is_metrics = parseInt(this.field.signal_type.value, 10) === APM_SIGNAL_TYPE_METRICS;
+		const is_metrics = parseInt(this.field.signal_type.value, 10) === this.telemetry_signal_type_metrics;
 		const switcher = globalAllObjForViewSwitcher['type'];
 
 		// "Metric points" is shown only for "Metrics".
