@@ -700,6 +700,9 @@ class CConfigurationExport {
 				$host['proxy'] = [];
 				$host['monitored_by'] = ZBX_MONITORED_BY_SERVER;
 			}
+			else {
+				$host['proxy'] = [];
+			}
 		}
 		unset($host);
 
@@ -735,6 +738,9 @@ class CConfigurationExport {
 			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
 				$host['proxy_group'] = [];
 				$host['monitored_by'] = ZBX_MONITORED_BY_SERVER;
+			}
+			else {
+				$host['proxy_group'] = [];
 			}
 		}
 		unset($host);
