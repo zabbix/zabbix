@@ -1468,7 +1468,7 @@ static int	connector_match_value_type(const zbx_vector_connector_filter_t *conne
  *           Does not perform macro expansion or allocation.                  *
  *                                                                            *
  ******************************************************************************/
-static void	connector_match_resolved_tags(const zbx_vector_connector_filter_t *connector_filters,
+static void	connector_match_filters(const zbx_vector_connector_filter_t *connector_filters,
 		const zbx_vector_tags_ptr_t *resolved_tags, const zbx_history_sync_item_t *item,
 		zbx_vector_uint64_t *matching_ids)
 {
@@ -1545,7 +1545,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 		resolve_item_tags(&item_info->item_tags, um_handle, &item->host.hostid, &resolved_tags);
 
 		if (0 != connector_filters->values_num)
-			connector_match_resolved_tags(connector_filters, &resolved_tags, item, &connector_object.ids);
+			connector_match_filters(connector_filters, &resolved_tags, item, &connector_object.ids);
 
 		if (0 == connector_object.ids.values_num &&
 				(FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == h->value_type))
