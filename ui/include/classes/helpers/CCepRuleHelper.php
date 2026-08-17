@@ -209,7 +209,6 @@ class CCepRuleHelper {
 			self::OP_CLOSE_WINDOW
 		],
 		self::WHEN_WINDOW_CLOSED => [
-			self::OP_SET_NAME,
 			self::OP_CLOSE_EVENT,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,

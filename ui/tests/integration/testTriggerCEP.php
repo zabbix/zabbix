@@ -372,6 +372,17 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_RULE_WINDOW_TAG_RESET = self::CEP_RULE_NAME_PREFIX.'window tag reset';
 	const CEP_RULE_WINDOW_CAUSE_RESET = self::CEP_RULE_NAME_PREFIX.'window cause reset';
 	const CEP_RULE_WINDOW_PATTERN_RESET = self::CEP_RULE_NAME_PREFIX.'window pattern reset';
+	// The reset scenario is additionally run with the server restarted between the reset and everything the reset is
+	// read from: the windows of a rule are stored ones (cep_window and cep_window_event) that the server loads back
+	// at startup, so only a restart tells a reset that emptied the pool from a reset that emptied the store as well -
+	// see runEventAssessmentTestCepWindowReset(). One window type is enough for that, the store being the same for
+	// all of them, and it is the simple one.
+	const CEP_RULE_WINDOW_SIMPLE_RESET_RESTART = self::CEP_RULE_NAME_PREFIX.'window simple reset restart';
+	// The windows of that flavour have to be alive on both sides of the stop and start, so they are given a duration
+	// outlasting the whole scenario instead of the three seconds the reset flavours above run with - a restart takes
+	// longer than that, and a window whose duration ran out during it would be gone for a reason the scenario is not
+	// about.
+	const CEP_RULE_WINDOW_RESET_RESTART_DURATION = '30s';
 	// The delete scenario is run over the same rule of every window type, differing only in how the rule is taken
 	// away: deleting it must do to its windows what resetting it does, and it additionally takes the rule itself, so
 	// nothing opens a window again and what those windows held is the last thing the rule ever holds - see
@@ -3570,6 +3581,17 @@ HEREDOC;
 	}
 
 	/**
+	 * Prepare the flavour of the reset scenario the server is restarted in the middle of: the same simple window rule,
+	 * with a window duration that outlasts the whole scenario so the stop and start cannot be what its windows are
+	 * gone by - see prepareDataCepWindowHeldProblemsOperations() and runEventAssessmentTestCepWindowReset().
+	 */
+	public function prepareDataCepWindowSimpleResetRestart() {
+		return $this->prepareDataCepWindowHeldProblemsOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_RESET_RESTART, null, self::CEP_RULE_WINDOW_RESET_RESTART_DURATION
+		);
+	}
+
+	/**
 	 * Prepare the simple window flavour of the delete scenario, see prepareDataCepWindowHeldProblemsOperations().
 	 */
 	public function prepareDataCepWindowSimpleDelete() {
@@ -4050,14 +4072,16 @@ HEREDOC;
 	 *   - WHEN_EVENT_EVICTED, once the window duration has run out and the event is evicted from it. A cause and
 	 *     symptom window has no such point - the duration running out closes that window instead of evicting what
 	 *     it holds (see cep_window_causal_process()) - so it is the one window type this flavour is not run for;
-	 *   - WHEN_WINDOW_CLOSED, reached through a "close window" operation added below.
+	 *   - WHEN_WINDOW_CLOSED, reached through a "close window" operation added below. The "set name" operation is
+	 *     the one the server does not allow at this point, so this flavour runs every operation of the set except
+	 *     that one and its events keep the name their trigger gave them.
 	 *
 	 * The macros of the operations are what make the later two points more than the same coverage twice: an
 	 * operation resolves its event name and its tag names and values against the event it acts on, and an event
 	 * leaving a window is no longer the event that was just assessed - the server has to build its context from the
 	 * event the window was holding. Whether a macro can be resolved that late is therefore what these flavours read,
-	 * expression macro (which only the name accepts) and event macros included, see getWindowNoneEventOperationCase()
-	 * and getWindowNoneTagOperationCases().
+	 * event macros included, and the expression macro (which only the name accepts) as far as the name operation is
+	 * performed at all, see getWindowNoneEventOperationCase() and getWindowNoneTagOperationCases().
 	 */
 	private function prepareDataCepWindowOperations(int $window_type, string $name_infix,
 			int $execute_when = CCepRuleHelper::WHEN_EVENT_OCCURRED) {
@@ -4083,11 +4107,20 @@ HEREDOC;
 		// Both operation sets in one rule: with a window there is no second rule to run them from. When they run
 		// is $execute_when - the moment the event occurs, once the window duration has run out and the event is
 		// evicted from it, or as the window that holds the event closes.
+		$event_operations = $this->getWindowNoneEventOperationCase()['operations'];
+
+		if ($execute_when == CCepRuleHelper::WHEN_WINDOW_CLOSED) {
+			// "set name" is the one operation of the set the server does not allow at the window closed
+			// execution point (see CEP_OP_SET_NAME_MASK), so the flavour leaves it out and the events keep the
+			// name their trigger gave them - see runEventAssessmentTestCepWindowLateOperations(), which expects
+			// that name from this flavour and the rewritten one from every other.
+			$event_operations = array_values(array_filter($event_operations,
+				fn($operation) => $operation[0] != CCepRuleHelper::OP_SET_NAME
+			));
+		}
+
 		$operations = $this->buildWindowNoneOperations(
-			array_merge(
-				$this->getWindowNoneTagOperationOperations(),
-				$this->getWindowNoneEventOperationCase()['operations']
-			),
+			array_merge($this->getWindowNoneTagOperationOperations(), $event_operations),
 			$execute_when
 		);
 
@@ -10773,6 +10806,29 @@ HEREDOC;
 		}
 	}
 
+	/**
+	 * The same reset scenario with the server stopped and started between the reset and the values the reset is read
+	 * from: the windows a reset throws away are stored ones the server loads back at startup, so a reset that only
+	 * emptied the window pool would come back with the restart and close what it had been holding after all - and
+	 * the rule has to go on working across the restart, opening its windows again and closing what they hold.
+	 *
+	 * Unlike the *Restart variants of the trigger scenarios this one is not the same assertion after a fresh start,
+	 * so it is not skipped with them (SKIP_RESTART_TESTS): nothing else in the suite reads what a reset left in the
+	 * database - see runEventAssessmentTestCepWindowReset().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleResetRestart$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleResetRestart() {
+		$this->prepareDataCepWindowSimpleResetRestart();
+
+		try {
+			$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_SIMPLE_RESET_RESTART, true);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
 	/* Deletion of a rule - test that the windows of each window type are thrown away with it, and stay away */
 
 	/**
@@ -12279,20 +12335,27 @@ HEREDOC;
 	 * point instead of at the one of the arriving event.
 	 *
 	 * What that has to leave behind is the state of every other flavour, the resolved macros above all: the event
-	 * the operations act on is the one the closing window was holding rather than the one being assessed, so a name
-	 * or a tag the server could not resolve that late shows up as macro text where the resolved value is expected.
+	 * the operations act on is the one the closing window was holding rather than the one being assessed, so a tag
+	 * the server could not resolve that late shows up as macro text where the resolved value is expected.
 	 * No rule closes a problem, so all three stay open.
+	 *
+	 * The one difference to the flavours above is the event name: "set name" is not allowed at this execution point,
+	 * so the rule of this flavour does not carry that operation (see prepareDataCepWindowOperations()) and the events
+	 * must keep the name their trigger gave them instead of the rewritten one - which is what $set_name_skipped
+	 * below asks for.
 	 */
 	private function runEventAssessmentTestCepWindowClosedOperations(): void {
-		$this->runEventAssessmentTestCepWindowLateOperations('closed');
+		$this->runEventAssessmentTestCepWindowLateOperations('closed', true);
 	}
 
 	/**
-	 * The body of the two flavours above, which differ in nothing but the execution point their rule applies its
-	 * operations at ($what naming it for the failure messages): the events are driven the same way and the state
-	 * they must end up in is the same, an operation being what it does and not when it was asked to do it.
+	 * The body of the two flavours above, which differ in the execution point their rule applies its operations at
+	 * ($what naming it for the failure messages) and in whether that point allows the "set name" operation at all
+	 * ($set_name_skipped): the events are driven the same way and the state they must end up in is the same, an
+	 * operation being what it does and not when it was asked to do it.
 	 */
-	private function runEventAssessmentTestCepWindowLateOperations(string $what): void {
+	private function runEventAssessmentTestCepWindowLateOperations(string $what,
+			bool $set_name_skipped = false): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
 		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
 		$all = [$triggerid];
@@ -12325,7 +12388,7 @@ HEREDOC;
 		// or closed with the window that held them - which the wait below covers. These flavours create no second
 		// rule, so its tag may not be on any event either.
 		$this->waitForCepWindowNoneTaggedEvents($triggerid, $expected_tags,
-			[self::CEP_TAG_WINDOW_SECOND => null]
+			[self::CEP_TAG_WINDOW_SECOND => null], $set_name_skipped
 		);
 
 		$this->waitForCepWindowNoneUnsuppressed($triggerid);
@@ -12994,8 +13057,15 @@ HEREDOC;
 	 *
 	 * The scenario is the same for every window type: what a window holds is not what tells the types apart, so a
 	 * reset must take it away from all of them alike.
+	 *
+	 * $restart stops and starts the server between step 2 and step 3, which is what makes the reset of that flavour
+	 * more than an emptied window pool: a window and the events in it are rows of cep_window and cep_window_event
+	 * that the server loads back at startup, so a reset that had left them behind would come back with the restart
+	 * and step 4 would find the first "down" problems in a window again - which is exactly what the eventids of step
+	 * 1 catch. Everything after the restart is the scenario unchanged, so passing it also means the rule went on
+	 * working across the stop and start: it opened its windows again and closed what they held.
 	 */
-	private function runEventAssessmentTestCepWindowReset(string $rule_name): void {
+	private function runEventAssessmentTestCepWindowReset(string $rule_name, bool $restart = false): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
 		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
 		$all = [$triggerid];
@@ -13044,6 +13114,18 @@ HEREDOC;
 		// A window is discarded by a reset, not closed: the "close" operation of a closing window is not performed
 		// for the events it held, so the problems are exactly as they were.
 		$this->waitForOpenProblemCount($all, $open);
+
+		if ($restart) {
+			// 2a. The restart flavour: the windows of a rule are stored, and the server loads them back with the
+			//     events they held when it starts, so a reset that took them out of the window pool without taking
+			//     them out of the database is a reset the restart undoes. Everything the reset is read from happens
+			//     after this point, so an undone reset shows up exactly as no reset at all would - in step 4.
+			$this->maybeRestartServer(true);
+
+			// Coming back up may not change what is open either: a window that returned would be holding these
+			// problems again, but only a closing window closes what it holds and starting the server closes nothing.
+			$this->waitForOpenProblemCount($all, $open);
+		}
 
 		// 3. A second "down" value per id. A reset rule is an empty one, not a broken one, so every id gets a new
 		//    window and the problem of its second "down" is the one that window holds.
@@ -14077,14 +14159,17 @@ HEREDOC;
 	 * Every event is additionally checked against the tag state the operations of the tag operation rule must
 	 * have left on it (getWindowNoneTagOperationResults(), the same expectations for every event, including
 	 * the tags that must not be there at all) and against the name, severity and suppression the event
-	 * operation rule must have given it (getWindowNoneEventOperationCase()).
+	 * operation rule must have given it (getWindowNoneEventOperationCase()). $set_name_skipped is for the one
+	 * flavour whose execution point does not allow the "set name" operation and therefore does not carry it: the
+	 * name expected of its events is the one the trigger prototype gave them, built from the value that opened
+	 * the event, and the rewritten name of the operation would mean the operation ran after all.
 	 *
 	 * The tags are applied asynchronously after the event is created, hence the polling; the callback returns
 	 * a description of the first event that does not match, which callUntilDataIsPresent() surfaces in the
 	 * failure message.
 	 */
 	private function waitForCepWindowNoneTaggedEvents(int $triggerid, array $expected_by_service,
-			array $extra_results = []): void {
+			array $extra_results = [], bool $set_name_skipped = false): void {
 		// tag => the value the rule adds it with, for every rule of the scenario.
 		$rule_values = array_map(fn($rule) => $rule[1], $this->getWindowNoneRules());
 		// tag => the value the tag operations must have left on every event, or null if the tag must be gone.
@@ -14101,7 +14186,8 @@ HEREDOC;
 			'output' => ['eventid', 'name', 'severity', 'suppressed'],
 			'selectTags' => 'extend'
 		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($expected_by_service, $rule_values, $operation_results, $event_results) {
+			function ($response) use ($expected_by_service, $rule_values, $operation_results, $event_results,
+					$set_name_skipped) {
 				if (count($response['result']) !== count($expected_by_service)) {
 					return 'expected '.count($expected_by_service).' problem event(s), got '
 						.count($response['result']);
@@ -14141,10 +14227,21 @@ HEREDOC;
 						}
 					}
 
-					// The event operations leave the same name, severity and suppression on every event.
-					if ($event['name'] !== $event_results['name']) {
+					// The event operations leave the same severity and suppression on every event, and the same
+					// name too unless the flavour has no "set name" operation - then every event keeps the name
+					// its trigger prototype built from the value that opened it.
+					if ($set_name_skipped) {
+						$expected_name = 'CEP trigger '.self::COMPONENT_VALUE.' down_'.$service;
+						$name_source = 'the trigger prototype, the flavour having no "set name" operation';
+					}
+					else {
+						$expected_name = $event_results['name'];
+						$name_source = 'the event operations';
+					}
+
+					if ($event['name'] !== $expected_name) {
 						return 'event '.$event['eventid'].': name "'.$event['name'].'", expected "'
-							.$event_results['name'].'" from the event operations';
+							.$expected_name.'" from '.$name_source;
 					}
 
 					if ((int) $event['severity'] !== $event_results['severity']) {
