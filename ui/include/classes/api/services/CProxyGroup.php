@@ -370,12 +370,7 @@ class CProxyGroup extends CApiService {
 
 		self::validateDelete($proxy_groupids, $db_proxy_groups);
 
-		$proxy_groups = API::ProxyGroup()->get([
-			'output' => ['proxy_groupid'],
-			'proxy_groupids' => $proxy_groupids
-		]);
-
-		self::unlinkFromUserGroups($proxy_groups);
+		self::unlinkFromUserGroups($proxy_groupids);
 
 		DB::delete('proxy_group', ['proxy_groupid' => $proxy_groupids]);
 
@@ -411,12 +406,8 @@ class CProxyGroup extends CApiService {
 		self::checkUsedInHosts($db_proxy_groups);
 	}
 
-	private static function unlinkFromUserGroups(array $proxy_groups): void {
-		$proxy_groupids = [];
-
-		foreach ($proxy_groups as $proxy_group) {
-			$proxy_groupids[$proxy_group['proxy_groupid']] = true;
-		}
+	private static function unlinkFromUserGroups(array $proxy_groupids): void {
+		$proxy_groupids = array_fill_keys($proxy_groupids, true);
 
 		if (!$proxy_groupids) {
 			return;
