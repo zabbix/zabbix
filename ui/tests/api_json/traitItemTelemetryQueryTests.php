@@ -528,6 +528,34 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield '"time_shift" set to 0' =>[
+			[
+				'time_shift' => '0'
+			],
+			null
+		];
+
+		yield '"time_shift" empty value fail' =>[
+			[
+				'time_shift' => ''
+			],
+			'Invalid parameter "/1/time_shift": cannot be empty.'
+		];
+
+		yield '"lookback_limit" empty value fail' =>[
+			[
+				'lookback_limit' => ''
+			],
+			'Invalid parameter "/1/lookback_limit": cannot be empty.'
+		];
+
+		yield '"granularity" empty value fail' =>[
+			[
+				'granularity' => ''
+			],
+			'Invalid parameter "/1/granularity": cannot be empty.'
+		];
+
 		yield '"delay" and "timeout"' => [
 			[
 				'delay' => '3m',
