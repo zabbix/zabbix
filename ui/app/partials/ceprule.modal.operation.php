@@ -169,7 +169,7 @@ foreach ($labels as $option => $label) {
 			)
 			->addItem(new CObject('&nbsp;'))
 			->addItem((new CTextAreaFlexible('event_name'))
-				->setMaxlength(DB::getFieldLength('cep_condition', 'event_name'))
+				->setMaxlength(DB::getFieldLength('cep_operation', 'event_name'))
 				->setId('ceprule-operation-name-argument')
 				->setAttribute('placeholder', 'name')
 			)
