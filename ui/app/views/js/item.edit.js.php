@@ -844,12 +844,12 @@ window.item_edit_form = new class {
 			return;
 		}
 
-		const delay = this.#parseTimeToSeconds(this.form_element.querySelector('[name="delay"]').value);
-		const lookback_limit = this.#parseTimeToSeconds(
-			this.form_element.querySelector('[name="lookback_limit"]').value
+		const delay = timeUnitToSeconds(this.form_element.querySelector('[name="delay"]').value.trim(), false);
+		const lookback_limit = timeUnitToSeconds(
+			this.form_element.querySelector('[name="lookback_limit"]').value.trim(), false
 		);
-		const granularity = this.#parseTimeToSeconds(
-			this.form_element.querySelector('[name="granularity"]').value
+		const granularity = timeUnitToSeconds(
+			this.form_element.querySelector('[name="granularity"]').value.trim(), false
 		);
 
 		const lookback_too_small = lookback_limit !== null && granularity !== null && lookback_limit < granularity;
@@ -859,18 +859,6 @@ window.item_edit_form = new class {
 		this.label.lookback_limit_error.style.display = lookback_too_small ? '' : 'none';
 		this.label.lookback_limit_hint.style.display = data_gaps ? '' : 'none';
 		this.label.granularity_hint.style.display = data_overlap ? '' : 'none';
-	}
-
-	#parseTimeToSeconds(value) {
-		const match = value.trim().match(/^(\d+)(s|m|h|d|w)?$/);
-
-		if (match === null) {
-			return null;
-		}
-
-		const multipliers = {s: 1, m: 60, h: 3600, d: 86400, w: 604800};
-
-		return parseInt(match[1], 10) * multipliers[match[2] ?? 's'];
 	}
 
 	#showErrorDialog(body, trigger_element) {
