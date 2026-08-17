@@ -69,7 +69,6 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 
 	private static function getFormValidationRules(): array {
 		$complex_columns = CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME;
-		$operators = CTelemetryHelper::getConditionOperators();
 
 		return ['object', 'fields' => [
 			'row_index' => ['integer', 'required'],
@@ -93,10 +92,14 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 				'when' => ['column', 'in' => $complex_columns]
 			],
 			'operator' => [
-				['integer', 'required', 'in' => $operators['complex'],
+				['integer', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS],
 					'when' => ['column', 'in' => $complex_columns]
 				],
-				['integer', 'required', 'in' => $operators['simple'],
+				['integer', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+						CONDITION_OPERATOR_NOT_LIKE
+					],
 					'when' => ['column', 'not_in' => $complex_columns]
 				]
 			],
