@@ -2097,6 +2097,32 @@ time_t	cep_rule_get_window_start_time(zbx_cep_t *cep, zbx_uint64_t ruleid, int d
 
 	return rt->window_start;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize rule window start time, aligned to duration boundary   *
+ *                                                                            *
+ * Parameters: cep          - [IN] cep service                                *
+ *             ruleid       - [IN] rule identifier                            *
+ *             time_created - [IN] time the window was created                *
+ *             duration     - [IN] window duration in seconds                 *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_rule_set_window_start_time(zbx_cep_t *cep, zbx_uint64_t ruleid, time_t time_created, int duration)
+{
+	zbx_cep_rule_rtdata_t	*rt, rt_local = {.ruleid = ruleid};
+	time_t			now = time(NULL);
+
+	rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_insert(&cep->rules, &rt_local, sizeof(rt_local));
+	if (0 == rt->window_start)
+	{
+		rt->window_start = time_created;
+
+		while (rt->window_start + duration < now)
+			rt->window_start += duration;
+	}
+}
+
 void	cep_event_handle_set_committed(zbx_cep_event_handle_t hevent)
 {
 	atomic_fetch_or(&hevent->state, CEP_EVENT_STATE_COMMITTED);

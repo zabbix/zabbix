@@ -85,6 +85,7 @@ void	cep_object_inc_pending(zbx_cep_t *cep, const zbx_cep_origin_t *origin);
 int	cep_rule_check_error(zbx_cep_t *cep, zbx_uint64_t ruleid, const char *error);
 void	cep_rule_set_error(zbx_cep_t *cep, zbx_uint64_t ruleid, char *error);
 time_t	cep_rule_get_window_start_time(zbx_cep_t *cep, zbx_uint64_t ruleid, int duration);
+void	cep_rule_set_window_start_time(zbx_cep_t *cep, zbx_uint64_t ruleid, time_t time_created, int duration);
 
 /* statistics */
 void	cep_update_events_accessed(zbx_cep_t *cep, zbx_uint64_t value);

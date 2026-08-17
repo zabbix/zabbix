@@ -301,6 +301,15 @@ static void	cep_window_sync_entry_log_destroy(zbx_cep_window_t *window)
 	zbx_vector_cep_window_sync_entry_append(&window->sync, sync_local);
 }
 
+static void	cep_window_sync_entry_log_reset(zbx_cep_window_t *window)
+{
+	zbx_cep_window_sync_entry_t	sync_local = {
+		.type = CEP_WINDOW_SYNC_RESET
+	};
+
+	zbx_vector_cep_window_sync_entry_append(&window->sync, sync_local);
+}
+
 static void	cep_window_sync_entry_log_event_add(zbx_cep_window_t *window, zbx_uint64_t eventid)
 {
 	zbx_cep_window_sync_entry_t	sync_local = {
@@ -338,6 +347,17 @@ void	cep_window_sync_detach(zbx_cep_window_t *window, zbx_vector_cep_window_sync
 	zbx_vector_cep_window_sync_entry_append_array(sync, window->sync.values, window->sync.values_num);
 	zbx_vector_cep_window_sync_entry_clear(&window->sync);
 	cep_window_unlock(window);
+}
+
+time_t	cep_window_get_time_created(zbx_cep_window_t *window)
+{
+	time_t	time_created;
+
+	cep_window_lock(window);
+	time_created = window->time_created;
+	cep_window_unlock(window);
+
+	return time_created;
 }
 
 /******************************************************************************
@@ -929,6 +949,7 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	{
 		atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
 		cep_window_pool_enqueue(pool, window);
+		cep_window_sync_entry_log_reset(window);
 	}
 	else
 	{
@@ -1545,7 +1566,7 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 	hconfig = zbx_cep_config_open();
 
 	result = zbx_dbconn_select(db,
-		"select cep_windowid,cep_ruleid,group_by,groupid,hostid,tags,tags_value,nextcheck"
+		"select cep_windowid,cep_ruleid,group_by,groupid,hostid,tags,tags_value,created_at"
 		" from cep_window");
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -1581,9 +1602,19 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 
 		ref = zbx_hashset_insert(&pool->windows, &ref_local, sizeof(ref_local));
 		ref->window = cep_window_create(rule,  ref, win_local.windowid);
-		ref->window->nextcheck = atoi(row[7]);
+		ref->window->time_created = atoi(row[7]);
 		ref->window->capacity = capacity;
 		ref->window->duration = duration;
+		ref->window->nextcheck = cep_window_get_nextcheck(ref->window, NULL);
+
+		if (ZBX_CEP_WINDOW_CAUSAL == rule->window->type)
+		{
+			zbx_cep_t	*cep;
+
+			cep_cache_acquire(&cep);
+			cep_rule_set_window_start_time(cep, rule->ruleid, ref->window->time_created, duration);
+			cep_cache_release(&cep);
+		}
 
 		win_local.window = ref->window;
 

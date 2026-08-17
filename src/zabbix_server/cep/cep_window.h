@@ -38,6 +38,7 @@ typedef enum
 {
 	CEP_WINDOW_SYNC_DESTROY,	/* remove window and skip rest of updates */
 	CEP_WINDOW_SYNC_CREATE,		/* window must be created before events can be added/removed */
+	CEP_WINDOW_SYNC_RESET,		/* window was reset, update creation time */
 	CEP_WINDOW_SYNC_EVENT_REMOVE,	/* event removal will swallow adding of the same event */
 	CEP_WINDOW_SYNC_EVENT_ADD
 }
@@ -105,6 +106,8 @@ struct zbx_cep_window_ref
 zbx_cep_window_t	*cep_window_addref(zbx_cep_window_t *window);
 void	cep_window_release(zbx_cep_window_t *window);
 void	cep_window_sync_detach(zbx_cep_window_t *window, zbx_vector_cep_window_sync_entry_t *sync);
+time_t	cep_window_get_time_created(zbx_cep_window_t *window);
+
 void	cep_window_lock(zbx_cep_window_t *window);
 void	cep_window_unlock(zbx_cep_window_t *window);
 

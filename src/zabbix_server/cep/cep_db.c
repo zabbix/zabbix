@@ -1792,7 +1792,7 @@ static int	cep_db_sync_window_create(zbx_dbconn_t *db, zbx_db_insert_t *db_inser
 	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_group))
 	{
 		zbx_dbconn_prepare_insert(db, db_insert_group, "cep_window", "cep_windowid", "cep_ruleid", "group_by",
-				"groupid", "hostid", "tags", "tags_value", "nextcheck", NULL);
+				"groupid", "hostid", "tags", "tags_value", "created_at", NULL);
 	}
 
 	cep_window_lock(window);
@@ -1801,13 +1801,23 @@ static int	cep_db_sync_window_create(zbx_dbconn_t *db, zbx_db_insert_t *db_inser
 	{
 		zbx_db_insert_add_values(db_insert_group, window->windowid, ref->ruleid, ref->group_by,
 				ref->hostgroupid, ref->hostid, ZBX_NULL2EMPTY_STR(ref->tag),
-				ZBX_NULL2EMPTY_STR(ref->tag_value), (int)window->nextcheck);
+				ZBX_NULL2EMPTY_STR(ref->tag_value), (int)window->time_created);
 		ret = SUCCEED;
 	}
 
 	cep_window_unlock(window);
 
 	return ret;
+}
+
+static void	cep_db_sync_window_reset(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		zbx_cep_window_t *window)
+{
+	/* window creation time is updated for cause-symptom windows when they are being closed by duration */
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update cep_window set created_at=%d where cep_windowid="
+			ZBX_FS_UI64 ";\n", (int)cep_window_get_time_created(window), window->windowid);
+
+	zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL);
 }
 
 static void	cep_db_window_sync_event_add(zbx_dbconn_t *db, zbx_db_insert_t *db_insert_group_event,
@@ -1844,6 +1854,9 @@ static void	cep_db_sync_window(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, 
 				if (FAIL == cep_db_sync_window_create(db, db_insert_group, sync->window))
 					return;
 				break;
+			case CEP_WINDOW_SYNC_RESET:
+				cep_db_sync_window_reset(db, sql, sql_alloc, sql_offset, sync->window);
+				break;
 			case CEP_WINDOW_SYNC_EVENT_REMOVE:
 				zbx_vector_uint64_append(&eventids, entry->eventid);
 				last_eventid = entry->eventid;
@@ -1855,7 +1868,6 @@ static void	cep_db_sync_window(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, 
 							entry->eventid, entry->index);
 				}
 				break;
-
 		}
 	}
 
