@@ -380,6 +380,52 @@ class testTriggerCEP extends CIntegrationTest {
 	// like any other, so the two must close the same problems. The rule of a variant is named after the flavour it
 	// varies with this suffix appended, see buildEvictCloseRuleName().
 	const CEP_RULE_WINDOW_CLOSE_EVICT_SUFFIX = ' with evict close';
+	// Every flavour above is ended by an operation of its rule, and their windows are given a duration long enough
+	// that nothing else can end them (getCloseWindowDuration()). The duration of a window is the other way one can
+	// end, and what it comes to differs by window type, so it is a scenario of its own:
+	//   - a cause and symptom window is closed by its duration running out (cep_window_causal_process()), which is
+	//     the one window type whose duration ends it rather than evicting what it holds. No operation takes part in
+	//     it: the rule of that flavour has nothing but a "close" at the window closed execution point, and the
+	//     window closing on its own is what has to reach it - and it closes once per duration rather than once, the
+	//     period starting again with the events that arrive after it, see
+	//     runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration();
+	//   - a simple and a tag correlation window are the sliding types: their duration evicts the events that have
+	//     been in them too long, so what ends such a window is a "close window" operation at the eviction execution
+	//     point, reached this time by an event that was evicted for its age rather than for not fitting. The window
+	//     then closes with the younger events still in it, which is what the "close" of the closing window reaches -
+	//     the evicted event itself is out of the window before it closes and is not closed with it, see
+	//     runEventAssessmentTestCepWindowCloseOnDuration().
+	// A pattern match window is left out of the sliding pair on purpose: cep_window_pattern_process() drops the
+	// operation mask of the eviction it performs, so a "close window" operation cannot be reached that way at all -
+	// only the eviction of an event that does not fit reaches it there, which the flavours above already cover.
+	const CEP_RULE_WINDOW_CAUSE_CLOSE_DURATION = self::CEP_RULE_NAME_PREFIX.'window cause close on duration';
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_DURATION = self::CEP_RULE_NAME_PREFIX.'window simple close on duration';
+	const CEP_RULE_WINDOW_TAG_CLOSE_DURATION = self::CEP_RULE_NAME_PREFIX.'window tag close on duration';
+	// How long those windows last, in seconds. The two flavours are given different periods because they are ended
+	// differently:
+	//   - a sliding window is examined exactly when its oldest event ages out (cep_window_get_nextcheck()), so its
+	//     period only has to leave room for the second value of the scenario to be sent and its problem seen open
+	//     before that happens - and, when the restarts are turned on, for the stop and start between the two values as
+	//     well, which is what getCloseOnDurationPeriod() adds to it;
+	//   - a cause and symptom window closes at the end of the period it belongs to, and the periods follow a grid the
+	//     rule keeps for itself (cep_rule_get_window_start_time()), so a window is closed at most one period after it
+	//     was opened. The scenario waits out two of them in a row and a shorter period is what keeps that from being
+	//     the slowest thing in the family. A restart needs nothing added here: the window comes back with a period of
+	//     its own starting at the startup (time_created is not among the columns of cep_window), so what follows a
+	//     restart is one more period and no more.
+	const CEP_RULE_WINDOW_CLOSE_DURATION_PERIOD = 15;
+	const CEP_RULE_WINDOW_CLOSE_DURATION_CAUSE_PERIOD = 10;
+	// How long the sliding flavour waits between the two values it sends, so their ages differ by more than the
+	// second or so a window may be examined late by: the older value is the one that has to be evicted alone, with the
+	// younger one still in the window when the eviction closes it. It leaves the rest of the period above for the
+	// second value to be sent and its problem to be seen open before the first one ages out.
+	const CEP_RULE_WINDOW_CLOSE_DURATION_GAP = 7;
+	// What both flavours wait for is due at a time they know - the period of a window they opened themselves - so the
+	// waits are given that period and this much on top, rather than the patience the waits for a value being processed
+	// run with. The window pool examines a window within a second of when it is due (cep_window_get_nextcheck()), and
+	// the rest is for the closing to reach the database and the API: a closing that does not happen is then reported
+	// about when it was due instead of at the end of a patience meant for something else.
+	const CEP_RULE_WINDOW_CLOSE_DURATION_SLACK = 11;
 	// The reset scenario (see prepareDataCepWindowHeldProblemsOperations()) is run once per window type that has a
 	// window at all: resetting a rule throws away the windows it has open, and what a window holds is the one thing
 	// every window type keeps, so each of them must lose it the same way.
@@ -3718,6 +3764,103 @@ HEREDOC;
 				'type' => CCepRuleHelper::OP_CLOSE_EVENT
 			]
 		];
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
+			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the cause and symptom flavour of the scenarios whose window is ended by its duration, see
+	 * prepareDataCepWindowCloseOnDurationOperations().
+	 */
+	public function prepareDataCepWindowCauseSymptomCloseOnDuration() {
+		return $this->prepareDataCepWindowCloseOnDurationOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_DURATION
+		);
+	}
+
+	/**
+	 * Prepare the simple window flavour of the scenarios whose window is ended by its duration, see
+	 * prepareDataCepWindowCloseOnDurationOperations().
+	 */
+	public function prepareDataCepWindowSimpleCloseOnDuration() {
+		return $this->prepareDataCepWindowCloseOnDurationOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DURATION
+		);
+	}
+
+	/**
+	 * Prepare the tag correlation flavour of the scenarios whose window is ended by its duration, see
+	 * prepareDataCepWindowCloseOnDurationOperations().
+	 */
+	public function prepareDataCepWindowTagCloseOnDuration() {
+		return $this->prepareDataCepWindowCloseOnDurationOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+			self::CEP_RULE_WINDOW_TAG_CLOSE_DURATION
+		);
+	}
+
+	/**
+	 * Prepare the rule of the scenarios whose window is ended by its duration running out instead of by the value that
+	 * would have ended it: one window per id, grouped by the 'service' tag as everywhere else, with a duration short
+	 * enough to be waited out within a single wait (CEP_RULE_WINDOW_CLOSE_DURATION_PERIOD and, for the window type
+	 * examined on a grid, CEP_RULE_WINDOW_CLOSE_DURATION_CAUSE_PERIOD) and room for every event it is given, so nothing
+	 * can leave it for not fitting - what leaves this window leaves it because it is old.
+	 *
+	 * What the operations are depends on what the duration of $window_type does when it runs out:
+	 *   - a cause and symptom window is closed by it (cep_window_causal_process()), so the rule needs nothing but the
+	 *     "close" of a closing window: no operation takes part in the ending itself, which is what tells this scenario
+	 *     apart from every close window flavour;
+	 *   - a simple and a tag correlation window evict what has been in them too long instead, so this rule closes the
+	 *     window from the eviction execution point - unconditionally, unlike the close window flavours that restrict
+	 *     that operation to the "up" events, because here the event that ends the window is whichever one is oldest.
+	 *     The "close" of the closing window then reaches the events still in it, and not the evicted one that ended
+	 *     it, see runEventAssessmentTestCepWindowCloseOnDuration().
+	 *
+	 * Nothing else may close a problem of these scenarios: the rule is the only thing that does, and it does it by
+	 * the clock rather than by anything sent to it.
+	 */
+	private function prepareDataCepWindowCloseOnDurationOperations(int $window_type, string $name) {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// The rule of this scenario is the only thing that may close a problem.
+		$this->deleteCepCorrelations();
+
+		$window = [
+			// The cause and symptom flavour waits out two periods in a row, so it gets the shorter of the two
+			// durations - and the sliding one has to hold its younger event across the restart it takes, so its own
+			// grows with that, see CEP_RULE_WINDOW_CLOSE_DURATION_PERIOD and getCloseOnDurationPeriod().
+			'duration' => $window_type === CCepRuleHelper::WINDOW_CAUSE_SYMPTOM
+				? self::CEP_RULE_WINDOW_CLOSE_DURATION_CAUSE_PERIOD
+				: static::getCloseOnDurationPeriod(),
+			'capacity' => 0,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => ['service']
+		];
+
+		$operations = [
+			[
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
+				'type' => CCepRuleHelper::OP_CLOSE_EVENT
+			]
+		];
+
+		if ($window_type !== CCepRuleHelper::WINDOW_CAUSE_SYMPTOM) {
+			// The duration of a sliding window evicts rather than closes, so the eviction of its oldest event is what
+			// has to end it - the one execution point the duration of these window types reaches on its own.
+			$operations[] = [
+				'sortorder' => 1,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+				'type' => CCepRuleHelper::OP_CLOSE_WINDOW
+			];
+		}
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', $window_type, $window
@@ -10728,6 +10871,67 @@ HEREDOC;
 		}
 	}
 
+	/* The window ended by its duration instead of by an operation of the rule */
+
+	/**
+	 * A cause and symptom window left to its own duration: that is the one window type whose duration closes it rather
+	 * than evicting what it holds, so the problems of the events it was given are closed without a value of any kind
+	 * having been sent for them - and the next period closes the next window in turn. The rule has no operation that
+	 * could end anything, only the "close" of a closing window, see
+	 * runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomCloseOnDuration$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomCloseOnDuration() {
+		$this->prepareDataCepWindowCauseSymptomCloseOnDuration();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration(
+				self::CEP_RULE_WINDOW_CAUSE_CLOSE_DURATION
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * A simple window ended by its duration the only way a sliding window can be: its duration evicts the event that
+	 * has been in it too long, and the rule closes the window over that eviction rather than over the "up" value every
+	 * close window flavour uses. The window then closes with the younger event still in it, so that one is closed and
+	 * the evicted one is not - see runEventAssessmentTestCepWindowCloseOnDuration().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseOnDuration$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseOnDuration() {
+		$this->prepareDataCepWindowSimpleCloseOnDuration();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseOnDuration(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DURATION);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same as testTriggerCEP_CepWindowSimpleCloseOnDuration with a tag correlation window: correlating the events
+	 * of a group is not what ages them out of it, so the eviction that ends the window has to happen for this window
+	 * type exactly as it does for a simple one - see runEventAssessmentTestCepWindowCloseOnDuration().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseOnDuration$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseOnDuration() {
+		$this->prepareDataCepWindowTagCloseOnDuration();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseOnDuration(self::CEP_RULE_WINDOW_TAG_CLOSE_DURATION);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
 	/* Reset of a rule - test that the windows of each window type are thrown away with it */
 
 	/**
@@ -13052,6 +13256,209 @@ HEREDOC;
 	}
 
 	/**
+	 * Drive the cause and symptom flavour whose window is ended by its duration: the one window type the duration
+	 * closes instead of evicting what it holds (cep_window_causal_process()), so the rule of the scenario has no
+	 * operation that could end anything - nothing but the "close" of a closing window, see
+	 * prepareDataCepWindowCloseOnDurationOperations().
+	 *
+	 *   1. three values of one id, which is one window holding all three of their problems. Nothing is sent that
+	 *      would end that window and no other rule may touch it, so the only thing left that can close those problems
+	 *      is the duration;
+	 *   2. and it does: once the period is up the window closes, the "close" operation of the closing window reaches
+	 *      every event it was holding, and the problems are gone without a value of any kind having been sent for
+	 *      them. Closing the last problem of a trigger is what puts the trigger itself back to OK, so the clock alone
+	 *      brings both the problems and the trigger back - the trigger expression is still true, its last value being
+	 *      a "down" one;
+	 *   3. a fourth value, sent once the first window is gone. A closed window is not the end of the rule: the period
+	 *      starts again, this value opens a window of the id anew, and the next duration to run out closes that one
+	 *      with the problem it holds - so the closing is what the rule does once per period rather than once.
+	 *
+	 * Between step 1 and step 2 the server is stopped and started, unless the restarts are turned off: the window whose
+	 * duration then runs out is the one the server loaded back from the database, and the problems it closes are the
+	 * ones it came back holding - see maybeRestartServerMidScenario().
+	 *
+	 * What the problems are while a window still holds them is not asserted here, and cannot be: the periods of a
+	 * cause and symptom window follow a grid the rule keeps for itself (cep_rule_get_window_start_time()), so a value
+	 * may land anywhere in a period, even just before it ends, and a problem that is closed a moment after it opened is
+	 * the scenario working rather than failing - as is a group that the end of a period split in two. What every step
+	 * therefore waits for is the problem events existing - a count that only grows - and then nothing being open. That
+	 * the events are held and ranked while they are in the window is asserted where the window is ended by a value
+	 * instead, see runEventAssessmentTestCepWindowCauseSymptom().
+	 */
+	private function runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration(string $rule_name): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the duration close test of "'.$rule_name.'".');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$service = self::CEP_RULE_WINDOW_NONE_SERVICE;
+		$send = fn() => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down_'.$service]
+		]);
+
+		// 1. Three values of the one id the scenario drives, so one window is given all three of their problems.
+		$events = 0;
+
+		for ($i = 0; $i < 3; $i++) {
+			$send();
+			$this->waitForProblemEventCountByTag($all, 'service', $service, ++$events);
+		}
+
+		// 1a. Stop and start the server with the window holding all three, unless the restarts are turned off: what
+		//     closes them is then a window the server loaded back from the database, and it has to close the events it
+		//     came back with. The period of such a window starts again at the startup - the time it was created is not
+		//     among the columns of cep_window - so what the wait below waits out is one period from here either way.
+		$this->maybeRestartServerMidScenario();
+
+		// Both waits below are due at a time this scenario knows: a window is closed at most one period after it was
+		// opened, so that period plus the little the closing takes to reach the API is all the patience they get - a
+		// window that does not close is reported about when it was due to.
+		$patience = self::CEP_RULE_WINDOW_CLOSE_DURATION_CAUSE_PERIOD + self::CEP_RULE_WINDOW_CLOSE_DURATION_SLACK;
+
+		try {
+			// 2. Nothing else is sent and nothing else may close them: the window closing when its period is up is
+			//    what closes every problem it was holding, and the trigger returns to OK with the last of them.
+			$this->waitForNoOpenProblems($all,
+				'After the window of "'.$rule_name.'" was left to be closed by its duration', true, $patience
+			);
+
+			// 3. The rule closes a window every period, so the value after the first close is held by a new window of
+			//    the same id and closed when that period is up in turn.
+			$send();
+			$this->waitForProblemEventCountByTag($all, 'service', $service, ++$events);
+			$this->waitForNoOpenProblems($all,
+				'After the second window of "'.$rule_name.'" was left to be closed by its duration', true, $patience
+			);
+		}
+		catch (Throwable $e) {
+			$error = $this->getCepRuleError($rule_name);
+
+			$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error: '.$error);
+
+			throw $e;
+		}
+
+		// The rule closed both windows by the clock without failing on any of it.
+		$error = $this->getCepRuleError($rule_name);
+
+		$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error: '.$error);
+	}
+
+	/**
+	 * Drive a sliding flavour whose window is ended by its duration, the $rule_name rule of
+	 * prepareDataCepWindowCloseOnDurationOperations(): the duration of a simple or a tag correlation window evicts the
+	 * events that have been in it too long instead of closing it, so what ends the window here is the "close window"
+	 * operation of an event evicted for its age - and unlike every close window flavour, no value of the run asks for
+	 * it.
+	 *
+	 * Two values of one id go into the one window of that id, far enough apart (CEP_RULE_WINDOW_CLOSE_DURATION_GAP)
+	 * that only the older one is old enough to be evicted when the window is examined:
+	 *
+	 *   1. the first value opens a problem the window holds. Nothing may close it - the duration is what it has to be
+	 *      closed by, and it has not run out yet, which the wait for both problems below shows;
+	 *   2. the second value, sent while the first is still well inside the duration, is held by the same window, so
+	 *      two problems are open and the window has the older event first;
+	 *   3. the duration of the older event runs out and it is evicted, which the rule turns into the end of the
+	 *      window. The window closes with the younger event still in it, so that one is closed by the "close"
+	 *      operation of the closing window - while the evicted event is not: it was out of the window before it
+	 *      closed, and the rule has no operation for an evicted event other than ending the window. Exactly one
+	 *      problem is therefore left open and it is the one of the first value, asserted by eventid;
+	 *   4. nothing of the rule can reach that problem any more - the window that held it is gone - so the trigger
+	 *      expression has to close it, which is what the recovery value at the end is for.
+	 *
+	 * The server is stopped and started between step 1 and step 2, unless the restarts are turned off: the window that
+	 * ages its oldest event out and ends over it is then one the server loaded back from the database, and that event
+	 * came back with it. The period covers the stop and start (getCloseOnDurationPeriod()), so the eviction still
+	 * happens for the age of the event rather than because the server was away - see maybeRestartServerMidScenario().
+	 */
+	private function runEventAssessmentTestCepWindowCloseOnDuration(string $rule_name): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the duration close test of "'.$rule_name.'".');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$service = self::CEP_RULE_WINDOW_NONE_SERVICE;
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		// 1. The window of the id is empty, so this event takes a place in it and its problem stays open.
+		$send('down_'.$service);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		$first = $this->getOpenProblemEventids($all);
+
+		$this->assertCount(1, $first, 'Expected the one problem the window of "'.$rule_name.'" holds, got: '
+			.implode(', ', $first)
+		);
+
+		// 1a. Stop and start the server with that one event in the window, unless the restarts are turned off: the
+		//     window that ages it out and ends over it is then the one the server loaded back from the database, and
+		//     the event whose age ends it is one that came back with it. The period of the window covers the stop and
+		//     start (getCloseOnDurationPeriod()), so what ends it is still the age of that event and not the restart.
+		$this->maybeRestartServerMidScenario();
+
+		$this->waitForOpenProblemCount($all, 1);
+
+		// 2. The second value goes out once the first event has aged by this much and no more: both are inside the
+		//    duration of the window, so both problems are open, but only the first one is close to running out of it.
+		sleep(self::CEP_RULE_WINDOW_CLOSE_DURATION_GAP);
+
+		$send('down_'.$service);
+		$this->waitForOpenProblemCount($all, 2);
+
+		try {
+			// 3. The duration of the first event runs out, it is evicted, and the rule ends the window over it. What
+			//    the closing window still holds is the second event, so that is the problem the "close" operation of
+			//    the closing window closes - the evicted one had left the window before it closed and nothing closes
+			//    that. This wait is due at a time the scenario knows: the first event ages out one period after it
+			//    was sent, and the wait started within that period, so the period and the little the closing takes
+			//    to reach the API is all the patience it gets.
+			$this->waitForOpenProblemCount($all, 1,
+				static::getCloseOnDurationPeriod() + self::CEP_RULE_WINDOW_CLOSE_DURATION_SLACK
+			);
+
+			$left = $this->getOpenProblemEventids($all);
+
+			$this->assertSame($first, $left, 'The problem left open by "'.$rule_name.'" is not the one its window '
+				.'evicted to end itself: expected '.implode(', ', $first).', got '.implode(', ', $left).'.'
+			);
+		}
+		catch (Throwable $e) {
+			$error = $this->getCepRuleError($rule_name);
+
+			$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error: '.$error);
+
+			throw $e;
+		}
+
+		// 4. The window that could have closed the evicted problem is gone with the events it held, so the trigger
+		//    expression is what closes it.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the duration close scenario of "'.$rule_name.'"');
+
+		$error = $this->getCepRuleError($rule_name);
+
+		$this->assertSame('', $error, 'The rule "'.$rule_name.'" reported an error: '.$error);
+	}
+
+	/**
 	 * Drive the reset scenario of the $rule_name rule, whose windows hold the problems of the ids that opened them
 	 * and close them once that id recovers, see prepareDataCepWindowHeldProblemsOperations(). The rule is reset
 	 * while its windows are full, and what that must do is asserted from the outside, by what the rule can and
@@ -14737,14 +15144,18 @@ HEREDOC;
 	}
 
 	/**
-	 * Poll problem.get until the total number of open problems on $triggerids equals $expected.
+	 * Poll problem.get until the total number of open problems on $triggerids equals $expected. $iterations replaces
+	 * the patience of the wait for the scenarios that have to outlast a window duration rather than the processing of
+	 * a value, see runEventAssessmentTestCepWindowCloseOnDuration().
 	 */
-	private function waitForOpenProblemCount(array $triggerids, int $expected): void {
+	private function waitForOpenProblemCount(array $triggerids, int $expected, ?int $iterations = null): void {
 		$this->callUntilCountIsPresent('problem.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS
-		], $expected, static::WAIT_ITERATIONS_LONGER, self::WAIT_ITERATION_DELAY);
+		], $expected, $iterations === null ? static::WAIT_ITERATIONS_LONGER : $iterations,
+			self::WAIT_ITERATION_DELAY
+		);
 	}
 
 	/**
@@ -15230,13 +15641,17 @@ HEREDOC;
 	 *   - the cause and symptom flavour, once the cause of the group has been ranked and before the events that must
 	 *     join it (runEventAssessmentTestCepWindowCauseSymptom());
 	 *   - the reset and delete flavours, after the rule was reset or deleted, where what must come back is nothing
-	 *     (runEventAssessmentTestCepWindowReset() and runEventAssessmentTestCepWindowDelete()).
+	 *     (runEventAssessmentTestCepWindowReset() and runEventAssessmentTestCepWindowDelete());
+	 *   - the two flavours that leave a window to be ended by its own duration, with the events whose age ends it
+	 *     already in the window (runEventAssessmentTestCepWindowCloseOnDuration() and
+	 *     runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration()) - so the window that runs out is one loaded
+	 *     back from the database and the events it closes are the ones it came back with.
 	 *
-	 * The scenarios that do not, all for the same reason - what they read is a matter of seconds, and a restart is
-	 * seconds long: the operations flavours that wait for an eviction and the capacity discarding one that waits for
-	 * a window to run out (their durations have to stay short enough for the wait that follows), the delete during a
-	 * sleeping script, and the pattern flavours counting the copies of an examination that repeats once a second.
-	 * The windowless scenarios have no window to bring back at all.
+	 * The scenarios that do not, all for the same reason - what they read is a matter of seconds and a restart is
+	 * seconds long, and their durations have to stay short enough for the wait that follows them: the operations
+	 * flavours that wait for an eviction, the capacity discarding one that waits for a window to run out, the delete
+	 * during a sleeping script, and the pattern flavours counting the copies of an examination that repeats once a
+	 * second. The windowless scenarios have no window to bring back at all.
 	 */
 	private function maybeRestartServerMidScenario(): void {
 		if (static::SKIP_RESTART_TESTS) {
@@ -15257,6 +15672,17 @@ HEREDOC;
 	 */
 	private static function getRestartWindowAllowance(): int {
 		return static::SKIP_RESTART_TESTS ? 0 : static::CEP_RESTART_WINDOW_ALLOWANCE;
+	}
+
+	/**
+	 * How long the sliding windows of the duration close scenario last, in seconds: the age at which the oldest event
+	 * of such a window is evicted, which is what ends the window there - see
+	 * runEventAssessmentTestCepWindowCloseOnDuration(). The stop and start that scenario takes between its two values
+	 * happens inside that lifetime, so the time it costs is part of the period as well: the younger event has to still
+	 * be in the window when the older one ages out, restart or no restart.
+	 */
+	private static function getCloseOnDurationPeriod(): int {
+		return static::CEP_RULE_WINDOW_CLOSE_DURATION_PERIOD + static::getRestartWindowAllowance();
 	}
 
 	/**
@@ -16116,16 +16542,22 @@ HEREDOC;
 		}
 	}
 
-	private function waitForNoOpenProblems(array $triggerids, string $message = '', bool $wait_cep_drained = true): void {
+	private function waitForNoOpenProblems(array $triggerids, string $message = '', bool $wait_cep_drained = true,
+			?int $iterations = null): void {
 		// Wait for all problems to have a recovery event.
 		// Wait until no unresolved problems remain. Using countOutput avoids fetching/decoding any
 		// problem rows: the server returns just a count, and we poll until it reaches zero. (Default
 		// problem.get without 'recent' returns only open problems, so count 0 means all recovered.)
+		//
+		// $iterations replaces the patience of this one wait, for the scenarios whose closing is due at a time they
+		// know rather than as soon as a value has been processed: what they pass is that time and no more, so a
+		// closing that does not happen is reported when it was due instead of at the end of a generic patience - see
+		// runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration().
 		$this->callUntilCountIsPresent('problem.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS
-		], 0, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], 0, $iterations === null ? static::WAIT_ITERATIONS : $iterations, self::WAIT_ITERATION_DELAY);
 
 		// Wait for all triggers to return to OK.
 		$this->callUntilDataIsPresent('trigger.get', [
