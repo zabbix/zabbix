@@ -81,7 +81,15 @@ class CControllerCepRuleList extends CController {
 		$data['ceprules'] = self::fetchCepRules($filter);
 		$data['group_names'] = self::fetchGroupNames($data['ceprules']);
 
-		CArrayHelper::sort($data['ceprules'], [['field' => $sort_field, 'order' => $sort_order]]);
+		if ($sort_field === 'sortorder') {
+			CArrayHelper::sort($data['ceprules'], [
+				['field' => 'sortorder', 'order' => $sort_order],
+				['field' => 'name', 'order' => $sort_order]
+			]);
+		}
+		else {
+			CArrayHelper::sort($data['ceprules'], [['field' => $sort_field, 'order' => $sort_order]]);
+		}
 
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('ceprule.list', $page_num);
@@ -100,7 +108,8 @@ class CControllerCepRuleList extends CController {
 		$result_cep = [];
 		$result_legacy = [];
 
-		if ($filter['type'] == CCepRuleHelper::FILTER_SHOW_ALL || $filter['type'] == CCepRuleHelper::FILTER_SHOW_LEGACY) {
+		if ($filter['type'] == CCepRuleHelper::FILTER_SHOW_ALL
+				|| $filter['type'] == CCepRuleHelper::FILTER_SHOW_LEGACY) {
 			$result_legacy = API::Correlation()->get([
 				'output' => ['correlationid', 'name', 'description', 'status'],
 				'selectFilter' => ['conditions'],
