@@ -51,6 +51,41 @@ class CProxyHelper {
 	}
 
 	/**
+	 * Resolves a proxy group ID into a display-safe representation, respecting the current user's proxy group
+	 * permissions.
+	 *
+	 * @param string $proxy_groupid  ID of the proxy group to resolve.
+	 *
+	 * @return array
+	 */
+	public static function resolveProxyGroupOption(string $proxy_groupid): array {
+		if ($proxy_groupid == 0) {
+			return [];
+		}
+
+		$proxy_groups = API::ProxyGroup()->get([
+			'output' => ['proxy_groupid', 'name'],
+			'proxy_groupids' => $proxy_groupid
+		]);
+
+		if ($proxy_groups) {
+			$proxy_group = $proxy_groups[0];
+
+			return [
+				'id' => $proxy_group['proxy_groupid'],
+				'name' => $proxy_group['name'],
+				'inaccessible' => false
+			];
+		}
+
+		return [
+			'id' => $proxy_groupid,
+			'name' => _('Inaccessible proxy group'),
+			'inaccessible' => true
+		];
+	}
+
+	/**
 	 * Builds HTML badges for Proxy Allow List for the specified user.
 	 *
 	 * @param array $all_proxies  All proxues not assigned to a proxy group.

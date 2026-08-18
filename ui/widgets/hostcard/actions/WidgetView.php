@@ -217,14 +217,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$host['proxy'] = CProxyHelper::resolveProxyOption($host['proxyid']);
 			}
 			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-				$db_proxy_groups = API::ProxyGroup()->get([
-					'output' => ['name'],
-					'proxy_groupids' => [$host['proxy_groupid']]
-				]);
-
-				$host['proxy_group'] = $db_proxy_groups
-					? $db_proxy_groups[0]
-					: ['name' => _('Inaccessible proxy group'), 'inaccessible' => true];
+				$host['proxy_group'] = CProxyHelper::resolveProxyGroupOption($host['proxy_groupid']);
 			}
 		}
 
