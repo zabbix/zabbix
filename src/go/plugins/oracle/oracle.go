@@ -88,10 +88,7 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 		return nil, errs.Wrap(err, "get connection failed")
 	}
 
-	timeout := conn.GetCallTimeout()
-	if timeout < time.Second*time.Duration(pluginCtx.Timeout()) {
-		timeout = time.Second * time.Duration(pluginCtx.Timeout())
-	}
+	timeout := max(conn.GetCallTimeout(), time.Second*time.Duration(pluginCtx.Timeout()))
 
 	ctx, cancel := conn.GetContextWithTimeout(timeout)
 	defer cancel()

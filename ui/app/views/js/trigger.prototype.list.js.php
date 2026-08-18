@@ -148,7 +148,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows(this.parent_discoveryid, response.keepids ?? []);
+						uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -157,7 +157,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows(this.parent_discoveryid);
+						uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`);
 					}
 
 					location.href = location.href;

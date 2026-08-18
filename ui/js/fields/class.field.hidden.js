@@ -67,7 +67,7 @@ class CFieldHidden extends CField {
 			this.setGlobalError(message);
 		}
 		else {
-			this._global_errors = {};
+			this._global_errors = Object.create(null);
 		}
 	}
 }

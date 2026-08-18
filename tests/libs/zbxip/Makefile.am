@@ -19,8 +19,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 IP_LIBS = \
-	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(ANY_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

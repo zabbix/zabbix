@@ -4597,9 +4597,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 			0 != del_tagids.values_num || 0 != del_hgsetids->values_num)
 	{
 
+		/* mark host group sets for complete removal by housekeeper by unlinking host group sets from hosts */
 		if (0 != del_hgsetids->values_num)
 		{
-			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from hgset where");
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from host_hgset where");
 			zbx_db_add_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hgsetid",
 					del_hgsetids->values, del_hgsetids->values_num);
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");

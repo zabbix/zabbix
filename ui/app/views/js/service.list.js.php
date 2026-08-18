@@ -31,9 +31,10 @@
 			this.is_refresh_pending = false;
 		}
 
-		init({serviceid, path = null, is_filtered = null, mode_switch_url, parent_url = null, refresh_url,
-				refresh_interval, return_url = null}) {
+		init({serviceid, is_inaccessible, path = null, is_filtered = null, mode_switch_url, parent_url = null,
+				refresh_url, refresh_interval, return_url = null}) {
 			this.serviceid = serviceid;
+			this._is_inaccessible = is_inaccessible;
 			this.path = path;
 			this.is_filtered = is_filtered;
 			this.mode_switch_url = mode_switch_url;
@@ -43,9 +44,17 @@
 			this.return_url = return_url;
 
 			this.#initViewModeSwitcher();
-			this.#initTagFilter();
+
+			if (!this._is_inaccessible) {
+				this.#initTagFilter();
+			}
+
 			this.#initActions();
-			this.#initRefresh();
+
+			if (!this._is_inaccessible) {
+				this.#initRefresh();
+			}
+
 			this.#initPopupListeners();
 		}
 
@@ -204,7 +213,7 @@
 		}
 
 		#refresh() {
-			if (this.is_refresh_paused || this.is_refresh_pending) {
+			if (this._is_inaccessible || this.is_refresh_paused || this.is_refresh_pending) {
 				return;
 			}
 

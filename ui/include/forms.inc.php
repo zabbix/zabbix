@@ -197,7 +197,7 @@ JAVASCRIPT;
 	if (array_key_exists('itemid', $item)) {
 		$data['item'] = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
-		$data['limited'] = ($data['item']['templateid'] != 0);
+		$data['limited'] = ($data['item']['templateid'] != 0) && $data['form'] !== 'clone';
 		$data['interfaceid'] = $item['interfaceid'];
 
 		// Check for a discovered prototype

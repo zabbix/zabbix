@@ -53,8 +53,8 @@ class LinkForm {
 					filter: {
 						value_type: allowed_item_value_types
 					},
-					real_hosts: true,
-					resolve_macros: true
+					real_hosts: 1,
+					resolve_macros: 1
 				},
 				popup: {
 					parameters: {

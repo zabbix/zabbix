@@ -1,0 +1,32 @@
+---
+test case: memory mode create fails when buffer size is below minimum
+in:
+  mode: 1
+  size: 100
+out:
+  create_result: FAIL
+---
+test case: disk mode create succeeds - get_mem_info returns error
+in:
+  mode: 0
+  size: 0
+out:
+  create_result: SUCCEED
+  mem_info_result: FAIL
+  state: 0
+db data:
+  ids: []
+  ids (2): []
+  ids (3): []
+  proxy_history: []
+  proxy_dhistory: []
+  proxy_autoreg_host: []
+---
+test case: memory mode create succeeds - get_mem_info returns stats and state is 1
+in:
+  mode: 1
+  size: 1048576
+out:
+  create_result: SUCCEED
+  mem_info_result: SUCCEED
+  state: 1

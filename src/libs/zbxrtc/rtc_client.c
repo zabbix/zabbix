@@ -388,7 +388,7 @@ void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32
 
 /******************************************************************************
  *                                                                            *
- * Purpose: unsubsribe service from RTC notifications                         *
+ * Purpose: unsubscribe service from RTC notifications                        *
  *                                                                            *
  * Parameters:                                                                *
  *      config_timeout - [IN]                                                 *

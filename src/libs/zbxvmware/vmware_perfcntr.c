@@ -468,6 +468,7 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
+			memset(counter, 0, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s]", group, key, rollup);
 			ZBX_STR2UINT64(counter->id, counterid);
 			STR2UNIT(counter->unit, unit);
@@ -488,6 +489,7 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 				NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
+			memset(counter, 0, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s,%s]", group, key, rollup, stats);
 			ZBX_STR2UINT64(counter->id, counterid);
 			STR2UNIT(counter->unit, unit);
@@ -1350,7 +1352,10 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 	}
 
 	page.alloc = INIT_PERF_XML_SIZE;
+	page.offset = 0;
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
+	page.data[0] = '\0';
+
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1_V4);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER3);

@@ -70,7 +70,7 @@ zabbix_export:
           [Cloud SQL](https://cloud.google.com/monitoring/api/metrics_gcp#gcp-cloudsql)
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 7.4-4
       groups:
         - name: Templates/Cloud
       items:
@@ -339,9 +339,7 @@ zabbix_export:
                   	obj.high_availability = (sql_inst.failoverReplica) ? true : false;
                   
                   	if (obj.db_type.match(/SQLSERVER*/)) {
-                  		var mssql_audit = getField(sql_inst, 'settings.sqlServerAuditConfig');
-                  
-                  		obj.audited = (mssql_audit.bucket) ? true : false;
+                  		obj.audited = getFieldBool(sql_inst, 'settings.sqlServerAuditConfig.bucket');
                   	}
                   
                   	if (obj.inst_type === 'READ_REPLICA_INSTANCE') {

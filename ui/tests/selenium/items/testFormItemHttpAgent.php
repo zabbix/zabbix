@@ -17,8 +17,6 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @onBefore prepareHTTPItemData
  *
@@ -99,7 +97,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$this->query('link:'.$rows['Name'])->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
+		$this->query('id:name')->waitUntilVisible()->one();
 
 		foreach ($rows as $field_name => $value) {
 			$form_field = $form->getField($field_name);
@@ -1234,8 +1232,9 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$this->zbxTestWaitForPageToLoad();
 			$dialog = COverlayDialogElement::find()->one()->waitUntilready();
 			$dialog->getFooter()->query('button:Update')->one()->click();
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item updated');
+			$this->assertMessage(TEST_GOOD, 'Item updated');
 			$dialog->ensureNotPresent();
+			CMessageElement::find()->one()->close();
 		}
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));

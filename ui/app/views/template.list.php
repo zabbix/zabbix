@@ -32,7 +32,7 @@ $html_page = (new CHtmlPage())
 		(new CList())
 			->addItem(
 				(new CSimpleButton(_('Create template')))
-					->setAttribute('data-groupids', json_encode(array_keys($data['filter']['groups'])))
+					->setAttribute('data-groupids', json_encode(array_column($data['filter']['groups'], 'id')))
 					->setId('js-create'))
 			->addItem((new CSimpleButton(_('Import')))->setId('js-import'))
 	))->setAttribute('aria-label', _('Content controls')));
@@ -304,7 +304,7 @@ $form->addItem([
 		'template.export' => [
 			'content' => new CButtonExport('export.templates',
 				(new CUrl('zabbix.php'))
-					->setArgument('action', 'templates.list')
+					->setArgument('action', 'template.list')
 					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
 					->getUrl()
 			)

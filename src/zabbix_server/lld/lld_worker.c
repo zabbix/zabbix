@@ -25,7 +25,6 @@
 #include "zbxself.h"
 #include "zbxtime.h"
 #include "zbx_item_constants.h"
-#include "zbxstr.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
@@ -419,6 +418,9 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 		}
 
 		zbx_ipc_message_clean(&message);
+#ifdef HAVE_MALLOC_TRIM
+		zbx_malloc_trim(time(NULL), 0, ZBX_MEBIBYTE * 8);
+#endif
 	}
 
 	if (0 != lld_value.item.itemid)

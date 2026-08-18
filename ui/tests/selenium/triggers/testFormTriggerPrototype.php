@@ -20,7 +20,6 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 define('LONG_KEY', substr(STRING_6000, 0, 2038).'[{#MACRO}]');
 
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
@@ -422,7 +421,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		// Check hintbox.
 		$this->query('class:zi-help-filled-small')->one()->click();
-		$hint = $this->query('xpath:.//div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+		$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->one();
 
 		// Assert text.
 		$this->assertEquals('Menu entry name is used as a label for the trigger URL in the event context menu.',
@@ -793,7 +792,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expression' => 'last(/Simple form test host/someItem.uptime,#1)<0',
 					'url' => 'javascript:alert(123);',
 					'inline_errors' => [
-						'Menu entry URL' => 'Unacceptable URL.'
+						'Menu entry URL' => 'Unacceptable URL scheme.'
 					]
 				]
 			],
@@ -1090,7 +1089,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (!isset($data['constructor'])) {
-			$dialog_footer->query('button:Add')->one()->click();
+			$dialog_footer->query('button:Add')->waitUntilClickable()->one()->click();
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototype added');

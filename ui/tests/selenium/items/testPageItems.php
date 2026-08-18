@@ -23,6 +23,18 @@ require_once __DIR__.'/../../include/CLegacyWebTest.php';
  */
 class testPageItems extends CLegacyWebTest {
 
+	/**
+	 * Attach TableBehavior and MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			CMessageBehavior::class
+		];
+	}
+
 	public static function prepareItemData() {
 		$hostid = CDBHelper::getValue("SELECT hostid FROM hosts WHERE host='Host for trigger tags filtering'");
 		CDataHelper::call('item.create', [
@@ -250,5 +262,33 @@ class testPageItems extends CLegacyWebTest {
 		}
 
 		$this->assertEquals(count($data['result']), $table->getRows()->count());
+	}
+
+	/**
+	 * @dataProvider data
+	 */
+	public function testPageItems_Delete($data) {
+		$context = ($data['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
+		$this->page->login()->open('zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.
+				$data['hostid']
+		)->waitUntilReady();
+
+		$table_rows_count = $this->query('class:list-table')->asTable()->one()->getRows()->count();
+		$this->assertTableStats($table_rows_count);
+		$delete_button = $this->query('button:Delete')->one();
+
+		// Cancel delete.
+		$this->query('id:all_items')->asCheckbox()->one()->check();
+		$delete_button->click();
+		$this->page->dismissAlert();
+		$this->assertTableStats($table_rows_count);
+		$this->assertSelectedCount($table_rows_count);
+
+		// Delete all.
+		$delete_button->click();
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, 'Item deleted');
+		$this->assertTableStats(0);
+		$this->assertSelectedCount(0);
 	}
 }

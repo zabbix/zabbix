@@ -1172,10 +1172,8 @@ function getEventsSuppressions(array $events): array {
 			}
 		}
 
-		CArrayHelper::sort($event_suppressions, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
 		$suppressions[$event['eventid']] = [
-			'suppress_until' => array_values($event_suppressions),
+			'suppress_until' => $event_suppressions,
 			'count' => count($event_suppressions)
 		];
 	}
@@ -1217,10 +1215,8 @@ function getEventsMessages(array $events): array {
 			}
 		}
 
-		CArrayHelper::sort($event_messages, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
 		$messages[$event['eventid']] = [
-			'messages' => array_values($event_messages),
+			'messages' => $event_messages,
 			'count' => count($event_messages)
 		];
 	}
@@ -1268,10 +1264,8 @@ function getEventsSeverityChanges(array $events, array $triggers): array {
 			}
 		}
 
-		CArrayHelper::sort($event_severities, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
 		$severities[$event['eventid']] = [
-			'severities' => array_values($event_severities),
+			'severities' => $event_severities,
 			'count' => count($event_severities),
 			'original_severity' => $triggers[$event['objectid']]['priority'],
 			'current_severity' => $event['severity']
@@ -1510,29 +1504,6 @@ function getSingleEventActions(array $event, array $r_events, array $alerts): ar
 }
 
 /**
- * Get data required to create history list in problem update page.
- *
- * @param array  $event                               Array with event objects with acknowledges.
- *        array  $event['acknowledges']               Array with manual updates to problem.
- *        string $event['acknowledges'][]['clock']    Time when severity was changed.
- *        string $event['acknowledges'][]['userid']   Responsible user's userid.
- */
-function getEventUpdates(array $event): array {
-	$userids = [];
-
-	foreach ($event['acknowledges'] as $ack) {
-		$userids[$ack['userid']] = true;
-	}
-
-	CArrayHelper::sort($event['acknowledges'], [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
-	return [
-		'data' => array_values($event['acknowledges']),
-		'userids' => $userids
-	];
-}
-
-/**
  * Make icons (suppressions, messages, severity changes, actions) for actions column.
  *
  * @param string $eventid                  ID for event, for which icons are created.
@@ -1740,17 +1711,17 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButtonIcon {
 	if ($data['original_severity'] > $data['current_severity']) {
 		$button = (new CButtonIcon(ZBX_ICON_ARROW_DOWN_SMALL))
 			->addClass(ZBX_STYLE_COLOR_POSITIVE)
-			->setAttribute('aria-label', _x('Severity decreased', 'screen reader'));
+			->setAttribute('aria-label', _x('Problem severity decreased', 'screen reader'));
 	}
 	elseif ($data['original_severity'] < $data['current_severity']) {
 		$button = (new CButtonIcon(ZBX_ICON_ARROW_UP_SMALL))
 			->addClass(ZBX_STYLE_COLOR_NEGATIVE)
-			->setAttribute('aria-label', _x('Severity increased', 'screen reader'));
+			->setAttribute('aria-label', _x('Problem severity increased', 'screen reader'));
 	}
 	else {
 		$button = (new CButtonIcon(ZBX_ICON_ARROWS_TOP_BOTTOM))
 			->addClass(ZBX_STYLE_COLOR_ICON)
-			->setAttribute('aria-label', _x('Severity changed', 'screen reader'));
+			->setAttribute('aria-label', _x('Problem severity changed', 'screen reader'));
 	}
 
 	return $button->setHint($table, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);
@@ -1837,7 +1808,7 @@ function makeEventActionsIcon(array $data, $eventid): ?CButtonIcon {
 	return $button
 		->setAttribute('data-content', $data['count'])
 		->setAttribute('aria-label',
-			_xn('%1$s action', '%1$s actions', $data['count'], 'screen reader', $data['count'])
+			_xn('%1$s action have been taken', '%1$s actions have been taken', $data['count'], 'screen reader', $data['count'])
 		)
 		->setAjaxHint([
 			'type' => 'eventactions',

@@ -286,6 +286,7 @@ require_once __DIR__.'/tags/testFormTagsServices.php';
 require_once __DIR__.'/tags/testFormTagsServicesProblemTags.php';
 require_once __DIR__.'/tags/testFormTagsItem.php';
 require_once __DIR__.'/tags/testFormTagsItemPrototype.php';
+require_once __DIR__.'/tags/testFormTagsMaintenance.php';
 require_once __DIR__.'/tags/testFormTagsTemplate.php';
 require_once __DIR__.'/tags/testFormTagsTrigger.php';
 require_once __DIR__.'/tags/testFormTagsTriggerPrototype.php';
@@ -636,6 +637,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTagsServicesProblemTags');
 		$suite->addTestSuite('testFormTagsItem');
 		$suite->addTestSuite('testFormTagsItemPrototype');
+		$suite->addTestSuite('testFormTagsMaintenance');
 		$suite->addTestSuite('testFormTagsTemplate');
 		$suite->addTestSuite('testFormTagsTrigger');
 		$suite->addTestSuite('testFormTagsTriggerPrototype');

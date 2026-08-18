@@ -230,6 +230,10 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
+		'status_codes' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
 		'username' => [
 			'support_user_macros' => true,
 			'support_lld_macros' => true

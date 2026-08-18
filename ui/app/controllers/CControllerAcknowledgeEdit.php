@@ -114,14 +114,14 @@ class CControllerAcknowledgeEdit extends CController {
 
 		// Show action list if only one event is requested.
 		if (count($events) == 1) {
-			$history = getEventUpdates(reset($events));
-			$data['history'] = $history['data'];
+			$event = reset($events);
+			$data['history'] = $event['acknowledges'];
 			$data['users'] = API::User()->get([
 				'output' => ['username', 'name', 'surname'],
-				'userids' => array_keys($history['userids']),
+				'userids' => array_column($event['acknowledges'], 'userid', 'userid'),
 				'preservekeys' => true
 			]);
-			$data['problem_name'] = reset($events)['name'];
+			$data['problem_name'] = $event['name'];
 		}
 		else {
 			$data['problem_name'] = _s('%1$d problems selected.', count($events));

@@ -52,6 +52,10 @@ if ($data['has_inline_validation']) {
 	$options['has_inline_validation'] = true;
 }
 
+if ($data['readonly']) {
+	$table->setAttribute('data-readonly', '');
+}
+
 // fields
 foreach (array_values($data['tags']) as $index  => $tag) {
 	if ($with_automatic) {

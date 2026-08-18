@@ -40,6 +40,7 @@ require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
 /* require_once dirname(__FILE__).'/testTlsRequest.php'; */
 require_once dirname(__FILE__).'/testActiveAvailability.php';
+require_once dirname(__FILE__).'/testActiveCheckHeartbeat.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
 /* require_once dirname(__FILE__).'/testDiscoveryRules.php'; snmpsim does not work properly on new Debian */
 require_once dirname(__FILE__).'/testAutoregistration.php';
@@ -62,6 +63,10 @@ require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
 require_once dirname(__FILE__).'/testNestedLLD.php';
 require_once dirname(__FILE__).'/testCalculatedExpression.php';
+require_once dirname(__FILE__).'/testDiagInfo.php';
+require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
+/* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
+require_once dirname(__FILE__).'/testTelnetChecks.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -100,6 +105,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testTriggerState');
 		/* $suite->addTestSuite('testTlsRequest'); */
 		$suite->addTestSuite('testActiveAvailability');
+		$suite->addTestSuite('testActiveCheckHeartbeat');
 		$suite->addTestSuite('testProxyConfSync');
 		$suite->addTestSuite('testInitialConfSync');
 		$suite->addTestSuite('testEventsCauseAndSymptoms');
@@ -120,6 +126,10 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserMacrosWithContextRegex');
 		$suite->addTestSuite('testNestedLLD');
 		$suite->addTestSuite('testCalculatedExpression');
+		$suite->addTestSuite('testDiagInfo');
+		$suite->addTestSuite('testLLDHistorySyncAtScale');
+		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
+		$suite->addTestSuite('testTelnetChecks');
 		return $suite;
 	}
 }

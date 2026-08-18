@@ -38,8 +38,8 @@ int	item_preproc_validate_not_regex(const zbx_variant_t *value, const char *para
 int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *params, char **error);
 int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const char *params, char **error);
 int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const char *params, char **error);
-int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_t *ts,
-		const zbx_variant_t *history_value_last, zbx_variant_t *history_value, zbx_timespec_t *history_ts);
+int	item_preproc_throttle_value(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
+		const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out, zbx_timespec_t *history_ts);
 int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t *ts, const char *params,
 		const zbx_variant_t *history_value_last, zbx_variant_t *history_value, zbx_timespec_t *history_ts,
 		char **errmsg);

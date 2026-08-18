@@ -29,8 +29,23 @@ $html_page = (new CHtmlPage())
 	));
 
 $url = (new CUrl('host_discovery.php'))
-	->setArgument('context', $data['context'])
-	->getUrl();
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update')
+	->setArgument('context', $data['context']);
+
+if ($data['form'] !== 'create') {
+	$url->setArgument('itemid', $data['itemid']);
+}
+else {
+	$url->setArgument('hostid', $data['hostid']);
+}
+
+if ($data['master_itemid'] && $data['hostid'] && $data['backurl']) {
+	$url->setArgument('hostid', $data['hostid'])
+		->setArgument('master_itemid', $data['master_itemid'])
+		->setArgument('backurl', $data['backurl']);
+}
+
+$url = $url->getUrl();
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
@@ -62,7 +77,7 @@ if (array_key_exists('discoveryRule', $data)) {
 	]);
 }
 
-if (!empty($data['templates'])) {
+if (!empty($data['templates']) && $data['form'] !== 'clone') {
 	$item_tab->addItem([
 		new CLabel(_('Parent discovery rules')),
 		new CFormField($data['templates'])
@@ -1068,7 +1083,7 @@ if ($data['form_refresh'] == 0) {
 }
 
 // Append buttons to form.
-if (!empty($data['itemid'])) {
+if ($data['form'] === 'update') {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
@@ -1113,6 +1128,8 @@ $html_page->addItem($form);
 require_once __DIR__.'/js/configuration.host.discovery.edit.js.php';
 
 $html_page->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	item_form.init('.json_encode([

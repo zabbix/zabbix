@@ -19,6 +19,8 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 /**
  * @backup hosts
  *
+ * @dataSource HostAvailabilityWidget
+ *
  * @onBefore prepareInterfacesData
  */
 class testPageHostInterfaces extends CWebTest {
@@ -454,9 +456,11 @@ class testPageHostInterfaces extends CWebTest {
 
 		// Unstable test ConfigurationHosts#3 on Jenkins due to insufficient table width and horizontal scroll appears.
 		if (CTestArrayHelper::get($data, 'filter', false) && $selector === 'hosts') {
+			$table = $this->query('class:list-table')->asTable()->one();
 			$filter_form = CFilterElement::find()->one()->getForm();
 			$filter_form->fill($data['filter']);
 			$filter_form->submit();
+			$table->waitUntilReloaded();
 		}
 
 		if ($navigation) {
@@ -477,7 +481,7 @@ class testPageHostInterfaces extends CWebTest {
 			$this->assertEquals($data['interfaces'][$interface_name]['color'], $interface->getCSSValue('background-color'));
 			// Open interface popup. Unstable test on Jenkins, requires hoverMouse.
 			$interface->hoverMouse()->waitUntilClickable()->click();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$overlay = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()->waitUntilPresent()->one();
 			$interface_table = $overlay->query('xpath:.//table[@class="list-table"]')->asTable()->one();
 			// Check table headers in popup.
 			$this->assertSame(['Interface', 'Status', 'Error'], $interface_table->getHeadersText());
