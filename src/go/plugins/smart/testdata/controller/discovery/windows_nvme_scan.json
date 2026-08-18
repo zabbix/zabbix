@@ -1,0 +1,18 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 1],
+    "pre_release": false,
+    "platform_info": "x86_64-w64-mingw32-generic",
+    "argv": ["smartctl", "--scan", "-j"],
+    "exit_status": 0
+  },
+  "devices": [
+    {
+      "name": "/dev/sda",
+      "info_name": "/dev/sda",
+      "type": "nvme",
+      "protocol": "NVMe"
+    }
+  ]
+}
