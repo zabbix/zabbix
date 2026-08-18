@@ -1369,8 +1369,7 @@ static void	audit_item_add_query_aggr_column(const char *prefix_aggr_col,
 		zbx_snprintf(prefix_param, sizeof(prefix_param), "%s.%s[%d]",
 				prefix_aggr_col, ZBX_TQ_QUERY_TAG_PARAMETERS, j);
 
-		add_string_cb(prefix_param, "Added", ctx);
-		add_string_cb(KEY(prefix_param, ZBX_TQ_QUERY_TAG_VALUE), aggr_col->parameters.values[j], ctx);
+		add_string_cb(prefix_param, aggr_col->parameters.values[j], ctx);
 	}
 
 	add_string_cb(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_ALIAS), aggr_col->alias, ctx);
@@ -1650,7 +1649,7 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 					j < aggr_col_new->parameters.values_num; j++)
 			{
 				const char	*param_old = NULL, *param_new = NULL;
-				char		prefix_param[AUDIT_DETAILS_KEY_LEN];
+				char		key_param[AUDIT_DETAILS_KEY_LEN];
 
 				if (j < aggr_col_old->parameters.values_num)
 					param_old = aggr_col_old->parameters.values[j];
@@ -1658,37 +1657,29 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 				if (j < aggr_col_new->parameters.values_num)
 					param_new = aggr_col_new->parameters.values[j];
 
-				zbx_snprintf(prefix_param, sizeof(prefix_param), "%s.%s[%d]", prefix_aggr_col,
+				zbx_snprintf(key_param, sizeof(key_param), "%s.%s[%d]", prefix_aggr_col,
 						ZBX_TQ_QUERY_TAG_PARAMETERS, j);
 
 				if (NULL != param_old && NULL != param_new)
 				{
 					int	param_changed = FAIL;
 
-					UPD_STR(KEY(prefix_param, ZBX_TQ_QUERY_TAG_VALUE), param_old, param_new,
-							&param_changed);
+					UPD_STR(key_param, param_old, param_new, &param_changed);
 
 					if (SUCCEED == param_changed)
-					{
-						zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID,
-								AUDIT_DETAILS_ACTION_ADD, prefix_param, "Updated",
-								NULL, NULL);
 						aggr_col_changed = SUCCEED;
-					}
 				}
 				else if (NULL == param_old)
 				{
 					zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID,
-							AUDIT_DETAILS_ACTION_ADD, prefix_param, "Added", NULL, NULL);
-					zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID,
-							AUDIT_DETAILS_ACTION_ADD,
-							KEY(prefix_param, ZBX_TQ_QUERY_TAG_VALUE), param_new, NULL,
-							NULL);
+							AUDIT_DETAILS_ACTION_ADD, key_param, param_new, NULL, NULL);
+					aggr_col_changed = SUCCEED;
 				}
 				else /* NULL == param_new */
 				{
 					zbx_audit_update_json_delete(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_DELETE,
-							prefix_param);
+							key_param);
+					aggr_col_changed = SUCCEED;
 				}
 			}
 
