@@ -31,11 +31,6 @@ require_once __DIR__.'/../common/testWidgets.php';
 class testDashboardClockWidget extends testWidgets {
 
 	/**
-	 * There are two labels "Time zone", so the xpath is used for Time zone container in Advanced configuration block.
-	 */
-	const TZONE_FIELDS_GROUP = 'xpath:.//div[@class="fields-group fields-group-tzone"]';
-
-	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
@@ -194,10 +189,13 @@ class testDashboardClockWidget extends testWidgets {
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Clock')]);
 
+		$timezone = CDateTimeHelper::getTimeZoneFormat('Europe/Riga');
+
 		$form->checkValue([
 			'Name' => '',
 			'Refresh interval' => 'Default (15 minutes)',
 			'Time type' => 'Local time',
+			'Override time zone' => 'Local default: '.$timezone,
 			'Clock type' => 'Analog',
 			'id:show_header' => true
 		]);
@@ -205,7 +203,7 @@ class testDashboardClockWidget extends testWidgets {
 		// Check fields "Refresh interval" and "Time type" values.
 		$dropdowns = [
 			'Refresh interval' => ['Default (15 minutes)',  'No refresh', '10 seconds', '30 seconds', '1 minute',
-				'2 minutes', '10 minutes',  '15 minutes'
+					'2 minutes', '10 minutes',  '15 minutes'
 			],
 			'Time type' => ['Local time', 'Server time', 'Host time']
 		];
@@ -221,16 +219,21 @@ class testDashboardClockWidget extends testWidgets {
 			$form->fill(['Time type' => $type]);
 
 			/**
-			 * If the clock widgets type equals to "Host time", then additional field appears - 'Item',
-			 * which requires to select item of the "Host", in this case array_splice function allows us to put
-			 * this fields name into the array. Positive offset (5) starts from the beginning of the array,
-			 * while - (0) length parameter - specifies how many elements will be removed.
+			 * If the clock widgets type equals to "Host time", then an empty 'Item' multiselect appears instead of the
+			 * 'Override time zone' field. Function array_splice replaces field 'Override time zone' with field 'Item'
+			 * in the $fields array. Second parameter (with value '5') is offset from the beginning of the array,
+			 * third parameter (with value '1') represents how many $fields array elements will be replaced, and the
+			 * forth parameter is an array with the replacement elements.
 			 */
 			if ($type === 'Host time') {
 				$form->getField('Item')->waitUntilVisible();
 				array_splice($fields, 5, 1, ['Item']);
 				$form->checkValue(['Item' => '']);
 				$form->isRequired('Item');
+			}
+			else {
+				$timezone_prefix = ($type === 'Server time') ? 'System default: ' : 'Local default: ';
+				$this->assertEquals($timezone_prefix.$timezone, $form->getField('Override time zone')->getValue());
 			}
 
 			$this->assertEquals($fields, array_values($form->getLabels(CElementFilter::VISIBLE)->asText()));
@@ -266,8 +269,7 @@ class testDashboardClockWidget extends testWidgets {
 				$form->fill(['Advanced configuration' => true]);
 
 				// Check that only Background colour and Time fields are visible (because only Time checkbox is checked).
-				foreach (['Background colour' => true, 'Date' => false, 'Time' => true,
-							self::TZONE_FIELDS_GROUP => false] as $name => $visible) {
+				foreach (['Background colour' => true, 'Date' => false, 'Time' => true, 'Time zone' => false] as $name => $visible) {
 					$this->assertTrue($form->getField($name)->isVisible($visible));
 				}
 
@@ -285,35 +287,23 @@ class testDashboardClockWidget extends testWidgets {
 						'id:time_sec' => true,
 						'id:time_format' => '24-hour'
 					],
-					// This is Time zone field found by xpath, because we have one more field with Time zone label.
-					self::TZONE_FIELDS_GROUP => [
+					'Time zone' => [
 						'id:tzone_bold' => false,
 						'xpath:.//z-color-picker[@color-field-name="date_color"]' => null,
-						'id:tzone_timezone' => null,
 						'id:tzone_format' => 'Short'
 					]
 				];
 
 				// Check Advanced config fields depending on Time type.
 				foreach (['Local time', 'Server time', 'Host time'] as $type) {
-					$form->fill(['Time type' => $type]);
-					$form->fill(['Advanced configuration' => true]);
+					$form->fill(['Time type' => $type, 'Advanced configuration' => true]);
 
-					// Check that with Host time 'Time zone' and 'Format' fields disappear,
-					// otherwise 'Time zone' default value depends on selected Time type.
+					// Check that with Host time 'Format' field disappears.
 					if ($type === 'Host time') {
 						$form->getField('Item')->waitUntilVisible();
-						$advanced_configuration[self::TZONE_FIELDS_GROUP] =
-								['id:tzone_bold' => false, 'xpath:.//z-color-picker[@color-field-name="tzone_color"]' => null];
+						unset($advanced_configuration['Time zone']['id:tzone_format']);
 
-						foreach (['id:tzone_timezone', 'id:tzone_format'] as $id) {
-							$this->assertFalse($form->getField($id)->isVisible());
-						}
-					}
-					else {
-						$advanced_configuration[self::TZONE_FIELDS_GROUP]['id:tzone_timezone'] =
-							($type === 'Local time' ? 'Local default: ' : 'System default: ').
-							CDateTimeHelper::getTimeZoneFormat('Europe/Riga');
+						$this->assertFalse($form->getField('id:tzone_format')->isVisible());
 					}
 
 					// Check Advanced fields' visibility and values.
@@ -335,7 +325,7 @@ class testDashboardClockWidget extends testWidgets {
 				// Now remove the Time checkbox from Show field and check that only its Advanced config disappeared.
 				$form->fill(['id:show_2' => false]);
 
-				foreach ( ['Date' => true, 'Time' => false, self::TZONE_FIELDS_GROUP => true] as $name => $visible) {
+				foreach ( ['Date' => true, 'Time' => false, 'Time zone' => true] as $name => $visible) {
 					$this->assertTrue($form->getField($name)->isVisible($visible));
 				}
 			}
