@@ -840,13 +840,14 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 	unsigned char			*results = NULL;
 	zbx_db_event			*event;
 
+	query.triggerid = triggerid;
+	query.flags = TRIGGER_VALUE_OK;
+	zbx_vector_uint64_create(&query.dep_triggerids);
+
 	zbx_dc_config_get_triggers_by_triggerids(&trigger, &triggerid, &errcode, 1);
 	if (SUCCEED != errcode)
 		goto out;
 
-	query.triggerid = triggerid;
-	query.flags = TRIGGER_VALUE_OK;
-	zbx_vector_uint64_create(&query.dep_triggerids);
 	zbx_cep_assess_trigger_events(&query, 1, &results);
 
 	if (CEP_EVENT_DENY == results[0])
