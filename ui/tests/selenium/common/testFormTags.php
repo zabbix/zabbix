@@ -286,6 +286,11 @@ class testFormTags extends CWebTest {
 				$group_field = ($object === 'template') ? 'Template groups' : 'Host groups';
 				$group_name = ($object === 'template') ? 'Templates' : 'Zabbix servers';
 				$fields = [ucfirst($object).' name' => $data['name'], $group_field => $group_name];
+				break;
+
+			case 'maintenance':
+				$sql = 'SELECT * FROM maintenances ORDER BY maintenanceid';
+				$fields = ['Name' => $data['name'], 'Host groups' => 'Zabbix servers'];
 		}
 
 		if ($expected === TEST_BAD) {
@@ -293,7 +298,8 @@ class testFormTags extends CWebTest {
 		}
 
 		$this->page->login()->open($this->link);
-		$this->query('button:Create '.$object)->waitUntilClickable()->one()->click();
+		$button_name = ($object === 'maintenance') ? 'Create maintenance period' : 'Create '.$object;
+		$this->query('button:'.$button_name)->waitUntilClickable()->one()->click();
 
 		switch ($object) {
 			case 'host prototype':
@@ -326,12 +332,27 @@ class testFormTags extends CWebTest {
 				$form = COverlayDialogElement::find()->waitUntilReady()->asGridForm(['normalized' => true])->one()->waitUntilVisible();
 				$form->fill($fields);
 				break;
+
+			case 'maintenance':
+				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+				$form->fill($fields);
+				$form->getField('Periods')->query('button:Add')->one()->click();
+				$period_form = COverlayDialogElement::find(1)->waitUntilReady()->asForm()->one();
+				$period_form->submit();
+				$period_form->waitUntilNotVisible();
+				break;
 		}
 
-		if (!$this->problem_tags && $object !== 'connector') {
+		if (!$this->problem_tags && !in_array($object, ['connector', 'maintenance'])) {
 			$form->selectTab('Tags');
 		}
-		$this->query($this->tags_table)->asMultifieldTable()->one()->fill($data['tags']);
+
+		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->one();
+		if ($object === 'maintenance') {
+			$tags_table->setFieldMapping(['tag', 'operator', 'value']);
+		}
+
+		$tags_table->fill($data['tags']);
 
 		// Check screenshots of text area right after filling.
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
@@ -353,7 +374,6 @@ class testFormTags extends CWebTest {
 		$this->checkResult($data, $object, $form, 'add', $sql, $old_hash, $inline_validation);
 
 		return $form;
-
 	}
 
 	public static function getUpdateData() {
@@ -513,6 +533,10 @@ class testFormTags extends CWebTest {
 			case 'template':
 				$sql = 'SELECT * FROM hosts ORDER BY hostid';
 				$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : null;
+				break;
+
+			case 'maintenance':
+				$sql = 'SELECT * FROM maintenances ORDER BY maintenanceid';
 		}
 
 		if ($expected === TEST_BAD) {
@@ -531,21 +555,28 @@ class testFormTags extends CWebTest {
 				$this->query('button:Reset')->one()->click();
 				$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 				$form->fill(['Name' => $this->update_name]);
+				$table = $this->query('class:list-table')->asTable()->one();
 				$this->query('button:Apply')->one()->waitUntilClickable()->click();
+				$table->waitUntilReloaded();
 			}
 
 			$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
 		}
 
-			$form = ($object === 'web scenario' || $object === 'host prototype')
-					? $this->query($locator)->asForm()->waitUntilPresent()->one()
-					: COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
+		$form = ($object === 'web scenario' || $object === 'host prototype')
+			? $this->query($locator)->asForm()->waitUntilPresent()->one()
+			: COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
 
-		if (!$this->problem_tags && $object !== 'connector') {
+		if (!$this->problem_tags && !in_array($object, ['connector', 'maintenance'])) {
 			$form->selectTab('Tags');
 		}
 
-		$this->query($this->tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
+		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->waitUntilPresent()->one();
+		if ($object === 'maintenance') {
+			$tags_table->setFieldMapping(['tag', 'operator', 'value']);
+		}
+
+		$tags_table->fill($data['tags']);
 
 		if ($inline_validation && $expected === TEST_BAD) {
 			$this->page->removeFocus();
@@ -574,7 +605,7 @@ class testFormTags extends CWebTest {
 	 * @param string    $old_hash           db hash before changes
 	 * @param bool      $inline_validation  flag that determines if inline validation is enabled in the form
 	 */
-	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null, $inline_validation = false) {
+	protected function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null, $inline_validation = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if ($inline_validation) {
 				$inline_error = [];
@@ -596,6 +627,9 @@ class testFormTags extends CWebTest {
 			elseif ($object === 'service') {
 				$title = null;
 			}
+			elseif ($object === 'maintenance') {
+				$title = ($action === 'add') ? 'Cannot create maintenance period' : 'Cannot update maintenance period';
+			}
 			else {
 				$title = ($action === 'add')
 					? ($object === 'connector') ? 'Cannot create '.$object : 'Cannot add '.$object
@@ -610,7 +644,7 @@ class testFormTags extends CWebTest {
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 
 			if (in_array($object, ['connector', 'template', 'trigger', 'trigger prototype', 'item', 'item prototype',
-				'host', 'service'])) {
+				'host', 'service', 'maintenance'])) {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -643,11 +677,20 @@ class testFormTags extends CWebTest {
 				case 'connector':
 					$success_sql = 'SELECT NULL FROM connector WHERE name='.zbx_dbstr($data['name']);
 					break;
+
+				case 'maintenance':
+					$success_sql = 'SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($data['name']);
+					break;
 			}
 
-			$title = ($action === 'add')
-				? ($object === 'service' || $object === 'connector') ? ucfirst($object).' created' : ucfirst($object).' added'
-				: ucfirst($object).' updated';
+			if ($object === 'maintenance') {
+				$title = ($action === 'add') ? 'Maintenance period created' : 'Maintenance period updated';
+			}
+			else {
+				$title = ($action === 'add')
+					? ($object === 'service' || $object === 'connector') ? ucfirst($object).' created' : ucfirst($object).' added'
+					: ucfirst($object).' updated';
+			}
 
 			$this->assertMessage(TEST_GOOD, $title);
 
@@ -752,9 +795,15 @@ class testFormTags extends CWebTest {
 				$sql_new_name = 'SELECT NULL FROM connector WHERE name='.zbx_dbstr($new_name);
 				break;
 
+			case 'maintenance':
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+				$form->fill(['Name' => $new_name]);
+				$sql_old_name = 'SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->clone_name);
+				$sql_new_name = 'SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($new_name);
+				break;
 		}
 
-		if (!$this->problem_tags && $object !== 'connector') {
+		if (!$this->problem_tags && !in_array($object, ['connector', 'maintenance'])) {
 			$form->selectTab('Tags');
 		}
 		$element = $this->query($this->tags_table)->asMultifieldTable()->waitUntilPresent()->one();
@@ -775,6 +824,9 @@ class testFormTags extends CWebTest {
 
 		if ($object === 'discovered host') {
 			$this->assertMessage(TEST_GOOD, ('Host added'));
+		}
+		elseif ($object === 'maintenance') {
+			$this->assertMessage(TEST_GOOD, 'Maintenance period created');
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, (
@@ -824,11 +876,12 @@ class testFormTags extends CWebTest {
 			case 'web scenario':
 			case 'connector':
 			case 'service':
+			case 'maintenance':
 				$this->assertEquals($new_name, $form->getField('Name')->getValue());
 				break;
 		}
 
-		if ($object !== 'connector') {
+		if (!in_array($object, ['connector', 'maintenance'])) {
 			$form->selectTab('Tags');
 		}
 
@@ -846,7 +899,7 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   host, template, trigger, item or prototype
 	 * @param string   $form     object configuration form
 	 */
-	private function checkTagFields($data, $object, $form) {
+	protected function checkTagFields($data, $object, $form) {
 		switch ($object) {
 			case 'item':
 			case 'item prototype':
@@ -877,6 +930,7 @@ class testFormTags extends CWebTest {
 			case 'connector':
 			case 'item':
 			case 'item prototype':
+			case 'maintenance':
 				$this->page->open($this->link);
 				$table = $this->query($object === 'item' ? 'name:item_list' : 'class:list-table')->asTable()->one()
 					->waitUntilReady();
@@ -902,7 +956,7 @@ class testFormTags extends CWebTest {
 			$form = $this->query('id:host-form')->waitUntilPresent()->asForm()->one();
 		}
 
-		if (!$this->problem_tags && $object !== 'connector') {
+		if (!$this->problem_tags && !in_array($object, ['connector', 'maintenance'])) {
 			$form->selectTab('Tags');
 		}
 
@@ -926,7 +980,13 @@ class testFormTags extends CWebTest {
 		}
 		unset($tag);
 
-		$this->query($this->tags_table)->asMultifieldTable()->one()->checkValue($expected);
+		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->one();
+
+		if ($object === 'maintenance') {
+			$tags_table->setFieldMapping(['tag', 'operator', 'value']);
+		}
+
+		$tags_table->checkValue($expected);
 
 		// Check screenshot of text area after saving.
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
@@ -1271,6 +1331,7 @@ class testFormTags extends CWebTest {
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
 
 		if ($object === 'web scenario') {
+			$form->waitUntilReloaded();
 			$this->page->waitUntilReady();
 		}
 		else {
@@ -1307,11 +1368,12 @@ class testFormTags extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function getInheritedTags() {
+	protected function getInheritedTags() {
 		$inherited_tags = [];
 
 		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->one();
 		$headers = $tags_table->getHeadersText();
+
 		// Find disabled rows of host and/or template tags by disabled Name field.
 		$disabled_rows = $tags_table->findRows(function ($row) {
 			return $row->getColumn('Name')->children()->one()->detect()->isEnabled() === false;
@@ -1319,8 +1381,9 @@ class testFormTags extends CWebTest {
 
 		foreach ($disabled_rows as $row) {
 			// Check other disabled fields.
-			$this->assertFalse($row->getColumn('Value')->children()->one()->detect()->isEnabled());
-			$this->assertFalse($row->getColumn('')->children()->one()->detect()->isEnabled());
+			foreach (['Value', ''] as $column) {
+				$this->assertFalse($row->getColumn($column)->children()->one()->isEnabled());
+			}
 
 			$values = [];
 			// Get disabled row values.
@@ -1341,7 +1404,7 @@ class testFormTags extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function prepareAllTags($tags, $parent_tags) {
+	protected function prepareAllTags($tags, $parent_tags) {
 		// Prepare all tags data (inherited form host and/or template, and element tags).
 		$all_tags = array_merge($parent_tags, $tags);
 		// Sort reference tags array by field "tag".
@@ -1360,7 +1423,7 @@ class testFormTags extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function prepareInheritedTags($tags, $parent_tags = false) {
+	protected function prepareInheritedTags($tags, $parent_tags = false) {
 		if (!$parent_tags) {
 			$host_template_tags = array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS);
 			$parent_tags = array_unique($host_template_tags, SORT_REGULAR);
@@ -1420,11 +1483,17 @@ class testFormTags extends CWebTest {
 				? $this->query($locators[$object])->asForm()->waitUntilPresent()->one()
 				: COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
-		if (!$this->problem_tags && $object !== 'connector') {
+		if (!$this->problem_tags && !in_array($object, ['connector', 'maintenance'])) {
 			$form->selectTab('Tags');
 		}
 
-		$this->query($this->tags_table)->asMultifieldTable()->waitUntilPresent()->one()->clear();
+		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->waitUntilPresent()->one();
+
+		if ($object === 'maintenance') {
+			$tags_table->setFieldMapping(['tag', 'operator', 'value']);
+		}
+
+		$tags_table->clear();
 		$form->submit();
 		$this->page->waitUntilReady();
 

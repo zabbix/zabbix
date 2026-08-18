@@ -655,11 +655,11 @@ class CMediatype extends CApiService {
 		$api_required = $is_update ? 0 : API_REQUIRED;
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'redirection_url' =>		['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'redirection_url')],
+			'redirection_url' =>		['type' => API_URL, 'flags' => $api_required | API_NOT_EMPTY, 'schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES, 'length' => DB::getFieldLength('media_type_oauth', 'redirection_url')],
 			'client_id' =>				['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'client_id')],
 			'client_secret' =>			['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'client_secret')],
-			'authorization_url' =>		['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'authorization_url')],
-			'token_url' =>				['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'token_url')],
+			'authorization_url' =>		['type' => API_URL, 'flags' => $api_required | API_NOT_EMPTY, 'schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES, 'length' => DB::getFieldLength('media_type_oauth', 'authorization_url')],
+			'token_url' =>				['type' => API_URL, 'flags' => $api_required | API_NOT_EMPTY, 'schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES, 'length' => DB::getFieldLength('media_type_oauth', 'token_url')],
 			'tokens_status' =>			['type' => API_INT32, 'in' => implode(':', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID])],
 			'access_token' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'access_token')],
 			'access_token_updated' =>	['type' => API_TIMESTAMP],
@@ -693,6 +693,15 @@ class CMediatype extends CApiService {
 		if (array_key_exists('access_token', $mediatype) !== array_key_exists('access_expires_in', $mediatype)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
 				_('both "access_token" and "access_expires_in" should be either present or absent')
+			));
+		}
+
+		if ($is_update
+				&& !array_key_exists('client_secret', $mediatype)
+				&& array_key_exists('token_url', $mediatype)
+				&& $mediatype['token_url'] !== $db_mediatype['token_url']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('the parameter "%1$s" is missing', 'client_secret')
 			));
 		}
 	}
@@ -912,6 +921,12 @@ class CMediatype extends CApiService {
 					$_upd_media_type_oauth = DB::getUpdatedValues('media_type_oauth', $mediatype, $db_mediatype);
 
 					if ($_upd_media_type_oauth) {
+						if (array_key_exists('authorization_url', $_upd_media_type_oauth)
+								|| array_key_exists('token_url', $_upd_media_type_oauth)) {
+							$_upd_media_type_oauth['tokens_status'] = array_key_exists('tokens_status', $mediatype)
+								? $mediatype['tokens_status'] : 0;
+						}
+
 						$upd_media_type_oauth[] = [
 							'values' => $_upd_media_type_oauth,
 							'where' => ['mediatypeid' => $mediatype['mediatypeid']]

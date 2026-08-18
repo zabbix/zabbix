@@ -160,7 +160,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 		// Check the hintbox next to the Name fields.
 		$dialog_form->getLabel('Name')->query('xpath:./button[@data-hintbox]')->one()->click();
-		$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->all()->last();
+		$hintbox = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->all()->last();
 		$this->assertEquals('Shown as the label to all MFA users in authenticator apps.', $hintbox->getText());
 		$hintbox->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 
@@ -665,9 +665,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog_form = $dialog->asForm();
 		$this->page->removeFocus();
-		// TODO: unstable screenshot on Jenkins. Remove border radius from button element.
-		$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
-				[$dialog->query('button:Add')->one()]);
 		$this->assertScreenshot($dialog, 'type_totp');
 		$dialog_form->fill([
 			'Type' => 'Duo Universal Prompt',

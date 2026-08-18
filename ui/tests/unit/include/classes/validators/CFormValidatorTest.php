@@ -823,6 +823,31 @@ class CFormValidatorTest extends TestCase {
 				]],
 				null,
 				'[RULES ERROR] Rule "use" should contain an array with up to two elements (Path: /value)'
+			],
+			[
+				['object', 'fields' => [
+					'item_type' => ['string', 'in' => [1 => 'agent', 2 => 'snmp', 3 => 'simple']]
+				]],
+				['type' => 'object', 'fields' => [
+					'item_type' => [['type' => 'string', 'in' => ['agent', 'snmp', 'simple']]]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'item_type' => ['string'],
+					'target_field' => ['string',
+						'when' => [
+							'item_type',
+							'in' => [1 => 'agent', 2 => 'snmp', 3 => 'simple']
+						]
+					]
+				]],
+				['type' => 'object', 'fields' => [
+					'item_type' => [['type' => 'string']],
+					'target_field' => [['type' => 'string', 'when' => [
+						['item_type', 'in' => ['agent', 'snmp', 'simple']]
+					]]]
+				]]
 			]
 		];
 	}
@@ -2111,6 +2136,86 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
+					'value' => ['string', 'in' => [1, 2, 3]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => ['1']]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'not_in' => [1]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value cannot be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => [1.0]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => [1]]
+				]],
+				['value' => '1.0'],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value must be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'not_in' => [1.0]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value cannot be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'not_in' => [1]]
+				]],
+				['value' => '01'],
+				['value' => '01'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => [1]]
+				]],
+				['value' => '01'],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value must be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
 					'value' => ['string', 'use' => [CUserMacroParser::class, []]]
 				]],
 				['value' => '{$MACRO}'],
@@ -2525,6 +2630,26 @@ class CFormValidatorTest extends TestCase {
 				CFormValidator::ERROR,
 				['/value' => [
 					['message' => 'Invalid date.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string'],
+					'object' => ['object', 'fields' => [
+						'value2' => ['string', 'required', 'when' => ['../value', 'in' => ['test']]]
+					]],
+					'object2' => ['object', 'fields' => [
+						'value2' => ['string', 'required', 'when' => ['../value', 'in' => ['test']]]
+					]]
+				]],
+				[
+					'value' => 'test',
+					'object' => []
+				],
+				[],
+				CFormValidator::ERROR,
+				['/object/value2' => [
+					['message' => 'Required field is missing.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
 			]
 		];

@@ -17,8 +17,6 @@
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 require_once __DIR__.'/../common/testFormMacros.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup globalmacro, settings
  *
@@ -110,13 +108,15 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 	}
 
 	private function saveGlobalMacros($confirmation = false) {
-		$this->zbxTestClick('update');
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		if ($confirmation) {
 			$this->zbxTestAcceptAlert();
 		}
-			$this->zbxTestCheckHeader('Macros');
-			$this->zbxTestTextPresent('Macros');
-			$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);
+		$this->page->waitUntilReady();
+		CMessageElement::find()->one();
+		$this->zbxTestCheckHeader('Macros');
+		$this->zbxTestTextPresent('Macros');
+		$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);
 	}
 
 	private function calculateHash($conditions = null) {
@@ -165,7 +165,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->zbxTestAssertElementPresentId('macro_add');
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		for ($i = 0; $i <= $countGlobalMacros; $i++) {
 			if ($i < $countGlobalMacros) {
@@ -220,7 +220,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Macros updated');
@@ -246,7 +246,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro', $macro);
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
@@ -272,7 +272,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro', '');
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
@@ -301,7 +301,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro', self::NEW_MACRO);
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
@@ -333,7 +333,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro', self::NEW_EMPTY_MACRO);
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', '');
@@ -363,7 +363,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro',  self::NEW_MACRO);
 		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
@@ -616,7 +616,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		$this->zbxTestClick('macro_add');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->waitUntilVisible()->one();
 
 		$this->zbxTestClick('macros_'.$countGlobalMacros.'_remove');
 
@@ -824,6 +824,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		// Press revert button and save the changes and make sure that changes were reverted.
 		$value_field->getRevertButton()->click();
 		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 		// Check that no macro value changes took place.
 		$this->assertEquals('******', $this->getValueField($data['macro_fields']['macro'])->getValue());
 		$this->assertEquals($old_values, CDBHelper::getRow($sql));

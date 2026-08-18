@@ -39,7 +39,12 @@ class CControllerTemplateUpdate extends CController {
 			'templates' => ['array', 'field' => ['db hosts.hostid']],
 			'template_add_templates' => ['array', 'field' => ['db hosts.hostid']],
 			'clear_templates' => ['array', 'field' => ['db hosts.hostid']],
-			'template_groups_new' => ['array', 'field' => ['db hstgrp.name']],
+			'template_groups_new' => ['array', 'field' => [
+					'db hstgrp.name',
+					'use' => [CHostGroupNameParser::class, []],
+					'messages' => ['use' => _('Invalid template group name.')]
+				]
+			],
 			'template_groups' => [
 				['array', 'field' => ['db hstgrp.groupid']],
 				['array', 'required', 'not_empty', 'when' => ['template_groups_new', 'empty']]
@@ -111,118 +116,132 @@ class CControllerTemplateUpdate extends CController {
 	}
 
 	protected function doAction(): void {
-		$templateid = $this->getInput('templateid');
-		$template_name = $this->getInput('template_name', '');
-		$tags = $this->getInput('tags', []);
+		try {
+			DBstart();
+			$templateid = $this->getInput('templateid');
+			$template_name = $this->getInput('template_name', '');
+			$tags = $this->getInput('tags', []);
 
-		// Linked templates.
-		$templates = [];
+			// Linked templates.
+			$templates = [];
 
-		foreach (array_merge($this->getInput('templates', []), $this->getInput('template_add_templates', [])) as $linked_id) {
-			$templates[] = ['templateid' => $linked_id];
-		}
+			foreach (array_merge($this->getInput('templates', []), $this->getInput('template_add_templates', []))
+					as $linked_id) {
+				$templates[] = ['templateid' => $linked_id];
+			}
 
-		// Clear templates.
-		$templates_clear = array_diff(
-			$this->getInput('clear_templates', []),
-			$this->getInput('template_add_templates', [])
-		);
+			// Clear templates.
+			$templates_clear = array_diff(
+				$this->getInput('clear_templates', []),
+				$this->getInput('template_add_templates', [])
+			);
 
-		// Add new group.
-		$groups = $this->getInput('template_groups', []);
-		$new_groups = $this->getInput('template_groups_new', []);
+			// Add new group.
+			$groups = $this->getInput('template_groups', []);
+			$new_groups = $this->getInput('template_groups_new', []);
 
-		if ($new_groups) {
-			$new_groupid = API::TemplateGroup()->create(array_map(
-				static fn(string $name) => ['name' => $name],
-				$new_groups
-			));
+			if ($new_groups) {
+				$new_groupid = API::TemplateGroup()->create(array_map(
+					static fn(string $name) => ['name' => $name],
+					$new_groups
+				));
 
-			if (!$new_groupid) {
+				if (!$new_groupid) {
+					throw new Exception();
+				}
+
+				$groups = array_merge($groups, $new_groupid['groupids']);
+			}
+
+			foreach ($tags as $key => $tag) {
+				// Remove empty new tag lines.
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($tags[$key]);
+					continue;
+				}
+
+				// Remove inherited tags.
+				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+					unset($tags[$key]);
+				}
+				else {
+					unset($tags[$key]['type']);
+				}
+			}
+
+			// Remove inherited macros data.
+			$macros = cleanInheritedMacros($this->getInput('macros', []));
+
+			// Remove empty new macro lines.
+			$macros = array_filter($macros, function($macro) {
+				$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
+
+				return (bool) array_filter(array_intersect_key($macro, $keys));
+			});
+
+			foreach ($macros as &$macro) {
+				unset($macro['discovery_state']);
+				unset($macro['allow_revert']);
+			}
+			unset($macro);
+
+			// Value maps.
+			$valuemaps = $this->getinput('valuemaps', []);
+			$ins_valuemaps = [];
+			$upd_valuemaps = [];
+
+			$del_valuemapids = API::ValueMap()->get([
+				'output' => [],
+				'hostids' => $templateid,
+				'preservekeys' => true
+			]);
+
+			foreach ($valuemaps as $valuemap) {
+				if (array_key_exists('valuemapid', $valuemap)) {
+					$upd_valuemaps[] = $valuemap;
+					unset($del_valuemapids[$valuemap['valuemapid']]);
+				}
+				else {
+					$ins_valuemaps[] = $valuemap + ['hostid' => $templateid];
+				}
+			}
+
+			if ($upd_valuemaps && !API::ValueMap()->update($upd_valuemaps)) {
 				throw new Exception();
 			}
 
-			$groups = array_merge($groups, $new_groupid['groupids']);
-		}
-
-		foreach ($tags as $key => $tag) {
-			// Remove empty new tag lines.
-			if ($tag['tag'] === '' && $tag['value'] === '') {
-				unset($tags[$key]);
-				continue;
+			if ($ins_valuemaps && !API::ValueMap()->create($ins_valuemaps)) {
+				throw new Exception();
 			}
 
-			// Remove inherited tags.
-			if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
-				unset($tags[$key]);
+			if ($del_valuemapids && !API::ValueMap()->delete(array_keys($del_valuemapids))) {
+				throw new Exception();
 			}
-			else {
-				unset($tags[$key]['type']);
+
+			$template = [
+				'templateid' => $templateid,
+				'host' => $template_name,
+				'name' => $this->getInput('visiblename', '') ?: $template_name,
+				'templates' => $templates,
+				'templates_clear' => zbx_toObject($templates_clear, 'templateid'),
+				'groups' => zbx_toObject($groups, 'groupid'),
+				'description' => $this->getInput('description', ''),
+				'tags' => $tags,
+				'macros' => $macros
+			];
+
+			$result = (bool) API::Template()->update($template);
+
+			if (!$result) {
+				throw new Exception();
 			}
+
+			$result = DBend(true);
 		}
-
-		// Remove inherited macros data.
-		$macros = cleanInheritedMacros($this->getInput('macros', []));
-
-		// Remove empty new macro lines.
-		$macros = array_filter($macros, function($macro) {
-			$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
-
-			return (bool) array_filter(array_intersect_key($macro, $keys));
-		});
-
-		foreach ($macros as &$macro) {
-			unset($macro['discovery_state']);
-			unset($macro['allow_revert']);
+		catch (Exception $e) {
+			$result = false;
+			DBend(false);
 		}
-		unset($macro);
-
-		// Value maps.
-		$valuemaps = $this->getinput('valuemaps', []);
-		$ins_valuemaps = [];
-		$upd_valuemaps = [];
-
-		$del_valuemapids = API::ValueMap()->get([
-			'output' => [],
-			'hostids' => $templateid,
-			'preservekeys' => true
-		]);
-
-		foreach ($valuemaps as $valuemap) {
-			if (array_key_exists('valuemapid', $valuemap)) {
-				$upd_valuemaps[] = $valuemap;
-				unset($del_valuemapids[$valuemap['valuemapid']]);
-			}
-			else {
-				$ins_valuemaps[] = $valuemap + ['hostid' => $templateid];
-			}
-		}
-
-		if ($upd_valuemaps && !API::ValueMap()->update($upd_valuemaps)) {
-			throw new Exception();
-		}
-
-		if ($ins_valuemaps && !API::ValueMap()->create($ins_valuemaps)) {
-			throw new Exception();
-		}
-
-		if ($del_valuemapids && !API::ValueMap()->delete(array_keys($del_valuemapids))) {
-			throw new Exception();
-		}
-
-		$template = [
-			'templateid' => $templateid,
-			'host' => $template_name,
-			'name' => $this->getInput('visiblename', '') ?: $template_name,
-			'templates' => $templates,
-			'templates_clear' => zbx_toObject($templates_clear, 'templateid'),
-			'groups' => zbx_toObject($groups, 'groupid'),
-			'description' => $this->getInput('description', ''),
-			'tags' => $tags,
-			'macros' => $macros
-		];
-
-		$result = API::Template()->update($template);
 
 		$output = [];
 

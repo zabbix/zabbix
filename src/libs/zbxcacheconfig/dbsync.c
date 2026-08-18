@@ -758,6 +758,8 @@ void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, const char *name, unsigned ch
  *                                                                            *
  * Purpose: frees resources allocated by changeset                            *
  *                                                                            *
+ * Comments:  must not be called before zbx_dbsync_env_flush_changelog()      *
+ *                                                                            *
  ******************************************************************************/
 void	zbx_dbsync_clear(zbx_dbsync_t *sync)
 {

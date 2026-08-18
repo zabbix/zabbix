@@ -711,9 +711,9 @@ class testPageReportsActionLog extends CWebTest {
 		// Check hintbox.
 		$table->findRow('Status', 'Failed')->getColumn('Info')->query("xpath:.//button[@data-hintbox]")
 				->waitUntilClickable()->one()->click();
-		$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+		$hintbox = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->one();
 		$this->assertEquals('Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused',
-				$hintbox->one()->getText()
+				$hintbox->getText()
 		);
 
 		// Close hintbox.

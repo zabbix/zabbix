@@ -52,7 +52,7 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 			return false;
 		}
 
-		return parent::checkPermissions();
+		return true;
 	}
 
 	protected function doAction(): void {

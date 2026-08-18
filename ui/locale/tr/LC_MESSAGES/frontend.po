@@ -138,6 +138,14 @@ msgid_plural "%1$s actions"
 msgstr[0] "%1$s işlem"
 msgstr[1] "%1$s işlemler"
 
+#: include/actions.inc.php:1811
+#, c-format
+msgctxt "screen reader"
+msgid "%1$s action have been taken"
+msgid_plural "%1$s actions have been taken"
+msgstr[0] ""
+msgstr[1] ""
+
 #: jsLoader.php:321
 #, c-format
 msgid "%1$s characters"
@@ -1034,6 +1042,10 @@ msgstr "Ana makineden ekle"
 msgid "Add from template"
 msgstr "Şablondan ekle"
 
+#: app/controllers/CControllerFavoriteDelete.php:65 include/html.inc.php:178
+msgid "Add graph to Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
 msgstr "Ana makine ekle"
@@ -1056,6 +1068,10 @@ msgstr "Ana makine tetikleyicisi ekle"
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
 msgstr "Öğe ekle"
+
+#: app/controllers/CControllerFavoriteDelete.php:64 include/html.inc.php:177
+msgid "Add map to Favorite maps widget"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -4770,6 +4786,10 @@ msgstr ""
 msgid "Change indicator"
 msgstr ""
 
+#: include/classes/html/CMacroValue.php:243
+msgid "Change macro value type"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:157
 #: app/views/administration.user.edit.php:209 app/views/mediatype.edit.php:214
 #: app/views/popup.ldap.edit.php:98
@@ -5073,10 +5093,18 @@ msgstr "Kapat"
 msgid "Close expression constructor"
 msgstr "İfade düzenleyicisini kapat"
 
+#: jsLoader.php:416
+msgid "Close modal window"
+msgstr ""
+
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
 msgstr "Yeni olayı kapat"
+
+#: include/func.inc.php:1653 jsLoader.php:290
+msgid "Close notification"
+msgstr ""
 
 #: app/views/correlation.edit.php:247
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -5102,6 +5130,12 @@ msgstr ""
 #: jsLoader.php:304 widgets/problems/Widget.php:35
 msgid "Collapse"
 msgstr "Daralt"
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:60 jsLoader.php:428
+#: jsLoader.php:460
+msgid "Collapse section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:40
 msgid "Collapse sidebar"
@@ -6302,6 +6336,10 @@ msgstr "\"%1$s\" panosu halihazırda mevcut."
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
 msgstr ""
 
+#: app/views/monitoring.dashboard.view.php:97
+msgid "Dashboard actions"
+msgstr ""
+
 #: app/controllers/CControllerDashboardUpdate.php:218
 #: app/controllers/CControllerTemplateDashboardUpdate.php:190
 msgid "Dashboard created"
@@ -6669,6 +6707,10 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:42
 msgid "Default authentication"
 msgstr "Öntanımlı kimlik doğrulama"
+
+#: include/classes/html/CTabFilter.php:169
+msgid "Default filter tab"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
@@ -7232,6 +7274,10 @@ msgstr "Bağımlı"
 #: include/items.inc.php:102
 msgid "Dependent item"
 msgstr "Bağımlı öğe"
+
+#: include/triggers.inc.php:2024 widgets/trigover/includes/ViewHelper.php:94
+msgid "Dependent trigger"
+msgstr ""
 
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
@@ -8158,6 +8204,10 @@ msgstr "Düzenle"
 msgid "Edit dashboard"
 msgstr "Panoyu düzenle"
 
+#: jsLoader.php:597
+msgid "Edit filter properties"
+msgstr ""
+
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
 msgstr "Haritayı düzenle"
@@ -8174,6 +8224,10 @@ msgstr "Ağaç öğesini düzenle"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "Parçacığı düzenle"
+
+#: jsLoader.php:242
+msgid "Edit widget settings"
+msgstr ""
 
 #: jsLoader.php:185
 msgid "Editing other objects is not allowed in dashboard editing mode."
@@ -8599,6 +8653,10 @@ msgstr ""
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr ""
 
+#: include/html.inc.php:201
+msgid "Enter full screen mode"
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr ""
@@ -8917,6 +8975,10 @@ msgstr "Çalıştırma onayı"
 msgid "Exists"
 msgstr ""
 
+#: include/classes/html/CHtmlPage.php:113 include/html.inc.php:192
+msgid "Exit full screen mode"
+msgstr ""
+
 #: app/views/js/monitoring.problem.view.js.php:230
 #: include/classes/html/CFormFieldsetCollapsible.php:45
 #: include/classes/html/CSectionCollapsible.php:46
@@ -8929,6 +8991,12 @@ msgstr "Genişlet"
 #: include/views/monitoring.sysmap.constructor.php:49
 msgid "Expand macros"
 msgstr "Makroları genişlet"
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:63 jsLoader.php:427
+#: jsLoader.php:459
+msgid "Expand section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
@@ -9628,6 +9696,10 @@ msgstr ""
 msgid "Go to last page, %1$s"
 msgstr ""
 
+#: include/classes/html/CTabFilter.php:387
+msgid "Go to next filter tab"
+msgstr ""
+
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
 msgid "Go to next page, %1$s"
@@ -9641,6 +9713,10 @@ msgstr ""
 #: include/classes/helpers/CPagerHelper.php:214
 #, c-format
 msgid "Go to page %1$s, current page"
+msgstr ""
+
+#: include/classes/html/CTabFilter.php:400
+msgid "Go to previous filter tab"
 msgstr ""
 
 #: include/classes/helpers/CPagerHelper.php:199
@@ -12359,6 +12435,11 @@ msgstr ""
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr ""
 
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
+
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
 msgstr ""
@@ -12740,6 +12821,11 @@ msgstr ""
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Geçersiz etiket \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -13649,6 +13735,10 @@ msgstr ""
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr ""
 
+#: include/classes/html/CTabFilter.php:382
+msgid "List of open filter tabs"
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
 msgid "List of user group shares"
@@ -14276,6 +14366,11 @@ msgstr ""
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr ""
 
+#: app/partials/configuration.host.interface.row.php:57
+#: app/views/host.wizard.edit.php:752
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
 msgstr ""
@@ -14863,6 +14958,14 @@ msgstr ""
 msgid "Most critical of child services"
 msgstr ""
 
+#: include/classes/html/CFilter.php:256 include/classes/html/CTabFilter.php:332
+msgid "Move time range backward"
+msgstr ""
+
+#: include/classes/html/CFilter.php:261 include/classes/html/CTabFilter.php:339
+msgid "Move time range forward"
+msgstr ""
+
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
@@ -15222,6 +15325,10 @@ msgstr ""
 msgid "New MFA method"
 msgstr ""
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr ""
@@ -15414,6 +15521,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr ""
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15427,6 +15538,10 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Sonraki adım"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15616,6 +15731,11 @@ msgstr "Hiçbir harita eklenmemiş."
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
 msgstr "Hiçbir eşleşen bulunmadı"
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
@@ -16593,6 +16713,11 @@ msgstr "Yalnızca etkin ana makinelere atanmış ve etkin öğelere bağımlıl�
 msgid "Open URL"
 msgstr ""
 
+#: app/views/popup.generic.php:436 include/classes/html/CHtmlPage.php:175
+#: jsLoader.php:417
+msgid "Open Zabbix documentation in a new tab"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr ""
@@ -16604,6 +16729,10 @@ msgstr ""
 
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
+msgstr ""
+
+#: jsLoader.php:243
+msgid "Open widget actions"
 msgstr ""
 
 #: include/classes/server/CZabbixServer.php:627
@@ -17234,6 +17363,10 @@ msgstr ""
 msgid "Parent templates"
 msgstr ""
 
+#: include/triggers.inc.php:2024 widgets/trigover/includes/ViewHelper.php:94
+msgid "Parent trigger"
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:32
 msgid "Parent triggers"
 msgstr "Üst tetikleyiciler"
@@ -17833,6 +17966,21 @@ msgstr ""
 
 #: include/actions.inc.php:1981
 msgid "Problem resolved"
+msgstr ""
+
+#: include/actions.inc.php:1724
+msgctxt "screen reader"
+msgid "Problem severity changed"
+msgstr ""
+
+#: include/actions.inc.php:1714
+msgctxt "screen reader"
+msgid "Problem severity decreased"
+msgstr ""
+
+#: include/actions.inc.php:1719
+msgctxt "screen reader"
+msgid "Problem severity increased"
 msgstr ""
 
 #: app/views/usergroup.edit.php:273
@@ -18634,12 +18782,20 @@ msgstr "Ana makine grubundan kaldır"
 msgid "Remove from host groups"
 msgstr "Ana makine gruplarından kaldır"
 
+#: app/controllers/CControllerFavoriteCreate.php:54 include/html.inc.php:169
+msgid "Remove graph from the Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
 msgstr "Ana makineyi kaldır"
 
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
+msgstr ""
+
+#: app/controllers/CControllerFavoriteCreate.php:53 include/html.inc.php:168
+msgid "Remove map from the Favorite maps widget"
 msgstr ""
 
 #: widgets/favgraphs/views/widget.view.php:43
@@ -19809,6 +19965,10 @@ msgstr ""
 msgid "Select a template"
 msgstr ""
 
+#: include/classes/html/CDateSelector.php:198
+msgid "Select date"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
 #: include/views/configuration.graph.edit.php:336
@@ -20315,6 +20475,10 @@ msgstr "Göster"
 msgid "Show aggregation function"
 msgstr ""
 
+#: include/events.inc.php:761
+msgid "Show all tags"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
 msgstr ""
@@ -20374,6 +20538,10 @@ msgstr "Satırları göster"
 
 #: include/views/monitoring.sysmap.edit.php:274
 msgid "Show link labels"
+msgstr ""
+
+#: include/classes/html/CHtmlPage.php:146
+msgid "Show main menu"
 msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:267
@@ -21226,6 +21394,10 @@ msgstr "Bayt cinsinden veya toplamın yüzdesi olarak takas alanı boyutu. Bayt 
 msgid "Swedish (sv_SE)"
 msgstr "İsveççe (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Kimlik doğrulama yöntemini değiştirmek bu oturum dışındaki bütün oturumları sıfırlar! Devam edilsin mi?"
@@ -21851,6 +22023,10 @@ msgstr ""
 
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
 msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
@@ -23235,6 +23411,10 @@ msgstr ""
 
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
+msgstr ""
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
 msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
@@ -25086,6 +25266,10 @@ msgstr ""
 msgid "Widget is deprecated."
 msgstr ""
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
@@ -25469,6 +25653,10 @@ msgstr ""
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Bu işlemi gerçekleştirmek için izniniz yok."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -28036,6 +28224,10 @@ msgstr "aramak için buraya yazın"
 #: app/controllers/CControllerWebScenarioStepCheck.php:79
 #: include/classes/validators/CApiInputValidator.php:2602
 msgid "unacceptable URL"
+msgstr ""
+
+#: include/classes/validators/CUrlValidator.php:147
+msgid "unacceptable URL scheme"
 msgstr ""
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296

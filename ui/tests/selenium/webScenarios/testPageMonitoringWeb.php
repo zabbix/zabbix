@@ -302,9 +302,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
-						'Web scenario 1st host for widget communication',
-						'Web scenario 2nd host for widget communication',
-						'Web scenario 3rd host for widget communication',
+						'Web scenario for 1st host for widgets',
+						'Web scenario for 2nd host for widgets',
+						'Web scenario for 3rd host for widgets',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -334,9 +334,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
-						'Web scenario 1st host for widget communication',
-						'Web scenario 2nd host for widget communication',
-						'Web scenario 3rd host for widget communication',
+						'Web scenario for 1st host for widgets',
+						'Web scenario for 2nd host for widgets',
+						'Web scenario for 3rd host for widgets',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -367,9 +367,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
-						'Web scenario 1st host for widget communication',
-						'Web scenario 2nd host for widget communication',
-						'Web scenario 3rd host for widget communication',
+						'Web scenario for 1st host for widgets',
+						'Web scenario for 2nd host for widgets',
+						'Web scenario for 3rd host for widgets',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -400,9 +400,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
-						'Web scenario 1st host for widget communication',
-						'Web scenario 2nd host for widget communication',
-						'Web scenario 3rd host for widget communication',
+						'Web scenario for 1st host for widgets',
+						'Web scenario for 2nd host for widgets',
+						'Web scenario for 3rd host for widgets',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -432,9 +432,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
-						'Web scenario 1st host for widget communication',
-						'Web scenario 2nd host for widget communication',
-						'Web scenario 3rd host for widget communication',
+						'Web scenario for 1st host for widgets',
+						'Web scenario for 2nd host for widgets',
+						'Web scenario for 3rd host for widgets',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -689,12 +689,12 @@ class testPageMonitoringWeb extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
 
 		// Check title, filter and table display after pressing Kiosk mode/Normal view.
-		foreach (['Kiosk mode', 'Normal view'] as $status) {
-			$this->query('xpath://button[@title="'.$status.'"]')->one()->click();
+		foreach (['Enter full screen mode', 'Exit full screen mode'] as $status) {
+			$this->query('xpath://button[@aria-label="'.$status.'"]')->one()->click();
 			$this->page->waitUntilReady();
 
 			$header = $this->query('xpath://h1[@id="page-title-general"]');
-			$status === 'Kiosk mode'
+			$status === 'Enter full screen mode'
 				? $header->waitUntilNotVisible()
 				: $header->waitUntilVisible();
 
@@ -702,7 +702,7 @@ class testPageMonitoringWeb extends CWebTest {
 			$this->assertTrue($this->query('id:flickerfreescreen_httptest')->exists());
 		}
 
-		$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilVisible();
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->waitUntilVisible();
 	}
 
 	/**

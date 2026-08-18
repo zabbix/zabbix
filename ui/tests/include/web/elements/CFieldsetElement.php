@@ -84,7 +84,7 @@ class CFieldsetElement extends CElement {
 	/**
 	 * Get label text.
 	 *
-	 * @return string|null
+	 * @return string
 	 */
 	public function getText() {
 		$label = $this->getLabel();
@@ -92,7 +92,7 @@ class CFieldsetElement extends CElement {
 			return $label->getText();
 		}
 
-		return null;
+		return '';
 	}
 
 	/**
