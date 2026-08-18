@@ -96,7 +96,7 @@ $formgrid
 				->addClass('js-parseurl')
 				->setEnabled(!$readonly),
 			(new CDiv())->setId('url-error-container')
-		]))->setId('js-item-url-field'),
+		]))->setId('js-item-url-field')
 	])
 	->addItem([
 		(new CLabel(_('Query fields')))->setId('js-item-query-fields-label'),
