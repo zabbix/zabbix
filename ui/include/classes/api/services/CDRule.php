@@ -184,14 +184,10 @@ class CDRule extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array $drules) {
+	protected function validateCreate(array &$drules) {
 		// Check permissions.
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		if (!$drules) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['druleid']], 'fields' => [
@@ -311,7 +307,7 @@ class CDRule extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $drules) {
+	protected function validateUpdate(array &$drules) {
 		// Check permissions.
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -793,7 +789,6 @@ class CDRule extends CApiService {
 	 * @return array
 	 */
 	public function create(array $drules) {
-		$drules = zbx_toArray($drules);
 		$this->validateCreate($drules);
 
 		$druleids = DB::insert('drules', $drules);
@@ -849,10 +844,9 @@ class CDRule extends CApiService {
 	 * @return array
 	 */
 	public function update(array $drules) {
-		$drules = zbx_toArray($drules);
-		$druleids = zbx_objectValues($drules, 'druleid');
-
 		$this->validateUpdate($drules);
+
+		$druleids = zbx_objectValues($drules, 'druleid');
 
 		$db_drules = API::DRule()->get([
 			'output' => ['druleid', 'proxyid', 'name', 'iprange', 'delay', 'status', 'concurrency_max'],
