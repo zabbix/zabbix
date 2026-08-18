@@ -79,7 +79,7 @@ class CControllerProxyEdit extends CController {
 
 	protected function doAction(): void {
 		if ($this->proxy !== null) {
-			$apm = array_merge(self::getApmDefaults(), json_decode($this->proxy['apm'], true));
+			$apm = array_merge(CProxy::APM_DEFAULT_FIELDS, json_decode($this->proxy['apm'], true));
 
 			$data = [
 				'proxyid' => $this->proxy['proxyid'],
@@ -171,7 +171,7 @@ class CControllerProxyEdit extends CController {
 					'timeout_telnet_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
 					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
 					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
-				] + self::getApmDefaults()
+				] + CProxy::APM_DEFAULT_FIELDS
 			];
 		}
 
@@ -191,13 +191,5 @@ class CControllerProxyEdit extends CController {
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
-	}
-
-	private static function getApmDefaults(): array {
-		return [
-			'data_collection_status' => PROXY_APM_STATUS_NOT_CONFIGURED,
-			'max_messages_per_second' => 0,
-			'additional_resource_attributes' => [],
-		];
 	}
 }
