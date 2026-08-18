@@ -2206,6 +2206,117 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 		},
 		{
+			name: "+ccissLinux",
+			expectations: []expectation{
+				{
+					args: []string{"-a", "/dev/sg0", "-d", "cciss,0", "-j"},
+					out:  readControllerFixture(t, "device/cciss/scsi.json"),
+				},
+				{
+					args: []string{"-a", "/dev/sg0", "-d", "cciss,1", "-j"},
+					out:  readControllerFixture(t, "device/cciss/ata.json"),
+				},
+				{
+					args: []string{"-a", "/dev/sg0", "-d", "cciss,2", "-j"},
+					out:  readControllerFixture(t, "device/cciss/device_open_error.json"),
+					err:  errs.New("exit status 2"),
+				},
+			},
+			args: args{
+				deviceName: "/dev/sg0",
+				deviceType: CCISS,
+			},
+			want: []*SmartCtlDeviceData{
+				{
+					Device: &deviceParser{
+						SerialNumber: "TEST-CCISS-SCSI-0001",
+						RotationRate: 7200,
+						Info: deviceInfo{
+							Name:     "/dev/sg0 cciss,0",
+							InfoName: "/dev/sg0 [cciss_disk_00] [SCSI]",
+							DevType:  "cciss",
+							name:     "/dev/sg0",
+							raidType: "cciss,0",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 4}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+					},
+					Data: readControllerFixture(t, "device/cciss/scsi.json"),
+				},
+				{
+					Device: &deviceParser{
+						ModelName:    "TEST_SATA_SSD",
+						SerialNumber: "TEST-CCISS-ATA-0002",
+						Info: deviceInfo{
+							Name:     "/dev/sg0 cciss,1",
+							InfoName: "/dev/sg0 [cciss_disk_01] [SAT]",
+							DevType:  "sat",
+							name:     "/dev/sg0",
+							raidType: "cciss,1",
+						},
+						Smartctl: smartctlField{
+							Messages: []message{
+								{Str: "Warning: This result is based on an Attribute check."},
+							},
+							Version: []int{7, 4},
+						},
+						SmartStatus: &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{
+							Table: []table{
+								{
+									Attrname: "Reallocated_Sector_Ct",
+									ID:       5,
+								},
+								{
+									Attrname: "Power_On_Hours",
+									ID:       9,
+								},
+								{
+									Attrname: "Available_Reservd_Space",
+									ID:       170,
+									Thresh:   10,
+								},
+							},
+						},
+					},
+					Data: readControllerFixture(t, "device/cciss/ata.json"),
+				},
+			},
+		},
+		{
+			name: "-ccissUnavailableOnFirstDisk",
+			expectations: []expectation{
+				{
+					args: []string{"-a", "/dev/sg0", "-d", "cciss,0", "-j"},
+					out: readControllerFixture(
+						t,
+						"device/cciss/first_device_open_error.json",
+					),
+					err: errs.New("exit status 2"),
+				},
+			},
+			args: args{
+				deviceName: "/dev/sg0",
+				deviceType: CCISS,
+			},
+			want: nil,
+		},
+		{
+			name: "-ccissUnsupportedOnWindows",
+			expectations: []expectation{
+				{
+					args: []string{"-a", "/dev/sda", "-d", "cciss,0", "-j"},
+					out: readControllerEnvironment(t, "env_1").
+						AllSmartInfoScans.get(t, "-a /dev/sda -d cciss,0 -j"),
+				},
+			},
+			args: args{
+				deviceName: "/dev/sda",
+				deviceType: CCISS,
+			},
+			want: nil,
+		},
+		{
 			name: "-invalidType3ware",
 			expectations: []expectation{
 				{
@@ -2223,7 +2334,6 @@ func Test_getRaidDevices(t *testing.T) {
 		// missing cases for:
 		// - 3ware
 		// - areca
-		// - cciss
 		// because of lack of test data
 	}
 	for _, tt := range tests {
