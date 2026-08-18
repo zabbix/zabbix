@@ -100,6 +100,16 @@ class testTriggerCEP extends CIntegrationTest {
 	// the CEP rules in the teardown takes their suppressions with them.
 	const SKIP_UNSUPPRESS_WAIT = true;
 
+	// The flavours whose operation condition compares a tag VALUE (CONDITION_TAG_VALUE) rather than a tag name are
+	// skipped while the API cannot store one: CCepRule declares the operation condition field as 'value' but the
+	// column behind it is cep_operation_condition.tag_value, and nothing maps the one to the other, so
+	// DB::checkValueTypes() drops the unknown key and the condition is written with an empty tag_value. The server
+	// then evaluates it as "tag = ''", which matches no event, and the operation never runs. Everything those
+	// flavours assert is also asserted by their tag-name siblings, which is why skipping them leaves no window
+	// behaviour uncovered - what they add is coverage of the condition type itself. Set to false once the API stores
+	// the value, see skipIfOperationTagValueTestsDisabled().
+	const SKIP_OPERATION_TAG_VALUE_TESTS = true;
+
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
 	const SKIP_SERVICES_TESTS = null;
 
@@ -351,6 +361,12 @@ class testTriggerCEP extends CIntegrationTest {
 	// Which id that is follows from how many the scenario sends, so it is getCloseWindowDiscardService() rather
 	// than a constant: a constant expression cannot read a knob through static:: and would therefore ignore the
 	// count a child class overrides.
+	// The pattern match one of those flavours once more, with the discarded id named by the value of the plain
+	// 'service' tag instead of by the name of the per-id one: the same discard, written with the one operation
+	// condition type that compares a tag value rather than a tag name, see
+	// testTriggerCEP_CepWindowPatternCloseWindowDiscardOnDownTagValue() and SKIP_OPERATION_TAG_VALUE_TESTS.
+	const CEP_RULE_WINDOW_PATTERN_CLOSE_DISCARD_TAG_VALUE = self::CEP_RULE_NAME_PREFIX
+		.'window pattern close window discard tag value';
 	// Every one of those flavours except the discarding ones is additionally run over a single id, the first of the
 	// ones the scenario has (getCloseWindowServices()), with every value it sends being the "down" value of that one
 	// id: the rule then keeps one window instead of one per id and everything the closing window has to close was
@@ -2832,6 +2848,20 @@ HEREDOC;
 	}
 
 	/**
+	 * The same pattern match flavour with the discarded id named by the value of the plain 'service' tag rather than
+	 * by the name of the per-id one, which is the only operation condition of the whole scenario that compares a tag
+	 * value instead of a tag name. Nothing else about it differs from
+	 * prepareDataCepWindowPatternCloseWindowDiscardDown(), so it asserts what that one asserts, see
+	 * prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowPatternCloseWindowDiscardDownTagValue() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_DISCARD_TAG_VALUE, CCepRuleHelper::WHEN_PATTERN_MATCHED, true,
+			false, false, true
+		);
+	}
+
+	/**
 	 * Prepare the simple window flavour of the close window scenario with the "down" values of one id discarded as
 	 * they occur, so the window of that id never has the problem that an ending window would have closed, see
 	 * prepareDataCepWindowCloseWindowOperations().
@@ -3086,6 +3116,11 @@ HEREDOC;
 	 * took a place in a window, so there is nothing for the ending window of that id to close, and it left no problem
 	 * of its own either. That is the one thing a discard can do to a window that closes: not stop it, but empty it.
 	 *
+	 * $discard_by_tag_value only changes how that one operation names the id it drops - by the value of the plain
+	 * 'service' tag rather than by the name of the per-id one - so it says exactly what $discard_down says and is a
+	 * flavour of its own for the sake of the condition type alone, see
+	 * prepareDataCepWindowPatternCloseWindowDiscardDownTagValue(). It means nothing without $discard_down.
+	 *
 	 * $single_service leaves the rule with a single window instead of one per id: the scenario then drives one id only
 	 * and sends it a value per discovered trigger (LLD_DISCOVERY_COUNT) rather than CEP_CLOSE_WINDOW_EVENT_COUNT values,
 	 * so both limits of the window are sized from those instead - the duration from the one id the flavour drives and
@@ -3103,7 +3138,8 @@ HEREDOC;
 	 * more than closing it once, so the doubled flavours assert what the single ones do.
 	 */
 	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when,
-			bool $discard_down = false, bool $single_service = false, bool $second_rule = false) {
+			bool $discard_down = false, bool $single_service = false, bool $second_rule = false,
+			bool $discard_by_tag_value = false) {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this flavour is the only thing that may close a problem.
@@ -3240,6 +3276,29 @@ HEREDOC;
 			// the "up" values still end them: the operations above are left to do their work, and the one id whose
 			// event was dropped is what shows the difference. Conditions on distinct tags are AND-ed, so this
 			// matches an event that is both a "down" one and of that id.
+			//
+			// Both halves of that are tag NAME conditions by default: the state is carried by the name of the
+			// CEP_STATE_TAG_DOWN tag and the id by the name of the per-id CEP_SERVICE_TAG one, exactly as the
+			// windowless flavours single an id out (buildWindowNoneServiceCondition()). What the server groups
+			// AND/OR conditions by is the type and the tag name together (cep_operation_condition_match_key()), so
+			// two conditions of the same type on different tag names are AND-ed just as differing types would be.
+			//
+			// $discard_by_tag_value asks the id half to compare the value of the plain 'service' tag instead, which
+			// is the same discard expressed the other way round - see
+			// prepareDataCepWindowPatternCloseWindowDiscardDownTagValue() for why that flavour is kept apart.
+			$discarded_service_condition = $discard_by_tag_value
+				? [
+					'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
+					'operator' => CONDITION_OPERATOR_EQUAL,
+					'tag' => 'service',
+					'value' => static::getCloseWindowDiscardService()
+				]
+				: [
+					'type' => CCepRuleHelper::CONDITION_TAG,
+					'operator' => CONDITION_OPERATOR_EXISTS,
+					'tag' => self::CEP_SERVICE_TAG_PREFIX.static::getCloseWindowDiscardService()
+				];
+
 			array_unshift($operations, [
 				'sortorder' => -1,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
@@ -3252,12 +3311,7 @@ HEREDOC;
 							'operator' => CONDITION_OPERATOR_EXISTS,
 							'tag' => self::CEP_STATE_TAG_DOWN
 						],
-						[
-							'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
-							'operator' => CONDITION_OPERATOR_EQUAL,
-							'tag' => 'service',
-							'value' => static::getCloseWindowDiscardService()
-						]
+						$discarded_service_condition
 					]
 				]
 			]);
@@ -9623,6 +9677,32 @@ HEREDOC;
 	}
 
 	/**
+	 * The same discarding flavour with the discarded id named by the value of the plain 'service' tag rather than by
+	 * the name of the per-id one, so the operation is singled out by the one condition type that compares a tag value
+	 * (CONDITION_TAG_VALUE) instead of a tag name. Everything it asserts is what its sibling above asserts - the
+	 * condition type is the whole of the difference - so this is the only place in the scenario where an operation
+	 * condition carries a value at all.
+	 *
+	 * Skipped while the API cannot store that value, see SKIP_OPERATION_TAG_VALUE_TESTS for what is wrong with it.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowDiscardOnDownTagValue$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowDiscardOnDownTagValue() {
+		$this->skipIfOperationTagValueTestsDisabled();
+
+		$this->prepareDataCepWindowPatternCloseWindowDiscardDownTagValue();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::CEP_RULE_WINDOW_PATTERN_CLOSE_DISCARD_TAG_VALUE, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * The same pattern match close window rule driven over a single id instead of one per id: every value sent is the
 	 * "down" value of that one id and every one of them goes through a discovered trigger of its own, one value per
 	 * trigger (LLD_DISCOVERY_COUNT), so the rule keeps one window and everything it holds was opened by the very same
@@ -12446,7 +12526,10 @@ HEREDOC;
 		$event_count_tag = $this->getCepRuleEventCountTag($rule_name);
 
 		if ($event_count_tag !== '') {
-			$this->waitForCepWindowEventCounts($all, $event_count_tag, $counted_services, $events);
+			// Which event of an id opened its window is only known when every event of the id went through the same
+			// trigger, which is what the flavours driving an id per window do - the single id ones give each value a
+			// trigger of its own, see $keys above.
+			$this->waitForCepWindowEventCounts($all, $event_count_tag, $counted_services, $events, !$single_service);
 		}
 
 		// None of the windows has closed anything yet either, which is where the restarts stop and start the server:
@@ -13554,7 +13637,7 @@ HEREDOC;
 
 	/**
 	 * Wait until the window of every id in $services has recorded how many events it collected in the $tag tag of the
-	 * event that opened it: every one of those windows was given $events values, so the oldest event of an id has to
+	 * event that opened it: every one of those windows was given $events values, so exactly one event of an id has to
 	 * carry that number less itself - the events that joined it - and no other event of the id may carry the tag at
 	 * all, the count being kept on the event that opened the window and on no other
 	 * (cep_window_set_event_set_tag_value(), called with the first event of the window).
@@ -13562,11 +13645,19 @@ HEREDOC;
 	 * With a single value per window there is nothing that ever joined one, so the tag is written nowhere and no event
 	 * may have it.
 	 *
+	 * $ordered additionally says the oldest event of the id is the one that must carry it. That holds only while every
+	 * event of an id went through the same trigger: the CEP queue keeps one task at a time per event origin - source,
+	 * object and objectid, so per trigger (cep_queue_task_limit_by_origin()) - and lets different origins run at once
+	 * over CEP_WORKERS_DEFAULT worker threads. Events of one trigger therefore reach a window in the order their
+	 * eventids were handed out, and events of different triggers in no order at all, so a group fed a trigger per
+	 * value can only be asked that exactly one of its events carries the count, not which one.
+	 *
 	 * The count is a tag the server maintains as the events arrive, so it lags the problems it belongs to and is
 	 * polled for; the callback names the first id that does not match, which callUntilDataIsPresent() surfaces in the
 	 * failure message.
 	 */
-	private function waitForCepWindowEventCounts(array $triggerids, string $tag, array $services, int $events): void {
+	private function waitForCepWindowEventCounts(array $triggerids, string $tag, array $services, int $events,
+			bool $ordered = true): void {
 		$this->callUntilDataIsPresent('event.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -13578,7 +13669,7 @@ HEREDOC;
 			'sortfield' => 'eventid',
 			'sortorder' => 'ASC'
 		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($tag, $services, $events) {
+			function ($response) use ($tag, $services, $events, $ordered) {
 				// Group the events the way the windows grouped them, by the value of their 'service' tag. They come
 				// back oldest first, so the first event of a group is the one that opened its window.
 				$by_service = [];
@@ -13607,27 +13698,45 @@ HEREDOC;
 					}
 
 					// Only the event that opened the window counts the ones that joined it, and only if any did.
+					$counted = [];
+
 					foreach ($group as $index => $event) {
-						$has = array_key_exists($tag, $event['tag_values']);
-						$info = '"service" group '.$service.': event '.$event['eventid'].' ('.$event['name'].')';
+						if (array_key_exists($tag, $event['tag_values'])) {
+							$counted[$index] = $event;
+						}
+					}
 
-						if ($index !== 0 || $events == 1) {
-							if ($has) {
-								return $info.': unexpected "'.$tag.'" tag, only the event that opened a window'
-									.' carries the count of the events that joined it';
-							}
+					$info = '"service" group '.$service;
 
-							continue;
+					if ($events == 1) {
+						if ($counted) {
+							$event = reset($counted);
+
+							return $info.': event '.$event['eventid'].' ('.$event['name'].') carries a "'.$tag
+								.'" tag, but nothing ever joined a window holding a single event';
 						}
 
-						if (!$has) {
-							return $info.': missing the "'.$tag.'" tag of the event that opened the window';
-						}
+						continue;
+					}
 
-						if ((int) $event['tag_values'][$tag] !== $events - 1) {
-							return $info.': "'.$tag.'" tag value "'.$event['tag_values'][$tag].'", expected '
-								.($events - 1).' - the events that joined it';
-						}
+					if (count($counted) !== 1) {
+						return $info.': expected exactly one event carrying the "'.$tag.'" tag - the one that opened'
+							.' the window - got '.count($counted).' of the '.count($group).' events of the id';
+					}
+
+					$index = array_key_first($counted);
+					$event = $counted[$index];
+					$info .= ': event '.$event['eventid'].' ('.$event['name'].')';
+
+					if ($ordered && $index !== 0) {
+						return $info.' carries the "'.$tag.'" tag, but it is not the oldest event of the id - every'
+							.' value of this flavour went through one trigger, so the window was opened by the'
+							.' oldest';
+					}
+
+					if ((int) $event['tag_values'][$tag] !== $events - 1) {
+						return $info.': "'.$tag.'" tag value "'.$event['tag_values'][$tag].'", expected '
+							.($events - 1).' - the events that joined it';
 					}
 				}
 
@@ -15319,6 +15428,18 @@ HEREDOC;
 	private function skipIfRestartTestsDisabled(): void {
 		if (static::SKIP_RESTART_TESTS) {
 			$this->markTestSkipped('Restart test variants disabled via SKIP_RESTART_TESTS.');
+		}
+	}
+
+	/**
+	 * Skip the calling flavour whose operation condition compares a tag value when SKIP_OPERATION_TAG_VALUE_TESTS is
+	 * enabled. Its tag-name sibling asserts the same thing, so nothing about windows goes uncovered while it is off.
+	 */
+	private function skipIfOperationTagValueTestsDisabled(): void {
+		if (static::SKIP_OPERATION_TAG_VALUE_TESTS) {
+			$this->markTestSkipped(
+				'Operation conditions comparing a tag value disabled via SKIP_OPERATION_TAG_VALUE_TESTS.'
+			);
 		}
 	}
 
