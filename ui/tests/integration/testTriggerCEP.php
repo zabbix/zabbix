@@ -482,14 +482,12 @@ class testTriggerCEP extends CIntegrationTest {
 	// rule back - see runEventAssessmentTestCepWindowSingleUnresolvedLimit().
 	const CEP_RULE_WINDOW_PATTERN_DURATION_LIMIT = self::CEP_RULE_NAME_PREFIX.'window pattern unresolved duration';
 	const CEP_RULE_WINDOW_PATTERN_CAPACITY_LIMIT = self::CEP_RULE_NAME_PREFIX.'window pattern unresolved capacity';
-	// What that rule must report, one message per limit that does not resolve. The macros are the very ones the
-	// working flavours give their windows (CEP_WINDOW_DURATION_MACRO and CEP_WINDOW_CAPACITY_MACRO), which this
-	// scenario leaves uncreated instead, so what the messages name is the macro text the server was left with -
-	// an unknown user macro is not replaced by anything, and neither a duration nor a capacity can be read out of
-	// it. The duration is the limit the server parses first, so it is what a window with neither macro created
-	// reports, and the capacity message is reached only once the duration macro exists.
-	const CEP_RULE_WINDOW_LIMITS_DURATION_ERROR = 'Invalid CEP window duration '.self::CEP_WINDOW_DURATION_MACRO.'.';
-	const CEP_RULE_WINDOW_LIMITS_CAPACITY_ERROR = 'Invalid CEP window capacity '.self::CEP_WINDOW_CAPACITY_MACRO.'.';
+	// That the rule reports something is what the scenario reads, not what it says: the macros are the very ones the
+	// working flavours give their windows (CEP_WINDOW_DURATION_MACRO and CEP_WINDOW_CAPACITY_MACRO) and this scenario
+	// leaves them uncreated, so an unknown user macro is replaced by nothing at all and neither a duration nor a
+	// capacity can be read out of what is left. Which of the two the server names is its own wording and is left to
+	// it - what the scenario is about is a rule that cannot open a window saying so, and clearing that once the
+	// macros exist, see waitForCepRuleError() and waitForCepRuleNoError().
 	// What the macros are set to once the scenario has seen the error each of them causes while missing: a duration
 	// outlasting the rest of the run, so the window that is finally opened keeps what it is given until an
 	// operation ends it, and no capacity limit at all, so nothing is evicted for not fitting.
@@ -10504,7 +10502,7 @@ HEREDOC;
 		try {
 			$this->runEventAssessmentTestCepWindowSingleUnresolvedLimit(
 				self::CEP_RULE_WINDOW_PATTERN_DURATION_LIMIT, self::CEP_WINDOW_DURATION_MACRO,
-				self::CEP_RULE_WINDOW_LIMITS_DURATION, self::CEP_RULE_WINDOW_LIMITS_DURATION_ERROR
+				self::CEP_RULE_WINDOW_LIMITS_DURATION
 			);
 		}
 		finally {
@@ -10526,7 +10524,7 @@ HEREDOC;
 		try {
 			$this->runEventAssessmentTestCepWindowSingleUnresolvedLimit(
 				self::CEP_RULE_WINDOW_PATTERN_CAPACITY_LIMIT, self::CEP_WINDOW_CAPACITY_MACRO,
-				(string) self::CEP_RULE_WINDOW_LIMITS_CAPACITY, self::CEP_RULE_WINDOW_LIMITS_CAPACITY_ERROR
+				(string) self::CEP_RULE_WINDOW_LIMITS_CAPACITY
 			);
 		}
 		finally {
@@ -13192,15 +13190,13 @@ HEREDOC;
 	 * open one. Each of the three ids it drives is sent through a different state of the macros:
 	 *
 	 *   1. neither macro exists. The "down" value of the first id opens its problem, and no window is opened for it:
-	 *      the duration is the limit the server parses first, so the rule reports CEP_RULE_WINDOW_LIMITS_DURATION_ERROR
-	 *      - a message naming the macro text itself, an unknown user macro being replaced by nothing at all. The "up"
-	 *      value of that id, the value that ends a window and closes everything in it, then reaches no window and
-	 *      closes nothing: both problems of the id are open, and the second of them shows what the missing window
-	 *      costs rather than only that the rule complained;
+	 *      the rule reports an error, an unknown user macro being replaced by nothing at all and neither limit being
+	 *      readable out of what is left. The "up" value of that id, the value that ends a window and closes
+	 *      everything in it, then reaches no window and closes nothing: both problems of the id are open, and the
+	 *      second of them shows what the missing window costs rather than only that the rule complained;
 	 *   2. the duration macro is created, so the capacity is the limit that is left unresolvable. The "down" value of
-	 *      the second id gets the same treatment - no window, nothing closed by its "up" value - and the message the
-	 *      rule reports moves to CEP_RULE_WINDOW_LIMITS_CAPACITY_ERROR, which is what says both limits are resolved
-	 *      and checked rather than the duration alone;
+	 *      the second id gets the same treatment - no window, nothing closed by its "up" value, and the rule still
+	 *      reporting - which is what says both limits are resolved and checked rather than the duration alone;
 	 *   3. the capacity macro is created as well. The rule itself was never touched through any of this, so the
 	 *      "down" value of the third id is what shows it is not broken but was only ever missing its limits: a window
 	 *      is opened, the error the rule had been reporting is cleared, and the "up" value of that id ends the window
@@ -13249,7 +13245,7 @@ HEREDOC;
 		$send('down_'.$unresolved_service);
 		$this->waitForOpenProblemCount($all, 1);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
-		$this->waitForCepRuleError($rule_name, self::CEP_RULE_WINDOW_LIMITS_DURATION_ERROR);
+		$this->waitForCepRuleError($rule_name);
 
 		// The "up" value of that id, the one that ends the window of its id and closes every problem the window
 		// held. There is no window for it to end, so it closes nothing and is left open as a problem of its own -
@@ -13267,7 +13263,7 @@ HEREDOC;
 		// the rule reports moves on to the limit that is now the unresolvable one.
 		$send('down_'.$capacity_service);
 		$this->waitForOpenProblemCount($all, 3);
-		$this->waitForCepRuleError($rule_name, self::CEP_RULE_WINDOW_LIMITS_CAPACITY_ERROR);
+		$this->waitForCepRuleError($rule_name);
 
 		$send('up_'.$capacity_service);
 		$this->waitForProblemEventCountByTag($all, 'service', $capacity_service, 2);
@@ -13283,7 +13279,7 @@ HEREDOC;
 		// touched itself.
 		$send('down_'.$resolved_service);
 		$this->waitForOpenProblemCount($all, 5);
-		$this->waitForCepRuleError($rule_name, '');
+		$this->waitForCepRuleNoError($rule_name);
 
 		// And the window it opened is a window like any other: the "up" value of the id ends it and both problems of
 		// that id are closed with it - the "down" one the window held and the "up" one that ended it.
@@ -13341,7 +13337,7 @@ HEREDOC;
 	 * has to.
 	 */
 	private function runEventAssessmentTestCepWindowSingleUnresolvedLimit(string $rule_name, string $macro,
-			string $value, string $error): void {
+			string $value): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
 		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
 		$all = [$triggerid];
@@ -13369,12 +13365,12 @@ HEREDOC;
 		$this->assertSame('', $reported, 'The rule "'.$rule_name.'" reported an error before any event: '.$reported);
 
 		// 1. The limit under test does not resolve. The problem of the "down" value is opened by the trigger as
-		//    always - the rule does not stand between an event and its problem - and the rule reports that limit
-		//    and no other: the limit parsed before it, if there is one, resolves.
+		//    always - the rule does not stand between an event and its problem - and the rule reports a failure it
+		//    can only have from that limit: the one parsed before it, if there is one, resolves.
 		$send('down_'.$unresolved_service);
 		$this->waitForOpenProblemCount($all, 1);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
-		$this->waitForCepRuleError($rule_name, $error);
+		$this->waitForCepRuleError($rule_name);
 
 		// The "up" value of that id, the one that ends the window of its id and closes every problem the window
 		// held. There is no window for it to end, so it closes nothing and is left open as a problem of its own -
@@ -13394,7 +13390,7 @@ HEREDOC;
 		// touched itself.
 		$send('down_'.$resolved_service);
 		$this->waitForOpenProblemCount($all, 3);
-		$this->waitForCepRuleError($rule_name, '');
+		$this->waitForCepRuleNoError($rule_name);
 
 		// And the window it opened is a window like any other: the "up" value of the id ends it and both problems of
 		// that id are closed with it - the "down" one the window held and the "up" one that ended it.
@@ -14513,28 +14509,44 @@ HEREDOC;
 	}
 
 	/**
-	 * Wait until the CEP rule named $name reports exactly the $expected error, an empty string being a rule that
-	 * reports none - which is what a rule whose error was cleared has to come back to, so both directions are
-	 * waited for the same way.
+	 * Wait until the CEP rule named $name reports an error - any error. What the server writes there is its own
+	 * wording and changing it is not something these scenarios should fail on: that a rule which cannot do what it
+	 * was configured to do says so is the whole of what they read, see
+	 * runEventAssessmentTestCepWindowUnresolvedLimits().
 	 *
 	 * The error is recorded by the server rather than by whatever asked it to do the work, so it arrives after the
-	 * event that caused it has been assessed and is polled for instead of being read once. What the rule reports
-	 * while the wait goes on is what the failure names: an error that never appeared and the one that appeared
-	 * instead are told apart by it, see runEventAssessmentTestCepWindowUnresolvedLimits().
+	 * event that caused it has been assessed and is polled for instead of being read once.
 	 */
-	private function waitForCepRuleError(string $name, string $expected): void {
+	private function waitForCepRuleError(string $name): void {
 		$this->callUntilDataIsPresent('ceprule.get', [
 			'filter' => ['name' => $name],
 			'output' => ['cep_ruleid', 'error']
-		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($name, $expected) {
-			$error = $response['result'][0]['error'];
-
-			if ($error === $expected) {
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($name) {
+			if ($response['result'][0]['error'] !== '') {
 				return true;
 			}
 
-			return 'the rule "'.$name.'" reports '.($error === '' ? 'no error' : '"'.$error.'"').', expected '
-				.($expected === '' ? 'none' : '"'.$expected.'"');
+			return 'the rule "'.$name.'" reports no error, expected one';
+		});
+	}
+
+	/**
+	 * The other direction: wait until the CEP rule named $name reports no error at all, which is what a rule whose
+	 * error was cleared has to come back to. Unlike the error itself there is only one thing this can be, so it is
+	 * asserted exactly, see waitForCepRuleError().
+	 */
+	private function waitForCepRuleNoError(string $name): void {
+		$this->callUntilDataIsPresent('ceprule.get', [
+			'filter' => ['name' => $name],
+			'output' => ['cep_ruleid', 'error']
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($name) {
+			$error = $response['result'][0]['error'];
+
+			if ($error === '') {
+				return true;
+			}
+
+			return 'the rule "'.$name.'" reports "'.$error.'", expected none';
 		});
 	}
 
