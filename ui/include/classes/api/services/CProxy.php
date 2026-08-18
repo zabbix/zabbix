@@ -495,12 +495,7 @@ class CProxy extends CApiService {
 
 		$this->validateDelete($proxyids, $db_proxies);
 
-		$proxies = API::Proxy()->get([
-			'output' => ['proxyid', 'proxy_groupid'],
-			'proxyids' => $proxyids
-		]);
-
-		self::unlinkFromUserGroups($proxies);
+		self::unlinkFromUserGroups($db_proxies);
 
 		DB::delete('host_proxy', ['proxyid' => $proxyids]);
 		DB::delete('proxy', ['proxyid' => $proxyids]);
@@ -524,7 +519,7 @@ class CProxy extends CApiService {
 		}
 
 		$db_proxies = $this->get([
-			'output' => ['proxyid', 'name'],
+			'output' => ['proxyid', 'name', 'proxy_groupid'],
 			'proxyids' => $proxyids,
 			'editable' => true,
 			'preservekeys' => true
