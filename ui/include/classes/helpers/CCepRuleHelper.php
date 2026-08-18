@@ -346,7 +346,8 @@ class CCepRuleHelper {
 			self::WHEN_EVENT_OCCURRED => _('Event occured'),
 			self::WHEN_EVENT_EVICTED => _('Event evicted'),
 			self::WHEN_WINDOW_CLOSED => _('Window closed'),
-			self::WHEN_PATTERN_MATCHED => _('Event pattern matched')
+			self::WHEN_PATTERN_MATCHED => _('Event pattern matched'),
+			self::WHEN_EVENT_ADDED => _('Event added to window')
 		];
 	}
 
