@@ -327,7 +327,7 @@ class CDRule extends CApiService {
 		}
 
 		$db_drules = $this->get([
-			'output' => ['druleid', 'name'],
+			'output' => ['druleid', 'name', 'proxyid'],
 			'druleids' => zbx_objectValues($drules, 'druleid'),
 			'preservekeys' => true
 		]);
@@ -408,7 +408,9 @@ class CDRule extends CApiService {
 				);
 			}
 
-			$proxyids[] = array_key_exists('proxyid', $drule) ? $drule['proxyid'] : 0;
+			$proxyids[] = array_key_exists('proxyid', $drule)
+				? $drule['proxyid']
+				: $db_drules[$drule['druleid']]['proxyid'];
 
 			if (array_key_exists('dchecks', $drule)) {
 				if ($drule['dchecks']) {
