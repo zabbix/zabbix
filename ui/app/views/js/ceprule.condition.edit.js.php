@@ -30,8 +30,7 @@ window.ceprule_condition_edit_popup = new class {
 	init({rules, condition, overlay}) {
 		this.form_element = overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
-
-		this.#setValues(condition);
+		this.#setValues(this.#defaultCondition(condition));
 		this.#initActions();
 		window['ceprule-condition-type'].dispatchEvent(new Event('change'));
 		window['ceprule-condition-tag-operator'].dispatchEvent(new Event('change'));
@@ -49,18 +48,16 @@ window.ceprule_condition_edit_popup = new class {
 
 			if (value == <?= CONDITION_OPERATOR_EXISTS ?> || value == <?= CONDITION_OPERATOR_NOT_EXISTS ?>) {
 				window['ceprule-condition-tag-value'].style.display = 'none';
+				window['ceprule-condition-tag-value'].disabled = true;
 			}
 			else {
 				window['ceprule-condition-tag-value'].style.display = '';
+				window['ceprule-condition-tag-value'].disabled = false;
 			}
 		});
 	}
 
 	#setValues(condition) {
-		if (condition.tag_operator === '') {
-			condition.tag_operator = '<?= CONDITION_OPERATOR_EQUAL ?>';
-		}
-
 		this.form_element.querySelectorAll('[name]').forEach(node => {
 			if (node.type === 'radio') {
 				node.checked = node.value === condition[node.name];
@@ -164,5 +161,56 @@ window.ceprule_condition_edit_popup = new class {
 		return new Promise((resolve, reject) => this.form.validateSubmit(fields)
 			.then(result => result && resolve(fields) || reject(fields))
 		);
+	}
+
+	/**
+	 * Full record set with defaults. Type determines the used record properties whom no defaults will be applied.
+	 */
+	#defaultCondition(condition) {
+		const default_condition = {
+			type: '<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>',
+			operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
+			host_group: '',
+			host: '',
+			severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
+			tag_operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
+			tag: '',
+			tag_value: '',
+			event_name: '',
+			time_period: ''
+		};
+
+		if (condition === undefined) {
+			return default_condition;
+		}
+
+		function keep() {
+			[...arguments].forEach(field_name => {
+				default_condition[field_name] = condition[field_name];
+			});
+		}
+
+		switch (Number(condition.type)) {
+			case <?= CCepRuleHelper::CONDITION_EVENT_NAME ?>:
+				keep('type', 'event_name', 'operator');
+			break;
+			case <?= CCepRuleHelper::CONDITION_TAG ?>:
+				keep('type', 'tag', 'tag_operator', 'tag_value');
+			break;
+			case <?= CCepRuleHelper::CONDITION_SEVERITY ?>:
+				keep('type', 'severity', 'operator');
+			break;
+			case <?= CCepRuleHelper::CONDITION_HOST ?>:
+				keep('type', 'operator', 'host');
+			break;
+			case <?= CCepRuleHelper::CONDITION_HOST_GROUP ?>:
+				keep('type', 'operator', 'host_group');
+			break;
+			case <?= CCepRuleHelper::CONDITION_TIME_PERIOD ?>:
+				keep('type', 'operator', 'time_period');
+			break;
+		}
+
+		return default_condition;
 	}
 };

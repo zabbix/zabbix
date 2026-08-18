@@ -75,9 +75,7 @@ window.ceprule_edit_popup = new class {
 		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 
 		for (const condition of Object.values(ceprule.filter.conditions)) {
-			const formulaid = num2letter(this.#condition_row_index++);
-
-			this.#addConditionRow({...condition, formulaid, row_index: this.#condition_row_index});
+			this.#addConditionRow(condition);
 		}
 
 		for (const operation of Object.values(ceprule.operations)) {
@@ -135,7 +133,7 @@ window.ceprule_edit_popup = new class {
 				const row_index = e.target.closest('tr').dataset.row_index;
 				const conditions = this.form.findFieldByName('filter[conditions]').getValue();
 
-				this.#openConditionPopup(conditions[row_index], e.target);
+				this.#openConditionPopup(conditions[row_index], e.target, row_index);
 			}
 			else if (e.target.classList.contains('js-condition-remove')) {
 				e.target.closest('tr').remove();
@@ -480,24 +478,8 @@ window.ceprule_edit_popup = new class {
 		window['ceprule-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
 	}
 
-	#openConditionPopup(condition, trigger_element) {
+	#openConditionPopup(condition, trigger_element, index) {
 		const is_new = condition === undefined;
-
-		if (is_new) {
-			condition = {
-				row_index: this.#condition_row_index + 1,
-				formulaid: num2letter(this.#condition_row_index),
-				type: '<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>',
-				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
-				host_group: '',
-				host: '',
-				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
-				tag_operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
-				tag: '',
-				tag_value: '',
-				time_period: ''
-			};
-		}
 
 		const template = document.getElementById('ceprule-condition-modal-template');
 		const form_element = template.content.querySelector('form').cloneNode(true);
@@ -512,8 +494,12 @@ window.ceprule_edit_popup = new class {
 					isSubmit: true,
 					action: overlay => ceprule_condition_edit_popup.submit()
 						.then(fields => {
-							is_new && this.#addConditionRow(fields) || this.#editConditionRow(fields);
-							is_new && (this.#condition_row_index++);
+							if (is_new) {
+								this.#addConditionRow(fields);
+							}
+							else {
+								this.#editConditionRow(fields, index);
+							}
 							this.form.discoverAllFields();
 							this.form_element.dispatchEvent(new Event('filter.change'));
 						})
@@ -736,17 +722,17 @@ window.ceprule_edit_popup = new class {
 		return rows;
 	}
 
-	#editConditionRow(condition) {
-		window['ceprule-filter-conditions'].querySelector(`[data-row_index="${condition.row_index}"]`)
-			.replaceWith(this.#buildConditionRow(condition));
+	#editConditionRow(condition, index) {
+		window['ceprule-filter-conditions'].querySelector(`[data-row_index="${index}"]`)
+			.replaceWith(this.#buildConditionRow(condition, index));
 	}
 
 	#addConditionRow(condition) {
 		window['ceprule-filter-conditions'].querySelector('tbody')
-			.insertAdjacentElement('beforeend', this.#buildConditionRow(condition));
+			.insertAdjacentElement('beforeend', this.#buildConditionRow(condition, this.#condition_row_index++));
 	}
 
-	#buildConditionRow(condition) {
+	#buildConditionRow(condition, index) {
 		const label_names = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getConditionLabels()
 		) ?>');
@@ -798,9 +784,9 @@ window.ceprule_edit_popup = new class {
 
 		description_view.operator = description_view.operator.toLocaleLowerCase();
 
-		return this.#condition_row_template.evaluateToElement({
+		return this.#condition_row_template.evaluateToElement({...condition,
 			description_html: description_template.evaluate(description_view),
-			...condition
+			row_index: index, formulaid: num2letter(index)
 		});
 	}
 

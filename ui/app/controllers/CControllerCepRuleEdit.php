@@ -297,8 +297,7 @@ class CControllerCepRuleEdit extends CController {
 			'time_period' => ['db cep_condition.time_period', 'required', 'not_empty',
 				'use' => [CTimePeriodParser::class, ['usermacros' => false, 'lldmacros' => false]],
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
-			],
-			'formulaid' => ['string', 'required', 'not_empty']
+			]
 		]]))->getRules();
 	}
 }
