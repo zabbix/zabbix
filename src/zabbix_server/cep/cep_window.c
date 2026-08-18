@@ -825,8 +825,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 	cep_window_lock(window);
 
-	if (0 == window->time_created)
-		window->time_created = start_time;
+	window->time_created = start_time;
 
 	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) >= window->capacity)
 	{
@@ -943,13 +942,13 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 			window->time_created += window->duration;
 
 		window->flags = CEP_WINDOW_FLAGS_NONE;
+		cep_window_sync_entry_log_reset(window);
 	}
 
 	if (0 != zbx_queue_ptr_values_num(&window->hevents) || 0 != window->access_num)
 	{
 		atomic_store(&window->nextcheck, cep_window_get_nextcheck(window, NULL));
 		cep_window_pool_enqueue(pool, window);
-		cep_window_sync_entry_log_reset(window);
 	}
 	else
 	{
