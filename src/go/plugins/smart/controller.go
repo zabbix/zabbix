@@ -93,16 +93,7 @@ func (s *SmartCtl) Execute(args ...string) ([]byte, error) {
 			)
 		}
 
-		failing, ferr := failExistStatus(exitErr)
-		if ferr != nil {
-			return nil, errs.Wrapf(
-				err,
-				"failed to get combined output of stdout and stderr for smartctl process, %s",
-				ferr.Error(),
-			)
-		}
-
-		if failing {
+		if isFatalExitStatus(exitErr.ExitCode()) {
 			return nil, errs.Wrapf(err, "%q", strings.TrimSuffix(string(out), "\n"))
 		}
 	}
@@ -114,14 +105,17 @@ func (s *SmartCtl) Execute(args ...string) ([]byte, error) {
 	return out, nil
 }
 
-func failExistStatus(e *exec.ExitError) (bool, error) {
-	// exit codes taken from smartctl documentation
-	switch e.ExitCode() {
-	case 1, 2, 4, 8:
-		return true, nil
-	case 0, 16, 32, 64, 128:
-		return false, nil
-	default:
-		return true, errs.Errorf("unknown status code %d ", e.ExitCode())
-	}
+func isFatalExitStatus(status int) bool {
+	// smartctl exit statuses are combinations of the values documented at:
+	// https://www.smartmontools.org/static/doxygen/smartctl_8h_source.html
+	// Values 1 and 2 mean that the command could not run against the requested device. Other values
+	// may still accompany useful SMART data and are intentionally excluded from the fatal status mask.
+	const (
+		commandLineErrorStatus = 1
+		deviceOpenErrorStatus  = 2
+	)
+
+	const fatalExitStatusMask = commandLineErrorStatus | deviceOpenErrorStatus
+
+	return status&fatalExitStatusMask != 0
 }
