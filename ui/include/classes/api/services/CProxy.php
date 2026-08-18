@@ -418,10 +418,11 @@ class CProxy extends CApiService {
 			'SELECT ugp.usrgrpid,ugp.proxyid,ugp.usrgrp_proxyid,ug.name'.
 			' FROM usrgrp_proxy ugp'.
 			' JOIN usrgrp ug ON ug.usrgrpid=ugp.usrgrpid'.
-			' WHERE ugp.usrgrpid IN ('.
-				'SELECT DISTINCT ugp2.usrgrpid'.
+			' WHERE EXISTS ('.
+				'SELECT NULL'.
 				' FROM usrgrp_proxy ugp2'.
-				' WHERE '.dbConditionId('ugp2.proxyid', array_keys($proxyids)).
+				' WHERE ugp.usrgrpid=ugp2.usrgrpid'.
+				' AND '.dbConditionId('ugp2.proxyid', array_keys($proxyids)).
 			')'
 		);
 
