@@ -91,7 +91,7 @@ window.ceprule_edit_popup = new class {
 		this.form = new CForm(this.form_element, rules);
 		this.form.findFieldByName('operations').setButtonOnBlur('js-operation-add', 'ceprule.operation.edit');
 
-		this.#handleFilterChanged();
+		this.#refreshExpressionPreview();
 		this.#handleOptgroupTagChange.call(window['ceprule-window-groupby-opt-tag']);
 		this.#handleWindowTypeChanged(Number(ceprule.window_type));
 
@@ -138,12 +138,11 @@ window.ceprule_edit_popup = new class {
 			else if (e.target.classList.contains('js-condition-remove')) {
 				e.target.closest('tr').remove();
 				this.form.discoverAllFields();
+				this.#refreshExpressionPreview();
 
 				if (!window['ceprule-filter-conditions'].querySelector('[data-row_index]')) {
 					this.#condition_row_index = 0;
 				}
-
-				this.form_element.dispatchEvent(new Event('filter.change'));
 			}
 			else if (e.target.classList.contains('js-operation-add')) {
 				this.#openOperationPopup(undefined, e.target);
@@ -163,16 +162,7 @@ window.ceprule_edit_popup = new class {
 			}
 		});
 
-		// Add event proxies.
-		this.form_element.addEventListener('change', (e) => {
-			if (e.target.name === 'filter[evaltype]') {
-				this.form_element.dispatchEvent(new Event('filter.change'));
-			}
-		});
-
-		// Add proxied form event handlers.
-		this.form_element.addEventListener('filter.change', () => this.#handleFilterChanged());
-
+		window['ceprule-filter-evaltype'].addEventListener('change', () => this.#refreshExpressionPreview());
 		window['ceprule-window-counttag-toggle'].addEventListener('change', (e) => {
 			const enabled = window['ceprule-window-counttag-toggle'].querySelector('[value="1"]').checked;
 			window['ceprule-window-counttag'].style.display = enabled ? '' : 'none';
@@ -446,36 +436,38 @@ window.ceprule_edit_popup = new class {
 			});
 	}
 
-	/**
-	 * Method ensures filter view is correct with data:
-	 *	- conditions formula preview string.
-	 *	- type of calculation row.
-	 */
-	#handleFilterChanged() {
-		const evaltype_select = window['ceprule-filter-evaltype'];
-		const evaltype_field = evaltype_select.closest('.form-field');
-
+	#listConditionIdentifiers() {
 		const conditions = Object.values(this.form.findFieldByName('filter[conditions]').getValue() ?? {});
 
-		if (conditions.length < 2) {
-			evaltype_field.style.display = 'none';
-			evaltype_field.previousElementSibling.style.display = 'none';
+		return conditions.map(condition => ({id: condition.formulaid}));
+	}
 
-			return;
+	#refreshExpressionPreview() {
+		const identifiers = this.#listConditionIdentifiers();
+		const evaltype = Number(window['ceprule-filter-evaltype'].value);
+
+		if (evaltype == <?= CONDITION_EVAL_TYPE_AND_OR ?>
+				|| evaltype == <?= CONDITION_EVAL_TYPE_AND ?>
+				|| evaltype == <?= CONDITION_EVAL_TYPE_OR ?>) {
+			window['ceprule-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
+			window['ceprule-filter-expression-preview'].style.display = ''
+			window['ceprule-filter-expression'].disabled = true;
+			window['ceprule-filter-expression'].style.display = 'none';
+		}
+		else {
+			window['ceprule-filter-expression'].disabled = identifiers.length < 2;
+			window['ceprule-filter-expression'].style.display = '';
+			window['ceprule-filter-expression-preview'].style.display = 'none'
+
+			if (identifiers.length < 2) {
+				window['ceprule-filter-evaltype'].value = <?= CONDITION_EVAL_TYPE_AND_OR ?>;
+			}
 		}
 
-		evaltype_field.style.display = '';
-		evaltype_field.previousElementSibling.style.display = '';
+		const evaltype_field = window['ceprule-filter-evaltype'].closest('.form-field');
 
-		const evaltype = Number(evaltype_select.value);
-		const is_expression_evaltype = evaltype == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
-
-		window['ceprule-filter-expression'].style.display = is_expression_evaltype ? '' : 'none';
-		window['ceprule-filter-expression-preview'].style.display = !is_expression_evaltype ? '' : 'none';
-
-		const identifiers = Object.values(conditions).map(condition => ({id: condition.formulaid}));
-
-		window['ceprule-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
+		evaltype_field.style.display = identifiers.length < 2 ? 'none' : '';
+		evaltype_field.previousElementSibling.style.display = identifiers.length < 2 ? 'none' : '';
 	}
 
 	#openConditionPopup(condition, trigger_element, index) {
@@ -501,7 +493,7 @@ window.ceprule_edit_popup = new class {
 								this.#editConditionRow(fields, index);
 							}
 							this.form.discoverAllFields();
-							this.form_element.dispatchEvent(new Event('filter.change'));
+							this.#refreshExpressionPreview();
 						})
 						.then(() => overlayDialogueDestroy(overlay.dialogueid))
 						.catch(() => overlay.unsetLoading())
