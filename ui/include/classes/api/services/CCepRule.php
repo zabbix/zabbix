@@ -230,8 +230,7 @@ class CCepRule extends CApiService {
 		}
 
 		foreach ($cep_rules as &$cep_rule) {
-			$cep_rule['window'] = [];
-			$cep_rule['window']['tags'] = [];
+			$cep_rule['window'] = self::getWindowDefaults();
 		}
 		unset($cep_rule);
 
@@ -954,11 +953,16 @@ class CCepRule extends CApiService {
 	}
 
 	private static function getWindowDefaults(): array {
-		return array_intersect_key(DB::getDefaults('cep_rule_window'),
-			array_flip(['duration', 'capacity', 'group_by_host_group', 'group_by_host', 'group_by_tags',
-				'event_count_tag', 'script'
-			])
-		) + ['tags' => []];
+		return [
+			'duration' => DB::getDefault('cep_rule_window', 'duration'),
+			'capacity' => DB::getDefault('cep_rule_window', 'capacity'),
+			'group_by_host_group' => DB::getDefault('cep_rule_window', 'group_by_host_group'),
+			'group_by_host' => DB::getDefault('cep_rule_window', 'group_by_host'),
+			'group_by_tags' => DB::getDefault('cep_rule_window', 'group_by_tags'),
+			'tags' => [],
+			'event_count_tag' => DB::getDefault('cep_rule_window', 'event_count_tag'),
+			'script' => DB::getDefault('cep_rule_window', 'script')
+		];
 	}
 
 	private static function addWindowFieldDefaultsByGroupByTagField(array &$cep_rules, array $db_cep_rules): void {
