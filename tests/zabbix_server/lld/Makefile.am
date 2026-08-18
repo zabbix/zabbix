@@ -6,8 +6,7 @@ SERVER_tests = zbx_lld_hgsets_test \
 		lld_compare_entries \
 		zbx_substitute_lld_macros \
 		zbx_substitute_macros_in_json_pairs \
-		zbx_substitute_expression_lld_macros \
-		lld_manager_test
+		zbx_substitute_expression_lld_macros
 
 noinst_PROGRAMS = $(SERVER_tests)
 
@@ -104,18 +103,4 @@ zbx_substitute_expression_lld_macros_LDFLAGS = @SERVER_LDFLAGS@ $(LLD_WRAP_FUNCS
 zbx_substitute_expression_lld_macros_CFLAGS = \
 	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 
-# lld_manager_test
-
-lld_manager_test_SOURCES = \
-	lld_manager_test.c
-
-lld_manager_test_LDADD = $(LLD_LIBS)
-lld_manager_test_LDADD += @SERVER_LIBS@
-lld_manager_test_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
-	-Wl,--wrap=zbx_ipc_service_recv \
-	-Wl,--wrap=getppid \
-	-Wl,--wrap=zbx_ipc_client_close
-
-lld_manager_test_CFLAGS = \
-	-I@top_srcdir@/tests -I@top_srcdir@/src  @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 endif

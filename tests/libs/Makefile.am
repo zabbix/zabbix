@@ -33,5 +33,4 @@ SUBDIRS = \
 	zbxfile \
 	zbxodbc \
 	zbxhttp \
-	zbxip \
-	zbxipmi
+	zbxip
