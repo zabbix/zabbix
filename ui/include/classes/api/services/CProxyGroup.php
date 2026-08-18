@@ -441,19 +441,6 @@ class CProxyGroup extends CApiService {
 			$indexes = [];
 
 			foreach ($db_usrgrps as $db_usrgrpid => $db_usrgrp) {
-				$upd_user_group = false;
-
-				foreach ($db_usrgrp['proxy_groups'] as $proxy_group) {
-					if (in_array($proxy_group['proxy_groupid'], $proxy_groupids)) {
-						$upd_user_group = true;
-						break;
-					}
-				}
-
-				if (!$upd_user_group) {
-					continue;
-				}
-
 				$usrgrps[] = [
 					'name' => $db_usrgrp['name'],
 					'usrgrpid' => $db_usrgrp['usrgrpid'],
