@@ -4276,15 +4276,13 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	const char		*p = NULL;
 	time_t			itemtime;
 	char			host[HOST_HOST_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], dns[INTERFACE_DNS_LEN_MAX],
-				tmp[MAX_STRING_LEN], *host_metadata = NULL;
+				tmp[MAX_STRING_LEN], host_metadata[MAX_BUFFER_LEN];
 	unsigned short		port;
-	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
 	zbx_vector_ptr_t	autoreg_hosts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&autoreg_hosts);
-	host_metadata = (char *)zbx_malloc(host_metadata, host_metadata_alloc);
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
@@ -4308,10 +4306,16 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 			continue;
 		}
 
-		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOST_METADATA,
-				&host_metadata, &host_metadata_alloc, NULL))
+		if (NULL == zbx_json_pair_by_name(&jp_row, ZBX_PROTO_TAG_HOST_METADATA))
 		{
 			*host_metadata = '\0';
+		}
+		else if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST_METADATA, host_metadata,
+				sizeof(host_metadata), NULL))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process auto registration for host \"%s\":"
+					" host metadata is too long", host);
+			continue;
 		}
 
 		if (FAIL != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_FLAGS, tmp, sizeof(tmp), NULL))
@@ -4393,7 +4397,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 		DBcommit();
 	}
 
-	zbx_free(host_metadata);
 	DBregister_host_clean(&autoreg_hosts);
 	zbx_vector_ptr_destroy(&autoreg_hosts);
 
