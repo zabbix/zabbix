@@ -886,10 +886,10 @@ int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out,
 		return ret_errf(FAIL, error, max_error_len, "Unsupported granularity value");
 
 	if (0 == granularity_tmp)
-		return ret_errf(FAIL, error, max_error_len, "Aggregation size cannot be 0");
+		return ret_errf(FAIL, error, max_error_len, "Granularity cannot be 0");
 
 	if (granularity_tmp > lookback_limit_tmp)
-		return ret_errf(FAIL, error, max_error_len, "Aggregation size cannot be larger than lookback limit");
+		return ret_errf(FAIL, error, max_error_len, "Granularity cannot be larger than lookback limit");
 
 	if (NULL != time_shift_out)
 		*time_shift_out = time_shift_tmp;
