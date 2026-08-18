@@ -233,14 +233,16 @@ try {
 			$saml_data['nameid_format'], $saml_data['nameid_name_qualifier'], $saml_data['nameid_sp_name_qualifier']
 		);
 
+		header('Pragma: no-cache');
+		header('Cache-Control: no-cache, must-revalidate');
 		redirect($url);
 	}
 
 	if ($saml_settings['slo_url'] !== '' && hasRequest('sls')) {
-		CSessionHelper::unset(['saml_data']);
-		$auth->processSLO();
+		$auth->processSLO(true, null, false, null, true);
+		CWebUser::logout();
 
-		redirect('index.php');
+		redirect($redirect_to->toString());
 	}
 
 	if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
@@ -308,13 +310,17 @@ try {
 		redirect(reset($redirect));
 	}
 
-	$auth->login(null, [], hasRequest('force_authn'));
+	$url = $auth->login(null, [], hasRequest('force_authn'), false, true);
+
+	header('Pragma: no-cache');
+	header('Cache-Control: no-cache, must-revalidate');
+	redirect($url);
 }
 catch (Exception $e) {
 	error($e->getMessage());
 }
 
-if ($saml_data !== null) {
+if ($saml_data !== null && !CWebUser::isLoggedIn()) {
 	error(_('You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed.'));
 	error(_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.'));
 }
