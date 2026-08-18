@@ -17,7 +17,6 @@ package smart
 
 import (
 	"encoding/json"
-	"errors"
 	"testing"
 	"time"
 
@@ -1180,12 +1179,190 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:       "+windowsCSMISSD",
+			deviceName: "/dev/csmi0,0",
+			expectations: expectation{
+				args: []string{"-a", "/dev/csmi0,0", "-j"},
+				err:  nil,
+				out:  readControllerFixture(t, "device/csmi/ssd.json"),
+			},
+			args: args{
+				basicDev: []deviceInfo{
+					{
+						Name:     "/dev/csmi0,0",
+						InfoName: "/dev/csmi0,0",
+						DevType:  "ata",
+					},
+				},
+				jsonRunner: false,
+			},
+			expectedResult: &SmartCtlDeviceData{
+				Device: &deviceParser{
+					ModelName:    "TEST_CSMI_SSD",
+					SerialNumber: "TEST-CSMI-SSD-0001",
+					Info: deviceInfo{
+						Name:     "/dev/csmi0,0",
+						InfoName: "/dev/csmi0,0",
+						DevType:  "ata",
+						name:     "/dev/csmi0,0",
+					},
+					Smartctl:    smartctlField{Version: []int{7, 3}},
+					SmartStatus: &smartStatus{SerialNumber: true},
+					SmartAttributes: smartAttributes{
+						Table: []table{
+							{
+								Attrname: "Reallocated_Sector_Ct",
+								ID:       5,
+							},
+							{
+								Attrname: "Power_On_Hours",
+								ID:       9,
+							},
+							{
+								Attrname: "Available_Reservd_Space",
+								ID:       170,
+								Thresh:   10,
+							},
+						},
+					},
+				},
+				Data: readControllerFixture(t, "device/csmi/ssd.json"),
+			},
+			wantErr: false,
+		},
+		{
+			name:       "+windowsCSMIHDD",
+			deviceName: "/dev/csmi0,2",
+			expectations: expectation{
+				args: []string{"-a", "/dev/csmi0,2", "-j"},
+				err:  nil,
+				out:  readControllerFixture(t, "device/csmi/hdd.json"),
+			},
+			args: args{
+				basicDev: []deviceInfo{
+					{
+						Name:     "/dev/csmi0,2",
+						InfoName: "/dev/csmi0,2",
+						DevType:  "ata",
+					},
+				},
+				jsonRunner: false,
+			},
+			expectedResult: &SmartCtlDeviceData{
+				Device: &deviceParser{
+					ModelName:    "TEST_CSMI_HDD",
+					SerialNumber: "TEST-CSMI-HDD-0002",
+					RotationRate: 7200,
+					Info: deviceInfo{
+						Name:     "/dev/csmi0,2",
+						InfoName: "/dev/csmi0,2",
+						DevType:  "ata",
+						name:     "/dev/csmi0,2",
+					},
+					Smartctl:    smartctlField{Version: []int{7, 3}},
+					SmartStatus: &smartStatus{SerialNumber: true},
+					SmartAttributes: smartAttributes{
+						Table: []table{
+							{
+								Attrname: "Reallocated_Sector_Ct",
+								ID:       5,
+								Thresh:   10,
+							},
+							{
+								Attrname: "Power_On_Hours",
+								ID:       9,
+							},
+							{
+								Attrname: "Current_Pending_Sector",
+								ID:       197,
+							},
+						},
+					},
+				},
+				Data: readControllerFixture(t, "device/csmi/hdd.json"),
+			},
+			wantErr: false,
+		},
+		{
+			name:       "+windowsCSMISecondaryHDD",
+			deviceName: "/dev/csmi0,3",
+			expectations: expectation{
+				args: []string{"-a", "/dev/csmi0,3", "-j"},
+				out:  readControllerFixture(t, "device/csmi/hdd_secondary.json"),
+			},
+			args: args{
+				basicDev: []deviceInfo{
+					{
+						Name:     "/dev/csmi0,3",
+						InfoName: "/dev/csmi0,3",
+						DevType:  "ata",
+					},
+				},
+				jsonRunner: false,
+			},
+			expectedResult: &SmartCtlDeviceData{
+				Device: &deviceParser{
+					ModelName:    "TEST_CSMI_HDD",
+					SerialNumber: "TEST-CSMI-HDD-0003",
+					RotationRate: 7200,
+					Info: deviceInfo{
+						Name:     "/dev/csmi0,3",
+						InfoName: "/dev/csmi0,3",
+						DevType:  "ata",
+						name:     "/dev/csmi0,3",
+					},
+					Smartctl:    smartctlField{Version: []int{7, 3}},
+					SmartStatus: &smartStatus{SerialNumber: true},
+					SmartAttributes: smartAttributes{
+						Table: []table{
+							{
+								Attrname: "Reallocated_Sector_Ct",
+								ID:       5,
+								Thresh:   10,
+							},
+							{
+								Attrname: "Power_On_Hours",
+								ID:       9,
+							},
+							{
+								Attrname: "Current_Pending_Sector",
+								ID:       197,
+							},
+						},
+					},
+				},
+				Data: readControllerFixture(t, "device/csmi/hdd_secondary.json"),
+			},
+			wantErr: false,
+		},
+		{
+			name:       "-windowsCSMIDeviceOpenError",
+			deviceName: "/dev/csmi0,1",
+			expectations: expectation{
+				args: []string{"-a", "/dev/csmi0,1", "-j"},
+				err:  errs.New("exit status 2"),
+				out:  readControllerFixture(t, "device/csmi/device_open_error.json"),
+			},
+			args: args{
+				basicDev: []deviceInfo{
+					{
+						Name:     "/dev/csmi0,1",
+						InfoName: "/dev/csmi0,1",
+						DevType:  "ata",
+					},
+				},
+				jsonRunner: false,
+			},
+			expectedResult: nil,
+			wantErr:        true,
+		},
+		{
 			name:       "-invalidJSON",
 			deviceName: "/dev/sda",
 			expectations: expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
 				err:  nil,
-				out:  []byte(`{`), // Corrupted or incomplete JSON
+				out:  readControllerFixture(t, "errors/invalid_json.txt"),
 			},
 			args: args{
 				basicDev: []deviceInfo{
@@ -1206,7 +1383,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			expectations: expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
 				err:  nil,
-				out:  []byte(`{"smartctl":{},"device":{},"model_name":"Example Model"}`), // No SmartStatus field
+				out:  readControllerFixture(t, "device/no_smart_status.json"),
 			},
 			args: args{
 				basicDev: []deviceInfo{
@@ -1226,7 +1403,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			deviceName: "/dev/sda",
 			expectations: expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
-				err:  errors.New("failed to exec smart control"),
+				err:  errs.New("failed to exec smart control"),
 				out:  []byte{},
 			},
 			args: args{
@@ -1549,7 +1726,7 @@ func TestPlugin_checkVersion(t *testing.T) { //nolint:paralleltest
 			expect: expect{exec: true},
 			fields: fields{
 				execOut: readControllerFixture(t, "version/valid.json"),
-				execErr: errors.New("fail"),
+				execErr: errs.New("fail"),
 			},
 			wantErr: true,
 		},
@@ -2206,6 +2383,135 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 		},
 		{
+			name: "-satDeviceOpenError",
+			expectations: []expectation{
+				{
+					args: []string{"-a", "/dev/sda", "-d", "sat", "-j"},
+					out:  readControllerFixture(t, "device/sat/device_open_error.json"),
+					err:  errs.New("exit status 2"),
+				},
+			},
+			args: args{
+				deviceName: "/dev/sda",
+				deviceType: SAT,
+			},
+			want: []*SmartCtlDeviceData{},
+		},
+		{
+			name: "-scsiDeviceOpenError",
+			expectations: []expectation{
+				{
+					args: []string{"-a", "/dev/sda", "-d", "scsi", "-j"},
+					out:  readControllerFixture(t, "device/scsi/device_open_error.json"),
+					err:  errs.New("exit status 2"),
+				},
+			},
+			args: args{
+				deviceName: "/dev/sda",
+				deviceType: SCSI,
+			},
+			want: []*SmartCtlDeviceData{},
+		},
+		{
+			name: "+3wareLinux",
+			expectations: []expectation{
+				{
+					args: []string{"-a", "/dev/twa0", "-d", "3ware,0", "-j"},
+					out:  readControllerFixture(t, "device/3ware/ata.json"),
+				},
+				{
+					args: []string{"-a", "/dev/twa0", "-d", "3ware,1", "-j"},
+					out:  readControllerFixture(t, "device/3ware/device_open_error.json"),
+					err:  errs.New("exit status 2"),
+				},
+			},
+			args: args{
+				deviceName: "/dev/twa0",
+				deviceType: ThreeWare,
+			},
+			want: []*SmartCtlDeviceData{
+				{
+					Device: &deviceParser{
+						ModelName:    "TEST_3WARE_HDD",
+						SerialNumber: "TEST-3WARE-ATA-0001",
+						RotationRate: 7200,
+						Info: deviceInfo{
+							Name:     "/dev/twa0 3ware,0",
+							InfoName: "/dev/twa0 [3ware_disk_00]",
+							DevType:  "3ware",
+							name:     "/dev/twa0",
+							raidType: "3ware,0",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 4}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{
+							Table: []table{
+								{
+									Attrname: "Reallocated_Sector_Ct",
+									ID:       5,
+									Thresh:   10,
+								},
+								{
+									Attrname: "Power_On_Hours",
+									ID:       9,
+								},
+							},
+						},
+					},
+					Data: readControllerFixture(t, "device/3ware/ata.json"),
+				},
+			},
+		},
+		{
+			name: "+arecaLinux",
+			expectations: []expectation{
+				{
+					args: []string{"-a", "/dev/sg2", "-d", "areca,1", "-j"},
+					out:  readControllerFixture(t, "device/areca/ata.json"),
+				},
+				{
+					args: []string{"-a", "/dev/sg2", "-d", "areca,2", "-j"},
+					out:  readControllerFixture(t, "device/areca/device_open_error.json"),
+					err:  errs.New("exit status 2"),
+				},
+			},
+			args: args{
+				deviceName: "/dev/sg2",
+				deviceType: Areca,
+			},
+			want: []*SmartCtlDeviceData{
+				{
+					Device: &deviceParser{
+						ModelName:    "TEST_ARECA_SSD",
+						SerialNumber: "TEST-ARECA-ATA-0001",
+						Info: deviceInfo{
+							Name:     "/dev/sg2 areca,1",
+							InfoName: "/dev/sg2 [areca_disk_01]",
+							DevType:  "areca",
+							name:     "/dev/sg2",
+							raidType: "areca,1",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 4}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{
+							Table: []table{
+								{
+									Attrname: "Reallocated_Sector_Ct",
+									ID:       5,
+									Thresh:   10,
+								},
+								{
+									Attrname: "Power_On_Hours",
+									ID:       9,
+								},
+							},
+						},
+					},
+					Data: readControllerFixture(t, "device/areca/ata.json"),
+				},
+			},
+		},
+		{
 			name: "+ccissLinux",
 			expectations: []expectation{
 				{
@@ -2317,6 +2623,21 @@ func Test_getRaidDevices(t *testing.T) {
 			want: nil,
 		},
 		{
+			name: "-arecaUnsupportedOnWindows",
+			expectations: []expectation{
+				{
+					args: []string{"-a", "/dev/sda", "-d", "areca,1", "-j"},
+					out: readControllerEnvironment(t, "env_1").
+						AllSmartInfoScans.get(t, "-a /dev/sda -d areca,1 -j"),
+				},
+			},
+			args: args{
+				deviceName: "/dev/sda",
+				deviceType: Areca,
+			},
+			want: nil,
+		},
+		{
 			name: "-invalidType3ware",
 			expectations: []expectation{
 				{
@@ -2331,10 +2652,6 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			want: nil,
 		},
-		// missing cases for:
-		// - 3ware
-		// - areca
-		// because of lack of test data
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -3111,7 +3428,7 @@ func TestPlugin_getDevices(t *testing.T) {
 			},
 			fields: fields{
 				basicScanOut: readControllerFixture(t, "discovery/basic_scan.json"),
-				basicScanErr: errors.New("fail"),
+				basicScanErr: errs.New("fail"),
 			},
 			wantBasic:    nil,
 			wantRaid:     nil,
@@ -3132,7 +3449,7 @@ func TestPlugin_getDevices(t *testing.T) {
 			fields: fields{
 				basicScanOut: readControllerFixture(t, "discovery/basic_scan.json"),
 				raidScanOut:  readControllerFixture(t, "discovery/sat_scan.json"),
-				raidScanErr:  errors.New("fail"),
+				raidScanErr:  errs.New("fail"),
 			},
 			wantBasic:    nil,
 			wantRaid:     nil,
@@ -3393,18 +3710,37 @@ func TestPlugin_scanDevices(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "+windowsNVMe",
+			fields: fields{
+				execOut: readControllerFixture(t, "discovery/windows_nvme_scan.json"),
+			},
+			args: args{
+				args: []string{"--scan", "-j"},
+			},
+			want: []deviceInfo{
+				{
+					Name:     "/dev/sda",
+					InfoName: "/dev/sda",
+					DevType:  "nvme",
+				},
+			},
+			wantErr: false,
+		},
+		{
 			name: "-execErr",
 			fields: fields{
 				execOut: readControllerFixture(t, "discovery/basic_scan.json"),
-				execErr: errors.New("fail"),
+				execErr: errs.New("fail"),
 			},
 			args:    args{args: []string{"--scan", "-j"}},
 			want:    nil,
 			wantErr: true,
 		},
 		{
-			name:    "-marshalErr",
-			fields:  fields{execOut: []byte("{")},
+			name: "-marshalErr",
+			fields: fields{
+				execOut: readControllerFixture(t, "errors/invalid_json.txt"),
+			},
 			args:    args{args: []string{"--scan", "-j"}},
 			want:    nil,
 			wantErr: true,
