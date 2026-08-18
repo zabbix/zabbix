@@ -1,0 +1,81 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 4],
+    "pre_release": false,
+    "svn_revision": "5530",
+    "platform_info": "Darwin 23.1.0 arm64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-j",
+      "-a",
+      "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1"
+    ],
+    "messages": [
+      {
+        "string": "Read 1 entries from Error Information Log failed: GetLogPage failed: system=0x38, sub=0x0, code=745",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 4
+  },
+  "local_time": {
+    "time_t": 1699624455,
+    "asctime": "Fri Nov 10 15:54:15 2023 EET"
+  },
+  "device": {
+    "name": "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
+    "info_name": "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
+    "type": "nvme",
+    "protocol": "NVMe"
+  },
+  "model_name": "APPLE SSD AP0512Z",
+  "serial_number": "0ba02202c4bc1a1e",
+  "firmware_version": "359.40.2",
+  "nvme_pci_vendor": {
+    "id": 4203,
+    "subsystem_id": 4203
+  },
+  "nvme_ieee_oui_identifier": 0,
+  "nvme_controller_id": 0,
+  "nvme_version": {
+    "string": "<1.2",
+    "value": 0
+  },
+  "nvme_number_of_namespaces": 3,
+  "smart_support": {
+    "available": true,
+    "enabled": true
+  },
+  "smart_status": {
+    "passed": true,
+    "nvme": {
+      "value": 0
+    }
+  },
+  "nvme_smart_health_information_log": {
+    "critical_warning": 0,
+    "temperature": 37,
+    "available_spare": 100,
+    "available_spare_threshold": 99,
+    "percentage_used": 0,
+    "data_units_read": 17752601,
+    "data_units_written": 10046748,
+    "host_reads": 516431091,
+    "host_writes": 252462788,
+    "controller_busy_time": 0,
+    "power_cycles": 90,
+    "power_on_hours": 269,
+    "unsafe_shutdowns": 6,
+    "media_errors": 0,
+    "num_err_log_entries": 0
+  },
+  "temperature": {
+    "current": 37
+  },
+  "power_cycle_count": 90,
+  "power_on_time": {
+    "hours": 269
+  }
+}
