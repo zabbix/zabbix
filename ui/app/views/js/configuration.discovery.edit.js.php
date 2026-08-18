@@ -423,12 +423,12 @@ window.drule_edit_popup = new class {
 
 		if (!this.#can_select_server_for_discovery_by) {
 			const discovery_by_server = this.#form_element.querySelector(
-				'[name="discovery_by"][value="<?= ZBX_MONITORED_BY_SERVER ?>"]'
+				'[name="discovery_by"][value="<?= ZBX_DISCOVERY_BY_SERVER ?>"]'
 			);
 
 			if (discovery_by_server.checked) {
 				const discovery_by_proxy = this.#form_element.querySelector(
-					'[name="discovery_by"][value="<?= ZBX_MONITORED_BY_PROXY ?>"]'
+					'[name="discovery_by"][value="<?= ZBX_DISCOVERY_BY_PROXY ?>"]'
 				);
 
 				discovery_by_proxy.checked = true;
