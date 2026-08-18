@@ -513,7 +513,7 @@ static int	store_hk_setting(const zbx_setting_value_t *values, const char *name,
 	if (0 != non_zero && 0 == value_int)
 		return FAIL;
 
-	if (0 != value_min && (value_min > value_int || ZBX_HK_PERIOD_MAX < value_int))
+	if (0 != value_int && (value_min > value_int || ZBX_HK_PERIOD_MAX < value_int))
 		return FAIL;
 
 	if (*value != value_int)
