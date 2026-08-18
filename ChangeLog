@@ -1,9 +1,12 @@
 Changes for 7.0.30rc1
 
 New features:
+A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
 ..F....... [ZBXNEXT-10732] implemented update for the Help URL path (scernisenko)
 
 Bug fixes:
+..F....... [ZBX-27836] fixed PHP runtime errors in user role edit form (Ivo)
+...G...... [ZBX-28045] fixed active checks in case of failed response on Zabbix agent 2 (aetatsu)
 .........T [ZBX-23057] fixed memory fragmentation trigger and added RSS overhead triggers in Redis by Zabbix agent 2 template (mruszczyk)
 .D........ [ZBX-27746] removed unsupported discovery worker targets and preprocessing worker profiling targets from Zabbix server and proxy help messages and man pages (rtrizna)
 .........T [ZBX-27791] added multiplier to percent_used metric in Ceph by Zabbix agent 2 template (mruszczyk)
