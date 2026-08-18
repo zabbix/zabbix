@@ -197,19 +197,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	}
 }
 
-.link-cloud {
-	display: inline-block;
-	box-sizing: border-box;
-
-	&:hover {
-		color: $btn-color;
-	}
-
-	&:not(:hover) {
-		color: $btn-alt-color;
-	}
-}
-
 .disabled {
 	cursor: default !important;
 	opacity: .35;
