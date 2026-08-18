@@ -23,7 +23,7 @@
 
 #ifdef _WINDOWS
 /* the size of Windows pipe used to read command output */
-#define ZBX_EXEC_PIPE_SIZE	(16 * ZBX_KIBIBYTE)
+#define ZBX_EXEC_PIPE_SIZE	(64 * ZBX_KIBIBYTE)
 
 /******************************************************************************
  *                                                                            *
@@ -80,10 +80,10 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 
 		if (MAX_EXECUTE_OUTPUT_LEN <= *offset + in_buf_size)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
+			zbx_snprintf(error, max_error_len, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
-			zbx_snprintf(error, max_error_len, "Command output exceeded limit of %d KB",
-				MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+			zabbix_log(LOG_LEVEL_ERR, "%s", error);
+			*error = (char)toupper((unsigned char)*error);
 
 			return FAIL;
 		}
@@ -523,11 +523,10 @@ close:
 		}
 		else if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
 		{
-			zbx_snprintf(error, max_error_len, "Command output exceeded limit of %d KB",
+			zbx_snprintf(error, max_error_len, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
-
-			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
-					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+			zabbix_log(LOG_LEVEL_ERR, "%s", error);
+			*error = (char)toupper((unsigned char)*error);
 		}
 		else if (0 == WIFEXITED(status) || (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != WEXITSTATUS(status)))
 		{
