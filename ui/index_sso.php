@@ -67,7 +67,7 @@ $service = API::getApiService('user');
 $userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 $provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);
 $provisioning_enabled = ($provisioning->isProvisioningEnabled()
-	&& CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_JIT_STATUS) ==  JIT_PROVISIONING_ENABLED
+	&& CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_JIT_STATUS) == JIT_PROVISIONING_ENABLED
 );
 
 if (array_key_exists('baseurl', $SSO['SETTINGS']) && !is_array($SSO['SETTINGS']['baseurl'])
@@ -178,6 +178,7 @@ try {
 		}
 
 		$groups_key = $saml_settings['group_name'];
+		$user_attributes = [];
 
 		foreach ($auth->getAttributes() as $attribute => $value) {
 			if ($groups_key !== $attribute) {
