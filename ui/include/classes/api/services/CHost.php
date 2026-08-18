@@ -1920,9 +1920,34 @@ class CHost extends CHostGeneral {
 				$api_input_rules = self::getDiscoveredValidationRules();
 			}
 			else {
-				$host += array_intersect_key($db_host, array_flip(['monitored_by', 'tls_connect', 'tls_accept']));
+				if (array_key_exists('monitored_by', $host)) {
+					$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+						'monitored_by' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => static fn(): bool => !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING) && $db_host['monitored_by'] != $host['monitored_by'], 'type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => implode(',', [ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
+												['else' => true, 'type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])]
+						]],
+						'proxyid' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+												['else' => true, 'type' => API_ID, 'in' => '0']
+						]],
+						'proxy_groupid' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY_GROUP], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+												['else' => true, 'type' => API_ID, 'in' => '0']
+						]]
+					]];
 
-				self::addRequiredFieldsByMonitoredBy($host, $db_host);
+					if (!CApiInputValidator::validate($api_input_rules, $host, '/'.($i + 1), $error)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+					}
+
+					$host += array_intersect_key($db_host, array_flip(['tls_connect', 'tls_accept']));
+				}
+				else {
+					$host += array_intersect_key($db_host, array_flip(['monitored_by', 'tls_connect', 'tls_accept']));
+
+					self::addRequiredFieldsByMonitoredBy($host, $db_host);
+				}
+
 				self::addRequiredFieldsByTls($host, $db_host);
 
 				$api_input_rules = self::getValidationRules();
@@ -2232,15 +2257,6 @@ class CHost extends CHostGeneral {
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'hostid' =>				['type' => API_ANY],
-			'monitored_by' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
-			'proxyid' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID],
-										['else' => true, 'type' => API_ID, 'in' => '0']
-			]],
-			'proxy_groupid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY_GROUP], 'type' => API_ID],
-										['else' => true, 'type' => API_ID, 'in' => '0']
-			]],
 			'tls_connect' =>		['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
 			'tls_accept' =>			['type' => API_INT32, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE])],
 			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
