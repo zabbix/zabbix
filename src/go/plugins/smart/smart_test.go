@@ -649,71 +649,96 @@ func Test_diskGetSingle(t *testing.T) {
 		fields fields
 		want   want
 	}{
-		{name: "+normalValues", args: args{
-			path:     "path",
-			raidType: "rt",
-		}, fields: fields{
-			ctlOutput: []byte(nvme),
-			ctlErr:    nil,
-		}, want: want{
-			output: []byte(
-				`{"critical_warning":0,"disk_type":"nvme","error":"","exit_status":0,"firmware_version":"HPS1",` +
-					`"media_errors":0,"model_name":"INTEL SSDPEKNW512G8H",` +
-					`"percentage_used":0,"power_on_time":2222,"self_test_in_progress":null,` +
-					`"self_test_passed":null,"serial_number":"BTNH115603K7512A","temperature":25}`,
-			),
-			wantErr: false,
-		}},
-		{name: "+valueOverflow", args: args{
-			path:     "path",
-			raidType: "rt",
-		}, fields: fields{
-			ctlOutput: []byte(nvmeMediaErrorOverflow),
-			ctlErr:    nil,
-		}, want: want{
-			output: []byte(
-				`{"critical_warning":0,"disk_type":"nvme","error":"","exit_status":0,"firmware_version":"HPS1",` +
-					`"media_errors":12345678901234567890,"model_name":"INTEL SSDPEKNW512G8H",` +
-					`"percentage_used":0,"power_on_time":2222,"self_test_in_progress":null,` +
-					`"self_test_passed":null,"serial_number":"BTNH115603K7512A","temperature":25}`,
-			),
-			wantErr: false,
-		}},
-		{name: "+SCSIMegaRAID", args: args{
-			path:     "/dev/bus/0",
-			raidType: "megaraid,0",
-		}, fields: fields{
-			ctlOutput: megaraidSCSIDrive,
-			ctlErr:    nil,
-		}, want: want{
-			output: []byte(
-				`{"critical_warning":0,"disk_type":"hdd","error":"","exit_status":0,"firmware_version":"",` +
-					`"media_errors":0,"model_name":"","percentage_used":0,"power_on_time":1000,` +
-					`"self_test_in_progress":null,"self_test_passed":null,` +
-					`"serial_number":"TEST-SERIAL-0001","temperature":30}`,
-			),
-			wantErr: false,
-		}},
-		{name: "-ctlError", args: args{
-			path:     "path",
-			raidType: "rt",
-		}, fields: fields{
-			ctlOutput: []byte{},
-			ctlErr:    errs.New("test"),
-		}, want: want{
-			output:  []byte{},
-			wantErr: true,
-		}},
-		{name: "-jsonFormatError", args: args{
-			path:     "path",
-			raidType: "rt",
-		}, fields: fields{
-			ctlOutput: []byte(`{abc`),
-			ctlErr:    nil,
-		}, want: want{
-			output:  []byte{},
-			wantErr: true,
-		}},
+		{
+			name: "+normalValues",
+			args: args{
+				path:     "path",
+				raidType: "rt",
+			},
+			fields: fields{
+				ctlOutput: []byte(nvme),
+				ctlErr:    nil,
+			},
+			want: want{
+				output: []byte(
+					`{"critical_warning":0,"disk_type":"nvme","error":"","exit_status":0,"firmware_version":"HPS1",` +
+						`"media_errors":0,"model_name":"INTEL SSDPEKNW512G8H",` +
+						`"percentage_used":0,"power_on_time":2222,"self_test_in_progress":null,` +
+						`"self_test_passed":null,"serial_number":"BTNH115603K7512A","temperature":25}`,
+				),
+				wantErr: false,
+			},
+		},
+		{
+			name: "+valueOverflow",
+			args: args{
+				path:     "path",
+				raidType: "rt",
+			},
+			fields: fields{
+				ctlOutput: []byte(nvmeMediaErrorOverflow),
+				ctlErr:    nil,
+			},
+			want: want{
+				output: []byte(
+					`{"critical_warning":0,"disk_type":"nvme","error":"","exit_status":0,"firmware_version":"HPS1",` +
+						`"media_errors":12345678901234567890,"model_name":"INTEL SSDPEKNW512G8H",` +
+						`"percentage_used":0,"power_on_time":2222,"self_test_in_progress":null,` +
+						`"self_test_passed":null,"serial_number":"BTNH115603K7512A","temperature":25}`,
+				),
+				wantErr: false,
+			},
+		},
+		{
+			name: "+SCSIMegaRAID",
+			args: args{
+				path:     "/dev/bus/0",
+				raidType: "megaraid,0",
+			},
+			fields: fields{
+				ctlOutput: megaraidSCSIDrive,
+				ctlErr:    nil,
+			},
+			want: want{
+				output: []byte(
+					`{"critical_warning":0,"disk_type":"hdd","error":"","exit_status":0,"firmware_version":"",` +
+						`"media_errors":0,"model_name":"","percentage_used":0,"power_on_time":1000,` +
+						`"self_test_in_progress":null,"self_test_passed":null,` +
+						`"serial_number":"TEST-SERIAL-0001","temperature":30}`,
+				),
+				wantErr: false,
+			},
+		},
+		{
+			name: "-ctlError",
+			args: args{
+				path:     "path",
+				raidType: "rt",
+			},
+			fields: fields{
+				ctlOutput: []byte{},
+				ctlErr:    errs.New("test"),
+			},
+			want: want{
+				output:  []byte{},
+				wantErr: true,
+			},
+		},
+		{
+			name: "-jsonFormatError",
+			args: args{
+				path:     "path",
+				raidType: "rt",
+			},
+			fields: fields{
+				ctlOutput: []byte(`{abc`),
+				ctlErr:    nil,
+			},
+			want: want{
+				output:  []byte{},
+				wantErr: true,
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -752,112 +777,137 @@ func Test_setSingleDiskFields(t *testing.T) {
 		wantOut map[string]any
 		wantErr bool
 	}{
-		{name: "nvme_device", args: args{dev: []byte(nvme)}, wantOut: map[string]any{
-			"critical_warning":      0,
-			"disk_type":             "nvme",
-			"error":                 "",
-			"exit_status":           0,
-			"firmware_version":      "HPS1",
-			"media_errors":          json.Number("0"),
-			"model_name":            "INTEL SSDPEKNW512G8H",
-			"percentage_used":       0,
-			"power_on_time":         2222,
-			"self_test_passed":      nilReference,
-			"self_test_in_progress": nilReference,
-			"serial_number":         "BTNH115603K7512A",
-			"temperature":           25,
-		}, wantErr: false},
-		{name: "mediaOverflow", args: args{dev: []byte(nvmeMediaErrorOverflow)}, wantOut: map[string]any{
-			"critical_warning":      0,
-			"disk_type":             "nvme",
-			"error":                 "",
-			"exit_status":           0,
-			"firmware_version":      "HPS1",
-			"media_errors":          json.Number("12345678901234567890"),
-			"model_name":            "INTEL SSDPEKNW512G8H",
-			"percentage_used":       0,
-			"power_on_time":         2222,
-			"self_test_passed":      nilReference,
-			"self_test_in_progress": nilReference,
-			"serial_number":         "BTNH115603K7512A",
-			"temperature":           25,
-		}, wantErr: false},
-		{name: "hdd_device", args: args{dev: []byte(hdd)}, wantOut: map[string]any{
-			"critical_warning":      0,
-			"disk_type":             "hdd",
-			"error":                 "",
-			"exit_status":           0,
-			"firmware_version":      "CV26",
-			"media_errors":          json.Number("0"),
-			"model_name":            "ST1000VX000-1ES162",
-			"percentage_used":       0,
-			"power_on_time":         39153,
-			"self_test_passed":      boolToPtr(true),
-			"self_test_in_progress": boolToPtr(false),
-			"serial_number":         "Z4Y7SJBD",
-			"temperature":           30,
-			"raw_read_error_rate": singleRequestAttribute{
-				Value: 182786912,
-				Raw:   "182786912",
+		{
+			name: "nvme_device",
+			args: args{dev: []byte(nvme)},
+			wantOut: map[string]any{
+				"critical_warning":      0,
+				"disk_type":             "nvme",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "HPS1",
+				"media_errors":          json.Number("0"),
+				"model_name":            "INTEL SSDPEKNW512G8H",
+				"percentage_used":       0,
+				"power_on_time":         2222,
+				"self_test_passed":      nilReference,
+				"self_test_in_progress": nilReference,
+				"serial_number":         "BTNH115603K7512A",
+				"temperature":           25,
 			},
-			"spin_up_time": singleRequestAttribute{
-				Value: 0,
-				Raw:   "0",
+			wantErr: false,
+		},
+		{
+			name: "mediaOverflow",
+			args: args{dev: []byte(nvmeMediaErrorOverflow)},
+			wantOut: map[string]any{
+				"critical_warning":      0,
+				"disk_type":             "nvme",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "HPS1",
+				"media_errors":          json.Number("12345678901234567890"),
+				"model_name":            "INTEL SSDPEKNW512G8H",
+				"percentage_used":       0,
+				"power_on_time":         2222,
+				"self_test_passed":      nilReference,
+				"self_test_in_progress": nilReference,
+				"serial_number":         "BTNH115603K7512A",
+				"temperature":           25,
 			},
-		}, wantErr: false},
-		{name: "ssd_device", args: args{dev: []byte(ssd)}, wantOut: map[string]any{
-			"critical_warning":      0,
-			"disk_type":             "ssd",
-			"error":                 "",
-			"exit_status":           0,
-			"firmware_version":      "O1225G",
-			"media_errors":          json.Number("0"),
-			"model_name":            "TS128GMTS800",
-			"percentage_used":       0,
-			"power_on_time":         732,
-			"self_test_passed":      boolToPtr(true),
-			"self_test_in_progress": boolToPtr(false),
-			"serial_number":         "D486530350",
-			"temperature":           18,
-			"raw_read_error_rate": singleRequestAttribute{
-				Value:           0,
-				Raw:             "0",
-				NormalizedValue: intToPtr(100),
+			wantErr: false,
+		},
+		{
+			name: "hdd_device",
+			args: args{dev: []byte(hdd)},
+			wantOut: map[string]any{
+				"critical_warning":      0,
+				"disk_type":             "hdd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "CV26",
+				"media_errors":          json.Number("0"),
+				"model_name":            "ST1000VX000-1ES162",
+				"percentage_used":       0,
+				"power_on_time":         39153,
+				"self_test_passed":      boolToPtr(true),
+				"self_test_in_progress": boolToPtr(false),
+				"serial_number":         "Z4Y7SJBD",
+				"temperature":           30,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value: 182786912,
+					Raw:   "182786912",
+				},
+				"spin_up_time": singleRequestAttribute{
+					Value: 0,
+					Raw:   "0",
+				},
 			},
-			"reallocated_sector_ct": singleRequestAttribute{
-				Value: 10,
-				Raw:   "10",
+			wantErr: false,
+		},
+		{
+			name: "ssd_device",
+			args: args{dev: []byte(ssd)},
+			wantOut: map[string]any{
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          json.Number("0"),
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      boolToPtr(true),
+				"self_test_in_progress": boolToPtr(false),
+				"serial_number":         "D486530350",
+				"temperature":           18,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
+				},
+				"reallocated_sector_ct": singleRequestAttribute{
+					Value: 10,
+					Raw:   "10",
+				},
+				"zero_norm_value": singleRequestAttribute{
+					Value:           15,
+					Raw:             "15",
+					NormalizedValue: intToPtr(0),
+				},
 			},
-			"zero_norm_value": singleRequestAttribute{
-				Value:           15,
-				Raw:             "15",
-				NormalizedValue: intToPtr(0),
+			wantErr: false,
+		},
+		{
+			name: "ssd_device_with_unknown_attribute",
+			args: args{dev: []byte(ssdUnknown)},
+			wantOut: map[string]any{
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          json.Number("0"),
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      boolToPtr(true),
+				"self_test_in_progress": boolToPtr(false),
+				"serial_number":         "D486530350",
+				"temperature":           18,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
+				},
+				"reallocated_sector_ct": singleRequestAttribute{
+					Value: 10,
+					Raw:   "10",
+				},
 			},
-		}, wantErr: false},
-		{name: "ssd_device_with_unknown_attribute", args: args{dev: []byte(ssdUnknown)}, wantOut: map[string]any{
-			"critical_warning":      0,
-			"disk_type":             "ssd",
-			"error":                 "",
-			"exit_status":           0,
-			"firmware_version":      "O1225G",
-			"media_errors":          json.Number("0"),
-			"model_name":            "TS128GMTS800",
-			"percentage_used":       0,
-			"power_on_time":         732,
-			"self_test_passed":      boolToPtr(true),
-			"self_test_in_progress": boolToPtr(false),
-			"serial_number":         "D486530350",
-			"temperature":           18,
-			"raw_read_error_rate": singleRequestAttribute{
-				Value:           0,
-				Raw:             "0",
-				NormalizedValue: intToPtr(100),
-			},
-			"reallocated_sector_ct": singleRequestAttribute{
-				Value: 10,
-				Raw:   "10",
-			},
-		}, wantErr: false},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -890,123 +940,143 @@ func Test_setSingleDiskFieldsWithSelfTest(t *testing.T) {
 		wantOut map[string]any
 		wantErr bool
 	}{
-		{name: "+valid", args: // self test in progress case
-		args{dev: []byte(ataSelfTestInProgress)}, wantOut: map[string]any{
-			"critical_warning":      0,
-			"disk_type":             "ssd",
-			"error":                 "",
-			"exit_status":           0,
-			"firmware_version":      "O1225G",
-			"media_errors":          json.Number("0"),
-			"model_name":            "TS128GMTS800",
-			"percentage_used":       0,
-			"power_on_time":         732,
-			"self_test_passed":      nilReference,
-			"self_test_in_progress": boolToPtr(true),
-			"serial_number":         "D486530350",
-			"temperature":           18,
-			"raw_read_error_rate": singleRequestAttribute{
-				Value:           0,
-				Raw:             "0",
-				NormalizedValue: intToPtr(100),
+		{
+			name: "+valid",
+			args:// self test in progress case
+			args{dev: []byte(ataSelfTestInProgress)},
+			wantOut: map[string]any{
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          json.Number("0"),
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      nilReference,
+				"self_test_in_progress": boolToPtr(true),
+				"serial_number":         "D486530350",
+				"temperature":           18,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
+				},
+				"reallocated_sector_ct": singleRequestAttribute{
+					Value: 10,
+					Raw:   "10",
+				},
+				"zero_norm_value": singleRequestAttribute{
+					Value:           15,
+					Raw:             "15",
+					NormalizedValue: intToPtr(0),
+				},
 			},
-			"reallocated_sector_ct": singleRequestAttribute{
-				Value: 10,
-				Raw:   "10",
+			wantErr: false,
+		},
+		{
+			name: "+ataSelfTestNotCapable",
+			args: args{dev: []byte(ataSelfTestNotCapable)},
+			wantOut: map[string]any{
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          json.Number("0"),
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      nilReference,
+				"self_test_in_progress": nilReference,
+				"serial_number":         "D486530350",
+				"temperature":           18,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
+				},
+				"reallocated_sector_ct": singleRequestAttribute{
+					Value: 10,
+					Raw:   "10",
+				},
+				"zero_norm_value": singleRequestAttribute{
+					Value:           15,
+					Raw:             "15",
+					NormalizedValue: intToPtr(0),
+				},
 			},
-			"zero_norm_value": singleRequestAttribute{
-				Value:           15,
-				Raw:             "15",
-				NormalizedValue: intToPtr(0),
+			wantErr: false,
+		},
+		{
+			name: "+ataSelfTestNotPassed",
+			args: args{dev: []byte(ataSelfTestNotPassed)},
+			wantOut: map[string]any{
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          json.Number("0"),
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      boolToPtr(false),
+				"self_test_in_progress": boolToPtr(false),
+				"serial_number":         "D486530350",
+				"temperature":           18,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
+				},
+				"reallocated_sector_ct": singleRequestAttribute{
+					Value: 10,
+					Raw:   "10",
+				},
+				"zero_norm_value": singleRequestAttribute{
+					Value:           15,
+					Raw:             "15",
+					NormalizedValue: intToPtr(0),
+				},
 			},
-		}, wantErr: false},
-		{name: "+ataSelfTestNotCapable", args: args{dev: []byte(ataSelfTestNotCapable)}, wantOut: map[string]any{
-			"critical_warning":      0,
-			"disk_type":             "ssd",
-			"error":                 "",
-			"exit_status":           0,
-			"firmware_version":      "O1225G",
-			"media_errors":          json.Number("0"),
-			"model_name":            "TS128GMTS800",
-			"percentage_used":       0,
-			"power_on_time":         732,
-			"self_test_passed":      nilReference,
-			"self_test_in_progress": nilReference,
-			"serial_number":         "D486530350",
-			"temperature":           18,
-			"raw_read_error_rate": singleRequestAttribute{
-				Value:           0,
-				Raw:             "0",
-				NormalizedValue: intToPtr(100),
+			wantErr: false,
+		},
+		{
+			name: "+ataSelfTestInterrupted",
+			args: args{dev: []byte(ataSelfTestInterrupted)},
+			wantOut: map[string]any{
+				"critical_warning":      0,
+				"disk_type":             "ssd",
+				"error":                 "",
+				"exit_status":           0,
+				"firmware_version":      "O1225G",
+				"media_errors":          json.Number("0"),
+				"model_name":            "TS128GMTS800",
+				"percentage_used":       0,
+				"power_on_time":         732,
+				"self_test_passed":      boolToPtr(false),
+				"self_test_in_progress": boolToPtr(false),
+				"serial_number":         "D486530350",
+				"temperature":           18,
+				"raw_read_error_rate": singleRequestAttribute{
+					Value:           0,
+					Raw:             "0",
+					NormalizedValue: intToPtr(100),
+				},
+				"reallocated_sector_ct": singleRequestAttribute{
+					Value: 10,
+					Raw:   "10",
+				},
+				"zero_norm_value": singleRequestAttribute{
+					Value:           15,
+					Raw:             "15",
+					NormalizedValue: intToPtr(0),
+				},
 			},
-			"reallocated_sector_ct": singleRequestAttribute{
-				Value: 10,
-				Raw:   "10",
-			},
-			"zero_norm_value": singleRequestAttribute{
-				Value:           15,
-				Raw:             "15",
-				NormalizedValue: intToPtr(0),
-			},
-		}, wantErr: false},
-		{name: "+ataSelfTestNotPassed", args: args{dev: []byte(ataSelfTestNotPassed)}, wantOut: map[string]any{
-			"critical_warning":      0,
-			"disk_type":             "ssd",
-			"error":                 "",
-			"exit_status":           0,
-			"firmware_version":      "O1225G",
-			"media_errors":          json.Number("0"),
-			"model_name":            "TS128GMTS800",
-			"percentage_used":       0,
-			"power_on_time":         732,
-			"self_test_passed":      boolToPtr(false),
-			"self_test_in_progress": boolToPtr(false),
-			"serial_number":         "D486530350",
-			"temperature":           18,
-			"raw_read_error_rate": singleRequestAttribute{
-				Value:           0,
-				Raw:             "0",
-				NormalizedValue: intToPtr(100),
-			},
-			"reallocated_sector_ct": singleRequestAttribute{
-				Value: 10,
-				Raw:   "10",
-			},
-			"zero_norm_value": singleRequestAttribute{
-				Value:           15,
-				Raw:             "15",
-				NormalizedValue: intToPtr(0),
-			},
-		}, wantErr: false},
-		{name: "+ataSelfTestInterrupted", args: args{dev: []byte(ataSelfTestInterrupted)}, wantOut: map[string]any{
-			"critical_warning":      0,
-			"disk_type":             "ssd",
-			"error":                 "",
-			"exit_status":           0,
-			"firmware_version":      "O1225G",
-			"media_errors":          json.Number("0"),
-			"model_name":            "TS128GMTS800",
-			"percentage_used":       0,
-			"power_on_time":         732,
-			"self_test_passed":      boolToPtr(false),
-			"self_test_in_progress": boolToPtr(false),
-			"serial_number":         "D486530350",
-			"temperature":           18,
-			"raw_read_error_rate": singleRequestAttribute{
-				Value:           0,
-				Raw:             "0",
-				NormalizedValue: intToPtr(100),
-			},
-			"reallocated_sector_ct": singleRequestAttribute{
-				Value: 10,
-				Raw:   "10",
-			},
-			"zero_norm_value": singleRequestAttribute{
-				Value:           15,
-				Raw:             "15",
-				NormalizedValue: intToPtr(0),
-			},
-		}, wantErr: false},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -1046,13 +1116,28 @@ func Test_setDiskFields(t *testing.T) {
 		want    []any
 		wantErr bool
 	}{
-		{name: "+one_drive", args: args{deviceJsons: map[string]jsonDevice{"/dev/sda": {jsonData: jsonSdaStr}}}, want: []any{sdaOutStr}, wantErr: false},
-		{name: "-failed_json", args: args{deviceJsons: map[string]jsonDevice{"/dev/sda": {jsonData: `{"device":}`}}}, want: nil, wantErr: true},
-		{name: "-failed_device_data_json", args: args{
-			deviceJsons: map[string]jsonDevice{
-				"/dev/sda": {jsonData: `{"device": foo,"rotation_rate": 0}`},
+		{
+			name:    "+one_drive",
+			args:    args{deviceJsons: map[string]jsonDevice{"/dev/sda": {jsonData: jsonSdaStr}}},
+			want:    []any{sdaOutStr},
+			wantErr: false,
+		},
+		{
+			name:    "-failed_json",
+			args:    args{deviceJsons: map[string]jsonDevice{"/dev/sda": {jsonData: `{"device":}`}}},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "-failed_device_data_json",
+			args: args{
+				deviceJsons: map[string]jsonDevice{
+					"/dev/sda": {jsonData: `{"device": foo,"rotation_rate": 0}`},
+				},
 			},
-		}, want: nil, wantErr: true},
+			want:    nil,
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -1079,9 +1164,21 @@ func Test_getRateFromJson(t *testing.T) {
 		args    args
 		wantOut int
 	}{
-		{name: "rate", args: args{in: map[string]any{"rotation_rate": 10}}, wantOut: 10},
-		{name: "multiple_fields", args: args{in: map[string]any{"foobar": "abc", "rotation_rate": 10}}, wantOut: 10},
-		{name: "no_rate", args: args{in: map[string]any{"foobar": "abc"}}, wantOut: 0},
+		{
+			name:    "rate",
+			args:    args{in: map[string]any{"rotation_rate": 10}},
+			wantOut: 10,
+		},
+		{
+			name:    "multiple_fields",
+			args:    args{in: map[string]any{"foobar": "abc", "rotation_rate": 10}},
+			wantOut: 10,
+		},
+		{
+			name:    "no_rate",
+			args:    args{in: map[string]any{"foobar": "abc"}},
+			wantOut: 0,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1110,9 +1207,21 @@ func Test_getTypeFromJson(t *testing.T) {
 		args    args
 		wantOut string
 	}{
-		{name: "type", args: args{in: map1}, wantOut: "sat"},
-		{name: "multiple_fields", args: args{in: map2}, wantOut: "sat"},
-		{name: "no_type", args: args{in: map3}, wantOut: ""},
+		{
+			name:    "type",
+			args:    args{in: map1},
+			wantOut: "sat",
+		},
+		{
+			name:    "multiple_fields",
+			args:    args{in: map2},
+			wantOut: "sat",
+		},
+		{
+			name:    "no_type",
+			args:    args{in: map3},
+			wantOut: "",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1144,13 +1253,41 @@ func Test_getTablesFromJson(t *testing.T) {
 		args args
 		want []table
 	}{
-		{name: "attr_table", args: args{in: attrTable1}, want: []table{table1, table2, attrTable}},
-		{name: "no_attr_table", args: args{in: attrTable2}, want: []table{table1, table2, table4}},
-		{name: "no_table", args: args{in: attrTable3}, want: nil},
-		{name: "incorrect_table_value", args: args{in: attrTable4}, want: nil},
-		{name: "empty_map", args: args{in: attrTable5}, want: nil},
-		{name: "no_ata_attributes", args: args{in: nil}, want: nil},
-		{name: "empty_ata_attributes", args: args{in: map[string]any{}}, want: nil},
+		{
+			name: "attr_table",
+			args: args{in: attrTable1},
+			want: []table{table1, table2, attrTable},
+		},
+		{
+			name: "no_attr_table",
+			args: args{in: attrTable2},
+			want: []table{table1, table2, table4},
+		},
+		{
+			name: "no_table",
+			args: args{in: attrTable3},
+			want: nil,
+		},
+		{
+			name: "incorrect_table_value",
+			args: args{in: attrTable4},
+			want: nil,
+		},
+		{
+			name: "empty_map",
+			args: args{in: attrTable5},
+			want: nil,
+		},
+		{
+			name: "no_ata_attributes",
+			args: args{in: nil},
+			want: nil,
+		},
+		{
+			name: "empty_ata_attributes",
+			args: args{in: map[string]any{}},
+			want: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1172,61 +1309,105 @@ func Test_getAttributeType(t *testing.T) {
 		args args
 		want string
 	}{
-		{name: "ssd_no_tables", args: args{
-			devType: "SAT",
-			rate:    0,
-			tables:  nil,
-		}, want: "ssd"},
-		{name: "ssd_tables_no_spin_up_table", args: args{
-			devType: "SAT",
-			rate:    0,
-			tables:  []table{table1, table2, table4},
-		}, want: "ssd"},
-		{name: "hdd_no_tables", args: args{
-			devType: "SAT",
-			rate:    12,
-			tables:  nil,
-		}, want: "hdd"},
-		{name: "hdd_rate_spin_up_table", args: args{
-			devType: "SAT",
-			rate:    12,
-			tables:  []table{table1, table2, table4, attrTable},
-		}, want: "hdd"},
-		{name: "hdd_no_rate_spin_up_table", args: args{
-			devType: "SAT",
-			rate:    0,
-			tables:  []table{table1, table2, table4, attrTable},
-		}, want: "hdd"},
-		{name: "hdd_no_spin_up_table", args: args{
-			devType: "SAT",
-			rate:    12,
-			tables:  []table{table1, table2, table4},
-		}, want: "hdd"},
-		{name: "unknown_no_attr_table", args: args{
-			devType: "unknown",
-			rate:    1000,
-			tables:  []table{table1, table2, table4},
-		}, want: "unknown"},
-		{name: "unknown_value_table", args: args{
-			devType: "unknown",
-			rate:    1000,
-			tables:  []table{table1, table2, table4, attrTable},
-		}, want: "unknown"},
-		{name: "unknown_no_rate_no_tables", args: args{
-			devType: "unknown",
-			rate:    0,
-			tables:  nil,
-		}, want: "unknown"},
-		{name: "unknown_no_rate_no_attr_table", args: args{
-			devType: "unknown",
-			rate:    0,
-			tables:  []table{table1, table2, table4},
-		}, want: "unknown"},
-		{name: "unknown_no_rate_value_table", args: args{
-			devType: "unknown",
-			rate:    0,
-			tables:  []table{table1, table2, table4, attrTable},
-		}, want: "unknown"},
+		{
+			name: "ssd_no_tables",
+			args: args{
+				devType: "SAT",
+				rate:    0,
+				tables:  nil,
+			},
+			want: "ssd",
+		},
+		{
+			name: "ssd_tables_no_spin_up_table",
+			args: args{
+				devType: "SAT",
+				rate:    0,
+				tables:  []table{table1, table2, table4},
+			},
+			want: "ssd",
+		},
+		{
+			name: "hdd_no_tables",
+			args: args{
+				devType: "SAT",
+				rate:    12,
+				tables:  nil,
+			},
+			want: "hdd",
+		},
+		{
+			name: "hdd_rate_spin_up_table",
+			args: args{
+				devType: "SAT",
+				rate:    12,
+				tables:  []table{table1, table2, table4, attrTable},
+			},
+			want: "hdd",
+		},
+		{
+			name: "hdd_no_rate_spin_up_table",
+			args: args{
+				devType: "SAT",
+				rate:    0,
+				tables:  []table{table1, table2, table4, attrTable},
+			},
+			want: "hdd",
+		},
+		{
+			name: "hdd_no_spin_up_table",
+			args: args{
+				devType: "SAT",
+				rate:    12,
+				tables:  []table{table1, table2, table4},
+			},
+			want: "hdd",
+		},
+		{
+			name: "unknown_no_attr_table",
+			args: args{
+				devType: "unknown",
+				rate:    1000,
+				tables:  []table{table1, table2, table4},
+			},
+			want: "unknown",
+		},
+		{
+			name: "unknown_value_table",
+			args: args{
+				devType: "unknown",
+				rate:    1000,
+				tables:  []table{table1, table2, table4, attrTable},
+			},
+			want: "unknown",
+		},
+		{
+			name: "unknown_no_rate_no_tables",
+			args: args{
+				devType: "unknown",
+				rate:    0,
+				tables:  nil,
+			},
+			want: "unknown",
+		},
+		{
+			name: "unknown_no_rate_no_attr_table",
+			args: args{
+				devType: "unknown",
+				rate:    0,
+				tables:  []table{table1, table2, table4},
+			},
+			want: "unknown",
+		},
+		{
+			name: "unknown_no_rate_value_table",
+			args: args{
+				devType: "unknown",
+				rate:    0,
+				tables:  []table{table1, table2, table4, attrTable},
+			},
+			want: "unknown",
+		},
 	}
 
 	for _, tt := range tests {
@@ -1247,11 +1428,31 @@ func Test_getAttributes(t *testing.T) {
 		args args
 		want string
 	}{
-		{name: "attributes_set", args: args{in: deviceParser{SmartAttributes: smartAttributes{Table: []table{table1, table2}}}}, want: "test1 test2"},
-		{name: "attributes_table_empty", args: args{in: deviceParser{SmartAttributes: smartAttributes{Table: []table{}}}}, want: ""},
-		{name: "unknown_attributes_table_empty", args: args{in: deviceParser{SmartAttributes: smartAttributes{Table: []table{table1, unknown, table2}}}}, want: "test1 test2"},
-		{name: "attributes_missing", args: args{in: deviceParser{}}, want: ""},
-		{name: "parser_missing", args: args{}, want: ""},
+		{
+			name: "attributes_set",
+			args: args{in: deviceParser{SmartAttributes: smartAttributes{Table: []table{table1, table2}}}},
+			want: "test1 test2",
+		},
+		{
+			name: "attributes_table_empty",
+			args: args{in: deviceParser{SmartAttributes: smartAttributes{Table: []table{}}}},
+			want: "",
+		},
+		{
+			name: "unknown_attributes_table_empty",
+			args: args{in: deviceParser{SmartAttributes: smartAttributes{Table: []table{table1, unknown, table2}}}},
+			want: "test1 test2",
+		},
+		{
+			name: "attributes_missing",
+			args: args{in: deviceParser{}},
+			want: "",
+		},
+		{
+			name: "parser_missing",
+			args: args{},
+			want: "",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1273,96 +1474,168 @@ func Test_getType(t *testing.T) {
 		args    args
 		wantOut string
 	}{
-		{name: "ssd_no_tables", args: args{
-			devType: "SAT",
-			rate:    0,
-			tables:  nil,
-		}, wantOut: "ssd"},
-		{name: "ssd_tables_no_spin_up_table", args: args{
-			devType: "SAT",
-			rate:    0,
-			tables:  []table{table1, table2, table4},
-		}, wantOut: "ssd"},
-		{name: "hdd_no_tables", args: args{
-			devType: "SAT",
-			rate:    12,
-			tables:  nil,
-		}, wantOut: "hdd"},
-		{name: "hdd_rate_spin_up_table", args: args{
-			devType: "SAT",
-			rate:    12,
-			tables:  []table{table1, table2, table4, attrTable},
-		}, wantOut: "hdd"},
-		{name: "hdd_no_rate_spin_up_table", args: args{
-			devType: "SAT",
-			rate:    0,
-			tables:  []table{table1, table2, table4, attrTable},
-		}, wantOut: "hdd"},
-		{name: "hdd_no_spin_up_table", args: args{
-			devType: "SAT",
-			rate:    12,
-			tables:  []table{table1, table2, table4},
-		}, wantOut: "hdd"},
-		{name: "nvme_no_tables", args: args{
-			devType: "nvme",
-			rate:    1000,
-			tables:  nil,
-		}, wantOut: "nvme"},
-		{name: "nvme_no_attr_table", args: args{
-			devType: "nvme",
-			rate:    1000,
-			tables:  []table{table1, table2, table4},
-		}, wantOut: "nvme"},
-		{name: "nvme_value_table", args: args{
-			devType: "nvme",
-			rate:    1000,
-			tables:  []table{table1, table2, table4, attrTable},
-		}, wantOut: "nvme"},
-		{name: "nvme_no_rate_no_tables", args: args{
-			devType: "nvme",
-			rate:    0,
-			tables:  nil,
-		}, wantOut: "nvme"},
-		{name: "nvme_no_rate_no_attr_table", args: args{
-			devType: "nvme",
-			rate:    0,
-			tables:  []table{table1, table2, table4},
-		}, wantOut: "nvme"},
-		{name: "nvme_no_rate_value_table", args: args{
-			devType: "nvme",
-			rate:    0,
-			tables:  []table{table1, table2, table4, attrTable},
-		}, wantOut: "nvme"},
-		{name: "unknown_no_tables", args: args{
-			devType: "unknown",
-			rate:    1000,
-			tables:  nil,
-		}, wantOut: "unknown"},
-		{name: "unknown_no_attr_table", args: args{
-			devType: "unknown",
-			rate:    1000,
-			tables:  []table{table1, table2, table4},
-		}, wantOut: "unknown"},
-		{name: "unknown_value_table", args: args{
-			devType: "unknown",
-			rate:    1000,
-			tables:  []table{table1, table2, table4, attrTable},
-		}, wantOut: "unknown"},
-		{name: "unknown_no_rate_no_tables", args: args{
-			devType: "unknown",
-			rate:    0,
-			tables:  nil,
-		}, wantOut: "unknown"},
-		{name: "unknown_no_rate_no_attr_table", args: args{
-			devType: "unknown",
-			rate:    0,
-			tables:  []table{table1, table2, table4},
-		}, wantOut: "unknown"},
-		{name: "unknown_no_rate_value_table", args: args{
-			devType: "unknown",
-			rate:    0,
-			tables:  []table{table1, table2, table4, attrTable},
-		}, wantOut: "unknown"},
+		{
+			name: "ssd_no_tables",
+			args: args{
+				devType: "SAT",
+				rate:    0,
+				tables:  nil,
+			},
+			wantOut: "ssd",
+		},
+		{
+			name: "ssd_tables_no_spin_up_table",
+			args: args{
+				devType: "SAT",
+				rate:    0,
+				tables:  []table{table1, table2, table4},
+			},
+			wantOut: "ssd",
+		},
+		{
+			name: "hdd_no_tables",
+			args: args{
+				devType: "SAT",
+				rate:    12,
+				tables:  nil,
+			},
+			wantOut: "hdd",
+		},
+		{
+			name: "hdd_rate_spin_up_table",
+			args: args{
+				devType: "SAT",
+				rate:    12,
+				tables:  []table{table1, table2, table4, attrTable},
+			},
+			wantOut: "hdd",
+		},
+		{
+			name: "hdd_no_rate_spin_up_table",
+			args: args{
+				devType: "SAT",
+				rate:    0,
+				tables:  []table{table1, table2, table4, attrTable},
+			},
+			wantOut: "hdd",
+		},
+		{
+			name: "hdd_no_spin_up_table",
+			args: args{
+				devType: "SAT",
+				rate:    12,
+				tables:  []table{table1, table2, table4},
+			},
+			wantOut: "hdd",
+		},
+		{
+			name: "nvme_no_tables",
+			args: args{
+				devType: "nvme",
+				rate:    1000,
+				tables:  nil,
+			},
+			wantOut: "nvme",
+		},
+		{
+			name: "nvme_no_attr_table",
+			args: args{
+				devType: "nvme",
+				rate:    1000,
+				tables:  []table{table1, table2, table4},
+			},
+			wantOut: "nvme",
+		},
+		{
+			name: "nvme_value_table",
+			args: args{
+				devType: "nvme",
+				rate:    1000,
+				tables:  []table{table1, table2, table4, attrTable},
+			},
+			wantOut: "nvme",
+		},
+		{
+			name: "nvme_no_rate_no_tables",
+			args: args{
+				devType: "nvme",
+				rate:    0,
+				tables:  nil,
+			},
+			wantOut: "nvme",
+		},
+		{
+			name: "nvme_no_rate_no_attr_table",
+			args: args{
+				devType: "nvme",
+				rate:    0,
+				tables:  []table{table1, table2, table4},
+			},
+			wantOut: "nvme",
+		},
+		{
+			name: "nvme_no_rate_value_table",
+			args: args{
+				devType: "nvme",
+				rate:    0,
+				tables:  []table{table1, table2, table4, attrTable},
+			},
+			wantOut: "nvme",
+		},
+		{
+			name: "unknown_no_tables",
+			args: args{
+				devType: "unknown",
+				rate:    1000,
+				tables:  nil,
+			},
+			wantOut: "unknown",
+		},
+		{
+			name: "unknown_no_attr_table",
+			args: args{
+				devType: "unknown",
+				rate:    1000,
+				tables:  []table{table1, table2, table4},
+			},
+			wantOut: "unknown",
+		},
+		{
+			name: "unknown_value_table",
+			args: args{
+				devType: "unknown",
+				rate:    1000,
+				tables:  []table{table1, table2, table4, attrTable},
+			},
+			wantOut: "unknown",
+		},
+		{
+			name: "unknown_no_rate_no_tables",
+			args: args{
+				devType: "unknown",
+				rate:    0,
+				tables:  nil,
+			},
+			wantOut: "unknown",
+		},
+		{
+			name: "unknown_no_rate_no_attr_table",
+			args: args{
+				devType: "unknown",
+				rate:    0,
+				tables:  []table{table1, table2, table4},
+			},
+			wantOut: "unknown",
+		},
+		{
+			name: "unknown_no_rate_value_table",
+			args: args{
+				devType: "unknown",
+				rate:    0,
+				tables:  []table{table1, table2, table4, attrTable},
+			},
+			wantOut: "unknown",
+		},
 	}
 
 	for _, tt := range tests {
@@ -1384,30 +1657,54 @@ func Test_getTypeByRateAndAttr(t *testing.T) {
 		args args
 		want string
 	}{
-		{name: "zero_rate_zero_spin_up", args: args{
-			rate:   0,
-			tables: []table{table1, table2},
-		}, want: "ssd"},
-		{name: "zero_rate_no_tables", args: args{
-			rate:   0,
-			tables: nil,
-		}, want: "ssd"},
-		{name: "negative_rate_no_tables", args: args{
-			rate:   -1000,
-			tables: nil,
-		}, want: "ssd"},
-		{name: "positive_rate_spin_up_table", args: args{
-			rate:   12,
-			tables: []table{table1, table2, table3, attrTable},
-		}, want: "hdd"},
-		{name: "positive_rate_no_tables", args: args{
-			rate:   12,
-			tables: nil,
-		}, want: "hdd"},
-		{name: "zero_rate_spin_up_table", args: args{
-			rate:   0,
-			tables: []table{table1, table2, table3, attrTable},
-		}, want: "hdd"},
+		{
+			name: "zero_rate_zero_spin_up",
+			args: args{
+				rate:   0,
+				tables: []table{table1, table2},
+			},
+			want: "ssd",
+		},
+		{
+			name: "zero_rate_no_tables",
+			args: args{
+				rate:   0,
+				tables: nil,
+			},
+			want: "ssd",
+		},
+		{
+			name: "negative_rate_no_tables",
+			args: args{
+				rate:   -1000,
+				tables: nil,
+			},
+			want: "ssd",
+		},
+		{
+			name: "positive_rate_spin_up_table",
+			args: args{
+				rate:   12,
+				tables: []table{table1, table2, table3, attrTable},
+			},
+			want: "hdd",
+		},
+		{
+			name: "positive_rate_no_tables",
+			args: args{
+				rate:   12,
+				tables: nil,
+			},
+			want: "hdd",
+		},
+		{
+			name: "zero_rate_spin_up_table",
+			args: args{
+				rate:   0,
+				tables: []table{table1, table2, table3, attrTable},
+			},
+			want: "hdd",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1430,26 +1727,106 @@ func Test_validateParams(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{name: "+valid", args: args{params: []string{"/dev/sda"}}, wantErr: false},
-		{name: "+keyNoParams", args: args{params: []string{}}, wantErr: false},
-		{name: "+spaceHypen", args: args{params: []string{"/dev/sda -B/some/file/path"}}, wantErr: false},
-		{name: "+manySpacesHypen", args: args{params: []string{"/dev/sda    -B/some/file/path"}}, wantErr: false},
-		{name: "+tabHypen", args: args{params: []string{"/dev/sda\t-B/some/file/path"}}, wantErr: false},
-		{name: "+noSpacesHypen", args: args{params: []string{"/dev/sda-B/some/file/path"}}, wantErr: false},
-		{name: "+hypenInSpaces", args: args{params: []string{"/dev/sda - B/some/file/path"}}, wantErr: false},
-		{name: "+hypenEnd", args: args{params: []string{"/dev/sda-"}}, wantErr: false},
-		{name: "+empty", args: args{params: []string{""}}, wantErr: false},
-		{name: "+twoParams", args: args{params: []string{"/dev/sda", "megaraid"}}, wantErr: false},
-		{name: "+threeParams", args: args{params: []string{"/dev/sda", "megaraid", "three"}}, wantErr: false},
-		{name: "-hypenStart", args: args{params: []string{"-B/some/file/path"}}, wantErr: true},
-		{name: "-hypenStartSpace", args: args{params: []string{"- B/some/file/path"}}, wantErr: true},
-		{name: "-hypenStartApostr", args: args{params: []string{"'-B/some/file/path'"}}, wantErr: true},
-		{name: "-hypenStartApostrSpace", args: args{params: []string{"'   -B/some/file/path'"}}, wantErr: true},
-		{name: "-hypenStartApostrTab", args: args{params: []string{"'\t-B/some/file/path'"}}, wantErr: true},
-		{name: "-hypenStartApostrTabSpace", args: args{params: []string{"'\t -B/some/file/path'"}}, wantErr: true},
-		{name: "-hypenStart2Apostr", args: args{params: []string{"''-B/some/file/path''"}}, wantErr: true},
-		{name: "-hypenStart3Apostr", args: args{params: []string{"'''-B/some/file/path'''"}}, wantErr: true},
-		{name: "-hypenStartApostrQuote", args: args{params: []string{"\"-B/some/file/path\""}}, wantErr: true},
+		{
+			name:    "+valid",
+			args:    args{params: []string{"/dev/sda"}},
+			wantErr: false,
+		},
+		{
+			name:    "+keyNoParams",
+			args:    args{params: []string{}},
+			wantErr: false,
+		},
+		{
+			name:    "+spaceHypen",
+			args:    args{params: []string{"/dev/sda -B/some/file/path"}},
+			wantErr: false,
+		},
+		{
+			name:    "+manySpacesHypen",
+			args:    args{params: []string{"/dev/sda    -B/some/file/path"}},
+			wantErr: false,
+		},
+		{
+			name:    "+tabHypen",
+			args:    args{params: []string{"/dev/sda\t-B/some/file/path"}},
+			wantErr: false,
+		},
+		{
+			name:    "+noSpacesHypen",
+			args:    args{params: []string{"/dev/sda-B/some/file/path"}},
+			wantErr: false,
+		},
+		{
+			name:    "+hypenInSpaces",
+			args:    args{params: []string{"/dev/sda - B/some/file/path"}},
+			wantErr: false,
+		},
+		{
+			name:    "+hypenEnd",
+			args:    args{params: []string{"/dev/sda-"}},
+			wantErr: false,
+		},
+		{
+			name:    "+empty",
+			args:    args{params: []string{""}},
+			wantErr: false,
+		},
+		{
+			name:    "+twoParams",
+			args:    args{params: []string{"/dev/sda", "megaraid"}},
+			wantErr: false,
+		},
+		{
+			name:    "+threeParams",
+			args:    args{params: []string{"/dev/sda", "megaraid", "three"}},
+			wantErr: false,
+		},
+		{
+			name:    "-hypenStart",
+			args:    args{params: []string{"-B/some/file/path"}},
+			wantErr: true,
+		},
+		{
+			name:    "-hypenStartSpace",
+			args:    args{params: []string{"- B/some/file/path"}},
+			wantErr: true,
+		},
+		{
+			name:    "-hypenStartApostr",
+			args:    args{params: []string{"'-B/some/file/path'"}},
+			wantErr: true,
+		},
+		{
+			name:    "-hypenStartApostrSpace",
+			args:    args{params: []string{"'   -B/some/file/path'"}},
+			wantErr: true,
+		},
+		{
+			name:    "-hypenStartApostrTab",
+			args:    args{params: []string{"'\t-B/some/file/path'"}},
+			wantErr: true,
+		},
+		{
+			name:    "-hypenStartApostrTabSpace",
+			args:    args{params: []string{"'\t -B/some/file/path'"}},
+			wantErr: true,
+		},
+		{
+			name:    "-hypenStart2Apostr",
+			args:    args{params: []string{"''-B/some/file/path''"}},
+			wantErr: true,
+		},
+		{
+			name:    "-hypenStart3Apostr",
+			args:    args{params: []string{"'''-B/some/file/path'''"}},
+			wantErr: true,
+		},
+		{
+			name:    "-hypenStartApostrQuote",
+			args:    args{params: []string{"\"-B/some/file/path\""}},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -1488,11 +1865,41 @@ func Test_validateExport(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{name: "+valid", expect: expect{exec: true}, fields: fields{execOut: readControllerFixture(t, "version/valid.json")}, args: args{params: nil}, wantErr: false},
-		{name: "+nothingToValidate", expect: expect{exec: true}, fields: fields{execOut: readControllerFixture(t, "version/valid.json")}, args: args{params: nil}, wantErr: false},
-		{name: "+paramOk", expect: expect{exec: true}, fields: fields{execOut: readControllerFixture(t, "version/valid.json")}, args: args{params: []string{"smth"}}, wantErr: false},
-		{name: "-badParam", expect: expect{exec: false}, fields: fields{execOut: readControllerFixture(t, "version/valid.json")}, args: args{params: []string{"-Bsmth"}}, wantErr: true},
-		{name: "-badVersion", expect: expect{exec: true}, fields: fields{execOut: readControllerFixture(t, "version/invalid.json")}, args: args{params: []string{"smth"}}, wantErr: true},
+		{
+			name:    "+valid",
+			expect:  expect{exec: true},
+			fields:  fields{execOut: readControllerFixture(t, "version/valid.json")},
+			args:    args{params: nil},
+			wantErr: false,
+		},
+		{
+			name:    "+nothingToValidate",
+			expect:  expect{exec: true},
+			fields:  fields{execOut: readControllerFixture(t, "version/valid.json")},
+			args:    args{params: nil},
+			wantErr: false,
+		},
+		{
+			name:    "+paramOk",
+			expect:  expect{exec: true},
+			fields:  fields{execOut: readControllerFixture(t, "version/valid.json")},
+			args:    args{params: []string{"smth"}},
+			wantErr: false,
+		},
+		{
+			name:    "-badParam",
+			expect:  expect{exec: false},
+			fields:  fields{execOut: readControllerFixture(t, "version/valid.json")},
+			args:    args{params: []string{"-Bsmth"}},
+			wantErr: true,
+		},
+		{
+			name:    "-badVersion",
+			expect:  expect{exec: true},
+			fields:  fields{execOut: readControllerFixture(t, "version/invalid.json")},
+			args:    args{params: []string{"smth"}},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
