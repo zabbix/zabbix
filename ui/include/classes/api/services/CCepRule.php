@@ -1270,7 +1270,8 @@ class CCepRule extends CApiService {
 		$resource = DBselect(DB::makeSql('cep_rule', $options));
 
 		while ($row = DBfetch($resource)) {
-			$db_cep_rules[$row['cep_ruleid']]['filter'] = array_diff_key($row, array_flip(['cep_ruleid']));
+			$db_cep_rules[$row['cep_ruleid']]['filter'] =
+				array_diff_key($row, array_flip(['cep_ruleid'])) + ['conditions' => []];
 		}
 
 		$options = [
@@ -1284,7 +1285,7 @@ class CCepRule extends CApiService {
 
 		while ($row = DBfetch($resource)) {
 			$db_cep_rules[$row['cep_ruleid']]['filter']['conditions'][$row['cep_conditionid']] =
-				array_diff_key($row, array_flip(['cep_ruleid'])) + ['conditions' => []];
+				array_diff_key($row, array_flip(['cep_ruleid']));
 		}
 
 		foreach ($_db_cep_rules as &$db_cep_rule) {
