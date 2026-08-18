@@ -15,10 +15,11 @@
 #include "permissions.h"
 #include "zbxhash.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
-#include "zbxthreads.h"
 #include "zbxdbwrap.h"
 #include "zbxnix.h"
+#include "zbxalgo.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define PERM_REBUILD_IDLE	0
 #define PERM_REBUILD_RUNNING	1
