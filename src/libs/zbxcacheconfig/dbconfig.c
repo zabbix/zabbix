@@ -1033,7 +1033,7 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 	if (0 != non_zero && 0 == value_int)
 		return FAIL;
 
-	if (0 != value_min && (value_min > value_int || ZBX_HK_PERIOD_MAX < value_int))
+	if (0 != value_int && (value_min > value_int || ZBX_HK_PERIOD_MAX < value_int))
 		return FAIL;
 
 	if (*value != value_int)
