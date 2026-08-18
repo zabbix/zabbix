@@ -4784,6 +4784,9 @@ HEREDOC;
 			],
 			'window_type' => $window_type,
 			'window' => $window,
+			// The rule of a close-on-up scenario is the only one there, so where in the order it sits does
+			// not matter - but the API requires the field, so it is given the first place.
+			'sortorder' => 0,
 			'operations' => [
 				[
 					'sortorder' => 0,
@@ -4854,6 +4857,9 @@ HEREDOC;
 			// Every rule must be evaluated for every event, so none of them may stop the processing of the
 			// rules after it.
 			'stop' => CCepRuleHelper::EXECUTION_CONTINUE,
+			// The place in the order every rule of the scenarios takes unless its caller asks for another one
+			// with ['sortorder' => N] + buildWindowNoneCepRuleParams(...), which wins over this default.
+			'sortorder' => 0,
 			'operations' => $operations
 		] + ($window_type === null ? [] : ['window' => $window]);
 	}
