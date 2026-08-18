@@ -35,6 +35,7 @@
 #define ZBX_RTC_PROF_ENABLE			20
 #define ZBX_RTC_PROF_DISABLE			21
 #define ZBX_RTC_HISTORY_CACHE_CLEAR		22
+#define ZBX_RTC_PERMISSIONS_REBUILD		23
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100
@@ -72,5 +73,6 @@
 #define ZBX_PROF_ENABLE			"prof_enable"
 #define ZBX_PROF_DISABLE		"prof_disable"
 #define ZBX_HISTORY_CACHE_CLEAR		"history_cache_clear"
+#define ZBX_PERMISSIONS_REBUILD		"permissions_rebuild"
 
 #endif

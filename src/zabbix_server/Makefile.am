@@ -28,7 +28,8 @@ SUBDIRS = \
 	rtc \
 	ha \
 	proxyconfigread \
-	pgmanager
+	pgmanager \
+	permissions
 
 sbin_PROGRAMS = zabbix_server
 
@@ -62,6 +63,7 @@ zabbix_server_LDADD = \
 	proxyconfigread/libzbxproxyconfigread.a \
 	$(top_builddir)/src/libs/zbxvmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager_server.a \
+	permissions/libzbx_permissions.a \
 	connector/libconnector.a \
 	service/libservice_server.a \
 	$(top_builddir)/src/libs/zbxscripts/libzbxscripts.a \
