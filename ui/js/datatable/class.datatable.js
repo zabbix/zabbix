@@ -1367,11 +1367,11 @@ class CDataTable {
 				onSuccess(response);
 			})
 			.catch(error => {
-				if (window.unloading) {
+				if (window.unloading || error instanceof TypeError) {
 					return;
 				}
 
-				if (error.name != 'AbortError') {
+				if (error.name !== 'AbortError') {
 					CMessageHelper.error(this.#element, [error.message], error.name);
 				}
 
@@ -2737,7 +2737,11 @@ class CDataTable {
 		/* global updateUserProfile */
 		return updateUserProfile(this.#storage_idx, value, idx2, PROFILE_TYPE_STR, abort_controller)
 			.catch(error => {
-				if (error.name != 'AbortError') {
+				if (window.unloading || error instanceof TypeError) {
+					return;
+				}
+
+				if (error.name !== 'AbortError') {
 					CMessageHelper.error(this.#element, [error.message], error.name);
 				}
 			})
