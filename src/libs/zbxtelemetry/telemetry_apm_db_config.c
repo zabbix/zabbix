@@ -263,7 +263,7 @@ int	zbx_apm_db_config_init(zbx_apm_db_config_t *apm_db_config, const char *confi
 {
 	memset(apm_db_config, 0, sizeof(*apm_db_config));
 
-	if (NULL == config_apm_provider || '\0' == *config_apm_provider)
+	if (NULL == config_apm_provider)
 		return SUCCEED;
 
 	if (SUCCEED != parse_apm_provider(apm_db_config, config_apm_provider, config_source_ip, config_ssl_ca_location,
