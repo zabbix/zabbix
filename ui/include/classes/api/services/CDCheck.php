@@ -116,7 +116,7 @@ class CDCheck extends CApiService {
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			$sqlParts['join']['dr'] = ['table' => 'drules', 'using' => 'druleid'];
-			$sqlParts['join']['p'] = ['left_table' => 'dr', 'table' => 'proxy', 'using' => 'proxyid'];
+			$sqlParts['join']['p'] = ['type' => 'left', 'left_table' => 'dr', 'table' => 'proxy', 'using' => 'proxyid'];
 			$sqlParts['where'][] = '('.
 				'dr.proxyid IS NULL'.
 				' OR '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
