@@ -38,6 +38,12 @@ class CProxy extends CApiService {
 		'apm'
 	];
 
+	public const APM_DEFAULT_FIELDS = [
+		'additional_resource_attributes' => [],
+		'data_collection_status' => 0,
+		'max_messages_per_second' => 0
+	];
+
 	/**
 	 * @param array $options
 	 *
@@ -276,17 +282,9 @@ class CProxy extends CApiService {
 			return;
 		}
 
-		$default_apm = '{"additional_resource_attributes":[],"data_collection_status":0,"max_messages_per_second":0}';
-
-		$default_apm_fields = [
-			'additional_resource_attributes',
-			'data_collection_status',
-			'max_messages_per_second'
-		];
-
 		$options['selectApm'] = $options['selectApm'] === API_OUTPUT_EXTEND
-			? $default_apm_fields
-			: array_intersect($default_apm_fields, $options['selectApm']);
+			? array_keys(self::APM_DEFAULT_FIELDS)
+			: array_intersect(array_keys(self::APM_DEFAULT_FIELDS), $options['selectApm']);
 
 		$resource = DBselect(
 			'SELECT p.proxyid,p.apm'.
@@ -298,7 +296,7 @@ class CProxy extends CApiService {
 			$apm = json_decode($row['apm'], true);
 
 			if (!$apm) {
-				$apm = json_decode($default_apm, true);
+				$apm = self::APM_DEFAULT_FIELDS;
 			}
 
 			$result[$row['proxyid']]['apm'] = array_intersect_key(
@@ -459,11 +457,6 @@ class CProxy extends CApiService {
 	private static function prepareApmForDb(array &$proxy, ?array $db_proxies = null): void {
 		if (array_key_exists('apm', $proxy) && $proxy['apm']
 				&& $proxy['apm']['data_collection_status'] === PROXY_APM_STATUS_CONFIGURED) {
-			$default_apm = [
-				'additional_resource_attributes' => [],
-				'data_collection_status' => 0,
-				'max_messages_per_second' => 0
-			];
 
 			$default_attributes = [
 				'signal_type' => [],
@@ -471,7 +464,7 @@ class CProxy extends CApiService {
 				'value' => 0
 			];
 
-			$proxy['apm'] = array_merge($default_apm, $proxy['apm']);
+			$proxy['apm'] = array_merge(self::APM_DEFAULT_FIELDS, $proxy['apm']);
 
 			if ($proxy['apm']['additional_resource_attributes']) {
 				CArrayHelper::sort($proxy['apm']['additional_resource_attributes'], ['signal_type', 'key']);
