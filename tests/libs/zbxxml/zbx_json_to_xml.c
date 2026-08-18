@@ -21,8 +21,8 @@
 #include "zbxstr.h"
 #include "zbxthreads.h"
 
-#define ZBX_XML_HEADER_SIZE 22
-#define ZBX_THREAD_STACK_SIZE (128 * 1024)   /* stack size in B */
+#define ZBX_XML_HEADER_SIZE	22
+#define ZBX_THREAD_STACK_SIZE	(128 * 1024)   /* stack size in B */
 
 typedef struct
 {

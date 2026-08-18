@@ -862,11 +862,10 @@ int	zbx_xmlnode_to_json(void *xml_node, char **jstr)
 static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, xmlDoc *doc, xmlNode *parent_node,
 		char **attr, char **attr_val, char **text, char *nodevalue)
 {
-#define ZBX_MAX_JSON_DEPTH	64
 	const char		*json_string_ptr = NULL, *json_string_ptr_old = NULL;
 	char			*array_loc, *pname, *attr_loc = NULL,
 			*attr_val_loc = NULL, *text_loc = NULL, *value = NULL, *name = NULL;
-	int			set_attr, set_text, idx = 0;
+	int			set_attr, set_text, idx = 0, ret = SUCCEED;
 	zbx_json_type_t		type;
 	xmlNode			*node;
 	struct zbx_json_parse	jp_data;
@@ -960,12 +959,8 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 				if (SUCCEED != json_to_xmlnode(&jp_data, array_loc, deep + 1, doc, node,
 						&attr_loc, &attr_val_loc, &text_loc, nodevalue))
 				{
-					zbx_free(attr_loc);
-					zbx_free(attr_val_loc);
-					zbx_free(text_loc);
-					zbx_free(value);
-					zbx_free(name);
-					return FAIL;
+					ret = FAIL;
+					goto clean;
 				}
 			}
 		}
@@ -984,11 +979,14 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 	}
 	while (NULL != json_string_ptr);
 
+clean:
+	zbx_free(attr_loc);
+	zbx_free(attr_val_loc);
+	zbx_free(text_loc);
 	zbx_free(value);
 	zbx_free(name);
 
-	return SUCCEED;
-#undef ZBX_MAX_JSON_DEPTH
+	return ret;
 }
 #endif /* HAVE_LIBXML2 */
 

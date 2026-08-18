@@ -53,10 +53,10 @@ zbx_int64_t	json_error(const char *message, const char *ptr, char **error)
  *                                                                            *
  * Purpose: Prepares JSON parsing error message with count                    *
  *                                                                            *
- * Parameters: message - [IN] the error message format string                 *
- *             count   - [IN] the integer value to be inserted into message   *
- *             ptr     - [IN] the failing data fragment                       *
- *             error   - [OUT] the parsing error message (can be NULL)        *
+ * Parameters: message - [IN] error message format string                     *
+ *             count   - [IN] integer value to be inserted into message       *
+ *             ptr     - [IN] failing data fragment                           *
+ *             error   - [OUT] parsing error message (can be NULL)            *
  *                                                                            *
  * Return value: 0 - the json_error() function always returns 0 value         *
  *               so it can be used to return from failed parses               *
@@ -344,7 +344,6 @@ static zbx_int64_t	json_parse_literal(const char *start, const char *text, char 
  ******************************************************************************/
 zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, int depth, char **error)
 {
-#define ZBX_MAX_JSON_DEPTH	64
 	const char	*ptr = start;
 	zbx_int64_t	len;
 	char		*str = NULL;
@@ -420,7 +419,6 @@ zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, int depth, c
 	}
 
 	return ptr - start + len;
-#undef ZBX_MAX_JSON_DEPTH
 }
 
 /******************************************************************************
