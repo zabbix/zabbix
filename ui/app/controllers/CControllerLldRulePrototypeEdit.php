@@ -211,6 +211,43 @@ class CControllerLldRulePrototypeEdit extends CController
 		return true;
 	}
 
+	public function doAction(): void {
+		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
+
+		[$lldrule, $inherited_timeouts] = $this->getLldRuleData($host);
+
+		$data = [
+			'itemid' => $lldrule['itemid'],
+			'host' => $host,
+			'context' => $this->getInput('context'),
+			'parent_discovery' => $this->parent_discovery,
+			'executable_item_types' => checkNowAllowedTypes(),
+			'preprocessing_types' => CDiscoveryRulePrototype::SUPPORTED_PREPROCESSING_TYPES,
+			'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD_PROTOTYPE,
+			'lldrule' => $lldrule,
+			'inherited_timeouts' => $inherited_timeouts,
+			'readonly' => $lldrule['templated'] || $lldrule['discovered_lld'],
+			'can_edit_source_timeouts' => $host['proxyid']
+				? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+				: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL),
+			'types' => array_intersect_key(item_type2str(), array_flip(CControllerLldRuleUpdateGeneral::getItemTypes())),
+			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
+			'js_test_validation_rules' => (new CFormValidator(
+				CControllerPopupItemTestEdit::getValidationRules(true)
+			))->getRules()
+		];
+
+		$data['js_validation_rules'] = $lldrule['itemid']
+			? (new CFormValidator(CControllerLldRulePrototypeUpdate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerLldRulePrototypeCreate::getValidationRules()))->getRules();
+
+		$data['user'] = [
+			'debug_mode' => $this->getDebugMode()
+		];
+
+		$this->setResponse(new CControllerResponseData($data));
+	}
+
 	/**
 	 * Get host data.
 	 *
@@ -249,43 +286,6 @@ class CControllerLldRulePrototypeEdit extends CController
 		];
 
 		return $template;
-	}
-
-	public function doAction(): void {
-		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
-
-		[$lldrule, $inherited_timeouts] = $this->getLldRuleData($host);
-
-		$data = [
-			'itemid' => $lldrule['itemid'],
-			'host' => $host,
-			'context' => $this->getInput('context'),
-			'parent_discovery' => $this->parent_discovery,
-			'executable_item_types' => checkNowAllowedTypes(),
-			'preprocessing_types' => CDiscoveryRulePrototype::SUPPORTED_PREPROCESSING_TYPES,
-			'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD_PROTOTYPE,
-			'lldrule' => $lldrule,
-			'inherited_timeouts' => $inherited_timeouts,
-			'readonly' => $lldrule['templated'] || $lldrule['discovered_lld'],
-			'can_edit_source_timeouts' => $host['proxyid']
-				? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
-				: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL),
-			'types' => array_intersect_key(item_type2str(), array_flip(CControllerLldRuleUpdateGeneral::getItemTypes())),
-			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($host['hostid']),
-			'js_test_validation_rules' => (new CFormValidator(
-				CControllerPopupItemTestEdit::getValidationRules(true)
-			))->getRules()
-		];
-
-		$data['js_validation_rules'] = $lldrule['itemid']
-			? (new CFormValidator(CControllerLldRulePrototypeUpdate::getValidationRules()))->getRules()
-			: (new CFormValidator(CControllerLldRulePrototypeCreate::getValidationRules()))->getRules();
-
-		$data['user'] = [
-			'debug_mode' => $this->getDebugMode()
-		];
-
-		$this->setResponse(new CControllerResponseData($data));
 	}
 
 	private function getLldRuleData(array $host): array {

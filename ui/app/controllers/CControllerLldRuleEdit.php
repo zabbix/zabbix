@@ -188,46 +188,6 @@ class CControllerLldRuleEdit extends CController
 		return true;
 	}
 
-	/**
-	 * Get host data.
-	 *
-	 * @return array
-	 */
-	protected function getHost(): array {
-		$host = $this->host;
-
-		if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-			$host['proxyid'] = $host['assigned_proxyid'];
-		}
-		unset($host['monitored_by'], $host['assigned_proxyid']);
-
-		$host['interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
-		// Sort interfaces to be listed starting with one selected as 'main'.
-		CArrayHelper::sort($host['interfaces'], [
-			['field' => 'main', 'order' => ZBX_SORT_DOWN],
-			['field' => 'interfaceid','order' => ZBX_SORT_UP]
-		]);
-
-		return $host;
-	}
-
-	/**
-	 * Get template data.
-	 *
-	 * @return array
-	 */
-	protected function getTemplate(): array {
-		$template = $this->template;
-		$template += [
-			'hostid' => $template['templateid'],
-			'proxyid' => 0,
-			'status' => HOST_STATUS_TEMPLATE,
-			'interfaces' => []
-		];
-
-		return $template;
-	}
-
 	public function doAction(): void {
 		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
 
@@ -269,6 +229,46 @@ class CControllerLldRuleEdit extends CController
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	/**
+	 * Get host data.
+	 *
+	 * @return array
+	 */
+	protected function getHost(): array {
+		$host = $this->host;
+
+		if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+			$host['proxyid'] = $host['assigned_proxyid'];
+		}
+		unset($host['monitored_by'], $host['assigned_proxyid']);
+
+		$host['interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
+		// Sort interfaces to be listed starting with one selected as 'main'.
+		CArrayHelper::sort($host['interfaces'], [
+			['field' => 'main', 'order' => ZBX_SORT_DOWN],
+			['field' => 'interfaceid','order' => ZBX_SORT_UP]
+		]);
+
+		return $host;
+	}
+
+	/**
+	 * Get template data.
+	 *
+	 * @return array
+	 */
+	protected function getTemplate(): array {
+		$template = $this->template;
+		$template += [
+			'hostid' => $template['templateid'],
+			'proxyid' => 0,
+			'status' => HOST_STATUS_TEMPLATE,
+			'interfaces' => []
+		];
+
+		return $template;
 	}
 
 	private function getLldRuleData(array $host): array {
