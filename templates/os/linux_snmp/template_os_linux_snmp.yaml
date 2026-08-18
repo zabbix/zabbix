@@ -63,7 +63,7 @@ zabbix_export:
         You can also try to use `snmpconf`: http://www.net-snmp.org/wiki/index.php/TUT:snmpd_configuration.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -307,6 +307,17 @@ zabbix_export:
           description: 'The combined rate at which all processors on the computer are switched from one thread to another.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: a614935444324860b637d5f98936d829
+          name: 'Average CPU utilization'
+          type: CALCULATED
+          key: 'system.cpu.util.avg[snmp]'
+          value_type: FLOAT
+          units: '%'
+          params: 'avg(last_foreach(//system.cpu.util[snmp,*]))'
+          description: 'The average CPU utilization across all discovered CPUs, expressed in %.'
           tags:
             - tag: component
               value: cpu
@@ -570,7 +581,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: c071dae605b64cce886df7d2865e77e0
-          name: 'Memory (buffers)'
+          name: 'Memory (Buffers)'
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.2021.4.14.0]'
           key: 'vm.memory.buffers[memBuffer.0]'
@@ -586,7 +597,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: d5e0a99bfd9844108c3d26d53d1a3d0c
-          name: 'Memory (cached)'
+          name: 'Memory (Cached)'
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.2021.4.15.0]'
           key: 'vm.memory.cached[memCached.0]'
@@ -1018,6 +1029,9 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - 'return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}":""}])'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: c29a7bbfba3441b1b155e68cbe44a685
           name: 'Network interfaces discovery'
           type: DEPENDENT
@@ -1467,7 +1481,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: 3943b515dcfc4321be0e15eb99eb0077
-          name: 'EtherLike-MIB Discovery'
+          name: 'EtherLike-MIB discovery'
           type: DEPENDENT
           key: net.if.duplex.discovery
           filter:
@@ -1679,12 +1693,10 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const portionHigh = 4294967296;
-                      
-                      const obj = JSON.parse(value);
-                      
-                      const dskAvailHigh = parseInt(obj['dskAvailHigh'], 10),
-                      	  dskAvailLow = parseInt(obj['dskAvailLow'], 10);
+                      var portionHigh = 4294967296,
+                      	obj = JSON.parse(value),
+                      	dskAvailHigh = parseInt(obj['dskAvailHigh'], 10),
+                      	dskAvailLow = parseInt(obj['dskAvailLow'], 10);
                       
                       return (dskAvailHigh * portionHigh + dskAvailLow) * 1024;
               master_item:
@@ -1759,17 +1771,14 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const portionHigh = 4294967296;
-                      
-                      const obj = JSON.parse(value);
-                      
-                      const dskAvailHigh = parseInt(obj['dskAvailHigh'], 10),
-                      	  dskAvailLow = parseInt(obj['dskAvailLow'], 10),
-                      	  dskUsedHigh = parseInt(obj['dskUsedHigh'], 10),
-                      	  dskUsedLow = parseInt(obj['dskUsedLow'], 10);
-                      
-                      const available = (dskAvailHigh * portionHigh + dskAvailLow) * 1024,
-                      	  used = (dskUsedHigh * portionHigh + dskUsedLow) * 1024;
+                      var portionHigh = 4294967296,
+                      	obj = JSON.parse(value),
+                      	dskAvailHigh = parseInt(obj['dskAvailHigh'], 10),
+                      	dskAvailLow = parseInt(obj['dskAvailLow'], 10),
+                      	dskUsedHigh = parseInt(obj['dskUsedHigh'], 10),
+                      	dskUsedLow = parseInt(obj['dskUsedLow'], 10),
+                      	available = (dskAvailHigh * portionHigh + dskAvailLow) * 1024,
+                      	used = (dskUsedHigh * portionHigh + dskUsedLow) * 1024;
                       
                       if ((available + used) <= 0) {
                       	return 0;
@@ -1835,12 +1844,10 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const portionHigh = 4294967296;
-                      
-                      const obj = JSON.parse(value);
-                      
-                      const dskTotalHigh = parseInt(obj['dskTotalHigh'], 10),
-                      	  dskTotalLow = parseInt(obj['dskTotalLow'], 10);
+                      var portionHigh = 4294967296,
+                      	obj = JSON.parse(value),
+                      	dskTotalHigh = parseInt(obj['dskTotalHigh'], 10),
+                      	dskTotalLow = parseInt(obj['dskTotalLow'], 10);
                       
                       return (dskTotalHigh * portionHigh + dskTotalLow) * 1024;
               master_item:
@@ -1867,12 +1874,10 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const portionHigh = 4294967296;
-                      
-                      const obj = JSON.parse(value);
-                      
-                      const dskUsedHigh = parseInt(obj['dskUsedHigh'], 10),
-                      	  dskUsedLow = parseInt(obj['dskUsedLow'], 10);
+                      var portionHigh = 4294967296,
+                      	obj = JSON.parse(value),
+                      	dskUsedHigh = parseInt(obj['dskUsedHigh'], 10),
+                      	dskUsedLow = parseInt(obj['dskUsedLow'], 10);
                       
                       return (dskUsedHigh * portionHigh + dskUsedLow) * 1024;
               master_item:
@@ -1886,7 +1891,7 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.walk.data[dskEntry.{#SNMPINDEX}]'
-              history: 1h
+              history: '0'
               value_type: TEXT
               description: |
                 MIB: UCD-SNMP-MIB
@@ -1895,11 +1900,10 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      var data = JSON.parse(value);
-                      
-                      result = data.filter(function(obj) {
-                      	return obj["{\#SNMPINDEX}"] === "{#SNMPINDEX}";
-                      })[0];
+                      var data = JSON.parse(value),
+                      	result = data.filter(function(obj) {
+                      		return obj["{\#SNMPINDEX}"] === "{#SNMPINDEX}";
+                      	})[0];
                       
                       return JSON.stringify(result);
               master_item:
@@ -1963,15 +1967,14 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var filesystems = JSON.parse(value);
-                  
-                  result = filesystems.map(function (filesystem) {
-                  	return {
-                  		'dskPath': filesystem.dskPath,
-                  		'dskDevice': filesystem.dskDevice,
-                  		'index': filesystem['{#SNMPINDEX}']
-                  	};
-                  });
+                  var filesystems = JSON.parse(value),
+                  	result = filesystems.map(function (filesystem) {
+                  		return {
+                  			dskPath: filesystem.dskPath,
+                  			dskDevice: filesystem.dskDevice,
+                  			index: filesystem['{#SNMPINDEX}']
+                  		};
+                  	});
                   
                   return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1988,7 +1991,7 @@ zabbix_export:
           description: 'Critical threshold of CPU utilization expressed in %.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '1'
             section_name: Thresholds
             label: 'Threshold of CPU utilization expressed'
             description: 'Critical threshold of CPU utilization expressed in %. In the range from 0 to 100 inclusive.'
@@ -1998,7 +2001,7 @@ zabbix_export:
           description: 'Warning threshold of ICMP packet loss in %.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '22'
             section_name: Thresholds
             label: 'Threshold of ICMP packet loss'
             description: 'Warning threshold of ICMP packet loss in %. In the range from 0 to 100 inclusive.'
@@ -2008,7 +2011,7 @@ zabbix_export:
           description: 'Warning threshold of the average ICMP response time in seconds.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '23'
             section_name: Thresholds
             label: 'Threshold of the average ICMP response'
             description: 'Warning threshold of the average ICMP response time in seconds. No less than 0.'
@@ -2018,7 +2021,7 @@ zabbix_export:
           description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '16'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
             description: 'Warning threshold of error packet rate. No less than 0.'
@@ -2028,7 +2031,7 @@ zabbix_export:
           description: 'Used as a threshold in the interface utilization trigger.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '15'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
             description: 'Used as a threshold in the interface utilization trigger. In the range from 0 to 100 inclusive.'
@@ -2038,7 +2041,7 @@ zabbix_export:
           description: 'Link status trigger will be fired only for interfaces where the context macro equals "1".'
           config:
             type: CHECKBOX
-            priority: '20'
+            priority: '14'
             label: 'Interfaces control'
             description: 'Fire a trigger when the interface operational status changes to "Link down".'
             options:
@@ -2046,10 +2049,10 @@ zabbix_export:
                 unchecked: '0'
         - macro: '{$LOAD_AVG_PER_CPU.MAX.WARN}'
           value: '1.5'
-          description: 'Load per CPU considered sustainable. Tune if needed.'
+          description: 'The CPU load per core is considered sustainable. If necessary, it can be tuned.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '2'
             section_name: Thresholds
             label: 'The CPU load per core'
             description: 'CPU load per core is considered sustainable. No less than 0.'
@@ -2059,7 +2062,7 @@ zabbix_export:
           description: 'Used as a threshold in the available memory trigger.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '4'
             section_name: Thresholds
             label: 'Threshold in the available memory'
             description: 'Used as a threshold in the available memory trigger.'
@@ -2068,7 +2071,7 @@ zabbix_export:
           description: 'Used as a threshold in the memory utilization trigger.'
           config:
             type: TEXT
-            priority: '1'
+            priority: '3'
             section_name: Thresholds
             label: 'Threshold in the memory utilization'
             description: 'Used as a threshold in the memory utilization trigger. In the range from 0 to 100 inclusive.'
@@ -2078,16 +2081,16 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '26'
             section_name: Filters
-            label: 'Filter network interface by adminstatus'
+            label: 'Filter network interface by adminstatus (include)'
             description: 'Regex string to include discovered interface by adminstatus.'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore `down(2)` administrative status'
           config:
             type: TEXT
-            priority: '28'
+            priority: '27'
             section_name: Filters
             label: 'Filter network interface by adminstatus (exclude)'
             description: 'Regex string to exclude discovered interface by adminstatus.'
@@ -2096,16 +2099,16 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '30'
             section_name: Filters
-            label: 'Filter network interface by alias'
+            label: 'Filter network interface by alias (include)'
             description: 'Regex string to include discovered interface by alias.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '31'
             section_name: Filters
             label: 'Filter network interface by alias (exclude)'
             description: 'Regex string to exclude discovered interface by alias.'
@@ -2114,16 +2117,16 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '28'
             section_name: Filters
-            label: 'Filter network interface by description'
+            label: 'Filter network interface by description (include)'
             description: 'Regex string to include discovered interface by description.'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '29'
             section_name: Filters
             label: 'Filter network interface by description (exclude)'
             description: 'Regex string to exclude discovered interface by description.'
@@ -2132,34 +2135,34 @@ zabbix_export:
           description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '17'
             section_name: Filters
-            label: 'Filter for network interface by name'
+            label: 'Filter for network interface by name (include)'
             description: 'Regex string to include discovered interface by name.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
-          description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.'
+          description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '18'
             section_name: Filters
-            label: 'Filter for network interface by name (exclude)'
+            label: 'Filter for network interface by name'
             description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
           description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '24'
             section_name: Filters
-            label: 'Filter network interface by status'
+            label: 'Filter network interface by status (include)'
             description: 'Regex string to include discovered interface by status.'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
           description: 'Ignore `notPresent(6)`'
           config:
             type: TEXT
-            priority: '26'
+            priority: '25'
             section_name: Filters
             label: 'Filter network interface by status (exclude)'
             description: 'Regex string to exclude discovered interface by status.'
@@ -2168,16 +2171,16 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '32'
             section_name: Filters
-            label: 'Filter network interface by type'
+            label: 'Filter network interface by type (include)'
             description: 'Regex string to include discovered interface by type.'
         - macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '33'
             section_name: Filters
             label: 'Filter network interface by type (exclude)'
             description: 'Regex string to exclude discovered interface by type.'
@@ -2186,44 +2189,35 @@ zabbix_export:
           description: 'Time interval for the SNMP availability trigger.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '21'
             section_name: Other
             label: 'Time interval'
             description: 'Time interval for the SNMP availability trigger.'
-        - macro: '{$SNMP.UPTIME.WARN}'
-          value: 10m
-          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
-          config:
-            type: TEXT
-            priority: '17'
-            section_name: Other
-            label: 'Uptime recovery threshold'
-            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '50'
           description: 'The warning threshold of the minimum free swap.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '5'
             section_name: Thresholds
             label: 'Threshold of the minimum free swap'
             description: 'Warning threshold of the minimum free swap. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
-          description: 'Used in block device discovery. Can be overridden on the host or linked template level.'
+          description: 'Used for block device discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '12'
             section_name: Filters
             label: 'Filter for block device discovery'
             description: 'Regex string to include discovered block device.'
         - macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
           value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)'
-          description: 'Used in block device discovery. Can be overridden on the host or linked template level.'
+          description: 'Used for block device discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '13'
             section_name: Filters
             label: 'Filter for block device discovery (exclude)'
             description: 'Regex string to exclude discovered block device.'
@@ -2232,34 +2226,34 @@ zabbix_export:
           description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '19'
             section_name: Filters
-            label: 'Filter filesystem by type'
+            label: 'Filter filesystem by type (include)'
             description: 'Regex string to include discovered filesystem by type.'
         - macro: '{$VFS.FS.FSDEVICE.NOT_MATCHES}'
           value: '.*(tmpfs|shm)$'
           description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '20'
             section_name: Filters
             label: 'Filter filesystem by type (exclude)'
             description: 'Regex string to exclude discovered filesystem by type.'
         - macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
-          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '10'
             section_name: Filters
             label: 'Filter filesystem by name'
             description: 'Regex string to include discovered filesystem by name.'
         - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
           value: ^(/dev|/sys|/run|/proc|.+/shm$)
-          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '11'
             section_name: Filters
             label: 'Filter filesystem by name (exclude)'
             description: 'Regex string to exclude discovered filesystem by name.'
@@ -2268,7 +2262,7 @@ zabbix_export:
           description: 'The critical threshold of the filesystem metadata utilization.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '9'
             section_name: Thresholds
             label: 'Threshold of the filesystem metadata utilization (critical)'
             description: 'Critical threshold of the filesystem metadata utilization. In the range from 0 to 100 inclusive.'
@@ -2278,7 +2272,7 @@ zabbix_export:
           description: 'The warning threshold of the filesystem metadata utilization.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '8'
             section_name: Thresholds
             label: 'Threshold of the filesystem metadata utilization'
             description: 'Warning threshold of the filesystem metadata utilization. In the range from 0 to 100 inclusive.'
@@ -2288,7 +2282,7 @@ zabbix_export:
           description: 'The critical threshold of the filesystem utilization.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '7'
             section_name: Thresholds
             label: 'Threshold of the filesystem utilization (critical)'
             description: 'Critical threshold of the filesystem utilization. In the range from 0 to 100 inclusive.'
@@ -2298,193 +2292,819 @@ zabbix_export:
           description: 'The warning threshold of the filesystem utilization.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '6'
             section_name: Thresholds
             label: 'Threshold of the filesystem utilization'
             description: 'Warning threshold of the filesystem utilization. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
       dashboards:
-        - uuid: db1904856337427f9b5ae667e0d93b45
-          name: Filesystems
+        - uuid: 59f09fada3ab43d1bdb70091f92e77f1
+          name: 'Linux Dashboard'
           pages:
             - name: Overview
               widgets:
-                - type: graphprototype
-                  width: '72'
-                  height: '5'
+                - type: item
+                  width: '49'
+                  height: '1'
+                  hide_header: 'YES'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '3'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by SNMP'
-                        name: 'FS [{#FSNAME}]: Space utilization chart (relative to total)'
-                    - type: STRING
-                      name: reference
-                      value: AAAEB
-                - type: graphprototype
-                  'y': '5'
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by SNMP'
-                        name: 'FS [{#FSNAME}]: Space usage graph, in % (relative to max available)'
-                    - type: STRING
-                      name: reference
-                      value: AAAEC
-        - uuid: e0f04b83911a47ba8ee30fa91b4f63a9
-          name: 'Network interfaces'
-          pages:
-            - widgets:
-                - type: graphprototype
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by SNMP'
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: STRING
-                      name: reference
-                      value: AAAAI
-        - uuid: 59f09fada3ab43d1bdb70091f92e77f1
-          name: 'System performance'
-          pages:
-            - widgets:
-                - type: graph
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Linux by SNMP'
-                        name: 'Linux: System load'
-                    - type: STRING
-                      name: reference
-                      value: AAAAA
-                - type: graph
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Linux by SNMP'
-                        name: 'Linux: Memory usage'
-                    - type: STRING
-                      name: reference
-                      value: AAAAC
-                - type: graphprototype
-                  'y': '10'
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '3'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by SNMP'
-                        name: 'FS [{#FSNAME}]: Space utilization chart (relative to total)'
-                    - type: STRING
-                      name: reference
-                      value: AAAEA
-                - type: graphprototype
-                  'y': '15'
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by SNMP'
-                        name: '{#DEVNAME}: Disk read/write rates'
-                    - type: STRING
-                      name: reference
-                      value: AAAAF
-                - type: graphprototype
-                  'y': '20'
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: ITEM_PROTOTYPE
+                    - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Linux by SNMP'
-                        key: 'vfs.dev.util[diskIOLA1.{#SNMPINDEX}]'
-                    - type: STRING
-                      name: reference
-                      value: AAAAG
+                        key: 'system.descr[sysDescr.0]'
                     - type: INTEGER
-                      name: source_type
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: INTEGER
+                      name: value_h_pos
+                      value: '0'
+                - type: gauge
+                  name: 'CPU utilization'
+                  'y': '1'
+                  width: '10'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'system.cpu.util.avg[snmp]'
+                    - type: STRING
+                      name: max
+                      value: '100'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
                       value: '3'
-                - type: graphprototype
-                  'y': '25'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: show.3
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '80'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                - type: gauge
+                  'y': '4'
+                  width: '10'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'vm.memory.util[snmp]'
+                    - type: STRING
+                      name: max
+                      value: '100'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: show.3
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '80'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                - type: itemnavigator
+                  name: 'Disk performance'
+                  'y': '7'
+                  width: '10'
+                  height: '6'
+                  fields:
+                    - type: INTEGER
+                      name: group_by.0.attribute
+                      value: '3'
+                    - type: STRING
+                      name: group_by.0.tag_name
+                      value: disk
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: storage
+                    - type: INTEGER
+                      name: item_tags.1.operator
+                      value: '4'
+                    - type: STRING
+                      name: item_tags.1.tag
+                      value: disk
+                    - type: STRING
+                      name: item_tags.1.value
+                      value: ''
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: PBTWV
+                    - type: INTEGER
+                      name: show_lines
+                      value: '500'
+                - type: svggraph
+                  name: CPU
+                  x: '10'
+                  'y': '1'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 4FC3F7
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'system.cpu.util.avg[snmp]'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: percentile_left
+                      value: '1'
+                    - type: STRING
+                      name: percentile_left_value
+                      value: '80'
+                    - type: STRING
+                      name: reference
+                      value: PPZRN
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Memory
+                  x: '10'
+                  'y': '4'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 2196F3
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'vm.memory.util[snmp]'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: INTEGER
+                      name: percentile_left
+                      value: '1'
+                    - type: STRING
+                      name: percentile_left_value
+                      value: '80'
+                    - type: STRING
+                      name: reference
+                      value: QTGYC
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Disk
+                  x: '10'
+                  'y': '7'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7CB342
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.itemids.0._reference
+                      value: PBTWV._itemid
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: GTYHI
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Network
+                  x: '10'
+                  'y': '10'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.color_palette
+                      value: '9'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Bits sent'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '6'
+                    - type: INTEGER
+                      name: ds.0.invert_values
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Interface *(*): Bits sent'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.stacked
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.color_palette
+                      value: '5'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Bits received'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '6'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Interface *(*): Bits received'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.stacked
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: FPGPW
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: item
+                  x: '49'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: system.name
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '49'
+                  'y': '2'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'zabbix[host,snmp,available]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '49'
+                  'y': '4'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'system.cpu.load.avg1[laLoad.1]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                - type: item
+                  x: '49'
+                  'y': '6'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'vm.memory.available[snmp]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                - type: piechart
+                  name: 'Used storage'
+                  x: '49'
+                  'y': '8'
+                  width: '16'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: draw_type
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.color_palette
+                      value: '11'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: Available
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'FS [*]: Space: Available'
+                    - type: INTEGER
+                      name: ds.1.color_palette
+                      value: '9'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: Used
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'FS [*]: Space: Used'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '8'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                    - type: INTEGER
+                      name: space
+                      value: '10'
+                    - type: INTEGER
+                      name: stroke
+                      value: '10'
+                    - type: INTEGER
+                      name: total_show
+                      value: '1'
+                    - type: INTEGER
+                      name: units_show
+                      value: '1'
+                - type: item
+                  x: '57'
+                  width: '15'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'system.net.uptime[sysUpTime.0]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '600'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '3600'
+                - type: item
+                  x: '57'
+                  'y': '2'
+                  width: '15'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'system.hw.uptime[hrSystemUptime.0]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '600'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '3600'
+                - type: item
+                  x: '57'
+                  'y': '4'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'system.cpu.num[snmp]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '57'
+                  'y': '6'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'vm.memory.total[memTotalReal.0]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '4'
+                  width: '7'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'system.cpu.switches[ssRawContexts.0]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '6'
+                  width: '7'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'vm.memory.cached[memCached.0]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '8'
+                  width: '7'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'system.swap.free[memAvailSwap.0]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '10'
+                  width: '7'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        key: 'system.swap.pfree[snmp]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+            - name: Problems
+              widgets:
+                - type: problems
                   width: '72'
-                  height: '5'
+                  height: '6'
                   fields:
+                    - type: STRING
+                      name: reference
+                      value: YHGQK
                     - type: INTEGER
-                      name: columns
+                      name: show_opdata
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by SNMP'
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: STRING
-                      name: reference
-                      value: AAAAH
-                - type: graphprototype
-                  x: '36'
-                  width: '36'
-                  height: '5'
-                  fields:
                     - type: INTEGER
-                      name: columns
+                      name: show_suppressed
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Linux by SNMP'
-                        name: 'Linux: CPU usage{#SINGLETON}'
-                    - type: STRING
-                      name: reference
-                      value: AAAAB
-                - type: graph
-                  x: '36'
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Linux by SNMP'
-                        name: 'Linux: Swap usage'
-                    - type: STRING
-                      name: reference
-                      value: AAAAD
+                    - type: INTEGER
+                      name: show_symptoms
+                      value: '1'
+                - type: toptriggers
+                  'y': '6'
+                  width: '72'
+                  height: '7'
       valuemaps:
         - uuid: 1fe48656fa5e4a23903921a5b0f2aac4
           name: 'EtherLike-MIB::dot3StatsDuplexStatus'
@@ -3118,20 +3738,11 @@ zabbix_export:
         - tag: scope
           value: capacity
     - uuid: e129fb90ec084a83806aec27141cd6eb
-      expression: |
-        (last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0],#2)))
-        or (last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/Linux by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/Linux by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/Linux by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/Linux by SNMP/system.net.uptime[sysUpTime.0],#2)))
-      recovery_mode: RECOVERY_EXPRESSION
-      recovery_expression: |
-        last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
-        or last(/Linux by SNMP/system.net.uptime[sysUpTime.0])>{$SNMP.UPTIME.WARN}
+      expression: '(last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Linux by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Linux: Host has been restarted'
-      event_name: 'Linux: {HOST.NAME} has been restarted'
+      event_name: 'Linux: {HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
-      description: |
-        The uptime counter has decreased, which indicates that the host has been restarted.
-        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
-        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
+      description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
         - name: 'Linux: No SNMP data collection'
