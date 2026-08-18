@@ -147,7 +147,7 @@ class CDHost extends CApiService {
 			$sqlParts['where'][] = '('.
 				'dr.proxyid IS NULL'.
 				' OR '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
-				')';
+			')';
 		}
 //-------
 
