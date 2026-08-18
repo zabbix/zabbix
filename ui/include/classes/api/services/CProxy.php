@@ -398,20 +398,20 @@ class CProxy extends CApiService {
 		return ['proxyids' => array_column($proxies, 'proxyid')];
 	}
 
-	protected static function prepareProxiesForApi(array &$proxies, ?bool $update = null): void {
+	protected static function prepareProxiesForApi(array &$proxies, bool $update = false): void {
 		foreach ($proxies as &$proxy) {
 			self::prepareProxyForApi($proxy, $update);
 		}
 		unset($proxy);
 	}
 
-	protected static function prepareProxyForApi(array &$proxy, ?bool $update = null): void {
+	protected static function prepareProxyForApi(array &$proxy, bool $update = false): void {
 		if (array_key_exists('apm', $proxy)) {
 			$proxy['apm'] = self::prepareApmFieldsForApi($proxy['apm'], $update);
 		}
 	}
 
-	private static function prepareApmFieldsForApi(string $apm_fields, ?bool $update = null): array {
+	private static function prepareApmFieldsForApi(string $apm_fields, bool $update = false): array {
 		$_apm_fields = json_decode($apm_fields, true);
 		$apm_fields = [];
 
