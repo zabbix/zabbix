@@ -417,7 +417,7 @@ class CProxyGroup extends CApiService {
 				'SELECT NULL'.
 				' FROM usrgrp_proxy_group ugpg2'.
 				' WHERE ugpg.usrgrpid=ugpg2.usrgrpid'.
-				' AND '.dbConditionId('ugpg2.proxy_groupid', $proxy_groupids).
+					' AND '.dbConditionId('ugpg2.proxy_groupid', $proxy_groupids).
 			')'
 		);
 

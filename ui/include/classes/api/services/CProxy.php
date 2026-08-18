@@ -422,7 +422,7 @@ class CProxy extends CApiService {
 				'SELECT NULL'.
 				' FROM usrgrp_proxy ugp2'.
 				' WHERE ugp.usrgrpid=ugp2.usrgrpid'.
-				' AND '.dbConditionId('ugp2.proxyid', array_keys($proxyids)).
+					' AND '.dbConditionId('ugp2.proxyid', array_keys($proxyids)).
 			')'
 		);
 
