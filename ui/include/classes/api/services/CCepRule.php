@@ -303,6 +303,20 @@ class CCepRule extends CApiService {
 			}
 		}
 
+		if ($has_filter) {
+			foreach ($cep_rules as &$cep_rule) {
+				foreach ($cep_rule['operations'] as &$operation) {
+					$eval_formula = CConditionHelper::getEvalFormula($operation['filter']['conditions'],
+						'type', (int) $operation['filter']['evaltype']
+					);
+
+					CConditionHelper::addFormulaIds($operation['filter']['conditions'], $eval_formula);
+				}
+				unset($operation);
+			}
+			unset($cep_rule);
+		}
+
 		foreach ($cep_rules as &$cep_rule) {
 			$cep_rule['operations'] = array_values($cep_rule['operations']);
 		}
