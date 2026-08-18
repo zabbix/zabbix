@@ -329,6 +329,7 @@ static void	rm_register_writer(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_
 
 		writer = (zbx_rm_writer_t *)manager->writers.values[manager->next_writer_index++];
 		writer->client = client;
+		zbx_ipc_client_addref(client);
 
 		zbx_queue_ptr_push(&manager->free_writers, writer);
 	}

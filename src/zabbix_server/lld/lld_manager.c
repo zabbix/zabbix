@@ -226,6 +226,7 @@ static void	lld_register_worker(zbx_lld_manager_t *manager, zbx_ipc_client_t *cl
 
 		worker = manager->workers.values[manager->next_worker_index++];
 		worker->client = client;
+		zbx_ipc_client_addref(client);
 
 		zbx_hashset_insert(&manager->workers_client, &worker, sizeof(zbx_lld_worker_t *));
 		zbx_queue_ptr_push(&manager->free_workers, worker);
