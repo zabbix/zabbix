@@ -225,7 +225,7 @@ class CProxyHelper {
 		if ($objects['more'] > 0) {
 			$objects_list[] = (new CButton('plus_more', _s('+ %1$d more', $objects['more'])))
 				->addClass(ZBX_STYLE_BTN_PLUS_MORE)
-				->setHint($all_entities, ZBX_STYLE_HINTBOX_WRAP.' '.'status-list-wrapper');
+				->setHint($all_entities, ZBX_STYLE_HINTBOX_WRAP.' status-list-wrapper');
 		}
 
 		return $objects_list;
