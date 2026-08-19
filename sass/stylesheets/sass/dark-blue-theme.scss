@@ -19,7 +19,7 @@ $diff-removed-bg-color: rgba(#ff5555, .2);
 
 $disabled-bg-color: #003065;
 $disabled-item-color: #626c75;
-$disabled-item-bg-color: #003065;
+$disabled-item-bg-color: #00356f;
 
 $progress-complete-color: #0066d9;
 $progress-current-color: #0066d9;
@@ -109,7 +109,7 @@ $form-radio-selected-color: #e5f1ff;
 $form-description-border-color: #0066d9;
 
 $form-disabled-font-color: #626c75;
-$form-disabled-bg-color: #001f42;
+$form-disabled-bg-color: #002956;
 $form-disabled-border-color: #003a7a;
 
 $form-search-color: #cce4ff;
@@ -275,7 +275,7 @@ $datatable-scrollbar-thumb-bg-color: #004fa8;
 }
 
 .multiselect [aria-readonly] .subfilter-enabled {
-	color: #7a858f;
+	color: #e5f1ff;
 
 	.btn-icon {
 		color: #7a858f;
@@ -300,9 +300,23 @@ z-textarea-flexible textarea[readonly],
 input[readonly],
 textarea[readonly],
 select[readonly] {
+	border-color: #004fa8;
+}
+
+select[readonly] {
+	color: #e5f1ff;
+	-webkit-text-fill-color: #e5f1ff;
+}
+
+.multiselect[aria-readonly]::placeholder,
+.z-select[readonly] .focusable::placeholder,
+z-select[readonly] .focusable::placeholder,
+z-textarea-flexible textarea[readonly]::placeholder,
+input[readonly]::placeholder,
+textarea[readonly]::placeholder,
+select[readonly]::placeholder {
 	color: #7a858f;
 	-webkit-text-fill-color: #7a858f;
-	border-color: #004fa8;
 }
 
 .checkbox-radio[readonly] {
@@ -311,9 +325,14 @@ select[readonly] {
 	}
 
 	& + label {
-		color: #7a858f;
-		-webkit-text-fill-color: #7a858f;
+		color: #e5f1ff;
+		-webkit-text-fill-color: #e5f1ff;
 	}
+}
+
+.checkbox-radio[disabled] + label {
+	color: #626c75;
+	-webkit-text-fill-color: #626c75;
 }
 
 [data-indicator="count"][data-indicator-value]:not([data-indicator-value="0"])::after {
@@ -338,7 +357,7 @@ select[readonly] {
 
 .radio-list-control input[type="radio"][readonly]:checked + label,
 .radio-list-control input[type="radio"][disabled]:checked + label {
-	background-color: #003065;
+	background-color: #00356f;
 }
 
 .btn-grey,
@@ -560,7 +579,7 @@ z-select .list,
 	}
 
 	&[type="checkbox"]:checked[readonly] + label span::after {
-		border-color: #7a858f !important;
+		border-color: #e5f1ff !important;
 	}
 
 	&[type="checkbox"]:checked[disabled] + label span::after {
@@ -568,7 +587,7 @@ z-select .list,
 	}
 
 	&[type="radio"]:checked[readonly] + label span::after {
-		background-color: #7a858f !important;
+		background-color: #e5f1ff !important;
 	}
 
 	&[type="radio"]:checked[disabled] + label span::after {
@@ -581,10 +600,15 @@ z-select .list,
 		color: #3d98ff;
 	}
 
-	input[type="radio"]:checked + label {
+	input[type="radio"]:checked:not([readonly]):not([disabled]) + label {
 		color: #e5f1ff;
 		-webkit-text-fill-color: #e5f1ff;
 		border-color: #0066d9;
+	}
+
+	input[type="radio"][disabled]:checked + label {
+		color: #7a858f;
+		-webkit-text-fill-color: #7a858f;
 	}
 }
 
