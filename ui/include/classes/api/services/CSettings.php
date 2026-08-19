@@ -178,7 +178,7 @@ class CSettings extends CApiService {
 			'timeout_telnet_agent' =>			['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:600'],
 			'timeout_script' =>					['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:600'],
 			'timeout_browser' =>				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:600'],
-			'timeout_telemetry_query' =>		['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:600'],
+			'timeout_telemetry_query' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
 			'socket_timeout' =>					['type' => API_TIME_UNIT, 'in' => '1:300'],
 			'connect_timeout' =>				['type' => API_TIME_UNIT, 'in' => '1:30'],
 			'media_type_test_timeout' =>		['type' => API_TIME_UNIT, 'in' => '1:300'],
