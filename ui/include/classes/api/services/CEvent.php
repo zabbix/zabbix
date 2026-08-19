@@ -263,20 +263,26 @@ class CEvent extends CApiService {
 				if ($options['object'] == EVENT_OBJECT_DHOST) {
 					$sql_parts['join']['dh'] = ['table' => 'dhosts', 'on' => ['objectid' => 'dhostid']];
 					$sql_parts['join']['dr'] = ['left_table' => 'dh', 'table' => 'drules', 'using' => 'druleid'];
+					$sql_parts['join']['p'] = ['type' => 'left', 'left_table' => 'dr', 'table' => 'proxy',
+						'using' => 'proxyid'
+					];
+					$sql_parts['where'][] = '('.
+						'dr.proxyid IS NULL'.
+						' OR '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
+					')';
 				}
 				elseif ($options['object'] == EVENT_OBJECT_DSERVICE) {
 					$sql_parts['join']['ds'] = ['table' => 'dservices', 'on' => ['objectid' => 'dserviceid']];
 					$sql_parts['join']['dc'] = ['left_table' => 'ds', 'table' => 'dchecks', 'using' => 'dcheckid'];
 					$sql_parts['join']['dr'] = ['left_table' => 'dc', 'table' => 'drules', 'using' => 'druleid'];
+					$sql_parts['join']['p'] = ['type' => 'left', 'left_table' => 'dr', 'table' => 'proxy',
+						'using' => 'proxyid'
+					];
+					$sql_parts['where'][] = '('.
+						'dr.proxyid IS NULL'.
+						' OR '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
+					')';
 				}
-
-				$sql_parts['join']['p'] = ['type' => 'left', 'left_table' => 'dr', 'table' => 'proxy',
-					'using' => 'proxyid'
-				];
-				$sql_parts['where'][] = '('.
-					'dr.proxyid IS NULL'.
-					' OR '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
-				')';
 			}
 		}
 
