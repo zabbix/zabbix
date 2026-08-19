@@ -17,7 +17,6 @@ package smart
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"sort"
 	"strconv"
@@ -283,13 +282,9 @@ func (p *Plugin) execute(byID, jsonRunner bool) (*runner, error) {
 			default:
 				deviceInfo, err := getBasicDeviceInfo(p.ctl, name) //nolint:govet
 				if err != nil {
-					if errors.Is(err, errNoSmartStatus) {
-						p.Logger.Debugf("skipping device with no smart status: %q", name)
+					p.Debugf("failed to collect SMART data for device %q, skipping it: %s", name, err)
 
-						return nil
-					}
-
-					return err
+					return nil
 				}
 
 				resultChan <- deviceInfo
