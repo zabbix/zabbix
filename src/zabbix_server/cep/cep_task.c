@@ -13,16 +13,24 @@
 **/
 
 #include "cep_task.h"
-#include "zabbix_server/cep/zbx_cep.h"
+#include "zbx_cep.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
+#include "zbxcommon.h"
 #include "zbxipcservice.h"
 #include "zbxdbwrap.h"
+#include "zbxjson.h"
 
 static void	cep_task_request_remote_free(void *mw_task);
 static void	cep_task_event_free(void *mw_task);
 static void	cep_task_event_commit_free(void *mw_task);
 static void	cep_task_add_tags_free(void *mw_task);
+static void	cep_task_sync_event_free(void *mw_task);
+static void	cep_task_window_free(void *mw_task);
+static void	cep_task_window_sync_free(void *mw_task);
+static void	cep_task_acknowledge_free(void *mw_task);
+static void	cep_task_rule_error_free(void *mw_task);
+static void	cep_task_rule_reset_free(void *mw_task);
 
 static void	cep_task_init(zbx_cep_task_t *task)
 {
@@ -103,9 +111,29 @@ zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event)
 	task->obj_value = TRIGGER_VALUE_NONE;
 	zbx_vector_cep_event_update_create(&task->updates);
 	task->event = NULL;
+	task->flags = ZBX_EVENT_NORMAL;
 	task->hevent = NULL;
 
 	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create task to create a copy of another event                     *
+ *                                                                            *
+ * Parameters: event   - [IN] copied event                                    *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_event_by_copy(zbx_db_event *event)
+{
+	zbx_mw_task_t		*task = cep_create_task_event(event);
+	zbx_cep_task_event_t	*event_task = (zbx_cep_task_event_t *)task;
+
+	event_task->flags = ZBX_EVENT_COPIED;
+
+	return task;
 }
 
 /******************************************************************************
@@ -156,6 +184,32 @@ zbx_mw_task_t	*cep_create_task_event_by_correlation(zbx_db_event *event, zbx_uin
 	event_task->target_eventid = eventid;
 	event_task->creator.correlationid = correlationid;
 	event_task->creator.c_eventid = c_eventid;
+
+	return task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create task to close specified event by CEP rule                  *
+ *                                                                            *
+ * Parameters: event      - [IN] new event that will close the specified      *
+ *                                  event                                     *
+ *             eventid    - [IN] id of event to be closed                     *
+ *             cep_ruleid - [IN] id of correlation rule closing the event     *
+ *             c_eventid  - [IN] id of event that caused correlation          *
+ *                                  match                                     *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_event_by_cep_rule(zbx_db_event *event, zbx_uint64_t eventid,
+		zbx_uint64_t cep_ruleid)
+{
+	zbx_mw_task_t		*task = cep_create_task_event(event);
+	zbx_cep_task_event_t	*event_task = (zbx_cep_task_event_t *)task;
+
+	event_task->target_eventid = eventid;
+	event_task->creator.cep_ruleid = cep_ruleid;
 
 	return task;
 }
@@ -227,7 +281,7 @@ zbx_mw_task_t	*cep_create_task_commit(zbx_vector_mw_task_ptr_t *tasks)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free task that commits events created by other tasks              *
+ * Purpose: free 'event commit' task                                          *
  *                                                                            *
  ******************************************************************************/
 static void	cep_task_event_commit_free(void *mw_task)
@@ -281,7 +335,7 @@ zbx_mw_task_t	*cep_create_task_add_tags(zbx_vector_event_tags_t *event_tags, zbx
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free task that adds tags to events                                *
+ * Purpose: free 'add tags' task                                              *
  *                                                                            *
  ******************************************************************************/
 static void	cep_task_add_tags_free(void *mw_task)
@@ -305,6 +359,218 @@ static void	cep_task_add_tags_free(void *mw_task)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: create task to sync event changes from cache to db                *
+ *                                                                            *
+ * Parameters: hevent - [IN] event to sync                                    *
+ *             flags  - [IN] update flags specifying what should be updated   *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t hevent, zbx_uint32_t flags)
+{
+	zbx_cep_task_sync_event_t	*task;
+
+	task = (zbx_cep_task_sync_event_t *)zbx_mw_task_create(CEP_TASK_SYNC_EVENT, cep_task_sync_event_free,
+			sizeof(zbx_cep_task_sync_event_t));
+
+	task->hevent = zbx_cep_event_handle_addref(hevent);
+	task->flags = flags;
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'sync event' task                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_sync_event_free(void *mw_task)
+{
+	zbx_cep_task_sync_event_t	*task = (zbx_cep_task_sync_event_t *)mw_task;
+
+	zbx_cep_event_handle_release(task->hevent);
+	zbx_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create task to process event window                               *
+ *                                                                            *
+ * Parameters: window - [IN] window to process                                *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_window(zbx_cep_window_t *window, time_t now)
+{
+	zbx_cep_task_window_t	*task;
+
+	task = (zbx_cep_task_window_t *)zbx_mw_task_create(CEP_TASK_WINDOW, cep_task_window_free,
+			sizeof(zbx_cep_task_window_t));
+
+	task->window = window;
+	task->now = now;
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'process window' task                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_window_free(void *mw_task)
+{
+	zbx_cep_task_window_t	*task = (zbx_cep_task_window_t *)mw_task;
+
+	cep_window_release(task->window);
+	zbx_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create task to sync windows changes                               *
+ *                                                                            *
+ * Parameters: window - [IN] window to process                                *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_window_sync(zbx_cep_window_t *window)
+{
+	zbx_cep_task_window_sync_t	*task;
+
+	task = (zbx_cep_task_window_sync_t *)zbx_mw_task_create(CEP_TASK_WINDOW_SYNC, cep_task_window_sync_free,
+			sizeof(zbx_cep_task_window_sync_t));
+
+	task->window = window;
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'process window' task                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_window_sync_free(void *mw_task)
+{
+	zbx_cep_task_window_sync_t	*task = (zbx_cep_task_window_sync_t *)mw_task;
+
+	cep_window_release(task->window);
+	zbx_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create an acknowledge task                                        *
+ *                                                                            *
+ * Parameters: ack     - [IN/OUT] acknowledge data; reset after transfer      *
+ *             ruleid  - [IN] rule identifier                                 *
+ *             eventid - [IN] event identifier                                *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_acknowledge(zbx_cep_acknowledge_t *ack, zbx_uint64_t ruleid, zbx_uint64_t eventid)
+{
+	zbx_cep_task_acknowledge_t	*task;
+
+	task = (zbx_cep_task_acknowledge_t *)zbx_mw_task_create(CEP_TASK_ACKNOWLEDGE, cep_task_acknowledge_free,
+			sizeof(zbx_cep_task_acknowledge_t));
+
+	task->ruleid = ruleid;
+	task->eventid = eventid;
+	zbx_json_copy(&task->details, &ack->json);
+	memset(ack, 0, sizeof(zbx_cep_acknowledge_t));
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'process window' task                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_acknowledge_free(void *mw_task)
+{
+	zbx_cep_task_acknowledge_t	*task = (zbx_cep_task_acknowledge_t *)mw_task;
+
+	zbx_json_free(&task->details);
+	zbx_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a rule error task                                          *
+ *                                                                            *
+ * Parameters: ruleid - [IN] rule identifier                                  *
+ *             error  - [IN] error string or NULL; ownership is transferred   *
+ *                          to task                                           *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_rule_error(zbx_uint64_t ruleid, char *error)
+{
+	zbx_cep_task_rule_error_t	*task;
+
+	task = (zbx_cep_task_rule_error_t *)zbx_mw_task_create(CEP_TASK_RULE_ERROR, cep_task_rule_error_free,
+			sizeof(zbx_cep_task_rule_error_t));
+
+	task->ruleid = ruleid;
+	task->error = error;
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'rule error' task                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_rule_error_free(void *mw_task)
+{
+	zbx_cep_task_rule_error_t	*task = (zbx_cep_task_rule_error_t *)mw_task;
+
+	zbx_free(task->error);
+	zbx_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a rule reset task                                          *
+ *                                                                            *
+ * Parameters: ruleid - [IN] rule identifier                                  *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_rule_reset(zbx_uint64_t ruleid)
+{
+	zbx_cep_task_rule_reset_t	*task;
+
+	task = (zbx_cep_task_rule_reset_t *)zbx_mw_task_create(CEP_TASK_RULE_RESET, cep_task_rule_reset_free,
+			sizeof(zbx_cep_task_rule_reset_t));
+
+	task->ruleid = ruleid;
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'rule reset' task                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_rule_reset_free(void *mw_task)
+{
+	zbx_free(mw_task);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: free a task                                                       *
  *                                                                            *
  ******************************************************************************/
@@ -317,16 +583,37 @@ void	cep_task_free(zbx_mw_task_t *mw_task)
 	switch (task->type)
 	{
 		case CEP_TASK_REMOTE:
-			cep_task_request_remote_free((zbx_cep_task_remote_t *)task);
+			cep_task_request_remote_free(task);
 			break;
 		case CEP_TASK_EVENT:
-			cep_task_event_free((zbx_cep_task_event_t *)task);
+			cep_task_event_free(task);
 			break;
 		case CEP_TASK_COMMIT:
-			cep_task_event_commit_free((zbx_cep_task_commit_t *)task);
+			cep_task_event_commit_free(task);
 			break;
 		case CEP_TASK_ADD_TAGS:
-			cep_task_add_tags_free((zbx_cep_task_add_tags_t *)task);
+			cep_task_add_tags_free(task);
+			break;
+		case CEP_TASK_SYNC_EVENT:
+			cep_task_sync_event_free(task);
+			break;
+		case CEP_TASK_WINDOW:
+			cep_task_window_free(task);
+			break;
+		case CEP_TASK_WINDOW_SYNC:
+			cep_task_window_sync_free(task);
+			break;
+		case CEP_TASK_ACKNOWLEDGE:
+			cep_task_acknowledge_free(task);
+			break;
+		case CEP_TASK_RULE_ERROR:
+			cep_task_rule_error_free(task);
+			break;
+		case CEP_TASK_RULE_RESET:
+			cep_task_rule_reset_free(task);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown CEP task %d", task->type);
 			break;
 	}
 }

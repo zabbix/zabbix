@@ -12,27 +12,30 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "cep_api.h"
 #include "cep.h"
+#include "cep_api.h"
 #include "zbx_cep.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"
 
 ZBX_VECTOR_IMPL(cep_event_update, zbx_cep_event_update_t)
 
-
 /* guards access to CEP cache which can be accessed only by acquiring with */
 /* cep_cache_acquire() and releasing afterwards with cep_cache_release()   */
 typedef struct
 {
-	zbx_cep_t	*cep;
-	pthread_mutex_t	lock;
+	void			*ptr;
+	zbx_mem_free_func_t	destroy;
+	pthread_mutex_t		lock;
 }
 zbx_cep_guard_t;
 
 typedef struct
 {
-	zbx_cep_guard_t	*cache_guard;
+	zbx_cep_guard_t		*cache_guard;
+	zbx_cep_guard_t		*window_pool_guard;
+
+	const char		*config_source_ip;
 
 	zbx_channel_t		*update_channel;
 	zbx_atomic_uint32_t	refcount;
@@ -43,14 +46,16 @@ static zbx_cep_api_t	*cep_api = NULL;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create and initialize a CEP cache guard                           *
+ * Purpose: create and initialize a guard for a managed resource              *
  *                                                                            *
- * Parameters: error - [OUT] error message if initialization fails            *
+ * Parameters: ptr     - [IN] pointer to the resource to be guarded           *
+ *             destroy - [IN] destructor function for the resource            *
+ *             error   - [OUT] error message                                  *
  *                                                                            *
- * Return value: pointer to the created guard, or NULL on failure             *
+ * Return value: pointer to the created guard, or NULL on error               *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_guard_t	*cep_guard_create(char **error)
+static zbx_cep_guard_t	*cep_guard_create(void *ptr, zbx_mem_free_func_t destroy, char **error)
 {
 	zbx_cep_guard_t	*guard;
 	int		err;
@@ -65,19 +70,20 @@ static zbx_cep_guard_t	*cep_guard_create(char **error)
 		return NULL;
 	}
 
-	guard->cep = cep_create();
+	guard->ptr = ptr;
+	guard->destroy = destroy;
 
 	return guard;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: destroy a CEP cache guard and free all associated resources       *
+ * Purpose: destroy a guard and free all associated resources                 *
  *                                                                            *
  ******************************************************************************/
 static void	cep_guard_destroy(zbx_cep_guard_t *guard)
 {
-	cep_destroy(guard->cep);
+	guard->destroy(guard->ptr);
 	pthread_mutex_destroy(&guard->lock);
 
 	zbx_free(guard);
@@ -85,6 +91,39 @@ static void	cep_guard_destroy(zbx_cep_guard_t *guard)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: acquire the guard lock and expose the protected pointer           *
+ *                                                                            *
+ * Parameters: guard - [INT]                                                  *
+*              ptr   - [OUT] set to the protected pointer                     *
+ *                                                                            *
+ * Comments: Must be paired with a call to cep_guard_release().               *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_guard_acquire(zbx_cep_guard_t *guard, void **ptr)
+{
+	pthread_mutex_lock(&guard->lock);
+	*ptr = guard->ptr;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release the guard lock and nullify the pointer                    *
+ *                                                                            *
+ * Parameters: guard - [INT]                                                  *
+ *              ptr - [IN/OUT] pointer to nullify before releasing            *
+ *                                                                            *
+ * Comments: Must be paired with a prior call to cep_guard_acquire().         *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_guard_release(zbx_cep_guard_t *guard, void **ptr)
+{
+	*ptr = NULL;
+	pthread_mutex_unlock(&guard->lock);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize the CEP API and its associated resources               *
  * Purpose: free CEP API handle and its associated resources                  *
  *                                                                            *
  * Parameters: api - [IN] CEP API handle to free                              *
@@ -92,6 +131,9 @@ static void	cep_guard_destroy(zbx_cep_guard_t *guard)
  ******************************************************************************/
 static void	cep_api_free(zbx_cep_api_t *api)
 {
+	if (NULL != api->window_pool_guard)
+		cep_guard_destroy(api->window_pool_guard);
+
 	if (NULL != api->cache_guard)
 		cep_guard_destroy(api->cache_guard);
 
@@ -114,13 +156,21 @@ static void	cep_api_free(zbx_cep_api_t *api)
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	cep_api_init(zbx_cep_api_t *api, char **error)
+static int	cep_api_init(zbx_cep_api_t *api, const char *config_source_ip, char **error)
 {
-	if (NULL == (api->cache_guard = cep_guard_create(error)))
+	if (NULL == (api->cache_guard = cep_guard_create(cep_create(), (zbx_mem_free_func_t)cep_destroy, error)))
 		return FAIL;
+
+	if (NULL == (api->window_pool_guard = cep_guard_create(cep_window_pool_create(),
+			(zbx_mem_free_func_t)cep_window_pool_destroy, error)))
+	{
+		return FAIL;
+	}
 
 	api->update_channel = (zbx_channel_t *)zbx_malloc(NULL, sizeof(zbx_channel_t));
 	zbx_chan_init(api->update_channel, sizeof(zbx_cep_event_update_t), 10);
+
+	api->config_source_ip = config_source_ip;
 
 	return SUCCEED;
 }
@@ -134,11 +184,12 @@ static int	cep_api_init(zbx_cep_api_t *api, char **error)
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-int	cep_api_create(char **error)
+int	cep_api_create(const char *config_source_ip, char **error)
 {
+
 	zbx_cep_api_t	*api = (zbx_cep_api_t *)zbx_calloc(NULL, 1, sizeof(zbx_cep_api_t));
 
-	if (FAIL == cep_api_init(api, error))
+	if (FAIL == cep_api_init(api, config_source_ip, error))
 	{
 		cep_api_free(api);
 		return FAIL;
@@ -152,6 +203,9 @@ int	cep_api_create(char **error)
 /******************************************************************************
  *                                                                            *
  * Purpose: acquire a reference to the CEP API                                *
+ *                                                                            *
+ * Comments: Called on thread entry to keep the CEP API alive for the         *
+ *           duration of the thread's use of it                               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_cep_api_acquire(void)
@@ -167,6 +221,8 @@ void	zbx_cep_api_acquire(void)
 /******************************************************************************
  *                                                                            *
  * Purpose: release a reference to the CEP API handle                         *
+ *                                                                            *
+ * Comments: Called before thread exit.                                       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_cep_api_release(void)
@@ -186,8 +242,7 @@ void	zbx_cep_api_release(void)
  ******************************************************************************/
 void	cep_cache_acquire(zbx_cep_t **cep)
 {
-	pthread_mutex_lock(&cep_api->cache_guard->lock);
-	*cep = cep_api->cache_guard->cep;
+	cep_guard_acquire(cep_api->cache_guard, (void **)cep);
 }
 
 /******************************************************************************
@@ -201,8 +256,35 @@ void	cep_cache_acquire(zbx_cep_t **cep)
  ******************************************************************************/
 void	cep_cache_release(zbx_cep_t **cep)
 {
-	*cep = NULL;
-	pthread_mutex_unlock(&cep_api->cache_guard->lock);
+	cep_guard_release(cep_api->cache_guard, (void **)cep);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire the CEP window pool and lock its guard                    *
+ *                                                                            *
+ * Parameters: pool - [OUT] pointer to the window pool                        *
+ *                                                                            *
+ * Comments: Must be paired with a call to cep_window_pool_release().         *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_window_pool_acquire(zbx_cep_window_pool_t **pool)
+{
+	cep_guard_acquire(cep_api->window_pool_guard, (void **)pool);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release the CEP window pool and unlock its guard                  *
+ *                                                                            *
+ * Parameters: pool - [IN/OUT] pointer to the window pool                     *
+ *                                                                            *
+ * Comments: Must be paired with a prior call to cep_window_pool_acquire().   *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_window_pool_release(zbx_cep_window_pool_t **pool)
+{
+	cep_guard_release(cep_api->window_pool_guard, (void **)pool);
 }
 
 #define CEP_UPDATE_BATCH_SIZE  1000
@@ -357,21 +439,61 @@ void	zbx_cep_event_handle_release(zbx_cep_event_handle_t h)
 	zbx_cep_event_release(event);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update the CEP cache events accessed counter                      *
+ *                                                                            *
+ * Parameters: value - [IN] number of events accessed                         *
+ *                                                                            *
+ * Comments: Does not lock the cache guard; the underlying update function    *
+ *           is thread-safe.                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_stats_update_events_accessed(zbx_uint64_t value)
 {
-	cep_update_events_accessed(cep_api->cache_guard->cep, value);
+	cep_update_events_accessed((zbx_cep_t *)cep_api->cache_guard->ptr, value);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update the CEP cache events processed counter                     *
+ *                                                                            *
+ * Parameters: value - [IN] number of events processed                        *
+ *                                                                            *
+ * Comments: Does not lock the cache guard; the underlying update function    *
+ *           is thread-safe.                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_stats_update_events_processed(zbx_uint64_t value)
 {
-	cep_update_events_processed(cep_api->cache_guard->cep, value);
+	cep_update_events_processed((zbx_cep_t *)cep_api->cache_guard->ptr, value);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update the CEP cache events discarded counter                     *
+ *                                                                            *
+ * Parameters: value - [IN] number of events discarded                        *
+ *                                                                            *
+ * Comments: Does not lock the cache guard; the underlying update function    *
+ *           is thread-safe.                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_stats_update_events_discarded(zbx_uint64_t value)
 {
-	cep_update_events_discarded(cep_api->cache_guard->cep, value);
+	cep_update_events_discarded((zbx_cep_t *)cep_api->cache_guard->ptr, value);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: collect CEP cache statistics                                      *
+ *                                                                            *
+ * Parameters: stats - [OUT] collected statistics                             *
+ *                                                                            *
+ * Comments: Does not lock the cache guard; the underlying collection         *
+ *           function is thread-safe.                                         *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_stats_collect(zbx_cep_stats_t *stats)
 {
 	zbx_cep_t	*cep;
@@ -381,3 +503,17 @@ void	cep_stats_collect(zbx_cep_stats_t *stats)
 	cep_cache_release(&cep);
 }
 
+/*
+ * server configuration parameter support
+ */
+
+const char	*cep_config_get_source_ip(void)
+{
+	if (NULL == cep_api)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("CEP api has not been initialized");
+		zbx_exit(EXIT_FAILURE);
+	}
+
+	return cep_api->config_source_ip;
+}

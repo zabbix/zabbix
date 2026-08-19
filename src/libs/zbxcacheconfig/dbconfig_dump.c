@@ -159,12 +159,20 @@ static void	DCdump_hosts(void)
 
 		zabbix_log(LOG_LEVEL_TRACE, "  items:");
 
-		zbx_hashset_iter_t	item_iter;
-		ZBX_DC_ITEM_REF		*ref;
+		ZBX_DC_ITEM_REF	*ref;
 
-		zbx_hashset_iter_reset(&host->items, &item_iter);
-		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&item_iter)))
+		zbx_hashset_iter_reset(&host->items, &iter);
+		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 			zabbix_log(LOG_LEVEL_TRACE, "    itemid:" ZBX_FS_UI64, ref->item->itemid);
+
+
+		zabbix_log(LOG_LEVEL_TRACE, "  groupids:");
+
+		zbx_uint64_t	*groupid;
+
+		zbx_hashset_iter_reset(&host->groupids, &iter);
+		while (NULL != (groupid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+			zabbix_log(LOG_LEVEL_TRACE, "    groupid:" ZBX_FS_UI64, *groupid);
 	}
 
 	zbx_vector_ptr_destroy(&index);

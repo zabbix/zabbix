@@ -1574,6 +1574,12 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 			zbx_hashset_create_ext(&host->items, 0, dc_item_ref_hash, dc_item_ref_compare, NULL,
 					__config_shmem_malloc_func, __config_shmem_realloc_func,
 					__config_shmem_free_func);
+
+			zbx_hashset_create_ext(&host->groupids, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+					__config_shmem_malloc_func, __config_shmem_realloc_func,
+					__config_shmem_free_func);
+
 		}
 		else
 		{
@@ -1735,6 +1741,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 #endif
 		zbx_vector_ptr_destroy(&host->interfaces_v);
 		zbx_hashset_destroy(&host->items);
+		zbx_hashset_destroy(&host->groupids);
 		zbx_hashset_remove_direct(&config->hosts, host);
 
 		zbx_vector_dc_httptest_ptr_destroy(&host->httptests);
@@ -5765,9 +5772,8 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-
 	zbx_dc_hostgroup_t	*group = NULL;
-
+	ZBX_DC_HOST		*dc_host;
 	int			ret;
 	zbx_uint64_t		last_groupid = 0, groupid, hostid;
 
@@ -5796,6 +5802,10 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(hostid, row[1]);
 		zbx_hashset_insert(&group->hostids, &hostid, sizeof(hostid));
+
+		if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+			zbx_hashset_insert(&dc_host->groupids, &groupid, sizeof(groupid));
+
 	}
 
 	/* remove deleted group hostids from cache */
@@ -5808,6 +5818,9 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(hostid, row[1]);
 		zbx_hashset_remove(&group->hostids, &hostid);
+
+		if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+			zbx_hashset_remove(&dc_host->groupids, &groupid);
 	}
 
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
@@ -7501,7 +7514,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
 			drules_sync, dchecks_sync, httptest_sync, httptest_field_sync, httpstep_sync,
 			httpstep_field_sync, autoreg_host_sync, connector_sync, connector_tag_sync, proxy_sync,
-			proxy_group_sync, hp_sync, autoreg_config_sync;
+			proxy_group_sync, hp_sync, autoreg_config_sync, cep_rule_sync, cep_condition_sync,
+			cep_window_sync, cep_operation_sync, cep_op_condition_sync;
 	zbx_uint64_t	update_flags = 0;
 	zbx_int64_t	used_size, update_size = 0, topology_size = 0, timers_size = 0, um_cache_dup_size = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
@@ -7578,6 +7592,11 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	zbx_dbsync_init_changelog(&func_sync, "functions", changelog_sync_mode, db);
 	zbx_dbsync_init(&expr_sync, "regexps", mode, db);
 	zbx_dbsync_init(&action_sync, "actions", mode, db);
+	zbx_dbsync_init_changelog(&cep_rule_sync, "cep_rule", changelog_sync_mode, db);
+	zbx_dbsync_init_changelog(&cep_condition_sync, "cep_condition", changelog_sync_mode, db);
+	zbx_dbsync_init_changelog(&cep_window_sync, "cep_window", changelog_sync_mode, db);
+	zbx_dbsync_init_changelog(&cep_operation_sync, "cep_operation", changelog_sync_mode, db);
+	zbx_dbsync_init_changelog(&cep_op_condition_sync, "cep_operation_condition", changelog_sync_mode, db);
 
 	/* Action operation sync produces virtual rows with two columns - actionid, opflags. */
 	/* Because of this it cannot return the original database select and must always be  */
@@ -7851,6 +7870,24 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 		goto out;
 
 	correlation_config_sync(&correlation_sync, &corr_operation_sync, &corr_condition_sync);
+
+	if (FAIL == zbx_dbsync_prepare_cep_rule(&cep_rule_sync))
+		goto out;
+
+	if (FAIL == zbx_dbsync_prepare_cep_condition(&cep_condition_sync))
+		goto out;
+
+	if (FAIL == zbx_dbsync_prepare_cep_rule_window(&cep_window_sync))
+		goto out;
+
+	if (FAIL == zbx_dbsync_prepare_cep_operation(&cep_operation_sync))
+		goto out;
+
+	if (FAIL == zbx_dbsync_prepare_cep_operation_condition(&cep_op_condition_sync))
+		goto out;
+
+	cep_config_sync(&cep_rule_sync, &cep_condition_sync, &cep_window_sync, &cep_operation_sync,
+			&cep_op_condition_sync, new_revision);
 
 	START_SYNC;
 
@@ -8203,6 +8240,11 @@ clean:
 	zbx_dbsync_clear(&proxy_sync);
 	zbx_dbsync_clear(&proxy_group_sync);
 	zbx_dbsync_clear(&hp_sync);
+	zbx_dbsync_clear(&cep_rule_sync);
+	zbx_dbsync_clear(&cep_condition_sync);
+	zbx_dbsync_clear(&cep_window_sync);
+	zbx_dbsync_clear(&cep_operation_sync);
+	zbx_dbsync_clear(&cep_op_condition_sync);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
@@ -13651,6 +13693,34 @@ void	zbx_dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vec
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get host ID by function ID from configuration cache               *
+ *                                                                            *
+ * Parameters: functionid - [IN] function ID                                  *
+ *                                                                            *
+ * Return value: host ID, or 0 if not found                                   *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dc_get_hostid_by_functionid(zbx_uint64_t functionid)
+{
+	const ZBX_DC_FUNCTION	*function;
+	const ZBX_DC_ITEM	*item;
+	zbx_uint64_t		hostid = 0;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionid)))
+	{
+		if (NULL != (item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
+			hostid = item->hostid;
+	}
+
+	UNLOCK_CACHE;
+
+	return hostid;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get hosts for the specified list of functions                     *
  *                                                                            *
  * Parameters: functionids     - [IN]                                         *
@@ -13705,6 +13775,191 @@ void	zbx_dc_get_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __func__, hosts->num_data);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host names for the specified list of functions                *
+ *                                                                            *
+ * Parameters: functionids - [IN]                                             *
+ *             hosts       - [OUT] - vector of host names                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_host_names_by_functionids(const zbx_vector_uint64_t *functionids, zbx_vector_str_t *hosts)
+{
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host;
+	zbx_vector_uint64_t	hostids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_reserve(&hostids, (size_t)functionids->values_num);
+
+	zbx_vector_str_reserve(hosts, (size_t)functionids->values_num);
+
+	RDLOCK_CACHE;
+
+	for (int i = 0; i < functionids->values_num; i++)
+	{
+		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+				&functionids->values[i])))
+		{
+			continue;
+		}
+
+		if (NULL == (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
+			continue;
+
+		zbx_vector_uint64_append(&hostids, dc_item->hostid);
+	}
+
+	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (int i = 0; i < hostids.values_num; i++)
+	{
+		if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostids.values[i])))
+			continue;
+
+		zbx_vector_str_append(hosts, zbx_strdup(NULL, dc_host->host));
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_destroy(&hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __func__, hosts->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host group names for the specified list of functions          *
+ *                                                                            *
+ * Parameters: functionids - [IN]                                             *
+ *             groups      - [OUT] - vector of host group names               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_hostgroup_names_by_functionids(const zbx_vector_uint64_t *functionids, zbx_vector_str_t *groups)
+{
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST		*dc_host;
+	zbx_vector_uint64_t	groupids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&groupids);
+	zbx_vector_uint64_reserve(&groupids, (size_t)functionids->values_num);
+
+	/* assume that on average host belongs to two groups */
+	zbx_vector_str_reserve(groups, (size_t)functionids->values_num * 2);
+
+	RDLOCK_CACHE;
+
+	for (int i = 0; i < functionids->values_num; i++)
+	{
+		zbx_hashset_iter_t	iter;
+		zbx_uint64_t		*groupid;
+
+		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+				&functionids->values[i])))
+		{
+			continue;
+		}
+
+		if (NULL == (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
+			continue;
+
+		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		zbx_hashset_iter_reset(&dc_host->groupids, &iter);
+		while (NULL != (groupid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+			zbx_vector_uint64_append(&groupids, *groupid);
+	}
+
+	zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (int i = 0; i < groupids.values_num; i++)
+	{
+		zbx_dc_hostgroup_t	*dc_group;
+
+		if (NULL == (dc_group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups,
+				&groupids.values[i])))
+		{
+			continue;
+		}
+
+		zbx_vector_str_append(groups, zbx_strdup(NULL, dc_group->name));
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_destroy(&groupids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() groups:%d", __func__, groups->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host group ID by function ID from configuration cache         *
+ *                                                                            *
+ * Parameters: functionid - [IN] function ID                                  *
+ *                                                                            *
+ * Return value: alphabetically first host group ID, or 0 if not found        *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dc_get_hostgroupid_by_functionid(zbx_uint64_t functionid)
+{
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST		*dc_host;
+	zbx_vector_uint64_t	groupids;
+	const char		*name = NULL;
+	zbx_uint64_t		*groupid, first_groupid = 0;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&groupids);
+
+	RDLOCK_CACHE;
+
+	if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionid)))
+		goto unlock;
+
+	if (NULL == (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
+		goto unlock;
+
+	if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		goto unlock;
+
+	zbx_hashset_iter_reset(&dc_host->groupids, &iter);
+	while (NULL != (groupid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_dc_hostgroup_t	*dc_group;
+
+		if (NULL == (dc_group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, groupid)))
+			continue;
+
+		if (NULL == name || 0 > strcmp(dc_group->name, name))
+		{
+			name = dc_group->name;
+			first_groupid = *groupid;
+		}
+	}
+unlock:
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_destroy(&groupids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return first_groupid;
+}
+
 
 /******************************************************************************
  *                                                                            *

@@ -161,7 +161,7 @@ static void	db_remove_expired_event_suppress_data(time_t now)
 	zbx_vector_event_maintenance_create(&event_maintenance);
 
 	result = zbx_db_select(
-			"select eventid,maintenanceid"
+			"select eventid,maintenanceid,cep_ruleid"
 			" from event_suppress"
 			" where suppress_until<" ZBX_FS_TIME_T
 				" and suppress_until<>0",
@@ -173,6 +173,7 @@ static void	db_remove_expired_event_suppress_data(time_t now)
 
 		ZBX_STR2UINT64(event.eventid, row[0]);
 		ZBX_DBROW2UINT64(event.maintenanceid, row[1]);
+		ZBX_DBROW2UINT64(event.cep_ruleid, row[2]);
 
 		zbx_vector_event_maintenance_append(&event_maintenance, event);
 	}

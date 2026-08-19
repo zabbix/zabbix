@@ -307,7 +307,7 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 
 		case ZBX_PROCESS_TYPE_CEP_MANAGER:
 			*owner = PROCESS_OWNER_SUPERVISOR;
-			*runlevel = ZBX_RUNLEVEL_CACHESYNC;
+			*runlevel = ZBX_RUNLEVEL_CEP;
 			break;
 
 		case ZBX_PROCESS_TYPE_CEP_WORKER:

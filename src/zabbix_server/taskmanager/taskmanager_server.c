@@ -329,6 +329,9 @@ static int	tm_rank_event_as_cause(zbx_uint64_t eventid)
 		ret = FAIL;
 	}
 out:
+	if (SUCCEED == ret)
+		zbx_cep_set_event_cause(eventid, 0);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -389,6 +392,9 @@ static int	tm_rank_event_as_symptom(zbx_uint64_t eventid, zbx_uint64_t cause_eve
 		ret = FAIL;
 	}
 out:
+	if (SUCCEED == ret)
+		zbx_cep_set_event_cause(eventid, cause_eventid);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -1071,8 +1077,8 @@ static void	tm_process_temp_suppression(const char *data)
 	if (ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS == action ||
 			(ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME != ts && time(NULL) >= ts))
 	{
-		zbx_db_execute("delete from event_suppress where eventid=" ZBX_FS_UI64 " and maintenanceid is null",
-				eventid);
+		zbx_db_execute("delete from event_suppress where eventid=" ZBX_FS_UI64
+			" and maintenanceid is null and cep_ruleid is null", eventid);
 	}
 	else if (ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS == action)
 	{
@@ -1083,7 +1089,8 @@ static void	tm_process_temp_suppression(const char *data)
 			return;
 
 		result = zbx_db_select("select event_suppressid,suppress_until from event_suppress where eventid="
-				ZBX_FS_UI64 " and maintenanceid is null" ZBX_FOR_UPDATE, eventid);
+				ZBX_FS_UI64 " and maintenanceid is null and cep_ruleid is null" ZBX_FOR_UPDATE,
+				eventid);
 
 		if (NULL != (row = zbx_db_fetch(result)))
 		{

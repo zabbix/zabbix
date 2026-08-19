@@ -12,28 +12,23 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_CEP_WORKER_H
-#define ZABBIX_CEP_WORKER_H
+#ifndef ZABBIX_CEP_JS_H
+#define ZABBIX_CEP_JS_H
 
-#include "zbxmw.h"
-#include "zbxexport.h"
-#include "zbxipcservice.h"
-#include "zbxtypes.h"
+#include "zbx_cep.h"
+#include "zbxembed.h"
 
 typedef struct
 {
-	zbx_mw_worker_t		base;
-
-
-	zbx_dbconn_pool_t	*dbpool;
-
-	zbx_ipc_async_socket_t	rtc;
-
-	zbx_export_file_t	*problem_export;
+	zbx_cep_event_t	**events;
+	int		events_num;
+	zbx_hashset_t	index;
 }
-zbx_cep_worker_t;
+zbx_cep_js_ctx_t;
 
-zbx_cep_worker_t	*cep_worker_create( zbx_dbconn_pool_t *dbpool);
-void	*cep_worker_entry(void *args);
+void	cep_js_init(zbx_es_t *es);
+void	cep_js_ctx_init(zbx_cep_js_ctx_t *js, zbx_vector_cep_event_handle_t *hevents);
+void	cep_js_ctx_clear(zbx_cep_js_ctx_t *js);
+void	cep_js_set_ctx(zbx_es_t *es, zbx_cep_js_ctx_t *js);
 
-#endif /* ZABBIX_CEP_WORKER_H */
+#endif

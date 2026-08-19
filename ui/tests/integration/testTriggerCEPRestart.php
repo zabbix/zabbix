@@ -32,8 +32,11 @@ class testTriggerCEPRestart extends testTriggerCEP {
 	const RECOVERY_CYCLES_COUNT = 20;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
 	const MAINTENANCE_COUNT_EXTRA = 10;
+	// Kept small like the knobs above: this suite is about the restart and services variants, not about load.
+	const CEP_CLOSE_WINDOW_SERVICE_COUNT = 3;
 	const SKIP_RESTART_TESTS = false;
 
 	// Larger scale needs longer to settle; override the parent's reduced default back up.
 	const WAIT_ITERATIONS = 60;
+	const WAIT_ITERATIONS_LONGER = 120;
 }

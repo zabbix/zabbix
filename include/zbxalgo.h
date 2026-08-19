@@ -829,7 +829,7 @@ zbx_queue_ptr_t;
 
 #define zbx_queue_ptr_empty(queue)	((queue)->head_pos == (queue)->tail_pos ? SUCCEED : FAIL)
 
-int	zbx_queue_ptr_values_num(zbx_queue_ptr_t *queue);
+int	zbx_queue_ptr_values_num(const zbx_queue_ptr_t *queue);
 void	zbx_queue_ptr_reserve(zbx_queue_ptr_t *queue, int num);
 void	zbx_queue_ptr_compact(zbx_queue_ptr_t *queue);
 void	zbx_queue_ptr_create(zbx_queue_ptr_t *queue);
@@ -838,6 +838,16 @@ void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *value);
 void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue);
 void	*zbx_queue_ptr_peek(zbx_queue_ptr_t *queue);
 void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value);
+
+typedef struct
+{
+	int			pos;
+	const zbx_queue_ptr_t	*queue;
+}
+zbx_queue_ptr_iter_t;
+
+void	zbx_queue_ptr_iter_reset(const zbx_queue_ptr_t *queue, zbx_queue_ptr_iter_t *iter);
+const void	*zbx_queue_ptr_iter_next(zbx_queue_ptr_iter_t *iter);
 
 /* list item data */
 typedef struct list_item

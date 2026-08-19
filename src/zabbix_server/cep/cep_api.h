@@ -16,14 +16,18 @@
 #define ZABBIX_CEP_API_H
 
 #include "cep.h"
+#include "cep_window.h"
 #include "zbx_cep.h"
 
-int	cep_api_create(char **error);
+int	cep_api_create(const char *config_source_ip, char **error);
 void	zbx_cep_api_acquire(void);
 void	zbx_cep_api_release(void);
 
 void	cep_cache_acquire(zbx_cep_t **);
 void	cep_cache_release(zbx_cep_t **);
+void	cep_window_pool_acquire(zbx_cep_window_pool_t **pool);
+void	cep_window_pool_release(zbx_cep_window_pool_t **pool);
+
 void	cep_post_event_updates(zbx_cep_event_update_t *updates, int updates_num);
 void	cep_post_event_handle_action(zbx_cep_event_handle_t *handles, int handles_num, zbx_cep_event_op_t action);
 
@@ -32,5 +36,8 @@ void	cep_stats_update_events_accessed(zbx_uint64_t value);
 void	cep_stats_update_events_processed(zbx_uint64_t value);
 void	cep_stats_update_events_discarded(zbx_uint64_t value);
 void	cep_stats_collect(zbx_cep_stats_t *stats);
+
+/* server configuration parameters */
+const char	*cep_config_get_source_ip(void);
 
 #endif

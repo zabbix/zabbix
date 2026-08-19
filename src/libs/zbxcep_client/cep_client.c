@@ -503,6 +503,7 @@ static zbx_uint32_t	cep_deserialize_event(const unsigned char *data, zbx_db_even
 			{
 				ptr += zbx_deserialize_value(ptr, &suppress_local.maintenanceid);
 				ptr += zbx_deserialize_value(ptr, &suppress_local.until);
+				suppress_local.cep_ruleid = 0;
 				zbx_vector_db_event_suppress_append(e->suppress, suppress_local);
 			}
 		}
@@ -603,6 +604,7 @@ void	zbx_cep_deserialize_event_maintenance(const unsigned char *data, zbx_vector
 		zbx_event_maintenance_t	event_local;
 		data += zbx_deserialize_value(data, &event_local.eventid);
 		data += zbx_deserialize_value(data, &event_local.maintenanceid);
+		data += zbx_deserialize_value(data, &event_local.cep_ruleid);
 
 		zbx_vector_event_maintenance_append(events, event_local);
 	}
@@ -620,7 +622,7 @@ void	zbx_cep_deserialize_event_maintenance(const unsigned char *data, zbx_vector
 static void	cep_send_event_maintenance(const zbx_event_maintenance_t *events, int events_num, zbx_uint32_t code)
 {
 	unsigned char	*data = NULL, *ptr;
-	zbx_uint32_t	data_len = 2 * sizeof(zbx_uint64_t) * events_num + sizeof(int);
+	zbx_uint32_t	data_len = 3 * sizeof(zbx_uint64_t) * events_num + sizeof(int);
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)data_len);
 	ptr += zbx_serialize_value(ptr, events_num);
@@ -628,6 +630,7 @@ static void	cep_send_event_maintenance(const zbx_event_maintenance_t *events, in
 	{
 		ptr += zbx_serialize_value(ptr, events[i].eventid);
 		ptr += zbx_serialize_value(ptr, events[i].maintenanceid);
+		ptr += zbx_serialize_value(ptr, events[i].cep_ruleid);
 	}
 
 	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), code, data, data_len))
@@ -1011,7 +1014,10 @@ int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error)
 	ptr += zbx_deserialize_value(ptr, &stats->task_internal_num);
 	ptr += zbx_deserialize_value(ptr, &stats->task_completed_num);
 	ptr += zbx_deserialize_value(ptr, &stats->events_num);
-	(void)zbx_deserialize_value(ptr, &stats->objects_num);
+	ptr += zbx_deserialize_value(ptr, &stats->objects_num);
+	ptr += zbx_deserialize_value(ptr, &stats->windows_num);
+	ptr += zbx_deserialize_value(ptr, &stats->window_alarms_num);
+	(void)zbx_deserialize_value(ptr, &stats->window_ticks_num);
 
 	zbx_ipc_message_clean(&response);
 
@@ -1124,3 +1130,52 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send event cause to CEP service                                   *
+ *                                                                            *
+ * Parameters: eventid       - [IN] event ID                                  *
+ *             cause_eventid - [IN] cause event ID                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_cep_set_event_cause(zbx_uint64_t eventid, zbx_uint64_t cause_eventid)
+{
+	unsigned char	buf[sizeof(eventid) + sizeof(cause_eventid)], *ptr = buf;
+	ptr += zbx_serialize_value(ptr, eventid);
+	(void)zbx_serialize_value(ptr, cause_eventid);
+
+	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_SET_EVENT_CAUSE, buf, sizeof(buf)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send set event cause message to CEP service");
+		zbx_exit(EXIT_FAILURE);
+	}
+}
+
+int	zbx_cep_reset_rule(zbx_uint64_t cep_ruleid, char **error)
+{
+	unsigned char		buf[sizeof(cep_ruleid)];
+	int			ret = FAIL;
+	char			*errmsg = NULL;
+	zbx_ipc_socket_t	socket;
+
+	(void)zbx_serialize_value(buf, cep_ruleid);
+
+	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot connect to CEP service: %s", errmsg);
+		zbx_free(errmsg);
+		return ret;
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_CEP_RESET_RULE, buf, sizeof(buf)))
+	{
+		*error = zbx_strdup(NULL, "cannot send reset rule message to CEP service");
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_ipc_socket_close(&socket);
+
+	return ret;
+}

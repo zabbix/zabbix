@@ -569,6 +569,35 @@ void	zbx_db_trigger_get_all_functionids(const zbx_db_trigger *trigger, zbx_vecto
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get the first function ID from a trigger expression               *
+ *                                                                            *
+ * Parameters: trigger - [IN] trigger                                         *
+ *                                                                            *
+ * Return value: first function ID, or 0 if none found                        *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_db_trigger_get_first_functionid(const zbx_db_trigger *trigger)
+{
+	zbx_trigger_cache_t	*cache;
+	zbx_vector_uint64_t	functionids;
+	zbx_uint64_t		functionid = 0;
+
+	zbx_vector_uint64_create(&functionids);
+
+	if (NULL != (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX)))
+	{
+		zbx_eval_get_functionids_ordered(&cache->eval_ctx, &functionids);
+		if (0 != functionids.values_num)
+			functionid = functionids.values[0];
+	}
+
+	zbx_vector_uint64_destroy(&functionids);
+
+	return functionid;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get functionids from trigger expression                           *
  *                                                                            *
  * Parameters: trigger     - [IN] the trigger                                 *

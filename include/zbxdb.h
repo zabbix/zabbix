@@ -121,6 +121,12 @@ zbx_db_config_t;
 	}						\
 	while (0)
 
+#define ZBX_DBROW2STR(str, row)				\
+	if (NULL == str || 0 != strcmp(str, row))	\
+	{						\
+		str = zbx_strdup(str, row);		\
+	}
+
 #ifdef HAVE_MYSQL
 #	define ZBX_SQL_SORT_ASC(field)	field " asc"
 #	define ZBX_SQL_SORT_DESC(field)	field " desc"

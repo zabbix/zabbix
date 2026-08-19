@@ -14,8 +14,7 @@
 
 #include "cep_correlation.h"
 #include "cep_task.h"
-
-#include "zabbix_server/cep/cep_event.h"
+#include "cep_event.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcalc.h"
@@ -570,18 +569,12 @@ out:
 static zbx_db_event	*cep_create_close_event(const zbx_db_event *problem)
 {
 	zbx_db_event	*ok;
+	zbx_cep_origin_t	origin = {.source = problem->source, .object = problem->object,
+					.objectid = problem->objectid};
 
-	ok = (zbx_db_event *)zbx_malloc(NULL, sizeof(zbx_db_event));
-	memset(ok, 0, sizeof(zbx_db_event));
-	ok->clock = problem->clock;
-	ok->ns = problem->ns;
-	ok->source = problem->source;
-	ok->object = problem->object;
-	ok->objectid = problem->objectid;
-	ok->name = zbx_strdup(NULL, problem->name);
-	ok->value = TRIGGER_VALUE_OK;
+	ok = cep_db_event_create(&origin, problem->name, problem->clock, problem->ns, problem->severity,
+		TRIGGER_VALUE_OK, NULL);
 
-	zbx_vector_tags_ptr_create(&ok->tags);
 	if (0 != problem->tags.values_num)
 	{
 		zbx_vector_tags_ptr_reserve(&ok->tags, (size_t)problem->tags.values_num);
@@ -617,7 +610,6 @@ static void	correlation_add_close_new_task(zbx_vector_mw_task_ptr_t *tasks, cons
 	zbx_db_event	*close_event;
 
 	close_event = cep_create_close_event(db_event);
-	cep_event_expect(close_event);
 
 	task = cep_create_task_event_by_correlation(close_event, result->eventid,
 			result->correlationid, db_event->eventid);
@@ -684,7 +676,6 @@ static void	correlation_add_close_old_tasks(zbx_dbconn_t *db, zbx_uint64_t c_eve
 			continue;
 
 		db_event = zbx_create_trigger_event(&triggers[index], result->clock, result->ns, TRIGGER_VALUE_OK);
-		cep_event_expect(db_event);
 		task = cep_create_task_event_by_correlation(db_event, result->eventid, result->correlationid,
 				c_eventid);
 		zbx_vector_mw_task_ptr_append(tasks, task);
@@ -727,7 +718,7 @@ int	cep_correlate_db_event(const zbx_db_event *db_event, zbx_dbconn_pool_t *dbpo
 	if (NULL == (handle = zbx_correlation_config_open()))
 		return op_result;
 
-	zbx_hashset_create(&results, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&results, 100, ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_correlation_ptr_create(&corr_old);
 	zbx_vector_correlation_ptr_create(&corr_new);

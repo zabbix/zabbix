@@ -32,12 +32,11 @@ zbx_cep_task_group_t;
 
 struct zbx_cep_queue
 {
-	/* remote requests (IPC messages) will be queued as priority tasks */
 	zbx_mw_queue_t	base;
 
 	/* pending tasks grouped by event origin (source, object, objectid), each group enforcing */
-	zbx_hashset_t	groups;
 	/* a limit on parallel tasks with excess tasks stored as pending in the group             */
+	zbx_hashset_t	groups;
 
 	/* number of pending tasks in groups */
 	int		group_tasks_num;
@@ -342,11 +341,27 @@ void	cep_queue_push_completed(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 			zbx_queue_ptr_values_num(&queue->base.completed));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return the number of pending commits in queue                     *
+ *                                                                            *
+ ******************************************************************************/
 int	cep_queue_pending_commits_num(zbx_cep_queue_t *queue)
 {
 	return queue->pending_commits_num;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether a queue is empty                                    *
+ *                                                                            *
+ * Parameters: queue - [IN] queue                                             *
+ *                                                                            *
+ * Return value: SUCCEED - the queue is empty                                 *
+ *               FAIL - the queue has pending, processing, group, or          *
+ *                      completed tasks                                       *
+ *                                                                            *
+ ******************************************************************************/
 int	cep_queue_is_empty(zbx_cep_queue_t *queue)
 {
 	if (0 != queue->base.pending_num || 0 != queue->base.processing_num)

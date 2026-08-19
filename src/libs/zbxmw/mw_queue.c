@@ -169,9 +169,9 @@ void	zbx_mw_queue_push_priority(zbx_mw_queue_t *queue, zbx_mw_task_t *task)
  *             task  - [IN] task to push                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_mw_queue_push_normal(zbx_mw_queue_t *queue, zbx_mw_task_t *tasks)
+void	zbx_mw_queue_push_normal(zbx_mw_queue_t *queue, zbx_mw_task_t *task)
 {
-	zbx_queue_ptr_push(&queue->normal, tasks);
+	zbx_queue_ptr_push(&queue->normal, task);
 	queue->pending_num++;
 	zbx_mw_queue_notify(queue);
 }

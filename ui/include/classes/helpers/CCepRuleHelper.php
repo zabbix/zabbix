@@ -226,6 +226,7 @@ class CCepRuleHelper {
 			self::OP_REMOVE_TAG
 		],
 		self::WHEN_PATTERN_MATCHED => [
+			self::OP_DISCARD,
 			self::OP_CLOSE_EVENT,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,

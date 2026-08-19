@@ -448,6 +448,7 @@ typedef struct
 
 	zbx_vector_dc_httptest_ptr_t	httptests;
 	zbx_hashset_t			items;
+	zbx_hashset_t			groupids;
 }
 ZBX_DC_HOST;
 

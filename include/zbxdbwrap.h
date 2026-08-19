@@ -143,6 +143,7 @@ void	zbx_db_event_add_maintenanceid(zbx_db_event *event, zbx_uint64_t maintenanc
 
 void	zbx_db_trigger_get_all_functionids(const zbx_db_trigger *trigger, zbx_vector_uint64_t *functionids);
 void	zbx_db_trigger_get_functionids(const zbx_db_trigger *trigger, zbx_vector_uint64_t *functionids);
+zbx_uint64_t	zbx_db_trigger_get_first_functionid(const zbx_db_trigger *trigger);
 int	zbx_db_trigger_get_constant(const zbx_db_trigger *trigger, int index, char **out);
 int	zbx_db_trigger_get_all_hostids(const zbx_db_trigger *trigger, const zbx_vector_uint64_t **hostids);
 int	zbx_db_trigger_get_itemid(const zbx_db_trigger *trigger, int index, zbx_uint64_t *itemid);
@@ -217,6 +218,9 @@ int	zbx_macro_trigger_desc_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		char **data, char *error, size_t maxerrlen);
 int	zbx_macro_event_name_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
 		char **data, char *error, size_t maxerrlen);
+int	zbx_macro_trigger_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen);
+
 
 int	zbx_db_trigger_recovery_user_and_func_macro_eval_resolv(zbx_token_type_t token_type, char **value,
 		char **error, va_list args);

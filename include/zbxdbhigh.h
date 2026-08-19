@@ -207,8 +207,8 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS	0x0020
 	zbx_uint64_t		flags;
 }
-
 zbx_db_event;
+
 ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
 
 typedef struct
@@ -551,15 +551,13 @@ int	zbx_db_get_database_type(void);
 
 typedef struct
 {
-	zbx_uint64_t		eventid;
-	int			clock;
-	int			ns;
-	int			value;
-	int			severity;
-	int			mtime;
-	zbx_vector_tags_ptr_t	tags;
-
-	zbx_vector_uint64_t	*maintenanceids;
+	zbx_uint64_t			eventid;
+	int				clock;
+	int				ns;
+	int				value;
+	int				severity;
+	int				mtime;
+	zbx_vector_tags_ptr_t		tags;
 }
 zbx_event_t;
 
@@ -832,6 +830,12 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define ZBX_CONDITION_TYPE_EVENT_TAG_VALUE		26
 #define ZBX_CONDITION_TYPE_SERVICE			27
 #define ZBX_CONDITION_TYPE_SERVICE_NAME			28
+#define ZBX_CONDITION_TYPE_EVENT_OPEN			29
+#define ZBX_CONDITION_TYPE_EVENT_FIRST			30
+#define ZBX_CONDITION_TYPE_EVENT_LAST			31
+#define ZBX_CONDITION_TYPE_EVENT_SYMPTOM		32
+#define ZBX_CONDITION_TYPE_EVENT_COPIED			33
+#define ZBX_CONDITION_TYPE_EVENT_SUPPRESSED		34
 
 #define PROXY_OPERATING_MODE_ACTIVE	0
 #define PROXY_OPERATING_MODE_PASSIVE	1

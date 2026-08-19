@@ -17,8 +17,11 @@
 #include "cep_db.h"
 #include "cep_api.h"
 #include "cep_queue.h"
+#include "cep_rule.h"
 #include "cep_task.h"
 #include "cep_correlation.h"
+#include "cep_rule_operation.h"
+#include "cep_window.h"
 #include "cep_event.h"
 #include "zbx_cep.h"
 #include "zbx_cep_client.h"
@@ -30,7 +33,6 @@
 #include "zbxcommon.h"
 #include "zbxipcservice.h"
 #include "zbxrtc.h"
-#include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxregexp.h"
 #include "zbxserialize.h"
@@ -358,11 +360,15 @@ static void	cep_worker_delete_events(zbx_cep_task_remote_t *task)
  *                                                                            *
  * Parameters: task - [IN/OUT] remote task with pre-allocated response buffer *
  *                                                                            *
+ * Comments: The result is stored in pre-allocated task->response buffer      *
+ *                                                                            *
  ******************************************************************************/
 static void	cep_worker_get_stats(zbx_cep_worker_t *worker, zbx_cep_task_remote_t *task)
 {
-	zbx_cep_stats_t	stats;
-	unsigned char	*ptr = task->response;
+	zbx_cep_stats_t			stats;
+	unsigned char			*ptr = task->response;
+	zbx_cep_window_pool_stats_t	win_stats;
+	zbx_cep_window_pool_t		*pool;
 
 	cep_stats_collect(&stats);
 
@@ -371,6 +377,10 @@ static void	cep_worker_get_stats(zbx_cep_worker_t *worker, zbx_cep_task_remote_t
 			&stats.task_completed_num);
 	zbx_mw_queue_unlock(worker->base.queue);
 
+	cep_window_pool_acquire(&pool);
+	cep_window_pool_get_stats(pool, &win_stats);
+	cep_window_pool_release(&pool);
+
 	ptr += zbx_serialize_value(ptr, stats.events_accessed);
 	ptr += zbx_serialize_value(ptr, stats.events_processed);
 	ptr += zbx_serialize_value(ptr, stats.events_discarded);
@@ -378,8 +388,25 @@ static void	cep_worker_get_stats(zbx_cep_worker_t *worker, zbx_cep_task_remote_t
 	ptr += zbx_serialize_value(ptr, stats.task_internal_num);
 	ptr += zbx_serialize_value(ptr, stats.task_completed_num);
 	ptr += zbx_serialize_value(ptr, stats.events_num);
-	(void)zbx_serialize_value(ptr, stats.objects_num);
+	ptr += zbx_serialize_value(ptr, stats.objects_num);
+	ptr += zbx_serialize_value(ptr, win_stats.windows_num);
+	ptr += zbx_serialize_value(ptr, win_stats.alarms_num);
+	(void)zbx_serialize_value(ptr, win_stats.ticks_num);
 
+}
+
+static void	cep_worker_set_event_cause(zbx_cep_task_remote_t *task)
+{
+	zbx_cep_t	*cep;
+	unsigned char	*ptr = task->message->data;
+	zbx_uint64_t	eventid, cause_eventid;
+
+	ptr += zbx_deserialize_value(ptr, &eventid);
+	(void)zbx_deserialize_value(ptr, &cause_eventid);
+
+	cep_cache_acquire(&cep);
+	cep_set_event_cause(cep, eventid, cause_eventid);
+	cep_cache_release(&cep);
 }
 
 /******************************************************************************
@@ -428,6 +455,9 @@ static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_tas
 		case ZBX_CEP_GET_STATS:
 			cep_worker_get_stats(worker, task);
 			break;
+		case ZBX_CEP_SET_EVENT_CAUSE:
+			cep_worker_set_event_cause(task);
+			break;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -461,19 +491,45 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 		return;
 	}
 
+	cep_stats_update_events_processed(1);
+
 	db_event->eventid = eventid;
 
 	zbx_cep_event_t	*event = cep_event_create(db_event->eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
-			db_event->trigger.triggerid, db_event->name, db_event->clock, db_event->ns,
-			TRIGGER_VALUE_PROBLEM, db_event->severity, &db_event->tags, db_event->suppress);
-
-	cep_cache_acquire(&cep);
-	h = cep_add_event(cep, event);
-	cep_cache_release(&cep);
+			db_event->objectid, db_event->name, db_event->clock, db_event->ns, TRIGGER_VALUE_PROBLEM,
+			db_event->severity, task->flags, 0, &db_event->tags, db_event->suppress);
 
 	cep_stats_update_events_processed(1);
 
-	int	corr_ret;
+	const zbx_cep_rule_t		**rules = NULL;
+	int				rules_num = 0;
+	zbx_cep_config_handle_t		hconfig;
+	zbx_cep_event_context_t		event_ctx = {.db_event = db_event, .event = cep_event_addref(event),
+						.pos = CEP_POS_LAST, .sync_flags = CEP_SYNC_IGNORE};
+	int				corr_ret;
+
+	/* cep config returns NULL handle if there are no cep rules to process */
+	if (NULL != (hconfig = zbx_cep_config_open()))
+	{
+		if (SUCCEED != cep_event_process_rules(hconfig, &rules, &rules_num, &event_ctx, tasks))
+		{
+			cep_cache_acquire(&cep);
+			cep_origin_pending_event_done(cep, &event->origin);
+			cep_cache_release(&cep);
+			zbx_cep_event_release(event);
+			zbx_vector_mw_task_ptr_clear_ext(tasks, cep_task_free);
+
+			goto out;
+		}
+	}
+
+	cep_cache_acquire(&cep);
+	h = cep_add_event(cep, event);
+	event_ctx.hevent = zbx_cep_event_handle_addref(h);
+	cep_cache_release(&cep);
+
+	if (0 != rules_num)
+		cep_event_add_to_rules(&event_ctx, rules, rules_num, tasks);
 
 	corr_ret = cep_correlate_db_event(db_event, worker->dbpool, tasks);
 
@@ -482,7 +538,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 		task->action_state = CEP_ACTION_DISABLED;
 
 	task->event_op = CEP_EVENT_OPEN;
-	task->event = cep_event_addref(event);
+	task->event = cep_event_addref(event_ctx.event);
 	task->hevent = zbx_cep_event_handle_addref(h);
 
 	if (0 != zbx_dc_local_get_itservices_num() && CEP_ACTION_DISABLED != task->action_state)
@@ -497,6 +553,14 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	}
 	else
 		zbx_cep_event_handle_release(h);
+out:
+	cep_event_context_clear(&event_ctx);
+
+	if (hconfig != NULL)
+	{
+		zbx_free(rules);
+		zbx_cep_config_close(hconfig);
+	}
 
 	return;
 }
@@ -520,7 +584,7 @@ static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64
 
 	zbx_cep_event_t	*r_event = cep_event_create(db_event->eventid, EVENT_SOURCE_TRIGGERS,
 		EVENT_OBJECT_TRIGGER, db_event->objectid, db_event->name, db_event->clock, db_event->ns,
-		TRIGGER_VALUE_OK, db_event->severity, &db_event->tags, db_event->suppress);
+		TRIGGER_VALUE_OK, db_event->severity, ZBX_EVENT_NORMAL, 0, &db_event->tags, db_event->suppress);
 
 	cep_cache_acquire(&cep);
 	cep_resolve_trigger_events(cep, r_event, handles);
@@ -640,8 +704,8 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 
 	/* don't cache tags for internal events since they are not used */
 	zbx_cep_event_t	*event = cep_event_create(db_event->eventid, EVENT_SOURCE_INTERNAL, db_event->object,
-			db_event->objectid, db_event->name, db_event->clock, db_event->ns, db_event->value, 0, NULL,
-			NULL);
+			db_event->objectid, db_event->name, db_event->clock, db_event->ns, db_event->value, 0,
+			ZBX_EVENT_NORMAL, 0, NULL, NULL);
 
 	cep_cache_acquire(&cep);
 	h = cep_add_event(cep, event);
@@ -748,7 +812,47 @@ static void	cep_worker_process_task_event(zbx_cep_worker_t *worker, zbx_cep_task
 				task->db_event->object);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() event_op:%d", __func__, task->event_op);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() event_op:%d tasks:%d", __func__, task->event_op, tasks->values_num);
+}
+
+static int	cep_task_sync_event_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_task_sync_event_t	*t1 = *(const zbx_cep_task_sync_event_t * const *)a1;
+	const zbx_cep_task_sync_event_t	*t2 = *(const zbx_cep_task_sync_event_t * const *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(zbx_cep_event_handle_eventid(t1->hevent), zbx_cep_event_handle_eventid(t2->hevent));
+
+	return 0;
+}
+
+static int	cep_task_ack_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_task_acknowledge_t	*ack1 = *(const zbx_cep_task_acknowledge_t * const *)a1;
+	const zbx_cep_task_acknowledge_t	*ack2 = *(const zbx_cep_task_acknowledge_t * const *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(ack1->eventid, ack2->eventid);
+
+	return 0;
+}
+
+static int	cep_task_rule_error_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_task_rule_error_t	*re1 = *(const zbx_cep_task_rule_error_t * const *)a1;
+	const zbx_cep_task_rule_error_t	*re2 = *(const zbx_cep_task_rule_error_t * const *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(re1->ruleid, re2->ruleid);
+
+	return 0;
+}
+
+static int	cep_task_win_sync_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_task_window_sync_t	*ws1 = *(const zbx_cep_task_window_sync_t * const *)a1;
+	const zbx_cep_task_window_sync_t	*ws2 = *(const zbx_cep_task_window_sync_t * const *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(ws1->window, ws2->window);
+
+	return 0;
 }
 
 /******************************************************************************
@@ -760,10 +864,14 @@ static void	cep_worker_process_task_event(zbx_cep_worker_t *worker, zbx_cep_task
  ******************************************************************************/
 static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_task_commit_t *task)
 {
-	zbx_vector_mw_task_ptr_t	event_tasks, add_tags_tasks;
+	zbx_vector_mw_task_ptr_t	event_tasks, add_tags_tasks, sync_tasks, ack_tasks, rule_tasks, win_tasks;
 
 	zbx_vector_mw_task_ptr_create(&event_tasks);
 	zbx_vector_mw_task_ptr_create(&add_tags_tasks);
+	zbx_vector_mw_task_ptr_create(&sync_tasks);
+	zbx_vector_mw_task_ptr_create(&ack_tasks);
+	zbx_vector_mw_task_ptr_create(&rule_tasks);
+	zbx_vector_mw_task_ptr_create(&win_tasks);
 
 	for (int i = 0; i < task->tasks.values_num; i++)
 	{
@@ -774,6 +882,18 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 				break;
 			case CEP_TASK_ADD_TAGS:
 				zbx_vector_mw_task_ptr_append(&add_tags_tasks, task->tasks.values[i]);
+				break;
+			case CEP_TASK_SYNC_EVENT:
+				zbx_vector_mw_task_ptr_append(&sync_tasks, task->tasks.values[i]);
+				break;
+			case CEP_TASK_ACKNOWLEDGE:
+				zbx_vector_mw_task_ptr_append(&ack_tasks, task->tasks.values[i]);
+				break;
+			case CEP_TASK_RULE_ERROR:
+				zbx_vector_mw_task_ptr_append(&rule_tasks, task->tasks.values[i]);
+				break;
+			case CEP_TASK_WINDOW_SYNC:
+				zbx_vector_mw_task_ptr_append(&win_tasks, task->tasks.values[i]);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported task %d in commit",
@@ -820,8 +940,118 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 		}
 	}
 
+	if (0 != sync_tasks.values_num)
+	{
+		zbx_vector_cep_event_update_t	updates;
+
+		zbx_vector_mw_task_ptr_sort(&sync_tasks, cep_task_sync_event_compare);
+		cep_db_sync_events(worker->dbpool, &sync_tasks);
+
+		zbx_vector_cep_event_update_create(&updates);
+
+		for (int i = 0; i < sync_tasks.values_num; i++)
+		{
+			zbx_cep_task_sync_event_t	*sync = (zbx_cep_task_sync_event_t *)sync_tasks.values[i];
+			zbx_cep_event_update_t		update;
+
+			if (0 != (sync->flags & CEP_SYNC_EVENT_TAGS))
+			{
+				update.handle = zbx_cep_event_handle_addref(sync->hevent);
+				update.op = CEP_EVENT_UPDATE_TAGS;
+				zbx_vector_cep_event_update_append(&updates, update);
+			}
+			if (0 != (sync->flags & CEP_SYNC_EVENT_SUPPRESS))
+			{
+				update.handle = zbx_cep_event_handle_addref(sync->hevent);
+				update.op = CEP_EVENT_SUPPRESS;
+				zbx_vector_cep_event_update_append(&updates, update);
+			}
+			if (0 != (sync->flags & CEP_SYNC_EVENT_UNSUPPRESS))
+			{
+				update.handle = zbx_cep_event_handle_addref(sync->hevent);
+				update.op = CEP_EVENT_UNSUPPRESS;
+				zbx_vector_cep_event_update_append(&updates, update);
+			}
+			if (0 != (sync->flags & CEP_SYNC_EVENT_SEVERITY))
+			{
+				update.handle = zbx_cep_event_handle_addref(sync->hevent);
+				update.op = CEP_EVENT_UPDATE_SEVERITY;
+				zbx_vector_cep_event_update_append(&updates, update);
+			}
+		}
+
+		if (0 != updates.values_num)
+			cep_post_event_updates(updates.values, updates.values_num);
+
+		zbx_vector_cep_event_update_destroy(&updates);
+	}
+
+	if (0 != ack_tasks.values_num)
+	{
+		zbx_vector_mw_task_ptr_sort(&ack_tasks, cep_task_ack_compare);
+		cep_db_add_acknowledges(worker->dbpool, &ack_tasks);
+	}
+
+	if (0 != rule_tasks.values_num)
+	{
+		zbx_vector_mw_task_ptr_sort(&rule_tasks, cep_task_rule_error_compare);
+		cep_db_update_rule_errors(worker->dbpool, &rule_tasks);
+	}
+
+	if (0 != win_tasks.values_num)
+	{
+		zbx_vector_mw_task_ptr_sort(&win_tasks, cep_task_win_sync_compare);
+		cep_db_sync_windows(worker->dbpool, &win_tasks);
+	}
+
+
+	zbx_vector_mw_task_ptr_destroy(&win_tasks);
+	zbx_vector_mw_task_ptr_destroy(&rule_tasks);
+	zbx_vector_mw_task_ptr_destroy(&ack_tasks);
+	zbx_vector_mw_task_ptr_destroy(&sync_tasks);
 	zbx_vector_mw_task_ptr_destroy(&add_tags_tasks);
 	zbx_vector_mw_task_ptr_destroy(&event_tasks);
+}
+
+static void	cep_worker_process_task_window(zbx_cep_task_window_t *task, zbx_vector_mw_task_ptr_t *tasks)
+{
+	cep_window_process(task->window, task->now, tasks);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process rule reset task                                           *
+ *                                                                            *
+ * Parameters: task  - [IN] rule reset task                                   *
+ *             tasks - [OUT] new tasks to be queued                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_worker_process_task_rule_reset(zbx_cep_task_rule_reset_t *task, zbx_vector_mw_task_ptr_t *tasks)
+{
+	cep_remove_windows_by_rule(task->ruleid, tasks);
+}
+
+static void	cep_worker_expect_events(zbx_vector_mw_task_ptr_t *tasks)
+{
+	zbx_vector_db_event_t	db_events;
+
+	if (0 == tasks->values_num)
+		return;
+
+	zbx_vector_db_event_create(&db_events);
+
+	for (int i = 0; i < tasks->values_num; i++)
+	{
+		if (CEP_TASK_EVENT != tasks->values[i]->type)
+			continue;
+
+		zbx_vector_db_event_append(&db_events, ((zbx_cep_task_event_t *)tasks->values[i])->db_event);
+	}
+
+	if (0 != db_events.values_num)
+		cep_events_expect(db_events.values, db_events.values_num);
+
+	zbx_vector_db_event_destroy(&db_events);
 }
 
 /******************************************************************************
@@ -881,9 +1111,23 @@ void	*cep_worker_entry(void *args)
 					break;
 				case CEP_TASK_EVENT:
 					cep_worker_process_task_event(worker, (zbx_cep_task_event_t *)task, &tasks);
+					cep_worker_expect_events(&tasks);
 					break;
 				case CEP_TASK_COMMIT:
 					cep_worker_process_task_commit(worker, (zbx_cep_task_commit_t *)task);
+					break;
+				case CEP_TASK_WINDOW:
+					cep_worker_process_task_window((zbx_cep_task_window_t *)task, &tasks);
+					cep_worker_expect_events(&tasks);
+					break;
+				case CEP_TASK_RULE_RESET:
+					cep_worker_process_task_rule_reset((zbx_cep_task_rule_reset_t *)task, &tasks);
+					break;
+				case CEP_TASK_SYNC_EVENT:
+				case CEP_TASK_ACKNOWLEDGE:
+				case CEP_TASK_RULE_ERROR:
+				case CEP_TASK_WINDOW_SYNC:
+					/* nop tasks, contains data for commit */
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN_MSG("unknown task type %d", task->type);

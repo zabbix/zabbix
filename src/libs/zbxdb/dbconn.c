@@ -223,8 +223,8 @@ static void	dbconn_errlog(zbx_dbconn_t *db, zbx_err_codes_t zbx_errno, int db_er
 			s = zbx_dsprintf(NULL, "query failed: [%d] %s", db_errno, db->last_db_strerror);
 			break;
 		case ERR_Z3008:
-			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno,
-					db->last_db_strerror);
+			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s [%s]", db_errno,
+					db->last_db_strerror, context);
 			break;
 		case ERR_Z3009:
 			s = zbx_dsprintf(NULL, "query failed due to read-only transaction: [%d] %s", db_errno,
