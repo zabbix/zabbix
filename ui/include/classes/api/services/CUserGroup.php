@@ -313,8 +313,8 @@ class CUserGroup extends CApiService {
 			'proxy_groups' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxy_groupid']], 'fields' => [
 				'proxy_groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'proxy_mode' =>				['type' => API_INT32, 'in' => implode(',', [PROXY_MODE_ALLOW, PROXY_MODE_DENY])],
-			'proxy_group_mode' =>		['type' => API_INT32, 'in' => implode(',', [PROXY_GROUP_MODE_ALLOW, PROXY_GROUP_MODE_DENY])]
+			'proxy_mode' =>				['type' => API_INT32, 'in' => implode(',', [PROXY_MODE_DENY, PROXY_MODE_ALLOW])],
+			'proxy_group_mode' =>		['type' => API_INT32, 'in' => implode(',', [PROXY_GROUP_MODE_DENY, PROXY_GROUP_MODE_ALLOW])]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -424,8 +424,8 @@ class CUserGroup extends CApiService {
 			'proxy_groups' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxy_groupid']], 'fields' => [
 				'proxy_groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'proxy_mode' =>				['type' => API_INT32, 'in' => implode(',', [PROXY_MODE_ALLOW, PROXY_MODE_DENY])],
-			'proxy_group_mode' =>		['type' => API_INT32, 'in' => implode(',', [PROXY_GROUP_MODE_ALLOW, PROXY_GROUP_MODE_DENY])]
+			'proxy_mode' =>				['type' => API_INT32, 'in' => implode(',', [PROXY_MODE_DENY, PROXY_MODE_ALLOW])],
+			'proxy_group_mode' =>		['type' => API_INT32, 'in' => implode(',', [PROXY_GROUP_MODE_DENY, PROXY_GROUP_MODE_ALLOW])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
