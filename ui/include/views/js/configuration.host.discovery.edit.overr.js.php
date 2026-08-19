@@ -160,6 +160,17 @@
 				does_not_contain:           <?= json_encode(_('does not contain')) ?>,
 				matches:                    <?= json_encode(_('matches')) ?>,
 				does_not_match:             <?= json_encode(_('does not match')) ?>
+			},
+			appendFormData: function (form_element) {
+				var hidden_form = form_element.querySelector('#hidden-form');
+
+				hidden_form && hidden_form.remove();
+				hidden_form = document.createElement('div');
+				hidden_form.id = 'hidden-form';
+
+				hidden_form.appendChild(lldoverrides.overrides.toFragment());
+
+				form_element.appendChild(hidden_form);
 			}
 		};
 
@@ -180,17 +191,13 @@
 			'optag', 'optemplate', 'opinventory'
 		];
 
-		window.lldoverrides.$form = $('form[name="itemForm"]').on('submit', function(e) {
-			var hidden_form = this.querySelector('#hidden-form');
-
-			hidden_form && hidden_form.remove();
-			hidden_form = document.createElement('div');
-			hidden_form.id = 'hidden-form';
-
-			hidden_form.appendChild(lldoverrides.overrides.toFragment());
-
-			this.appendChild(hidden_form);
-		});
+		ZABBIX.EventHub.publish(new CEventHubEvent({
+			data: {},
+			descriptor: {
+				context: 'configuration.host.discovery.edit.overr',
+				action: 'ready'
+			}
+		}));
 	});
 
 	/**
@@ -224,6 +231,7 @@
 		var input = window.document.createElement('input');
 
 		input.type = 'hidden';
+		input.setAttribute('data-field-type', 'hidden');
 		input.value = value;
 		input.name = prefix ? prefix + '[' + name + ']' : name;
 
@@ -467,8 +475,11 @@
 	 * @return {object}  Returns DocumentFragment object.
 	 */
 	Overrides.prototype.toFragment = function() {
-		var frag = document.createDocumentFragment(),
-			iter_step = 0;
+		const frag = window.document.createElement('div');
+		frag.setAttribute('data-field-type', 'set');
+		frag.setAttribute('data-field-name', 'overrides');
+
+		let iter_step = 0;
 
 		this.sort_index.forEach(function(id) {
 			var override = this.data[id],
@@ -712,6 +723,18 @@
 	OverrideEditForm.prototype.filterDynamicRows = function() {
 		var that = this;
 
+		const toggleConditionValue = function(target) {
+			const value_input = target.closest('.form_row').querySelector('.js-value');
+			const show_value = (target.value == <?= CONDITION_OPERATOR_REGEXP ?>
+				|| target.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
+
+			value_input.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_value);
+
+			if (!show_value) {
+				value_input.value = '';
+			}
+		}
+
 		jQuery('#overrides_filters')
 			.dynamicRows({
 				template: '#override-filters-row-tmpl',
@@ -739,7 +762,7 @@
 			.on('afteradd.dynamicRows', (event) => {
 				[...event.currentTarget.querySelectorAll('.js-operator')]
 					.pop()
-					.addEventListener('change', view.toggleConditionValue);
+					.addEventListener('change', (e) => toggleConditionValue(e.currentTarget));
 			})
 			.ready(function() {
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);
@@ -761,7 +784,7 @@
 		jQuery('#overrides-evaltype').trigger('change');
 
 		[...document.getElementById('overrides_filters').querySelectorAll('.js-operator')].map((elem) => {
-			elem.addEventListener('change', view.toggleConditionValue);
+			elem.addEventListener('change', (e) => toggleConditionValue(e.currentTarget));
 		});
 	};
 
