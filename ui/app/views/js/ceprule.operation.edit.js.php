@@ -102,13 +102,21 @@ window.ceprule_operation_edit_popup = new class {
 				}
 			}
 			else if (e.target.classList.contains('js-tag-remove')) {
-				e.target.closest('tr').remove();
+				const row = e.target.closest('tr');
+
+				row.nextElementSibling.remove();
+				row.remove();
+
 				this.form.discoverAllFields();
 				this.#updateAvailablePropertyTypes();
 				this.#updateHoistedLabelsView();
 			}
 			else if (e.target.classList.contains('js-property-remove')) {
-				e.target.closest('tr').remove();
+				const row = e.target.closest('tr');
+
+				row.nextElementSibling.remove();
+				row.remove();
+
 				this.form.discoverAllFields();
 				this.#updateAvailablePropertyTypes();
 				this.#updateHoistedLabelsView();
