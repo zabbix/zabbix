@@ -33,8 +33,8 @@ class CSettings extends CApiService {
 		// Timeouts.
 		'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
 		'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script',
-		'timeout_browser', 'timeout_telemetry_query', 'socket_timeout', 'connect_timeout', 'media_type_test_timeout', 'script_timeout',
-		'item_test_timeout', 'report_test_timeout', 'device_link_timeout',
+		'timeout_browser', 'timeout_telemetry_query', 'socket_timeout', 'connect_timeout', 'media_type_test_timeout',
+		'script_timeout', 'item_test_timeout', 'report_test_timeout', 'device_link_timeout',
 
 		// Trigger displaying options.
 		'custom_color', 'problem_unack_color', 'problem_unack_style', 'problem_ack_color', 'problem_ack_style',

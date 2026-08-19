@@ -44,8 +44,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	// SIGNAL_TYPE_TRACES column names
 	public const TRACES_COLUMNS_COLUMN = [
 		'Timestamp', 'TraceId', 'SpanId', 'ParentSpanId', 'TraceState', 'SpanName', 'SpanKind', 'ServiceName',
-		'ResourceAttributes', 'SpanAttributes', 'ScopeName', 'ScopeVersion', 'Duration', 'StatusCode',
-		'StatusMessage'
+		'ResourceAttributes', 'SpanAttributes', 'ScopeName', 'ScopeVersion', 'Duration', 'StatusCode', 'StatusMessage'
 	];
 	public const TRACES_AGGREGATED_COLUMN = [
 		'Timestamp', 'Duration'
@@ -78,8 +77,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 		],
 		self::METRICS_POINT_GAUGE => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
-			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription',
-			'MetricUnit', 'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags'
+			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
+			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags'
 		],
 		self::METRICS_POINT_HISTOGRAM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
@@ -110,9 +109,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 	];
 	public const METRICS_CONDITIONS_COLUMN = [
 		self::METRICS_POINT_SUM => [
-			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
-			'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes',
-			'Exemplars.FilteredAttributes'
+			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
+			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
 		],
 		self::METRICS_POINT_GAUGE => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
@@ -136,12 +134,12 @@ class CItemTypeTelemetryQuery extends CItemType {
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
-			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift'), 'default' => DB::getDefault('items', 'time_shift')],
-			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit'), 'default' => DB::getDefault('items', 'lookback_limit')],
-			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity'), 'default' => DB::getDefault('items', 'granularity')],
-			'query'				=> ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => self::getQueryFieldValidationRules($item)],
-			'timeout'			=> self::getCreateFieldRule('timeout', $item),
-			'delay'				=> self::getCreateFieldRule('delay', $item)
+			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift'), 'default' => DB::getDefault('items', 'time_shift')],
+			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit'), 'default' => DB::getDefault('items', 'lookback_limit')],
+			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity'), 'default' => DB::getDefault('items', 'granularity')],
+			'query' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => self::getQueryFieldValidationRules($item)],
+			'timeout' =>		self::getCreateFieldRule('timeout', $item),
+			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
 	}
 
@@ -153,12 +151,12 @@ class CItemTypeTelemetryQuery extends CItemType {
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
-			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift')],
-			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
-			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity')],
-			'query'				=> ['type' => API_OBJECT, 'fields' => self::getQueryFieldValidationRules($db_item)],
-			'timeout'			=> self::getUpdateFieldRule('timeout', $db_item),
-			'delay'				=> self::getUpdateFieldRule('delay', $db_item)
+			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift')],
+			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
+			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity')],
+			'query' =>			['type' => API_OBJECT, 'fields' => self::getQueryFieldValidationRules($db_item)],
+			'timeout' =>		self::getUpdateFieldRule('timeout', $db_item),
+			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
 
@@ -170,12 +168,12 @@ class CItemTypeTelemetryQuery extends CItemType {
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
-			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift')],
-			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
-			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity')],
-			'query'				=> ['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'timeout'			=> self::getUpdateFieldRuleInherited('timeout', $db_item),
-			'delay'				=> self::getUpdateFieldRuleInherited('delay', $db_item)
+			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift')],
+			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
+			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity')],
+			'query' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'timeout' =>		self::getUpdateFieldRuleInherited('timeout', $db_item),
+			'delay' =>			self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
 
@@ -184,12 +182,12 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'time_shift'		=> ['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift')],
-			'lookback_limit'	=> ['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
-			'granularity'		=> ['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity')],
-			'query'				=> ['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
-			'timeout'			=> self::getUpdateFieldRuleDiscovered('timeout'),
-			'delay'				=> self::getUpdateFieldRuleDiscovered('delay')
+			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift')],
+			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
+			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity')],
+			'query' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'timeout' =>		self::getUpdateFieldRuleDiscovered('timeout'),
+			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}
 
@@ -400,18 +398,18 @@ class CItemTypeTelemetryQuery extends CItemType {
 		}
 
 		$condition_fields = [
-			'column'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', $condition_column)],
-			'attribute_key'		=> ['type' => API_MULTIPLE, 'rules' => [
+			'column' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', $condition_column)],
+			'attribute_key' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)],
 										'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]],
-			'operator'			=> ['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+			'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)],
 										'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS])],
 									['else' => true, 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])]
 			]],
-			'value'				=> ['type' => API_MULTIPLE, 'rules' => [
+			'value' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
 										'type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
@@ -419,46 +417,46 @@ class CItemTypeTelemetryQuery extends CItemType {
 		];
 
 		return [
-			'signal_type'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::SIGNAL_TYPE_TRACES, self::SIGNAL_TYPE_METRICS, self::SIGNAL_TYPE_LOGS])],
-			'metric_point_type'		=> ['type' => API_MULTIPLE, 'rules' => [
+			'signal_type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::SIGNAL_TYPE_TRACES, self::SIGNAL_TYPE_METRICS, self::SIGNAL_TYPE_LOGS])],
+			'metric_point_type' =>		['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'signal_type', 'in' => self::SIGNAL_TYPE_METRICS],
 												'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::METRICS_POINT_SUM, self::METRICS_POINT_GAUGE, self::METRICS_POINT_HISTOGRAM, self::METRICS_POINT_EXPONENTIAL_HISTOGRAM])],
 											['else' => true, 'type' => API_INT32, 'in' => self::METRICS_POINT_SUM, 'default' => self::METRICS_POINT_SUM]
 			]],
-			'columns'				=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['column', 'attribute_key']], 'fields' => [
-				'column'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', $columns_column)],
-				'attribute_key'			=> ['type' => API_MULTIPLE, 'rules' => [
+			'columns' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['column', 'attribute_key']], 'fields' => [
+				'column' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', $columns_column)],
+				'attribute_key' =>			['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)],
 													'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]]]],
-			'aggregated_columns'	=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['alias']], 'fields' => [
-				'function'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_PERCENTILE])],
-				'column'				=> ['type' => API_MULTIPLE, 'rules' => [
+			'aggregated_columns' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['alias']], 'fields' => [
+				'function' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_PERCENTILE])],
+				'column' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PERCENTILE])],
 													'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $aggregated_column)],
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 				]],
-				'parameters'			=> ['type' => API_MULTIPLE, 'rules' => [
+				'parameters' =>				['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'function', 'in' => AGGREGATE_PERCENTILE],
 													'type' => API_FLOATS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => '0:100'],
 												['else' => true, 'type' => API_OBJECTS, 'length' => 0, 'unset' => true]
 				]],
-				'alias'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				'alias' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]],
-			'filter'				=> ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'evaltype'		=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
-				'formula'		=> ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION],
-											'type' => API_COND_FORMULA, 'flags' => API_REQUIRED],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
+			'filter' =>					['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+				'evaltype' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
+				'formula' =>				['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION],
+													'type' => API_COND_FORMULA, 'flags' => API_REQUIRED],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 				]],
-				'conditions'	=>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION],
-											'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
-												'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
-											] + $condition_fields],
-										['else' => true, 'type' => API_OBJECTS, 'fields' => $condition_fields]
+				'conditions' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+												['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION],
+													'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
+														'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
+													] + $condition_fields],
+												['else' => true, 'type' => API_OBJECTS, 'fields' => $condition_fields]
 				]]
 			]]
 		];
