@@ -42,6 +42,9 @@ window.ceprule_operation_edit_popup = new class {
 	/** @type {Template} */
 	#property_template;
 
+	/** @type {Template} */
+	#error_row_template;
+
 	init({rules, operation, overlay, window_type, operation_types_by_execute_when, execute_when_by_window_type}) {
 		this.#operation_types_by_execute_when = operation_types_by_execute_when;
 		this.#execute_when_for_window_type = execute_when_by_window_type[window_type];
@@ -49,6 +52,7 @@ window.ceprule_operation_edit_popup = new class {
 		this.#overlay = overlay;
 		this.#tag_template = new Template(window['ceprule-operation-condition-tag-template'].innerHTML);
 		this.#property_template = new Template(window['ceprule-operation-condition-property-template'].innerHTML);
+		this.#error_row_template = new Template(window['ceprule-operation-condition-error-row-template'].innerHTML);
 
 		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 		this.#setValues({...operation, window_type: String(window_type)});
@@ -121,11 +125,12 @@ window.ceprule_operation_edit_popup = new class {
 	#addPropertyRow(property) {
 		const row_index = this.form_element.querySelectorAll('#ceprule-operation-filter-table tbody tr').length;
 		const last_tag = window['ceprule-operation-filter-table'].querySelector('.js-filter-tag-label:last-child');
+		const row_errors = this.#error_row_template.evaluateToElement({row_index});
+		const target = this.form_element.querySelector('#ceprule-operation-filter-table tbody');
+		const row = this.#buildPropertyRow(property, row_index);
 
-		this.form_element.querySelector('#ceprule-operation-filter-table tbody')
-			.insertAdjacentElement('beforeend', this.#buildPropertyRow(property, row_index));
-		this.form_element.querySelector('#ceprule-operation-filter-table tbody')
-			.insertAdjacentHTML('beforeend', `<tr><td class="<?= ZBX_STYLE_ERROR_CONTAINER ?>"></td></tr>`);
+		target.insertAdjacentElement('beforeend', row);
+		target.insertAdjacentElement('beforeend', row_errors);
 	}
 
 	#addTagRow(tag) {
@@ -134,8 +139,7 @@ window.ceprule_operation_edit_popup = new class {
 			.querySelector('.js-filter-property-label:first-child');
 
 		const row = this.#buildTagRow(tag, row_index);
-		const row_errors = (new Template(`<tr><td class="<?= ZBX_STYLE_ERROR_CONTAINER ?>"></td></tr>`))
-			.evaluateToElement();
+		const row_errors = this.#error_row_template.evaluateToElement({row_index});
 
 		if (first_property) {
 			const target = first_property.closest('tr');
