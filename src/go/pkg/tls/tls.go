@@ -1255,7 +1255,7 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bo
 		if err != nil {
 			closeErr := c.Close()
 			if closeErr != nil {
-				log.Debugf("Failed to close client: %s", err)
+				log.Debugf("failed to close client: %s", closeErr)
 			}
 
 			return nil, err
