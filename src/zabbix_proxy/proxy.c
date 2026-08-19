@@ -1978,6 +1978,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #else
 #	define TLS_FEATURE_STATUS	" NO"
 #endif
+#if defined(HAVE_APM)
+#	define APM_FEATURE_STATUS	"YES"
+#else
+#	define APM_FEATURE_STATUS	" NO"
+#endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).",
 			ZBX_PROXYMODE_PASSIVE == config_proxymode ? "passive" : "active",
@@ -1992,6 +1997,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "SSH support:           " SSH_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "APM support:           " APM_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
