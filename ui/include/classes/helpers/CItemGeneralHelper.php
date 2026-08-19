@@ -212,6 +212,14 @@ JAVASCRIPT;
 		foreach ($item['preprocessing'] as &$step) {
 			$step['params'] = $step['type'] == ZBX_PREPROC_SCRIPT
 				? [$step['params'], ''] : explode("\n", $step['params']);
+
+			if ($step['type'] == ZBX_PREPROC_PROMETHEUS_PATTERN) {
+				if ($step['params'][1] == ZBX_PREPROC_PROMETHEUS_FUNCTION) {
+					$step['params'][1] = $step['params'][2];
+					$step['params'][2] = '';
+				}
+			}
+
 			$step['sortorder'] = $i++;
 		}
 		unset($step);
@@ -270,7 +278,7 @@ JAVASCRIPT;
 			$item['parameters'] = array_values($item['parameters']);
 		}
 
-		if ($item['tags']) {
+		if (array_key_exists('tags', $item) && $item['tags']) {
 			CArrayHelper::sort($item['tags'], ['tag', 'value']);
 		}
 
@@ -316,9 +324,11 @@ JAVASCRIPT;
 			$delay = timeUnitToSeconds($item['delay']);
 
 			if ($delay == 0 && ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
-					|| $item['type'] == ITEM_TYPE_DEPENDENT || ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-						&& strncmp($item['key'], 'mqtt.get', 8) == 0))) {
-				$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+					|| $item['type'] == ITEM_TYPE_DEPENDENT || $item['type'] == ITEM_TYPE_NESTED
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key'], 'mqtt.get', 8) == 0))) {
+				$item['delay'] = $item['flags'] & ZBX_FLAG_DISCOVERY_RULE
+					? ZBX_LLD_RULE_DELAY_DEFAULT
+					: ZBX_ITEM_DELAY_DEFAULT;
 			}
 		}
 
@@ -545,14 +555,6 @@ JAVASCRIPT;
 	public static function convertFormInputForApi(array $input): array {
 		$field_map = ['key' => 'key_'];
 
-		if ($input['history_mode'] == ITEM_STORAGE_OFF) {
-			$input['history'] = ITEM_NO_STORAGE_VALUE;
-		}
-
-		if ($input['trends_mode'] == ITEM_STORAGE_OFF) {
-			$input['trends'] = ITEM_NO_STORAGE_VALUE;
-		}
-
 		if ($input['type'] == ITEM_TYPE_HTTPAGENT) {
 			$field_map['http_authtype'] = 'authtype';
 			$field_map['http_username'] = 'username';
@@ -572,10 +574,6 @@ JAVASCRIPT;
 
 		if ($input['type'] != ITEM_TYPE_JMX) {
 			$input['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
-		}
-
-		if ($input['request_method'] == HTTPCHECK_REQUEST_HEAD) {
-			$input['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
 		}
 
 		if ($input['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) {
@@ -621,23 +619,26 @@ JAVASCRIPT;
 		}
 		unset($step);
 
-		$tags = [];
+		if (array_key_exists('tags', $input)) {
+			$tags = [];
 
-		foreach ($input['tags'] as $tag) {
-			if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
-				// Skip inherited tags.
-				continue;
+			foreach ($input['tags'] as $tag) {
+				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+					// Skip inherited tags.
+					continue;
+				}
+
+				if ($tag['tag'] !== '' || $tag['value'] !== '') {
+					$tags[] = [
+						'tag' => $tag['tag'],
+						'value' => $tag['value']
+					];
+				}
 			}
 
-			if ($tag['tag'] !== '' || $tag['value'] !== '') {
-				$tags[] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value']
-				];
-			}
+			$input['tags'] = $tags;
 		}
 
-		$input['tags'] = $tags;
 		$custom_intervals = [];
 
 		foreach ($input['delay_flex'] as $interval) {
@@ -694,6 +695,11 @@ JAVASCRIPT;
 	}
 
 	public static function normalizeFormDataPreprocessingStep(array $step): array {
+		$step += [
+			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+			'error_handler_params' => ''
+		];
+
 		if (array_key_exists('params', $step)) {
 			return $step;
 		}

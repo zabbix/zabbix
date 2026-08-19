@@ -1104,7 +1104,8 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->page->login()->open('zabbix.php?action=action.list&eventsource='.$eventsource);
 		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickButtonText('Update');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->getFooter()->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
 		$this->zbxTestCheckHeader($this->event_sources[$data['eventsource']]);
