@@ -410,8 +410,10 @@ class CItemTypeTelemetryQuery extends CItemType {
 									['else' => true, 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])]
 			]],
 			'value' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
+									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])],
 										'type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
+										'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]]
 		];

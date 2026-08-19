@@ -222,6 +222,26 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield '"query.filter.conditions[].value" value empty string for operation equal/notequal/exists' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A or B or C',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => '', 'formulaid' => 'A', 'operator' => CONDITION_OPERATOR_EQUAL],
+							['column' => 'TraceId', 'value' => '', 'formulaid' => 'B', 'operator' => CONDITION_OPERATOR_NOT_EQUAL],
+							['column' => 'Events.Attributes', 'attribute_key' => 'a', 'value' => '', 'formulaid' => 'C', 'operator' => CONDITION_OPERATOR_EXISTS]
+						]
+					]
+				]
+			],
+			null
+		];
+
 		yield '"query.columns[].attribute_key" for complex "query.columns[].column"' => [
 			[
 				'query' => [
@@ -417,6 +437,44 @@ trait traitItemTelemetryQueryTests {
 				]
 			],
 			'Invalid parameter "/1/query/filter/conditions/2": value (formulaid)=(A) already exists.'
+		];
+
+		yield '"query.filter.conditions[].value" value empty string for operation like fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A or B',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => '', 'formulaid' => 'A', 'operator' => CONDITION_OPERATOR_LIKE],
+							['column' => 'TraceId', 'value' => 'a', 'formulaid' => 'B', 'operator' => CONDITION_OPERATOR_NOT_LIKE]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/query/filter/conditions/1/value": cannot be empty.'
+		];
+
+		yield '"query.filter.conditions[].value" value empty string for operation not like fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A or B',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => 'a', 'formulaid' => 'A', 'operator' => CONDITION_OPERATOR_LIKE],
+							['column' => 'TraceId', 'value' => '', 'formulaid' => 'B', 'operator' => CONDITION_OPERATOR_NOT_LIKE]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/query/filter/conditions/2/value": cannot be empty.'
 		];
 
 		yield '"query.columns[].attribute_key" for non complex "query.columns[].column" fail' => [
