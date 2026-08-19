@@ -76,14 +76,9 @@ foreach ($labels as $option => $label) {
 				->addItem((new CCol())
 					->addItem((new CSelect('filter[conditions][#{row_index}][operator]'))
 						->setValue('#{operator}')
-						->addOptions(CSelect::createOptionsFromArray([
-							CONDITION_OPERATOR_EXISTS => _('Exists'),
-							CONDITION_OPERATOR_EQUAL => _('Equals'),
-							CONDITION_OPERATOR_LIKE => _('Contains'),
-							CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist'),
-							CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
-							CONDITION_OPERATOR_NOT_LIKE => _('Does not contain')
-						]))
+						->addOptions(CSelect::createOptionsFromArray(
+							CCepRuleHelper::getTagOperators()
+						))
 					)
 					->addItem((new CCol())
 						->addItem((new CTextBox('filter[conditions][#{row_index}][value]', '#{value}'))

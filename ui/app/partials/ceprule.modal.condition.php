@@ -19,23 +19,6 @@
  * @var array    $data
  */
 
-$condition_type = (new CSelect('type'))
-	->setId('ceprule-condition-type')
-	->setAttribute('autofocus', 'autofocus')
-	->setFocusableElementId('ceprule-condition-type-focus');
-
-foreach (CCepRuleHelper::getConditionLabels() as $value => $name) {
-	$condition_type->addOption(new CSelectOption($value, $name));
-}
-
-$tag_operators = (new CSelect('tag_operator'))
-	->setId('ceprule-condition-type')
-	->setFocusableElementId('ceprule-condition-type-focus');
-
-foreach (CCepRuleHelper::getConditionTagOperators() as $value => $name) {
-	$tag_operators->addOption(new CSelectOption($value, $name));
-}
-
 (new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
@@ -43,7 +26,15 @@ foreach (CCepRuleHelper::getConditionTagOperators() as $value => $name) {
 	->addItem((new CFormGrid())
 		->addItem([
 			new CLabel('Type', 'ceprule-condition-type-focus'),
-			new CFormField($condition_type)
+			new CFormField(
+				(new CSelect('type'))
+					->setId('ceprule-condition-type')
+					->setAttribute('autofocus', 'autofocus')
+					->setFocusableElementId('ceprule-condition-type-focus')
+					->addOptions(CSelect::createOptionsFromArray(
+						CCepRuleHelper::getConditionLabels()
+					))
+			)
 		])
 		->addItem([
 			(new CLabel('Tag', 'ceprule-condition-tag-name'))->setAsteriskMark(),
@@ -52,7 +43,12 @@ foreach (CCepRuleHelper::getConditionTagOperators() as $value => $name) {
 					->setId('ceprule-condition-tag-name')
 					->setAttribute('placeholder', 'tag'),
 				new CObject('&nbsp;'),
-				$tag_operators->setId('ceprule-condition-tag-operator'),
+				(new CSelect('tag_operator'))
+					->setId('ceprule-condition-tag-operator')
+					->setFocusableElementId('ceprule-condition-type-focus')
+					->addOptions(CSelect::createOptionsFromArray(
+						CCepRuleHelper::getTagOperators()
+					)),
 				new CObject('&nbsp;'),
 				(new CTextBox('tag_value'))
 					->setId('ceprule-condition-tag-value')

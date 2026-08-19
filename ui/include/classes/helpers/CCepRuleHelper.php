@@ -267,16 +267,16 @@ class CCepRuleHelper {
 		return $labels[$type];
 	}
 
-	public static function getConditionTagOperators(): array {
+	public static function getTagOperators(): array {
 		return [
+			CONDITION_OPERATOR_EXISTS => _('Exists'),
 			CONDITION_OPERATOR_EQUAL => _('Equals'),
-			CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
 			CONDITION_OPERATOR_LIKE => _('Contains'),
+			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist'),
+			CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
 			CONDITION_OPERATOR_NOT_LIKE => _('Does not contain'),
 			CONDITION_OPERATOR_MORE_EQUAL => _('Is more than or equal'),
-			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal'),
-			CONDITION_OPERATOR_EXISTS => _('Exists'),
-			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist')
+			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal')
 		];
 	}
 
