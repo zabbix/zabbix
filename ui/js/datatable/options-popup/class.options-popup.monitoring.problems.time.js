@@ -69,16 +69,17 @@ class CDataTableOptionsPopupMonitoringProblemsTime extends CDataTableOptionsPopu
 		show_timeline_field.addEventListener('input', e => {
 			e.stopPropagation();
 
-			const column_options = this.getColumn().getColumnOptions();
+			const column_options = {
+				...this.getColumn().getColumnOptions(),
+				show_timeline: e.target.checked ? 1 : 0
+			};
 
-			this.getColumn().setColumnOptions({
-				...column_options,
-				show_timeline: e.target.checked ? '1' : '0'
-			});
+			this.getColumn().setColumnOptions(column_options);
 
 			this.getDataTable().updateUserConfig();
 
 			this.getDataTable().dispatchEvent(CDataTable.EVENT_INIT);
+			this.getDataTable().dispatchEvent(CDataTable.EVENT_SAVE);
 		});
 	}
 }

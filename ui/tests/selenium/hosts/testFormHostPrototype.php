@@ -302,11 +302,11 @@ class testFormHostPrototype extends CLegacyWebTest {
 			}
 		}
 
-		$this->page->removeFocus();
-
 		if (CTestArrayHelper::get($data, 'submit')) {
-			$dialog->getFooter()->query('button:Add')->one()->click();
+			$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		}
+
+		$this->page->removeFocus();
 
 		// Check the results in frontend.
 		$this->assertInlineError($form, $data['inline_errors']);
@@ -923,6 +923,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change name and visible name.
 		$this->zbxTestInputTypeOverwrite('host', $data['name']);
+		// Remove focus, so the inline validation error disappears and the dialog layout is not shifted later.
+		$this->page->removeFocus();
+
 		if (array_key_exists('visible_name', $data)) {
 			$dialog->query('id:name')->one()->fill($data['visible_name']);
 		}
@@ -933,10 +936,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Change host group.
 		if (array_key_exists('hostgroup', $data)) {
 			$this->zbxTestClickXpathWait('//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
-			$this->zbxTestMultiselectClear('group_links_');
-			$this->zbxTestClickButtonMultiselect('group_links_');
-			$this->zbxTestLaunchOverlayDialog('Host groups');
-			$this->zbxTestClickLinkTextWait($data['hostgroup']);
+			$dialog->asForm()->getField('Host groups')->asMultiselect()->select($data['hostgroup']);
 		}
 		// Change host group prototype.
 		if (array_key_exists('group_prototype', $data)) {
@@ -980,10 +980,12 @@ class testFormHostPrototype extends CLegacyWebTest {
 	private function checkFormFields($data) {
 		if (array_key_exists('visible_name', $data)) {
 			$this->zbxTestClickLinkTextWait($data['visible_name']);
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestAssertElementValue('name', $data['visible_name']);
 		}
 		else {
 			$this->zbxTestClickLinkTextWait($data['name']);
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestAssertElementValue('host', $data['name']);
 		}
 

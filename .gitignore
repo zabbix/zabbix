@@ -136,6 +136,7 @@ src/zabbix_server/zabbix_server
 src/libs/test_zbxcommon/test_libzbxcommon_bin
 src/go/bin/zabbix_web_service
 tests/libs/**/grouped-libs-generated.mk
+tests/zabbix_server/**/grouped-libs-generated.mk
 tests/libs/zbxalgo/queue
 tests/libs/zbxalgo/zbx_binary_heap_direct
 tests/libs/zbxalgo/zbx_binary_heap

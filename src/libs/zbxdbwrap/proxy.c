@@ -101,17 +101,14 @@ zbx_host_rights_t;
 static zbx_lld_process_agent_result_func_t	lld_process_agent_result_cb = NULL;
 static zbx_preprocess_item_value_func_t		preprocess_item_value_cb = NULL;
 static zbx_preprocessor_flush_func_t		preprocessor_flush_cb = NULL;
-static zbx_get_denyitemtypes_mask_func_t	get_denyitemtypes_mask_cb = NULL;
 
 void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func,
 	zbx_preprocess_item_value_func_t preprocess_item_value_func,
-	zbx_preprocessor_flush_func_t preprocessor_flush_func,
-	zbx_get_denyitemtypes_mask_func_t get_denyitemtypes_mask_func)
+	zbx_preprocessor_flush_func_t preprocessor_flush_func)
 {
 	lld_process_agent_result_cb = lld_process_agent_result_func;
 	preprocess_item_value_cb = preprocess_item_value_func;
 	preprocessor_flush_cb = preprocessor_flush_func;
-	get_denyitemtypes_mask_cb = get_denyitemtypes_mask_func;
 }
 
 /******************************************************************************
@@ -654,9 +651,6 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 {
 	AGENT_RESULT	result;
 	zbx_log_t	*log;
-
-	if (0 != ZBX_ITEM_TYPE_DENIED(get_denyitemtypes_mask_cb(), item->type))
-		return FAIL;
 
 	if (ITEM_STATUS_ACTIVE != item->status)
 		return FAIL;
@@ -2434,9 +2428,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, con
 	const char		*p = NULL;
 	time_t			itemtime;
 	char			host[ZBX_HOSTNAME_BUF_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
-				dns[ZBX_INTERFACE_DNS_LEN_MAX], tmp[MAX_STRING_LEN], *host_metadata = NULL;
+				dns[ZBX_INTERFACE_DNS_LEN_MAX], tmp[MAX_STRING_LEN], host_metadata[MAX_BUFFER_LEN];
 	unsigned short		port;
-	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
 
 	zbx_vector_autoreg_host_ptr_t	autoreg_hosts;
 
@@ -2450,7 +2443,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, con
 	}
 
 	zbx_vector_autoreg_host_ptr_create(&autoreg_hosts);
-	host_metadata = (char *)zbx_malloc(host_metadata, host_metadata_alloc);
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
@@ -2474,12 +2466,12 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, con
 			continue;
 		}
 
-		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOST_METADATA,
-				&host_metadata, &host_metadata_alloc, NULL))
+		if (NULL == zbx_json_pair_by_name(&jp_row, ZBX_PROTO_TAG_HOST_METADATA))
 		{
 			*host_metadata = '\0';
 		}
-		else if (MAX_BUFFER_LEN <= strlen(host_metadata))
+		else if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST_METADATA, host_metadata,
+				sizeof(host_metadata), NULL))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot process auto registration for host \"%s\":"
 					" host metadata is too long", host);
@@ -2566,7 +2558,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, con
 		zbx_autoreg_host_invalidate_cache(&autoreg_hosts);
 	}
 
-	zbx_free(host_metadata);
 	zbx_vector_autoreg_host_ptr_clear_ext(&autoreg_hosts, autoreg_host_free_cb);
 	zbx_vector_autoreg_host_ptr_destroy(&autoreg_hosts);
 

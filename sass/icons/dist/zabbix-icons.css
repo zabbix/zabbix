@@ -1,9 +1,9 @@
 @font-face {
   font-family: "zabbix-icons";
-  src: url("zabbix-icons.woff2?t=1782391548915") format("woff2"),
-  url("zabbix-icons.woff?t=1782391548915") format("woff"),
-  url('zabbix-icons.ttf?t=1782391548915') format('truetype'),
-  url('zabbix-icons.svg?t=1782391548915#zabbix-icons') format('svg');
+  src: url("zabbix-icons.woff2?t=1787129458616") format("woff2"),
+  url("zabbix-icons.woff?t=1787129458616") format("woff"),
+  url('zabbix-icons.ttf?t=1787129458616') format('truetype'),
+  url('zabbix-icons.svg?t=1787129458616#zabbix-icons') format('svg');
 }
 
 [class^="zi-"]::before, [class*=" zi-"]::before {
@@ -122,7 +122,7 @@
 .zi-star-filled:before { content: "\ea6b"; }
 .zi-star:before { content: "\ea6c"; }
 .zi-stop-sign:before { content: "\ea6d"; }
-.zi-support:before { content: "\ea6e"; }
+.zi-subscriptions:before { content: "\ea6e"; }
 .zi-text:before { content: "\ea6f"; }
 .zi-time-period:before { content: "\ea70"; }
 .zi-times:before { content: "\ea71"; }
