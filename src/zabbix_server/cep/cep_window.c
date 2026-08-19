@@ -932,19 +932,17 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	}
 
 	if (window->time_created + window->duration <= now)
+	{
 		cep_window_close(rule, window, tasks);
 
-	cep_window_pool_acquire(&pool);
-
-	/* window was closed - 're-create' it */
-	if (window->time_created + window->duration <= now)
-	{
 		while (window->time_created + window->duration <= now)
 			window->time_created += window->duration;
 
 		window->flags = CEP_WINDOW_FLAGS_NONE;
 		cep_window_sync_entry_log_reset(window);
 	}
+
+	cep_window_pool_acquire(&pool);
 
 	if (0 != zbx_queue_ptr_values_num(&window->hevents) || 0 != window->access_num)
 	{

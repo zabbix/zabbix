@@ -2091,7 +2091,7 @@ time_t	cep_rule_get_window_start_time(zbx_cep_t *cep, zbx_uint64_t ruleid, int d
 	}
 	else
 	{
-		while (rt->window_start + duration < now)
+		while (rt->window_start + duration <= now)
 			rt->window_start += duration;
 	}
 
