@@ -164,16 +164,12 @@ class CUserGroup extends CApiService {
 
 		// proxyids
 		if (array_key_exists('proxyids', $options) && $options['proxyids'] !== null) {
-			zbx_value2array($options['proxyids']);
-
 			$sqlParts['join']['up'] = ['table' => 'usrgrp_proxy', 'using' => 'usrgrpid'];
 			$sqlParts['where'][] = dbConditionInt('up.proxyid', $options['proxyids']);
 		}
 
 		// proxy_groupids
 		if (array_key_exists('proxy_groupids', $options) && $options['proxy_groupids'] !== null) {
-			zbx_value2array($options['proxy_groupids']);
-
 			$sqlParts['join']['ugp'] = ['table' => 'usrgrp_proxy_group', 'using' => 'usrgrpid'];
 			$sqlParts['where'][] = dbConditionInt('ugp.proxy_groupid', $options['proxy_groupids']);
 		}
