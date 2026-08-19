@@ -1814,13 +1814,13 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0'
+				'default' => '1'
 			],
 			'proxy_group_mode' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0'
+				'default' => '1'
 			]
 		]
 	],

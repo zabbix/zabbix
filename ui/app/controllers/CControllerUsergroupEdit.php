@@ -92,8 +92,8 @@ class CControllerUsergroupEdit extends CController {
 			'debug_mode' => $db_defaults['debug_mode'],
 			'mfa_status' => $mfa_config_status == MFA_ENABLED ? GROUP_MFA_ENABLED : GROUP_MFA_DISABLED,
 			'mfaid' => 0,
-			'proxy_mode' => PROXY_MODE_DENY,
-			'proxy_group_mode' => PROXY_GROUP_MODE_DENY
+			'proxy_mode' => PROXY_MODE_ALLOW,
+			'proxy_group_mode' => PROXY_GROUP_MODE_ALLOW
 		];
 
 		if ($this->hasInput('usrgrpid')) {
