@@ -259,8 +259,7 @@ class CEvent extends CApiService {
 					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
 				}
 			}
-
-			if ($options['source'] == EVENT_SOURCE_DISCOVERY) {
+			elseif ($options['source'] == EVENT_SOURCE_DISCOVERY) {
 				if ($options['object'] == EVENT_OBJECT_DHOST) {
 					$sql_parts['join']['dh'] = ['table' => 'dhosts', 'on' => ['objectid' => 'dhostid']];
 					$sql_parts['join']['dr'] = ['left_table' => 'dh', 'table' => 'drules', 'using' => 'druleid'];
@@ -271,7 +270,9 @@ class CEvent extends CApiService {
 					$sql_parts['join']['dr'] = ['left_table' => 'dc', 'table' => 'drules', 'using' => 'druleid'];
 				}
 
-				$sql_parts['join']['p'] = ['type' => 'left', 'left_table' => 'dr', 'table' => 'proxy', 'using' => 'proxyid'];
+				$sql_parts['join']['p'] = [
+					'type' => 'left', 'left_table' => 'dr', 'table' => 'proxy', 'using' => 'proxyid'
+				];
 				$sql_parts['where'][] = '('.
 					'dr.proxyid IS NULL'.
 					' OR '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
