@@ -329,11 +329,7 @@ if ($data['is_item_testable']) {
 	]);
 }
 else {
-	$form->addItem(
-		(new CInput('hidden', 'get_value', 0))
-			->setAttribute('data-field-type', 'hidden')
-			->removeId()
-	);
+	$form->addVar('get_value', 0);
 }
 
 $form_grid->addItem([
