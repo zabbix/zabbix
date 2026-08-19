@@ -662,7 +662,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'description' => 'Minimal metrics exponential histogram test',
 				'item' => self::tqItem(
 					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
-					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM,
 					[],
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
@@ -1103,7 +1103,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'description' => 'Metrics exponential histogram all columns test with AND evaltype',
 				'item' => self::tqItem(
 					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
-					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM,
 					[
 						self::qcol('ResourceAttributes', 'host.name'),
 						self::qcol('ResourceSchemaUrl'),

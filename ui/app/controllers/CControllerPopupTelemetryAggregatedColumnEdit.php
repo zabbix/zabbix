@@ -37,7 +37,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
 					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
-					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
 				]
 			],
 			'existing_aliases' => ['array', 'field' => ['string']],
@@ -100,7 +100,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
 					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
-					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
 				]
 			],
 			'function' => ['integer', 'required',

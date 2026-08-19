@@ -411,7 +411,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
 					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
-					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
 				],
 				'when' => [
 					['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]],

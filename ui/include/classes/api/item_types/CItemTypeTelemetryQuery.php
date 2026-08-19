@@ -33,7 +33,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	public const METRICS_POINT_SUM = 0;
 	public const METRICS_POINT_GAUGE = 1;
 	public const METRICS_POINT_HISTOGRAM = 2;
-	public const METRICS_POINT_EXPHISTOGRAM = 3;
+	public const METRICS_POINT_EXPONENTIAL_HISTOGRAM = 3;
 
 	// Column names require "attribute_key" to be set.
 	public const COMPLEX_COLUMN_NAME = [
@@ -86,7 +86,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
 			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Flags', 'Min', 'Max', 'AggregationTemporality'
 		],
-		self::METRICS_POINT_EXPHISTOGRAM => [
+		self::METRICS_POINT_EXPONENTIAL_HISTOGRAM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
 			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
 			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Scale', 'ZeroCount', 'PositiveOffset',
@@ -103,7 +103,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 		self::METRICS_POINT_HISTOGRAM => [
 			'ScopeDroppedAttrCount', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Min', 'Max'
 		],
-		self::METRICS_POINT_EXPHISTOGRAM => [
+		self::METRICS_POINT_EXPONENTIAL_HISTOGRAM => [
 			'ScopeDroppedAttrCount', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Scale', 'ZeroCount',
 			'PositiveOffset', 'NegativeOffset', 'Min', 'Max'
 		]
@@ -122,7 +122,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
 			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
 		],
-		self::METRICS_POINT_EXPHISTOGRAM => [
+		self::METRICS_POINT_EXPONENTIAL_HISTOGRAM => [
 			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
 			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
 		]
@@ -422,7 +422,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'signal_type'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::SIGNAL_TYPE_TRACES, self::SIGNAL_TYPE_METRICS, self::SIGNAL_TYPE_LOGS])],
 			'metric_point_type'		=> ['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'signal_type', 'in' => self::SIGNAL_TYPE_METRICS],
-												'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::METRICS_POINT_SUM, self::METRICS_POINT_GAUGE, self::METRICS_POINT_HISTOGRAM, self::METRICS_POINT_EXPHISTOGRAM])],
+												'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::METRICS_POINT_SUM, self::METRICS_POINT_GAUGE, self::METRICS_POINT_HISTOGRAM, self::METRICS_POINT_EXPONENTIAL_HISTOGRAM])],
 											['else' => true, 'type' => API_INT32, 'in' => self::METRICS_POINT_SUM, 'default' => self::METRICS_POINT_SUM]
 			]],
 			'columns'				=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['column', 'attribute_key']], 'fields' => [

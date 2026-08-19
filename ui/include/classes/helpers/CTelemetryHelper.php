@@ -77,7 +77,7 @@ class CTelemetryHelper {
 			CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 			CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
 			CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
-			CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
+			CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
 		];
 		$signal_types = [
 			CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
@@ -174,12 +174,12 @@ class CTelemetryHelper {
 			],
 			['string', 'required', 'not_empty',
 				'in' => self::getSectionColumns($section, CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
-					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
 				),
 				'messages' => ['in' => _('This column is not available for the selected metric points.')],
 				'when' => [
 					['../signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS]],
-					['../metric_point_type', 'in' => [CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM]],
+					['../metric_point_type', 'in' => [CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM]],
 					...$function_when
 				]
 			]

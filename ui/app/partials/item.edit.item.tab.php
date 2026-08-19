@@ -668,7 +668,7 @@ $formgrid
 				->addValue(_('Sum'), CItemTypeTelemetryQuery::METRICS_POINT_SUM)
 				->addValue(_('Gauge'), CItemTypeTelemetryQuery::METRICS_POINT_GAUGE)
 				->addValue(_('Histogram'), CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM)
-				->addValue(_('Exponential histogram'), CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM)
+				->addValue(_('Exponential histogram'), CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM)
 				->setModern()
 				->setReadonly($readonly)
 		))->setId('js-item-metric-point-type-field')

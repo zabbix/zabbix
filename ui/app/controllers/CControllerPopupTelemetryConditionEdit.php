@@ -36,7 +36,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
 					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
-					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
 				]
 			]
 		]];
@@ -84,7 +84,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
 					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
 					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
-					CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
 				]
 			],
 			'column' => ['string', 'required', 'not_empty'],

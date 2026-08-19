@@ -3861,7 +3861,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 			CXmlConstantValue::TQ_METRICS_POINT_TYPE_SUM => CXmlConstantName::TQ_METRICS_POINT_TYPE_SUM,
 			CXmlConstantValue::TQ_METRICS_POINT_TYPE_GAUGE => CXmlConstantName::TQ_METRICS_POINT_TYPE_GAUGE,
 			CXmlConstantValue::TQ_METRICS_POINT_TYPE_HISTOGRAM => CXmlConstantName::TQ_METRICS_POINT_TYPE_HISTOGRAM,
-			CXmlConstantValue::TQ_METRICS_POINT_TYPE_EXPHISTOGRAM => CXmlConstantName::TQ_METRICS_POINT_TYPE_EXPHISTOGRAM
+			CXmlConstantValue::TQ_METRICS_POINT_TYPE_EXPONENTIAL_HISTOGRAM => CXmlConstantName::TQ_METRICS_POINT_TYPE_EXPONENTIAL_HISTOGRAM
 		];
 		$aggregated_function = [
 			CXmlConstantValue::AGGREGATE_MIN => CXmlConstantName::MIN,

@@ -79,7 +79,7 @@ abstract class CControllerItem extends CController {
 			'lookback_limit'		=> 'db items.lookback_limit',
 			'granularity'			=> 'db items.granularity',
 			'signal_type'			=> 'in '.implode(',', [CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES, CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS, CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS]),
-			'metric_point_type'		=> 'in '.implode(',', [CItemTypeTelemetryQuery::METRICS_POINT_SUM, CItemTypeTelemetryQuery::METRICS_POINT_GAUGE, CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM, CItemTypeTelemetryQuery::METRICS_POINT_EXPHISTOGRAM]),
+			'metric_point_type'		=> 'in '.implode(',', [CItemTypeTelemetryQuery::METRICS_POINT_SUM, CItemTypeTelemetryQuery::METRICS_POINT_GAUGE, CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM, CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM]),
 			'columns'				=> 'array',
 			'aggregated_columns'	=> 'array',
 			'evaltype'				=> 'in '.implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]),
