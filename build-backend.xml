@@ -336,7 +336,6 @@
 	</target>
 
 	<target name="java-tests" depends="make-dist">
-		<!-- Test the Java gateway; reuses the --enable-java configure from make-dist -->
 		<exec executable="make" failonerror="on">
 			<arg line="-C"/>
 			<arg line="src/zabbix_java"/>
