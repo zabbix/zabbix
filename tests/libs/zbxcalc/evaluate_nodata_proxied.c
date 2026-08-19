@@ -21,8 +21,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
 #include "zbxhistory.h"
-#include "zbxexpression.h"
-#include "../../src/libs/zbxexpression/evalfunc.h"
+#include "zbxcalc.h"
 
 #include "zbxnum.h"
 #include "zbxvariant.h"
@@ -178,11 +177,10 @@ static unsigned char	str_to_dc_flag(const char *str)
 }
 
 static void	zbx_dummy_history_sync(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
+		zbx_history_sync_stats_t *stats)
 {
 	ZBX_UNUSED(events_cbs);
 	ZBX_UNUSED(rtc);
-	ZBX_UNUSED(config_history_storage_pipelines);
 
 	memset(stats, 0, sizeof(zbx_history_sync_stats_t));
 }
@@ -342,6 +340,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	handle;
 	zbx_variant_t		returned_value;
 	zbx_dc_evaluate_item_t	evaluate_item;
+	zbx_history_selector_t	selector = {0};
 
 	ZBX_UNUSED(state);
 
@@ -397,7 +396,7 @@ void	zbx_mock_test_entry(void **state)
 	evaluate_item.host = item.host.host;
 	evaluate_item.key_orig = item.key_orig;
 
-	returned_ret = zbx_evaluate_function(&returned_value, &evaluate_item, "nodata", params, &ts, &error);
+	returned_ret = zbx_evaluate_function(&returned_value, &evaluate_item, "nodata", params, &ts, &selector, &error);
 
 	zbx_vc_flush_stats();
 
