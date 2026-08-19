@@ -190,7 +190,7 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['druleid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
 			'proxyid' =>	['type' => API_MULTIPLE, 'rules' => [
 								['if' => static fn(): bool => !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING), 'type' => API_ID, 'flags' => API_REQUIRED],
 								['else' => true, 'type' => API_ID]
