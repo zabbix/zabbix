@@ -429,7 +429,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 												['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)],
 													'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
-			]]]],
+				]]
+			]],
 			'aggregated_columns' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['alias']], 'fields' => [
 				'function' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_PERCENTILE])],
 				'column' =>					['type' => API_MULTIPLE, 'rules' => [
