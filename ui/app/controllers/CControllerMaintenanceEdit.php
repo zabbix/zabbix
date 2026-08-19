@@ -247,15 +247,39 @@ class CControllerMaintenanceEdit extends CController {
 				$db_hosts = $hostids
 					? API::Host()->get([
 						'output' => ['hostid', 'name'],
+						'hostids' => $hostids
+					])
+					: [];
+
+				$groups = $hostids
+					? API::HostGroup()->get([
+						'output' => ['groupid', 'name'],
 						'hostids' => $hostids,
-						'selectHostGroups' => ['groupid', 'name']
+						'preservekeys' => true
+					])
+					: [];
+
+				$groups_rw = ($groups && CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
+					? API::HostGroup()->get([
+						'output' => [],
+						'groupids' => array_keys($groups),
+						'editable' => true,
+						'preservekeys' => true
 					])
 					: [];
 
 				$host_groups = [];
-				foreach ($db_hosts as $host) {
-					$host_groups = array_merge($host_groups, $host['hostgroups']);
+				foreach ($groups as $groupid => $group) {
+					$is_editable = array_key_exists($groupid, $groups_rw);
+
+					if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !$is_editable) {
+						continue;
+					}
+
+					$host_groups[] = $group;
 				}
+
+				CArrayHelper::sort($host_groups, ['name']);
 
 				switch ($this->getInput('context')) {
 					case 'host':
