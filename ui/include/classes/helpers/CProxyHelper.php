@@ -169,7 +169,7 @@ class CProxyHelper {
 			$final_allowed_ids = array_diff(array_keys($all_by_id), $result_deny_ids);
 		}
 		else {
-			$final_allowed_ids = array_keys($all_by_id);
+			$final_allowed_ids = [];
 		}
 
 		$total_objects = count($all_objects);

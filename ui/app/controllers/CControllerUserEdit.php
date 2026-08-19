@@ -264,25 +264,23 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['groups_rights'] = collapseGroupRights(getHostGroupsRights($user_groups));
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
 
-			if ($data['groups']) {
-				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+			$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
-				$db_proxies = API::Proxy()->get([
-					'output' => ['proxyid', 'name'],
-					'proxy_groupids' => 0,
-					'limit' => $limit
-				]);
-				CArrayHelper::sort($db_proxies, ['name']);
+			$db_proxies = API::Proxy()->get([
+				'output' => ['proxyid', 'name'],
+				'proxy_groupids' => 0,
+				'limit' => $limit
+			]);
+			CArrayHelper::sort($db_proxies, ['name']);
 
-				$db_proxy_groups = API::ProxyGroup()->get([
-					'output' => ['proxy_groupid', 'name'],
-					'limit' => $limit
-				]);
-				CArrayHelper::sort($db_proxy_groups, ['name']);
+			$db_proxy_groups = API::ProxyGroup()->get([
+				'output' => ['proxy_groupid', 'name'],
+				'limit' => $limit
+			]);
+			CArrayHelper::sort($db_proxy_groups, ['name']);
 
-				$data['proxies_list'] = CProxyHelper::getProxiesHtml($db_proxies, $data['groups']);
-				$data['proxy_groups_list'] = CProxyHelper::getProxyGroupsHtml($db_proxy_groups, $data['groups']);
-			}
+			$data['proxies_list'] = CProxyHelper::getProxiesHtml($db_proxies, $data['groups']);
+			$data['proxy_groups_list'] = CProxyHelper::getProxyGroupsHtml($db_proxy_groups, $data['groups']);
 		}
 
 		$data['modules_config_enabled'] = $ZBX_FEATURE_FLAGS['modules_config_enabled'];
