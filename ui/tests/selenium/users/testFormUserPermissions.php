@@ -63,6 +63,7 @@ class testFormUserPermissions extends CWebTest {
 				'name' => 'admin_role',
 				'type' => 2,
 				'rules' => [
+					'api.access' => 1,
 					'api' => [
 						'host.create'
 					]

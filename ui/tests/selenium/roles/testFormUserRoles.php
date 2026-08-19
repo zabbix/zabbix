@@ -71,6 +71,7 @@ class testFormUserRoles extends CWebTest {
 				'name' => 'role_for_update',
 				'type' => 1,
 				'rules' => [
+					'api.access' => 1,
 					'api' => [
 						'*.create',
 						'host.*',
@@ -80,11 +81,17 @@ class testFormUserRoles extends CWebTest {
 			],
 			[
 				'name' => 'super_role',
-				'type' => 3
+				'type' => 3,
+				'rules' => [
+					'api.access' => 1
+				]
 			],
 			[
 				'name' => 'role_for_delete',
-				'type' => 3
+				'type' => 3,
+				'rules' => [
+					'api.access' => 1
+				]
 			]
 		]);
 		$this->assertArrayHasKey('roleids', $response);
@@ -633,7 +640,8 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'user_ui_api_deny',
-						'User type' => 'User'
+						'User type' => 'User',
+						'Enabled' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -649,7 +657,8 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'admin_ui_api_deny',
-						'User type' => 'Admin'
+						'User type' => 'Admin',
+						'Enabled' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -665,7 +674,8 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'super_admin_ui_api_deny',
-						'User type' => 'Super admin'
+						'User type' => 'Super admin',
+						'Enabled' => true
 					],
 					'api_methods' => [
 						'dashboard.create',
@@ -682,6 +692,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_api_allow',
 						'User type' => 'User',
+						'Enabled' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -699,6 +710,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_api_allow',
 						'User type' => 'Admin',
+						'Enabled' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -716,6 +728,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_api_allow',
 						'User type' => 'Super admin',
+						'Enabled' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
@@ -891,7 +904,8 @@ class testFormUserRoles extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'user_api',
-						'User type' => 'User'
+						'User type' => 'User',
+						'Enabled' => true
 					],
 					'api_list' => [
 						'action.get', 'alert.get', 'configuration.export', 'configuration.import', 'configuration.importcompare',
@@ -916,7 +930,8 @@ class testFormUserRoles extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'admin_api',
-						'User type' => 'Admin'
+						'User type' => 'Admin',
+						'Enabled' => true
 					],
 					'api_list' => [
 						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'configuration.export',
@@ -959,7 +974,8 @@ class testFormUserRoles extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'super_admin_api',
-						'User type' => 'Super admin'
+						'User type' => 'Super admin',
+						'Enabled' => true
 					],
 					'api_list' => [
 						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'auditlog.get',
@@ -1189,7 +1205,9 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields' => [],
+					'fields' => [
+						'Enabled' => true
+					],
 					'api_methods' => '',
 					'message_header' => 'User role updated'
 				]
@@ -1199,6 +1217,7 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Enabled' => true,
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => ['*.create'],
@@ -1584,6 +1603,9 @@ class testFormUserRoles extends CWebTest {
 			}
 		}
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
+		if ($action === 'create') {
+			$this->assertFalse($this->query('id:api-access')->asCheckbox()->one()->isChecked());
+		}
 		$form->fill($data['fields']);
 
 		if (array_key_exists('write_services', $data) || array_key_exists('read_services', $data)) {
