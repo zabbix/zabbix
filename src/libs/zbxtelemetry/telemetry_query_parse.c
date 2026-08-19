@@ -571,11 +571,6 @@ out:
 	return ret;
 }
 
-static int	tq_validate_str(const char *str)
-{
-	return NULL == str || SUCCEED == zbx_is_utf8(str) ? SUCCEED : FAIL;
-}
-
 static void	tq_set_column_types(zbx_tq_query_t *query)
 {
 	for (int i = 0; i < query->columns.values_num; i++)
@@ -654,7 +649,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for column #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 
-		if (FAIL == tq_validate_str(col->attribute_key))
+		if (SUCCEED != zbx_is_utf8(col->attribute_key))
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not valid UTF-8 for column #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 	}
@@ -696,7 +691,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for aggregated column #%d",
 					ZBX_TQ_QUERY_TAG_ALIAS, i);
 
-		if (FAIL == tq_validate_str(aggr_col->alias))
+		if (SUCCEED != zbx_is_utf8(aggr_col->alias))
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not valid UTF-8 for column #%d",
 					ZBX_TQ_QUERY_TAG_ALIAS, i);
 
@@ -756,7 +751,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 						"\"%s\" is not set for condition #%d",
 						ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 
-			if (FAIL == tq_validate_str(cond->attribute_key))
+			if (SUCCEED != zbx_is_utf8(cond->attribute_key))
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not valid UTF-8 for condition #%d",
 						ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
@@ -765,7 +760,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 				return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for condition #%d",
 						ZBX_TQ_QUERY_TAG_VALUE, i);
 
-			if (FAIL == tq_validate_str(cond->value))
+			if (SUCCEED != zbx_is_utf8(cond->value))
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not valid UTF-8 for condition #%d",
 						ZBX_TQ_QUERY_TAG_VALUE, i);
