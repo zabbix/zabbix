@@ -872,8 +872,9 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 
 		if (ZBX_DB_OK == tnx_err)
 		{
-			zbx_trigger_diff_t	diff, *pdiff = &diff;
+			zbx_trigger_diff_t	diff = {0}, *pdiff = &diff;
 
+			diff.triggerid = triggerid;
 			diff.flags = ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR;
 			diff.state = TRIGGER_STATE_NORMAL;
 			diff.error = "";
