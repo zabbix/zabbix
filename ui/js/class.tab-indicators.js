@@ -836,8 +836,8 @@ class ProxyTimeoutsTabIndicatorItem extends TabIndicatorItem {
 
 class ProxyAccessListTabIndicatorItem extends TabIndicatorItem {
 
-	static PROXY_MODE_DENY = 0;
-	static PROXY_GROUP_MODE_DENY = 0;
+	static PROXY_MODE_ALLOW = 1;
+	static PROXY_GROUP_MODE_ALLOW = 1;
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
@@ -846,14 +846,14 @@ class ProxyAccessListTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const proxy_mode = document.querySelector('[name="proxy_mode"]:checked');
 
-		if (proxy_mode !== null && proxy_mode.value != ProxyAccessListTabIndicatorItem.PROXY_MODE_DENY) {
+		if (proxy_mode !== null && proxy_mode.value != ProxyAccessListTabIndicatorItem.PROXY_MODE_ALLOW) {
 			return true;
 		}
 
 		const proxy_group_mode = document.querySelector('[name="proxy_group_mode"]:checked');
 
 		if (proxy_group_mode !== null
-				&& proxy_group_mode.value != ProxyAccessListTabIndicatorItem.PROXY_GROUP_MODE_DENY) {
+				&& proxy_group_mode.value != ProxyAccessListTabIndicatorItem.PROXY_GROUP_MODE_ALLOW) {
 			return true;
 		}
 
