@@ -527,10 +527,12 @@ window.ceprule_edit_popup = new class {
 				evaltype: '<?= CONDITION_EVAL_TYPE_AND_OR ?>',
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
-				new_tag: '',
 				suppress_duration: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
+				old_tag: '',
+				new_tag: '',
+				tag_name: '',
 				tag_value: '',
 				filter: {
 					evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
@@ -694,14 +696,14 @@ window.ceprule_edit_popup = new class {
 			arguments_str = severity_names[operation.severity];
 		}
 		else if (operation_type == <?= CCepRuleHelper::OP_RENAME_TAG ?>) {
-			arguments_str = `${operation.tag}:${operation.new_tag}`;
+			arguments_str = `${operation.old_tag}:${operation.new_tag}`;
 		}
 		else if ([
 			<?= CCepRuleHelper::OP_SET_TAG_VALUE ?>,
 			<?= CCepRuleHelper::OP_SET_TAG ?>,
 			<?= CCepRuleHelper::OP_ADD_TAG ?>
 		].includes(operation_type)) {
-			arguments_str = `${operation.tag}:${operation.tag_value}`;
+			arguments_str = `${operation.tag_name}:${operation.tag_value}`;
 		}
 
 		const conditions_input_html = Object.values(operation.filter.conditions)

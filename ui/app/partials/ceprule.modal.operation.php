@@ -19,11 +19,6 @@
  * @var array    $data
  */
 
-$execute_when = new CSelect('execute_when');
-foreach (CCepRuleHelper::getOperationExecuteWhenStrings() as $value => $name) {
-	$execute_when->addOption(new CSelectOption($value, $name));
-}
-
 $events_operations = new CSelectOptionGroup(_('Event'));
 $tags_operations = new CSelectOptionGroup(_('Tag'));
 $window_operations = new CSelectOptionGroup(_('Window'));
@@ -143,10 +138,13 @@ foreach ($labels as $option => $label) {
 		)
 		->addItem(new CLabel(_('Execute when'), 'ceprule-operation-execute-when-label'))
 		->addItem(new CFormField(
-			$execute_when
+			(new CSelect('execute_when'))
+				->setId('ceprule-operation-execute-when')
 				->setAttribute('autofocus', '')
 				->setFocusableElementId('ceprule-operation-execute-when-label')
-				->setId('ceprule-operation-execute-when')
+				->addOptions(CSelect::createOptionsFromArray(
+					CCepRuleHelper::getOperationExecuteWhenStrings()
+				))
 		))
 		->addItem(new CLabel('Event tag/property filter'))
 		->addItem(new CFormField((new CRadioButtonList('filter[evaltype]', TAG_EVAL_TYPE_AND_OR))
@@ -178,11 +176,9 @@ foreach ($labels as $option => $label) {
 			->addItem(new CObject('&nbsp;'))
 			->addItem((new CTextAreaFlexible('event_name'))
 				->setMaxlength(DB::getFieldLength('cep_operation', 'event_name'))
-				->setId('ceprule-operation-name-argument')
 				->setAttribute('placeholder', 'name')
 			)
 			->addItem((new CTextBox('tag'))
-				->setId('ceprule-operation-tag-argument')
 				->setAttribute('placeholder', 'tag')
 			)
 			->addItem((new CDateSelector('suppress_duration'))
@@ -192,17 +188,39 @@ foreach ($labels as $option => $label) {
 				->setAriaRequired()
 			)
 		)
-		->addItem((new CFormField())
-			->setId('ceprule-operation-tag-rename-argument')
-			->addItem((new CTextBox('tag'))->setAttribute('placeholder', _('old name')))
-			->addItem(new CObject('&nbsp;'))
-			->addItem((new CTextBox('new_tag'))->setAttribute('placeholder', _('new name')))
+		->addItem(
+			(new CFormField([
+				new CHorList([
+					(new CTextBox('old_tag'))
+						->setAttribute('placeholder', _('old name'))
+						->setErrorLabel(_('old name'))
+						->setErrorContainer('ceprule-operation-tag-rename-error-container'),
+					(new CTextBox('new_tag'))
+						->setAttribute('placeholder', _('new name'))
+						->setErrorLabel(_('new name'))
+						->setErrorContainer('ceprule-operation-tag-rename-error-container')
+				]),
+				(new CDiv())
+					->setId('ceprule-operation-tag-rename-error-container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			]))
+				->setId('ceprule-operation-tag-rename-argument')
 		)
-		->addItem((new CFormField())
-			->setId('ceprule-operation-tag-pair-argument')
-			->addItem((new CTextBox('tag'))->setAttribute('placeholder', _('tag')))
-			->addItem(new CObject('&nbsp;'))
-			->addItem((new CTextBox('tag_value'))->setAttribute('placeholder', _('value')))
+		->addItem(
+			(new CFormField([
+				new CHorList([
+					(new CTextBox('tag_name'))
+						->setAttribute('placeholder', _('tag'))
+						->setErrorContainer('ceprule-operation-tag-pair-error-container'),
+					(new CTextBox('tag_value'))
+						->setAttribute('placeholder', _('value'))
+						->setErrorContainer('ceprule-operation-tag-pair-error-container')
+				]),
+				(new CDiv())
+					->setId('ceprule-operation-tag-pair-error-container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			]))
+				->setId('ceprule-operation-tag-pair-argument')
 		)
 		->addItem((new CFormField())
 			->setId('ceprule-operation-severity-argument')

@@ -150,13 +150,27 @@ class CControllerCepRuleEdit extends CController {
 		if (array_key_exists('operations', $ceprule)) {
 			array_walk($ceprule['operations'], function(array &$operation) {
 
-				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS) {
-					if ($operation['suppress_duration'] === DB::getDefault('cep_operation', 'suppress_duration')) {
-						$operation['suppress_duration'] = '';
-					}
-					else {
-						$operation['suppress_duration'] = date(ZBX_DATE_TIME, $operation['suppress_duration']);
-					}
+				switch ($operation['type']) {
+					case CCepRuleHelper::OP_SUPPRESS:
+						if ($operation['suppress_duration'] === DB::getDefault('cep_operation', 'suppress_duration')) {
+							$operation['suppress_duration'] = '';
+						}
+						else {
+							$operation['suppress_duration'] = date(ZBX_DATE_TIME, $operation['suppress_duration']);
+						}
+						break;
+
+					case CCepRuleHelper::OP_RENAME_TAG:
+						$operation['old_tag'] = $operation['tag'];
+						$operation['tag'] = '';
+						break;
+
+					case CCepRuleHelper::OP_ADD_TAG:
+					case CCepRuleHelper::OP_SET_TAG:
+					case CCepRuleHelper::OP_SET_TAG_VALUE:
+						$operation['tag_name'] = $operation['tag'];
+						$operation['tag'] = '';
+						break;
 				}
 			});
 		}
@@ -216,17 +230,20 @@ class CControllerCepRuleEdit extends CController {
 				'in' => [CCepRuleHelper::OP_SET_NAME]
 			]],
 			'tag' => ['db cep_operation.tag', 'required', 'not_empty', 'when' => ['type', 'in' => [
-				CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE,
 				CCepRuleHelper::OP_INCREASE_TAG_VALUE, CCepRuleHelper::OP_DECREASE_TAG_VALUE,
-				CCepRuleHelper::OP_RENAME_TAG, CCepRuleHelper::OP_REMOVE_TAG
+				CCepRuleHelper::OP_REMOVE_TAG
+			]]],
+			'old_tag' => ['db cep_operation.tag', 'required', 'not_empty', 'when' => ['type', 'in' => [
+				CCepRuleHelper::OP_RENAME_TAG
 			]]],
 			'new_tag' => ['db cep_operation.new_tag', 'required', 'not_empty', 'when' => ['type', 'in' => [
 				CCepRuleHelper::OP_RENAME_TAG
 			]]],
+			'tag_name' => ['db cep_operation.tag', 'required', 'not_empty', 'when' => ['type', 'in' => [
+				CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE
+			]]],
 			'tag_value' => ['db cep_operation.tag_value', 'required', 'when' => ['type', 'in' => [
-				CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE,
-				CCepRuleHelper::OP_INCREASE_TAG_VALUE, CCepRuleHelper::OP_DECREASE_TAG_VALUE,
-				CCepRuleHelper::OP_REMOVE_TAG
+				CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE
 			]]],
 			'severity' => ['db cep_operation.severity', 'required',
 				'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,

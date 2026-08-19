@@ -319,8 +319,10 @@ window.ceprule_operation_edit_popup = new class {
 		this.form_element.querySelector(`[name="execute_when"]`).value = operation.execute_when;
 		this.form_element.querySelector(`[name="window_type"]`).value = operation.window_type;
 		this.form_element.querySelector(`[name="sortorder"]`).value = operation.sortorder;
-		this.form_element.querySelector(`[name="tag_value"]`).value = operation.tag_value;
 		this.form_element.querySelector(`[name="tag"]`).value = operation.tag;
+		this.form_element.querySelector(`[name="tag_name"]`).value = operation.tag_name;
+		this.form_element.querySelector(`[name="tag_value"]`).value = operation.tag_value;
+		this.form_element.querySelector(`[name="old_tag"]`).value = operation.old_tag;
 		this.form_element.querySelector(`[name="new_tag"]`).value = operation.new_tag;
 		this.form_element.querySelector(`[name="suppress_duration"]`).value = operation.suppress_duration;
 		this.form_element.querySelectorAll(`[name="severity"]`).forEach(node => {
@@ -344,79 +346,82 @@ window.ceprule_operation_edit_popup = new class {
 
 	#handleOperationTypeChanged(value) {
 		value = Number(value);
-		const name = window['ceprule-operation-name-argument'];
-		const tag = window['ceprule-operation-tag-argument'];
-		const severity = window['ceprule-operation-severity-argument'];
-		const period = window['ceprule-operation-period-argument'];
-		const tag_pair = window['ceprule-operation-tag-pair-argument'];
-		const tag_rename = window['ceprule-operation-tag-rename-argument'];
 
-		name.style.display = 'none';
-		tag.style.display = 'none';
-		tag.disabled = true;
-		severity.style.display = 'none';
-		period.style.display = 'none';
-		tag_pair.style.display = 'none';
-		tag_rename.style.display = 'none';
+		const fields = {
+			'event_name': this.form.findFieldByName('event_name')._field,
+			'tag': this.form.findFieldByName('tag')._field,
+			'suppress_duration': this.form.findFieldByName('suppress_duration')._field,
+			'old_tag': this.form.findFieldByName('old_tag')._field,
+			'new_tag': this.form.findFieldByName('new_tag')._field,
+			'tag_name': this.form.findFieldByName('tag_name')._field,
+			'tag_value': this.form.findFieldByName('tag_value')._field,
+			'severity': this.form.findFieldByName('severity')._field,
+		};
 
-		if ([
-			<?= CCepRuleHelper::OP_CLONE_FIRST ?>,
-			<?= CCepRuleHelper::OP_CLONE_LAST ?>,
-			<?= CCepRuleHelper::OP_UNSUPPRESS ?>,
-			<?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>,
-			<?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>,
-			<?= CCepRuleHelper::OP_DISCARD ?>,
-			<?= CCepRuleHelper::OP_CLOSE_EVENT ?>
-		].includes(value)) {
-			return;
-		}
+		const dateselector_suppress_duration = document.getElementById('ceprule-operation-period-argument');
+		const row_rename = document.getElementById('ceprule-operation-tag-rename-argument');
+		const row_tag_pair = document.getElementById('ceprule-operation-tag-pair-argument');
+		const row_severity = document.getElementById('ceprule-operation-severity-argument');
 
-		if ([
-			<?= CCepRuleHelper::OP_SUPPRESS ?>
-		].includes(value)) {
-			period.style.display = '';
-			return;
-		}
+		Object.entries(fields).forEach(([field_name, field]) => {
+			field.disabled = true;
 
-		if ([
-			<?= CCepRuleHelper::OP_SET_SEVERITY ?>
-		].includes(value)) {
-			severity.style.display = '';
-			return;
-		}
+			if (['event_name', 'tag'].includes(field_name)) {
+				field.style.display = 'none';
+			}
+		});
 
-		if ([
-			<?= CCepRuleHelper::OP_SET_NAME ?>
-		].includes(value)) {
-			name.style.display = '';
-			return;
-		}
+		dateselector_suppress_duration.style.display = 'none';
+		row_rename.style.display = 'none';
+		row_tag_pair.style.display = 'none';
+		row_severity.style.display = 'none';
 
-		if ([
-			<?= CCepRuleHelper::OP_REMOVE_TAG ?>,
-			<?= CCepRuleHelper::OP_DECREASE_TAG_VALUE ?>,
-			<?= CCepRuleHelper::OP_INCREASE_TAG_VALUE ?>,
-			<?= CCepRuleHelper::OP_REMOVE_TAG ?>
-		].includes(value)) {
-			tag.style.display = '';
-			tag.disabled = false;
-			return;
-		}
+		switch (value) {
+			case <?= CCepRuleHelper::OP_CLONE_FIRST ?>:
+			case <?= CCepRuleHelper::OP_CLONE_LAST ?>:
+			case <?= CCepRuleHelper::OP_UNSUPPRESS ?>:
+			case <?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>:
+			case <?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>:
+			case <?= CCepRuleHelper::OP_DISCARD ?>:
+			case <?= CCepRuleHelper::OP_CLOSE_EVENT ?>:
+				break;
 
-		if ([
-			<?= CCepRuleHelper::OP_RENAME_TAG ?>,
-		].includes(value)) {
-			tag_rename.style.display = '';
-			return;
-		}
+			case <?= CCepRuleHelper::OP_SUPPRESS ?>:
+				fields.suppress_duration.disabled = false;
+				fields.suppress_duration.style.display = '';
+				dateselector_suppress_duration.style.display = '';
+				break;
 
-		if ([
-			<?= CCepRuleHelper::OP_ADD_TAG ?>,
-			<?= CCepRuleHelper::OP_SET_TAG ?>,
-			<?= CCepRuleHelper::OP_SET_TAG_VALUE ?>
-		].includes(value)) {
-			tag_pair.style.display = '';
-			return;
+			case <?= CCepRuleHelper::OP_SET_SEVERITY ?>:
+				row_severity.style.display = '';
+				fields.severity.disabled = false;
+				break;
+
+			case <?= CCepRuleHelper::OP_SET_NAME ?>:
+				fields.event_name.disabled = false;
+				fields.event_name.style.display = '';
+				break;
+
+			case <?= CCepRuleHelper::OP_DECREASE_TAG_VALUE ?>:
+			case <?= CCepRuleHelper::OP_INCREASE_TAG_VALUE ?>:
+			case <?= CCepRuleHelper::OP_REMOVE_TAG ?>:
+				fields.tag.disabled = false;
+				fields.tag.style.display = '';
+				break;
+
+			case <?= CCepRuleHelper::OP_RENAME_TAG ?>:
+				row_rename.style.display = '';
+				fields.old_tag.disabled = false;
+				fields.new_tag.disabled = false;
+				break;
+
+			case <?= CCepRuleHelper::OP_ADD_TAG ?>:
+			case <?= CCepRuleHelper::OP_SET_TAG ?>:
+			case <?= CCepRuleHelper::OP_SET_TAG_VALUE ?>:
+				row_tag_pair.style.display = '';
+				fields.tag_name.disabled = false;
+				fields.tag_value.disabled = false;
+				break;
 		}
 	}
 

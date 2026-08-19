@@ -129,7 +129,9 @@ $form = (new CForm())
 					(new CVar('operations[#{sortorder}][filter][evaltype]', '#{filter.evaltype}'))->removeId(),
 					(new CVar('operations[#{sortorder}][event_name]', '#{event_name}'))->removeId(),
 					(new CVar('operations[#{sortorder}][tag]', '#{tag}'))->removeId(),
+					(new CVar('operations[#{sortorder}][old_tag]', '#{old_tag}'))->removeId(),
 					(new CVar('operations[#{sortorder}][new_tag]', '#{new_tag}'))->removeId(),
+					(new CVar('operations[#{sortorder}][tag_name]', '#{tag_name}'))->removeId(),
 					(new CVar('operations[#{sortorder}][tag_value]', '#{tag_value}'))->removeId(),
 					(new CVar('operations[#{sortorder}][severity]', '#{severity}'))->removeId(),
 					(new CVar('operations[#{sortorder}][suppress_duration]', '#{suppress_duration}'))->removeId()
