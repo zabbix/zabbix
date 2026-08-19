@@ -405,7 +405,7 @@ class CDRule extends CApiService {
 			}
 
 			if (array_key_exists('proxyid', $drule)
-					&& $drule['proxyid'] != $db_drules[$drule['druleid']]['proxyid']) {
+					&& bccomp($drule['proxyid'], $db_drules[$drule['druleid']]['proxyid']) != 0) {
 				$proxyids[$i] = $drule['proxyid'];
 			}
 
