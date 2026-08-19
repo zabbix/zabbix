@@ -348,14 +348,14 @@ window.ceprule_operation_edit_popup = new class {
 		value = Number(value);
 
 		const fields = {
-			'event_name': this.form.findFieldByName('event_name')._field,
-			'tag': this.form.findFieldByName('tag')._field,
-			'suppress_duration': this.form.findFieldByName('suppress_duration')._field,
-			'old_tag': this.form.findFieldByName('old_tag')._field,
-			'new_tag': this.form.findFieldByName('new_tag')._field,
-			'tag_name': this.form.findFieldByName('tag_name')._field,
-			'tag_value': this.form.findFieldByName('tag_value')._field,
-			'severity': this.form.findFieldByName('severity')._field,
+			'event_name': this.form.findFieldByName('event_name').getField(),
+			'tag': this.form.findFieldByName('tag').getField(),
+			'suppress_duration': this.form.findFieldByName('suppress_duration').getField(),
+			'old_tag': this.form.findFieldByName('old_tag').getField(),
+			'new_tag': this.form.findFieldByName('new_tag').getField(),
+			'tag_name': this.form.findFieldByName('tag_name').getField(),
+			'tag_value': this.form.findFieldByName('tag_value').getField(),
+			'severity': this.form.findFieldByName('severity').getField()
 		};
 
 		const dateselector_suppress_duration = document.getElementById('ceprule-operation-period-argument');
