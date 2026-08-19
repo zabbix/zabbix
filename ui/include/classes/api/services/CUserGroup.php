@@ -1316,14 +1316,9 @@ class CUserGroup extends CApiService {
 				continue;
 			}
 
-			if ($db_usrgrps !== null
-					&& array_key_exists($usrgrp['usrgrpid'], $db_usrgrps)
-					&& array_key_exists('proxies', $db_usrgrps[$usrgrp['usrgrpid']])) {
-				$db_proxies = array_column($db_usrgrps[$usrgrp['usrgrpid']]['proxies'], null, 'proxyid');
-			}
-			else {
-				$db_proxies = [];
-			}
+			$db_proxies = $db_usrgrps !== null
+				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['proxies'], null, 'proxyid')
+				: [];
 
 			foreach ($usrgrp['proxies'] as &$proxy) {
 				if (array_key_exists($proxy['proxyid'], $db_proxies)) {
@@ -1377,16 +1372,9 @@ class CUserGroup extends CApiService {
 				continue;
 			}
 
-			if ($db_usrgrps !== null
-					&& array_key_exists($usrgrp['usrgrpid'], $db_usrgrps)
-					&& array_key_exists('proxy_groups', $db_usrgrps[$usrgrp['usrgrpid']])) {
-				$db_proxy_groups = array_column(
-					$db_usrgrps[$usrgrp['usrgrpid']]['proxy_groups'], null, 'proxy_groupid'
-				);
-			}
-			else {
-				$db_proxy_groups = [];
-			}
+			$db_proxy_groups = $db_usrgrps !== null
+				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['proxy_groups'], null, 'proxy_groupid')
+				: [];
 
 			foreach ($usrgrp['proxy_groups'] as &$proxy_groups) {
 				if (array_key_exists($proxy_groups['proxy_groupid'], $db_proxy_groups)) {
