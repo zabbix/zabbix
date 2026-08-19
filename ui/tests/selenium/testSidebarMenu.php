@@ -403,8 +403,8 @@ class testSidebarMenu extends CWebTest {
 		return [
 			[
 				[
-					'section' => 'Support',
-					'link' => 'https://www.zabbix.com/support'
+					'section' => 'Subscriptions',
+					'link' => 'https://www.zabbix.com/subscriptions'
 				]
 			],
 			[

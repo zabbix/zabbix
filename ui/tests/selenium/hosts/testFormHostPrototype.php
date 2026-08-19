@@ -302,11 +302,11 @@ class testFormHostPrototype extends CLegacyWebTest {
 			}
 		}
 
-		$this->page->removeFocus();
-
 		if (CTestArrayHelper::get($data, 'submit')) {
-			$dialog->getFooter()->query('button:Add')->one()->click();
+			$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		}
+
+		$this->page->removeFocus();
 
 		// Check the results in frontend.
 		$this->assertInlineError($form, $data['inline_errors']);
@@ -922,6 +922,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change name and visible name.
 		$this->zbxTestInputTypeOverwrite('host', $data['name']);
+		// Remove focus, so the inline validation error disappears and the dialog layout is not shifted later.
+		$this->page->removeFocus();
+
 		if (array_key_exists('visible_name', $data)) {
 			$dialog->query('id:name')->one()->fill($data['visible_name']);
 		}
