@@ -827,10 +827,10 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	 * @hosts agent
 	 */
 	public function testLogValueTypeJSON_agentRestart() {
-		$this->checkItemState('agent:LOG_JSON_VALUE_TYPE', ITEM_STATE_NORMAL);
+		$this->checkItemState('agent:log['.self::$file_name_log_json.']', ITEM_STATE_NORMAL);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:LOG_JSON_VALUE_TYPE'],
+			'itemids'	=>	self::$itemids['agent:log['.self::$file_name_log_json.']'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON
 		]);
 		$this->assertArrayHasKey('result', $response);
@@ -846,7 +846,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'resuming Zabbix agent checks on host "agent": connection restored');
 
-		$this->checkItemState('agent:LOG_JSON_VALUE_TYPE', ITEM_STATE_NORMAL);
+		$this->checkItemState('agent:log['.self::$file_name_log_json.']', ITEM_STATE_NORMAL);
 
 		$this->assertFalse(
 			self::isLogLinePresent(self::COMPONENT_SERVER, 'Something unexpected has just happened.', false),
