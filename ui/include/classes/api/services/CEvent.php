@@ -270,7 +270,7 @@ class CEvent extends CApiService {
 					$sql_parts['join']['dr'] = ['left_table' => 'dc', 'table' => 'drules', 'using' => 'druleid'];
 				}
 
-				$sql_parts['join']['p'] = [ 'type' => 'left', 'left_table' => 'dr', 'table' => 'proxy',
+				$sql_parts['join']['p'] = ['type' => 'left', 'left_table' => 'dr', 'table' => 'proxy',
 					'using' => 'proxyid'
 				];
 				$sql_parts['where'][] = '('.
