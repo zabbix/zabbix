@@ -285,15 +285,16 @@ class CDRule extends CApiService {
 		}
 
 		// Check drule name duplicates in DB.
-		$db_duplicate = $this->get([
-			'output' => ['name'],
-			'filter' => ['name' => zbx_objectValues($drules, 'name')],
-			'limit' => 1
-		]);
+		$db_duplicate = DBfetch(DBselect(
+			'SELECT name'.
+			' FROM drules'.
+			' WHERE '.dbConditionString('name', array_column($drules, 'name')),
+			1
+		));
 
 		if ($db_duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Discovery rule "%1$s" already exists.', $db_duplicate[0]['name'])
+				_s('Discovery rule "%1$s" already exists.', $db_duplicate['name'])
 			);
 		}
 
@@ -430,15 +431,16 @@ class CDRule extends CApiService {
 			}
 
 			// Check drule name duplicates in DB.
-			$db_duplicate = $this->get([
-				'output' => ['name'],
-				'filter' => ['name' => zbx_objectValues($drule_names_changed, 'name')],
-				'limit' => 1
-			]);
+			$db_duplicate = DBfetch(DBselect(
+				'SELECT name'.
+				' FROM drules'.
+				' WHERE '.dbConditionString('name', array_column($drules, 'name')),
+				1
+			));
 
 			if ($db_duplicate) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Discovery rule "%1$s" already exists.', $db_duplicate[0]['name'])
+					_s('Discovery rule "%1$s" already exists.', $db_duplicate['name'])
 				);
 			}
 		}
