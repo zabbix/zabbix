@@ -27,7 +27,7 @@ class testVfsDevGet extends CIntegrationTest {
 	private static $hostids = [];
 	private static $itemids = [];
 
-	// Real top level disk (and its partitions), discovered in prepareData() and used as expected values.
+	// Test disk (and its partitions), discovered/created in onBeforeTestSuite() and used as expected values.
 	private static $diskName;
 	private static $diskType;
 	private static $diskPath;
@@ -35,6 +35,10 @@ class testVfsDevGet extends CIntegrationTest {
 	private static $diskLogicalBlkSize;
 	private static $diskPhysicalBlkSize;
 	private static $partitionSizes = [];
+
+	// Set if the /dev/<$diskName> node was created by this suite (see createLoopDeviceNode()), so it
+	// can be removed again in clearData() instead of being left behind.
+	private static $diskNodeCreated = false;
 
 	// List of items to check.
 	private static $items = [
@@ -47,18 +51,18 @@ class testVfsDevGet extends CIntegrationTest {
 	];
 
 	/**
-	 * @inheritdoc
+	 * If a block device to test against cannot be found or created, the whole suite is skipped rather
+	 * than failed, since that would be an environment limitation and not something a re-run can fix.
 	 */
-	public function prepareData() {
-		// Only consider devices that also have a real /dev/<name> block special node, since that is
-		// what vfs.dev.get itself relies on for discovery (unlike lsblk, which reads sysfs and can see
-		// devices that have no corresponding node inside a restricted/containerized environment).
-		$name = trim((string) shell_exec(
-				"lsblk -dnlo NAME,TYPE | awk '\$2 == \"disk\" {print \$1}' | while read -r n; do ".
-				'[ -b "/dev/$n" ] && echo "$n" && break; done'
-		));
-		if ($name === '') {
-			throw new Exception('Cannot find a real block device on this host to test vfs.dev.get against.');
+	protected function onBeforeTestSuite() {
+		$name = self::createLoopDeviceNode();
+
+		if ($name === null) {
+			self::markTestSuiteSkipped(
+					'Cannot find or create a real block device on this host to test vfs.dev.get against.'
+			);
+
+			return;
 		}
 
 		self::$diskName = $name;
@@ -80,6 +84,13 @@ class testVfsDevGet extends CIntegrationTest {
 			}
 		}
 
+		parent::onBeforeTestSuite();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function prepareData() {
 		// Create host "agentd" and "agent2".
 		$hosts = [];
 		foreach ([self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 =>
@@ -162,7 +173,8 @@ class testVfsDevGet extends CIntegrationTest {
 	}
 
 	/**
-	 * Remove the hosts (and, with them, the items and history) created for this suite.
+	 * Remove the hosts (and, with them, the items and history) created for this suite, and any
+	 * /dev node this suite created for testing (see createLoopDeviceNode()).
 	 */
 	public static function clearData(): void {
 		if (self::$hostids) {
@@ -171,6 +183,57 @@ class testVfsDevGet extends CIntegrationTest {
 
 		self::$hostids = [];
 		self::$itemids = [];
+
+		if (self::$diskNodeCreated) {
+			shell_exec('rm -f '.escapeshellarg(self::$diskPath));
+			self::$diskNodeCreated = false;
+		}
+	}
+
+	/**
+	 * Get a /dev/<name> block special node for an already existing loop device, creating the node
+	 * itself if needed - the same approach is used everywhere (a real disk on a dev machine and a
+	 * Docker container both go through this), rather than preferring a real disk where one happens
+	 * to be available, so the suite exercises the same code path everywhere it runs.
+	 *
+	 * Loop devices are reported with DEVTYPE=disk in sysfs, exactly like vfs.dev.get relies on for a
+	 * real disk, so this is indistinguishable from one to the item - no actual attached backing file
+	 * is needed, since neither the item nor this suite ever reads the device's contents.
+	 *
+	 * Creating the node (when it does not already exist) requires the CAP_MKNOD capability, which a
+	 * root process has by default even inside a non-privileged Docker container (unlike, say,
+	 * CAP_SYS_ADMIN, which would be needed to losetup a new loop device instead of reusing an
+	 * existing one).
+	 *
+	 * @return string|null
+	 */
+	private static function createLoopDeviceNode() {
+		$name = trim((string) shell_exec('ls -d /sys/class/block/loop* 2>/dev/null | head -1 | xargs -r basename'));
+
+		if ($name === '') {
+			return null;
+		}
+
+		if (trim((string) shell_exec('[ -b '.escapeshellarg('/dev/'.$name).' ] && echo yes')) === 'yes') {
+			return $name;
+		}
+
+		$devt = trim((string) shell_exec('cat '.escapeshellarg('/sys/class/block/'.$name.'/dev').' 2>/dev/null'));
+		[$major, $minor] = array_pad(explode(':', $devt), 2, '');
+
+		if (!ctype_digit($major) || !ctype_digit($minor)) {
+			return null;
+		}
+
+		shell_exec('mknod '.escapeshellarg('/dev/'.$name).' b '.$major.' '.$minor.' 2>/dev/null');
+
+		if (trim((string) shell_exec('[ -b '.escapeshellarg('/dev/'.$name).' ] && echo yes')) !== 'yes') {
+			return null;
+		}
+
+		self::$diskNodeCreated = true;
+
+		return $name;
 	}
 
 	/**
