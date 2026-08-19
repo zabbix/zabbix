@@ -825,7 +825,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 	cep_window_lock(window);
 
-	if (0 == start_time)
+	if (0 != start_time)
 		window->time_created = start_time;
 
 	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) >= window->capacity)
