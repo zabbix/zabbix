@@ -174,6 +174,186 @@ func TestPlugin_execute(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "+windowsCSMISkipsUnavailablePort",
+			args: args{
+				jsonRunner: false,
+			},
+			expectations: []expectation{
+				{
+					args: []string{"--scan", "-j"},
+					out: readControllerFixture(
+						t,
+						"discovery/windows_csmi_scan_with_unavailable_port.json",
+					),
+				},
+				{
+					args: []string{"--scan", "-d", "sat", "-j"},
+					out:  readControllerFixture(t, "discovery/empty_sat_scan.json"),
+				},
+				{
+					args: []string{"-a", "/dev/csmi0,0", "-j"},
+					out:  readControllerFixture(t, "device/csmi/ssd.json"),
+				},
+				{
+					args: []string{"-a", "/dev/csmi0,1", "-j"},
+					err:  errs.New("exit status 2"),
+					out:  readControllerFixture(t, "device/csmi/device_open_error.json"),
+				},
+				{
+					args: []string{"-a", "/dev/csmi0,2", "-j"},
+					out:  readControllerFixture(t, "device/csmi/ssd_secondary.json"),
+				},
+			},
+			wantRunner: &runner{
+				devices: map[string]deviceParser{
+					"/dev/csmi0,0": {
+						ModelName:    "TEST_CSMI_SSD",
+						SerialNumber: "TEST-CSMI-SSD-0001",
+						Info: deviceInfo{
+							Name:     "/dev/csmi0,0",
+							InfoName: "/dev/csmi0,0",
+							DevType:  "ata",
+							name:     "/dev/csmi0,0",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 3}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{
+							Table: []table{
+								{
+									Attrname: "Reallocated_Sector_Ct",
+									ID:       5,
+								},
+								{
+									Attrname: "Power_On_Hours",
+									ID:       9,
+								},
+								{
+									Attrname: "Available_Reservd_Space",
+									ID:       170,
+									Thresh:   10,
+								},
+							},
+						},
+					},
+					"/dev/csmi0,2": {
+						ModelName:    "TEST_CSMI_SSD_SECONDARY",
+						SerialNumber: "TEST-CSMI-SSD-0002",
+						Info: deviceInfo{
+							Name:     "/dev/csmi0,2",
+							InfoName: "/dev/csmi0,2",
+							DevType:  "ata",
+							name:     "/dev/csmi0,2",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 4}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{
+							Table: []table{
+								{
+									Attrname: "Reallocated_Sector_Ct",
+									ID:       5,
+								},
+								{
+									Attrname: "Power_On_Hours",
+									ID:       9,
+								},
+								{
+									Attrname: "Available_Reservd_Space",
+									ID:       170,
+									Thresh:   10,
+								},
+							},
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "+linuxATASkipsUnavailableDevice",
+			args: args{
+				jsonRunner: false,
+			},
+			expectations: []expectation{
+				{
+					args: []string{"--scan", "-j"},
+					out: readControllerFixture(
+						t,
+						"discovery/linux_ata_scan_with_unavailable_device.json",
+					),
+				},
+				{
+					args: []string{"--scan", "-d", "sat", "-j"},
+					out:  readControllerFixture(t, "discovery/empty_sat_scan_linux.json"),
+				},
+				{
+					args: []string{"-a", "/dev/sda", "-j"},
+					out:  readControllerFixture(t, "device/ata/ssd_primary.json"),
+				},
+				{
+					args: []string{"-a", "/dev/sdb", "-j"},
+					out:  readControllerFixture(t, "device/ata/ssd_secondary.json"),
+				},
+				{
+					args: []string{"-a", "/dev/sdc", "-j"},
+					err:  errs.New("exit status 2"),
+					out:  readControllerFixture(t, "device/ata/device_open_error.json"),
+				},
+			},
+			wantRunner: &runner{
+				devices: map[string]deviceParser{
+					"/dev/sda": {
+						ModelName:    "TEST_LINUX_SSD_PRIMARY",
+						SerialNumber: "TEST-LINUX-SSD-0001",
+						Info: deviceInfo{
+							Name:     "/dev/sda",
+							InfoName: "/dev/sda",
+							DevType:  "ata",
+							name:     "/dev/sda",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 4}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{
+							Table: []table{
+								{
+									Attrname: "Reallocated_Sector_Ct",
+									ID:       5,
+								},
+								{
+									Attrname: "Power_On_Hours",
+									ID:       9,
+								},
+							},
+						},
+					},
+					"/dev/sdb": {
+						ModelName:    "TEST_LINUX_SSD_SECONDARY",
+						SerialNumber: "TEST-LINUX-SSD-0002",
+						Info: deviceInfo{
+							Name:     "/dev/sdb",
+							InfoName: "/dev/sdb",
+							DevType:  "ata",
+							name:     "/dev/sdb",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 4}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{
+							Table: []table{
+								{
+									Attrname: "Reallocated_Sector_Ct",
+									ID:       5,
+								},
+								{
+									Attrname: "Power_On_Hours",
+									ID:       9,
+								},
+							},
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
 			name: "+validByIDDevices",
 			args: args{
 				byID:       true,
@@ -951,7 +1131,7 @@ func TestPlugin_execute(t *testing.T) {
 			wantErr:    true,
 		},
 		{
-			name: "-basicSmartScanError",
+			name: "+skipBasicSmartScanError",
 			args: args{jsonRunner: false},
 			expectations: []expectation{
 				{
@@ -970,9 +1150,29 @@ func TestPlugin_execute(t *testing.T) {
 					out: readControllerEnvironment(t, "manually_created_2_basic_devices").
 						AllSmartInfoScans.get(t, "-a /dev/sda -j"),
 				},
+				{
+					args: []string{"-a", "/dev/sdb", "-j"},
+					out: readControllerEnvironment(t, "manually_created_2_basic_devices").
+						AllSmartInfoScans.get(t, "-a /dev/sdb -j"),
+				},
 			},
-			wantRunner: nil,
-			wantErr:    true,
+			wantRunner: &runner{
+				devices: map[string]deviceParser{
+					"/dev/sdb": {
+						ModelName:    "LEFT LEG",
+						SerialNumber: "42070",
+						Info: deviceInfo{
+							Name:     "/dev/sdb",
+							InfoName: "/dev/sdb",
+							DevType:  "nvme",
+							name:     "/dev/sdb",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 1}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+					},
+				},
+			},
+			wantErr: false,
 		},
 		{
 			name: "-basicDeviceNoSmart",
