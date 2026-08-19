@@ -177,16 +177,14 @@ static unsigned char	str_to_dc_flag(const char *str)
 	return 0;
 }
 
-static void	zbx_dummy_history_sync(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
-		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more)
+static void	zbx_dummy_history_sync(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
 {
 	ZBX_UNUSED(events_cbs);
 	ZBX_UNUSED(rtc);
 	ZBX_UNUSED(config_history_storage_pipelines);
 
-	*values_num = 0;
-	*triggers_num = 0;
-	*more = 0;
+	memset(stats, 0, sizeof(zbx_history_sync_stats_t));
 }
 
 /******************************************************************************
@@ -399,7 +397,7 @@ void	zbx_mock_test_entry(void **state)
 	evaluate_item.host = item.host.host;
 	evaluate_item.key_orig = item.key_orig;
 
-	returned_ret = evaluate_function(&returned_value, &evaluate_item, "nodata", params, &ts, &error);
+	returned_ret = zbx_evaluate_function(&returned_value, &evaluate_item, "nodata", params, &ts, &error);
 
 	zbx_vc_flush_stats();
 
