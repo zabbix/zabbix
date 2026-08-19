@@ -1720,7 +1720,7 @@ void	cep_add_event_tags(zbx_cep_t *cep, zbx_vector_event_tags_t *events, zbx_vec
 		{
 			(void)cep_release_event_handle(cep, h);
 			zbx_vector_tag_destroy(&events->values[i].tags);
-			zbx_vector_event_tags_remove_noorder(events, i);
+			zbx_vector_event_tags_remove(events, i);
 		}
 	}
 }
