@@ -605,77 +605,38 @@ class CSvgGraphHelper {
 		 * $metric.
 		 */
 		if ($data_source == SVG_GRAPH_DATA_SOURCE_AUTO) {
-			/**
-			 * First, if global configuration setting "Override item history period" is enabled, override globally
-			 * specified "Data storage period" value to each metric custom history storage duration, converting it
-			 * to seconds. If "Override item history period" is disabled, item level field 'history' will be used
-			 * later, but now we are just storing the field name 'history' in array $to_resolve.
-			 *
-			 * Do the same with trends.
-			 */
-			$to_resolve = [];
+			$metrics = CMacrosResolverHelper::resolveTimeUnitMacros($metrics, ['history', 'trends']);
 
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-				foreach ($metrics as &$metric) {
-					if ($metric['history'] != 0) {
-						$metric['history'] = timeUnitToSeconds(
-							CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)
-						);
-					}
+			foreach ($metrics as $num => &$metric) {
+				[
+					'keep_history' => $metric['history'],
+					'history_has_errors' => $history_has_errors,
+					'keep_trends' => $metric['trends'],
+					'trends_has_errors' => $trends_has_errors
+				] = CItemHelper::getStoragePeriods((int) $metric['value_type'], $metric['history'], $metric['trends']);
+
+				if ($history_has_errors) {
+					$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'history',
+						_('invalid history storage period')
+					);
+					unset($metrics[$num]);
 				}
-				unset($metric);
-			}
-			else {
-				$to_resolve[] = 'history';
-			}
 
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-				foreach ($metrics as &$metric) {
-					if ($metric['trends'] != 0) {
-						$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
-					}
+				if ($trends_has_errors) {
+					$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'trends',
+						_('invalid trend storage period')
+					);
+					unset($metrics[$num]);
 				}
-				unset($metric);
-			}
-			else {
-				$to_resolve[] = 'trends';
-			}
 
-			// If no global history and trend override enabled, resolve 'history' and/or 'trends' values for given $metric.
-			if ($to_resolve) {
-				$metrics = CMacrosResolverHelper::resolveTimeUnitMacros($metrics, $to_resolve);
-				$simple_interval_parser = new CSimpleIntervalParser();
-
-				foreach ($metrics as $num => &$metric) {
-					// Convert its values to seconds.
-					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-						if ($simple_interval_parser->parse($metric['history']) != CParser::PARSE_SUCCESS) {
-							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'history',
-								_('invalid history storage period')
-							);
-							unset($metrics[$num]);
-						}
-						else {
-							$metric['history'] = timeUnitToSeconds($metric['history']);
-						}
-					}
-
-					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-						if ($simple_interval_parser->parse($metric['trends']) != CParser::PARSE_SUCCESS) {
-							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'trends',
-								_('invalid trend storage period')
-							);
-							unset($metrics[$num]);
-						}
-						else {
-							$metric['trends'] = timeUnitToSeconds($metric['trends']);
-						}
-					}
+				if ($metric['history'] === null) {
+					$metric['history'] = 25 * SEC_PER_YEAR;
 				}
-				unset($metric);
-			}
 
-			foreach ($metrics as &$metric) {
+				if ($metric['trends'] === null) {
+					$metric['trends'] = 25 * SEC_PER_YEAR;
+				}
+
 				/**
 				 * History as a data source is used in 2 cases:
 				 * 1) if trends are disabled (set to 0) either for particular $metric item or globally;
@@ -684,24 +645,23 @@ class CSvgGraphHelper {
 				 *
 				 * Use trends otherwise.
 				 */
-				$history = $metric['history'];
-				$trends = $metric['trends'];
 				$time_from = $metric['time_period']['time_from'];
 				$period = $metric['time_period']['time_to'] - $time_from;
 
-				$metric['source'] = ($trends == 0 || (time() - $history < $time_from
-						&& $period / $width <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))
+				$metric['source'] = $metric['trends'] == 0 || (time() - $metric['history'] < $time_from
+						&& $period / $width <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)
 					? SVG_GRAPH_DATA_SOURCE_HISTORY
 					: SVG_GRAPH_DATA_SOURCE_TRENDS;
 			}
+			unset($metric);
 		}
 		else {
 			foreach ($metrics as &$metric) {
 				$metric['source'] = $data_source;
 			}
+			unset($metric);
 		}
 
-		unset($metric);
 	}
 
 	/**

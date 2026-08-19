@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -63,10 +64,12 @@ type mount struct {
 	Type        string `json:"Type"`
 }
 
-func keyContainersHandler(client *http.Client, query string, _ ...string) (string, error) {
+func keyContainersHandler(
+	ctx plugin.ContextProvider, client *http.Client, query string, _ ...string,
+) (string, error) {
 	var data []container
 
-	body, err := queryDockerAPI(client, query)
+	body, err := queryDockerAPI(ctx, client, query)
 	if err != nil {
 		return "", err
 	}

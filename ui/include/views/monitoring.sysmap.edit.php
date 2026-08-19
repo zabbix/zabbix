@@ -31,8 +31,17 @@ if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
+$url = (new CUrl('sysmaps.php'))
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update');
+
+if ($data['form'] !== 'create') {
+	$url->setArgument('sysmapid', $data['sysmap']['sysmapid']);
+}
+
+$url = $url->getUrl();
+
 // Create sysmap form.
-$form = (new CForm())
+$form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sysmaps.php')))->removeId())
 	->setId('sysmap-form')
@@ -71,16 +80,28 @@ $multiselect_data = [
 $map_ownerid = $data['sysmap']['userid'];
 
 if ($map_ownerid != 0) {
-	$multiselect_data['data'][] = array_key_exists($map_ownerid, $data['users'])
-		? [
-			'id' => $map_ownerid,
-			'name' => getUserFullname($data['users'][$map_ownerid])
-		]
-		: [
-			'id' => $map_ownerid,
-			'name' => _('Inaccessible user'),
-			'inaccessible' => true
+	$is_owner_accessible = array_key_exists($map_ownerid, $data['users']);
+
+	if ($data['form'] === 'clone' && !$is_owner_accessible) {
+		$userid = $data['current_user_userid'];
+
+		$multiselect_data['data'][] = [
+			'id' => $userid,
+			'name' => getUserFullname($data['users'][$userid])
 		];
+	}
+	else {
+		$multiselect_data['data'][] = $is_owner_accessible
+			? [
+				'id' => $map_ownerid,
+				'name' => getUserFullname($data['users'][$map_ownerid])
+			]
+			: [
+				'id' => $map_ownerid,
+				'name' => _('Inaccessible user'),
+				'inaccessible' => true
+			];
+	}
 }
 
 // Append multiselect to map tab.
@@ -436,11 +457,11 @@ $sharing_tab = (new CFormList('sharing_form'))
 $tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab, TAB_INDICATOR_SHARING);
 
 // Append buttons to form.
-if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !== 'clone') {
+if ($data['sysmap']['sysmapid'] > 0 && $data['form'] !== 'clone') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new	CButton('clone', _('Clone')),
+			new	CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid']).'&'.
 				CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('sysmaps.php')
 			),
@@ -460,3 +481,5 @@ $form->addItem($tabs);
 $html_page
 	->addItem($form)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");

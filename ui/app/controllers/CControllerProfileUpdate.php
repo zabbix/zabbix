@@ -47,9 +47,9 @@ class CControllerProfileUpdate extends CController {
 				case 'web.hostinventoriesoverview.filter.active':
 				case 'web.hosts.filter.active':
 				case 'web.hosts.graph.list.filter.active':
-				case 'web.hosts.host_discovery.filter.active':
 				case 'web.hosts.httpconf.filter.active':
 				case 'web.hosts.items.list.filter.active':
+				case 'web.hosts.lldrules.filter.active':
 				case 'web.hosts.trigger.list.filter.active':
 				case 'web.hostsmon.filter.active':
 				case 'web.httpdetails.filter.active':
@@ -75,9 +75,9 @@ class CControllerProfileUpdate extends CController {
 				case 'web.templategroups.filter.active':
 				case 'web.templates.filter.active':
 				case 'web.templates.graph.list.filter.active':
-				case 'web.templates.host_discovery.filter.active':
 				case 'web.templates.httpconf.filter.active':
 				case 'web.templates.items.list.filter.active':
+				case 'web.templates.lldrules.filter.active':
 				case 'web.templates.trigger.list.filter.active':
 				case 'web.token.filter.active':
 				case 'web.toptriggers.filter.active':
@@ -85,6 +85,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state':
 				case 'web.user.filter.active':
 				case 'web.user.token.filter.active':
+				case 'web.user.device.list.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
 				case 'web.monitoring.problem.datatable':
@@ -92,6 +93,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.monitoring.hosts.datatable':
 				case 'web.hosts.datatable':
 				case 'web.templates.datatable':
+				case 'web.banner.dismissed_ids':
 					$ret = true;
 					break;
 
@@ -117,6 +119,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.monitoring.hosts.datatable':
 				case 'web.hosts.datatable':
 				case 'web.templates.datatable':
+				case 'web.banner.dismissed_ids':
 					$ret = $this->hasInput('value_str');
 					break;
 
@@ -144,6 +147,7 @@ class CControllerProfileUpdate extends CController {
 		switch ($idx) {
 			// PROFILE_TYPE_STR
 			case 'web.dashboard.last_widget_type':
+			case 'web.banner.dismissed_ids':
 				$value_str = $this->getInput('value_str');
 				if ($value_str === '') {
 					CProfile::delete($idx);

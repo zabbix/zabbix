@@ -47,23 +47,7 @@ class Manager extends CRegistryFactory {
 	 * @return CHistoryManager
 	 */
 	public static function History() {
-		static $instance;
-
-		if ($instance === null) {
-			$instance = self::getInstance()->getObject('history');
-
-			foreach (CSettingsHelper::getDbVersionStatus() as $dbversion) {
-				if (array_key_exists('history_pk', $dbversion)) {
-					if ($dbversion['history_pk'] == 1) {
-						$instance->setPrimaryKeysEnabled();
-					}
-
-					break;
-				}
-			}
-		}
-
-		return $instance;
+		return self::getInstance()->getObject('history');
 	}
 
 	/**

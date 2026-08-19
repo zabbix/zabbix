@@ -60,7 +60,7 @@ zabbix_export:
         See [Huawei support documentation](https://support.huawei.com/enterprise/en/doc/EDOC1100041787/6460e7f3/ar600-series) for details.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1703,7 +1703,7 @@ zabbix_export:
           description: 'Used to include CoS metrics by queue direction: `IN`, `OUT`, or regex (default: `OUT` only).'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Filter for queue direction'
             description: 'Used to include CoS metrics by queue direction: `IN`, `OUT`, or regex (default: `OUT` only).'
@@ -1712,7 +1712,7 @@ zabbix_export:
           description: 'Used to exclude CoS metrics by queue direction: `IN`, `OUT`, or regex (default: `OUT` only).'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'Filter for queue direction'
             description: 'Used to exclude CoS metrics by queue direction: `IN`, `OUT`, or regex (default: `OUT` only).'
@@ -1721,7 +1721,7 @@ zabbix_export:
           description: 'Warning threshold for discarded byte rate (Bps).'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Thresholds
             label: 'Threshold for discarded byte rate (warning)'
             description: 'Warning threshold for discarded byte rate (Bps).'
@@ -1731,7 +1731,7 @@ zabbix_export:
           description: 'Used to include interfaces by name regex (e.g., `^GigabitEthernet0/0/3$`).'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'Filter for interface name'
             description: 'Used to include interfaces by name regex (e.g., `^GigabitEthernet0/0/3$`).'
@@ -1740,7 +1740,7 @@ zabbix_export:
           description: 'Used to exclude interfaces by name regex (e.g., `^GigabitEthernet0/0/3$`).'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'Filter for interface name'
             description: 'Used to exclude interfaces by name regex (e.g., `^GigabitEthernet0/0/3$`).'
@@ -1749,7 +1749,7 @@ zabbix_export:
           description: 'Used to include CoS metrics by queue number regex (e.g., `^(1\|2\|3)$`).'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'Filter for queue number'
             description: 'Used to include CoS metrics by queue number regex (e.g., `^(1\|2\|3)$`).'
@@ -1758,7 +1758,7 @@ zabbix_export:
           description: 'Used to exclude CoS metrics by queue number regex (e.g., `^(1\|2\|3)$`).'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Filters
             label: 'Filter for queue number'
             description: 'Used to exclude CoS metrics by queue number regex (e.g., `^(1\|2\|3)$`).'
@@ -1767,7 +1767,7 @@ zabbix_export:
           description: 'Threshold of jitter values from destination to source for critical trigger in ms.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Thresholds
             label: 'Threshold for jitter values (critical)'
             description: 'Threshold of jitter values from destination to source for critical trigger in ms.'
@@ -1777,7 +1777,7 @@ zabbix_export:
           description: 'Used to include NQA metrics by admin name regex.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Filter for including NQA admin name by regex'
             description: 'Used to include NQA metrics by admin name regex.'
@@ -1786,7 +1786,7 @@ zabbix_export:
           description: 'Used to exclude NQA metrics by admin name regex.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Filter for excluding NQA admin name by regex'
             description: 'Used to exclude NQA metrics by admin name regex.'
@@ -1795,7 +1795,7 @@ zabbix_export:
           description: 'Used to include NQA metrics by test class name regex.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Filter for including NQA test class by regex'
             description: 'Used to include NQA metrics by test class name regex.'
@@ -1804,7 +1804,7 @@ zabbix_export:
           description: 'Used to exclude NQA metrics by test class name regex.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Filter for excluding NQA test class by regex'
             description: 'Used to exclude NQA metrics by test class name regex.'
@@ -1813,7 +1813,7 @@ zabbix_export:
           description: 'Threshold of packet loss ratio in %.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Thresholds
             label: 'Threshold for packet loss (critical)'
             description: 'Threshold of packet loss ratio in %. In the range from 0 to 100 inclusive.'
@@ -1823,7 +1823,7 @@ zabbix_export:
           description: 'Threshold of average RTT in ms.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Thresholds
             label: 'Threshold for average RTT (critical)'
             description: 'Threshold of average RTT in ms.'
@@ -1853,7 +1853,7 @@ zabbix_export:
           description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
             description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
@@ -1863,7 +1863,7 @@ zabbix_export:
           description: 'Maximum threshold of interface bandwidth utilization in %. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
             description: 'Maximum threshold of interface bandwidth utilization in %. Can be used with interface name as context. In the range from 0 to 100 inclusive.'
@@ -1873,7 +1873,7 @@ zabbix_export:
           description: 'Macro for operational state of interface for link down trigger. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Other
             label: 'Interfaces control'
             description: 'Macro for operational state of interface for link down trigger. Can be used with interface name as context.'
@@ -1883,7 +1883,7 @@ zabbix_export:
           description: 'Threshold of memory utilization for trigger in %.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Thresholds
             label: 'Threshold for memory utilization'
             description: 'Threshold of memory utilization for trigger in %. In the range from 0 to 100 inclusive.'
@@ -1893,7 +1893,7 @@ zabbix_export:
           description: 'This macro is used to include network interfaces by their administrative status.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Filter for network interface by adminstatus'
             description: 'This macro is used to include network interfaces by their administrative status.'
@@ -1902,7 +1902,7 @@ zabbix_export:
           description: 'This macro is used to exclude network interfaces by their administrative status.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Filter for network interface by adminstatus (exclude)'
             description: 'This macro is used to exclude network interfaces by their administrative status.'
@@ -1911,7 +1911,7 @@ zabbix_export:
           description: 'This macro is used to include network interfaces by their alias.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Filter for network interfaces by alias'
             description: 'This macro is used to include network interfaces by their alias.'
@@ -1920,7 +1920,7 @@ zabbix_export:
           description: 'This macro is used to exclude network interfaces by their alias.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Filter for network interfaces by alias (exclude)'
             description: 'This macro is used to exclude network interfaces by their alias.'
@@ -1929,7 +1929,7 @@ zabbix_export:
           description: 'This macro is used to include network interfaces by their description.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Filter for network interfaces by description'
             description: 'This macro is used to include network interfaces by their description.'
@@ -1938,7 +1938,7 @@ zabbix_export:
           description: 'This macro is used to exclude network interfaces by their description.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Filter for network interfaces by description (exclude)'
             description: 'This macro is used to exclude network interfaces by their description.'
@@ -1947,7 +1947,7 @@ zabbix_export:
           description: 'This macro is used to include network interfaces by their name.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Filter for network interface by name'
             description: 'This macro is used to include network interfaces by their name.'
@@ -1956,7 +1956,7 @@ zabbix_export:
           description: 'Filter out loopbacks, nulls, docker veth links, and docker0 bridge by default.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Filter for network interface by name (exclude)'
             description: 'Filter out loopbacks, nulls, docker veth links, and docker0 bridge by default.'
@@ -1965,7 +1965,7 @@ zabbix_export:
           description: 'This macro is used to include network interfaces by their operational status.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Filter for network interface by status'
             description: 'This macro is used to include network interfaces by their operational status.'
@@ -1974,7 +1974,7 @@ zabbix_export:
           description: 'This macro is used to exclude network interfaces by their operational status.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Filter for network interface by status (exclude)'
             description: 'This macro is used to exclude network interfaces by their operational status.'
@@ -1983,7 +1983,7 @@ zabbix_export:
           description: 'This macro is used to include network interfaces by their type.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Filter for network interfaces by type'
             description: 'This macro is used to include network interfaces by their type.'
@@ -1992,7 +1992,7 @@ zabbix_export:
           description: 'This macro is used to exclude network interfaces by their type.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Filter for network interfaces by type (exclude)'
             description: 'This macro is used to exclude network interfaces by their type.'
@@ -2001,7 +2001,7 @@ zabbix_export:
           description: 'Warning threshold for device power usage in %.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Thresholds
             label: 'Threshold for power usage'
             description: 'Warning threshold for device power usage in % In the range from 0 to 100 inclusive.'
@@ -2015,6 +2015,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'Time interval for SNMP availability trigger.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '5'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
       dashboards:
         - uuid: 861eb1016c234f1d8e7e2a0271f69d45
           name: 'Huawei AR600 Series: General'
@@ -3589,11 +3598,20 @@ zabbix_export:
         - tag: scope
           value: performance
     - uuid: 6f00359af55f45909bdecbad234c7652
-      expression: '(last(/Huawei AR600 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Huawei AR600 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Huawei AR600 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Huawei AR600 by SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: |
+        (last(/Huawei AR600 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/Huawei AR600 by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/Huawei AR600 by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Huawei AR600 by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/Huawei AR600 by SNMP/system.hw.uptime[hrSystemUptime.0],#2)))
+        or (last(/Huawei AR600 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/Huawei AR600 by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/Huawei AR600 by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/Huawei AR600 by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/Huawei AR600 by SNMP/system.net.uptime[sysUpTime.0],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/Huawei AR600 by SNMP/system.hw.uptime[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
+        or last(/Huawei AR600 by SNMP/system.net.uptime[sysUpTime.0])>{$SNMP.UPTIME.WARN}
       name: 'Huawei AR600: Host has been restarted'
-      event_name: 'Huawei AR600: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'Huawei AR600: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       dependencies:
         - name: 'Huawei AR600: No SNMP data collection'

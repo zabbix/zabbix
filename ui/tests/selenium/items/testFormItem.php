@@ -2396,11 +2396,11 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->item);
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
-		$form->getLabel('History')->query('xpath:span[@class="js-hint"]/button')->one()->click();
+		$form->getLabel('History')->query('xpath:span[@class="js-history-hint"]/button')->one()->click();
 		$this->zbxTestAssertElementText('//div[contains(@class, "hintbox-static")]',
 				'Overridden by global housekeeping settings (99d)'
 		);
-		$form->getLabel('Trends')->query('xpath:span[@class="js-hint"]/button')->one()->click();
+		$form->getLabel('Trends')->query('xpath:span[@class="js-trends-hint"]/button')->one()->click();
 		$this->zbxTestAssertElementText('//div[contains(@class, "hintbox-static")][2]',
 				'Overridden by global housekeeping settings (455d)'
 		);

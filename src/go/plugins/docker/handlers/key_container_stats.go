@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -94,10 +95,12 @@ type pidsStats struct {
 	Current uint64 `json:"current"`
 }
 
-func keyContainerStatsHandler(client *http.Client, query string, _ ...string) (string, error) {
+func keyContainerStatsHandler(
+	ctx plugin.ContextProvider, client *http.Client, query string, _ ...string,
+) (string, error) {
 	var data containerStats
 
-	body, err := queryDockerAPI(client, query)
+	body, err := queryDockerAPI(ctx, client, query)
 	if err != nil {
 		return "", err
 	}

@@ -930,7 +930,7 @@ class testFormServicesServices extends CWebTest {
 			// Service without children.
 			[
 				[
-					'button_query' => 'xpath:.//button[@title="Close"]'
+					'button_query' => 'xpath:.//button[@aria-label="Close modal window"]'
 				]
 			],
 			// Service with children.

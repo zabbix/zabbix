@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CBehavior.php';
 
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * Behavior for datatable element.
@@ -85,7 +86,14 @@ class CDatatableBehavior extends CBehavior {
 	 * @param string  $selector    datatable selector
 	 */
 	public function assertDatatableData($data = [], $selector = null) {
-		$rows = $this->getDatatable($selector)->waitUntilReady()->getRows();
+		$datatable = $this->getDatatable($selector)->waitUntilReady();
+
+		if ($data) {
+			// Rows are loaded asynchronously after the datatable reports ready, so wait for the expected count.
+			$datatable->waitUntilRowsCount(count($data));
+		}
+
+		$rows = $datatable->getRows();
 		if (!$data) {
 			$this->test->assertEquals(0, $rows->count());
 			// Check that datatable contain one row with text "No data found."
@@ -100,7 +108,8 @@ class CDatatableBehavior extends CBehavior {
 		);
 
 		foreach ($this->normalizeData($data) as $i => $values) {
-			$row = $rows->get($i);
+			// Use getRow() instead of $rows->get() so each row has its own selector and can be reloaded if the page auto-refreshes.
+			$row = $datatable->getRow($i);
 
 			foreach ($values as $name => $value) {
 				if (($text = $row->getColumnData($name, $value)) === null) {
@@ -159,25 +168,24 @@ class CDatatableBehavior extends CBehavior {
 		$table = $this->getDatatable($selector);
 
 		foreach ($header_settings as $column => $select_data) {
+			// Wait for the datatable to finish (re)loading so the header button reference does not go stale.
+			$table->waitUntilReady();
+
 			$button_selector = (in_array($column, ['Name', 'Time', 'Problem']))
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
-			$button = $table->getHeaderByText($column)->query($button_selector)->one();
-
-			if (!$button->isClickable()) {
-				$table->scrollRightHorizontally();
-			}
+			$button = $table->getHeaderByText($column)->query($button_selector);
 
 			/**
 			 *  When the button is placed under the datatable-options button it is considered clickable.
 			 *  Additional scrolling is required in such cases.
 			 */
 			try {
-				$button->click();
+				$button->waitUntilClickable(3)->one()->click();
 			}
-			catch (ElementClickInterceptedException $exception) {
+			catch (Exception $exception) {
 				$table->scrollRightHorizontally();
-				$button->click();
+				$button->waitUntilClickable()->one()->click();
 			}
 
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
@@ -190,10 +198,10 @@ class CDatatableBehavior extends CBehavior {
 				$table->waitUntilReady()->invalidate();
 			}
 
-			// Click on button again to close the popup.
-			$button->invalidate();
-			$button->click();
-			$popup_dialog->waitUntilNotVisible();
+			// Press Enter key to close the popup.
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+
+			$this->test->query('class:datatable-options-popup')->waitUntilNotVisible();
 		}
 	}
 
@@ -217,11 +225,11 @@ class CDatatableBehavior extends CBehavior {
 			 *  Additional scrolling is required in such cases.
 			 */
 			try {
-				$button->click();
+				$button->waitUntilClickable(3)->click();
 			}
 			catch (ElementClickInterceptedException $exception) {
 				$table->scrollRightHorizontally();
-				$button->click();
+				$button->waitUntilClickable()->click();
 			}
 
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();

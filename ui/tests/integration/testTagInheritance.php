@@ -729,7 +729,7 @@ class testTagInheritance extends CIntegrationTest {
 
 			$request = [
 				'output' => ['name'],
-				'groupids' => 4, // Zabbx servers
+				'groupids' => 4, // Zabbix servers
 				'hostids' => [self::$host_id]
 			] + $filter;
 

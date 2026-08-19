@@ -80,21 +80,9 @@ void	zbx_db_flush_version_requirements(const char *version)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/*********************************************************************************
- *                                                                               *
- * Purpose: verify that Zabbix server/proxy will start with provided DB version  *
- *          and configuration                                                    *
- *                                                                               *
- * Parameters: info              - [IN] DB version information                   *
- *             allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
- *             program_type      - [IN]                                          *
- *                                                                               *
- *********************************************************************************/
-int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+int	zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
 		unsigned char program_type)
 {
-	zbx_db_extract_version_info(info);
-
 	if (DB_VERSION_NOT_SUPPORTED_ERROR == info->flag ||
 			DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag || DB_VERSION_LOWER_THAN_MINIMUM == info->flag)
 	{
@@ -108,7 +96,7 @@ int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsu
 
 		if (0 == allow_unsupported || 0 != server_db_deprecated)
 		{
-			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "==================================================");
 			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix %s due to unsupported %s database"
 					" version (%s).", program_type_s, info->database,
 					info->friendly_current_version);
@@ -133,7 +121,7 @@ int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsu
 						" in Zabbix %s configuration file at your own risk.", program_type_s);
 			}
 
-			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "==================================================");
 
 			return FAIL;
 		}
@@ -162,6 +150,25 @@ int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsu
 	}
 
 	return SUCCEED;
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: verify that Zabbix server/proxy will start with provided DB version  *
+ *          and configuration                                                    *
+ *                                                                               *
+ * Parameters: info              - [IN] DB version information                   *
+ *             allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
+ *             program_type      - [IN]                                          *
+ *                                                                               *
+ *********************************************************************************/
+int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type)
+{
+	if (SUCCEED != zbx_db_extract_version_info(info))
+		return FAIL;
+
+	return zbx_db_verify_version_info(info, allow_unsupported, program_type);
 }
 
 void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info)
@@ -744,6 +751,190 @@ int	zbx_db_update_software_update_checkid(void)
 		ret = FAIL;
 	}
 	zbx_db_free_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks serverid value in settings table and generates new         *
+ *          serverid if it is not present                                     *
+ *                                                                            *
+ * Return value: SUCCEED - valid serverid either exists or was created        *
+ *               FAIL    - no valid serverid exists and could not create one  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_check_serverid(void)
+{
+	zbx_db_result_t	result;
+	int		ret = SUCCEED;
+
+	if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table "
+				"on the first try");
+		ret = FAIL;
+		goto out;
+	}
+
+	if (NULL == zbx_db_fetch(result))
+	{
+		char	*uuid7 = zbx_gen_uuid7_hyphenated();
+
+		if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
+				"('serverid',1,'%s',0)", uuid7))
+		{
+			/* INSERT may fail if a concurrent HA node has already inserted the   */
+			/* serverid row. Re-verify the row exists before treating this as     */
+			/* fatal.                                                             */
+			zbx_db_free_result(result);
+
+			if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table "
+						"after trying to insert");
+				zbx_free(uuid7);
+				ret = FAIL;
+				goto out;
+			}
+
+			if (NULL == zbx_db_fetch(result))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot insert serverid into settings table");
+				ret = FAIL;
+			}
+		}
+
+		zbx_free(uuid7);
+	}
+
+	zbx_db_free_result(result);
+out:
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set settings value in database                                    *
+ *                                                                            *
+ * Parameters: name  - [IN] setting name                                      *
+ *             value - [IN] setting value                                     *
+ *             type  - [IN] setting value type (ZBX_SETTING_TYPE_*)           *
+ *                                                                            *
+ * Return value: SUCCEED - setting value was set successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: The settings value will be either inserted or updated.           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_settings_set_value(const char *name, const void *value, int type)
+{
+	const char	*fields[] = {NULL, "value_str", "value_int", "value_usrgrpid", "value_hostgroupid",
+					"value_userdirectoryid", "value_mfaid"};
+	char		*name_esc;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	int		ret = FAIL, old_type = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:%s", __func__, name);
+
+	if (ZBX_SETTING_TYPE_STR > type || ZBX_SETTING_TYPE_MAX <= type)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("Invalid setting value type %d", type);
+		exit(EXIT_FAILURE);
+	}
+
+	name_esc = zbx_db_dyn_escape_string(name);
+
+	result = zbx_db_select("select type from settings where name='%s'", name_esc);
+
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		zbx_db_insert_t	db_insert;
+
+		zbx_db_insert_prepare(&db_insert, "settings", "name", fields[type], "type", NULL);
+
+		switch (type)
+		{
+			case ZBX_SETTING_TYPE_STR:
+				zbx_db_insert_add_values(&db_insert, name, (const char *)value, type);
+				break;
+			case ZBX_SETTING_TYPE_INT:
+				zbx_db_insert_add_values(&db_insert, name, *(const int *)value, type);
+				break;
+			default:
+				zbx_db_insert_add_values(&db_insert, name, *(const zbx_uint64_t *)value, type);
+				break;
+		}
+
+		ret = zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
+	else
+		old_type = atoi(row[0]);
+
+	if (SUCCEED != ret)
+	{
+		char	*value_esc, *sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update settings set %s=", fields[type]);
+
+		switch (type)
+		{
+			case ZBX_SETTING_TYPE_STR:
+				value_esc = zbx_db_dyn_escape_string((const char *)value);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s'", value_esc);
+				zbx_free(value_esc);
+				break;
+			case ZBX_SETTING_TYPE_INT:
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%d", *(const int *)value);
+				break;
+			default:
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FS_UI64,
+						*(const zbx_uint64_t *)value);
+		}
+
+		if (old_type != type)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",type=%d", type);
+
+			switch (old_type)
+			{
+				case ZBX_SETTING_TYPE_STR:
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s=''", fields[old_type]);
+					break;
+				case ZBX_SETTING_TYPE_INT:
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s=0", fields[old_type]);
+					break;
+				case ZBX_SETTING_TYPE_USRGRPID:
+				case ZBX_SETTING_TYPE_HOSTGROUPID:
+				case ZBX_SETTING_TYPE_USRDIRID:
+				case ZBX_SETTING_TYPE_MFAID:
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%s=null", fields[old_type]);
+					break;
+				default:
+					zabbix_log(LOG_LEVEL_WARNING, "invalid old setting \"%s\" type %d", name,
+							old_type);
+					break;
+			}
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where name='%s'", name_esc);
+
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+			zabbix_log(LOG_LEVEL_CRIT, "Failed to set %s", name);
+		else
+			ret = SUCCEED;
+
+		zbx_free(sql);
+	}
+
+	zbx_db_free_result(result);
+	zbx_free(name_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

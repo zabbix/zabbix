@@ -296,7 +296,7 @@ class testFormConnectors extends CWebTest {
 						'URL' => 'dns://zabbix.com:82/v1/history'
 					],
 					'inline_errors' => [
-						'URL' => 'Unacceptable URL.'
+						'URL' => 'Unacceptable URL scheme.'
 					]
 				]
 			],
@@ -309,7 +309,7 @@ class testFormConnectors extends CWebTest {
 						'URL' => 'message://zabbix.com:82/v1/history'
 					],
 					'inline_errors' => [
-						'URL' => 'Unacceptable URL.'
+						'URL' => 'Unacceptable URL scheme.'
 					]
 				]
 			],
@@ -1438,7 +1438,7 @@ class testFormConnectors extends CWebTest {
 				$this->query('link', self::DEFAULT_CONNECTOR)->one()->click();
 			}
 			else {
-				$this->assertInlineError($form, ['URL' => 'Unacceptable URL.']);
+				$this->assertInlineError($form, ['URL' => 'Unacceptable URL scheme.']);
 			}
 		}
 

@@ -8,7 +8,9 @@ libzbxtrapper_server_a_SOURCES = \
 	proxydata.c \
 	proxydata.h \
 	trapper_history_push.c \
-	trapper_history_push.h
+	trapper_history_push.h \
+	trapper_push_test.c \
+	trapper_push_test.h
 
 libzbxtrapper_server_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server \
