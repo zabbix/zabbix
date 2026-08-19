@@ -94,6 +94,7 @@ window.ceprule_edit_popup = new class {
 		this.#refreshExpressionPreview();
 		this.#handleOptgroupTagChange.call(window['ceprule-window-groupby-opt-tag']);
 		this.#handleWindowTypeChanged(Number(ceprule.window_type));
+		this.#toggleOperationsInformation();
 
 		window['ceprule-window-counttag-toggle'].dispatchEvent(new Event('change'));
 		window['ceprule-window-capacity-toggle'].dispatchEvent(new Event('change'));
@@ -159,6 +160,7 @@ window.ceprule_edit_popup = new class {
 				row.remove();
 				this.#renumberOperationRows();
 				this.form.discoverAllFields();
+				this.#toggleOperationsInformation();
 			}
 		});
 
@@ -568,6 +570,7 @@ window.ceprule_edit_popup = new class {
 
 								is_new && this.#addOperationRow(fields) || this.#editOperationRow(fields);
 								this.form.discoverAllFields();
+								this.#toggleOperationsInformation();
 							});
 
 						return false;
@@ -623,6 +626,19 @@ window.ceprule_edit_popup = new class {
 	#addOperationRow(operation) {
 		this.form_element.querySelector('#ceprule-operations-table tbody')
 			.append(this.#buildOperationRow(operation));
+	}
+
+	#toggleOperationsInformation() {
+		const operations = this.form.findFieldByName('operations').getValue();
+		const [has_op_close, has_when_close] = Object.values(operations)
+			.reduce(([has_op_close, has_when_close], {type, execute_when}) => [
+				has_op_close || type == <?= CCepRuleHelper::OP_CLOSE_WINDOW ?>,
+				has_when_close || execute_when == <?= CCepRuleHelper::WHEN_WINDOW_CLOSED ?>
+			], [false, false]
+		);
+
+		window['ceprule-operations-table'].querySelector('.js-operations-info')
+			.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !(has_when_close && !has_op_close));
 	}
 
 	#buildOperationRow(operation) {

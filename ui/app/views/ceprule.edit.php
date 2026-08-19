@@ -147,7 +147,20 @@ $form = (new CForm())
 					->setId('ceprule-operations-table')
 					->addClass('list-numbered')
 					->setColumns([
-						(new CTableColumn(new CColHeader(''))),
+						(new CTableColumn(new CColHeader((new CDiv())
+								->addItem(makeWarningIcon(
+									_s('Execute when %1$s: There is no "%2$s" operation defined.',
+										CCepRuleHelper::getOperationExecuteWhenString([
+											'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED
+										]),
+										CCepRuleHelper::getOperationLabelString([
+											'type' => CCepRuleHelper::OP_CLOSE_WINDOW
+										])
+									)
+								))
+								->addClass('js-operations-info')
+								->addClass(ZBX_STYLE_DISPLAY_NONE)
+						))),
 						(new CTableColumn(new CColHeader(_('Details'))))
 							->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
 						(new CTableColumn(new CColHeader('')))
