@@ -1330,7 +1330,7 @@ static int	housekeeping_delete_internal_events(int config_max_hk_delete)
 
 	zbx_db_begin();
 
-	while (deleted_num < config_max_hk_delete)
+	while (0 == config_max_hk_delete || deleted_num < config_max_hk_delete)
 	{
 		size_t	sql_offset = 0;
 		int	events_num;
