@@ -421,11 +421,11 @@ class testTriggerCEP extends CIntegrationTest {
 	//   - a cause and symptom window closes at the end of the period it belongs to, and the periods follow a grid the
 	//     rule keeps for itself (cep_rule_get_window_start_time()), so a window is closed at most one period after it
 	//     was opened. The scenario waits out two of them in a row and a shorter period is what keeps that from being
-	//     the slowest thing in the family. A restart needs nothing added here: the window comes back with a period of
-	//     its own starting at the startup (time_created is not among the columns of cep_window), so what follows a
-	//     restart is one more period and no more.
+	//     the slowest thing in the family. A restart needs nothing added here: the grid comes back as it was, restored
+	//     from cep_window.created_at and advanced whole periods at a time (cep_rule_set_window_start_time()), so what
+	//     follows a restart is the rest of a period the scenario was already waiting for and no more.
 	const CEP_RULE_WINDOW_CLOSE_DURATION_PERIOD = 15;
-	const CEP_RULE_WINDOW_CLOSE_DURATION_CAUSE_PERIOD = 10;
+	const CEP_RULE_WINDOW_CLOSE_DURATION_CAUSE_PERIOD = 20;
 	// How long the sliding flavour waits between the two values it sends, so their ages differ by more than the
 	// second or so a window may be examined late by: the older value is the one that has to be evicted alone, with the
 	// younger one still in the window when the eviction closes it. It leaves the rest of the period above for the
@@ -13119,13 +13119,19 @@ HEREDOC;
 	 * duration then runs out is the one the server loaded back from the database, and the problems it closes are the
 	 * ones it came back holding - see maybeRestartServerMidScenario().
 	 *
-	 * What the problems are while a window still holds them is not asserted here, and cannot be: the periods of a
-	 * cause and symptom window follow a grid the rule keeps for itself (cep_rule_get_window_start_time()), so a value
-	 * may land anywhere in a period, even just before it ends, and a problem that is closed a moment after it opened is
-	 * the scenario working rather than failing - as is a group that the end of a period split in two. What every step
-	 * therefore waits for is the problem events existing - a count that only grows - and then nothing being open. That
-	 * the events are held and ranked while they are in the window is asserted where the window is ended by a value
-	 * instead, see runEventAssessmentTestCepWindowCauseSymptom().
+	 * Both closings have an earliest as well as a latest, and the scenario holds the rule to both: the periods of a
+	 * cause and symptom window follow a grid the rule keeps for itself, and that grid starts at the first value the
+	 * rule ever sees - the rule is created by this scenario, so it has no window start of its own until then and takes
+	 * the time of that value as one (cep_rule_get_window_start_time()). Every period of it therefore ends a multiple of
+	 * the duration after that value, restart or no restart (the grid is restored from cep_window.created_at and
+	 * advanced whole periods at a time, see cep_rule_set_window_start_time()), and a window is closed at the end of the
+	 * period it belongs to and not before - which is what the two waits are given a patience for and what the two
+	 * assertions before them hold the rule to: the problems the window is holding must still be open until the period
+	 * that holds them is up, so a rule that closes them early fails here rather than passing for having closed them at
+	 * all.
+	 *
+	 * How the events are ranked while the window holds them is not asserted here - that is asserted where the window is
+	 * ended by a value instead, see runEventAssessmentTestCepWindowCauseSymptom().
 	 */
 	private function runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration(string $rule_name): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
@@ -13145,8 +13151,17 @@ HEREDOC;
 			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down_'.$service]
 		]);
 
-		// 1. Three values of the one id the scenario drives, so one window is given all three of their problems.
+		// 1. Three values of the one id the scenario drives, so one window is given all three of their problems. The
+		//    first of them is what starts the period grid of the rule, so the time it goes out at is the time every
+		//    period of the scenario is counted from - the three of them are sent one after another and well inside the
+		//    first of those periods, which is why all three end up in the one window.
+		//    That time is taken as the whole second before the value goes out, which is the earliest the grid can start
+		//    at: the rule starts it at the whole second the server processed the value in
+		//    (cep_rule_get_window_start_time()), and that is this second or a later one and never an earlier one. No
+		//    period of the rule can therefore be up before this second plus that period, so the assertions below hold
+		//    the problems open for a whole period each rather than for most of one.
 		$events = 0;
+		$opened_at = time();
 
 		for ($i = 0; $i < 3; $i++) {
 			$send();
@@ -13155,26 +13170,42 @@ HEREDOC;
 
 		// 1a. Stop and start the server with the window holding all three, unless the restarts are turned off: what
 		//     closes them is then a window the server loaded back from the database, and it has to close the events it
-		//     came back with. The period of such a window starts again at the startup - the time it was created is not
-		//     among the columns of cep_window - so what the wait below waits out is one period from here either way.
+		//     came back with. The grid the window belongs to comes back with it - it is restored from the created_at of
+		//     the row and advanced whole periods at a time - so the periods below are still counted from the first
+		//     value, and a restart that outlasts one of them only moves the closing on to the next.
 		$this->maybeRestartServerMidScenario();
 
 		// Both waits below are due at a time this scenario knows: a window is closed at most one period after it was
 		// opened, so that period plus the little the closing takes to reach the API is all the patience they get - a
 		// window that does not close is reported about when it was due to.
-		$patience = self::CEP_RULE_WINDOW_CLOSE_DURATION_CAUSE_PERIOD + self::CEP_RULE_WINDOW_CLOSE_DURATION_SLACK;
+		$period = self::CEP_RULE_WINDOW_CLOSE_DURATION_CAUSE_PERIOD;
+		$patience = $period + self::CEP_RULE_WINDOW_CLOSE_DURATION_SLACK;
+		// And each of them is due no sooner than that time either: the period a window belongs to ends a multiple of
+		// the duration after the value that started the grid, so the first of the two closings may not happen before
+		// one whole such period is up and the second, held by the window that follows, before two are - whatever the
+		// closing of the first one was observed at.
+		$due = fn(int $periods) => $opened_at + $periods * $period;
 
 		try {
 			// 2. Nothing else is sent and nothing else may close them: the window closing when its period is up is
-			//    what closes every problem it was holding, and the trigger returns to OK with the last of them.
+			//    what closes every problem it was holding, and the trigger returns to OK with the last of them. Until
+			//    that period is up all three problems have to still be open - the duration is what closes them and it
+			//    has not run out.
+			$this->assertOpenProblemCountUntil($all, 3, $due(1),
+				'The window of "'.$rule_name.'" closed the problems it was holding before its duration was up'
+			);
 			$this->waitForNoOpenProblems($all,
 				'After the window of "'.$rule_name.'" was left to be closed by its duration', true, $patience
 			);
 
 			// 3. The rule closes a window every period, so the value after the first close is held by a new window of
-			//    the same id and closed when that period is up in turn.
+			//    the same id and closed when that period is up in turn - not before, the window it went into being the
+			//    one of the period that follows the closed one.
 			$send();
 			$this->waitForProblemEventCountByTag($all, 'service', $service, ++$events);
+			$this->assertOpenProblemCountUntil($all, 1, $due(2),
+				'The second window of "'.$rule_name.'" closed the problem it was holding before its duration was up'
+			);
 			$this->waitForNoOpenProblems($all,
 				'After the second window of "'.$rule_name.'" was left to be closed by its duration', true, $patience
 			);
@@ -15150,6 +15181,31 @@ HEREDOC;
 				return $message;
 			}
 		);
+	}
+
+	/**
+	 * Hold the number of open problems on $triggerids at $expected until the $until deadline (a unix timestamp, whole
+	 * or fractional) has passed, failing the moment problem.get returns anything else: the waits above wait for
+	 * something to happen by a deadline, this one asserts that it does not happen before one - the "not sooner than" of a closing that is
+	 * due at a time the scenario knows, see runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration(). A deadline
+	 * that has already passed leaves nothing to hold and asserts nothing.
+	 */
+	private function assertOpenProblemCountUntil(array $triggerids, int $expected, float $until,
+			string $message): void {
+		while (($left = $until - microtime(true)) > 0) {
+			$response = $this->call('problem.get', [
+				'objectids' => $triggerids,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'countOutput' => true
+			]);
+
+			$this->assertEquals($expected, $response['result'], $message.': expected '.$expected
+				.' open problems '.sprintf('%.1f', $left).'s before it was due, got '.$response['result']
+			);
+
+			sleep(self::WAIT_ITERATION_DELAY);
+		}
 	}
 
 	/**
