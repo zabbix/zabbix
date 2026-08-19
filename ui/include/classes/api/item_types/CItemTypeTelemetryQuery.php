@@ -194,6 +194,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	/**
 	 * Validate "query.aggregated_columns":
 	 * - for "function" AGGREGATE_PERCENTILE "parameters" array may have only single value
+	 * - "alias" value cannot start or end with whitespace character
 	 *
 	 * @param array       $item   Telemetry item to validate.
 	 * @param string      $path   Path for validation message.
@@ -205,6 +206,14 @@ class CItemTypeTelemetryQuery extends CItemType {
 				$error = _s('Invalid parameter "%1$s": %2$s.',
 					$path.'/query/aggregated_columns/'.($i + 1).'/parameters',
 					_s('maximum number of array elements is %1$s', 1)
+				);
+
+				return false;
+			}
+
+			if (str_starts_with($column['alias'], ' ') || str_ends_with($column['alias'], ' ')) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path.'/query/aggregated_columns/'.($i + 1).'/alias',
+					_('value cannot start or end with whitespace')
 				);
 
 				return false;

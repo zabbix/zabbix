@@ -491,6 +491,20 @@ trait traitItemTelemetryQueryTests {
 			'Invalid parameter "/1/query/columns/1/attribute_key": value must be empty.'
 		];
 
+		yield '"query.aggregated_columns[].alias" value start and end with whitespace fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [
+						['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => ' a ']
+					],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value cannot start or end with whitespace.'
+		];
+
 		yield '"query.aggregated_columns[].parameters" set to single invalid value array fail' => [
 			[
 				'query' => [
