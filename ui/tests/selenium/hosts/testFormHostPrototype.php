@@ -889,8 +889,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 					'name' => 'Clone_5 of Host prototype {#1}',
 					'group_prototype' => 'Clone group prototype {#MACRO}'
 				]
-			]
-			,
+			],
 			[
 				[
 					'name' => 'Clone_6 of Host prototype {#1}',
@@ -933,7 +932,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Change host group.
 		if (array_key_exists('hostgroup', $data)) {
 			$this->zbxTestClickXpathWait('//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
-			$this->query('id:group_links_')->asMultiselect()->one()->fill($data['hostgroup']);
+			$form->fill(['Host groups' => $data['hostgroup']]);
 		}
 		// Change host group prototype.
 		if (array_key_exists('group_prototype', $data)) {
