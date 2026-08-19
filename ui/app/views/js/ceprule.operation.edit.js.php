@@ -233,6 +233,8 @@ window.ceprule_operation_edit_popup = new class {
 			zselect.addOptions(options);
 			zselect.init();
 		});
+
+		window['ceprule-operation-filter-table'].querySelector('.js-add-property').disabled = available.length == 0;
 	}
 
 	#updateHoistedLabelsView() {
