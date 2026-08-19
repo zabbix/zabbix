@@ -1510,7 +1510,10 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, int mod
 		int			trends_num = 0, timers_num = 0, ret = SUCCEED;
 		ZBX_DC_TREND		*trends = NULL;
 
-		add_internal_event_cb = (0 == zbx_dc_get_internal_action_count() ? NULL : events_cbs->add_event_cb);
+		if (mode != ZBX_HISTORY_SYNC_SKIP_TRIGGERS && 0 != zbx_dc_get_internal_action_count())
+			add_internal_event_cb = events_cbs->add_event_cb;
+		else
+			add_internal_event_cb = NULL;
 
 		stats->more = ZBX_SYNC_DONE;
 
