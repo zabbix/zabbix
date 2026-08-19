@@ -154,6 +154,8 @@ static void	process_listener(zbx_socket_t *s, int config_timeout)
 {
 	int	ret;
 
+	s->max_len_limit = ZBX_MAX_PASSIVE_CHECK_DATA_SIZE;
+
 	if (SUCCEED == (ret = zbx_tcp_recv_to(s, config_timeout)))
 	{
 		struct zbx_json_parse	jp;
