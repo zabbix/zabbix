@@ -34,6 +34,7 @@
 #define ZBX_TQ_QUERY_TAG_OPERATOR		"operator"
 #define ZBX_TQ_QUERY_TAG_VALUE			"value"
 
+/* SYNC WITH PHP! */
 #define ZBX_TQ_TIME_SHIFT_MIN		0
 #define ZBX_TQ_TIME_SHIFT_MAX		SEC_PER_DAY
 #define ZBX_TQ_LOOKBACK_LIMIT_MIN	1
