@@ -55,18 +55,23 @@ class CControllerPopupMassupdateTrigger extends CController {
 	}
 
 	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
+		$has_access = match ($this->getInput('context')) {
+			'host' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+			'template' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		};
+
+		if (!$has_access) {
 			return false;
 		}
 
 		if ($this->hasInput('prototype')) {
-			$discoveryRule = API::DiscoveryRule()->get([
+			$discovery_rule = API::DiscoveryRule()->get([
 				'output' => [],
 				'itemids' => [$this->getInput('parent_discoveryid', 0)],
 				'editable' => true
 			]);
 
-			if (!$discoveryRule) {
+			if (!$discovery_rule) {
 				return false;
 			}
 		}
