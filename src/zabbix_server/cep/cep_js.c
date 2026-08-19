@@ -244,7 +244,7 @@ void	cep_js_init(zbx_es_t *es)
  ******************************************************************************/
 void	cep_js_ctx_init(zbx_cep_js_ctx_t *js, zbx_vector_cep_event_handle_t *hevents)
 {
-	zbx_hashset_create(&js->index, (size_t)js->events_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&js->index, (size_t)hevents->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	js->events_num = 0;
