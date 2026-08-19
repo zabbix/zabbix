@@ -701,7 +701,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qagg('Duration', AGGREGATE_MAX, 'duration_max'),
 						self::qagg('Duration', AGGREGATE_AVG, 'duration_avg'),
 						self::qagg('Duration', AGGREGATE_SUM, 'duration_sum'),
-						self::qagg('Duration', AGGREGATE_PCTILE, 'duration_p90', ['90'])
+						self::qagg('Duration', AGGREGATE_PERCENTILE, 'duration_p90', ['90'])
 					],
 					self::qfilter(
 						CONDITION_EVAL_TYPE_EXPRESSION,
@@ -788,7 +788,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qagg('SeverityNumber', AGGREGATE_MAX, 'severity_max'),
 						self::qagg('SeverityNumber', AGGREGATE_AVG, 'severity_avg'),
 						self::qagg('SeverityNumber', AGGREGATE_SUM, 'severity_sum'),
-						self::qagg('SeverityNumber', AGGREGATE_PCTILE, 'severity_p50', ['50'])
+						self::qagg('SeverityNumber', AGGREGATE_PERCENTILE, 'severity_p50', ['50'])
 					],
 					self::qfilter(CONDITION_EVAL_TYPE_AND, [
 						self::qcond('TraceId', CONDITION_OPERATOR_EQUAL, '6123456789abcdef0123456789abcdef'),
@@ -874,7 +874,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qagg('Value', AGGREGATE_MAX, 'value_max'),
 						self::qagg('Value', AGGREGATE_AVG, 'value_avg'),
 						self::qagg('Value', AGGREGATE_SUM, 'value_sum'),
-						self::qagg('Value', AGGREGATE_PCTILE, 'value_p50', ['50'])
+						self::qagg('Value', AGGREGATE_PERCENTILE, 'value_p50', ['50'])
 					],
 					self::qfilter(CONDITION_EVAL_TYPE_OR, [
 						self::qcond('MetricName', CONDITION_OPERATOR_EQUAL, 'will-not-match'),
@@ -1042,7 +1042,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qagg('Sum', AGGREGATE_AVG, 'sum_avg'),
 						self::qagg('Min', AGGREGATE_MIN, 'min_min'),
 						self::qagg('Max', AGGREGATE_MAX, 'max_max'),
-						self::qagg('Sum', AGGREGATE_PCTILE, 'sum_p95', ['95'])
+						self::qagg('Sum', AGGREGATE_PERCENTILE, 'sum_p95', ['95'])
 					],
 					self::qfilter(CONDITION_EVAL_TYPE_AND_OR, [
 						self::qcond('MetricName', CONDITION_OPERATOR_EQUAL, 'test_histogram'),
@@ -1143,7 +1143,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qagg('NegativeOffset', AGGREGATE_MIN, 'negative_offset_min'),
 						self::qagg('Min', AGGREGATE_MIN, 'min_min'),
 						self::qagg('Max', AGGREGATE_MAX, 'max_max'),
-						self::qagg('Max', AGGREGATE_PCTILE, 'max_p99', ['99'])
+						self::qagg('Max', AGGREGATE_PERCENTILE, 'max_p99', ['99'])
 					],
 					self::qfilter(CONDITION_EVAL_TYPE_AND, [
 						self::qcond('MetricName', CONDITION_OPERATOR_EQUAL, 'test_exponential_histogram'),
@@ -1217,7 +1217,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					['function' => AGGREGATE_MAX,		'expected' => 3],
 					['function' => AGGREGATE_AVG,		'expected' => 0],
 					['function' => AGGREGATE_SUM,		'expected' => 0],
-					['function' => AGGREGATE_PCTILE,	'expected' => 0,	'parameters' => ['50']]
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 0,	'parameters' => ['50']]
 				]
 			),
 			self::getAggregationSubcase(
@@ -1229,7 +1229,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					['function' => AGGREGATE_MAX,		'expected' => 0],
 					['function' => AGGREGATE_AVG,		'expected' => 0],
 					['function' => AGGREGATE_SUM,		'expected' => 0],
-					['function' => AGGREGATE_PCTILE,	'expected' => 0,	'parameters' => ['50.05']]
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 0,	'parameters' => ['50.05']]
 				]
 			),
 			self::getAggregationSubcase(
@@ -1241,7 +1241,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					['function' => AGGREGATE_MAX,		'expected' => 0.1],
 					['function' => AGGREGATE_AVG,		'expected' => -0.1],
 					['function' => AGGREGATE_SUM,		'expected' => -0.5],
-					['function' => AGGREGATE_PCTILE,	'expected' => -0.3,	'parameters' => ['0']]
+					['function' => AGGREGATE_PERCENTILE,	'expected' => -0.3,	'parameters' => ['0']]
 				]
 			),
 			self::getAggregationSubcase(
@@ -1253,7 +1253,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					['function' => AGGREGATE_MAX,		'expected' => 3],
 					['function' => AGGREGATE_AVG,		'expected' => 2],
 					['function' => AGGREGATE_SUM,		'expected' => 6],
-					['function' => AGGREGATE_PCTILE,	'expected' => 3,	'parameters' => ['100']]
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 3,	'parameters' => ['100']]
 				]
 			),
 			[

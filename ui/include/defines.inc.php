@@ -1271,15 +1271,15 @@ define('GRAPH_FILTER_SIMPLE',	2);
 
 define('GRAPH_AGGREGATE_DEFAULT_INTERVAL',	'1h');
 
-define('AGGREGATE_NONE',	0);
-define('AGGREGATE_MIN',		1);
-define('AGGREGATE_MAX',		2);
-define('AGGREGATE_AVG',		3);
-define('AGGREGATE_COUNT',	4);
-define('AGGREGATE_SUM',		5);
-define('AGGREGATE_FIRST',	6);
-define('AGGREGATE_LAST',	7);
-define('AGGREGATE_PCTILE',	8);
+define('AGGREGATE_NONE',		0);
+define('AGGREGATE_MIN',			1);
+define('AGGREGATE_MAX',			2);
+define('AGGREGATE_AVG',			3);
+define('AGGREGATE_COUNT',		4);
+define('AGGREGATE_SUM',			5);
+define('AGGREGATE_FIRST',		6);
+define('AGGREGATE_LAST',		7);
+define('AGGREGATE_PERCENTILE',	8);
 
 define('APPROXIMATION_MIN',	1);
 define('APPROXIMATION_AVG',	2);

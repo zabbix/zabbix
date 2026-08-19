@@ -43,7 +43,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 			'existing_aliases' => ['array', 'field' => ['string']],
 			'function' => ['integer', 'required',
 				'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM,
-					AGGREGATE_PCTILE
+					AGGREGATE_PERCENTILE
 				],
 				'when' => ['edit', 'in' => [1]]
 			],
@@ -105,12 +105,12 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 			],
 			'function' => ['integer', 'required',
 				'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM,
-					AGGREGATE_PCTILE
+					AGGREGATE_PERCENTILE
 				]
 			],
 			'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_AGGREGATED_COLUMNS),
 			'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
-				'when' => ['function', 'in' => [AGGREGATE_PCTILE]]
+				'when' => ['function', 'in' => [AGGREGATE_PERCENTILE]]
 			],
 			'alias' => $alias_rules
 		]];

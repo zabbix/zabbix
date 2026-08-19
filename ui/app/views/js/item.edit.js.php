@@ -749,7 +749,7 @@ window.item_edit_form = new class {
 		const percentile = data.percentile ?? '';
 		let function_label = this.telemetry_function_labels[func];
 
-		if (func === <?= AGGREGATE_PCTILE ?>) {
+		if (func === <?= AGGREGATE_PERCENTILE ?>) {
 			function_label += `(${data.column}, ${percentile})`;
 		}
 		else if (func !== <?= AGGREGATE_COUNT ?>) {

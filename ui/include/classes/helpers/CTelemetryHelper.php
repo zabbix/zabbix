@@ -119,7 +119,7 @@ class CTelemetryHelper {
 	 */
 	public static function getColumnValidationRules(string $section): array {
 		$function_when = $section === self::SECTION_AGGREGATED_COLUMNS
-			? [['function', 'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PCTILE]]]
+			? [['function', 'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PERCENTILE]]]
 			: [];
 
 		return [
@@ -198,7 +198,7 @@ class CTelemetryHelper {
 			AGGREGATE_AVG => _('avg'),
 			AGGREGATE_COUNT => _('count'),
 			AGGREGATE_SUM => _('sum'),
-			AGGREGATE_PCTILE => _('percentile')
+			AGGREGATE_PERCENTILE => _('percentile')
 		];
 	}
 

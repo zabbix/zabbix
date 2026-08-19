@@ -655,7 +655,7 @@ JAVASCRIPT;
 		foreach ($input['aggregated_columns'] as $column) {
 			$function = (int) $column['function'];
 			$percentile = array_key_exists('percentile', $column) ? (string) $column['percentile'] : '';
-			$parameters = $function == AGGREGATE_PCTILE && $percentile !== '' ? [$percentile] : [];
+			$parameters = $function == AGGREGATE_PERCENTILE && $percentile !== '' ? [$percentile] : [];
 			$column_name = $function != AGGREGATE_COUNT && array_key_exists('column', $column)
 				? $column['column']
 				: '';

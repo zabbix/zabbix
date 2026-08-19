@@ -257,7 +257,7 @@ trait traitItemTelemetryQueryTests {
 					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
-						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [10], 'alias' => 'time']
+						['column' => 'Timestamp', 'function' => AGGREGATE_PERCENTILE, 'parameters' => [10], 'alias' => 'time']
 					],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
@@ -439,7 +439,7 @@ trait traitItemTelemetryQueryTests {
 					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
-						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [200], 'alias' => 'time']
+						['column' => 'Timestamp', 'function' => AGGREGATE_PERCENTILE, 'parameters' => [200], 'alias' => 'time']
 					],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
@@ -453,7 +453,7 @@ trait traitItemTelemetryQueryTests {
 					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
-						['column' => 'Timestamp', 'function' => AGGREGATE_PCTILE, 'parameters' => [2, 10], 'alias' => 'time']
+						['column' => 'Timestamp', 'function' => AGGREGATE_PERCENTILE, 'parameters' => [2, 10], 'alias' => 'time']
 					],
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]

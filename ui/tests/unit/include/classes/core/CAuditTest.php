@@ -101,9 +101,9 @@ class CAuditTest extends TestCase {
 						['column' => 'column 2', 'attribute_key' => 'attr']
 					],
 					'aggregated_columns' => [
-						['column' => 'aggregated 1', 'function' => AGGREGATE_PCTILE, 'parameters' => [], 'alias' => ''],
-						['column' => 'aggregated 2', 'function' => AGGREGATE_PCTILE, 'parameters' => ['10'], 'alias' => ''],
-						['column' => 'aggregated 3', 'function' => AGGREGATE_PCTILE, 'parameters' => ['10'], 'alias' => 'aggregate alias']
+						['column' => 'aggregated 1', 'function' => AGGREGATE_PERCENTILE, 'parameters' => [], 'alias' => ''],
+						['column' => 'aggregated 2', 'function' => AGGREGATE_PERCENTILE, 'parameters' => ['10'], 'alias' => ''],
+						['column' => 'aggregated 3', 'function' => AGGREGATE_PERCENTILE, 'parameters' => ['10'], 'alias' => 'aggregate alias']
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -532,7 +532,7 @@ class CAuditTest extends TestCase {
 					'columns' => [],
 					'aggregated_columns' => [
 						['column' => '', 'function' => AGGREGATE_COUNT, 'alias' => 'total'],
-						['column' => '', 'function' => AGGREGATE_PCTILE, 'parameters' => ['10'], 'alias' => '']
+						['column' => '', 'function' => AGGREGATE_PERCENTILE, 'parameters' => ['10'], 'alias' => '']
 					],
 					'filter' => [
 						'evaltype' => 0,
@@ -573,7 +573,7 @@ class CAuditTest extends TestCase {
 					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
-						['column' => '', 'function' => AGGREGATE_PCTILE, 'parameters' => ['10'], 'alias' => '']
+						['column' => '', 'function' => AGGREGATE_PERCENTILE, 'parameters' => ['10'], 'alias' => '']
 					],
 					'filter' => [
 						'evaltype' => 0,
@@ -588,7 +588,7 @@ class CAuditTest extends TestCase {
 					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
-						['column' => '', 'function' => AGGREGATE_PCTILE, 'parameters' => ['5'], 'alias' => '']
+						['column' => '', 'function' => AGGREGATE_PERCENTILE, 'parameters' => ['5'], 'alias' => '']
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -626,7 +626,7 @@ class CAuditTest extends TestCase {
 					'metric_point_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
 					'aggregated_columns' => [
-						['column' => '', 'function' => AGGREGATE_PCTILE, 'parameters' => ['10'], 'alias' => '']
+						['column' => '', 'function' => AGGREGATE_PERCENTILE, 'parameters' => ['10'], 'alias' => '']
 					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,

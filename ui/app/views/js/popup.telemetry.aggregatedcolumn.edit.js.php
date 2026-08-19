@@ -39,7 +39,7 @@ window.telemetry_aggregated_column_popup = new class {
 	#update() {
 		const func = this.#form.findFieldByName('function').getValue();
 		const is_count = func === '<?= AGGREGATE_COUNT ?>';
-		const is_percentile = func === '<?= AGGREGATE_PCTILE ?>';
+		const is_percentile = func === '<?= AGGREGATE_PERCENTILE ?>';
 
 		this.#form_element.querySelector('#js-column-field').style.display = is_count ? 'none' : '';
 		this.#form_element.querySelector('#js-column-label').style.display = is_count ? 'none' : '';
@@ -66,7 +66,7 @@ window.telemetry_aggregated_column_popup = new class {
 						row_index: fields.row_index,
 						column: func === <?= AGGREGATE_COUNT ?> ? '' : fields.column,
 						function: func,
-						percentile: func === <?= AGGREGATE_PCTILE ?> ? fields.percentile : '',
+						percentile: func === <?= AGGREGATE_PERCENTILE ?> ? fields.percentile : '',
 						alias: fields.alias
 					}
 				}));

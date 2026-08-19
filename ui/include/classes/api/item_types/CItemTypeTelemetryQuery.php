@@ -195,7 +195,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 
 	/**
 	 * Validate "query.aggregated_columns":
-	 * - for "function" AGGREGATE_PCTILE "parameters" array may have only single value
+	 * - for "function" AGGREGATE_PERCENTILE "parameters" array may have only single value
 	 *
 	 * @param array       $item   Telemetry item to validate.
 	 * @param string      $path   Path for validation message.
@@ -203,7 +203,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 */
 	public static function validateAggregatedColumns(array $item, string $path, ?string &$error): bool {
 		foreach ($item['query']['aggregated_columns'] as $i => $column) {
-			if ($column['function'] == AGGREGATE_PCTILE && count($column['parameters']) > 1) {
+			if ($column['function'] == AGGREGATE_PERCENTILE && count($column['parameters']) > 1) {
 				$error = _s('Invalid parameter "%1$s": %2$s.',
 					$path.'/query/aggregated_columns/'.($i + 1).'/parameters',
 					_s('maximum number of array elements is %1$s', 1)
@@ -297,7 +297,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 */
 	public static function prepareQueryFieldForDb(array $query): string {
 		foreach ($query['aggregated_columns'] as &$column) {
-			if ($column['function'] == AGGREGATE_PCTILE) {
+			if ($column['function'] == AGGREGATE_PERCENTILE) {
 				// Server expects "query.aggregated_columns[].parameters" to be stored as array of strings.
 				$column['parameters'] = array_map('strval', $column['parameters']);
 			}
@@ -433,14 +433,14 @@ class CItemTypeTelemetryQuery extends CItemType {
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]]]],
 			'aggregated_columns'	=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['alias']], 'fields' => [
-				'function'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_PCTILE])],
+				'function'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_PERCENTILE])],
 				'column'				=> ['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PCTILE])],
+												['if' => ['field' => 'function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PERCENTILE])],
 													'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $aggregated_column)],
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 				]],
 				'parameters'			=> ['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'function', 'in' => AGGREGATE_PCTILE],
+												['if' => ['field' => 'function', 'in' => AGGREGATE_PERCENTILE],
 													'type' => API_FLOATS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => '0:100'],
 												['else' => true, 'type' => API_OBJECTS, 'length' => 0, 'unset' => true]
 				]],
