@@ -119,13 +119,15 @@ $formgrid = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('items', 'url'))
 				->setReadonly($readonly)
+				->setErrorContainer('url-error-container')
 				->setAriaRequired(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CSimpleButton(_('Parse')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->setAttribute('name', 'parseurl')
 				->setAttribute('error-message', _('Failed to parse URL.').BR().BR()._('URL is not properly encoded.'))
-				->setEnabled(!$readonly)
+				->setEnabled(!$readonly),
+			(new CDiv())->setId('url-error-container')
 		]))->setId('js-item-url-field')
 	])
 	->addItem([

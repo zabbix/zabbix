@@ -528,221 +528,319 @@ class testUrlParameters extends CLegacyWebTest {
 			],
 			[
 				[
-					'title' => 'Configuration of discovery prototypes',
+					'title' => 'Discovery prototype edit',
 					'check_server_name' => true,
 					'server_name_on_page' => false,
 					'substitute_ids' => true,
 					'test_cases' => [
 						// Context = template, validate itemid.
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid={template_lld_prototypeid}'.
-									'&parent_discoveryid={template_lldid}',
-							'text_present' => 'Discovery prototypes'
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={template_lld_prototypeid}'.
+									'&parent_discoveryid={template_lldid}&context=template',
+							'text_present' => 'Discovery prototype'
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid=1&parent_discoveryid={template_lldid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid=1'.
+									'&parent_discoveryid={template_lldid}&context=template',
+							'text_not_present' => 'Discovery prototype',
+							'access_denied' => true,
 							'text_present' => [
-								'No permissions to referred object or it does not exist!'
+								'You are logged in as "Admin". You have no permissions to access this page.'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid=abc&parent_discoveryid={template_lldid}',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid=abc'.
+									'&parent_discoveryid={template_lldid}&context=template',
 							'text_not_present' => 'Discovery prototypes',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "itemid" is not integer.'
+								'Controller: popup',
+								'action: popup',
+								'context: template',
+								'itemid: abc',
+								'parent_discoveryid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid=&parent_discoveryid={template_lldid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid='.
+									'&parent_discoveryid={template_lldid}&context=template',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "itemid" is not integer.'
+								'Controller: popup',
+								'action: popup',
+								'context: template',
+								'itemid:',
+								'parent_discoveryid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid=-1&parent_discoveryid={template_lldid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid=-1'.
+									'&parent_discoveryid={template_lldid}&context=template',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Incorrect value "-1" for "itemid" field.'
+								'Controller: popup',
+								'action: popup',
+								'context: template',
+								'itemid: -1',
+								'parent_discoveryid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid[]={template_lld_prototypeid}'.
-									'&parent_discoveryid={template_lldid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid[]={template_lld_prototypeid}'.
+									'&parent_discoveryid={template_lldid}&context=template',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "itemid" is not correct: invalid data type.'
+								'Controller: popup',
+								'action: popup',
+								'context: template',
+								'itemid: array',
+								'parent_discoveryid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&parent_discoveryid={template_lldid}',
-							'text_not_present' => 'Discovery prototypes',
-							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "itemid" is mandatory.'
-							]
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&parent_discoveryid={template_lldid}'.
+									'&context=template',
+							'text_present' => 'New discovery prototype'
 						],
 						// Context = template, validate parent_discoveryid.
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid={template_lld_prototypeid}'.
-									'&parent_discoveryid=1',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={template_lld_prototypeid}'.
+									'&parent_discoveryid=1&context=template',
+							'text_not_present' => 'Discovery prototype',
+							'access_denied' => true,
 							'text_present' => [
-								'No permissions to referred object or it does not exist!'
+								'You are logged in as "Admin". You have no permissions to access this page.'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid={template_lld_prototypeid}'.
-									'&parent_discoveryid=abc',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={template_lld_prototypeid}'.
+									'&parent_discoveryid=abc&context=template',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "parent_discoveryid" is not integer.'
+								'Controller: popup',
+								'action: popup',
+								'context: template',
+								'itemid: ',
+								'parent_discoveryid: abc',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid={template_lld_prototypeid}'.
-									'&parent_discoveryid=',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={template_lld_prototypeid}'.
+									'&parent_discoveryid=&context=template',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "parent_discoveryid" is not integer.'
+								'Controller: popup',
+								'action: popup',
+								'context: template',
+								'itemid: ',
+								'parent_discoveryid:',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid={template_lld_prototypeid}'.
-									'&parent_discoveryid=-1',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={template_lld_prototypeid}'.
+									'&parent_discoveryid=-1&context=template',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Incorrect value "-1" for "parent_discoveryid" field.'
+								'Controller: popup',
+								'action: popup',
+								'context: template',
+								'itemid: ',
+								'parent_discoveryid: -1',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid={template_lld_prototypeid}'.
-									'&parent_discoveryid[]={template_lldid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={template_lld_prototypeid}'.
+									'&parent_discoveryid[]={template_lldid}&context=template',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "parent_discoveryid" is not correct: invalid data type.'
+								'Controller: popup',
+								'action: popup',
+								'context: template',
+								'itemid: ',
+								'parent_discoveryid: array',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=template&itemid={template_lld_prototypeid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={template_lld_prototypeid}'.
+									'&context=template',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'No permissions to referred object or it does not exist!'
+								'Controller: popup',
+								'action: popup',
+								'context: template',
+								'itemid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						// Context = host, validate itemid.
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&itemid={host_lld_prototypeid}'.
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={host_lld_prototypeid}'.
 									'&parent_discoveryid={host_lldid}&context=host',
-							'text_present' => 'Discovery prototypes'
+							'text_present' => 'Discovery prototype'
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&itemid=1&parent_discoveryid={host_lldid}&context=host',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid=1'.
+									'&parent_discoveryid={host_lldid}&context=host',
+							'text_not_present' => 'Discovery prototype',
+							'access_denied' => true,
 							'text_present' => [
-								'No permissions to referred object or it does not exist!'
+								'You are logged in as "Admin". You have no permissions to access this page.'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=host&itemid=abc&parent_discoveryid={host_lldid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid=abc'.
+									'&parent_discoveryid={host_lldid}&context=host',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "itemid" is not integer.'
+								'Controller: popup',
+								'action: popup',
+								'context: host',
+								'itemid: abc',
+								'parent_discoveryid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=host&itemid=&parent_discoveryid={host_lldid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid='.
+									'&parent_discoveryid={host_lldid}&context=host',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "itemid" is not integer.'
+								'Controller: popup',
+								'action: popup',
+								'context: host',
+								'itemid:',
+								'parent_discoveryid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=host&itemid=-1&parent_discoveryid={host_lldid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid=-1'.
+									'&parent_discoveryid={host_lldid}&context=host',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Incorrect value "-1" for "itemid" field.'
+								'Controller: popup',
+								'action: popup',
+								'context: host',
+								'itemid: -1',
+								'parent_discoveryid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=host&itemid[]={host_lld_prototypeid}'.
-									'&parent_discoveryid={host_lldid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid[]={host_lld_prototypeid}'.
+									'&parent_discoveryid={host_lldid}&context=host',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "itemid" is not correct: invalid data type.'
+								'Controller: popup',
+								'action: popup',
+								'context: host',
+								'itemid: array',
+								'parent_discoveryid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=host&parent_discoveryid={host_lldid}',
-							'text_not_present' => 'Discovery prototypes',
-							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "itemid" is mandatory.'
-							]
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&parent_discoveryid={host_lldid}'.
+									'&context=host',
+							'text_present' => 'New discovery prototype'
 						],
 						// Context = host, validate parent_discoveryid.
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=host&itemid={host_lld_prototypeid}'.
-									'&parent_discoveryid=1',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={host_lld_prototypeid}'.
+									'&parent_discoveryid=1&context=host',
+							'text_not_present' => 'Discovery prototype',
+							'access_denied' => true,
 							'text_present' => [
-								'No permissions to referred object or it does not exist!'
+								'You are logged in as "Admin". You have no permissions to access this page.'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=host&itemid={host_lld_prototypeid}'.
-									'&parent_discoveryid=abc',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={host_lld_prototypeid}'.
+									'&parent_discoveryid=abc&context=host',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "parent_discoveryid" is not integer.'
+								'Controller: popup',
+								'action: popup',
+								'context: host',
+								'itemid: ',
+								'parent_discoveryid: abc',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=host&itemid={host_lld_prototypeid}'.
-									'&parent_discoveryid=',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={host_lld_prototypeid}'.
+									'&parent_discoveryid=&context=host',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "parent_discoveryid" is not integer.'
+								'Controller: popup',
+								'action: popup',
+								'context: host',
+								'itemid: ',
+								'parent_discoveryid:',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=host&itemid={host_lld_prototypeid}'.
-									'&parent_discoveryid=-1',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={host_lld_prototypeid}'.
+									'&parent_discoveryid=-1&context=host',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Incorrect value "-1" for "parent_discoveryid" field.'
+								'Controller: popup',
+								'action: popup',
+								'context: host',
+								'itemid: ',
+								'parent_discoveryid: -1',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=host&itemid={host_lld_prototypeid}'.
-									'&parent_discoveryid[]={host_lldid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={host_lld_prototypeid}'.
+									'&parent_discoveryid[]={host_lldid}&context=host',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'Zabbix has received an incorrect request.',
-								'Field "parent_discoveryid" is not correct: invalid data type.'
+								'Controller: popup',
+								'action: popup',
+								'context: host',
+								'itemid: ',
+								'parent_discoveryid: array',
+								'popup: lldrule.prototype.edit'
 							]
 						],
 						[
-							'url' => 'host_discovery_prototypes.php?form=update&context=host&itemid={host_lld_prototypeid}',
-							'text_not_present' => 'Discovery prototypes',
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={host_lld_prototypeid}'.
+									'&context=host',
+							'text_not_present' => 'Discovery prototype',
+							'fatal_error' => true,
 							'text_present' => [
-								'No permissions to referred object or it does not exist!'
+								'Controller: popup',
+								'action: popup',
+								'context: host',
+								'itemid: ',
+								'popup: lldrule.prototype.edit'
 							]
 						]
 					]

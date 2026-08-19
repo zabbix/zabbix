@@ -304,13 +304,15 @@
 				.setCellRenderer('discovery', ({cell_data, cell}) => {
 					const [templateid, discovery_rules] = cell_data;
 
-					const url = new URL('host_discovery.php', location.href);
-					url.searchParams.set('filter_set', '1');
-					url.searchParams.set('filter_hostids[0]', templateid);
-					url.searchParams.set('context', 'template');
+					const url_params = {
+						action: 'lldrule.list',
+						filter_set: 1,
+						filter_hostids: [templateid],
+						context: 'template'
+					};
 
 					const item_link = document.createElement('a');
-					item_link.setAttribute('href', url.toString());
+					item_link.setAttribute('href', zabbixUrl(url_params));
 					item_link.textContent = <?= json_encode(_('Discovery')); ?>;
 
 					cell.appendChild(item_link);

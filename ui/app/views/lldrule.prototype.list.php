@@ -19,7 +19,7 @@
  * @var array $data
  */
 
-require_once __DIR__.'/js/configuration.host.discovery.prototype.list.js.php';
+$this->includeJsFile('lldrule.prototype.list.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Discovery prototypes'))
@@ -31,19 +31,16 @@ $html_page = (new CHtmlPage())
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					(new CRedirectButton(_('Create discovery prototype'),
-						(new CUrl('host_discovery_prototypes.php'))
-							->setArgument('form', 'create')
-							->setArgument('hostid', $data['hostid'])
-							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-							->setArgument('context', $data['context'])
-					))->setEnabled(!$data['is_parent_discovered'])
+					(new CSimpleButton(_('Create discovery prototype')))
+						->addClass('js-create-item')
+						->setEnabled(!$data['is_parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->setNavigation(getHostNavigation('lld_prototypes', $data['hostid'], $data['parent_discoveryid']));
 
-$url = (new CUrl('host_discovery_prototypes.php'))
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'lldrule.prototype.list')
 	->setArgument('context', $data['context'])
 	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->getUrl();
@@ -52,7 +49,7 @@ $url = (new CUrl('host_discovery_prototypes.php'))
 $discoveryForm = (new CForm('post', $url))->setName('discovery_prototype');
 
 if ($data['hostid'] != 0) {
-	$discoveryForm->addVar('hostid', $data['hostid']);
+	$discoveryForm->addItem((new CVar('hostid', $data['hostid']))->removeId());
 }
 
 // create table
@@ -76,7 +73,6 @@ $discoveryTable = (new CTableInfo())
 	->setPageNavigation($data['paging']);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
-$csrf_token = CCsrfTokenHelper::get('host_discovery_prototypes.php');
 
 foreach ($data['discoveries'] as $discovery) {
 	// description
@@ -87,8 +83,9 @@ foreach ($data['discoveries'] as $discovery) {
 
 	if ($discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
 		$description[] = (new CLink($data['source_link_data']['name'],
-			(new CUrl('host_discovery_prototypes.php'))
-				->setArgument('form', 'update')
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'lldrule.prototype.edit')
 				->setArgument('parent_discoveryid', $data['source_link_data']['parent_itemid'])
 				->setArgument('itemid', $discovery['discoveryData']['parent_itemid'])
 				->setArgument('context', 'host')
@@ -132,8 +129,9 @@ foreach ($data['discoveries'] as $discovery) {
 
 	$description[] = new CLink(
 		$discovery['name'],
-		(new CUrl('host_discovery_prototypes.php'))
-			->setArgument('form', 'update')
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'popup')
+			->setArgument('popup', 'lldrule.prototype.edit')
 			->setArgument('context', $data['context'])
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('itemid', $discovery['itemid'])
@@ -142,40 +140,22 @@ foreach ($data['discoveries'] as $discovery) {
 	$status_disabled = $discovery['status'] == ITEM_STATUS_DISABLED;
 	$status_toggle = $data['is_parent_discovered']
 		? (new CSpan($status_disabled ? _('No') : _('Yes')))
-		: (new CLink($status_disabled ? _('No') : _('Yes'),
-			(new CUrl('host_discovery_prototypes.php'))
-				->setArgument('hostid', $discovery['hostid'])
-				->setArgument('g_hostdruleid[]', $discovery['itemid'])
-				->setArgument('action', $status_disabled
-					? 'discoveryprototype.massenable'
-					: 'discoveryprototype.massdisable'
-				)
-				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('context', $data['context'])
-				->getUrl()
-			))
-				->addCsrfToken($csrf_token)
-				->addClass(ZBX_STYLE_LINK_ACTION);
+		: (new CLink($status_disabled ? _('No') : _('Yes')))
+			->addClass($status_disabled ? 'js-enable-item' : 'js-disable-item')
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setAttribute('data-itemid', $discovery['itemid']);
 
 	$no_discover = $discovery['discover'] == ZBX_PROTOTYPE_NO_DISCOVER;
 	$discover_toggle = $data['is_parent_discovered']
 		? (new CSpan($no_discover ? _('No') : _('Yes')))
-		: (new CLink($no_discover ? _('No') : _('Yes'),
-			(new CUrl('host_discovery_prototypes.php'))
-				->setArgument('hostid', $discovery['hostid'])
-				->setArgument('itemid', $discovery['itemid'])
-				->setArgument('action', 'discoveryprototype.updatediscover')
-				->setArgument('discover', $no_discover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
-				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('context', $data['context'])
-				->getUrl()
-		))
-			->addCsrfToken($csrf_token)
-			->addClass(ZBX_STYLE_LINK_ACTION);
+		: (new CLink($no_discover ? _('No') : _('Yes')))
+			->addClass($no_discover ? 'js-discover-enable-item' : 'js-discover-disable-item')
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setAttribute('data-itemid', $discovery['itemid']);
 
 	// Hide zeros for specific items.
 	if (in_array($discovery['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_NESTED])
-			|| ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
+		|| ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
@@ -238,7 +218,8 @@ foreach ($data['discoveries'] as $discovery) {
 		],
 		[
 			new CLink(_('Discovery prototypes'),
-				(new CUrl('host_discovery_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.prototype.list')
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
@@ -253,32 +234,28 @@ foreach ($data['discoveries'] as $discovery) {
 }
 
 $buttons = [
-	'discoveryprototype.massenable' => [
-		'name' => _('Create enabled'),
-		'confirm_singular' => _('Enable selected discovery prototype?'),
-		'confirm_plural' => _('Enable selected discovery prototypes?'),
-		'csrf_token' => $csrf_token
+	[
+		'content' => (new CSimpleButton(_('Create enabled')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-massenable-item')
+			->addClass('js-no-chkbxrange')
+			->setEnabled(!$data['is_parent_discovered'])
+			->setAttribute('data-disabled', $data['is_parent_discovered'] ? 1 : null)
 	],
-	'discoveryprototype.massdisable' => [
-		'name' => _('Create disabled'),
-		'confirm_singular' => _('Disable selected discovery prototype?'),
-		'confirm_plural' => _('Disable selected discovery prototypes?'),
-		'csrf_token' => $csrf_token
+	[
+		'content' => (new CSimpleButton(_('Create disabled')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-massdisable-item')
+			->addClass('js-no-chkbxrange')
+			->setEnabled(!$data['is_parent_discovered'])
+			->setAttribute('data-disabled', $data['is_parent_discovered'] ? 1 : null)
+	],
+	[
+		'content' => (new CSimpleButton(_('Delete')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-massdelete-item')
+			->addClass('js-no-chkbxrange')
 	]
-];
-
-if ($data['is_parent_discovered']) {
-	foreach ($buttons as &$button) {
-		$button['disabled'] = true;
-	}
-	unset($button);
-}
-
-$buttons['discoveryprototype.massdelete'] = [
-	'name' => _('Delete'),
-	'confirm_singular' => _('Delete selected discovery prototype?'),
-	'confirm_plural' => _('Delete selected discovery prototypes?'),
-	'csrf_token' => $csrf_token
 ];
 
 // Append table to form.
@@ -291,12 +268,19 @@ $html_page
 	->addItem($discoveryForm)
 	->show();
 
-zbx_add_post_js("history.replaceState({}, '');");
+$confirm_messages = [
+	'lldrule.prototype.enable' => [_('Enable selected discovery prototype?'), _('Enable selected discovery prototypes?')],
+	'lldrule.prototype.disable' => [_('Disable selected discovery prototype?'), _('Disable selected discovery prototypes?')],
+	'lldrule.prototype.delete' => [_('Delete selected discovery prototype?'), _('Delete selected discovery prototypes?')]
+];
 
 (new CScriptTag('
 	view.init('.json_encode([
 		'context' => $data['context'],
-		'checkbox_hash' => $data['checkbox_hash']
+		'confirm_messages' => $confirm_messages,
+		'form_name' => $discoveryForm->getName(),
+		'hostid' => $data['hostid'],
+		'parent_discoveryid' => $data['parent_discoveryid']
 	]).');
 '))
 	->setOnDocumentReady()

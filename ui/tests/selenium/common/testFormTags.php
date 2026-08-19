@@ -307,8 +307,7 @@ class testFormTags extends CWebTest {
 			case 'host prototype':
 				$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
 				$data['name'] = $data['name'].' {#KEY}';
-				$form->fill(['Host name' => $data['name']]);
-				$form->fill(['Host groups' => 'Zabbix servers']);
+				$form->fill(['Host name' => $data['name'], 'Host groups' => 'Zabbix servers']);
 				break;
 
 			case 'web scenario':

@@ -144,6 +144,75 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 		*num = atoi(zbx_db_get_field(table, fieldname)->default_value);
 }
 
+static int	process_zero_pollers_items(zbx_dc_item_t *item, zbx_get_config_forks_f get_config_forks, char **info)
+{
+	unsigned char	proc_type, snmp_oid_type = 0;
+
+	switch (item->type)
+	{
+		case ITEM_TYPE_DB_MONITOR:
+#ifndef HAVE_UNIXODBC
+			*info = zbx_strdup(NULL, "Support for ODBC was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_IPMI:
+#ifndef HAVE_OPENIPMI
+			*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_SSH:
+#if !defined(HAVE_SSH) && !defined(HAVE_SSH2)
+			*info = zbx_strdup(NULL, "Support for SSH was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_SNMP:
+#ifndef HAVE_NETSNMP
+			*info = zbx_strdup(NULL, "Support for SNMP was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+		case ITEM_TYPE_HTTPAGENT:
+		case ITEM_TYPE_BROWSER:
+#ifndef HAVE_LIBCURL
+			*info = zbx_strdup(NULL, "Support for libCURL was not compiled in.");
+			return FAIL;
+#else
+			break;
+#endif
+	}
+
+	if (ITEM_TYPE_SNMP == item->type)
+	{
+#		define ZBX_SNMP_OID_TYPE_WALK	3
+#		define ZBX_SNMP_OID_TYPE_GET	4
+
+		if (0 == strncmp(item->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
+			snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;
+		else if (0 == strncmp(item->snmp_oid, "get[", ZBX_CONST_STRLEN("get[")))
+			snmp_oid_type = ZBX_SNMP_OID_TYPE_GET;
+
+#		undef ZBX_SNMP_OID_TYPE_WALK
+#		undef ZBX_SNMP_OID_TYPE_GET
+	}
+
+	if (ZBX_NO_POLLER != zbx_poller_by_item(item->type, item->key, snmp_oid_type, get_config_forks, &proc_type) ||
+			ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
+	{
+		return SUCCEED;
+	}
+
+	*info = zbx_dsprintf(NULL, "\"%s\" is disabled in configuration", get_process_type_string(proc_type));
+
+	return FAIL;
+}
+
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
@@ -390,7 +459,12 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			sizeof(item.host.tls_psk));
 #endif
 
-	if (ITEM_TYPE_IPMI == item.type)
+	if (FAIL == process_zero_pollers_items(&item, get_config_forks, info))
+	{
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+			dump_item(&item);
+	}
+	else if (ITEM_TYPE_IPMI == item.type)
 	{
 		zbx_init_agent_result(&result);
 
@@ -398,21 +472,10 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		{
 			*info = zbx_dsprintf(NULL, "Invalid port number [%s]", item.interface.port_orig);
 		}
-		else
-		{
 #ifdef HAVE_OPENIPMI
-			if (0 == get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER))
-			{
-				*info = zbx_strdup(NULL, "Cannot perform IPMI request: configuration parameter"
-						" \"StartIPMIPollers\" is 0.");
-			}
-			else
-				ret = zbx_ipmi_test_item(&item, info);
-#else
-			ZBX_UNUSED(get_config_forks);
-			*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
+		else
+			ret = zbx_ipmi_test_item(&item, info);
 #endif
-		}
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);
