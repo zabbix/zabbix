@@ -1200,10 +1200,10 @@ void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_t
 	if (SUCCEED != ret)
 		goto enqueue;
 
-	cep_window_evict_expired(window, rule, now, tasks);
+	opmask = cep_window_evict_expired(window, rule, now, tasks);
 
 	if (SUCCEED == cep_window_js_process_script(window, &es, &error))
-		opmask = cep_window_execute_operations(rule, window, ZBX_CEP_WHEN_PATTERN_MATCH, tasks);
+		opmask |= cep_window_execute_operations(rule, window, ZBX_CEP_WHEN_PATTERN_MATCH, tasks);
 
 	if (0 != (opmask & CEP_FLAG(ZBX_CEP_OP_CLOSE_WINDOW)))
 		cep_window_close(rule, window, tasks);
