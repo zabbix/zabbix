@@ -673,21 +673,15 @@ class CDRule extends CApiService {
 
 	private static function checkProxies(array $proxyids): void {
 		if ($proxyids) {
-			$db_proxies = DBselect(
-				'SELECT proxyid'.
-				' FROM proxy'.
-				' WHERE '.dbConditionId('proxyid', $proxyids)
-			);
-
-			$db_proxyids = [];
-
-			while ($db_proxy = DBfetch($db_proxies)) {
-				$db_proxyids[$db_proxy['proxyid']] = true;
-			}
+			$db_proxies = API::Proxy()->get([
+				'output' => [],
+				'proxyids' => $proxyids,
+				'preservekeys' => true
+			]);
 
 			foreach ($proxyids as $i => $proxyid) {
 				if (($proxyid == 0 && !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING))
-						|| ($proxyid > 0 && !array_key_exists($proxyid, $db_proxyids))) {
+						|| ($proxyid > 0 && !array_key_exists($proxyid, $db_proxies))) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
 					));
