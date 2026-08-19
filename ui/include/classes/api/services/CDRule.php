@@ -54,6 +54,7 @@ class CDRule extends CApiService {
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
 			'editable'					=> false,
+			'nopermissions'				=> null,
 			'selectDHosts'				=> null,
 			'selectDChecks'				=> null,
 			// filter
@@ -111,7 +112,7 @@ class CDRule extends CApiService {
 		}
 
 // proxy
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$sqlParts['join']['p'] = ['type' => 'left', 'table' => 'proxy', 'using' => 'proxyid'];
 			$sqlParts['where'][] = '('.
 				'dr.proxyid IS NULL'.
@@ -288,6 +289,7 @@ class CDRule extends CApiService {
 		$db_duplicate = $this->get([
 			'output' => ['name'],
 			'filter' => ['name' => zbx_objectValues($drules, 'name')],
+			'nopermissions' => true,
 			'limit' => 1
 		]);
 
@@ -432,6 +434,7 @@ class CDRule extends CApiService {
 			$db_duplicate = $this->get([
 				'output' => ['name'],
 				'filter' => ['name' => zbx_objectValues($drule_names_changed, 'name')],
+				'nopermissions' => true,
 				'limit' => 1
 			]);
 
