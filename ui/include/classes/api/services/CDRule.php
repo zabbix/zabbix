@@ -54,7 +54,6 @@ class CDRule extends CApiService {
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
 			'editable'					=> false,
-			'nopermissions'				=> null,
 			'selectDHosts'				=> null,
 			'selectDChecks'				=> null,
 			// filter
@@ -112,7 +111,7 @@ class CDRule extends CApiService {
 		}
 
 // proxy
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			$sqlParts['join']['p'] = ['type' => 'left', 'table' => 'proxy', 'using' => 'proxyid'];
 			$sqlParts['where'][] = '('.
 				'dr.proxyid IS NULL'.
@@ -289,7 +288,6 @@ class CDRule extends CApiService {
 		$db_duplicate = $this->get([
 			'output' => ['name'],
 			'filter' => ['name' => zbx_objectValues($drules, 'name')],
-			'nopermissions' => true,
 			'limit' => 1
 		]);
 
@@ -435,7 +433,6 @@ class CDRule extends CApiService {
 			$db_duplicate = $this->get([
 				'output' => ['name'],
 				'filter' => ['name' => zbx_objectValues($drule_names_changed, 'name')],
-				'nopermissions' => true,
 				'limit' => 1
 			]);
 
@@ -676,15 +673,21 @@ class CDRule extends CApiService {
 
 	private static function checkProxies(array $proxyids): void {
 		if ($proxyids) {
-			$db_proxies = API::Proxy()->get([
-				'output' => [],
-				'proxyids' => $proxyids,
-				'preservekeys' => true
-			]);
+			$db_proxies = DBselect(
+				'SELECT proxyid'.
+				' FROM proxy'.
+				' WHERE '.dbConditionId('proxyid', $proxyids)
+			);
+
+			$db_proxyids = [];
+
+			while ($db_proxy = DBfetch($db_proxies)) {
+				$db_proxyids[$db_proxy['proxyid']] = true;
+			}
 
 			foreach ($proxyids as $i => $proxyid) {
 				if (($proxyid == 0 && !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING))
-						|| ($proxyid > 0 && !array_key_exists($proxyid, $db_proxies))) {
+						|| ($proxyid > 0 && !array_key_exists($proxyid, $db_proxyids))) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
 					));
