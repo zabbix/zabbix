@@ -860,31 +860,38 @@ out:
 	return ret;
 }
 
+static int tq_validate_time_param(const char *str, int *out, int min, int max, const char *error_name, char *error,
+		size_t max_error_len)
+{
+	if (NULL == str)
+		return ret_errf(FAIL, error, max_error_len, "%s is not set", error_name);
+	if (FAIL == zbx_is_time_suffix(str, out, ZBX_LENGTH_UNLIMITED))
+		return ret_errf(FAIL, error, max_error_len, "unsupported %s value", error_name);
+	if (min > *out || *out > max)
+		return ret_errf(FAIL, error, max_error_len, "%s must be within range %ds-%ds", error_name, min, max);
+	return SUCCEED;
+}
+
 int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out, const char *lookback_limit_str,
 		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
 		size_t max_error_len)
 {
 	int	time_shift_tmp, lookback_limit_tmp, granularity_tmp;
 
-	if (NULL == time_shift_str)
-		return ret_errf(FAIL, error, max_error_len, "Time shift is not set");
-	if (NULL == lookback_limit_str)
-		return ret_errf(FAIL, error, max_error_len, "Lookback limit is not set");
-	if (NULL == granularity_str)
-		return ret_errf(FAIL, error, max_error_len, "Granularity is not set");
+	if (SUCCEED != tq_validate_time_param(time_shift_str, &time_shift_tmp, ZBX_TQ_TIME_SHIFT_MIN,
+			ZBX_TQ_TIME_SHIFT_MAX, "time shift", error, max_error_len))
+		return FAIL;
 
-	if (FAIL == zbx_is_time_suffix(time_shift_str, &time_shift_tmp, ZBX_LENGTH_UNLIMITED))
-		return ret_errf(FAIL, error, max_error_len, "Unsupported time shift value");
-	if (FAIL == zbx_is_time_suffix(lookback_limit_str, &lookback_limit_tmp, ZBX_LENGTH_UNLIMITED))
-		return ret_errf(FAIL, error, max_error_len, "Unsupported lookback limit value");
-	if (FAIL == zbx_is_time_suffix(granularity_str, &granularity_tmp, ZBX_LENGTH_UNLIMITED))
-		return ret_errf(FAIL, error, max_error_len, "Unsupported granularity value");
+	if (SUCCEED != tq_validate_time_param(lookback_limit_str, &lookback_limit_tmp, ZBX_TQ_LOOKBACK_LIMIT_MIN,
+			ZBX_TQ_LOOKBACK_LIMIT_MAX, "lookback limit", error, max_error_len))
+		return FAIL;
 
-	if (0 == granularity_tmp)
-		return ret_errf(FAIL, error, max_error_len, "Granularity cannot be 0");
+	if (SUCCEED != tq_validate_time_param(granularity_str, &granularity_tmp, ZBX_TQ_GRANULARITY_MIN,
+			ZBX_TQ_GRANULARITY_MAX, "granularity", error, max_error_len))
+		return FAIL;
 
 	if (granularity_tmp > lookback_limit_tmp)
-		return ret_errf(FAIL, error, max_error_len, "Granularity cannot be larger than lookback limit");
+		return ret_errf(FAIL, error, max_error_len, "granularity cannot be larger than lookback limit");
 
 	if (NULL != time_shift_out)
 		*time_shift_out = time_shift_tmp;
