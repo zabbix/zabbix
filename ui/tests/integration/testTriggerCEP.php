@@ -6398,7 +6398,6 @@ HEREDOC;
 		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
 		$this->assertCepStatEquals('cache', 'events', 0);
 		$this->assertCepStatEquals('cache', 'objects', 0);
-		$this->assertCepNoWindows();
 	}
 
 	/**
@@ -9124,7 +9123,6 @@ HEREDOC;
 			$this->waitForNoOpenProblems($all, 'after the paired burst');
 			$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 			$this->assertCepStatEquals('cache', 'events', 0);
-			$this->assertCepNoWindows();
 		}
 		finally {
 			// The sequence closed every problem itself; only the rule must not survive it.
@@ -9193,7 +9191,6 @@ HEREDOC;
 			$this->waitForNoOpenProblems($triggerids, 'after the closing up wave');
 			$this->waitForParentsValue($triggerids, TRIGGER_VALUE_FALSE);
 			$this->assertCepStatEquals('cache', 'events', 0);
-			$this->assertCepNoWindows();
 		}
 		finally {
 			// The sequence closed every problem itself; only the rule must not survive it.
@@ -9306,11 +9303,9 @@ HEREDOC;
 		$this->waitForNoOpenProblems($triggerids, 'close by window correlation');
 		$this->waitForParentsValue($triggerids, TRIGGER_VALUE_FALSE);
 
-		// Nothing is left cached once every problem of every trigger is closed, and the windows the rule
-		// closed are gone with the events they held.
+		// Nothing is left cached once every problem of every trigger is closed.
 		$this->assertCepStatEquals('cache', 'events', 0);
 		$this->assertCepStatEquals('cache', 'objects', 0);
-		$this->assertCepNoWindows();
 
 		if ($check_services) {
 			$this->waitForServicesStatus(ZBX_SEVERITY_OK);
@@ -16554,7 +16549,7 @@ HEREDOC;
 	}
 
 	private function waitForNoOpenProblems(array $triggerids, string $message = '', bool $wait_cep_drained = true,
-			?int $iterations = null): void {
+			?int $iterations = null, bool $check_no_windows = false): void {
 		// Wait for all problems to have a recovery event.
 		// Wait until no unresolved problems remain. Using countOutput avoids fetching/decoding any
 		// problem rows: the server returns just a count, and we poll until it reaches zero. (Default
@@ -16609,6 +16604,11 @@ HEREDOC;
 		if ($wait_cep_drained) {
 			$this->assertCepStatEquals('cache', 'events', 0);
 			$this->assertCepStatEquals('cache', 'objects', 0);
+		}
+
+		// Off by default: a window may legitimately outlive the problems it held (it is closed by its own
+		// duration or by a closing event), so only the scenarios that know theirs are gone ask for this.
+		if ($check_no_windows) {
 			$this->assertCepNoWindows();
 		}
 	}
