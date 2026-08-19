@@ -231,7 +231,7 @@
 		<property name="cmocka-2-agent-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-agent --with-libpcre2"/>
 		<property name="cmocka-3-server-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-server --with-mysql --with-libcurl --with-libpcre2"/>
 		<property name="cmocka-4-proxy-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-proxy --with-sqlite3 --with-libcurl --with-libpcre2"/>
-		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS} -Wenum-conversion -fsanitize=leak,address,undefined -fsanitize-address-use-after-scope' LDFLAGS='-fsanitize=leak,address,undefined -fsanitize-address-use-after-scope' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-iconv"/>
+		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS} -Wenum-conversion -fsanitize=leak,address,undefined -fsanitize-address-use-after-scope' LDFLAGS='-fsanitize=leak,address,undefined -fsanitize-address-use-after-scope' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-libmodbus --with-iconv --with-zlib"/>
 	</target>
 
 	<target name="cmocka-tests" depends="init-cmocka-test-conf-options">
@@ -292,26 +292,33 @@
 
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
-			<arg line="src"/>
+			<arg line="."/>
 			<arg line="-zerocounters"/>
 		</exec>
 		<exec executable="./bootstrap.sh" failonerror="on">
 			<arg line="tests"/>
 		</exec>
-		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-libpcre2" conf-name="gen-test-coverage-report"/>
+		<make-tests conf="CFLAGS='--coverage' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-libmodbus --with-iconv --with-zlib" conf-name="gen-test-coverage-report"/>
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
-			<arg line="src"/>
+			<arg line="."/>
 			<arg line="--capture"/>
 			<arg line="--output-file"/>
 			<arg line="tests_results/html/app.info"/>
+		</exec>
+		<exec executable="lcov" failonerror="on">
+			<arg line="--extract"/>
+			<arg line="tests_results/html/app.info"/>
+			<arg line="*/src/*"/>
+			<arg line="--output-file"/>
+			<arg line="tests_results/html/app_filtered.info"/>
 		</exec>
 		<exec executable="genhtml" failonerror="on">
 			<arg line="-p"/>
 			<arg line="${user.dir}"/>
 			<arg line="-o"/>
 			<arg line="tests_results/html"/>
-			<arg line="tests_results/html/app.info"/>
+			<arg line="tests_results/html/app_filtered.info"/>
 		</exec>
 		<antcall target="clean-tests"/>
 	</target>
