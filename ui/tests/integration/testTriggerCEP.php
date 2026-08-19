@@ -7518,6 +7518,22 @@ HEREDOC;
 	}
 
 	/**
+	 * Same manual-close scenario as testTriggerCEP_EventAssessmentServiceCorrelationManualClose, but the
+	 * remaining "down_1" problem is closed while its trigger is UNKNOWN: unsupported values are sent for
+	 * every discovered item right before the manual close, so CEP keeps the trigger value as PROBLEM while
+	 * its state becomes UNKNOWN, and the manual close has to close the problem of an unknown trigger.
+	 * Supported values are restored afterwards so the triggers leave the UNKNOWN state.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentServiceCorrelationManualCloseUnknown$)
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentServiceCorrelationManualCloseUnknown() {
+		$this->prepareDataServiceCorrelation();
+		$this->runEventAssessmentTestCorrelationManualClose(false, true);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
+	}
+
+	/**
 	 * Verify cross-trigger-prototype global event correlation: proto 1 and proto 2 both fire
 	 * PROBLEM events with service="down"; sending "up" to proto 1 generates a RESOLVED event
 	 * with service="up" which triggers the global correlation rule (old service="down",
@@ -11379,8 +11395,11 @@ HEREDOC;
 	 *                 "down_1" problem (service = "1") is still open → trigger stays TRUE.
 	 *   4. Manual close → closeTagCorrelationProblems closes the remaining "down_1" problem;
 	 *                 all problems resolved → trigger returns to OK.
+	 *
+	 * With $unknown the manual close is performed while the triggers are UNKNOWN: closeTagCorrelationProblems
+	 * flips every discovered item to the unsupported state before closing (and restores it afterwards).
 	 */
-	private function runEventAssessmentTestCorrelationManualClose(bool $restart): void {
+	private function runEventAssessmentTestCorrelationManualClose(bool $restart, bool $unknown = false): void {
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$triggerids = self::$discovered_triggerids;
 
@@ -11418,8 +11437,9 @@ HEREDOC;
 		// 4. Manual close: exactly one problem per trigger remains open (the "down_1" / service="1"
 		//    problem). closeTagCorrelationProblems verifies that manual close is rejected while
 		//    manual_close=false, then enables it, closes all remaining problems and waits for all
-		//    triggers to return to OK.
-		$this->closeTagCorrelationProblems($triggerids);
+		//    triggers to return to OK. With $unknown the problems are closed while the triggers are
+		//    UNKNOWN (all discovered items flipped to unsupported first).
+		$this->closeTagCorrelationProblems($triggerids, $unknown);
 	}
 
 	/**
@@ -15524,8 +15544,14 @@ HEREDOC;
 	 * rejected while the flag is off, then enable manual_close on the trigger prototypes,
 	 * resend LLD discovery data so the change propagates to the discovered triggers, reload
 	 * the configuration cache, close all problems, and wait for every trigger to return to OK.
+	 *
+	 * With $unknown every discovered item is flipped to the unsupported state after the configuration
+	 * reload and before the close, so the problems are closed while their triggers are UNKNOWN (CEP keeps
+	 * the trigger value as PROBLEM). The close must still resolve them and drop the trigger value to OK
+	 * without leaving the UNKNOWN state; supported values are restored afterwards so the triggers can
+	 * return to NORMAL/OK.
 	 */
-	private function closeTagCorrelationProblems(array $triggerids): void {
+	private function closeTagCorrelationProblems(array $triggerids, bool $unknown = false): void {
 		// Collect the event ID of the open problem for every trigger.
 		$response = $this->call('problem.get', [
 			'objectids' => $triggerids,
@@ -15596,11 +15622,45 @@ HEREDOC;
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
+		if ($unknown) {
+			$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+
+			// Push a non-numeric value with the unsupported state flag so every discovered item becomes
+			// unsupported; CEP keeps the trigger values as PROBLEM while the states become UNKNOWN. Done
+			// after the LLD resend above, which would otherwise re-instantiate the items and could clear
+			// the state before the close.
+			$this->dispatchSenderValues(
+				array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key,
+						'value' => 'not_a_number', 'state' => ITEM_STATE_NOTSUPPORTED], $keys)
+			);
+
+			$this->validateTriggerParams(TRIGGER_STATE_UNKNOWN, TRIGGER_VALUE_TRUE);
+		}
+
 		$this->call('event.acknowledge', [
 			'eventids' => $problem_eventids,
 			'action' => ZBX_PROBLEM_UPDATE_CLOSE,
 			'message' => 'Manual close for tag-correlation mode test'
 		]);
+
+		if ($unknown) {
+			// The manual close must resolve the problems of the unknown triggers and drop their values to
+			// OK, while the states stay UNKNOWN - closing a problem does not make an item supported again.
+			$this->callUntilCountIsPresent('problem.get', [
+				'objectids' => $triggerids,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'source' => EVENT_SOURCE_TRIGGERS
+			], 0, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+
+			//$this->validateTriggerParams(TRIGGER_STATE_UNKNOWN, TRIGGER_VALUE_FALSE);
+
+			// Restore the supported state with a value the expression does not match, so the triggers
+			// leave UNKNOWN for NORMAL and stay OK.
+			$this->dispatchSenderValues(
+				array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'up_1'],
+					$keys)
+			);
+		}
 
 		$this->waitForNoOpenProblems($triggerids);
 	}
