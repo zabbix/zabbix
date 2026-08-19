@@ -1746,63 +1746,24 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	fi
 fi
 
+have_apm="no"
+want_apm="no"
+
 if test "x$proxy" = "xyes"; then
-    dnl *****************************************************************
-    dnl * OTLP/gRPC event collector (proxy only)                        *
-    dnl *****************************************************************
-    AC_ARG_WITH([apm],
-        [
-If you want to use APM collector in proxy:
-AS_HELP_STRING([--with-apm], [turn on OTLP/gRPC event collector, requires --enable-proxy @<:@default=no@:>@])],
-        [
-        if test "x$withval" = "xno"; then
-            with_apm="no"
-        elif test "x$withval" = "xyes"; then
-            with_apm="yes"
-        else
-            with_apm="yes"
-        fi
-        ],
-        [with_apm="no"])
-
-    if test "x$with_apm" != "xno"; then
-        AC_LANG_PUSH([C++])
-        AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
-        AC_LANG_POP([C++])
-
-        m4_ifdef([PKG_CHECK_MODULES], [
-            PKG_CHECK_MODULES([GRPC], [grpc++ >= 1.40])
-            PKG_CHECK_MODULES([PROTOBUF], [protobuf])
-        ], [
-            AC_MSG_ERROR([--with-apm needs pkg-config autoconf macros (pkg.m4); install pkg-config/pkgconf and re-run autoreconf])
-        ])
-
-        dnl Check / grpc_cpp_plugin (build-time codegen tools)
-        AC_ARG_VAR([PROTOC], [Path to the protoc compiler])
-        AC_PATH_PROG([PROTOC], [protoc], [no])
-        AS_IF([test "x$PROTOC" = "xno"],
-            [AC_MSG_ERROR([protoc not found; required by --with-apm. Install protobuf-compiler (or equivalent) and re-run configure.])])
-
-        AC_ARG_VAR([GRPC_CPP_PLUGIN], [Path to the grpc_cpp_plugin protoc plugin])
-        AC_PATH_PROG([GRPC_CPP_PLUGIN], [grpc_cpp_plugin], [no])
-        AS_IF([test "x$GRPC_CPP_PLUGIN" = "xno"],
-            [AC_MSG_ERROR([grpc_cpp_plugin not found; required by --with-apm. Install grpc-cpp-plugin/grpc-plugins (or equivalent) and re-run configure.])])
-
-        dnl Optionally sanity-check protoc version matches libprotobuf
-        protoc_version=`$PROTOC --version | sed 's/^libprotoc //'`
-        AC_MSG_NOTICE([using protoc $protoc_version at $PROTOC])
-        AC_MSG_NOTICE([using grpc_cpp_plugin at $GRPC_CPP_PLUGIN])
-
-        APM_CFLAGS="$GRPC_CFLAGS $PROTOBUF_CFLAGS"
-        APM_LIBS="$GRPC_LIBS $PROTOBUF_LIBS -lstdc++"
-        AC_SUBST(APM_CFLAGS)
-        AC_SUBST(APM_LIBS)
-
-        AC_DEFINE([HAVE_APM], [1], [Define to 1 if built with OTLP/gRPC event collector support])
-    fi
+	dnl *****************************************************************
+	dnl * OTLP/gRPC event collector (proxy only)                        *
+	dnl *****************************************************************
+	APM_CHECK_CONFIG()
+	if test "x$want_apm" = "xyes"; then
+		if test "x$found_apm" != "xyes"; then
+			AC_MSG_ERROR([Unable to use APM collector (APM check failed)])
+		fi
+		have_apm="yes"
+		AC_DEFINE([HAVE_APM], [1], [Define to 1 if built with OTLP/gRPC event collector support])
+	fi
 fi
 
-AM_CONDITIONAL([HAVE_APM], [test "x$with_apm" != "xno"])
+AM_CONDITIONAL([HAVE_APM], [test "x$have_apm" = "xyes"])
 
 SERVER_LDFLAGS="$SERVER_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
@@ -2578,7 +2539,7 @@ echo "    SNMP:                  ${have_snmp}
     SSH:                   ${have_ssh}
     TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
-    OTLP collector:        ${with_apm}
+    APM:                   ${have_apm}
     Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}
     Libraries:             ${PROXY_LIBS} ${LIBS}
     Configuration file:    ${PROXY_CONFIG_FILE}
