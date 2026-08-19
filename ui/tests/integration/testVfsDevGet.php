@@ -50,7 +50,13 @@ class testVfsDevGet extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
-		$name = trim((string) shell_exec("lsblk -dnlo NAME,TYPE | awk '\$2 == \"disk\" {print \$1; exit}'"));
+		// Only consider devices that also have a real /dev/<name> block special node, since that is
+		// what vfs.dev.get itself relies on for discovery (unlike lsblk, which reads sysfs and can see
+		// devices that have no corresponding node inside a restricted/containerized environment).
+		$name = trim((string) shell_exec(
+				"lsblk -dnlo NAME,TYPE | awk '\$2 == \"disk\" {print \$1}' | while read -r n; do ".
+				'[ -b "/dev/$n" ] && echo "$n" && break; done'
+		));
 		if ($name === '') {
 			throw new Exception('Cannot find a real block device on this host to test vfs.dev.get against.');
 		}
