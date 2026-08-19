@@ -473,6 +473,7 @@ static zbx_cep_rule_t	*cep_rule_clone(const zbx_cep_rule_t *rule)
 	clone->status = rule->status;
 	clone->stop = rule->stop;
 	clone->formula = zbx_strdup(NULL, rule->formula);
+	clone->name = zbx_strdup(NULL, rule->name);
 
 	cep_rule_copy_conditions(&clone->conditions, &rule->conditions);
 	cep_rule_copy_operations(&clone->operations, &rule->operations);
