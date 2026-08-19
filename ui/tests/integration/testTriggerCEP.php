@@ -429,14 +429,56 @@ class testTriggerCEP extends CIntegrationTest {
 	// How long the sliding flavour waits between the two values it sends, so their ages differ by more than the
 	// second or so a window may be examined late by: the older value is the one that has to be evicted alone, with the
 	// younger one still in the window when the eviction closes it. It leaves the rest of the period above for the
-	// second value to be sent and its problem to be seen open before the first one ages out.
+	// second value to be sent and its problem to be seen open before the first one ages out. The aged close window
+	// family below waits it out in the same place and for the same reason, between the value of every id that has to
+	// age out of its window and the values that have to outlive it.
 	const CEP_RULE_WINDOW_CLOSE_DURATION_GAP = 7;
-	// What both flavours wait for is due at a time they know - the period of a window they opened themselves - so the
-	// waits are given that period and this much on top, rather than the patience the waits for a value being processed
-	// run with. The window pool examines a window within a second of when it is due (cep_window_get_nextcheck()), and
-	// the rest is for the closing to reach the database and the API: a closing that does not happen is then reported
-	// about when it was due instead of at the end of a patience meant for something else.
+	// What every flavour that leaves a window to its duration waits for is due at a time it knows - the period of a
+	// window it opened itself - so the waits are given that period and this much on top, rather than the patience the
+	// waits for a value being processed run with. The window pool examines a window within a second of when it is due
+	// (cep_window_get_nextcheck()), and the rest is for the closing to reach the database and the API: a closing that
+	// does not happen is then reported about when it was due instead of at the end of a patience meant for something
+	// else.
 	const CEP_RULE_WINDOW_CLOSE_DURATION_SLACK = 11;
+	// The close window family once more, ended by that same duration instead of by a value: the flavours above end
+	// their windows from an "up" value, and these end them from the eviction of the event that has been in the window
+	// longest - the one execution point the duration of a sliding window reaches on its own, reached here without
+	// anything at all having been sent for it. What that leaves behind is the other way round from every flavour
+	// above: the evicted event is out of the window before it closes and is not closed with it, so of the events of an
+	// id it is the only problem still open once the window is gone, while the younger ones the closing window was
+	// still holding are the problems the rule closed. The whole family is driven that way - the ids and the values of
+	// every id (getCloseWindowServices() and getCloseWindowEventCount()), the single window variant, the doubled rule
+	// and the macro-ised window limits - so what those flavours assert of a window ended by a value is asserted of one
+	// ended by the clock as well, see prepareDataCepWindowCloseWindowOperations() and
+	// runEventAssessmentTestCepWindowCloseWindowAged().
+	//
+	// A cause and symptom window is the one type the family has no flavour of: its duration closes it rather than
+	// evicting over it (cep_window_causal_process()), so the eviction execution point is never reached by the clock
+	// there - what the clock does to that window type is a scenario of its own, see
+	// runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration(). Reaching a "close window" operation from the other
+	// kind of eviction, the one an event that does not fit is given, is covered for every window type there is by the
+	// flavours above.
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED = self::CEP_RULE_NAME_PREFIX.'window simple close window aged';
+	const CEP_RULE_WINDOW_TAG_CLOSE_AGED = self::CEP_RULE_NAME_PREFIX.'window tag close window aged';
+	// A pattern match window is here as well, and it is the flavour the family was extended for: that window type
+	// evicts what has aged out of it exactly as a sliding one does (cep_window_evict_expired() is called for it too),
+	// but cep_window_js_process() used to drop the operation mask that eviction returned, so a "close window" operation
+	// reached from it could not end the window - it is OR-ed into the mask of the pattern match operations now, which
+	// is what this flavour holds the server to. A window whose script reports no match is then still ended by the age
+	// of its oldest event, and the events it was holding are closed with it.
+	const CEP_RULE_WINDOW_PATTERN_CLOSE_AGED = self::CEP_RULE_NAME_PREFIX.'window pattern close window aged';
+	// How long the windows of that family last, which is also the age at which their oldest event is evicted and
+	// therefore what the scenario waits out. The duration has to outlast the values that go out after that event -
+	// they are the ones the closing window must still be holding - and no more than that, every second of it being a
+	// second the wait for the closing costs, so it is counted from how many of them there are: this much per value
+	// when they go out one at a time and are verified as they go, and this much when they go out in a single batch and
+	// only the totals are read (CEP_CLOSE_WINDOW_BATCH_FILL), see getCloseWindowAgedPeriod().
+	const CEP_CLOSE_WINDOW_AGED_VALUE_ALLOWANCE = 5;
+	const CEP_CLOSE_WINDOW_AGED_BATCH_ALLOWANCE = 1;
+	// What that duration gets on top of the values it has to outlast: the room for the counts of a full window to be
+	// read and for the restart to be taken before the oldest event of it ages out. The gap the scenario leaves before
+	// those values is added to it as well, being just as much a part of the lifetime the oldest event has to reach.
+	const CEP_CLOSE_WINDOW_AGED_MARGIN = 15;
 	// The reset scenario (see prepareDataCepWindowHeldProblemsOperations()) is run once per window type that has a
 	// window at all: resetting a rule throws away the windows it has open, and what a window holds is the one thing
 	// every window type keeps, so each of them must lose it the same way.
@@ -3086,6 +3128,123 @@ HEREDOC;
 	}
 
 	/**
+	 * Prepare the aged variants of the close window family: the very flavours above with the window ended by its own
+	 * duration instead of by the "up" value of an id - the oldest event of a window is evicted for its age and the
+	 * "close window" operation of that eviction is what ends the window, so nothing is sent that asks for the closing
+	 * at all. The rule is built by the same method with $aged set, which is what sizes its window for being waited out
+	 * and takes the "up" condition off the operation: what gets evicted here is whichever event is oldest and not the
+	 * one that says an id has recovered, see prepareDataCepWindowCloseWindowOperations() and
+	 * runEventAssessmentTestCepWindowCloseWindowAged().
+	 *
+	 * These are the sliding window types; the pattern match one is aged by the family as well and to the same end, see
+	 * prepareDataCepWindowPatternCloseWindowAged(). A cause and symptom window has no aged variant at all: its duration
+	 * closes it rather than evicting what it holds (cep_window_causal_process()), so its eviction execution point
+	 * cannot be reached by the clock, and what the clock does to that window type is a scenario of its own, see
+	 * prepareDataCepWindowCauseSymptomCloseOnDuration().
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowAged() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, false, false,
+			true
+		);
+	}
+
+	/**
+	 * The tag correlation flavour of the aged close window variants: correlating the events of a group is not what ages
+	 * them out of the window, so the eviction that ends it has to happen for this window type exactly as it does for a
+	 * simple one, see prepareDataCepWindowSimpleCloseWindowAged().
+	 */
+	public function prepareDataCepWindowTagCloseWindowAged() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+			self::CEP_RULE_WINDOW_TAG_CLOSE_AGED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, false, false,
+			true
+		);
+	}
+
+	/**
+	 * The single id variant of the aged close window flavours: one window instead of one per id, filled as deep as the
+	 * discovery goes and grouped out of the events of every discovered trigger, with the first of those events the one
+	 * that ages out of it and ends it - see prepareDataCepWindowPatternCloseWindowSingleService() for what the variant
+	 * changes and prepareDataCepWindowSimpleCloseWindowAged() for what ends the window.
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowAgedSingleService() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED),
+			CCepRuleHelper::WHEN_EVENT_EVICTED, false, true, false, false, true
+		);
+	}
+
+	/**
+	 * @see prepareDataCepWindowSimpleCloseWindowAgedSingleService()
+	 */
+	public function prepareDataCepWindowTagCloseWindowAgedSingleService() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE_AGED),
+			CCepRuleHelper::WHEN_EVENT_EVICTED, false, true, false, false, true
+		);
+	}
+
+	/**
+	 * The doubled variant of the aged close window flavours: two simple window rules keep a window of the same events
+	 * at once, both of them age the same event out of it and both close over that eviction - see
+	 * prepareDataCepWindowPatternCloseWindowDoubleRule() for what the variant changes and
+	 * prepareDataCepWindowSimpleCloseWindowAged() for what ends the window. Only the simple flavour is doubled here:
+	 * of the two window types that may be doubled at all the pattern match one has no aged variant, and a tag
+	 * correlation window is exclusive.
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowAgedDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true, false,
+			true
+		);
+	}
+
+	/**
+	 * Prepare the pattern match flavour of the aged close window variants, the window type the family was extended for:
+	 * a pattern match window evicts what has aged out of it as a sliding one does, so the eviction execution point is
+	 * reached by the clock there just the same - and the operation mask of that eviction is honoured now
+	 * (cep_window_js_process() OR-s it into the mask of the pattern match operations), so the "close window" reached
+	 * from it ends the window as it does everywhere else. The script of the window reports no match however many events
+	 * it is given, which is what leaves the age of its oldest event the only thing that can end it: a flavour whose
+	 * window is ended by the script is what the non-aged family already covers, see
+	 * prepareDataCepWindowPatternCloseWindow().
+	 *
+	 * Nothing about the rule differs from the sliding flavours, so the same assessment drives it and asserts the same
+	 * outcome, see prepareDataCepWindowSimpleCloseWindowAged() and runEventAssessmentTestCepWindowCloseWindowAged().
+	 */
+	public function prepareDataCepWindowPatternCloseWindowAged() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, false, false,
+			true
+		);
+	}
+
+	/**
+	 * The single id variant of the aged pattern match flavour: one window holding an event of every discovered trigger,
+	 * ended by the first of those events ageing out of it - see
+	 * prepareDataCepWindowSimpleCloseWindowAgedSingleService() and prepareDataCepWindowPatternCloseWindowAged().
+	 */
+	public function prepareDataCepWindowPatternCloseWindowAgedSingleService() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED),
+			CCepRuleHelper::WHEN_EVENT_EVICTED, false, true, false, false, true
+		);
+	}
+
+	/**
+	 * The doubled variant of the aged pattern match flavour, which a pattern match window may have, being one of the
+	 * two types that are not exclusive: two rules keep a window of the same events at once, both windows age the same
+	 * event out and both close over that eviction - see prepareDataCepWindowSimpleCloseWindowAgedDoubleRule() and
+	 * prepareDataCepWindowPatternCloseWindowAged().
+	 */
+	public function prepareDataCepWindowPatternCloseWindowAgedDoubleRule() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED, CCepRuleHelper::WHEN_EVENT_EVICTED, false, false, true, false,
+			true
+		);
+	}
+
+	/**
 	 * Prepare the close window scenario: a window per id that is ended by the rule as soon as that id has
 	 * recovered, which closes the events the window held. The window groups by the 'service' tag, so every id
 	 * gets a window of its own and outlasts the whole scenario (getCloseWindowDuration()), so what a window
@@ -3125,6 +3284,18 @@ HEREDOC;
 	 * A pattern match window cannot be without a script, so the flavours that do not close the window on a match
 	 * get one that never reports one: the events of such a window are only ever acted on by the operation of the
 	 * arriving or evicted event, exactly as in the window types that have no script at all.
+	 *
+	 * $aged turns an eviction flavour into one the clock reaches instead of a value: its window is given room for
+	 * everything it is sent and a duration short enough to be waited out (getCloseWindowAgedPeriod()) rather than the
+	 * other way round, so what leaves that window leaves it for having been in it too long and not for failing to fit
+	 * into it. The "close window" operation then keeps no condition either - the event that ages out of a window is
+	 * whichever one is oldest and not the one that says an id has recovered, so there is nothing about it to match on -
+	 * and the extra "close" of the eviction execution point below is left out, which is what leaves the aged event
+	 * itself open: it is out of the window before the window closes, so nothing of the rule reaches it at all.
+	 *
+	 * A pattern match window may be aged as well and needs nothing of its own for it: the script it is required to have
+	 * reports no match, so the age of its oldest event is the only thing left that can end it, and the eviction that
+	 * age causes reaches this very operation - see prepareDataCepWindowPatternCloseWindowAged().
 	 *
 	 * The last operation of every flavour closes the events the window held, at WHEN_WINDOW_CLOSED - the execution
 	 * point a closing window reaches for every event it held, and the only one it reaches: an event a window lets go
@@ -3177,7 +3348,7 @@ HEREDOC;
 	 */
 	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when,
 			bool $discard_down = false, bool $single_service = false, bool $second_rule = false,
-			bool $discard_by_tag_value = false) {
+			bool $discard_by_tag_value = false, bool $aged = false) {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this flavour is the only thing that may close a problem.
@@ -3186,9 +3357,15 @@ HEREDOC;
 		// Both limits reach the window as user macros rather than as the values written here, so what the rule
 		// stores are the macro names and these are only what the macros are set to, see macroizeWindowLimits().
 		$window = $this->macroizeWindowLimits([
-			'duration' => static::getCloseWindowDuration($single_service),
-			// Only the eviction flavour needs an event not to fit; the others must hold everything they are given.
-			'capacity' => $execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED
+			// An aged flavour is ended by this very duration, so its window gets the age at which its oldest event is
+			// evicted rather than a lifetime nothing of the scenario is meant to reach.
+			'duration' => $aged
+				? static::getCloseWindowAgedPeriod($single_service).'s'
+				: static::getCloseWindowDuration($single_service),
+			// Only the eviction flavour needs an event not to fit; the others must hold everything they are given -
+			// and so must an aged one, an event that left its window for not fitting being exactly what must not be
+			// what ends it there.
+			'capacity' => $execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED && !$aged
 				? static::getCloseWindowCapacity($single_service)
 				: 0,
 			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
@@ -3279,10 +3456,11 @@ HEREDOC;
 
 		$operations = [];
 
-		if ($execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED) {
+		if ($execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED && !$aged) {
 			// The evicted event is not in the window it ends, so the "close" operation below is not applied to it:
 			// this is what closes it, leaving this flavour with the same two closed problems per id as the ones
-			// whose window held both events.
+			// whose window held both events. An aged flavour is the one that does without it: that the event which
+			// ended the window is the one problem nothing closed is what it is there to show.
 			$operations[] = [
 				'sortorder' => 0,
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
@@ -3296,7 +3474,10 @@ HEREDOC;
 			'type' => CCepRuleHelper::OP_CLOSE_WINDOW
 		];
 
-		$operations[] = $execute_when == CCepRuleHelper::WHEN_PATTERN_MATCHED
+		// The pattern match execution point is reached only once the script has found the "up" event, and an aged
+		// flavour is reached by whichever event of the window is oldest - neither of them has anything for a condition
+		// to single out, so the operation is left unconditional there.
+		$operations[] = $execute_when == CCepRuleHelper::WHEN_PATTERN_MATCHED || $aged
 			? $close_window
 			: $close_window + $close_window_condition;
 
@@ -10614,6 +10795,171 @@ HEREDOC;
 		}
 	}
 
+	/* The close window family driven by the window duration instead of by an "up" value */
+
+	/**
+	 * The close window family of a simple window with the clock in place of the value that ends it: every id has a
+	 * window of its own and is sent every value the flavours ended by an "up" value send, and what ends those windows
+	 * is the eviction of the event that has been in them longest. The younger events the closing window still held are
+	 * the problems the rule closes and the aged one is the problem it leaves - see
+	 * prepareDataCepWindowSimpleCloseWindowAged() and runEventAssessmentTestCepWindowCloseWindowAged().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowAged$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowAged() {
+		$this->prepareDataCepWindowSimpleCloseWindowAged();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same as testTriggerCEP_CepWindowSimpleCloseWindowAged with a tag correlation window: correlating the events
+	 * of a group is not what ages them out of it, so the eviction that ends the window has to happen for this window
+	 * type exactly as it does for a simple one - see runEventAssessmentTestCepWindowCloseWindowAged().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseWindowAged$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseWindowAged() {
+		$this->prepareDataCepWindowTagCloseWindowAged();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_TAG_CLOSE_AGED);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The single id variant of testTriggerCEP_CepWindowSimpleCloseWindowAged: one window instead of one per id, filled
+	 * as deep as the discovery goes out of the events of every discovered trigger, and ended by the first of those
+	 * events ageing out of it - so the problems the closing window closes are spread over that many triggers, each of
+	 * which returns to OK once the last of its own is gone. See
+	 * prepareDataCepWindowSimpleCloseWindowAgedSingleService() and runEventAssessmentTestCepWindowCloseWindowAged().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowAgedSingleService$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowAgedSingleService() {
+		$this->prepareDataCepWindowSimpleCloseWindowAgedSingleService();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindowAged(
+				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED), true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The single id variant of testTriggerCEP_CepWindowTagCloseWindowAged, which asserts what the simple one of it
+	 * asserts - see testTriggerCEP_CepWindowSimpleCloseWindowAgedSingleService().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseWindowAgedSingleService$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseWindowAgedSingleService() {
+		$this->prepareDataCepWindowTagCloseWindowAgedSingleService();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindowAged(
+				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE_AGED), true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The doubled variant of testTriggerCEP_CepWindowSimpleCloseWindowAged: two simple window rules keep a window of
+	 * the same events at once, both of them age the same event out of it and both close over that eviction, so every
+	 * problem the closing windows reach is closed by two rules instead of one. The counts are the ones of the single
+	 * rule flavour - closing a problem twice may not do more than closing it once - and that both rules were processed
+	 * for the very events their windows closed is read from the tags they add as an event occurs, see
+	 * prepareDataCepWindowSimpleCloseWindowAgedDoubleRule() and runEventAssessmentTestCepWindowCloseWindowAged().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowAgedDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowAgedDoubleRule() {
+		$this->prepareDataCepWindowSimpleCloseWindowAgedDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED, false,
+				true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same as testTriggerCEP_CepWindowSimpleCloseWindowAged with a pattern match window, the window type this
+	 * family was extended for: such a window evicts what has aged out of it as a sliding one does, and the mask of
+	 * that eviction has to be honoured for the "close window" reached from it to end the window - it is OR-ed into the
+	 * mask of the pattern match operations in cep_window_js_process(), and dropping it again is what this fails on. The
+	 * script of the window reports no match, so the age of its oldest event is the only thing that can end it - see
+	 * prepareDataCepWindowPatternCloseWindowAged() and runEventAssessmentTestCepWindowCloseWindowAged().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowAged$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowAged() {
+		$this->prepareDataCepWindowPatternCloseWindowAged();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The single id variant of testTriggerCEP_CepWindowPatternCloseWindowAged: one window holding an event of every
+	 * discovered trigger, ended by the first of those events ageing out of it - see
+	 * testTriggerCEP_CepWindowSimpleCloseWindowAgedSingleService().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowAgedSingleService$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowAgedSingleService() {
+		$this->prepareDataCepWindowPatternCloseWindowAgedSingleService();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindowAged(
+				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED), true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The doubled variant of testTriggerCEP_CepWindowPatternCloseWindowAged, which a pattern match window may have,
+	 * being one of the two types that are not exclusive: two windows of the same events age the same event out and both
+	 * close over that eviction - see testTriggerCEP_CepWindowSimpleCloseWindowAgedDoubleRule().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowAgedDoubleRule$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowAgedDoubleRule() {
+		$this->prepareDataCepWindowPatternCloseWindowAgedDoubleRule();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED, false,
+				true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
 	/* Reset of a rule - test that the windows of each window type are thrown away with it */
 
 	/**
@@ -12823,6 +13169,30 @@ HEREDOC;
 	}
 
 	/**
+	 * How long the windows of the aged close window flavours last, in seconds: the age at which the oldest event of
+	 * such a window is evicted, which is what ends the window there - and therefore also what the scenario has to wait
+	 * out, so unlike the duration above this one is as short as it can be rather than generous, see
+	 * runEventAssessmentTestCepWindowCloseWindowAged().
+	 *
+	 * What it has to be longer than is the part of the scenario that happens inside it: the gap that keeps the oldest
+	 * event of a window the only one old enough to be evicted (CEP_RULE_WINDOW_CLOSE_DURATION_GAP), the values that go
+	 * out after that gap - every value of every id but its first, so the count grows with both knobs of the family -
+	 * and the margin that leaves room for the counts of the filled windows to be read and for the restart to be taken.
+	 * A value costs what it costs to send and verify, which is what the two allowances are for: the values are verified
+	 * one by one or only counted once as a batch, see CEP_CLOSE_WINDOW_BATCH_FILL.
+	 */
+	private static function getCloseWindowAgedPeriod(bool $single_service = false): int {
+		$after_gap = (static::getCloseWindowEventCount($single_service) - 1)
+			* count(static::getCloseWindowServices($single_service));
+
+		return static::CEP_RULE_WINDOW_CLOSE_DURATION_GAP
+			+ $after_gap * (static::CEP_CLOSE_WINDOW_BATCH_FILL
+				? static::CEP_CLOSE_WINDOW_AGED_BATCH_ALLOWANCE
+				: static::CEP_CLOSE_WINDOW_AGED_VALUE_ALLOWANCE)
+			+ static::CEP_CLOSE_WINDOW_AGED_MARGIN + static::getRestartWindowAllowance();
+	}
+
+	/**
 	 * Drive every flavour of the close window scenario, whose $rule_name rule ends the window of an id once that
 	 * id has recovered - on a pattern match, on the arrival of the "up" event or on its eviction, see
 	 * prepareDataCepWindowCloseWindowOperations(). What ends the window is the only difference between the
@@ -13115,6 +13485,237 @@ HEREDOC;
 		// were to OK as well.
 		$this->waitForNoOpenProblems($all, 'After the close window scenario of "'.$rule_name.'"');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+	}
+
+	/**
+	 * Drive an aged flavour of the close window family, the $rule_name rule of
+	 * prepareDataCepWindowCloseWindowOperations() built with $aged: the window of an id is ended by the eviction of the
+	 * event that has been in it longest instead of by the "up" value of that id, so nothing at all is sent that asks
+	 * for the closing - the duration of the window is what reaches the eviction execution point the operation sits at,
+	 * and the clock is what ends the window.
+	 *
+	 *   1. one "down" value per id, all of them in a single dispatch: every window of the rule is opened as close
+	 *      together as it can be, so one duration covers all of them. The event of that value is the first of its
+	 *      window and therefore the one that will age out of it, so the problems opened here are the ones that have to
+	 *      be left open at the end and their eventids are taken now;
+	 *   2. the gap (CEP_RULE_WINDOW_CLOSE_DURATION_GAP), which is what leaves those events the only ones old enough to
+	 *      be evicted when a duration is up: everything sent after it is younger by more than the second or so a window
+	 *      may be examined late by, so it is still well inside the duration when the first event has run out of it;
+	 *   3. the rest of the values of every id, as many as the flavours ended by a value send
+	 *      (getCloseWindowEventCount()) and in the order and the batching those use (getCloseWindowFillOrder() and
+	 *      CEP_CLOSE_WINDOW_BATCH_FILL). Every window now holds every event of its id and every one of their problems
+	 *      is open - nothing may leave such a window for not fitting, it having room for all of them;
+	 *   4. and nothing is closed before the duration is up, which is asserted rather than waited for: the oldest event
+	 *      of a window ages out one duration after it was sent and not sooner, so every problem of the run has to still
+	 *      be open until then - a rule that closes them early fails here rather than passing for having closed them at
+	 *      all;
+	 *   5. once it is up, every window evicts its oldest event and the rule ends the window over it. What the closing
+	 *      window still holds are the younger events of that id, so those are the problems the "close" of the closing
+	 *      window closes - while the evicted one is not: it was out of the window before it closed, and the rule has no
+	 *      operation for an evicted event other than ending the window. Exactly one problem per id is therefore left
+	 *      open and it is the one of step 1, asserted by eventid and not only by count;
+	 *   6. nothing of the rule can reach those problems any more - the windows that held them are gone - so the trigger
+	 *      expression is what closes them, which is what the recovery value at the end is for. Every value of step 1
+	 *      went through the first of the triggers, so one recovery value reaches all of them.
+	 *
+	 * Between step 3 and step 4 the server is stopped and started, unless the restarts are turned off: the windows that
+	 * age their oldest event out are then the ones the server loaded back from the database, and the events whose age
+	 * ends them came back with them. The duration covers the stop and start (getCloseWindowAgedPeriod()), so what ends
+	 * a window is still the age of an event and not the restart - see maybeRestartServerMidScenario().
+	 *
+	 * $single_service drives the single window variant, exactly as the flavours ended by a value drive it (see
+	 * runEventAssessmentTestCepWindowCloseWindow()): one id, one window, and one value per discovered trigger, so that
+	 * window is grouped out of the events of every trigger the host has while grouping by the 'service' tag alone. The
+	 * event that ages out of it is the first of them and the problems the closing window closes belong to the other
+	 * triggers, each of which returns to OK with the last of its own.
+	 *
+	 * $doubled drives the variant whose rule was created twice: two rules keep a window of the same events at once,
+	 * both of them age the same event out and both close over that eviction, so the younger problems are closed by two
+	 * rules instead of one and what that has to leave behind is what a single rule leaves. That both rules really were
+	 * processed for those events is read from the tags they add as an event occurs, one of its own per rule
+	 * (CEP_TAG_WINDOW_FIRST and CEP_TAG_WINDOW_SECOND).
+	 */
+	private function runEventAssessmentTestCepWindowCloseWindowAged(string $rule_name, bool $single_service = false,
+			bool $doubled = false): void {
+		// The rules whose errors are reported when an assertion fails: a doubled flavour has two, and either of them
+		// failing is what would leave the problems never closing.
+		$rule_names = $doubled ? [$rule_name, self::buildSecondRuleName($rule_name)] : [$rule_name];
+		$services = static::getCloseWindowServices($single_service);
+		$events = static::getCloseWindowEventCount($single_service);
+
+		// The family needs more than one value per id: one of them ages out of the window and ends it, and what the
+		// closing window then closes are the others - a window whose only event aged out closes nothing at all, and
+		// there would be nothing to tell the two outcomes apart.
+		$this->assertGreaterThan(1, $events, 'The aged close window flavour of "'.$rule_name
+			.'" needs more than one value per id.'
+		);
+
+		// Which discovered triggers the values go through, as in the flavours ended by a value: one trigger for the
+		// flavours driving an id per window, and one per value for the single id variant - see
+		// runEventAssessmentTestCepWindowCloseWindow().
+		$discovered = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$keys = $single_service ? $discovered : [$discovered[0]];
+
+		$triggerids = $this->getTriggeridsForKeys(self::HOST_DISC_VALUE, $keys);
+		$all = array_values($triggerids);
+
+		// Every trigger the values will go through must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the aged close window test of "'.$rule_name.'".');
+		}
+
+		$this->captureEventBaseline($all);
+
+		// 1. The first value of every id, in one dispatch, so the windows are opened together and one duration covers
+		//    all of them. The time is taken before the values go out, which is the earliest their events can be clocked
+		//    at and therefore the earliest the duration of any of those windows can be up - so the assertion of step 4
+		//    holds the problems open for a whole duration rather than for most of one.
+		$opened_at = time();
+
+		$this->dispatchSenderValues(array_map(fn(string $service) => [
+			'host' => self::HOST_DISC_VALUE,
+			'key' => $keys[0],
+			'value' => 'down_'.$service
+		], $services));
+
+		$this->waitForOpenProblemCount($all, count($services));
+		$this->waitForParentsValue([$triggerids[$keys[0]]], TRIGGER_VALUE_TRUE);
+
+		// The problems of those events: the ones every window will evict to end itself, and therefore the ones that
+		// have to be the only ones left open once the rule is done with the run.
+		$aged = $this->getOpenProblemEventids($all);
+
+		$this->assertCount(count($services), $aged, 'Expected the one problem per id the windows of "'.$rule_name
+			.'" were opened with, got: '.implode(', ', $aged)
+		);
+
+		// 2. The gap, which is what leaves the events above the only ones old enough to be evicted when a duration is
+		//    up.
+		sleep(self::CEP_RULE_WINDOW_CLOSE_DURATION_GAP);
+
+		// 3. The rest of the values of every id: the fill order of the flavours ended by a value with the first round
+		//    of every id already sent. What a step of that order carries is how many values its id has been sent
+		//    including this one, so the rounds still to go out are the ones counting above one - and that count is what
+		//    the per-id wait below is for, whichever order the values go out in.
+		$order = array_values(array_filter(static::getCloseWindowFillOrder($services, $events),
+			fn(array $step) => $step[1] > 1
+		));
+		$open = count($services) * $events;
+
+		if (static::CEP_CLOSE_WINDOW_BATCH_FILL) {
+			$this->dispatchSenderValues(array_map(fn(array $step, int $index) => [
+				'host' => self::HOST_DISC_VALUE,
+				// The first value of the run went through the first trigger, so the values after it start at the next
+				// one: the single id variant then fills its one window out of every discovered trigger there is.
+				'key' => $keys[($index + 1) % count($keys)],
+				'value' => 'down_'.$step[0]
+			], $order, array_keys($order)));
+
+			$this->waitForOpenProblemCount($all, $open);
+
+			// The total alone would also be reached by windows that took more of one id and less of another, so every
+			// id is asked for its own count as well.
+			foreach ($services as $service) {
+				$this->waitForOpenProblemCountByTag($all, 'service', $service, $events);
+			}
+		}
+		else {
+			$sent = count($services);
+
+			foreach ($order as $index => [$service, $count]) {
+				$step_key = $keys[($index + 1) % count($keys)];
+
+				$this->dispatchSenderValues([
+					['host' => self::HOST_DISC_VALUE, 'key' => $step_key, 'value' => 'down_'.$service]
+				]);
+
+				$this->waitForOpenProblemCount($all, ++$sent);
+				$this->waitForParentsValue([$triggerids[$step_key]], TRIGGER_VALUE_TRUE);
+				$this->waitForOpenProblemCountByTag($all, 'service', $service, $count);
+			}
+		}
+
+		// 3a. Stop and start the server with every window holding every event of its id, unless the restarts are turned
+		//     off: what ages out of a window and what is closed with it is then read from the windows the server loaded
+		//     back from the database. The duration covers the stop and start (getCloseWindowAgedPeriod()), so the
+		//     eviction still happens for the age of the event.
+		$this->maybeRestartServerMidScenario();
+
+		// The restart closes nothing on its way down or up, so what is open going into step 4 is what step 3 left.
+		$this->waitForOpenProblemCount($all, $open);
+
+		// Both steps below are due at a time the scenario knows: the oldest event of a window ages out one duration
+		// after it was sent, so that duration is the "not sooner than" of the closing and the duration plus the little
+		// it takes to reach the API is all the patience the wait for it gets.
+		$period = static::getCloseWindowAgedPeriod($single_service);
+
+		try {
+			// 4. Nothing may be closed before the duration is up: the clock is what closes these problems and it has
+			//    not run out.
+			$this->assertOpenProblemCountUntil($all, $open, $opened_at + $period,
+				'The windows of "'.$rule_name.'" closed the problems they were holding before their duration was up'
+			);
+
+			// 5. Every window evicts its oldest event, the rule ends the window over it, and the "close" of the closing
+			//    window reaches the younger events it still held. The evicted event had left the window before it
+			//    closed and nothing of the rule closes that, so one problem per id is left open.
+			$this->waitForOpenProblemCount($all, count($services), '',
+				$period + self::CEP_RULE_WINDOW_CLOSE_DURATION_SLACK
+			);
+
+			$left = $this->getOpenProblemEventids($all);
+
+			$this->assertSame($aged, $left, 'The problems left open by "'.$rule_name.'" are not the ones its windows '
+				.'evicted to end themselves: expected '.implode(', ', $aged).', got '.implode(', ', $left).'.'
+			);
+
+			// The same per id, so the one problem left of an id is one of its own and not two of another: every id is
+			// down to the event its window aged out.
+			foreach ($services as $service) {
+				$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
+			}
+
+			if ($doubled) {
+				// Both rules of the flavour were processed for every event of the run, which is what their tags are
+				// for: an event carrying only one of the two would be an event one of the rules never got its turn for.
+				// The counts above have already shown that being closed by two rules instead of one left the problems
+				// exactly as one rule leaves them.
+				$this->waitForProblemEventCountByTag($all, self::CEP_TAG_WINDOW_FIRST,
+					self::CEP_TAG_WINDOW_FIRST_VALUE, $open
+				);
+				$this->waitForProblemEventCountByTag($all, self::CEP_TAG_WINDOW_SECOND,
+					self::CEP_TAG_WINDOW_SECOND_VALUE, $open
+				);
+			}
+		}
+		catch (Throwable $e) {
+			foreach ($rule_names as $name) {
+				$error = $this->getCepRuleError($name);
+
+				$this->assertSame('', $error, 'The rule "'.$name.'" reported an error: '.$error);
+			}
+
+			throw $e;
+		}
+
+		// 6. The windows that could have closed the aged problems are gone with the events they held, so the trigger
+		//    expression is what closes them. Every one of them was opened through the first trigger, so a single
+		//    recovery value takes all of them - and closing the last problem of a trigger is what returns the trigger
+		//    itself to OK, here as for the triggers whose problems the windows closed.
+		$this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $keys[0], 'value' => '0']
+		]);
+
+		$this->waitForNoOpenProblems($all, 'After the aged close window scenario of "'.$rule_name.'"');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+
+		// The rule closed every window by the clock without failing on any of it.
+		foreach ($rule_names as $name) {
+			$error = $this->getCepRuleError($name);
+
+			$this->assertSame('', $error, 'The rule "'.$name.'" reported an error: '.$error);
+		}
 	}
 
 	/**
@@ -15755,7 +16356,10 @@ HEREDOC;
 	 *   - the two flavours that leave a window to be ended by its own duration, with the events whose age ends it
 	 *     already in the window (runEventAssessmentTestCepWindowCloseOnDuration() and
 	 *     runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration()) - so the window that runs out is one loaded
-	 *     back from the database and the events it closes are the ones it came back with.
+	 *     back from the database and the events it closes are the ones it came back with;
+	 *   - the aged close window family, with every window holding every event of its id and none of them yet old enough
+	 *     to be evicted (runEventAssessmentTestCepWindowCloseWindowAged()) - so the windows that age an event out and
+	 *     close over it are ones loaded back from the database.
 	 *
 	 * The scenarios that do not, all for the same reason - what they read is a matter of seconds and a restart is
 	 * seconds long, and their durations have to stay short enough for the wait that follows them: the operations
