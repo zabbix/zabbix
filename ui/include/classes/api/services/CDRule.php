@@ -338,7 +338,7 @@ class CDRule extends CApiService {
 			'druleid', 'proxyid', 'name', 'iprange', 'delay', 'status', 'concurrency_max', 'dchecks'
 		]);
 
-		foreach ($drules as $drule) {
+		foreach ($drules as $i => $drule) {
 			if (array_diff_key($drule, $allowed_fields)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
@@ -406,9 +406,10 @@ class CDRule extends CApiService {
 				);
 			}
 
-			$proxyids[] = array_key_exists('proxyid', $drule)
-				? $drule['proxyid']
-				: $db_drules[$drule['druleid']]['proxyid'];
+			if (array_key_exists('proxyid', $drule)
+					&& $drule['proxyid'] != $db_drules[$drule['druleid']]['proxyid']) {
+				$proxyids[$i] = $drule['proxyid'];
+			}
 
 			if (array_key_exists('dchecks', $drule)) {
 				if ($drule['dchecks']) {
