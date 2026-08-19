@@ -94,6 +94,7 @@ void	*apm_worker_entry(void *args)
 		if (NULL != (task = zbx_mw_queue_pop(worker->base.queue)))
 		{
 			zbx_mw_queue_unlock(worker->base.queue);
+			zbx_mw_worker_report_busy(&worker->base);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() process task type:%u", __func__, task->type);
 
@@ -110,6 +111,7 @@ void	*apm_worker_entry(void *args)
 					break;
 			}
 
+			zbx_mw_worker_report_idle(&worker->base);
 			zbx_mw_queue_lock(worker->base.queue);
 			zbx_mw_queue_push_completed(worker->base.queue, task);
 			zbx_mw_worker_notify(&worker->base);
