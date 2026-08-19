@@ -2192,6 +2192,46 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Prepare the stepped flavour of the operation scenario: the same trigger prototypes and the same operation
+	 * macros prepareDataCepWindowNoneTagOperations() prepares, and the global correlation rules gone for the same
+	 * reason - nothing but the trigger expression may close the problems it opens.
+	 *
+	 * What it does not prepare is a rule, because the rule is what this flavour changes as it goes:
+	 * runEventAssessmentTestCepWindowOperationSteps() creates it with the operations of its first step and updates
+	 * it in place for every step after that. Returned is the part of that rule which stays the same through all of
+	 * them - its name, so every step finds the rule the step before it left behind, and its window - and the driver
+	 * adds the operations of a step to it.
+	 *
+	 * The configuration cache is not reloaded here either: the driver reloads it after upserting the rule of its
+	 * first step, which is before any value of the scenario is sent.
+	 *
+	 * $window_type gives that rule a window of that type instead of none and $name_infix names it after the
+	 * flavour, exactly as in the flavours that create their rules themselves.
+	 */
+	public function prepareDataCepWindowOperationSteps(?int $window_type = null,
+			string $name_infix = 'none'): array {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+		$this->prepareWindowOperationMacros();
+		$this->deleteCepCorrelations();
+
+		// As in the other windowed flavours, the limits of the window are handed to it as user macros.
+		$window = $window_type === null ? [] : $this->macroizeWindowLimits($this->buildWindowOperationsWindow());
+
+		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+			// A pattern match window cannot be without a script and no step of this flavour is driven by a
+			// match: every operation a step performs runs the moment the event occurs, so a window reporting
+			// no match however many events it is handed leaves the step to act alone.
+			$window['script'] = "return 'false';";
+		}
+
+		return [
+			'name' => self::CEP_RULE_NAME_PREFIX.'window '.$name_infix.' operation step',
+			'window_type' => $window_type,
+			'window' => $window
+		];
+	}
+
+	/**
 	 * Prepare the simple window flavour of the windowless scenario, see prepareDataCepWindowOperations().
 	 */
 	public function prepareDataCepWindowSimpleOperations() {
@@ -5622,6 +5662,230 @@ HEREDOC;
 		}
 
 		return $expected;
+	}
+
+	/**
+	 * The steps of the stepped operation scenario (see runEventAssessmentTestCepWindowOperationSteps()), which runs
+	 * the very operations of the windowless flavour one case at a time instead of all of them from a single rule:
+	 * one step per case, in the order the cases are listed, each of them holding
+	 *   - 'label', naming the step in the failure of an assertion made on it;
+	 *   - 'operations' - the [operation type, operation parameters] pairs the rule is brought to for this step and
+	 *     nothing else, so the outcome below is the outcome of these operations alone;
+	 *   - 'tags' - the tag state the event of the step must end up in, which is the state its own case expects and,
+	 *     for the tags of every other case, the state they are in while that case is not in the rule (see
+	 *     getWindowOperationStepTagResults()). That second half is what makes a step more than the case it repeats:
+	 *     the operations of the step before it are gone from the rule, so the tags they produced may not be on this
+	 *     event any more - a rule the server kept processing as it was before the update would still add them;
+	 *   - 'event' - the name, the severity and the suppression the event must have, which for a tag operation step
+	 *     is what its trigger gave it: a step performing tag operations only may not touch the event itself.
+	 *
+	 * The event operation steps follow the tag operation ones and are the other way round - they change the event
+	 * and no tag at all, so every tag of every case must be in that untouched state for all of them, see
+	 * getWindowNoneEventOperationSteps().
+	 *
+	 * Those two blocks are then followed by a sweep of the same steps in another order (see
+	 * getWindowOperationTransitionOrder()), because the order the cases are listed in leaves most of the transitions
+	 * from one operation to another untested: it runs the tag operations one after the other and the event
+	 * operations one after the other, so what a rule update mostly replaces there is an operation of the very family
+	 * and often of the very type that stood in its place. The sweep repeats a step for each transition that was not
+	 * made yet.
+	 */
+	private function getWindowOperationSteps(): array {
+		$steps = [];
+		$trigger_event = $this->getWindowOperationStepTriggerEvent();
+
+		foreach ($this->getWindowNoneTagOperationCases() as $index => $case) {
+			$steps[] = [
+				// A case is named after the first tag it expects, which is the tag its operations work on.
+				'label' => array_key_first($case['expected']),
+				'operations' => $case['operations'],
+				'tags' => $this->getWindowOperationStepTagResults($index),
+				'event' => $trigger_event
+			];
+		}
+
+		// Passing no case index asks for the state every tag of every case is in when none of them is in the rule,
+		// which is what the steps performing no tag operation at all must leave behind.
+		$tag_baseline = $this->getWindowOperationStepTagResults(null);
+
+		foreach ($this->getWindowNoneEventOperationSteps() as $step) {
+			$steps[] = $step + ['tags' => $tag_baseline];
+		}
+
+		// The sweep: the steps above once more in the order of getWindowOperationTransitionOrder(), which is a
+		// transition the run has not made yet at every one of them. A step is the same rule and the same
+		// expectations wherever it is run, so a sweep step needs nothing of its own beyond a label naming the
+		// transition it makes.
+		$by_label = array_column($steps, null, 'label');
+		$previous = $steps[count($steps) - 1]['label'];
+
+		foreach ($this->getWindowOperationTransitionOrder() as $label) {
+			$this->assertArrayHasKey($label, $by_label,
+				'The transition order of the stepped CEP operation scenario names a step that does not exist.'
+			);
+
+			$steps[] = ['label' => $label.' after "'.$previous.'"'] + $by_label[$label];
+			$previous = $label;
+		}
+
+		return $steps;
+	}
+
+	/**
+	 * The order the sweep of the stepped scenario runs its steps in (see getWindowOperationSteps()), as the labels
+	 * of the steps it repeats: every step of it is entered from a step the run has not entered it from before.
+	 *
+	 * The scenario needs the sweep because the operations of a rule are updated by their sortorder (see
+	 * CCepRule::updateOperations(), which matches them position by position and fills the columns the new operation
+	 * type does not use from the defaults of the table). What a step therefore reads is not only whether its own
+	 * operations are performed, but whether the operation it replaced at that position left nothing of itself
+	 * behind - and the operations of one family have next to nothing in common with those of another: a tag
+	 * operation is a tag name and a tag value, "rename tag" adds a second name, "set name" is an event name,
+	 * "set severity" a number and "suppress" a duration. Running the cases in their own order never asks for most of
+	 * those replacements: it goes from tag operation to tag operation, then once from a tag operation into "set
+	 * name", and from there through the event operations it ends with.
+	 *
+	 * So the sweep alternates between the two families in both directions and pairs the steps carrying two
+	 * operations with each other, which is the only way a second position changes families as well:
+	 *   - "suppress" -> 'op_add': a duration replaced by a tag and a tag value;
+	 *   - 'op_add' -> "increase severity": the other way round, and a second operation appears where the step
+	 *     before it had one;
+	 *   - "increase severity" -> 'op_trigger_counter': a severity replaced by a tag, and the second operation of
+	 *     the step before it is gone;
+	 *   - 'op_trigger_counter' -> 'op_set_existing': one tag operation into two of another type;
+	 *   - 'op_set_existing' -> "decrease severity": two tag operations replaced by two event ones, so both
+	 *     positions change families at once;
+	 *   - "decrease severity" -> 'op_trigger_rename': "rename tag" is the one operation with a second tag name;
+	 *   - 'op_trigger_rename' -> "set name": that second name is what must not be left behind here;
+	 *   - "set name" -> 'op_trigger_remove': an event name replaced by a tag alone;
+	 *   - 'op_trigger_remove' -> "set severity": a tag replaced by a severity;
+	 *   - "set severity" -> 'op_macro_name': and a severity by two tag operations whose tag name is a macro.
+	 */
+	private function getWindowOperationTransitionOrder(): array {
+		return ['op_add', 'increase severity', 'op_trigger_counter', 'op_set_existing', 'decrease severity',
+			'op_trigger_rename', 'set name', 'op_trigger_remove', 'set severity', self::CEP_OP_TAG_NAME
+		];
+	}
+
+	/**
+	 * The name, the severity and the suppression the trigger prototypes give the event every step of the stepped
+	 * scenario opens: the event name they build from the value that opened it, their DISASTER priority and no
+	 * suppression. It is what a step whose operations leave the event itself alone must end up with, and what the
+	 * event operation steps are expected to change one field of.
+	 */
+	private function getWindowOperationStepTriggerEvent(): array {
+		return [
+			'name' => 'CEP trigger '.self::COMPONENT_VALUE.' down_'.self::CEP_RULE_WINDOW_NONE_SERVICE,
+			'severity' => TRIGGER_SEVERITY_DISASTER,
+			'suppressed' => false
+		];
+	}
+
+	/**
+	 * The tag state the event of one step of the stepped scenario must end up in, as the same tag => value map
+	 * waitForCepWindowNoneTaggedEvents() works with (a null value meaning the tag must not be on the event at all),
+	 * covering the tags of every case of getWindowNoneTagOperationCases() and not only those of the step's own case.
+	 *
+	 * $step is the index of the case the rule holds the operations of, or null when it holds none of them. That case
+	 * contributes exactly what it expects; every other case contributes what its tags hold without its operations,
+	 * which is the value the trigger prototypes put on the event for the cases that work on a trigger tag and
+	 * nothing at all for the cases whose tags only an operation ever creates.
+	 */
+	private function getWindowOperationStepTagResults(?int $step): array {
+		$results = [];
+
+		foreach ($this->getWindowNoneTagOperationCases() as $index => $case) {
+			$trigger_tags = array_key_exists('trigger_tags', $case)
+				? array_column($case['trigger_tags'], 'value', 'tag')
+				: [];
+
+			foreach ($case['expected'] as $tag => $value) {
+				$results[$tag] = $index === $step
+					? $value
+					: (array_key_exists($tag, $trigger_tags) ? $trigger_tags[$tag] : null);
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * The operations changing the event itself, split into a step per operation the way
+	 * getWindowNoneTagOperationCases() splits the tag ones, with the event state each step must leave behind: the
+	 * fields it does not change are the ones the trigger gave the event (getWindowOperationStepTriggerEvent()).
+	 *
+	 * The two severity shifts are the only steps carrying a second operation, a "set severity" ahead of them, and
+	 * they carry it for the reason the windowless flavour chains all of them: the events of these prototypes are at
+	 * DISASTER, the top of the scale, so an "increase severity" performed on one is indistinguishable from an
+	 * "increase severity" that did nothing. Setting the severity first puts the event where a shift has somewhere to
+	 * go and makes the expected severity one only the shift can produce.
+	 *
+	 * "discard" and "close" are left out here as they are there, although a step of this scenario recovers its
+	 * trigger and could afford a closed problem: the driver reads the outcome of a step off the one problem event
+	 * the step opens, which a discarded event never becomes and a closed one does not stay - see
+	 * prepareDataCepDiscardUp() and the window scenarios for those two. "unsuppress" is left out because an event
+	 * that was never suppressed cannot show it ran.
+	 */
+	private function getWindowNoneEventOperationSteps(): array {
+		$trigger_event = $this->getWindowOperationStepTriggerEvent();
+
+		return [
+			[
+				// The same name operation the windowless flavour performs, macros and all, so the event ends up
+				// with the name below only if the server resolved the user macro leading it and the expression
+				// macro ending it and left the text between them alone.
+				'label' => 'set name',
+				'operations' => [
+					[CCepRuleHelper::OP_SET_NAME, ['event_name' => self::CEP_OP_EVENT_NAME_MACRO
+						.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_MIDDLE.self::CEP_OP_EXPRESSION_MACRO
+					]]
+				],
+				'event' => ['name' => self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME] + $trigger_event
+			],
+			[
+				// A severity of its own, which is neither the DISASTER of the trigger nor what any shift below
+				// leaves behind.
+				'label' => 'set severity',
+				'operations' => [
+					[CCepRuleHelper::OP_SET_SEVERITY, ['severity' => TRIGGER_SEVERITY_INFORMATION]]
+				],
+				'event' => ['severity' => TRIGGER_SEVERITY_INFORMATION] + $trigger_event
+			],
+			[
+				// Information +1.
+				'label' => 'increase severity',
+				'operations' => [
+					[CCepRuleHelper::OP_SET_SEVERITY, ['severity' => TRIGGER_SEVERITY_INFORMATION]],
+					[CCepRuleHelper::OP_INCREASE_SEVERITY, []]
+				],
+				'event' => ['severity' => TRIGGER_SEVERITY_WARNING] + $trigger_event
+			],
+			[
+				// Warning -1, so the shift that leaves the event at Information here is the one that started
+				// from it in the step above: a decrease read as an increase or as nothing at all is a severity
+				// of its own either way.
+				'label' => 'decrease severity',
+				'operations' => [
+					[CCepRuleHelper::OP_SET_SEVERITY, ['severity' => TRIGGER_SEVERITY_WARNING]],
+					[CCepRuleHelper::OP_DECREASE_SEVERITY, []]
+				],
+				'event' => ['severity' => TRIGGER_SEVERITY_INFORMATION] + $trigger_event
+			],
+			[
+				// The suppression is a timed one, as in the windowless flavour, and only its first half is
+				// asserted here - the step ends long before CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD runs out and
+				// the suppressions are taken away with the rules in the teardown
+				// (event_suppress.cep_ruleid cascades), so it outlives neither the scenario nor the suite.
+				// It is the last step for that reason too: nothing that follows has to wait for it.
+				'label' => 'suppress',
+				'operations' => [
+					[CCepRuleHelper::OP_SUPPRESS,
+						['suppress_duration' => self::CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD]
+					]
+				],
+				'event' => ['suppressed' => true] + $trigger_event
+			]
+		];
 	}
 
 	/**
@@ -9163,6 +9427,81 @@ HEREDOC;
 	}
 
 	/**
+	 * The operation coverage of testTriggerCEP_CepWindowNone once more, but one operation case at a time and out of a
+	 * rule that is updated between the cases instead of one created with all of them at once.
+	 *
+	 * Every step brings the one rule of the scenario to the operations of a single case, opens one problem with one
+	 * value, reads the event it produced and recovers the trigger again, and the step after it updates that same rule
+	 * to the operations of the next case - so the whole operation set is walked through as a sequence of rule
+	 * updates. What each step expects of its event is what the all-at-once flavour expects of the case it is running
+	 * plus, for every other case of the set, the state its tags are in without it: the operations of the step before
+	 * are no longer in the rule, so the tags they left behind may not be on this event. That is the half a create can
+	 * never check - a server that kept processing the rule as it stood before the update would go on adding them -
+	 * and it is checked for every operation of the set, the ones changing the event itself included (see
+	 * getWindowOperationSteps()).
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowNoneOperationSteps$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowNoneOperationSteps() {
+		$rule = $this->prepareDataCepWindowOperationSteps();
+
+		try {
+			$this->runEventAssessmentTestCepWindowOperationSteps($rule);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The stepped operation scenario of testTriggerCEP_CepWindowNoneOperationSteps with a simple window on the rule
+	 * that is updated: the same operations, the same step by step updates and the same outcome expected of every one
+	 * of them, only now the rule collects the event of a step into a window grouped by its 'service' id while it
+	 * works.
+	 *
+	 * That the outcome may not change is the point, as it is for testTriggerCEP_CepWindowSimple - every operation of
+	 * these steps runs the moment the event occurs and nothing here acts on a window - and the window is what an
+	 * update has one more thing to get right about: the rule of a step is updated while the window its previous step
+	 * left behind is still around, and the operations of the new rule must be the ones performed for the event that
+	 * enters it.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleOperationSteps$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleOperationSteps() {
+		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple');
+
+		try {
+			$this->runEventAssessmentTestCepWindowOperationSteps($rule);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The stepped operation scenario with a pattern match window on the updated rule, whose script reports no match
+	 * however many events the window holds: the operations of a step are all performed the moment the event occurs,
+	 * so a match would have nothing to run either way, and the outcome of every step must again be the one the
+	 * windowless flavour of the scenario produces.
+	 *
+	 * What this flavour adds to the simple one is the script: it is part of the window of the rule, so every step
+	 * updates it along with the operations, and the window of the step before it is examined by the script of that
+	 * step until the update replaces it.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternOperationSteps$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternOperationSteps() {
+		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_PATTERN_MATCH, 'pattern');
+
+		try {
+			$this->runEventAssessmentTestCepWindowOperationSteps($rule);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * The same operations as testTriggerCEP_CepWindowNone, applied by a rule that has a simple window instead
 	 * of none: the events are grouped into a window per 'service' id and must come out with exactly the same
 	 * tags, event name, severity and suppression the windowless rule produces, showing the operations behave
@@ -11763,6 +12102,153 @@ HEREDOC;
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 		$this->waitForNoOpenProblems($all, 'After the windowless CEP scenario recovery value');
+	}
+
+	/**
+	 * Drive the stepped operation scenario on the same single discovered item the windowless flavour is driven on,
+	 * running the very operations that flavour performs from one rule - but a step at a time and, from the second
+	 * step on, out of a rule that was updated rather than created: the rule of $rule_template
+	 * (prepareDataCepWindowOperationSteps()) is brought to the operations of one step of getWindowOperationSteps(),
+	 * the step is read off the one event it opens, and the rule is then brought to the operations of the next one.
+	 *
+	 * Every step therefore asserts two things at once: that its own operations produce exactly what the case they
+	 * come from expects - the same expectations the all-at-once flavour makes - and that the operations of the step
+	 * before it are gone. The second half is what an update has to get right and a create never can: a server still
+	 * processing the rule as it stood before the update would keep adding the tags of the previous step, and the
+	 * expectations of a step name every tag of every case for exactly that reason (see
+	 * getWindowOperationStepTagResults()).
+	 *
+	 * A step is self contained: it takes the trigger from OK to one open problem with the one "down" value it sends,
+	 * reads its event, and recovers the trigger with a value matching neither "down" nor "up", which closes that
+	 * problem again. So the step after it starts where this one started and inspects one event of its own - the
+	 * events of the steps before it are left behind the baseline (captureEventBaseline()).
+	 */
+	private function runEventAssessmentTestCepWindowOperationSteps(array $rule_template): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the stepped CEP operation test.');
+		}
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		// Every step sends the same id, so what tells its event apart from the events of the steps before it is
+		// the baseline and not the id: one step, one problem, one event to read.
+		$service = self::CEP_RULE_WINDOW_NONE_SERVICE;
+
+		foreach ($this->getWindowOperationSteps() as $index => $step) {
+			$label = 'step #'.$index.' ('.$step['label'].')';
+
+			// The one rule of the scenario, brought to the operations of this step and to no others: created on
+			// the first step and updated in place on every step after it, see upsertCepRule().
+			$this->upsertCepRule($this->buildWindowNoneCepRuleParams($rule_template['name'], [],
+				$this->buildWindowNoneOperations($step['operations']), CONDITION_EVAL_TYPE_AND, '',
+				$rule_template['window_type'], $rule_template['window']
+			));
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// Only the event this step opens is inspected, so the baseline is taken after the rule is in place
+			// and before the value that opens it is sent.
+			$this->captureEventBaseline($all);
+
+			$send('down_'.$service);
+			$this->waitForOpenProblemCount($all, 1, 'After the "down" value of '.$label);
+			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+			$this->waitForCepOperationStepEvent($triggerid, $service, $step, $label);
+
+			// The trigger goes back to where the step found it, which closes the problem the step opened: the
+			// next step opens one problem of its own from an expression that is false again.
+			$send('0');
+			$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+			$this->waitForNoOpenProblems($all, 'After the recovery value of '.$label);
+		}
+	}
+
+	/**
+	 * Wait until the one problem event generated on $triggerid since the baseline of one step of the stepped
+	 * scenario is in the state that step must have left it in: the 'service' id it was opened with, the event name,
+	 * severity and suppression of $step['event'] and the tag state of $step['tags'] - a tag => value map in which a
+	 * null value means the tag must not be on the event at all, naming the tags of every operation case of the
+	 * scenario and not only those of the step's own (see getWindowOperationSteps()).
+	 *
+	 * $label names the step in the failure. The operations are applied asynchronously after the event is created,
+	 * hence the polling; the callback returns what does not match yet, which callUntilDataIsPresent() surfaces in
+	 * the failure message once its patience has run out.
+	 */
+	private function waitForCepOperationStepEvent(int $triggerid, string $service, array $step,
+			string $label): void {
+		$expected_tags = $step['tags'];
+		$expected_event = $step['event'];
+
+		$this->callUntilDataIsPresent('event.get', [
+			'objectids' => [$triggerid],
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'filter' => ['value' => TRIGGER_VALUE_TRUE],
+			'output' => ['eventid', 'name', 'severity', 'suppressed'],
+			'selectTags' => 'extend'
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+			function ($response) use ($service, $expected_tags, $expected_event, $label) {
+				if (count($response['result']) !== 1) {
+					return $label.': expected 1 problem event, got '.count($response['result']);
+				}
+
+				$event = $response['result'][0];
+				$tags = array_column($event['tags'], 'value', 'tag');
+				$info = $label.': event '.$event['eventid'].' ('.$event['name'].') tags '
+					.json_encode($event['tags']);
+
+				if (!array_key_exists('service', $tags)) {
+					return $info.': no "service" tag';
+				}
+
+				if ($tags['service'] !== $service) {
+					return $info.': service "'.$tags['service'].'", expected "'.$service.'"';
+				}
+
+				// The name, the severity and the suppression a step whose operations change the event itself
+				// must have left behind - and, for every other step, the ones its trigger gave the event: an
+				// operation of a step that is no longer in the rule must not have changed them either.
+				if ($event['name'] !== $expected_event['name']) {
+					return $label.': event '.$event['eventid'].' name "'.$event['name'].'", expected "'
+						.$expected_event['name'].'"';
+				}
+
+				if ((int) $event['severity'] !== $expected_event['severity']) {
+					return $info.': severity '.$event['severity'].', expected '.$expected_event['severity'];
+				}
+
+				if (((int) $event['suppressed'] === 1) !== $expected_event['suppressed']) {
+					return $info.': suppressed '.$event['suppressed'].', expected '
+						.($expected_event['suppressed'] ? 1 : 0);
+				}
+
+				foreach ($expected_tags as $tag => $value) {
+					if ($value === null) {
+						if (array_key_exists($tag, $tags)) {
+							return $info.': "'.$tag.'" tag present, the operations of this step must have left'
+								.' no tag of that name';
+						}
+					}
+					elseif (!array_key_exists($tag, $tags)) {
+						return $info.': missing "'.$tag.'" tag';
+					}
+					elseif ($tags[$tag] !== $value) {
+						return $info.': "'.$tag.'" tag value "'.$tags[$tag].'", expected "'.$value.'"';
+					}
+				}
+
+				return true;
+			}
+		);
 	}
 
 	/**

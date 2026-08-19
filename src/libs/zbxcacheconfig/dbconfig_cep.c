@@ -118,6 +118,8 @@ static void	cep_operation_clear_args(zbx_cep_operation_t *operation)
 			zbx_free(operation->args.remove_tag.tag);
 			break;
 	}
+
+	memset(&operation->args, 0, sizeof(operation->args));
 }
 
 /******************************************************************************
@@ -185,6 +187,8 @@ static void	cep_condition_clear_args(zbx_cep_condition_t *condition)
 		default:
 			break;
 	}
+
+	memset(&condition->args, 0, sizeof(condition->args));
 }
 
 /******************************************************************************
@@ -1354,7 +1358,7 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 		operation->execute_when = atoi(row[3]);
 		operation->evaltype = atoi(row[4]);
 		operation->sortorder = atoi(row[11]);
-
+		zabbix_log(LOG_LEVEL_INFORMATION, "operation->type:%d", operation->type);
 		switch (operation->type)
 		{
 			case ZBX_CEP_OP_SET_NAME:
@@ -1397,6 +1401,7 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 			case ZBX_CEP_OP_UNSUPPRESS:
 				break;
 		}
+		zabbix_log(LOG_LEVEL_INFORMATION, "end of operation->type:%d", operation->type);
 	}
 
 	/* remove deleted cep operations */
