@@ -32,6 +32,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	const json_data_http_response = "200";
 	const tls_handshake = 230;
 	const error_message = "assertion failed: element id top-header not found";
+	const log_json_line = '{"active_check":"log_json"}';
 
 	static $file_name_json_with_image_for_binary_item;
 	static $file_name_json_with_image_for_json_item;
@@ -40,6 +41,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	static $json_with_image;
 	static $invalid_json;
 	static $json_image_normalized;
+	static $file_name_log_json;
 
 	public static function ksort_recursive(&$array) {
 		if (!is_array($array)) {
@@ -74,6 +76,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		self::$file_name_json_with_image_for_json_item = "/tmp/json_with_image2.txt".time();
 		self::$file_name_invalid_json_for_binary_item = "/tmp/invalid_JSON.txt".time();
 		self::$file_name_invalid_json_for_json_item = "/tmp/invalid_JSON_2.txt".time();
+		self::$file_name_log_json = "/tmp/log_json.txt".time();
 
 		$base64_image = self::base64_image;
 		$base64_empty = self::base64_empty;
@@ -130,10 +133,15 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			unlink(self::$file_name_invalid_json_for_json_item);
 		}
 
+		if (file_exists(self::$file_name_log_json)) {
+			unlink(self::$file_name_log_json);
+		}
+
 		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_binary_item, self::$json_with_image) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_json_item, self::$json_with_image) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_binary_item, self::$invalid_json) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_json_item, self::$invalid_json) !== false);
+		$this->assertTrue(@file_put_contents(self::$file_name_log_json, self::log_json_line.PHP_EOL) !== false);
 
 		self::$json_image_normalized = self::normalize_json(self::$json_with_image);
 
@@ -379,6 +387,13 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_invalid_json_for_json_item.',]'],
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '0s'
+				],
+				[
+						'name' => 'LOG_JSON_VALUE_TYPE',
+						'key_' => 'log['.self::$file_name_log_json.']',
+						'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '1s'
 				]
 				]
 			]
@@ -787,6 +802,57 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC', ITEM_STATE_NORMAL);
 		$this->checkItemState('agent:STR_VALUE_TYPE_DEP_WITH_PREPROC', ITEM_STATE_NORMAL);
 		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_INVALID', ITEM_STATE_NOTSUPPORTED);
+	}
+
+	/**
+	 * Regression test.
+	 *
+	 * The item key is "log[]" (a check that natively supports metadata-only updates, i.e. lastlogsize/
+	 * mtime with no new line to report), but the item's *value type* is configured as JSON - not LOG.
+	 * That combination used to trigger a THIS_SHOULD_NEVER_HAPPEN condition in
+	 * zbx_preprocess_item_value() (pp_protocol.c), logged as "unexpected result type: 64 and
+	 * item_value_type: 6" / "Something unexpected has just happened." The server process itself does
+	 * not crash and keeps running, but the metadata-only update that triggered it is silently dropped
+	 * instead of being stored.
+	 *
+	 * Reproduction: the server hands out the already advanced lastlogsize/mtime to the agent on every
+	 * active check refresh. After an agent restart the log[] metric is "new" for the freshly started
+	 * agent process, so even though there is nothing new to read from the log file, the agent still
+	 * sends a metadata-only update (no value, only lastlogsize/mtime). The JSON value type handling in
+	 * zbx_preprocess_item_value() only recognizes JSON/TEXT/STR/LOG/DBL/UI64/BIN typed AGENT_RESULTs -
+	 * an AGENT_RESULT carrying only the meta bit (type == AR_META) matches none of them.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider agentConfigurationProvider
+	 * @hosts agent
+	 */
+	public function testLogValueTypeJSON_agentRestart() {
+		$this->checkItemState('agent:LOG_JSON_VALUE_TYPE', ITEM_STATE_NORMAL);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['agent:LOG_JSON_VALUE_TYPE'],
+			'history'	=>	ITEM_VALUE_TYPE_JSON
+		]);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertNotEmpty($response['result']);
+		$this->assertEquals(self::log_json_line, $response['result'][0]['value']);
+
+		// Restart the agent without changing the log file. The server already knows the lastlogsize
+		// for this item, so the agent will find nothing new to read but, being a freshly started
+		// process, will still report a meta-only update for it.
+		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->startComponent(self::COMPONENT_AGENT);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'resuming Zabbix agent checks on host "agent": connection restored');
+
+		$this->checkItemState('agent:LOG_JSON_VALUE_TYPE', ITEM_STATE_NORMAL);
+
+		$this->assertFalse(
+			self::isLogLinePresent(self::COMPONENT_SERVER, 'Something unexpected has just happened.', false),
+			'Server log contains "Something unexpected has just happened." after agent restart for '.
+			'a JSON value type "log[]" item.'
+		);
 	}
 
 	/**
