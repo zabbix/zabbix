@@ -237,10 +237,4 @@ public class JMXTest {
 		jmxTestScenario(true, false, false, false);
 	}
 
-	@Test
-	public void artificialFailureForJenkinsCheck()
-	{
-		fail("artificial failure added on purpose to check how Jenkins reports a failed JUnit test");
-	}
-
 }
