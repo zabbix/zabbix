@@ -51,7 +51,7 @@ static int	rtc_parse_options_server(const char *opt, zbx_uint32_t *code, struct 
 		return SUCCEED;
 	}
 
-	if (0 == strncmp(opt, ZBX_PERMISSIONS_REBUILD, ZBX_CONST_STRLEN(ZBX_PERMISSIONS_REBUILD)))
+	if (0 == strcmp(opt, ZBX_PERMISSIONS_REBUILD))
 	{
 		*code = ZBX_RTC_PERMISSIONS_REBUILD;
 		return SUCCEED;

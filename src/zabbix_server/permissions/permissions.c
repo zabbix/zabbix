@@ -357,7 +357,7 @@ void	zbx_permissions_rebuild_start(void)
 			exit(EXIT_SUCCESS);
 		default: /* parent */
 			rebuild_pid = pid;
-			zabbix_log(LOG_LEVEL_WARNING, "[started] permissions rebuild");
+			zabbix_log(LOG_LEVEL_WARNING, "process started [permissions rebuild]");
 	}
 
 	(void)zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
@@ -382,7 +382,7 @@ void	zbx_permissions_rebuild_poll(void)
 
 	rebuild_pid = ZBX_THREAD_HANDLE_NULL;
 
-	zabbix_log(LOG_LEVEL_WARNING, "[finished] permissions rebuild");
+	zabbix_log(LOG_LEVEL_WARNING, "process finished [permissions rebuild]");
 }
 
 /******************************************************************************
@@ -417,5 +417,5 @@ void	zbx_permissions_rebuild_stop(void)
 				zbx_strerror(errno));
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "[terminated] permissions rebuild");
+	zabbix_log(LOG_LEVEL_WARNING, "process terminated [permissions rebuild]");
 }
