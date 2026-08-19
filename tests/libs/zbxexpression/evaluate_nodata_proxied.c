@@ -47,6 +47,29 @@
 static unsigned char	mock_proxy_flags;
 static int		mock_proxy_lastaccess_age;
 
+static void	check_expected_error(const char *actual_error)
+{
+	zbx_mock_handle_t	param_handle;
+	const char		*expected_error;
+	zbx_mock_error_t	mock_ret;
+
+	mock_ret = zbx_mock_out_parameter("error", &param_handle);
+
+	if (ZBX_MOCK_SUCCESS != mock_ret)
+		fail_msg("Cannot get expected 'error' parameter: %s", zbx_mock_error_string(mock_ret));
+
+	mock_ret = zbx_mock_string(param_handle, &expected_error);
+
+	if (ZBX_MOCK_SUCCESS != mock_ret)
+		fail_msg("Cannot read expected 'error' string: %s", zbx_mock_error_string(mock_ret));
+
+	if (NULL == actual_error)
+		fail_msg("Expected error '%s' but got NULL", expected_error);
+
+	if (0 != strcmp(actual_error, expected_error))
+		fail_msg("Got\n'%s'\ninstead of\n'%s'", actual_error, expected_error);
+}
+
 static int	get_optional_parameter_int(const char *path, int default_value)
 {
 	const char	*value;
@@ -376,12 +399,7 @@ void	zbx_mock_test_entry(void **state)
 	evaluate_item.host = item.host.host;
 	evaluate_item.key_orig = item.key_orig;
 
-	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &evaluate_item, "nodata", params, &ts,
-			&error)))
-	{
-		printf("evaluate_function returned error: %s\n", error);
-		zbx_free(error);
-	}
+	returned_ret = evaluate_function(&returned_value, &evaluate_item, "nodata", params, &ts, &error);
 
 	zbx_vc_flush_stats();
 
@@ -406,6 +424,12 @@ void	zbx_mock_test_entry(void **state)
 
 		zbx_mock_assert_double_eq("function result", atof(expected_value), returned_value.data.dbl);
 	}
+	else
+	{
+		check_expected_error(error);
+	}
+
+	zbx_free(error);
 
 	if (SUCCEED == returned_ret)
 		zbx_variant_clear(&returned_value);
