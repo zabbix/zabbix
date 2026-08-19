@@ -433,10 +433,10 @@ class CMenuHelper {
 			$lang = CWebUser::getLang();
 			$menu
 				->add(
-					(new CMenuItem(_('Support')))
-						->setIcon(ZBX_ICON_SUPPORT)
-						->setUrl(new CUrl(getSupportUrl($lang)))
-						->setTitle(_('Zabbix Technical Support'))
+					(new CMenuItem(_('Subscriptions')))
+						->setIcon(ZBX_ICON_SUBSCRIPTIONS)
+						->setUrl(new CUrl(getSubscriptionsUrl($lang)))
+						->setTitle(_('Zabbix Subscriptions'))
 						->setTarget('_blank')
 				)
 				->add(
