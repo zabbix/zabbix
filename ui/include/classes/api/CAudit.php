@@ -520,9 +520,7 @@ class CAudit {
 		'usergroup.tag_filters' => 'tag_filter',
 		'usergroup.users' => 'users_groups',
 		'usergroup.proxies' => 'usrgrp_proxy',
-		'usergroup.proxy_groups' => 'usrgrp_proxy_group',
-		'usergroup.proxy_mode' => 'proxy_mode',
-		'usergroup.proxy_group_mode' => 'proxy_group_mode'
+		'usergroup.proxy_groups' => 'usrgrp_proxy_group'
 	];
 
 	/**
@@ -640,9 +638,7 @@ class CAudit {
 		'usergroup.tag_filters' => 'tag_filterid',
 		'usergroup.users' => 'id',
 		'usergroup.proxies' => 'proxyid',
-		'usergroup.proxy_groups' => 'proxy_groupid',
-		'usergroup.proxy_mode' => 'proxy_mode',
-		'usergroup.proxy_group_mode' => 'proxy_group_mode'
+		'usergroup.proxy_groups' => 'proxy_groupid'
 	];
 
 	/**
