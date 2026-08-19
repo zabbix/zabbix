@@ -440,7 +440,7 @@ out:
   return: FAIL
   error: 'invalid number of parameters'
 ---
-test case: strict mode bypasses lazy proxy suppression (would FAIL as lazy on the same tail, see tail=realvalue_fresh offset=0)
+test case: strict mode bypasses proxy lazy suppression (would FAIL as lazy on the same tail, see tail=realvalue_fresh offset=0)
 in:
   history:
   - itemid: 1
