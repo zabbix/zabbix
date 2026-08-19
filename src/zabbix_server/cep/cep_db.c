@@ -505,22 +505,23 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
  ******************************************************************************/
 static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_vector_mw_task_ptr_t	problem_tasks;
-	zbx_vector_uint64_t		maintenanceids;
-	zbx_db_insert_t			db_insert_es = {0}, db_insert_ack;
+	zbx_vector_uint64_t		maintenanceids, cep_ruleids;
+	zbx_db_insert_t			db_insert_es = {0}, db_insert_ack = {0};
 	int				suppress_num = 0, now;
+	zbx_vector_cep_event_ptr_t	events;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
 	now = (int)time(NULL);
 
-	zbx_vector_mw_task_ptr_create(&problem_tasks);
 	zbx_vector_uint64_create(&maintenanceids);
+	zbx_vector_uint64_create(&cep_ruleids);
+	zbx_vector_cep_event_ptr_create(&events);
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
 		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
-		const zbx_cep_event_t		*event;
+		zbx_cep_event_t			*event;
 
 		if (EVENT_SOURCE_TRIGGERS != task->db_event->source || EVENT_OBJECT_TRIGGER != task->db_event->object)
 			continue;
@@ -528,28 +529,78 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		if (CEP_EVENT_OPEN != task->event_op)
 			continue;
 
-		if (NULL == (event = task->event))
+		if (NULL == (event = (zbx_cep_event_t *)task->event))
 			continue;
 
-		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert_es))
+		if (0 != event->suppress.values_num)
 		{
-			zbx_dbconn_prepare_insert(db, &db_insert_es, "event_suppress", "event_suppressid",
-					"eventid", "maintenanceid", "cep_ruleid", "suppress_until", (char *)NULL);
+			for (int j = 0; j < event->suppress.values_num; j++)
+			{
+				zbx_db_event_suppress_t	*suppress = &event->suppress.values[j];
 
-			zbx_dbconn_prepare_insert(db, &db_insert_ack, "acknowledges", "acknowledgeid",
-					"eventid", "clock", "action", "suppress_until", "maintenanceid", (char *)NULL);
+				if (0 != suppress->maintenanceid)
+					zbx_vector_uint64_append(&maintenanceids, suppress->maintenanceid);
+
+				if (0 != suppress->cep_ruleid)
+					zbx_vector_uint64_append(&cep_ruleids, suppress->cep_ruleid);
+			}
+
+			zbx_vector_cep_event_ptr_append(&events, event);
 		}
+	}
 
-		for (int j = 0; j < event->suppress.values_num; j++)
+	if (0 != events.values_num)
+	{
+		zbx_vector_uint64_sort(&maintenanceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&maintenanceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_dbconn_lock_ids_pk(db, "maintenances", "maintenanceid", &maintenanceids);
+
+		zbx_vector_uint64_sort(&cep_ruleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&cep_ruleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_dbconn_lock_ids_pk(db, "cep_rule", "cep_ruleid", &cep_ruleids);
+
+		zbx_dbconn_prepare_insert(db, &db_insert_es, "event_suppress", "event_suppressid",
+				"eventid", "maintenanceid", "cep_ruleid", "suppress_until", (char *)NULL);
+
+		zbx_dbconn_prepare_insert(db, &db_insert_ack, "acknowledges", "acknowledgeid",
+				"eventid", "clock", "action", "suppress_until", "maintenanceid", (char *)NULL);
+
+		for (int i = 0; i < events.values_num; i++)
 		{
-			zbx_db_event_suppress_t	*suppress = &event->suppress.values[j];
+			zbx_cep_event_t	*event = events.values[i];
 
-			zbx_db_insert_add_values(&db_insert_es, __UINT64_C(0), event->eventid, suppress->maintenanceid,
-			suppress->cep_ruleid, suppress->until);
+			for (int j = 0; j < event->suppress.values_num; j++)
+			{
+				zbx_db_event_suppress_t	*suppress = &event->suppress.values[j];
+				zbx_vector_uint64_t	*fk_ids;
+				zbx_uint64_t		fk_id = 0;
 
-			zbx_db_insert_add_values(&db_insert_ack, __UINT64_C(0), event->eventid, now,
-					ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS, suppress->until,
-					suppress->maintenanceid);
+				if (0 != suppress->maintenanceid)
+				{
+					fk_ids = &maintenanceids;
+					fk_id = suppress->maintenanceid;
+				}
+				else if (0 != suppress->cep_ruleid)
+				{
+					fk_ids = &cep_ruleids;
+					fk_id = suppress->cep_ruleid;
+				}
+				else
+				{
+					THIS_SHOULD_NEVER_HAPPEN_MSG("event suppress data without actor id");
+					continue;
+				}
+
+				if (FAIL == zbx_vector_uint64_bsearch(fk_ids, fk_id, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+					continue;
+
+				zbx_db_insert_add_values(&db_insert_es, __UINT64_C(0), event->eventid,
+						suppress->maintenanceid, suppress->cep_ruleid, suppress->until);
+
+				zbx_db_insert_add_values(&db_insert_ack, __UINT64_C(0), event->eventid, now,
+						ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS, suppress->until,
+						suppress->maintenanceid);
+			}
 		}
 	}
 
@@ -564,6 +615,10 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		zbx_db_insert_execute(&db_insert_ack);
 		zbx_db_insert_clean(&db_insert_ack);
 	}
+
+	zbx_vector_uint64_destroy(&maintenanceids);
+	zbx_vector_uint64_destroy(&cep_ruleids);
+	zbx_vector_cep_event_ptr_destroy(&events);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() suppressed problems:%d", __func__, suppress_num);
 }

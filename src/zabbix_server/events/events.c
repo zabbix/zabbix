@@ -675,7 +675,7 @@ static void	add_event_maintenances(zbx_vector_db_event_t *problems, zbx_vector_u
 		zbx_vector_event_suppress_query_ptr_append(&event_queries, query);
 	}
 
-	/* get maintenance data and save it in database */
+	/* get maintenance data  */
 	if (SUCCEED == zbx_dc_get_event_maintenances(&event_queries, maintenanceids))
 	{
 		for (int i = 0; i < event_queries.values_num; i++)
