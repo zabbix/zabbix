@@ -982,20 +982,20 @@ out:
 #undef CEP_WINDOW_UNIQ
 }
 
-char	*cep_tag_value_shift(const char *value, int shift)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: shift numeric tag value by specified amount                       *
+ *                                                                            *
+ * Parameters: value - [IN] tag value                                         *
+ *             shift - [IN] amount to shift value by                          *
+ *                                                                            *
+ * Return value: shifted value as a newly allocated string, or NULL if value  *
+ *               is not a valid double                                        *
+ *                                                                            *
+ ******************************************************************************/
+static char	*cep_tag_value_dbl_shift(const char *value, int shift)
 {
-	zbx_uint64_t	value_ui64;
-	double		value_dbl;
-
-	if ('\0' == *value)
-	{
-		if (1 == shift)
-			return zbx_strdup(NULL, "1");
-		return zbx_strdup(NULL, "0");
-	}
-
-	if (SUCCEED == zbx_is_uint64(value, &value_ui64))
-		return zbx_dsprintf(NULL, ZBX_FS_UI64, value_ui64 + shift);
+	double	value_dbl;
 
 	if (SUCCEED == zbx_is_double(value, &value_dbl))
 	{
@@ -1006,6 +1006,83 @@ char	*cep_tag_value_shift(const char *value, int shift)
 	}
 
 	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: increment numeric tag value by one                                *
+ *                                                                            *
+ * Parameters: value - [IN] tag value                                         *
+ *                                                                            *
+ * Return value: incremented value as a newly allocated string, or NULL if    *
+ *               value is not numeric                                         *
+ *                                                                            *
+ * Comments: An empty string is treated as 0. Incrementing the maximum        *
+ *           uint64 value wraps around.                                       *
+ *                                                                            *
+ ******************************************************************************/
+char	*cep_tag_value_inc(const char *value)
+{
+	if ('\0' == *value)
+		return zbx_strdup(NULL, "1");
+
+	if ('-' == *value)
+	{
+		zbx_int64_t	value_i64;
+
+		if (SUCCEED == zbx_is_uint63(value + 1, &value_i64))
+			return zbx_dsprintf(NULL, ZBX_FS_I64, -value_i64 + 1);
+	}
+	else
+	{
+		zbx_uint64_t	value_ui64;
+
+		if (SUCCEED == zbx_is_uint64(value, &value_ui64))
+			return zbx_dsprintf(NULL, ZBX_FS_UI64, value_ui64 + 1);
+	}
+
+	return cep_tag_value_dbl_shift(value, 1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decrement numeric tag value by one                                *
+ *                                                                            *
+ * Parameters: value - [IN] tag value                                         *
+ *                                                                            *
+ * Return value: decremented value as a newly allocated string, or NULL if    *
+ *               value is not numeric                                         *
+ *                                                                            *
+ * Comments: An empty string is treated as 0. Decrementing 0 returns -1,      *
+ *           and decrementing the minimum int64 value wraps around.           *
+ *                                                                            *
+ ******************************************************************************/
+char	*cep_tag_value_dec(const char *value)
+{
+	if ('\0' == *value)
+		return zbx_strdup(NULL, "0");
+
+	if ('-' == *value)
+	{
+		zbx_int64_t	value_i64;
+
+		if (SUCCEED == zbx_is_uint63(value + 1, &value_i64))
+			return zbx_dsprintf(NULL, ZBX_FS_I64,  -value_i64 - 1);
+	}
+	else
+	{
+		zbx_uint64_t	value_ui64;
+
+		if (SUCCEED == zbx_is_uint64(value, &value_ui64))
+		{
+			if (0 != value_ui64)
+				return zbx_dsprintf(NULL, ZBX_FS_UI64, value_ui64 - 1);
+
+			return zbx_strdup(NULL, "-1");
+		}
+	}
+
+	return cep_tag_value_dbl_shift(value, -1);
 }
 
 void	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_mw_task_ptr_t *tasks)

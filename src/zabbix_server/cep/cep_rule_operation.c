@@ -684,7 +684,7 @@ static int	cep_operation_event_increase_tag_value(const zbx_cep_operation_t *op,
 		zbx_tag_t	*t = &(*event)->tags.values[index];
 		char		*value;
 
-		if (NULL != (value = cep_tag_value_shift(t->value, 1)))
+		if (NULL != (value = cep_tag_value_inc(t->value)))
 		{
 			cep_acknowledge_update_tag(ack, op->type, t->tag, t->value, NULL, value);
 			zbx_free(t->value);
@@ -737,7 +737,7 @@ static int	cep_operation_event_decrease_tag_value(const zbx_cep_operation_t *op,
 		zbx_tag_t	*t = &(*event)->tags.values[index];
 		char	*value;
 
-		if (NULL != (value = cep_tag_value_shift(t->value, -1)))
+		if (NULL != (value = cep_tag_value_dec(t->value)))
 		{
 			cep_acknowledge_update_tag(ack, op->type, t->tag, t->value, NULL, value);
 			zbx_free(t->value);

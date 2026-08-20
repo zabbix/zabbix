@@ -19,7 +19,8 @@
 #include "zbxcacheconfig.h"
 #include "zbxmw.h"
 
-char	*cep_tag_value_shift(const char *value, int shift);
+char	*cep_tag_value_inc(const char *value);
+char	*cep_tag_value_dec(const char *value);
 
 #define CEP_FLAG(x)  (__UINT64_C(1) << (x))
 
