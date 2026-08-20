@@ -84,7 +84,7 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 				]
 			],
 			'column' => ['string', 'required', 'not_empty'],
-			'attribute_key' => ['string', 'required', 'not_empty',
+			'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
 				'when' => ['column', 'in' => $complex_columns]
 			],
 			'operator' => [
@@ -100,10 +100,10 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 				]
 			],
 			'value' => [
-				['string', 'required',
+				['string', 'required', 'length' => 255,
 					'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]]
 				],
-				['string', 'required', 'not_empty',
+				['string', 'required', 'length' => 255, 'not_empty',
 					'when' => ['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
 				],
 				['string', 'in' => [''],

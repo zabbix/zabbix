@@ -422,7 +422,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				'messages' => ['uniq' => _('Column and key name combination is not unique.')],
 				'fields' => [
 					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_COLUMNS),
-					'attribute_key' => ['string', 'required', 'not_empty',
+					'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
 						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 					]
 				],
@@ -446,7 +446,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 					'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
 						'when' => ['function', 'in' => [AGGREGATE_PERCENTILE]]
 					],
-					'alias' => ['string', 'required', 'not_empty']
+					'alias' => ['string', 'required', 'length' => 255, 'not_empty']
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
@@ -456,7 +456,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
-			'formula' => ['string', 'required', 'not_empty',
+			'formula' => ['string', 'required', 'length' => 255, 'not_empty',
 				'when' => [
 					['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]],
 					['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
@@ -466,7 +466,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				'fields' => [
 					'formulaid' => ['string', 'required', 'not_empty'],
 					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_CONDITIONS),
-					'attribute_key' => ['string', 'required', 'not_empty',
+					'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
 						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 					],
 					'operator' => [
@@ -482,10 +482,10 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 						]
 					],
 					'value' => [
-						['string', 'required',
+						['string', 'required', 'length' => 255,
 							'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]]
 						],
-						['string', 'required', 'not_empty',
+						['string', 'required', 'length' => 255, 'not_empty',
 							'when' => ['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
 						],
 						['string', 'in' => [''],
