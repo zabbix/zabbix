@@ -827,6 +827,11 @@ JAVASCRIPT;
 
 			$input['parameters'] = $parameters;
 		}
+		elseif ($input['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+			$input['columns'] = array_values($input['columns']);
+			$input['aggregated_columns'] = array_values($input['aggregated_columns']);
+			$input['conditions'] = array_values($input['conditions']);
+		}
 
 		$input['query_fields'] = array_values($query_fields);
 		$input['headers'] = array_values($headers);
