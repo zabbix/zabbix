@@ -1585,8 +1585,7 @@ class CHost extends CHostGeneral {
 	protected function validateCreate(array &$hosts) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
 			'monitored_by' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => static fn(array $data): bool => array_key_exists('monitored_by', $data) && $data['monitored_by'] == ZBX_MONITORED_BY_SERVER && !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING), 'type' => API_INT32, 'flags' => API_REQUIRED],
-									['if' => static fn(): bool => !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING), 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
+									['if' => static fn(array $data): bool => array_key_exists('monitored_by', $data) && $data['monitored_by'] == ZBX_MONITORED_BY_SERVER && !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING), 'type' => API_INT32],
 									['else' => true, 'type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP]), 'default' => DB::getDefault('hosts', 'monitored_by')]
 			]],
 			'proxyid' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -1921,18 +1920,25 @@ class CHost extends CHostGeneral {
 			}
 			else {
 				if (array_key_exists('monitored_by', $host)) {
+					$this->checkProxiesAndProxyGroupsAccessibility($hosts, $db_hosts);
+
+					$server_monitoring_access = self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING);
+					$required = API_REQUIRED;
+
+					if (($db_host['monitored_by'] == ZBX_MONITORED_BY_SERVER && !$server_monitoring_access)
+							|| $host['monitored_by'] == $db_host['monitored_by']) {
+						$required = 0;
+					}
+
 					$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-						'monitored_by' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => static fn(): bool => !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING) && $db_host['monitored_by'] != $host['monitored_by'], 'type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => implode(',', [ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
-												['else' => true, 'type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])]
-						]],
+						'monitored_by' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
 						'proxyid' =>		['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-												['else' => true, 'type' => API_ID, 'in' => '0']
+												['if' => static fn(): bool => $host['monitored_by'] === ZBX_MONITORED_BY_PROXY, 'type' => API_ID, 'flags' => $required],
+												['else' => true, 'type' => API_ID]
 						]],
 						'proxy_groupid' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY_GROUP], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-												['else' => true, 'type' => API_ID, 'in' => '0']
+												['if' => static fn(): bool => $host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP, 'type' => API_ID, 'flags' => $required],
+												['else' => true, 'type' => API_ID]
 						]]
 					]];
 
@@ -1946,6 +1952,7 @@ class CHost extends CHostGeneral {
 					$host += array_intersect_key($db_host, array_flip(['monitored_by', 'tls_connect', 'tls_accept']));
 
 					self::addRequiredFieldsByMonitoredBy($host, $db_host);
+					$this->checkProxiesAndProxyGroupsAccessibility($hosts, $db_hosts);
 				}
 
 				self::addRequiredFieldsByTls($host, $db_host);
@@ -1959,9 +1966,8 @@ class CHost extends CHostGeneral {
 		}
 		unset($host);
 
-		self::checkProxiesAndProxyGroups($hosts, $db_hosts);
 		$this->checkMonitoredByField($hosts, $db_hosts);
-		$this->checkProxiesAndProxyGroupsAccessibility($hosts, $db_hosts);
+		self::checkProxiesAndProxyGroups($hosts, $db_hosts);
 		self::checkTlsPskPairs($hosts, $db_hosts);
 
 		foreach ($hosts as $host) {
@@ -2174,6 +2180,10 @@ class CHost extends CHostGeneral {
 	}
 
 	private function checkProxiesAndProxyGroupsAccessibility(array $hosts, array $db_hosts): void {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			return;
+		}
+
 		$monitored_by_upd = [];
 		$proxyids = [];
 		$proxy_groupids = [];
@@ -2184,7 +2194,7 @@ class CHost extends CHostGeneral {
 			}
 
 			if (array_key_exists('monitored_by', $host)
-					&& bccomp($host['monitored_by'], $db_hosts[$host['hostid']]['monitored_by']) != 0
+					&& $host['monitored_by'] != $db_hosts[$host['hostid']]['monitored_by']
 					&& $db_hosts[$host['hostid']]['monitored_by'] != ZBX_MONITORED_BY_SERVER) {
 				$monitored_by_upd[$host['hostid']] = true;
 
@@ -2196,16 +2206,15 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-
 			if (!array_key_exists($host['hostid'], $monitored_by_upd)) {
 				if (array_key_exists('proxyid', $host)
-						&& bccomp($host['proxyid'], $db_hosts[$host['hostid']]['proxyid']) != 0
+						&& $host['proxyid'] != $db_hosts[$host['hostid']]['proxyid']
 						&& $db_hosts[$host['hostid']]['proxyid'] != 0) {
 					$proxyids[$host['hostid']] = $db_hosts[$host['hostid']]['proxyid'];
 				}
 
 				if (array_key_exists('proxy_groupid', $host)
-						&& bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0
+						&& $host['proxy_groupid'] != $db_hosts[$host['hostid']]['proxy_groupid']
 						&& $db_hosts[$host['hostid']]['proxy_groupid'] != 0) {
 					$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
 				}
@@ -2257,6 +2266,15 @@ class CHost extends CHostGeneral {
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'hostid' =>				['type' => API_ANY],
+			'monitored_by' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
+			'proxyid' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID],
+										['else' => true, 'type' => API_ID, 'in' => '0']
+			]],
+			'proxy_groupid' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY_GROUP], 'type' => API_ID],
+										['else' => true, 'type' => API_ID, 'in' => '0']
+			]],
 			'tls_connect' =>		['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
 			'tls_accept' =>			['type' => API_INT32, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE])],
 			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
