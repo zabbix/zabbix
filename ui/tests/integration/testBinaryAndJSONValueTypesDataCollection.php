@@ -831,17 +831,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	 * @hosts agent
 	 */
 	public function testLogValueTypeJSON_agentRestart() {
-		// Don't assume the agent connection was already established by an earlier test case - poll
-		// via API instead of waiting on a specific (possibly already-passed) one-time log line, so
-		// this works regardless of test execution order/isolation.
-		$this->callUntilDataIsPresent('host.get', [
-			'output' => 'extend',
-			'filter' => [
-				'host' => 'agent',
-				'active_available' => INTERFACE_AVAILABLE_TRUE
-			]
-		], 30, 2);
-
 		// The "agent" host is toggled NOT_MONITORED/MONITORED around every test case that declares
 		// "@hosts agent", so the server config cache must be refreshed before relying on the host's
 		// active checks being processed.
