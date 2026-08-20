@@ -285,7 +285,7 @@ function stepSelectTemplate($old_template_count): array {
 		),
 		new CTemplateTag('host-wizard-template-tags-more',
 			(new CButtonIcon(ZBX_ICON_MORE))
-				->setHint('#{tag_values}', ZBX_STYLE_HINTBOX_WRAP)
+				->setHint('#{tag_values}', ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_TAGS_WRAPPER)
 		)
 	];
 }
