@@ -827,6 +827,16 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	 * @hosts agent
 	 */
 	public function testLogValueTypeJSON_agentRestart() {
+		// The "agent" host is toggled NOT_MONITORED/MONITORED around every test case that declares
+		// "@hosts agent", so the server config cache must be refreshed before relying on the host's
+		// active checks being processed.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
+			'enabling Zabbix agent checks on host "agent": interface became available',
+			'resuming Zabbix agent checks on host "agent": connection restored'
+		]);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
 		$this->checkItemState('agent:log['.self::$file_name_log_json.']', ITEM_STATE_NORMAL);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
