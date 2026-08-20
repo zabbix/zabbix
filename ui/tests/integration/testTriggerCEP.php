@@ -132,6 +132,18 @@ class testTriggerCEP extends CIntegrationTest {
 	const ITEM_PROTO_KEY = 'cep.trap';
 	const ITEM_PROTO_KEY2 = 'cep.trap2';
 	const COMPONENT_VALUE = 'sensor1';
+	// A trapper item of the host itself rather than of a discovered one, created by prepareData() - which runs
+	// before any component is started (see CIntegrationTest::onBeforeTestSuite()) - so unlike everything the LLD
+	// rules bring in while the server runs, this item is already in the database when the server reads its
+	// configuration and is in the configuration cache from the first moment on. It carries units, which nothing
+	// else in the suite does, so a value read out of it is read out of an item that has them.
+	//
+	// What reads it are the counting expression macros of the event operations (see
+	// CEP_OP_EXPRESSION_UNITS_LAST_MACRO): the flavours using them send it CEP_UNITS_ITEM_VALUE before they open
+	// their first event, so the value is in history by the time an operation asks for it.
+	const CEP_UNITS_ITEM_KEY = 'cep.units';
+	const CEP_UNITS_ITEM_UNITS = 'B';
+	const CEP_UNITS_ITEM_VALUE = '1024';
 	// Stable per-trigger tag (fixed name, value resolved from the LLD macro to the component, e.g.
 	// 'sensor1') used to map each discovered trigger to its own service. Unlike 'component_{ITEM.VALUE}'
 	// the tag name does not contain {ITEM.VALUE}, so it is not rewritten at event time and the service
@@ -230,11 +242,39 @@ class testTriggerCEP extends CIntegrationTest {
 	// operation as it stands: what leads it comes from a user macro (CEP_OP_EVENT_NAME_MACRO) and what ends it from
 	// an expression macro (CEP_OP_EXPRESSION_MACRO), so the name below is what the event ends up with only if the
 	// server resolved both of them. That is also why it is kept as the parts it is assembled from rather than as
-	// one string: the operation and the expectation are built from the same pieces and cannot drift apart.
+	// one string: the operation (CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_OPERATION) and the expectation are built from
+	// the same pieces in the same order and cannot drift apart.
 	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_PREFIX = 'CEP window none';
 	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_MIDDLE = ' event operations ';
+	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_OPERATION = self::CEP_OP_EVENT_NAME_MACRO
+			.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_MIDDLE.self::CEP_OP_EXPRESSION_MACRO;
 	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME = self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_PREFIX
 			.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_MIDDLE.self::CEP_OP_EXPRESSION_VALUE;
+	// The very same operation and the very same expectation with the four history reading expression macros
+	// appended - two counting the values of the item of the event (CEP_OP_EXPRESSION_COUNT_MACRO,
+	// CEP_OP_EXPRESSION_COUNT_ABSENT_MACRO) and two reading the item that was there before the server started
+	// (CEP_OP_EXPRESSION_UNITS_COUNT_MACRO, CEP_OP_EXPRESSION_UNITS_LAST_MACRO). This is the form the flavours driven
+	// by runEventAssessmentTestCepWindowNone() use and the one no other flavour does: what those others are for is
+	// an operation reaching an event that has left a window, or a rule being updated between the operations, and
+	// having them ask the history for a count as well would say nothing new. Both halves come from the same flag,
+	// so the rule and the assertion of a flavour cannot end up on different sides of it, see
+	// getWindowNoneEventOperationCase().
+	//
+	// The glue is what separates one expression macro of the name from the next, in the operation and in the
+	// expectation alike: they resolve to bare numbers, so without it "1" followed by "0" would read as "10" and a
+	// resolved macro could not be told from a missing one.
+	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_GLUE = ' ';
+	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_COUNT_OPERATION =
+			self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_OPERATION
+			.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_GLUE.self::CEP_OP_EXPRESSION_COUNT_MACRO
+			.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_GLUE.self::CEP_OP_EXPRESSION_COUNT_ABSENT_MACRO
+			.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_GLUE.self::CEP_OP_EXPRESSION_UNITS_COUNT_MACRO
+			.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_GLUE.self::CEP_OP_EXPRESSION_UNITS_LAST_MACRO;
+	const CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_COUNT = self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME
+			.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_GLUE.self::CEP_OP_EXPRESSION_COUNT_VALUE
+			.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_GLUE.self::CEP_OP_EXPRESSION_COUNT_ABSENT_VALUE
+			.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_GLUE.self::CEP_OP_EXPRESSION_UNITS_COUNT_VALUE
+			.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_GLUE.self::CEP_OP_EXPRESSION_UNITS_LAST_VALUE;
 	// The macros the operations of those two rules are given instead of plain strings, and the values they must
 	// resolve to. Unlike the limits of a window (CEP_WINDOW_DURATION_MACRO), an operation acts on an event, so its
 	// user macros are resolved for the host of that event and its templates first and only fall back to the global
@@ -248,7 +288,8 @@ class testTriggerCEP extends CIntegrationTest {
 	//   - a macro of the event itself, plain ({HOST.HOST}), in its indexed form ({HOST.HOST1}) and under a macro
 	//     function ({{HOST.HOST}.uppercase()});
 	//   - an expression macro ({?...}), which only the event name accepts - the tag operations are resolved without
-	//     the expression macro search enabled, so a tag may not hold one.
+	//     the expression macro search enabled, so a tag may not hold one - both as a constant expression and as
+	//     expressions reading the history of an item.
 	// The event macros a case may use are limited to those that are the same for every event of the scenario: one
 	// tag state is asserted for all of them, so a value carrying macro like {ITEM.VALUE} could not be expected -
 	// the trigger tags cover that one (see prepareCloseOnUpTriggerPrototypes(), which builds the 'state' and
@@ -273,13 +314,65 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_OP_HOST_MACRO = '{HOST.HOST}';
 	const CEP_OP_HOST_INDEXED_MACRO = '{HOST.HOST1}';
 	const CEP_OP_HOST_FUNC_MACRO = '{{HOST.HOST}.uppercase()}';
-	// The expression macro of the event name and what it must evaluate to. Its expression is a constant one on
-	// purpose: the name is asserted as a whole, so an expression reading the history of the item would resolve to
-	// something different for every event of the scenario and could not be expected at all. What is covered by it
-	// is that the name is resolved with the expression macro search enabled - the expression itself is the
-	// evaluator's business, not CEP's.
+	// The expression macros of the event name and what they must evaluate to. The first one is a constant
+	// expression, which needs nothing but the name being resolved with the expression macro search enabled.
 	const CEP_OP_EXPRESSION_MACRO = '{?2*3}';
 	const CEP_OP_EXPRESSION_VALUE = '6';
+	// The other two ask for a great deal more of the server than a constant expression does: they count the values
+	// an item collected over the last hour, so the process running the operation has to read the trigger of the
+	// event, the item its expression refers to and then the history of that item - none of which it can do without
+	// a working database connection of its own. That is the point of them: a constant expression is resolved by
+	// the evaluator alone and would come out the same in a CEP worker that never reaches the database, while these
+	// leave no name at all unless it does. Only the flavours driven by runEventAssessmentTestCepWindowNone() put
+	// them into their "set name" operation, see CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_COUNT_OPERATION.
+	//
+	// The item they count is the one the scenario drives, the first discovered item of the discovered host (see
+	// buildDiscoveredKeys()), which is the item of every event the operations act on. The two name it differently
+	// on purpose, since an item query resolves each form on a path of its own: the first through the {HOST.HOST}
+	// macro, which the query takes from the trigger of the event (the host and item key macros are the only ones
+	// an item query accepts), the second written out in full.
+	//
+	// What the first of them puts into the name is not the count but whether it is above zero: the number of
+	// values the item has collected keeps growing while the scenario runs and differs from run to run, so the
+	// count itself could not be expected, while "at least one value" holds for every event of the scenario - the
+	// trigger that opened it fired on a value of that very item.
+	const CEP_OP_EXPRESSION_COUNT_ITEM_KEY = self::ITEM_PROTO_KEY.'['.self::COMPONENT_VALUE.']';
+	const CEP_OP_EXPRESSION_COUNT_MACRO = '{?count(/{HOST.HOST}/'.self::CEP_OP_EXPRESSION_COUNT_ITEM_KEY.',1h)>0}';
+	const CEP_OP_EXPRESSION_COUNT_VALUE = '1';
+	// The second one counts over the same hour of the same item, narrowed to a pattern no value of the scenario
+	// contains, and is therefore exactly zero. It is what makes the count above mean something: an evaluation that
+	// read no history at all would leave a zero behind for both of them, whereas the pair can only come out "1 0"
+	// if the values were really read and really matched against the pattern.
+	const CEP_OP_EXPRESSION_COUNT_ABSENT_PATTERN = 'no_such_value';
+	const CEP_OP_EXPRESSION_COUNT_ABSENT_MACRO = '{?count(/'.self::HOST_DISC_VALUE.'/'
+			.self::CEP_OP_EXPRESSION_COUNT_ITEM_KEY.',1h,"like","'
+			.self::CEP_OP_EXPRESSION_COUNT_ABSENT_PATTERN.'")}';
+	const CEP_OP_EXPRESSION_COUNT_ABSENT_VALUE = '0';
+	// The last two read an item of another host altogether - CEP_UNITS_ITEM_KEY, the item that is in the database
+	// before the server starts and the only one of the suite carrying units - so the counts above are not the whole
+	// story: those read an item the server learned about while it was running, from an LLD rule and on the host of
+	// the event itself, and these read one it has known since it read its configuration and that no event of the
+	// scenario belongs to. An item query naming another host is what makes that possible at all, and it is the
+	// server that has to find the item behind the name.
+	//
+	// The first is the same "at least one value in the last hour" question as above, asked of that item: the
+	// flavours using these macros send it one value before they open their first event, so the answer is yes for
+	// every event of theirs (see sendCepUnitsItemValue()).
+	const CEP_OP_EXPRESSION_UNITS_COUNT_MACRO = '{?count(/'.self::HOST_NAME.'/'.self::CEP_UNITS_ITEM_KEY
+			.',1h)>0}';
+	const CEP_OP_EXPRESSION_UNITS_COUNT_VALUE = '1';
+	// The second reads the value itself rather than a count, which is the one thing a count cannot show: a count
+	// is the same number whatever the values behind it are, so only reading one proves the history that was read
+	// is the history of this item. The value is the one the flavour sent, sent again at the start of every run so
+	// the last value of the item is known however often the suite has run before.
+	//
+	// What is expected of it is the bare number and not the number with the units of the item: an expression macro
+	// resolves to the value the expression evaluated to (zbx_db_get_expression_macro_result() hands on what the
+	// evaluation returned), and formatting a value with the units of its item is what the value macros of an event
+	// do, not what an expression does. CEP_UNITS_ITEM_VALUE is chosen so the two cannot be confused - with the
+	// units applied 1024 B would read as "1 KB" and not as "1024".
+	const CEP_OP_EXPRESSION_UNITS_LAST_MACRO = '{?last(/'.self::HOST_NAME.'/'.self::CEP_UNITS_ITEM_KEY.')}';
+	const CEP_OP_EXPRESSION_UNITS_LAST_VALUE = self::CEP_UNITS_ITEM_VALUE;
 	// The windowed flavours of the scenario (see prepareDataCepWindowOperations()) run the very same
 	// operations from a rule that has a window instead of none, grouped by the 'service' tag, so every id gets
 	// a window of its own. They cannot reuse the operator coverage rules above, because how many windowed
@@ -692,6 +785,8 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $hostid_cache = [];
 	private static $itemid_cache = [];
 	private static $disc_hostid;
+	// The item of the host that exists before the server is started, see CEP_UNITS_ITEM_KEY.
+	private static $units_itemid;
 	private static $templateid;
 	private static $log_templateid;
 	private static $log_lld_ruleid;
@@ -990,6 +1085,20 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid = $response['result']['hostids'][0];
+
+		// The one item of the suite that is neither discovered nor on a template: it is created here, before the
+		// server is started, and it has units - see CEP_UNITS_ITEM_KEY for what reads it.
+		$response = $this->call('item.create', [
+			'hostid' => self::$hostid,
+			'name' => 'CEP units item',
+			'key_' => self::CEP_UNITS_ITEM_KEY,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'units' => self::CEP_UNITS_ITEM_UNITS
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$units_itemid = $response['result']['itemids'][0];
 
 		// Create the active proxy and assign the host to it. The host prototype discovers its host with the
 		// parent host's proxy inherited, so the discovered host is monitored by this proxy too; every value
@@ -2260,8 +2369,11 @@ class testTriggerCEP extends CIntegrationTest {
 		));
 
 		// This one changes the event name and severity, which the rules above have conditions on, so it must
-		// be evaluated after all of them: rules run in sortorder and every other rule leaves it at 0.
-		$event_operations = $this->getWindowNoneEventOperationCase()['operations'];
+		// be evaluated after all of them: rules run in sortorder and every other rule leaves it at 0. Its name
+		// is the one carrying the counting expression macros as well: the flavours of this scenario are the
+		// ones that ask for them, and waitForCepWindowNoneTaggedEvents() is told the same when their events are
+		// read back (see getWindowNoneEventOperationCase()).
+		$event_operations = $this->getWindowNoneEventOperationCase(true)['operations'];
 		$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams($prefix.'event operations',
 			[], $this->buildWindowNoneOperations($event_operations), CONDITION_EVAL_TYPE_AND, '', $window_type,
 			$window
@@ -5921,11 +6033,15 @@ HEREDOC;
 	 * The operations changing the event itself rather than its tags, with the state they must leave on every
 	 * problem event of the scenario. They all run in one rule, the "event operations" one, whose filter is
 	 * just the 'type' Equals "cep" guard, in the order listed:
-	 *   - "set name" replaces the event name. Its leading half is a user macro of the template the event's host is
-	 *     linked to (see prepareWindowOperationMacros()) and the rest is written out, so the expected name is
-	 *     reached only by resolving the one and keeping the other - the name is the only field of these operations
-	 *     that may hold a macro at all: a severity is a number and a suppression duration is read straight from
-	 *     the configuration, without a macro ever being resolved in it;
+	 *   - "set name" replaces the event name. It leads with a user macro of the template the event's host is
+	 *     linked to (see prepareWindowOperationMacros()), carries written out text in the middle and ends with a
+	 *     constant expression macro, and with $count_expression_macros two more expression macros follow that one:
+	 *     they count the values of the event's own item over the last hour, which the process running the
+	 *     operation can only answer by reading the trigger of the event and the history of its item out of the
+	 *     database (see CEP_OP_EXPRESSION_COUNT_MACRO). The expected name is reached only by resolving every one
+	 *     of them and keeping the text as it stands - the name is the only field of these operations that may hold
+	 *     a macro at all: a severity is a number and a suppression duration is read straight from the
+	 *     configuration, without a macro ever being resolved in it;
 	 *   - "set severity" puts the event at Information, then two "increase severity" and one "decrease
 	 *     severity" shift it by one step each, leaving Warning. The severity is asserted after the whole
 	 *     chain, and since the three shifts do not cancel out, an operation that did nothing would leave a
@@ -5949,16 +6065,24 @@ HEREDOC;
 	 * Either way the suppressions cannot outlive the test: event_suppress.cep_ruleid is an ON DELETE CASCADE
 	 * foreign key, so deleting the CEP rules in the teardown removes them - a manual unsuppress could not, it
 	 * only clears rows with no cep_ruleid.
+	 *
+	 * $count_expression_macros is asked for by the flavours driven by runEventAssessmentTestCepWindowNone() and
+	 * by no others, and it has to be asked for the same way twice: once where the rule is created
+	 * (prepareDataCepWindowNoneTagOperations()) and once where its outcome is read
+	 * (waitForCepWindowNoneTaggedEvents()). The operation and the expectation are both taken from here, so a
+	 * flavour that passed it in one place and not the other would be asserting a name it never asked for.
 	 */
-	private function getWindowNoneEventOperationCase(): array {
+	private function getWindowNoneEventOperationCase(bool $count_expression_macros = false): array {
 		return [
 			'operations' => [
 				// The name is a user macro (see prepareWindowOperationMacros()), then text, then an expression
 				// macro - the one macro form only the name accepts, the tag operations being resolved without the
-				// expression macro search. The event ends up with the expected name below only when both macros
-				// were resolved and the text between them was left alone.
-				[CCepRuleHelper::OP_SET_NAME, ['event_name' => self::CEP_OP_EVENT_NAME_MACRO
-					.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_MIDDLE.self::CEP_OP_EXPRESSION_MACRO
+				// expression macro search - and, for the flavours asking for it, the two counting expression
+				// macros on top of that. The event ends up with the expected name below only when every one of
+				// them was resolved and the text between them was left alone.
+				[CCepRuleHelper::OP_SET_NAME, ['event_name' => $count_expression_macros
+					? self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_COUNT_OPERATION
+					: self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_OPERATION
 				]],
 				[CCepRuleHelper::OP_SET_SEVERITY, ['severity' => TRIGGER_SEVERITY_INFORMATION]],
 				[CCepRuleHelper::OP_INCREASE_SEVERITY, []],
@@ -5967,7 +6091,9 @@ HEREDOC;
 				[CCepRuleHelper::OP_SUPPRESS, ['suppress_duration' => self::CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD]]
 			],
 			'expected' => [
-				'name' => self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME,
+				'name' => $count_expression_macros
+					? self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_COUNT
+					: self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME,
 				// Information +1 +1 -1.
 				'severity' => TRIGGER_SEVERITY_WARNING,
 				'suppressed' => true
@@ -6193,12 +6319,15 @@ HEREDOC;
 			[
 				// The same name operation the windowless flavour performs, macros and all, so the event ends up
 				// with the name below only if the server resolved the user macro leading it and the expression
-				// macro ending it and left the text between them alone.
+				// macro ending it and left the text between them alone. What it does not carry are the counting
+				// expression macros of that flavour: a step is about the operation being the one the updated rule
+				// holds, which the name it writes shows without a history read (see
+				// getWindowNoneEventOperationCase()).
 				'label' => 'set name',
 				'operations' => [
-					[CCepRuleHelper::OP_SET_NAME, ['event_name' => self::CEP_OP_EVENT_NAME_MACRO
-						.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_MIDDLE.self::CEP_OP_EXPRESSION_MACRO
-					]]
+					[CCepRuleHelper::OP_SET_NAME,
+						['event_name' => self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_OPERATION]
+					]
 				],
 				'event' => ['name' => self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME] + $trigger_event
 			],
@@ -12667,6 +12796,10 @@ HEREDOC;
 				'Trigger must start in OK state for the windowless CEP test.');
 		}
 
+		// The item the expression macros of the event operations read besides the item of the event itself gets
+		// its value before the first event is opened, so its history holds one by the time an operation asks.
+		$this->sendCepUnitsItemValue();
+
 		// Only the events generated from here on are inspected for the CEP tags.
 		$this->captureEventBaseline($all);
 
@@ -12756,7 +12889,10 @@ HEREDOC;
 			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
 			$expected_so_far[$service] = $tags;
-			$this->waitForCepWindowNoneTaggedEvents($triggerid, $expected_so_far);
+			// The last argument is what prepareDataCepWindowNoneTagOperations() built the "set name" operation
+			// of these flavours with: the name they expect ends with the four history reading expression
+			// macros resolved.
+			$this->waitForCepWindowNoneTaggedEvents($triggerid, $expected_so_far, [], false, true);
 		}
 
 		// Every event checked above was suppressed by the event operations. That suppression is time limited,
@@ -12769,6 +12905,46 @@ HEREDOC;
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
 		$this->waitForNoOpenProblems($all, 'After the windowless CEP scenario recovery value');
+	}
+
+	/**
+	 * Send CEP_UNITS_ITEM_VALUE to the item that was in the database before the server started
+	 * (CEP_UNITS_ITEM_KEY) and wait until it is in history, which is what the expression macros of the event
+	 * operations read it out of.
+	 *
+	 * The wait is the point of the method: the value goes to the server the same way every other value of the
+	 * suite does, through the proxy, so it is in history some time after it was sent and not when the call
+	 * returns. An event opened before that would have its name resolved against an item with no value in the
+	 * last hour, and the flavour expects the answer of an item that has one.
+	 *
+	 * The value is the same on every run and is sent again on each of them, so the last value of the item is the
+	 * expected one however often the suite has run before and whatever it left behind.
+	 */
+	private function sendCepUnitsItemValue(): void {
+		$this->dispatchSenderValues([
+			[
+				'host' => self::HOST_NAME,
+				'key' => self::CEP_UNITS_ITEM_KEY,
+				'value' => self::CEP_UNITS_ITEM_VALUE
+			]
+		]);
+
+		$this->callUntilDataIsPresent('history.get', [
+			'itemids' => [self::$units_itemid],
+			'history' => ITEM_VALUE_TYPE_UINT64,
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 1
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+			// callUntilDataIsPresent() only calls this once the item has history at all, so what is left to
+			// check is that its newest value is the one the expression macro expects to read back.
+			if ($response['result'][0]['value'] !== self::CEP_UNITS_ITEM_VALUE) {
+				return 'the last value of the "'.self::CEP_UNITS_ITEM_KEY.'" item is "'
+					.$response['result'][0]['value'].'", expected "'.self::CEP_UNITS_ITEM_VALUE.'"';
+			}
+
+			return true;
+		});
 	}
 
 	/**
@@ -15758,18 +15934,24 @@ HEREDOC;
 	 * name expected of its events is the one the trigger prototype gave them, built from the value that opened
 	 * the event, and the rewritten name of the operation would mean the operation ran after all.
 	 *
+	 * $count_expression_macros must be what the rule of the flavour was created with, since it selects which of
+	 * the two names the "set name" operation was given and therefore which one its events must carry - see
+	 * getWindowNoneEventOperationCase().
+	 *
 	 * The tags are applied asynchronously after the event is created, hence the polling; the callback returns
 	 * a description of the first event that does not match, which callUntilDataIsPresent() surfaces in the
 	 * failure message.
 	 */
 	private function waitForCepWindowNoneTaggedEvents(int $triggerid, array $expected_by_service,
-			array $extra_results = [], bool $set_name_skipped = false): void {
+			array $extra_results = [], bool $set_name_skipped = false,
+			bool $count_expression_macros = false): void {
 		// tag => the value the rule adds it with, for every rule of the scenario.
 		$rule_values = array_map(fn($rule) => $rule[1], $this->getWindowNoneRules());
 		// tag => the value the tag operations must have left on every event, or null if the tag must be gone.
 		$operation_results = array_merge($this->getWindowNoneTagOperationResults(), $extra_results);
-		// The name, severity and suppression the event operations must have left on every event.
-		$event_results = $this->getWindowNoneEventOperationCase()['expected'];
+		// The name, severity and suppression the event operations must have left on every event, with the name
+		// taken from the same flag the rule of the flavour was built with.
+		$event_results = $this->getWindowNoneEventOperationCase($count_expression_macros)['expected'];
 
 		$this->callUntilDataIsPresent('event.get', [
 			'objectids' => [$triggerid],
@@ -18438,8 +18620,10 @@ HEREDOC;
 		}
 
 		if (!empty(self::$hostid)) {
+			// The units item goes with the host it is on, so it needs no deletion of its own.
 			CDataHelper::call('host.delete', [self::$hostid]);
 			self::$hostid = null;
+			self::$units_itemid = null;
 		}
 
 		// Deleted after the hosts it monitors (self::$hostid and the discovered host) have been removed,
