@@ -755,7 +755,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const LOG_MASTER_ITEM_KEY = 'cep.log.master';
 	const LOG_ITEM_PROTO_KEY = 'cep.log.proto';
 	const LOG_COMPONENT_VALUE = 'logsensor1';
-	const WAIT_ITERATIONS = 120;
+	const WAIT_ITERATIONS = 30;
 	const WAIT_ITERATION_DELAY = 1;
 	const WAIT_ITERATIONS_LONGER = 30;
 
