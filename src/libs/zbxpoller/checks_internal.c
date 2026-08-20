@@ -207,7 +207,7 @@ static double	get_selfmon_stats_threads(unsigned char aggr_func, int proc_num, u
 	switch (aggr_func)
 	{
 		case ZBX_SELFMON_AGGR_FUNC_AVG:
-			return get_selfmon_stat(total / usage->values_num, state);
+			return get_selfmon_stat(total / count, state);
 		case ZBX_SELFMON_AGGR_FUNC_MIN:
 			return get_selfmon_stat(min, state);
 		case ZBX_SELFMON_AGGR_FUNC_MAX:
