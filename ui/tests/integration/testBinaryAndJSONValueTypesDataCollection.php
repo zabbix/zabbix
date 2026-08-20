@@ -521,7 +521,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => 'agent',
-				'ServerActive' => '127.0.0.1',
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'RefreshActiveChecks' => 5
 			]
 		];
