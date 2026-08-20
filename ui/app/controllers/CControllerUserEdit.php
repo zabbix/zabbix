@@ -264,18 +264,14 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['groups_rights'] = collapseGroupRights(getHostGroupsRights($user_groups));
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
 
-			$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
-
 			$db_proxies = API::Proxy()->get([
 				'output' => ['proxyid', 'name'],
-				'proxy_groupids' => 0,
-				'limit' => $limit
+				'proxy_groupids' => 0
 			]);
 			CArrayHelper::sort($db_proxies, ['name']);
 
 			$db_proxy_groups = API::ProxyGroup()->get([
-				'output' => ['proxy_groupid', 'name'],
-				'limit' => $limit
+				'output' => ['proxy_groupid', 'name']
 			]);
 			CArrayHelper::sort($db_proxy_groups, ['name']);
 
