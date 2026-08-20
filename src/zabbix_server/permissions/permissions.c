@@ -364,7 +364,7 @@ static void	*permissions_rebuild_entry(void *args)
 
 	ZBX_UNUSED(args);
 
-	zabbix_log(LOG_LEVEL_WARNING, "thread started [permissions rebuild]");
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [permissions rebuild]");
 
 	if (0 != (err = zbx_init_thread_signal_handler()))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
@@ -373,7 +373,7 @@ static void	*permissions_rebuild_entry(void *args)
 
 	res = permissions_rebuild_task();
 
-	zabbix_log(LOG_LEVEL_WARNING, "thread finished [permissions rebuild] %s in " ZBX_FS_DBL " sec",
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped [permissions rebuild] result: %s in " ZBX_FS_DBL " sec",
 			zbx_result_string(res), zbx_time() - start);
 
 	pthread_mutex_lock(&rebuild_lock);
