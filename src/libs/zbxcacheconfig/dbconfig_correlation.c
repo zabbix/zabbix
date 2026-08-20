@@ -210,6 +210,7 @@ static void	correlation_remove_condition(zbx_correlation_t *correlation, zbx_cor
 	{
 		if (correlation->conditions.values[i] == condition)
 		{
+			corr_condition_release(condition);
 			zbx_vector_corr_condition_ptr_remove_noorder(&correlation->conditions, i);
 			return;
 		}
