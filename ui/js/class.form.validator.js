@@ -966,14 +966,13 @@ class CFormValidator {
 
 				if (rel_field.includes('/*/')) {
 					// Wildcard pattern: add as related all fields based on value keys in same field path level.
-					const rel_field_parts = rel_field.split('/');
-					rel_field_parts.shift();
+					const rel_field_parts = rel_field.split('/').slice(1);
 					let path_value = values;
 					let next_value_key = rel_field_parts.shift();
 
 					while (next_value_key !== '*' && path_value !== null) {
-						path_value = Object.hasOwn(path_value, next_value_key) ? path_value[next_value_key] : null
-						next_value_key = rel_field_parts.shift();
+						path_value = Object.hasOwn(path_value, next_value_key) ? path_value[next_value_key] : null;
+;						next_value_key = rel_field_parts.shift();
 					}
 
 					if (path_value) {
@@ -981,7 +980,7 @@ class CFormValidator {
 							const new_rel_field = rel_field.replace('/*/', `/${key}/`);
 
 							if (!checked_related_fields.includes(new_rel_field)) {
-								related_field_paths.push(rel_field.replace('/*/', `/${key}/`));
+								related_field_paths.push(new_rel_field);
 							}
 						});
 					}
