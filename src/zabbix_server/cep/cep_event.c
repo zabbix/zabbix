@@ -819,8 +819,8 @@ static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int s
  ******************************************************************************/
 void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **str)
 {
-	return cep_event_context_resolve_macros(ctx, ZBX_TOKEN_SEARCH_REFERENCES | ZBX_TOKEN_SEARCH_EXPRESSION_MACRO,
-			zbx_macro_event_name_resolv, str);
+	return cep_event_context_resolve_macros(ctx, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, zbx_macro_event_name_resolv,
+			str);
 }
 
 /******************************************************************************
