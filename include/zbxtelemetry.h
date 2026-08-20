@@ -204,6 +204,12 @@ ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
 int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, char *error, size_t max_error_len);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
 
+int	zbx_tq_validate_time_shift(const char *time_shift_str, int *time_shift_out, char *error,
+		size_t max_error_len);
+int	zbx_tq_validate_lookback_limit(const char *lookback_limit_str, int *lookback_limit_out, char *error,
+		size_t max_error_len);
+int	zbx_tq_validate_granularity(const char *granularity_str, int *granularity_out, char *error,
+		size_t max_error_len);
 int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out, const char *lookback_limit_str,
 		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
 		size_t max_error_len);

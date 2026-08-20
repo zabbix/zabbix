@@ -1216,8 +1216,10 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 	}
 	else
 	{
+		int	ret;
 		int	value;
 		char	*errmsg = NULL;
+		char	errmsg_buf[MAX_STRING_LEN];
 
 		switch (flag)
 		{
@@ -1290,6 +1292,33 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 				}
 
 				lld_item_add_error(item, error, "invalid trends storage period \"%s\"", *field);
+				break;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT:
+			case ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT:
+			case ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY:
+				if (SUCCEED == is_user_macro(*field))
+					return;
+
+				if (ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT == flag)
+				{
+					ret = zbx_tq_validate_time_shift(*field, NULL, errmsg_buf,
+							sizeof(errmsg_buf));
+				}
+				else if (ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT == flag)
+				{
+					ret = zbx_tq_validate_lookback_limit(*field, NULL, errmsg_buf,
+							sizeof(errmsg_buf));
+				}
+				else /* ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY */
+				{
+					ret = zbx_tq_validate_granularity(*field, NULL, errmsg_buf,
+							sizeof(errmsg_buf));
+				}
+
+				if (SUCCEED == ret)
+					return;
+
+				lld_item_add_error(item, error, "%s", errmsg_buf);
 				break;
 			default:
 				return;
@@ -1634,45 +1663,6 @@ out:
 	zbx_vector_str_destroy(&keys);
 }
 
-static void	lld_items_validate_tq_time_params(zbx_lld_item_full_t *item, char **error)
-{
-#define ZBX_TIME_PARAM_FLAGS (ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT | ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT | \
-		ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY)
-	char	time_params_error[MAX_STRING_LEN];
-
-	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-		return;
-
-	if (ITEM_TYPE_TELEMETRY_QUERY != item->type)
-		return;
-
-	/* only new items or items with changed data or item type will be validated */
-	if (0 != item->itemid && 0 == (item->flags & ZBX_TIME_PARAM_FLAGS) &&
-			0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TYPE))
-		return;
-
-	if (SUCCEED == zbx_tq_validate_time_params(item->time_shift, NULL, item->lookback_limit, NULL,
-			item->granularity, NULL, time_params_error, sizeof(time_params_error)))
-		return;
-
-	lld_item_add_error(item, error, "%s", time_params_error);
-
-	if (0 != item->itemid)
-	{
-		/* if either of time_shift, lookback_limit and granularity is invalid, */
-		/* all of them are rolled back */
-		lld_field_str_rollback(&item->time_shift, &item->time_shift_orig,
-				&item->flags, ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT);
-		lld_field_str_rollback(&item->lookback_limit, &item->lookback_limit_orig,
-				&item->flags, ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT);
-		lld_field_str_rollback(&item->granularity, &item->granularity_orig,
-				&item->flags, ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY);
-	}
-	else
-		item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-#undef ZBX_TIME_PARAM_FLAGS
-}
-
 /******************************************************************************
  *                                                                            *
  * Parameters: hostid            - [IN]                                       *
@@ -1747,8 +1737,6 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 				ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT, ZBX_ITEM_LOOKBACK_LIMIT_LEN, error);
 		lld_validate_item_field(item, &item->granularity, &item->granularity_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY, ZBX_ITEM_GRANULARITY_LEN, error);
-
-		lld_items_validate_tq_time_params(item, error);
 	}
 
 	/* check duplicated item keys */
