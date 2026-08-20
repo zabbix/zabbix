@@ -118,7 +118,7 @@ class testTriggerCEP extends CIntegrationTest {
 	// one of them and no other test is, and the only test kept besides is testPrepareTriggerCEP_LLDDiscovery,
 	// which every one of them @depends on (and nothing they need depends on anything else, so nothing is lost
 	// as a dependency of a skipped test).
-	const SKIP_NON_WINDOW_TESTS = true;
+	const SKIP_NON_WINDOW_TESTS = false;
 
 	const HOST_NAME = 'test';
 	const TEMPLATE_NAME = 'template_trigger_cep';
