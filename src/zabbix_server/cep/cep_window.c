@@ -444,7 +444,7 @@ static void	cep_window_close(const zbx_cep_rule_t *rule, zbx_cep_window_t *windo
 		zbx_cep_event_context_t	ctx;
 
 		cep_event_context_init_with_handle(&ctx, (zbx_cep_event_handle_t)zbx_queue_ptr_pop(&window->hevents),
-				cep_window_event_pos(i++, events_num), dbpool);
+				cep_window_event_pos(i, events_num), dbpool);
 
 		cep_window_sync_entry_log_event_remove(window, zbx_cep_event_handle_eventid(ctx.hevent));
 		(void)cep_rule_event_context_execute_ops(rule, &ctx, ZBX_CEP_WHEN_WINDOW_CLOSED, tasks);
