@@ -359,7 +359,7 @@ skip:
 
 static void	*permissions_rebuild_entry(void *args)
 {
-	int	err, res = SUCCEED;
+	int	err, res;
 	double	start;
 
 	ZBX_UNUSED(args);
