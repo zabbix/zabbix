@@ -605,7 +605,7 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init
 
 	suppress_time = zbx_time();
 
-	result = zbx_dbconn_select(db, "select eventid,maintenanceid,cep_ruleid"
+	result = zbx_dbconn_select(db, "select eventid,maintenanceid,cep_ruleid,suppress_until"
 			" from event_suppress order by eventid");
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -625,7 +625,7 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init
 
 		ZBX_DBROW2UINT64(suppress_local.maintenanceid, row[1]);
 		ZBX_DBROW2UINT64(suppress_local.cep_ruleid, row[2]);
-		suppress_local.until = 0;
+		suppress_local.until = atoi(row[3]);
 
 		zbx_vector_db_event_suppress_append(&h->event->suppress, suppress_local);
 
