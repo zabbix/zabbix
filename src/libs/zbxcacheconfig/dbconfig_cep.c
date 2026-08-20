@@ -874,19 +874,13 @@ static void	cep_config_dump(void)
 	zbx_hashset_iter_t	iter;
 	zbx_cep_rule_ref_t	*ref;
 
-	// WDN remove
-	int	loglevel = zbx_set_log_level(LOG_LEVEL_TRACE);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() revision:" ZBX_FS_UI64 , __func__, cep_config->revision);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() revision:" ZBX_FS_UI64 , __func__, cep_config->revision);
 
 	zbx_hashset_iter_reset(&cep_config->rules, &iter);
 	while (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_iter_next(&iter)))
 		cep_rule_dump(ref->rule);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	// WDN remove
-	zbx_set_log_level(loglevel);
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1711,7 +1705,8 @@ void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_
 	cep_update_rules(cep_config, prules_cond, prules_op);
 	cep_config_update_handle(cep_config, revision);
 
-	cep_config_dump();
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+		cep_config_dump();
 
 	if (NULL != prules_cond)
 		zbx_vector_cep_rule_ptr_destroy(prules_cond);
