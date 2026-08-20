@@ -33,8 +33,6 @@ class CControllerCepRuleEdit extends CController {
 			return false;
 		}
 
-		$this->ceprule = self::withDefaults($this->ceprule);
-
 		return $this->getUserType() >= USER_TYPE_SUPER_ADMIN;
 	}
 
@@ -59,6 +57,8 @@ class CControllerCepRuleEdit extends CController {
 	}
 
 	protected function doAction(): void {
+		$ceprule = self::withDefaults($this->ceprule);
+
 		if ($this->hasInput('cepruleid')) {
 			$rules = (new CFormValidator(
 				CControllerCepRuleUpdate::getValidationRules()
@@ -79,12 +79,12 @@ class CControllerCepRuleEdit extends CController {
 			'js_validation_rules_for_clone' => $rules_for_clone,
 			'condition_js_validation_rules' => self::getConditionPopupValidationRules(),
 			'operation_js_validation_rules' => self::getOperationPopupValidationRules(),
-			'ceprule' => $this->ceprule,
+			'ceprule' => $ceprule,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle($this->ceprule['cepruleid'] === null
+		$response->setTitle($ceprule['cepruleid'] === null
 			? _('New complex event processing')
 			: _('Complex event processing')
 		);
