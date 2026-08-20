@@ -890,7 +890,10 @@ $formgrid
 		))->setId('js-item-flex-intervals-field')
 	])
 	->addItem([
-		(new CLabel(_('Time shift'), 'time_shift'))->setAsteriskMark()->setId('js-item-time-shift-label'),
+		(new CLabel([
+			_('Time shift'),
+			makeHelpIcon(_('Shift the processing window back by a fixed amount.'))
+		], 'time_shift'))->setAsteriskMark()->setId('js-item-time-shift-label'),
 		(new CFormField(
 			(new CTextBox('time_shift', $item['time_shift'], $item['discovered']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -900,10 +903,13 @@ $formgrid
 	->addItem([
 		(new CLabel([
 			_('Lookback limit'),
+			makeHelpIcon(
+				_('Limit processing window historical lookup when previous item updates are missing or too old.')
+			),
 			makeWarningIcon(_('Data gaps are possible.'))
 				->addClass('js-lookback-limit-hint')
 				->addStyle('display: none;'),
-			makeWarningIcon(_('Should not be less than the aggregation size, data will be incomplete.'))
+			makeWarningIcon(_('Should not be less than the granularity, data will be incomplete.'))
 				->addClass('js-lookback-limit-error')
 				->addStyle('display: none;')
 		], 'lookback_limit'))->setAsteriskMark()->setId('js-item-lookback-limit-label'),
@@ -915,7 +921,8 @@ $formgrid
 	])
 	->addItem([
 		(new CLabel([
-			_('Aggregation size'),
+			_('Granularity'),
+			makeHelpIcon(_('Fixed duration of each aggregated bucket within the processing window.')),
 			makeWarningIcon(_('Data will likely overlap.'))
 				->addClass('js-granularity-hint')
 				->addStyle('display: none;')
