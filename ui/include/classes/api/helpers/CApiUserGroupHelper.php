@@ -18,57 +18,49 @@
  * Helper class containing methods for checking permissions to proxies and proxy groups.
  */
 class CApiUserGroupHelper {
-
-	private static array $usrgrpid_lists = [];
-
 	public static function getProxyPermissionsCondition(string $alias): string {
 		if (CApiService::$userData['ugsetid'] == 0) {
 			return '1=0';
 		}
 
-		[
-			'proxy_deny_list_usrgrpids' => $proxy_deny_list_usrgrpids,
-			'proxy_allow_list_usrgrpids' => $proxy_allow_list_usrgrpids,
-			'proxy_group_deny_list_usrgrpids' => $proxy_group_deny_list_usrgrpids,
-			'proxy_group_allow_list_usrgrpids' => $proxy_group_allow_list_usrgrpids
-		] = self::getUserGroupIdsByPermissionLists();
+		$usrgrpids = self::getUserGroupIdsByPermissionLists();
 
 		$proxy_mode_conditions = [];
 		$proxy_group_mode_conditions = [];
 
-		if ($proxy_deny_list_usrgrpids) {
+		if ($usrgrpids['proxy']['deny_list']) {
 			$proxy_mode_conditions[] = 'NOT EXISTS ('.
 				'SELECT NULL'.
 				' FROM usrgrp_proxy ugp'.
 				' WHERE '.$alias.'.proxyid=ugp.proxyid'.
-					' AND '.dbConditionId('ugp.usrgrpid', $proxy_deny_list_usrgrpids).
+					' AND '.dbConditionId('ugp.usrgrpid', $usrgrpids['proxy']['deny_list']).
 			')';
 		}
 
-		if ($proxy_allow_list_usrgrpids) {
+		if ($usrgrpids['proxy']['allow_list']) {
 			$proxy_mode_conditions[] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM usrgrp_proxy ugp'.
 				' WHERE '.$alias.'.proxyid=ugp.proxyid'.
-					' AND '.dbConditionId('ugp.usrgrpid', $proxy_allow_list_usrgrpids).
+					' AND '.dbConditionId('ugp.usrgrpid', $usrgrpids['proxy']['allow_list']).
 			')';
 		}
 
-		if ($proxy_group_deny_list_usrgrpids) {
+		if ($usrgrpids['proxy_group']['deny_list']) {
 			$proxy_group_mode_conditions[] = 'NOT EXISTS ('.
 				'SELECT NULL'.
 				' FROM usrgrp_proxy_group ugpg'.
 				' WHERE '.$alias.'.proxy_groupid=ugpg.proxy_groupid'.
-					' AND '.dbConditionId('ugpg.usrgrpid', $proxy_group_deny_list_usrgrpids).
+					' AND '.dbConditionId('ugpg.usrgrpid', $usrgrpids['proxy_group']['deny_list']).
 			')';
 		}
 
-		if ($proxy_group_allow_list_usrgrpids) {
+		if ($usrgrpids['proxy_group']['allow_list']) {
 			$proxy_group_mode_conditions[] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM usrgrp_proxy_group ugpg'.
 				' WHERE '.$alias.'.proxy_groupid=ugpg.proxy_groupid'.
-					' AND '.dbConditionId('ugpg.usrgrpid', $proxy_group_allow_list_usrgrpids).
+					' AND '.dbConditionId('ugpg.usrgrpid', $usrgrpids['proxy_group']['allow_list']).
 			')';
 		}
 
@@ -88,28 +80,25 @@ class CApiUserGroupHelper {
 			return '1=0';
 		}
 
-		[
-			'proxy_group_deny_list_usrgrpids' => $proxy_group_deny_list_usrgrpids,
-			'proxy_group_allow_list_usrgrpids' => $proxy_group_allow_list_usrgrpids
-		] = self::getUserGroupIdsByPermissionLists();
+		$usrgrpids = self::getUserGroupIdsByPermissionLists();
 
 		$conditions = [];
 
-		if ($proxy_group_deny_list_usrgrpids) {
+		if ($usrgrpids['proxy_group']['deny_list']) {
 			$conditions[] = 'NOT EXISTS ('.
 				'SELECT NULL'.
 				' FROM usrgrp_proxy_group ugpg'.
 				' WHERE '.$alias.'.proxy_groupid=ugpg.proxy_groupid'.
-					' AND '.dbConditionId('ugpg.usrgrpid', $proxy_group_deny_list_usrgrpids).
+					' AND '.dbConditionId('ugpg.usrgrpid', $usrgrpids['proxy_group']['deny_list']).
 			')';
 		}
 
-		if ($proxy_group_allow_list_usrgrpids) {
+		if ($usrgrpids['proxy_group']['allow_list']) {
 			$conditions[] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM usrgrp_proxy_group ugpg'.
 				' WHERE '.$alias.'.proxy_groupid=ugpg.proxy_groupid'.
-					' AND '.dbConditionId('ugpg.usrgrpid', $proxy_group_allow_list_usrgrpids).
+					' AND '.dbConditionId('ugpg.usrgrpid', $usrgrpids['proxy_group']['allow_list']).
 			')';
 		}
 
@@ -117,12 +106,18 @@ class CApiUserGroupHelper {
 	}
 
 	private static function getUserGroupIdsByPermissionLists(): array {
-		if (!self::$usrgrpid_lists) {
-			self::$usrgrpid_lists = [
-				'proxy_deny_list_usrgrpids' => [],
-				'proxy_allow_list_usrgrpids' => [],
-				'proxy_group_deny_list_usrgrpids' => [],
-				'proxy_group_allow_list_usrgrpids' => []
+		$usrgrpids = null;
+
+		if ($usrgrpids === null) {
+			$usrgrpids = [
+				'proxy' => [
+					'deny_list' => [],
+					'allow_list' => []
+				],
+				'proxy_group' => [
+					'deny_list' => [],
+					'allow_list' => []
+				]
 			];
 
 			$resource = DBselect(
@@ -134,21 +129,21 @@ class CApiUserGroupHelper {
 
 			while ($row = DBfetch($resource)) {
 				if ($row['proxy_mode'] == PROXY_MODE_DENY) {
-					self::$usrgrpid_lists['proxy_deny_list_usrgrpids'][] = $row['usrgrpid'];
+					$usrgrpids['proxy']['deny_list'][] = $row['usrgrpid'];
 				}
 				else {
-					self::$usrgrpid_lists['proxy_allow_list_usrgrpids'][] = $row['usrgrpid'];
+					$usrgrpids['proxy']['allow_list'][] = $row['usrgrpid'];
 				}
 
 				if ($row['proxy_group_mode'] == PROXY_GROUP_MODE_DENY) {
-					self::$usrgrpid_lists['proxy_group_deny_list_usrgrpids'][] = $row['usrgrpid'];
+					$usrgrpids['proxy_group']['deny_list'][] = $row['usrgrpid'];
 				}
 				else {
-					self::$usrgrpid_lists['proxy_group_allow_list_usrgrpids'][] = $row['usrgrpid'];
+					$usrgrpids['proxy_group']['allow_list'][] = $row['usrgrpid'];
 				}
 			}
 		}
 
-		return self::$usrgrpid_lists;
+		return $usrgrpids;
 	}
 }
