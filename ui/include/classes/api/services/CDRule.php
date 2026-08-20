@@ -418,6 +418,15 @@ class CDRule extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
 				}
 			}
+
+			if (!self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+					&& $db_drules[$drule['druleid']]['proxyid'] == 0
+					&& $drule['proxyid'] != $db_drules[$drule['druleid']]['proxyid']) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/proxyid',
+					_('parameter is readonly while you do not have permission to select server for monitoring and discovery')
+				));
+			}
 		}
 
 		if ($drule_names_changed) {
