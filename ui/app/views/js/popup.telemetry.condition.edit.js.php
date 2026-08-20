@@ -66,10 +66,25 @@ window.telemetry_condition_popup = new class {
 
 		this.#form_element.querySelector('#js-value-field').style.display = is_exists ? 'none' : '';
 		this.#form_element.querySelector('#js-value-label').style.display = is_exists ? 'none' : '';
+
+		const value_required = ['<?= CONDITION_OPERATOR_LIKE ?>', '<?= CONDITION_OPERATOR_NOT_LIKE ?>']
+			.includes(operator_field.getValue());
+
+		this.#form_element.querySelector('#js-value-label')
+			.classList.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', value_required);
+		this.#form_element.querySelector('[name="value"]').toggleAttribute('aria-required', value_required);
 	}
 
 	submit() {
 		const fields = this.#form.getAllValues();
+
+		if (!this.#complex_columns.includes(fields.column)) {
+			fields.attribute_key = '';
+		}
+
+		if (fields.operator == <?= CONDITION_OPERATOR_EXISTS ?>) {
+			fields.value = '';
+		}
 
 		this.#form.validateSubmit(fields)
 			.then((result) => {
@@ -79,17 +94,14 @@ window.telemetry_condition_popup = new class {
 					return;
 				}
 
-				const is_complex = this.#complex_columns.includes(fields.column);
-				const operator = parseInt(fields.operator, 10);
-
 				overlayDialogueDestroy(this.#overlay.dialogueid);
 				this.#dialogue.dispatchEvent(new CustomEvent('telemetry_condition.submit', {
 					detail: {
 						row_index: fields.row_index,
 						column: fields.column,
-						attribute_key: is_complex ? fields.attribute_key : '',
-						operator,
-						value: operator === <?= CONDITION_OPERATOR_EXISTS ?> ? '' : fields.value
+						attribute_key: fields.attribute_key,
+						operator: fields.operator,
+						value: fields.value
 					}
 				}));
 			});

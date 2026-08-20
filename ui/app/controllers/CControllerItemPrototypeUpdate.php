@@ -481,10 +481,16 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 							'when' => ['column', 'not_in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 						]
 					],
-					'value' => ['string', 'required', 'not_empty',
-						'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
-							CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
-						]]
+					'value' => [
+						['string', 'required',
+							'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]]
+						],
+						['string', 'required', 'not_empty',
+							'when' => ['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
+						],
+						['string', 'in' => [''],
+							'when' => ['operator', 'in' => [CONDITION_OPERATOR_EXISTS]]
+						]
 					]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
