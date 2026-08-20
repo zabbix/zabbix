@@ -776,7 +776,7 @@ int	zbx_process_events(void)
 		zbx_vector_db_event_create(&discovery_events);
 
 		zbx_vector_db_event_reserve(&cep_events, (size_t)events.values_num);
-		zbx_vector_db_event_reserve(&cep_events, (size_t)discovery_events.values_num);
+		zbx_vector_db_event_reserve(&discovery_events, (size_t)events.values_num);
 
 		for (int i = 0; i < events.values_num; i++)
 		{
