@@ -182,9 +182,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 */
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
-			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift')],
-			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
-			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity')],
+			'time_shift' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'lookback_limit' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
+			'granularity' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'query' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'timeout' =>		self::getUpdateFieldRuleDiscovered('timeout'),
 			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')
