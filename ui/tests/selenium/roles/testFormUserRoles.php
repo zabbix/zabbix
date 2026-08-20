@@ -1603,10 +1603,20 @@ class testFormUserRoles extends CWebTest {
 			}
 		}
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
+
 		if ($action === 'create') {
 			$this->assertFalse($this->query('id:api-access')->asCheckbox()->one()->isChecked());
 		}
-		$form->fill($data['fields']);
+
+		if ($action === 'update' && array_key_exists('User type', $data['fields'])) {
+			$apiStatusBefore = $this->query('id:api-access')->asCheckbox()->one()->isChecked();
+			$form->fill($data['fields']);
+			$apiStatusAfter = $this->query('id:api-access')->asCheckbox()->one()->isChecked();
+			$this->assertEquals($apiStatusBefore, $apiStatusAfter);
+		}
+		else {
+			$form->fill($data['fields']);
+		}
 
 		if (array_key_exists('write_services', $data) || array_key_exists('read_services', $data)) {
 			$services = array_merge(CTestArrayHelper::get($data, 'write_services', []),
