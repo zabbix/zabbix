@@ -1085,7 +1085,7 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 			/* if there are open problems or pending events - */
 			/* OK event might close something, request it     */
 			if (0 != obj->pending_events_num)
-				results[i] = CEP_EVENT_DEFER;
+				result = CEP_EVENT_DEFER;
 		}
 		else
 		{
