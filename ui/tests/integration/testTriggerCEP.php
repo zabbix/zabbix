@@ -2364,8 +2364,13 @@ class testTriggerCEP extends CIntegrationTest {
 		// The two rules with more than a single operation: no condition of their own (so every problem event
 		// of the scenario goes through them) and every tag operation a windowless rule can perform, then
 		// every operation changing the event itself.
+		//
+		// After the tag operations proper come the macro smoke ones, which add a tag for every remaining macro
+		// the tag resolver of the server knows: the flavours of this scenario are the ones putting every macro
+		// form through the operations, on the tag side as well as in the name (see
+		// getWindowNoneTagSmokeOperations()).
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($prefix.'tag operations', [],
-			$this->getWindowNoneTagOperations(), CONDITION_EVAL_TYPE_AND, '', $window_type, $window
+			$this->getWindowNoneTagOperations(true), CONDITION_EVAL_TYPE_AND, '', $window_type, $window
 		));
 
 		// This one changes the event name and severity, which the rules above have conditions on, so it must
@@ -6009,9 +6014,18 @@ HEREDOC;
 	 * The operations of every getWindowNoneTagOperationCases() case, flattened into the operation list of the
 	 * single rule that performs them. They are numbered in the order the cases list them, which is the order
 	 * the server executes them in.
+	 *
+	 * $all_macros adds the macro smoke operations after them, which is the tag half of what that flag brings to
+	 * the event operations, see getWindowNoneTagSmokeOperations() and getWindowNoneEventOperationCase().
 	 */
-	private function getWindowNoneTagOperations(): array {
-		return $this->buildWindowNoneOperations($this->getWindowNoneTagOperationOperations());
+	private function getWindowNoneTagOperations(bool $all_macros = false): array {
+		$operations = $this->getWindowNoneTagOperationOperations();
+
+		if ($all_macros) {
+			$operations = array_merge($operations, $this->getWindowNoneTagSmokeOperations());
+		}
+
+		return $this->buildWindowNoneOperations($operations);
 	}
 
 	/**
@@ -6035,13 +6049,15 @@ HEREDOC;
 	 * just the 'type' Equals "cep" guard, in the order listed:
 	 *   - "set name" replaces the event name. It leads with a user macro of the template the event's host is
 	 *     linked to (see prepareWindowOperationMacros()), carries written out text in the middle and ends with a
-	 *     constant expression macro, and with $count_expression_macros two more expression macros follow that one:
-	 *     they count the values of the event's own item over the last hour, which the process running the
-	 *     operation can only answer by reading the trigger of the event and the history of its item out of the
-	 *     database (see CEP_OP_EXPRESSION_COUNT_MACRO). The expected name is reached only by resolving every one
-	 *     of them and keeping the text as it stands - the name is the only field of these operations that may hold
-	 *     a macro at all: a severity is a number and a suppression duration is read straight from the
-	 *     configuration, without a macro ever being resolved in it;
+	 *     constant expression macro, and with $all_macros four counting expression macros follow that one: they
+	 *     count the values of the item of the event and of an item that was in the database before the server
+	 *     started, which the process running the operation can only answer by reading the trigger of the event
+	 *     and the history of those items out of the database (see CEP_OP_EXPRESSION_COUNT_MACRO), and after them
+	 *     comes every remaining macro the name resolver knows, resolved but not expected to be anything in
+	 *     particular (see getWindowNoneEventNameSmokeMacros()). The expected name is reached only by resolving
+	 *     every one of them and keeping the text as it stands - the name is the only field of these operations
+	 *     that may hold a macro at all: a severity is a number and a suppression duration is read straight from
+	 *     the configuration, without a macro ever being resolved in it;
 	 *   - "set severity" puts the event at Information, then two "increase severity" and one "decrease
 	 *     severity" shift it by one step each, leaving Warning. The severity is asserted after the whole
 	 *     chain, and since the three shifts do not cancel out, an operation that did nothing would leave a
@@ -6066,24 +6082,35 @@ HEREDOC;
 	 * foreign key, so deleting the CEP rules in the teardown removes them - a manual unsuppress could not, it
 	 * only clears rows with no cep_ruleid.
 	 *
-	 * $count_expression_macros is asked for by the flavours driven by runEventAssessmentTestCepWindowNone() and
-	 * by no others, and it has to be asked for the same way twice: once where the rule is created
+	 * $all_macros is asked for by the flavours driven by runEventAssessmentTestCepWindowNone() and by no others,
+	 * and it has to be asked for the same way twice: once where the rule is created
 	 * (prepareDataCepWindowNoneTagOperations()) and once where its outcome is read
 	 * (waitForCepWindowNoneTaggedEvents()). The operation and the expectation are both taken from here, so a
-	 * flavour that passed it in one place and not the other would be asserting a name it never asked for.
+	 * flavour that passed it in one place and not the other would be asserting a name it never asked for. The
+	 * tag half of the same coverage sits in the tag operation rule of those flavours, see
+	 * getWindowNoneTagSmokeOperations().
 	 */
-	private function getWindowNoneEventOperationCase(bool $count_expression_macros = false): array {
+	private function getWindowNoneEventOperationCase(bool $all_macros = false): array {
+		// The name is a user macro (see prepareWindowOperationMacros()), then text, then an expression macro -
+		// the one macro form only the name accepts, the tag operations being resolved without the expression
+		// macro search. The event ends up with the expected name below only when both were resolved and the text
+		// between them was left alone.
+		//
+		// With $all_macros it carries two more things: the counting expression macros, which are expected as
+		// exactly as the rest of the name is, and after them every remaining macro the name resolver knows,
+		// which is expected to resolve to something and to nothing in particular - the name is asserted up to
+		// that point and no further (see getWindowNoneEventNameSmokeMacros()).
+		$event_name = $all_macros
+			? self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_COUNT_OPERATION
+				.self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_GLUE
+				.implode(self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_GLUE,
+					$this->getWindowNoneEventNameSmokeMacros()
+				)
+			: self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_OPERATION;
+
 		return [
 			'operations' => [
-				// The name is a user macro (see prepareWindowOperationMacros()), then text, then an expression
-				// macro - the one macro form only the name accepts, the tag operations being resolved without the
-				// expression macro search - and, for the flavours asking for it, the two counting expression
-				// macros on top of that. The event ends up with the expected name below only when every one of
-				// them was resolved and the text between them was left alone.
-				[CCepRuleHelper::OP_SET_NAME, ['event_name' => $count_expression_macros
-					? self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_COUNT_OPERATION
-					: self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_OPERATION
-				]],
+				[CCepRuleHelper::OP_SET_NAME, ['event_name' => $event_name]],
 				[CCepRuleHelper::OP_SET_SEVERITY, ['severity' => TRIGGER_SEVERITY_INFORMATION]],
 				[CCepRuleHelper::OP_INCREASE_SEVERITY, []],
 				[CCepRuleHelper::OP_INCREASE_SEVERITY, []],
@@ -6091,7 +6118,9 @@ HEREDOC;
 				[CCepRuleHelper::OP_SUPPRESS, ['suppress_duration' => self::CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD]]
 			],
 			'expected' => [
-				'name' => $count_expression_macros
+				// With $all_macros this is the part of the name the event must begin with rather than the whole
+				// of it, the smoke macros being what follows.
+				'name' => $all_macros
 					? self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME_COUNT
 					: self::CEP_RULE_WINDOW_NONE_OP_EVENT_NAME,
 				// Information +1 +1 -1.
@@ -6119,6 +6148,109 @@ HEREDOC;
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Every macro the event name resolver of the server knows and the operations of this scenario do not use
+	 * otherwise, appended to the "set name" operation of the flavours asking for all macro forms (see
+	 * getWindowNoneEventOperationCase()).
+	 *
+	 * Nothing is asserted about what they resolve to, and most of them could not be asserted here at all: {TIME}
+	 * and the age macros move as the scenario runs, the ids are database ids, {ITEM.VALUE} differs from event to
+	 * event and the log macros have no log item behind them. What the flavour does assert is that the strictly
+	 * known part of the name is still in front of them, unchanged (see waitForCepWindowNoneTaggedEvents()).
+	 *
+	 * What the list is for is the resolution itself. An operation resolves its name for an event CEP is holding
+	 * and not for one a trigger has just produced, so every one of these takes a path through the server it would
+	 * not take otherwise - a host or interface lookup, a history read, a trigger expression evaluation - and none
+	 * of them may bring the process running the operation down, leave it hanging or make it produce no name at
+	 * all. A macro this resolver does not know is left as it stands, which is why only the ones it does know are
+	 * listed: an unknown one would say nothing about the resolver.
+	 *
+	 * The log macros are given one representative each and the inventory ones (which only the tags accept, see
+	 * getWindowNoneTagSmokeMacros()) a handful, since a family of macros is one code path with one suffix
+	 * switched inside it.
+	 */
+	private function getWindowNoneEventNameSmokeMacros(): array {
+		return [
+			// The host and interface macros the name accepts beside {HOST.HOST}, which the operations already
+			// use, plus one indexed form: the index selects the item of the trigger expression the host is
+			// taken from.
+			'{HOST.NAME}', '{HOST.NAME1}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}',
+			// The value of the item of the event, in every property of it the name accepts.
+			'{ITEM.VALUE}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.TIME}', '{ITEM.VALUE.DATE}',
+			'{ITEM.VALUE.AGE}',
+			// The same for the last value of that item, which is read out of the history rather than out of
+			// the event.
+			'{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.TIME}', '{ITEM.LASTVALUE.DATE}',
+			'{ITEM.LASTVALUE.AGE}',
+			// The log macros: the item of these events is a text one, so what they have to do is come back
+			// without a log value rather than with one.
+			'{ITEM.LOG.SOURCE}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.EVENTID}',
+			// The macros of the trigger behind the event: its expression evaluated and explained, and the
+			// values its functions were evaluated with, plain and indexed.
+			'{TRIGGER.EXPRESSION.EXPLAIN}', '{FUNCTION.VALUE}', '{FUNCTION.VALUE1}',
+			'{FUNCTION.RECOVERY.VALUE}',
+			// The clock of the server rather than anything of the event.
+			'{TIME}', '{TIMESTAMP}',
+			// A reference to a constant of the trigger expression, which is a token of its own and not a macro
+			// at all - the name is resolved with the reference search enabled (see
+			// cep_event_context_resolve_name_macros()), so this is the only place it can be exercised.
+			'$1'
+		];
+	}
+
+	/**
+	 * The same for the tag resolver of the server, which knows a different set: no expression macro, no
+	 * reference, no clock and no value property beside the value itself, but the host inventory and the ids that
+	 * the name resolver does not take. Every one of them is added as a tag of its own by the tag operations of
+	 * the flavours asking for all macro forms (see getWindowNoneTagSmokeOperations()), and as with the name
+	 * nothing is asserted about what they resolve to - only that the tag is there.
+	 *
+	 * The macros the tag operations already use ({$MACRO} in all its forms and {HOST.HOST}, see
+	 * getWindowNoneTagOperationCases()) are left out; what is here is the rest of what the resolver knows.
+	 */
+	private function getWindowNoneTagSmokeMacros(): array {
+		return [
+			'smoke_host_id' => '{HOST.ID}',
+			'smoke_host_name' => '{HOST.NAME}',
+			'smoke_host_name_indexed' => '{HOST.NAME1}',
+			'smoke_host_ip' => '{HOST.IP}',
+			'smoke_host_dns' => '{HOST.DNS}',
+			'smoke_host_conn' => '{HOST.CONN}',
+			'smoke_host_port' => '{HOST.PORT}',
+			// The host has no inventory filled in, so these are the "nothing to give back" path of the
+			// inventory lookup; one macro per shape of the suffix is enough, they share the code behind it.
+			'smoke_inventory_type' => '{INVENTORY.TYPE}',
+			'smoke_inventory_name' => '{INVENTORY.NAME}',
+			'smoke_inventory_location' => '{INVENTORY.LOCATION}',
+			'smoke_inventory_os_full' => '{INVENTORY.OS.FULL}',
+			// The value of the item of the event and its last value, the two the tags accept.
+			'smoke_item_value' => '{ITEM.VALUE}',
+			'smoke_item_lastvalue' => '{ITEM.LASTVALUE}',
+			'smoke_item_log_source' => '{ITEM.LOG.SOURCE}',
+			'smoke_item_log_severity' => '{ITEM.LOG.SEVERITY}',
+			'smoke_trigger_id' => '{TRIGGER.ID}'
+		];
+	}
+
+	/**
+	 * getWindowNoneTagSmokeMacros() as operations of the tag operation rule: one "add tag" per macro, the macro
+	 * being the value of the tag.
+	 *
+	 * The value is the macro in brackets rather than the bare macro so that a macro resolving to nothing still
+	 * leaves a value behind - what is asserted of these tags is that they are on the event, and a tag that could
+	 * be either empty or missing would not tell the two apart. The brackets also make what a macro resolved to
+	 * readable in the failure of any assertion that prints the tags.
+	 */
+	private function getWindowNoneTagSmokeOperations(): array {
+		$operations = [];
+
+		foreach ($this->getWindowNoneTagSmokeMacros() as $tag => $macro) {
+			$operations[] = [CCepRuleHelper::OP_ADD_TAG, ['tag' => $tag, 'tag_value' => '['.$macro.']']];
+		}
+
+		return $operations;
 	}
 
 	/**
@@ -12889,9 +13021,9 @@ HEREDOC;
 			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
 			$expected_so_far[$service] = $tags;
-			// The last argument is what prepareDataCepWindowNoneTagOperations() built the "set name" operation
-			// of these flavours with: the name they expect ends with the four history reading expression
-			// macros resolved.
+			// The last argument is what prepareDataCepWindowNoneTagOperations() built the operations of these
+			// flavours with: the four history reading expression macros resolved into the name, every
+			// remaining name macro after them and a tag for every remaining tag macro.
 			$this->waitForCepWindowNoneTaggedEvents($triggerid, $expected_so_far, [], false, true);
 		}
 
@@ -15934,24 +16066,28 @@ HEREDOC;
 	 * name expected of its events is the one the trigger prototype gave them, built from the value that opened
 	 * the event, and the rewritten name of the operation would mean the operation ran after all.
 	 *
-	 * $count_expression_macros must be what the rule of the flavour was created with, since it selects which of
-	 * the two names the "set name" operation was given and therefore which one its events must carry - see
-	 * getWindowNoneEventOperationCase().
+	 * $all_macros must be what the rule of the flavour was created with, since it selects what the "set name"
+	 * operation was given and therefore what its events must carry: with it the name is asserted as the start of
+	 * the event name rather than as the whole of it, the macro smoke macros being what follows, and every tag the
+	 * macro smoke operations add must be on the event - present, with no expectation of its value. See
+	 * getWindowNoneEventOperationCase(), getWindowNoneEventNameSmokeMacros() and getWindowNoneTagSmokeMacros().
 	 *
 	 * The tags are applied asynchronously after the event is created, hence the polling; the callback returns
 	 * a description of the first event that does not match, which callUntilDataIsPresent() surfaces in the
 	 * failure message.
 	 */
 	private function waitForCepWindowNoneTaggedEvents(int $triggerid, array $expected_by_service,
-			array $extra_results = [], bool $set_name_skipped = false,
-			bool $count_expression_macros = false): void {
+			array $extra_results = [], bool $set_name_skipped = false, bool $all_macros = false): void {
 		// tag => the value the rule adds it with, for every rule of the scenario.
 		$rule_values = array_map(fn($rule) => $rule[1], $this->getWindowNoneRules());
 		// tag => the value the tag operations must have left on every event, or null if the tag must be gone.
 		$operation_results = array_merge($this->getWindowNoneTagOperationResults(), $extra_results);
 		// The name, severity and suppression the event operations must have left on every event, with the name
 		// taken from the same flag the rule of the flavour was built with.
-		$event_results = $this->getWindowNoneEventOperationCase($count_expression_macros)['expected'];
+		$event_results = $this->getWindowNoneEventOperationCase($all_macros)['expected'];
+		// The tags of the macro smoke operations, which only those flavours perform: what they resolved to is
+		// not asserted, only that every one of them is on the event.
+		$smoke_tags = $all_macros ? array_keys($this->getWindowNoneTagSmokeMacros()) : [];
 
 		$this->callUntilDataIsPresent('event.get', [
 			'objectids' => [$triggerid],
@@ -15963,7 +16099,7 @@ HEREDOC;
 			'selectTags' => 'extend'
 		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
 			function ($response) use ($expected_by_service, $rule_values, $operation_results, $event_results,
-					$set_name_skipped) {
+					$set_name_skipped, $all_macros, $smoke_tags) {
 				if (count($response['result']) !== count($expected_by_service)) {
 					return 'expected '.count($expected_by_service).' problem event(s), got '
 						.count($response['result']);
@@ -16015,9 +16151,30 @@ HEREDOC;
 						$name_source = 'the event operations';
 					}
 
-					if ($event['name'] !== $expected_name) {
-						return 'event '.$event['eventid'].': name "'.$event['name'].'", expected "'
-							.$expected_name.'" from '.$name_source;
+					// The flavours performing the macro smoke operations end their name with whatever those
+					// macros resolved to, which is not what this scenario is about: for them the name is
+					// asserted up to that point and the rest is left to be whatever the resolver made of it
+					// (see getWindowNoneEventNameSmokeMacros()).
+					if ($all_macros) {
+						$name_matches = strncmp($event['name'], $expected_name, strlen($expected_name)) === 0;
+						$name_wanted = 'to start with "'.$expected_name.'"';
+					}
+					else {
+						$name_matches = $event['name'] === $expected_name;
+						$name_wanted = '"'.$expected_name.'"';
+					}
+
+					if (!$name_matches) {
+						return 'event '.$event['eventid'].': name "'.$event['name'].'", expected '.$name_wanted
+							.' from '.$name_source;
+					}
+
+					// Every macro smoke tag must be on the event, whatever its macro resolved to - a macro the
+					// server could make nothing of still leaves the brackets around it behind.
+					foreach ($smoke_tags as $smoke_tag) {
+						if (!array_key_exists($smoke_tag, $tags)) {
+							return $info.': missing "'.$smoke_tag.'" tag of the macro smoke operations';
+						}
 					}
 
 					if ((int) $event['severity'] !== $event_results['severity']) {
