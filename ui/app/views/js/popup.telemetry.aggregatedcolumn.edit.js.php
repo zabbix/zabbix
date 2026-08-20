@@ -72,4 +72,4 @@ window.telemetry_aggregated_column_popup = new class {
 				}));
 			});
 	}
-}
+};

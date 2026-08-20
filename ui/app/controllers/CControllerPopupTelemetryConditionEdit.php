@@ -43,19 +43,15 @@ class CControllerPopupTelemetryConditionEdit extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules());
+		$ret = $this->validateInput(self::getValidationRules(), true);
 
 		if (!$ret) {
-			$form_errors = $this->getValidationError();
-			$response = $form_errors
-				? ['form_errors' => $form_errors]
-				: ['error' => [
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				]];
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)]))
-					->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				], JSON_THROW_ON_ERROR)]))->disableView()
 			);
 		}
 

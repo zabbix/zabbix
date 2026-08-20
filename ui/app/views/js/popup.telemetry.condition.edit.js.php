@@ -94,4 +94,4 @@ window.telemetry_condition_popup = new class {
 				}));
 			});
 	}
-}
+};

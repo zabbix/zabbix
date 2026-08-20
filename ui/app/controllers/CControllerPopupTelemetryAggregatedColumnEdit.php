@@ -23,7 +23,6 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 
 	private static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'edit' => ['integer', 'in' => [1]],
 			'row_index' => ['integer', 'required'],
 			'signal_type' => ['integer', 'required',
 				'in' => [
@@ -41,32 +40,23 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 				]
 			],
 			'existing_aliases' => ['array', 'field' => ['string']],
-			'function' => ['integer', 'required',
-				'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM,
-					AGGREGATE_PERCENTILE
-				],
-				'when' => ['edit', 'in' => [1]]
-			],
-			'column' => ['string', 'required', 'when' => ['edit', 'in' => [1]]],
-			'percentile' => ['string', 'required', 'when' => ['edit', 'in' => [1]]],
-			'alias' => ['string', 'required', 'when' => ['edit', 'in' => [1]]]
+			'function' => ['integer'],
+			'column' => ['string'],
+			'percentile' => ['string'],
+			'alias' => ['string']
 		]];
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules());
+		$ret = $this->validateInput(self::getValidationRules(), true);
 
 		if (!$ret) {
-			$form_errors = $this->getValidationError();
-			$response = $form_errors
-				? ['form_errors' => $form_errors]
-				: ['error' => [
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				]];
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)]))
-					->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				], JSON_THROW_ON_ERROR)]))->disableView()
 			);
 		}
 
