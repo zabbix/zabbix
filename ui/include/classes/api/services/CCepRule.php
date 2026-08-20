@@ -639,13 +639,15 @@ class CCepRule extends CApiService {
 				}
 			}
 
-			if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_PATTERN_MATCH
-					&& !in_array(CCepRuleHelper::WHEN_PATTERN_MATCHED,
-						array_column($cep_rule['operations'], 'execute_when'))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-					'/'.($i1 + 1).'/operations',
-					_('at least one operation must execute when event pattern matched')
-				));
+			if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+				$execute_whens = array_column($cep_rule['operations'], 'execute_when');
+
+				if (!in_array(CCepRuleHelper::WHEN_PATTERN_MATCHED, $execute_whens)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i1 + 1).'/operations',
+						_('at least one operation must execute when event pattern matched')
+					));
+				}
 			}
 		}
 		unset($cep_rule);
