@@ -734,21 +734,21 @@ static void	update_event_maintenances(zbx_vector_db_event_t *cep_events)
 	zbx_vector_uint64_destroy(&maintenanceids);
 }
 
-static void	save_discovery_events(zbx_db_event **db_events, int events_num)
+static void	save_discovery_events(zbx_vector_db_event_t *db_events)
 {
 	zbx_db_insert_t		db_insert;
 	zbx_uint64_t		eventid;
 	zbx_db_event		*event;
 
 
-	eventid = zbx_db_get_maxid_num("events", events_num);
+	eventid = zbx_db_get_maxid_num("events", db_events->values_num);
 
 	zbx_db_insert_prepare(&db_insert, "events", "eventid", "source", "object", "objectid", "clock", "ns", "value",
 			(char *)NULL);
 
-	for (int i = 0; i < events_num; i++)
+	for (int i = 0; i < db_events->values_num; i++)
 	{
-		event = db_events[i];
+		event = db_events->values[i];
 
 		event->eventid = eventid++;
 
@@ -759,7 +759,7 @@ static void	save_discovery_events(zbx_db_event **db_events, int events_num)
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	process_actions(zbx_db_dbconn(), &events, NULL, NULL);
+	process_actions(zbx_db_dbconn(), db_events, NULL, NULL);
 }
 
 int	zbx_process_events(void)
@@ -806,7 +806,7 @@ int	zbx_process_events(void)
 
 		if (0 != discovery_events.values_num)
 		{
-			save_discovery_events(discovery_events.values, discovery_events.values_num);
+			save_discovery_events(&discovery_events);
 			processed_num += discovery_events.values_num;
 		}
 
