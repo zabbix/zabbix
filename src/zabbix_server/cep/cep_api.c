@@ -227,6 +227,9 @@ void	zbx_cep_api_acquire(void)
  ******************************************************************************/
 void	zbx_cep_api_release(void)
 {
+	if (NULL == cep_api)
+		return;
+
 	if (1 == atomic_fetch_sub(&cep_api->refcount, 1))
 		cep_api_free(cep_api);
 }
