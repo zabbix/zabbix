@@ -106,7 +106,7 @@ class CApiUserGroupHelper {
 	}
 
 	private static function getUserGroupIdsByPermissionLists(): array {
-		$usrgrpids = null;
+		static $usrgrpids = null;
 
 		if ($usrgrpids === null) {
 			$usrgrpids = [
