@@ -98,20 +98,20 @@ class CSettings extends CApiService {
 
 		$db_settings = CApiSettingsHelper::getParameters($options['output']);
 
-		self::normalizeAffectedObjects($db_settings, false);
+		self::normalizeAffectedObjects($db_settings);
+
+		if (array_key_exists('apm_global_db', $db_settings)) {
+			unset($db_settings['apm_global_db']['password'], $db_settings['apm_global_db']['ssl_key_password']);
+		}
 
 		return $db_settings;
 	}
 
-	private static function normalizeAffectedObjects(array &$db_settings, bool $has_write_only = true): void {
+	public static function normalizeAffectedObjects(array &$db_settings): void {
 		if (array_key_exists('apm_global_db', $db_settings)) {
 			$db_apm_global_db = json_decode($db_settings['apm_global_db'], true);
 
 			$db_settings['apm_global_db'] = $db_apm_global_db ?: self::APM_GLOBAL_DB_DEFAULT;
-
-			if (!$has_write_only) {
-				unset($db_settings['apm_global_db']['password'], $db_settings['apm_global_db']['ssl_key_password']);
-			}
 		}
 	}
 
