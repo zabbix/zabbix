@@ -39,7 +39,15 @@ static void *zbx_mock_test_thread(void *arg)
 {
 	zbx_mock_thread_args_t *t = (zbx_mock_thread_args_t *)arg;
 
-	t->actual_result = zbx_json_to_xml(t->json, &t->xml, &t->error);
+	char *json_copy = strdup(t->json);
+	if (!json_copy)
+	{
+		return NULL;
+	}
+
+	t->actual_result = zbx_json_to_xml(json_copy, &t->xml, &t->error);
+
+	free(json_copy);
 
 	return NULL;
 }

@@ -13,6 +13,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 XML_LIBS = \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(XML_DEPS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
