@@ -1,1 +1,1 @@
-........S. [ZBX-26836] fixed possible crash in managers during shutdown (ademidovs)
+........S. [ZBX-26836] fixed crash in connector manager during Zabbix server shutdown (ademidovs)
