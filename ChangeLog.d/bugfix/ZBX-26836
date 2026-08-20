@@ -1,1 +1,1 @@
-........S. [ZBX-26836] fixed possible crash in managers during shutdown (ademidovs)
+........S. [ZBX-26836] fixed crashes in alert, connector, IPMI, LLD and report managers during Zabbix server shutdown (ademidovs)
