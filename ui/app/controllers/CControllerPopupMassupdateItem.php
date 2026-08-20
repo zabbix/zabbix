@@ -120,9 +120,15 @@ class CControllerPopupMassupdateItem extends CController {
 	}
 
 	protected function checkPermissions() {
-		$has_access = match ($this->getInput('context')) {
-			'host' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-			'template' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		$has_access = false;
+
+		switch ($this->getInput('context')) {
+			case 'host':
+				$has_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+				break;
+			case 'template':
+				$has_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+				break;
 		};
 
 		if (!$has_access) {
