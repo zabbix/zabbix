@@ -1040,6 +1040,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	 *
 	 * @required-components server
 	 * @configurationDataProvider simpleConfigurationProvider
+	 * @hosts simple
 	 */
 	public function testLogValueTypeJSON_triggerTypeChangeGraceful() {
 		$host = $this->call('host.get', [
@@ -1067,11 +1068,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$triggerid = $response['result']['triggerids'][0];
 
-		// Called twice: right after a fresh server (re)start (required by this test's own
-		// config provider), the first call's wait may match the server's own boot-time sync
-		// log line rather than a sync that actually includes the item/trigger just created
-		// above. The second call is then forced to wait for a genuinely new one.
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$this->sendSenderValue('simple', 'trigger.type.change.item', 'text_value');
@@ -1116,6 +1112,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	 *
 	 * @required-components server
 	 * @configurationDataProvider simpleConfigurationProvider
+	 * @hosts simple
 	 */
 	public function testLogValueTypeJSON_valueCacheCrash() {
 		$host = $this->call('host.get', [
@@ -1148,11 +1145,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$calc_itemid = $response['result']['itemids'][0];
 
-		// Called twice: right after a fresh server (re)start (required by this test's own
-		// config provider), the first call's wait may match the server's own boot-time sync log
-		// line rather than a sync that actually includes the items just created above. The
-		// second call is then forced to wait for a genuinely new one.
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$this->sendSenderValue('simple', 'valuecache.json.item', '{"a":1}');
