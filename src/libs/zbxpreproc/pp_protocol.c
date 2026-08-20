@@ -1157,6 +1157,12 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 		{
 			char	*json_val, *dyn_error = NULL;
 
+			if (0 == ZBX_ISSET_VALUE(result))
+			{
+				zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
+				goto out;
+			}
+
 			if (ZBX_ISSET_JSON(result))
 			{
 				json_val = result->json;
