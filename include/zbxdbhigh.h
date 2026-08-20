@@ -126,6 +126,8 @@
 #define ZBX_DSERVICE_VALUE_LEN			255
 #define ZBX_MAX_DISCOVERED_VALUE_SIZE	(ZBX_DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
 
+#define ZBX_EVENT_NAME_LEN			2048
+
 typedef struct
 {
 	zbx_uint64_t	druleid;

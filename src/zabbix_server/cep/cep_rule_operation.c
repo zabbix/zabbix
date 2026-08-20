@@ -26,6 +26,16 @@
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
 
+static void	cep_prepare_value(char *value, size_t size)
+{
+	zbx_ltrim(value, ZBX_WHITESPACE);
+
+	if (size < zbx_strlen_utf8(value))
+		value[zbx_strlen_utf8_nchars(value, size)] = '\0';
+
+	zbx_rtrim(value, ZBX_WHITESPACE);
+}
+
 static int	cep_acknowledge_is_set(zbx_cep_acknowledge_t *ack)
 {
 	return (0 == ack->json.buffer_size ? FAIL : SUCCEED);
@@ -223,6 +233,8 @@ static int	cep_operation_event_execute_set_name(const zbx_cep_operation_t *op, z
 		char	*name = zbx_strdup(NULL, op->args.set_name.name);
 
 		cep_event_context_resolve_name_macros(ctx, &name);
+		cep_prepare_value(name, ZBX_EVENT_NAME_LEN);
+
 		cep_acknowledge_update_name(ack, op->type, (*event)->name, name);
 		zbx_free((*event)->name);
 		(*event)->name = name;
@@ -467,6 +479,7 @@ static zbx_tag_t	cep_event_tag_create(zbx_cep_event_context_t *ctx, const char *
 	{
 		tag.tag = zbx_strdup(NULL, name);
 		cep_event_context_resolve_tag_macros(ctx, &tag.tag);
+		cep_prepare_value(tag.tag, ZBX_DB_TAG_NAME_LEN);
 	}
 	else
 		tag.tag = NULL;
@@ -475,6 +488,7 @@ static zbx_tag_t	cep_event_tag_create(zbx_cep_event_context_t *ctx, const char *
 	{
 		tag.value = zbx_strdup(NULL, value);
 		cep_event_context_resolve_tag_macros(ctx, &tag.value);
+		cep_prepare_value(tag.value, ZBX_DB_TAG_VALUE_LEN);
 	}
 	else
 		tag.value = NULL;
