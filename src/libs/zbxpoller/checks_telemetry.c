@@ -53,7 +53,9 @@ static int	send_query_http(const char *posts, const zbx_apm_db_config_t *apm_db_
 		if (SUCCEED == zbx_http_handle_response(context.easyhandle, &context, err, &response_code, &http_out,
 				&http_error) && SUCCEED == zbx_handle_response_code(status_codes, response_code,
 				http_out, &http_error))
+		{
 			ret = SUCCEED;
+		}
 		else
 			ret = FAIL;
 	}
@@ -102,7 +104,9 @@ static int	get_values_telemetry_http(const zbx_dc_item_t *item, time_t now, time
 
 	if (SUCCEED != send_query_http(posts, apm_db_config, url, item->timeout, post_type, output_format, &resp,
 			error))
+	{
 		goto out;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): response: '%s'", __func__, ZBX_NULL2STR(resp));
 

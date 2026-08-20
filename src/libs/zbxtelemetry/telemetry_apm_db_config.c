@@ -148,7 +148,9 @@ static int	parse_apm_provider(zbx_apm_db_config_t *apm_db_config, const char *co
 
 	if (ZBX_CONST_STRLEN(APM_PROVIDER_NAME_CLICKHOUSE) == (size_t)(p2 - p) &&
 			0 == strncmp(p, APM_PROVIDER_NAME_CLICKHOUSE, p2 - p))
+	{
 		apm_db_config->db_type = ZBX_APM_DB_TYPE_CLICKHOUSE;
+	}
 	else
 	{
 		*error = zbx_dsprintf(NULL, "invalid database type in TelemetryProvider: \"%.*s\"", (int)(p2 - p), p);
@@ -187,11 +189,15 @@ static int	parse_apm_provider(zbx_apm_db_config_t *apm_db_config, const char *co
 
 	if (SUCCEED != get_option_value_bool_uchar(&options, APM_PROVIDER_OPTION_SSL_VERIFY_PEER,
 			1, &apm_db_config->ssl_verify_peer, error))
+	{
 		goto out;
+	}
 
 	if (SUCCEED != get_option_value_bool_uchar(&options, APM_PROVIDER_OPTION_SSL_VERIFY_HOST,
 			1, &apm_db_config->ssl_verify_host, error))
+	{
 		goto out;
+	}
 
 	apm_db_config->ssl_ca_location = get_option_value_str_dyn(&options, APM_PROVIDER_OPTION_SSL_CA_LOCATION,
 			config_ssl_ca_location);

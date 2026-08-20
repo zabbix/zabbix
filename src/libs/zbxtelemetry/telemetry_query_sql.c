@@ -510,7 +510,9 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, cons
 static char	*tq_sql_dyn_get_condition(const zbx_tq_condition_t *cond, const tq_sql_ctx_t *ctx)
 {
 	if (SUCCEED == tq_column_type_is_array(cond->col_type))
+	{
 		return tq_sql_dyn_get_array_condition(cond, ctx);
+	}
 	else
 	{
 		char	*name_esc = tq_sql_dyn_escape_name(cond->column, ctx);
@@ -538,8 +540,10 @@ static char	*tq_sql_dyn_get_conditions_simple(const zbx_tq_query_t *query, const
 		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", cond_str);
 
 		if (query->conditions.values_num - 1 != i)
+		{
 			zbx_snprintf_alloc(&str, &alloc, &offset, " %s ",
 					(query->evaltype == ZBX_TQ_EVAL_TYPE_AND ? "AND" : "OR"));
+		}
 
 		zbx_free(cond_str);
 	}
@@ -578,12 +582,18 @@ static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, const
 		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", cond_str);
 
 		if (conditions_sorted.values_num - 1 == i)
+		{
 			zbx_snprintf_alloc(&str, &alloc, &offset, ")");
+		}
 		else if (0 != tq_condition_ptr_compare_by_column_and_key((void *)&cond,
 				(void *)&conditions_sorted.values[i + 1]))
+		{
 			zbx_snprintf_alloc(&str, &alloc, &offset, ")AND(");
+		}
 		else
+		{
 			zbx_snprintf_alloc(&str, &alloc, &offset, " OR ");
+		}
 
 		zbx_free(cond_str);
 	}
@@ -708,6 +718,7 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 
 	if (SUCCEED == query_has_columns)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "%s,", columns_to_select);
+
 	zbx_snprintf_alloc(sql, &alloc, &offset, "%s ", aggr_columns_to_select);
 
 	/* from */

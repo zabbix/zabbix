@@ -124,14 +124,15 @@ int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_ve
 
 		if (SUCCEED != zbx_json_open(start, &jp) ||
 				NULL == (str = tq_clickhouse_parse_row(query, &jp, ++row_count)))
+		{
 			ret = FAIL;
+		}
 
 		if (NULL != str)
 			zbx_vector_str_append(values, str);
 
-		if (NULL == end) {
+		if (NULL == end)
 			break;
-		}
 
 		*end = '\n';
 		start = end + 1;

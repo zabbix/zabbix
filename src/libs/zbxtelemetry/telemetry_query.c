@@ -105,7 +105,8 @@ void	zbx_tq_query_clean(zbx_tq_query_t *query)
 		query->formula_parsed = NULL;
 	}
 
-	for (int i = 0; i < query->conditions.values_num; i++) {
+	for (int i = 0; i < query->conditions.values_num; i++)
+	{
 		tq_condition_clean(&query->conditions.values[i]);
 	}
 	zbx_vector_tq_condition_destroy(&query->conditions);
@@ -136,8 +137,7 @@ static void	tq_get_timestamp_filter_bounds_unshifted(int lookback_limit, int gra
 		if (NULL != out_lower)
 			*out_lower = start;
 		if (NULL != out_upper)
-			*out_upper = start + ((now - start) / (time_t)granularity) *
-					(time_t)granularity;
+			*out_upper = start + ((now - start) / (time_t)granularity) * (time_t)granularity;
 	}
 }
 

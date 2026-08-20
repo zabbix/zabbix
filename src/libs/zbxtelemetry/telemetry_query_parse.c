@@ -194,7 +194,9 @@ static int	tq_parse_col(struct zbx_json_parse *jp, zbx_tq_column_t *col, char *b
 		{
 			if (FAIL == tq_read_string(p, &col->attribute_key, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, error,
 					max_error_len))
+			{
 				goto out;
+			}
 		}
 		else
 		{
@@ -283,14 +285,18 @@ static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *ag
 		{
 			if (FAIL == tq_read_string(p, &aggr_col->column, ZBX_TQ_QUERY_TAG_COLUMN, error,
 					max_error_len))
+			{
 				goto out;
+			}
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_FUNCTION))
 		{
 			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_function_type, &aggr_col->function,
-				aggr_col->function, ZBX_TQ_FUNCTION_UNKNOWN, ZBX_TQ_QUERY_TAG_FUNCTION, error,
-						max_error_len))
+					aggr_col->function, ZBX_TQ_FUNCTION_UNKNOWN, ZBX_TQ_QUERY_TAG_FUNCTION, error,
+					max_error_len))
+			{
 				goto out;
+			}
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_PARAMETERS))
 		{
@@ -373,13 +379,17 @@ static int	tq_parse_cond(struct zbx_json_parse *jp, zbx_tq_condition_t *cond, ch
 		{
 			if (FAIL == tq_read_string(p, &cond->column, ZBX_TQ_QUERY_TAG_COLUMN, error,
 					max_error_len))
+			{
 				goto out;
+			}
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY))
 		{
 			if (FAIL == tq_read_string(p, &cond->attribute_key, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, error,
 					max_error_len))
+			{
 				goto out;
+			}
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_VALUE))
 		{
@@ -390,7 +400,9 @@ static int	tq_parse_cond(struct zbx_json_parse *jp, zbx_tq_condition_t *cond, ch
 		{
 			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_operator, &cond->operator, cond->operator,
 					ZBX_TQ_OPERATOR_UNKNOWN, ZBX_TQ_QUERY_TAG_OPERATOR, error, max_error_len))
+			{
 				goto out;
+			}
 		}
 		else
 		{
@@ -454,7 +466,9 @@ static int	tq_parse_filter(struct zbx_json_parse *jp, zbx_tq_query_t *query, cha
 			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_eval_type, &query->evaltype,
 					query->evaltype, ZBX_TQ_EVAL_TYPE_UNKNOWN, ZBX_TQ_QUERY_TAG_EVALTYPE, error,
 					max_error_len))
+			{
 				goto out;
+			}
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_FORMULA))
 		{
@@ -475,7 +489,9 @@ static int	tq_parse_filter(struct zbx_json_parse *jp, zbx_tq_query_t *query, cha
 				goto out;
 			if (FAIL == tq_parse_conditions(&jp_conditions, &query->conditions, buf, buf_size, error,
 					max_error_len))
+			{
 				goto out;
+			}
 		}
 		else
 		{
@@ -507,7 +523,9 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char
 			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_signal_type, &query->signal_type,
 					query->signal_type, ZBX_TQ_SIGNAL_TYPE_UNKNOWN, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE,
 					error, max_error_len))
+			{
 				goto out;
+			}
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE))
 		{
@@ -515,7 +533,9 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char
 					&query->metric_point_type, query->metric_point_type,
 					ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE, error,
 					max_error_len))
+			{
 				goto out;
+			}
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_COLUMNS))
 		{
@@ -547,7 +567,9 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char
 				goto out;
 			if (FAIL == tq_parse_aggregated_columns(&jp_aggr_columns, &query->aggregated_columns, buf,
 					buf_size, error, max_error_len))
+			{
 				goto out;
+			}
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_FILTER))
 		{
@@ -602,8 +624,10 @@ static int	tq_validate_formula_node_indices(const zbx_tq_formula_node_t *node, i
 	if (TQ_FORMULA_NODE_TYPE_LEAF == node->type)
 	{
 		if (0 > node->condition_idx || node->condition_idx >= condition_count)
+		{
 			return ret_errf(FAIL, error, max_error_len, "Invalid condition id in \"%s\": %d",
 					ZBX_TQ_QUERY_TAG_FORMULA, node->condition_idx);
+		}
 
 		return SUCCEED;
 	}
@@ -613,7 +637,9 @@ static int	tq_validate_formula_node_indices(const zbx_tq_formula_node_t *node, i
 	{
 		if (SUCCEED != tq_validate_formula_node_indices(node->children.values[i], condition_count, error,
 				max_error_len))
+		{
 			return FAIL;
+		}
 	}
 
 	return SUCCEED;
@@ -632,26 +658,36 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		const zbx_tq_column_t	*col = &query->columns.values[i];
 
 		if (NULL == col->column)
+		{
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for column #%d",
 					ZBX_TQ_QUERY_TAG_COLUMN, i);
+		}
 
 		if (ZBX_TQ_COLUMN_TYPE_UNKNOWN == col->col_type)
+		{
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is invalid for column #%d",
 					ZBX_TQ_QUERY_TAG_COLUMN, i);
+		}
 
 		if (!(ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == col->col_type || ZBX_TQ_COLUMN_TYPE_STR == col->col_type ||
 				ZBX_TQ_COLUMN_TYPE_NUM == col->col_type ||
 				ZBX_TQ_COLUMN_TYPE_TIMESTAMP == col->col_type ||
 				ZBX_TQ_COLUMN_TYPE_BOOL == col->col_type))
+		{
 			return ret_errf(FAIL, error, max_error_len, "Unsupported column type for column #%d", i);
+		}
 
 		if (NULL == col->attribute_key)
+		{
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for column #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
+		}
 
 		if (SUCCEED != zbx_is_utf8(col->attribute_key))
+		{
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not valid UTF-8 for column #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
+		}
 	}
 
 	if (0 == query->aggregated_columns.values_num)
@@ -662,41 +698,55 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		const zbx_tq_aggr_column_t *aggr_col = &query->aggregated_columns.values[i];
 
 		if (NULL == aggr_col->column)
+		{
 			return ret_errf(FAIL, error, max_error_len,
 					"\"%s\" is not set for aggregated column #%d", ZBX_TQ_QUERY_TAG_COLUMN, i);
+		}
 
 		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function)
 		{
 			const tq_column_info_t	*col_info;
 
 			if (ZBX_TQ_COLUMN_TYPE_UNKNOWN == aggr_col->col_type)
+			{
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is invalid for aggregated column #%d", ZBX_TQ_QUERY_TAG_COLUMN,
-								i);
+						i);
+			}
 
 			if (!(ZBX_TQ_COLUMN_TYPE_NUM == aggr_col->col_type
 					|| ZBX_TQ_COLUMN_TYPE_TIMESTAMP == aggr_col->col_type))
+			{
 				return ret_errf(FAIL, error, max_error_len,
 						"Unsupported column type for aggregated column #%d", i);
+			}
 
 			col_info = tq_get_column_info(query->signal_type, query->metric_point_type, aggr_col->column);
 
 			if (0 != (col_info->flags & TQ_COLUMN_INFO_FLAG_NO_AGGREGATION))
+			{
 				return ret_errf(FAIL, error, max_error_len, "Aggregation is not supported "
 						"for column \"%s\" in aggregated column #%d", aggr_col->column, i);
+			}
 		}
 
 		if (NULL == aggr_col->alias)
+		{
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for aggregated column #%d",
 					ZBX_TQ_QUERY_TAG_ALIAS, i);
+		}
 
 		if (SUCCEED != zbx_is_utf8(aggr_col->alias))
+		{
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not valid UTF-8 for column #%d",
 					ZBX_TQ_QUERY_TAG_ALIAS, i);
+		}
 
 		if (ZBX_TQ_FUNCTION_UNKNOWN == aggr_col->function)
+		{
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for aggregated column #%d",
 					ZBX_TQ_QUERY_TAG_FUNCTION, i);
+		}
 
 		if (ZBX_TQ_FUNCTION_PERCENTILE == aggr_col->function)
 		{
@@ -705,8 +755,10 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			if (1 != aggr_col->parameters.values_num || NULL == aggr_col->parameters.values[0] ||
 					FAIL == zbx_is_double(aggr_col->parameters.values[0], &x) ||
 					0.0 > x || x > 100.0)
+			{
 				return ret_errf(FAIL, error, max_error_len, "Invalid parameters for \"percentile\" "
 						"function in aggregated column #%d", i);
+			}
 		}
 	}
 
@@ -721,12 +773,16 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		if (ZBX_TQ_EVAL_TYPE_EXPRESSION == query->evaltype)
 		{
 			if (NULL == query->formula_parsed)
+			{
 				return ret_errf(FAIL, error, max_error_len, "\"%s\" is invalid",
 						ZBX_TQ_QUERY_TAG_FORMULA);
+			}
 
 			if (SUCCEED != tq_validate_formula_node_indices(query->formula_parsed,
 					query->conditions.values_num, error, max_error_len))
+			{
 				return FAIL;
+			}
 		}
 
 		for (int i = 0; i < query->conditions.values_num; i++)
@@ -734,55 +790,75 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			const zbx_tq_condition_t	*cond = &query->conditions.values[i];
 
 			if (NULL == cond->column)
+			{
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not set for condition #%d", ZBX_TQ_QUERY_TAG_COLUMN, i);
+			}
 
 			if (ZBX_TQ_COLUMN_TYPE_UNKNOWN == cond->col_type)
+			{
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is invalid for condition #%d", ZBX_TQ_QUERY_TAG_COLUMN, i);
+			}
 
 			if (ZBX_TQ_OPERATOR_UNKNOWN == cond->operator)
+			{
 				return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for condition #%d",
 						ZBX_TQ_QUERY_TAG_OPERATOR, i);
+			}
 
 			if (NULL == cond->attribute_key)
+			{
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not set for condition #%d",
 						ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
+			}
 
 			if (SUCCEED != zbx_is_utf8(cond->attribute_key))
+			{
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not valid UTF-8 for condition #%d",
 						ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
+			}
 
 			if (NULL == cond->value)
+			{
 				return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for condition #%d",
 						ZBX_TQ_QUERY_TAG_VALUE, i);
+			}
 
 			if (SUCCEED != zbx_is_utf8(cond->value))
+			{
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not valid UTF-8 for condition #%d",
 						ZBX_TQ_QUERY_TAG_VALUE, i);
+			}
 
 			if (!(ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == cond->col_type ||
 					ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == cond->col_type ||
 					ZBX_TQ_COLUMN_TYPE_STR == cond->col_type ||
 					ZBX_TQ_COLUMN_TYPE_ARRAY_STR == cond->col_type))
+			{
 				return ret_errf(FAIL, error, max_error_len, "Unsupported column type for condition #%d",
 						i);
+			}
 
 			if (ZBX_TQ_OPERATOR_EXISTS == cond->operator
 					&& SUCCEED != tq_column_type_is_attributes(cond->col_type))
+			{
 				return ret_errf(FAIL, error, max_error_len,
 						"Operator \"exists\" selected for non-attribute condition #%d", i);
+			}
 
 			if (SUCCEED == tq_column_type_is_attributes(cond->col_type) &&
 					(ZBX_TQ_OPERATOR_CONTAINS == cond->operator ||
 					ZBX_TQ_OPERATOR_NOT_CONTAINS == cond->operator))
+			{
 				return ret_errf(FAIL, error, max_error_len,
 						"Operator \"%s\" selected for attribute condition #%d",
 						(ZBX_TQ_OPERATOR_CONTAINS == cond->operator ? "contains" :
 						"not contains"), i);
+			}
 		}
 	}
 
