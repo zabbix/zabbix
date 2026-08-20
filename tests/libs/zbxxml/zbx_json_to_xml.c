@@ -39,7 +39,7 @@ static void *zbx_mock_test_thread(void *arg)
 {
 	zbx_mock_thread_args_t *t = (zbx_mock_thread_args_t *)arg;
 
-	char *json_copy = strdup(t->json);
+	char	*json_copy = strdup(t->json);
 	if (!json_copy)
 	{
 		return NULL;

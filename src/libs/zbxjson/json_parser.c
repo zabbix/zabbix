@@ -62,7 +62,7 @@ zbx_int64_t	json_error(const char *message, const char *ptr, char **error)
  *               so it can be used to return from failed parses               *
  *                                                                            *
  ******************************************************************************/
-zbx_int64_t json_error_with_count(const char *message, int count, const char *ptr, char **error)
+static zbx_int64_t	json_error_with_count(const char *message, int count, const char *ptr, char **error)
 {
 	char err_buf[MAX_STRING_LEN];
 

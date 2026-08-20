@@ -1016,6 +1016,7 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 	xmlDoc			*doc = NULL;
 	const xmlError		*pErr;
 	xmlChar			*xmem;
+	char			json_value[MAX_STRING_LEN] = {0};
 
 	if (NULL == (doc = xmlNewDoc(BAD_CAST XML_DEFAULT_VERSION)))
 	{
@@ -1032,11 +1033,7 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 		goto clean;
 	}
 
-	char json_value[MAX_STRING_LEN] = {0};
-
-	int json_ret = json_to_xmlnode(&jp, NULL, 0, doc, NULL, &attr, &attr_val, &text, json_value);
-
-	if (SUCCEED != json_ret)
+	if (SUCCEED != json_to_xmlnode(&jp, NULL, 0, doc, NULL, &attr, &attr_val, &text, json_value))
 	{
 		*errmsg = zbx_strdup(*errmsg, "convert to xml node failed");
 		goto clean;
