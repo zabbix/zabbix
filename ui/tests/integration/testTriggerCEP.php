@@ -165,7 +165,8 @@ class testTriggerCEP extends CIntegrationTest {
 	// Extra trigger tag used by the tag-exists flavour of that scenario, whose NAME (not value) carries the
 	// state: the tag name contains {ITEM.VALUE}, which is resolved at event time, so a "down_N" event gets a
 	// 'state_down' tag and an "up_N" event a 'state_up' tag. That lets the close-window operation single out
-	// the "up" events with a plain tag-exists condition on CEP_STATE_TAG_UP, without comparing tag values.
+	// the "up" events by the presence of the CEP_STATE_TAG_UP tag alone, without comparing tag values, see
+	// buildUpEventOperationCondition().
 	const CEP_STATE_TAG = 'state_{{ITEM.VALUE}.regsub("^([a-z]+)", "\\1")}';
 	const CEP_STATE_TAG_UP = 'state_up';
 	// Its counterpart, the tag name a "down" event gets instead - what the discarding close window flavours single
@@ -635,8 +636,9 @@ class testTriggerCEP extends CIntegrationTest {
 	// Extra trigger tag the windowless scenario adds to the prototypes, whose NAME (not value) carries the
 	// service id: like CEP_STATE_TAG the name contains {ITEM.VALUE} and is resolved at event time, so a
 	// "down_0" event gets a 'service_0' tag and a "down_10" event a 'service_10' one. Existence is a property
-	// of the tag name, so this is what the Exists / Does not exist pair tests for (CEP_SERVICE_TAG_PREFIX
-	// concatenated with the id gives the name a rule looks for).
+	// of the tag name, so this is what the tag name pair of rules tests for: a condition on the tag name holds
+	// when the event carries that tag and its negation when it does not (CEP_SERVICE_TAG_PREFIX concatenated
+	// with the id gives the name a rule looks for, see buildWindowNoneServiceCondition()).
 	const CEP_SERVICE_TAG_PREFIX = 'service_';
 	const CEP_SERVICE_TAG = self::CEP_SERVICE_TAG_PREFIX.'{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}';
 	// What the event name rules test against. The prototypes name every event "CEP trigger <component>
@@ -2134,8 +2136,8 @@ class testTriggerCEP extends CIntegrationTest {
 	 *   - "service_not_contains": 'service' Does not contain "0";
 	 *   - "service_more_equal": 'service' Is more than or equal "1";
 	 *   - "service_less_equal": 'service' Is less than or equal "0";
-	 *   - "service_exists": tag 'service_0' Exists;
-	 *   - "service_not_exists": tag 'service_0' Does not exist;
+	 *   - "service_exists": tag name 'service_0' Equals, which holds exactly when the event carries that tag;
+	 *   - "service_not_exists": tag name 'service_0' Does not equal, i.e. no tag of that name on the event;
 	 *   - "event_name_equals": event name Equals "CEP trigger sensor1 down_1";
 	 *   - "event_name_not_equals": event name Does not equal that name;
 	 *   - "event_name_contains": event name Contains "down_1";
@@ -2211,8 +2213,8 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function prepareDataCepWindowNoneTagOperations(?int $window_type = null,
 			string $name_infix = 'none') {
-		// The first extra tag carries the service id in its NAME, which is what the Exists / Does not exist
-		// pair tests for; its value is irrelevant. The rest are the tags the tag operation rule modifies,
+		// The first extra tag carries the service id in its NAME, which is what the tag name pair of rules
+		// tests for; its value is irrelevant. The rest are the tags the tag operation rule modifies,
 		// renames and removes, so those operations are exercised on tags the trigger itself generated and not
 		// only on tags an earlier operation of the same rule added.
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
@@ -3668,7 +3670,7 @@ HEREDOC;
 				]
 				: [
 					'type' => CCepRuleHelper::CONDITION_TAG,
-					'operator' => CONDITION_OPERATOR_EXISTS,
+					'operator' => CONDITION_OPERATOR_EQUAL,
 					'tag' => self::CEP_SERVICE_TAG_PREFIX.static::getCloseWindowDiscardService()
 				];
 
@@ -3681,7 +3683,7 @@ HEREDOC;
 					'conditions' => [
 						[
 							'type' => CCepRuleHelper::CONDITION_TAG,
-							'operator' => CONDITION_OPERATOR_EXISTS,
+							'operator' => CONDITION_OPERATOR_EQUAL,
 							'tag' => self::CEP_STATE_TAG_DOWN
 						],
 						$discarded_service_condition
@@ -5174,7 +5176,7 @@ HEREDOC;
 				'conditions' => [
 					[
 						'type' => CCepRuleHelper::CONDITION_TAG,
-						'operator' => CONDITION_OPERATOR_EXISTS,
+						'operator' => CONDITION_OPERATOR_EQUAL,
 						'tag' => 'state',
 						'tag_value' => ''
 					]
@@ -5302,19 +5304,18 @@ HEREDOC;
 
 	/**
 	 * Build the filter condition a windowless rule uses to single out the events of one 'service' id through
-	 * the event tags. $service is always a plain id; how it is tested depends on the operator, exactly like in
-	 * the CEP rule form:
-	 *   - CONDITION_OPERATOR_EXISTS / CONDITION_OPERATOR_NOT_EXISTS test a tag NAME, so they get a
-	 *     CONDITION_TAG condition on the per-id 'service_<id>' tag (CEP_SERVICE_TAG resolves the id into the
-	 *     tag name at event time);
-	 *   - every other operator compares the value of the plain 'service' tag, so it gets a
-	 *     CONDITION_TAG_VALUE condition. CONDITION_TAG would not do: it matches on the tag name only (the
-	 *     server evaluates it as tag exists / does not exist and never looks at tag_value), which is why the
-	 *     form converts a "Tag" condition with a value operator to CONDITION_TAG_VALUE before handing it to
-	 *     the API.
+	 * the event tags. $service is always a plain id; what the condition tests it against is chosen by
+	 * $by_tag_name, exactly like the two tag condition types of the CEP rule form:
+	 *   - $by_tag_name = true gives a CONDITION_TAG condition, which the server matches against the tag NAMES
+	 *     of the event and never looks at tag_value, so it is put on the per-id 'service_<id>' tag
+	 *     (CEP_SERVICE_TAG resolves the id into the tag name at event time). $operator applies to that name,
+	 *     so Equals holds exactly when the event carries the tag and Does not equal exactly when it does not;
+	 *   - $by_tag_name = false gives a CONDITION_TAG_VALUE condition comparing the value of the plain
+	 *     'service' tag, which is what every operator beyond the four a tag name accepts needs anyway.
 	 */
-	private function buildWindowNoneServiceCondition(int $operator, string $service): array {
-		if (in_array($operator, [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS])) {
+	private function buildWindowNoneServiceCondition(int $operator, string $service,
+			bool $by_tag_name = false): array {
+		if ($by_tag_name) {
 			return [
 				'type' => CCepRuleHelper::CONDITION_TAG,
 				'operator' => $operator,
@@ -5472,10 +5473,10 @@ HEREDOC;
 				$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_LESS_EQUAL, $service), $service
 			],
 			self::CEP_TAG_SERVICE_EXISTS => [
-				$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_EXISTS, $service), $service
+				$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_EQUAL, $service, true), $service
 			],
 			self::CEP_TAG_SERVICE_NOT_EXISTS => [
-				$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_NOT_EXISTS, $service), $service
+				$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_NOT_EQUAL, $service, true), $service
 			],
 			self::CEP_TAG_EVENT_NAME_EQUALS => [
 				$this->buildWindowNoneEventNameCondition(CONDITION_OPERATOR_EQUAL, $event_name), $event_name
@@ -5997,13 +5998,14 @@ HEREDOC;
 	/**
 	 * The operation filter condition satisfied by an "up" event and by no other event of the close-on-up
 	 * scenarios: CEP_STATE_TAG_UP is the tag name the trigger prototypes build from {ITEM.VALUE} (see
-	 * CEP_STATE_TAG), so only an "up" event carries that tag at all and a plain tag-exists condition singles
-	 * them out without comparing any tag value.
+	 * CEP_STATE_TAG), so only an "up" event carries that tag at all and its mere presence singles them out
+	 * without comparing any tag value. A CONDITION_TAG condition is matched against the tag NAMES of the
+	 * event, so Equals on that name is exactly the "the event carries this tag" test.
 	 */
 	private static function buildUpEventOperationCondition(): array {
 		return [
 			'type' => CCepRuleHelper::CONDITION_TAG,
-			'operator' => CONDITION_OPERATOR_EXISTS,
+			'operator' => CONDITION_OPERATOR_EQUAL,
 			'tag' => self::CEP_STATE_TAG_UP
 		];
 	}
