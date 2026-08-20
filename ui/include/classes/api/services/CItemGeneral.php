@@ -391,29 +391,36 @@ abstract class CItemGeneral extends CApiService {
 				$item['headers'] = $fields;
 			}
 
-			if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY && array_key_exists('query', $item)) {
+			if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
 				/** @var CItemTypeTelemetryQuery $item_type */
 				$path = '/'.($i + 1);
 
-				if (!$item_type::validateColumnsAggregatedColumnsUnique($item, $path, $error)) {
+				if ($db_item !== null) {
+					$item += [
+						'granularity' => $db_item['granularity'],
+						'lookback_limit' => $db_item['lookback_limit']
+					];
+				}
+
+				if (!$item_type::validateGranularity($item, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
-				if (!$item_type::validateAggregatedColumns($item, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
+				if (array_key_exists('query', $item)) {
+					if (!$item_type::validateColumnsAggregatedColumnsUnique($item, $path, $error)
+							|| !$item_type::validateAggregatedColumns($item, $path, $error)
+							|| !$item_type::validateFilter($item, $path, $error)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+					}
 
-				if (!$item_type::validateFilter($item, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
+					$item['query'] = $item_type::convertFilterFormulaToExpression($item['query']);
 
-				$item['query'] = $item_type::convertFilterFormulaToExpression($item['query']);
-
-				if (strlen($item_type::prepareQueryFieldForDb($item['query']))
-						> DB::getFieldLength('items', 'query')) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/query', _('value is too long')
-					));
+					if (strlen($item_type::prepareQueryFieldForDb($item['query']))
+							> DB::getFieldLength('items', 'query')) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/query', _('value is too long')
+						));
+					}
 				}
 			}
 		}

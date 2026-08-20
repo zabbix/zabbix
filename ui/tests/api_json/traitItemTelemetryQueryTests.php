@@ -186,6 +186,34 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield '"granularity" value less than "lookback_limit" value' => [
+			[
+				'lookback_limit' => '30s',
+				'granularity' => '10s',
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			null
+		];
+
+		yield '"granularity" value user macro' => [
+			[
+				'lookback_limit' => '30s',
+				'granularity' => '{$M}',
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			null
+		];
+
 		yield 'duplicates in "query.aggregated_columns[].column" when "query.aggregated_columns[].alias" are unique' => [
 			[
 				'query' => [
@@ -283,6 +311,20 @@ trait traitItemTelemetryQueryTests {
 				]
 			],
 			null
+		];
+
+		yield '"granularity" value greater than "lookback_limit" value fail' => [
+			[
+				'lookback_limit' => '10s',
+				'granularity' => '30s',
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			'Invalid parameter "/1/granularity": cannot be greater than the value of parameter "/1/lookback_limit".'
 		];
 
 		yield 'serialized "query" longer than 64Kb fail' => [

@@ -192,6 +192,29 @@ class CItemTypeTelemetryQuery extends CItemType {
 	}
 
 	/**
+	 * Validate granularity value is less than lookback_limit value.
+	 *
+	 * @param array       $item   Telemetry item to validate.
+	 * @param string      $path   Path for validation message.
+	 * @param string|null $error  Error message when validation fails, set by reference.
+	 */
+	public static function validateGranularity(array $item, string $path, ?string &$error = null): bool {
+		if ($item['granularity'][0] === '{' || $item['lookback_limit'][0] === '{') {
+			return true;
+		}
+
+		if (timeUnitToSeconds($item['granularity']) > timeUnitToSeconds($item['lookback_limit'])) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path.'/granularity',
+				_s('cannot be greater than the value of parameter "%1$s"', $path.'/lookback_limit')
+			);
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Validate "query.aggregated_columns":
 	 * - for "function" AGGREGATE_PERCENTILE "parameters" array may have only single value
 	 * - "alias" value cannot start or end with whitespace character
