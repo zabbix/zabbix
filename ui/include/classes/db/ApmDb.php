@@ -106,7 +106,7 @@ class ApmDb {
 		$config['username'] = $credentials['user'];
 		$config['password'] = $credentials['password'];
 
-		return array_diff_key($config, array_flip(['status', 'vault_path', 'authentication_type']));
+		return array_diff_key($config, array_flip(['status', 'vault_path', 'authentication_type', 'provider']));
 	}
 
 	public static function getInstance(): self {
