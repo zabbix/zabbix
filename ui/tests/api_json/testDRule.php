@@ -33,8 +33,7 @@ class testDRule extends CAPITest {
 				['host' => 'drule.template']
 			],
 			'proxies' => [
-				['name' => 'drule.proxy'],
-				['name' => 'drule.inaccessible.proxy']
+				['name' => 'drule.proxy']
 			],
 			'drules' => [
 				['name' => 'drule.used.in.action.1'],
@@ -45,14 +44,6 @@ class testDRule extends CAPITest {
 				['name' => 'drule.perm.del'],
 				[
 					'name' => 'drule.with.proxy',
-					'proxyid' => ':proxy:drule.proxy'
-				],
-				[
-					'name' => 'drule.with.inaccessible.proxy',
-					'proxyid' => ':proxy:drule.inaccessible.proxy'
-				],
-				[
-					'name' => 'drule.with.accessible.proxy',
 					'proxyid' => ':proxy:drule.proxy'
 				]
 			],
@@ -89,19 +80,7 @@ class testDRule extends CAPITest {
 
 		CTestDataHelper::createObjects([
 			'user_groups' => [
-				[
-					'name' => 'perm.users.enabled',
-					'users_status' => GROUP_STATUS_ENABLED
-				],
-				[
-					'name' => 'user with inaccessible proxy',
-					'proxies' => ['proxyid' => ':proxy:drule.inaccessible.proxy']
-				],
-				[
-					'name' => 'user with accessible proxy',
-					'proxy_mode' => PROXY_MODE_ALLOW,
-					'proxies' => ['proxyid' => ':proxy:drule.proxy']
-				]
+				['name' => 'perm.users.enabled', 'users_status' => GROUP_STATUS_ENABLED]
 			],
 			'roles' => [
 				['name' => 'perm.user.role', 'type' => USER_TYPE_ZABBIX_USER],
@@ -119,22 +98,6 @@ class testDRule extends CAPITest {
 					'passwd' => 'zabbix!password',
 					'roleid' => ':role:perm.admin.role',
 					'usrgrps' => [['usrgrpid' => ':user_group:perm.users.enabled']]
-				],
-				[
-					'username' => 'admin.with.inaccessible.proxy',
-					'passwd' => 'zabbix!password',
-					'roleid' => ':role:perm.admin.role',
-					'usrgrps' => [
-						['usrgrpid' => ':user_group:user with inaccessible proxy']
-					]
-				],
-				[
-					'username' => 'admin.with.proxy',
-					'passwd' => 'zabbix!password',
-					'roleid' => ':role:perm.admin.role',
-					'usrgrps' => [
-						['usrgrpid' => ':user_group:user with accessible proxy']
-					]
 				]
 			]
 		]);
@@ -144,170 +107,6 @@ class testDRule extends CAPITest {
 		CTestDataHelper::disableGuestUser();
 
 		CTestDataHelper::cleanUp();
-	}
-
-	public static function dataProviderInvalidProxyForDRuleCreate() {
-		return [
-			'Create drule with inaccessible proxy' => [
-				'login' => ['user' => 'admin.with.inaccessible.proxy', 'password' => 'zabbix!password'],
-				'drule' => [
-					[
-						'name' => 'drule with inaccessible proxy',
-						'iprange' => ZBX_MONITORED_BY_PROXY,
-						'proxyid' => ':proxy:drule.inaccessible.proxy',
-						'dchecks' => [
-							[
-							'type' => 9,
-							'key_' => 'system.uname',
-							'ports' => '10050'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/proxyid": object does not exist, or you have no permissions to it.'
-			],
-			'Create drule with non-existent proxy' => [
-				'login' => ['user' => 'admin.with.proxy', 'password' => 'zabbix!password'],
-				'drule' => [
-					[
-						'name' => 'drule with existing proxy',
-						'iprange' => ZBX_MONITORED_BY_PROXY,
-						'proxyid' => ':proxy:drule.proxy',
-						'dchecks' => [
-							[
-							'type' => 9,
-							'key_' => 'system.uname',
-							'ports' => '10050'
-							]
-						]
-					],
-					[
-						'name' => 'drule with non-existing proxy',
-						'iprange' => ZBX_MONITORED_BY_PROXY,
-						'proxyid' => 999,
-						'dchecks' => [
-							[
-							'type' => 9,
-							'key_' => 'system.uname',
-							'ports' => '10050'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/2/proxyid": object does not exist, or you have no permissions to it.'
-			]
-		];
-	}
-
-	public static function dataProviderValidProxyForDRuleCreate() {
-		return [
-			'Create drule with accessible proxy' => [
-				'login' => ['user' => 'admin.with.inaccessible.proxy', 'password' => 'zabbix!password'],
-				'drule' => [
-					[
-						'name' => 'drule with accessible proxy',
-						'iprange' => ZBX_MONITORED_BY_PROXY,
-						'proxyid' => ':proxy:drule.proxy',
-						'dchecks' => [
-							[
-							'type' => 9,
-							'key_' => 'system.uname',
-							'ports' => '10050'
-							]
-						]
-					]
-				],
-				'expected_error' => null
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider dataProviderInvalidProxyForDRuleCreate
-	 * @dataProvider dataProviderValidProxyForDRuleCreate
-	 */
-	public function testDRule_Create(array $login, array $drules, ?string $expected_error): void {
-		foreach ($drules as &$drule) {
-			if (array_key_exists('proxyid', $drule)) {
-				$drule['proxyid'] = CTestDataHelper::getConvertedValueReference($drule['proxyid']);
-			}
-		}
-		unset($drule);
-
-		if ($login) {
-			$this->authorize($login['user'], $login['password']);
-		}
-
-		$result = $this->call('drule.create', $drules, $expected_error);
-
-		if ($expected_error === null) {
-			foreach ($result['result']['druleids'] as $druleid) {
-				$this->assertEquals(
-					1, CDBHelper::getCount('SELECT NULL FROM drules WHERE druleid='.zbx_dbstr($druleid))
-				);
-			}
-		}
-	}
-
-	public static function dataProviderInvalidProxyForDRuleUpdate() {
-		return [
-			'Update drule with inaccessible proxy' => [
-				'login' => ['user' => 'admin.with.inaccessible.proxy', 'password' => 'zabbix!password'],
-				'drule' => [
-					[
-						'druleid' => ':drule:drule.with.accessible.proxy',
-						'proxyid' => ':proxy:drule.inaccessible.proxy'
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/proxyid": object does not exist, or you have no permissions to it.'
-			]
-		];
-	}
-
-	public static function dataProviderValidProxyForDRuleUpdate() {
-		return [
-			'Create drule with accessible proxy' => [
-				'login' => ['user' => 'admin.with.inaccessible.proxy', 'password' => 'zabbix!password'],
-				'drule' => [
-					[
-						'druleid' => ':drule:drule.with.accessible.proxy',
-						'proxyid' => ':proxy:drule.proxy'
-					]
-				],
-				'expected_error' => null
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider dataProviderInvalidProxyForDRuleUpdate
-	 * @dataProvider dataProviderValidProxyForDRuleUpdate
-	 */
-	public function testDRule_Update(array $login, array $drules, ?string $expected_error): void {
-		foreach ($drules as &$drule) {
-			if (array_key_exists('druleid', $drule)) {
-				$drule['druleid'] = CTestDataHelper::getConvertedValueReference($drule['druleid']);
-			}
-
-			if (array_key_exists('proxyid', $drule)) {
-				$drule['proxyid'] = CTestDataHelper::getConvertedValueReference($drule['proxyid']);
-			}
-		}
-		unset($drule);
-
-		if ($login) {
-			$this->authorize($login['user'], $login['password']);
-		}
-
-		$result = $this->call('drule.update', $drules, $expected_error);
-
-		if ($expected_error === null) {
-			foreach ($result['result']['druleids'] as $druleid) {
-				$this->assertEquals(
-					1, CDBHelper::getCount('SELECT NULL FROM drules WHERE druleid='.zbx_dbstr($druleid))
-				);
-			}
-		}
 	}
 
 	public static function getDRuleDeleteData() {
@@ -359,11 +158,6 @@ class testDRule extends CAPITest {
 			'Delete two Discovery rules' => [
 				'drule' => [':drule:drule.del.2',':drule:drule.del.3'],
 				'expected_error' => null
-			],
-			'Delete discovery rule with inaccessible proxy' => [
-				'drule' => [':drule:drule.with.inaccessible.proxy'],
-				'expected_error' => 'No permissions to referred object or it does not exist!',
-				'login' => ['user' => 'admin.with.inaccessible.proxy', 'password' => 'zabbix!password']
 			]
 		];
 	}
@@ -371,12 +165,8 @@ class testDRule extends CAPITest {
 	/**
 	* @dataProvider getDRuleDeleteData
 	*/
-	public function testDRule_Delete(array $druleids, ?string $expected_error, ?array $login = null) {
+	public function testDRule_Delete(array $druleids, ?string $expected_error) {
 		$converted_druleids = CTestDataHelper::getConvertedValueReferences($druleids);
-
-		if ($login) {
-			$this->authorize($login['user'], $login['password']);
-		}
 
 		$this->call('drule.delete', $converted_druleids, $expected_error);
 

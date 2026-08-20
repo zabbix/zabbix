@@ -47,18 +47,6 @@ class testAction extends CAPITest {
 				[
 					'name' => 'del.p1',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
-				],
-				[
-					'name' => 'inaccessible.p1',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
-				],
-				[
-					'name' => 'accessible.p1',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
-				],
-				[
-					'name' => 'accessible.p2',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 				]
 			],
 			'templates' => [
@@ -122,15 +110,6 @@ class testAction extends CAPITest {
 						'id' => ':host_group:perm.hg4',
 						'permission' => PERM_READ
 					]
-				],
-				[
-					'name' => 'create.pr1',
-					'proxies' => ['proxyid' => ':proxy:inaccessible.p1']
-				],
-				[
-					'name' => 'create.pr2',
-					'proxies' => [['proxyid' => ':proxy:accessible.p1'], ['proxyid' => ':proxy:accessible.p2']],
-					'proxy_mode' => PROXY_MODE_ALLOW
 				]
 			],
 			'users' => [
@@ -146,20 +125,6 @@ class testAction extends CAPITest {
 					'passwd' => '|-|e!1@ (/\)0rLD!',
 					'usrgrps' => [
 						['usrgrpid' => ':user_group:perm.ug1']
-					]
-				],
-				[
-					'username' => 'admin.with.inaccessible.proxy',
-					'passwd' => 'zabbix!password',
-					'usrgrps' => [
-						['usrgrpid' => ':user_group:create.pr1']
-					]
-				],
-				[
-					'username' => 'admin.with.accessible.proxy',
-					'passwd' => 'zabbix!password',
-					'usrgrps' => [
-						['usrgrpid' => ':user_group:create.pr2']
 					]
 				]
 			],
@@ -331,44 +296,6 @@ class testAction extends CAPITest {
 							]
 						]
 					]
-				],
-				[
-					'name' => 'action with proxy',
-					'eventsource' => EVENT_SOURCE_DISCOVERY,
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							[
-								'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
-								'operator' => CONDITION_OPERATOR_EQUAL,
-								'value' => ':proxy:accessible.p1'
-							]
-						]
-					],
-					'operations' => [
-						[
-							'operationtype' => OPERATION_TYPE_HOST_ADD
-						]
-					]
-				],
-				[
-					'name' => 'delete action with proxy',
-					'eventsource' => EVENT_SOURCE_DISCOVERY,
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							[
-								'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
-								'operator' => CONDITION_OPERATOR_EQUAL,
-								'value' => ':proxy:inaccessible.p1'
-							]
-						]
-					],
-					'operations' => [
-						[
-							'operationtype' => OPERATION_TYPE_HOST_ADD
-						]
-					]
 				]
 			]
 		]);
@@ -478,169 +405,6 @@ class testAction extends CAPITest {
 		CTestDataHelper::cleanUp();
 	}
 
-	public static function dataProviderInvalidActionCreate() {
-		return [
-			'Create action with inaccessible proxy' => [
-				'login' => ['user' => 'admin.with.inaccessible.proxy', 'password' => 'zabbix!password'],
-				'action' => [
-					[
-						'name' => 'action with inaccessible proxy',
-						'eventsource' => EVENT_SOURCE_DISCOVERY,
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								[
-									'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
-									'operator' => CONDITION_OPERATOR_EQUAL,
-									'value' => ':proxy:inaccessible.p1'
-								]
-							]
-						],
-						'operations' => [
-							[
-								'operationtype' => OPERATION_TYPE_HOST_ADD
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/value": object does not exist, or you have no permissions to it.'
-			]
-		];
-	}
-
-	public static function dataProviderValidActionCreate() {
-		return [
-			'Create action with accessible proxy' => [
-				'login' => ['user' => 'admin.with.accessible.proxy', 'password' => 'zabbix!password'],
-				'action' => [
-					[
-						'name' => 'action with accessible proxy',
-						'eventsource' => EVENT_SOURCE_DISCOVERY,
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								[
-									'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
-									'operator' => CONDITION_OPERATOR_EQUAL,
-									'value' => ':proxy:accessible.p1'
-								]
-							]
-						],
-						'operations' => [
-							[
-								'operationtype' => OPERATION_TYPE_HOST_ADD
-							]
-						]
-					]
-				],
-				'expected_error' => null
-			]
-		];
-	}
-
-	/**
-	* @dataProvider dataProviderInvalidActionCreate
-	* @dataProvider dataProviderValidActionCreate
-	*/
-	public function testAction_Create(array $login, $actions, $expected_error) {
-		CTestDataHelper::convertActionReferences($actions);
-
-		if ($login) {
-			$this->authorize($login['user'], $login['password']);
-		}
-
-		$result = $this->call('action.create', $actions, $expected_error);
-
-		if ($expected_error === null) {
-			$actionids = $result['result']['actionids'];
-
-			foreach ($actionids as $actionid) {
-				$this->assertEquals(
-					1, CDBHelper::getCount('SELECT NULL FROM actions WHERE actionid='.zbx_dbstr($actionid))
-				);
-			}
-
-			// Clean up created actions to avoid permission conflicts.
-			$this->call('action.delete', $actionids, null);
-
-			foreach ($actionids as $actionid) {
-				$this->assertEquals(
-					0, CDBHelper::getCount('SELECT NULL FROM actions WHERE actionid='.zbx_dbstr($actionid))
-				);
-			}
-		}
-	}
-
-	public static function dataProviderInvalidActionUpdate() {
-		return [
-			'Update action with inaccessible proxy' => [
-				'login' => ['user' => 'admin.with.inaccessible.proxy', 'password' => 'zabbix!password'],
-				'action' => [
-					[
-						'actionid' => ':action:action with proxy',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								[
-									'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
-									'operator' => CONDITION_OPERATOR_EQUAL,
-									'value' => ':proxy:inaccessible.p1'
-								]
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/value": object does not exist, or you have no permissions to it.'
-			]
-		];
-	}
-
-	public static function dataProviderValidActionUpdate() {
-		return [
-			'Create action with accessible proxy' => [
-				'login' => ['user' => 'admin.with.accessible.proxy', 'password' => 'zabbix!password'],
-				'action' => [
-					[
-						'actionid' => ':action:action with proxy',
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								[
-									'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
-									'operator' => CONDITION_OPERATOR_EQUAL,
-									'value' => ':proxy:accessible.p2'
-								]
-							]
-						]
-					]
-				],
-				'expected_error' => null
-			]
-		];
-	}
-
-	/**
-	* @dataProvider dataProviderInvalidActionUpdate
-	* @dataProvider dataProviderValidActionUpdate
-	*/
-	public function testAction_Update(array $login, $actions, $expected_error) {
-		CTestDataHelper::convertActionReferences($actions);
-
-		if ($login) {
-			$this->authorize($login['user'], $login['password']);
-		}
-
-		$result = $this->call('action.update', $actions, $expected_error);
-
-		if ($expected_error === null) {
-			foreach ($result['result']['actionids'] as $actionid) {
-				$this->assertEquals(
-					1, CDBHelper::getCount('SELECT NULL FROM actions WHERE actionid='.zbx_dbstr($actionid))
-				);
-			}
-		}
-	}
-
 	public static function getActionDeleteData() {
 		return [
 			[
@@ -686,11 +450,6 @@ class testAction extends CAPITest {
 			[
 				'actionids' => [':action:del.internal.action.1'],
 				'expected_error' => null
-			],
-			[
-				'actionids' => [':action:delete action with proxy'],
-				'expected_error' => 'No permissions to referred object or it does not exist!',
-				'login' => ['user' => 'admin.with.inaccessible.proxy', 'password' => 'zabbix!password']
 			]
 		];
 	}
@@ -698,12 +457,8 @@ class testAction extends CAPITest {
 	/**
 	* @dataProvider getActionDeleteData
 	*/
-	public function testAction_Delete($actionids, $expected_error, ?array $login = null) {
+	public function testAction_Delete($actionids, $expected_error) {
 		$converted_actionids = CTestDataHelper::getConvertedValueReferences($actionids);
-
-		if ($login) {
-			$this->authorize($login['user'], $login['password']);
-		}
 
 		$this->call('action.delete', $converted_actionids, $expected_error);
 

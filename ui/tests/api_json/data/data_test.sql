@@ -537,11 +537,7 @@ INSERT INTO history_text (itemid, clock, value, ns) VALUES
 (133762, 1549350999, '2', 882825407),
 (133762, 1549351001, '3', 242835912);
 
--- testAuditLogUserGroups
-INSERT INTO proxy (proxyid, name, operating_mode, description, tls_connect, tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk, allowed_addresses, address, port, custom_timeouts, timeout_zabbix_agent, timeout_simple_check, timeout_snmp_agent, timeout_external_check, timeout_db_monitor, timeout_http_agent, timeout_ssh_agent, timeout_telnet_agent, timeout_script, local_address, local_port, proxy_groupid, timeout_browser) VALUES (1, 'proxy01', 0, '', 1, 1, '', '', '', '', '', '127.0.0.1', '10051', 0, '', '', '', '', '', '', '', '', '', '', '10051', NULL, '');
-INSERT INTO proxy_group (proxy_groupid, name, description, failover_delay, min_online) VALUES (1, 'proxy group01', '', '1m', '1');
-
--- Adding records into Auditlogn
+-- Adding records into Auditlog
 -- INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (9000, 1, 1582269000, 1, 4, '', '127.0.0.1', 10054, 'H1 updated');
 -- INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (9000, 9000, 'hosts', 'status', '0', '1');
 -- INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (9001, 1, 1582270260, 1, 4, '', '127.0.0.1', 10054, 'H1 updated');

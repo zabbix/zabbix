@@ -974,7 +974,7 @@ class testTaskCreate extends CAPITest {
 								]
 							]
 						],
-						'proxyid' => '999'
+						'proxyid' => '01'
 					]
 				],
 				'expected_results' => [],

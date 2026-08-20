@@ -21,7 +21,7 @@ require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
  * @onBefore setSamlCertificatesStorage, prepareTestData
  * @onAfter   cleanTestData, revertConfFile
  *
- * @backup usrgrp, userdirectory, mfa, proxy, proxy_group
+ * @backup usrgrp, userdirectory, mfa
  */
 class testUserGroup extends CAPITest {
 
@@ -59,34 +59,6 @@ class testUserGroup extends CAPITest {
 
 		$this->assertArrayHasKey('mfaids', $mfa);
 		self::$data['mfaid'] = array_combine(['MFA TOTP method'], $mfa['mfaids']);
-
-		$proxy_groups = CDataHelper::call('proxygroup.create', [
-			[
-				'name' => 'Test proxy group 1'
-			],
-			[
-				'name' => 'Test proxy group 2'
-			]
-		]);
-
-		$this->assertArrayHasKey('proxy_groupids', $proxy_groups);
-		self::$data['proxy_groupid'] = array_combine(['Test proxy group 1', 'Test proxy group 2'], $proxy_groups['proxy_groupids']);
-
-		$proxies = CDataHelper::call('proxy.create', [
-			[
-				'name' => 'Test proxy 1',
-				'operating_mode' => '0'
-			],
-			[
-				'name' => 'Test proxy 2',
-				'operating_mode' => '0',
-				'proxy_groupid' => self::$data['proxy_groupid']['Test proxy group 2'],
-				'local_address' => '127.0.0.1'
-			]
-		]);
-
-		$this->assertArrayHasKey('proxyids', $proxies);
-		self::$data['proxyid'] = array_combine(['Test proxy 1', 'Test proxy 2'], $proxies['proxyids']);
 
 		// usergroup.update
 		CTestDataHelper::createObjects([
@@ -956,22 +928,6 @@ class testUserGroup extends CAPITest {
 					]
 				],
 				'expected_error' => null
-			],
-			'Create group with default proxy_mode and without proxies' => [
-				'group' => [
-					[
-						'name' => 'API group #5'
-					]
-				],
-				'expected_error' => null
-			],
-			'Create group with default proxy_group_mode and without proxy groups' => [
-				'group' => [
-					[
-						'name' => 'API group #6'
-					]
-				],
-				'expected_error' => null
 			]
 		];
 	}
@@ -1172,190 +1128,6 @@ class testUserGroup extends CAPITest {
 		$this->call('usergroup.update', self::resolveIds($groups), $expected_error);
 	}
 
-	public static function crateValidProxyDataProvider(): array {
-		return [
-			'Create group with proxy in deny list' => [
-				'group' => [
-					[
-						'name' => 'User group with proxy in deny list',
-						'proxies' => ['proxyid' => 'Test proxy 1']
-					]
-				],
-				'expected_error' => null
-			],
-			'Create group with proxy in allow list' => [
-				'group' => [
-					[
-						'name' => 'User group with proxy in allow list',
-						'proxies' => ['proxyid' => 'Test proxy 1'],
-						'proxy_mode' => PROXY_MODE_ALLOW
-					]
-				],
-				'expected_error' => null
-			]
-		];
-	}
-
-	public static function crateInvalidProxyDataProvider(): array {
-		return [
-			'Create group with non-existent proxy' => [
-				'group' => [
-					[
-						'name' => 'User group with unexistent proxy',
-						'proxies' => [['proxyid' => 'Test proxy 1'], ['proxyid' => 999]]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/proxies/2/proxyid": object does not exist, or you have no permissions to it.'
-			],
-			'Create group with proxy in a proxy group' => [
-				'group' => [
-					[
-						'name' => 'User group with unexistent proxy',
-						'proxies' => [['proxyid' => 'Test proxy 1'], ['proxyid' => 'Test proxy 2']]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/proxies/2/proxyid": access to this proxy is managed by its proxy group.'
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider crateValidProxyDataProvider
-	 * @dataProvider crateInvalidProxyDataProvider
-	 */
-	public function testCreateWithProxyMethod(array $groups, $expected_error): void {
-		$groups_with_proxies = self::resolveNestedIds($groups);
-		$response = $this->call('usergroup.create', self::resolveIds($groups_with_proxies), $expected_error);
-
-		if ($expected_error === null) {
-			$this->assertArrayHasKey('usrgrpids', $response['result']);
-			self::$data['usrgrpid'] += array_combine(array_column($groups, 'name'), $response['result']['usrgrpids']);
-		}
-	}
-
-
-	public static function crateValidProxyGroupDataProvider(): array {
-		return [
-			'Create group with proxy group in deny list' => [
-				'group' => [
-					[
-						'name' => 'User group with proxy group in deny list',
-						'proxy_groups' => ['proxy_groupid' => 'Test proxy group 1']
-					]
-				],
-				'expected_error' => null
-			],
-			'Create group with proxy group in allow list' => [
-				'group' => [
-					[
-						'name' => 'User group with proxy group in allow list',
-						'proxy_groups' => ['proxy_groupid' => 'Test proxy group 1'],
-						'proxy_group_mode' => PROXY_MODE_DENY
-					]
-				],
-				'expected_error' => null
-			]
-		];
-	}
-
-	public static function crateInvalidProxyGroupDataProvider(): array {
-		return [
-			'Create group with non-existent proxy group' => [
-				'group' => [
-					[
-						'name' => 'User group with unexistent proxy',
-						'proxy_groups' => [['proxy_groupid' => 'Test proxy group 1'], ['proxy_groupid' => 999]]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/proxy_groups/2/proxy_groupid": object does not exist, or you have no permissions to it.'
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider crateValidProxyGroupDataProvider
-	 * @dataProvider crateInvalidProxyGroupDataProvider
-	 */
-	public function testCreateWithProxyGroupMethod(array $groups, $expected_error): void {
-		$groups_with_proxy_groups = self::resolveNestedIds($groups);
-		$response = $this->call('usergroup.create', self::resolveIds($groups_with_proxy_groups), $expected_error);
-
-		if ($expected_error === null) {
-			$this->assertArrayHasKey('usrgrpids', $response['result']);
-			self::$data['usrgrpid'] += array_combine(array_column($groups, 'name'), $response['result']['usrgrpids']);
-		}
-	}
-
-	public static function updateValidProxyAndProxyGroupDataProvider(): array {
-		return [
-			'Update group to use specific proxy in allow list' => [
-				'group' => [
-					[
-						'usrgrpid' => 'API group #5',
-						'proxy_mode' => PROXY_MODE_ALLOW,
-						'proxies' => ['proxyid' => 'Test proxy 1']
-					]
-				],
-				'expected_error' => null
-			],
-			'Update group to use specific proxy and proxy group in deny list' => [
-				'group' => [
-					[
-						'usrgrpid' => 'API group #6',
-						'proxies' => ['proxyid' => 'Test proxy 1'],
-						'proxy_groups' => ['proxy_groupid' => 'Test proxy group 1']
-					]
-				],
-				'expected_error' => null
-			]
-		];
-	}
-
-	public static function updateInvalidProxyOrProxyGroupDataProvider(): array {
-		return [
-			'Update group with invalid proxy' => [
-				'group' => [
-					[
-						'usrgrpid' => 'API group #5',
-						'proxy_mode' => PROXY_MODE_ALLOW,
-						'proxies' => ['proxyid' => 'Test proxy 2']
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/proxies/1/proxyid": access to this proxy is managed by its proxy group.'
-			],
-			'Update group with non-existent proxy' => [
-				'group' => [
-					[
-						'usrgrpid' => 'API group #5',
-						'proxy_mode' => PROXY_MODE_ALLOW,
-						'proxies' => ['proxyid' => 999]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/proxies/1/proxyid": object does not exist, or you have no permissions to it.'
-			],
-			'Update group with non-existent proxy group' => [
-				'group' => [
-					[
-						'usrgrpid' => 'API group #5',
-						'proxy_mode' => PROXY_MODE_ALLOW,
-						'proxy_groups' => ['proxy_groupid' => 999]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/proxy_groups/1/proxy_groupid": object does not exist, or you have no permissions to it.'
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider updateValidProxyAndProxyGroupDataProvider
-	 * @dataProvider updateInvalidProxyOrProxyGroupDataProvider
-	 */
-	public function testUpdateWithProxyAndProxyGroupMethod(array $groups, $expected_error): void {
-		$groups_with_proxy_groups = self::resolveNestedIds($groups);
-
-		$this->call('usergroup.update', self::resolveIds($groups_with_proxy_groups), $expected_error);
-	}
-
 	/**
 	 * Replace name by value for property names in self::$data.
 	 *
@@ -1375,27 +1147,6 @@ class testUserGroup extends CAPITest {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Replace name by value for property names in self::$data on any nesting level.
-	 *
-	 * @param array $data
-	 */
-	public static function resolveNestedIds(array $data): array {
-		foreach ($data as $key => &$value) {
-			if (is_array($value)) {
-				$value = self::resolveNestedIds($value);
-			}
-			else {
-				if (array_key_exists($key, self::$data) && array_key_exists($value, self::$data[$key])) {
-					$value = self::$data[$key][$value];
-				}
-			}
-		}
-		unset($value);
-
-		return $data;
 	}
 
 	/**

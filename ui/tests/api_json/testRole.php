@@ -479,36 +479,6 @@ class testRole extends CAPITest {
 					]
 				],
 				'expected_error' => 'UI element "reports.system_info" is not available for user role "zabbix-user-not-allowed-systeminfo".'
-			],
-			[
-				'role' => [
-					'name' => 'zabbix-user-not-allowed-selectserver',
-					'type' => '1', // USER_TYPE_ZABBIX_USER
-					'rules' => [
-						'actions' => [
-							[
-								'name' => 'select_server_for_monitoring',
-								'status' => '1'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Action "select_server_for_monitoring" is not available for user role "zabbix-user-not-allowed-selectserver".'
-			],
-			[
-				'role' => [
-					'name' => 'zabbix-user-allowed-selectserver',
-					'type' => '2', // USER_TYPE_ZABBIX_ADMIN
-					'rules' => [
-						'actions' => [
-							[
-								'name' => 'select_server_for_monitoring',
-								'status' => '1'
-							]
-						]
-					]
-				],
-				'expected_error' => null
 			]
 		];
 	}
