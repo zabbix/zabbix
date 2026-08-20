@@ -159,9 +159,6 @@ class CControllerCepRuleEdit extends CController {
 						if ($operation['suppress_duration'] === DB::getDefault('cep_operation', 'suppress_duration')) {
 							$operation['suppress_duration'] = '';
 						}
-						else {
-							$operation['suppress_duration'] = date(ZBX_DATE_TIME, $operation['suppress_duration']);
-						}
 						break;
 
 					case CCepRuleHelper::OP_RENAME_TAG:
@@ -254,8 +251,10 @@ class CControllerCepRuleEdit extends CController {
 					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SET_SEVERITY]
 			]],
-			'suppress_duration' => ['string',
-				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
+			'suppress_duration' => ['db cep_operation.suppress_duration',
+				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_YEAR, 'min' => 1, 'usermacros' => false,
+					'lldmacros' => false, 'accept_zero' => true, 'with_year' => false
+				]],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
 			],
 			'sortorder' => ['db cep_operation.sortorder', 'required']

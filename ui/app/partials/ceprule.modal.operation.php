@@ -181,12 +181,7 @@ foreach ($labels as $option => $label) {
 			->addItem((new CTextBox('tag'))
 				->setAttribute('placeholder', 'tag')
 			)
-			->addItem((new CDateSelector('suppress_duration'))
-				->setId('ceprule-operation-period-argument')
-				->setDateFormat(ZBX_DATE_TIME)
-				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
-				->setAriaRequired()
-			)
+			->addItem(new CTextBox('suppress_duration'))
 		)
 		->addItem(
 			(new CFormField([

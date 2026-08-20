@@ -668,7 +668,7 @@ class CCepRule extends CApiService {
 			]],
 			'suppress_duration' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::OP_SUPPRESS])], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_operation', 'suppress_duration')],
-										['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'suppress_duration')]
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation', 'suppress_duration')]
 			]],
 			'tag' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE, CCepRuleHelper::OP_INCREASE_TAG_VALUE, CCepRuleHelper::OP_DECREASE_TAG_VALUE, CCepRuleHelper::OP_RENAME_TAG, CCepRuleHelper::OP_REMOVE_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation', 'tag')],

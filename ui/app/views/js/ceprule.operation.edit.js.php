@@ -358,7 +358,6 @@ window.ceprule_operation_edit_popup = new class {
 			'severity': this.form.findFieldByName('severity').getField()
 		};
 
-		const dateselector_suppress_duration = document.getElementById('ceprule-operation-period-argument');
 		const row_rename = document.getElementById('ceprule-operation-tag-rename-argument');
 		const row_tag_pair = document.getElementById('ceprule-operation-tag-pair-argument');
 		const row_severity = document.getElementById('ceprule-operation-severity-argument');
@@ -371,7 +370,6 @@ window.ceprule_operation_edit_popup = new class {
 			}
 		});
 
-		dateselector_suppress_duration.style.display = 'none';
 		row_rename.style.display = 'none';
 		row_tag_pair.style.display = 'none';
 		row_severity.style.display = 'none';
@@ -389,7 +387,6 @@ window.ceprule_operation_edit_popup = new class {
 			case <?= CCepRuleHelper::OP_SUPPRESS ?>:
 				fields.suppress_duration.disabled = false;
 				fields.suppress_duration.style.display = '';
-				dateselector_suppress_duration.style.display = '';
 				break;
 
 			case <?= CCepRuleHelper::OP_SET_SEVERITY ?>:

@@ -69,13 +69,10 @@ abstract class CControllerCepRuleGeneral extends CController {
 					$operation['filter']['conditions'] = [];
 				}
 
-				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS) {
-					if ($operation['suppress_duration'] === '') {
-						$operation['suppress_duration'] = DB::getDefault('cep_operation', 'suppress_duration');
-					}
-					else {
-						$operation['suppress_duration'] = self::parseSuppressUntil($operation['suppress_duration']);
-					}
+				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS
+						&& array_key_exists('suppress_duration', $operation)
+						&& $operation['suppress_duration'] === '') {
+					$operation['suppress_duration'] = DB::getDefault('cep_operation', 'suppress_duration');
 				}
 
 				switch ($operation['type']) {
@@ -95,13 +92,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 		}
 
 		return $request;
-	}
-
-	protected static function parseSuppressUntil(string $suppress_duration): int {
-		$absolute_time_parser = new CAbsoluteTimeParser();
-		$absolute_time_parser->parse($suppress_duration);
-
-		return $absolute_time_parser->getDateTime(true)->getTimestamp();
 	}
 
 	protected static function getOperationValidationFields(): array {
@@ -143,8 +133,10 @@ abstract class CControllerCepRuleGeneral extends CController {
 					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SET_SEVERITY]
 			]],
-			'suppress_duration' => ['string', 'required',
-				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
+			'suppress_duration' => ['db cep_operation.suppress_duration',
+				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_YEAR, 'min' => 1, 'usermacros' => false,
+					'lldmacros' => false, 'accept_zero' => true, 'with_year' => false
+				]],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
 			],
 			'sortorder' => ['db cep_operation.sortorder', 'required']
