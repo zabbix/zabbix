@@ -142,6 +142,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_binary_item, self::$invalid_json) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_json_item, self::$invalid_json) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_log_json, self::log_json_line.PHP_EOL) !== false);
+		$this->assertTrue(@chmod(self::$file_name_log_json, 0666) !== false);
 
 		self::$json_image_normalized = self::normalize_json(self::$json_with_image);
 
@@ -830,11 +831,20 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	 * @hosts agent
 	 */
 	public function testLogValueTypeJSON_agentRestart() {
+		// Don't assume the agent connection was already established by an earlier test case - poll
+		// via API instead of waiting on a specific (possibly already-passed) one-time log line, so
+		// this works regardless of test execution order/isolation.
+		$this->callUntilDataIsPresent('host.get', [
+			'output' => 'extend',
+			'filter' => [
+				'host' => 'agent',
+				'active_available' => INTERFACE_AVAILABLE_TRUE
+			]
+		], 30, 2);
+
 		// The "agent" host is toggled NOT_MONITORED/MONITORED around every test case that declares
 		// "@hosts agent", so the server config cache must be refreshed before relying on the host's
-		// active checks being processed. Unlike the very first connection, this toggle is too brief to
-		// reliably wait on a specific one-time log line, so rely on checkItemState()/
-		// callUntilDataIsPresent()'s own retry loop instead.
+		// active checks being processed.
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$this->checkItemState('agent:log['.self::$file_name_log_json.']', ITEM_STATE_NORMAL);
