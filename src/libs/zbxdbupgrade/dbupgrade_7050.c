@@ -1194,46 +1194,54 @@ static int	DBpatch_7050090(void)
 
 static int	DBpatch_7050091(void)
 {
-	const zbx_db_field_t	field = {"timeout_telemetry_query", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBadd_field("proxy", &field);
-}
-
-static int	DBpatch_7050092(void)
-{
 	const zbx_db_field_t	field = {"query", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050093(void)
+static int	DBpatch_7050092(void)
 {
 	const zbx_db_field_t	field = {"time_shift", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050094(void)
+static int	DBpatch_7050093(void)
 {
 	const zbx_db_field_t	field = {"lookback_limit", "10m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050095(void)
+static int	DBpatch_7050094(void)
 {
 	const zbx_db_field_t	field = {"granularity", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050096(void)
+static int	DBpatch_7050095(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str)"
 			" values ('timeout_telemetry_query', %d, '3s')", ZBX_SETTING_TYPE_STR))
 	{
 		return FAIL;
 	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050096(void)
+{
+	const zbx_db_field_t	field = {"timeout_telemetry_query", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_7050097(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update proxy set timeout_telemetry_query='3s' where custom_timeouts=1"))
+		return FAIL;
 
 	return SUCCEED;
 }
@@ -1341,5 +1349,6 @@ DBPATCH_ADD(7050093, 0, 1)
 DBPATCH_ADD(7050094, 0, 1)
 DBPATCH_ADD(7050095, 0, 1)
 DBPATCH_ADD(7050096, 0, 1)
+DBPATCH_ADD(7050097, 0, 1)
 
 DBPATCH_END()
