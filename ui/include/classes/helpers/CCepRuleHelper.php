@@ -15,6 +15,7 @@
 
 
 class CCepRuleHelper {
+
 	public const WINDOW_NONE = 0;
 	public const WINDOW_SIMPLE = 1;
 	public const WINDOW_CAUSE_SYMPTOM = 2;

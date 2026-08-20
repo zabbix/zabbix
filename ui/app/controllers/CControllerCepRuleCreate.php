@@ -155,14 +155,16 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 				'when' => ['window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]]
 			],
 			'operations' => [
-				['objects', 'required', 'fields' => self::getOperationValidationFields()],
-				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(), 'when' => [
-					'window_type', 'in' => [CCepRuleHelper::WINDOW_NONE, CCepRuleHelper::WINDOW_SIMPLE,
-						CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH
+				['objects', 'required', 'fields' => self::getOperationValidationFields(),
+					'when' => ['window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]]
+				],
+				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(),
+					'when' => ['window_type', 'in' => [CCepRuleHelper::WINDOW_NONE, CCepRuleHelper::WINDOW_SIMPLE,
+						CCepRuleHelper::WINDOW_TAG_MATCH
 					]
 				]],
-				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(), 'when' => [
-						'window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]],
+				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(),
+					'when' => ['window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]],
 					'count_values' => [
 						'field_rules' => ['execute_when', 'in' => [(string) CCepRuleHelper::WHEN_PATTERN_MATCHED]],
 						'min' => 1,
