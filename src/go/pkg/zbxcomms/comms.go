@@ -228,6 +228,7 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 				maxRecvDataSize,
 			)
 		}
+
 		if c.maxRecvSize > 0 && reservedSize > c.maxRecvSize {
 			return nil, errs.Errorf(
 				"uncompressed message size %d exceeds the maximum size %d bytes",
@@ -272,49 +273,6 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 		return c.uncompress(s[:total], reservedSize, c.maxRecvSize)
 	}
 	return s[:total], nil
-}
-
-func (c *Connection) uncompress(data []byte, expLen uint32, maxSize uint32) ([]byte, error) {
-	var b bytes.Buffer
-
-	if maxSize > 0 && expLen > maxSize {
-		return nil, errs.Errorf(
-			"uncompressed message size %d exceeds the maximum size %d bytes",
-			expLen,
-			maxSize,
-		)
-	}
-
-	b.Grow(int(expLen))
-	z, err := zlib.NewReader(bytes.NewReader(data))
-	if nil != err {
-		return nil, fmt.Errorf("Unable to uncompress message: '%s'", err)
-	}
-
-	var r io.Reader = z
-	if maxSize > 0 {
-		r = io.LimitReader(z, int64(maxSize)+1)
-	}
-
-	len, err := b.ReadFrom(r)
-	z.Close()
-	if nil != err {
-		return nil, fmt.Errorf("Unable to uncompress message: '%s'", err)
-	}
-
-	if maxSize > 0 && len > int64(maxSize) {
-		return nil, errs.Errorf(
-			"uncompressed message size %d exceeds the maximum size %d bytes",
-			len,
-			maxSize,
-		)
-	}
-
-	if len != int64(expLen) {
-		return nil, fmt.Errorf("Uncompressed message size %d instead of expected %d.", len, expLen)
-	}
-
-	return b.Bytes(), nil
 }
 
 func (c *Connection) Read() (data []byte, err error) {
@@ -402,8 +360,64 @@ func (c *Connection) SetCompress(compress bool) {
 	c.compress = compress
 }
 
+// SetMaxRecvSize sets the maximum size of data that the connection can receive.
 func (c *Connection) SetMaxRecvSize(maxSize uint32) {
 	c.maxRecvSize = maxSize
+}
+
+func (*Connection) uncompress(data []byte, expLen, maxSize uint32) ([]byte, error) {
+	const uncompressError = "unable to uncompress message"
+
+	var b bytes.Buffer
+
+	if maxSize > 0 && expLen > maxSize {
+		return nil, errs.Errorf(
+			"uncompressed message size %d exceeds the maximum size %d bytes",
+			expLen,
+			maxSize,
+		)
+	}
+
+	b.Grow(int(expLen))
+
+	z, err := zlib.NewReader(bytes.NewReader(data))
+	if err != nil {
+		return nil, errs.Wrap(err, uncompressError)
+	}
+
+	var r io.Reader = z
+	if maxSize > 0 {
+		r = io.LimitReader(z, int64(maxSize)+1)
+	}
+
+	length, readErr := b.ReadFrom(r)
+	closeErr := z.Close()
+
+	if readErr != nil {
+		return nil, errs.Wrap(readErr, uncompressError)
+	}
+
+	if closeErr != nil {
+		return nil, errs.Wrap(closeErr, uncompressError)
+	}
+
+	if maxSize > 0 && length > int64(maxSize) {
+		return nil, errs.Errorf(
+			"uncompressed message size %d exceeds the maximum size %d bytes",
+			length,
+			maxSize,
+		)
+	}
+
+	if length != int64(expLen) {
+		return nil, errs.Errorf(
+			"uncompressed message size %d instead of expected %d",
+			length,
+			expLen,
+		)
+	}
+
+	return b.Bytes(), nil
 }
 
 // Close stops the listener.
