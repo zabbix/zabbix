@@ -756,7 +756,7 @@ $formgrid
 								->setErrorContainer('aggregated_columns_#{row_index}_error_container'),
 							'#{function_label}'
 						],
-						'#{alias}',
+						(new CCol('#{alias}'))->addClass(ZBX_STYLE_WORDWRAP),
 						(new CCol(new CHorList([
 							(new CButtonLink(_('Edit')))->addClass('js-edit-row')->setEnabled(!$readonly),
 							(new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)
@@ -834,10 +834,10 @@ $formgrid
 								->setAttribute('data-notrim', ''),
 							'#{formulaid}'
 						],
-						[
+						(new CCol([
 							'#{column}', ' ', new CTag('em', true, '#{attribute_key_name}'), ' ',
 							'#{operator_name}', ' ', new CTag('em', true, '#{value_name}')
-						],
+						]))->addClass(ZBX_STYLE_WORDWRAP),
 						(new CCol((new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)))
 					]))->setAttribute('data-row_index', '#{row_index}'),
 					(new CRow([
