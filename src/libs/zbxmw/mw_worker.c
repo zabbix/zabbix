@@ -131,6 +131,7 @@ int	mw_worker_start(zbx_mw_worker_t *worker, unsigned char process_type, void *(
 	if (0 != (err = pthread_create(&worker->thread, &attr, mw_worker_entry, (void *)args)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
+		zbx_free(args);
 		goto out;
 	}
 
