@@ -33,6 +33,8 @@ class CControllerCepRuleEdit extends CController {
 			return false;
 		}
 
+		$this->ceprule = self::withDefaults($this->ceprule);
+
 		return $this->getUserType() >= USER_TYPE_SUPER_ADMIN;
 	}
 
@@ -119,8 +121,10 @@ class CControllerCepRuleEdit extends CController {
 			return [];
 		}
 
-		$ceprule = $ceprules[0];
+		return $ceprules[0];
+	}
 
+	protected static function withDefaults(array $ceprule): array {
 		$ceprule['window'] += DB::getDefaults('cep_rule_window');
 
 		// Unlimited capacity's default value is "0".
