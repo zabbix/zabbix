@@ -432,20 +432,16 @@ class CItemTypeTelemetryQuery extends CItemType {
 		$condition_fields = [
 			'column' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', $condition_column)],
 			'attribute_key' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)],
-										'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]],
 			'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)],
-										'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS])],
+									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS])],
 									['else' => true, 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])]
 			]],
 			'value' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])],
-										'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
-										'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]]
 		];
@@ -453,28 +449,24 @@ class CItemTypeTelemetryQuery extends CItemType {
 		return [
 			'signal_type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::SIGNAL_TYPE_TRACES, self::SIGNAL_TYPE_METRICS, self::SIGNAL_TYPE_LOGS])],
 			'metric_point_type' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'signal_type', 'in' => self::SIGNAL_TYPE_METRICS],
-												'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::METRICS_POINT_SUM, self::METRICS_POINT_GAUGE, self::METRICS_POINT_HISTOGRAM, self::METRICS_POINT_EXPONENTIAL_HISTOGRAM])],
+											['if' => ['field' => 'signal_type', 'in' => self::SIGNAL_TYPE_METRICS], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::METRICS_POINT_SUM, self::METRICS_POINT_GAUGE, self::METRICS_POINT_HISTOGRAM, self::METRICS_POINT_EXPONENTIAL_HISTOGRAM])],
 											['else' => true, 'type' => API_INT32, 'in' => self::METRICS_POINT_SUM, 'default' => self::METRICS_POINT_SUM]
 			]],
 			'columns' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['column', 'attribute_key']], 'fields' => [
 				'column' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', $columns_column)],
 				'attribute_key' =>			['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)],
-													'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+												['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 				]]
 			]],
 			'aggregated_columns' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['alias']], 'fields' => [
 				'function' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_PERCENTILE])],
 				'column' =>					['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PERCENTILE])],
-													'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $aggregated_column)],
+												['if' => ['field' => 'function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM, AGGREGATE_PERCENTILE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $aggregated_column)],
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 				]],
 				'parameters' =>				['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'function', 'in' => AGGREGATE_PERCENTILE],
-													'type' => API_FLOATS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => '0:100'],
+												['if' => ['field' => 'function', 'in' => AGGREGATE_PERCENTILE], 'type' => API_FLOATS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => '0:100'],
 												['else' => true, 'type' => API_OBJECTS, 'length' => 0, 'unset' => true]
 				]],
 				'alias' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255]
@@ -482,15 +474,13 @@ class CItemTypeTelemetryQuery extends CItemType {
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'evaltype' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
 				'formula' =>				['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION],
-													'type' => API_COND_FORMULA, 'flags' => API_REQUIRED, 'length' => 255],
+												['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED, 'length' => 255],
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 				]],
 				'conditions' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-												['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION],
-													'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
-														'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
-													] + $condition_fields],
+												['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
+													'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
+												] + $condition_fields],
 												['else' => true, 'type' => API_OBJECTS, 'fields' => $condition_fields]
 				]]
 			]]
