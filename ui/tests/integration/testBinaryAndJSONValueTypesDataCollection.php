@@ -847,11 +847,11 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		// Restart the agent without changing the log file. The server already knows the lastlogsize
 		// for this item, so the agent will find nothing new to read but, being a freshly started
 		// process, will still report a meta-only update for it.
+		// A stop+start cycle is often quick enough that the server never observes a large enough
+		// gap to log an availability transition for it, so don't wait on that log line here - rely
+		// on settle time instead (see below).
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->startComponent(self::COMPONENT_AGENT);
-
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			'resuming Zabbix agent checks on host "agent": connection restored');
 
 		$this->checkItemState('agent:log['.self::$file_name_log_json.']', ITEM_STATE_NORMAL);
 
