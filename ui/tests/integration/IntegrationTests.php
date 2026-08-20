@@ -75,6 +75,7 @@ require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testBridgeAdapter.php';
 require_once dirname(__FILE__).'/testTelnetChecks.php';
 require_once dirname(__FILE__).'/testHashicorpVault.php';
+require_once dirname(__FILE__).'/testScheduledReports.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -147,6 +148,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testBridgeAdapter');
 		$suite->addTestSuite('testTelnetChecks');
 		$suite->addTestSuite('testHashicorpVault');
+		$suite->addTestSuite('testScheduledReports');
 		return $suite;
 	}
 }
