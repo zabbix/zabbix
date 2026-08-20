@@ -367,13 +367,12 @@ static void	*permissions_rebuild_entry(void *args)
 
 	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
-	zabbix_log(LOG_LEVEL_WARNING, "thread started [permissions rebuild]");
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [permissions rebuild]");
 
 	start = zbx_time();
-
 	res = permissions_rebuild_task();
 
-	zabbix_log(LOG_LEVEL_WARNING, "thread finished [permissions rebuild] %s in " ZBX_FS_DBL " sec",
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped [permissions rebuild] result: %s in " ZBX_FS_DBL " sec",
 			zbx_result_string(res), zbx_time() - start);
 
 	pthread_mutex_lock(&rebuild_lock);
