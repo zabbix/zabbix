@@ -761,7 +761,7 @@ $formgrid
 							(new CButtonLink(_('Edit')))->addClass('js-edit-row')->setEnabled(!$readonly),
 							(new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)
 						])))
-					]))->addClass('form_row')->setAttribute('data-row_index', '#{row_index}'),
+					]))->setAttribute('data-row_index', '#{row_index}'),
 					(new CRow([
 						(new CCol())
 							->setId('aggregated_columns_#{row_index}_error_container')
@@ -834,9 +834,12 @@ $formgrid
 								->setAttribute('data-notrim', ''),
 							'#{formulaid}'
 						],
-						'#{name}',
+						[
+							'#{column}', ' ', new CTag('em', true, '#{attribute_key_name}'), ' ',
+							'#{operator_name}', ' ', new CTag('em', true, '#{value_name}')
+						],
 						(new CCol((new CButtonLink(_('Remove')))->addClass('js-remove-row')->setEnabled(!$readonly)))
-					]))->addClass('form_row')->setAttribute('data-row_index', '#{row_index}'),
+					]))->setAttribute('data-row_index', '#{row_index}'),
 					(new CRow([
 						(new CCol())
 							->setId('conditions_#{row_index}_error_container')

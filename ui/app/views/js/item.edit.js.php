@@ -668,7 +668,7 @@ window.item_edit_form = new class {
 	}
 
 	#getExistingAliases(exclude_row = null) {
-		const rows = this.form_element.querySelectorAll('#aggregated-columns-table tr.form_row');
+		const rows = this.form_element.querySelectorAll('#aggregated-columns-table tbody [data-row_index]');
 
 		return [...rows]
 			.filter((row) => row !== exclude_row)
@@ -775,13 +775,14 @@ window.item_edit_form = new class {
 		const config = this.telemetry_columns_config;
 		const tbody = this.form_element.querySelector('#conditions-table tbody');
 		const is_complex = config.complex.includes(data.column);
-		const key_part = is_complex ? ` ${data.attribute_key}` : '';
-		const value_part = parseInt(data.operator, 10) === <?= CONDITION_OPERATOR_EXISTS ?> ? '' : ` ${data.value}`;
+		const is_exists = parseInt(data.operator, 10) === <?= CONDITION_OPERATOR_EXISTS ?>;
 		const source = document.getElementById('condition-row-tmpl').innerHTML;
 		const html = new Template(source).evaluate({
 			...data,
 			formulaid: num2letter(data.row_index),
-			name: `${data.column}${key_part} ${this.telemetry_operator_labels[data.operator]}${value_part}`
+			attribute_key_name: is_complex ? data.attribute_key : '',
+			operator_name: this.telemetry_operator_labels[data.operator],
+			value_name: is_exists ? '' : data.value
 		});
 
 		tbody.querySelector('.js-add-condition').closest('tr').insertAdjacentHTML('beforebegin', html);
