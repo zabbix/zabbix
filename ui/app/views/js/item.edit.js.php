@@ -632,7 +632,7 @@ window.item_edit_form = new class {
 	}
 
 	#updateColumnsIndicator() {
-		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY_QUERY) {
+		if (this.field.type.value != ITEM_TYPE_TELEMETRY_QUERY) {
 			return;
 		}
 
@@ -744,14 +744,13 @@ window.item_edit_form = new class {
 
 	#addAggregatedColumnRow(data) {
 		const tbody = this.form_element.querySelector('#aggregated-columns-table tbody');
-		const func = parseInt(data.function, 10);
 		const percentile = data.percentile ?? '';
-		let function_label = this.telemetry_function_labels[func];
+		let function_label = this.telemetry_function_labels[data.function];
 
-		if (func === <?= AGGREGATE_PERCENTILE ?>) {
+		if (data.function == <?= AGGREGATE_PERCENTILE ?>) {
 			function_label += `(${data.column}, ${percentile})`;
 		}
-		else if (func !== <?= AGGREGATE_COUNT ?>) {
+		else if (data.function != <?= AGGREGATE_COUNT ?>) {
 			function_label += `(${data.column})`;
 		}
 
@@ -774,7 +773,7 @@ window.item_edit_form = new class {
 		const config = this.telemetry_columns_config;
 		const tbody = this.form_element.querySelector('#conditions-table tbody');
 		const is_complex = config.complex.includes(data.column);
-		const is_exists = parseInt(data.operator, 10) === <?= CONDITION_OPERATOR_EXISTS ?>;
+		const is_exists = data.operator == <?= CONDITION_OPERATOR_EXISTS ?>;
 		const source = document.getElementById('condition-row-tmpl').innerHTML;
 		const html = new Template(source).evaluate({
 			...data,
@@ -788,7 +787,7 @@ window.item_edit_form = new class {
 	}
 
 	#initTelemetryRows() {
-		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY_QUERY) {
+		if (this.field.type.value != ITEM_TYPE_TELEMETRY_QUERY) {
 			return;
 		}
 
@@ -807,7 +806,7 @@ window.item_edit_form = new class {
 	}
 
 	#updateTelemetryVisibility() {
-		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY_QUERY) {
+		if (this.field.type.value != ITEM_TYPE_TELEMETRY_QUERY) {
 			return;
 		}
 
@@ -832,14 +831,14 @@ window.item_edit_form = new class {
 		);
 
 		// The formula field is shown only for the "Custom expression" calculation type.
-		const is_custom_expression = parseInt(this.field.evaltype.value, 10) === CONDITION_EVAL_TYPE_EXPRESSION;
+		const is_custom_expression = this.field.evaltype.value == CONDITION_EVAL_TYPE_EXPRESSION;
 
 		this.field.formula.style.display = is_custom_expression ? '' : 'none';
 		this.field.expression.style.display = is_custom_expression ? 'none' : '';
 
 		if (!is_custom_expression) {
 			this.field.expression.innerHTML = getConditionFormula(this.#getTelemetryConditions(),
-				parseInt(this.field.evaltype.value, 10)
+				+ this.field.evaltype.value
 			);
 		}
 
@@ -866,7 +865,7 @@ window.item_edit_form = new class {
 	}
 
 	#updateTelemetryIndicators() {
-		if (parseInt(this.field.type.value, 10) !== ITEM_TYPE_TELEMETRY_QUERY) {
+		if (this.field.type.value != ITEM_TYPE_TELEMETRY_QUERY) {
 			return;
 		}
 
