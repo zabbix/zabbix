@@ -79,7 +79,7 @@ zbx_add_post_js($tags->getPostJS());
 		)
 	)
 
-	->addItem((new CLabel('Group by'))->setAsteriskMark()->setId('ceprule-groupby-label'))
+	->addItem((new CLabel(_('Group by')))->setAsteriskMark()->setId('ceprule-groupby-label'))
 	->addItem(new CFormField((new CList([
 		(new CListItem())
 			->addItem((new CCheckBox('window[group_by_host_group]', CCepRuleHelper::GROUP_BY_YES))

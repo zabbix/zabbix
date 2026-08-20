@@ -139,7 +139,7 @@ $form = (new CForm())
 				]
 			]))->setAttribute('data-sortorder', '#{sortorder}')
 		))
-		->addItem((new CLabel('Operations'))->setAsteriskMark()->setId('ceprule-operations-label'))
+		->addItem((new CLabel(_('Operations')))->setAsteriskMark()->setId('ceprule-operations-label'))
 		->addItem((new CFormField())
 			->addItem((new CDiv())
 				->setAttribute('data-field-type', 'set')
