@@ -85,6 +85,11 @@ type smartCtlDeviceData struct {
 // deviceType describes the type of device.
 type deviceType string
 
+type deviceIndexRange struct {
+	first int
+	last  int
+}
+
 type devices struct {
 	Info []deviceInfo `json:"devices"`
 }
@@ -227,6 +232,20 @@ type table struct {
 type runner struct {
 	devices     map[string]deviceParser
 	jsonDevices map[string]jsonDevice
+}
+
+// indexRange returns the smartctl port range for an indexed RAID device type.
+// According to smartctl's -d documentation, areca,N uses 1-24, while 3ware,N and cciss,N use
+// 0-127. These bounds allow discovery to probe past empty ports without creating an unbounded loop.
+// https://github.com/smartmontools/smartmontools/blob/main/src/smartctl.8.in
+func (d deviceType) indexRange() deviceIndexRange {
+	if d == areca {
+		return deviceIndexRange{first: 1, last: 24}
+	}
+
+	// Keep the initial implementation's support for other indexed RAID device types as a
+	// compatibility fallback, using the largest documented range of the known types.
+	return deviceIndexRange{first: 0, last: 127}
 }
 
 // execute returns the smartctl runner with all devices data returned by smartctl.
@@ -482,34 +501,55 @@ func getAllDeviceInfoByType(
 func (p *Plugin) getRaidDevices(deviceName string, deviceType deviceType) []*smartCtlDeviceData {
 	switch deviceType {
 	case sat, scsi:
-		data, err := p.getRaidDevice(deviceName, string(deviceType))
-		if err != nil {
-			return []*smartCtlDeviceData{}
-		}
-
-		return []*smartCtlDeviceData{data}
+		return p.getSingleRaidDevice(deviceName, deviceType)
 	default:
-		var (
-			devices []*smartCtlDeviceData
-			i       int
-		)
+		return p.getBoundedRaidDevices(deviceName, deviceType)
+	}
+}
 
-		if deviceType == areca {
-			i = 1
-		}
+func (p *Plugin) getSingleRaidDevice(
+	deviceName string, deviceType deviceType,
+) []*smartCtlDeviceData {
+	data, err := p.getRaidDevice(deviceName, string(deviceType))
+	if err != nil {
+		return []*smartCtlDeviceData{}
+	}
 
-		for {
-			data, err := p.getRaidDevice(deviceName, fmt.Sprintf("%s,%d", deviceType, i))
-			if err != nil {
-				break
+	return []*smartCtlDeviceData{data}
+}
+
+func (p *Plugin) getBoundedRaidDevices(
+	deviceName string, deviceType deviceType,
+) []*smartCtlDeviceData {
+	var (
+		devices           []*smartCtlDeviceData
+		consecutiveErrors int
+	)
+
+	indexRange := deviceType.indexRange()
+
+	for i := indexRange.first; i <= indexRange.last; i++ {
+		data, err := p.getRaidDevice(deviceName, fmt.Sprintf("%s,%d", deviceType, i))
+		if err != nil {
+			if isUnsupportedRaidDevice(err) {
+				return devices
 			}
 
-			devices = append(devices, data)
-			i++
+			consecutiveErrors++
+			if p.maxConsecutiveRaidErrors > 0 &&
+				consecutiveErrors >= p.maxConsecutiveRaidErrors {
+				return devices
+			}
+
+			continue
 		}
 
-		return devices
+		consecutiveErrors = 0
+
+		devices = append(devices, data)
 	}
+
+	return devices
 }
 
 func (p *Plugin) getRaidDevice(deviceName, raidType string) (*smartCtlDeviceData, error) {
@@ -524,6 +564,13 @@ func (p *Plugin) getRaidDevice(deviceName, raidType string) (*smartCtlDeviceData
 	}
 
 	return data, nil
+}
+
+func isUnsupportedRaidDevice(err error) bool {
+	message := err.Error()
+
+	return strings.Contains(message, "Unknown device type") ||
+		strings.Contains(message, "requires device name")
 }
 
 func (r *runner) setDevicesData(data *smartCtlDeviceData, jsonRunner bool) {
