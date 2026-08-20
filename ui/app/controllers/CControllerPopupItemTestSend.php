@@ -326,7 +326,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$proxyid = $this->getInput('proxyid', 0);
 
 			return bccomp($proxyid, $this->host['proxyid']) == 0
-				|| ($proxyid !=0 && !CProxyHelper::resolveProxyOption($proxyid)['inaccessible']);
+				|| ($proxyid != 0 && !CProxyHelper::resolveProxyOption($proxyid)['inaccessible']);
 		}
 
 		return true;
