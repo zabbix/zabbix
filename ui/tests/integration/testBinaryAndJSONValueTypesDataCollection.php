@@ -1153,6 +1153,10 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		// value cache, and was gracefully refused rather than crashing.
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'cannot get values from value cache');
 
+		// The item's new state is only persisted to the database on the next history cache flush,
+		// so wait for one to complete before reading it back.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_mass_update_items()');
+
 		$calc_item = $this->call('item.get', [
 			'output' => ['state'],
 			'itemids' => [$calc_itemid]
