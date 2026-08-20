@@ -435,15 +435,15 @@ class CSettings extends CApiService {
 				'url' => ['type' => API_URL, 'flags' => API_NOT_EMPTY],
 				'authentication_type' => ['type' => API_ANY],
 				'username' => ['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'authentication_type', 'in' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD], 'type' => API_STRING_UTF8, 'flags' => $username_flags],
+					['if' => ['field' => 'authentication_type', 'in' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD], 'type' => API_STRING_UTF8, 'flags' => $username_flags, 'length' => 255],
 					['else' => true, 'type' => API_STRING_UTF8, 'in' => ''],
 				]],
 				'password' => ['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'authentication_type', 'in' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD], 'type' => API_STRING_UTF8, 'flags' => $password_flags],
+					['if' => ['field' => 'authentication_type', 'in' => APM_GLOBAL_DB_AUTHTYPE_PASSWORD], 'type' => API_STRING_UTF8, 'flags' => $password_flags, 'length' => 255],
 					['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 				]],
 				'vault_path' => ['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'authentication_type', 'in' => APM_GLOBAL_DB_AUTHTYPE_VAULT], 'type' => API_STRING_UTF8, 'flags' => $vault_path_flags],
+					['if' => ['field' => 'authentication_type', 'in' => APM_GLOBAL_DB_AUTHTYPE_VAULT], 'type' => API_STRING_UTF8, 'flags' => $vault_path_flags, 'length' => 255],
 					['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 				]],
 				'db' => ['type' => API_STRING_UTF8, 'length' => 255],
