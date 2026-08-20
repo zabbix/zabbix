@@ -111,6 +111,23 @@ static int	cep_blocker_object_compare(const void *a1, const void *a2)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: clear CEP manager resources without clearing base manager         *
+ *                                                                            *
+ * Parameters: manager - [IN] the CEP manager instance                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_manager_clear(zbx_cep_manager_t *manager)
+{
+	zbx_vector_mw_task_ptr_clear_ext(&manager->commits, cep_task_free);
+	zbx_vector_mw_task_ptr_destroy(&manager->commits);
+
+	zbx_hashset_destroy(&manager->blocker_events);
+	zbx_hashset_destroy(&manager->blocker_objects);
+	zbx_hashset_destroy(&manager->blocker_windows);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: free CEP manager resources                                        *
  *                                                                            *
  * Parameters: manager - [IN] the CEP manager instance                        *
@@ -135,15 +152,7 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
 		}
 	}
 
-	zbx_cep_api_release();
-
-	zbx_vector_mw_task_ptr_clear_ext(&manager->commits, cep_task_free);
-	zbx_vector_mw_task_ptr_destroy(&manager->commits);
-
-	zbx_hashset_destroy(&manager->blocker_events);
-	zbx_hashset_destroy(&manager->blocker_objects);
-	zbx_hashset_destroy(&manager->blocker_windows);
-
+	cep_manager_clear(manager);
 	zbx_free(manager);
 }
 
@@ -153,7 +162,6 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
  *                                                                            *
  * Parameters: workers_num      - [IN] initial number of workers              *
  *             dbpool           - [IN] database connection pool               *
- *             config_source_ip - [IN] source ip from conf parameters         *
  *             stats            - [OUT] initialization statistics             *
  *             error            - [OUT] error message                         *
  *                                                                            *
@@ -162,7 +170,7 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
  *                                                                            *
  ******************************************************************************/
 static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_dbconn_pool_t *dbpool,
-		const char *config_source_ip, zbx_cep_init_stats_t *stats, char **error)
+		zbx_cep_init_stats_t *stats, char **error)
 {
 	zbx_cep_manager_t	*manager;
 	int			ret = FAIL;
@@ -194,22 +202,23 @@ static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_
 		goto out;
 	}
 
-	if (FAIL == cep_api_create(config_source_ip, error))
-		goto out;
-
-	zbx_cep_api_acquire();
-
 	cep_cache_acquire(&cep);
 	cep_init(cep, dbpool, stats);
-	cep_dump(cep, "cache initialization");
 	cep_cache_release(&cep);
 
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
 	{
-		cep_manager_free(manager);
-		manager = NULL;
+		for (int i = 0; i < CEP_WORKERS_MAX; i++)
+			zbx_free(manager->base.workers[i]);
+		zbx_free(manager->base.workers);
+
+		cep_queue_clear(queue);
+		zbx_free(queue);
+
+		cep_manager_clear(manager);
+		zbx_free(manager);
 	}
 
 	return manager;
@@ -889,19 +898,27 @@ void	*zbx_cep_manager_thread(void *args)
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-
 	zbx_supervisor_update_activity("%s starting", unit_args->name);
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
+	if (FAIL == cep_api_create(cep_args->config_source_ip, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize CEP api: %s", error);
+		zbx_free(error);
+		zbx_exit(EXIT_FAILURE);
+	}
+
+	zbx_cep_api_acquire();
+
 	zbx_vector_mw_task_ptr_create(&tasks);
 
-	if (NULL == (manager = cep_manager_create(info, unit_args->shared->dbpool, cep_args->config_source_ip,
-			&init_stats, &error)))
+	if (NULL == (manager = cep_manager_create(info, unit_args->shared->dbpool, &init_stats, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize CEP manager: %s", error);
 		zbx_free(error);
+		zbx_cep_api_release();
 		zbx_exit(EXIT_FAILURE);
 	}
 
@@ -1063,6 +1080,7 @@ void	*zbx_cep_manager_thread(void *args)
 		zbx_rtc_unsubscribe_service(cep_args->config_timeout, ZBX_IPC_SERVICE_CEP);
 
 	cep_manager_free(manager);
+	zbx_cep_api_release();
 
 	zbx_deinit_regexp_env();
 	zbx_vector_mw_task_ptr_destroy(&tasks);
