@@ -123,7 +123,6 @@ if ($data['tokenid'] != 0) {
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete selected API token?'),
 			'class' => ZBX_STYLE_BTN_ALT.' js-delete',
 			'keepOpen' => true,
 			'isSubmit' => false

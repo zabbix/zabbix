@@ -590,13 +590,6 @@ class testGeneric extends CWebTest {
 			],
 			[
 				[
-					'url' => 'zabbix.php?action=regex.edit',
-					'title' => 'Configuration of regular expressions',
-					'header' => 'Regular expressions'
-				]
-			],
-			[
-				[
 					'url' => 'zabbix.php?action=trigdisplay.edit',
 					'title' => 'Configuration of trigger displaying options',
 					'header' => 'Trigger displaying options'
@@ -732,7 +725,7 @@ class testGeneric extends CWebTest {
 		}
 
 		// Verify that user menu contains default sections.
-		$menu_user = ['Support', 'Integrations', 'Help', 'User settings', 'Sign out'];
+		$menu_user = ['Subscriptions', 'Integrations', 'Help', 'User settings', 'Sign out'];
 		foreach ($menu_user as $text) {
 			$this->assertTrue($this->query('link', $text)->exists());
 		}

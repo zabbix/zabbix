@@ -6,10 +6,6 @@
 	border-top-left-radius: var(--surface-border-radius);
 	border-top-right-radius: var(--surface-border-radius);
 
-	&.fixed {
-		table-layout: fixed;
-	}
-
 	thead {
 		th {
 			height: 100%;
@@ -109,13 +105,6 @@
 		text-align: left;
 		vertical-align: top;
 		border-bottom: 1px solid $table-border-color;
-
-		&.second-col {
-			width: 20px;
-			padding-left: 0;
-			padding-right: 0;
-			text-align: center;
-		}
 	}
 
 	&.sticky-header {
@@ -298,39 +287,7 @@
 .list-table {
 	thead {
 		th {
-			&.column-tags-1 {
-				width: 75px;
-
-				@media screen and (min-width: 1200px) {
-					width: 106px;
-				}
-
-				@media screen and (min-width: 1400px) {
-					width: 137px;
-				}
-
-				@media screen and (min-width: 1600px) {
-					width: 168px;
-				}
-			}
-
-			&.column-tags-2 {
-				width: 124px;
-
-				@media screen and (min-width: 1200px) {
-					width: 186px;
-				}
-
-				@media screen and (min-width: 1400px) {
-					width: 248px;
-				}
-
-				@media screen and (min-width: 1600px) {
-					width: 310px;
-				}
-			}
-
-			&.column-tags-3 {
+			&.column-tags {
 				width: 173px;
 
 				@media screen and (min-width: 1200px) {

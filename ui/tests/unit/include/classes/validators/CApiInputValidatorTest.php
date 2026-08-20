@@ -5686,6 +5686,90 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'Invalid parameter "/uuid": UUIDv4 is expected.'
 			],
 			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-7c8e-8f12-ab34cd56ef78',
+				'/uuid_v7',
+				'019d6e13-a1b4-7c8e-8f12-ab34cd56ef78'
+			],
+			[
+				['type' => API_UUID_V7],
+				null,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				true,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				1,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				[],
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": cannot be empty.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'23',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": must be 36 characters long.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'1234567890123456789012345678901234567890',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": must be 36 characters long.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'123456789012345678901234567890123456',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'1234-1234-1234-1234-1234567890123456',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'12345678-1234-1234-1234-123456789012',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-7c8e-xf12-ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-0c8e-8f12-ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-7c8e-cf12-ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
+			],
+			[
 				['type' => API_CUIDS],
 				[],
 				'/',
