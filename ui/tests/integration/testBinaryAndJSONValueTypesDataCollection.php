@@ -76,7 +76,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		self::$file_name_json_with_image_for_json_item = "/tmp/json_with_image2.txt".time();
 		self::$file_name_invalid_json_for_binary_item = "/tmp/invalid_JSON.txt".time();
 		self::$file_name_invalid_json_for_json_item = "/tmp/invalid_JSON_2.txt".time();
-		self::$file_name_log_json = "/tmp/log_json.txt".time();
+		self::$file_name_log_json = PHPUNIT_COMPONENT_DIR.'log_json.txt'.time();
 
 		$base64_image = self::base64_image;
 		$base64_empty = self::base64_empty;
