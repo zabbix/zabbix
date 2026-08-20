@@ -707,7 +707,6 @@ static void	correlation_config_sync_conditions(zbx_dbsync_t *sync)
 		{
 			correlation = correlation_acquire(ref->correlation);
 			correlation_remove_condition(correlation, cond_ref->condition);
-			corr_condition_release(cond_ref->condition);
 
 			/* sort the conditions later */
 			if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION != correlation->evaltype)
