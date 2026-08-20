@@ -35,32 +35,30 @@ typedef struct
 	char *error;
 } zbx_mock_thread_args_t;
 
-static void *zbx_mock_test_thread(void *arg)
+static void	*zbx_mock_test_thread(void *arg)
 {
-	zbx_mock_thread_args_t *t = (zbx_mock_thread_args_t *)arg;
+	zbx_mock_thread_args_t	*t = (zbx_mock_thread_args_t *)arg;
 
 	char	*json_copy = strdup(t->json);
-	if (!json_copy)
+
+	if (NULL != json_copy)
 	{
-		return NULL;
+		t->actual_result = zbx_json_to_xml(json_copy, &t->xml, &t->error);
+		free(json_copy);
 	}
-
-	t->actual_result = zbx_json_to_xml(json_copy, &t->xml, &t->error);
-
-	free(json_copy);
 
 	return NULL;
 }
 
-void zbx_mock_test_entry(void **state)
+void	zbx_mock_test_entry(void **state)
 {
-	pthread_t thread;
-	pthread_attr_t attr;
-	int err;
+	pthread_t	thread;
+	pthread_attr_t	attr;
+	int		err;
 
 	ZBX_UNUSED(state);
 
-	zbx_mock_thread_args_t args = {
+	zbx_mock_thread_args_t	args = {
 		.json = zbx_mock_get_parameter_string("in.json"),
 		.expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")),
 		.expected_xml = zbx_mock_get_parameter_string("out.xml"),
@@ -92,7 +90,7 @@ void zbx_mock_test_entry(void **state)
 		return;
 	}
 
-	char *xml_content = args.xml;
+	char	*xml_content = args.xml;
 
 	if (NULL != xml_content)
 	{
