@@ -17,6 +17,7 @@ package smart
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -25,6 +26,8 @@ import (
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
+
+const testMaxConsecutiveRaidErrors = 3
 
 func TestPlugin_execute(t *testing.T) {
 	t.Parallel()
@@ -1297,9 +1300,10 @@ func TestPlugin_execute(t *testing.T) {
 			ctl := newFixtureController(t, responses...)
 
 			p := &Plugin{
-				cpuCount: 1,
-				ctl:      ctl,
-				Base:     plugin.Base{Logger: log.New("test")},
+				cpuCount:                 1,
+				ctl:                      ctl,
+				maxConsecutiveRaidErrors: testMaxConsecutiveRaidErrors,
+				Base:                     plugin.Base{Logger: log.New("test")},
 			}
 
 			r, err := p.execute(tt.args.byID, tt.args.jsonRunner)
@@ -2400,10 +2404,11 @@ func Test_getRaidDevices(t *testing.T) {
 	}
 
 	tests := []struct {
-		name         string
-		expectations []expectation
-		args         args
-		want         []*smartCtlDeviceData
+		name                   string
+		expectations           []expectation
+		args                   args
+		want                   []*smartCtlDeviceData
+		completeErrorThreshold bool
 	}{
 		{
 			name: "+sat",
@@ -2613,7 +2618,8 @@ func Test_getRaidDevices(t *testing.T) {
 			want: []*smartCtlDeviceData{},
 		},
 		{
-			name: "+3wareLinux",
+			name:                   "+3wareLinux",
+			completeErrorThreshold: true,
 			expectations: []expectation{
 				{
 					args: []string{"-a", "/dev/twa0", "-d", "3ware,0", "-j"},
@@ -2663,7 +2669,8 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 		},
 		{
-			name: "+arecaLinux",
+			name:                   "+arecaLinux",
+			completeErrorThreshold: true,
 			expectations: []expectation{
 				{
 					args: []string{"-a", "/dev/sg2", "-d", "areca,1", "-j"},
@@ -2712,7 +2719,8 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 		},
 		{
-			name: "+ccissLinux",
+			name:                   "+ccissLinux",
+			completeErrorThreshold: true,
 			expectations: []expectation{
 				{
 					args: []string{"-a", "/dev/sg0", "-d", "cciss,0", "-j"},
@@ -2790,7 +2798,8 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 		},
 		{
-			name: "-ccissUnavailableOnFirstDisk",
+			name:                   "-ccissUnavailableOnFirstDisk",
+			completeErrorThreshold: true,
 			expectations: []expectation{
 				{
 					args: []string{"-a", "/dev/sg0", "-d", "cciss,0", "-j"},
@@ -2857,6 +2866,26 @@ func Test_getRaidDevices(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
+			if tt.completeErrorThreshold {
+				last := tt.expectations[len(tt.expectations)-1]
+
+				var lastIndex int
+
+				_, err := fmt.Sscanf(
+					last.args[3], fmt.Sprintf("%s,%%d", tt.args.deviceType), &lastIndex,
+				)
+				if err != nil {
+					t.Fatalf("failed to parse indexed device type %q: %v", last.args[3], err)
+				}
+
+				for i := lastIndex + 1; i < lastIndex+testMaxConsecutiveRaidErrors; i++ {
+					last.args = []string{
+						"-a", tt.args.deviceName, "-d", fmt.Sprintf("%s,%d", tt.args.deviceType, i), "-j",
+					}
+					tt.expectations = append(tt.expectations, last)
+				}
+			}
+
 			responses := make([]controllerResponse, 0, len(tt.expectations))
 			for _, e := range tt.expectations {
 				responses = append(responses, controllerResponse{
@@ -2867,8 +2896,9 @@ func Test_getRaidDevices(t *testing.T) {
 			}
 
 			p := &Plugin{
-				Base: plugin.Base{Logger: log.New("")},
-				ctl:  newFixtureController(t, responses...),
+				Base:                     plugin.Base{Logger: log.New("")},
+				ctl:                      newFixtureController(t, responses...),
+				maxConsecutiveRaidErrors: testMaxConsecutiveRaidErrors,
 			}
 
 			got := p.getRaidDevices(tt.args.deviceName, tt.args.deviceType)
@@ -2877,6 +2907,191 @@ func Test_getRaidDevices(t *testing.T) {
 				cmp.AllowUnexported(deviceParser{}, deviceInfo{}),
 			); diff != "" {
 				t.Fatalf("getRaidDevices() = %s", diff)
+			}
+		})
+	}
+}
+
+//nolint:gocyclo,cyclop,gocognit // Covers bounds, gaps, thresholds and disk validation together.
+func Test_getRaidDevicesBoundedIndexRanges(t *testing.T) {
+	t.Parallel()
+
+	threeWareRange := threeWare.indexRange()
+	arecaRange := areca.indexRange()
+	ccissRange := cciss.indexRange()
+
+	allThreeWareIndexes := make(map[int]bool, threeWareRange.last-threeWareRange.first+1)
+	for i := threeWareRange.first; i <= threeWareRange.last; i++ {
+		allThreeWareIndexes[i] = true
+	}
+
+	allArecaIndexes := make(map[int]bool, arecaRange.last-arecaRange.first+1)
+	for i := arecaRange.first; i <= arecaRange.last; i++ {
+		allArecaIndexes[i] = true
+	}
+
+	allCCISSIndexes := make(map[int]bool, ccissRange.last-ccissRange.first+1)
+	for i := ccissRange.first; i <= ccissRange.last; i++ {
+		allCCISSIndexes[i] = true
+	}
+
+	tests := []struct {
+		name                    string
+		deviceType              deviceType
+		firstIndex              int
+		lastProbeIndex          int
+		diskIndexes             map[int]bool
+		unlimitedErrorThreshold bool
+	}{
+		{
+			name:           "ccissContiguous",
+			deviceType:     cciss,
+			firstIndex:     0,
+			lastProbeIndex: 10,
+			diskIndexes:    map[int]bool{0: true, 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true},
+		},
+		{
+			name:           "ccissLeadingAndMiddleGaps",
+			deviceType:     cciss,
+			firstIndex:     0,
+			lastProbeIndex: 11,
+			diskIndexes:    map[int]bool{1: true, 2: true, 3: true, 4: true, 6: true, 7: true, 8: true},
+		},
+		{
+			name:           "3wareGaps",
+			deviceType:     threeWare,
+			firstIndex:     0,
+			lastProbeIndex: 6,
+			diskIndexes:    map[int]bool{0: true, 2: true, 3: true},
+		},
+		{
+			name:           "arecaGaps",
+			deviceType:     areca,
+			firstIndex:     arecaRange.first,
+			lastProbeIndex: 7,
+			diskIndexes:    map[int]bool{1: true, 3: true, 4: true},
+		},
+		{
+			name:           "fallbackGaps",
+			deviceType:     deviceType("fallback"),
+			firstIndex:     0,
+			lastProbeIndex: 6,
+			diskIndexes:    map[int]bool{0: true, 2: true, 3: true},
+		},
+		{
+			name:           "3wareUpperBound",
+			deviceType:     threeWare,
+			firstIndex:     threeWareRange.first,
+			lastProbeIndex: threeWareRange.last,
+			diskIndexes:    allThreeWareIndexes,
+		},
+		{
+			name:           "arecaUpperBound",
+			deviceType:     areca,
+			firstIndex:     arecaRange.first,
+			lastProbeIndex: arecaRange.last,
+			diskIndexes:    allArecaIndexes,
+		},
+		{
+			name:           "ccissUpperBound",
+			deviceType:     cciss,
+			firstIndex:     ccissRange.first,
+			lastProbeIndex: ccissRange.last,
+			diskIndexes:    allCCISSIndexes,
+		},
+		{
+			name:                    "ccissUnlimitedErrorThreshold",
+			deviceType:              cciss,
+			firstIndex:              ccissRange.first,
+			lastProbeIndex:          ccissRange.last,
+			diskIndexes:             map[int]bool{ccissRange.last: true},
+			unlimitedErrorThreshold: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			responses := make(
+				[]controllerResponse, 0, tt.lastProbeIndex-tt.firstIndex+1,
+			)
+
+			for i := tt.firstIndex; i <= tt.lastProbeIndex; i++ {
+				response := controllerResponse{
+					args: []string{
+						"-a", "/dev/sda", "-d", fmt.Sprintf("%s,%d", tt.deviceType, i), "-j",
+					},
+				}
+				if !tt.diskIndexes[i] {
+					response.output = fmt.Appendf(nil, `{
+						"smartctl": {
+							"messages": [{"string": "%s,%d does not exist", "severity": "error"}],
+							"exit_status": 2
+						}
+					}`, tt.deviceType, i)
+					response.err = errs.New("exit status 2")
+					responses = append(responses, response)
+
+					continue
+				}
+
+				response.output = fmt.Appendf(nil, `{
+				"json_format_version": [1, 0],
+				"smartctl": {
+					"version": [7, 4],
+					"argv": ["smartctl", "-a", "/dev/sda", "-d", "%s,%d", "-j"],
+					"exit_status": 0
+				},
+				"device": {
+					"name": "/dev/sda",
+					"info_name": "/dev/sda [%s_disk_%02d] [SAT]",
+					"type": "sat",
+					"protocol": "ATA"
+				},
+				"model_name": "RAID TEST DISK %d",
+				"serial_number": "RAID-DISK-%02d",
+				"rotation_rate": 7200,
+				"smart_status": {"passed": true}
+			}`, tt.deviceType, i, tt.deviceType, i, i, i)
+				responses = append(responses, response)
+			}
+
+			maxConsecutiveErrors := testMaxConsecutiveRaidErrors
+			if tt.unlimitedErrorThreshold {
+				maxConsecutiveErrors = 0
+			}
+
+			p := &Plugin{
+				Base:                     plugin.Base{Logger: log.New("")},
+				ctl:                      newFixtureController(t, responses...),
+				maxConsecutiveRaidErrors: maxConsecutiveErrors,
+			}
+
+			got := p.getRaidDevices("/dev/sda", tt.deviceType)
+
+			if len(got) != len(tt.diskIndexes) {
+				t.Fatalf("getRaidDevices() returned %d disks, want %d", len(got), len(tt.diskIndexes))
+			}
+
+			for _, disk := range got {
+				var index int
+
+				_, err := fmt.Sscanf(
+					disk.Device.Info.raidType, fmt.Sprintf("%s,%%d", tt.deviceType), &index,
+				)
+				if err != nil {
+					t.Fatalf("failed to parse RAID type %q: %v", disk.Device.Info.raidType, err)
+				}
+
+				if !tt.diskIndexes[index] {
+					t.Errorf("unexpected disk at %s,%d", tt.deviceType, index)
+				}
+
+				wantSerial := fmt.Sprintf("RAID-DISK-%02d", index)
+				if disk.Device.SerialNumber != wantSerial {
+					t.Errorf("disk %d serial = %q, want %q", index, disk.Device.SerialNumber, wantSerial)
+				}
 			}
 		})
 	}
