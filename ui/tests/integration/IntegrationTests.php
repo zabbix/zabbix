@@ -63,6 +63,7 @@ require_once dirname(__FILE__).'/testCalculatedExpression.php';
 require_once dirname(__FILE__).'/testDiagInfo.php';
 require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
+require_once dirname(__FILE__).'/testTelnetChecks.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -122,6 +123,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testDiagInfo');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
+		$suite->addTestSuite('testTelnetChecks');
 		return $suite;
 	}
 }
