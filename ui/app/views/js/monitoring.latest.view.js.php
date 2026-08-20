@@ -78,7 +78,9 @@
 			this.#filter.on(TABFILTER_EVENT_URLSET, () => {
 				chkbxRange.clearSelectedOnFilterChange();
 
-				if (this.#active_filter !== this.#filter._active_item) {
+				const tabfilter_changed = this.#active_filter !== this.#filter._active_item;
+
+				if (tabfilter_changed) {
 					this.#active_filter = this.#filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
 
@@ -86,7 +88,7 @@
 				}
 
 				this.#scheduleRefresh();
-				this.#refresh();
+				this.#refresh({tabfilter_changed});
 			});
 
 			// Tags must be activated also using the enter button on keyboard.
@@ -206,7 +208,8 @@
 					new CDataTableColumn('last_check', <?= json_encode(_('Last check')); ?>)
 						.setFields(['last_check']),
 					new CDataTableColumn('last_value', <?= json_encode(_('Last value')); ?>)
-						.setFields(['last_value'])
+						.setFields(['value_type', 'last_value', 'last_history_value'])
+						.setRenderer('last_value')
 						.setWidth('20%'),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
 						.setFields(['change']),
@@ -233,11 +236,14 @@
 				.setTabFilterItem(this.#active_filter)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setCellRenderer('host', ({cell_data, cell_inner}) => {
+				.setCellRenderer('host', ({cell_data, cell}) => {
 					const [host, maintenance] = cell_data;
 
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 					const host_link = document.createElement('a');
-					host_link.classList.add(ZBX_STYLE_LINK_ACTION);
+					host_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					host_link.setAttribute('data-menu-popup', JSON.stringify({
 						type: 'host',
 						data: {
@@ -250,7 +256,7 @@
 					host_link.setAttribute('href', 'javascript:void(0);');
 					host_link.textContent = host.name;
 
-					cell_inner.appendChild(host_link);
+					flex_wrapper.appendChild(host_link);
 
 					if (maintenance && host.status == HOST_STATUS_MONITORED) {
 						const maintenance_icon = document.createElement('button');
@@ -280,19 +286,23 @@
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 
-						cell_inner.appendChild(maintenance_icon);
+						flex_wrapper.appendChild(maintenance_icon);
 					}
+
+					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('name', ({column, cell_data, cell_inner}) => {
+				.setCellRenderer('name', ({column, cell_data, cell}) => {
 					const [itemid, description_expanded, name, key_expanded] = cell_data;
+
+					cell.innerHTML = '';
 
 					const url_params = objectToSearchParams({action: 'latest.view', context: 'host'});
 
-					const action_container = document.createElement('div');
-					action_container.classList.add(ZBX_STYLE_ACTION_CONTAINER);
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
 
 					const name_link = document.createElement('a');
-					name_link.classList.add(ZBX_STYLE_LINK_ACTION);
+					name_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					name_link.setAttribute('data-menu-popup', JSON.stringify({
 						type: 'item',
 						data: {
@@ -307,7 +317,7 @@
 					name_link.setAttribute('href', 'javascript:void(0);');
 					name_link.textContent = name;
 
-					action_container.appendChild(name_link);
+					flex_wrapper.appendChild(name_link);
 
 					if (description_expanded) {
 						const description_icon = document.createElement('button');
@@ -321,23 +331,27 @@
 						description_icon.setAttribute('data-hintbox-static', '1');
 						description_icon.setAttribute('aria-expanded', 'false');
 
-						action_container.innerHTML += ' ';
-						action_container.appendChild(description_icon);
+						flex_wrapper.appendChild(description_icon);
 					}
 
-					cell_inner.appendChild(action_container);
+					cell.appendChild(flex_wrapper);
 
 					const {show_item_key} = column.getColumnOptions();
 
-					if (show_item_key) {
+					if (show_item_key == 1) {
+						const overflow_ellipsis = document.createElement('div');
+						overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+
 						const item_key = document.createElement('span');
 						item_key.classList.add(ZBX_STYLE_GREEN);
 						item_key.textContent = key_expanded;
 
-						cell_inner.appendChild(item_key);
+						overflow_ellipsis.appendChild(item_key);
+
+						cell.appendChild(overflow_ellipsis);
 					}
 				})
-				.setCellRenderer('type', ({cell_data, cell_inner}) => {
+				.setCellRenderer('type', ({cell_data, cell}) => {
 					const [type, state] = cell_data;
 
 					if (state == ITEM_STATE_NOTSUPPORTED) {
@@ -345,13 +359,50 @@
 						type_container.textContent = type;
 						type_container.classList.add(ZBX_STYLE_GREY);
 
-						cell_inner.appendChild(type_container);
+						cell.appendChild(type_container);
 					}
 					else {
-						cell_inner.textContent = type;
+						cell.textContent = type;
 					}
 				})
-				.setCellRenderer('actions', ({cell_data, cell_inner}) => {
+				.setCellRenderer('last_value', ({cell_data, cell}) => {
+					const [value_type, last_value, last_history_value] = cell_data;
+
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
+					if (value_type == ITEM_VALUE_TYPE_BINARY) {
+						const italic = document.createElement('i');
+						italic.classList.add(ZBX_STYLE_GREY);
+						italic.textContent = last_value;
+
+						flex_wrapper.appendChild(italic);
+					}
+					else {
+						const span = document.createElement('span');
+						span.classList.add(ZBX_STYLE_CURSOR_POINTER, ZBX_STYLE_OVERFLOW_ELLIPSIS);
+						span.textContent = last_value;
+
+						const hint = document.createElement('span');
+						hint.classList.add(ZBX_STYLE_HINTBOX_RAW_DATA, ZBX_STYLE_HINTBOX_WRAP);
+						hint.textContent = last_history_value;
+
+						if (last_history_value !== null
+								&& Array.from(last_history_value).length === ZBX_HINTBOX_HTML_LIMIT) {
+							hint.classList.add(ZBX_STYLE_TRIMMED_CONTENT);
+						}
+
+						span.setAttribute('data-hintbox-html', hint.outerHTML);
+						span.setAttribute('data-hintbox', '1');
+						span.setAttribute('data-hintbox-static', '1');
+						span.setAttribute('aria-expanded', 'false');
+
+						flex_wrapper.appendChild(span);
+					}
+
+					cell.appendChild(flex_wrapper);
+				})
+				.setCellRenderer('actions', ({cell_data, cell}) => {
 					const [itemid, is_graph, show_link] = cell_data;
 
 					if (!show_link) {
@@ -372,12 +423,7 @@
 						data_link.textContent = <?= json_encode(_('History')); ?>;
 					}
 
-					cell_inner.appendChild(data_link);
-				})
-				.setCellRenderer('info', ({cell_data, cell_inner}) => {
-					const [item_icons] = cell_data;
-
-					cell_inner.appendChild(item_icons);
+					cell.appendChild(data_link);
 				})
 				.setOptionsHandler('name', CDataTableOptionsPopupMonitoringLatestName)
 				.on(CMessageHelper.EVENT_MESSAGE, e => {
@@ -470,20 +516,28 @@
 			}
 		}
 
-		#refresh() {
-			if (isUserInteracting()) {
+		#refresh({tabfilter_changed = false, loading_fadein = false} = {}) {
+			if (this.#datatable.isUserInteracting()) {
 				return;
 			}
+
+			this.#unscheduleRefresh();
 
 			const search_params = new URLSearchParams(location.search.substring(1));
 			const current_filter = searchParamsToObject(search_params);
 			const filter = {...this.#filter_defaults, ...current_filter};
 
+			if (!tabfilter_changed) {
+				this.#datatable.updateUserConfig();
+			}
+
 			this.#datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
-					onSuccess: response => this.#onDataDone(response)
+					loading_fadein,
+					onSuccess: response => this.#onDataDone(response),
+					onFinally: () => this.#scheduleRefresh()
 				});
 		}
 
@@ -538,8 +592,10 @@
 				return;
 			}
 
+			const loading_fadein = true;
+
 			this.#unscheduleRefresh();
-			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
+			this.#refresh_interval_id = setInterval(() => this.#refresh({loading_fadein}), this.#refresh_interval);
 		}
 
 		#unscheduleRefresh() {

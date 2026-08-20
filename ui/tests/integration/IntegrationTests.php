@@ -17,6 +17,7 @@ require_once dirname(__FILE__).'/testInitialConfSync.php';
 require_once dirname(__FILE__).'/testProxyConfSync.php';
 require_once dirname(__FILE__).'/testTimescaleDb.php';
 require_once dirname(__FILE__).'/testDataCollection.php';
+require_once dirname(__FILE__).'/testEncryptionDataCollection.php';
 require_once dirname(__FILE__).'/testBinaryAndJSONValueTypesDataCollection.php';
 require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
@@ -73,6 +74,7 @@ require_once dirname(__FILE__).'/testLLDProxyHistorySyncAtScale.php';
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testBridgeAdapter.php';
+require_once dirname(__FILE__).'/testTelnetChecks.php';
 require_once dirname(__FILE__).'/testHashicorpVault.php';
 
 use PHPUnit\Framework\TestSuite;
@@ -90,6 +92,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
 		$suite->addTestSuite('testDataCollection');
+		$suite->addTestSuite('testEncryptionDataCollection');
 		$suite->addTestSuite('testBinaryAndJSONValueTypesDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
@@ -144,6 +147,7 @@ class IntegrationTests {
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testWebScenarioDynamicVariables');
 		$suite->addTestSuite('testBridgeAdapter');
+		$suite->addTestSuite('testTelnetChecks');
 		$suite->addTestSuite('testHashicorpVault');
 		return $suite;
 	}
