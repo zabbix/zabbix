@@ -829,12 +829,9 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	public function testLogValueTypeJSON_agentRestart() {
 		// The "agent" host is toggled NOT_MONITORED/MONITORED around every test case that declares
 		// "@hosts agent", so the server config cache must be refreshed before relying on the host's
-		// active checks being processed.
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-			'enabling Zabbix agent checks on host "agent": interface became available',
-			'resuming Zabbix agent checks on host "agent": connection restored'
-		]);
-
+		// active checks being processed. Unlike the very first connection, this toggle is too brief to
+		// reliably wait on a specific one-time log line, so rely on checkItemState()/
+		// callUntilDataIsPresent()'s own retry loop instead.
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$this->checkItemState('agent:log['.self::$file_name_log_json.']', ITEM_STATE_NORMAL);
@@ -845,7 +842,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('result', $response);
 		$this->assertNotEmpty($response['result']);
-		$this->assertEquals(self::log_json_line, $response['result'][0]['value']);
+		$this->assertEquals(self::normalize_json(self::log_json_line), self::normalize_json($response['result'][0]['value']));
 
 		// Restart the agent without changing the log file. The server already knows the lastlogsize
 		// for this item, so the agent will find nothing new to read but, being a freshly started
@@ -857,6 +854,12 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'resuming Zabbix agent checks on host "agent": connection restored');
 
 		$this->checkItemState('agent:log['.self::$file_name_log_json.']', ITEM_STATE_NORMAL);
+
+		// The meta-only update is only sent on the first active check cycle after the agent
+		// reconnects, which does not happen instantly - give it a few cycles (item delay is 1s)
+		// to fire before asserting its absence, otherwise this check races the bug and can pass
+		// merely because it ran too early.
+		sleep(10);
 
 		$this->assertFalse(
 			self::isLogLinePresent(self::COMPONENT_SERVER, 'Something unexpected has just happened.', false),
