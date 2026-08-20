@@ -705,7 +705,7 @@ $formgrid->addItem([
 				->addClass($custom_timeout_enabled ? ZBX_STYLE_DISPLAY_NONE : null)
 				->setId('js-item-timeout-inaccessible')
 			: null,
-		(new CTextBox('inherited_timeout', $data['inherited_timeout']))
+		(new CTextBox('inherited_timeout', $lldrule['inherited_timeout']))
 			->setReadonly(true)
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->addClass($custom_timeout_enabled || $lldrule['timeout_inaccessible'] ? ZBX_STYLE_DISPLAY_NONE : null),
