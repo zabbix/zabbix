@@ -387,6 +387,73 @@ class CConditionHelper {
 	}
 
 	/**
+	 * Sorts the CEP rule conditions based on the calculation types And/Or, And, Or.
+	 *
+	 * @param array $conditions
+	 */
+	public static function sortCepRuleConditions(array &$conditions): void {
+		$type_order = array_flip(CCepRuleHelper::CONDITION_TYPES);
+
+		uasort($conditions, static function (array $row1, array $row2) use ($type_order): int {
+			if ($cmp = $type_order[$row1['type']] <=> $type_order[$row2['type']]) {
+				return $cmp;
+			}
+
+			$field_names = match ((int) $row1['type']) {
+				CCepRuleHelper::CONDITION_EVENT_NAME => ['operator', 'event_name'],
+				CCepRuleHelper::CONDITION_TAG => ['operator', 'tag'],
+				CCepRuleHelper::CONDITION_TAG_VALUE => ['tag', 'operator', 'tag_value'],
+				CCepRuleHelper::CONDITION_SEVERITY => ['operator', 'severity'],
+				CCepRuleHelper::CONDITION_HOST => ['operator', 'host'],
+				CCepRuleHelper::CONDITION_HOST_GROUP => ['operator', 'host_group'],
+				CCepRuleHelper::CONDITION_TIME_PERIOD => ['operator', 'time_period']
+			};
+
+			foreach ($field_names as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
+	}
+
+	/**
+	 * Sorts the CEP rule operation conditions based on the calculation types And/Or, Or.
+	 *
+	 * @param array $conditions
+	 */
+	public static function sortCepRuleOperationConditions(array &$conditions): void {
+		$type_order = array_flip(CCepRuleHelper::OPERATION_CONDITION_TYPES);
+
+		uasort($conditions, static function (array $row1, array $row2) use ($type_order): int {
+			if ($cmp = $type_order[$row1['type']] <=> $type_order[$row2['type']]) {
+				return $cmp;
+			}
+
+			$field_names = match ((int) $row1['type']) {
+				ZBX_CONDITION_TYPE_EVENT_TAG => ['operator', 'tag'],
+				ZBX_CONDITION_TYPE_EVENT_TAG_VALUE => ['tag', 'operator', 'tag_value'],
+				ZBX_CONDITION_TYPE_EVENT_OPEN,
+				ZBX_CONDITION_TYPE_EVENT_FIRST,
+				ZBX_CONDITION_TYPE_EVENT_LAST,
+				ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+				ZBX_CONDITION_TYPE_EVENT_COPIED,
+				ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => ['operator']
+			};
+
+			foreach ($field_names as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
+	}
+
+	/**
 	 * Check that all constants of formula are specified in the filter conditions of the given LLD rules or overrides.
 	 *
 	 * @param array  $objects
