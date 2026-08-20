@@ -365,7 +365,7 @@ window.ceprule_operation_edit_popup = new class {
 		Object.entries(fields).forEach(([field_name, field]) => {
 			field.disabled = true;
 
-			if (['event_name', 'tag'].includes(field_name)) {
+			if (['event_name', 'tag', 'suppress_duration'].includes(field_name)) {
 				field.style.display = 'none';
 			}
 		});
