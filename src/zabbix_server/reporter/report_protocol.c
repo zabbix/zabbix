@@ -376,7 +376,7 @@ void	report_destroy_params(zbx_vector_ptr_pair_t *params)
  *               FAIL    - no access                                          *
  *                                                                            *
  ******************************************************************************/
-static int	check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
+static int	zbx_check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -462,7 +462,7 @@ void	zbx_report_test(const struct zbx_json_parse *jp, const zbx_user_t *user, st
 		}
 	}
 
-	if (USER_TYPE_SUPER_ADMIN != user->type && SUCCEED != check_dashboard_access(user->userid, dashboardid))
+	if (USER_TYPE_SUPER_ADMIN != user->type && SUCCEED != zbx_check_dashboard_access(user->userid, dashboardid))
 	{
 		error = zbx_strdup(error, "no access to dashboard");
 		goto out;
