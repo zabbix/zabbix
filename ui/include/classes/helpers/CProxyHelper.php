@@ -190,8 +190,7 @@ class CProxyHelper {
 		foreach ($all_by_id as $object_id => $object_name) {
 			if (array_key_exists($object_id, $allowed_lookup)) {
 				$list[] = [
-					'name' => $object_name,
-					'mode' => PROXY_MODE_ALLOW
+					'name' => $object_name
 				];
 			}
 		}
@@ -232,8 +231,6 @@ class CProxyHelper {
 	}
 
 	private static function buildObjectBadge(array $object): CSpan {
-		return (new CSpan($object['name']))->addClass(
-			$object['mode'] == PROXY_MODE_ALLOW ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-		);
+		return (new CSpan($object['name']))->addClass(ZBX_STYLE_STATUS_GREEN);
 	}
 }
