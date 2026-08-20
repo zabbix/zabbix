@@ -682,9 +682,8 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			col_info = tq_get_column_info(query->signal_type, query->metric_point_type, aggr_col->column);
 
 			if (0 != (col_info->flags & TQ_COLUMN_INFO_FLAG_NO_AGGREGATION))
-				return ret_errf(FAIL, error, max_error_len,
-						"Aggregation is not supported column \"%s\" in aggregated column #%d",
-						aggr_col->column, i);
+				return ret_errf(FAIL, error, max_error_len, "Aggregation is not supported "
+						"for column \"%s\" in aggregated column #%d", aggr_col->column, i);
 		}
 
 		if (NULL == aggr_col->alias)
