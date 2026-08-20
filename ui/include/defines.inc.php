@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',	7050090);
+define('ZABBIX_DB_VERSION',	7050091);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -31,6 +31,7 @@ define('DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING',	7);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2026');
 
+define('ZBX_CLOUD_URL', 'https://cloud.zabbix.com');
 define('ZBX_DOCUMENTATION_URL', 'https://www.zabbix.com/documentation');
 
 define('ZBX_BCRYPT_COST',		10);
@@ -2430,7 +2431,7 @@ define('ZBX_ICON_SPEAKER', 'zi-speaker');
 define('ZBX_ICON_SPEAKER_OFF', 'zi-speaker-off');
 define('ZBX_ICON_STAR', 'zi-star');
 define('ZBX_ICON_STAR_FILLED', 'zi-star-filled');
-define('ZBX_ICON_SUPPORT', 'zi-support');
+define('ZBX_ICON_SUBSCRIPTIONS', 'zi-subscriptions');
 define('ZBX_ICON_SQUARE', 'zi-square');
 define('ZBX_ICON_TEXT', 'zi-text');
 define('ZBX_ICON_TIME_PERIOD', 'zi-time-period');
