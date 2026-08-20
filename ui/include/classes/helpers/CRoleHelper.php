@@ -582,7 +582,7 @@ class CRoleHelper {
 		}
 
 		$labels += [
-			self::ACTIONS_SELECT_SERVER_FOR_MONITORING => _('Select "Server" for monitoring')
+			self::ACTIONS_SELECT_SERVER_FOR_MONITORING => _('Select "Server" for monitoring and discovery')
 		];
 
 		return $labels;

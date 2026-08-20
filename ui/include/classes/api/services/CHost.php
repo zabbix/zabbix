@@ -2165,14 +2165,14 @@ class CHost extends CHostGeneral {
 				if ($host['monitored_by'] == ZBX_MONITORED_BY_SERVER) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/monitored_by',
-						_('you do not have permission to select server for monitoring')
+						_('you do not have permission to select server for monitoring and discovery')
 					));
 				}
 
 				if ($db_hosts !== null && $db_hosts[$host['hostid']]['monitored_by'] == ZBX_MONITORED_BY_SERVER) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/monitored_by',
-						_('parameter is readonly while you do not have permission to select server for monitoring')
+						_('parameter is readonly while you do not have permission to select server for monitoring and discovery')
 					));
 				}
 			}
