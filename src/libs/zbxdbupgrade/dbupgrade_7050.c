@@ -1256,7 +1256,7 @@ static int	DBpatch_7050091(void)
 
 static int	DBpatch_7050092(void)
 {
-	/* 1  - PROXY_MODE_ALLOW   */
+	/* 1 - PROXY_MODE_ALLOW */
 	const zbx_db_field_t	field = {"proxy_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("usrgrp", &field);
@@ -1264,7 +1264,7 @@ static int	DBpatch_7050092(void)
 
 static int	DBpatch_7050093(void)
 {
-	/* 1  - PROXY_GROUP_MODE_ALLOW   */
+	/* 1 - PROXY_GROUP_MODE_ALLOW */
 	const zbx_db_field_t	field = {"proxy_group_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("usrgrp", &field);
@@ -1353,15 +1353,15 @@ static int	DBpatch_7050103(void)
 
 static int	DBpatch_7050104(void)
 {
-	/* 0  - PROXY_MODE_DENY, PROXY_GROUP_MODE_DENY   */
-	if (ZBX_DB_OK > zbx_db_execute("update usrgrp set proxy_mode=0, proxy_group_mode=0"))
-	{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 0 - PROXY_MODE_DENY, PROXY_GROUP_MODE_DENY */
+	if (ZBX_DB_OK > zbx_db_execute("update usrgrp set proxy_mode=0,proxy_group_mode=0"))
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
-
 
 #endif
 

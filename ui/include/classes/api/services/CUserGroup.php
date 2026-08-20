@@ -729,7 +729,6 @@ class CUserGroup extends CApiService {
 		}
 	}
 
-
 	/**
 	 * Auxiliary function for checkOneself().
 	 * Returns true if user group has GROUP_GUI_ACCESS_DISABLED or GROUP_STATUS_DISABLED states.
