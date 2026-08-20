@@ -118,7 +118,7 @@ class testTriggerCEP extends CIntegrationTest {
 	// one of them and no other test is, and the only test kept besides is testPrepareTriggerCEP_LLDDiscovery,
 	// which every one of them @depends on (and nothing they need depends on anything else, so nothing is lost
 	// as a dependency of a skipped test).
-	const SKIP_NON_WINDOW_TESTS = false;
+	const SKIP_NON_WINDOW_TESTS = true;
 
 	const HOST_NAME = 'test';
 	const TEMPLATE_NAME = 'template_trigger_cep';
@@ -550,6 +550,43 @@ class testTriggerCEP extends CIntegrationTest {
 	// long enough for the problems the windows hold to be seen open before it runs out - the scenario asserts
 	// them open first and only then waits for the eviction, see runEventAssessmentTestCepWindowCapacityDiscard().
 	const CEP_RULE_WINDOW_CAPACITY_DISCARD_DURATION = '5s';
+	// One tag per execution point the close window family suppresses at when it is asked to (see
+	// prepareDataCepWindowCloseWindowOperations() with $suppress_points), added by the very operation list the
+	// suppress operation of that point belongs to. The suppression cannot say which of the points ran on its own:
+	// an event carries a single suppression per rule however many times that rule suppresses it (event_suppress
+	// holds one record per eventid and cep_ruleid), so the tags are what tells a point that ran from one that did
+	// not, while the suppression is what tells that suppressing at those points worked at all - see
+	// waitForCepSuppressPointProblemEvents().
+	const CEP_TAG_SUPPRESS_POINT_PREFIX = 'suppressed_at_';
+	const CEP_TAG_SUPPRESS_POINT_VALUE = 'suppressed';
+	const CEP_SUPPRESS_POINT_OCCURRED = 'occurred';
+	const CEP_SUPPRESS_POINT_ADDED = 'added';
+	const CEP_SUPPRESS_POINT_EVICTED = 'evicted';
+	const CEP_SUPPRESS_POINT_WINDOW_CLOSED = 'window_closed';
+	const CEP_SUPPRESS_POINT_PATTERN_MATCHED = 'pattern_matched';
+	// The close window family is where those points are driven from: a flavour of it asked to suppress at all of
+	// them (prepareDataCepWindowCloseWindowOperations() with $suppress_points) reaches the window closed point with
+	// the window that held the event, the eviction point for an event that did not fit or grew too old, and the
+	// pattern matched point through a script that really matched - at whatever scale that family is driven at, and
+	// across the server restart it takes in the middle of itself. The period has to outlast the whole of such a
+	// run: the suppression of every event is read once the run is over, and an expired one is taken away by the
+	// next timer pass.
+	const CEP_RULE_WINDOW_CLOSE_SUPPRESS_SECONDS = 3600;
+	const CEP_RULE_WINDOW_CLOSE_SUPPRESS_PERIOD = self::CEP_RULE_WINDOW_CLOSE_SUPPRESS_SECONDS.'s';
+	// The rules of those flavours: one per execution point a window may be closed from, one for the closing by age
+	// and one for the window type that ranks what it holds.
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_SUPPRESS_POINTS = self::CEP_RULE_NAME_PREFIX
+		.'window simple close window suppress points';
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED_SUPPRESS_POINTS = self::CEP_RULE_NAME_PREFIX
+		.'window simple close window evicted suppress points';
+	const CEP_RULE_WINDOW_TAG_CLOSE_SUPPRESS_POINTS = self::CEP_RULE_NAME_PREFIX
+		.'window tag close window suppress points';
+	const CEP_RULE_WINDOW_CAUSE_CLOSE_SUPPRESS_POINTS = self::CEP_RULE_NAME_PREFIX
+		.'window cause close window suppress points';
+	const CEP_RULE_WINDOW_PATTERN_CLOSE_SUPPRESS_POINTS = self::CEP_RULE_NAME_PREFIX
+		.'window pattern close window suppress points';
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED_SUPPRESS_POINTS = self::CEP_RULE_NAME_PREFIX
+		.'window simple close window aged suppress points';
 	// The close window flavours compute both limits of their windows instead, from the number of ids they drive and
 	// the number of values each of them is sent, see getCloseWindowDuration() and getCloseWindowCapacity().
 	// They, like the windowed flavours of the operations scenario, also hand those limits to the window as user
@@ -3245,6 +3282,81 @@ HEREDOC;
 	}
 
 	/**
+	 * Prepare the simple window flavour of the close window family whose rule additionally suppresses at every
+	 * execution point, closed by the "up" event being added to the window: its "down" events and its "up" event
+	 * alike are suppressed as they occur, as they are added and as the window closes over them, see
+	 * prepareDataCepWindowCloseWindowOperations() and runEventAssessmentTestCepWindowCloseWindow().
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowSuppressPoints() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_ADDED, false, false,
+			false, false, false, true
+		);
+	}
+
+	/**
+	 * The same with the window closed by the eviction of the "up" event instead: that event does not fit into the
+	 * window, so it is the one event of the family suppressed at the eviction point and at no point of an event a
+	 * window held, see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowOnEvictedSuppressPoints() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_EVICTED, false,
+			false, false, false, false, true
+		);
+	}
+
+	/**
+	 * The tag correlation window flavour of the same, so the window type that correlates what it groups is shown to
+	 * suppress at the same points as the one that does not, see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowTagCloseWindowSuppressPoints() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_TAG_MATCH,
+			self::CEP_RULE_WINDOW_TAG_CLOSE_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_ADDED, false, false, false,
+			false, false, true
+		);
+	}
+
+	/**
+	 * The cause and symptom window flavour of the same: the window type that ranks what it takes in, and the one
+	 * whose window is otherwise closed on a schedule of its own - which here is exactly what the close window
+	 * operation replaces, see prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowCauseSymptomCloseWindowSuppressPoints() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_ADDED, false, false,
+			false, false, false, true
+		);
+	}
+
+	/**
+	 * The pattern match window flavour of the same, the one whose events reach the fifth execution point: the
+	 * script of the window matches once the "up" event has joined the "down" ones, so every event the window holds
+	 * is suppressed at the pattern matched point and then again as the match closes the window over it, see
+	 * prepareDataCepWindowCloseWindowOperations().
+	 */
+	public function prepareDataCepWindowPatternCloseWindowSuppressPoints() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_SUPPRESS_POINTS, CCepRuleHelper::WHEN_PATTERN_MATCHED, false,
+			false, false, false, false, true
+		);
+	}
+
+	/**
+	 * The aged flavour of the same: nothing is sent that asks for the closing, the oldest event of every window
+	 * ages out of it and the rule ends the window over that eviction. The event that aged out is therefore
+	 * suppressed at the eviction point for its age rather than for not fitting - the second of the two ways that
+	 * point is reached - and the younger events of its id at the window closed one, see
+	 * prepareDataCepWindowCloseWindowOperations() and runEventAssessmentTestCepWindowCloseWindowAged().
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowAgedSuppressPoints() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_EVICTED, false,
+			false, false, false, true, true
+		);
+	}
+
+	/**
 	 * Prepare the close window scenario: a window per id that is ended by the rule as soon as that id has
 	 * recovered, which closes the events the window held. The window groups by the 'service' tag, so every id
 	 * gets a window of its own and outlasts the whole scenario (getCloseWindowDuration()), so what a window
@@ -3348,7 +3460,7 @@ HEREDOC;
 	 */
 	private function prepareDataCepWindowCloseWindowOperations(int $window_type, string $name, int $execute_when,
 			bool $discard_down = false, bool $single_service = false, bool $second_rule = false,
-			bool $discard_by_tag_value = false, bool $aged = false) {
+			bool $discard_by_tag_value = false, bool $aged = false, bool $suppress_points = false) {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this flavour is the only thing that may close a problem.
@@ -3486,6 +3598,48 @@ HEREDOC;
 			'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
 			'type' => CCepRuleHelper::OP_CLOSE_EVENT
 		];
+
+		if ($suppress_points) {
+			// The suppress every execution point coverage this family can be asked for: a suppress operation and
+			// the marker tag of its point at every execution point the window type has, see
+			// getSuppressPointExecuteWhen(). How the events get to those points is the closing this family is
+			// about, at the scale it is driven at and across the restart it takes in the middle of itself.
+			//
+			// They are numbered above the operations of the flavour, so at every point they run after whatever the
+			// flavour itself does there. Closing an event only queues the recovery event that closes it
+			// (cep_operation_execute_close_event()) instead of taking it out of the context, so a suppression
+			// applied after a close is applied all the same - and event_suppress rows outlive the problems they
+			// belong to, which is what leaves them to be read once the run is over.
+			//
+			// The period has to outlast the whole run: the suppression of every event is read at the end, and an
+			// expired one is taken away by the next timer pass, see CEP_RULE_WINDOW_CLOSE_SUPPRESS_PERIOD.
+			//
+			// Not combined with the flavours that drop an event, drive a single window or run the rule twice: a
+			// dropped event leaves nothing to suppress, and a second rule would give every event a second
+			// suppression of its own - which is the opposite of what the assessment asserts.
+			$this->assertFalse($discard_down || $single_service || $second_rule,
+				'The suppress points coverage of "'.$name.'" cannot be combined with a discarding, single window'
+					.' or doubled flavour.'
+			);
+
+			$sortorder = 10;
+
+			foreach ($this->getSuppressPointExecuteWhen($window_type) as $point => $point_when) {
+				$operations[] = [
+					'sortorder' => $sortorder++,
+					'execute_when' => $point_when,
+					'type' => CCepRuleHelper::OP_SUPPRESS,
+					'suppress_duration' => self::CEP_RULE_WINDOW_CLOSE_SUPPRESS_PERIOD
+				];
+				$operations[] = [
+					'sortorder' => $sortorder++,
+					'execute_when' => $point_when,
+					'type' => CCepRuleHelper::OP_ADD_TAG,
+					'tag' => self::CEP_TAG_SUPPRESS_POINT_PREFIX.$point,
+					'tag_value' => self::CEP_TAG_SUPPRESS_POINT_VALUE
+				];
+			}
+		}
 
 		if ($discard_down) {
 			// Discarding is decided while the rules are matched, before the event is stored and before any window is
@@ -4190,6 +4344,29 @@ HEREDOC;
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		return true;
+	}
+
+	/**
+	 * The execution points a rule asked to suppress at all of them gets a suppress operation for, as an execution
+	 * point name => execute_when map: the four every windowed rule has, plus the pattern matched one a pattern
+	 * match window adds - the only window type that reaches it, the script being what it is reached through.
+	 *
+	 * The names are what the marker tag of a point is built from (CEP_TAG_SUPPRESS_POINT_PREFIX), so they are
+	 * also what the assessment reports a point by.
+	 */
+	private function getSuppressPointExecuteWhen(int $window_type): array {
+		$points = [
+			self::CEP_SUPPRESS_POINT_OCCURRED => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+			self::CEP_SUPPRESS_POINT_ADDED => CCepRuleHelper::WHEN_EVENT_ADDED,
+			self::CEP_SUPPRESS_POINT_EVICTED => CCepRuleHelper::WHEN_EVENT_EVICTED,
+			self::CEP_SUPPRESS_POINT_WINDOW_CLOSED => CCepRuleHelper::WHEN_WINDOW_CLOSED
+		];
+
+		if ($window_type == CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+			$points[self::CEP_SUPPRESS_POINT_PATTERN_MATCHED] = CCepRuleHelper::WHEN_PATTERN_MATCHED;
+		}
+
+		return $points;
 	}
 
 	/**
@@ -9879,6 +10056,133 @@ HEREDOC;
 	}
 
 	/**
+	 * The close window scenario of a simple window ended by the "up" event being added to it, run by a rule that
+	 * additionally suppresses at every execution point of that window type: every event of the run must come out
+	 * suppressed once and carrying the marker tags of exactly the points it reached - as its window fills, and
+	 * again once the "up" values have closed every window. The closing itself must be what it is without the
+	 * suppress operations, so every assertion of the plain flavour is made here too - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowSuppressPoints$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowSuppressPoints() {
+		$this->prepareDataCepWindowSimpleCloseWindowSuppressPoints();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::CEP_RULE_WINDOW_SIMPLE_CLOSE_SUPPRESS_POINTS, false, false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same with the window ended by the eviction of the "up" event: that event never entered the window, so it
+	 * is the one event of the run suppressed at the eviction point and at neither of the points of an event a
+	 * window held - see runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedSuppressPoints$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedSuppressPoints() {
+		$this->prepareDataCepWindowSimpleCloseWindowOnEvictedSuppressPoints();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED_SUPPRESS_POINTS, false, false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same with a tag correlation window: correlating the events of a group is not what a suppression acts on,
+	 * so the events of this window type must reach the same points and come out in the same state - see
+	 * runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowTagCloseWindowSuppressPoints$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowTagCloseWindowSuppressPoints() {
+		$this->prepareDataCepWindowTagCloseWindowSuppressPoints();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::CEP_RULE_WINDOW_TAG_CLOSE_SUPPRESS_POINTS, false, false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same with a cause and symptom window, the one window type whose window would otherwise end on a schedule
+	 * of its own: here the close window operation is what ends it, so its events reach the same points as every
+	 * other window type's and must come out suppressed the same way - ranked into a cause and its symptoms all the
+	 * while, which is asserted as in the plain flavour. See runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowCauseSymptomCloseWindowSuppressPoints$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowCauseSymptomCloseWindowSuppressPoints() {
+		$this->prepareDataCepWindowCauseSymptomCloseWindowSuppressPoints();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::CEP_RULE_WINDOW_CAUSE_CLOSE_SUPPRESS_POINTS, false, false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same with a pattern match window whose script is what ends the window: the match is found once the "up"
+	 * event has joined the "down" ones, so every event the window holds is suppressed at the pattern matched point
+	 * and then again as the match closes the window over it - the fifth execution point reached by a real match
+	 * rather than by a rule asking for the closing. See runEventAssessmentTestCepWindowCloseWindow().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternCloseWindowSuppressPoints$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternCloseWindowSuppressPoints() {
+		$this->prepareDataCepWindowPatternCloseWindowSuppressPoints();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::CEP_RULE_WINDOW_PATTERN_CLOSE_SUPPRESS_POINTS, false, false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The aged flavour of the same: nothing is sent that asks for the closing, so the oldest event of every window
+	 * ages out of it and the rule ends the window over that eviction. The event that aged out is the one suppressed
+	 * at the eviction point - reached for its age here and for not fitting in the flavour above, the two ways an
+	 * event can leave a window - and the younger events of its id at the window closed one. See
+	 * runEventAssessmentTestCepWindowCloseWindowAged().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowAgedSuppressPoints$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowAgedSuppressPoints() {
+		$this->prepareDataCepWindowSimpleCloseWindowAgedSuppressPoints();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindowAged(
+				self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED_SUPPRESS_POINTS, false, false, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * Discarding: a windowless rule whose only operation drops the "up" events as they occur, so they leave no
 	 * trace at all - unlike a close, which leaves a closed problem behind, and unlike a suppress, which leaves
 	 * a suppressed one. The "down" values around it must still open their problems, so the rule is shown to
@@ -12758,6 +13062,185 @@ HEREDOC;
 	}
 
 	/**
+	 * The execution points a problem event of the close window family must have been suppressed at when its rule
+	 * was asked to suppress at all of them (prepareDataCepWindowCloseWindowOperations() with $suppress_points),
+	 * read from the event itself and from $execute_when - the point that flavour closes its window at, which is
+	 * what decides how the event that ends a window gets there:
+	 *   - every "down" event is taken into the window of its id and is still in it when the window closes, so it
+	 *     reaches the occurred, added and window closed points - and, in the pattern match flavour, the pattern
+	 *     matched one as well, the script matching over the whole window before the match ends it;
+	 *   - the "up" event of an id reaches the same points when the window is closed by its being added to it or by
+	 *     the match that follows, having entered the window like any other event;
+	 *   - it reaches the occurred and evicted points instead when the window is closed by its eviction: it did not
+	 *     fit, so it was never added and was gone before the window it ended closed.
+	 *
+	 * See runEventAssessmentTestCepWindowCloseWindow(). The aged flavours split their events the other way and
+	 * build their own expectations, see runEventAssessmentTestCepWindowCloseWindowAged().
+	 */
+	private function getCloseWindowSuppressPoints(array $event, int $execute_when): array {
+		$tags = array_column($event['tags'], 'value', 'tag');
+
+		if ((array_key_exists('state', $tags) ? $tags['state'] : '') === 'up'
+				&& $execute_when == CCepRuleHelper::WHEN_EVENT_EVICTED) {
+			return [self::CEP_SUPPRESS_POINT_OCCURRED, self::CEP_SUPPRESS_POINT_EVICTED];
+		}
+
+		return array_merge([self::CEP_SUPPRESS_POINT_OCCURRED, self::CEP_SUPPRESS_POINT_ADDED],
+			$execute_when == CCepRuleHelper::WHEN_PATTERN_MATCHED
+				? [self::CEP_SUPPRESS_POINT_PATTERN_MATCHED]
+				: [],
+			[self::CEP_SUPPRESS_POINT_WINDOW_CLOSED]
+		);
+	}
+
+	/**
+	 * The execution point the "close window" operation of the $name rule is performed at, which is what tells the
+	 * flavours of the close window family apart - the window of one is ended by the event being added to it, of
+	 * another by that event not fitting, and of a third by the script of the window reporting a match.
+	 *
+	 * The rule is asked rather than the caller told, as it is asked whether its window keeps an event count (see
+	 * getCepRuleEventCountTag()): the family runs one assessment for every flavour, so what the assessment has to
+	 * expect is read from the rule it was given.
+	 */
+	private function getCepRuleCloseWindowExecuteWhen(string $name): int {
+		$response = $this->call('ceprule.get', [
+			'filter' => ['name' => $name],
+			'output' => ['cep_ruleid'],
+			'selectOperations' => ['type', 'execute_when']
+		]);
+
+		$this->assertNotEmpty($response['result'], 'There is no CEP rule named "'.$name.'".');
+
+		foreach ($response['result'][0]['operations'] as $operation) {
+			if ($operation['type'] == CCepRuleHelper::OP_CLOSE_WINDOW) {
+				return (int) $operation['execute_when'];
+			}
+		}
+
+		$this->fail('The rule "'.$name.'" has no "close window" operation to read an execution point from.');
+	}
+
+	/**
+	 * Poll event.get until the problem events generated on $triggerids since the scenario baseline are exactly
+	 * $expected_count and every one of them was suppressed at exactly the execution points $expected_points names
+	 * for it - a callback handed the event (tags included) and returning the list of point names, or a string
+	 * saying why the event is not one the caller expected at all.
+	 *
+	 * Every event is read for three things:
+	 *   - the marker tags of exactly those points (CEP_TAG_SUPPRESS_POINT_PREFIX followed by the point name):
+	 *     one suppression is all a rule leaves however many of its points suppressed the event, so the tag next
+	 *     to each suppress operation is the only trace that point leaves of its own;
+	 *   - the suppression itself, which must be there and must be a single record belonging to the rule rather
+	 *     than to a maintenance or to a user - a CEP suppression has neither;
+	 *   - the deadline of that record, which must be the $period suppress period counted from a moment inside this
+	 *     run: not before $suppress_from plus the period, the earliest any operation of the run could have set, and
+	 *     not after the period counted from now, the latest. A record left behind by an earlier scenario, the
+	 *     zero deadline of an indefinite suppression and a period that was never applied therefore all fail.
+	 *     The bounds are the whole run wide on purpose: which of the points wrote the deadline is not something
+	 *     the API can be asked, the record naming its rule and not its operation.
+	 *
+	 * The operations are applied asynchronously after the events are created, hence the polling; the callback
+	 * returns a description of the first event that does not match, which callUntilDataIsPresent() surfaces in
+	 * the failure message.
+	 */
+	private function waitForCepSuppressPointProblemEvents(array $triggerids, int $expected_count,
+			callable $expected_points, int $suppress_from, int $period): void {
+		$this->callUntilDataIsPresent('event.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'filter' => ['value' => TRIGGER_VALUE_TRUE],
+			'output' => ['eventid', 'name', 'suppressed'],
+			'selectTags' => 'extend',
+			'selectSuppressionData' => ['maintenanceid', 'suppress_until', 'userid']
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+			function ($response) use ($expected_count, $expected_points, $suppress_from, $period) {
+				if (count($response['result']) !== $expected_count) {
+					return 'expected '.$expected_count.' problem event(s), got '.count($response['result']);
+				}
+
+				foreach ($response['result'] as $event) {
+					$expected = $expected_points($event);
+					$info = 'event '.$event['eventid'].' ('.$event['name'].') tags '
+						.json_encode($event['tags']);
+
+					if (is_string($expected)) {
+						return $info.': '.$expected;
+					}
+
+					$error = $this->checkCepSuppressPointEvent($event, $expected, $suppress_from, $period, $info);
+
+					if ($error !== null) {
+						return $error;
+					}
+				}
+
+				return true;
+			}
+		);
+	}
+
+	/**
+	 * Check one problem event of a suppress every execution point flavour against the $expected_points it must
+	 * have been suppressed at, returning null when it matches and a description of the mismatch otherwise (with
+	 * $info, the description of the event itself, in front of it). What is checked and why is in
+	 * waitForCepSuppressPointProblemEvents(), which is the only caller.
+	 */
+	private function checkCepSuppressPointEvent(array $event, array $expected_points, int $suppress_from,
+			int $period, string $info): ?string {
+		$prefix = self::CEP_TAG_SUPPRESS_POINT_PREFIX;
+		$points = [];
+
+		foreach ($event['tags'] as $tag) {
+			if (strncmp($tag['tag'], $prefix, strlen($prefix)) !== 0) {
+				continue;
+			}
+
+			if ($tag['value'] !== self::CEP_TAG_SUPPRESS_POINT_VALUE) {
+				return $info.': "'.$tag['tag'].'" tag value "'.$tag['value'].'", expected "'
+					.self::CEP_TAG_SUPPRESS_POINT_VALUE.'"';
+			}
+
+			$points[] = substr($tag['tag'], strlen($prefix));
+		}
+
+		sort($points);
+		sort($expected_points);
+
+		if ($points !== $expected_points) {
+			return $info.': suppressed at ['.implode(', ', $points).'], expected ['
+				.implode(', ', $expected_points).']';
+		}
+
+		if ((int) $event['suppressed'] !== 1) {
+			return $info.': suppressed '.$event['suppressed'].', expected 1 - every execution point of the rule'
+				.' suppresses the event it acts on';
+		}
+
+		if (count($event['suppression_data']) !== 1) {
+			return $info.': '.count($event['suppression_data']).' suppression record(s) '
+				.json_encode($event['suppression_data']).', expected the single one of the rule';
+		}
+
+		$suppression = $event['suppression_data'][0];
+
+		if ((int) $suppression['maintenanceid'] !== 0 || (int) $suppression['userid'] !== 0) {
+			return $info.': suppression '.json_encode($suppression).' belongs to a maintenance or to a user,'
+				.' expected the one of the CEP rule';
+		}
+
+		$until = (int) $suppression['suppress_until'];
+
+		if ($until < $suppress_from + $period || $until > time() + $period) {
+			return $info.': suppressed until '.$until.', expected the '.$period.'s period counted from a moment'
+				.' of this run - between '.($suppress_from + $period).' and '.(time() + $period);
+		}
+
+		return null;
+	}
+
+	/**
 	 * Drive the capacity flavour: one window with room for a single event, so every event after the first one
 	 * is evicted the moment it arrives, and the rule closes what it evicts.
 	 *
@@ -13285,7 +13768,7 @@ HEREDOC;
 	 * the run must carry both of them, so neither rule can have been left out of the events the other one closed.
 	 */
 	private function runEventAssessmentTestCepWindowCloseWindow(string $rule_name, bool $discarded = false,
-			bool $single_service = false, bool $doubled = false): void {
+			bool $single_service = false, bool $doubled = false, bool $suppress_points = false): void {
 		// The rules whose errors are reported when an assertion of the scenario fails: a doubled flavour has two, and
 		// either of them failing is what would leave the problems never closing.
 		$rule_names = $doubled ? [$rule_name, self::buildSecondRuleName($rule_name)] : [$rule_name];
@@ -13325,6 +13808,16 @@ HEREDOC;
 		}
 
 		$this->captureEventBaseline($all);
+
+		// A suppress operation of a flavour asked to suppress at every execution point stores a duration and the
+		// server counts it from the moment the operation ran, so no deadline of this run can be earlier than the
+		// period counted from here.
+		$suppress_from = time();
+
+		// Which points the events of such a flavour reach depends on the one its rule closes the window at, and the
+		// rule is asked for that rather than the caller told - as it is asked whether its window keeps an event
+		// count further down.
+		$suppress_when = $suppress_points ? $this->getCepRuleCloseWindowExecuteWhen($rule_name) : null;
 
 		// The value goes through the first of those triggers unless one of them is named, which is what the values
 		// filling the windows do - the "up" values that end them are sent through it as one of the triggers whose
@@ -13407,6 +13900,17 @@ HEREDOC;
 			$this->waitForCepWindowEventCounts($all, $event_count_tag, $counted_services, $events, !$single_service);
 		}
 
+		if ($suppress_points) {
+			// Every window of the rule is full and nothing has been closed yet, so every event of the run so far is
+			// one that occurred and was added to a window and has reached no other execution point - the "up" values
+			// that reach the rest of them are still to come. An event carrying the tag of a later point here would
+			// be a point reached by the wrong event, and one missing a tag of these two a point not reached at all.
+			$this->waitForCepSuppressPointProblemEvents($all, $open,
+				fn(array $event) => [self::CEP_SUPPRESS_POINT_OCCURRED, self::CEP_SUPPRESS_POINT_ADDED],
+				$suppress_from, self::CEP_RULE_WINDOW_CLOSE_SUPPRESS_SECONDS
+			);
+		}
+
 		// None of the windows has closed anything yet either, which is where the restarts stop and start the server:
 		// the "up" values below then end windows the server loaded back from the database, and every problem those
 		// windows have been holding since before the shutdown has to be closed with them just the same. The restart is
@@ -13481,6 +13985,18 @@ HEREDOC;
 			);
 		}
 
+		if ($suppress_points) {
+			// Every event of the run has been through every execution point it will reach by now: the events the
+			// windows held through the closing that took them, and the "up" event of an id through whatever ended
+			// the window of that id - which is what getCloseWindowSuppressPoints() reads from the flavour. The
+			// suppressions are read after the closing rather than before it, so they are also shown to be what a
+			// closed problem keeps and, when the restarts are on, what survived the restart in the middle.
+			$this->waitForCepSuppressPointProblemEvents($all, count($services) * ($events + 1),
+				fn(array $event) => $this->getCloseWindowSuppressPoints($event, $suppress_when),
+				$suppress_from, self::CEP_RULE_WINDOW_CLOSE_SUPPRESS_SECONDS
+			);
+		}
+
 		// The last window took the problems it held with it, which is what returns every trigger whose problems those
 		// were to OK as well.
 		$this->waitForNoOpenProblems($all, 'After the close window scenario of "'.$rule_name.'"');
@@ -13536,7 +14052,7 @@ HEREDOC;
 	 * (CEP_TAG_WINDOW_FIRST and CEP_TAG_WINDOW_SECOND).
 	 */
 	private function runEventAssessmentTestCepWindowCloseWindowAged(string $rule_name, bool $single_service = false,
-			bool $doubled = false): void {
+			bool $doubled = false, bool $suppress_points = false): void {
 		// The rules whose errors are reported when an assertion fails: a doubled flavour has two, and either of them
 		// failing is what would leave the problems never closing.
 		$rule_names = $doubled ? [$rule_name, self::buildSecondRuleName($rule_name)] : [$rule_name];
@@ -13674,6 +14190,27 @@ HEREDOC;
 			// down to the event its window aged out.
 			foreach ($services as $service) {
 				$this->waitForOpenProblemCountByTag($all, 'service', $service, 1);
+			}
+
+			if ($suppress_points) {
+				// The event a window aged out of itself had left it before the window closed, so it reached the
+				// eviction execution point and not the window closed one; the younger events of its id were still in
+				// the window when it closed and reached them the other way round. Both sides being suppressed at the
+				// points of their own side is what tells them apart - and the eviction point is reached here for the
+				// age of an event rather than for its not fitting, which is the other way an event leaves a window
+				// and what the flavours ended by an "up" value cover, see runEventAssessmentTestCepWindowCloseWindow().
+				$aged_eventids = array_flip($aged);
+
+				$this->waitForCepSuppressPointProblemEvents($all, $open,
+					fn(array $event) => array_key_exists($event['eventid'], $aged_eventids)
+						? [self::CEP_SUPPRESS_POINT_OCCURRED, self::CEP_SUPPRESS_POINT_ADDED,
+							self::CEP_SUPPRESS_POINT_EVICTED
+						]
+						: [self::CEP_SUPPRESS_POINT_OCCURRED, self::CEP_SUPPRESS_POINT_ADDED,
+							self::CEP_SUPPRESS_POINT_WINDOW_CLOSED
+						],
+					$opened_at, self::CEP_RULE_WINDOW_CLOSE_SUPPRESS_SECONDS
+				);
 			}
 
 			if ($doubled) {
