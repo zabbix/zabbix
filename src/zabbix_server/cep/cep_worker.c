@@ -499,8 +499,6 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 			db_event->objectid, db_event->name, db_event->clock, db_event->ns, TRIGGER_VALUE_PROBLEM,
 			db_event->severity, task->flags, 0, &db_event->tags, db_event->suppress);
 
-	cep_stats_update_events_processed(1);
-
 	const zbx_cep_rule_t		**rules = NULL;
 	int				rules_num = 0;
 	zbx_cep_config_handle_t		hconfig;
