@@ -127,7 +127,8 @@ class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 					'group_by_host_group' => ['integer',
 						'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO]
 					],
-					'group_by_host' => ['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO]
+					'group_by_host' => ['integer',
+						'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO]
 					],
 					'group_by_tags' => [
 						['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO]],
