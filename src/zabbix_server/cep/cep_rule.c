@@ -94,20 +94,30 @@ static int	cep_condition_eval_value(int operator, const char *pattern, const cha
  * operations
  */
 
-static int	cep_operation_condition_eval_tag_exists(const zbx_cep_op_condition_t *condition,
+static int	cep_operation_condition_eval_tag(const zbx_cep_op_condition_t *condition,
 		zbx_cep_event_context_t *ctx)
 {
-	zbx_cep_event_t	*event;
-	int		ret = 0;
+	const zbx_cep_args_tag_name_t	*args = &condition->args.tag_name;
+	zbx_cep_event_t			*event;
+	int				ret = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tag:%s", __func__, condition->args.tag_name.tag);
 
 	if (NULL != (event = cep_event_context_get_event(ctx)))
 	{
-		ret = (FAIL == cep_event_find_tag(event, condition->args.tag_name.tag) ? 0 : 1);
+		for (int i = 0; i < event->tags.values_num && 0 == ret; i++)
+		{
+			ret = cep_condition_eval_value_str_raw(condition->operator, args->tag,
+					event->tags.values[i].tag);
+		}
 
-		if (ZBX_CONDITION_OPERATOR_NOT_EXIST == condition->operator)
-			ret = !ret;
+		switch (condition->operator)
+		{
+			case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+			case ZBX_CONDITION_OPERATOR_NOT_LIKE:
+				ret = !ret;
+				break;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d", __func__, ret);
@@ -211,7 +221,7 @@ static int	cep_operation_condition_eval(const zbx_cep_op_condition_t *condition,
 	switch (condition->type)
 	{
 		case ZBX_CONDITION_TYPE_EVENT_TAG:
-			return cep_operation_condition_eval_tag_exists(condition, ctx);
+			return cep_operation_condition_eval_tag(condition, ctx);
 		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 			return cep_operation_condition_eval_tag_value(condition, ctx);
 		case ZBX_CONDITION_TYPE_EVENT_OPEN:
@@ -400,17 +410,23 @@ static int	cep_condition_eval_event_name(int operator, const zbx_cep_args_name_t
  *           matches; for negative operators no tag name must match.          *
  *                                                                            *
  ******************************************************************************/
-static int	cep_condition_eval_tag_exists(int operator, const zbx_cep_args_tag_name_t *args,
+static int	cep_condition_eval_tag(int operator, const zbx_cep_args_tag_name_t *args,
 		const zbx_cep_event_context_t *ctx)
 {
-	int	ret;
+	int	ret = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operator:%d tag:%s", __func__, operator, args->tag);
 
-	ret = (FAIL == cep_event_find_tag(ctx->event, args->tag) ? 0 : 1);
+	for (int i = 0; i < ctx->event->tags.values_num && 0 == ret; i++)
+		ret = cep_condition_eval_value_str_raw(operator, args->tag, ctx->event->tags.values[i].tag);
 
-	if (ZBX_CONDITION_OPERATOR_NOT_EXIST == operator)
-		ret = !ret;
+	switch (operator)
+	{
+		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
+			ret = !ret;
+			break;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:%d", __func__, ret);
 
@@ -644,7 +660,7 @@ static int	cep_condition_eval(const zbx_cep_condition_t *cond, zbx_cep_event_con
 			ret = cep_condition_eval_event_name(cond->operator, &cond->args.event_name, ctx);
 			break;
 		case ZBX_CONDITION_TYPE_EVENT_TAG:
-			ret = cep_condition_eval_tag_exists(cond->operator, &cond->args.tag_name, ctx);
+			ret = cep_condition_eval_tag(cond->operator, &cond->args.tag_name, ctx);
 			break;
 		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 			ret = cep_condition_eval_tag_value(cond->operator, &cond->args.tag_value, ctx);
