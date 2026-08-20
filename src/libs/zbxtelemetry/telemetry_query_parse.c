@@ -22,7 +22,6 @@
 #include "zbxcommon.h"
 #include "zbxtime.h"
 #include "zbxalgo.h"
-#include "zbxdbhigh.h"
 
 /******************************************************************************
  *                                                                            *
@@ -68,7 +67,7 @@ static int	tq_read_string(const char *p, char **out, const char *tag, char *erro
 	return SUCCEED;
 }
 
-static int	tq_read_int_enum(const char *p, char *buf, size_t buf_size, tq_int_enum_set_func_t set_func,
+static int	tq_read_int_enum(const char *p, char **buf, size_t *buf_alloc, tq_int_enum_set_func_t set_func,
 		void *out, int cur_val, int val_unknown, const char *tag, char *error, size_t max_error_len)
 {
 	int	new_val;
@@ -76,7 +75,7 @@ static int	tq_read_int_enum(const char *p, char *buf, size_t buf_size, tq_int_en
 	if (cur_val != val_unknown)
 		return ret_errf(FAIL, error, max_error_len, "Duplicate \"%s\" tag", tag);
 
-	if (NULL == zbx_json_decodevalue(p, buf, buf_size, NULL) || SUCCEED != zbx_is_int(buf, &new_val))
+	if (NULL == zbx_json_decodevalue_dyn(p, buf, buf_alloc, NULL) || SUCCEED != zbx_is_int(*buf, &new_val))
 		return ret_errf(FAIL, error, max_error_len, "Failed to read \"%s\"", tag);
 
 	if (set_func(new_val, out) == val_unknown)
@@ -173,8 +172,8 @@ static zbx_tq_operator_t	tq_match_operator(int x)
 
 TQ_INT_ENUM_SET_FUNC_DEF(tq_set_operator, tq_match_operator, zbx_tq_operator_t)
 
-static int	tq_parse_col(struct zbx_json_parse *jp, zbx_tq_column_t *col, char *buf, size_t buf_size, char *error,
-		size_t max_error_len)
+static int	tq_parse_col(struct zbx_json_parse *jp, zbx_tq_column_t *col, char **buf, size_t *buf_alloc,
+		char *error, size_t max_error_len)
 {
 	int		ret = FAIL;
 	const char	*p = NULL;
@@ -183,14 +182,14 @@ static int	tq_parse_col(struct zbx_json_parse *jp, zbx_tq_column_t *col, char *b
 
 	tq_column_init(col);
 
-	while (NULL != (p = zbx_json_pair_next(jp, p, buf, buf_size)))
+	while (NULL != (p = zbx_json_pair_next_dyn(jp, p, buf, buf_alloc)))
 	{
-		if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_COLUMN))
+		if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_COLUMN))
 		{
 			if (FAIL == tq_read_string(p, &col->column, ZBX_TQ_QUERY_TAG_COLUMN, error, max_error_len))
 				goto out;
 		}
-		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY))
+		else if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY))
 		{
 			if (FAIL == tq_read_string(p, &col->attribute_key, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, error,
 					max_error_len))
@@ -200,7 +199,7 @@ static int	tq_parse_col(struct zbx_json_parse *jp, zbx_tq_column_t *col, char *b
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, buf);
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, *buf);
 		}
 	}
 
@@ -214,8 +213,8 @@ out:
 	return ret;
 }
 
-static int	tq_parse_columns(struct zbx_json_parse *jp, zbx_vector_tq_column_t *columns, char *buf, size_t buf_size,
-		char *error, size_t max_error_len)
+static int	tq_parse_columns(struct zbx_json_parse *jp, zbx_vector_tq_column_t *columns,
+		char **buf, size_t *buf_alloc, char *error, size_t max_error_len)
 {
 	/* in case of an error the columns vector is cleaned by the calling function */
 	int		ret = FAIL;
@@ -231,7 +230,7 @@ static int	tq_parse_columns(struct zbx_json_parse *jp, zbx_vector_tq_column_t *c
 			goto out;
 
 		zbx_tq_column_t	col;
-		if (FAIL == tq_parse_col(&jp_elem, &col, buf, buf_size, error, max_error_len))
+		if (FAIL == tq_parse_col(&jp_elem, &col, buf, buf_alloc, error, max_error_len))
 			goto out;
 
 		zbx_vector_tq_column_append(columns, col);
@@ -244,8 +243,8 @@ out:
 	return ret;
 }
 
-static int	tq_parse_function_parameters(struct zbx_json_parse *jp, zbx_vector_str_t *parameters, char *buf,
-		size_t buf_size)
+static int	tq_parse_function_parameters(struct zbx_json_parse *jp, zbx_vector_str_t *parameters,
+		char **buf, size_t *buf_alloc)
 {
 	/* in case of an error the parameters vector is cleaned by the calling function */
 	int		ret = FAIL;
@@ -256,10 +255,10 @@ static int	tq_parse_function_parameters(struct zbx_json_parse *jp, zbx_vector_st
 
 	while (NULL != (p = zbx_json_next(jp, p)))
 	{
-		if (NULL == zbx_json_decodevalue(p, buf, buf_size, &type) || ZBX_JSON_TYPE_STRING != type)
+		if (NULL == zbx_json_decodevalue_dyn(p, buf, buf_alloc, &type) || ZBX_JSON_TYPE_STRING != type)
 			goto out;
 
-		zbx_vector_str_append(parameters, zbx_strdup(NULL, buf));
+		zbx_vector_str_append(parameters, zbx_strdup(NULL, *buf));
 	}
 
 	ret = SUCCEED;
@@ -269,8 +268,8 @@ out:
 	return ret;
 }
 
-static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *aggr_col, char *buf, size_t buf_size,
-		char *error, size_t max_error_len)
+static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *aggr_col,
+		char **buf, size_t *buf_alloc, char *error, size_t max_error_len)
 {
 	int		ret = FAIL;
 	const char	*p = NULL;
@@ -279,9 +278,9 @@ static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *ag
 
 	tq_aggr_column_init(aggr_col);
 
-	while (NULL != (p = zbx_json_pair_next(jp, p, buf, buf_size)))
+	while (NULL != (p = zbx_json_pair_next_dyn(jp, p, buf, buf_alloc)))
 	{
-		if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_COLUMN))
+		if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_COLUMN))
 		{
 			if (FAIL == tq_read_string(p, &aggr_col->column, ZBX_TQ_QUERY_TAG_COLUMN, error,
 					max_error_len))
@@ -289,16 +288,16 @@ static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *ag
 				goto out;
 			}
 		}
-		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_FUNCTION))
+		else if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_FUNCTION))
 		{
-			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_function_type, &aggr_col->function,
+			if (FAIL == tq_read_int_enum(p, buf, buf_alloc, tq_set_function_type, &aggr_col->function,
 					aggr_col->function, ZBX_TQ_FUNCTION_UNKNOWN, ZBX_TQ_QUERY_TAG_FUNCTION, error,
 					max_error_len))
 			{
 				goto out;
 			}
 		}
-		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_PARAMETERS))
+		else if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_PARAMETERS))
 		{
 			if (0 != aggr_col->parameters.values_num)
 			{
@@ -309,17 +308,17 @@ static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *ag
 			struct zbx_json_parse	jp_params;
 			if (FAIL == zbx_json_brackets_open(p, &jp_params))
 				goto out;
-			if (FAIL == tq_parse_function_parameters(&jp_params, &aggr_col->parameters, buf, buf_size))
+			if (FAIL == tq_parse_function_parameters(&jp_params, &aggr_col->parameters, buf, buf_alloc))
 				goto out;
 		}
-		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_ALIAS))
+		else if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_ALIAS))
 		{
 			if (FAIL == tq_read_string(p, &aggr_col->alias, ZBX_TQ_QUERY_TAG_ALIAS, error, max_error_len))
 				goto out;
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, buf);
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, *buf);
 		}
 	}
 
@@ -334,7 +333,7 @@ out:
 }
 
 static int	tq_parse_aggregated_columns(struct zbx_json_parse *jp, zbx_vector_tq_aggr_column_t *aggregated_columns,
-		char *buf, size_t buf_size, char *error, size_t max_error_len)
+		char **buf, size_t *buf_alloc, char *error, size_t max_error_len)
 {
 	/* in case of an error the aggregated_columns vector is cleaned by the calling function */
 	int		ret = FAIL;
@@ -350,7 +349,7 @@ static int	tq_parse_aggregated_columns(struct zbx_json_parse *jp, zbx_vector_tq_
 			goto out;
 
 		zbx_tq_aggr_column_t	aggr_col;
-		if (FAIL == tq_parse_aggr_col(&jp_elem, &aggr_col, buf, buf_size, error, max_error_len))
+		if (FAIL == tq_parse_aggr_col(&jp_elem, &aggr_col, buf, buf_alloc, error, max_error_len))
 			goto out;
 
 		zbx_vector_tq_aggr_column_append(aggregated_columns, aggr_col);
@@ -363,7 +362,7 @@ out:
 	return ret;
 }
 
-static int	tq_parse_cond(struct zbx_json_parse *jp, zbx_tq_condition_t *cond, char *buf, size_t buf_size,
+static int	tq_parse_cond(struct zbx_json_parse *jp, zbx_tq_condition_t *cond, char **buf, size_t *buf_alloc,
 		char *error, size_t max_error_len)
 {
 	int		ret = FAIL;
@@ -373,9 +372,9 @@ static int	tq_parse_cond(struct zbx_json_parse *jp, zbx_tq_condition_t *cond, ch
 
 	tq_condition_init(cond);
 
-	while (NULL != (p = zbx_json_pair_next(jp, p, buf, buf_size)))
+	while (NULL != (p = zbx_json_pair_next_dyn(jp, p, buf, buf_alloc)))
 	{
-		if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_COLUMN))
+		if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_COLUMN))
 		{
 			if (FAIL == tq_read_string(p, &cond->column, ZBX_TQ_QUERY_TAG_COLUMN, error,
 					max_error_len))
@@ -383,7 +382,7 @@ static int	tq_parse_cond(struct zbx_json_parse *jp, zbx_tq_condition_t *cond, ch
 				goto out;
 			}
 		}
-		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY))
+		else if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY))
 		{
 			if (FAIL == tq_read_string(p, &cond->attribute_key, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, error,
 					max_error_len))
@@ -391,22 +390,23 @@ static int	tq_parse_cond(struct zbx_json_parse *jp, zbx_tq_condition_t *cond, ch
 				goto out;
 			}
 		}
-		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_VALUE))
+		else if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_VALUE))
 		{
 			if (FAIL == tq_read_string(p, &cond->value, ZBX_TQ_QUERY_TAG_VALUE, error, max_error_len))
 				goto out;
 		}
-		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_OPERATOR))
+		else if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_OPERATOR))
 		{
-			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_operator, &cond->operator, cond->operator,
-					ZBX_TQ_OPERATOR_UNKNOWN, ZBX_TQ_QUERY_TAG_OPERATOR, error, max_error_len))
+			if (FAIL == tq_read_int_enum(p, buf, buf_alloc, tq_set_operator, &cond->operator,
+					cond->operator, ZBX_TQ_OPERATOR_UNKNOWN, ZBX_TQ_QUERY_TAG_OPERATOR,
+					error, max_error_len))
 			{
 				goto out;
 			}
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, buf);
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, *buf);
 		}
 	}
 
@@ -420,8 +420,8 @@ out:
 	return ret;
 }
 
-static int	tq_parse_conditions(struct zbx_json_parse *jp, zbx_vector_tq_condition_t *conditions, char *buf,
-		size_t buf_size, char *error, size_t max_error_len)
+static int	tq_parse_conditions(struct zbx_json_parse *jp, zbx_vector_tq_condition_t *conditions,
+		char **buf, size_t *buf_alloc, char *error, size_t max_error_len)
 {
 	/* in case of an error the conditions vector is cleaned by the calling function */
 	int		ret = FAIL;
@@ -437,7 +437,7 @@ static int	tq_parse_conditions(struct zbx_json_parse *jp, zbx_vector_tq_conditio
 		if (FAIL == zbx_json_brackets_open(p, &jp_elem))
 			goto out;
 
-		if (FAIL == tq_parse_cond(&jp_elem, &cond, buf, buf_size, error, max_error_len))
+		if (FAIL == tq_parse_cond(&jp_elem, &cond, buf, buf_alloc, error, max_error_len))
 			goto out;
 
 		zbx_vector_tq_condition_append(conditions, cond);
@@ -450,7 +450,7 @@ out:
 	return ret;
 }
 
-static int	tq_parse_filter(struct zbx_json_parse *jp, zbx_tq_query_t *query, char *buf, size_t buf_size,
+static int	tq_parse_filter(struct zbx_json_parse *jp, zbx_tq_query_t *query, char **buf, size_t *buf_alloc,
 		char *error, size_t max_error_len)
 {
 	/* in case of an error the query is cleaned by the calling function */
@@ -459,23 +459,23 @@ static int	tq_parse_filter(struct zbx_json_parse *jp, zbx_tq_query_t *query, cha
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
-	while (NULL != (p = zbx_json_pair_next(jp, p, buf, buf_size)))
+	while (NULL != (p = zbx_json_pair_next_dyn(jp, p, buf, buf_alloc)))
 	{
-		if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_EVALTYPE))
+		if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_EVALTYPE))
 		{
-			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_eval_type, &query->evaltype,
+			if (FAIL == tq_read_int_enum(p, buf, buf_alloc, tq_set_eval_type, &query->evaltype,
 					query->evaltype, ZBX_TQ_EVAL_TYPE_UNKNOWN, ZBX_TQ_QUERY_TAG_EVALTYPE, error,
 					max_error_len))
 			{
 				goto out;
 			}
 		}
-		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_FORMULA))
+		else if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_FORMULA))
 		{
 			if (FAIL == tq_read_string(p, &query->formula, ZBX_TQ_QUERY_TAG_FORMULA, error, max_error_len))
 				goto out;
 		}
-		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_CONDITIONS))
+		else if (0 == strcmp(*buf, ZBX_TQ_QUERY_TAG_CONDITIONS))
 		{
 			struct zbx_json_parse	jp_conditions;
 
@@ -487,7 +487,7 @@ static int	tq_parse_filter(struct zbx_json_parse *jp, zbx_tq_query_t *query, cha
 
 			if (FAIL == zbx_json_brackets_open(p, &jp_conditions))
 				goto out;
-			if (FAIL == tq_parse_conditions(&jp_conditions, &query->conditions, buf, buf_size, error,
+			if (FAIL == tq_parse_conditions(&jp_conditions, &query->conditions, buf, buf_alloc, error,
 					max_error_len))
 			{
 				goto out;
@@ -495,7 +495,7 @@ static int	tq_parse_filter(struct zbx_json_parse *jp, zbx_tq_query_t *query, cha
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, buf);
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, *buf);
 		}
 	}
 
@@ -509,18 +509,18 @@ out:
 static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char *error, size_t max_error_len)
 {
 	/* in case of an error the query is cleaned by the calling function */
-	int				ret = FAIL;
-	static ZBX_THREAD_LOCAL char	buf[ZBX_ITEM_QUERY_LEN_MAX];
-	size_t				buf_size = sizeof(buf);
-	const char			*p = NULL;
+	int		ret = FAIL;
+	char		*buf = NULL;
+	size_t		buf_alloc = 0;
+	const char	*p = NULL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
-	while (NULL != (p = zbx_json_pair_next(jp, p, buf, buf_size)))
+	while (NULL != (p = zbx_json_pair_next_dyn(jp, p, &buf, &buf_alloc)))
 	{
 		if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE))
 		{
-			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_signal_type, &query->signal_type,
+			if (FAIL == tq_read_int_enum(p, &buf, &buf_alloc, tq_set_signal_type, &query->signal_type,
 					query->signal_type, ZBX_TQ_SIGNAL_TYPE_UNKNOWN, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE,
 					error, max_error_len))
 			{
@@ -529,7 +529,7 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE))
 		{
-			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_metric_point_type,
+			if (FAIL == tq_read_int_enum(p, &buf, &buf_alloc, tq_set_metric_point_type,
 					&query->metric_point_type, query->metric_point_type,
 					ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE, error,
 					max_error_len))
@@ -549,8 +549,11 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char
 
 			if (FAIL == zbx_json_brackets_open(p, &jp_columns))
 				goto out;
-			if (FAIL == tq_parse_columns(&jp_columns, &query->columns, buf, buf_size, error, max_error_len))
+			if (FAIL == tq_parse_columns(&jp_columns, &query->columns, &buf, &buf_alloc,
+					error, max_error_len))
+			{
 				goto out;
+			}
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_AGGREGATED_COLUMNS))
 		{
@@ -565,8 +568,8 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char
 
 			if (FAIL == zbx_json_brackets_open(p, &jp_aggr_columns))
 				goto out;
-			if (FAIL == tq_parse_aggregated_columns(&jp_aggr_columns, &query->aggregated_columns, buf,
-					buf_size, error, max_error_len))
+			if (FAIL == tq_parse_aggregated_columns(&jp_aggr_columns, &query->aggregated_columns,
+					&buf, &buf_alloc, error, max_error_len))
 			{
 				goto out;
 			}
@@ -577,17 +580,19 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char
 
 			if (FAIL == zbx_json_brackets_open(p, &jp_filter))
 				goto out;
-			if (FAIL == tq_parse_filter(&jp_filter, query, buf, buf_size, error, max_error_len))
+			if (FAIL == tq_parse_filter(&jp_filter, query, &buf, &buf_alloc, error, max_error_len))
 				goto out;
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, buf);
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, *buf);
 		}
 	}
 
 	ret = SUCCEED;
 out:
+	zbx_free(buf);
+
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%d", __func__, ret);
 
 	return ret;
