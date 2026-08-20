@@ -127,6 +127,8 @@ static void	dc_add_proxy_history_meta(zbx_pb_history_data_t *handle, const zbx_d
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			/* Meta (lastlogsize/mtime) comes from a log-reading item KEY like: log or eventlog. */
+			/* It is not dependent on the item's configured VALUE TYPE.                          */
 			case ITEM_VALUE_TYPE_JSON:
 				pvalue = h->entry.value.str;
 				break;
