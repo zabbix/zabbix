@@ -504,9 +504,10 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	const zbx_cep_rule_t		**rules = NULL;
 	int				rules_num = 0;
 	zbx_cep_config_handle_t		hconfig;
-	zbx_cep_event_context_t		event_ctx = {.db_event = db_event, .event = cep_event_addref(event),
-						.pos = CEP_POS_LAST, .sync_flags = CEP_SYNC_IGNORE};
+	zbx_cep_event_context_t		event_ctx;
 	int				corr_ret;
+
+	cep_event_context_init_with_event(&event_ctx, cep_event_addref(event), db_event, worker->dbpool);
 
 	/* cep config returns NULL handle if there are no cep rules to process */
 	if (NULL != (hconfig = zbx_cep_config_open()))
@@ -1013,9 +1014,10 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 	zbx_vector_mw_task_ptr_destroy(&event_tasks);
 }
 
-static void	cep_worker_process_task_window(zbx_cep_task_window_t *task, zbx_vector_mw_task_ptr_t *tasks)
+static void	cep_worker_process_task_window(zbx_cep_worker_t *worker, zbx_cep_task_window_t *task,
+		zbx_vector_mw_task_ptr_t *tasks)
 {
-	cep_window_process(task->window, task->now, tasks);
+	cep_window_process(task->window, worker->dbpool, task->now, tasks);
 }
 
 /******************************************************************************
@@ -1118,7 +1120,7 @@ void	*cep_worker_entry(void *args)
 					cep_worker_process_task_commit(worker, (zbx_cep_task_commit_t *)task);
 					break;
 				case CEP_TASK_WINDOW:
-					cep_worker_process_task_window((zbx_cep_task_window_t *)task, &tasks);
+					cep_worker_process_task_window(worker, (zbx_cep_task_window_t *)task, &tasks);
 					cep_worker_expect_events(&tasks);
 					break;
 				case CEP_TASK_RULE_RESET:

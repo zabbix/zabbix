@@ -16,6 +16,7 @@
 #define ZABBIX_CEP_EVENT_H
 
 #include "zbx_cep.h"
+#include "zbxtypes.h"
 
 typedef struct
 {
@@ -63,9 +64,16 @@ typedef struct
 	zbx_vector_str_t	hosts;
 	zbx_vector_str_t	groups;
 
+	zbx_dbconn_pool_t	*dbpool;
+
 	zbx_uint32_t		sync_flags;
 }
 zbx_cep_event_context_t;
+
+void	cep_event_context_init_with_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent,
+	zbx_cep_event_pos_t pos, zbx_dbconn_pool_t *dbpool);
+void	cep_event_context_init_with_event(zbx_cep_event_context_t *ctx, zbx_cep_event_t *event,
+	zbx_db_event *db_event, zbx_dbconn_pool_t *dbpool);
 
 void	cep_event_context_clear(zbx_cep_event_context_t *ctx);
 zbx_cep_event_t *cep_event_context_get_event(zbx_cep_event_context_t *ctx);

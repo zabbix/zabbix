@@ -14,10 +14,12 @@
 
 #include "cep_event.h"
 #include "cep_api.h"
+#include "zabbix_server/cep/cep_task.h"
 #include "zbx_cep.h"
 #include "zbx_trigger_constants.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxdbwrap.h"
 
@@ -786,6 +788,7 @@ static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int s
 {
 	const zbx_db_event	*db_event;
 	zbx_dc_um_handle_t	*um_handle;
+	zbx_dbconn_t		*db;
 
 	if (NULL == strchr(*str, '{'))
 		return;
@@ -795,7 +798,13 @@ static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int s
 
 	um_handle = zbx_dc_open_user_macros();
 
+	db = zbx_dbconn_pool_acquire_connection(ctx->dbpool);
+	zbx_db_stash_connection(db);
+
 	zbx_substitute_macros_ext_search(scope, str, NULL, 0, resolver, um_handle, db_event, NULL);
+
+	zbx_db_unstash_connection(db);
+	zbx_dbconn_pool_release_connection(ctx->dbpool, db);
 
 	zbx_dc_close_user_macros(um_handle);
 }
@@ -825,5 +834,45 @@ void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **
 void	cep_event_context_resolve_tag_macros(zbx_cep_event_context_t *ctx, char **str)
 {
 	return cep_event_context_resolve_macros(ctx, 0, zbx_macro_trigger_tag_resolv, str);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize cep event context with existing event handle           *
+ *                                                                            *
+ * Parameters: ctx    - [OUT] event context to initialize                     *
+ *             hevent - [IN] event handle                                     *
+ *             pos    - [IN] event position                                   *
+ *             dbpool - [IN] database connection pool                         *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_event_context_init_with_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent,
+		zbx_cep_event_pos_t pos, zbx_dbconn_pool_t *dbpool)
+{
+	memset(ctx, 0, sizeof(zbx_cep_event_context_t));
+	ctx->hevent = hevent;
+	ctx->pos = pos;
+	ctx->dbpool = dbpool;
+};
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize cep event context with existing event object           *
+ *                                                                            *
+ * Parameters: ctx      - [OUT] event context to initialize                   *
+ *             event    - [IN] cep event                                      *
+ *             db_event - [IN] database event                                 *
+ *             dbpool   - [IN] database connection pool                       *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_event_context_init_with_event(zbx_cep_event_context_t *ctx, zbx_cep_event_t *event,
+		zbx_db_event *db_event, zbx_dbconn_pool_t *dbpool)
+{
+	memset(ctx, 0, sizeof(zbx_cep_event_context_t));
+	ctx->event = event;
+	ctx->db_event = db_event;
+	ctx->pos = CEP_POS_LAST;
+	ctx->sync_flags = CEP_SYNC_IGNORE;
+	ctx->dbpool = dbpool;
 }
 

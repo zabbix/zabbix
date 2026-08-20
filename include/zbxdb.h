@@ -608,9 +608,8 @@ zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
 
 zbx_dbconn_t	*zbx_db_dbconn(void);
 
-void	zbx_db_stash_connection(zbx_dbconn_t *db);
 void	zbx_db_unstash_connection(zbx_dbconn_t *db);
-
+void	zbx_db_stash_connection(zbx_dbconn_t *db);
 
 /* connection pool settings */
 #define ZBX_SETTINGS_DBPOOL			"dbpool_"
