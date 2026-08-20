@@ -166,7 +166,7 @@ static const char	*help_message[] = {
 	"                                  (alerter, alert manager, alert syncer, availability manager,",
 	"                                  browser poller, configuration syncer, configuration syncer worker,",
 	"                                  connector manager, connector worker, discovery manager, escalator,",
-	"                                  event manager, event processor, ha manager, history poller, history syncer,"
+	"                                  event manager, event processor, ha manager, history poller, history syncer,",
 	"                                  housekeeper, http poller, http agent poller, icmp pinger, internal poller,",
 	"                                  ipmi manager, ipmi poller, java poller, lld manager, lld worker,",
 	"                                  odbc poller, poller, agent poller, preprocessing manager,",
