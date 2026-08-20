@@ -58,6 +58,8 @@ type Plugin struct {
 	ctl      SmartController
 	cpuCount int
 	metrics  map[metricKey]*smartMetric
+
+	maxConsecutiveRaidErrors int
 }
 
 //nolint:gochecknoinits
