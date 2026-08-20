@@ -191,17 +191,12 @@ class CDRule extends CApiService {
 		}
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
-			'proxyid' =>	['type' => API_MULTIPLE, 'rules' => [
-								['if' => static fn(): bool => !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING), 'type' => API_ID, 'flags' => API_REQUIRED],
-								['else' => true, 'type' => API_ID]
-			]]
+			'proxyid' =>	['type' => API_ID]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $drules, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		$proxyids = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 		$allowed_fields = array_flip(['proxyid', 'name', 'iprange', 'delay', 'status', 'concurrency_max', 'dchecks']);
@@ -265,19 +260,11 @@ class CDRule extends CApiService {
 				);
 			}
 
-			$proxyids[] = array_key_exists('proxyid', $drule) ? $drule['proxyid'] : 0;
-
 			if (array_key_exists('dchecks', $drule) && $drule['dchecks']) {
 				$this->validateDChecks($drule['dchecks']);
 			}
 			else {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
-			}
-
-			if (!self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING) && $drule['proxyid'] == 0) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.', 'proxyid',
-					_('you do not have permission to select server for monitoring and discovery')
-				));
 			}
 		}
 
@@ -304,7 +291,7 @@ class CDRule extends CApiService {
 			);
 		}
 
-		self::checkProxies($proxyids);
+		self::checkProxies($drules);
 	}
 
 	/**
@@ -336,14 +323,13 @@ class CDRule extends CApiService {
 		]);
 
 		$drule_names_changed = [];
-		$proxyids = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 		$allowed_fields = array_flip([
 			'druleid', 'proxyid', 'name', 'iprange', 'delay', 'status', 'concurrency_max', 'dchecks'
 		]);
 
-		foreach ($drules as $i => $drule) {
+		foreach ($drules as $drule) {
 			if (array_diff_key($drule, $allowed_fields)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
@@ -411,34 +397,12 @@ class CDRule extends CApiService {
 				);
 			}
 
-			if (array_key_exists('proxyid', $drule)
-					&& bccomp($drule['proxyid'], $db_drules[$drule['druleid']]['proxyid']) != 0) {
-				$proxyids[$i] = $drule['proxyid'];
-			}
-
 			if (array_key_exists('dchecks', $drule)) {
 				if ($drule['dchecks']) {
 					$this->validateDChecks($drule['dchecks']);
 				}
 				else {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
-				}
-			}
-
-			if (!self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
-					&& array_key_exists('proxyid', $drule)) {
-				if ($db_drules[$drule['druleid']]['proxyid'] == 0
-						&& $drule['proxyid'] != $db_drules[$drule['druleid']]['proxyid']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i + 1).'/proxyid',
-						_('parameter is readonly while you do not have permission to select server for monitoring and discovery')
-					));
-				}
-				elseif ($drule['proxyid'] == 0 && $db_drules[$drule['druleid']]['proxyid'] != 0) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i + 1).'/proxyid',
-						_('you do not have permission to select server for monitoring and discovery')
-					));
 				}
 			}
 		}
@@ -468,7 +432,7 @@ class CDRule extends CApiService {
 			}
 		}
 
-		self::checkProxies($proxyids);
+		self::checkProxies($drules, $db_drules);
 
 		self::addAffectedObjects($drules, $db_drules);
 
@@ -696,21 +660,56 @@ class CDRule extends CApiService {
 		}
 	}
 
-	private static function checkProxies(array $proxyids): void {
-		if ($proxyids) {
-			$db_proxies = API::Proxy()->get([
-				'output' => [],
-				'proxyids' => $proxyids,
-				'preservekeys' => true
-			]);
+	private static function checkProxies(array $drules, ?array $db_drules = null): void {
+		$proxyids = [];
 
-			foreach ($proxyids as $i => $proxyid) {
-				if (($proxyid == 0 && !self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING))
-						|| ($proxyid > 0 && !array_key_exists($proxyid, $db_proxies))) {
+		foreach ($drules as $i => $drule) {
+			$proxyid = array_key_exists('proxyid', $drule) ? $drule['proxyid'] : null;
+
+			if ($db_drules !== null) {
+				if ($proxyid === null || bccomp($proxyid, $db_drules[$drule['druleid']]['proxyid']) == 0) {
+					continue;
+				}
+			}
+			elseif ($proxyid === null) {
+				$proxyid = 0;
+			}
+
+			if (!self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)) {
+				if ($proxyid == 0) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
+						'/'.($i + 1).'/proxyid',
+						_('you do not have permission to select server for monitoring and discovery')
 					));
 				}
+				elseif ($db_drules !== null && $db_drules[$drule['druleid']]['proxyid'] == 0) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/proxyid',
+						_('parameter is readonly while you do not have permission to select server for monitoring and discovery')
+					));
+				}
+			}
+
+			if ($proxyid != 0 && !array_key_exists($proxyid, $proxyids)) {
+				$proxyids[$proxyid] = $i;
+			}
+		}
+
+		if (!$proxyids) {
+			return;
+		}
+
+		$db_proxies = API::Proxy()->get([
+			'output' => [],
+			'proxyids' => array_keys($proxyids),
+			'preservekeys' => true
+		]);
+
+		foreach ($proxyids as $proxyid => $i) {
+			if (!array_key_exists($proxyid, $db_proxies)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
+				));
 			}
 		}
 	}
