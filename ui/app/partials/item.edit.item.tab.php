@@ -798,7 +798,7 @@ $formgrid
 	->addItem($data['source'] === 'itemprototype' || $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED ? [
 		(new CLabel(_('Value mapping'), 'valuemapid_ms'))->setId('js-item-value-map-label'),
 		(new CFormField(
-		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES) ?
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES) ?
 				(new CMultiSelect([
 					'name' => 'valuemapid',
 					'object_name' => $item['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
