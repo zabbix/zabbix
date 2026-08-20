@@ -290,9 +290,11 @@ trait traitItemTelemetryQueryTests {
 				'query' => [
 					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
 					'columns' => [],
-					'aggregated_columns' => [
-						['function' => AGGREGATE_COUNT, 'alias' => str_repeat('A', 65535)]
-					],
+					'aggregated_columns' => array_map(
+						static fn($i) => [
+							'function' => AGGREGATE_COUNT, 'alias' => str_pad($i, 255, 'A')
+						], range(0, 300, 1)
+					),
 					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
 				]
 			],
@@ -324,7 +326,7 @@ trait traitItemTelemetryQueryTests {
 			'Invalid parameter "/1/query": an array is expected.'
 		];
 
-		yield 'no "query.aggregated_columns" fail' => [
+		yield '"query.aggregated_columns" not set fail' => [
 			[
 				'query' => [
 					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
@@ -335,7 +337,7 @@ trait traitItemTelemetryQueryTests {
 			'Invalid parameter "/1/query": the parameter "aggregated_columns" is missing.'
 		];
 
-		yield 'undefined "query.filter" fail' => [
+		yield '"query.filter" not set fail' => [
 			[
 				'query' => [
 					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
@@ -346,7 +348,7 @@ trait traitItemTelemetryQueryTests {
 			'Invalid parameter "/1/query": the parameter "filter" is missing.'
 		];
 
-		yield '"evaltype" not expression and "query.filter.formula" fail' => [
+		yield '"evaltype" not expression and not empty "query.filter.formula" fail' => [
 			[
 				'query' => [
 					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
@@ -420,6 +422,24 @@ trait traitItemTelemetryQueryTests {
 			'Invalid parameter "/1/query/filter/conditions/2/formulaid": an identifier is not defined in the formula.'
 		];
 
+		yield '"query.filter.formula" value too long fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+						'formula' => 'A'.str_repeat(' or A', 60),
+						'conditions' => [
+							['column' => 'TraceId', 'value' => 'test', 'formulaid' => 'A', 'operator' => CONDITION_OPERATOR_EQUAL]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/query/filter/formula": value is too long.'
+		];
+
 		yield '"query.filter.conditions" not unique "formulaid" fail' => [
 			[
 				'query' => [
@@ -477,18 +497,38 @@ trait traitItemTelemetryQueryTests {
 			'Invalid parameter "/1/query/filter/conditions/2/value": cannot be empty.'
 		];
 
-		yield '"query.columns[].attribute_key" for non complex "query.columns[].column" fail' => [
+		yield '"query.filter.conditions[].value" value too long fail' => [
 			[
 				'query' => [
 					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
 					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
-					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []],
-					'columns' => [
-						['column' => 'Timestamp', 'attribute_key' => 'attr1']
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_OR,
+						'formula' => '',
+						'conditions' => [
+							['column' => 'TraceId', 'value' => str_repeat('a', 256), 'operator' => CONDITION_OPERATOR_LIKE]
+						]
 					]
 				]
 			],
-			'Invalid parameter "/1/query/columns/1/attribute_key": value must be empty.'
+			'Invalid parameter "/1/query/filter/conditions/1/value": value is too long.'
+		];
+
+		yield '"query.filter.conditions[].attribute_key" value too long fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => [
+							['column' => 'ResourceAttributes', 'attribute_key' => str_repeat('A', 256), 'operator' => CONDITION_OPERATOR_EQUAL]
+					]]
+				]
+			],
+			'Invalid parameter "/1/query/filter/conditions/1/attribute_key": value is too long.'
 		];
 
 		yield '"query.aggregated_columns[].alias" value start and end with whitespace fail' => [
@@ -503,6 +543,21 @@ trait traitItemTelemetryQueryTests {
 				]
 			],
 			'Invalid parameter "/1/query/aggregated_columns/1/alias": value cannot start or end with whitespace.'
+		];
+
+		yield '"query.aggregated_columns[].alias" value too long fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					'columns' => [],
+					'aggregated_columns' => [
+						['column' => 'StartTimeUnix', 'function' => AGGREGATE_MIN, 'alias' => str_repeat('A', 256)]
+					],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			'Invalid parameter "/1/query/aggregated_columns/1/alias": value is too long.'
 		];
 
 		yield '"query.aggregated_columns[].parameters" set to single invalid value array fail' => [
@@ -531,6 +586,35 @@ trait traitItemTelemetryQueryTests {
 				]
 			],
 			'Invalid parameter "/1/query/aggregated_columns/1/parameters": maximum number of array elements is 1.'
+		];
+
+		yield '"query.columns[].attribute_key" set for non complex "query.columns[].column" fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []],
+					'columns' => [
+						['column' => 'Timestamp', 'attribute_key' => 'attr1']
+					]
+				]
+			],
+			'Invalid parameter "/1/query/columns/1/attribute_key": value must be empty.'
+		];
+
+		yield '"query.columns[].attribute_key" value too long fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					'metric_point_type' => CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					'columns' => [
+						['column' => 'ResourceAttributes', 'attribute_key' => str_repeat('A', 256)]
+					],
+					'aggregated_columns' => [['column' => 'StartTimeUnix', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			'Invalid parameter "/1/query/columns/1/attribute_key": value is too long.'
 		];
 
 		yield 'duplicates in "query.columns[].column" and "query.aggregated_columns[].alias" fail' => [
