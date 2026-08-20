@@ -127,6 +127,7 @@ static void	dc_add_proxy_history_meta(zbx_pb_history_data_t *handle, const zbx_d
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_JSON:
 				pvalue = h->entry.value.str;
 				break;
 			default:

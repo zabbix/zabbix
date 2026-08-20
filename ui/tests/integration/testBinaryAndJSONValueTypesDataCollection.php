@@ -826,21 +826,16 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	 *
 	 * The item key is "log[]" (a check that natively supports metadata-only updates, i.e. lastlogsize/
 	 * mtime with no new line to report), but the item's *value type* is configured as JSON - not LOG.
-	 * That combination used to trigger a THIS_SHOULD_NEVER_HAPPEN condition in
-	 * zbx_preprocess_item_value() (pp_protocol.c), logged as "unexpected result type: 64 and
-	 * item_value_type: 6" / "Something unexpected has just happened." The server process itself does
-	 * not crash and keeps running, but the metadata-only update that triggered it is silently dropped
-	 * instead of being stored.
+	 * That combination used to cause the server to log an internal error and silently drop the
+	 * metadata-only update instead of storing it, without crashing.
 	 *
 	 * Reproduction: the server hands out the already advanced lastlogsize/mtime to the agent on every
 	 * active check refresh. After an agent restart the log[] metric is "new" for the freshly started
 	 * agent process, so even though there is nothing new to read from the log file, the agent still
-	 * sends a metadata-only update (no value, only lastlogsize/mtime). The JSON value type handling in
-	 * zbx_preprocess_item_value() only recognizes JSON/TEXT/STR/LOG/DBL/UI64/BIN typed AGENT_RESULTs -
-	 * an AGENT_RESULT carrying only the meta bit (type == AR_META) matches none of them.
+	 * sends a metadata-only update (no value, only lastlogsize/mtime).
 	 *
-	 * This test only reproduces the scenario; detecting "Something unexpected has just happened." in
-	 * the server log is handled independently by the CI environment.
+	 * This test only reproduces the scenario; detecting the resulting error in the server log is
+	 * handled independently by the CI environment.
 	 *
 	 * @required-components server, agent
 	 * @configurationDataProvider agentConfigurationProvider
@@ -961,12 +956,10 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	/**
 	 * Regression test.
 	 *
-	 * dc_add_proxy_history_meta() in cachehistory_proxy.c is missing a case for
-	 * ITEM_VALUE_TYPE_JSON (unlike its sibling dc_add_proxy_history(), which has it) and falls into
-	 * default: THIS_SHOULD_NEVER_HAPPEN; return;, silently dropping the value with no log line. This
-	 * is hit whenever a proxy-monitored log[] item (value_type=JSON) reports a value together with
-	 * meta info (lastlogsize/mtime) in the same submission - the ordinary case for the very first
-	 * successful read of a growing log file, not a rare corner case.
+	 * A proxy-monitored log[] item (value_type=JSON) used to have its value silently dropped, with
+	 * no log line at all, when it reported a value together with meta info (lastlogsize/mtime) in
+	 * the same submission - the ordinary case for the very first successful read of a growing log
+	 * file, not a rare corner case.
 	 *
 	 * @required-components server, proxy, agent
 	 * @configurationDataProvider proxyConfigurationProvider
@@ -1033,5 +1026,150 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('result', $response);
 		$this->assertNotEmpty($response['result']);
 		$this->assertEquals('AAAAAAAAAAAAAAAA', $response['result'][0]['value']);
+	}
+
+	/**
+	 * Regression test.
+	 *
+	 * The API refuses to create a trigger function referencing a JSON value type item directly
+	 * (intentional limitation - JSON is not an allowed value type for trigger functions), so a
+	 * JSON item can't get into the value cache that way. But an item's value type can be changed
+	 * after a trigger already references it: create the item as TEXT, reference it in a trigger,
+	 * let the value cache pick it up, then change the item to JSON via item.update. The trigger
+	 * must end up in an unknown state - it must not crash the server.
+	 *
+	 * @required-components server
+	 * @configurationDataProvider simpleConfigurationProvider
+	 */
+	public function testLogValueTypeJSON_triggerTypeChangeGraceful() {
+		$host = $this->call('host.get', [
+			'output' => ['hostid'],
+			'filter' => ['host' => 'simple']
+		]);
+		$this->assertArrayHasKey(0, $host['result']);
+		$hostid = $host['result'][0]['hostid'];
+
+		$response = $this->call('item.create', [
+			'hostid' => $hostid,
+			'name' => 'TRIGGER_TYPE_CHANGE_ITEM',
+			'key_' => 'trigger.type.change.item',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_TEXT,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$itemid = $response['result']['itemids'][0];
+
+		$response = $this->call('trigger.create', [
+			'description' => 'TRIGGER_TYPE_CHANGE_TRIGGER',
+			'expression' => 'last(/simple/trigger.type.change.item)=0'
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$triggerid = $response['result']['triggerids'][0];
+
+		// Called twice: right after a fresh server (re)start (required by this test's own
+		// config provider), the first call's wait may match the server's own boot-time sync
+		// log line rather than a sync that actually includes the item/trigger just created
+		// above. The second call is then forced to wait for a genuinely new one.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->sendSenderValue('simple', 'trigger.type.change.item', 'text_value');
+
+		// Confirm the trigger was evaluated (reading the item's value through the value cache)
+		// before the item's value type changes below.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			"function:'last(/simple/trigger.type.change.item,)'", true, 30, 1);
+
+		$this->call('item.update', [
+			'itemid' => $itemid,
+			'value_type' => ITEM_VALUE_TYPE_JSON
+		]);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// Force the trigger to re-evaluate against the item's new (JSON) type.
+		$this->sendSenderValue('simple', 'trigger.type.change.item', '{"a":1}');
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'json-type items are not supported in functions');
+
+		$trigger = $this->call('trigger.get', [
+			'output' => ['value', 'state'],
+			'triggerids' => [$triggerid]
+		]);
+		$this->assertArrayHasKey(0, $trigger['result']);
+		$this->assertEquals(TRIGGER_STATE_UNKNOWN, $trigger['result'][0]['state']);
+	}
+
+	/**
+	 * Regression test.
+	 *
+	 * The value cache does not support caching JSON value type items at all, so a JSON item can
+	 * never actually populate it - this confirms removing such an item afterwards continues to be
+	 * handled cleanly, with no adverse effect on the server.
+	 *
+	 * Unlike trigger functions, a calculated item's formula is not validated against the
+	 * referenced item's value type, so a calculated item can reference a JSON value type item via
+	 * last() directly - this is how a JSON item's value would be read through the value cache, were
+	 * it supported.
+	 *
+	 * @required-components server
+	 * @configurationDataProvider simpleConfigurationProvider
+	 */
+	public function testLogValueTypeJSON_valueCacheCrash() {
+		$host = $this->call('host.get', [
+			'output' => ['hostid'],
+			'filter' => ['host' => 'simple']
+		]);
+		$this->assertArrayHasKey(0, $host['result']);
+		$hostid = $host['result'][0]['hostid'];
+
+		$response = $this->call('item.create', [
+			'hostid' => $hostid,
+			'name' => 'VALUECACHE_JSON_ITEM',
+			'key_' => 'valuecache.json.item',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_JSON,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$itemid = $response['result']['itemids'][0];
+
+		$response = $this->call('item.create', [
+			'hostid' => $hostid,
+			'name' => 'CALC_REFERENCING_JSON',
+			'key_' => 'calc.referencing.json',
+			'type' => ITEM_TYPE_CALCULATED,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'params' => 'last(/simple/valuecache.json.item)',
+			'delay' => '1s'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$calc_itemid = $response['result']['itemids'][0];
+
+		// Called twice: right after a fresh server (re)start (required by this test's own
+		// config provider), the first call's wait may match the server's own boot-time sync log
+		// line rather than a sync that actually includes the items just created above. The
+		// second call is then forced to wait for a genuinely new one.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->sendSenderValue('simple', 'valuecache.json.item', '{"a":1}');
+
+		// Confirm the calculated item actually attempted to read the JSON item's value through the
+		// value cache, and was gracefully refused rather than crashing.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'cannot get values from value cache');
+
+		$calc_item = $this->call('item.get', [
+			'output' => ['state'],
+			'itemids' => [$calc_itemid]
+		]);
+		$this->assertArrayHasKey(0, $calc_item['result']);
+		$this->assertEquals(ITEM_STATE_NOTSUPPORTED, $calc_item['result'][0]['state']);
+
+		$this->call('item.delete', [$itemid]);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 	}
 }
