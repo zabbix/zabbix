@@ -39,7 +39,8 @@
 		->addItem([
 			(new CLabel('Tag', 'ceprule-condition-tag-name'))->setAsteriskMark(),
 			(new CFormField([
-				(new CTextBox('tag'))
+				(new CTextAreaFlexible('tag'))
+					->setMaxlength(DB::getFieldLength('cep_condition', 'tag'))
 					->setId('ceprule-condition-tag-name')
 					->setAttribute('placeholder', 'tag'),
 				new CObject('&nbsp;'),
@@ -50,7 +51,8 @@
 						CCepRuleHelper::getTagOperators()
 					)),
 				new CObject('&nbsp;'),
-				(new CTextBox('tag_value'))
+				(new CTextAreaFlexible('tag_value'))
+					->setMaxlength(DB::getFieldLength('cep_condition', 'tag_value'))
 					->setId('ceprule-condition-tag-value')
 					->setAttribute('placeholder', 'value')
 			]))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG)
@@ -81,14 +83,16 @@
 		])
 		->addItem([
 			(new CLabel('Host', 'ceprule-condition-host'))->setAsteriskMark(),
-			(new CFormField((new CTextBox('host'))
+			(new CFormField((new CTextAreaFlexible('host'))
+				->setMaxlength(DB::getFieldLength('cep_condition', 'host'))
 				->setId('ceprule-condition-host')
 				->setAttribute('placeholder', 'host name')
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST)
 		])
 		->addItem([
 			(new CLabel('Host group', 'ceprule-condition-host-group'))->setAsteriskMark(),
-			(new CFormField((new CTextBox('host_group'))
+			(new CFormField((new CTextAreaFlexible('host_group'))
+				->setMaxlength(DB::getFieldLength('cep_condition', 'host_group'))
 				->setId('ceprule-condition-host-group')
 				->setAttribute('placeholder', 'host group name')
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST_GROUP)
@@ -100,7 +104,8 @@
 		])
 		->addItem([
 			(new CLabel('Time period', 'ceprule-condition-time-period'))->setAsteriskMark(),
-			(new CFormField((new CTextBox('time_period'))
+			(new CFormField((new CTextAreaFlexible('time_period'))
+				->setMaxlength(DB::getFieldLength('cep_condition', 'time_period'))
 				->setId('ceprule-condition-time-period')
 				->setAttribute('placeholder', '1-7,00:00-24:00')
 			))

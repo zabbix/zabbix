@@ -67,7 +67,8 @@ $form = (new CForm())
 		->addItem([
 			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('name', $data['ceprule']['name']))
+				(new CTextAreaFlexible('name', $data['ceprule']['name']))
+					->setMaxlength(DB::getFieldLength('cep_rule', 'name'))
 					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					->setAriaRequired()
 					->setAttribute('autofocus', 'autofocus')

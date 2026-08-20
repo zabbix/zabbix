@@ -35,7 +35,8 @@
 		))->addClass(ZBX_STYLE_CELL),
 		(new CDiv([
 			(new CSpan())->setId('ceprule-filter-expression-preview'),
-			(new CTextBox('filter[formula]', $data['filter']['formula']))
+			(new CTextAreaFlexible('filter[formula]', $data['filter']['formula']))
+				->setMaxlength(DB::getFieldLength('cep_rule', 'formula'))
 				->setId('ceprule-filter-expression')
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAttribute('placeholder', 'A or (B and C) ...')

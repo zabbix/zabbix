@@ -62,7 +62,8 @@ foreach ($labels as $option => $label) {
 					->addClass(ZBX_STYLE_VISIBILITY_HIDDEN)
 				)
 				->addItem((new CCol())
-					->addItem((new CTextBox('filter[conditions][#{row_index}][tag]', '#{tag}'))
+					->addItem((new CTextAreaFlexible('filter[conditions][#{row_index}][tag]', '#{tag}'))
+						->setMaxlength(DB::getFieldLength('cep_operation_condition', 'tag'))
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 						->setAttribute('placeholder', _('tag'))
 						->setErrorContainer('operation-conditions-#{row_index}-error-container')
@@ -76,7 +77,8 @@ foreach ($labels as $option => $label) {
 						))
 					)
 					->addItem((new CCol())
-						->addItem((new CTextBox('filter[conditions][#{row_index}][value]', '#{value}'))
+						->addItem((new CTextAreaFlexible('filter[conditions][#{row_index}][value]', '#{value}'))
+						->setMaxlength(DB::getFieldLength('cep_operation_condition', 'tag_value'))
 							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 							->setAttribute('placeholder', _('value'))
 							->setErrorContainer('operation-conditions-#{row_index}-error-container')
@@ -178,19 +180,24 @@ foreach ($labels as $option => $label) {
 				->setMaxlength(DB::getFieldLength('cep_operation', 'event_name'))
 				->setAttribute('placeholder', 'name')
 			)
-			->addItem((new CTextBox('tag'))
+			->addItem((new CTextAreaFlexible('tag'))
+				->setMaxlength(DB::getFieldLength('cep_operation', 'tag'))
 				->setAttribute('placeholder', 'tag')
 			)
-			->addItem(new CTextBox('suppress_duration'))
+			->addItem((new CTextAreaFlexible('suppress_duration'))
+				->setMaxlength(DB::getFieldLength('cep_operation', 'suppress_duration'))
+			)
 		)
 		->addItem(
 			(new CFormField([
 				new CHorList([
-					(new CTextBox('old_tag'))
+					(new CTextAreaFlexible('old_tag'))
+						->setMaxlength(DB::getFieldLength('cep_operation', 'tag'))
 						->setAttribute('placeholder', _('old name'))
 						->setErrorLabel(_('old name'))
 						->setErrorContainer('ceprule-operation-tag-rename-error-container'),
-					(new CTextBox('new_tag'))
+					(new CTextAreaFlexible('new_tag'))
+						->setMaxlength(DB::getFieldLength('cep_operation', 'new_tag'))
 						->setAttribute('placeholder', _('new name'))
 						->setErrorLabel(_('new name'))
 						->setErrorContainer('ceprule-operation-tag-rename-error-container')
@@ -204,10 +211,12 @@ foreach ($labels as $option => $label) {
 		->addItem(
 			(new CFormField([
 				new CHorList([
-					(new CTextBox('tag_name'))
+					(new CTextAreaFlexible('tag_name'))
+						->setMaxlength(DB::getFieldLength('cep_operation', 'tag'))
 						->setAttribute('placeholder', _('tag'))
 						->setErrorContainer('ceprule-operation-tag-pair-error-container'),
-					(new CTextBox('tag_value'))
+					(new CTextAreaFlexible('tag_value'))
+						->setMaxlength(DB::getFieldLength('cep_operation', 'tag_value'))
 						->setAttribute('placeholder', _('value'))
 						->setErrorContainer('ceprule-operation-tag-pair-error-container')
 				]),
