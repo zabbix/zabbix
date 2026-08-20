@@ -425,7 +425,8 @@ class CDRule extends CApiService {
 				}
 			}
 
-			if (!self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)) {
+			if (!self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+					&& array_key_exists('proxyid', $drule)) {
 				if ($db_drules[$drule['druleid']]['proxyid'] == 0
 						&& $drule['proxyid'] != $db_drules[$drule['druleid']]['proxyid']) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
