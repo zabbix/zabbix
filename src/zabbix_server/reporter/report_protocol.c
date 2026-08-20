@@ -47,7 +47,7 @@ static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zb
  ******************************************************************************/
 
 static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const char *name, zbx_uint64_t dashboardid,
-		zbx_uint64_t userid, zbx_uint64_t viewer_userid, int report_time, unsigned char period,
+		zbx_uint64_t userid, int report_time, unsigned char period,
 		const zbx_vector_ptr_pair_t *params)
 {
 	zbx_uint32_t	data_len = 0, *len, name_len;
@@ -56,7 +56,6 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const cha
 	zbx_serialize_prepare_str(data_len, name);
 	zbx_serialize_prepare_value(data_len, dashboardid);
 	zbx_serialize_prepare_value(data_len, userid);
-	zbx_serialize_prepare_value(data_len, viewer_userid);
 	zbx_serialize_prepare_value(data_len, report_time);
 	zbx_serialize_prepare_value(data_len, period);
 	zbx_serialize_prepare_value(data_len, params->values_num);
@@ -75,7 +74,6 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const cha
 	ptr += zbx_serialize_str(ptr, name, name_len);
 	ptr += zbx_serialize_value(ptr, dashboardid);
 	ptr += zbx_serialize_value(ptr, userid);
-	ptr += zbx_serialize_value(ptr, viewer_userid);
 	ptr += zbx_serialize_value(ptr, report_time);
 	ptr += zbx_serialize_value(ptr, period);
 	ptr += zbx_serialize_value(ptr, params->values_num);
@@ -92,7 +90,7 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const cha
 }
 
 void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_uint64_t *dashboardid,
-		zbx_uint64_t *userid, zbx_uint64_t *viewer_userid, int *report_time, unsigned char *period,
+		zbx_uint64_t *userid, int *report_time, unsigned char *period,
 		zbx_vector_ptr_pair_t *params)
 {
 	int		params_num;
@@ -101,7 +99,6 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
 	data += zbx_deserialize_str(data, name, len);
 	data += zbx_deserialize_value(data, dashboardid);
 	data += zbx_deserialize_value(data, userid);
-	data += zbx_deserialize_value(data, viewer_userid);
 	data += zbx_deserialize_value(data, report_time);
 	data += zbx_deserialize_value(data, period);
 	data += zbx_deserialize_value(data, &params_num);
@@ -367,9 +364,41 @@ void	report_destroy_params(zbx_vector_ptr_pair_t *params)
 	zbx_vector_ptr_pair_destroy(params);
 }
 
-void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j)
+static int	check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
 {
-	zbx_uint64_t				dashboardid, viewer_userid, ui64;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = FAIL;
+
+	result = zbx_db_select("select d.dashboardid from dashboard d"
+			" where d.templateid is null"
+			" and ("
+				"d.userid=" ZBX_FS_UI64
+				" or d.private=0"
+				" or exists ("
+					"select null from dashboard_user du"
+					" where d.dashboardid=du.dashboardid and du.userid=" ZBX_FS_UI64
+				")"
+				" or exists ("
+					"select null from dashboard_usrgrp dug"
+					" join users_groups ug on ug.usrgrpid=dug.usrgrpid"
+					" where dug.dashboardid=d.dashboardid and ug.userid=" ZBX_FS_UI64
+				")"
+			")"
+			" and d.dashboardid=" ZBX_FS_UI64,
+			userid, userid, userid, dashboardid);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+		ret = SUCCEED;
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+void	zbx_report_test(const struct zbx_json_parse *jp, const zbx_user_t *user, struct zbx_json *j)
+{
+	zbx_uint64_t				dashboardid, ui64;
 	int					period, report_time, ret = FAIL;
 	struct zbx_json_parse			jp_params;
 	zbx_vector_ptr_pair_t			params;
@@ -389,9 +418,6 @@ void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struc
 	}
 
 	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_DASHBOARDID, &dashboardid, &error))
-		goto out;
-
-	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_USERID, &viewer_userid, &error))
 		goto out;
 
 	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_PERIOD, &ui64, &error))
@@ -424,7 +450,13 @@ void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struc
 		}
 	}
 
-	size = report_serialize_test_report(&data, name, dashboardid, userid, viewer_userid, report_time, period,
+	if (USER_TYPE_SUPER_ADMIN != user->type && SUCCEED != check_dashboard_access(user->userid, dashboardid))
+	{
+		error = zbx_strdup(error, "no access to dashboard");
+		goto out;
+	}
+
+	size = report_serialize_test_report(&data, name, dashboardid, user->userid, report_time, period,
 			&params);
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_REPORTER, ZBX_IPC_REPORTER_TEST,

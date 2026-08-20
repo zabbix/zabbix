@@ -43,8 +43,7 @@ void	report_clear_params(zbx_vector_ptr_pair_t *params);
 void	report_destroy_params(zbx_vector_ptr_pair_t *params);
 
 void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_uint64_t *dashboardid,
-		zbx_uint64_t *userid, zbx_uint64_t *viewer_userid, int *report_time, unsigned char *period,
-		zbx_vector_ptr_pair_t *params);
+		zbx_uint64_t *userid, int *report_time, unsigned char *period, zbx_vector_ptr_pair_t *params);
 
 zbx_uint32_t	report_serialize_response(unsigned char **data, int status, const char *error,
 		const zbx_vector_alerter_dispatch_result_t *results);

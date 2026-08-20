@@ -17,7 +17,7 @@
 #include "zbxthreads.h"
 #include "zbxjson.h"
 
-void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j);
+void	zbx_report_test(const struct zbx_json_parse *jp, const zbx_user_t *user, struct zbx_json *j);
 
 typedef struct
 {
