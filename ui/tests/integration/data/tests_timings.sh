@@ -26,6 +26,7 @@ declare -A BASELINE_TIMES=(
   [testAutoregistrationPSK]=85
   [testLowLevelDiscovery]=84
   [testDataCollection]=77
+  [testEncryptionDataCollection]=240
   [testProxyConfSync]=70
   [testComplexServiceStatus]=66
   [testItemRate]=66
