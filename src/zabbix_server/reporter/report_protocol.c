@@ -20,6 +20,7 @@
 #include "zbxjson.h"
 #include "zbxserialize.h"
 #include "zbxnum.h"
+#include "zbxdb.h"
 
 static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zbx_uint64_t *value, char **error)
 {
@@ -364,6 +365,17 @@ void	report_destroy_params(zbx_vector_ptr_pair_t *params)
 	zbx_vector_ptr_pair_destroy(params);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if user has access to dashboard                            *
+ *                                                                            *
+ * Parameters: userid      - [IN]                                             *
+ *             dashboardid - [IN]                                             *
+ *                                                                            *
+ * Return value: SUCCEED - access granted                                     *
+ *               FAIL    - no access                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_dashboard_access(zbx_uint64_t userid, zbx_uint64_t dashboardid)
 {
 	zbx_db_result_t	result;
