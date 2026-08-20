@@ -275,7 +275,10 @@ void	zbx_mw_manager_clear(zbx_mw_manager_t *manager)
 	}
 
 	if (NULL != manager->timekeeper)
+	{
 		zbx_timekeeper_free(manager->timekeeper);
+		manager->timekeeper = NULL;
+	}
 }
 
 /******************************************************************************
