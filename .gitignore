@@ -180,7 +180,6 @@ tests/libs/zbxcacheconfig/is_item_processed_by_server
 tests/libs/zbxcacheconfig/um_cache_resolve
 tests/libs/zbxcacheconfig/um_cache_resolve_cont
 tests/libs/zbxcacheconfig/um_cache_sync
-tests/libs/zbxcacheconfig/dc_sync_settings
 tests/libs/zbxcachevalue/zbx_vc_add_values
 tests/libs/zbxcachevalue/zbx_vc_get_value
 tests/libs/zbxcachevalue/zbx_vc_get_values

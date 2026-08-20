@@ -153,4 +153,5 @@ um_cache_resolve_cont_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAG
 	-Wl,--wrap=__zbx_shmem_malloc \
 	-Wl,--wrap=__zbx_shmem_realloc \
 	-Wl,--wrap=__zbx_shmem_free
+
 endif
