@@ -1337,7 +1337,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 		deviceName     string
 		expectations   expectation
 		args           args
-		expectedResult *SmartCtlDeviceData
+		expectedResult *smartCtlDeviceData
 		wantErr        bool
 	}{
 		{
@@ -1358,7 +1358,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				jsonRunner: false,
 			},
-			expectedResult: &SmartCtlDeviceData{
+			expectedResult: &smartCtlDeviceData{
 				Device: &deviceParser{
 					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
 					SerialNumber: "S641NX0T509005",
@@ -1396,7 +1396,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				jsonRunner: false,
 			},
-			expectedResult: &SmartCtlDeviceData{
+			expectedResult: &smartCtlDeviceData{
 				Device: &deviceParser{
 					ModelName:    "TEST_CSMI_SSD",
 					SerialNumber: "TEST-CSMI-SSD-0001",
@@ -1448,7 +1448,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				jsonRunner: false,
 			},
-			expectedResult: &SmartCtlDeviceData{
+			expectedResult: &smartCtlDeviceData{
 				Device: &deviceParser{
 					ModelName:    "TEST_CSMI_HDD",
 					SerialNumber: "TEST-CSMI-HDD-0002",
@@ -1500,7 +1500,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				jsonRunner: false,
 			},
-			expectedResult: &SmartCtlDeviceData{
+			expectedResult: &smartCtlDeviceData{
 				Device: &deviceParser{
 					ModelName:    "TEST_CSMI_HDD",
 					SerialNumber: "TEST-CSMI-HDD-0003",
@@ -2278,7 +2278,7 @@ func Test_getAllDeviceInfoByType(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *SmartCtlDeviceData
+		want    *smartCtlDeviceData
 		wantErr bool
 	}{
 		{
@@ -2290,7 +2290,7 @@ func Test_getAllDeviceInfoByType(t *testing.T) {
 				deviceName: "/dev/sda",
 				deviceType: "raid,1,2,3",
 			},
-			want: &SmartCtlDeviceData{
+			want: &smartCtlDeviceData{
 				Device: &deviceParser{
 					SerialNumber: "S5G1NC0W102239",
 					Info: deviceInfo{
@@ -2396,14 +2396,14 @@ func Test_getRaidDevices(t *testing.T) {
 
 	type args struct {
 		deviceName string
-		deviceType DeviceType
+		deviceType deviceType
 	}
 
 	tests := []struct {
 		name         string
 		expectations []expectation
 		args         args
-		want         []*SmartCtlDeviceData
+		want         []*smartCtlDeviceData
 	}{
 		{
 			name: "+sat",
@@ -2416,9 +2416,9 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			args: args{
 				deviceName: "/dev/sda",
-				deviceType: SAT,
+				deviceType: sat,
 			},
-			want: []*SmartCtlDeviceData{
+			want: []*smartCtlDeviceData{
 				{
 					Device: &deviceParser{
 						ModelName:    "INTEL SSDSC2BB120G6",
@@ -2561,9 +2561,9 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			args: args{
 				deviceName: "/dev/sda",
-				deviceType: SCSI,
+				deviceType: scsi,
 			},
-			want: []*SmartCtlDeviceData{
+			want: []*smartCtlDeviceData{
 				{
 					Device: &deviceParser{
 						SerialNumber: "S5G1NC0W102239",
@@ -2593,9 +2593,9 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			args: args{
 				deviceName: "/dev/sda",
-				deviceType: SAT,
+				deviceType: sat,
 			},
-			want: []*SmartCtlDeviceData{},
+			want: []*smartCtlDeviceData{},
 		},
 		{
 			name: "-scsiDeviceOpenError",
@@ -2608,9 +2608,9 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			args: args{
 				deviceName: "/dev/sda",
-				deviceType: SCSI,
+				deviceType: scsi,
 			},
-			want: []*SmartCtlDeviceData{},
+			want: []*smartCtlDeviceData{},
 		},
 		{
 			name: "+3wareLinux",
@@ -2627,9 +2627,9 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			args: args{
 				deviceName: "/dev/twa0",
-				deviceType: ThreeWare,
+				deviceType: threeWare,
 			},
-			want: []*SmartCtlDeviceData{
+			want: []*smartCtlDeviceData{
 				{
 					Device: &deviceParser{
 						ModelName:    "TEST_3WARE_HDD",
@@ -2677,9 +2677,9 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			args: args{
 				deviceName: "/dev/sg2",
-				deviceType: Areca,
+				deviceType: areca,
 			},
-			want: []*SmartCtlDeviceData{
+			want: []*smartCtlDeviceData{
 				{
 					Device: &deviceParser{
 						ModelName:    "TEST_ARECA_SSD",
@@ -2730,9 +2730,9 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			args: args{
 				deviceName: "/dev/sg0",
-				deviceType: CCISS,
+				deviceType: cciss,
 			},
-			want: []*SmartCtlDeviceData{
+			want: []*smartCtlDeviceData{
 				{
 					Device: &deviceParser{
 						SerialNumber: "TEST-CCISS-SCSI-0001",
@@ -2803,7 +2803,7 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			args: args{
 				deviceName: "/dev/sg0",
-				deviceType: CCISS,
+				deviceType: cciss,
 			},
 			want: nil,
 		},
@@ -2818,7 +2818,7 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			args: args{
 				deviceName: "/dev/sda",
-				deviceType: CCISS,
+				deviceType: cciss,
 			},
 			want: nil,
 		},
@@ -2833,7 +2833,7 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			args: args{
 				deviceName: "/dev/sda",
-				deviceType: Areca,
+				deviceType: areca,
 			},
 			want: nil,
 		},
@@ -2848,7 +2848,7 @@ func Test_getRaidDevices(t *testing.T) {
 			},
 			args: args{
 				deviceName: "/dev/sda",
-				deviceType: ThreeWare,
+				deviceType: threeWare,
 			},
 			want: nil,
 		},
@@ -2866,12 +2866,12 @@ func Test_getRaidDevices(t *testing.T) {
 				})
 			}
 
-			got := getRaidDevices(
-				newFixtureController(t, responses...),
-				log.New(""),
-				tt.args.deviceName,
-				tt.args.deviceType,
-			)
+			p := &Plugin{
+				Base: plugin.Base{Logger: log.New("")},
+				ctl:  newFixtureController(t, responses...),
+			}
+
+			got := p.getRaidDevices(tt.args.deviceName, tt.args.deviceType)
 			if diff := cmp.Diff(
 				tt.want, got,
 				cmp.AllowUnexported(deviceParser{}, deviceInfo{}),
@@ -2887,7 +2887,7 @@ func Test_setDeviceData(t *testing.T) {
 
 	type args struct {
 		jsonRunner bool
-		data       *SmartCtlDeviceData
+		data       *smartCtlDeviceData
 	}
 
 	tests := []struct {
@@ -2897,7 +2897,7 @@ func Test_setDeviceData(t *testing.T) {
 	}{
 		{
 			name: "+validJsonRunner",
-			args: args{jsonRunner: true, data: &SmartCtlDeviceData{
+			args: args{jsonRunner: true, data: &smartCtlDeviceData{
 				Device: &deviceParser{
 					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
 					SerialNumber: "S641NX0T509005",
@@ -2929,7 +2929,7 @@ func Test_setDeviceData(t *testing.T) {
 		},
 		{
 			name: "+validDeviceRunner",
-			args: args{jsonRunner: false, data: &SmartCtlDeviceData{
+			args: args{jsonRunner: false, data: &smartCtlDeviceData{
 				Device: &deviceParser{
 					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
 					SerialNumber: "S641NX0T509005",
