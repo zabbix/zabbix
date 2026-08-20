@@ -417,6 +417,14 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);
 	}
+	else if (ITEM_TYPE_CALCULATED == item.type && 0 == get_config_forks(ZBX_PROCESS_TYPE_HISTORYPOLLER))
+	{
+		*info = zbx_strdup(NULL, "Cannot perform Calculate Item request: configuration parameter"
+				" \"StartHistoryPollers\" is 0.");
+
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+			dump_item(&item);
+	}
 	else
 	{
 		zbx_vector_agent_result_ptr_t	add_results;

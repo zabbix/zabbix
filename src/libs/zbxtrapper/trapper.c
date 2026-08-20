@@ -1294,14 +1294,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 		{
 #ifndef ZBX_DEBUG
-		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+			zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
 			recv_agenthistory(sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 		{
 #ifndef ZBX_DEBUG
-		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+			zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
 			recv_senderhistory(sock, &jp, ts, config_comms->config_timeout);
 		}
@@ -1313,7 +1313,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 		{
 #ifndef ZBX_DEBUG
-		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+			zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
 			ret = send_list_of_active_checks_json(sock, &jp, events_cbs, config_comms->config_timeout,
 					autoreg_update_host_cb);
@@ -1324,7 +1324,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
 						config_comms->config_trapper_timeout, config_comms->config_source_ip,
-						config_ssh_key_location, get_config_forks, config_enable_global_scripts, zbx_get_program_type_cb());
+						config_ssh_key_location, get_config_forks, config_enable_global_scripts,
+						zbx_get_program_type_cb());
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
@@ -1372,8 +1373,19 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
 		}
+
+		return ret;
 	}
-	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
+
+	if (ZBX_TCP_SEC_UNENCRYPTED == sock->connection_type && NULL != config_comms->config_tls->tls_listen)
+	{
+		zabbix_log(LOG_LEVEL_WARNING,
+				"from %s: unencrypted connection not allowed", sock->peer);
+
+		return FAIL;
+	}
+
+	if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper received request for list of active checks");
 		ret = send_list_of_active_checks(sock, s, events_cbs, config_comms->config_timeout,
@@ -1437,13 +1449,48 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			av.severity = 0;
 		}
 
-		zbx_timespec(&av.ts);
-
-		if (0 == strcmp(av.value, ZBX_NOTSUPPORTED))
-			av.state = ITEM_STATE_NOTSUPPORTED;
-
 		zbx_dc_config_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
-		zbx_process_history_data(&item, &av, &errcode, 1, NULL);
+
+		if (SUCCEED == errcode)
+		{
+			struct zbx_json		json;
+			struct zbx_json_parse	jp;
+			char			*info = NULL;
+
+			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+			zbx_json_addobject(&json, NULL);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, host, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, av.value, ZBX_JSON_TYPE_STRING);
+
+			if (0 != av.timestamp)
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, (zbx_uint64_t)av.timestamp);
+
+			if (0 != av.lastlogsize)
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, av.lastlogsize);
+
+			if (NULL != av.source && '\0' != *av.source)
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, av.source, ZBX_JSON_TYPE_STRING);
+
+			if (0 != av.severity)
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, (zbx_uint64_t)av.severity);
+
+			zbx_json_close(&json);
+			zbx_json_close(&json);
+
+			if (SUCCEED == zbx_json_open(json.buffer, &jp))
+			{
+				if (ITEM_TYPE_ZABBIX_ACTIVE == item.type)
+					zbx_process_agent_history_data(sock, &jp, ts, &info);
+				else
+					zbx_process_sender_history_data(sock, &jp, ts, &info);
+
+				zbx_free(info);
+			}
+
+			zbx_json_free(&json);
+		}
 
 		if (SUCCEED != zbx_tcp_send_ext(sock, "OK", ZBX_CONST_STRLEN("OK"), 0, 0, config_comms->config_timeout))
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
