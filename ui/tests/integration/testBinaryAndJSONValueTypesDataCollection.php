@@ -42,6 +42,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	static $invalid_json;
 	static $json_image_normalized;
 	static $file_name_log_json;
+	static $file_name_log_json_proxy;
 
 	public static function ksort_recursive(&$array) {
 		if (!is_array($array)) {
@@ -77,6 +78,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		self::$file_name_invalid_json_for_binary_item = "/tmp/invalid_JSON.txt".time();
 		self::$file_name_invalid_json_for_json_item = "/tmp/invalid_JSON_2.txt".time();
 		self::$file_name_log_json = PHPUNIT_COMPONENT_DIR.'log_json.txt'.time();
+		self::$file_name_log_json_proxy = PHPUNIT_COMPONENT_DIR.'log_json_proxy.txt'.time();
 
 		$base64_image = self::base64_image;
 		$base64_empty = self::base64_empty;
@@ -137,12 +139,18 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			unlink(self::$file_name_log_json);
 		}
 
+		if (file_exists(self::$file_name_log_json_proxy)) {
+			unlink(self::$file_name_log_json_proxy);
+		}
+
 		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_binary_item, self::$json_with_image) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_json_item, self::$json_with_image) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_binary_item, self::$invalid_json) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_json_item, self::$invalid_json) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_log_json, self::log_json_line.PHP_EOL) !== false);
 		$this->assertTrue(@chmod(self::$file_name_log_json, 0666) !== false);
+		$this->assertTrue(@file_put_contents(self::$file_name_log_json_proxy, self::log_json_line.PHP_EOL) !== false);
+		$this->assertTrue(@chmod(self::$file_name_log_json_proxy, 0666) !== false);
 
 		self::$json_image_normalized = self::normalize_json(self::$json_with_image);
 
@@ -478,6 +486,13 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'error_handler' => 0,
 						'error_handler_params' => ''
 					]]
+				],
+				[
+						'name' => 'LOG_JSON_VALUE_TYPE_PROXY',
+						'key_' => 'log['.self::$file_name_log_json_proxy.']',
+						'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '1s'
 				]
 				]
 			]
@@ -941,6 +956,30 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->assertEquals(1, count($active_data['result']));
 		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
+	}
+
+	/**
+	 * Regression test.
+	 *
+	 * dc_add_proxy_history_meta() in cachehistory_proxy.c is missing a case for
+	 * ITEM_VALUE_TYPE_JSON (unlike its sibling dc_add_proxy_history(), which has it) and falls into
+	 * default: THIS_SHOULD_NEVER_HAPPEN; return;, silently dropping the value with no log line. This
+	 * is hit whenever a proxy-monitored log[] item (value_type=JSON) reports a value together with
+	 * meta info (lastlogsize/mtime) in the same submission - the ordinary case for the very first
+	 * successful read of a growing log file, not a rare corner case.
+	 *
+	 * @required-components server, proxy, agent
+	 * @configurationDataProvider proxyConfigurationProvider
+	 * @hosts proxy_agent
+	 */
+	public function testLogValueTypeJSON_proxyMetaWithValue() {
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['proxy_agent:log['.self::$file_name_log_json_proxy.']'],
+			'history'	=>	ITEM_VALUE_TYPE_JSON
+		]);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertNotEmpty($response['result']);
+		$this->assertEquals(self::normalize_json(self::log_json_line), self::normalize_json($response['result'][0]['value']));
 	}
 
 	/**
