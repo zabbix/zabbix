@@ -40,6 +40,7 @@
 			filter,
 			filter_defaults,
 			filter_options,
+			highlight_row_enabled,
 			layout_mode,
 			page,
 			refresh_interval,
@@ -55,8 +56,8 @@
 			this.#csrf_token = csrf_token;
 
 			this.#initFilter(filter_options);
-			this.#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order,
-				storage_idx, user_configs, severities});
+			this.#initDataTable({page, filter, highlight_row_enabled, default_sort_field, default_sort_order,
+				sort_field, sort_order, storage_idx, user_configs, severities});
 
 			$.subscribe('event.rank_change', () => this.#refresh());
 
@@ -81,8 +82,8 @@
 			jqBlink.blink();
 		}
 
-		#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
-				user_configs, severities}) {
+		#initDataTable({page, filter, highlight_row_enabled, default_sort_field, default_sort_order, sort_field,
+				sort_order, storage_idx, user_configs, severities}) {
 
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'problem.view.data');
@@ -95,7 +96,7 @@
 				filter.to = this.#global_timerange.to;
 			}
 
-			this.#datatable = new CDataTable(document.getElementById('problems'), data_provider)
+			this.#datatable = new CDataTable(document.getElementById('datatable-problems'), data_provider)
 				.setColumns([
 					new CDataTableColumn('time', <?= json_encode(_('Time')); ?>)
 						.setColumnOptions({
@@ -132,7 +133,8 @@
 						.setTogglable(false)
 						.setWidth('auto'),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
-						.setFields(['duration']),
+						.setFields(['duration'])
+						.setWidth('94px'),
 					new CDataTableColumn('update', <?= json_encode(_('Update')); ?>)
 						.setFields(['can_be_closed', 'eventid'])
 						.setRenderer('update'),
@@ -142,27 +144,35 @@
 						.setFields(['opdata'])
 						.setVisible(false),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
-					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
+					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
+					new CDataTableColumnCustomText('custom_text', <?= json_encode(_('Custom text')); ?>)
 				])
 				.setOption('compact_view', <?= json_encode(_('Compact view')); ?>, {
 					onRender: option => {
 						this.#datatable.getElement().classList.toggle('compact-view', option.checked);
 					},
 					onChange: (e, option) => {
-						this.#datatable.updateOption(option.id, { checked: e.target.checked });
+						for (const id of ['time', 'problem']) {
+							this.#datatable.getColumnById(id)?.setShowOptionsPopup(!e.target.checked);
+						}
 
+						this.#datatable.updateOption(option.id, {checked: e.target.checked});
+					},
+					onSave: () => {
 						this.#datatable.dispatchEvent(CDataTable.EVENT_INIT);
 						this.#datatable.dispatchEvent(CDataTable.EVENT_SAVE);
 					}
 				})
 				.setOption('highlight_row', <?= json_encode(_('Highlight whole row')); ?>, {
+					enabled: highlight_row_enabled,
 					onRender: option => {
 						this.#datatable.getElement().classList.toggle('has-highlighted-rows', option.checked);
 					},
 					onChange: (e, option) => {
-						this.#datatable
-							.updateOption(option.id, { checked: e.target.checked })
-							.getData()
+						this.#datatable.updateOption(option.id, {checked: e.target.checked});
+					},
+					onSave: () => {
+						this.#datatable.getData()
 							.then(response => {
 								this.#datatable.dispatchEvent(CDataTable.EVENT_RENDER, {response});
 								this.#datatable.dispatchEvent(CDataTable.EVENT_SAVE);
@@ -181,9 +191,7 @@
 				.setStorageIdx(storage_idx)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, row, row_index, cell, cell_inner,
-						response}) => {
-
+				.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, row, row_index, cell, response}) => {
 					const [eventid, nested, symptom_count, cause_eventid, severity] = cell_data;
 
 					if (!eventid) {
@@ -191,6 +199,9 @@
 					}
 
 					const input_id = `${column.getId()}_${eventid}`;
+
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
 
 					const checkbox = document.createElement('input');
 					checkbox.classList.add(ZBX_STYLE_CHECKBOX_RADIO);
@@ -210,7 +221,7 @@
 						label.classList.add('symptoms-left');
 					}
 					else {
-						cell_inner.append(checkbox, label);
+						flex_wrapper.append(checkbox, label);
 					}
 
 					const filter = this.#datatable.getFilter();
@@ -227,7 +238,7 @@
 							column.setWidth('72px');
 						}
 						else {
-							column.setWidth('37px');
+							column.setWidth('33px');
 						}
 					}
 
@@ -271,13 +282,15 @@
 							}
 						}
 
-						cell.appendChild(symptoms);
+						flex_wrapper.append(symptoms);
 					}
+
+					cell.appendChild(flex_wrapper);
 
 					requestAnimationFrame(() => {
 						const highlight_row = this.#datatable.getOption('highlight_row');
 
-						if (highlight_row.checked) {
+						if (highlight_row.enabled && highlight_row.checked) {
 							const severity_data = severities.find(data => data.value == severity);
 							if (!severity_data) {
 								return;
@@ -294,8 +307,10 @@
 						}
 					});
 				})
-				.setCellRenderer('time', ({column, cell_data, cell, cell_inner}) => {
+				.setCellRenderer('time', ({column, cell_data, cell}) => {
 					const [clock, eventid, triggerid] = cell_data;
+
+					cell.innerHTML = '';
 
 					if (clock && eventid && triggerid) {
 						const url = new URL('tr_events.php', location.href);
@@ -311,15 +326,14 @@
 
 						timeline.appendChild(clock_link);
 
-						cell_inner.append(timeline);
+						cell.append(timeline);
 					}
 
 					const compact_view = this.#datatable.getOption('compact_view');
 					const column_options = column.getColumnOptions();
+					const sort_field = this.#datatable.getSortField();
 
-					if (column_options.show_timeline == 1 && !compact_view.checked
-							&& this.#datatable.getSortField() == 'clock') {
-
+					if (column_options.show_timeline == 1 && !compact_view.checked && sort_field == 'clock') {
 						const axis = document.createElement('div');
 						axis.classList.add('timeline-axis', 'timeline-dot');
 
@@ -330,7 +344,7 @@
 						cell.append(axis, td);
 					}
 				})
-				.setCellRenderer('breakpoint', ({column, cell_data, cell, cell_inner}) => {
+				.setCellRenderer('breakpoint', ({column, cell_data, cell}) => {
 					const [breakpoint] = cell_data;
 
 					const breakpoint_header = document.createElement('h4');
@@ -341,7 +355,7 @@
 
 					timeline.appendChild(breakpoint_header);
 
-					cell_inner.appendChild(timeline);
+					cell.appendChild(timeline);
 
 					const compact_view = this.#datatable.getOption('compact_view');
 					const column_options = column.getColumnOptions();
@@ -357,15 +371,18 @@
 						cell.append(axis, td);
 					}
 				})
-				.setCellRenderer('severity', ({cell_data, cell, cell_inner}) => {
+				.setCellRenderer('severity', ({cell_data, cell}) => {
 					const [severity] = cell_data;
 					const severity_data = severities.find(data => data.value == severity);
 
-					cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG, severity_data.style);
+					cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG);
 
-					cell_inner.textContent = severity_data.label;
+					if (severity_data) {
+						cell.classList.add(severity_data.style);
+						cell.textContent = severity_data.label;
+					}
 				})
-				.setCellRenderer('host', ({cell_data, cell_inner}) => {
+				.setCellRenderer('host', ({cell_data, cell}) => {
 					const [hosts] = cell_data;
 
 					if (!hosts) {
@@ -375,8 +392,11 @@
 					for (const host of hosts) {
 						const {hostid, name, maintenance_type, maintenance_status} = host;
 
+						const flex_wrapper = document.createElement('div');
+						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 						const host_link = document.createElement('a');
-						host_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_WORDBREAK);
+						host_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
 						host_link.setAttribute('data-menu-popup', JSON.stringify({
 							type: 'host',
 							data: {
@@ -389,7 +409,7 @@
 						host_link.setAttribute('href', 'javascript:void(0)');
 						host_link.textContent = name;
 
-						cell_inner.appendChild(host_link);
+						flex_wrapper.appendChild(host_link);
 
 						if (maintenance_status == HOST_MAINTENANCE_STATUS_ON) {
 							let maintenance_name, maintenance_description;
@@ -421,11 +441,13 @@
 							maintenance_icon.setAttribute('data-hintbox-static', '1');
 							maintenance_icon.setAttribute('aria-expanded', 'false');
 
-							cell_inner.appendChild(maintenance_icon);
+							flex_wrapper.appendChild(maintenance_icon);
 						}
+
+						cell.appendChild(flex_wrapper);
 					}
 				})
-				.setCellRenderer('update', ({cell_data, cell_inner, response}) => {
+				.setCellRenderer('update', ({cell_data, cell, response}) => {
 					const [can_be_closed, eventid] = cell_data;
 
 					if (!eventid) {
@@ -459,9 +481,9 @@
 
 					update_link.textContent = <?= json_encode(_('Update')); ?>;
 
-					cell_inner.appendChild(update_link);
+					cell.appendChild(update_link);
 				})
-				.setCellRenderer('symptom_limit', ({cell, cell_inner, cell_data}) => {
+				.setCellRenderer('symptom_limit', ({cell, cell_data}) => {
 					const [paging] = cell_data;
 
 					const table_stats = document.createElement('div');
@@ -469,11 +491,11 @@
 					table_stats.textContent = paging;
 
 					const paging_container = document.createElement('div');
-					paging_container.classList.add(ZBX_STYLE_PAGING_BTN_CONTAINER);
+					paging_container.classList.add(ZBX_STYLE_PAGER_CONTAINER);
 					paging_container.appendChild(table_stats);
 
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
-					cell_inner.appendChild(paging_container);
+					cell.appendChild(paging_container);
 				})
 				.setRowRenderer('nested_symptom', ({columns, row, row_index, data_fields, row_data, response}) => {
 					const column = this.#datatable.getCheckboxColumn();
@@ -613,7 +635,7 @@
 					requestAnimationFrame(() => this.#initExpandables());
 				})
 				.on(CDataTable.EVENT_COLUMN_TOGGLE, e => {
-					const {column_index} = e.detail;
+					const {column_index, visible} = e.detail;
 
 					const column = this.#datatable.getColumn(column_index);
 					if (!column) {
@@ -628,9 +650,13 @@
 					if (this.#show_problems_hidden_column_ids.includes(column.getId())) {
 						e.preventDefault();
 
-						column.setVisible(false);
+						const overrides = column.getOverrides();
 
-						this.#datatable.updateUserConfig();
+						column.setOverrides({...overrides, visible})
+							.setVisible(false);
+
+						this.#datatable.updateUserConfig()
+							.dispatchEvent(CDataTable.EVENT_SAVE);
 					}
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
@@ -672,7 +698,7 @@
 				}
 
 				this.#scheduleRefresh();
-				this.#refresh(tabfilter_changed);
+				this.#refresh({tabfilter_changed});
 			});
 
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
@@ -794,10 +820,6 @@
 			btn.disabled = false;
 		}
 
-		getCurrentDebugBlock() {
-			return document.querySelector('.wrapper > .debug-output');
-		}
-
 		#addRefreshMessage(messages) {
 			this.#removeRefreshMessage();
 
@@ -823,10 +845,12 @@
 			}
 		}
 
-		#refresh(tabfilter_changed = false) {
-			if (isUserInteracting()) {
+		#refresh({tabfilter_changed = false, loading_fadein = false} = {}) {
+			if (this.#datatable.isUserInteracting()) {
 				return;
 			}
+
+			this.#unscheduleRefresh();
 
 			const search_params = new URLSearchParams(location.search.substring(1));
 			const url_filter = searchParamsToObject(search_params);
@@ -850,7 +874,9 @@
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
-					onSuccess: response => this.#onDataDone(response)
+					loading_fadein,
+					onSuccess: response => this.#onDataDone(response),
+					onFinally: () => this.#scheduleRefresh()
 				});
 		}
 
@@ -869,8 +895,10 @@
 				return;
 			}
 
+			const loading_fadein = true;
+
 			this.#unscheduleRefresh();
-			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
+			this.#refresh_interval_id = setInterval(() => this.#refresh({loading_fadein}), this.#refresh_interval);
 		}
 
 		#unscheduleRefresh() {

@@ -396,7 +396,7 @@ class testDashboardUserPermissions extends CWebTest {
 	protected function checkAccessViaMonitoringHosts($data) {
 		// Open host list in monitorting section.
 		$this->page->open('zabbix.php?action=host.view&groupids%5B%5D='.self::$host_groupid)->waitUntilReady();
-		$table = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		if ($data['view']) {
 			$column = $table->findRow('Name', self::HOSTNAME)->getColumn('Dashboards');

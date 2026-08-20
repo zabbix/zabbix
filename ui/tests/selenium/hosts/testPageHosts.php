@@ -85,8 +85,11 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->submit();
 		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 
+		// Wait for all datatable rows to load.
+		$count = (int) CDataHelper::call('host.get', ['countOutput' => true, 'groupids' => 4]);
+		$table->waitUntilRowsCount($count);
+
 		$this->zbxTestTextPresent($this->HostName);
-		$this->zbxTestTextPresent('Simple form test host');
 		$this->zbxTestTextNotPresent('Empty host');
 
 		// Check display of proxy and proxy group multiselects based on value of Monitored by field.
@@ -156,7 +159,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
 
-		$datatable = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$datatable = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 		$this->query('link', $name)->waitUntilVisible()->one()->scrollIntoView(50)->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$form->submit();
@@ -235,9 +238,10 @@ class testPageHosts extends CLegacyWebTest {
 
 		// Apply filtering parameters.
 		$form->fill($data['filter']);
+		$table = $this->query('id:datatable-hosts')->asDatatable()->one();
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
 
 		if (array_key_exists('expected', $data)) {
 			// Using column Name check that only the expected Hosts are returned in the list.
@@ -258,7 +262,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButtonText('Disable');
@@ -283,7 +287,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		$this->zbxTestCheckboxSelect('hostids_'.$hostid);
 		$this->zbxTestClickButtonText('Disable');
@@ -307,7 +311,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		$this->zbxTestCheckboxSelect('hostids_'.$hostid);
 		$this->zbxTestClickButtonText('Enable');
@@ -327,7 +331,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
@@ -348,7 +352,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->getField('Name')->fill($this->HostName);
 		$filter->submit();
 		$datatable->waitUntilReady();
-		$this->zbxTestTextPresent($this->HostName);
+		$this->query('xpath://div[@class="datatable-body"]//a[text()="'.$this->HostName.'"]')->waitUntilPresent();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
@@ -360,6 +364,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->fill(['Templates' => ['values' =>'Template for web scenario testing', 'context' => 'Templates']]);
 		$filter->submit();
 		$table->waitUntilReady();
+		$table->waitUntilRowsCount(1);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementPresentXpath('//div[@class="datatable-body"]//a[text()="Simple form test host"]');
 		$this->assertDatatableStats(1);
@@ -427,6 +432,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->submit();
 		$this->page->waitUntilReady();
 		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
+		$table->waitUntilRowsCount(count($data['expected']));
 
 		$this->assertDatatableStats(count($data['expected']));
 		$this->assertEquals(array_keys($data['expected']), $this->getDatatableColumnData('Name'));
@@ -441,14 +447,15 @@ class testPageHosts extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('1928379128ksdhksdjfh');
+		$table = $this->query('class:datatable')->asDatatable()->one();
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
-		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		$this->assertDatatableStats();
 		$filter->invalidate();
 		$filter->getField('Name')->fill('%');
 		$filter->submit();
-		$table->waitUntilReady();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertDatatableStats();
 	}
@@ -462,7 +469,8 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->getField('IP')->fill($this->HostIp);
 		$filter->getField('Port')->fill($this->HostPort);
 		$filter->submit();
-		$this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
+		$this->page->waitUntilReady();
+		$this->query('class:datatable')->asDatatable()->one()->waitUntilReady()->waitUntilRowsCount(1);
 		$this->zbxTestTextPresent($this->HostName);
 		$this->assertDatatableStats(1);
 	}
@@ -865,9 +873,10 @@ class testPageHosts extends CLegacyWebTest {
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);
+		$table = $this->query('class:datatable')->asDatatable()->one();
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
-		$this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		// Check filtered result.
 		$this->assertDatatableData(CTestArrayHelper::get($data, 'result', []));
 
@@ -879,16 +888,19 @@ class testPageHosts extends CLegacyWebTest {
 	 * Test the Enable and Disable link in the Host list.
 	 */
 	public function testPageHosts_EnableDisableLink() {
-		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		// Reset the filter (filter_rst=1) so a filter left over from a previous test does not hide the host.
+		$this->page->login()->open('zabbix.php?action=host.list&filter_rst=1')->waitUntilReady();
 		$host_row = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady()->findRow('Name', 'Enabled status');
 
 		foreach (['Disabled' => HOST_STATUS_NOT_MONITORED, 'Enabled' => HOST_STATUS_MONITORED] as $status => $id) {
 			$host_row->invalidate();
-			$host_row->getColumn('Status')->scrollIntoView(50)->query('tag:a')->one()->click();
+			$status_link = $host_row->getColumn('Status')->query('tag:a')->one();
+			$status_link->scrollIntoView(50)->click();
 			$this->page->waitUntilReady();
-			$host_row->invalidate();
+			$status_link->waitUntilStalled();
 			$this->assertMessage(TEST_GOOD, 'Host '.strtolower($status));
-			$this->assertEquals($status, $host_row->getColumn('Status')->getText());
+			$status_link->invalidate();
+			$this->assertEquals($status, $status_link->getText());
 			$this->assertEquals($id, CDBHelper::getValue('SELECT status FROM hosts WHERE host='.zbx_dbstr('Enabled status')));
 			CMessageElement::find()->one()->close();
 		}
@@ -901,9 +913,11 @@ class testPageHosts extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('Host for t');
+		$table = $this->query('id:datatable-hosts')->asDatatable()->one();
 		$filter->submit();
+		$table->waitUntilReloaded();
 
-		$table_rows_count = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady()->getRows()->count();
+		$table_rows_count = $table->waitUntilReady()->getRows()->count();
 		$this->assertDatatableStats($table_rows_count);
 		$delete_button = $this->query('button:Delete')->one();
 

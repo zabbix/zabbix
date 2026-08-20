@@ -54,18 +54,24 @@
 		/**
 		 * @type {number|null}
 		 */
-		#time_selector_toggle_timeout = null;
+		#time_period_update_timeout = null;
 
 		/**
 		 * @type {number|null}
 		 */
 		#host_override_toggle_timeout = null;
 
+		/**
+		 * @type {number}
+		 */
+		#web_layout_mode;
+
 		init({
 			dashboard,
 			widget_defaults,
 			widget_last_type,
 			configuration_hash,
+			start_slideshow,
 			dashboard_host,
 			dashboard_time_period,
 			web_layout_mode,
@@ -74,6 +80,7 @@
 			this.#dashboard = dashboard;
 			this.#dashboard_time_period = dashboard_time_period;
 			this.#clone = clone;
+			this.#web_layout_mode = web_layout_mode;
 
 			timeControl.refreshPage = false;
 
@@ -150,8 +157,6 @@
 				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});
 
-			ZABBIX.Dashboard.activate();
-
 			if (web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.#edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, () => this.#applyProperties());
@@ -196,6 +201,23 @@
 			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, () => {
 				location.href = location.href;
 			});
+
+			ZABBIX.Dashboard.on(CDashboard.EVENT_PAGE_SELECT, e => {
+				const {dashboard_page_index} = e.detail;
+				const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : null;
+
+				this.#updateHistory({page, add_new: false});
+			});
+
+			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_START, () => {
+				this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_ON, add_new: false});
+			});
+
+			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STOP, () => {
+				this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_OFF, add_new: false});
+			});
+
+			ZABBIX.Dashboard.activate(start_slideshow);
 
 			jqBlink.blink();
 		}
@@ -251,6 +273,8 @@
 			});
 
 			this.#enableNavigationWarning();
+
+			this.#updateHistory({add_new: false});
 		}
 
 		#save() {
@@ -363,11 +387,17 @@
 			document.getElementById('dashboard-save').disabled = do_disable;
 		}
 
-		#updateHistory({add_new})  {
+		#updateHistory({slideshow = null, page = undefined, add_new} = {}) {
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.view');
-			curl.setArgument('dashboardid', this.#dashboard.dashboardid);
+
+			if (this.#dashboard.dashboardid !== null) {
+				curl.setArgument('dashboardid', this.#dashboard.dashboardid);
+			}
+			else {
+				curl.setArgument('new', '1');
+			}
 
 			const state = {};
 
@@ -382,15 +412,34 @@
 				}
 			}
 
-			if (ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_TIME_PERIOD)) {
+			if (this.#clone) {
+				curl.setArgument('clone', '1');
+			}
+			else if (ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_TIME_PERIOD)) {
 				curl.setArgument('from', this.#dashboard_time_period.from);
 				curl.setArgument('to', this.#dashboard_time_period.to);
 			}
 
-			const page = new Curl().getArgument('page');
+			const url = new Curl();
+
+			if (page === undefined) {
+				page = url.getArgument('page');
+			}
 
 			if (page !== null) {
 				curl.setArgument('page', page);
+			}
+
+			if (!ZABBIX.Dashboard.isEditMode()) {
+				const auto_start = this.#dashboard.auto_start === '1'
+					? DASHBOARD_SLIDESHOW_ON
+					: DASHBOARD_SLIDESHOW_OFF;
+
+				slideshow = slideshow ?? url.getArgument('slideshow');
+
+				if (slideshow !== null && slideshow !== auto_start) {
+					curl.setArgument('slideshow', slideshow);
+				}
 			}
 
 			if (add_new) {
@@ -570,18 +619,20 @@
 		#onReferredUpdate(e) {
 			switch (e.detail.type) {
 				case CWidgetsData.DATA_TYPE_TIME_PERIOD:
-					if (this.#time_selector_toggle_timeout !== null) {
-						clearTimeout(this.#time_selector_toggle_timeout);
+					if (this.#time_period_update_timeout !== null) {
+						clearTimeout(this.#time_period_update_timeout);
 					}
 
-					this.#time_selector_toggle_timeout = setTimeout(() => {
-						this.#time_selector_toggle_timeout = null;
+					this.#time_period_update_timeout = setTimeout(() => {
+						this.#time_period_update_timeout = null;
 
 						if (this.#dashboard.dashboardid !== null && !this.#clone) {
 							this.#updateHistory({add_new: false});
 						}
 
-						this.#toggleTimeSelector(e.detail.is_referred);
+						if (this.#web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+							this.#toggleTimeSelector(e.detail.is_referred);
+						}
 					});
 
 					break;

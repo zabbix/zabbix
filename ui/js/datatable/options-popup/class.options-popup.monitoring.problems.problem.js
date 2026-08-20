@@ -74,7 +74,7 @@ class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsP
 	onInit() {
 		super.onInit();
 
-		const column_options = this.getColumnConfig().getColumnOptions();
+		const column_options = this.getColumn().getColumnOptions();
 		const compact_view = this.getDataTable().getOption('compact_view');
 
 		for (const field of Object.keys(this.getDefaultData())) {
@@ -85,17 +85,13 @@ class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsP
 				input.disabled = compact_view.checked;
 			}
 
-			input.addEventListener('input', e => e.stopPropagation());
-
-			input.addEventListener('change', e => {
+			input.addEventListener('input', e => {
 				e.stopPropagation();
 
-				const column_options = {
-					...this.getColumnConfig().getColumnOptions(),
+				this.getColumn().setColumnOptions({
+					...this.getColumn().getColumnOptions(),
 					[field]: e.target.checked ? 1 : 0
-				};
-
-				this.getColumnConfig().setColumnOptions(column_options);
+				});
 
 				this.getDataTable().updateUserConfig();
 

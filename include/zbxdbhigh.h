@@ -229,7 +229,8 @@ typedef enum
 	MEDIA_TYPE_EMAIL = 0,
 	MEDIA_TYPE_EXEC,
 	MEDIA_TYPE_SMS,
-	MEDIA_TYPE_WEBHOOK = 4
+	MEDIA_TYPE_WEBHOOK = 4,
+	MEDIA_TYPE_PUSH = 5
 }
 zbx_media_type_t;
 
@@ -623,6 +624,7 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 
 int	zbx_db_check_instanceid(void);
 int	zbx_db_update_software_update_checkid(void);
+int	zbx_db_check_serverid(void);
 
 /* tags */
 typedef struct
@@ -822,6 +824,7 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define ZBX_CONDITION_TYPE_EVENT_TAG_VALUE		26
 #define ZBX_CONDITION_TYPE_SERVICE			27
 #define ZBX_CONDITION_TYPE_SERVICE_NAME			28
+#define ZBX_CONDITION_TYPE_PROXY_GROUP			29
 
 #define PROXY_OPERATING_MODE_ACTIVE	0
 #define PROXY_OPERATING_MODE_PASSIVE	1

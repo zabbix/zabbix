@@ -24,6 +24,8 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 
 	#sortable = null;
 
+	#options = {};
+
 	getTemplate() {
 		const template = document.createElement('div');
 		const options = this.getDataTable().getOptions();
@@ -36,7 +38,7 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 			const table_options = document.createElement('ul');
 			table_options.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST);
 
-			for (const [id, option] of Object.entries(options)) {
+			for (const [id, option] of Object.entries(options).filter(([, option]) => option.enabled)) {
 				const input = document.createElement('input');
 				input.id = id;
 				input.classList.add(ZBX_STYLE_CHECKBOX_RADIO);
@@ -44,7 +46,10 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 				input.setAttribute('data-field-type', 'checkbox');
 				input.value = '1';
 				input.checked = option.checked;
-				input.addEventListener('change', event => option.onChange(event, option));
+				input.addEventListener('change', event => {
+					option.onChange(event, option);
+					option.onSave();
+				});
 
 				const label = document.createElement('div');
 				label.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM_LABEL);
@@ -106,6 +111,10 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 	onInit() {
 		super.onInit();
 
+		for (const [id, option] of Object.entries(this.getDataTable().getOptions())) {
+			this.#options[id] = option;
+		}
+
 		this.getElement().classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_TABLE);
 	}
 
@@ -132,16 +141,20 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 		const icon = document.createElement('div');
 		icon.classList.add(ZBX_STYLE_DRAG_ICON);
 
+		const overrides = column.getOverrides();
+
 		const input = document.createElement('input');
 		input.classList.add(ZBX_STYLE_CHECKBOX_RADIO);
 		input.setAttribute('id', id);
 		input.setAttribute('type', 'checkbox');
 		input.setAttribute('data-field-type', 'checkbox');
-		input.checked = column.isVisible();
+		input.checked = overrides?.visible ?? column.isVisible();
 		input.disabled = !column.isTogglable();
 		input.value = '1';
 		input.addEventListener('change', e => {
 			const visible = e.target.checked;
+
+			e.target.focus();
 
 			this.getDataTable().dispatchEvent(CDataTable.EVENT_COLUMN_TOGGLE, {column_index, visible},
 				{cancelable: true});

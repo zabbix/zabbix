@@ -39,7 +39,7 @@ zabbix_export:
         - Device: HP 1910-48
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1168,7 +1168,7 @@ zabbix_export:
           description: 'Warning threshold of ICMP packet loss in %.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Thresholds
             label: 'Threshold of ICMP packet loss'
             description: 'Warning threshold of ICMP packet loss in %. In the range from 0 to 100 inclusive.'
@@ -1178,7 +1178,7 @@ zabbix_export:
           description: 'Warning threshold of the average ICMP response time in seconds.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Thresholds
             label: 'Threshold of the average ICMP response'
             description: 'Warning threshold of the average ICMP response time in seconds. No less than 0.'
@@ -1188,7 +1188,7 @@ zabbix_export:
           description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
             description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
@@ -1197,7 +1197,7 @@ zabbix_export:
           value: '90'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
             description: 'In the range from 0 to 100 inclusive.'
@@ -1206,7 +1206,7 @@ zabbix_export:
           value: '1'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Thresholds
             label: 'Interfaces control'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -1223,7 +1223,7 @@ zabbix_export:
           value: '^.*'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Filter for network interface by adminstatus'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
@@ -1231,42 +1231,42 @@ zabbix_export:
           description: 'Ignore down(2) administrative status'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Filter for network interface by adminstatus (exclude)'
         - macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '.*'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Filter for network interfaces by alias'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Filter for network interfaces by alias (exclude)'
         - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Filter for network interfaces by description'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Filter for network interfaces by description (exclude)'
         - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '^.*$'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Filter for network interface by name'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
@@ -1274,7 +1274,7 @@ zabbix_export:
           description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Filter for network interface by name (exclude)'
             description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
@@ -1282,7 +1282,7 @@ zabbix_export:
           value: '^.*$'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Filter for network interface by status'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
@@ -1290,21 +1290,21 @@ zabbix_export:
           description: 'Ignore notPresent(6)'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Filter for network interface by status (exclude)'
         - macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'Filter for network interfaces by type'
         - macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Filter for network interfaces by type (exclude)'
         - macro: '{$PSU_CRIT_STATUS:"hardwareFaulty"}'
@@ -1340,6 +1340,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'Time interval for the SNMP availability trigger.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '12'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
           config:
@@ -2075,11 +2084,20 @@ zabbix_export:
               newvalue: unknown
   triggers:
     - uuid: c1372deba2b148f4ac8be6493f0b9868
-      expression: '(last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Comware HH3C by SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: |
+        (last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0],#2)))
+        or (last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/HP Comware HH3C by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/HP Comware HH3C by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/HP Comware HH3C by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/HP Comware HH3C by SNMP/system.net.uptime[sysUpTime.0],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
+        or last(/HP Comware HH3C by SNMP/system.net.uptime[sysUpTime.0])>{$SNMP.UPTIME.WARN}
       name: 'HP Comware HH3C: Host has been restarted'
-      event_name: 'HP Comware HH3C: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'HP Comware HH3C: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       dependencies:
         - name: 'HP Comware HH3C: No SNMP data collection'

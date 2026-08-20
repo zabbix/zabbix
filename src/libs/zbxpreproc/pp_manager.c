@@ -864,8 +864,8 @@ static void	preprocessor_reply_size(zbx_pp_manager_t *manager, zbx_ipc_client_t 
  * Purpose: flush processed value task                                        *
  *                                                                            *
  * Parameters: manager  - [IN] preprocessing manager                          *
- *             tasks    - [IN] processed tasks                                *
- *             runstate - [IN] preprocexsing manager run state                *
+ *             task     - [IN] processed task                                 *
+ *             runstate - [IN] preprocessing manager run state                *
  *                                                                            *
  ******************************************************************************/
 static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_task_t *task,
@@ -889,7 +889,7 @@ static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_t
  *                                                                            *
  * Purpose: send back result of processed test task                           *
  *                                                                            *
- * Parameters: tasks - [IN] processed tasks                                   *
+ * Parameters: task - [IN] processed task                                     *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_reply_test_result(zbx_pp_task_t *task)

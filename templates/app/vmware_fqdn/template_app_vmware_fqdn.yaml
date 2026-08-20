@@ -1125,7 +1125,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -1158,6 +1158,9 @@ zabbix_export:
           valuemap:
             name: 'VMware Consolidation'
           preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -1166,9 +1169,6 @@ zabbix_export:
                   	'false'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 2;
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
           tags:
             - tag: component
               value: storage
@@ -1502,12 +1502,12 @@ zabbix_export:
           password: '{$VMWARE.PASSWORD}'
           description: 'System boot time.'
           preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - 'return Math.floor(Date.parse(value)/1000);'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+            - type: JAVASCRIPT
+              parameters:
+                - 'return Math.floor(Date.parse(value)/1000);'
           tags:
             - tag: component
               value: system
@@ -1580,6 +1580,9 @@ zabbix_export:
           valuemap:
             name: 'VMware Virtual Machine state'
           preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -1592,9 +1595,6 @@ zabbix_export:
                   	'unknown'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 5;
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: health
@@ -1660,6 +1660,9 @@ zabbix_export:
           valuemap:
             name: 'VMware Tools status'
           preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -1669,9 +1672,6 @@ zabbix_export:
                   	'guestToolsRunning'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: system
@@ -3701,7 +3701,7 @@ zabbix_export:
         Note: To enable discovery of hardware sensors of VMware hypervisors, set the host wizard configuration field `Monitoring of hardware sensors` to the selected state.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -3764,6 +3764,9 @@ zabbix_export:
           valuemap:
             name: 'VMware Connection state'
           preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -3773,9 +3776,6 @@ zabbix_export:
                   	'notResponding'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 3;
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: availability
@@ -4366,6 +4366,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")].healthState.label.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
                 - type: JAVASCRIPT
                   parameters:
                     - |
@@ -4376,9 +4379,6 @@ zabbix_export:
                       	'red'
                       ].indexOf(value.toLowerCase());
                       return idx !== -1 ? idx : 0;
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
               master_item:
                 key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
               tags:
@@ -4423,12 +4423,12 @@ zabbix_export:
                 - '$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")]'
               error_handler: CUSTOM_VALUE
               error_handler_params: '[]'
-            - type: JAVASCRIPT
-              parameters:
-                - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
         - uuid: cabe1fbdd4e04ef396afaa5dfd1a3423
           name: 'Network interface discovery'
           type: SIMPLE
@@ -4488,6 +4488,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$..HostNumericSensorInfo[?(@.name=="{#NAME}")].healthState.label.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
                 - type: JAVASCRIPT
                   parameters:
                     - |
@@ -4498,9 +4501,6 @@ zabbix_export:
                       	'red'
                       ].indexOf(value.toLowerCase());
                       return idx !== -1 ? idx : 0;
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 6h
               master_item:
                 key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
               tags:
@@ -4592,6 +4592,9 @@ zabbix_export:
           master_item:
             key: 'vmware.hv.version[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -4642,9 +4645,6 @@ zabbix_export:
                   	Zabbix.log(3, '[ VMware Serial Number Discovery ] ERROR: ' + error);
                   	throw 'Failed to process data:' + error;
                   }
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
       tags:
         - tag: class
           value: software

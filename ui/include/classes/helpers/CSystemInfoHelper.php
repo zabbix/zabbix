@@ -32,14 +32,20 @@ class CSystemInfoHelper {
 		$data = [
 			'is_global_scripts_enabled' => CSettingsHelper::isGlobalScriptsEnabled(),
 			'is_software_update_check_enabled' => CSettingsHelper::isSoftwareUpdateCheckEnabled(),
+			'software_update_check_data' => [],
 			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT),
+			CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY => false,
+			CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS => false,
 			'server_details' => '',
+			'server_host' => null,
+			'server_port' => null,
+			'history_pk' => false,
 			'failover_delay' => 0,
+			'failover_delay_seconds' => 0,
 			'http_auth_warning' => array_key_exists('ALLOW_HTTP_AUTH', APP::getConfig())
 		];
 
 		if ($data['is_software_update_check_enabled']) {
-			$data['software_update_check_data'] = [];
 			$check_data = CSettingsHelper::getSoftwareUpdateCheckData();
 
 			if ($check_data) {
@@ -115,17 +121,22 @@ class CSystemInfoHelper {
 			$failover_delay = CSettingsHelper::get(CSettingsHelper::HA_FAILOVER_DELAY);
 			$failover_delay_seconds = timeUnitToSeconds($failover_delay);
 			$data['failover_delay'] = secondsToPeriod($failover_delay_seconds);
+			$data['failover_delay_seconds'] = $failover_delay_seconds;
 		}
 
-		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+		if (CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			return $data;
 		}
 
 		if ($ZBX_SERVER !== null && $ZBX_SERVER_PORT !== null) {
 			$data['server_details'] = $ZBX_SERVER.':'.$ZBX_SERVER_PORT;
+			$data['server_host'] = $ZBX_SERVER;
+			$data['server_port'] = $ZBX_SERVER_PORT;
 		}
 		elseif (count($ha_nodes) == 1) {
 			$data['server_details'] = $ha_nodes[0]['address'].':'.$ha_nodes[0]['port'];
+			$data['server_host'] = $ha_nodes[0]['address'];
+			$data['server_port'] = $ha_nodes[0]['port'];
 		}
 
 		$setup = new CFrontendSetup();
@@ -180,6 +191,182 @@ class CSystemInfoHelper {
 	}
 
 	/**
+	 * Get system information export data.
+	 *
+	 * @param array $system_info  System information array received from self::getData method
+	 */
+	public static function getExportData(array $system_info): array {
+		$status = array_replace([
+			'server_version' => null,
+			'triggers_count_disabled' => null,
+			'triggers_count_off' => null,
+			'triggers_count_on' => null,
+			'items_count_monitored' => null,
+			'items_count_disabled' => null,
+			'items_count_not_supported' => null,
+			'hosts_count_monitored' => null,
+			'hosts_count_not_monitored' => null,
+			'hosts_count_template' => null,
+			'users_count' => null,
+			'users_online' => null,
+			'vps_total' => null,
+			'hosts_count' => null,
+			'items_count' => null,
+			'triggers_count' => null,
+			'triggers_count_enabled' => null
+		], $system_info['status']);
+
+		$result = [
+			'report' => [
+				'id' => _('System information'),
+				'value' => time()
+			],
+			'serverid' => [
+				'id' => _('Zabbix server ID'),
+				'value' => CSettingsHelper::get(CSettingsHelper::SERVER_ID)
+			],
+			'server_running' => [
+				'id' => _('Zabbix server is running'),
+				'value' => $status['is_running'],
+				'details' => [
+					'has_status' => $status['has_status'],
+					'error_code' => $status['error_code'],
+					'address' => $system_info['server_host'],
+					'port' => $system_info['server_port']
+				]
+			],
+			'server_version' => [
+				'id' => _('Zabbix server version'),
+				'value' => $status['server_version'],
+				'details' => [
+					'outdated' => null
+				]
+			],
+			'frontend_version' => [
+				'id' => _('Zabbix frontend version'),
+				'value' => ZABBIX_VERSION,
+				'details' => [
+					'update_check_enabled' => $system_info['is_software_update_check_enabled'],
+					'last_checked' => array_key_exists('lastcheck', $system_info['software_update_check_data'])
+						? $system_info['software_update_check_data']['lastcheck']
+						: null,
+					'outdated' => null,
+					'encoding_warning' => $system_info['encoding_warning'] !== ''
+						? $system_info['encoding_warning']
+						: null
+				]
+			],
+			'hosts' => [
+				'id' => _('Number of hosts (enabled/disabled)'),
+				'value' => $status['hosts_count'],
+				'details' => [
+					'enabled' => $status['hosts_count_monitored'],
+					'disabled' => $status['hosts_count_not_monitored']
+				]
+			],
+			'templates' => [
+				'id' => _('Number of templates'),
+				'value' => $status['hosts_count_template']
+			],
+			'items' => [
+				'id' => _('Number of items (enabled/disabled/not supported)'),
+				'value' => $status['items_count'],
+				'details' => [
+					'enabled' => $status['items_count_monitored'],
+					'disabled' => $status['items_count_disabled'],
+					'not_supported' => $status['items_count_not_supported']
+				]
+			],
+			'triggers' => [
+				'id' => _('Number of triggers (enabled/disabled [problem/ok])'),
+				'value' => $status['triggers_count'],
+				'details' => [
+					'enabled' => $status['triggers_count_enabled'],
+					'disabled' => $status['triggers_count_disabled'],
+					'problem' => $status['triggers_count_on'],
+					'ok' => $status['triggers_count_off']
+				]
+			],
+			'users' => [
+				'id' => _('Number of users (online)'),
+				'value' => $status['users_count'],
+				'details' => [
+					'online' => $status['users_online']
+				]
+			],
+			'values_per_second' => [
+				'id' => _('Required server performance, new values per second'),
+				'value' => $status['vps_total'] !== null ? round($status['vps_total'], 2) : null
+			],
+			'global_scripts' => [
+				'id' => _('Global scripts on Zabbix server'),
+				'value' => $system_info['is_global_scripts_enabled']
+			],
+			'history_primary_key' => [
+				'id' => _('Database history tables use primary key'),
+				'value' => false
+			],
+			'data_stores' => [
+				'id' => _('Data stores'),
+				'value' => null,
+				'details' => []
+			],
+			'housekeeping' => [
+				'id' => _('Housekeeping'),
+				'value' => null,
+				'details' => [
+					'needs_override_history' => $system_info[CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY],
+					'needs_override_trends' => $system_info[CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS]
+				]
+			],
+			'high_availability' => [
+				'id' => _('High availability cluster'),
+				'value' => $system_info['ha_cluster_enabled'],
+				'details' => [
+					'failover_delay' => $system_info['failover_delay_seconds'],
+					'nodes' => []
+				]
+			]
+		];
+
+		if (array_key_exists('latest_release', $system_info['software_update_check_data'])) {
+			$latest_release = $system_info['software_update_check_data']['latest_release'];
+			$result['frontend_version']['details']['outdated'] = version_compare(ZABBIX_VERSION, $latest_release, '<');
+
+			if ($status['server_version'] !== null) {
+				$result['server_version']['details']['outdated'] = version_compare(
+					$status['server_version'],
+					$latest_release, '<'
+				);
+			}
+		}
+
+		foreach ($system_info['dbversion_status'] as $dbversion) {
+			$result['data_stores']['details'][] = [
+				'store' => $dbversion['database'],
+				'current_version' => $dbversion['current_version'],
+				'version_supported' => $dbversion['flag'] == DB_VERSION_SUPPORTED
+			] + array_intersect_key($dbversion, array_flip(['history_pk', 'value_types']));
+
+			if (array_key_exists('history_pk', $dbversion)) {
+				$result['history_primary_key']['value'] = $dbversion['history_pk'] == 1;
+			}
+		}
+
+		foreach ($system_info['ha_nodes'] as $ha_node) {
+			$result['high_availability']['details']['nodes'][] = [
+				'name' => $ha_node['name'],
+				'address' => $ha_node['address'],
+				'port' => (int) $ha_node['port'],
+				'last_access' => (int) $ha_node['lastaccess'],
+				'status' => (int) $ha_node['status']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Get a summary of running server stats.
 	 *
 	 * @param string|null  $ZBX_SERVER
@@ -190,7 +377,8 @@ class CSystemInfoHelper {
 	private static function getServerStatus(?string $ZBX_SERVER, ?int $ZBX_SERVER_PORT): array {
 		$status = [
 			'is_running' => false,
-			'has_status' => false
+			'has_status' => false,
+			'error_code' => 0
 		];
 
 		if ($ZBX_SERVER === null && $ZBX_SERVER_PORT === null) {
@@ -203,8 +391,9 @@ class CSystemInfoHelper {
 		);
 
 		$status['is_running'] = $server->isRunning() || $server->canConnect(CSessionHelper::getId());
+		$status['error_code'] = $server->getErrorCode();
 
-		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+		if (CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			return $status;
 		}
 
@@ -221,6 +410,7 @@ class CSystemInfoHelper {
 
 		$server_status = $server->getStatus(CSessionHelper::getId());
 		$status['has_status'] = (bool) $server_status;
+		$status['error_code'] = $server->getErrorCode();
 
 		if ($server_status === false) {
 			error($server->getError());

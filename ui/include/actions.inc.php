@@ -57,6 +57,7 @@ function condition_type2str($type = null) {
 		ZBX_CONDITION_TYPE_DVALUE => _('Received value'),
 		ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED => _('Event acknowledged'),
 		ZBX_CONDITION_TYPE_PROXY => _('Proxy'),
+		ZBX_CONDITION_TYPE_PROXY_GROUP => _('Proxy group'),
 		ZBX_CONDITION_TYPE_EVENT_TYPE => _('Event type'),
 		ZBX_CONDITION_TYPE_HOST_METADATA => _('Host metadata'),
 		ZBX_CONDITION_TYPE_EVENT_TAG => _('Tag name'),
@@ -105,6 +106,7 @@ function actionConditionValueToString(array $actions): array {
 	$hostids = [];
 	$templateids = [];
 	$proxyids = [];
+	$proxy_groupids = [];
 	$druleids = [];
 	$dcheckids = [];
 	$serviceids = [];
@@ -150,6 +152,10 @@ function actionConditionValueToString(array $actions): array {
 
 				case ZBX_CONDITION_TYPE_PROXY:
 					$proxyids[$condition['value']] = $condition['value'];
+					break;
+
+				case ZBX_CONDITION_TYPE_PROXY_GROUP:
+					$proxy_groupids[$condition['value']] = $condition['value'];
 					break;
 
 				case ZBX_CONDITION_TYPE_SERVICE:
@@ -211,6 +217,7 @@ function actionConditionValueToString(array $actions): array {
 	$hosts = [];
 	$templates = [];
 	$proxies = [];
+	$proxy_groups = [];
 	$drules = [];
 	$dchecks = [];
 	$services = [];
@@ -257,6 +264,14 @@ function actionConditionValueToString(array $actions): array {
 		]);
 	}
 
+	if ($proxy_groupids) {
+		$proxy_groups = API::ProxyGroup()->get([
+			'output' => ['name'],
+			'proxy_groupids' => $proxy_groupids,
+			'preservekeys' => true
+		]);
+	}
+
 	if ($druleids) {
 		$drules = API::DRule()->get([
 			'output' => ['name'],
@@ -282,7 +297,7 @@ function actionConditionValueToString(array $actions): array {
 		]);
 	}
 
-	if ($groups || $triggers || $hosts || $templates || $proxies || $drules || $dchecks || $services) {
+	if ($groups || $triggers || $hosts || $templates || $proxies || $proxy_groups || $drules || $dchecks || $services) {
 		foreach ($actions as $i => $action) {
 			foreach ($action['filter']['conditions'] as $j => $condition) {
 				$id = $condition['value'];
@@ -316,6 +331,12 @@ function actionConditionValueToString(array $actions): array {
 					case ZBX_CONDITION_TYPE_PROXY:
 						if (array_key_exists($id, $proxies)) {
 							$result[$i][$j] = $proxies[$id]['name'];
+						}
+						break;
+
+					case ZBX_CONDITION_TYPE_PROXY_GROUP:
+						if (array_key_exists($id, $proxy_groups)) {
+							$result[$i][$j] = $proxy_groups[$id]['name'];
 						}
 						break;
 
@@ -780,6 +801,7 @@ function get_conditions_by_eventsource($eventsource): array {
 		ZBX_CONDITION_TYPE_DRULE,
 		ZBX_CONDITION_TYPE_DSTATUS,
 		ZBX_CONDITION_TYPE_PROXY,
+		ZBX_CONDITION_TYPE_PROXY_GROUP,
 		ZBX_CONDITION_TYPE_DVALUE,
 		ZBX_CONDITION_TYPE_DSERVICE_PORT,
 		ZBX_CONDITION_TYPE_DSERVICE_TYPE,
@@ -788,7 +810,8 @@ function get_conditions_by_eventsource($eventsource): array {
 	$conditions[EVENT_SOURCE_AUTOREGISTRATION] = [
 		ZBX_CONDITION_TYPE_HOST_NAME,
 		ZBX_CONDITION_TYPE_HOST_METADATA,
-		ZBX_CONDITION_TYPE_PROXY
+		ZBX_CONDITION_TYPE_PROXY,
+		ZBX_CONDITION_TYPE_PROXY_GROUP
 	];
 	$conditions[EVENT_SOURCE_INTERNAL] = [
 		ZBX_CONDITION_TYPE_EVENT_TYPE,
@@ -960,6 +983,7 @@ function get_operators_by_conditiontype($conditiontype): array {
 		case ZBX_CONDITION_TYPE_HOST:
 		case ZBX_CONDITION_TYPE_HOST_GROUP:
 		case ZBX_CONDITION_TYPE_PROXY:
+		case ZBX_CONDITION_TYPE_PROXY_GROUP:
 		case ZBX_CONDITION_TYPE_SERVICE:
 		case ZBX_CONDITION_TYPE_TEMPLATE:
 		case ZBX_CONDITION_TYPE_TRIGGER:
@@ -1809,17 +1833,17 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButtonIcon {
 	if ($data['original_severity'] > $data['current_severity']) {
 		$button = (new CButtonIcon(ZBX_ICON_ARROW_DOWN_SMALL))
 			->addClass(ZBX_STYLE_COLOR_POSITIVE)
-			->setAttribute('aria-label', _x('Severity decreased', 'screen reader'));
+			->setAttribute('aria-label', _x('Problem severity decreased', 'screen reader'));
 	}
 	elseif ($data['original_severity'] < $data['current_severity']) {
 		$button = (new CButtonIcon(ZBX_ICON_ARROW_UP_SMALL))
 			->addClass(ZBX_STYLE_COLOR_NEGATIVE)
-			->setAttribute('aria-label', _x('Severity increased', 'screen reader'));
+			->setAttribute('aria-label', _x('Problem severity increased', 'screen reader'));
 	}
 	else {
 		$button = (new CButtonIcon(ZBX_ICON_ARROWS_TOP_BOTTOM))
 			->addClass(ZBX_STYLE_COLOR_ICON)
-			->setAttribute('aria-label', _x('Severity changed', 'screen reader'));
+			->setAttribute('aria-label', _x('Problem severity changed', 'screen reader'));
 	}
 
 	return $button->setHint($table, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);
@@ -1926,7 +1950,7 @@ function makeEventActionsIcon(array $data, string $eventid): ?CButtonIcon {
 	return $button
 		->setAttribute('data-content', $data['count'])
 		->setAttribute('aria-label',
-			_xn('%1$s action', '%1$s actions', $data['count'], 'screen reader', $data['count'])
+			_xn('%1$s action have been taken', '%1$s actions have been taken', $data['count'], 'screen reader', $data['count'])
 		)
 		->setAjaxHint([
 			'type' => 'eventactions',

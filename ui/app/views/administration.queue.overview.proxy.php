@@ -71,9 +71,9 @@ if (CWebUser::getRefresh()) {
 $html_page
 	->addItem($table)
 	->addItem((new CDiv())
-		->addClass(ZBX_STYLE_TABLE_PAGING)
+		->addClass(ZBX_STYLE_PAGER)
 		->addItem((new CDiv())
-			->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+			->addClass(ZBX_STYLE_PAGER_CONTAINER)
 			->addItem((new CDiv())
 				->addClass(ZBX_STYLE_TABLE_STATS)
 				->addItem(_('Total').': '.$table->getNumRows())

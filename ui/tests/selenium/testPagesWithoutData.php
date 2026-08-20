@@ -143,7 +143,7 @@ class testPagesWithoutData extends CWebTest {
 			// #4 Empty hosts' LLD table.
 			[
 				[
-					'url' => 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='
 				]
 			],
 			// #5 Empty hosts' Web scenarios table.
@@ -179,7 +179,7 @@ class testPagesWithoutData extends CWebTest {
 			// #10 LLD rule prototypes table.
 			[
 				[
-					'url' => 'host_discovery_prototypes.php?context=host&parent_discoveryid='
+					'url' => 'zabbix.php?action=lldrule.prototype.list&context=host&parent_discoveryid='
 				]
 			],
 			//Templates.
@@ -212,7 +212,7 @@ class testPagesWithoutData extends CWebTest {
 			// #15 Empty templates' LLD table.
 			[
 				[
-					'url' => 'host_discovery.php?filter_set=1&context=template&filter_hostids%5B0%5D='
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&context=template&filter_hostids[0]='
 				]
 			],
 			// #16 Empty templates' Web scenarios table.
@@ -254,7 +254,7 @@ class testPagesWithoutData extends CWebTest {
 			// #22 LLD rule prototypes table.
 			[
 				[
-					'url' => 'host_discovery_prototypes.php?context=template&parent_discoveryid='
+					'url' => 'zabbix.php?action=lldrule.prototype.list&context=template&parent_discoveryid='
 				]
 			],
 			//Other pages.
@@ -338,7 +338,7 @@ class testPagesWithoutData extends CWebTest {
 				$this->assertEquals('No data found', $table->query('class:datatable-body')->one()->getText());
 			}
 			else {
-				$table = $this->getTable('xpath://table[@class="list-table no-data"]');
+				$table = $this->getTable('xpath://table[contains(@class, "no-data")]');
 				$this->assertTableStats();
 				$this->assertEquals(['No data found'], $table->getRows()->asText());
 			}

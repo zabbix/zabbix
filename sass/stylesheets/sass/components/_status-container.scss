@@ -11,7 +11,7 @@
 	vertical-align: top;
 	border-width: 1px;
 	border-style: solid;
-	border-radius: 2px;
+	border-radius: var(--badge-border-radius);
 }
 
 .status-container {

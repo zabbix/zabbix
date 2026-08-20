@@ -54,7 +54,7 @@ class testTimeoutsTemplates extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsTemplates_CheckDiscoveryMacros() {
-		$link = 'host_discovery.php?filter_set=1&context=template&filter_hostids%5B0%5D='.self::$templateid;
+		$link = 'zabbix.php?action=lldrule.list&filter_set=1&context=template&filter_hostids[0]='.self::$templateid;
 		$this->checkGlobal('global_macros', $link, 'Create discovery rule');
 	}
 
@@ -69,7 +69,7 @@ class testTimeoutsTemplates extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsTemplates_CheckDiscoveryCustom() {
-		$link = 'host_discovery.php?filter_set=1&context=template&filter_hostids%5B0%5D='.self::$templateid;
+		$link = 'zabbix.php?action=lldrule.list&filter_set=1&context=template&filter_hostids[0]='.self::$templateid;
 		$this->checkGlobal('global_custom', $link, 'Create discovery rule');
 	}
 
@@ -84,7 +84,7 @@ class testTimeoutsTemplates extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsTemplates_CheckDiscoveryDefault() {
-		$link = 'host_discovery.php?filter_set=1&context=template&filter_hostids%5B0%5D='.self::$templateid;
+		$link = 'zabbix.php?action=lldrule.list&filter_set=1&context=template&filter_hostids[0]='.self::$templateid;
 		$this->checkGlobal('global_default', $link, 'Create discovery rule');
 	}
 

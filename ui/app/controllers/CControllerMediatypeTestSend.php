@@ -32,7 +32,8 @@ class CControllerMediatypeTestSend extends CController {
 		return ['object', 'fields' => [
 			'mediatypeid' => ['db media_type.mediatypeid', 'required'],
 			'type' => ['db media_type.type', 'required',
-				'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]],
+				'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK, MEDIA_TYPE_PUSH]
+			],
 			'sendto' => [
 				['string','required', 'not_empty',
 					'when' => ['type', 'in' => [MEDIA_TYPE_SMS]]
@@ -41,9 +42,14 @@ class CControllerMediatypeTestSend extends CController {
 					'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL]]
 				]
 			],
-			'subject' => ['string', 'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_SMS]]],
-			'message' => ['string', 'required', 'not_empty',
-				'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_SMS]]
+			'sendto_deviceuuids' => ['array', 'required', 'not_empty',
+				'field' => ['db device.uuid', 'required', 'not_empty'],
+				'when' => ['type', 'in' => [MEDIA_TYPE_PUSH]]
+			],
+			'subject' => ['string', 'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_SMS, MEDIA_TYPE_PUSH]]],
+			'message' => [
+				['string', 'required', 'not_empty', 'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_SMS]]],
+				['string', 'required', 'when' => ['type', 'in' => [MEDIA_TYPE_PUSH]]]
 			],
 			'parameters' => ['objects', 'fields' => [
 				'name' => ['db media_type_param.name', 'required', 'not_empty',
@@ -114,6 +120,10 @@ class CControllerMediatypeTestSend extends CController {
 		}
 		elseif ($params['type'] == MEDIA_TYPE_WEBHOOK) {
 			$params['parameters'] =  array_column($params['parameters'] ?? [], 'value', 'name');
+		}
+		elseif ($params['type'] == MEDIA_TYPE_PUSH) {
+			$params['sendto'] = implode(',', $params['sendto_deviceuuids']);
+			unset($params['sendto_deviceuuids']);
 		}
 
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,

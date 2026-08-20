@@ -50,7 +50,10 @@ const (
 	defaultCapacity = 1000
 
 	maxItemTimeout = 600 // seconds
-	minItemTimeout = 1   // seconds
+)
+
+var (
+	_ Scheduler = (*Manager)(nil)
 )
 
 // ErrUnsupportedTimeout is thrown if timeout value cannot be parsed or exceeds limit (> maxTimeout or 0).
@@ -63,6 +66,9 @@ type Request struct {
 	LastLogsize *uint64 `json:"lastlogsize"`
 	Mtime       *int    `json:"mtime"`
 	Timeout     any     `json:"timeout"`
+
+	// Server doesn't send this value. It's used to mark plaintext passive and active checks requests.
+	LegacyTimeout bool
 }
 
 // Manager implements Scheduler interface and manages plugin interface usage.
@@ -126,6 +132,7 @@ type Scheduler interface {
 	PerformTask(
 		key string,
 		timeout time.Duration,
+		legacyTimeout bool,
 		clientID uint64,
 	) (result *string, err error)
 	Query(command string) (status string)
@@ -222,14 +229,19 @@ func parseItemTimeout(s string) (int, error) {
 	return seconds, nil
 }
 
-// ParseItemTimeoutAny converts item timeout to seconds (if it is in form of suffixes time) and
-// validates it (whether it is within limits).
-func ParseItemTimeoutAny(timeoutIn any) (int, error) {
+// ParseAndValidateItemTimeout parses and validates item timeouts.
+// Parses passive and active check item timeouts. Accepts nil, float, int and
+// string values. Timeout value must be in range from 1 to 600.
+// Nil and zero values are set to Agent.Options timeout value.
+// String values must be in `[integer]m` or `[integer]s` format, e.g. `4m` or
+// `150s`.
+// Returns item timeout in seconds.
+func ParseAndValidateItemTimeout(unparsedTimeout any) (int, error) {
 	var timeout int
-
 	var err error
 
-	switch v := timeoutIn.(type) {
+	//nolint:wsl_v5 // false positive
+	switch v := unparsedTimeout.(type) {
 	case nil:
 		timeout = agent.Options.Timeout
 	case float64:
@@ -239,19 +251,30 @@ func ParseItemTimeoutAny(timeoutIn any) (int, error) {
 	case string:
 		timeout, err = parseItemTimeout(v)
 	default:
-		err = errs.Wrapf(ErrUnsupportedTimeout, "unexpected timeout %q of type %T", timeoutIn, timeoutIn)
+		err = errs.Wrapf(ErrUnsupportedTimeout, "unexpected timeout %q of type %T", unparsedTimeout, unparsedTimeout)
 	}
 
-	if err == nil {
-		if timeout > maxItemTimeout {
-			err = errs.Wrapf(
-				ErrUnsupportedTimeout, "timeout %d is too large, max - %d", timeout, maxItemTimeout,
-			)
-		} else if timeout < minItemTimeout {
-			err = errs.Wrapf(
-				ErrUnsupportedTimeout, "timeout %d is too small, min - %d", timeout, minItemTimeout,
-			)
-		}
+	if err != nil {
+		return 0, errs.Wrap(err, "item timeout parse failed")
+	}
+
+	// this should never happen, but we'll do this just in case
+	if timeout == 0 {
+		return agent.Options.Timeout, nil
+	}
+
+	if timeout > maxItemTimeout {
+		return 0, errs.Wrapf(
+			ErrUnsupportedTimeout,
+			"timeout '%d' is larger than maximum allowed duration of '%d'",
+			timeout, maxItemTimeout,
+		)
+	}
+
+	if timeout < 0 {
+		return 0, errs.Wrapf(
+			ErrUnsupportedTimeout, "timeout '%d' is negative", timeout,
+		)
 	}
 
 	return timeout, err
@@ -294,12 +317,7 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 			if !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
-				var timeout int
-				timeout, err = ParseItemTimeoutAny(r.Timeout)
-
-				if err == nil {
-					err = c.addRequest(p, r, timeout, update.sink, update.now, update.firstActiveChecksRefreshed)
-				}
+				err = c.addRequest(p, r, update.sink, update.now, update.firstActiveChecksRefreshed)
 			}
 		}
 
@@ -752,6 +770,7 @@ func (r resultWriter) PersistSlotsAvailable() int {
 func (m *Manager) PerformTask(
 	key string,
 	timeout time.Duration,
+	legacyTimeout bool,
 	clientID uint64,
 ) (*string, error) {
 	var lastLogsize uint64
@@ -766,10 +785,11 @@ func (m *Manager) PerformTask(
 		nil,
 		[]*Request{
 			{
-				Key:         key,
-				LastLogsize: &lastLogsize,
-				Mtime:       &mtime,
-				Timeout:     int(timeout.Seconds()),
+				Key:           key,
+				LastLogsize:   &lastLogsize,
+				Mtime:         &mtime,
+				Timeout:       int(timeout.Seconds()),
+				LegacyTimeout: legacyTimeout,
 			},
 		},
 		time.Now(),

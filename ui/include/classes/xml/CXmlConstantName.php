@@ -298,6 +298,7 @@ class CXmlConstantName {
 	const SCRIPT = 'SCRIPT';
 	const SMS = 'SMS';
 	const WEBHOOK = 'WEBHOOK';
+	const PUSH = 'PUSH';
 
 	const GENERIC_SMTP = 'GENERIC_SMTP';
 	const GMAIL = 'GMAIL';
@@ -405,4 +406,11 @@ class CXmlConstantName {
 	public const INDICATOR_TYPE_STATIC_LINK = 'STATIC_LINK';
 	public const INDICATOR_TYPE_TRIGGER = 'TRIGGER';
 	public const INDICATOR_TYPE_ITEM_VALUE = 'ITEM_VALUE';
+
+	// Regular expression types.
+	public const REGEX_TYPE_CONTAINS_STRING = 'CONTAINS_STRING';
+	public const REGEX_TYPE_CONTAINS_ANY_SUBSTRING = 'CONTAINS_ANY_SUBSTRING';
+	public const REGEX_TYPE_NOT_CONTAINS_STRING = 'NOT_CONTAINS_STRING';
+	public const REGEX_TYPE_MATCHES_REGEX = 'MATCHES_REGEX';
+	public const REGEX_TYPE_NOT_MATCHES_REGEX = 'NOT_MATCHES_REGEX';
 }

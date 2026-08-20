@@ -33,6 +33,11 @@ const ZBX_STYLE_LOADING_FADEIN = 'is-loading-fadein';
 const ZBX_STYLE_HIDDEN = 'hidden';
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
 
+const ZBX_STYLE_CURSOR_POINTER = 'cursor-pointer';
+const ZBX_STYLE_FLEX_WRAPPER = 'flex-wrapper';
+const ZBX_STYLE_OVERFLOW_ELLIPSIS = 'overflow-ellipsis';
+const ZBX_STYLE_TRIMMED_CONTENT = 'trimmed-content';
+
 const ZBX_STYLE_NO_DATA = 'no-data';
 const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
 const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
@@ -51,8 +56,6 @@ const ZBX_STYLE_BTN_SMALL = 'btn-small';
 const ZBX_STYLE_BTN_TAG = 'btn-tag';
 
 const ZBX_STYLE_ACTION_CONTAINER = 'action-container';
-
-const ZBX_STYLE_OVERLAY_DIALOGUE_HEADER = 'overlay-dialogue-header';
 
 const ZBX_STYLE_GRID_COLUMN_FIRST = 'column-first';
 const ZBX_STYLE_GRID_COLUMN_LAST = 'column-last';
@@ -74,8 +77,8 @@ const ZBX_STYLE_FORMATED_TEXT = 'formated-text';
 
 const ZBX_STYLE_GREY = 'grey';
 
-const ZBX_STYLE_PAGING_BTN_CONTAINER = 'paging-btn-container';
-const ZBX_STYLE_TABLE_PAGING = 'table-paging';
+const ZBX_STYLE_PAGER = 'pager';
+const ZBX_STYLE_PAGER_CONTAINER = 'pager-container';
 const ZBX_STYLE_TABLE_STATS = 'table-stats';
 
 const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
@@ -134,6 +137,9 @@ const ZBX_STYLE_TAGS_WRAPPER = 'tags-wrapper';
 const ZBX_STYLE_CHECKBOX_RADIO = 'checkbox-radio';
 
 const ZBX_STYLE_OVERLAY_DIALOGUE = 'overlay-dialogue';
+const ZBX_STYLE_OVERLAY_DIALOGUE_HEADER = 'overlay-dialogue-header';
+const ZBX_STYLE_OVERLAY_DIALOGUE_BODY = 'overlay-dialogue-body';
+const ZBX_STYLE_OVERLAY_DIALOGUE_FOOTER = 'overlay-dialogue-footer';
 
 const ZBX_STYLE_HEADER_CONTROLS = 'header-controls';
 
@@ -144,6 +150,7 @@ const ZBX_STYLE_REL_CONTAINER = 'rel-container';
 
 const ZBX_STYLE_SELECTED_ITEM_COUNT = 'selected-item-count';
 
+const ZBX_STYLE_HINTBOX_RAW_DATA = 'hintbox-raw-data';
 const ZBX_STYLE_HINTBOX_WRAP = 'hintbox-wrap';
 
 const ZBX_ICON_ALERT_WITH_CONTENT = 'zi-alert-with-content';
@@ -222,6 +229,8 @@ const TRIGGER_SEVERITY_WARNING = 2;
 const TRIGGER_SEVERITY_AVERAGE = 3;
 const TRIGGER_SEVERITY_HIGH = 4;
 const TRIGGER_SEVERITY_DISASTER = 5;
+
+const ZBX_HINTBOX_HTML_LIMIT = 8192;
 
 const ZBX_SECRET_MASK = '******';
 
@@ -346,8 +355,13 @@ const OPERATIONAL_DATA_SHOW_NONE = 0;
 const OPERATIONAL_DATA_SHOW_SEPARATELY = 1;
 const OPERATIONAL_DATA_SHOW_WITH_PROBLEM = 2;
 
+const DASHBOARD_SLIDESHOW_OFF = 'off';
+const DASHBOARD_SLIDESHOW_ON = 'on';
+
 const EVENT_CONTEXT_PAGE_NAVIGATION = 'page_navigation';
 const EVENT_BACK_FORWARD = 'back_forward';
 
 const EVENT_CONTEXT_OVERLAY = 'overlay';
 const EVENT_UNMOUNT = 'unmount';
+
+const VALIDATE_USE_CHUNK_SIZE = 500;

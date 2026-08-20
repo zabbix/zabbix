@@ -18,7 +18,7 @@ class CControllerHostDashboardView extends CController {
 
 	private $host;
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
@@ -27,7 +27,8 @@ class CControllerHostDashboardView extends CController {
 			'hostid' => 'required|db hosts.hostid',
 			'dashboardid' => 'db dashboard.dashboardid',
 			'from' => 'range_time',
-			'to' => 'range_time'
+			'to' => 'range_time',
+			'slideshow' => 'in '.DASHBOARD_SLIDESHOW_OFF.','.DASHBOARD_SLIDESHOW_ON
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -59,7 +60,7 @@ class CControllerHostDashboardView extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$host_dashboards = $this->getSortedHostDashboards();
 
 		if (!$host_dashboards) {
@@ -109,12 +110,16 @@ class CControllerHostDashboardView extends CController {
 				updateTimeSelectorPeriod($time_selector_options);
 
 				$dashboard_time_period = getTimeSelectorPeriod($time_selector_options);
+				$start_slideshow = $this->hasInput('slideshow')
+					? $this->getInput('slideshow') === DASHBOARD_SLIDESHOW_ON
+					: $dashboard['auto_start'] == 1;
 
 				$data = [
 					'host_dashboards' => $host_dashboards,
 					'dashboard' => $dashboard,
 					'widget_defaults' => $widget_defaults,
 					'configuration_hash' => $configuration_hash,
+					'start_slideshow' => $start_slideshow,
 					'broadcast_requirements' => $broadcast_requirements,
 					'dashboard_host' => $this->host,
 					'dashboard_time_period' => $dashboard_time_period,

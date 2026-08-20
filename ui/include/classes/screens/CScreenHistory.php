@@ -406,7 +406,8 @@ class CScreenHistory extends CScreenBase {
 			 */
 			elseif ($this->action === HISTORY_LATEST) {
 				$history_table = (new CTableInfo())
-					->setHeader([(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH), _('Value')]);
+					->setHeader([(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH), _('Value')])
+					->addClass(ZBX_STYLE_ROUNDED_SURFACE);
 
 				$items_by_type = [];
 				$history_data = [];

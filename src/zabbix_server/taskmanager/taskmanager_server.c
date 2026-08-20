@@ -409,7 +409,7 @@ out:
  * Purpose: ranks event task                                                  *
  *                                                                            *
  * Parameters: taskid - [IN]                                                  *
- *             data   - [IN] JSON with with acknowledge id, action, event id  *
+ *             data   - [IN] JSON with acknowledge id, action, event id       *
  *                           for all actions and cause_eventid for rank to    *
  *                           symptom action                                   *
  *                                                                            *

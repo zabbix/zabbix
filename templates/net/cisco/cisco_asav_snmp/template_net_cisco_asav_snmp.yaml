@@ -30,7 +30,7 @@ zabbix_export:
         Learn more about Cisco ASAv: https://www.cisco.com/c/en/us/products/collateral/security/adaptive-security-virtual-appliance-asav/adapt-security-virtual-appliance-ds.html
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -138,11 +138,16 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 7fcf46583d2b42f4be6758e85784f28f
-              expression: 'last(/Cisco ASAv by SNMP/cisco.asav.uptime)<10m'
+              expression: 'change(/Cisco ASAv by SNMP/cisco.asav.uptime)<0 and last(/Cisco ASAv by SNMP/cisco.asav.uptime,#2)<42949672.96-(lastclock(/Cisco ASAv by SNMP/cisco.asav.uptime)-lastclock(/Cisco ASAv by SNMP/cisco.asav.uptime,#2))'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/Cisco ASAv by SNMP/cisco.asav.uptime)>{$SNMP.UPTIME.WARN}'
               name: 'Cisco ASAv: Host has been restarted'
-              event_name: 'Cisco ASAv: {HOST.NAME} has been restarted (uptime < 10m)'
+              event_name: 'Cisco ASAv: {HOST.NAME} has been restarted'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: |
+                The uptime counter has decreased, which indicates that the host has been restarted.
+                A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+                The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -153,10 +158,6 @@ zabbix_export:
           key: 'zabbix[host,snmp,available]'
           valuemap:
             name: 'SNMP available'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: application
@@ -1224,7 +1225,7 @@ zabbix_export:
             3 - Testing
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Filters
             label: 'Interface admin status filter (include)'
             description: |
@@ -1238,7 +1239,7 @@ zabbix_export:
           description: 'Filter to exclude discovered interfaces by admin status.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Interface admin status filter (exclude)'
             description: 'Filter to exclude discovered interfaces by admin status.'
@@ -1249,7 +1250,7 @@ zabbix_export:
             Used in overrides. Triggers will only be created for interfaces whose names contain the value of the macro.
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Interface triggers filter (include)'
             description: |
@@ -1260,7 +1261,7 @@ zabbix_export:
           description: 'Filter by discoverable interface description.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Filters
             label: 'Interface description filter (include)'
             description: 'Filter by discoverable interface description.'
@@ -1269,7 +1270,7 @@ zabbix_export:
           description: 'Filter to exclude discovered interfaces by description.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Filters
             label: 'Interface description filter (exclude)'
             description: 'Filter to exclude discovered interfaces by description.'
@@ -1278,7 +1279,7 @@ zabbix_export:
           description: 'Filter by discoverable interface names.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '3'
             section_name: Filters
             label: 'Interface name filter (include)'
             description: 'Filter by discoverable interface names.'
@@ -1287,7 +1288,7 @@ zabbix_export:
           description: 'Filter to exclude discovered interfaces by name.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             section_name: Filters
             label: 'Interface name filter (exclude)'
             description: 'Filter to exclude discovered interfaces by name.'
@@ -1296,7 +1297,7 @@ zabbix_export:
           description: 'Critical threshold of CPU utilization in %.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Thresholds
             label: 'Threshold for CPU utilization (critical)'
             description: 'Critical threshold of CPU utilization in %. In the range from 0 to 100 inclusive.'
@@ -1306,7 +1307,7 @@ zabbix_export:
           description: 'Threshold for maximum memory utilization in %.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Thresholds
             label: 'Threshold for memory utilization'
             description: 'Threshold for maximum memory utilization in %. In the range from 0 to 100 inclusive.'
@@ -1320,6 +1321,15 @@ zabbix_export:
             section_name: Other
             label: 'SNMP agent availability interval'
             description: 'The time interval for SNMP agent availability trigger expression.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '2'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
       dashboards:
         - uuid: 91fa042eeba442b492ba16422b7ce567
           name: 'Cisco ASAv: Overview'

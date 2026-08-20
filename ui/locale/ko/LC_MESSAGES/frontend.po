@@ -23036,6 +23036,10 @@ msgstr "0 으로 처리"
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "추세 기능 캐시 통계입니다. 유효한 매개변수는 다음과 같습니다: all, hit, phits, misses, pmisses, items, pitems 및 request."
 
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162
 #: app/partials/monitoring.latest.view.html.php:74

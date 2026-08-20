@@ -31,7 +31,7 @@ zabbix_export:
         Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]`
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -1151,6 +1151,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$.pools["{#POOLNAME}"].percent_used'
+                - type: MULTIPLIER
+                  parameters:
+                    - '100'
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:

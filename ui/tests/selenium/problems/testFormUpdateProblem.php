@@ -276,7 +276,7 @@ class testFormUpdateProblem extends CWebTest {
 	public function testFormUpdateProblem_Layout($data) {
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&filter_set=1&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 		$table->findRows('Problem', $data['problems'])->select();
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 
@@ -390,7 +390,7 @@ class testFormUpdateProblem extends CWebTest {
 		// Check other buttons in overlay.
 		$button_queries = [
 			// Button ? (help) is covered in testDocumentationLinks.
-			'xpath:.//button[@title="Close"]' => true,
+			'xpath:.//button[@aria-label="Close modal window"]' => true,
 			'xpath:.//button[@id="suppress_until_problem_calendar"]' => false,
 			'button:Update' => true,
 			'button:Cancel' => true
@@ -804,7 +804,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 
 		$count = count($data['problems']);
 		$table->findRows('Problem', $data['problems']);
@@ -897,7 +897,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$this->query('id:problems')->asDatatable()->one()->waitUntilReady()->findRow('Problem', 'Trigger for log')
+		$this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady()->findRow('Problem', 'Trigger for log')
 				->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('id:acknowledge_form')->asForm()->one()->fill([
@@ -910,7 +910,7 @@ class testFormUpdateProblem extends CWebTest {
 				'Acknowledge' => true
 		]);
 
-		$dialog->query(($data['case'] === 'Close') ? 'xpath:.//button[@title="Close"]' : 'button:Cancel')->one()
+		$dialog->query(($data['case'] === 'Close') ? 'xpath:.//button[@aria-label="Close modal window"]' : 'button:Cancel')->one()
 				->waitUntilClickable()->click();
 		$dialog->ensureNotPresent();
 		$this->page->assertHeader('Problems');
@@ -919,7 +919,7 @@ class testFormUpdateProblem extends CWebTest {
 
 	public function testFormUpdateProblem_CheckSuppressIcon() {
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 
 		$row = $table->findRow('Problem', 'Trigger for icon test');
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();

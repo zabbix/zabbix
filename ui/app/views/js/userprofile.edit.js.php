@@ -33,6 +33,12 @@
 			document.getElementById('change-password-button')?.addEventListener('click', () => {
 				document.getElementById('change_password').value = 1;
 				this.#displayPasswordChange(true);
+
+				const current_password = document.getElementById('current_password');
+
+				if (current_password !== null) {
+					current_password.focus();
+				}
 			});
 
 			this.#displayPasswordChange(false);
@@ -106,33 +112,27 @@
 		}
 
 		#displayPasswordChange(visible = true) {
-			if (visible) {
-				this.form_element.querySelectorAll('[name=current_password],[name=password1],[name=password2]')
-					.forEach(input => {
-						input.disabled = false;
-					});
+			const password1 = document.getElementById('password1');
+			const password2 = document.getElementById('password2');
+			const current_password = document.getElementById('current_password');
 
-				this.form_element.querySelectorAll('.password-change-active').forEach(elem => {
-					elem.style.display = '';
-				})
-
-				this.form_element.querySelectorAll('.password-change-inactive').forEach(elem => {
-					elem.style.display = 'none';
-				})
+			if (password1 === null && password2 === null) {
+				return;
 			}
-			else {
-				this.form_element.querySelectorAll('[name=current_password],[name=password1],[name=password2]')
-					.forEach(input => {
-						input.disabled = true;
-					});
 
-				this.form_element.querySelectorAll('.password-change-active').forEach(elem => {
-					elem.style.display = 'none';
-				})
+			this.form_element.querySelectorAll('.password-change-active').forEach(element => {
+				element.style.display = visible ? '' : 'none';
+			});
 
-				this.form_element.querySelectorAll('.password-change-inactive').forEach(elem => {
-					elem.style.display = '';
-				})
+			this.form_element.querySelectorAll('.password-change-inactive').forEach(element => {
+				element.style.display = visible ? 'none' : '';
+			});
+
+			password1.disabled = !visible;
+			password2.disabled = !visible;
+
+			if (current_password !== null) {
+				current_password.disabled = !visible;
 			}
 		}
 

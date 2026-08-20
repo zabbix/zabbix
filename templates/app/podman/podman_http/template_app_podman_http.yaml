@@ -41,7 +41,7 @@ zabbix_export:
         2. **Use VPN**: If remote access is required, consider using a VPN to securely connect to the network where the API service is running.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -2358,7 +2358,6 @@ zabbix_export:
       dashboards:
         - uuid: b1a8873f761244b5a20d8b3973a9e5cd
           name: Podman
-          auto_start: 'NO'
           pages:
             - name: Overview
               widgets:

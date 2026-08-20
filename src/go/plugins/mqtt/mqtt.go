@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -140,6 +141,13 @@ func (p *Plugin) EventSourceByKey(rawKey string) (watch.EventSource, error) {
 		return nil, errs.WrapConst(errs.New("second parameter \"Topic\" is required"), zbxerr.ErrorTooFewParameters)
 	}
 
+	connectionTimeout, err := p.getConnectionTimeout(params)
+	if err != nil {
+		return nil, err
+	}
+
+	p.Tracef("connection timeout set to: %d", connectionTimeout)
+
 	var (
 		client *mqttClient
 		ok     bool
@@ -161,6 +169,7 @@ func (p *Plugin) EventSourceByKey(rawKey string) (watch.EventSource, error) {
 			TLSKeyFile:  params["TLSKeyFile"],
 			RawURI:      u.String(),
 		},
+		connectionTimeout,
 	)
 	if err != nil {
 		return nil, err
@@ -260,7 +269,7 @@ func (ms *mqttSub) Release() {
 		impl.Tracef("unsubscribing topic '%s' from [%s]", ms.topic, ms.broker.url)
 
 		token := mc.client.Unsubscribe(ms.topic)
-		if !token.WaitTimeout(time.Duration(impl.options.Timeout) * time.Second) {
+		if !token.WaitTimeout(mc.opts.ConnectTimeout) {
 			impl.Errf("cannot unsubscribe topic '%s' from [%s]: timed out", ms.topic, ms.broker.url)
 		}
 
@@ -386,18 +395,37 @@ func (ms *mqttSub) startAsyncEstablishingConnectionBackoff() {
 	}()
 }
 
+func (p *Plugin) getConnectionTimeout(params map[string]string) (int, error) {
+	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
+	if err != nil {
+		p.Tracef("failed to convert parameter connection timeout %s", err.Error())
+
+		if p.options.Default != nil {
+			connectionTimeout, err = strconv.Atoi(p.options.Default.ConnectionTimeout)
+			if err != nil {
+				p.Tracef("failed to convert default connection timeout %s", err.Error())
+
+				return 0, errs.New("failed to get connection timeout")
+			}
+		}
+	}
+
+	return connectionTimeout, nil
+}
+
 func (p *Plugin) createOptions(
 	clientid string,
 	username string,
 	password string,
 	b broker,
 	details *tlsconfig.Details,
+	connectionTimeout int,
 ) (*mqtt.ClientOptions, error) {
 	opts := mqtt.NewClientOptions().
 		AddBroker(b.url).
 		SetClientID(clientid).
 		SetCleanSession(true).
-		SetConnectTimeout(time.Duration(impl.options.Timeout) * time.Second)
+		SetConnectTimeout(time.Duration(connectionTimeout) * time.Second)
 
 	if username != "" {
 		opts.SetUsername(username)
@@ -457,7 +485,7 @@ func newClient(options *mqtt.ClientOptions) (mqtt.Client, error) {
 	c := mqtt.NewClient(options)
 
 	token := c.Connect()
-	if !token.WaitTimeout(time.Duration(impl.options.Timeout) * time.Second) {
+	if !token.WaitTimeout(options.ConnectTimeout) {
 		c.Disconnect(200)
 
 		return nil, errs.New("timed out while connecting")
@@ -509,7 +537,7 @@ func (ms *mqttSub) subscribe(mc *mqttClient) error {
 	impl.Tracef("subscribing '%s' to [%s]", ms.topic, ms.broker.url)
 
 	token := mc.client.Subscribe(ms.topic, 0, ms.handler)
-	if !token.WaitTimeout(time.Duration(impl.options.Timeout) * time.Second) {
+	if !token.WaitTimeout(mc.opts.ConnectTimeout) {
 		return errs.New("timed out while subscribing")
 	}
 

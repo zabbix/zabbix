@@ -27,13 +27,6 @@ abstract class CControllerPopupItemTest extends CController {
 	const ZBX_TEST_TYPE_LLD_PROTOTYPE = 3;
 
 	/**
-	 * Max-length of input fields that can contain resolved macro values. Used in views for input fields.
-	 *
-	 * @var int
-	 */
-	public const INPUT_MAX_LENGTH = 2048;
-
-	/**
 	 * Define a set of item types allowed to test and item properties needed to collect for each item type.
 	 *
 	 * @var array
@@ -848,9 +841,12 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function resolvePreprocessingStepMacros(array $steps) {
 		// Resolve macros used in parameter fields.
-		$macros_posted = $this->hasInput('macros')
-			? json_decode($this->getInput('macros'), true)
-			: [];
+		$macros_posted = $this->getInput('macros', []);
+		$macros_posted = array_combine(
+			array_column($macros_posted, 'name'),
+			array_column($macros_posted, 'value')
+		);
+
 		$macros_types = in_array($this->test_type,
 			[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
 		)
@@ -1016,9 +1012,11 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function resolveItemPropertyMacros(array $inputs) {
 		// Resolve macros used in parameter fields.
-		$macros_posted = $this->hasInput('macros')
-			? json_decode($this->getInput('macros'), true)
-			: [];
+		$macros_posted = $this->getInput('macros', []);
+		$macros_posted = array_combine(
+			array_column($macros_posted, 'name'),
+			array_column($macros_posted, 'value')
+		);
 
 		foreach (array_keys($this->macros_by_item_props) as $field) {
 			if (!array_key_exists($field, $inputs)) {
@@ -1147,73 +1145,6 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		return $value;
-	}
-
-	/**
-	 * Validates interface object in context of current item type.
-	 *
-	 * @param array  $interface
-	 * @param string $interface['address']               (optional)
-	 * @param string $interface['port']                  (optional)
-	 * @param array  $interface['details']               (optional)
-	 * @param int    $interface['details']['version']
-	 * @param string $interface['details']['community']  (optional)
-	 *
-	 * @return bool
-	 */
-	final protected function validateInterface(array $interface): bool {
-		if ($this->item_type == ITEM_TYPE_SNMP) {
-			if (($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C)
-					&& (!array_key_exists('community', $interface['details'])
-						|| $interface['details']['community'] === '')) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('SNMP community'), _('cannot be empty')));
-
-				return false;
-			}
-
-			if ($interface['details']['version'] == SNMP_V2C || $interface['details']['version'] == SNMP_V3) {
-				if (!array_key_exists('max_repetitions', $interface['details'])
-						|| $interface['details']['max_repetitions'] === '') {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _('cannot be empty')));
-
-					return false;
-				}
-
-				if (!is_numeric($interface['details']['max_repetitions'])) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _('a numeric value is expected')));
-
-					return false;
-				}
-
-				if ($interface['details']['max_repetitions'] < 1) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _s('value must be no less than "%1$s"', 1)));
-
-					return false;
-				}
-
-				if ($interface['details']['max_repetitions'] > ZBX_MAX_INT32) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _s('value must be no greater than "%1$s"', ZBX_MAX_INT32)));
-
-					return false;
-				}
-			}
-		}
-
-		if ($this->items_require_interface[$this->item_type]['address']
-				&& (!array_key_exists('address', $interface) || $interface['address'] === '')) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Host address'), _('cannot be empty')));
-
-			return false;
-		}
-
-		if ($this->items_require_interface[$this->item_type]['port']
-				&& (!array_key_exists('port', $interface) || $interface['port'] === '')) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
-
-			return false;
-		}
-
-		return true;
 	}
 
 	/**

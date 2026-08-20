@@ -179,6 +179,8 @@
 				});
 			}
 
+			this.#form.findFieldByName('saml_provision_groups').setButtonOnBlur('js-add', 'user_group_edit');
+
 			this.saml_provision_groups_table.addEventListener('click', (e) => {
 				if (e.target.classList.contains('disabled')) {
 					return;
@@ -214,6 +216,8 @@
 				e.preventDefault();
 				this.#submit();
 			});
+
+			this.#form.findFieldByName('mfa_methods').setButtonOnBlur('js-add', 'mfa_edit');
 
 			this.mfa_table.addEventListener('click', (e) => {
 				if (e.target.classList.contains('disabled')) {
@@ -340,6 +344,8 @@
 			if (this.ldap_auth_enabled === null) {
 				return;
 			}
+
+			this.#form.findFieldByName('ldap_servers').setButtonOnBlur('js-add', 'ldap_edit');
 
 			this.ldap_servers_table.addEventListener('click', (e) => {
 				if (e.target.classList.contains('disabled')) {

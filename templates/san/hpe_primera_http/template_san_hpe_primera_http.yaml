@@ -43,7 +43,7 @@ zabbix_export:
         4. Change the `Scheme` and `Port` if needed.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/SAN
       items:
@@ -3551,7 +3551,6 @@ zabbix_export:
       dashboards:
         - uuid: 38656d541ee34c40b4a50943a2e6f999
           name: 'Storage overview'
-          auto_start: 'NO'
           pages:
             - name: 'System capacity'
               widgets:

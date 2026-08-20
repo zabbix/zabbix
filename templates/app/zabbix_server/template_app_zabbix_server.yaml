@@ -24,7 +24,7 @@ zabbix_export:
         Specify the address of the remote Zabbix server as the values for the `Zabbix server Address` and `Zabbix server Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote server's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -2602,7 +2602,6 @@ zabbix_export:
       dashboards:
         - uuid: 6a654650e39d4968918df85f9be47584
           name: 'Remote Zabbix server health'
-          auto_start: 'NO'
           pages:
             - name: Performance
               widgets:
@@ -3945,7 +3944,7 @@ zabbix_export:
         Link this template to the local Zabbix server host.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -6281,7 +6280,6 @@ zabbix_export:
       dashboards:
         - uuid: 6815a90fb9b745fd8f1b1f47697893d6
           name: 'Zabbix server health'
-          auto_start: 'NO'
           pages:
             - name: Performance
               widgets:
@@ -7642,7 +7640,7 @@ zabbix_export:
         Specify the address of the remote Zabbix server as the values for the `Zabbix server Address` and `Zabbix server Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote server's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -10217,7 +10215,6 @@ zabbix_export:
       dashboards:
         - uuid: dcb92016508d4aef8e48fbad302ad34b
           name: 'Zabbix server health'
-          auto_start: 'NO'
           pages:
             - name: Performance
               widgets:
@@ -11560,7 +11557,7 @@ zabbix_export:
         Specify the address of the remote Zabbix server as the values for the `Zabbix server Address` and `Zabbix server Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote server's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -14138,7 +14135,6 @@ zabbix_export:
       dashboards:
         - uuid: 4903e2c2ba9240e18ecb4153cee44e4f
           name: 'Zabbix server health'
-          auto_start: 'NO'
           pages:
             - name: Performance
               widgets:
