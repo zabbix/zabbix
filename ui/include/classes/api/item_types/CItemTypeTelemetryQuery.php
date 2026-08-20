@@ -467,7 +467,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 				]],
 				'parameters' =>				['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'function', 'in' => AGGREGATE_PERCENTILE], 'type' => API_FLOATS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => '0:100'],
-												['else' => true, 'type' => API_OBJECTS, 'length' => 0, 'unset' => true]
+												['else' => true, 'type' => API_OBJECTS, 'length' => 0, 'default' => []]
 				]],
 				'alias' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255]
 			]],
