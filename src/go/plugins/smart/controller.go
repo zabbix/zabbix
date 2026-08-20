@@ -26,6 +26,11 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
+const (
+	commandLineErrorStatus = 1
+	deviceOpenErrorStatus  = 2
+)
+
 var _ SmartController = (*SmartCtl)(nil)
 
 // SmartController describes the signature for a smartctl runner.
@@ -110,11 +115,6 @@ func isFatalExitStatus(status int) bool {
 	// https://www.smartmontools.org/static/doxygen/smartctl_8h_source.html
 	// Values 1 and 2 mean that the command could not run against the requested device. Other values
 	// may still accompany useful SMART data and are intentionally excluded from the fatal status mask.
-	const (
-		commandLineErrorStatus = 1
-		deviceOpenErrorStatus  = 2
-	)
-
 	const fatalExitStatusMask = commandLineErrorStatus | deviceOpenErrorStatus
 
 	return status&fatalExitStatusMask != 0
