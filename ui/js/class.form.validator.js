@@ -972,7 +972,7 @@ class CFormValidator {
 
 					while (next_value_key !== '*' && path_value !== null) {
 						path_value = Object.hasOwn(path_value, next_value_key) ? path_value[next_value_key] : null;
-;						next_value_key = rel_field_parts.shift();
+						next_value_key = rel_field_parts.shift();
 					}
 
 					if (path_value) {
