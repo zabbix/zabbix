@@ -359,7 +359,7 @@ skip:
 
 static void	*permissions_rebuild_entry(void *args)
 {
-	int		err, res = SUCCEED;
+	int		res;
 	double		start;
 	sigjmp_buf	jmp_ret;
 
