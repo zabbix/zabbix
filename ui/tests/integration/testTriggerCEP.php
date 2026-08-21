@@ -388,13 +388,14 @@ class testTriggerCEP extends CIntegrationTest {
 	// How long the windows of those flavours stay open. The evicted flavours wait for it to run out before
 	// their operations run, so it is kept short.
 	const CEP_RULE_WINDOW_OPS_DURATION = '3s';
-	// The pattern match flavour of that scenario (testTriggerCEP_CepWindowPattern()) additionally gives every
-	// rule of the set one operation at the pattern matched execution point, which is the only execution point
-	// the other flavours cannot reach at all. Without it a match only ever runs an empty operation list, so
-	// nothing of what a matched pattern does with the operations of a rule is exercised - the conditions of an
-	// operation least of all. The operation is therefore one that must not run: a "close window" filtered on
-	// this tag, which no trigger of the suite produces and no operation of the set adds, so the condition
-	// cannot hold and the window is left alone however often its script matches - see
+	// The pattern match flavours of that scenario (testTriggerCEP_CepWindowPattern() and
+	// testTriggerCEP_CepWindowPatternOperationSteps()) additionally give every rule they create one operation at
+	// the pattern matched execution point, which is the only execution point the other flavours cannot reach at
+	// all. Without it that point is never anything but an empty operation list, so nothing of what a window
+	// examination does with the operations of a rule is exercised. The operation is therefore one that must not
+	// run, and the flavour whose script does report a match is the one that needs a condition to stop it: a
+	// "close window" filtered on this tag, which no trigger of the suite produces and no operation of the set
+	// adds, so the condition cannot hold and the window is left alone however often its script matches - see
 	// buildWindowNonePatternNoopOperation().
 	const CEP_TAG_PATTERN_NOOP = 'pattern_noop';
 	// The event pattern match flavour (see prepareDataCepWindowPattern()) is driven by a script instead: the
@@ -2434,7 +2435,10 @@ class testTriggerCEP extends CIntegrationTest {
 		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
 			// A pattern match window cannot be without a script and no step of this flavour is driven by a
 			// match: every operation a step performs runs the moment the event occurs, so a window reporting
-			// no match however many events it is handed leaves the step to act alone.
+			// no match however many events it is handed leaves the step to act alone. The rule does have an
+			// operation at the pattern matched execution point all the same, and this script is what keeps it
+			// from ever running - so what the flavour holds the server to is that an operation of a point the
+			// window never reaches stays unperformed, see addWindowNonePatternNoopOperation().
 			$window['script'] = "return 'false';";
 		}
 
@@ -6285,48 +6289,59 @@ HEREDOC;
 	}
 
 	/**
-	 * The operation the pattern match flavour of the windowless scenario appends to every rule of the set (see
-	 * prepareDataCepWindowNoneTagOperations()): a "close window" at the pattern matched execution point, filtered
-	 * on CEP_TAG_PATTERN_NOOP - a tag no event of the scenario carries, so the condition is never satisfied and
-	 * the operation never runs.
+	 * The operation the pattern match flavours of the operation scenario append to every rule they create - the
+	 * whole rule set at once (prepareDataCepWindowNoneTagOperations()) and the one rule of the stepped flavour
+	 * (prepareDataCepWindowOperationSteps()) alike: a "close window" at the pattern matched execution point.
 	 *
-	 * An operation that does nothing is what that flavour needs there. The point of the flavour is that a window
-	 * examined once a second and matching in it leaves the events alone, so a match may not act on them - but with
-	 * no operation at that execution point at all a match reaches an empty operation list, and the path a matched
-	 * pattern takes into the operations of a rule is then never taken. This gives it an operation to evaluate and
-	 * a condition that cannot hold, so the path is walked for every window the flavour opens and the events keep
-	 * coming out exactly as they do in the windowless run.
+	 * An operation that does nothing is what those flavours need there. Their point is that a window examined once
+	 * a second leaves the events alone, so nothing may act on them - but with no operation at that execution point
+	 * at all the point is never anything more than an empty operation list, and the path from a window examination
+	 * into the operations of a rule is then never taken.
+	 *
+	 * What keeps the operation from acting differs by flavour, which is what $filtered chooses:
+	 *   - a flavour whose script reports a match (prepareDataCepWindowNoneTagOperations()) reaches the operation on
+	 *     every examination, so the operation itself has to refuse: $filtered gives it a condition on
+	 *     CEP_TAG_PATTERN_NOOP, a tag no event of the scenario carries, which is never satisfied;
+	 *   - a flavour whose script reports no match (prepareDataCepWindowOperationSteps()) never reaches it at all,
+	 *     so the operation is left bare and it is the missing match that keeps it unperformed.
 	 *
 	 * $sortorder places it after the operations of the rule it is appended to.
 	 */
-	private static function buildWindowNonePatternNoopOperation(int $sortorder): array {
-		return [
+	private static function buildWindowNonePatternNoopOperation(int $sortorder, bool $filtered): array {
+		$operation = [
 			'sortorder' => $sortorder,
 			'execute_when' => CCepRuleHelper::WHEN_PATTERN_MATCHED,
-			'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
-			'filter' => [
+			'type' => CCepRuleHelper::OP_CLOSE_WINDOW
+		];
+
+		if ($filtered) {
+			$operation['filter'] = [
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 				'conditions' => [[
 					'type' => CCepRuleHelper::CONDITION_TAG,
 					'operator' => CONDITION_OPERATOR_EQUAL,
 					'tag' => self::CEP_TAG_PATTERN_NOOP
 				]]
-			]
-		];
+			];
+		}
+
+		return $operation;
 	}
 
 	/**
 	 * The rule parameters $params with the operation above appended to them, which is done to every rule of the
-	 * windowless operation scenario whose window is a pattern match one and to no other: the pattern matched
-	 * execution point exists for that window type alone (EXECUTE_WHEN_BY_WINDOW_TYPE), so a rule of any other
-	 * type is handed back untouched.
+	 * operation scenario whose window is a pattern match one and to no other: the pattern matched execution point
+	 * exists for that window type alone (EXECUTE_WHEN_BY_WINDOW_TYPE), so a rule of any other type is handed back
+	 * untouched. $filtered is what the caller says of its script, see above.
 	 */
-	private static function addWindowNonePatternNoopOperation(array $params): array {
+	private static function addWindowNonePatternNoopOperation(array $params, bool $filtered = true): array {
 		if ($params['window_type'] != CCepRuleHelper::WINDOW_PATTERN_MATCH) {
 			return $params;
 		}
 
-		$params['operations'][] = self::buildWindowNonePatternNoopOperation(count($params['operations']));
+		$params['operations'][] = self::buildWindowNonePatternNoopOperation(count($params['operations']),
+			$filtered
+		);
 
 		return $params;
 	}
@@ -10178,8 +10193,13 @@ HEREDOC;
 	/**
 	 * The stepped operation scenario with a pattern match window on the updated rule, whose script reports no match
 	 * however many events the window holds: the operations of a step are all performed the moment the event occurs,
-	 * so a match would have nothing to run either way, and the outcome of every step must again be the one the
-	 * windowless flavour of the scenario produces.
+	 * and the outcome of every step must again be the one the windowless flavour of the scenario produces.
+	 *
+	 * Every step does give its rule a "close window" at the pattern matched execution point all the same (see
+	 * buildWindowNonePatternNoopOperation()), so what this flavour holds the server to is that an operation of an
+	 * execution point the window never reaches stays unperformed: the point exists in the rule of every step,
+	 * with an operation behind it that needs no condition to be kept from acting, and a window that reports no
+	 * match may not perform it anyway.
 	 *
 	 * What this flavour adds to the simple one is the script: it is part of the window of the rule, so every step
 	 * updates it along with the operations, and the window of the step before it is examined by the script of that
@@ -13187,9 +13207,15 @@ HEREDOC;
 
 			// The one rule of the scenario, brought to the operations of this step and to no others: created on
 			// the first step and updated in place on every step after it, see upsertCepRule().
-			$this->upsertCepRule($this->buildWindowNoneCepRuleParams($rule_template['name'], [],
-				$this->buildWindowNoneOperations($step['operations']), CONDITION_EVAL_TYPE_AND, '',
-				$rule_template['window_type'], $rule_template['window']
+			// The operations of a step are the ones of its case plus, for a pattern match window, the
+			// operation that may not run: the rule is rewritten on every step, so an operation left out here
+			// would leave the pattern matched execution point of that step empty. It needs no condition -
+			// the script of this flavour reports no match, which is what keeps it unperformed.
+			$this->upsertCepRule(self::addWindowNonePatternNoopOperation(
+				$this->buildWindowNoneCepRuleParams($rule_template['name'], [],
+					$this->buildWindowNoneOperations($step['operations']), CONDITION_EVAL_TYPE_AND, '',
+					$rule_template['window_type'], $rule_template['window']
+				), false
 			));
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
