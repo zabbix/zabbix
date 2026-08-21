@@ -173,7 +173,7 @@ class CProxyHelper {
 		}
 
 		$total_objects = count($all_objects);
-		$all_allowed = count($final_allowed_ids) == $total_objects;
+		$all_allowed = $total_objects > 0 && count($final_allowed_ids) == $total_objects;
 		$all_denied = count($final_allowed_ids) == 0;
 
 		if ($all_allowed || $all_denied) {
