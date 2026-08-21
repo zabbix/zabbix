@@ -389,14 +389,20 @@
 						return;
 					}
 
-					for (const host of hosts) {
+					const compact_view = this.#datatable.getOption('compact_view');
+					const host_link_style = compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK;
+
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER, 'wrap');
+
+					for (const [index, host] of hosts.entries()) {
+						const flex_item = document.createElement('div');
+						flex_item.classList.add('flex-item');
+
 						const {hostid, name, maintenance_type, maintenance_status} = host;
 
-						const flex_wrapper = document.createElement('div');
-						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 						const host_link = document.createElement('a');
-						host_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
+						host_link.classList.add(ZBX_STYLE_LINK_ACTION, host_link_style);
 						host_link.setAttribute('data-menu-popup', JSON.stringify({
 							type: 'host',
 							data: {
@@ -409,7 +415,7 @@
 						host_link.setAttribute('href', 'javascript:void(0)');
 						host_link.textContent = name;
 
-						flex_wrapper.appendChild(host_link);
+						flex_item.appendChild(host_link);
 
 						if (maintenance_status == HOST_MAINTENANCE_STATUS_ON) {
 							let maintenance_name, maintenance_description;
@@ -441,11 +447,21 @@
 							maintenance_icon.setAttribute('data-hintbox-static', '1');
 							maintenance_icon.setAttribute('aria-expanded', 'false');
 
-							flex_wrapper.appendChild(maintenance_icon);
+							flex_item.appendChild(maintenance_icon);
 						}
 
-						cell.appendChild(flex_wrapper);
+						if (index + 1 < hosts.length) {
+							const separator = document.createElement('span');
+							separator.classList.add(ZBX_STYLE_SEPARATOR);
+							separator.textContent = ',';
+
+							flex_item.appendChild(separator);
+						}
+
+						flex_wrapper.appendChild(flex_item);
 					}
+
+					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('update', ({cell_data, cell, response}) => {
 					const [can_be_closed, eventid] = cell_data;
