@@ -319,6 +319,109 @@ static int	cep_operation_eval_or(const zbx_cep_operation_t *op, zbx_cep_event_co
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: evaluate AND operation conditions for event                       *
+ *                                                                            *
+ * Parameters: op    - [IN] operation whose tag conditions to evaluate        *
+ *             ctx   - [IN/OUT] event context for caching resolved values     *
+ *                                                                            *
+ * Return value: SUCCEED if alls conditions is are, FAIL otherwise            *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_operation_eval_and(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx)
+{
+	for (int i = 0; i < op->conditions.values_num; i++)
+	{
+		if (0 == cep_operation_condition_eval(&op->conditions.values[i], ctx))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate custom expression operation conditions against event     *
+ *                                                                            *
+ * Parameters: op  - [IN] operation whose conditions to evaluate              *
+ *             ctx  - [IN/OUT] event context for caching resolved values      *
+ *                                                                            *
+ * Return value: SUCCEED if expression evaluates to non-zero, FAIL otherwise  *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_operation_eval_expression(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx)
+{
+	zbx_eval_context_t	eval;
+	char			*error = NULL;
+	int			j, ret = FAIL;
+	zbx_variant_t		value, value_fail;
+
+	zbx_variant_set_none(&value);
+	zbx_variant_set_dbl(&value_fail, 0.0);
+
+	if (SUCCEED != zbx_eval_parse_expression(&eval, op->formula,
+			ZBX_EVAL_PARSE_FUNCTIONID | ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_GROUP, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse CEP operation custom expression: %s", error);
+		zbx_free(error);
+		return FAIL;
+	}
+
+	for (int i = 0; i < eval.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &eval.stack.values[i];
+		zbx_uint64_t		conditionid;
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+			continue;
+
+		if (SUCCEED != zbx_is_uint64_n(eval.expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
+				&conditionid))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "invalid condition id in CEP operation custom expression starting"
+					" with: %s", eval.expression + token->loc.l);
+			goto out;
+		}
+
+		for (j = 0; j < op->conditions.values_num; j++)
+		{
+			const zbx_cep_op_condition_t	*cond = &op->conditions.values[j];
+
+			if (cond->cep_op_conditionid == conditionid)
+			{
+				zbx_variant_clear(&token->value);
+				zbx_variant_set_ui64(&token->value,
+						(zbx_uint64_t)cep_operation_condition_eval(cond, ctx));
+				break;
+			}
+		}
+
+		if (j == op->conditions.values_num)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find CEP operation condition " ZBX_FS_UI64
+					" set in expression", conditionid);
+			goto out;
+		}
+	}
+
+	if (SUCCEED != zbx_eval_execute(&eval, NULL, &value, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot evaluate CEP operation custom expression: %s", error);
+		zbx_free(error);
+		goto out;
+	}
+
+	if (0 != zbx_variant_compare(&value, &value_fail))
+		ret = SUCCEED;
+out:
+	zbx_eval_clear(&eval);
+	zbx_variant_clear(&value);
+	zbx_variant_clear(&value_fail);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: check if event matches operation condition                        *
  *                                                                            *
  * Parameters: op    - [IN] operation to match                                *
@@ -348,6 +451,12 @@ int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_conte
 			break;
 		case ZBX_CONDITION_EVAL_TYPE_OR:
 			ret = cep_operation_eval_or(op, ctx);
+			break;
+		case ZBX_CONDITION_EVAL_TYPE_AND:
+			ret = cep_operation_eval_and(op, ctx);
+			break;
+		case ZBX_CONDITION_EVAL_TYPE_EXPRESSION:
+			ret = cep_operation_eval_expression(op, ctx);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("invalid CEP operation evaltype %d", op->evaltype);
