@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-//nolint:goconst // Table-driven tests intentionally repeat literal inputs and expected values.
 package smart
 
 import (
