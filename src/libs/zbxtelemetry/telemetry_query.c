@@ -210,6 +210,7 @@ int	tq_validate_result_column_type(zbx_json_type_t type)
 		case ZBX_JSON_TYPE_STRING:
 		case ZBX_JSON_TYPE_INT:
 		case ZBX_JSON_TYPE_NUMBER:
+		case ZBX_JSON_TYPE_NULL:
 			return SUCCEED;
 		default:
 			return FAIL;
@@ -222,6 +223,7 @@ int	tq_validate_result_aggr_column_type(zbx_json_type_t type)
 	{
 		case ZBX_JSON_TYPE_INT:
 		case ZBX_JSON_TYPE_NUMBER:
+		case ZBX_JSON_TYPE_NULL:
 			return SUCCEED;
 		default:
 			return FAIL;

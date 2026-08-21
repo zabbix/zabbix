@@ -55,6 +55,7 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 		const zbx_tq_column_t	*col = &query->columns.values[i];
 		char			*field_name = tq_get_result_field_name_dyn(col);
 		zbx_json_type_t		type;
+		const char		*string;
 
 		if (NULL == (p = zbx_json_next_value_dyn(jp, p, &buf, &buf_alloc, &type)) ||
 				SUCCEED != tq_validate_result_column_type(type))
@@ -65,7 +66,8 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 			goto out;
 		}
 
-		zbx_json_addstring(&j, field_name, buf, type);
+		string = (ZBX_JSON_TYPE_NULL == type ? NULL : buf);
+		zbx_json_addstring(&j, field_name, string, type);
 
 		zbx_free(field_name);
 	}
@@ -74,6 +76,7 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 	{
 		const char	*field_name = query->aggregated_columns.values[i].alias;
 		zbx_json_type_t	type;
+		const char	*string;
 
 		if (NULL == (p = zbx_json_next_value_dyn(jp, p, &buf, &buf_alloc, &type)) ||
 				SUCCEED != tq_validate_result_aggr_column_type(type))
@@ -83,7 +86,8 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 			goto out;
 		}
 
-		zbx_json_addstring(&j, field_name, buf, type);
+		string = (ZBX_JSON_TYPE_NULL == type ? NULL : buf);
+		zbx_json_addstring(&j, field_name, string, type);
 	}
 
 	zbx_json_close(&j);
