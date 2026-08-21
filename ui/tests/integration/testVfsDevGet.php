@@ -27,18 +27,9 @@ class testVfsDevGet extends CIntegrationTest {
 	private static $hostids = [];
 	private static $itemids = [];
 
-	// Test disk (and its partitions), discovered/created in onBeforeTestSuite() and used as expected values.
-	private static $diskName;
-	private static $diskType;
-	private static $diskPath;
-	private static $diskSizeBytes;
-	private static $diskLogicalBlkSize;
-	private static $diskPhysicalBlkSize;
-	private static $partitionSizes = [];
-
-	// Set if the /dev/<$diskName> node was created by this suite (see createLoopDeviceNode()), so it
-	// can be removed again in clearData() instead of being left behind.
-	private static $diskNodeCreated = false;
+	// Real disk-type block devices on the host (and their partitions), discovered in
+	// onBeforeTestSuite() and used as expected values - see listBlockDevices(). Keyed by device name.
+	private static $disks = [];
 
 	// List of items to check.
 	private static $items = [
@@ -51,37 +42,16 @@ class testVfsDevGet extends CIntegrationTest {
 	];
 
 	/**
-	 * If a block device to test against cannot be found or created, the whole suite is skipped rather
-	 * than failed, since that would be an environment limitation and not something a re-run can fix.
+	 * Discover the real block devices to test vfs.dev.get against. This suite never creates,
+	 * attaches, or otherwise mocks a device of its own - if the host genuinely has none, that is a
+	 * real gap in coverage, not an environment quirk to route around, so the suite fails outright
+	 * rather than being skipped.
 	 */
 	protected function onBeforeTestSuite() {
-		$name = self::createLoopDeviceNode();
+		self::$disks = self::listBlockDevices();
 
-		if ($name === null) {
-			self::markTestSuiteSkipped(
-					'Cannot find or create a real block device on this host to test vfs.dev.get against.'
-			);
-
-			return;
-		}
-
-		self::$diskName = $name;
-		self::$diskType = 'disk';
-		self::$diskPath = '/dev/'.$name;
-		self::$diskSizeBytes = self::readSysfsSizeBytes($name);
-		self::$diskLogicalBlkSize = self::readSysfsUint($name.'/queue/logical_block_size');
-		self::$diskPhysicalBlkSize = self::readSysfsUint($name.'/queue/physical_block_size');
-
-		$partitions = trim((string) shell_exec('lsblk -nlo NAME,TYPE /dev/'.$name.
-				" | awk 'NR > 1 && \$2 == \"part\" {print \$1}'"
-		));
-
-		foreach (($partitions === '') ? [] : explode("\n", $partitions) as $partition) {
-			$partition = trim($partition);
-
-			if ($partition !== '') {
-				self::$partitionSizes[$partition] = self::readSysfsSizeBytes($partition);
-			}
+		if (!self::$disks) {
+			throw new Exception('No block devices found on this host to test vfs.dev.get against.');
 		}
 
 		parent::onBeforeTestSuite();
@@ -173,8 +143,7 @@ class testVfsDevGet extends CIntegrationTest {
 	}
 
 	/**
-	 * Remove the hosts (and, with them, the items and history) created for this suite, and any
-	 * /dev node this suite created for testing (see createLoopDeviceNode()).
+	 * Remove the hosts (and, with them, the items and history) created for this suite.
 	 */
 	public static function clearData(): void {
 		if (self::$hostids) {
@@ -183,57 +152,53 @@ class testVfsDevGet extends CIntegrationTest {
 
 		self::$hostids = [];
 		self::$itemids = [];
-
-		if (self::$diskNodeCreated) {
-			shell_exec('rm -f '.escapeshellarg(self::$diskPath));
-			self::$diskNodeCreated = false;
-		}
 	}
 
 	/**
-	 * Get a /dev/<name> block special node for an already existing loop device, creating the node
-	 * itself if needed - the same approach is used everywhere (a real disk on a dev machine and a
-	 * Docker container both go through this), rather than preferring a real disk where one happens
-	 * to be available, so the suite exercises the same code path everywhere it runs.
+	 * List every real disk-type block device on the host that has a working /dev node, together with
+	 * the values vfs.dev.get is expected to report for it. Ground truth comes straight from lsblk and
+	 * sysfs, the same sources vfs.dev.get itself relies on.
 	 *
-	 * Loop devices are reported with DEVTYPE=disk in sysfs, exactly like vfs.dev.get relies on for a
-	 * real disk, so this is indistinguishable from one to the item - no actual attached backing file
-	 * is needed, since neither the item nor this suite ever reads the device's contents.
-	 *
-	 * Creating the node (when it does not already exist) requires the CAP_MKNOD capability, which a
-	 * root process has by default even inside a non-privileged Docker container (unlike, say,
-	 * CAP_SYS_ADMIN, which would be needed to losetup a new loop device instead of reusing an
-	 * existing one).
-	 *
-	 * @return string|null
+	 * @return array  device name => ['type' => .., 'path' => .., 'size_bytes' => .., ..,
+	 *                'partitions' => [partition name => size_bytes]]
 	 */
-	private static function createLoopDeviceNode() {
-		$name = trim((string) shell_exec('ls -d /sys/class/block/loop* 2>/dev/null | head -1 | xargs -r basename'));
+	private static function listBlockDevices() {
+		$disks = [];
 
-		if ($name === '') {
-			return null;
+		$names = trim((string) shell_exec("lsblk -dnlo NAME,TYPE | awk '\$2 == \"disk\" {print \$1}'"));
+
+		foreach (($names === '') ? [] : explode("\n", $names) as $name) {
+			$name = trim($name);
+
+			if ($name === ''
+					|| trim((string) shell_exec('[ -b '.escapeshellarg('/dev/'.$name).' ] && echo yes')) !== 'yes') {
+				continue;
+			}
+
+			$partitions = [];
+			$partition_names = trim((string) shell_exec('lsblk -nlo NAME,TYPE '.escapeshellarg('/dev/'.$name).
+					" | awk 'NR > 1 && \$2 == \"part\" {print \$1}'"
+			));
+
+			foreach (($partition_names === '') ? [] : explode("\n", $partition_names) as $partition) {
+				$partition = trim($partition);
+
+				if ($partition !== '') {
+					$partitions[$partition] = self::readSysfsSizeBytes($partition);
+				}
+			}
+
+			$disks[$name] = [
+				'type' => 'disk',
+				'path' => '/dev/'.$name,
+				'size_bytes' => self::readSysfsSizeBytes($name),
+				'logical_block_size' => self::readSysfsUint($name.'/queue/logical_block_size'),
+				'physical_block_size' => self::readSysfsUint($name.'/queue/physical_block_size'),
+				'partitions' => $partitions
+			];
 		}
 
-		if (trim((string) shell_exec('[ -b '.escapeshellarg('/dev/'.$name).' ] && echo yes')) === 'yes') {
-			return $name;
-		}
-
-		$devt = trim((string) shell_exec('cat '.escapeshellarg('/sys/class/block/'.$name.'/dev').' 2>/dev/null'));
-		[$major, $minor] = array_pad(explode(':', $devt), 2, '');
-
-		if (!ctype_digit($major) || !ctype_digit($minor)) {
-			return null;
-		}
-
-		shell_exec('mknod '.escapeshellarg('/dev/'.$name).' b '.$major.' '.$minor.' 2>/dev/null');
-
-		if (trim((string) shell_exec('[ -b '.escapeshellarg('/dev/'.$name).' ] && echo yes')) !== 'yes') {
-			return null;
-		}
-
-		self::$diskNodeCreated = true;
-
-		return $name;
+		return $disks;
 	}
 
 	/**
@@ -352,7 +317,7 @@ class testVfsDevGet extends CIntegrationTest {
 	}
 
 	/**
-	 * Find the config entry for the test disk inside a vfs.dev.get "config" array.
+	 * Find the config entry for a device inside a vfs.dev.get "config" array.
 	 *
 	 * @param array  $config
 	 * @param string $name
@@ -379,26 +344,30 @@ class testVfsDevGet extends CIntegrationTest {
 
 			$this->assertArrayHasKey('config', $json, $component.':'.$key);
 
-			$found = self::findConfigEntry($json['config'], self::$diskName);
-			$this->assertIsArray($found, 'Device "'.self::$diskName.'" is missing from '.$component.':'.$key);
+			foreach (self::$disks as $name => $disk) {
+				$found = self::findConfigEntry($json['config'], $name);
+				$this->assertIsArray($found, 'Device "'.$name.'" is missing from '.$component.':'.$key);
 
-			$this->assertEquals(self::$diskType, $found['type'], $component.':'.$key.' type');
-			$this->assertEquals(self::$diskPath, $found['path'], $component.':'.$key.' path');
+				$this->assertEquals($disk['type'], $found['type'], $component.':'.$key.' type for "'.$name.'"');
+				$this->assertEquals($disk['path'], $found['path'], $component.':'.$key.' path for "'.$name.'"');
 
-			if (self::$diskSizeBytes !== null) {
-				$this->assertEquals(self::$diskSizeBytes, $found['size_bytes'], $component.':'.$key.' size_bytes');
-			}
+				if ($disk['size_bytes'] !== null) {
+					$this->assertEquals($disk['size_bytes'], $found['size_bytes'],
+							$component.':'.$key.' size_bytes for "'.$name.'"'
+					);
+				}
 
-			if (self::$diskLogicalBlkSize !== null) {
-				$this->assertEquals(self::$diskLogicalBlkSize, $found['logical_block_size'],
-						$component.':'.$key.' logical_block_size'
-				);
-			}
+				if ($disk['logical_block_size'] !== null) {
+					$this->assertEquals($disk['logical_block_size'], $found['logical_block_size'],
+							$component.':'.$key.' logical_block_size for "'.$name.'"'
+					);
+				}
 
-			if (self::$diskPhysicalBlkSize !== null) {
-				$this->assertEquals(self::$diskPhysicalBlkSize, $found['physical_block_size'],
-						$component.':'.$key.' physical_block_size'
-				);
+				if ($disk['physical_block_size'] !== null) {
+					$this->assertEquals($disk['physical_block_size'], $found['physical_block_size'],
+							$component.':'.$key.' physical_block_size for "'.$name.'"'
+					);
+				}
 			}
 		}
 	}
@@ -408,28 +377,26 @@ class testVfsDevGet extends CIntegrationTest {
 	 * @dataProvider componentsDataProvider
 	 */
 	public function testVfsDevGet_devices($component) {
-		if (!self::$partitionSizes) {
-			$this->markTestSkipped('Test disk "'.self::$diskName.'" has no partitions on this host.');
-		}
-
 		$key = 'vfs.dev.get[devices]';
 		$json = $this->decodeItemValue($this->getItemResult($component, $key), $component, $key);
 
 		$this->assertArrayHasKey('config', $json, $component.':'.$key);
 
-		$found = self::findConfigEntry($json['config'], self::$diskName);
-		$this->assertIsArray($found, 'Device "'.self::$diskName.'" is missing from '.$component.':'.$key);
-		$this->assertArrayHasKey('partitions', $found, $component.':'.$key);
+		foreach (self::$disks as $name => $disk) {
+			$found = self::findConfigEntry($json['config'], $name);
+			$this->assertIsArray($found, 'Device "'.$name.'" is missing from '.$component.':'.$key);
+			$this->assertArrayHasKey('partitions', $found, $component.':'.$key.' for "'.$name.'"');
 
-		foreach (self::$partitionSizes as $partition => $size) {
-			$this->assertArrayHasKey($partition, $found['partitions'],
-					'Partition "'.$partition.'" is missing from '.$component.':'.$key
-			);
-
-			if ($size !== null) {
-				$this->assertEquals($size, $found['partitions'][$partition],
-						'Partition "'.$partition.'" size mismatch for '.$component.':'.$key
+			foreach ($disk['partitions'] as $partition => $size) {
+				$this->assertArrayHasKey($partition, $found['partitions'],
+						'Partition "'.$partition.'" is missing from '.$component.':'.$key
 				);
+
+				if ($size !== null) {
+					$this->assertEquals($size, $found['partitions'][$partition],
+							'Partition "'.$partition.'" size mismatch for '.$component.':'.$key
+					);
+				}
 			}
 		}
 	}
@@ -444,27 +411,29 @@ class testVfsDevGet extends CIntegrationTest {
 
 			$this->assertArrayHasKey('values', $json, $component.':'.$key);
 
-			$found = null;
-			foreach ($json['values'] as $value) {
-				if (array_key_exists('name', $value) && $value['name'] === self::$diskName) {
-					$found = $value;
-					break;
+			foreach (array_keys(self::$disks) as $name) {
+				$found = null;
+				foreach ($json['values'] as $value) {
+					if (array_key_exists('name', $value) && $value['name'] === $name) {
+						$found = $value;
+						break;
+					}
 				}
-			}
 
-			$this->assertIsArray($found, 'Device "'.self::$diskName.'" is missing from '.$component.':'.$key);
-			$this->assertArrayHasKey('stats', $found, $component.':'.$key);
+				$this->assertIsArray($found, 'Device "'.$name.'" is missing from '.$component.':'.$key);
+				$this->assertArrayHasKey('stats', $found, $component.':'.$key);
 
-			foreach (['reads_completed', 'bytes_read', 'writes_completed', 'bytes_written'] as $field) {
-				$this->assertArrayHasKey($field, $found['stats'],
-						'Field "'.$field.'" is missing from '.$component.':'.$key
-				);
-				$this->assertIsNumeric($found['stats'][$field],
-						'Field "'.$field.'" is not numeric for '.$component.':'.$key
-				);
-				$this->assertGreaterThanOrEqual(0, $found['stats'][$field],
-						'Field "'.$field.'" is negative for '.$component.':'.$key
-				);
+				foreach (['reads_completed', 'bytes_read', 'writes_completed', 'bytes_written'] as $field) {
+					$this->assertArrayHasKey($field, $found['stats'],
+							'Field "'.$field.'" is missing from '.$component.':'.$key
+					);
+					$this->assertIsNumeric($found['stats'][$field],
+							'Field "'.$field.'" is not numeric for '.$component.':'.$key
+					);
+					$this->assertGreaterThanOrEqual(0, $found['stats'][$field],
+							'Field "'.$field.'" is negative for '.$component.':'.$key
+					);
+				}
 			}
 		}
 	}
