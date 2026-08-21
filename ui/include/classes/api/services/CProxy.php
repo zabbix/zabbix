@@ -292,6 +292,8 @@ class CProxy extends CApiService {
 			' WHERE '.dbConditionId('p.proxyid', array_keys($result))
 		);
 
+		$apmOptionsMap = array_flip($options['selectApm']);
+
 		while ($row = DBfetch($resource)) {
 			$apm = json_decode($row['apm'], true);
 
@@ -299,9 +301,7 @@ class CProxy extends CApiService {
 				$apm = self::APM_DEFAULT_FIELDS;
 			}
 
-			$result[$row['proxyid']]['apm'] = array_intersect_key(
-				$apm, array_flip($options['selectApm'])
-			);
+			$result[$row['proxyid']]['apm'] = array_intersect_key($apm, $apmOptionsMap);
 		}
 	}
 
