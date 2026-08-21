@@ -457,11 +457,10 @@ class CProxy extends CApiService {
 	private static function prepareApmForDb(array &$proxy, ?array $db_proxies = null): void {
 		if (array_key_exists('apm', $proxy) && $proxy['apm']
 				&& $proxy['apm']['data_collection_status'] === PROXY_APM_STATUS_CONFIGURED) {
-
 			$default_attributes = [
-				'signal_type' => [],
+				'signal_type' => 0,
 				'key' => 0,
-				'value' => 0
+				'value' => ""
 			];
 
 			$proxy['apm'] = array_merge(self::APM_DEFAULT_FIELDS, $proxy['apm']);
@@ -474,7 +473,7 @@ class CProxy extends CApiService {
 				);
 
 				foreach ($proxy['apm']['additional_resource_attributes'] as &$attributes) {
-					$attributes = array_merge(array_intersect_key($default_attributes, $attributes), $attributes);
+					$attributes = array_merge($default_attributes, $attributes, $attributes);
 				}
 				unset($attributes);
 			}
