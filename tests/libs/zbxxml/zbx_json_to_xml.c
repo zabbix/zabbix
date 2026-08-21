@@ -26,13 +26,13 @@
 
 typedef struct
 {
-	const char *json;
-	const char *expected_xml;
-	int expected_result;
+	const char	*json;
+	const char	*expected_xml;
+	int		expected_result;
 
-	int actual_result;
-	char *xml;
-	char *error;
+	int		actual_result;
+	char		*xml;
+	char		*error;
 } zbx_mock_thread_args_t;
 
 static void	*zbx_mock_test_thread(void *arg)

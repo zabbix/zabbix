@@ -64,7 +64,7 @@ zbx_int64_t	json_error(const char *message, const char *ptr, char **error)
  ******************************************************************************/
 static zbx_int64_t	json_error_with_count(const char *message, int count, const char *ptr, char **error)
 {
-	char err_buf[MAX_STRING_LEN];
+	char	err_buf[MAX_STRING_LEN];
 
 	zbx_snprintf(err_buf, sizeof(err_buf), message, count);
 
