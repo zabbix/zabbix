@@ -806,6 +806,17 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		);
 	}
 
+	private static function tmplSimpleMetricGauge(float $now, float $offset_s, string $metric_name, mixed $value): array {
+		return self::tmplMetricGauge(
+			self::tsOffStr($now, $offset_s),
+			self::tsOffStr($now, $offset_s),
+			function (array &$payload) use ($metric_name, $value) {
+				$payload['scopeMetrics'][0]['metrics'][0]['name'] = $metric_name;
+				$payload['scopeMetrics'][0]['metrics'][0]['gauge']['dataPoints'][0]['asDouble'] = $value;
+			}
+		);
+	}
+
 	/*
 		TODO: add test cases for:
 			- time buckets with overlap
@@ -1516,7 +1527,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	 * @onBeforeOnce createHost
 	 * @onAfterOnce deleteHost
 	 */
-	public function testTelemetryQueryItems_checkDataNaNAndInf(): void {
+	public function testTelemetryQueryItems_checkDataAggregationWithNaNAndInf(): void {
 		$this->executeSubcases([
 			self::getAggregationSubcase(
 				'The only data point is NaN',
@@ -1600,6 +1611,90 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	 * @onBeforeOnce createHost
 	 * @onAfterOnce deleteHost
 	 */
+	public function testTelemetryQueryItems_checkDataSelectingNaNAndInf(): void {
+		$this->executeSubcases([
+			[
+				'description' => 'Selecting NaN and +- Inf',
+				'item' => self::tqItem(
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+					[
+						self::qcol('MetricName'),
+						self::qcol('Value')
+					],
+					[
+						self::qagg('', AGGREGATE_COUNT, 'cnt')
+					],
+					self::emptyFilter()
+				),
+				'buckets_tmpl' => fn(int $now) => [
+					[
+						'id' => 1,
+						'columns' => [
+							'MetricName' => 'a',
+							'Value' => 1,
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 2,
+						'columns' => [
+							'MetricName' => 'b',
+							'Value' => null,
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 3,
+						'columns' => [
+							'MetricName' => 'c',
+							'Value' => null,
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 4,
+						'columns' => [
+							'MetricName' => 'd',
+							'Value' => null,
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 5,
+						'columns' => [
+							'MetricName' => 'e',
+							'Value' => 0,
+							'cnt' => 1
+						]
+					],
+					[
+						'id' => 6,
+						'columns' => [
+							'MetricName' => 'f',
+							'Value' => 0.5,
+							'cnt' => 1
+						]
+					],
+				],
+				'input_tmpl' => fn(int $now) => [
+					'metrics' => [
+						self::tmplSimpleMetricGauge($now, -10, 'a', 1),
+						self::tmplSimpleMetricGauge($now, -10, 'b', "NaN"),
+						self::tmplSimpleMetricGauge($now, -10, 'c', "Infinity"),
+						self::tmplSimpleMetricGauge($now, -10, 'd', "-Infinity"),
+						self::tmplSimpleMetricGauge($now, -10, 'e', 0),
+						self::tmplSimpleMetricGauge($now, -10, 'f', 0.5)
+					]
+				]
+			]
+		]);
+	}
+
+	/**
+	 * @onBeforeOnce createHost
+	 * @onAfterOnce deleteHost
+	 */
 	public function testTelemetryQueryItems_checkDataTimeBuckets(): void {
 		$this->executeSubcases([
 			[
@@ -1664,7 +1759,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	 */
 	public function testTelemetryQueryItems_checkDataGrouping(): void {
 		$this->executeSubcases([
-						[
+			[
 				'description' => 'Grouping test #1',
 				'item' => self::tqItem(
 					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
