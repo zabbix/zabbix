@@ -114,8 +114,6 @@ foreach ($data['ceprules'] as $ceprule) {
 		}
 	}
 
-	CArrayHelper::sort($ceprule['operations'], ['type']);
-
 	foreach ($ceprule['operations'] as $operation) {
 		if ($is_legacy) {
 			$operations[] = CCorrelationHelper::getOperationTypes()[$operation['type']];
