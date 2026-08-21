@@ -674,12 +674,7 @@ $formgrid
 		))->setId('js-item-metric-point-type-field')
 	])
 	->addItem([
-		(new CLabel([
-			_('Columns'),
-			makeErrorIcon(_('Complex columns require a key name.'))
-				->addClass('js-columns-error')
-				->addStyle('display: none;')
-		], 'columns-table'))->setId('js-item-columns-label'),
+		(new CLabel(_('Columns'), 'columns-table'))->setId('js-item-columns-label'),
 		(new CFormField(
 			(new CDiv([
 				(new CTable())

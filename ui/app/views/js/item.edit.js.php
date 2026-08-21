@@ -156,7 +156,6 @@ window.item_edit_form = new class {
 			lookback_limit_hint: this.form_element.querySelector('[for="lookback_limit"] .js-lookback-limit-hint'),
 			lookback_limit_error: this.form_element.querySelector('[for="lookback_limit"] .js-lookback-limit-error'),
 			granularity_hint: this.form_element.querySelector('[for="granularity"] .js-granularity-hint'),
-			columns_error: this.form_element.querySelector('[for="columns-table"] .js-columns-error'),
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
@@ -206,9 +205,7 @@ window.item_edit_form = new class {
 					this.#toggleAttributeKey(select);
 				}
 			}
-
-			this.#updateColumnsIndicator();
-		}).on('afterremove.dynamicRows', () => this.#updateColumnsIndicator());
+		});
 
 		this.form_element.querySelectorAll('#delay-flex-table .form_row')?.forEach(row => {
 			const flexible = row.querySelector('[name$="[type]"]:checked').value == ITEM_DELAY_FLEXIBLE;
@@ -309,13 +306,6 @@ window.item_edit_form = new class {
 		this.form_element.querySelector('#columns-table').addEventListener('change', (e) => {
 			if (e.target.classList.contains('js-column')) {
 				this.#toggleAttributeKey(e.target);
-				this.#updateColumnsIndicator();
-			}
-		});
-
-		this.form_element.querySelector('#columns-table').addEventListener('input', (e) => {
-			if (e.target.classList.contains('js-attribute-key')) {
-				this.#updateColumnsIndicator();
 			}
 		});
 
@@ -631,32 +621,11 @@ window.item_edit_form = new class {
 		}
 	}
 
-	#updateColumnsIndicator() {
-		if (this.field.type.value != ITEM_TYPE_TELEMETRY_QUERY) {
-			return;
-		}
-
-		const config = this.telemetry_columns_config;
-		let has_missing_key = false;
-
-		for (const select of this.form_element.querySelectorAll('#columns-table tbody .js-column')) {
-			if (config.complex.includes(select.value)
-					&& select.closest('tr').querySelector('.js-attribute-key').value.trim() === '') {
-				has_missing_key = true;
-				break;
-			}
-		}
-
-		this.label.columns_error.style.display = has_missing_key ? '' : 'none';
-	}
-
 	#refreshTelemetryColumns() {
 		for (const select of this.form_element.querySelectorAll('#columns-table tbody .js-column')) {
 			this.#populateColumnSelect(select);
 			this.#toggleAttributeKey(select);
 		}
-
-		this.#updateColumnsIndicator();
 	}
 
 	#removeRelatedErrorContainer(row) {
@@ -843,7 +812,6 @@ window.item_edit_form = new class {
 		}
 
 		this.#updateTelemetryIndicators();
-		this.#updateColumnsIndicator();
 	}
 
 	#getTelemetryConditions() {
