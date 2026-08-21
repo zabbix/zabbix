@@ -272,12 +272,12 @@ class CCepRule extends CApiService {
 
 		$operation_options = [
 			'output' => array_merge(
-				['cep_operationid', 'cep_ruleid', 'sortorder'],
+				['cep_operationid', 'cep_ruleid'],
 				array_diff($options['selectOperations'], ['filter']),
 				$has_filter ? ['evaltype'] : []
 			),
 			'filter' => ['cep_ruleid' => array_keys($cep_rules)],
-			'sortfield' => ['cep_operationid']
+			'sortfield' => ['sortorder']
 		];
 		$resource = DBselect(DB::makeSql('cep_operation', $operation_options));
 
@@ -324,9 +324,6 @@ class CCepRule extends CApiService {
 		}
 
 		foreach ($cep_rules as &$cep_rule) {
-			usort($cep_rule['operations'], fn(array $operation, array $operation_next)
-				=> $operation['sortorder'] <=> $operation_next['sortorder']
-			);
 			$cep_rule['operations'] = array_values($cep_rule['operations']);
 		}
 		unset($cep_rule);
