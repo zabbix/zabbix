@@ -44,17 +44,14 @@ class CControllerCepRuleResetTimeWindows extends CController {
 	}
 
 	protected function doAction(): void {
-		$cepruleids = $this->getInput('cepruleids', []);
-		$reset = count($cepruleids);
+		$cep_ruleids = $this->getInput('cepruleids', []);
+
+		$result = API::CepRule()->resetTimeWindows(['cep_ruleid' => reset($cep_ruleids)]);
+
 		$output = [];
 
-		/* $result = API::CepRule()->resetTimeWindows($cepruleids); */// TODO: no API method yet
-		$result = true;
-
 		if ($result) {
-			$output['success']['title'] = _n('Rule time windows are reset',
-				'Rules time windows are reset', $reset
-			);
+			$output['success']['title'] = _('Rule time windows are reset');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -62,7 +59,7 @@ class CControllerCepRuleResetTimeWindows extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot reset rule time windows', 'Cannot reset rules time windows', $reset),
+				'title' => _('Cannot reset rule time windows'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

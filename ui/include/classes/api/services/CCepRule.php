@@ -23,7 +23,8 @@ class CCepRule extends CApiService {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'resettimewindows' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
 	protected $tableName = 'cep_rule';
@@ -1616,6 +1617,46 @@ class CCepRule extends CApiService {
 		if ($operationids) {
 			DB::delete('cep_operation_condition', ['cep_operationid' => $operationids]);
 			DB::delete('cep_operation', ['cep_operationid' => $operationids]);
+		}
+	}
+
+	public function resetTimeWindows(array $cep_rule): array {
+		$this->validateResetTimeWindows($cep_rule);
+
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
+
+		$result = $zabbix_server->resetCepRule($cep_rule, self::getAuthIdentifier());
+
+		if ($result === false) {
+			self::exception(ZBX_API_ERROR_INTERNAL, $zabbix_server->getError());
+		}
+
+		return $cep_rule;
+	}
+
+	private function validateResetTimeWindows(array $cep_rule): void {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'cep_ruleid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $cep_rule, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_cep_rule = DB::select('cep_rule', [
+			'output' =>	[],
+			'cep_ruleids' => $cep_rule['cep_ruleid']
+		]);
+
+		if (!$db_cep_rule) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('No permissions to referred object or it does not exist!')
+			);
 		}
 	}
 }
