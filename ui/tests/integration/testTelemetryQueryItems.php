@@ -14,6 +14,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
+require_once __DIR__.'/../../include/classes/api/item_types/CItemType.php';
 require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
 
 /**
@@ -36,6 +37,235 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 	const ITEM_KEY = 'test_tq_item';
 	const ITEM_VALUE_TYPE = ITEM_VALUE_TYPE_TEXT;
+
+	private static int $hostid;
+
+	public function serverConfigurationProvider(): array {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 5,
+				'LogFileSize' => 0,
+				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
+				'TelemetryProvider' =>	'clickhouse;url="' . self::CLICKHOUSE_URL . '",' .
+										'username="' . self::CLICKHOUSE_USERNAME . '",' .
+										'password="' . self::CLICKHOUSE_PASSWORD . '",' .
+										'db="' . self::CLICKHOUSE_DB . '"'
+			]
+		];
+	}
+
+	private function createTQItem(int $hostid, array $item_fields): int {
+		$response = $this->call('item.create', array_merge([
+			'hostid' => $hostid,
+			'name' => self::ITEM_KEY,
+			'key_' => self::ITEM_KEY,
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'value_type' => self::ITEM_VALUE_TYPE,
+			'timeout' => '3s'
+		], $item_fields));
+
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+		$itemid = $response['result']['itemids'][0];
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 0);
+
+		return $itemid;
+	}
+
+	private function deleteTQItem(int $itemid): void {
+		$response = $this->call('item.delete', [$itemid]);
+
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+		$this->assertEquals($itemid, $response['result']['itemids'][0]);
+	}
+
+	private function waitForBuckets(int $itemid, int $min_bucket_count, int $iterations, int $delay, string $msg): array {
+		/* TODO: maybe also check that there isn't more buckets than expected */
+		for ($i = 0; $i < $iterations; $i++) {
+			$response = $this->call('history.get', [
+				'output' => ['value'],
+				'itemids' => [$itemid],
+				'history' => self::ITEM_VALUE_TYPE,
+				'sortorder' => 'ASC',
+				'sortfield' => 'clock'
+			]);
+
+			if (isset($response['result']) && count($response['result']) >= $min_bucket_count) {
+				return $response;
+			}
+
+			sleep($delay);
+		}
+
+		$msg2 = "$msg\nFailed to wait for the minimum of $min_bucket_count buckets";
+
+		if (isset($response)) {
+			$msg2 .= "\nLast response:\n".json_encode($response);
+		}
+
+		$this->fail($msg2);
+	}
+
+	private function sendOTLP(string $import_path, string $proto, string $payload, string $address, string $method): void {
+		$cmd =
+			'grpcurl '.
+			'-plaintext ' .
+			'-import-path ' . escapeshellarg($import_path) . ' ' .
+			'-proto ' . escapeshellarg($proto) . ' ' .
+			'-d ' . escapeshellarg($payload) . ' ' .
+			escapeshellarg($address) . ' ' .
+			escapeshellarg($method);
+
+		$output_lines = [];
+		$exit_code = 0;
+
+		exec($cmd, $output_lines, $exit_code);
+
+		$this->assertEquals(0, $exit_code, "Unexpected exit code: " . $exit_code . ", output_lines:\n" . implode("\n", $output_lines));
+	}
+
+	private function sendInput(array $input): void {
+		if (isset($input['metrics'])) {
+			$payload = [];
+			$payload['resourceMetrics'] = $input['metrics'];
+			$json = json_encode($payload);
+
+			$this->sendOTLP(
+				self::PROTO_DIR,
+				'opentelemetry/proto/collector/metrics/v1/metrics_service.proto',
+				$json,
+				self::COLLECTOR_ADDRESS,
+				'opentelemetry.proto.collector.metrics.v1.MetricsService/Export'
+			);
+		}
+
+		if (isset($input['traces'])) {
+			$payload = [];
+			$payload['resourceSpans'] = $input['traces'];
+			$json = json_encode($payload);
+
+			$this->sendOTLP(
+				self::PROTO_DIR,
+				'opentelemetry/proto/collector/trace/v1/trace_service.proto',
+				$json,
+				self::COLLECTOR_ADDRESS,
+				'opentelemetry.proto.collector.trace.v1.TraceService/Export'
+			);
+		}
+
+		if (isset($input['logs'])) {
+			$payload = [];
+			$payload['resourceLogs'] = $input['logs'];
+			$json = json_encode($payload);
+
+			$this->sendOTLP(
+				self::PROTO_DIR,
+				'opentelemetry/proto/collector/logs/v1/logs_service.proto',
+				$json,
+				self::COLLECTOR_ADDRESS,
+				'opentelemetry.proto.collector.logs.v1.LogsService/Export'
+			);
+		}
+	}
+
+	private function deleteOTData(): void {
+		$handle = curl_init();
+
+		$sql = "TRUNCATE ALL TABLES FROM " . self::CLICKHOUSE_DB . " LIKE 'otel_%'";
+
+		curl_setopt_array($handle, [
+			CURLOPT_URL => self::CLICKHOUSE_URL,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_POST => true,
+			CURLOPT_POSTFIELDS => $sql,
+			CURLOPT_HTTPHEADER => ['Content-Type: text/plain'],
+			CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+			CURLOPT_USERNAME => self::CLICKHOUSE_USERNAME,
+			CURLOPT_PASSWORD => self::CLICKHOUSE_PASSWORD
+		]);
+
+		$response = curl_exec($handle);
+		$http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+
+		$this->assertEquals(200, $http_code, 'Unexpected http code: ' . $http_code . ', response: ' . $response);
+	}
+
+	private static function normalizeValue(mixed $value): mixed {
+		if (is_int($value) || is_float($value)) {
+			return (float) $value;
+		}
+		return $value;
+	}
+
+	private static function normalizeBucket(array $bucket): array {
+		if (isset($bucket['id'])) {
+			$bucket['id'] = self::normalizeValue($bucket['id']);
+		}
+
+		if (!isset($bucket['columns']) || !is_array($bucket['columns'])) {
+			return $bucket;
+		}
+
+		foreach ($bucket['columns'] as &$value) {
+			$value = self::normalizeValue($value);
+		}
+		unset($value);
+
+		return $bucket;
+	}
+
+	private function executeSubcase(int $hostid, array $subcase): void {
+		$msg = $subcase['description'];
+
+		$this->deleteOTData();
+
+		$itemid = $this->createTQItem($hostid, $subcase['item']);
+
+		$now = time();
+		$this->sendInput($subcase['input_tmpl']($now));
+
+
+		$expected_buckets = $subcase['buckets_tmpl']($now);
+
+		$response = $this->waitForBuckets($itemid, count($expected_buckets), 30, 1, $msg);
+
+		for ($i = 0; $i < count($expected_buckets); $i++) {
+			$this->assertArrayHasKey('value', $response['result'][$i], $msg);
+			$value = json_decode($response['result'][$i]['value'], true, 512, JSON_THROW_ON_ERROR);
+
+			$this->assertArrayHasKey('timestamp', $value, $msg);
+			unset($value['timestamp']);
+
+			$this->assertSame(self::normalizeBucket($expected_buckets[$i]), self::normalizeBucket($value), $msg);
+		}
+
+		$this->deleteTQItem($itemid);
+	}
+
+	public static function createHost(): void {
+		$response = CDataHelper::call('host.create', [
+			'host' => self::HOST_NAME,
+			'groups' => [
+				[
+					'groupid' => 4
+				]
+			]
+		]);
+
+		self::$hostid = $response['hostids'][0];
+	}
+
+	public static function deleteHost(): void {
+		CDataHelper::call('host.delete', [self::$hostid]);
+	}
+
+	public function executeSubcases(array $subcases): void {
+		foreach ($subcases as $subcase) {
+			$this->executeSubcase(self::$hostid, $subcase);
+		}
+	}
 
 	private static function tsOffStr(int $now, float $offset): string {
 		return (string) (int) (($now + $offset) * 1000000000);
@@ -586,8 +816,13 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			- exists condition
 			- utf-8 handling in attributes (both keys and values)
 	*/
-	private function getSubcases(): array {
-		return [
+
+	/**
+	 * @onBeforeOnce createHost
+	 * @onAfterOnce deleteHost
+	 */
+	public function testTelemetryQueryItems_checkDataMinimal(): void {
+		$this->executeSubcases([
 			[
 				'description' => 'Minimal traces test',
 				'item' => self::tqItem(
@@ -671,7 +906,16 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricExponentialHistogram(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
-			],
+			]
+		]);
+	}
+
+	/**
+	 * @onBeforeOnce createHost
+	 * @onAfterOnce deleteHost
+	 */
+	public function testTelemetryQueryItems_checkDataAllCollumns(): void {
+		$this->executeSubcases([
 			[
 				'description' => 'Traces all columns test with EXPRESSION evaltype',
 				'item' => self::tqItem(
@@ -1207,16 +1451,25 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricExponentialHistogram(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
-			],
+			]
+		]);
+	}
+
+	/**
+	 * @onBeforeOnce createHost
+	 * @onAfterOnce deleteHost
+	 */
+	public function testTelemetryQueryItems_checkDataAggregation(): void {
+		$this->executeSubcases([
 			self::getAggregationSubcase(
 				'Aggregation test #1',
 				[-3, -2, -1, 0, 1, 2, 3],
 				[
-					['function' => AGGREGATE_COUNT,		'expected' => 7],
-					['function' => AGGREGATE_MIN,		'expected' => -3],
-					['function' => AGGREGATE_MAX,		'expected' => 3],
-					['function' => AGGREGATE_AVG,		'expected' => 0],
-					['function' => AGGREGATE_SUM,		'expected' => 0],
+					['function' => AGGREGATE_COUNT,			'expected' => 7],
+					['function' => AGGREGATE_MIN,			'expected' => -3],
+					['function' => AGGREGATE_MAX,			'expected' => 3],
+					['function' => AGGREGATE_AVG,			'expected' => 0],
+					['function' => AGGREGATE_SUM,			'expected' => 0],
 					['function' => AGGREGATE_PERCENTILE,	'expected' => 0,	'parameters' => ['50']]
 				]
 			),
@@ -1224,11 +1477,11 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'Aggregation test #2',
 				[0],
 				[
-					['function' => AGGREGATE_COUNT,		'expected' => 1],
-					['function' => AGGREGATE_MIN,		'expected' => 0],
-					['function' => AGGREGATE_MAX,		'expected' => 0],
-					['function' => AGGREGATE_AVG,		'expected' => 0],
-					['function' => AGGREGATE_SUM,		'expected' => 0],
+					['function' => AGGREGATE_COUNT,			'expected' => 1],
+					['function' => AGGREGATE_MIN,			'expected' => 0],
+					['function' => AGGREGATE_MAX,			'expected' => 0],
+					['function' => AGGREGATE_AVG,			'expected' => 0],
+					['function' => AGGREGATE_SUM,			'expected' => 0],
 					['function' => AGGREGATE_PERCENTILE,	'expected' => 0,	'parameters' => ['50.05']]
 				]
 			),
@@ -1236,26 +1489,119 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				'Aggregation test #3',
 				[-0.3, -0.2, -0.1, 0.0, 0.1],
 				[
-					['function' => AGGREGATE_COUNT,		'expected' => 5],
-					['function' => AGGREGATE_MIN,		'expected' => -0.3],
-					['function' => AGGREGATE_MAX,		'expected' => 0.1],
-					['function' => AGGREGATE_AVG,		'expected' => -0.1],
-					['function' => AGGREGATE_SUM,		'expected' => -0.5],
+					['function' => AGGREGATE_COUNT,			'expected' => 5],
+					['function' => AGGREGATE_MIN,			'expected' => -0.3],
+					['function' => AGGREGATE_MAX,			'expected' => 0.1],
+					['function' => AGGREGATE_AVG,			'expected' => -0.1],
+					['function' => AGGREGATE_SUM,			'expected' => -0.5],
 					['function' => AGGREGATE_PERCENTILE,	'expected' => -0.3,	'parameters' => ['0']]
 				]
 			),
 			self::getAggregationSubcase(
-				'Aggregation test #3',
+				'Aggregation test #4',
 				[1, 2, 3],
 				[
-					['function' => AGGREGATE_COUNT,		'expected' => 3],
-					['function' => AGGREGATE_MIN,		'expected' => 1],
-					['function' => AGGREGATE_MAX,		'expected' => 3],
-					['function' => AGGREGATE_AVG,		'expected' => 2],
-					['function' => AGGREGATE_SUM,		'expected' => 6],
+					['function' => AGGREGATE_COUNT,			'expected' => 3],
+					['function' => AGGREGATE_MIN,			'expected' => 1],
+					['function' => AGGREGATE_MAX,			'expected' => 3],
+					['function' => AGGREGATE_AVG,			'expected' => 2],
+					['function' => AGGREGATE_SUM,			'expected' => 6],
 					['function' => AGGREGATE_PERCENTILE,	'expected' => 3,	'parameters' => ['100']]
 				]
+			)
+		]);
+	}
+
+	/**
+	 * @onBeforeOnce createHost
+	 * @onAfterOnce deleteHost
+	 */
+	public function testTelemetryQueryItems_checkDataNaNAndInf(): void {
+		$this->executeSubcases([
+			self::getAggregationSubcase(
+				'The only data point is NaN',
+				["NaN"],
+				[
+					['function' => AGGREGATE_COUNT,			'expected' => 1],
+					['function' => AGGREGATE_MIN,			'expected' => null],
+					['function' => AGGREGATE_MAX,			'expected' => null],
+					['function' => AGGREGATE_AVG,			'expected' => null],
+					['function' => AGGREGATE_SUM,			'expected' => null],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => null,	'parameters' => ['0']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => null,	'parameters' => ['10']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => null,	'parameters' => ['90']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => null,	'parameters' => ['100']]
+				]
 			),
+			self::getAggregationSubcase(
+				'One of the data points is NaN #1',
+				[1, "NaN"],
+				[
+					['function' => AGGREGATE_COUNT,			'expected' => 2],
+					['function' => AGGREGATE_MIN,			'expected' => 1],
+					['function' => AGGREGATE_MAX,			'expected' => 1],
+					['function' => AGGREGATE_AVG,			'expected' => null],
+					['function' => AGGREGATE_SUM,			'expected' => null],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 1,	'parameters' => ['0']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 1,	'parameters' => ['10']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 1,	'parameters' => ['90']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 1,	'parameters' => ['100']]
+				]
+			),
+			self::getAggregationSubcase(
+				'One of the data points is NaN #2',
+				[1, 2, "NaN"],
+				[
+					['function' => AGGREGATE_COUNT,			'expected' => 3],
+					['function' => AGGREGATE_MIN,			'expected' => 1],
+					['function' => AGGREGATE_MAX,			'expected' => 2],
+					['function' => AGGREGATE_AVG,			'expected' => null],
+					['function' => AGGREGATE_SUM,			'expected' => null],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 1,	'parameters' => ['0']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 1,	'parameters' => ['10']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 2,	'parameters' => ['90']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 2,	'parameters' => ['100']]
+				]
+			),
+			self::getAggregationSubcase(
+				'One of the data points is +Inf',
+				[1, 2, "Infinity"],
+				[
+					['function' => AGGREGATE_COUNT,			'expected' => 3],
+					['function' => AGGREGATE_MIN,			'expected' => 1],
+					['function' => AGGREGATE_MAX,			'expected' => null],
+					['function' => AGGREGATE_AVG,			'expected' => null],
+					['function' => AGGREGATE_SUM,			'expected' => null],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 1,	'parameters' => ['0']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 1,	'parameters' => ['10']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => null,	'parameters' => ['90']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => null,	'parameters' => ['100']],
+				]
+			),
+			self::getAggregationSubcase(
+				'One of the data points is -Inf',
+				["-Infinity", 2, 3],
+				[
+					['function' => AGGREGATE_COUNT,			'expected' => 3],
+					['function' => AGGREGATE_MIN,			'expected' => null],
+					['function' => AGGREGATE_MAX,			'expected' => 3],
+					['function' => AGGREGATE_AVG,			'expected' => null],
+					['function' => AGGREGATE_SUM,			'expected' => null],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => null,	'parameters' => ['0']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => null,	'parameters' => ['10']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 3,	'parameters' => ['90']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => 3,	'parameters' => ['100']]
+				]
+			)
+		]);
+	}
+
+	/**
+	 * @onBeforeOnce createHost
+	 * @onAfterOnce deleteHost
+	 */
+	public function testTelemetryQueryItems_checkDataTimeBuckets(): void {
+		$this->executeSubcases([
 			[
 				'description' => 'Time bucket test #1: no gap, no overlap',
 				'item' => self::tqItem(
@@ -1308,8 +1654,17 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::tmplSimpleSpan($now, -300.2, 'e')
 					]
 				]
-			],
-			[
+			]
+		]);
+	}
+
+	/**
+	 * @onBeforeOnce createHost
+	 * @onAfterOnce deleteHost
+	 */
+	public function testTelemetryQueryItems_checkDataGrouping(): void {
+		$this->executeSubcases([
+						[
 				'description' => 'Grouping test #1',
 				'item' => self::tqItem(
 					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
@@ -1397,7 +1752,16 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::tmplSimpleSpan($now, -204, 'ZABBIX')
 					]
 				]
-			],
+			]
+		]);
+	}
+
+	/**
+	 * @onBeforeOnce createHost
+	 * @onAfterOnce deleteHost
+	 */
+	public function testTelemetryQueryItems_checkDataAttributes(): void {
+		$this->executeSubcases([
 			[
 				'description' => 'Attributes test',
 				'item' => self::tqItem(
@@ -1442,229 +1806,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					]
 				]
 			]
-		];
-	}
-
-	public function serverConfigurationProvider(): array {
-		return [
-			self::COMPONENT_SERVER => [
-				'DebugLevel' => 5,
-				'LogFileSize' => 0,
-				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
-				'TelemetryProvider' =>	'clickhouse;url="' . self::CLICKHOUSE_URL . '",' .
-										'username="' . self::CLICKHOUSE_USERNAME . '",' .
-										'password="' . self::CLICKHOUSE_PASSWORD . '",' .
-										'db="' . self::CLICKHOUSE_DB . '"'
-			]
-		];
-	}
-
-	private function createTQItem(int $hostid, array $item_fields): int {
-		$response = $this->call('item.create', array_merge([
-			'hostid' => $hostid,
-			'name' => self::ITEM_KEY,
-			'key_' => self::ITEM_KEY,
-			'type' => ITEM_TYPE_TELEMETRY_QUERY,
-			'value_type' => self::ITEM_VALUE_TYPE,
-			'timeout' => '3s'
-		], $item_fields));
-
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-		$itemid = $response['result']['itemids'][0];
-
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 0);
-
-		return $itemid;
-	}
-
-	private function deleteTQItem(int $itemid): void {
-		$response = $this->call('item.delete', [$itemid]);
-
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-		$this->assertEquals($itemid, $response['result']['itemids'][0]);
-	}
-
-	private function waitForBuckets(int $itemid, int $min_bucket_count, int $iterations, int $delay, string $msg): array {
-		/* TODO: maybe also check that there isn't more buckets than expected */
-		for ($i = 0; $i < $iterations; $i++) {
-			$response = $this->call('history.get', [
-				'output' => ['value'],
-				'itemids' => [$itemid],
-				'history' => self::ITEM_VALUE_TYPE,
-				'sortorder' => 'ASC',
-				'sortfield' => 'clock'
-			]);
-
-			if (isset($response['result']) && count($response['result']) >= $min_bucket_count) {
-				return $response;
-			}
-
-			sleep($delay);
-		}
-
-		$msg2 = "$msg\nFailed to wait for the minimum of $min_bucket_count buckets";
-
-		if (isset($response)) {
-			$msg2 .= "\nLast response:\n".json_encode($response);
-		}
-
-		$this->fail($msg2);
-	}
-
-	private function sendOTLP(string $import_path, string $proto, string $payload, string $address, string $method): void {
-		$cmd =
-			'grpcurl '.
-			'-plaintext ' .
-			'-import-path ' . escapeshellarg($import_path) . ' ' .
-			'-proto ' . escapeshellarg($proto) . ' ' .
-			'-d ' . escapeshellarg($payload) . ' ' .
-			escapeshellarg($address) . ' ' .
-			escapeshellarg($method);
-
-		$output_lines = [];
-		$exit_code = 0;
-
-		exec($cmd, $output_lines, $exit_code);
-
-		$this->assertEquals(0, $exit_code, "Unexpected exit code: " . $exit_code . ", output_lines:\n" . implode("\n", $output_lines));
-	}
-
-	private function sendInput(array $input): void {
-		if (isset($input['metrics'])) {
-			$payload = [];
-			$payload['resourceMetrics'] = $input['metrics'];
-			$json = json_encode($payload);
-
-			$this->sendOTLP(
-				self::PROTO_DIR,
-				'opentelemetry/proto/collector/metrics/v1/metrics_service.proto',
-				$json,
-				self::COLLECTOR_ADDRESS,
-				'opentelemetry.proto.collector.metrics.v1.MetricsService/Export'
-			);
-		}
-
-		if (isset($input['traces'])) {
-			$payload = [];
-			$payload['resourceSpans'] = $input['traces'];
-			$json = json_encode($payload);
-
-			$this->sendOTLP(
-				self::PROTO_DIR,
-				'opentelemetry/proto/collector/trace/v1/trace_service.proto',
-				$json,
-				self::COLLECTOR_ADDRESS,
-				'opentelemetry.proto.collector.trace.v1.TraceService/Export'
-			);
-		}
-
-		if (isset($input['logs'])) {
-			$payload = [];
-			$payload['resourceLogs'] = $input['logs'];
-			$json = json_encode($payload);
-
-			$this->sendOTLP(
-				self::PROTO_DIR,
-				'opentelemetry/proto/collector/logs/v1/logs_service.proto',
-				$json,
-				self::COLLECTOR_ADDRESS,
-				'opentelemetry.proto.collector.logs.v1.LogsService/Export'
-			);
-		}
-	}
-
-	private function deleteOTData(): void {
-		$handle = curl_init();
-
-		$sql = "TRUNCATE ALL TABLES FROM " . self::CLICKHOUSE_DB . " LIKE 'otel_%'";
-
-		curl_setopt_array($handle, [
-			CURLOPT_URL => self::CLICKHOUSE_URL,
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_POST => true,
-			CURLOPT_POSTFIELDS => $sql,
-			CURLOPT_HTTPHEADER => ['Content-Type: text/plain'],
-			CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-			CURLOPT_USERNAME => self::CLICKHOUSE_USERNAME,
-			CURLOPT_PASSWORD => self::CLICKHOUSE_PASSWORD
 		]);
-
-		$response = curl_exec($handle);
-		$http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-
-		$this->assertEquals(200, $http_code, 'Unexpected http code: ' . $http_code . ', response: ' . $response);
-	}
-
-	private static function normalizeValue(mixed $value): mixed {
-		if (is_int($value) || is_float($value)) {
-			return (float) $value;
-		}
-		return $value;
-	}
-
-	private static function normalizeBucket(array $bucket): array {
-		if (isset($bucket['id'])) {
-			$bucket['id'] = self::normalizeValue($bucket['id']);
-		}
-
-		if (!isset($bucket['columns']) || !is_array($bucket['columns'])) {
-			return $bucket;
-		}
-
-		foreach ($bucket['columns'] as &$value) {
-			$value = self::normalizeValue($value);
-		}
-		unset($value);
-
-		return $bucket;
-	}
-
-	private function executeSubcase(int $hostid, array $subcase): void {
-		$msg = $subcase['description'];
-
-		$this->deleteOTData();
-
-		$itemid = $this->createTQItem($hostid, $subcase['item']);
-
-		$now = time();
-		$this->sendInput($subcase['input_tmpl']($now));
-
-
-		$expected_buckets = $subcase['buckets_tmpl']($now);
-
-		$response = $this->waitForBuckets($itemid, count($expected_buckets), 30, 1, $msg);
-
-		for ($i = 0; $i < count($expected_buckets); $i++) {
-			$this->assertArrayHasKey('value', $response['result'][$i], $msg);
-			$value = json_decode($response['result'][$i]['value'], true, 512, JSON_THROW_ON_ERROR);
-
-			$this->assertArrayHasKey('timestamp', $value, $msg);
-			unset($value['timestamp']);
-
-			$this->assertSame(self::normalizeBucket($expected_buckets[$i]), self::normalizeBucket($value), $msg);
-		}
-
-		$this->deleteTQItem($itemid);
-	}
-
-	public function testTelemetryQueryItems_checkData(): void {
-		$response = $this->call('host.create', [
-			'host' => self::HOST_NAME,
-			'groups' => [
-				[
-					'groupid' => 4
-				]
-			]
-		]);
-
-		$this->assertArrayHasKey('hostids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['hostids']);
-		$hostid = $response['result']['hostids'][0];
-
-		foreach ($this->getSubcases() as $subcase) {
-			$this->executeSubcase($hostid, $subcase);
-		}
 	}
 }
