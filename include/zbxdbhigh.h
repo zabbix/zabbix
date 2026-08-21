@@ -824,6 +824,7 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define ZBX_CONDITION_TYPE_EVENT_TAG_VALUE		26
 #define ZBX_CONDITION_TYPE_SERVICE			27
 #define ZBX_CONDITION_TYPE_SERVICE_NAME			28
+#define ZBX_CONDITION_TYPE_PROXY_GROUP			29
 
 #define PROXY_OPERATING_MODE_ACTIVE	0
 #define PROXY_OPERATING_MODE_PASSIVE	1
