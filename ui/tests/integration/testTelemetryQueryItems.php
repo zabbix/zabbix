@@ -1586,7 +1586,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					['function' => AGGREGATE_PERCENTILE,	'expected' => 1,	'parameters' => ['0']],
 					['function' => AGGREGATE_PERCENTILE,	'expected' => 1,	'parameters' => ['10']],
 					['function' => AGGREGATE_PERCENTILE,	'expected' => null,	'parameters' => ['90']],
-					['function' => AGGREGATE_PERCENTILE,	'expected' => null,	'parameters' => ['100']],
+					['function' => AGGREGATE_PERCENTILE,	'expected' => null,	'parameters' => ['100']]
 				]
 			),
 			self::getAggregationSubcase(
@@ -1675,7 +1675,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 							'Value' => 0.5,
 							'cnt' => 1
 						]
-					],
+					]
 				],
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [
