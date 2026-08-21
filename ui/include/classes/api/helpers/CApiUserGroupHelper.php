@@ -102,7 +102,7 @@ class CApiUserGroupHelper {
 			')';
 		}
 
-		return $conditions ? '('.implode(' AND ', $conditions).')' : '1=0';
+		return implode(' AND ', $conditions);
 	}
 
 	private static function getUserGroupIdsByPermissionLists(): array {
