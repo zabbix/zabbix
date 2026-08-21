@@ -486,7 +486,7 @@ class CProxy extends CApiService {
 				if ($proxy['apm']) {
 					if (array_key_exists('data_collection_status', $proxy['apm'])
 							&& $proxy['apm']['data_collection_status'] === PROXY_APM_STATUS_NOT_CONFIGURED) {
-						$proxy['apm'] = json_encode(new stdClass());
+						$proxy['apm'] = json_encode([], JSON_FORCE_OBJECT);
 
 						return;
 					}
@@ -500,7 +500,7 @@ class CProxy extends CApiService {
 				}
 			}
 
-			$proxy['apm'] = json_encode(new stdClass());
+			$proxy['apm'] = json_encode([], JSON_FORCE_OBJECT);
 		}
 	}
 
