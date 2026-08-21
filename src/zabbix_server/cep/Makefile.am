@@ -6,6 +6,7 @@ libzbxcep_a_CFLAGS = \
 	$(TLS_CFLAGS)
 
 libzbxcep_a_SOURCES = \
+	zbx_cep.h \
 	cep_manager.c \
 	cep_manager.h \
 	cep_worker.c \
