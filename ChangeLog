@@ -1,6 +1,11 @@
 Changes for 8.0.0rc1
 
 New features:
+..F.....S. [ZBXNEXT-9399] added new condition type "Proxy Group" for auto-registration and discovery actions (isharha, wiper)
+..F....... [ZBXNEXT-10730] implemented "Create proxy in Cloud" button with external link for proxies page (scernisenko)
+..F....... [ZBXNEXT-9851] implemented inline validation, moved to MVC and modal for discovery rules and discovery prototypes (gberzina)
+..F....... [ZBXNEXT-10733] implemented Subscriptions menu option with new icon instead of obsolete Support option (scernisenko)
+A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
 .........T [ZBXNEXT-10313] updated PostgreSQL by Zabbix agent template (smansurovs)
 .........T [ZBXNEXT-10154] updated Linux templates with the latest features: new dashboards for all and new keys for Agent templates (abrosimovs)
 .........T [ZBXNEXT-5564] improved device uptime trigger in SNMP templates (kflorowski)
@@ -22,6 +27,7 @@ A.F.I...S. [ZBXNEXT-10357] implemented Zabbix server, API and frontend changes f
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27992] fixed extra spacing after disabled z-textarea-flexible input (scernisenko)
 ..F....... [ZBX-28012] fixed spacing between Host Wizard template tags in the expanded hintbox (scernisenko)
 ..F....... [ZBX-27836] fixed PHP runtime errors in user role edit form (Ivo)
 ...G...... [ZBX-28045] fixed active checks in case of failed response on Zabbix agent 2 (aetatsu)
@@ -6225,6 +6231,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.49rc1
 
 New features:
+A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
 
 Bug fixes:
 
