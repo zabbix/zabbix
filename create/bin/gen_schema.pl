@@ -732,6 +732,14 @@ EOF
 	;
 	}
 
+	for ("proxy_history")
+	{
+		print<<EOF
+	PERFORM create_hypertable('$_', 'id', chunk_time_interval => 1000000, $flags);
+EOF
+	;
+	}
+
 	print<<EOF
 
 	IF (current_db_extension = 'timescaledb') THEN
