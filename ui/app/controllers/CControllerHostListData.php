@@ -91,7 +91,7 @@ class CControllerHostListData extends CControllerDataTable {
 				break;
 
 			case ZBX_MONITORED_BY_PROXY_GROUP:
-				if ($filter['proxyids']) {
+				if ($filter['proxy_groupids']) {
 					$proxy_groupids = $filter['proxy_groupids'];
 				}
 				else {
