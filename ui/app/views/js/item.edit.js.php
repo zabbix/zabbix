@@ -657,6 +657,7 @@ window.item_edit_form = new class {
 		if (row !== null) {
 			const row_index = row.dataset.row_index;
 
+			parameters.edit = '1';
 			parameters.row_index = row_index;
 			parameters.column = row.querySelector(`[name="aggregated_columns[${row_index}][column]"]`).value;
 			parameters.function = row.querySelector(`[name="aggregated_columns[${row_index}][function]"]`).value;

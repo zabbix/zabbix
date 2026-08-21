@@ -23,6 +23,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 
 	private static function getValidationRules(): array {
 		return ['object', 'fields' => [
+			'edit' => ['integer', 'in' => [1]],
 			'row_index' => ['integer', 'required'],
 			'signal_type' => ['integer', 'required',
 				'in' => [
@@ -109,6 +110,7 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 	protected function doAction(): void {
 		$data = [
 			'action' => $this->getAction(),
+			'is_edit' => $this->hasInput('edit'),
 			'row_index' => $this->getInput('row_index'),
 			'signal_type' => $this->getInput('signal_type'),
 			'metric_point_type' => $this->getInput('metric_point_type'),

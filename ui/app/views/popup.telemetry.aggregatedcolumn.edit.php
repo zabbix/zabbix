@@ -72,7 +72,7 @@ $form_grid = (new CFormGrid())
 $form->addItem($form_grid);
 
 $output = [
-	'header' => _('Aggregated columns'),
+	'header' => $data['is_edit'] ? _('Aggregated column') : _('New aggregated column'),
 	'script_inline' => getPagePostJs().$this->readJsFile('popup.telemetry.aggregatedcolumn.edit.js.php').
 		'telemetry_aggregated_column_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules']
@@ -80,7 +80,7 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => [
 		[
-			'title' => _('Add'),
+			'title' => $data['is_edit'] ? _('Update') : _('Add'),
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
