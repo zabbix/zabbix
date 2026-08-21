@@ -137,7 +137,7 @@ $form = (new CForm())
 					(new CVar('operations[#{sortorder}][severity]', '#{severity}'))->removeId(),
 					(new CVar('operations[#{sortorder}][suppress_duration]', '#{suppress_duration}'))->removeId()
 				]
-			]))->setAttribute('data-sortorder', '#{sortorder}')
+			]))->setAttribute('data-row_index', '#{sortorder}')
 		))
 		->addItem((new CLabel(_('Operations')))->setAsteriskMark()->setId('ceprule-operations-label'))
 		->addItem((new CFormField())

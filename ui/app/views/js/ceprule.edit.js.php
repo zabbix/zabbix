@@ -150,7 +150,7 @@ window.ceprule_edit_popup = new class {
 			}
 			else if (e.target.classList.contains('js-operation-edit')) {
 				const {
-					[e.target.closest('[data-sortorder]').getAttribute('data-sortorder')]: operation
+					[e.target.closest('[data-row_index]').getAttribute('data-row_index')]: operation
 				} = this.form.findFieldByName('operations').getValue();
 				this.#openOperationPopup(operation, e.target);
 			}
@@ -619,7 +619,7 @@ window.ceprule_edit_popup = new class {
 
 	#editOperationRow(operation) {
 		const row = this.form_element
-			.querySelector(`#ceprule-operations-table [data-sortorder="${operation.sortorder}"]`);
+			.querySelector(`#ceprule-operations-table [data-row_index="${operation.sortorder}"]`);
 
 		row.nextElementSibling.remove();
 		row.replaceWith(this.#buildOperationRow(operation));
@@ -802,9 +802,9 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#renumberOperationRows() {
-		window['ceprule-operations-table'].querySelectorAll('[data-sortorder]')
+		window['ceprule-operations-table'].querySelectorAll('[data-row_index]')
 			.forEach(function(row, index) {
-				row.dataset.sortorder = index;
+				row.dataset.row_index = index;
 				row.querySelectorAll('[data-field-type="hidden"]').forEach(function(input) {
 					input.name = input.name.replace( /^operations\[\d+\]/, `operations[${index}]`);
 
