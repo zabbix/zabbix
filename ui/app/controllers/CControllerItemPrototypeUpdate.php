@@ -457,7 +457,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
 			'formula' => ['string', 'required', 'length' => 255, 'not_empty',
-				'use' => [CConditionFormulaParser::class, []],
+				'use' => [CConditionFormulaParser::class],
 				'when' => [
 					['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]],
 					['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
