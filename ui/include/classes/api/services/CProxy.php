@@ -188,7 +188,7 @@ class CProxy extends CApiService {
 		$this->addRelatedAssignedHosts($options, $result);
 		$this->addRelatedHosts($options, $result);
 		$this->addRelatedProxyGroup($options, $result);
-		$this->addRelatedAPM($options, $result);
+		$this->addRelatedAPm($options, $result);
 
 		return $result;
 	}
@@ -277,7 +277,7 @@ class CProxy extends CApiService {
 		$result = $relation_map->mapOne($result, $db_proxy_groups, 'proxyGroup');
 	}
 
-	private function addRelatedAPM(array $options, array &$result): void {
+	private function addRelatedApm(array $options, array &$result): void {
 		if ($options['selectApm'] === null) {
 			return;
 		}
