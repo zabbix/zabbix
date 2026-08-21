@@ -6390,7 +6390,16 @@ HEREDOC;
 	 *     the operations of the step before it are gone from the rule, so the tags they produced may not be on this
 	 *     event any more - a rule the server kept processing as it was before the update would still add them;
 	 *   - 'event' - the name, the severity and the suppression the event must have, which for a tag operation step
-	 *     is what its trigger gave it: a step performing tag operations only may not touch the event itself.
+	 *     is what its trigger gave it: a step performing tag operations only may not touch the event itself;
+	 *   - 'filter' - the conditions, the evaltype and the formula the rule is brought to along with the operations,
+	 *     one of the four filters of getWindowOperationStepFilters() and never the one of the step before it. Every
+	 *     one of them matches the event of every step, so what the filter changes is not what a step expects but
+	 *     how the server had to arrive at the match, and the order the filters are cycled in makes every transition
+	 *     from one evaltype into another (see getWindowOperationStepFilterOrder());
+	 *   - 'operation_filter' - the filter every operation of the step is given, or null for the steps whose
+	 *     operations are unconditional. It is the same idea one level down - the conditions of an operation decide
+	 *     whether that operation is performed for the event the rule matched - and it is cycled the same way, over
+	 *     the states an operation filter has (see getWindowOperationStepOperationFilters()).
 	 *
 	 * The event operation steps follow the tag operation ones and are the other way round - they change the event
 	 * and no tag at all, so every tag of every case must be in that untouched state for all of them, see
@@ -6441,6 +6450,40 @@ HEREDOC;
 			$previous = $label;
 		}
 
+		// Every step is finally given two filters of its own, taken from their orders at the position of the step:
+		// the filter of the rule (getWindowOperationStepFilterOrder()) and the filter its operations carry
+		// (getWindowOperationStepOperationFilterOrder()), both of them matching the event of the step and neither
+		// of them the one the step before it was run with - so the update between two steps replaces the filter of
+		// the rule and the conditions of every operation along with the operations themselves.
+		// The filters are handed out here rather than in the loops above so the sweep gets its own as well: a sweep
+		// step repeats the operations and the expectations of a step, not its position, and the filters are what
+		// follows the position. The two orders are of coprime lengths, which is what makes the scenario run every
+		// one of the sixteen pairings of a rule filter with an operation filter.
+		$filters = $this->getWindowOperationStepFilters();
+		$order = $this->getWindowOperationStepFilterOrder();
+		$operation_filters = $this->getWindowOperationStepOperationFilters();
+		$operation_order = $this->getWindowOperationStepOperationFilterOrder();
+
+		foreach ($steps as $index => &$step) {
+			$evaltype = $order[$index % count($order)];
+			$operation_evaltype = $operation_order[$index % count($operation_order)];
+
+			$this->assertArrayHasKey($evaltype, $filters,
+				'The filter order of the stepped CEP operation scenario names a filter that does not exist.'
+			);
+			$this->assertArrayHasKey($operation_evaltype, $operation_filters,
+				'The operation filter order of the stepped CEP operation scenario names a filter that does not'
+					.' exist.'
+			);
+
+			// Both filters are named in the label as well: what a step asserts is the same under all of them, so
+			// the pair it was run under is what a failure of one of them has to name.
+			$step['label'] .= ', rule filter "'.$evaltype.'", operation filter "'.$operation_evaltype.'"';
+			$step['filter'] = $filters[$evaltype];
+			$step['operation_filter'] = $operation_filters[$operation_evaltype];
+		}
+		unset($step);
+
 		return $steps;
 	}
 
@@ -6477,6 +6520,240 @@ HEREDOC;
 	private function getWindowOperationTransitionOrder(): array {
 		return ['op_add', 'increase severity', 'op_trigger_counter', 'op_set_existing', 'decrease severity',
 			'op_trigger_rename', 'set name', 'op_trigger_remove', 'set severity', self::CEP_OP_TAG_NAME
+		];
+	}
+
+	/**
+	 * The filters the steps of the stepped scenario are run under (see getWindowOperationSteps()), one per evaltype
+	 * a CEP rule filter can be evaluated by, each of them holding the conditions it combines, the evaltype
+	 * combining them and the formula only a custom expression has.
+	 *
+	 * All four match the one event a step opens - the "down_0" event of the one discovered trigger, at DISASTER and
+	 * on the discovered host - so the operations of a step are performed whichever filter that step carries and
+	 * every step expects the very same outcome under all of them. What differs is the way the server had to arrive
+	 * at the match, and the three beyond the plain AND one hold their conditions together in a way the evaltypes
+	 * around them cannot:
+	 *   - 'and' is the filter of every other flavour of the scenario, the 'type' Equals "cep" guard alone, which
+	 *     buildWindowNoneCepRuleParams() adds under this evaltype and under no other;
+	 *   - 'or' matches through its first condition alone: the second one asks for the event name of another id and
+	 *     is false for this event, and the two are of distinct types, so AND and AND_OR would both AND them and
+	 *     match nothing;
+	 *   - 'and_or' OR-s its two same-type conditions into one group - the id of the event and an id it never has -
+	 *     and AND-s the severity, of another type, with the result; plain AND would ask the one event for both ids
+	 *     at once and match nothing;
+	 *   - 'expression' groups conditions of three distinct types as "A and (B or C)" (the same formula the
+	 *     combining rule of the windowless scenario uses), OR-ing two of DISTINCT types, which no other evaltype
+	 *     can express: AND_OR, finding no two conditions of one type, would AND all three and match nothing.
+	 *
+	 * None of the three needs the guard the AND one gets, and none of them may have it - it would be OR-ed in and
+	 * change what the filter means: every branch of theirs is a positive comparison against the 'service' tag or the
+	 * event name, which no event outside this scenario satisfies.
+	 *
+	 * A filter is evaluated against the event as it occurred, which is what lets the severity be part of one at
+	 * all: the steps that change the event severity change it with an operation the filter has already let
+	 * through, so the event every filter is matched against is still at the DISASTER of its trigger.
+	 */
+	private function getWindowOperationStepFilters(): array {
+		$service = self::CEP_RULE_WINDOW_NONE_SERVICE;
+		$service_absent = self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT;
+		// The item value of another id, which the event name of this one does not contain: the name ends with
+		// "down_0" and this is "down_10".
+		$value_absent = self::CEP_RULE_WINDOW_NONE_VALUE_LAST;
+
+		return [
+			'and' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND,
+				'conditions' => [],
+				'formula' => ''
+			],
+			'or' => [
+				'evaltype' => CONDITION_EVAL_TYPE_OR,
+				'conditions' => [
+					$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_EQUAL, $service),
+					$this->buildWindowNoneEventNameCondition(CONDITION_OPERATOR_LIKE, $value_absent)
+				],
+				'formula' => ''
+			],
+			'and_or' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [
+					$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_EQUAL, $service),
+					$this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_EQUAL, $service_absent),
+					$this->buildWindowNoneSeverityCondition(CONDITION_OPERATOR_EQUAL, TRIGGER_SEVERITY_DISASTER)
+				],
+				'formula' => ''
+			],
+			'expression' => [
+				'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+				'conditions' => [
+					['formulaid' => 'A'] + $this->buildWindowNoneSeverityCondition(CONDITION_OPERATOR_EQUAL,
+						TRIGGER_SEVERITY_DISASTER),
+					['formulaid' => 'B'] + $this->buildWindowNoneServiceCondition(CONDITION_OPERATOR_EQUAL,
+						$service),
+					['formulaid' => 'C'] + $this->buildWindowNoneEventNameCondition(CONDITION_OPERATOR_LIKE,
+						$value_absent)
+				],
+				'formula' => self::CEP_RULE_WINDOW_NONE_FORMULA
+			]
+		];
+	}
+
+	/**
+	 * The order the steps of the stepped scenario take their filters from, as the keys of
+	 * getWindowOperationStepFilters(), cycled over the steps: the filter of a step is the entry standing at its own
+	 * position, so no step is run under the evaltype of the step before it and every rule update of the scenario
+	 * changes the filter as well as the operations.
+	 *
+	 * The order is a closed walk over every ordered pair of the four evaltypes - twelve entries for the twelve
+	 * transitions, the wrap from the last entry back to the first one included - so a run that cycles through it
+	 * makes every transition from one evaltype into another at least once, and the scenario has steps enough to
+	 * cycle through it more than three times.
+	 *
+	 * Every one of those transitions is an update path of its own, for the reason the operations get a sweep of
+	 * their own (see getWindowOperationTransitionOrder()): a filter is stored as an evaltype, a formula and a list
+	 * of conditions matched position by position, and what one evaltype needs of them the next one does not. The
+	 * conditions are replaced by conditions of other types and other counts (one, two and three of them here), the
+	 * formula and the condition formulaids only a custom expression has must be written when it is entered and
+	 * cleared again when it is left (see CCepRule::updateFilters()), and the server has to be evaluating the
+	 * filter the rule ended up with and not the one it held before - which is what every step of this scenario
+	 * reads, since a filter that no longer matches leaves the operations of the step unperformed.
+	 */
+	private function getWindowOperationStepFilterOrder(): array {
+		return ['and', 'or', 'and', 'and_or', 'and', 'expression', 'or', 'and_or', 'or', 'expression', 'and_or',
+			'expression'
+		];
+	}
+
+	/**
+	 * The filters the OPERATIONS of a step of the stepped scenario carry (see getWindowOperationSteps()), which are
+	 * a second filter and not the one above: the filter of a rule decides whether the rule is processed for the
+	 * event at all, the filter of an operation whether that one operation is performed once the rule was, and the
+	 * server evaluates them apart (cep_rule_match_event() and cep_operation_match_event()) against conditions of
+	 * their own kinds - an operation condition tests the tags and the properties of the event ("is it open", "is it
+	 * a symptom", "is it suppressed") and knows nothing of the host, the severity or the time an event happened at.
+	 *
+	 * Every filter here matches the event of every step, as the rule filters do, so a step expects the same outcome
+	 * whichever of them its operations carry - and again what it holds the server to is that the operations were
+	 * performed at all.
+	 *
+	 * Three of the evaltypes are covered, and the fourth state is the one an operation is in without conditions:
+	 *   - 'none' leaves the operations of the step unconditional, which is what an operation matching every event
+	 *     the rule matched looks like - and, between two steps, what makes the update add the conditions of a
+	 *     filter to an operation that had none and take them away again;
+	 *   - 'and_or' pairs two conditions on the SAME tag, one of which holds and one of which does not, with a
+	 *     condition on a property of the event. Conditions of one type on one tag name are OR-ed into a group and
+	 *     the groups AND-ed (cep_operation_condition_match_key()), so the pair holds through its first half and the
+	 *     property through itself; a server AND-ing the pair instead would perform nothing;
+	 *   - 'or' pairs a condition that holds with a condition on a tag no event of the suite carries. The two are of
+	 *     distinct groups, so only OR can hold them together: under AND_OR the second group is false and the
+	 *     operation is not performed;
+	 *   - 'expression' groups those same three conditions as "A and (B or C)", the formula the rule filters of the
+	 *     scenario use as well: the condition that holds, AND-ed with a group of the one that does not and the
+	 *     property. AND_OR would make three groups of the three conditions and AND them, and the false one would
+	 *     leave the operation unperformed - so an operation performed under this filter is one whose formula was
+	 *     evaluated. A plain OR of the three would hold through the first condition alone, which no matching event
+	 *     can tell apart from the formula: a match needs a condition that holds, and one is all OR needs.
+	 *
+	 * The custom expression one is ahead of the server: an operation filter is evaluated as AND_OR or as OR and
+	 * anything else is treated as invalid (cep_operation_match_event()), the operation form offers that pair alone
+	 * ('filter[evaltype]' of ceprule.modal.operation.php) and the formula column of the operation is not among the
+	 * ones read into the configuration cache (zbx_dbsync_prepare_cep_operation()) - while the API stores a formula
+	 * for an operation and rewrites its formulaids into condition ids exactly as it does for a rule
+	 * (CCepRule::updateOperationFilters()). Until the server evaluates one, the steps carrying this filter perform
+	 * no operation and fail on the expectations of their own case.
+	 *
+	 * The property condition is the "is the event open" one, which holds for every event of these steps: a step
+	 * reads the problem event it opened while that problem is open, and its own operations are performed before it
+	 * ever recovers.
+	 */
+	private function getWindowOperationStepOperationFilters(): array {
+		return [
+			'none' => null,
+			'and_or' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [
+					[
+						'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'tag' => 'service',
+						'tag_value' => self::CEP_RULE_WINDOW_NONE_SERVICE
+					],
+					// The same type on the same tag name as the condition above, so the two are one group and
+					// this half of it may be false.
+					[
+						'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'tag' => 'service',
+						'tag_value' => self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT
+					],
+					[
+						'type' => ZBX_CONDITION_TYPE_EVENT_OPEN,
+						'operator' => CONDITION_OPERATOR_YES
+					]
+				]
+			],
+			'or' => [
+				'evaltype' => CONDITION_EVAL_TYPE_OR,
+				'conditions' => [
+					[
+						'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'tag' => 'service',
+						'tag_value' => self::CEP_RULE_WINDOW_NONE_SERVICE
+					],
+					// The tag the noop operation of the pattern flavours is conditioned on, which no event of
+					// the suite carries (see buildPatternMatchedNoopOperation()).
+					[
+						'type' => CCepRuleHelper::CONDITION_TAG,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'tag' => self::CEP_TAG_PATTERN_NOOP
+					]
+				]
+			],
+			'expression' => [
+				'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+				'conditions' => [
+					['formulaid' => 'A',
+						'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'tag' => 'service',
+						'tag_value' => self::CEP_RULE_WINDOW_NONE_SERVICE
+					],
+					// False for every event of the suite, and the half of the group the formula may lose.
+					['formulaid' => 'B',
+						'type' => CCepRuleHelper::CONDITION_TAG,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'tag' => self::CEP_TAG_PATTERN_NOOP
+					],
+					['formulaid' => 'C',
+						'type' => ZBX_CONDITION_TYPE_EVENT_OPEN,
+						'operator' => CONDITION_OPERATOR_YES
+					]
+				],
+				'formula' => self::CEP_RULE_WINDOW_NONE_FORMULA
+			]
+		];
+	}
+
+	/**
+	 * The order the steps of the stepped scenario take the filters of their operations from, as the keys of
+	 * getWindowOperationStepOperationFilters() and cycled over the steps exactly as the rule filters are (see
+	 * getWindowOperationStepFilterOrder()).
+	 *
+	 * The order is a closed walk over every ordered pair of the four states, so cycling it makes every transition
+	 * between them: conditions replaced by conditions of another shape, an evaltype replaced by another one, the
+	 * formula of a custom expression written and cleared again, conditions added to an operation that had none and
+	 * taken away from one that had some. Twelve entries would carry those twelve transitions; the thirteenth is
+	 * there to make the length coprime with the twelve of the rule filter order, so the two cycles do not lock into
+	 * the same pairs - cycled against each other over the steps of the scenario they run every one of the sixteen
+	 * pairings of a rule filter with an operation filter. A walk of thirteen over twelve transitions has to repeat
+	 * one of them, and the repetition can only be a step that keeps the filter it had (the 'and_or' one here):
+	 * entering a state once more would leave it once more as well, which is a thirteenth transition and not a
+	 * repeated one.
+	 */
+	private function getWindowOperationStepOperationFilterOrder(): array {
+		return ['none', 'or', 'and_or', 'expression', 'and_or', 'and_or', 'or', 'none', 'and_or', 'none',
+			'expression', 'or', 'expression'
 		];
 	}
 
@@ -10167,6 +10444,28 @@ HEREDOC;
 	 * never check - a server that kept processing the rule as it stood before the update would go on adding them -
 	 * and it is checked for every operation of the set, the ones changing the event itself included (see
 	 * getWindowOperationSteps()).
+	 *
+	 * The filter of that rule is updated along with its operations, and to another evaltype every time: the guard
+	 * condition alone under CONDITION_EVAL_TYPE_AND, two conditions OR-ed under CONDITION_EVAL_TYPE_OR, three
+	 * grouped by type under CONDITION_EVAL_TYPE_AND_OR and three grouped as "A and (B or C)" under
+	 * CONDITION_EVAL_TYPE_EXPRESSION, cycled over the steps in an order making every transition from one of them
+	 * into another (see getWindowOperationStepFilters()). All four match the one event a step opens, so what every
+	 * step expects of it stays the same - which is what makes the operations the reading of the filter: a filter the
+	 * server did not end up evaluating, or one whose formula or conditions an update left half replaced, matches
+	 * nothing and the operations of the step are not performed at all.
+	 *
+	 * The operations of a step carry a filter of their own on top of that, cycled the same way over the states an
+	 * operation filter has: no conditions at all, conditions OR-ed under CONDITION_EVAL_TYPE_OR, conditions grouped
+	 * under CONDITION_EVAL_TYPE_AND_OR and the same conditions grouped by a formula under
+	 * CONDITION_EVAL_TYPE_EXPRESSION (see getWindowOperationStepOperationFilters()). They are read the same way -
+	 * all of them hold for the event of every step, so an operation filter that came out false leaves the operation
+	 * of the step unperformed - and the transitions between them are what an update of an operation has to get
+	 * right: the conditions of one filter replaced by those of another, added to an operation that had none and
+	 * taken away again.
+	 *
+	 * The custom expression one is the single expectation of this scenario the server does not meet yet: it
+	 * evaluates an operation filter as AND_OR or as OR and treats any other evaltype as invalid, so the steps
+	 * carrying that filter perform no operation until it does (see getWindowOperationStepOperationFilters()).
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowNoneOperationSteps$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -13194,6 +13493,17 @@ HEREDOC;
 	 * expectations of a step name every tag of every case for exactly that reason (see
 	 * getWindowOperationStepTagResults()).
 	 *
+	 * What a step updates is not only the operations of the rule: two filters are replaced as well, both of them
+	 * matching the event of the step and neither of them the one the step before it was run with.
+	 *   - the filter of the rule, which decides whether the rule is processed for the event: all four evaltypes,
+	 *     the guard alone under CONDITION_EVAL_TYPE_AND, an OR of two conditions, an AND_OR grouping three and a
+	 *     custom expression over three, see getWindowOperationStepFilters();
+	 *   - the filter every operation of the step carries, which decides whether that operation is performed once
+	 *     the rule was: three evaltypes and the unconditional state, the custom expression one written ahead of the
+	 *     server evaluating it, see getWindowOperationStepOperationFilters().
+	 * The outcome a step expects is the same under all of them, so a filter the server did not end up evaluating -
+	 * of the rule or of an operation - shows as the operations of that step not having been performed at all.
+	 *
 	 * A step is self contained: it takes the trigger from OK to one open problem with the one "down" value it sends,
 	 * reads its event, and recovers the trigger with a value matching neither "down" nor "up", which closes that
 	 * problem again. So the step after it starts where this one started and inspects one event of its own - the
@@ -13221,15 +13531,35 @@ HEREDOC;
 		foreach ($this->getWindowOperationSteps() as $index => $step) {
 			$label = 'step #'.$index.' ('.$step['label'].')';
 
-			// The one rule of the scenario, brought to the operations of this step and to no others: created on
-			// the first step and updated in place on every step after it, see upsertCepRule().
+			// The operations of a step, each of them carrying the operation filter the step was handed by
+			// getWindowOperationSteps(): the conditions the operation itself has to satisfy for the event
+			// before it is performed, which the server evaluates apart from the filter of the rule
+			// (cep_operation_match_event()). They hold for the event of every step, so the outcome is again
+			// the one the step expects - and a step whose filter is the 'none' one leaves its operations
+			// unconditional, so the update into it takes the conditions of the step before away, see
+			// getWindowOperationStepOperationFilters().
+			$operations = $this->buildWindowNoneOperations($step['operations']);
+
+			if ($step['operation_filter'] !== null) {
+				foreach ($operations as &$operation) {
+					$operation['filter'] = $step['operation_filter'];
+				}
+				unset($operation);
+			}
+
+			// The one rule of the scenario, brought to the operations and the filter of this step and to no
+			// others: created on the first step and updated in place on every step after it, see
+			// upsertCepRule(). The filter is the one the step was handed by getWindowOperationSteps() - a
+			// filter matching the event of every step, under an evaltype the step before it was not run
+			// under - so an update has to replace the conditions, the evaltype and the formula of the rule
+			// as well as its operations, see getWindowOperationStepFilters().
 			// The operations of a step are the ones of its case plus, for a pattern match window, the
 			// operation that may not run - appended here rather than left to upsertCepRule() because this
 			// flavour needs no condition on it: the script of its window reports no match, which is what
 			// keeps the operation unperformed, see addPatternMatchedNoopOperation().
 			$this->upsertCepRule(self::addPatternMatchedNoopOperation(
-				$this->buildWindowNoneCepRuleParams($rule_template['name'], [],
-					$this->buildWindowNoneOperations($step['operations']), CONDITION_EVAL_TYPE_AND, '',
+				$this->buildWindowNoneCepRuleParams($rule_template['name'], $step['filter']['conditions'],
+					$operations, $step['filter']['evaltype'], $step['filter']['formula'],
 					$rule_template['window_type'], $rule_template['window']
 				), false
 			));
