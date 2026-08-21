@@ -168,7 +168,7 @@ foreach ($data['ceprules'] as $ceprule) {
 			(new CCol($operations))->addClass(ZBX_STYLE_WORDBREAK),
 			$ceprule['stop'] == CCepRuleHelper::EXECUTION_STOP
 				? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
-				: new CObject(),
+				: '',
 			$ceprule['sortorder'],
 			(new CLink($ceprule['status'] == CCepRuleHelper::STATUS_ENABLED ? _('Enabled') : _('Disabled')))
 				->addClass($ceprule['status'] == CCepRuleHelper::STATUS_ENABLED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
