@@ -981,7 +981,8 @@ ZABBIX.apps.map = (function($) {
 					var value = parseInt(this.value, 10),
 						last_value = parseInt($('#shapeForm #last_shape_type').val(), 10);
 
-					$('#shape-text-row, #shape-background-row').toggle(value !== SVGMapShape.TYPE_LINE);
+					$('#shape-text-row, #shape-background-row')
+						.css('display', value !== SVGMapShape.TYPE_LINE ? '' : 'none');
 					$('.switchable-content').each(function (i, element) {
 						element.textContent = element.hasAttribute('data-value-' + value) ?
 								element.getAttribute('data-value-' + value) :
