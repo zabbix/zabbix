@@ -10553,6 +10553,37 @@ HEREDOC;
 	}
 
 	/**
+	 * The stepped operation scenario of testTriggerCEP_CepWindowSimpleOperationSteps as a stress test: the
+	 * rapid burst of testTriggerCEP_MultEventWindowBurstSingleItem is sent at the one item that flavour is
+	 * driven on, and the whole sequence of rule updates the scenario is made of is then run through on top of
+	 * it - one update and one configuration cache reload after another, with nothing waited for in between.
+	 *
+	 * So the server is working through a burst of problem events while the rule those events are processed by
+	 * is being replaced under it, over and over: every step brings the rule to other operations, another rule
+	 * filter, another operation filter and another window, and the window the step before it opened is holding
+	 * the events of the burst while that happens. What no step does here is read an event - which rule version
+	 * an event of the burst was processed by is exactly what this flavour gives up, and what the stepped
+	 * flavour asserts instead (see runEventAssessmentTestCepWindowOperationSteps()).
+	 *
+	 * What is asserted is what the churn may not cost: every value of the burst must have come out as a problem
+	 * event of its own and all of them must still be open once the sequence is through, and the rule the
+	 * sequence left behind must still process an event exactly the way its step says it must - the operations of
+	 * the last step and of no other, read off one problem opened after the burst has been recovered.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleOperationStepsBurst$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleOperationStepsBurst() {
+		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple burst');
+
+		try {
+			$this->runStressTestCepWindowOperationStepsBurst($rule);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * The same operations as testTriggerCEP_CepWindowNone, applied by a rule that has a simple window instead
 	 * of none: the events are grouped into a window per 'service' id and must come out with exactly the same
 	 * tags, event name, severity and suppression the windowless rule produces, showing the operations behave
@@ -13610,6 +13641,144 @@ HEREDOC;
 		// cached: the events are gone with their problems and the windows that held them with their duration.
 		$this->assertCepStatEquals('cache', 'events', 0);
 		$this->assertCepStatEquals('cache', 'objects', 0);
+	}
+
+	/**
+	 * Drive the stressed flavour of the stepped operation scenario (see
+	 * testTriggerCEP_CepWindowSimpleOperationStepsBurst()): the rapid burst of
+	 * testTriggerCEP_MultEventWindowBurstSingleItem is sent at the single discovered item the stepped scenario is
+	 * driven on, and the steps of getWindowOperationSteps() are then walked through the way
+	 * runEventAssessmentTestCepWindowOperationSteps() walks them - the rule of $rule_template brought to the
+	 * operations, the filters and the window of one step after another - but with the value sending, the event
+	 * reading and every wait of a step left out, so nothing separates one update from the next but the
+	 * configuration cache reload the update needs to reach the server.
+	 *
+	 * That is the stress: the burst opens as many problems as it has values and every one of them stays open, so
+	 * the server is processing those events, and holding them in the window of the rule, while the rule itself is
+	 * replaced under it - operations, both filters and the window at every step. Which version of the rule an
+	 * event of the burst was processed by is not knowable here, which is why no event of the burst is read: the
+	 * stepped flavour is the one that reads them, one event per rule, and this one runs the same sequence with the
+	 * events arriving all at once instead.
+	 *
+	 * What is left to assert is therefore the two things the churn may not cost:
+	 *   - the burst itself - every value ingested, one problem event per value and not one more, and all of them
+	 *     still open, since nothing in the rules of the steps closes a problem or a window;
+	 *   - the rule the sequence left behind - one "down" value sent once the burst has been recovered opens one
+	 *     problem, and its event must be exactly what the last step of the sequence expects (see
+	 *     waitForCepOperationStepEvent()), including the tags of every other step being absent: a server left
+	 *     processing a rule the sequence had already moved past would show as one of those.
+	 */
+	private function runStressTestCepWindowOperationStepsBurst(array $rule_template): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state: what the burst opens is counted, so a problem another scenario
+		// left open on it would be counted with them.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the stressed CEP operation step test.');
+		}
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		// Every value of the burst carries the one id the stepped scenario sends, so the whole burst lands in the
+		// single window of that id - the window of a step groups by the 'service' tag.
+		$service = self::CEP_RULE_WINDOW_NONE_SERVICE;
+		$cycles = static::RECOVERY_CYCLES_COUNT;
+		$steps = $this->getWindowOperationSteps();
+
+		// The prototypes prepareDataCepWindowOperationSteps() put in place - text items and the close-on-up
+		// expression over them - reach the server with a configuration cache reload and not before, and this
+		// flavour is the one that sends its values before it has updated a rule: without the reload the burst
+		// would be text values arriving at items the server still holds as numeric, which makes every one of
+		// them unsupported instead of an event. The stepped flavour needs no reload of its own here, because the
+		// rule of its first step brings one with it before anything is sent.
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		$this->captureEventBaseline($all);
+
+		$data = [];
+
+		for ($i = 0; $i < $cycles; $i++) {
+			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down_'.$service];
+		}
+
+		// The burst goes out as a single batch, every value of it with a strictly increasing (clock, ns). The
+		// trigger generates multiple events, so each value opens a problem of its own, and the expression stays
+		// true through all of them: nothing recovers until the value at the end of this driver.
+		//
+		// Nothing is read back about the batch before the updates below start - not even that it was ingested
+		// (getVpsWritten(), which the burst tests do): the values are to be processed while the rule is being
+		// replaced, so the sending is the last thing that happens before the sequence does. A value that never
+		// made it is reported by the event count of the trigger further down instead.
+		$this->dispatchSenderValues($data);
+
+		// And the sequence of rule updates starts right on top of it: no value is sent by a step, no event is
+		// read and nothing is waited for beyond the reload every update needs, so the steps are made while the
+		// server is still working through the burst - and the rule each of them replaces is one holding the
+		// events of that burst in its window.
+		foreach ($steps as $step) {
+			$operations = $this->buildWindowNoneOperations($step['operations']);
+
+			if ($step['operation_filter'] !== null) {
+				foreach ($operations as &$operation) {
+					$operation['filter'] = $step['operation_filter'];
+				}
+				unset($operation);
+			}
+
+			$this->upsertCepRule(self::addPatternMatchedNoopOperation(
+				$this->buildWindowNoneCepRuleParams($rule_template['name'], $step['filter']['conditions'],
+					$operations, $step['filter']['evaltype'], $step['filter']['formula'],
+					$rule_template['window_type'], $rule_template['window']
+				), false
+			));
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+		}
+
+		// What the burst had to survive is asked once the sequence is through with it and not before - a wait in
+		// between is time the stress must not be given.
+		//
+		// One problem event per value of the burst and not one more, and every one of them still open: the
+		// operations of the steps change events, they do not close them, and no rule of the sequence closes a
+		// window either. A dropped or a duplicated value fails one of the two counts.
+		$this->waitForAllTriggerEventCounts($all, $cycles);
+		$this->waitForOpenProblemCount($all, $cycles,
+			'After the burst of '.$cycles.' values and '.count($steps).' rule updates'
+		);
+		$this->assertAllTriggerValues($all, TRIGGER_VALUE_TRUE,
+			'must be PROBLEM after the burst, with every problem it opened still open'
+		);
+
+		// The burst is recovered by the only thing that can recover it - the trigger expression turning false -
+		// which closes every problem it opened at once.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the recovery value of the burst', false);
+
+		// And the rule the sequence left behind is read the way a step of the stepped scenario reads its own: one
+		// "down" value, one problem, one event, and the operations of the last step of the sequence must be all
+		// that event came out of. The baseline is taken first, so the events of the burst are behind it and this
+		// one problem is the only one inspected.
+		$last = $steps[count($steps) - 1];
+
+		$this->captureEventBaseline($all);
+
+		$send('down_'.$service);
+		$this->waitForOpenProblemCount($all, 1, 'After the "down" value following the burst');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForCepOperationStepEvent($triggerid, $service, $last,
+			'the last step ("'.$last['label'].'") after the burst'
+		);
+
+		// Closing that one takes the last problem of the scenario with it, so nothing of it is left cached: the
+		// events are gone with their problems and the windows that held them with their duration.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the recovery value following the burst');
 	}
 
 	/**
