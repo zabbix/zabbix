@@ -125,14 +125,6 @@ foreach ($data['ceprules'] as $ceprule) {
 		}
 	}
 
-	$make_stop_indicator = function (array $ceprule): CSpan {
-		if ($ceprule['stop'] == CCepRuleHelper::EXECUTION_STOP) {
-			return (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN);
-		}
-
-		return (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_ORANGE);
-	};
-
 	if ($is_legacy) {
 		$table->addRow([
 			new CCheckBox('cepruleids[legacy-'.$ceprule['correlationid'].']', $ceprule['correlationid']),
@@ -172,7 +164,9 @@ foreach ($data['ceprules'] as $ceprule) {
 			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
 			CCepRuleHelper::getWindowLabelString($ceprule),
 			(new CCol($operations))->addClass(ZBX_STYLE_WORDBREAK),
-			$make_stop_indicator($ceprule),
+			$ceprule['stop'] == CCepRuleHelper::EXECUTION_STOP
+				? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
+				: new CObject(),
 			$ceprule['sortorder'],
 			(new CLink($ceprule['status'] == CCepRuleHelper::STATUS_ENABLED ? _('Enabled') : _('Disabled')))
 				->addClass($ceprule['status'] == CCepRuleHelper::STATUS_ENABLED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
