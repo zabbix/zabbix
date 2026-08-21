@@ -1512,7 +1512,7 @@ static void	cep_sync_operation_conditions(zbx_cep_config_t *cep_config, zbx_dbsy
 	char		**row;
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
-	int		ret;
+	int		ret, condition_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1536,7 +1536,12 @@ static void	cep_sync_operation_conditions(zbx_cep_config_t *cep_config, zbx_dbsy
 			continue;
 		}
 
-		op_condition->type = atoi(row[2]);
+		if (op_condition->type != (condition_type = atoi(row[2])))
+		{
+			cep_operation_condition_clear(op_condition);
+			op_condition->type = condition_type;
+		}
+
 		op_condition->operator = atoi(row[3]);
 
 		switch (op_condition->type)
