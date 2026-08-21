@@ -149,18 +149,6 @@ class CControllerCepRuleList extends CController {
 				$record['filter'] += [
 					'conditions' => []
 				];
-
-				$record['filter']['conditions'] = array_map(function(array $condition) {
-					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE) {
-						$condition['type'] = CCepRuleHelper::CONDITION_TAG;
-					}
-
-					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG) {
-						$condition['tag_operator'] = $condition['operator'];
-					}
-
-					return $condition;
-				}, $record['filter']['conditions']);
 			}
 
 			$record['cepruleid'] = array_key_exists('cep_ruleid', $record) ? $record['cep_ruleid'] : null;

@@ -99,7 +99,7 @@ class CControllerCepRuleEdit extends CController {
 				'output' => ['cep_ruleid', 'name', 'description', 'window_type', 'status', 'stop', 'sortorder'],
 				'selectOperations' => ['sortorder', 'execute_when', 'filter', 'type', 'event_name', 'severity',
 					'suppress_duration', 'tag', 'new_tag', 'tag_value'],
-				'selectFilter' => ['eval_formula', 'evaltype', 'conditions'],
+				'selectFilter' => ['formula', 'evaltype', 'conditions'],
 				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host',
 					'group_by_tags', 'event_count_tag', 'tags'
 				]
@@ -108,7 +108,7 @@ class CControllerCepRuleEdit extends CController {
 		else {
 			$ceprules = [DB::getDefaults('cep_rule') + [
 				'filter' => [
-					'eval_formula' => '',
+					'formula' => '',
 					'evaltype' => DB::getDefault('cep_rule', 'evaltype'),
 					'conditions' => []
 				],
@@ -142,11 +142,13 @@ class CControllerCepRuleEdit extends CController {
 		$ceprule['cepruleid'] = array_key_exists('cep_ruleid', $ceprule) ? $ceprule['cep_ruleid'] : null;
 		unset($ceprule['cep_ruleid']);
 
-		// Form will use this interpolated formula API field's name in submitted structure.
-		$ceprule['filter']['formula'] = $ceprule['filter']['eval_formula'];
-		unset($ceprule['filter']['eval_formula']);
-
-		$ceprule['filter']['conditions'] = self::prepareFilterConditions($ceprule['filter']['conditions']);
+		foreach ($ceprule['filter']['conditions'] as &$condition) {
+			if ($condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE) {
+				$condition['tag_name'] = $condition['tag'];
+				unset($condition['tag']);
+			}
+		}
+		unset($condition);
 
 		if (array_key_exists('operations', $ceprule)) {
 			array_walk($ceprule['operations'], function(array &$operation) {
@@ -174,35 +176,6 @@ class CControllerCepRuleEdit extends CController {
 		}
 
 		return $ceprule;
-	}
-
-	protected static function prepareFilterConditions(array $conditions): array {
-		$conditions = self::prepareConditionsFormula($conditions);
-		$conditions = array_map(function(array $condition): array {
-			if ($condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE) {
-				$condition['type'] = CCepRuleHelper::CONDITION_TAG;
-			}
-
-			if ($condition['type'] == CCepRuleHelper::CONDITION_TIME_PERIOD) {
-				$condition['tag_operator'] = CONDITION_OPERATOR_EQUAL;
-			}
-			else {
-				$condition['tag_operator'] = $condition['operator'];
-			}
-
-			return $condition;
-		}, $conditions);
-
-		return $conditions;
-	}
-
-	protected static function prepareConditionsFormula(array $conditions): array {
-		$conditions = array_reduce($conditions,
-			static fn (array $carry, array $condition) => [$condition['formulaid'] => $condition, ...$carry], []
-		);
-		ksort($conditions);
-
-		return $conditions;
 	}
 
 	protected static function getOperationPopupValidationRules(): array {
@@ -260,9 +233,11 @@ class CControllerCepRuleEdit extends CController {
 
 	protected static function getConditionPopupValidationRules(): array {
 		return (new CFormValidator(['object', 'fields' => [
-			'type' => ['integer', 'required', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
-				CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_SEVERITY, CCepRuleHelper::CONDITION_HOST,
-				CCepRuleHelper::CONDITION_HOST_GROUP, CCepRuleHelper::CONDITION_TIME_PERIOD
+			'type' => ['integer', 'required', 'in' => [
+				CCepRuleHelper::CONDITION_EVENT_NAME, CCepRuleHelper::CONDITION_TAG,
+				CCepRuleHelper::CONDITION_TAG_VALUE, CCepRuleHelper::CONDITION_SEVERITY,
+				CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP,
+				CCepRuleHelper::CONDITION_TIME_PERIOD
 			]],
 			'operator' => [
 				[
@@ -283,22 +258,32 @@ class CControllerCepRuleEdit extends CController {
 					'integer', 'required',
 					'in' => [CONDITION_OPERATOR_IN, CONDITION_OPERATOR_NOT_IN],
 					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
+				],
+				[
+					'integer', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+						CONDITION_OPERATOR_NOT_LIKE],
+					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
+				],
+				[
+					'integer', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+						CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL,
+						CONDITION_OPERATOR_LESS_EQUAL],
+					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
 				]
 			],
 			'event_name' => ['db cep_condition.event_name', 'required', 'not_empty',
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME]]
 			],
-			'tag_operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
-					CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS,
-					CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
-				],
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
-			],
 			'tag' => ['db cep_condition.tag', 'required', 'not_empty',
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
 			],
+			'tag_name' => ['db cep_condition.tag', 'required', 'not_empty',
+				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
+			],
 			'tag_value' => ['db cep_condition.tag_value',
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
+				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
 			],
 			'host' => ['db cep_condition.host', 'required', 'not_empty',
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST]]

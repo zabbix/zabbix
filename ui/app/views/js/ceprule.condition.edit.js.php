@@ -33,7 +33,6 @@ window.ceprule_condition_edit_popup = new class {
 		this.#setValues(this.#defaultCondition(condition));
 		this.#initActions();
 		window['ceprule-condition-type'].dispatchEvent(new Event('change'));
-		window['ceprule-condition-tag-operator'].dispatchEvent(new Event('change'));
 
 		window.requestAnimationFrame(() => {
 			this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE);
@@ -43,18 +42,6 @@ window.ceprule_condition_edit_popup = new class {
 
 	#initActions() {
 		window['ceprule-condition-type'].addEventListener('change', (e) => this.#handleTypeChanged(e.target.value));
-		window['ceprule-condition-tag-operator'].addEventListener('change', (e) => {
-			const value = Number(e.target.value);
-
-			if (value == <?= CONDITION_OPERATOR_EXISTS ?> || value == <?= CONDITION_OPERATOR_NOT_EXISTS ?>) {
-				window['ceprule-condition-tag-value'].style.display = 'none';
-				window['ceprule-condition-tag-value'].disabled = true;
-			}
-			else {
-				window['ceprule-condition-tag-value'].style.display = '';
-				window['ceprule-condition-tag-value'].disabled = false;
-			}
-		});
 	}
 
 	#setValues(condition) {
@@ -69,24 +56,6 @@ window.ceprule_condition_edit_popup = new class {
 	}
 
 	#handleTypeChanged(type) {
-		const operator_field = window['ceprule-condition-operator'].closest('.form-field');
-		const operator_field_label = operator_field.previousElementSibling;
-		const tag_operator_field = window['ceprule-condition-tag-operator'].closest('.form-field');
-		const tag_operator_field_label = tag_operator_field.previousElementSibling;
-
-		if (Number(type) == <?= CCepRuleHelper::CONDITION_TAG ?>) {
-			operator_field.style.display = 'none';
-			operator_field_label.style.display = 'none';
-			tag_operator_field.style.display = '';
-			tag_operator_field_label.style.display = '';
-		}
-		else {
-			operator_field.style.display = '';
-			operator_field_label.style.display = '';
-			tag_operator_field.style.display = 'none';
-			tag_operator_field_label.style.display = 'none';
-		}
-
 		const condition_type_operators = {
 			[<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>]: [
 				<?= CONDITION_OPERATOR_NOT_LIKE ?>,
@@ -116,9 +85,13 @@ window.ceprule_condition_edit_popup = new class {
 				<?= CONDITION_OPERATOR_EQUAL ?>,
 				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
 				<?= CONDITION_OPERATOR_LIKE ?>,
+				<?= CONDITION_OPERATOR_NOT_LIKE ?>
+			],
+			[<?= CCepRuleHelper::CONDITION_TAG_VALUE ?>]: [
+				<?= CONDITION_OPERATOR_EQUAL ?>,
+				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
+				<?= CONDITION_OPERATOR_LIKE ?>,
 				<?= CONDITION_OPERATOR_NOT_LIKE ?>,
-				<?= CONDITION_OPERATOR_EXISTS ?>,
-				<?= CONDITION_OPERATOR_NOT_EXISTS ?>,
 				<?= CONDITION_OPERATOR_MORE_EQUAL ?>,
 				<?= CONDITION_OPERATOR_LESS_EQUAL ?>
 			],
@@ -173,8 +146,8 @@ window.ceprule_condition_edit_popup = new class {
 			host_group: '',
 			host: '',
 			severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
-			tag_operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 			tag: '',
+			tag_name: '',
 			tag_value: '',
 			event_name: '',
 			time_period: ''
@@ -192,13 +165,16 @@ window.ceprule_condition_edit_popup = new class {
 
 		switch (Number(condition.type)) {
 			case <?= CCepRuleHelper::CONDITION_EVENT_NAME ?>:
-				keep('type', 'event_name', 'operator');
+				keep('type', 'operator', 'event_name', );
 			break;
 			case <?= CCepRuleHelper::CONDITION_TAG ?>:
-				keep('type', 'tag', 'tag_operator', 'tag_value');
+				keep('type', 'operator', 'tag');
 			break;
+			case <?= CCepRuleHelper::CONDITION_TAG_VALUE ?>:
+				keep('type', 'operator', 'tag_name','tag_value');
+				break;
 			case <?= CCepRuleHelper::CONDITION_SEVERITY ?>:
-				keep('type', 'severity', 'operator');
+				keep('type', 'operator', 'severity');
 			break;
 			case <?= CCepRuleHelper::CONDITION_HOST ?>:
 				keep('type', 'operator', 'host');

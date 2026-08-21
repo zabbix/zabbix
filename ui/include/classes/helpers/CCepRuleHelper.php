@@ -271,7 +271,8 @@ class CCepRuleHelper {
 	public static function getConditionLabels(): array {
 		return [
 			self::CONDITION_EVENT_NAME => _('Event name'),
-			self::CONDITION_TAG => _('Tag'),
+			self::CONDITION_TAG => _('Tag name'),
+			self::CONDITION_TAG_VALUE => _('Tag value'),
 			self::CONDITION_SEVERITY => _('Severity'),
 			self::CONDITION_HOST => _('Host'),
 			self::CONDITION_HOST_GROUP => _('Host group'),
@@ -291,10 +292,10 @@ class CCepRuleHelper {
 
 	public static function getTagOperators(): array {
 		return [
-			CONDITION_OPERATOR_EXISTS => _('Exists'),
+			CONDITION_OPERATOR_EXISTS => _('Exists'), // TODO VM: remove after operations are updated
 			CONDITION_OPERATOR_EQUAL => _('Equals'),
 			CONDITION_OPERATOR_LIKE => _('Contains'),
-			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist'),
+			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist'), // TODO VM: remove after operations are updated
 			CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
 			CONDITION_OPERATOR_NOT_LIKE => _('Does not contain'),
 			CONDITION_OPERATOR_MORE_EQUAL => _('Is more than or equal'),
@@ -311,9 +312,7 @@ class CCepRuleHelper {
 			CONDITION_OPERATOR_LIKE => _('Contains'),
 			CONDITION_OPERATOR_NOT_LIKE => _('Does not contain'),
 			CONDITION_OPERATOR_MORE_EQUAL => _('Is more than or equal'),
-			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal'),
-			CONDITION_OPERATOR_EXISTS => _('Exists'),
-			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist')
+			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal')
 		];
 	}
 
@@ -349,15 +348,12 @@ class CCepRuleHelper {
 			return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['time_period'])];
 		}
 		elseif (self::CONDITION_TAG == $ceprule_condition['type']) {
-			if ($ceprule_condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS
-					|| $ceprule_condition['operator'] == CONDITION_OPERATOR_EXISTS) {
-				return [$type_name, ' ', italic($ceprule_condition['tag']), ' ', $operator_name];
-			}
-			else {
-				return [$type_name, ' ', italic($ceprule_condition['tag']), ' ', $operator_name, ' ',
-					italic($ceprule_condition['tag_value'])
-				];
-			}
+				return [$type_name, ' ', $operator_name, ' ', italic($ceprule_condition['tag'])];
+		}
+		elseif (self::CONDITION_TAG_VALUE == $ceprule_condition['type']) {
+			return [$type_name, ' ', italic($ceprule_condition['tag']), ' ', $operator_name, ' ',
+				italic($ceprule_condition['tag_value'])
+			];
 		}
 		else {
 			throw new Exception('Unknown condition type');

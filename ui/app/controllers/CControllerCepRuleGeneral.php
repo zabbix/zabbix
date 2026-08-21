@@ -43,20 +43,10 @@ abstract class CControllerCepRuleGeneral extends CController {
 		if (array_key_exists('filter', $request)) {
 			if (array_key_exists('conditions', $request['filter'])) {
 				array_walk($request['filter']['conditions'], function (array &$condition) {
-					$condition['operator'] = match ($condition['type']) {
-						CCepRuleHelper::CONDITION_TAG,
-						CCepRuleHelper::CONDITION_TAG_VALUE => $condition['tag_operator'],
-						default => $condition['operator']
-					};
-
-					$is_exists_operator = $condition['operator'] == CONDITION_OPERATOR_EXISTS
-						|| $condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS;
-
-					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG && !$is_exists_operator) {
-						$condition['type'] = CCepRuleHelper::CONDITION_TAG_VALUE;
+					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE) {
+						$condition['tag'] = $condition['tag_name'];
+						unset($condition['tag_name']);
 					}
-
-					unset($condition['tag_operator']);
 				});
 				$request['filter']['conditions'] = array_values($request['filter']['conditions']);
 			}

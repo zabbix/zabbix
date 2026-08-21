@@ -19,13 +19,21 @@
  * @var array    $data
  */
 
+$operator_values = [];
+foreach (CCepRuleHelper::getConditionOperatorLabels() as $value => $name) {
+	$operator_values[] = [
+		'value' => $value,
+		'name' => $name
+	];
+}
+
 (new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addClass(ZBX_STYLE_DISPLAY_NONE)
 	->addItem((new CFormGrid())
 		->addItem([
-			new CLabel('Type', 'ceprule-condition-type-focus'),
+			new CLabel(_('Type'), 'ceprule-condition-type-focus'),
 			new CFormField(
 				(new CSelect('type'))
 					->setId('ceprule-condition-type')
@@ -37,44 +45,39 @@
 			)
 		])
 		->addItem([
-			(new CLabel('Tag', 'ceprule-condition-tag-name'))->setAsteriskMark(),
-			(new CFormField([
-				(new CTextAreaFlexible('tag'))
-					->setMaxlength(DB::getFieldLength('cep_condition', 'tag'))
-					->setId('ceprule-condition-tag-name')
-					->setAttribute('placeholder', 'tag'),
-				new CObject('&nbsp;'),
-				(new CSelect('tag_operator'))
-					->setId('ceprule-condition-tag-operator')
-					->setFocusableElementId('ceprule-condition-type-focus')
-					->addOptions(CSelect::createOptionsFromArray(
-						CCepRuleHelper::getTagOperators()
-					)),
-				new CObject('&nbsp;'),
-				(new CTextAreaFlexible('tag_value'))
-					->setMaxlength(DB::getFieldLength('cep_condition', 'tag_value'))
-					->setId('ceprule-condition-tag-value')
-					->setAttribute('placeholder', 'value')
-			]))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG)
+			(new CLabel(_('Tag'), 'ceprule-condition-tag-name'))->setAsteriskMark(),
+			(new CFormField((new CTextAreaFlexible('tag_name'))
+				->setMaxlength(DB::getFieldLength('cep_condition', 'tag'))
+				->setId('ceprule-condition-tag-name')
+				->setAttribute('placeholder', 'tag')
+			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG_VALUE)
 		])
 		->addItem([
-			new CLabel('Operator'),
+			new CLabel(_('Operator'), 'ceprule-condition-operator'),
 			new CFormField((new CRadioButtonList('operator'))
 				->setId('ceprule-condition-operator')
+				->setValues($operator_values)
 				->setModern()
-				->addValue('Equals', CONDITION_OPERATOR_EQUAL)
-				->addValue('Does not equal', CONDITION_OPERATOR_NOT_EQUAL)
-				->addValue('Contains', CONDITION_OPERATOR_LIKE)
-				->addValue('Does not contain', CONDITION_OPERATOR_NOT_LIKE)
-				->addValue('Does not exist', CONDITION_OPERATOR_NOT_EXISTS)
-				->addValue('In', CONDITION_OPERATOR_IN)
-				->addValue('Not in', CONDITION_OPERATOR_NOT_IN)
-				->addValue('Is greater than or equals', CONDITION_OPERATOR_MORE_EQUAL)
-				->addValue('Is less than or equals', CONDITION_OPERATOR_LESS_EQUAL)
 			)
 		])
 		->addItem([
-			(new CLabel('Event name', 'ceprule-condition-event-name'))->setAsteriskMark(),
+			(new CLabel(_('Tag'), 'ceprule-condition-tag'))->setAsteriskMark(),
+			(new CFormField((new CTextAreaFlexible('tag'))
+				->setMaxlength(DB::getFieldLength('cep_condition', 'tag'))
+				->setId('ceprule-condition-tag')
+				->setAttribute('placeholder', 'tag')
+			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG)
+		])
+		->addItem([
+			(new CLabel(_('Tag value'), 'ceprule-condition-tag-value')),
+			(new CFormField((new CTextAreaFlexible('tag_value'))
+				->setMaxlength(DB::getFieldLength('cep_condition', 'tag_value'))
+				->setId('ceprule-condition-tag-value')
+				->setAttribute('placeholder', 'value')
+			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG_VALUE)
+		])
+		->addItem([
+			(new CLabel(_('Event name'), 'ceprule-condition-event-name'))->setAsteriskMark(),
 			(new CFormField((new CTextAreaFlexible('event_name'))
 				->setMaxlength(DB::getFieldLength('cep_condition', 'event_name'))
 				->setId('ceprule-condition-event-name')
@@ -82,34 +85,30 @@
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_EVENT_NAME)
 		])
 		->addItem([
-			(new CLabel('Host', 'ceprule-condition-host'))->setAsteriskMark(),
+			(new CLabel(_('Host'), 'ceprule-condition-host'))->setAsteriskMark(),
 			(new CFormField((new CTextAreaFlexible('host'))
-				->setMaxlength(DB::getFieldLength('cep_condition', 'host'))
 				->setId('ceprule-condition-host')
 				->setAttribute('placeholder', 'host name')
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST)
 		])
 		->addItem([
-			(new CLabel('Host group', 'ceprule-condition-host-group'))->setAsteriskMark(),
+			(new CLabel(_('Host group'), 'ceprule-condition-host-group'))->setAsteriskMark(),
 			(new CFormField((new CTextAreaFlexible('host_group'))
-				->setMaxlength(DB::getFieldLength('cep_condition', 'host_group'))
 				->setId('ceprule-condition-host-group')
 				->setAttribute('placeholder', 'host group name')
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST_GROUP)
 		])
 		->addItem([
-			new CLabel('Severity'),
+			new CLabel(_('Severity')),
 			(new CFormField(new CSeverity('severity')))
 				->setAttribute('for-type', CCepRuleHelper::CONDITION_SEVERITY)
 		])
 		->addItem([
-			(new CLabel('Time period', 'ceprule-condition-time-period'))->setAsteriskMark(),
+			(new CLabel(_('Time period'), 'ceprule-condition-time-period'))->setAsteriskMark(),
 			(new CFormField((new CTextAreaFlexible('time_period'))
-				->setMaxlength(DB::getFieldLength('cep_condition', 'time_period'))
 				->setId('ceprule-condition-time-period')
 				->setAttribute('placeholder', '1-7,00:00-24:00')
-			))
-				->setAttribute('for-type', CCepRuleHelper::CONDITION_TIME_PERIOD)
+			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TIME_PERIOD)
 		])
 		->addItem(
 			(new CInput('hidden', 'formulaid', ''))

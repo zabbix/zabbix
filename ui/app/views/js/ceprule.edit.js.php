@@ -49,7 +49,7 @@ window.ceprule_edit_popup = new class {
 	#condition_row_template_tag;
 
 	/** @type {Template} */
-	#condition_row_template_tag_exists;
+	#condition_row_template_tag_value;
 
 	/** @type {Number} */
 	#condition_row_index = 0;
@@ -110,10 +110,10 @@ window.ceprule_edit_popup = new class {
 			`<div class="text">#{name} #{operator} <em>#{value}</em></div>`
 		);
 		this.#condition_row_template_tag = new Template(
-			`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em></div>`
+			`<div class="text">#{name} #{operator} <em>#{tag}</em></div>`
 		);
-		this.#condition_row_template_tag_exists = new Template(
-			`<div class="text">#{name} <em>#{tag_name}</em> #{operator}</div>`
+		this.#condition_row_template_tag_value = new Template(
+			`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em></div>`
 		);
 		this.#condition_row_template = new Template(window['ceprule-condition-row-template'].innerHTML);
 		this.#operation_row_template = new Template(window['ceprule-operation-row-template'].innerHTML);
@@ -441,7 +441,10 @@ window.ceprule_edit_popup = new class {
 	#listConditionIdentifiers() {
 		const conditions = Object.values(this.form.findFieldByName('filter[conditions]').getValue() ?? {});
 
-		return conditions.map(condition => ({id: condition.formulaid}));
+		return conditions.map(condition => ({
+			id: condition.formulaid,
+			type: condition.type
+		}));
 	}
 
 	#refreshExpressionPreview() {
@@ -759,10 +762,9 @@ window.ceprule_edit_popup = new class {
 		let description_template = this.#condition_row_template_value;
 		const description_view = {
 			name: label_names[condition.type],
-			operator: condition.type == <?= CCepRuleHelper::CONDITION_TAG ?>
-				? operator_names[condition.tag_operator]
-				: operator_names[condition.operator],
+			operator: operator_names[condition.operator],
 			value: undefined,
+			tag: undefined,
 			tag_name: undefined,
 			tag_value: undefined
 		};
@@ -783,21 +785,22 @@ window.ceprule_edit_popup = new class {
 			description_view.value = condition.time_period;
 		}
 		else if (condition.type == <?= CCepRuleHelper::CONDITION_TAG ?>) {
-			description_view.tag_name = condition.tag;
-			description_template = this.#condition_row_template_tag_exists;
-
-			if (condition.tag_operator != <?= CONDITION_OPERATOR_EXISTS ?>
-					&& condition.tag_operator != <?= CONDITION_OPERATOR_NOT_EXISTS ?>) {
-				description_view.tag_value = condition.tag_value;
-				description_template = this.#condition_row_template_tag;
-			}
+			description_template = this.#condition_row_template_tag;
+			description_view.tag = condition.tag;
+		}
+		else if (condition.type == <?= CCepRuleHelper::CONDITION_TAG_VALUE ?>) {
+			description_template = this.#condition_row_template_tag_value;
+			description_view.tag_name = condition.tag_name;
+			description_view.tag_value = condition.tag_value;
 		}
 
 		description_view.operator = description_view.operator.toLocaleLowerCase();
 
-		return this.#condition_row_template.evaluateToElement({...condition,
-			description_html: description_template.evaluate(description_view),
-			row_index: index, formulaid: num2letter(index)
+		return this.#condition_row_template.evaluateToElement({
+			...condition,
+			row_index: index,
+			formulaid: num2letter(index),
+			description_html: description_template.evaluate(description_view)
 		});
 	}
 

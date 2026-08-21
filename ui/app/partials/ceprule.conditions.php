@@ -27,10 +27,12 @@
 				->setValue($data['filter']['evaltype'])
 				->setId('ceprule-filter-evaltype')
 				->setFocusableElementId('ceprule-filter-evaltype-select')
-				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND_OR, _('And/Or')))
-				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND, _('And')))
-				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_OR, _('Or')))
-				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_EXPRESSION, _('Custom expression')))
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				]))
 				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 		))->addClass(ZBX_STYLE_CELL),
 		(new CDiv([
@@ -42,7 +44,7 @@
 				->setAttribute('placeholder', 'A or (B and C) ...')
 		]))->addClass(ZBX_STYLE_CELL)
 	]))
-	->addItem(new CLabel(_('Conditions')))
+	->addItem(new CLabel(_('Conditions'), 'ceprule-filter-conditions'))
 	->addItem((new CFormField())
 		->addItem((new CDiv())
 			->setAttribute('data-field-type', 'set')
@@ -50,10 +52,10 @@
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addItem((new CTable())
 				->setColumns([
-					new CTableColumn(new CColHeader(_('Label'))),
-					(new CTableColumn(new CColHeader(_('Name'))))
+					new CTableColumn(_('Label')),
+					(new CTableColumn(_('Name')))
 						->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
-					new CTableColumn(new CColHeader(_('Actions')))
+					new CTableColumn(_('Actions'))
 				])
 				->setId('ceprule-filter-conditions')
 				->addItem((new CTag('tfoot', true))

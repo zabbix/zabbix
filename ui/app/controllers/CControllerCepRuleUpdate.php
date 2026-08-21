@@ -38,8 +38,9 @@ class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 					]
 				],
 				'conditions' => ['objects', 'fields' => [
-					'type' => ['integer', 'required', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
-						CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_SEVERITY,
+					'type' => ['integer', 'required', 'in' => [
+						CCepRuleHelper::CONDITION_EVENT_NAME, CCepRuleHelper::CONDITION_TAG,
+						CCepRuleHelper::CONDITION_TAG_VALUE, CCepRuleHelper::CONDITION_SEVERITY,
 						CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP,
 						CCepRuleHelper::CONDITION_TIME_PERIOD
 					]],
@@ -62,23 +63,32 @@ class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 							'integer', 'required',
 							'in' => [CONDITION_OPERATOR_IN, CONDITION_OPERATOR_NOT_IN],
 							'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
+						],
+						[
+							'integer', 'required',
+							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+								CONDITION_OPERATOR_NOT_LIKE],
+							'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
+						],
+						[
+							'integer', 'required',
+							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+								CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL,
+								CONDITION_OPERATOR_LESS_EQUAL],
+							'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
 						]
 					],
 					'event_name' => ['db cep_condition.event_name', 'required', 'not_empty',
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME]]
 					],
-					'tag_operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL,
-							CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE,
-							CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_MORE_EQUAL,
-							CONDITION_OPERATOR_LESS_EQUAL
-						],
-						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
-					],
 					'tag' => ['db cep_condition.tag', 'required', 'not_empty',
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
 					],
+					'tag_name' => ['db cep_condition.tag', 'required', 'not_empty',
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
+					],
 					'tag_value' => ['db cep_condition.tag_value',
-						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
 					],
 					'host' => ['db cep_condition.host', 'required', 'not_empty',
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST]]
