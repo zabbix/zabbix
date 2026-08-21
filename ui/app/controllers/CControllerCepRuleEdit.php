@@ -101,7 +101,8 @@ class CControllerCepRuleEdit extends CController {
 					'suppress_duration', 'tag', 'new_tag', 'tag_value'],
 				'selectFilter' => ['eval_formula', 'evaltype', 'conditions'],
 				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host',
-					'group_by_tags', 'event_count_tag', 'tags']
+					'group_by_tags', 'event_count_tag', 'tags'
+				]
 			]);
 		}
 		else {
@@ -131,10 +132,6 @@ class CControllerCepRuleEdit extends CController {
 		$ceprule['window']['capacity_enabled'] = $ceprule['window']['capacity'] != 0;
 		if (!$ceprule['window']['capacity_enabled']) {
 			$ceprule['window']['capacity'] = '10'; // Pre-fill a convenient default upon change into limited setting.
-		}
-
-		if ($ceprule['sortorder'] == 0) {
-			$ceprule['sortorder'] = '1';
 		}
 
 		if ($ceprule['window']['duration'] == 0) {
