@@ -125,7 +125,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 				// filter only normal and discovery created hosts
 				$options = [
-					'output' => ['hostid', 'host', 'inventory_mode', 'flags', 'monitored_by'],
+					'output' => ['hostid', 'host', 'inventory_mode', 'flags'],
 					'hostids' => $hostids,
 					'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]],
 					'editable' => true
