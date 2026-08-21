@@ -13231,10 +13231,20 @@ HEREDOC;
 
 			// The trigger goes back to where the step found it, which closes the problem the step opened: the
 			// next step opens one problem of its own from an expression that is false again.
+			//
+			// Whether the CEP cache drained with it is not asked here: that counter is global and the window
+			// of a step outlives the problems it held (it is dropped once its own duration has run out), so a
+			// step would be waiting for the window of the step before it as often as for anything of its own -
+			// a wait per step for a state the scenario only needs at the end of it, see below.
 			$send('0');
 			$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-			$this->waitForNoOpenProblems($all, 'After the recovery value of '.$label);
+			$this->waitForNoOpenProblems($all, 'After the recovery value of '.$label, false);
 		}
+
+		// Every step closed the problem it opened, so once the last one has, nothing of the scenario is left
+		// cached: the events are gone with their problems and the windows that held them with their duration.
+		$this->assertCepStatEquals('cache', 'events', 0);
+		$this->assertCepStatEquals('cache', 'objects', 0);
 	}
 
 	/**
