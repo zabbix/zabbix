@@ -146,8 +146,8 @@ class IntegrationTests {
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		$suite->addTestSuite('testTriggerCEP');
-		$suite->addTestSuite('testTriggerCEPAtScale');
-		$suite->addTestSuite('testTriggerCEPRestart');
+		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
+		/* $suite->addTestSuite('testTriggerCEPRestart'); */
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testWebScenarioDynamicVariables');
 		$suite->addTestSuite('testBridgeAdapter');

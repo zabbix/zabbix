@@ -35,8 +35,8 @@ class testTriggerCEP extends CIntegrationTest {
 	// running locally to actually stress CEP, raise them to the recommended values noted below (or higher).
 	// Increasing them makes the tests slower but far more thorough.
 	const LLD_DISCOVERY_COUNT = 10;	// discovered items/triggers per rule; use at least 4000 to stress CEP
-	const LOG_EVENT_COUNT = 10;		// log values pushed at the single-trigger stream; use at least 10000
-	const RECOVERY_CYCLES_COUNT = 10;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
+	const LOG_EVENT_COUNT = 100;		// log values pushed at the single-trigger stream; use at least 10000
+	const RECOVERY_CYCLES_COUNT = 100;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
 	const MAINTENANCE_COUNT_EXTRA = 10;
 	// How many ids the close window scenarios drive (see runEventAssessmentTestCepWindowCloseWindow()). Every
