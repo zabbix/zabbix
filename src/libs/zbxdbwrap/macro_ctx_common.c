@@ -622,7 +622,8 @@ int	zbx_macro_event_name_resolv(zbx_macro_resolv_data_t *p, va_list args, char *
 	{
 		ret = macro_trigger_common_resolv(p, um_handle, event, tz, replace_to);
 
-		if (ret == SUCCEED && EVENT_OBJECT_TRIGGER == event->object)
+		if (ret == SUCCEED && EVENT_OBJECT_TRIGGER == event->object &&
+				0 != (p->token.type & (ZBX_TOKEN_MACRO | ZBX_TOKEN_FUNC_MACRO)))
 		{
 			if (0 == strcmp(p->macro, MVAR_TIME))
 			{

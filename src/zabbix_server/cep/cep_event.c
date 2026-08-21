@@ -790,7 +790,7 @@ static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int s
 	zbx_dc_um_handle_t	*um_handle;
 	zbx_dbconn_t		*db;
 
-	if (NULL == strchr(*str, '{'))
+	if (NULL == strchr(*str, '{') && NULL == strchr(*str, '$'))
 		return;
 
 	if (NULL == (db_event = cep_event_context_get_db_event(ctx)))
@@ -819,8 +819,8 @@ static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int s
  ******************************************************************************/
 void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **str)
 {
-	return cep_event_context_resolve_macros(ctx, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, zbx_macro_event_name_resolv,
-			str);
+	return cep_event_context_resolve_macros(ctx, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO | ZBX_TOKEN_SEARCH_REFERENCES,
+			zbx_macro_event_name_resolv, str);
 }
 
 /******************************************************************************
