@@ -791,13 +791,15 @@ $formgrid
 				(new CSpan(''))->setId('expression'),
 				(new CTextBox('formula', $item['formula'], $readonly))
 					->setId('formula')
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->addClass(ZBX_STYLE_MONOSPACE_FONT)
+					->addStyle('width: 100%;')
 					->setAttribute('placeholder', 'A or (B and C) ...')
 			]))
 				->addClass(ZBX_STYLE_CELL)
 				->addClass(ZBX_STYLE_CELL_EXPRESSION)
-		]))->setId('js-item-evaltype-field')
+				->addStyle('width: 100%;')
+		]))
+			->setId('js-item-evaltype-field')
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	])
 	->addItem([
 		(new CLabel(_('Conditions')))->setId('js-item-conditions-label'),
