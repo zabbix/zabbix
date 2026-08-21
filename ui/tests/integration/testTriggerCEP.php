@@ -388,15 +388,12 @@ class testTriggerCEP extends CIntegrationTest {
 	// How long the windows of those flavours stay open. The evicted flavours wait for it to run out before
 	// their operations run, so it is kept short.
 	const CEP_RULE_WINDOW_OPS_DURATION = '3s';
-	// The pattern match flavours of that scenario (testTriggerCEP_CepWindowPattern() and
-	// testTriggerCEP_CepWindowPatternOperationSteps()) additionally give every rule they create one operation at
-	// the pattern matched execution point, which is the only execution point the other flavours cannot reach at
-	// all. Without it that point is never anything but an empty operation list, so nothing of what a window
-	// examination does with the operations of a rule is exercised. The operation is therefore one that must not
-	// run, and the flavour whose script does report a match is the one that needs a condition to stop it: a
-	// "close window" filtered on this tag, which no trigger of the suite produces and no operation of the set
-	// adds, so the condition cannot hold and the window is left alone however often its script matches - see
-	// buildWindowNonePatternNoopOperation().
+	// A rule of a pattern match window may not be without an operation at the pattern matched execution point,
+	// so the flavours of that window type that are driven by their own execution point instead of by a match are
+	// given one that cannot be performed - a "close window" filtered on this tag, which no trigger of the suite
+	// produces and no operation of any rule adds, so the condition can never hold however often the script of a
+	// window matches. See buildPatternMatchedNoopOperation() for the operation and upsertCepRule() for the rules
+	// that are given it.
 	const CEP_TAG_PATTERN_NOOP = 'pattern_noop';
 	// The event pattern match flavour (see prepareDataCepWindowPattern()) is driven by a script instead: the
 	// window runs it over its events once a second and, when it reports a match, the operations of the rule
@@ -2354,8 +2351,8 @@ class testTriggerCEP extends CIntegrationTest {
 		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
 			// A pattern window is not allowed without a script. This one reports a match every time the
 			// window is examined, which changes nothing at all: the only operation these rules have at that
-			// execution point is the one addWindowNonePatternNoopOperation() appends, conditioned on a tag no
-			// event of the scenario carries and therefore never run.
+			// execution point is the one upsertCepRule() gives them, conditioned on a tag no event of the
+			// scenario carries and therefore never performed (see addPatternMatchedNoopOperation()).
 			$window['script'] = "return 'true';";
 		}
 
@@ -2367,10 +2364,8 @@ class testTriggerCEP extends CIntegrationTest {
 			$evaltype = isset($rule[2]) ? $rule[2] : CONDITION_EVAL_TYPE_AND;
 			$formula = isset($rule[3]) ? $rule[3] : '';
 
-			$this->upsertCepRule(self::addWindowNonePatternNoopOperation(
-				$this->buildWindowNoneAddTagCepRuleParams($prefix.$tag, $conditions, $tag, $operand,
-					$evaltype, $formula, $window_type, $window
-				)
+			$this->upsertCepRule($this->buildWindowNoneAddTagCepRuleParams($prefix.$tag, $conditions, $tag,
+				$operand, $evaltype, $formula, $window_type, $window
 			));
 		}
 
@@ -2382,10 +2377,8 @@ class testTriggerCEP extends CIntegrationTest {
 		// the tag resolver of the server knows: the flavours of this scenario are the ones putting every macro
 		// form through the operations, on the tag side as well as in the name (see
 		// getWindowNoneTagSmokeOperations()).
-		$this->upsertCepRule(self::addWindowNonePatternNoopOperation(
-			$this->buildWindowNoneCepRuleParams($prefix.'tag operations', [],
-				$this->getWindowNoneTagOperations(true), CONDITION_EVAL_TYPE_AND, '', $window_type, $window
-			)
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($prefix.'tag operations', [],
+			$this->getWindowNoneTagOperations(true), CONDITION_EVAL_TYPE_AND, '', $window_type, $window
 		));
 
 		// This one changes the event name and severity, which the rules above have conditions on, so it must
@@ -2394,11 +2387,9 @@ class testTriggerCEP extends CIntegrationTest {
 		// ones that ask for them, and waitForCepWindowNoneTaggedEvents() is told the same when their events are
 		// read back (see getWindowNoneEventOperationCase()).
 		$event_operations = $this->getWindowNoneEventOperationCase(true)['operations'];
-		$this->upsertCepRule(['sortorder' => 1] + self::addWindowNonePatternNoopOperation(
-			$this->buildWindowNoneCepRuleParams($prefix.'event operations', [],
-				$this->buildWindowNoneOperations($event_operations), CONDITION_EVAL_TYPE_AND, '', $window_type,
-				$window
-			)
+		$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams($prefix.'event operations',
+			[], $this->buildWindowNoneOperations($event_operations), CONDITION_EVAL_TYPE_AND, '', $window_type,
+			$window
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -2438,7 +2429,7 @@ class testTriggerCEP extends CIntegrationTest {
 			// no match however many events it is handed leaves the step to act alone. The rule does have an
 			// operation at the pattern matched execution point all the same, and this script is what keeps it
 			// from ever running - so what the flavour holds the server to is that an operation of a point the
-			// window never reaches stays unperformed, see addWindowNonePatternNoopOperation().
+			// window never reaches stays unperformed, see addPatternMatchedNoopOperation().
 			$window['script'] = "return 'false';";
 		}
 
@@ -4923,8 +4914,15 @@ HEREDOC;
 	 * a run that never reached its teardown - an aborted test, a killed server - harmless: the rule the
 	 * scenario needs is brought to the parameters it asks for instead of the create failing on the duplicate
 	 * name.
+	 *
+	 * A rule of a pattern match window is additionally given the operation that does nothing at the pattern
+	 * matched execution point unless it has one there of its own: a rule of that window type may not be without
+	 * one, and most flavours of that type are driven by their window and not by a match, see
+	 * addPatternMatchedNoopOperation().
 	 */
 	private function upsertCepRule(array $rule_params): string {
+		$rule_params = self::addPatternMatchedNoopOperation($rule_params);
+
 		$existing = $this->call('ceprule.get',
 			['filter' => ['name' => $rule_params['name']], 'output' => ['cep_ruleid']]
 		);
@@ -6289,25 +6287,26 @@ HEREDOC;
 	}
 
 	/**
-	 * The operation the pattern match flavours of the operation scenario append to every rule they create - the
-	 * whole rule set at once (prepareDataCepWindowNoneTagOperations()) and the one rule of the stepped flavour
-	 * (prepareDataCepWindowOperationSteps()) alike: a "close window" at the pattern matched execution point.
+	 * The operation a pattern match window rule is given when the flavour it belongs to has nothing to do on a
+	 * match: a "close window" at the pattern matched execution point that can never be performed.
 	 *
-	 * An operation that does nothing is what those flavours need there. Their point is that a window examined once
-	 * a second leaves the events alone, so nothing may act on them - but with no operation at that execution point
-	 * at all the point is never anything more than an empty operation list, and the path from a window examination
-	 * into the operations of a rule is then never taken.
+	 * Such an operation is needed because a rule of that window type may not be without one - the API refuses a
+	 * pattern match rule that has no operation at that execution point at all - and because a flavour that is not
+	 * driven by a match must not be changed by getting one: those flavours are about what their own execution
+	 * point does, so an operation that acts on a match would take their events out of the windows they are being
+	 * observed in.
 	 *
 	 * What keeps the operation from acting differs by flavour, which is what $filtered chooses:
 	 *   - a flavour whose script reports a match (prepareDataCepWindowNoneTagOperations()) reaches the operation on
 	 *     every examination, so the operation itself has to refuse: $filtered gives it a condition on
-	 *     CEP_TAG_PATTERN_NOOP, a tag no event of the scenario carries, which is never satisfied;
+	 *     CEP_TAG_PATTERN_NOOP, a tag no event of the suite carries, which is never satisfied. That is what a rule
+	 *     is given unless its caller says otherwise, being safe whatever the script of the window does;
 	 *   - a flavour whose script reports no match (prepareDataCepWindowOperationSteps()) never reaches it at all,
-	 *     so the operation is left bare and it is the missing match that keeps it unperformed.
+	 *     so the operation may be left bare and it is the missing match that keeps it unperformed.
 	 *
 	 * $sortorder places it after the operations of the rule it is appended to.
 	 */
-	private static function buildWindowNonePatternNoopOperation(int $sortorder, bool $filtered): array {
+	private static function buildPatternMatchedNoopOperation(int $sortorder, bool $filtered): array {
 		$operation = [
 			'sortorder' => $sortorder,
 			'execute_when' => CCepRuleHelper::WHEN_PATTERN_MATCHED,
@@ -6329,17 +6328,35 @@ HEREDOC;
 	}
 
 	/**
-	 * The rule parameters $params with the operation above appended to them, which is done to every rule of the
-	 * operation scenario whose window is a pattern match one and to no other: the pattern matched execution point
-	 * exists for that window type alone (EXECUTE_WHEN_BY_WINDOW_TYPE), so a rule of any other type is handed back
-	 * untouched. $filtered is what the caller says of its script, see above.
+	 * The rule parameters $params with the operation above appended to them, which is done to a rule that needs it
+	 * and to no other:
+	 *   - a rule of any window type but the pattern match one is handed back untouched, that execution point
+	 *     existing for that type alone (EXECUTE_WHEN_BY_WINDOW_TYPE);
+	 *   - so is a rule that already has an operation there, which is what a flavour driven by a match has - the
+	 *     operation of such a flavour is the one the match must perform and nothing may be added beside it.
+	 *
+	 * Every rule of the suite goes through upsertCepRule(), which is where this is applied, so a flavour only has
+	 * to say what it wants performed on a match and needs no operation there when it wants nothing. A flavour that
+	 * wants the bare operation instead of the filtered one (see above) applies this itself, with $filtered false,
+	 * before the rule is upserted - what it appended is then already there and upsertCepRule() adds nothing.
+	 *
+	 * The operation is appended last, after the operations of the flavour itself, so the "close window" of a rule
+	 * that is read back to find the execution point it closes from is still the first of the two
+	 * (getCepRuleCloseWindowExecuteWhen(), which reads the operations in sortorder).
 	 */
-	private static function addWindowNonePatternNoopOperation(array $params, bool $filtered = true): array {
-		if ($params['window_type'] != CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+	private static function addPatternMatchedNoopOperation(array $params, bool $filtered = true): array {
+		if ($params['window_type'] != CCepRuleHelper::WINDOW_PATTERN_MATCH
+				|| in_array(CCepRuleHelper::WHEN_PATTERN_MATCHED,
+					array_column($params['operations'], 'execute_when'))) {
 			return $params;
 		}
 
-		$params['operations'][] = self::buildWindowNonePatternNoopOperation(count($params['operations']),
+		// The place after the last operation of the rule is one past the highest sortorder in it and not the
+		// number of them: a sortorder must be unique within its rule and the flavours do not all number their
+		// operations from zero upwards.
+		$sortorders = array_column($params['operations'], 'sortorder');
+
+		$params['operations'][] = self::buildPatternMatchedNoopOperation($sortorders ? max($sortorders) + 1 : 0,
 			$filtered
 		);
 
@@ -10120,10 +10137,9 @@ HEREDOC;
 	 * The outcome must again be the one the windowless run produces. A pattern window is not exclusive, so
 	 * every rule still processes every event, and the match the script reports has an operation to reach that
 	 * cannot act: every rule of the set carries a "close window" at the pattern matched execution point,
-	 * conditioned on a tag no event of the scenario has (see buildWindowNonePatternNoopOperation()), so a
-	 * match walks into the operations of the rule and comes back out having done nothing. What the flavour
-	 * shows is that having a window, examining it once a second and matching in it leaves the events
-	 * themselves alone.
+	 * conditioned on a tag no event of the scenario has (see buildPatternMatchedNoopOperation()), so a match
+	 * walks into the operations of the rule and comes back out having done nothing. What the flavour shows is
+	 * that having a window, examining it once a second and matching in it leaves the events themselves alone.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPattern$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -10196,7 +10212,7 @@ HEREDOC;
 	 * and the outcome of every step must again be the one the windowless flavour of the scenario produces.
 	 *
 	 * Every step does give its rule a "close window" at the pattern matched execution point all the same (see
-	 * buildWindowNonePatternNoopOperation()), so what this flavour holds the server to is that an operation of an
+	 * buildPatternMatchedNoopOperation()), so what this flavour holds the server to is that an operation of an
 	 * execution point the window never reaches stays unperformed: the point exists in the rule of every step,
 	 * with an operation behind it that needs no condition to be kept from acting, and a window that reports no
 	 * match may not perform it anyway.
@@ -13121,7 +13137,7 @@ HEREDOC;
 		// trigger and closes every problem this scenario left open.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the windowless CEP scenario recovery value');
+		$this->waitForNoOpenProblems($all, 'After the windowless CEP scenario recovery value', false);
 	}
 
 	/**
@@ -13208,10 +13224,10 @@ HEREDOC;
 			// The one rule of the scenario, brought to the operations of this step and to no others: created on
 			// the first step and updated in place on every step after it, see upsertCepRule().
 			// The operations of a step are the ones of its case plus, for a pattern match window, the
-			// operation that may not run: the rule is rewritten on every step, so an operation left out here
-			// would leave the pattern matched execution point of that step empty. It needs no condition -
-			// the script of this flavour reports no match, which is what keeps it unperformed.
-			$this->upsertCepRule(self::addWindowNonePatternNoopOperation(
+			// operation that may not run - appended here rather than left to upsertCepRule() because this
+			// flavour needs no condition on it: the script of its window reports no match, which is what
+			// keeps the operation unperformed, see addPatternMatchedNoopOperation().
+			$this->upsertCepRule(self::addPatternMatchedNoopOperation(
 				$this->buildWindowNoneCepRuleParams($rule_template['name'], [],
 					$this->buildWindowNoneOperations($step['operations']), CONDITION_EVAL_TYPE_AND, '',
 					$rule_template['window_type'], $rule_template['window']
@@ -13384,7 +13400,7 @@ HEREDOC;
 		// closes every problem left open.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the windowed operations recovery value');
+		$this->waitForNoOpenProblems($all, 'After the windowed operations recovery value', false);
 	}
 
 	/**
@@ -13469,7 +13485,7 @@ HEREDOC;
 		// every problem left open.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the window '.$what.' operations recovery value');
+		$this->waitForNoOpenProblems($all, 'After the window '.$what.' operations recovery value', false);
 	}
 
 	/**
@@ -13874,7 +13890,7 @@ HEREDOC;
 		// The problems the rule did not touch recover the usual way.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the discard scenario recovery value');
+		$this->waitForNoOpenProblems($all, 'After the discard scenario recovery value', false);
 	}
 
 	/**
@@ -14893,7 +14909,7 @@ HEREDOC;
 		//    expression is what closes it.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the duration close scenario of "'.$rule_name.'"');
+		$this->waitForNoOpenProblems($all, 'After the duration close scenario of "'.$rule_name.'"', false);
 
 		$error = $this->getCepRuleError($rule_name);
 
@@ -15032,7 +15048,7 @@ HEREDOC;
 		// 5. Nothing of the rule can close them any more, so the trigger expression has to.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the window reset scenario of "'.$rule_name.'"');
+		$this->waitForNoOpenProblems($all, 'After the window reset scenario of "'.$rule_name.'"', false);
 
 		// The rule that was reset is still there and still working - a reset empties a rule, it does not break it.
 		$error = $this->getCepRuleError($rule_name);
@@ -15167,7 +15183,7 @@ HEREDOC;
 		// 5. There is no rule to close any of them, so the trigger expression has to.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the window delete scenario of "'.$rule_name.'"');
+		$this->waitForNoOpenProblems($all, 'After the window delete scenario of "'.$rule_name.'"', false);
 	}
 
 	/**
@@ -15266,7 +15282,7 @@ HEREDOC;
 		//    the window that was being examined when its rule went away has to have let go of the event it held.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the sleeping script delete scenario of "'.$rule_name.'"');
+		$this->waitForNoOpenProblems($all, 'After the sleeping script delete scenario of "'.$rule_name.'"', false);
 	}
 
 	/**
@@ -15392,7 +15408,7 @@ HEREDOC;
 		// Nothing of the rule can reach the four problems left, so the trigger expression has to.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the unresolved limits scenario of "'.$rule_name.'"');
+		$this->waitForNoOpenProblems($all, 'After the unresolved limits scenario of "'.$rule_name.'"', false);
 	}
 
 	/**
@@ -15501,7 +15517,7 @@ HEREDOC;
 		// Nothing of the rule can reach the two problems left, so the trigger expression has to.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the single unresolved limit scenario of "'.$rule_name.'"');
+		$this->waitForNoOpenProblems($all, 'After the single unresolved limit scenario of "'.$rule_name.'"', false);
 	}
 
 	/**
@@ -15915,7 +15931,7 @@ HEREDOC;
 		// Nothing in this flavour closes a problem, so the trigger expression has to.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the event pattern match recovery value');
+		$this->waitForNoOpenProblems($all, 'After the event pattern match recovery value', false);
 	}
 
 	/**
@@ -15966,7 +15982,7 @@ HEREDOC;
 		// Nothing in this scenario closes a problem, so the trigger expression has to.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the tag driven service recovery value');
+		$this->waitForNoOpenProblems($all, 'After the tag driven service recovery value', false);
 	}
 
 	/**
@@ -16045,7 +16061,7 @@ HEREDOC;
 		// Nothing in this scenario closes a problem, so the trigger expression has to.
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the copy scenario recovery value');
+		$this->waitForNoOpenProblems($all, 'After the copy scenario recovery value', false);
 	}// burst
 
 	/**
@@ -16093,7 +16109,7 @@ HEREDOC;
 
 		$send('0');
 		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-		$this->waitForNoOpenProblems($all, 'After the runaway copy scenario recovery value');
+		$this->waitForNoOpenProblems($all, 'After the runaway copy scenario recovery value', false);
 	}
 
 	/**
