@@ -1777,12 +1777,6 @@ class CUserGroup extends CApiService {
 		}
 	}
 
-	/**
-	 * Add the existing rights, tag_filters and userids to $db_usrgrps whether these are affected by the update.
-	 *
-	 * @param array $usrgrps
-	 * @param array $db_usrgrps
-	 */
 	private static function addAffectedObjects(array $usrgrps, array &$db_usrgrps): void {
 		$usrgrpids = ['hostgroup_rights' => [], 'templategroup_rights' => [], 'tag_filters' => [], 'users' => [],
 			'proxies' => [], 'proxy_groups' => []
