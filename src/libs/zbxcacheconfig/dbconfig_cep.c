@@ -129,6 +129,7 @@ static void	cep_operation_clear_args(zbx_cep_operation_t *operation)
  ******************************************************************************/
 static void	cep_operation_clear(zbx_cep_operation_t *operation)
 {
+	zbx_free(operation->formula);
 	cep_operation_clear_args(operation);
 
 	for (int i = 0; i < operation->conditions.values_num; i++)
@@ -450,6 +451,8 @@ static void	cep_rule_copy_operations(zbx_vector_cep_operation_t *dst, const zbx_
 				op->args.remove_tag.tag = zbx_strdup(NULL, op->args.remove_tag.tag);
 				break;
 		}
+
+		op->formula = zbx_strdup(NULL, op->formula);
 
 		cep_operation_copy_conditions(&op->conditions, &src->values[i].conditions);
 	}
@@ -1353,7 +1356,8 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 		operation->execute_when = atoi(row[3]);
 		operation->evaltype = atoi(row[4]);
 		operation->sortorder = atoi(row[11]);
-		zabbix_log(LOG_LEVEL_INFORMATION, "operation->type:%d", operation->type);
+		ZBX_DBROW2STR(operation->formula, row[12]);
+
 		switch (operation->type)
 		{
 			case ZBX_CEP_OP_SET_NAME:
@@ -1396,7 +1400,6 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 			case ZBX_CEP_OP_UNSUPPRESS:
 				break;
 		}
-		zabbix_log(LOG_LEVEL_INFORMATION, "end of operation->type:%d", operation->type);
 	}
 
 	/* remove deleted cep operations */

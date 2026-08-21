@@ -1830,6 +1830,7 @@ typedef struct
 	int				sortorder;
 	zbx_cep_op_args_t		args;
 	zbx_vector_cep_op_condition_t	conditions;
+	char				*formula;
 }
 zbx_cep_operation_t;
 
