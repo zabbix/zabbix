@@ -388,6 +388,15 @@ class testTriggerCEP extends CIntegrationTest {
 	// How long the windows of those flavours stay open. The evicted flavours wait for it to run out before
 	// their operations run, so it is kept short.
 	const CEP_RULE_WINDOW_OPS_DURATION = '3s';
+	// The pattern match flavour of that scenario (testTriggerCEP_CepWindowPattern()) additionally gives every
+	// rule of the set one operation at the pattern matched execution point, which is the only execution point
+	// the other flavours cannot reach at all. Without it a match only ever runs an empty operation list, so
+	// nothing of what a matched pattern does with the operations of a rule is exercised - the conditions of an
+	// operation least of all. The operation is therefore one that must not run: a "close window" filtered on
+	// this tag, which no trigger of the suite produces and no operation of the set adds, so the condition
+	// cannot hold and the window is left alone however often its script matches - see
+	// buildWindowNonePatternNoopOperation().
+	const CEP_TAG_PATTERN_NOOP = 'pattern_noop';
 	// The event pattern match flavour (see prepareDataCepWindowPattern()) is driven by a script instead: the
 	// window runs it over its events once a second and, when it reports a match, the operations of the rule
 	// are applied to the events the window holds. The operations that execution point allows are the two that
@@ -2343,8 +2352,9 @@ class testTriggerCEP extends CIntegrationTest {
 
 		if ($window_type === CCepRuleHelper::WINDOW_PATTERN_MATCH) {
 			// A pattern window is not allowed without a script. This one reports a match every time the
-			// window is examined, which changes nothing at all: none of these rules has an operation at that
-			// execution point, so there is nothing for a match to run.
+			// window is examined, which changes nothing at all: the only operation these rules have at that
+			// execution point is the one addWindowNonePatternNoopOperation() appends, conditioned on a tag no
+			// event of the scenario carries and therefore never run.
 			$window['script'] = "return 'true';";
 		}
 
@@ -2356,8 +2366,10 @@ class testTriggerCEP extends CIntegrationTest {
 			$evaltype = isset($rule[2]) ? $rule[2] : CONDITION_EVAL_TYPE_AND;
 			$formula = isset($rule[3]) ? $rule[3] : '';
 
-			$this->upsertCepRule($this->buildWindowNoneAddTagCepRuleParams($prefix.$tag, $conditions, $tag,
-				$operand, $evaltype, $formula, $window_type, $window
+			$this->upsertCepRule(self::addWindowNonePatternNoopOperation(
+				$this->buildWindowNoneAddTagCepRuleParams($prefix.$tag, $conditions, $tag, $operand,
+					$evaltype, $formula, $window_type, $window
+				)
 			));
 		}
 
@@ -2369,8 +2381,10 @@ class testTriggerCEP extends CIntegrationTest {
 		// the tag resolver of the server knows: the flavours of this scenario are the ones putting every macro
 		// form through the operations, on the tag side as well as in the name (see
 		// getWindowNoneTagSmokeOperations()).
-		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($prefix.'tag operations', [],
-			$this->getWindowNoneTagOperations(true), CONDITION_EVAL_TYPE_AND, '', $window_type, $window
+		$this->upsertCepRule(self::addWindowNonePatternNoopOperation(
+			$this->buildWindowNoneCepRuleParams($prefix.'tag operations', [],
+				$this->getWindowNoneTagOperations(true), CONDITION_EVAL_TYPE_AND, '', $window_type, $window
+			)
 		));
 
 		// This one changes the event name and severity, which the rules above have conditions on, so it must
@@ -2379,9 +2393,11 @@ class testTriggerCEP extends CIntegrationTest {
 		// ones that ask for them, and waitForCepWindowNoneTaggedEvents() is told the same when their events are
 		// read back (see getWindowNoneEventOperationCase()).
 		$event_operations = $this->getWindowNoneEventOperationCase(true)['operations'];
-		$this->upsertCepRule(['sortorder' => 1] + $this->buildWindowNoneCepRuleParams($prefix.'event operations',
-			[], $this->buildWindowNoneOperations($event_operations), CONDITION_EVAL_TYPE_AND, '', $window_type,
-			$window
+		$this->upsertCepRule(['sortorder' => 1] + self::addWindowNonePatternNoopOperation(
+			$this->buildWindowNoneCepRuleParams($prefix.'event operations', [],
+				$this->buildWindowNoneOperations($event_operations), CONDITION_EVAL_TYPE_AND, '', $window_type,
+				$window
+			)
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -6269,6 +6285,53 @@ HEREDOC;
 	}
 
 	/**
+	 * The operation the pattern match flavour of the windowless scenario appends to every rule of the set (see
+	 * prepareDataCepWindowNoneTagOperations()): a "close window" at the pattern matched execution point, filtered
+	 * on CEP_TAG_PATTERN_NOOP - a tag no event of the scenario carries, so the condition is never satisfied and
+	 * the operation never runs.
+	 *
+	 * An operation that does nothing is what that flavour needs there. The point of the flavour is that a window
+	 * examined once a second and matching in it leaves the events alone, so a match may not act on them - but with
+	 * no operation at that execution point at all a match reaches an empty operation list, and the path a matched
+	 * pattern takes into the operations of a rule is then never taken. This gives it an operation to evaluate and
+	 * a condition that cannot hold, so the path is walked for every window the flavour opens and the events keep
+	 * coming out exactly as they do in the windowless run.
+	 *
+	 * $sortorder places it after the operations of the rule it is appended to.
+	 */
+	private static function buildWindowNonePatternNoopOperation(int $sortorder): array {
+		return [
+			'sortorder' => $sortorder,
+			'execute_when' => CCepRuleHelper::WHEN_PATTERN_MATCHED,
+			'type' => CCepRuleHelper::OP_CLOSE_WINDOW,
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [[
+					'type' => CCepRuleHelper::CONDITION_TAG,
+					'operator' => CONDITION_OPERATOR_EQUAL,
+					'tag' => self::CEP_TAG_PATTERN_NOOP
+				]]
+			]
+		];
+	}
+
+	/**
+	 * The rule parameters $params with the operation above appended to them, which is done to every rule of the
+	 * windowless operation scenario whose window is a pattern match one and to no other: the pattern matched
+	 * execution point exists for that window type alone (EXECUTE_WHEN_BY_WINDOW_TYPE), so a rule of any other
+	 * type is handed back untouched.
+	 */
+	private static function addWindowNonePatternNoopOperation(array $params): array {
+		if ($params['window_type'] != CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+			return $params;
+		}
+
+		$params['operations'][] = self::buildWindowNonePatternNoopOperation(count($params['operations']));
+
+		return $params;
+	}
+
+	/**
 	 * The tag state getWindowNoneTagOperationCases() must leave on every problem event of the scenario, as a
 	 * tag => value map in which a null value means the tag must not be on the event at all.
 	 */
@@ -10040,10 +10103,12 @@ HEREDOC;
 	 * rule and a script that reports a match every time a window is examined.
 	 *
 	 * The outcome must again be the one the windowless run produces. A pattern window is not exclusive, so
-	 * every rule still processes every event; the script decides nothing here beyond being run, because none
-	 * of these rules has an operation at the pattern matched execution point - so a match has nothing to
-	 * execute. What the flavour does show is that having a window, examining it once a second and matching in
-	 * it leaves the events themselves alone.
+	 * every rule still processes every event, and the match the script reports has an operation to reach that
+	 * cannot act: every rule of the set carries a "close window" at the pattern matched execution point,
+	 * conditioned on a tag no event of the scenario has (see buildWindowNonePatternNoopOperation()), so a
+	 * match walks into the operations of the rule and comes back out having done nothing. What the flavour
+	 * shows is that having a window, examining it once a second and matching in it leaves the events
+	 * themselves alone.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPattern$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */

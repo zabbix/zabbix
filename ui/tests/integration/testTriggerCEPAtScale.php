@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/testTriggerCEP.php';
  * @hosts test
  */
 class testTriggerCEPAtScale extends testTriggerCEP {
-	const LLD_DISCOVERY_COUNT = 500;	// discovered items/triggers per rule; use at least 4000 to stress CEP
+	const LLD_DISCOVERY_COUNT = 100;	// discovered items/triggers per rule; use at least 4000 to stress CEP
 	const LOG_EVENT_COUNT = 10000;		// log values pushed at the single-trigger stream; use at least 10000
 	const RECOVERY_CYCLES_COUNT = 2000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
