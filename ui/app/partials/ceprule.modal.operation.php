@@ -158,7 +158,7 @@ foreach ($labels as $option => $label) {
 			(new CTable())
 				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
 				->setId('ceprule-operation-filter-table')
-				->setHeader(['', 'Name', 'Type', 'Value', ''])
+				->setHeader(['', _('Name'), _('Type'), _('Value'), ''])
 				->setAttribute('data-field-type', 'set')
 				->setAttribute('data-field-name', 'filter[conditions]')
 				->addItem((new CTag('tfoot', true))->addItem((new CCol([

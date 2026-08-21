@@ -79,7 +79,7 @@ zbx_add_post_js($tags->getPostJS());
 		)
 	)
 
-	->addItem((new CLabel(_('Group by')))->setAsteriskMark()->setId('ceprule-groupby-label'))
+	->addItem((new CLabel(_('Group by'), 'ceprule-window-groupby-opt-group'))->setAsteriskMark()->setId('ceprule-groupby-label'))
 	->addItem(new CFormField((new CList([
 		(new CListItem())
 			->addItem((new CCheckBox('window[group_by_host_group]', CCepRuleHelper::GROUP_BY_YES))
@@ -114,8 +114,8 @@ zbx_add_post_js($tags->getPostJS());
 			($data['window']['event_count_tag'] !== '') ? '1' : '0'
 		))
 			->setId('ceprule-window-counttag-toggle')
-			->addValue('No', '0')
-			->addValue('Yes', '1')
+			->addValue(_('No'), '0')
+			->addValue(_('Yes'), '1')
 			->setModern()
 		)
 		->addItem(new CObject('&nbsp;'))

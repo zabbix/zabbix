@@ -206,7 +206,7 @@ window.ceprule_edit_popup = new class {
 				this.#submit();
 			}
 			else if (class_list.contains('js-delete')) {
-				if (window.confirm(<?= json_encode('Delete complex event processing rule?') ?>)) {
+				if (window.confirm(<?= json_encode(_('Delete complex event processing rule?')) ?>)) {
 					this.#delete();
 				}
 				else {
