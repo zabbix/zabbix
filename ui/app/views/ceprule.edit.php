@@ -180,7 +180,7 @@ $form = (new CForm())
 			->addItem((new CDiv())->setId('ceprule-operations-error-container'))
 		)
 		->addItem([
-			new CLabel(_('Stop processing'), 'stop'),
+			new CLabel(_('Stop after this rule'), 'stop'),
 			new CFormField((new CCheckBox('stop', CCepRuleHelper::EXECUTION_STOP))
 				->setChecked($data['ceprule']['stop'] == CCepRuleHelper::EXECUTION_STOP)
 				->setUncheckedValue(CCepRuleHelper::EXECUTION_CONTINUE)
