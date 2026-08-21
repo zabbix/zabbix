@@ -938,3 +938,94 @@ int	zbx_db_settings_set_value(const char *name, const void *value, int type)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate user permissions for proxy access                        *
+ *                                                                            *
+ * Parameters: user    - [IN] user information                                *
+ *             proxyid - [IN]                                                 *
+ *                                                                            *
+ * Return value:  SUCCEED - access to proxy is allowed                        *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_user_access_to_proxy_check(zbx_user_t *user, zbx_uint64_t proxyid)
+{
+#	define PROXY_MODE_DENY		"0"
+#	define PROXY_MODE_ALLOW		"1"
+#	define PROXY_GROUP_MODE_DENY	"0"
+#	define PROXY_GROUP_MODE_ALLOW	"1"
+
+	int		ret = FAIL;
+	zbx_db_result_t	result;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() user:%s userid:" ZBX_FS_UI64 " proxyid:" ZBX_FS_UI64, __func__,
+			user->username, user->userid, proxyid);
+
+	zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
+
+	if (NULL != (result = zbx_db_select(
+			"select null"
+			" from proxy p"
+			" where p.proxyid=" ZBX_FS_UI64
+				" and ("
+					"("
+						" p.proxy_groupid is null"
+						" and not exists ("
+							" select null"
+							" from usrgrp_proxy ugp"
+							" join users_groups uug on ugp.usrgrpid=uug.usrgrpid"
+							" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
+							" where p.proxyid=ugp.proxyid"
+								" and uug.userid=" ZBX_FS_UI64
+								" and ug.proxy_mode=" PROXY_MODE_DENY
+						")"
+						" and exists ("
+							" select null"
+							" from usrgrp_proxy ugp"
+							" join users_groups uug on ugp.usrgrpid=uug.usrgrpid"
+							" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
+							" where p.proxyid=ugp.proxyid"
+								" and uug.userid=" ZBX_FS_UI64
+								" and ug.proxy_mode=" PROXY_MODE_ALLOW
+							")"
+					") or ("
+						" p.proxy_groupid is not null"
+						" and not exists ("
+							" select null"
+							" from usrgrp_proxy_group ugpg"
+							" join users_groups uug on ugpg.usrgrpid=uug.usrgrpid"
+							" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
+							" where p.proxy_groupid=ugpg.proxy_groupid"
+								" and uug.userid=" ZBX_FS_UI64
+								" and ug.proxy_group_mode=" PROXY_GROUP_MODE_DENY
+						")"
+						" and exists ("
+							" select null"
+							" from usrgrp_proxy_group ugpg"
+							" join users_groups uug ON ugpg.usrgrpid=uug.usrgrpid"
+							" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
+							" where p.proxy_groupid=ugpg.proxy_groupid"
+								" and uug.userid=" ZBX_FS_UI64
+								" and ug.proxy_group_mode=" PROXY_GROUP_MODE_ALLOW
+						")"
+					")"
+				")", proxyid, user->userid, user->userid, user->userid, user->userid)))
+	{
+		if (NULL != zbx_db_fetch(result))
+			ret = SUCCEED;
+	}
+
+	zbx_db_free_result(result);
+	zbx_db_set_log_masked_values(old_queries);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+
+#	undef PROXY_MODE_DENY
+#	undef PROXY_MODE_ALLOW
+#	undef PROXY_GROUP_MODE_DENY
+#	undef PROXY_GROUP_MODE_ALLOW
+}

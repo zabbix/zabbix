@@ -875,5 +875,6 @@ void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_copy(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
 
 int	zbx_db_settings_set_value(const char *name, const void *value, int type);
+int	zbx_db_user_access_to_proxy_check(zbx_user_t *user, zbx_uint64_t proxyid);
 
 #endif

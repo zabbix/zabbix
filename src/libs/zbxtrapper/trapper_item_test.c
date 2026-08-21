@@ -686,6 +686,12 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(proxyid, tmp);
 
+	if (0 != proxyid && 1 != user.userid && FAIL == zbx_db_user_access_to_proxy_check(&user, proxyid))
+	{
+		*error = zbx_strdup(NULL, "Proxy access permission denied.");
+		goto out;
+	}
+
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
 			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
 			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location,
