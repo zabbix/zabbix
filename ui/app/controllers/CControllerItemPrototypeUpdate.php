@@ -488,9 +488,6 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 						],
 						['string', 'required', 'length' => 255, 'not_empty',
 							'when' => ['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
-						],
-						['string', 'in' => [''],
-							'when' => ['operator', 'in' => [CONDITION_OPERATOR_EXISTS]]
 						]
 					]
 				],

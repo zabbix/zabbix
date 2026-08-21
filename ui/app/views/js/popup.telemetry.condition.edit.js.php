@@ -78,14 +78,6 @@ window.telemetry_condition_popup = new class {
 	submit() {
 		const fields = this.#form.getAllValues();
 
-		if (!this.#complex_columns.includes(fields.column)) {
-			fields.attribute_key = '';
-		}
-
-		if (fields.operator == <?= CONDITION_OPERATOR_EXISTS ?>) {
-			fields.value = '';
-		}
-
 		this.#form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {

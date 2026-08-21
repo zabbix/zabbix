@@ -58,15 +58,13 @@ window.telemetry_aggregated_column_popup = new class {
 					return;
 				}
 
-				const func = parseInt(fields.function, 10);
-
 				overlayDialogueDestroy(this.#overlay.dialogueid);
 				this.#dialogue.dispatchEvent(new CustomEvent('telemetry_aggregated_column.submit', {
 					detail: {
 						row_index: fields.row_index,
-						column: func === <?= AGGREGATE_COUNT ?> ? '' : fields.column,
-						function: func,
-						percentile: func === <?= AGGREGATE_PERCENTILE ?> ? fields.percentile : '',
+						column: fields.column,
+						function: fields.function,
+						percentile: fields.percentile,
 						alias: fields.alias
 					}
 				}));
