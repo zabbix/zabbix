@@ -106,7 +106,9 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 						'use' => [CTimePeriodParser::class, ['usermacros' => false, 'lldmacros' => false]],
 						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
 					],
-					'formulaid' => ['string', 'required', 'not_empty']
+					'formulaid' => ['string', 'required', 'not_empty',
+						'when' => ['../evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
+					]
 				]],
 				'formula' => ['db cep_rule.formula', 'required', 'not_empty',
 					'use' => [CConditionFormulaParser::class, []],
