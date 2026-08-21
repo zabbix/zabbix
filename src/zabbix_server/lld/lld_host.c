@@ -3547,6 +3547,7 @@ static void	lld_interface_snmp_prepare_sql(zbx_audit_entry_t *audit_entry, const
 		value_esc = zbx_db_dyn_escape_string(snmp->max_repetitions);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%smax_repetitions='%s'", d, value_esc);
 		zbx_free(value_esc);
+		d = ",";
 
 		zbx_audit_entry_update_string(audit_entry, KEY(max_repetitions), snmp->max_repetitions_orig,
 				snmp->max_repetitions);
@@ -5499,7 +5500,12 @@ static zbx_uint64_t	lld_interface_compare(const zbx_lld_interface_t *ifold, cons
 			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT;
 
 		if (0 != strcmp(ifold->lld_row.snmp->max_repetitions, ifnew->lld_row.snmp->max_repetitions))
-			snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_MAXREPS;
+		{
+			if (0 != zbx_atoi(ifnew->lld_row.snmp->max_repetitions))
+			{
+				snmp_flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_MAXREPS;
+			}
+		}
 	}
 
 	return (snmp_flags << 32) | flags;

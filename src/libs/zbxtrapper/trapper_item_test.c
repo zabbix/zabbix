@@ -508,6 +508,12 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	item.snmp_max_repetitions = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_MAX_REPS, table_interface_snmp,
 			"max_repetitions");
 
+	if (0 == zbx_atoi(item.snmp_max_repetitions))
+	{
+		item.snmp_max_repetitions = zbx_strdup(NULL,
+			zbx_db_get_field(table_interface_snmp, "max_repetitions")->default_value);
+	}
+
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_AUTHPROTOCOL, table_interface_snmp, "authprotocol",
 			&item.snmpv3_authprotocol);
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_PRIVPROTOCOL, table_interface_snmp, "privprotocol",
@@ -625,6 +631,7 @@ out:
 	zbx_free(item.snmpv3_privpassphrase);
 	zbx_free(item.snmpv3_contextname);
 	zbx_free(item.query);
+	zbx_free(item.snmp_max_repetitions);
 	for (int i = 0; i < item.script_params.values_num; i++)
 	{
 		zbx_free(item.script_params.values[i].first);

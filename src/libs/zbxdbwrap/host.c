@@ -6431,7 +6431,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 	unsigned char		db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	static char		*max_repetitions = "10";
+	char			*max_repetitions = "10";
 	int			break_loop = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64, __func__, interfaceid);
