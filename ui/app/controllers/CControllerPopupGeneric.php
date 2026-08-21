@@ -1415,6 +1415,7 @@ class CControllerPopupGeneric extends CController {
 				$options += [
 					'output' => ['hostid', 'name'],
 					'groupids' => $this->groupids ? $this->groupids : null,
+					'selectHostGroups' => ['groupid'],
 					'real_hosts' => $this->hasInput('real_hosts') ? '1' : null,
 					'with_httptests' => $this->hasInput('with_httptests') ? '1' : null,
 					'with_items' => $this->hasInput('with_items') ? true : null,
@@ -1441,6 +1442,29 @@ class CControllerPopupGeneric extends CController {
 				$records = (!$this->group_preselect_required || $this->groupids)
 					? API::Host()->get($options)
 					: [];
+
+				if ($options['editable']) {
+					$hostids = array_column($records, 'hostid');
+
+					if ($hostids) {
+						$groups_rw = API::HostGroup()->get([
+							'output' => [],
+							'hostids' => $hostids,
+							'editable' => true,
+							'preservekeys' => true
+						]);
+
+						foreach ($records as $i => $host) {
+							$host_groupids = array_column($host['hostgroups'], 'groupid');
+
+							foreach ($host_groupids as $groupid) {
+								if (!array_key_exists($groupid, $groups_rw)) {
+									unset($records[$i]);
+								}
+							}
+						}
+					}
+				}
 
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['hostid' => 'id']);
@@ -1539,6 +1563,7 @@ class CControllerPopupGeneric extends CController {
 				$options += [
 					'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
 					'selectHosts' => ['name'],
+					'selectHostGroups' => ['groupid'],
 					'selectDependencies' => ['triggerid', 'expression', 'description'],
 					'expandDescription' => true
 				];
@@ -1563,6 +1588,29 @@ class CControllerPopupGeneric extends CController {
 				}
 				else {
 					$records = [];
+				}
+
+				if ($options['editable']) {
+					$triggerids = array_column($records, 'triggerid');
+
+					if ($triggerids) {
+						$groups_rw = API::HostGroup()->get([
+							'output' => [],
+							'triggerids' => $triggerids,
+							'editable' => true,
+							'preservekeys' => true
+						]);
+
+						foreach ($records as $i => $trigger) {
+							$host_groupids = array_column($trigger['hostgroups'], 'groupid');
+
+							foreach ($host_groupids as $groupid) {
+								if (!array_key_exists($groupid, $groups_rw)) {
+									unset($records[$i]);
+								}
+							}
+						}
+					}
 				}
 
 				CArrayHelper::sort($records, ['description']);

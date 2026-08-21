@@ -140,17 +140,29 @@ class CControllerMaintenanceEdit extends CController {
 			$db_groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'maintenanceids' => $data['maintenanceid'],
-				'editable' => true
+				'editable' => true,
+				'preservekeys' => true
 			]);
 
 			$db_triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description'],
 				'selectHosts' => ['name'],
+				'selectHostGroups' => ['groupid'],
 				'maintenanceids' => $data['maintenanceid'],
 				'editable' => true
 			]);
 
-			foreach ($db_triggers as &$trigger) {
+			foreach ($db_triggers as $i => &$trigger) {
+				$trigger_groupids = array_column($trigger['hostgroups'], 'groupid');
+
+				foreach ($trigger_groupids as $trigger_groupid) {
+					if (!array_key_exists($trigger_groupid, $db_groups)) {
+						unset($db_triggers[$i]);
+
+						continue 2;
+					}
+				};
+
 				$trigger['description'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
 			}
 			unset($trigger);
@@ -247,7 +259,8 @@ class CControllerMaintenanceEdit extends CController {
 				$db_hosts = $hostids
 					? API::Host()->get([
 						'output' => ['hostid', 'name'],
-						'hostids' => $hostids
+						'hostids' => $hostids,
+						'editable' => true,
 					])
 					: [];
 
@@ -276,7 +289,7 @@ class CControllerMaintenanceEdit extends CController {
 						continue;
 					}
 
-					$host_groups[] = $group;
+					$host_groups[$groupid] = $group;
 				}
 
 				CArrayHelper::sort($host_groups, ['name']);
@@ -292,6 +305,14 @@ class CControllerMaintenanceEdit extends CController {
 
 					case 'trigger':
 						foreach ($db_triggers as $trigger) {
+							$trigger_groupids = array_column($trigger['hostgroups'], 'groupid');
+
+							foreach ($trigger_groupids as $groupid) {
+								if (!array_key_exists($groupid, $host_groups)) {
+									continue 2;
+								}
+							}
+
 							$data['triggers_ms'][$trigger['triggerid']] = [
 								'id' => $trigger['triggerid'],
 								'name' => $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description']
