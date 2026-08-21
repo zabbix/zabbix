@@ -402,10 +402,6 @@ class CCepRuleHelper {
 	}
 
 	public static function getOperationLabelString(array $ceprule_operation): string {
-		if ($ceprule_operation['type'] === self::OP_SET_CAUSE) {
-			return _('Set cause');
-		}
-
 		return self::getOperationLabelStrings()[$ceprule_operation['type']];
 	}
 
@@ -536,7 +532,10 @@ class CCepRuleHelper {
 			default => ''
 		};
 
-		$label = CCepRuleHelper::getOperationLabelString(['type' => $operation]);
+		$label = match ($operation) {
+			self::OP_SET_CAUSE => _('Set cause for this event'),
+			default => CCepRuleHelper::getOperationLabelString(['type' => $operation])
+		};
 
 		return $arguments !== '' ? "$label: $arguments." : "$label.";
 	}
