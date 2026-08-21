@@ -421,7 +421,7 @@ class CDRule extends CApiService {
 			$db_duplicate = DBfetch(DBselect(
 				'SELECT name'.
 				' FROM drules'.
-				' WHERE '.dbConditionString('name', array_column($drules, 'name')),
+				' WHERE '.dbConditionString('name', array_column($drule_names_changed, 'name')),
 				1
 			));
 
