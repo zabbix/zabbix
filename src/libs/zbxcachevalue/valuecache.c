@@ -3243,7 +3243,6 @@ void	zbx_vc_flush_stats(void)
 	vc_itemupdates_initialized = 0;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: add newly created items with triggers to value cachel              *

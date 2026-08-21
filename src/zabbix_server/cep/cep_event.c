@@ -18,6 +18,7 @@
 #include "zbx_cep.h"
 #include "zbx_trigger_constants.h"
 #include "zbxcacheconfig.h"
+#include "zbxcachevalue.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
@@ -807,6 +808,8 @@ static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int s
 	zbx_dbconn_pool_release_connection(ctx->dbpool, db);
 
 	zbx_dc_close_user_macros(um_handle);
+
+	zbx_vc_flush_stats();
 }
 
 /******************************************************************************
