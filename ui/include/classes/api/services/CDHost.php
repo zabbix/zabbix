@@ -141,7 +141,7 @@ class CDHost extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$sqlParts['join']['dr'] = ['table' => 'drules', 'using' => 'druleid'];
 			$sqlParts['join']['p'] = ['type' => 'left', 'left_table' => 'dr', 'table' => 'proxy', 'using' => 'proxyid'];
 			$sqlParts['where'][] = '('.

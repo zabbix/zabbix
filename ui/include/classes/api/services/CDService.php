@@ -158,7 +158,7 @@ class CDService extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'dhostid'];
 			$sqlParts['join']['dr'] = ['left_table' => 'dh', 'table' => 'drules', 'using' => 'druleid'];
 			$sqlParts['join']['p'] = ['type' => 'left', 'left_table' => 'dr', 'table' => 'proxy', 'using' => 'proxyid'];
