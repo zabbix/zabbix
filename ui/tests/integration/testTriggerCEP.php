@@ -895,17 +895,16 @@ class testTriggerCEP extends CIntegrationTest {
 		// Disable audit log so the bulk of API operations below do not flood it.
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
 
-		// Disable every pre-existing monitored host so they don't interfere with the suite; this
-		// suite's own hosts are (re-)set to monitored after prepareData() by onBeforeTestSuite().
-		$response = $this->call('host.get', [
-			'filter' => ['status' => HOST_STATUS_MONITORED],
-			'output' => ['hostid']
-		]);
-		foreach ($response['result'] as $h) {
-			$this->call('host.update', [
-				'hostid' => $h['hostid'],
-				'status' => HOST_STATUS_NOT_MONITORED
-			]);
+		// Delete every pre-existing host so none of them interferes with the suite. Disabling them would
+		// leave their items, triggers and problem records in the database, where the CEP cache assertions
+		// (cache.events must drain to zero) would still count them; deleting also clears whatever a
+		// previously failed run of this suite left behind, including its discovered host. This runs before
+		// anything of this suite is created, so nothing of ours is deleted here - the suite's own hosts are
+		// created below and (re-)set to monitored after prepareData() by onBeforeTestSuite().
+		$response = $this->call('host.get', ['output' => ['hostid']]);
+		$hostids = array_column($response['result'], 'hostid');
+		if ($hostids) {
+			$this->call('host.delete', $hostids);
 		}
 
 		// Retrieve template group ID.
@@ -7323,6 +7322,12 @@ HEREDOC;
 	 * @configurationDataProvider configurationProvider
 	 */
 	public function testPrepareTriggerCEP_LLDDiscovery() {
+		// Force both housekeepers before anything else: a previous run of this suite leaves the problem and
+		// event records of its deleted hosts and triggers queued for removal, and those leftovers would be
+		// counted by the scenarios below. Running the housekeepers first drains that queue so every
+		// scenario starts from a clean state.
+		$this->forceHousekeeperExecution();
+
 		// Reload configuration cache before sending discovery data.
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -12883,13 +12888,9 @@ HEREDOC;
 		// Removing the discovered host must delete any remaining resources and resolve every open problem.
 		$this->testTriggerCEP_CleanupDiscoveredHost();
 
-		// Deleting the host queues its triggers' problem/event records for removal; force both the general and
-		// the trigger housekeeper so those records are actually deleted before verifying that nothing remains.
-		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'housekeeper_execute');
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'forced execution of the housekeeper', true, 20, 3);
-		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'trigger_housekeeper_execute');
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'forced execution of the trigger housekeeper',
-				true, 20, 3);
+		// Deleting the host queues its triggers' problem/event records for removal; force both housekeepers
+		// so those records are actually deleted before verifying that nothing remains.
+		$this->forceHousekeeperExecution();
 
 		// The triggers were deleted (by empty LLD and then with the host), so only the problem count can be
 		// checked here: waitForNoOpenProblems() additionally asserts the triggers are still present in OK
@@ -12902,6 +12903,19 @@ HEREDOC;
 		$this->assertCepStatEquals('cache', 'objects', 0);
 		$this->assertCepNoWindows();
 		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'diaginfo=cep');
+	}
+
+	/**
+	 * Force both the general and the trigger housekeeper and wait until the server logs that each of them
+	 * ran. Deleting a host or a trigger only queues its problem/event records for removal, so the records
+	 * are gone only once both housekeepers have executed.
+	 */
+	private function forceHousekeeperExecution(): void {
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'housekeeper_execute');
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'forced execution of the housekeeper', true, 20, 3);
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'trigger_housekeeper_execute');
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'forced execution of the trigger housekeeper',
+				true, 20, 3);
 	}
 
 	/**
