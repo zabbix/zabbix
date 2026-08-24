@@ -303,13 +303,13 @@ class CCepRule extends CApiService {
 
 		if ($op_filters) {
 			$filter_options = [
-				'output' => ['cep_operationid', 'type', 'operator', 'tag', 'tag_value'],
+				'output' => ['cep_operation_conditionid', 'cep_operationid', 'type', 'operator', 'tag', 'tag_value'],
 				'filter' => ['cep_operationid' => array_keys($op_filters)]
 			];
 			$resource = DBselect(DB::makeSql('cep_operation_condition', $filter_options));
 
 			while ($row = DBfetch($resource)) {
-				$op_filters[$row['cep_operationid']]['conditions'][] =
+				$op_filters[$row['cep_operationid']]['conditions'][$row['cep_operation_conditionid']] =
 					array_diff_key($row, array_flip(['cep_operationid', 'cep_operation_conditionid']));
 			}
 
@@ -333,6 +333,8 @@ class CCepRule extends CApiService {
 				if ($op_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 					$op_filter['formula'] = $op_filter['eval_formula'];
 				}
+
+				$op_filter['conditions'] = array_values($op_filter['conditions']);
 			}
 			unset($op_filter);
 		}
