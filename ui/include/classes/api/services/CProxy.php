@@ -1083,7 +1083,7 @@ class CProxy extends CApiService {
 			'hosts' =>					['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'apm' =>					['type' => API_ANY]
+			'apm' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
