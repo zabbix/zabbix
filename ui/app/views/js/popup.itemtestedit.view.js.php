@@ -62,7 +62,7 @@ window.itemtestedit_view_popup = new class {
 
 	#initEvents() {
 		this.#form.findFieldByName('not_supported')?.getField().addEventListener('change', (e) => {
-			const get_value_checked = this.#form.findFieldByName('get_value').getField().checked;
+			const get_value_checked = parseInt(this.#form.findFieldByName('get_value').getValue(), 10) == 1;
 
 			$(this.#form.findFieldByName('value').getField())
 				.multilineInput(get_value_checked || e.target.checked ? 'setReadOnly' : 'unsetReadOnly');
@@ -91,19 +91,7 @@ window.itemtestedit_view_popup = new class {
 	}
 
 	#update() {
-		if (!this.#is_item_testable) {
-			return;
-		}
-
-		const get_value_checked = this.#form.findFieldByName('get_value').getField().checked;
-
-		for (const element of this.#form_element.querySelectorAll('#test_with input')) {
-			element.disabled = !get_value_checked;
-		}
-
-		this.#form_element.querySelector('.js-test-with-proxy').style
-			.display = this.#form.findFieldByName('test_with').getValue() == 0 ? 'none' : '';
-
+		const get_value_checked = parseInt(this.#form.findFieldByName('get_value').getValue(), 10) == 1;
 		const not_supported_field = this.#form.findFieldByName('not_supported');
 
 		if (not_supported_field !== null) {
@@ -114,6 +102,19 @@ window.itemtestedit_view_popup = new class {
 			$(this.#form.findFieldByName('value').getField())
 				.multilineInput(get_value_checked ? 'setReadOnly' : 'unsetReadOnly');
 		}
+
+		if (!this.#is_item_testable) {
+			return;
+		}
+
+		for (const element of this.#form_element.querySelectorAll('#test_with input')) {
+			element.disabled = !get_value_checked;
+		}
+
+		this.#form_element.querySelector('.js-test-with-proxy').style
+			.display = this.#form.findFieldByName('test_with').getValue() == 0 ? 'none' : '';
+
+
 
 		const value_warning = this.#form_element.querySelector('#value_warning');
 		value_warning.style.display = !get_value_checked && value_warning.classList.contains('js-retrieved')
@@ -323,7 +324,7 @@ window.itemtestedit_view_popup = new class {
 	#submit() {
 		this.#removePopupMessages();
 		this.#cleanPreviousTestResults();
-		const fields = this.#getFormFields(this.#form.findFieldByName('get_value')?.getField().checked ? true : false);
+		const fields = this.#getFormFields(parseInt(this.#form.findFieldByName('get_value').getValue(), 10) == 1);
 
 		this.#form.lock();
 		this.#setLoading();

@@ -124,12 +124,15 @@ class testPermissions extends CIntegrationTest {
 		// Delete hosts
 		$response = $this->call('host.get', []);
 
-		$hostids = [];
-		foreach ($response['result'] as $host) {
-			$hostids[] = $host['hostid'];
+		if ($response['result']) {
+			$hostids = [];
+			foreach ($response['result'] as $host) {
+				$hostids[] = $host['hostid'];
+			}
+
+			$this->call('host.delete', $hostids);
 		}
 
-		$this->call('host.delete', $hostids);
 		$response = $this->call('host.get', []);
 		$this->assertCount(0, $response['result']);
 
@@ -702,9 +705,9 @@ class testPermissions extends CIntegrationTest {
 		];
 	}
 
-	private function waitForHost($hostname, $expected_hostgroups = null) {
-		$max_attempts = 5;
-		$sleep_time = 2;
+	private function waitForHost($hostname, $expected_hostgroups = null, $expected_item_key = null) {
+		$max_attempts = 30;
+		$sleep_time = 1;
 
 		$request = [
 			'filter' => [
@@ -721,30 +724,49 @@ class testPermissions extends CIntegrationTest {
 		else
 			$err_msg = 'Failed to autoregister host before timeout';
 
-		for ($i = 0; $i < $max_attempts; $i++) {
-			try {
-				$response = $this->call('host.get', $request);
-				$this->assertCount(1, $response['result'], $err_msg);
-				$autoreg_host = $response['result'][0];
-				$this->assertArrayHasKey('hostid', $autoreg_host,
-						'Failed to get host ID of the autoregistered host');
+		if ($expected_item_key != null) {
+			$err_msg = 'Failed to get item "'.$expected_item_key.'" on autoregistered host before timeout';
+			$request['selectItems'] = ['key_'];
+		}
 
-				if ($expected_hostgroups != null) {
-					$this->assertArrayHasKey('hostgroups', $response['result'][0], $err_msg);
-					$hostgroups = $autoreg_host['hostgroups'];
-					$this->assertCount(count($expected_hostgroups), $hostgroups, $err_msg);
+		$response = $this->callUntilDataIsPresent('host.get', $request, $max_attempts, $sleep_time,
+			function ($r) use ($expected_item_key) {
+				if (count($r['result']) !== 1)
+					return false;
 
-					foreach ($expected_hostgroups as $hostgroup)
-						$this->assertContains($hostgroup, $hostgroups, $err_msg);
+				if ($expected_item_key === null)
+					return true;
+
+				if (!array_key_exists('items', $r['result'][0]))
+					return false;
+
+				foreach ($r['result'][0]['items'] as $item) {
+					if ($item['key_'] === $expected_item_key)
+						return true;
 				}
 
-				break;
-			} catch (Exception $e) {
-				if ($i == $max_attempts - 1)
-					throw $e;
-				else
-					sleep($sleep_time);
-			}
+				return false;
+		});
+
+		$this->assertCount(1, $response['result'], $err_msg);
+
+		$autoreg_host = $response['result'][0];
+		$this->assertArrayHasKey('hostid', $autoreg_host,
+				'Failed to get host ID of the autoregistered host');
+
+		if ($expected_hostgroups != null) {
+			$this->assertArrayHasKey('hostgroups', $response['result'][0], $err_msg);
+
+			$hostgroups = $autoreg_host['hostgroups'];
+			$this->assertCount(count($expected_hostgroups), $hostgroups, $err_msg);
+
+			foreach ($expected_hostgroups as $hostgroup)
+				$this->assertContains($hostgroup, $hostgroups, $err_msg);
+		}
+
+		if ($expected_item_key != null) {
+			$this->assertArrayHasKey('items', $autoreg_host, $err_msg);
+			$this->assertContains($expected_item_key, array_column($autoreg_host['items'], 'key_'), $err_msg);
 		}
 
 		return $autoreg_host['hostid'];
@@ -1025,7 +1047,7 @@ class testPermissions extends CIntegrationTest {
 			['data' => [[self::LLD_MACRO_HP => self::HOST_NAME_01, self::LLD_MACRO_GP => self::HOSTGROUP_NAME_01]]]
 		);
 
-		self::$hostids[self::HP01_HOST_NAME_01] = $this->waitForHost(self::HP01_HOST_NAME_01);
+		self::$hostids[self::HP01_HOST_NAME_01] = $this->waitForHost(self::HP01_HOST_NAME_01, null, self::ITEM_NAME);
 
 		self::$hostgroupids[self::HP01_HOSTGROUP_NAME_01] = $this->getHostGroupId(self::HP01_HOSTGROUP_NAME_01);
 		self::$hostgroupids[self::HP01_HOSTGROUP_NAME_02] = $this->getHostGroupId(self::HP01_HOSTGROUP_NAME_02);
@@ -1145,7 +1167,7 @@ class testPermissions extends CIntegrationTest {
 		foreach ($usergroups as $i => $usergroup)
 			self::$usergroupids[$usergroup['name']] = $usergroupids[$i];
 
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		$hosts = [
 			self::HOST_NAME_12,

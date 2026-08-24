@@ -236,6 +236,26 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Determine which TLS library the server/agent/proxy binaries were built with.
+	 *
+	 * Mirrors the ENCRYPTION handling in build.xml's "with.encryption" property: GNUTLS, NONE, or
+	 * default to OpenSSL. Read directly from the environment, the same way IntegrationTests::suite()
+	 * reads DB/HISTORY_STORAGE to decide which suites to run.
+	 *
+	 * @return string 'gnutls', 'openssl' or 'none'
+	 */
+	protected static function detectTLSLibrary(): string {
+		switch (strtoupper((string) getenv('ENCRYPTION'))) {
+			case 'GNUTLS':
+				return 'gnutls';
+			case 'NONE':
+				return 'none';
+			default:
+				return 'openssl';
+		}
+	}
+
+	/**
 	 * Callback executed before every test case.
 	 *
 	 * @before
@@ -1089,11 +1109,15 @@ class CIntegrationTest extends CAPITest {
 			$component = $this->getActiveComponent();
 		}
 
+		$this->clearLog($component);
+
+		$line = '';
 		$this->reloadConfigurationCache($component, $delayOverride);
 
 		switch ($component) {
 			case self::COMPONENT_SERVER:
 			case self::COMPONENT_PROXY:
+			case self::COMPONENT_PROXY_HANODE1:
 				$line = 'finished forced reloading of the configuration cache';
 				break;
 			default:

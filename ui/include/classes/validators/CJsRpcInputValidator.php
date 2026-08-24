@@ -396,11 +396,9 @@ class CJsRpcInputValidator {
 			case 'template_valuemaps':
 				$rules = ['type' => API_OBJECT, 'fields' => $head_rules['fields'] + [
 					'hostids' => ['type' => API_IDS, 'flags' => API_NORMALIZE | API_REQUIRED],
-					'context' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['host',
-						'template'
-					])],
 
 					// Option is not passed to API.
+					'context' => ['type' => API_STRING_UTF8],
 					'editable' => ['type' => API_INT32]
 				]];
 				break;
