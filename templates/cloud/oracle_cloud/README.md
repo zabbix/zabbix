@@ -308,22 +308,20 @@ Threshold macros could be used with a context to fine tune threshold for differe
 
 ## Overview
 
-This template is designed as a master template that discovers various Oracle Cloud Infrastructure (OCI) services
-and resources, such as:
+This template is designed to monitor Oracle Cloud by HTTP.
+It works without any external scripts and uses the script item.
+Currently, the template supports the discovery of Compute instances, Autonomous Databases, Object Storage, Virtual Cloud Networks (VCNs), Block Volumes, Boot Volumes, and Load Balancers, as well as the collection of OCI cost data.
 
-* OCI Compute;
+## Included Monitoring Templates
 
-* OCI Autonomous Database (serverless);
-
-* OCI Object Storage;
-
-* OCI Virtual Cloud Networks (VCNs);
-
-* OCI Block Volumes;
-
-* OCI Boot Volumes.
-
-* OCI Load Balancers.
+- *Oracle Cloud Autonomous Database by HTTP*
+- *Oracle Cloud Block Volume by HTTP*
+- *Oracle Cloud Boot Volume by HTTP*
+- *Oracle Cloud Compute by HTTP*
+- *Oracle Cloud Costs by HTTP*
+- *Oracle Cloud Load Balancer by HTTP*
+- *Oracle Cloud Networking by HTTP*
+- *Oracle Cloud Object Storage by HTTP*
 
 For communication with OCI, this template utilizes script items which execute HTTP `GET` and `POST` requests.
 `POST` requests are required for OCI Monitoring API as it utilizes Monitoring Query Language (MQL) which uses an
