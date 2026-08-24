@@ -506,7 +506,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	zbx_cep_event_context_t		event_ctx;
 	int				corr_ret;
 
-	cep_event_context_init_with_event(&event_ctx, cep_event_addref(event), db_event, worker->dbpool);
+	cep_event_context_init_with_event(&event_ctx, event, db_event, worker->dbpool);
 
 	/* cep config returns NULL handle if there are no cep rules to process */
 	if (NULL != (hconfig = zbx_cep_config_open()))
@@ -516,7 +516,6 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 			cep_cache_acquire(&cep);
 			cep_origin_pending_event_done(cep, &event->origin);
 			cep_cache_release(&cep);
-			zbx_cep_event_release(event);
 			zbx_vector_mw_task_ptr_clear_ext(tasks, cep_task_free);
 
 			goto out;
@@ -524,7 +523,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	}
 
 	cep_cache_acquire(&cep);
-	h = cep_add_event(cep, event);
+	h = cep_add_event(cep, cep_event_addref(event));
 	event_ctx.hevent = zbx_cep_event_handle_addref(h);
 	cep_cache_release(&cep);
 
