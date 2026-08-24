@@ -115,7 +115,7 @@ class CControllerProxyCreate extends CController {
 			'max_messages_per_second' => ['required', 'integer', 'not_empty', 'min' => 0, 'max' => ZBX_MAX_INT32,
 				'when' => [['data_collection_status', 'in' => [PROXY_APM_STATUS_CONFIGURED]]]
 			],
-			'additional_resource_attributes' => ['objects', 'uniq' => ['key'],
+			'additional_resource_attributes' => ['objects', 'uniq' => ['key', 'signal_type'],
 				'fields' => [
 					'key' => ['required', 'string', 'not_empty'],
 					'value' => ['required', 'string'],
