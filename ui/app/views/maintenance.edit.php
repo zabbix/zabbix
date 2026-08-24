@@ -98,7 +98,7 @@ $event_names_template = (new CTemplateTag('event-names-row-tmpl'))
 				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
 			(new CTextAreaFlexible('event_names[#{rowNum}][value]', '#{value}'))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setMaxlength(DB::getFieldLength('maintenance_tag', 'value'))
+				->setMaxlength(DB::getFieldLength('maintenance_eventname', 'value'))
 				->setAttribute('placeholder',  _('value'))
 				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 				->setErrorContainer('event_names_#{rowNum}_error_container')
