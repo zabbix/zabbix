@@ -72,6 +72,14 @@ class CCepRuleHelper {
 	public const WHEN_WINDOW_CLOSED = 3;
 	public const WHEN_PATTERN_MATCHED = 4;
 
+	public const EXECUTE_WHEN_ORDER = [
+		self::WHEN_EVENT_OCCURRED,
+		self::WHEN_EVENT_ADDED,
+		self::WHEN_EVENT_EVICTED,
+		self::WHEN_WINDOW_CLOSED,
+		self::WHEN_PATTERN_MATCHED
+	];
+
 	public const WINDOW_CONDITION_TAG_PAIR = 0;
 	public const WINDOW_CONDITION_OLD_TAG = 1;
 	public const WINDOW_CONDITION_OLD_TAG_VALUE = 2;

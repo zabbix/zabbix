@@ -646,25 +646,19 @@ class CCepRule extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
+			$cep_rule_path = '/'.($i1 + 1);
+
 			foreach ($cep_rule['operations'] as $i2 => $operation) {
 				$api_input_rules = self::getOperationValidationRules($operation);
-				$path = '/'.($i1 + 1).'/operations/'.($i2 + 1);
+				$path = $cep_rule_path.'/operations/'.($i2 + 1);
 
 				if (!CApiInputValidator::validate($api_input_rules, $operation, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
 
-			if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_PATTERN_MATCH) {
-				$execute_whens = array_column($cep_rule['operations'], 'execute_when');
-
-				if (!in_array(CCepRuleHelper::WHEN_PATTERN_MATCHED, $execute_whens)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i1 + 1).'/operations',
-						_('at least one operation must execute when event pattern matched')
-					));
-				}
-			}
+			self::checkPatternMatchOperations($cep_rule, $cep_rule_path);
+			self::checkOperationOrder($cep_rule, $cep_rule_path);
 		}
 		unset($cep_rule);
 	}
@@ -757,6 +751,37 @@ class CCepRule extends CApiService {
 								['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation_condition', 'tag_value')]
 			]]
 		];
+	}
+
+	private static function checkPatternMatchOperations(array $cep_rule, string $cep_rule_path): void {
+		if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+			$execute_whens = array_column($cep_rule['operations'], 'execute_when', 'execute_when');
+
+			if (!array_key_exists(CCepRuleHelper::WHEN_PATTERN_MATCHED, $execute_whens)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					$cep_rule_path.'/operations', _('at least one operation must execute when event pattern matched')
+				));
+			}
+		}
+	}
+
+	private static function checkOperationOrder(array $cep_rule, string $cep_rule_path): void {
+		$order = array_flip(CCepRuleHelper::EXECUTE_WHEN_ORDER);
+
+		CArrayHelper::sort($cep_rule['operations'], ['field' => 'sortorder', 'order' => ZBX_SORT_UP]);
+		$prev_i = null;
+
+		foreach ($cep_rule['operations'] as $i => $operation) {
+			if ($prev_i !== null
+					&& $order[$operation['execute_when']] < $order[$cep_rule['operations'][$prev_i]['execute_when']]) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					$cep_rule_path.'/operations/'.($i + 1).'/sortorder',
+					_('operations must be grouped by "execute_when" in ascending order')
+				));
+			}
+
+			$prev_i = $i;
+		}
 	}
 
 	private static function checkDuplicates(array $cep_rules, ?array $db_cep_rules = null): void {
