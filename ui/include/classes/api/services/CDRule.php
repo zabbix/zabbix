@@ -676,17 +676,10 @@ class CDRule extends CApiService {
 			}
 
 			if (!self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)) {
-				if ($proxyid == 0) {
+				if ($proxyid == 0 || $db_drules !== null && $db_drules[$drule['druleid']]['proxyid'] == 0) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/proxyid',
-						_('you do not have permission to select server for monitoring and discovery')
-					));
-				}
-
-				if ($db_drules !== null && $db_drules[$drule['druleid']]['proxyid'] == 0) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i + 1).'/proxyid',
-						_('parameter is readonly while you do not have permission to select server for monitoring and discovery')
+						_('you do not have permission to select Server for monitoring and discovery')
 					));
 				}
 			}

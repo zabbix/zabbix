@@ -2107,17 +2107,11 @@ class CHost extends CHostGeneral {
 				continue;
 			}
 
-			if ($host['monitored_by'] == ZBX_MONITORED_BY_SERVER) {
+			if ($host['monitored_by'] == ZBX_MONITORED_BY_SERVER
+					|| $db_hosts !== null && $db_hosts[$host['hostid']]['monitored_by'] == ZBX_MONITORED_BY_SERVER) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i + 1).'/monitored_by',
-					_('you do not have permission to select server for monitoring and discovery')
-				));
-			}
-
-			if ($db_hosts !== null && $db_hosts[$host['hostid']]['monitored_by'] == ZBX_MONITORED_BY_SERVER) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-					'/'.($i + 1).'/monitored_by',
-					_('parameter is readonly while you do not have permission to select server for monitoring and discovery')
+					_('you do not have permission to select Server for monitoring and discovery')
 				));
 			}
 		}
@@ -2183,7 +2177,7 @@ class CHost extends CHostGeneral {
 					: '/'.($i + 1).'/proxyid';
 
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.', $path,
-					_('parameter is readonly while you do not have permission to current proxy')
+					_('you do not have permission to current proxy')
 				));
 			}
 
@@ -2194,7 +2188,7 @@ class CHost extends CHostGeneral {
 					: '/'.($i + 1).'/proxy_groupid';
 
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.', $path,
-					_('parameter is readonly while you do not have permission to current proxy group')
+					_('you do not have permission to current proxy group')
 				));
 			}
 		}
