@@ -62,7 +62,6 @@ $apm_tab = (new CFormGrid())
 		(new CFormField(
 			(new CRadioButtonList('authentication_type', (int) $data['values']['authentication_type']))
 				->addValue(_('Username and password'), APM_GLOBAL_DB_AUTHTYPE_PASSWORD)
-				->addValue(_('Vault path'), APM_GLOBAL_DB_AUTHTYPE_VAULT)
 				->addValue(_('None'), APM_GLOBAL_DB_AUTHTYPE_NONE)
 				->setModern()
 		))->addClass('js-auth-type')
@@ -88,15 +87,6 @@ $apm_tab = (new CFormGrid())
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->addClass('js-change-password')
 		]))->addClass('js-password')
-	])
-	->addItem([
-		(new CLabel(_('Vault path'), 'vault_path'))
-			->setAsteriskMark()
-			->addClass('js-vault-path'),
-		(new CFormField(
-			(new CTextBox('vault_path', $data['values']['vault_path']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		))->addClass('js-vault-path')
 	])
 	->addItem([
 		(new CLabel(_('Database'), 'db'))

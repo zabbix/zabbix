@@ -138,7 +138,6 @@ const view = new class {
 
 		const show_fields = values.status === APM_GLOBAL_DB_STATUS_CONFIGURED;
 		const show_user_fields = show_fields && values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
-		const show_vault_path = show_fields && values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_VAULT;
 		const show_ssl_fields = show_fields && values.url.substring(0, 8) === 'https://';
 		const show_ssl_verify_peer_fields = show_ssl_fields
 			&& values.ssl_verify_peer === APM_GLOBAL_DB_VERIFY_PEER_ENABLED;
@@ -154,10 +153,6 @@ const view = new class {
 			...document.querySelectorAll('.js-username'),
 			...document.querySelectorAll('.js-password')
 		], show_user_fields, true);
-
-		this.#updateDisplayState([
-			...document.querySelectorAll('.js-vault-path')
-		], show_vault_path, true);
 
 		this.#updateDisplayState([
 			...document.querySelectorAll('.js-ssl-verify-peer'),

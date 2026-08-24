@@ -24,24 +24,21 @@ class CControllerApmDbUpdate extends CController {
 	public static function getValidationRules(): array {
 		$status_configured = ['status', 'in' => [APM_GLOBAL_DB_STATUS_CONFIGURED]];
 		$auth_type_password = ['authentication_type', 'in' => [APM_GLOBAL_DB_AUTHTYPE_PASSWORD]];
-		$auth_type_vault_path = ['authentication_type', 'in' => [APM_GLOBAL_DB_AUTHTYPE_VAULT]];
 		$verify_certificate = ['ssl_verify_peer', 'in' => [APM_GLOBAL_DB_VERIFY_PEER_ENABLED]];
 		$url_scheme_https = ['url', 'regex' => '/^https\:\/\//'];
 
 		return ['object', 'fields' => [
-			'status' => ['boolean', 'required', 'in' => [APM_GLOBAL_DB_STATUS_NOT_CONFIGURED,
-				APM_GLOBAL_DB_STATUS_CONFIGURED]],
+			'status' => ['boolean', 'required',
+				'in' => [APM_GLOBAL_DB_STATUS_NOT_CONFIGURED, APM_GLOBAL_DB_STATUS_CONFIGURED]],
 			'url' => ['string', 'required', 'not_empty', 'length' => 2048, 'when' => [$status_configured],
 				'use' => [CUrlValidator::class, ['schemes' => ['http', 'https']]]],
 			'authentication_type' => ['integer', 'required',
-				'in' => [APM_GLOBAL_DB_AUTHTYPE_PASSWORD, APM_GLOBAL_DB_AUTHTYPE_VAULT, APM_GLOBAL_DB_AUTHTYPE_NONE],
+				'in' => [APM_GLOBAL_DB_AUTHTYPE_PASSWORD, APM_GLOBAL_DB_AUTHTYPE_NONE],
 				'when' => [$status_configured]
 			],
 			'username' => ['string', 'required', 'not_empty', 'length' => 255,
 				'when' => [$status_configured, $auth_type_password]],
 			'password' => ['string', 'required', 'length' => 255, 'when' => [$status_configured, $auth_type_password]],
-			'vault_path' => ['string', 'required', 'not_empty', 'length' => 255,
-				'when' => [$status_configured, $auth_type_vault_path]],
 			'db' => ['string', 'required', 'length' => 255, 'when' => $status_configured],
 			'ssl_verify_peer' => ['integer', 'required', 'when' => [$status_configured, $url_scheme_https]],
 			'ssl_ca_location' => ['string', 'required', 'length' => 2048,
@@ -50,8 +47,12 @@ class CControllerApmDbUpdate extends CController {
 			'ssl_verify_host' => ['integer', 'required',
 				'when' => [$status_configured, $url_scheme_https, $verify_certificate]
 			],
-			'ssl_cert_file' => ['string', 'required', 'length' => 2048, 'when' => [$status_configured, $url_scheme_https]],
-			'ssl_key_file' => ['string', 'required', 'length' => 2048, 'when' => [$status_configured, $url_scheme_https]],
+			'ssl_cert_file' => ['string', 'required', 'length' => 2048,
+				'when' => [$status_configured, $url_scheme_https]
+			],
+			'ssl_key_file' => ['string', 'required', 'length' => 2048,
+				'when' => [$status_configured, $url_scheme_https]
+			],
 			'ssl_key_password' => [
 				['string', 'length' => 255],
 				['string', 'length' => 255, 'in' => [''],
