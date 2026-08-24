@@ -889,8 +889,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 					'name' => 'Clone_5 of Host prototype {#1}',
 					'group_prototype' => 'Clone group prototype {#MACRO}'
 				]
-			]
-			,
+			],
 			[
 				[
 					'name' => 'Clone_6 of Host prototype {#1}',
@@ -936,7 +935,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Change host group.
 		if (array_key_exists('hostgroup', $data)) {
 			$this->zbxTestClickXpathWait('//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
-			$dialog->asForm()->getField('Host groups')->asMultiselect()->select($data['hostgroup']);
+			$form->fill(['Host groups' => $data['hostgroup']]);
 		}
 		// Change host group prototype.
 		if (array_key_exists('group_prototype', $data)) {
@@ -1048,8 +1047,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$table->waitUntilReloaded();
 		$table->findRow('Name', $host)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 
-		$this->zbxTestClickLinkTextWait($discovery_rule);
-		$this->zbxTestClickLinkTextWait('Host prototypes');
+		$this->query('tag:table')->waitUntilPresent()->asTable()->one()->findRow('Name', $discovery_rule)
+				->query('link:Host prototypes')->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
 
 		COverlayDialogElement::find()->waitUntilReady()->one();

@@ -349,7 +349,7 @@ class testGeneric extends CWebTest {
 			],
 			[
 				[
-					'url' => 'host_discovery.php?context=template',
+					'url' => 'zabbix.php?action=lldrule.list&context=template',
 					'title' => 'Configuration of discovery rules',
 					'header' => 'Discovery rules'
 				]
@@ -377,7 +377,7 @@ class testGeneric extends CWebTest {
 			],
 			[
 				[
-					'url' => 'host_discovery.php?context=host',
+					'url' => 'zabbix.php?action=lldrule.list&context=host',
 					'title' => 'Configuration of discovery rules',
 					'header' => 'Discovery rules'
 				]

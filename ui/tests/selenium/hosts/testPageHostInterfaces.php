@@ -439,7 +439,7 @@ class testPageHostInterfaces extends CWebTest {
 	 */
 	public function testPageHostInterfaces_DiscoveryPage($data) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host ='.zbx_dbstr($data['host']));
-		$link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$id.'&context=host';
+		$link = 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.$id.'&context=host';
 		$this->checkInterfaces($data, $link, $selector = null, true);
 	}
 

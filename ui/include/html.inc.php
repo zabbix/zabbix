@@ -507,7 +507,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 		// discovery rules
 		$lld_rules = new CSpan([
-			new CLink(_('Discovery rules'), (new CUrl('host_discovery.php'))
+			new CLink(_('Discovery rules'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'lldrule.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$db_host['hostid']])
 				->setArgument('context', $context)
@@ -539,13 +540,15 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			new CLink(
 				$db_discovery_rule['name'],
 				$db_lld_prototype_parents
-					? (new CUrl('host_discovery_prototypes.php'))
-						->setArgument('form', 'update')
+					? (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.prototype.edit')
 						->setArgument('itemid', $db_discovery_rule['itemid'])
 						->setArgument('parent_discoveryid', $discovery_parent['itemid'])
 						->setArgument('context', $context)
-					: (new CUrl('host_discovery.php'))
-						->setArgument('form', 'update')
+					: (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.edit')
 						->setArgument('itemid', $db_discovery_rule['itemid'])
 						->setArgument('context', $context)
 			)
@@ -557,7 +560,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			$parents_breadcrumbs_data = [];
 
 			foreach ($db_lld_prototype_parents as $parent) {
-				$parent_url = (new CUrl('host_discovery_prototypes.php'))
+				$parent_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.prototype.list')
 					->setArgument('parent_discoveryid', $parent['itemid'])
 					->setArgument('context', $context)
 					->getUrl();
@@ -578,7 +582,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 		$list->addItem(new CBreadcrumbs([
 			(new CSpan())->addItem(new CLink(_('Discovery list'),
-				(new CUrl('host_discovery.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
@@ -652,7 +657,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// Discovery prototypes
 		$item_prototypes = new CSpan([
 			new CLink(_('Discovery prototypes'),
-				(new CUrl('host_discovery_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.prototype.list')
 					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
 					->setArgument('context', $context)
 			),
