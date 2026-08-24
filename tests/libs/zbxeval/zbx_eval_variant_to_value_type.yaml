@@ -74,7 +74,7 @@ out:
   return: "{\"name\":\"John\"}"
   ret: SUCCEED
 ---
-test case: 8. JSON empty string converted fine to JSON, there is no JSON validation in variant convert
+test case: 8. JSON empty string fails to convert to JSON, there is JSON validation in variant convert
 in:
   value:
     type: ZBX_VARIANT_STR
@@ -84,7 +84,7 @@ out:
   return: "unexpected end of object value"
   ret: FAIL
 ---
-test case: 9. invalid JSON string converted fine to JSON, as there is no JSON validation in variant convert
+test case: 9. invalid JSON string fails to convert to JSON, there is JSON validation in variant convert
 in:
   value:
     type: ZBX_VARIANT_STR
