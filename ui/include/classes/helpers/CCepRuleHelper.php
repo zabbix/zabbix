@@ -370,7 +370,7 @@ class CCepRuleHelper {
 
 	public static function getOperationExecuteWhenStrings(): array {
 		return [
-			self::WHEN_EVENT_OCCURRED => _('Event occured'),
+			self::WHEN_EVENT_OCCURRED => _('Event occurred'),
 			self::WHEN_EVENT_EVICTED => _('Event evicted'),
 			self::WHEN_WINDOW_CLOSED => _('Window closed'),
 			self::WHEN_PATTERN_MATCHED => _('Event pattern matched'),
