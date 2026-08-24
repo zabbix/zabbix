@@ -79,7 +79,7 @@ class testVfsDevGet extends CIntegrationTest {
 				],
 				'groups' => [
 					[
-						'groupid' => 4
+						'groupid' => 4 // Zabbix servers
 					]
 				],
 				'status' => HOST_STATUS_NOT_MONITORED
