@@ -171,7 +171,7 @@ zbx_mw_task_t	*cep_create_task_acknowledge(zbx_cep_acknowledge_t *ack, zbx_uint6
 zbx_mw_task_t	*cep_create_task_rule_error(zbx_uint64_t ruleid, char *error);
 zbx_mw_task_t	*cep_create_task_rule_reset(zbx_uint64_t ruleid);
 
-void	cep_task_free(zbx_mw_task_t *mw_task);
+void	cep_task_free(zbx_mw_task_t *task);
 
 #endif
 

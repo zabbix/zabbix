@@ -21,16 +21,7 @@
 #include "zbxdbwrap.h"
 #include "zbxjson.h"
 
-static void	cep_task_request_remote_free(void *mw_task);
-static void	cep_task_event_free(void *mw_task);
-static void	cep_task_event_commit_free(void *mw_task);
-static void	cep_task_add_tags_free(void *mw_task);
-static void	cep_task_sync_event_free(void *mw_task);
-static void	cep_task_window_free(void *mw_task);
-static void	cep_task_window_sync_free(void *mw_task);
-static void	cep_task_acknowledge_free(void *mw_task);
-static void	cep_task_rule_error_free(void *mw_task);
-static void	cep_task_rule_reset_free(void *mw_task);
+static void	cep_task_free_impl(void *mw_task);
 
 static void	cep_task_init(zbx_cep_task_t *task)
 {
@@ -60,7 +51,7 @@ zbx_mw_task_t	*cep_create_task_remote(zbx_ipc_client_t *client, zbx_ipc_message_
 {
 	zbx_cep_task_remote_t	*task;
 
-	task = (zbx_cep_task_remote_t *)zbx_mw_task_create(CEP_TASK_REMOTE, cep_task_request_remote_free,
+	task = (zbx_cep_task_remote_t *)zbx_mw_task_create(CEP_TASK_REMOTE, cep_task_free_impl,
 			sizeof(zbx_cep_task_remote_t));
 
 	cep_task_init(&task->base);
@@ -100,7 +91,7 @@ zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event)
 {
 	zbx_cep_task_event_t	*task;
 
-	task = (zbx_cep_task_event_t *)zbx_mw_task_create(CEP_TASK_EVENT, cep_task_event_free,
+	task = (zbx_cep_task_event_t *)zbx_mw_task_create(CEP_TASK_EVENT, cep_task_free_impl,
 			sizeof(zbx_cep_task_event_t));
 	cep_task_init(&task->base);
 
@@ -178,8 +169,6 @@ zbx_mw_task_t	*cep_create_task_event_by_correlation(zbx_db_event *event, zbx_uin
 {
 	zbx_mw_task_t		*task = cep_create_task_event(event);
 	zbx_cep_task_event_t	*event_task = (zbx_cep_task_event_t *)task;
-
-	cep_task_init(&event_task->base);
 
 	event_task->target_eventid = eventid;
 	event_task->creator.correlationid = correlationid;
@@ -267,7 +256,7 @@ zbx_mw_task_t	*cep_create_task_commit(zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_task_commit_t	*task;
 
-	task = (zbx_cep_task_commit_t *)zbx_mw_task_create(CEP_TASK_COMMIT, cep_task_event_commit_free,
+	task = (zbx_cep_task_commit_t *)zbx_mw_task_create(CEP_TASK_COMMIT, cep_task_free_impl,
 			sizeof(zbx_cep_task_commit_t));
 	cep_task_init(&task->base);
 
@@ -308,7 +297,7 @@ zbx_mw_task_t	*cep_create_task_add_tags(zbx_vector_event_tags_t *event_tags, zbx
 {
 	zbx_cep_task_add_tags_t	*task;
 
-	task = (zbx_cep_task_add_tags_t *)zbx_mw_task_create(CEP_TASK_ADD_TAGS, cep_task_add_tags_free,
+	task = (zbx_cep_task_add_tags_t *)zbx_mw_task_create(CEP_TASK_ADD_TAGS, cep_task_free_impl,
 			sizeof(zbx_cep_task_add_tags_t));
 	cep_task_init(&task->base);
 
@@ -371,8 +360,9 @@ zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t hevent, zbx_uin
 {
 	zbx_cep_task_sync_event_t	*task;
 
-	task = (zbx_cep_task_sync_event_t *)zbx_mw_task_create(CEP_TASK_SYNC_EVENT, cep_task_sync_event_free,
+	task = (zbx_cep_task_sync_event_t *)zbx_mw_task_create(CEP_TASK_SYNC_EVENT, cep_task_free_impl,
 			sizeof(zbx_cep_task_sync_event_t));
+	cep_task_init(&task->base);
 
 	task->hevent = zbx_cep_event_handle_addref(hevent);
 	task->flags = flags;
@@ -406,8 +396,9 @@ zbx_mw_task_t	*cep_create_task_window(zbx_cep_window_t *window, time_t now)
 {
 	zbx_cep_task_window_t	*task;
 
-	task = (zbx_cep_task_window_t *)zbx_mw_task_create(CEP_TASK_WINDOW, cep_task_window_free,
+	task = (zbx_cep_task_window_t *)zbx_mw_task_create(CEP_TASK_WINDOW, cep_task_free_impl,
 			sizeof(zbx_cep_task_window_t));
+	cep_task_init(&task->base);
 
 	task->window = window;
 	task->now = now;
@@ -441,8 +432,9 @@ zbx_mw_task_t	*cep_create_task_window_sync(zbx_cep_window_t *window)
 {
 	zbx_cep_task_window_sync_t	*task;
 
-	task = (zbx_cep_task_window_sync_t *)zbx_mw_task_create(CEP_TASK_WINDOW_SYNC, cep_task_window_sync_free,
+	task = (zbx_cep_task_window_sync_t *)zbx_mw_task_create(CEP_TASK_WINDOW_SYNC, cep_task_free_impl,
 			sizeof(zbx_cep_task_window_sync_t));
+	cep_task_init(&task->base);
 
 	task->window = window;
 
@@ -477,8 +469,9 @@ zbx_mw_task_t	*cep_create_task_acknowledge(zbx_cep_acknowledge_t *ack, zbx_uint6
 {
 	zbx_cep_task_acknowledge_t	*task;
 
-	task = (zbx_cep_task_acknowledge_t *)zbx_mw_task_create(CEP_TASK_ACKNOWLEDGE, cep_task_acknowledge_free,
+	task = (zbx_cep_task_acknowledge_t *)zbx_mw_task_create(CEP_TASK_ACKNOWLEDGE, cep_task_free_impl,
 			sizeof(zbx_cep_task_acknowledge_t));
+	cep_task_init(&task->base);
 
 	task->ruleid = ruleid;
 	task->eventid = eventid;
@@ -516,8 +509,9 @@ zbx_mw_task_t	*cep_create_task_rule_error(zbx_uint64_t ruleid, char *error)
 {
 	zbx_cep_task_rule_error_t	*task;
 
-	task = (zbx_cep_task_rule_error_t *)zbx_mw_task_create(CEP_TASK_RULE_ERROR, cep_task_rule_error_free,
+	task = (zbx_cep_task_rule_error_t *)zbx_mw_task_create(CEP_TASK_RULE_ERROR, cep_task_free_impl,
 			sizeof(zbx_cep_task_rule_error_t));
+	cep_task_init(&task->base);
 
 	task->ruleid = ruleid;
 	task->error = error;
@@ -551,8 +545,9 @@ zbx_mw_task_t	*cep_create_task_rule_reset(zbx_uint64_t ruleid)
 {
 	zbx_cep_task_rule_reset_t	*task;
 
-	task = (zbx_cep_task_rule_reset_t *)zbx_mw_task_create(CEP_TASK_RULE_RESET, cep_task_rule_reset_free,
+	task = (zbx_cep_task_rule_reset_t *)zbx_mw_task_create(CEP_TASK_RULE_RESET, cep_task_free_impl,
 			sizeof(zbx_cep_task_rule_reset_t));
+	cep_task_init(&task->base);
 
 	task->ruleid = ruleid;
 
@@ -569,12 +564,7 @@ static void	cep_task_rule_reset_free(void *mw_task)
 	zbx_free(mw_task);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: free a task                                                       *
- *                                                                            *
- ******************************************************************************/
-void	cep_task_free(zbx_mw_task_t *mw_task)
+static void	cep_task_free_impl(void *mw_task)
 {
 	zbx_mw_task_t	*task = (zbx_mw_task_t *)mw_task;
 
@@ -616,5 +606,15 @@ void	cep_task_free(zbx_mw_task_t *mw_task)
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown CEP task %d", task->type);
 			break;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free a task                                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_task_free(zbx_mw_task_t *task)
+{
+	cep_task_free_impl((void *)task);
 }
 

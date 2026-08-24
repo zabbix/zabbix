@@ -207,7 +207,6 @@ void	zbx_cep_assess_trigger_events(const zbx_cep_assessment_query_t *queries, in
 	zbx_free(data);
 	if (SUCCEED != ret)
 	{
-		zbx_free(data);
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to CEP service");
 		zbx_exit(EXIT_FAILURE);
 	}
