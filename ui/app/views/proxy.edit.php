@@ -238,14 +238,6 @@ $encryption_tab
 		))->addClass('js-tls-subject')
 	]);
 
-if (!$data['form']['additional_resource_attributes']) {
-	$data['form']['additional_resource_attributes'][] = [
-		'key' => '',
-		'value' => '',
-		'signal_type' => PROXY_APM_ATTR_SIGNAL_TYPE_TRACES
-	];
-}
-
 // APM tab.
 $apm_tab = (new CFormGrid())
 	->addItem(
