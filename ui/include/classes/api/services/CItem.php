@@ -474,7 +474,23 @@ class CItem extends CItemGeneral {
 
 		foreach ($items as &$item) {
 			if (array_key_exists('query', $item) && $item['query']) {
-				$item['query'] = CItemTypeTelemetryQuery::convertFilterExpressionToFormula($item['query']);
+				$query = CItemTypeTelemetryQuery::convertFilterExpressionToFormula($item['query']);
+
+				$query['signal_type'] = (string) $query['signal_type'];
+				$query['metric_point_type'] = (string) $query['metric_point_type'];
+				$query['filter']['evaltype'] = (string) $query['filter']['evaltype'];
+
+				foreach ($query['aggregated_columns'] as &$column) {
+					$column['function'] = (string) $column['function'];
+				}
+				unset($column);
+
+				foreach ($query['filter']['conditions'] as &$condition) {
+					$condition['operator'] = (string) $condition['operator'];
+				}
+				unset($condition);
+
+				$item['query'] = $query;
 			}
 
 			// Items share table with item prototypes. Therefore remove item unrelated fields.
