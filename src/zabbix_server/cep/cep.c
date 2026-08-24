@@ -934,6 +934,9 @@ void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool, zbx_cep_init_stats_t *s
 
 	db = zbx_dbconn_pool_acquire_connection(dbpool);
 
+	/* warmup event ids cache */
+	(void)zbx_dbconn_get_maxid_num(db, "events", 1);
+
 	cep_load_problems(cep, db, stats);
 	cep_load_maintenances(cep, db, stats);
 	cep_load_rule_errors(cep, db);
