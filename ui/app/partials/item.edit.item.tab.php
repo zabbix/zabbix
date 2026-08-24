@@ -798,30 +798,28 @@ $formgrid
 	->addItem($data['source'] === 'itemprototype' || $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED ? [
 		(new CLabel(_('Value mapping'), 'valuemapid_ms'))->setId('js-item-value-map-label'),
 		(new CFormField(
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES) ?
-				(new CMultiSelect([
-					'name' => 'valuemapid',
-					'object_name' => $item['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
-					'readonly' => $readonly,
-					'multiple' => false,
-					'data' => $item['valuemap']
-						? [[
-								'id' => $item['valuemap']['valuemapid'],
-								'name' => $item['valuemap']['name']
-						]] : [],
-					'popup' => [
-						'parameters' => [
-							'srctbl' => $item['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
-							'srcfld1' => 'valuemapid',
-							'dstfrm' => $data['form_name'],
-							'dstfld1' => 'valuemapid',
-							'hostids' => [$item['hostid']],
-							'context' => $item['context'],
-							'editable' => true
-						]
+			(new CMultiSelect([
+				'name' => 'valuemapid',
+				'object_name' => $item['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
+				'readonly' => $readonly,
+				'multiple' => false,
+				'data' => $item['valuemap']
+					? [[
+							'id' => $item['valuemap']['valuemapid'],
+							'name' => $item['valuemap']['name']
+					]] : [],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => $item['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
+						'srcfld1' => 'valuemapid',
+						'dstfrm' => $data['form_name'],
+						'dstfld1' => 'valuemapid',
+						'hostids' => [$item['hostid']],
+						'context' => $item['context'],
+						'editable' => true
 					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			: (new CSpan(_('Inaccessible value mapping')))->addClass(ZBX_STYLE_GREY)
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-value-map-field')
 	] : null)
 	->addItem([

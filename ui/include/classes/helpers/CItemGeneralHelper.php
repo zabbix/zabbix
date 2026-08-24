@@ -268,7 +268,14 @@ JAVASCRIPT;
 				'output' => ['valuemapid', 'name', 'hostid'],
 				'valuemapids' => [$item['valuemapid']]
 			]);
-			$item['valuemap'] = $valuemap ? reset($valuemap) : [];
+
+			$item['valuemap'] = $valuemap
+				? reset($valuemap)
+				: [
+					'valuemapid' => 0,
+					'name' => _('Inaccessible value mapping'),
+					'hostid' => 0
+				];
 		}
 
 		$params_field = [
