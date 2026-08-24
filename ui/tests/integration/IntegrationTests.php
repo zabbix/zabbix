@@ -143,6 +143,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testCalculatedExpression');
 		$suite->addTestSuite('testDiagInfo');
 		$suite->addTestSuite('testHousekeepingConfSync');
+		$suite->addTestSuite('testTriggerCEP');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
@@ -152,7 +153,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testBridgeAdapter');
 		$suite->addTestSuite('testTelnetChecks');
 		$suite->addTestSuite('testHashicorpVault');
-		$suite->addTestSuite('testTriggerCEP');
+
 		return $suite;
 	}
 }

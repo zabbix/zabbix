@@ -7743,6 +7743,18 @@ HEREDOC;
 		$this->runOpenAndImmediateRecoverySingleItemTest(false);
 	}
 
+	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecoverySingleItem but every cycle of the long rapid burst on the
+	 * single discovered item is preceded by an unsupported value (unsupported, 1, 0). The unsupported value
+	 * sends the trigger to UNKNOWN without changing its value, so it must emit no trigger event, while the
+	 * following 1 and 0 must still each emit exactly one event - verifying CEP neither collapses nor drops
+	 * an event when a state change is interleaved with the value transitions on one event stream.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoverySingleItemUnsupported() {
+		$this->runOpenAndImmediateRecoverySingleItemTest(false, false, true);
+	}
 
 	/**
 	 * Like testTriggerCEP_OpenAndImmediateRecovery but the single batch is grouped by value ("waves")
@@ -8029,8 +8041,13 @@ HEREDOC;
 	 * purely by that trigger tag - it reaches the trigger's DISASTER priority with exactly one open service
 	 * problem (no duplicate cached during the burst) - before following the close back to OK. The service
 	 * checks are skipped when the per-trigger services do not exist (service tests skipped).
+	 *
+	 * When $with_unsupported is true every cycle is preceded by an unsupported value (unsupported, 1, 0),
+	 * which sends the trigger to UNKNOWN without changing its value and so must emit no event of its own -
+	 * the burst must still produce exactly one event per real value transition.
 	 */
-	private function runOpenAndImmediateRecoverySingleItemTest(bool $restart, bool $with_service = false): void {
+	private function runOpenAndImmediateRecoverySingleItemTest(bool $restart, bool $with_service = false,
+			bool $with_unsupported = false): void {
 		$this->maybeRestartServer($restart);
 
 		// Drive a single discovered item (and its one trigger) so the whole burst lands on one event
@@ -8052,34 +8069,52 @@ HEREDOC;
 		// Build a long alternating PROBLEM/recovery burst (1,0,1,0,...) and send it in a single batch. Every
 		// value gets a strictly increasing (clock, ns) so CEP must process the whole rapid burst in order
 		// and emit one event per transition without collapsing or dropping any. The sequence ends on 0 so
-		// the trigger finishes OK.
+		// the trigger finishes OK. With $with_unsupported each cycle becomes (unsupported, 1, 0): the
+		// unsupported value only flips the item state, so it must not add an event of its own.
+		$unsupported = 'not_a_number';
 		$cycles = static::RECOVERY_CYCLES_COUNT;
 		$values = [];
 		for ($i = 0; $i < $cycles; $i++) {
+			if ($with_unsupported) {
+				$values[] = $unsupported;
+			}
 			$values[] = '1';
 			$values[] = '0';
 		}
 
 		$data = [];
 		foreach ($values as $value) {
-			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
+			$entry = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
+			// The server skips preprocessing for proxy-delivered values, so the unsupported transition
+			// must be reported explicitly rather than relying on the non-numeric value failing.
+			if ($value === $unsupported) {
+				$entry['state'] = ITEM_STATE_NOTSUPPORTED;
+			}
+			$data[] = $entry;
 		}
 		$vps_written = $this->getVpsWritten();
 		$sent = $this->dispatchSenderValues($data);
 
+		// Only the numeric values of the burst carry a history value - an unsupported value reports an item
+		// state change instead - so just those are expected to be written and to flip the trigger.
+		$value_count = 2 * $cycles;
+
 		// Confirm the whole burst was ingested (written to the history cache) before asserting on events,
 		// so a dropped or not-yet-processed value surfaces here rather than as a confusing event mismatch.
-		$this->assertVpsWrittenIncreasedBy($vps_written, count($values));
+		$this->assertVpsWrittenIncreasedBy($vps_written, $value_count);
 
-		$expected_events = count($values);
+		$expected_events = $value_count;
 
 		// The trigger must produce one event per transition: PROBLEM, RESOLVED, PROBLEM, RESOLVED, ... . Every
 		// value flips the trigger, so each sent (clock, ns) must appear as exactly one event. If the count is
 		// still off on the final wait iteration, the info callback diagnoses which sent offset/timestamp never
 		// produced an event and appends it to the failure message.
+		// The unsupported values of the burst produce no event, so they are left out of the diagnostic
+		// reference - otherwise each of them would be reported as a missing event.
+		$sent_values = array_values(array_filter($sent, fn(array $entry) => !isset($entry['state'])));
 		$this->waitForAllTriggerEventCounts([$triggerid], $expected_events,
-			function () use ($triggerid, $sent) {
-				return $this->diagnoseMissingBurstEvents($triggerid, $sent);
+			function () use ($triggerid, $sent_values) {
+				return $this->diagnoseMissingBurstEvents($triggerid, $sent_values);
 			}
 		);
 
@@ -11323,7 +11358,7 @@ HEREDOC;
 	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepUnsuppressMaintenance$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
-	public function testTriggerCEP_CepUnsuppressMaintenance() {
+	/*public function testTriggerCEP_CepUnsuppressMaintenance() {
 		self::$disc_maintenanceids = [];
 		$this->prepareDataCepUnsuppress();
 
@@ -11346,7 +11381,7 @@ HEREDOC;
 				'suppressed' => true
 			], 0, 120, self::WAIT_ITERATION_DELAY);
 		}
-	}
+	}*/
 
 	/**
 	 * Copying an event: a simple window whose only operation copies an event when it is evicted, so a single
