@@ -339,7 +339,7 @@ window.ceprule_edit_popup = new class {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json; charset=UTF-8'},
 			body: JSON.stringify({
-				cepruleids: [this.form.findFieldByName('cepruleid').getValue()],
+				cepruleid: this.form.findFieldByName('cepruleid').getValue(),
 				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
 			})
 		})

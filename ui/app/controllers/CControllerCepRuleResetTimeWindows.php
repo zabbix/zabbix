@@ -25,7 +25,7 @@ class CControllerCepRuleResetTimeWindows extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'cepruleids' => 'array_db cep_rule.cep_ruleid'
+			'cepruleid' => 'required|db cep_rule.cep_ruleid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,9 +44,9 @@ class CControllerCepRuleResetTimeWindows extends CController {
 	}
 
 	protected function doAction(): void {
-		$cep_ruleids = $this->getInput('cepruleids', []);
+		$cep_ruleid = $this->getInput('cepruleid');
 
-		$result = API::CepRule()->resetTimeWindows(['cep_ruleid' => reset($cep_ruleids)]);
+		$result = API::CepRule()->resetTimeWindows(['cep_ruleid' => $cep_ruleid]);
 
 		$output = [];
 
