@@ -56,7 +56,7 @@ class testPageSearch extends CWebTest {
 				['text' => 'Items', 'href' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
 				['text' => 'Triggers', 'href' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
 				['text' => 'Graphs', 'href' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
-				['text' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
+				['text' => 'Discovery', 'href' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D={id}&context=host'],
 				['text' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D={id}&context=host']
 			]
 		],
@@ -86,7 +86,7 @@ class testPageSearch extends CWebTest {
 				['text' => 'Triggers', 'href' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
 				['text' => 'Graphs', 'href' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
 				['text' => 'Dashboards', 'href' => 'zabbix.php?action=template.dashboard.list&templateid={id}'],
-				['text' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
+				['text' => 'Discovery', 'href' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
 				['text' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template']
 			]
 		],
@@ -340,11 +340,11 @@ class testPageSearch extends CWebTest {
 			// Check expanding functionality.
 			$widget_body = $widget->query('class:section-body')->one();
 			$toggle_button = $widget->query('class:toggle')->one();
-			$this->assertEquals('Collapse', $toggle_button->getAttribute('title'));
+			$this->assertEquals('Collapse section', $toggle_button->getAttribute('aria-label'));
 
 			$toggle_button->click();
 			$widget_body->waitUntilNotVisible();
-			$this->assertEquals('Expand', $toggle_button->getAttribute('title'));
+			$this->assertEquals('Expand section', $toggle_button->getAttribute('aria-label'));
 
 			$toggle_button->click();
 			$widget_body->waitUntilVisible();

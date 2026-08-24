@@ -179,8 +179,16 @@ static void	dc_items_convert_hk_periods(const zbx_dc_um_handle_t *um_handle, con
 				item->history_sec = ZBX_HK_PERIOD_MAX;
 		}
 
-		if (0 != item->history_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
-			item->history_sec = config_hk->history;
+		if (0 != item->history_sec)
+		{
+			if (0 != config_hk->history_override[item->value_type])
+			{
+				item->history_sec = config_hk->history_override[item->value_type];
+				item->history = 1;
+			}
+			else if (ZBX_HK_OPTION_ENABLED == config_hk->history_global)
+				item->history_sec = config_hk->history;
+		}
 
 		item->history = (0 != item->history_sec);
 	}
@@ -1178,27 +1186,6 @@ out:
 	UNLOCK_CACHE;
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get host information by name                                      *
- *                                                                            *
- * Parameters: host      - [IN] host name                                     *
- *             sock      - [IN] connection socket                             *
- *             recv_host - [OUT] host information                             *
- *             redirect  - [OUT] host redirection data (optional)             *
- *                                                                            *
- * Return value: SUCCEED         - host found                                 *
- *               SUCCEED_PARTIAL - redirection data was specified and host is *
- *                                 not monitored by the this instance         *
- *               FAIL            - host not found                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
-		zbx_comms_redirect_t *redirect)
-{
-	return dc_config_get_host_by_name(host, sock, ZBX_ITEM_GET_HOSTINFO, recv_host, redirect);
 }
 
 /******************************************************************************

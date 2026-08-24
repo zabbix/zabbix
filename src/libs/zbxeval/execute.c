@@ -3208,6 +3208,7 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 	char			*errmsg = NULL;
 
 	zbx_vector_var_create(&output);
+	zbx_vector_var_reserve(&output, 3);
 
 	for (i = 0; i < ctx->stack.values_num; i++)
 	{

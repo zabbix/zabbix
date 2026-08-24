@@ -17,8 +17,6 @@
 #include "discoverer_int.h"
 #include "zbx_discoverer_constants.h"
 
-ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
-
 int	discoverer_range_check_iter(zbx_discoverer_task_t *task)
 {
 	int			ret;

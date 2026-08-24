@@ -288,7 +288,7 @@ window.host_edit_popup = {
 	},
 
 	updateTagsList() {
-		const fields = getFormFields(this.form_element);
+		const fields = this.form.getAllValues();
 
 		fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
 			if (!('type' in tag) || (tag.type & <?= ZBX_PROPERTY_OWN ?>)) {
@@ -468,6 +468,8 @@ window.host_edit_popup = {
 				this.form_element.querySelector('#change_psk').closest('div').remove();
 				this.form_element.querySelector('[for="change_psk"]').remove();
 				this.updateEncryptionFields();
+
+				document.getElementById('tls_psk_identity').focus();
 			});
 		}
 

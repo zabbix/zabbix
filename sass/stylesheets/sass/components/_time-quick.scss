@@ -1,0 +1,48 @@
+.time-quick {
+	font-size: 12px;
+	line-height: 20px;
+
+	li {
+		&:last-of-type {
+			a {
+				margin-bottom: 0;
+			}
+		}
+
+		a {
+			display: inline-block;
+			padding: 2px 10px;
+			margin-bottom: 2px;
+			margin-left: -10px;
+			border-bottom: 0;
+
+			&:hover,
+			&:focus,
+			&.selected {
+				border-radius: var(--button-border-radius);
+				border-bottom: 0;
+			}
+
+			&:hover {
+				background: $action-hover-color;
+
+				@if $ui-transitions {
+					transition: background-color $ui-controls-transition-duration ease-out;
+				}
+			}
+
+			&:focus {
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
+			}
+
+			&.selected {
+				background: $ui-bg-selected-color;
+				color: $white;
+
+				@if $ui-transitions {
+					transition: background-color $ui-controls-transition-duration ease-out;
+				}
+			}
+		}
+	}
+}

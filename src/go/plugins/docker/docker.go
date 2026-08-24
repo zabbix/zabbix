@@ -20,6 +20,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"golang.zabbix.com/agent2/plugins/docker/handlers"
 	"golang.zabbix.com/sdk/errs"
@@ -57,7 +58,7 @@ func init() {
 // Export implements the plugin.Exporter interface.
 //
 //nolint:gocyclo,cyclop // this is export function, it can be with high cyclo sometimes.
-func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
+func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvider) (any, error) {
 	params, _, _, err := metrics[key].EvalParams(rawParams, nil)
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to evaluate params")
@@ -69,6 +70,12 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	if handler == nil {
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
+
+	if ctx.LegacyTimeout() {
+		ctx = plugin.OverrideTimeout(ctx, time.Now(), p.options.LegacyTimeout)
+	}
+
+	p.Tracef("query timeout set to: %d", ctx.Timeout())
 
 	var (
 		queryPath = metricsMeta[dockerKey].path
@@ -84,7 +91,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		handlers.KeyPing:
 		query = queryPath
 
-		return handler(p.client, query)
+		return handler(ctx, p.client, query)
 	case handlers.KeyContainersDiscovery:
 		_, err = strconv.ParseBool(params["All"])
 		if err != nil {
@@ -93,7 +100,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 		query = fmt.Sprintf(queryPath, params["All"])
 
-		return handler(p.client, query)
+		return handler(ctx, p.client, query)
 	case handlers.KeyContainerInfo:
 		container := params["Container"]
 
@@ -111,7 +118,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 			return nil, errs.New("info must be either 'full' or 'short'")
 		}
 
-		return handler(p.client, query, info)
+		return handler(ctx, p.client, query, info)
 	case handlers.KeyContainerStats:
 		container := params["Container"]
 
@@ -124,7 +131,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 		query = fmt.Sprintf(queryPath, container)
 
-		return handler(p.client, query)
+		return handler(ctx, p.client, query)
 	default:
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}

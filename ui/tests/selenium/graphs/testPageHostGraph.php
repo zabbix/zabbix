@@ -67,8 +67,10 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath('//span[@class="status-grey"][text()="ZBX"]');
 
 		// Check host breadcrumbs text and url.
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter->getField('Hosts')->fill($host_name);
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$breadcrumbs = [
 			self::HOST_LIST_PAGE => 'All hosts',
@@ -76,7 +78,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Items',
 			'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Triggers',
 			'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Graphs',
-			'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Discovery rules',
+			'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Discovery rules',
 			'httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Web scenarios'
 		];
 		$count_items = CDBHelper::getValue('SELECT COUNT(*) FROM items WHERE hostid='.$hostid);

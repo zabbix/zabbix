@@ -119,7 +119,6 @@ if ($data['proxy_groupid'] !== null) {
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete selected proxy group?'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
 			'isSubmit' => false

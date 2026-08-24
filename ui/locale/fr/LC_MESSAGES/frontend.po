@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-05-18 18:29+0000\n"
+"PO-Revision-Date: 2026-06-16 18:09+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -13,8 +13,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pontoon\n"
-"X-POOTLE-MTIME: 1516000918.000000\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1516000918.000000\n"
 
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
@@ -147,6 +147,12 @@ msgstr "%1$s caractères"
 #, c-format
 msgid "%1$s characters remaining"
 msgstr "%1$s caractères restants"
+
+#: app/views/administration.housekeeping.edit.php:165
+#: app/views/administration.housekeeping.edit.php:166
+#, c-format
+msgid "%1$s data storage period"
+msgstr "%1$s période de stockage des données"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -1682,7 +1688,7 @@ msgstr "Taille de l'arc"
 #: jsLoader.php:267
 #, c-format
 msgid "Are you sure you want to delete %1$s? This action cannot be undone."
-msgstr ""
+msgstr "Êtes-vous sûr de vouloir supprimer %1$s ? Cette action est irréversible."
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -4773,7 +4779,7 @@ msgstr "Impossible de mettre à jour l'étape du scénario web"
 #: include/classes/core/CConfigFile.php:192
 #, c-format
 msgid "Cannot use both %1$s and %2$s at the same time."
-msgstr ""
+msgstr "Impossible d'utiliser %1$s et %2$s en même temps."
 
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
@@ -4821,7 +4827,7 @@ msgstr "Certificat"
 
 #: app/views/js/monitoring.latest.view.js.php:211
 msgid "Change"
-msgstr ""
+msgstr "Changement"
 
 #: app/partials/monitoring.latest.view.html.php:78
 #: app/partials/monitoring.latest.view.html.php:91 include/items.inc.php:1577
@@ -5117,6 +5123,15 @@ msgstr "Cliquez et faites glisser jusqu'à la taille désirée."
 msgid "Click to view or edit"
 msgstr "Cliquez pour voir ou éditer"
 
+#: app/views/administration.housekeeping.edit.php:165
+msgid "ClickHouse"
+msgstr "ClickHouse"
+
+#: include/classes/api/managers/history/CClickHouseStorage.php:118
+#, c-format
+msgid "ClickHouse error: %1$s."
+msgstr "Erreur ClickHouse : %1$s."
+
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
 msgstr "ID client"
@@ -5280,11 +5295,11 @@ msgstr "Fonction d'agrégation de colonnes"
 
 #: jsLoader.php:304
 msgid "Column list"
-msgstr ""
+msgstr "Liste des colonnes"
 
 #: jsLoader.php:273
 msgid "Column name"
-msgstr ""
+msgstr "Nom de la colonne"
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
@@ -5753,7 +5768,7 @@ msgstr[1] "Connecteurs désactivés"
 
 #: app/controllers/CControllerPopup.php:43
 msgid "Connector edit"
-msgstr ""
+msgstr "Modification du connecteur"
 
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
@@ -5915,7 +5930,7 @@ msgstr "Copier dans le presse-papier"
 
 #: app/controllers/CControllerPopup.php:44
 msgid "Correlation edit"
-msgstr ""
+msgstr "Modification de la corrélation"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
@@ -6384,7 +6399,7 @@ msgstr "Les modèles personnalisés ne sont pas pris en charge."
 
 #: jsLoader.php:270
 msgid "Customize table"
-msgstr ""
+msgstr "Personnaliser le tableau"
 
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
@@ -6981,7 +6996,7 @@ msgstr "Supprimer et nettoyer le modèle ? (Attention : tous les hôtes liés se
 
 #: jsLoader.php:275
 msgid "Delete column"
-msgstr ""
+msgstr "Supprimer la colonne"
 
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
@@ -8279,7 +8294,7 @@ msgstr "Identifiant de groupe d'utilisateurs \"%1$s\" en doublon dans les groupe
 
 #: jsLoader.php:274
 msgid "Duplicate column"
-msgstr ""
+msgstr "Dupliquer la colonne"
 
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
@@ -8384,6 +8399,10 @@ msgstr "Date effective"
 #: app/partials/hostmacros.inherited.list.html.php:50
 msgid "Effective value"
 msgstr "Valeur effective"
+
+#: app/views/administration.housekeeping.edit.php:166
+msgid "Elasticsearch"
+msgstr "Elasticsearch"
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -10015,7 +10034,7 @@ msgstr[1] "Graphiques supprimés"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Graph edit"
-msgstr ""
+msgstr "Modification du graphique"
 
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
@@ -10071,7 +10090,7 @@ msgstr[1] "Prototypes de graphique supprimés"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Graph prototype edit"
-msgstr ""
+msgstr "Modification du prototype de graphique"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -10630,7 +10649,7 @@ msgstr[1] "Hôtes désactivés"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Host edit"
-msgstr ""
+msgstr "Modification de l'hôte"
 
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
@@ -10693,7 +10712,7 @@ msgstr[1] "Groupes d'hôtes supprimé"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Host group edit"
-msgstr ""
+msgstr "Modification du groupe d'hôtes"
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -10864,7 +10883,7 @@ msgstr[1] "Prototypes d'hôte supprimés"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Host prototype edit"
-msgstr ""
+msgstr "Modification du prototype d'hôte"
 
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "Host prototype macros"
@@ -11811,7 +11830,7 @@ msgstr "Caractères incorrects utilisés pour le nom du modèle."
 #: include/classes/core/CConfigFile.php:411
 #, c-format
 msgid "Incorrect configuration %1$s: %2$s."
-msgstr ""
+msgstr "Configuration incorrecte %1$s : %2$s."
 
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
@@ -11847,6 +11866,16 @@ msgstr "Téléversement de fichier incorrect."
 #: include/triggers.inc.php:768
 msgid "Incorrect function is used"
 msgstr "Fonction incorrecte utilisée"
+
+#: include/classes/core/CConfigFile.php:211
+#: include/classes/core/CConfigFile.php:219
+#: include/classes/core/CConfigFile.php:557
+#: include/classes/core/CConfigFile.php:563
+#: include/classes/core/CConfigFile.php:569
+#: include/classes/core/CConfigFile.php:579
+#, c-format
+msgid "Incorrect history storage configuration %1$s: %2$s."
+msgstr "Configuration de stockage de l'historique incorrecte %1$s : %2$s."
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -12388,7 +12417,7 @@ msgstr "Macros héritées et du prototype d'hôte"
 
 #: jsLoader.php:260
 msgid "Inherited and host prototype tag"
-msgstr ""
+msgstr "Tags hérités et du prototype d'hôte"
 
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
@@ -12400,7 +12429,7 @@ msgstr "Tags hérités et de l'hôte"
 
 #: jsLoader.php:262
 msgid "Inherited and item prototype tag"
-msgstr ""
+msgstr "Tags hérités et du prototype d'élément"
 
 #: include/classes/helpers/CTagHelper.php:231
 msgid "Inherited and item tag"
@@ -12428,7 +12457,7 @@ msgstr "Tags hérités et de modèle"
 
 #: jsLoader.php:264
 msgid "Inherited and trigger prototype tag"
-msgstr ""
+msgstr "Tags hérités et du déclencheur"
 
 #: include/classes/helpers/CTagHelper.php:232
 msgid "Inherited and trigger tag"
@@ -13069,7 +13098,7 @@ msgstr "Plage non valide."
 #: app/controllers/CControllerDataTable.php:59
 #: app/controllers/CControllerDataTable.php:138
 msgid "Invalid request"
-msgstr ""
+msgstr "Requête invalide"
 
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
@@ -13269,7 +13298,7 @@ msgstr[1] "Éléments désactivés"
 
 #: app/controllers/CControllerPopup.php:48
 msgid "Item edit"
-msgstr ""
+msgstr "Modification de l'élément"
 
 #: items.php:707
 msgid "Item enabled"
@@ -13346,7 +13375,7 @@ msgstr[1] "Prototypes d'élément supprimés"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Item prototype edit"
-msgstr ""
+msgstr "Modification du prototype d'élément"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -14351,7 +14380,7 @@ msgstr "La maintenance \"%1$s\" existe déjà."
 
 #: app/controllers/CControllerPopup.php:50
 msgid "Maintenance edit"
-msgstr ""
+msgstr "Modification de la maintenance"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -14455,7 +14484,7 @@ msgstr "Fermé manuellement"
 #: include/actions.inc.php:1698 include/actions.inc.php:2195
 #: include/html.inc.php:1135
 msgid "Manually suppressed"
-msgstr ""
+msgstr "Supprimé manuellement"
 
 #: app/controllers/CControllerProblemViewData.php:475
 #: include/actions.inc.php:1674 include/actions.inc.php:1675
@@ -14463,7 +14492,7 @@ msgstr ""
 #: include/actions.inc.php:2201 include/blocks.inc.php:692
 #: widgets/problems/includes/WidgetProblems.php:280
 msgid "Manually unsuppressed"
-msgstr ""
+msgstr "Restauré manuellement"
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: include/classes/data/CWidgetsData.php:110
@@ -14844,7 +14873,7 @@ msgstr "Type de média désactivé par l'administration."
 
 #: app/controllers/CControllerPopup.php:51
 msgid "Media type edit"
-msgstr ""
+msgstr "Modification du type de média"
 
 #: app/controllers/CControllerMediatypeEnable.php:87
 #: app/controllers/CControllerMediatypeEnable.php:94
@@ -15221,7 +15250,7 @@ msgstr[1] "Modules désactivés"
 
 #: app/controllers/CControllerPopup.php:52
 msgid "Module edit"
-msgstr ""
+msgstr "Modification du module"
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -15906,6 +15935,10 @@ msgstr "Suivant"
 msgid "Next dashboard"
 msgstr "Tableau de bord suivant"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr "Mois suivant"
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15919,6 +15952,10 @@ msgstr "Page suivante"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Prochaine étape"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr "Année suivante"
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -16624,6 +16661,12 @@ msgstr "Éléments non hérités"
 msgid "Not linked"
 msgstr "Non lié"
 
+#: app/views/item.list.php:233 app/views/item.list.php:234
+#: include/classes/helpers/CItemHelper.php:386
+#: include/classes/helpers/CItemHelper.php:416
+msgid "Not stored"
+msgstr "Non stocké"
+
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.latest.filter.php:191
@@ -16781,7 +16824,7 @@ msgstr "Nombre d'étapes"
 
 #: jsLoader.php:291
 msgid "Number of tags"
-msgstr ""
+msgstr "Nombre de tags"
 
 #: app/partials/administration.system.info.php:60
 msgid "Number of templates"
@@ -18550,7 +18593,7 @@ msgstr[1] "Proxy supprimé"
 
 #: app/controllers/CControllerPopup.php:53
 msgid "Proxy edit"
-msgstr ""
+msgstr "Modification du proxy"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/partials/configuration.host.edit.html.php:266
@@ -18588,7 +18631,7 @@ msgstr[1] "Groupes de proxy supprimés"
 
 #: app/controllers/CControllerPopup.php:54
 msgid "Proxy group edit"
-msgstr ""
+msgstr "Modification du groupe de proxys"
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
@@ -19387,7 +19430,7 @@ msgstr "Réinitialiser aux valeurs par défaut"
 
 #: jsLoader.php:305
 msgid "Reset layout"
-msgstr ""
+msgstr "Réinitialiser la disposition"
 
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
@@ -19746,7 +19789,7 @@ msgstr[1] "SLAs désactivés"
 
 #: app/controllers/CControllerPopup.php:58
 msgid "SLA edit"
-msgstr ""
+msgstr "Modification de SLA"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
@@ -20128,7 +20171,7 @@ msgstr[1] "Rapports planifiés désactivés"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Scheduled report edit"
-msgstr ""
+msgstr "Modification du rapport planifié"
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
@@ -20213,7 +20256,7 @@ msgstr "Le script n'a pas de paramètres."
 
 #: app/controllers/CControllerPopup.php:56
 msgid "Script edit"
-msgstr ""
+msgstr "Modification du script"
 
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
@@ -20592,7 +20635,7 @@ msgstr[1] "Services supprimés"
 
 #: app/controllers/CControllerPopup.php:57
 msgid "Service edit"
-msgstr ""
+msgstr "Modification du service"
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -20905,7 +20948,7 @@ msgstr "Afficher les hôtes en maintenance"
 
 #: jsLoader.php:281
 msgid "Show item key"
-msgstr ""
+msgstr "Afficher la clé de l'élément"
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
@@ -21037,7 +21080,7 @@ msgstr "Afficher la valeur totale"
 
 #: jsLoader.php:285
 msgid "Show trigger expression"
-msgstr ""
+msgstr "Afficher l'expression de déclenchement"
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -21777,7 +21820,7 @@ msgstr "Supprimé"
 
 #: include/actions.inc.php:2241 include/html.inc.php:1134
 msgid "Suppressed by maintenance"
-msgstr ""
+msgstr "Supprimé par la maintenance"
 
 #: include/actions.inc.php:2019 include/html.inc.php:1000
 #, c-format
@@ -21943,7 +21986,7 @@ msgstr "La table \"%1$s\" n'a pas de champ nommé \"%2$s\"."
 
 #: jsLoader.php:303
 msgid "Table options"
-msgstr ""
+msgstr "Options du tableau"
 
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
@@ -22006,7 +22049,7 @@ msgstr "La combinaison du nom et de la valeur du tag n'est pas unique."
 
 #: jsLoader.php:292
 msgid "Tag name display"
-msgstr ""
+msgstr "Affichage du nom du tag"
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
 #: app/controllers/CControllerMaintenanceUpdate.php:94
@@ -22151,7 +22194,7 @@ msgstr[1] "Modèles supprimés"
 
 #: app/controllers/CControllerPopup.php:59
 msgid "Template edit"
-msgstr ""
+msgstr "Modification du modèle"
 
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
@@ -22178,7 +22221,7 @@ msgstr[1] "Groupes de modèles supprimés"
 
 #: app/controllers/CControllerPopup.php:55
 msgid "Template group edit"
-msgstr ""
+msgstr "Modification du groupe de modèles"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
@@ -22691,6 +22734,10 @@ msgstr "Ce paramètre s'applique uniquement aux données numériques."
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Ce paramètre s'applique uniquement aux données numériques. Les données non numériques seront toujours extraites de l'historique."
 
+#: app/views/administration.housekeeping.edit.php:145
+msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
+msgstr "Ce paramètre n'affecte pas les périodes de stockage d'Elasticsearch et de ClickHouse."
+
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
 msgid "This setting should be enabled, because history tables contain compressed chunks."
@@ -23030,7 +23077,7 @@ msgstr "Aujourd'hui jusqu'à présent"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
-msgstr ""
+msgstr "Modification du jeton"
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
@@ -23088,6 +23135,11 @@ msgstr "Total"
 msgctxt "compact table header"
 msgid "Total"
 msgstr "Total"
+
+#: include/classes/debug/CProfiler.php:172
+#, c-format
+msgid "Total ClickHouse time: %1$s"
+msgstr "Temps total passé sur ClickHouse : %1$s"
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -23163,6 +23215,10 @@ msgstr "Traitée comme 0"
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "Statistiques du cache de la fonction de tendance. Les paramètres valides sont : all, hits, phits, misses, pmisses, items, pitems et requests."
 
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr "Statistiques du cache des fonctions de tendance. Les paramètres valides sont : all, hits, phits, misses, pmisses, items, pitems, paccessed et requests."
+
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162
 #: app/partials/monitoring.latest.view.html.php:74
@@ -23178,6 +23234,11 @@ msgstr "Statistiques du cache de la fonction de tendance. Les paramètres valide
 #: widgets/tophosts/views/column.edit.php:206
 msgid "Trends"
 msgstr "Tendances"
+
+#: app/partials/item.edit.item.tab.php:774
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
+msgstr "Les tendances ne sont ni calculées ni enregistrées pour les éléments dont l'historique est conservé dans Elasticsearch ou ClickHouse."
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -23303,7 +23364,7 @@ msgstr "Options d'affichage des déclencheurs"
 
 #: app/controllers/CControllerPopup.php:61
 msgid "Trigger edit"
-msgstr ""
+msgstr "Modification du déclencheur"
 
 #: app/controllers/CControllerTriggerEnable.php:67
 msgid "Trigger enabled"
@@ -23446,7 +23507,7 @@ msgstr[1] "Prototypes de déclencheur supprimés"
 
 #: app/controllers/CControllerPopup.php:62
 msgid "Trigger prototype edit"
-msgstr ""
+msgstr "Modification du prototype de déclencheur"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -24115,7 +24176,7 @@ msgstr "Restauré"
 
 #: include/actions.inc.php:2257
 msgid "Unsuppressed by maintenance"
-msgstr ""
+msgstr "Restauré par la maintenance"
 
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
@@ -24301,7 +24362,7 @@ msgstr "Fonctionnement/Arrêt"
 #: app/partials/administration.system.info.php:328
 #, c-format
 msgid "Use %1$s instead"
-msgstr ""
+msgstr "Utilisez %1$s à la place"
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
@@ -26167,7 +26228,7 @@ msgstr "Votre progression sera annulée et vous quitterez l'assistant d'hôte. V
 
 #: jsLoader.php:307
 msgid "Your table settings will be reset to default and duplicated columns will be removed."
-msgstr ""
+msgstr "Les paramètres de votre tableau seront réinitialisés par défaut et les colonnes dupliquées seront supprimées."
 
 #: include/page_header.php:122
 msgid "Zabbix"
@@ -27249,7 +27310,7 @@ msgstr "ne correspond pas"
 
 #: jsLoader.php:268
 msgid "duplicate"
-msgstr ""
+msgstr "dupliquer"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
@@ -27355,6 +27416,10 @@ msgstr "fuzzytime() - La différence entre la valeur de l'horodatage de l'élém
 #: include/classes/validators/CApiInputValidator.php:3317
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
 msgstr "des coordonnées géographiques (valeurs de latitude et de longitude séparées par des virgules) sont attendues"
+
+#: app/views/item.edit.php:224 app/views/item.edit.php:228
+msgid "global housekeeping settings"
+msgstr "paramètres de nettoyage globaux"
 
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
@@ -27514,6 +27579,11 @@ msgstr "compte d'éléments incorrect"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "expression incorrecte à partir de \"%1$s\""
+
+#: include/classes/core/CConfigFile.php:212
+#: include/classes/core/CConfigFile.php:220
+msgid "incorrect format"
+msgstr "format incorrect"
 
 #: jsLoader.php:298
 msgid "incorrect item value type"

@@ -439,7 +439,7 @@ class testPageHostInterfaces extends CWebTest {
 	 */
 	public function testPageHostInterfaces_DiscoveryPage($data) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host ='.zbx_dbstr($data['host']));
-		$link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$id.'&context=host';
+		$link = 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.$id.'&context=host';
 		$this->checkInterfaces($data, $link, $selector = null, true);
 	}
 
@@ -456,9 +456,11 @@ class testPageHostInterfaces extends CWebTest {
 
 		// Unstable test ConfigurationHosts#3 on Jenkins due to insufficient table width and horizontal scroll appears.
 		if (CTestArrayHelper::get($data, 'filter', false) && $selector === 'hosts') {
+			$table = $this->query('class:datatable')->asDatatable()->one();
 			$filter_form = CFilterElement::find()->one()->getForm();
 			$filter_form->fill($data['filter']);
 			$filter_form->submit();
+			$table->waitUntilReloaded();
 		}
 
 		if ($navigation) {

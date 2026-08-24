@@ -48,6 +48,7 @@ snmp_access allow <zbx_acl_name> <zabbix_server_ip>
 |{$SQUID.SNMP.COMMUNITY}|<p>SNMP community allowed by ACL in squid.conf</p>|`public`|
 |{$SQUID.FILE.DESC.WARN.MIN}|<p>The threshold for minimum number of available file descriptors</p>|`100`|
 |{$SQUID.PAGE.FAULT.WARN}|<p>The threshold for sys page faults rate in percent of received HTTP requests</p>|`90`|
+|{$SNMP.UPTIME.WARN}|<p>Uptime threshold above which the restart problem auto-resolves.</p>|`10m`|
 
 ### Items
 
@@ -113,7 +114,7 @@ snmp_access allow <zbx_acl_name> <zabbix_server_ip>
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Squid: Port {$SQUID.HTTP.PORT} is down||`last(/Squid by SNMP/net.tcp.service[tcp,,{$SQUID.HTTP.PORT}])=0`|Average|**Manual close**: Yes|
-|Squid: Squid has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Squid by SNMP/squid[cacheUptime])<10m`|Info|**Manual close**: Yes|
+|Squid: Squid has been restarted|<p>The uptime counter has decreased, which indicates that Squid has been restarted.<br>A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.<br>The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.</p>|`change(/Squid by SNMP/squid[cacheUptime])<0 and last(/Squid by SNMP/squid[cacheUptime],#2)<42949672.96-(lastclock(/Squid by SNMP/squid[cacheUptime])-lastclock(/Squid by SNMP/squid[cacheUptime],#2))`|Info|**Manual close**: Yes|
 |Squid: Squid version has been changed|<p>Squid version has changed. Acknowledge to close the problem manually.</p>|`last(/Squid by SNMP/squid[cacheVersionId],#1)<>last(/Squid by SNMP/squid[cacheVersionId],#2) and length(last(/Squid by SNMP/squid[cacheVersionId]))>0`|Info|**Manual close**: Yes|
 |Squid: Swap usage is more than low watermark||`last(/Squid by SNMP/squid[cacheCurrentSwapSize])>last(/Squid by SNMP/squid[cacheSwapLowWM])*last(/Squid by SNMP/squid[cacheSwapMaxSize])/100`|Warning||
 |Squid: Swap usage is more than high watermark||`last(/Squid by SNMP/squid[cacheCurrentSwapSize])>last(/Squid by SNMP/squid[cacheSwapHighWM])*last(/Squid by SNMP/squid[cacheSwapMaxSize])/100`|High||

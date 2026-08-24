@@ -27,6 +27,8 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxcachevalue.h"
+#include "zbxhistory.h"
 
 /******************************************************************************
  *                                                                            *
@@ -299,6 +301,116 @@ static void	get_recovery_event_value(const char *macro, const zbx_db_event *r_ev
 	}
 }
 
+static const char	*item_logtype_string(unsigned char logtype)
+{
+	switch (logtype)
+	{
+		case ITEM_LOGTYPE_INFORMATION:
+			return "Information";
+		case ITEM_LOGTYPE_WARNING:
+			return "Warning";
+		case ITEM_LOGTYPE_ERROR:
+			return "Error";
+		case ITEM_LOGTYPE_FAILURE_AUDIT:
+			return "Failure Audit";
+		case ITEM_LOGTYPE_SUCCESS_AUDIT:
+			return "Success Audit";
+		case ITEM_LOGTYPE_CRITICAL:
+			return "Critical";
+		case ITEM_LOGTYPE_VERBOSE:
+			return "Verbose";
+		default:
+			return "unknown";
+	}
+}
+
+/* requests for get_history_log_value() */
+#define ZBX_DC_REQUEST_ITEM_LOG_DATE		201
+#define ZBX_DC_REQUEST_ITEM_LOG_TIME		202
+#define ZBX_DC_REQUEST_ITEM_LOG_AGE		203
+#define ZBX_DC_REQUEST_ITEM_LOG_SOURCE		204
+#define ZBX_DC_REQUEST_ITEM_LOG_SEVERITY	205
+#define ZBX_DC_REQUEST_ITEM_LOG_NSEVERITY	206
+#define ZBX_DC_REQUEST_ITEM_LOG_EVENTID		207
+#define ZBX_DC_REQUEST_ITEM_LOG_TIMESTAMP	208
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a particular attribute of a log value.                   *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
+		const char *tz)
+{
+	zbx_dc_item_t		item;
+	int			ret = FAIL, errcode = FAIL;
+	zbx_timespec_t		ts = {clock, ns};
+	zbx_history_record_t	value;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
+
+	if (SUCCEED != errcode || ITEM_VALUE_TYPE_LOG != item.value_type)
+		goto out;
+
+	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value))
+		goto out;
+
+	zbx_vc_flush_stats();
+
+	switch (request)
+	{
+		case ZBX_DC_REQUEST_ITEM_LOG_DATE:
+			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)value.value.log->timestamp, tz));
+			goto success;
+		case ZBX_DC_REQUEST_ITEM_LOG_TIME:
+			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)value.value.log->timestamp, tz));
+			goto success;
+		case ZBX_DC_REQUEST_ITEM_LOG_AGE:
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - value.value.log->timestamp));
+			goto success;
+		case ZBX_DC_REQUEST_ITEM_LOG_TIMESTAMP:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->timestamp);
+			goto success;
+	}
+
+	/* the following attributes are set only for windows eventlog items */
+	if (0 != strncmp(item.key_orig, "eventlog[", 9))
+		goto clean;
+
+	switch (request)
+	{
+		case ZBX_DC_REQUEST_ITEM_LOG_SOURCE:
+			*replace_to = zbx_strdup(*replace_to, (NULL == value.value.log->source ? "" :
+					value.value.log->source));
+			break;
+		case ZBX_DC_REQUEST_ITEM_LOG_SEVERITY:
+			*replace_to = zbx_strdup(*replace_to,
+					item_logtype_string((unsigned char)value.value.log->severity));
+			break;
+		case ZBX_DC_REQUEST_ITEM_LOG_NSEVERITY:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->severity);
+			break;
+		case ZBX_DC_REQUEST_ITEM_LOG_EVENTID:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->logeventid);
+			break;
+	}
+success:
+	ret = SUCCEED;
+clean:
+	zbx_history_record_clear(&value, ITEM_VALUE_TYPE_LOG);
+out:
+	zbx_dc_config_clean_items(&item, &errcode, 1);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve a particular attribute of a log value.                   *
@@ -351,7 +463,7 @@ int	zbx_get_history_log_value(const char *m, const zbx_db_trigger *trigger, char
 		goto out;
 
 	if (SUCCEED == (ret = zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid)))
-		ret = zbx_dc_get_history_log_value(itemid, replace_to, request, clock, ns, tz);
+		ret = get_history_log_value(itemid, replace_to, request, clock, ns, tz);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

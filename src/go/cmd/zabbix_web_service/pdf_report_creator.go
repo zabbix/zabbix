@@ -182,6 +182,10 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 
 	opts := chromedp.DefaultExecAllocatorOptions[:]
 
+	opts = append(opts, chromedp.Env(
+		"BREAKPAD_DUMP_LOCATION="+h.breakpadDumpDir,
+	))
+
 	if options.IgnoreURLCertErrors == 1 {
 		opts = append(opts, chromedp.Flag("ignore-certificate-errors", "1"))
 	}

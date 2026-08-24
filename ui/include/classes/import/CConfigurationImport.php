@@ -78,7 +78,8 @@ class CConfigurationImport {
 			'images' => ['updateExisting' => false, 'createMissing' => false],
 			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'dashboards' => ['updateExisting' => false, 'createMissing' => false]
+			'dashboards' => ['updateExisting' => false, 'createMissing' => false],
+			'global_regexes' => ['updateExisting' => false, 'createMissing' => false]
 		];
 
 		$options += $default_options;
@@ -166,6 +167,7 @@ class CConfigurationImport {
 		$this->processTemplateDashboards();
 
 		$this->processDashboards(false);
+		$this->processGlobalRegexes();
 	}
 
 	/**
@@ -217,6 +219,7 @@ class CConfigurationImport {
 		$httptests_refs = [];
 		$httpsteps_refs = [];
 		$dashboards_refs = [];
+		$global_regexes_refs = [];
 
 		foreach ($this->getFormattedTemplateGroups() as $group) {
 			$template_groups_refs[$group['name']] = ['uuid' => $group['uuid']];
@@ -596,6 +599,10 @@ class CConfigurationImport {
 			);
 		}
 
+		foreach ($this->getFormattedGlobalRegexes() as $name => $global_regex) {
+			$global_regexes_refs[$name] = [];
+		}
+
 		$this->referencer->addTemplateGroups($template_groups_refs);
 		$this->referencer->addTemplates($templates_refs);
 		$this->referencer->addHostGroups($host_groups_refs);
@@ -623,6 +630,7 @@ class CConfigurationImport {
 		$this->referencer->addHttpTests($httptests_refs);
 		$this->referencer->addHttpSteps($httpsteps_refs);
 		$this->referencer->addDashboards($dashboards_refs);
+		$this->referencer->addGlobalRegexes($global_regexes_refs);
 	}
 
 	private function gatherDashboardReferences(array $dashboard, bool $is_templated, array &$host_groups_refs,
@@ -2369,6 +2377,25 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Import global regexes.
+	 */
+	protected function processGlobalRegexes(): void {
+		if (!$this->options['global_regexes']['updateExisting'] && !$this->options['global_regexes']['createMissing']) {
+			return;
+		}
+
+		$global_regexes = $this->getFormattedGlobalRegexes();
+
+		if (!$global_regexes) {
+			return;
+		}
+
+		$regex_importer = new CGlobalRegexImporter($this->options, $this->referencer, $this->importedObjectContainer);
+
+		$regex_importer->import($global_regexes);
+	}
+
+	/**
 	 * Deletes items from DB that are missing in import file.
 	 */
 	protected function deleteMissingItems(): void {
@@ -3114,6 +3141,19 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['mediaTypes'];
+	}
+
+	/**
+	 * Get formatted global regexes.
+	 *
+	 * @return array
+	 */
+	protected function getFormattedGlobalRegexes(): array {
+		if (!array_key_exists('global_regexes', $this->formattedData)) {
+			$this->formattedData['global_regexes'] = $this->adapter->getGlobalRegexes();
+		}
+
+		return $this->formattedData['global_regexes'];
 	}
 
 	/**

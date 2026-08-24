@@ -246,7 +246,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			}
 		}
 
-		$checks_dialog->query('xpath:.//button[@title="Close"]')->one()->waitUntilClickable()->click();
+		$checks_dialog->query('xpath:.//button[@aria-label="Close modal window"]')->one()->waitUntilClickable()->click();
 		$dialog->close();
 	}
 
@@ -260,9 +260,11 @@ class testFormNetworkDiscovery extends CWebTest {
 						'Name' => 'Empty port'
 					],
 					'Checks' => [
-						['Port range' => '']
-					],
-					'dialog_error' => 'Incorrect value for field "ports": cannot be empty.'
+						[
+							'Port range' => '',
+							'inline_errors' => ['Port range' => 'This field cannot be empty.']
+						]
+					]
 				]
 			],
 			// #1.
@@ -270,10 +272,12 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Local network'
+						'Name' => 'Local network',
+						// Update interval is changed to avoid the "This field cannot be empty." error appearing first.
+						'Update interval' => '2h'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Discovery rule "Local network" already exists.'
+					'inline_errors' => ['Name' => 'This object already exists.']
 				]
 			],
 			// #2.
@@ -286,13 +290,13 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [
 						[
 							'Check type' => 'SNMPv1 agent',
-							'Port range' => ''
+							'Port range' => '',
+							'inline_errors' => [
+								'Port range' => 'This field cannot be empty.',
+								'SNMP community' => 'This field cannot be empty.',
+								'SNMP OID' => 'This field cannot be empty.'
+							]
 						]
-					],
-					'dialog_error' => [
-						'Incorrect value for field "ports": cannot be empty.',
-						'Incorrect value for field "snmp_community": cannot be empty.',
-						'Incorrect value for field "snmp_oid": cannot be empty.'
 					]
 				]
 			],
@@ -301,17 +305,17 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Validation priority for SNMPv1'
+						'Name' => 'Text in port for SNMPv1'
 					],
 					'Checks' => [
 						[
 							'Check type' => 'SNMPv1 agent',
 							'Port range' => 'test',
 							'SNMP community' => 'test',
-							'SNMP OID' => 'test'
+							'SNMP OID' => 'test',
+							'inline_errors' => ['Port range' => 'Incorrect port range.']
 						]
-					],
-					'dialog_error' => 'Incorrect port range.'
+					]
 				]
 			],
 			// #4.
@@ -326,10 +330,10 @@ class testFormNetworkDiscovery extends CWebTest {
 							'Check type' => 'SNMPv2 agent',
 							'Port range' => 65536,
 							'SNMP community' => 'test',
-							'SNMP OID' => 'test'
+							'SNMP OID' => 'test',
+							'inline_errors' => ['Port range' => 'Incorrect port range.']
 						]
-					],
-					'dialog_error' => 'Incorrect port range.'
+					]
 				]
 			],
 			// #5.
@@ -337,17 +341,17 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Negative port for SNMPv3'
+						'Name' => 'Negative port for SNMPv2'
 					],
 					'Checks' => [
 						[
 							'Check type' => 'SNMPv2 agent',
 							'Port range' => -1,
 							'SNMP community' => 'test',
-							'SNMP OID' => 'test'
+							'SNMP OID' => 'test',
+							'inline_errors' => ['Port range' => 'Incorrect port range.']
 						]
-					],
-					'dialog_error' => 'Incorrect port range.'
+					]
 				]
 			],
 			// #6.
@@ -362,10 +366,10 @@ class testFormNetworkDiscovery extends CWebTest {
 							'Check type' => 'SNMPv2 agent',
 							'Port range' => 'text',
 							'SNMP community' => 'test',
-							'SNMP OID' => 'test'
+							'SNMP OID' => 'test',
+							'inline_errors' => ['Port range' => 'Incorrect port range.']
 						]
-					],
-					'dialog_error' => 'Incorrect port range.'
+					]
 				]
 			],
 			// #7.
@@ -373,15 +377,18 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Validation priority for SNMPv3'
+						'Name' => 'Validation fields for SNMPv3'
 					],
 					'Checks' => [
 						[
 							'Check type' => 'SNMPv3 agent',
-							'Port range' => 'text'
+							'Port range' => 'text',
+							'inline_errors' => [
+								'Port range' => 'Incorrect port range.',
+								'SNMP OID' => 'This field cannot be empty.'
+							]
 						]
-					],
-					'dialog_error' => 'Incorrect value for field "snmp_oid": cannot be empty.'
+					]
 				]
 			],
 			// #8.
@@ -392,14 +399,12 @@ class testFormNetworkDiscovery extends CWebTest {
 						'Name' => 'Same default check validation'
 					],
 					'Checks' => [
+						['default' => true],
 						[
-							'default' => true
-						],
-						[
-							'default' => true
+							'default' => true,
+							'dialog_error' => 'Check already exists.'
 						]
-					],
-					'dialog_error' => 'Check already exists.'
+					]
 				]
 			],
 			// #9.
@@ -428,10 +433,10 @@ class testFormNetworkDiscovery extends CWebTest {
 							'SNMP OID' => 1,
 							'Security level' => 'authNoPriv',
 							'Authentication protocol' => 'SHA256',
-							'Authentication passphrase' => 1
+							'Authentication passphrase' => 1,
+							'dialog_error' => 'Check already exists.'
 						]
-					],
-					'dialog_error' => 'Check already exists.'
+					]
 				]
 			],
 			// #10.
@@ -439,16 +444,15 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Validation fields for SNMPv3'
+						'Name' => 'Validation authNoPriv for SNMPv3'
 					],
 					'Checks' => [
 						[
 							'Check type' => 'SNMPv3 agent',
-							'Port range' => 'text',
-							'SNMP OID' => 'test'
+							'Security level' => 'authNoPriv',
+							'inline_errors' => ['SNMP OID' => 'This field cannot be empty.']
 						]
-					],
-					'dialog_error' => 'Incorrect port range.'
+					]
 				]
 			],
 			// #11.
@@ -461,32 +465,16 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [
 						[
 							'Check type' => 'SNMPv3 agent',
-							'Security level' => 'authNoPriv'
+							'Security level' => 'authPriv',
+							'inline_errors' => [
+								'SNMP OID' => 'This field cannot be empty.',
+								'Privacy passphrase' => 'This field cannot be empty.'
+							]
 						]
-					],
-					'dialog_error' => 'Incorrect value for field "snmp_oid": cannot be empty.'
-				]
-			],
-			// #12.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Validation authPriv for SNMPv3'
-					],
-					'Checks' => [
-						[
-							'Check type' => 'SNMPv3 agent',
-							'Security level' => 'authPriv'
-						]
-					],
-					'dialog_error' => [
-						'Incorrect value for field "snmp_oid": cannot be empty.',
-						'Incorrect value for field "snmpv3_privpassphrase": cannot be empty.'
 					]
 				]
 			],
-			// #13.
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -496,13 +484,13 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [
 						[
 							'Check type' => 'Zabbix agent',
-							'Key' => '😀'
+							'Key' => '😀',
+							'inline_errors' => ['Key' => 'Incorrect syntax near "😀".']
 						]
-					],
-					'dialog_error' => 'Invalid key "😀": incorrect syntax near "😀".'
+					]
 				]
 			],
-			// #14.
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -512,32 +500,16 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [
 						[
 							'Check type' => 'Zabbix agent',
-							'Port range' => ''
+							'Port range' => '',
+							'inline_errors' => [
+								'Port range' => 'This field cannot be empty.',
+								'Key' => 'This field cannot be empty.'
+							]
 						]
-					],
-					'dialog_error' => [
-						'Incorrect value for field "ports": cannot be empty.',
-						'Incorrect value for field "key_": cannot be empty.'
 					]
 				]
 			],
-			// #15.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Validation priority for Zabbix agent'
-					],
-					'Checks' => [
-						[
-							'Check type' => 'Zabbix agent',
-							'Port range' => 'test'
-						]
-					],
-					'dialog_error' => 'Incorrect value for field "key_": cannot be empty.'
-				]
-			],
-			// #16.
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -548,10 +520,47 @@ class testFormNetworkDiscovery extends CWebTest {
 						[
 							'Check type' => 'Zabbix agent',
 							'Port range' => 'test',
-							'Key' => 'test'
+							'inline_errors' => [
+								'Port range' => 'Incorrect port range.',
+								'Key' => 'This field cannot be empty.'
+							]
 						]
+					]
+				]
+			],
+			// #15.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => '',
+						'IP range' => '',
+						'Update interval' => '',
+						'Discovery by' => 'Proxy'
 					],
-					'dialog_error' => 'Incorrect port range.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'IP range' => 'This field cannot be empty.',
+						'Update interval' => 'This field cannot be empty.',
+						'id:dcheckList' => 'This field cannot be empty.',
+						'xpath:.//div[@id="proxyid"]/..' => 'This field cannot be empty.'
+					]
+				]
+			],
+			// #16.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Numbers in IP range and text in Update interval',
+						'IP range' => 12345,
+						'Update interval' => 'text'
+					],
+					'Checks' => [['default' => true]],
+					'inline_errors' => [
+						'IP range' => 'Incorrect address starting from "12345".',
+						'Update interval' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #17.
@@ -559,11 +568,15 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty IP range',
-						'IP range' => ''
+						'Name' => 'Text and special symbols in IP range and Update interval',
+						'IP range' => 'Text 😀',
+						'Update interval' => '😀'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": cannot be empty.'
+					'inline_errors' => [
+						'IP range' => 'Incorrect address starting from "Text 😀".',
+						'Update interval' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #18.
@@ -571,38 +584,18 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Numbers in IP range',
-						'IP range' => 12345
+						'Name' => 'Wrong IPV4 in IP range and negative Update interval',
+						'IP range' => '192.168.4.300-305',
+						'Update interval' => -1
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "12345".'
+					'inline_errors' => [
+						'IP range' => 'Incorrect address starting from "192.168.4.300-305".',
+						'Update interval' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #19.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Text in IP range',
-						'IP range' => 'Text 😀'
-					],
-					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "Text 😀".'
-				]
-			],
-			// #20.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Wrong IPV4 in IP range',
-						'IP range' => '192.168.4.300-305'
-					],
-					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "192.168.4.300-305".'
-				]
-			],
-			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -611,10 +604,10 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '192.168.4.0/5'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": IP range "192.168.4.0/5" exceeds "65536" address limit.'
+					'inline_errors' => ['IP range' => 'IP range "192.168.4.0/5" exceeds "65536" address limit.']
 				]
 			],
-			// #22.
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -623,22 +616,10 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '192.168.4.0/111'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "/111".'
+					'inline_errors' => ['IP range' => 'Incorrect address starting from "/111".']
 				]
 			],
-			// #23.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Wrong IPV4 mask in IP range _3',
-						'IP range' => '192.168.4.0/129'
-					],
-					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "/129".'
-				]
-			],
-			// #24.
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -647,10 +628,12 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '2001:DB8:0000:0000:244:17FF:FEB6:D37D/64'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": IP range "2001:DB8:0000:0000:244:17FF:FEB6:D37D/64" exceeds "65536" address limit.'
+					'inline_errors' => [
+						'IP range' => 'IP range "2001:DB8:0000:0000:244:17FF:FEB6:D37D/64" exceeds "65536" address limit.'
+					]
 				]
 			],
-			// #25.
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -659,71 +642,10 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '2001:db8::/130'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "/130".'
+					'inline_errors' => ['IP range' => 'Incorrect address starting from "/130".']
 				]
 			],
-			// #26.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => ''
-					],
-					'error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Field "dchecks" is mandatory.'
-					]
-				]
-			],
-			// #27.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty interval validation',
-						'Update interval' => ''
-					],
-					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "delay": cannot be empty.'
-				]
-			],
-			// #28.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Text interval validation',
-						'Update interval' => 'text'
-					],
-					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "delay": a time unit is expected.'
-				]
-			],
-			// #29.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Special symbols in interval validation',
-						'Update interval' => '😀'
-					],
-					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "delay": a time unit is expected.'
-				]
-			],
-			// #30.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Negative interval validation',
-						'Update interval' => -1
-					],
-					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "delay": a time unit is expected.'
-				]
-			],
-			// #31.
+			// #23.
 			[
 				[
 					'fields' => [
@@ -732,7 +654,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #32.
+			// #24.
 			[
 				[
 					'fields' => [
@@ -746,7 +668,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #33.
+			// #25.
 			[
 				[
 					'fields' => [
@@ -756,7 +678,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #34.
+			// #26.
 			[
 				[
 					'fields' => [
@@ -766,7 +688,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #35.
+			// #27.
 			[
 				[
 					'fields' => [
@@ -776,7 +698,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #36.
+			// #28.
 			[
 				[
 					'fields' => [
@@ -786,7 +708,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #37.
+			// #29.
 			[
 				[
 					'fields' => [
@@ -796,7 +718,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #38.
+			// #30.
 			[
 				[
 					'fields' => [
@@ -811,7 +733,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [['default' => true]]
 				]
 			],
-			// #39.
+			// #31.
 			[
 				[
 					'fields' => [
@@ -849,7 +771,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #40.
+			// #32.
 			[
 				[
 					'fields' => [
@@ -877,7 +799,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #41.
+			// #33.
 			[
 				[
 					'fields' => [
@@ -922,7 +844,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #42.
+			// #34.
 			[
 				[
 					'trim' => true,
@@ -954,7 +876,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #43.
+			// #35.
 			[
 				[
 					'check_radio_labels' => true,
@@ -1022,7 +944,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	public function getCreateData() {
 		return [
-			// #44.
+			// #36.
 			[
 				[
 					'fields' => [
@@ -1055,7 +977,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	public function getUpdateData() {
 		return [
-			// #44.
+			// #37.
 			[
 				[
 					'fields' => [
@@ -1140,7 +1062,11 @@ class testFormNetworkDiscovery extends CWebTest {
 			$add_button = $form->getField('Checks')->query('button:Add')->waitUntilClickable()->one();
 			$expected_checks = [];
 
-			foreach ($data['Checks'] as $i => $check) {
+			foreach ($data['Checks'] as $check) {
+				$inline_errors = CTestArrayHelper::get($check, 'inline_errors');
+				$dialog_error = CTestArrayHelper::get($check, 'dialog_error');
+				unset($check['inline_errors'], $check['dialog_error']);
+
 				$add_button->click();
 				$check_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$checks_form = $check_dialog->asForm();
@@ -1161,14 +1087,20 @@ class testFormNetworkDiscovery extends CWebTest {
 				// Submit Discovery check dialog.
 				$checks_form->submit();
 
-				// If there is more than 1 check, dialog error will appear only in the last check.
-				if (CTestArrayHelper::get($data, 'dialog_error') && ($i + 1 === count($data['Checks']))) {
-					$this->assertMessage(TEST_BAD, null, $data['dialog_error']);
+				if ($inline_errors !== null || $dialog_error !== null) {
+					if ($inline_errors !== null) {
+						$this->assertInlineError($checks_form, $inline_errors);
+					}
+					else {
+						$this->assertMessage(TEST_BAD, $dialog_error);
+					}
+
 					$this->assertEquals($old_hash, $this->getHash());
 
-					// After checking error in overlay no need to test further form.
+					// The check dialog stays open on error, so there is nothing left to test in the rule form.
 					$check_dialog->close();
 					$dialog->close();
+
 					return;
 				}
 
@@ -1254,9 +1186,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot'.($update ? ' update': ' create').' discovery rule',
-					$data['error_details']
-			);
+			$this->assertInlineError($form, $data['inline_errors']);
 			$this->assertEquals($old_hash, $this->getHash());
 		}
 		else {
@@ -1524,7 +1454,7 @@ class testFormNetworkDiscovery extends CWebTest {
 							'IP address' => true
 						]
 					],
-					'error_details' => 'Field "dchecks" is mandatory.'
+					'inline_errors' => ['id:dcheckList' => 'This field cannot be empty.'] // Checks field.
 				]
 			]
 		];
@@ -1551,8 +1481,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot update discovery rule', $data['error_details']);
-
+			$this->assertInlineError($form, $data['inline_errors']);
 			$this->assertEquals($old_hash, $this->getHash());
 		}
 		else {

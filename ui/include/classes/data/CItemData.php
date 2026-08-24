@@ -934,9 +934,9 @@ final class CItemData {
 					'js-item-public-key-label',
 					'js-item-public-key-field',
 					'publickey',
-					$data['is_discovery_rule'] ? 'js-item-password-label' : 'js-item-passphrase-label',
-					$data['is_discovery_rule'] ? 'js-item-password-field' : 'js-item-passphrase-field',
-					$data['is_discovery_rule'] ? 'password' : 'passphrase'
+					'js-item-passphrase-label',
+					'js-item-passphrase-field',
+					'passphrase'
 				]
 			],
 			'for_http_auth_type' => [
@@ -3010,7 +3010,7 @@ final class CItemData {
 				]
 			],
 			'zabbix[tcache, cache, <parameter>]' => [
-				'description' => _('Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests.'),
+				'description' => _('Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests.'),
 				'value_type' => null,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#tcache'

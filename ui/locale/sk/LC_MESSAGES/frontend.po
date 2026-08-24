@@ -152,6 +152,12 @@ msgstr "%1$s znakov"
 msgid "%1$s characters remaining"
 msgstr "Zostáva %1$s znakov"
 
+#: app/views/administration.housekeeping.edit.php:165
+#: app/views/administration.housekeeping.edit.php:166
+#, c-format
+msgid "%1$s data storage period"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
@@ -5224,6 +5230,15 @@ msgstr "Kliknite a potiahnite na požadovanú veľkosť."
 msgid "Click to view or edit"
 msgstr "Kliknutím zobrazíte alebo upravíte"
 
+#: app/views/administration.housekeeping.edit.php:165
+msgid "ClickHouse"
+msgstr ""
+
+#: include/classes/api/managers/history/CClickHouseStorage.php:118
+#, c-format
+msgid "ClickHouse error: %1$s."
+msgstr ""
+
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
 msgstr "ID klienta"
@@ -8504,6 +8519,10 @@ msgstr "Dátum účinnosti"
 #: app/partials/hostmacros.inherited.list.html.php:50
 msgid "Effective value"
 msgstr "Efektívna hodnota"
+
+#: app/views/administration.housekeeping.edit.php:166
+msgid "Elasticsearch"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -11984,6 +12003,16 @@ msgstr "Nahraný neplatný súbor."
 #: include/triggers.inc.php:768
 msgid "Incorrect function is used"
 msgstr "Nie je použitá platná funkcia"
+
+#: include/classes/core/CConfigFile.php:211
+#: include/classes/core/CConfigFile.php:219
+#: include/classes/core/CConfigFile.php:557
+#: include/classes/core/CConfigFile.php:563
+#: include/classes/core/CConfigFile.php:569
+#: include/classes/core/CConfigFile.php:579
+#, c-format
+msgid "Incorrect history storage configuration %1$s: %2$s."
+msgstr ""
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -16067,6 +16096,10 @@ msgstr "Ďalej"
 msgid "Next dashboard"
 msgstr "Ďalší dashboard"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -16080,6 +16113,10 @@ msgstr "Ďalšia strana"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Ďalší krok"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -16784,6 +16821,12 @@ msgstr "Nededené položky"
 #: app/views/host.wizard.edit.php:175
 msgid "Not linked"
 msgstr "Neprepojené"
+
+#: app/views/item.list.php:233 app/views/item.list.php:234
+#: include/classes/helpers/CItemHelper.php:386
+#: include/classes/helpers/CItemHelper.php:416
+msgid "Not stored"
+msgstr ""
 
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
@@ -22870,6 +22913,10 @@ msgstr "Toto nastavenie platí len pre číselné údaje."
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Toto nastavenie platí len pre číselné údaje. Nečíselné údaje budú vždy prevzaté z histórie."
 
+#: app/views/administration.housekeeping.edit.php:145
+msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
+msgstr ""
+
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
 msgid "This setting should be enabled, because history tables contain compressed chunks."
@@ -23270,6 +23317,11 @@ msgctxt "compact table header"
 msgid "Total"
 msgstr "Celkom"
 
+#: include/classes/debug/CProfiler.php:172
+#, c-format
+msgid "Total ClickHouse time: %1$s"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
@@ -23344,6 +23396,10 @@ msgstr "Považovať za 0"
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "Štatistika vyrovnávacej pamäte funkcie trend. Platné parametre sú: all, hits, phits, misses, pmisses, items, pitems a requests."
 
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162
 #: app/partials/monitoring.latest.view.html.php:74
@@ -23359,6 +23415,11 @@ msgstr "Štatistika vyrovnávacej pamäte funkcie trend. Platné parametre sú: 
 #: widgets/tophosts/views/column.edit.php:206
 msgid "Trends"
 msgstr "Trendy"
+
+#: app/partials/item.edit.item.tab.php:774
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -27554,6 +27615,10 @@ msgstr "fuzzytime() – Rozdiel medzi hodnotou položky (ako časová pečiatka)
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
 msgstr "očakávajú sa zemepisné súradnice (hodnoty zemepisnej šírky a dĺžky oddelené čiarkou)"
 
+#: app/views/item.edit.php:224 app/views/item.edit.php:228
+msgid "global housekeeping settings"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
 #: include/views/configuration.item.edit.php:918
@@ -27712,6 +27777,11 @@ msgstr "nesprávny počet prvkov"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "nesprávny výraz začínajúci od „%1$s“"
+
+#: include/classes/core/CConfigFile.php:212
+#: include/classes/core/CConfigFile.php:220
+msgid "incorrect format"
+msgstr ""
 
 #: jsLoader.php:298
 msgid "incorrect item value type"

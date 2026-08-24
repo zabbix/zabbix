@@ -19,7 +19,7 @@
  */
 ?>
 
-$('.overlay-dialogue-body #filter_custom_time').on('change', function() {
+$(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY} #filter_custom_time`).on('change', function() {
 	let $calendars = $(this).closest('form').find('.calendar-control');
 
 	$('input,button', $calendars).prop('disabled', !$(this).is(':checked'));

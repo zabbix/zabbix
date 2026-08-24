@@ -22,6 +22,7 @@ class ConfigurationParameter
 	static final int TYPE_INTEGER = 0;
 	static final int TYPE_INETADDRESS = 1;
 	static final int TYPE_FILE = 2;
+	static final int TYPE_STRING = 3;
 
 	private String name;
 	private int type;
@@ -69,6 +70,9 @@ class ConfigurationParameter
 					break;
 				case TYPE_FILE:
 					userValue = new File(text);
+					break;
+				case TYPE_STRING:
+					userValue = text;
 					break;
 				default:
 					throw new IllegalArgumentException(String.format("unknown type %d", type));

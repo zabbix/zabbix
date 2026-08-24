@@ -341,15 +341,17 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
+int	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
 {
 	if (NULL == dbconn)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return;
+		return FAIL;
 	}
 
 	zbx_dbconn_extract_version_info(dbconn, version_info);
+
+	return SUCCEED;
 }
 
 #ifdef HAVE_POSTGRESQL

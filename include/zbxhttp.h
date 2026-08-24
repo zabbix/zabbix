@@ -79,6 +79,22 @@ int	zbx_http_req(const char *url, const char *header, long timeout, const char *
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **out,
 		const char *post_data, long *response_code, char **error);
 
+/* transport-level outcome of zbx_http_post_json_rpc(); a request-specific "returned error" (the */
+/* JSON-RPC "error" member) is left for the caller to detect, since only the caller knows how to react */
+typedef enum
+{
+	ZBX_HTTP_JSONRPC_ERR_CONNECT,
+	ZBX_HTTP_JSONRPC_ERR_INVALID_RESPONSE
+}
+zbx_http_jsonrpc_error_t;
+
+struct zbx_json_parse;
+
+int	zbx_http_post_json_rpc(const char *url, const char *ca_file, const char *crl_file, const char *cert_file,
+		const char *key_file, const char *connect_to_value, const char *payload, const char *request,
+		const char *service_name, long timeout, char **body_data, struct zbx_json_parse *jp_body,
+		zbx_http_jsonrpc_error_t *err_kind);
+
 #define HTTP_REQUEST_GET	0
 #define HTTP_REQUEST_POST	1
 #define HTTP_REQUEST_PUT	2

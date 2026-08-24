@@ -44,7 +44,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 				'expressions' => [
 					[
 						'expression' => 'test 🙂🙃 ZaBbiX зАБбИкс āēīõšŗ \n <br/>',
-						'expression_type' => EXPRESSION_TYPE_INCLUDED
+						'expression_type' => REGEX_TYPE_CONTAINS_STRING
 					]
 				]
 			],
@@ -53,12 +53,12 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 				'expressions' => [
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_ANY_INCLUDED,
+						'expression_type' => REGEX_TYPE_CONTAINS_ANY_SUBSTRING,
 						'case_sensitive' => 1
 					],
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_NOT_INCLUDED,
+						'expression_type' => REGEX_TYPE_NOT_CONTAINS_STRING,
 						'case_sensitive' => 0
 					]
 				]
@@ -68,15 +68,15 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 				'expressions' => [
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_INCLUDED
+						'expression_type' => REGEX_TYPE_CONTAINS_STRING
 					],
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_TRUE
+						'expression_type' => REGEX_TYPE_MATCHES_REGEX
 					],
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_FALSE
+						'expression_type' => REGEX_TYPE_NOT_MATCHES_REGEX
 					]
 				]
 			],
@@ -85,7 +85,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 				'expressions' => [
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_INCLUDED
+						'expression_type' => REGEX_TYPE_CONTAINS_STRING
 					]
 				]
 			]
@@ -108,27 +108,27 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		);
 		$popup_menu->close();
 
-		// Check if the New regular expression button is clickable.
-		$this->assertTrue($this->query('button:New regular expression')->one()->isClickable());
+		// Check if the Create regular expression button is clickable.
+		$this->assertTrue($this->query('button:Create regular expression')->one()->isClickable());
 
 		// Check the data table.
-		$this->assertEquals(['', 'Name', 'Expressions'], $this->query('class:list-table')->asTable()->one()->getHeadersText());
+		$this->assertEquals(['', 'Name', 'Expressions', 'Description'], $this->query('class:list-table')->asTable()->one()->getHeadersText());
 
 		$expected_data = [
 			[
 				'Name' => '0_case_1 🙂🙃 ZaBbiX зАБбИкс āēīõšŗ \n <br/>',
-				'Expressions' => '1 ⇒ test 🙂🙃 ZaBbiX зАБбИкс āēīõšŗ \n <br/> [Character string included]'
+				'Expressions' => '1 ⇒ test 🙂🙃 ZaBbiX зАБбИкс āēīõšŗ \n <br/> [Contains string]'
 			],
 			[
 				'Name' => '0_case_2',
-				'Expressions' => "1 ⇒ test [Any character string included]\n".
-						'2 ⇒ test [Character string not included]'
+				'Expressions' => "1 ⇒ test [Contains any substring from list]\n".
+						'2 ⇒ test [Does not contain string]'
 			],
 			[
 				'Name' => '0_case_3',
-				'Expressions' => "1 ⇒ test [Character string included]\n".
-						"2 ⇒ test [Result is TRUE]\n".
-						'3 ⇒ test [Result is FALSE]'
+				'Expressions' => "1 ⇒ test [Contains string]\n".
+						"2 ⇒ test [Matches regular expression]\n".
+						'3 ⇒ test [Does not match regular expression]'
 			]
 		];
 

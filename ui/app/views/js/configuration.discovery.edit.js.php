@@ -21,16 +21,27 @@
 
 window.drule_edit_popup = new class {
 
-	init({druleid, dchecks, drule}) {
-		this.overlay = overlays_stack.getById('discovery.edit');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+	#overlay;
+	#dialogue;
+	#form_element;
+	#form;
+	#clone_rules;
+	#dchecks;
+	#drule;
+	#dcheckid;
+	#available_device_types;
 
-		this.druleid = druleid;
-		this.dchecks = dchecks;
-		this.drule = drule;
-		this.dcheckid = getUniqueId();
-		this.available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
+	init({rules, clone_rules, dchecks, drule}) {
+		this.#overlay = overlays_stack.getById('discovery.edit');
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
+		this.#clone_rules = clone_rules;
+
+		this.#dchecks = dchecks;
+		this.#drule = drule;
+		this.#dcheckid = getUniqueId();
+		this.#available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'discovery.list');
@@ -47,44 +58,50 @@ window.drule_edit_popup = new class {
 		}
 
 		this.#addRadioButtonValues(drule);
-		this.#initActionButtons();
-		this.#updateForm();
-		this.form.style.display = '';
-		this.overlay.recoverFocus();
+		this.#form.discoverAllFields();
+		this.#initEvents();
+		this.#form_element.style.display = '';
+		this.#overlay.recoverFocus();
 	}
 
-	#initActionButtons() {
-		this.dialogue.addEventListener('click', (e) => {
+	#initEvents() {
+		this.#dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-check-add')) {
 				this.#editCheck();
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				this.#removeDCheckRow(e.target.closest('tr').id);
 				e.target.closest('tr').remove();
+				this.#form.discoverAllFields();
 			}
 			else if (e.target.classList.contains('js-edit')) {
 				this.#editCheck(e.target.closest('tr'));
 			}
 		});
 
-		const max_sessions = this.form.querySelector('#concurrency_max_type');
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
 
-		max_sessions.onchange = () => {
-			this.#updateForm();
-		};
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-clone')
+			?.addEventListener('click', () => this.#clone());
 
-		max_sessions.dispatchEvent(new Event('change'));
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-delete')
+			?.addEventListener('click', () => this.#delete());
+
+		this.#form_element.querySelector('#concurrency_max_type').addEventListener('change', () => this.#updateForm());
+
+		this.#updateForm();
 	}
 
 	#updateForm() {
-		const discovery_by = this.form.querySelector('[name="discovery_by"]:checked').value;
+		const discovery_by = this.#form_element.querySelector('[name="discovery_by"]:checked').value;
 
-		this.form.querySelector('.js-field-proxy').style.display = discovery_by == <?= ZBX_DISCOVERY_BY_PROXY ?>
+		this.#form_element.querySelector('.js-field-proxy').style.display = discovery_by == <?= ZBX_DISCOVERY_BY_PROXY ?>
 			? ''
 			: 'none';
 
-		const concurrency_max_type = this.form.querySelector('[name="concurrency_max_type"]:checked').value;
-		const concurrency_max = this.form.querySelector('#concurrency_max');
+		const concurrency_max_type = this.#form.findFieldByName('concurrency_max_type').getValue()
+		const concurrency_max = this.#form_element.querySelector('#concurrency_max');
 		const is_custom = concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>;
 
 		concurrency_max.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_custom);
@@ -95,22 +112,21 @@ window.drule_edit_popup = new class {
 
 	#updateCheck(row, input) {
 		delete input.dchecks;
+		input.dcheckid = row.dataset.dcheckid;
 		input.warning = row.querySelector('.btn-icon')?.getAttribute('data-hintbox-html');
 
 		this.#addCheck(input, row, true);
 		row.remove();
 		this.#updateCheckWarningIcon(input);
 		this.#addInputFields(input);
+		this.#form.discoverAllFields();
 	}
 
 	#editCheck(row = null) {
-		let params = {
-			dcheckid: this.dcheckid
-		};
+		let params = {};
 
 		if (row !== null) {
 			params = {
-				dcheckid: this.dcheckid,
 				update: 1
 			};
 
@@ -126,6 +142,16 @@ window.drule_edit_popup = new class {
 			}
 		}
 
+		params.dchecks = this.#form.findFieldByName('dchecks').getValue();
+
+		if (row !== null) {
+			const current_dcheckid = row.dataset.dcheckid;
+
+			if (Object.prototype.hasOwnProperty.call(params.dchecks, current_dcheckid)) {
+				delete params.dchecks[current_dcheckid];
+			}
+		}
+
 		const overlay = PopUp('discovery.check.edit', params, {
 			dialogueid: 'discovery-check',
 			dialogue_class: 'modal-popup-medium'
@@ -136,30 +162,57 @@ window.drule_edit_popup = new class {
 				this.#updateCheck(row, e.detail);
 			}
 			else {
-				this.dcheckid = getUniqueId()
+				e.detail.dcheckid = getUniqueId();
 				this.#addCheck(e.detail, null);
+				this.#form.discoverAllFields();
 			}
 		});
 	}
 
 	#addRadioButtonValues(drule) {
-		jQuery('input:radio[name="uniqueness_criteria"][value='+jQuery.escapeSelector(drule.uniqueness_criteria)+']')
-			.attr('checked', 'checked');
-		jQuery('input:radio[name="host_source"][value='+jQuery.escapeSelector(drule.host_source)+']')
-			.attr('checked', 'checked');
-		jQuery('input:radio[name="name_source"][value='+jQuery.escapeSelector(drule.name_source)+']')
-			.attr('checked', 'checked');
+		['uniqueness_criteria', 'host_source', 'name_source'].forEach((field) => {
+			if (field === 'uniqueness_criteria' && drule.uniq === 1) {
+				drule[field] = `_${drule.dcheckid}`;
+			}
+
+			const radioButton = document.querySelector(
+				`input[type="radio"][name="${field}"][value="${CSS.escape(drule[field])}"]`
+			);
+
+			if (radioButton) {
+				radioButton.checked = true;
+			}
+		});
 
 		document.querySelectorAll('#host_source, #name_source').forEach((element) => {
 			element.addEventListener('change', (e) => {
 				this.#updateRadioButtonValues(e);
 			});
 		});
+
+		document.querySelectorAll('#device-uniqueness-list').forEach((element) => {
+			element.addEventListener('change', (e) => {
+				this.#updateRadioButtonUniquenessCriteria(e);
+			});
+		});
+	}
+
+	#updateRadioButtonUniquenessCriteria(event) {
+		const target = event.target;
+
+		document.querySelectorAll('[name^=dchecks][name$="[uniq]"]')
+			.forEach((dcheck) => {
+				dcheck.value = 0;
+			});
+
+		if (typeof target.dataset.id !== 'undefined') {
+			document.querySelector(`[name="dchecks[${target.dataset.id}][uniq]"]`).value = 1;
+		}
 	}
 
 	#updateRadioButtonValues(event) {
-		let target = event.target;
-		let name = target.getAttribute('name');
+		const target = event.target;
+		const name = target.getAttribute('name');
 
 		if (typeof target.dataset.id !== 'undefined') {
 			document.querySelectorAll(`[name^=dchecks][name$="[${name}]"]`)
@@ -184,6 +237,18 @@ window.drule_edit_popup = new class {
 		delete input.dchecks;
 
 		if (update === false) {
+			if (typeof input.uniq === 'undefined') {
+				const checked_uniqueness_criteria = document.querySelector(
+					'[name="uniqueness_criteria"]:checked:not([data-id])'
+				);
+
+				if (checked_uniqueness_criteria !== null && checked_uniqueness_criteria.value === input.dcheckid) {
+					input.uniq = 1;
+				} else {
+					input.uniq = 0;
+				}
+			}
+
 			if (typeof input.host_source === 'undefined') {
 				const checked_host_source = document.querySelector('[name="host_source"]:checked:not([data-id])');
 				input.host_source = checked_host_source === null
@@ -199,10 +264,12 @@ window.drule_edit_popup = new class {
 			}
 		}
 		else {
-			if (this.available_device_types.includes(parseInt(input.type))) {
+			if (this.#available_device_types.includes(parseInt(input.type))) {
 				input.host_source = document.querySelector('input[name=host_source]:checked').value;
 				input.name_source = document.querySelector('input[name=name_source]:checked').value;
-				input.uniqueness_criteria = document.querySelector('input[name=uniqueness_criteria]:checked').value;
+				const checked_uniqueness_criteria = document.querySelector('input[name=uniqueness_criteria]:checked');
+
+				input.uniq = checked_uniqueness_criteria.value === '_'+input.dcheckid ? 1 : 0;
 			}
 		}
 
@@ -236,7 +303,7 @@ window.drule_edit_popup = new class {
 			warning_icon.remove();
 		}
 
-		this.dchecks.forEach(dcheck => {
+		this.#dchecks.forEach(dcheck => {
 			if (dcheck.dcheckid === input.dcheckid) {
 				dcheck.warning === '' ? warning_icon.remove() : row.querySelector('.js-remove').disabled = true;
 			}
@@ -250,6 +317,7 @@ window.drule_edit_popup = new class {
 				input_element.name = `dchecks[${input.dcheckid}][${field_name}]`;
 				input_element.type = 'hidden';
 				input_element.value = input[field_name];
+				input_element.setAttribute('data-field-type', 'hidden');
 
 				const dcheck_cell = document.getElementById(`dcheckCell_${input.dcheckid}`);
 				dcheck_cell.appendChild(input_element);
@@ -264,7 +332,7 @@ window.drule_edit_popup = new class {
 			name_template: ['name-source-row-tmpl', 'name_source', 'name_source_', 'chk_host']
 		};
 
-		const need_to_add_row = this.available_device_types.includes(parseInt(input.type));
+		const need_to_add_row = this.#available_device_types.includes(parseInt(input.type));
 
 		for (const [template_id, list_id, key, def] of Object.values(templates)) {
 			if (need_to_add_row) {
@@ -298,7 +366,7 @@ window.drule_edit_popup = new class {
 		}
 
 		if (update === false) {
-			this.#addRadioButtonValues(this.drule);
+			this.#addRadioButtonValues(this.#drule);
 		}
 		else {
 			this.#addRadioButtonValues(input);
@@ -321,8 +389,6 @@ window.drule_edit_popup = new class {
 
 			setInputSource('host_source', <?= ZBX_DISCOVERY_DNS ?>);
 			setInputSource('name_source', <?= ZBX_DISCOVERY_UNSPEC ?>);
-
-			delete input.uniqueness_criteria;
 		}
 	}
 
@@ -348,8 +414,10 @@ window.drule_edit_popup = new class {
 		}
 	}
 
-	clone({title, buttons}) {
-		this.druleid = null;
+	#clone() {
+		this.#removePopupMessages();
+		const druleid = this.#form_element.querySelector('[name="druleid"]');
+		druleid.remove();
 
 		// Remove all warning icons and enable all Remove buttons in Checks table.
 		const table = document.getElementById('dcheckList');
@@ -357,39 +425,70 @@ window.drule_edit_popup = new class {
 		table.querySelectorAll('.js-remove').forEach(element => element.disabled = false);
 		table.querySelectorAll('.btn-icon').forEach(element => element.remove());
 
-		this.overlay.setProperties({title, buttons});
-		this.overlay.unsetLoading();
-		this.overlay.recoverFocus();
-		this.overlay.containFocus();
+		const title = <?= json_encode(_('New discovery rule')) ?>;
+		const buttons = [
+			{
+				title: <?= json_encode(_('Add')) ?>,
+				class: 'js-submit',
+				keepOpen: true,
+				isSubmit: true
+			},
+			{
+				title: <?= json_encode(_('Cancel')) ?>,
+				class: ZBX_STYLE_BTN_ALT,
+				cancel: true,
+				action: ''
+			}
+		];
+
+		this.#overlay.unsetLoading();
+		this.#overlay.setProperties({title, buttons});
+
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-submit').addEventListener('click', () => this.#submit());
+
+		this.#overlay.recoverFocus();
+		this.#overlay.containFocus();
+		this.#form.reload(this.#clone_rules);
 	}
 
-	delete() {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'discovery.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>);
+	#delete() {
+		if (window.confirm(<?= json_encode(_('Delete discovery rule?')) ?>)) {
+			this.#removePopupMessages();
+			const url_params = {
+				action: 'discovery.delete',
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
+			};
+			const druleid = this.#form.findFieldByName('druleid').getValue();
 
-		this.#post(curl.getUrl(), {druleids: [this.druleid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+			this.#post(zabbixUrl(url_params), {druleids: [druleid]}, (response) => {
+					overlayDialogueDestroy(this.#overlay.dialogueid);
+					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				}
+			);
+		}
+		else {
+			this.#overlay.unsetLoading();
+		}
 	}
 
-	submit() {
-		const fields = getFormFields(this.form);
+	#submit() {
+		this.#removePopupMessages();
+		const fields = this.#form.getAllValues();
+		const action = document.getElementById('druleid') !== null ? 'discovery.update' : 'discovery.create';
 
-		['name', 'iprange', 'delay'].forEach(
-			field => fields[field] = fields[field].trim()
-		);
+		this.#form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#overlay.unsetLoading();
+					return;
+				}
 
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', this.druleid === null ? 'discovery.create' : 'discovery.update');
+				this.#post(zabbixUrl({action}), fields, (response) => {
+					overlayDialogueDestroy(this.#overlay.dialogueid);
 
-		this.#post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				});
+			})
 	}
 
 	#post(url, data, success_callback) {
@@ -404,32 +503,40 @@ window.drule_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				if ('form_errors' in response) {
+					this.#form.setErrors(response.form_errors, true, true);
+					this.#form.renderErrors();
+
+					return;
+				}
+
+				return success_callback(response);
 			})
-			.then(success_callback)
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this.#overlay.unsetLoading());
+	}
 
-				let title, messages;
+	#removePopupMessages() {
+		for (const el of this.#form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
 
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
 
-				}
-				const message_box = makeMessageBox('bad', messages, title)[0];
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
 
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 	}
 }
