@@ -941,7 +941,9 @@ function getMenuPopupTrigger(options, trigger_element) {
 		};
 	}
 
-	if (options.allowed_edit_maintenance && options.allowed_host_edit) {
+	const has_eventid = options.eventid !== undefined && Number(options.eventid) > 0;
+
+	if (options.allowed_edit_maintenance && options.allowed_host_edit && has_eventid) {
 		const item_urls = [];
 
 		const maintenance = [
