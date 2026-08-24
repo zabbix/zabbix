@@ -51,7 +51,13 @@ class testVfsDevGet extends CIntegrationTest {
 		self::$disks = self::listBlockDevices();
 
 		if (!self::$disks) {
-			throw new Exception('No block devices found on this host to test vfs.dev.get against.');
+			throw new Exception('No block devices found on this host to test vfs.dev.get against.'.
+					"\n--- debug: lsblk -a ---\n".shell_exec('lsblk -a 2>&1').
+					"\n--- debug: ls -l /dev/nvme0n1 /dev/ram0 ---\n".
+					shell_exec('ls -l /dev/nvme0n1 /dev/ram0 2>&1').
+					"\n--- debug: which lsblk awk ---\n".shell_exec('which lsblk awk 2>&1').
+					"\n--- debug: id ---\n".shell_exec('id 2>&1')
+			);
 		}
 
 		parent::onBeforeTestSuite();
