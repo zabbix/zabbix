@@ -422,7 +422,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			[
 				[
 					'object' => 'discovery rule',
-					'url' => 'host_discovery.php?context=host&filter_set=1&filter_key=Discovered&filter_hostids%5B%5D='
+					'url' => 'zabbix.php?action=lldrule.list&context=host&filter_set=1&filter_key=Discovered&filter_hostids[0]='
 				]
 			]
 		];

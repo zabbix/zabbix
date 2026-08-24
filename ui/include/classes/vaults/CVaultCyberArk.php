@@ -69,10 +69,7 @@ class CVaultCyberArk extends CVault {
 		if ($this->cert_file !== '' && $this->key_file !== '') {
 			$context['ssl'] = [
 				'local_cert'		=> $this->cert_file,
-				'local_pk'			=> $this->key_file,
-				'verify_peer'		=> false,
-				'verify_peer_name'	=> false,
-				'allow_self_signed'	=> true
+				'local_pk'			=> $this->key_file
 			];
 		}
 

@@ -88,7 +88,7 @@ global $ZBX_SERVER_NAME;
 			CBrandHelper::isRebranded() ? null : [NBSP(), NBSP(), BULLET(), NBSP(), NBSP()],
 			CBrandHelper::isRebranded()
 				? null
-				: (new CLink(_('Support'), getSupportUrl(CWebUser::getLang())))
+				: (new CLink(_('Subscriptions'), getSubscriptionsUrl(CWebUser::getLang())))
 					->setTarget('_blank')
 					->addClass(ZBX_STYLE_GREY)
 					->addClass(ZBX_STYLE_LINK_ALT)

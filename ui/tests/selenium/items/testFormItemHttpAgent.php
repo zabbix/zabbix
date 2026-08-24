@@ -1229,6 +1229,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$dialog->getFooter()->query('button:Update')->one()->click();
 			$this->assertMessage(TEST_GOOD, 'Item updated');
 			$dialog->ensureNotPresent();
+			CMessageElement::find()->one()->close();
 		}
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));

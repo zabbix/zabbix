@@ -114,7 +114,17 @@ class CDatatableElement extends CElement {
 		}
 
 		if ($this->headers_text === null) {
-			$this->headers_text = $this->getHeaders()->asText();
+			try {
+				$this->headers_text = $this->getHeaders()->asText();
+			}
+			catch (Exception $exception) {
+				/*
+				 * Headers can become stale while the datatable is re-rendering. Such headers cannot be reloaded,
+				 * because they are selected as a part of multi-element selection, so get them again and retry.
+				 */
+				$this->invalidate();
+				$this->headers_text = $this->getHeaders()->asText();
+			}
 		}
 
 		return $this->headers_text;

@@ -115,7 +115,7 @@ svg *:focus {
   unicode-range: U+4E00-9FFF; }
 @font-face {
   font-family: "zabbix-icons";
-  src: url("../fonts/zabbix-icons.woff2?t=1779433480634") format("woff2"), url("../fonts/zabbix-icons.woff?t=1779433480634") format("woff"), url("../fonts/zabbix-icons.ttf?t=1779433480634") format("truetype"), url("../fonts/zabbix-icons.svg?t=1779433480634#zabbix-icons") format("svg"); }
+  src: url("../fonts/zabbix-icons.woff2?t=1786100546126") format("woff2"), url("../fonts/zabbix-icons.woff?t=1786100546126") format("woff"), url("../fonts/zabbix-icons.ttf?t=1786100546126") format("truetype"), url("../fonts/zabbix-icons.svg?t=1786100546126#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close::before, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, .tag.tag-inherited::before, .tag.tag-inherited-duplicate::before, .color-picker-no-color::after, .z-select .focusable::after,
 z-select .focusable::after, .link-external::after, .markdown a::after, .modal-popup-host-wizard .formated-text a::after, .drag-icon::before, .btn-dropdown-container .btn-dropdown-toggle::after {
   font-family: 'zabbix-icons';
@@ -456,7 +456,7 @@ button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"]
 .zi-stop-sign:before {
   content: "\ea6c"; }
 
-.zi-support:before {
+.zi-subscriptions:before {
   content: "\ea6d"; }
 
 .zi-text:before {
@@ -1437,11 +1437,11 @@ button, .btn {
   color: #f2f2f2;
   background-color: #69808d;
   border-color: #69808d; }
-  button:hover, .btn:hover {
+  button:hover, .btn:hover, button:hover:link, .btn:hover:link, button:hover:visited, .btn:hover:visited {
     color: #f2f2f2;
     background-color: #5e737e;
     border-color: #5e737e; }
-  button:active, .btn:active, button:focus, .btn:focus {
+  button:active, .btn:active, button:active:link, .btn:active:link, button:active:visited, .btn:active:visited, button:focus, .btn:focus, button:focus:link, .btn:focus:link, button:focus:visited, .btn:focus:visited {
     color: #f2f2f2;
     background-color: #5e737e;
     border-color: #5e737e; }
@@ -1513,6 +1513,9 @@ button {
   display: inline-block; }
   .btn:link, .btn:visited {
     color: #f2f2f2; }
+
+.btn-alt:link, .btn-alt:visited {
+  color: #768d99; }
 
 .btn-icon {
   border-radius: max(0px, calc(var(--button-border-radius) - 2px));
