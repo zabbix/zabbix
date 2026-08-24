@@ -373,6 +373,7 @@ class testUserRolesPermissions extends CWebTest {
 			if (in_array('Cancel', $data['form_button'])) {
 				$this->query('button:Cancel')->one()->click();
 				COverlayDialogElement::ensureNotPresent();
+				$this->page->waitUntilReady();
 			}
 
 			if ($action_status) {
@@ -635,7 +636,7 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'link' => 'zabbix.php?action=problem.view',
-					'selector' => 'xpath:(//a[@class="link-action wordbreak" and text()="ЗАББИКС Сервер"])[1]'
+					'selector' => 'xpath:(//a[@class="link-action overflow-ellipsis" and text()="ЗАББИКС Сервер"])[1]'
 				]
 			],
 			// Dashboard problem widget.

@@ -409,7 +409,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 		}
 
 		foreach (['Host name', 'Text'] as $data) {
-			$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL($data)]);
+			$column_form->fill(['Data' => $data]);
+			$column_form->getField('Item name')->waitUntilNotVisible();
 			$required_fields = ($data === 'Host name') ? ['Name'] : ['Name', 'Text'];
 			$column_default_fields['Data']['value'] = ($data === 'Host name') ? 'Host name' : 'Text';
 			$column_default_fields['Text']['visible'] = $data === 'Text';
@@ -422,7 +423,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 			$this->assertEquals($required_fields, $column_form->getRequiredLabels());
 		}
 
-		$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL('Item value')]);
+		$column_form->fill(['Data' => 'Item value']);
+		$column_form->getField('Item name')->waitUntilVisible();
 
 		// 'Sparkline' displayed fields when Display => Sparkline option is set.
 		$sparkline_fields = ['id:sparkline_width', 'id:sparkline_fill', self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]',

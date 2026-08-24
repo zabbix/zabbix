@@ -88,8 +88,8 @@ class testItemTest extends CWebTest {
 		$context = $is_host ? 'host' : 'template';
 
 		if ($item_type === 'Discovery rule') {
-			$create_link = 'host_discovery.php?form=create&hostid='.$id.'&context='.$context;
-			$saved_link = $items.'.php?form=update&context=host&hostid='.$id.'&itemid=';
+			$create_link = 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[]='.$id.'&context='.$context;
+			$saved_link = 'zabbix.php?action=popup&popup='.$items.'.edit&context='.$context.'&itemid=';
 		}
 		else {
 			$create_link = ($items === null)
@@ -98,15 +98,9 @@ class testItemTest extends CWebTest {
 		}
 
 		$this->page->login()->open($create_link);
-
-		if ($item_type !== 'Discovery rule') {
-			$this->query('button:'.(($items === null) ? 'Create item prototype' : 'Create item'))->one()->click();
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-			$item_form = $dialog->asForm();
-		}
-		else {
-			$item_form = $this->query('name:itemForm')->asForm()->waitUntilReady()->one();
-		}
+		$this->query('button:Create '.lcfirst($item_type))->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$item_form = $dialog->asForm();
 
 		// Create item.
 		$item_form->fill([
@@ -166,19 +160,10 @@ class testItemTest extends CWebTest {
 				}
 
 				$this->query('link', $item_name)->waitUntilClickable()->one()->click();
-
-				if ($item_type === 'Discovery rule') {
-					$button = $this->query('button:Execute now')->waitUntilVisible()->one();
-				}
-				else {
-					$button = COverlayDialogElement::find()->one()->waitUntilReady()->query('button:Execute now')->one();
-				}
+				$button = COverlayDialogElement::find()->one()->waitUntilReady()->query('button:Execute now')->one();
 
 				$this->assertTrue($button->isEnabled($enabled));
-
-				if ($item_type !== 'Discovery rule') {
-					COverlayDialogElement::find()->one()->close();
-				}
+				COverlayDialogElement::find()->one()->close();
 			}
 		}
 	}
@@ -756,21 +741,21 @@ class testItemTest extends CWebTest {
 	 * @param array		$data			data provider
 	 * @param boolean	$is_host		true if host, false if template
 	 * @param string	$id				id of a host, template or LLD rule
-	 * @param string	$items			pointer to form in URL
-	 * @param boolean   $lld            true if lld, false if item or item prototype
+	 * @param string	$item_type		pointer to form in URL
 	 */
-	public function checkTestItem($data, $is_host, $id, $items = null, $lld = false) {
+	public function checkTestItem($data, $is_host, $id, $item_type = null) {
+		$lld = ($item_type === 'lldrule');
 		$context = ($is_host === true) ? 'host' : 'template';
-		$create_link = ($items === null)
+		$create_link = ($item_type === 'item prototype')
 			? 'zabbix.php?action=item.prototype.list&context='.$context.'&parent_discoveryid='.$id
-			: 'zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$id;
+			: 'zabbix.php?action='.$item_type.'.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$id;
 
 		if (!$is_host && $data['fields']['Type'] === 'IPMI agent') {
 			return;
 		}
 
 		$this->page->login()->open($create_link);
-		$this->query('button:'.(($items === null) ? 'Create item prototype' : 'Create item'))->one()->click();
+		$this->query('button:'.(($lld) ? 'Create discovery rule' : 'Create '.$item_type))->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$item_form = $dialog->asForm();
 		$item_form->fill($data['fields']);
@@ -1253,7 +1238,7 @@ class testItemTest extends CWebTest {
 					}
 				}
 			}
-			if ($lld === false){
+			if ($lld === false) {
 				$not_supported->check();
 				$this->assertFalse($value->isEnabled());
 			}
@@ -1276,16 +1261,9 @@ class testItemTest extends CWebTest {
 	 * @param int		$i			index number of preprocessing step
 	 */
 	private function checkTestButtonInPreprocessing($item_type, $enabled = true, $i = 0) {
-
-		if ($item_type == 'Discovery rule') {
-			$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-			$test_button = $this->query('id:test_item')->waitUntilVisible()->one();
-		}
-		else {
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-			$item_form = $dialog->asForm();
-			$test_button = $dialog->getFooter()->query('button:Test')->one();
-		}
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$item_form = $dialog->asForm();
+		$test_button = $dialog->getFooter()->query('button:Test')->one();
 
 		$this->assertTrue($test_button->isEnabled($enabled));
 		$item_form->selectTab('Preprocessing');
@@ -1296,11 +1274,13 @@ class testItemTest extends CWebTest {
 		$item_form->selectTab($item_type);
 	}
 
-	private function saveFormAndCheckMessage($message, $lld = 'false') {
-
-		$item_form = $lld
-			? $this->query('name:itemForm')->waitUntilPresent()->asForm()->one()
-			: COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
+	private function saveFormAndCheckMessage($message, $lld = false) {
+		if ($lld) {
+			$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		}
+		else {
+			$item_form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
+		}
 
 		$item_form->submit();
 		$this->page->waitUntilReady();
