@@ -120,6 +120,9 @@ class testTriggerCEP extends CIntegrationTest {
 	// as a dependency of a skipped test).
 	const SKIP_NON_WINDOW_TESTS = false;
 
+	// Number of times a runtime control command is re-sent while waiting for the log line it must produce.
+	const RUNTIME_CONTROL_ATTEMPTS = 3;
+
 	const HOST_NAME = 'test';
 	const TEMPLATE_NAME = 'template_trigger_cep';
 	const LLD_RULE_KEY = 'lld.cep.trapper';
@@ -12952,11 +12955,35 @@ HEREDOC;
 	 * are gone only once both housekeepers have executed.
 	 */
 	private function forceHousekeeperExecution(): void {
-		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'housekeeper_execute');
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'forced execution of the housekeeper', true, 20, 3);
-		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'trigger_housekeeper_execute');
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'forced execution of the trigger housekeeper',
-				true, 20, 3);
+		$this->executeAndWaitForLogLine('housekeeper_execute', 'forced execution of the housekeeper');
+		$this->executeAndWaitForLogLine('trigger_housekeeper_execute',
+				'forced execution of the trigger housekeeper');
+	}
+
+	/**
+	 * Execute a runtime control command and wait until the server logs the expected line, re-executing the
+	 * command if the line has not appeared yet: the request is dropped without any log entry when the
+	 * housekeeper is not listening for it yet (it is still starting up or already busy with a previous run).
+	 *
+	 * @param string $command    runtime control command to execute
+	 * @param string $line       log line to wait for
+	 *
+	 * @throws Exception    if the line does not appear after the last attempt
+	 */
+	private function executeAndWaitForLogLine(string $command, string $line): void {
+		for ($attempt = 1;; $attempt++) {
+			$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, $command);
+
+			try {
+				$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $line, true, 3, 3);
+				return;
+			}
+			catch (Exception $e) {
+				if ($attempt >= self::RUNTIME_CONTROL_ATTEMPTS) {
+					throw $e;
+				}
+			}
+		}
 	}
 
 	/**
