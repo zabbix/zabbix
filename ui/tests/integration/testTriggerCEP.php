@@ -111,7 +111,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const SKIP_OPERATION_TAG_VALUE_TESTS = true;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
-	const SKIP_SERVICES_TESTS = false;
+	const SKIP_SERVICES_TESTS = null;
 
 	// Set to true to run the CEP window scenarios alone, so a debugging run starts at the windows instead of at
 	// the hundred correlation and trigger scenarios that come before them: every test with "Cep" in its name is
