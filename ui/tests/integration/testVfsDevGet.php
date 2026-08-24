@@ -51,13 +51,7 @@ class testVfsDevGet extends CIntegrationTest {
 		self::$disks = self::listBlockDevices();
 
 		if (!self::$disks) {
-			throw new Exception('No block devices found on this host to test vfs.dev.get against.'.
-					"\n--- debug: lsblk -a ---\n".shell_exec('lsblk -a 2>&1').
-					"\n--- debug: ls -l /dev/nvme0n1 /dev/ram0 ---\n".
-					shell_exec('ls -l /dev/nvme0n1 /dev/ram0 2>&1').
-					"\n--- debug: which lsblk awk ---\n".shell_exec('which lsblk awk 2>&1').
-					"\n--- debug: id ---\n".shell_exec('id 2>&1')
-			);
+			throw new Exception('No block devices found on this host to test vfs.dev.get against.');
 		}
 
 		parent::onBeforeTestSuite();
@@ -165,13 +159,19 @@ class testVfsDevGet extends CIntegrationTest {
 	 * the values vfs.dev.get is expected to report for it. Ground truth comes straight from lsblk and
 	 * sysfs, the same sources vfs.dev.get itself relies on.
 	 *
+	 * lsblk is run with --all: by default lsblk excludes RAM disks (major number 1) outright and also
+	 * hides other "empty" devices (no partition table, filesystem, or LVM signature) - a RAM disk set
+	 * up purely to give this suite something to test against in CI is hit by the first of those, so
+	 * without --all it would silently vanish from lsblk's own output, before the disk-type filter
+	 * below even sees it.
+	 *
 	 * @return array  device name => ['type' => .., 'path' => .., 'size_bytes' => .., ..,
 	 *                'partitions' => [partition name => size_bytes]]
 	 */
 	private static function listBlockDevices() {
 		$disks = [];
 
-		$names = trim((string) shell_exec("lsblk -dnlo NAME,TYPE | awk '\$2 == \"disk\" {print \$1}'"));
+		$names = trim((string) shell_exec("lsblk --all -dnlo NAME,TYPE | awk '\$2 == \"disk\" {print \$1}'"));
 
 		foreach (($names === '') ? [] : explode("\n", $names) as $name) {
 			$name = trim($name);
@@ -182,7 +182,7 @@ class testVfsDevGet extends CIntegrationTest {
 			}
 
 			$partitions = [];
-			$partition_names = trim((string) shell_exec('lsblk -nlo NAME,TYPE '.escapeshellarg('/dev/'.$name).
+			$partition_names = trim((string) shell_exec('lsblk --all -nlo NAME,TYPE '.escapeshellarg('/dev/'.$name).
 					" | awk 'NR > 1 && \$2 == \"part\" {print \$1}'"
 			));
 
