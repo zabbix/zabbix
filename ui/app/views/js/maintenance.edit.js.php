@@ -98,7 +98,7 @@ window.maintenance_edit = new class {
 
 			event_names_table?.addEventListener('input', () => this.#updateMaintenanceType($triggerids, event_names_table));
 
-			event_names_table.addEventListener('click', e => {
+			event_names_table?.addEventListener('click', e => {
 				if (e.target.classList.contains('element-table-remove')) {
 					this.#updateMaintenanceType($triggerids, event_names_table);
 				}
