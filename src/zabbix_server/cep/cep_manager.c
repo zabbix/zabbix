@@ -211,8 +211,10 @@ out:
 	if (SUCCEED != ret)
 	{
 		for (int i = 0; i < CEP_WORKERS_MAX; i++)
-			zbx_free(manager->base.workers[i]);
-		zbx_free(manager->base.workers);
+		{
+			zbx_free(workers[i]);
+		}
+		zbx_free(workers);
 
 		cep_queue_clear(queue);
 		zbx_free(queue);
