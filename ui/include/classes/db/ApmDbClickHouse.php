@@ -40,10 +40,13 @@ class ApmDbClickHouse {
 		return self::$instances[$token];
 	}
 
+	/**
+	 * @throws DBException
+	 */
 	public function fetch(string $sql, array $params = []): Generator {
 		$curl = curl_init();
 
-		$this->configureCurl($curl, $params);
+		$this->configureCurl($curl, $sql, $params);
 
 		$http_response_validated = false;
 		$http_error = false;
@@ -51,7 +54,6 @@ class ApmDbClickHouse {
 		$rows = [];
 
 		curl_setopt_array($curl, [
-			CURLOPT_POSTFIELDS => $sql,
 			CURLOPT_HEADERFUNCTION => static function (CurlHandle $curl, string $header)
 					use (&$http_response_validated, &$http_error): int {
 				self::processResponseHeader($curl, $header, $http_response_validated, $http_error);
@@ -131,7 +133,7 @@ class ApmDbClickHouse {
 		}
 	}
 
-	private function configureCurl(CurlHandle $curl, array $params): void {
+	private function configureCurl(CurlHandle $curl, string $sql, array $params): void {
 		$http_headers = ['X-ClickHouse-Format: JSONEachRow'];
 
 		if ($this->config['db'] !== '') {
@@ -140,13 +142,26 @@ class ApmDbClickHouse {
 
 		$curl_options = [
 			CURLOPT_POST => true,
-			CURLOPT_URL => $this->makeUrl($params),
+			CURLOPT_URL => $this->config['url'],
 			CURLOPT_RETURNTRANSFER => false,
 			CURLOPT_SHARE => $this->curl_share,
 			CURLOPT_SSL_VERIFYPEER => (bool) $this->config['ssl_verify_peer'],
 			CURLOPT_SSL_VERIFYHOST => $this->config['ssl_verify_host'] ? 2 : 0,
 			CURLOPT_HTTPHEADER => $http_headers
 		];
+
+		if ($params) {
+			$post_fields = ['query' => $sql];
+
+			foreach ($params as $name => $value) {
+				$post_fields['param_'.$name] = self::encodeParamValue($value);
+			}
+
+			$curl_options[CURLOPT_POSTFIELDS] = $post_fields;
+		}
+		else {
+			$curl_options[CURLOPT_POSTFIELDS] = $sql;
+		}
 
 		if ($this->config['username'] !== '') {
 			$curl_options += [
@@ -174,22 +189,61 @@ class ApmDbClickHouse {
 		curl_setopt_array($curl, $curl_options);
 	}
 
-	private function makeUrl(array $params): string {
-		$url = $this->config['url'];
-
-		if (!$params) {
-			return $url;
+	/**
+	 * @throws DBException
+	 */
+	private static function encodeParamValue(mixed $value): string {
+		if (!is_array($value)) {
+			return self::encodeScalarParamValue($value);
 		}
 
-		$query_params = [];
+		$values = [];
 
-		foreach ($params as $name => $value) {
-			$query_params['param_'.$name] = $value;
+		foreach ($value as $item) {
+			if (is_array($item)) {
+				throw new DBException(
+					_('Nested arrays are not supported in ClickHouse query parameters.'),
+					DB::DBEXECUTE_ERROR
+				);
+			}
+
+			$values[] = is_string($item) ? "'".self::escapeString($item)."'" : self::encodeScalarParamValue($item);
 		}
 
-		$separator = parse_url($url, PHP_URL_QUERY) === null ? '?' : '&';
+		return '['.implode(',', $values).']';
+	}
 
-		return $url.$separator.http_build_query($query_params);
+	private static function encodeScalarParamValue(mixed $value): string {
+		if (is_string($value)) {
+			return self::escapeString($value);
+		}
+
+		if (is_bool($value)) {
+			return $value ? 'TRUE' : 'FALSE';
+		}
+
+		if ($value === null) {
+			return '\N';
+		}
+
+		if (is_int($value) || is_float($value)) {
+			return (string) $value;
+		}
+
+		throw new DBException(
+			_('Unsupported ClickHouse query parameter type.'),
+			DB::DBEXECUTE_ERROR
+		);
+	}
+
+	private static function escapeString(string $value): string {
+		return strtr($value, [
+			'\\' => '\\\\',
+			"'" => "\\'",
+			"\n" => '\\n',
+			"\r" => '\\r',
+			"\t" => '\\t'
+		]);
 	}
 
 	private static function processResponseHeader(CurlHandle $curl, string $header, bool &$http_response_validated,
