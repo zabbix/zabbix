@@ -217,6 +217,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	/**
 	 * Validate "query.aggregated_columns":
 	 * - for "function" AGGREGATE_PERCENTILE "parameters" array may have only single value
+	 * - "function" AGGREGATE_PERCENTILE "parameters" parameter cannot have more than 4 fractional digits
 	 * - "alias" value cannot start or end with whitespace character
 	 *
 	 * @param array       $item   Telemetry item to validate.
@@ -225,13 +226,28 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 */
 	public static function validateAggregatedColumns(array $item, string $path, ?string &$error): bool {
 		foreach ($item['query']['aggregated_columns'] as $i => $column) {
-			if ($column['function'] == AGGREGATE_PERCENTILE && count($column['parameters']) > 1) {
-				$error = _s('Invalid parameter "%1$s": %2$s.',
-					$path.'/query/aggregated_columns/'.($i + 1).'/parameters',
-					_s('maximum number of array elements is %1$s', 1)
-				);
+			if ($column['function'] == AGGREGATE_PERCENTILE) {
+				if (count($column['parameters']) > 1) {
+					$error = _s('Invalid parameter "%1$s": %2$s.',
+						$path.'/query/aggregated_columns/'.($i + 1).'/parameters',
+						_s('maximum number of array elements is %1$s', 1)
+					);
 
-				return false;
+					return false;
+				}
+
+				foreach ($column['parameters'] as $j => $value) {
+					if (round($value, 4) == $value) {
+						continue;
+					}
+
+					$error = _s('Invalid parameter "%1$s": %2$s.',
+						$path.'/query/aggregated_columns/'.($i + 1).'/parameters/'.($j + 1),
+						_s('value cannot have more than %1$s fractional digits', 4)
+					);
+
+					return false;
+				}
 			}
 
 			if (str_starts_with($column['alias'], ' ') || str_ends_with($column['alias'], ' ')) {

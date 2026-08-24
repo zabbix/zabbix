@@ -313,6 +313,20 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield '"query.aggregated_columns[].parameters" value fractional part is 4 digits' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [
+						['column' => 'Timestamp', 'function' => AGGREGATE_PERCENTILE, 'parameters' => [10.1234], 'alias' => 'time']
+					],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			null
+		];
+
 		yield '"granularity" value greater than "lookback_limit" value fail' => [
 			[
 				'lookback_limit' => '10s',
@@ -614,6 +628,20 @@ trait traitItemTelemetryQueryTests {
 				]
 			],
 			'Invalid parameter "/1/query/aggregated_columns/1/parameters/1": value must be within the range of 0-100.'
+		];
+
+		yield '"query.aggregated_columns[].parameters" value have 5 fractional part digits fail' => [
+			[
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [
+						['column' => 'Timestamp', 'function' => AGGREGATE_PERCENTILE, 'parameters' => [10.12345], 'alias' => 'time']
+					],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			'Invalid parameter "/1/query/aggregated_columns/1/parameters/1": value cannot have more than 4 fractional digits.'
 		];
 
 		yield '"query.aggregated_columns[].parameters" set to multiple values array fail' => [
