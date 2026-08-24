@@ -144,6 +144,12 @@ class CControllerMaintenanceEdit extends CController {
 				'preservekeys' => true
 			]);
 
+			$db_groups_rw = API::HostGroup()->get([
+				'output' => [],
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
 			$db_triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description'],
 				'selectHosts' => ['name'],
@@ -156,7 +162,7 @@ class CControllerMaintenanceEdit extends CController {
 				$trigger_groupids = array_column($trigger['hostgroups'], 'groupid');
 
 				foreach ($trigger_groupids as $trigger_groupid) {
-					if (!array_key_exists($trigger_groupid, $db_groups)) {
+					if (!array_key_exists($trigger_groupid, $db_groups_rw)) {
 						unset($db_triggers[$i]);
 
 						continue 2;
