@@ -111,7 +111,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const SKIP_OPERATION_TAG_VALUE_TESTS = true;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
-	const SKIP_SERVICES_TESTS = null;
+	const SKIP_SERVICES_TESTS = false;
 
 	// Set to true to run the CEP window scenarios alone, so a debugging run starts at the windows instead of at
 	// the hundred correlation and trigger scenarios that come before them: every test with "Cep" in its name is
@@ -160,6 +160,13 @@ class testTriggerCEP extends CIntegrationTest {
 	// the same webhook). The web-tag services (see createWebTagServices) match problems only on this tag,
 	// so they can go into problem state only via tags applied by the webhook, never via a trigger tag.
 	const WEB_COMPONENT_TAG = 'web_component';
+	// Tag put on every event the window tagging flavour of the close-on-up CEP rule matches, as the event
+	// occurs, by the per-component tagging operations that flavour is given (see
+	// buildCloseOnUpCepRuleParams()), carrying the value of the event's 'component' tag. The window-tag
+	// services (see createWindowTagServices) match problems only on this tag, so they can go into problem
+	// state only via a tag an operation of the rule applied - never via a trigger tag and, unlike the web-tag
+	// services, never via a webhook either.
+	const CEP_WINDOW_COMPONENT_TAG = 'cep_window_component';
 
 	// Name prefix shared by every CEP rule (ceprule API) these scenarios create. deleteCepRules() removes
 	// every rule whose name starts with it, so a rule left behind by an aborted test cannot keep closing
@@ -822,7 +829,10 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $tag_actionid;
 	private static $tag_mediatypeid2;
 	private static $tag_actionid2;
-	private static $web_tag_serviceids = [];
+	// The services matched to their problems only by a tag no trigger of the suite produces, so they can be
+	// brought into problem state only by whatever applies that tag: the tagging webhook
+	// (createWebTagServices) or the tagging operations of a CEP rule (createWindowTagServices).
+	private static $tag_driven_serviceids = [];
 	// The service of the tag driven service scenario, see prepareDataCepServiceTag().
 	private static $cep_tag_serviceid = null;
 	private static $sessionid = null;
@@ -2175,11 +2185,15 @@ class testTriggerCEP extends CIntegrationTest {
 	 * $extra_tag_via_webhook adds the same two tagging webhook media types the global correlation variant sets
 	 * up (see createExtraTagWebhookAction), so the CEP flavours of the JS scenarios can assert that tags
 	 * returned by a media type land on the events they were generated for.
+	 *
+	 * $window_tag_operations gives the rule the per-component tagging operations of
+	 * buildWindowComponentTagOperations(), the CEP-side counterpart of that webhook: the rule then tags every
+	 * event it matches with its component, which is what the window-tag services match on.
 	 */
 	public function prepareDataCepWindowTagCorrelationCloseOnUp(bool $tag_exists_condition = true,
-			bool $extra_tag_via_webhook = false) {
+			bool $extra_tag_via_webhook = false, bool $window_tag_operations = false) {
 		return $this->prepareCloseOnUpCepRule(CCepRuleHelper::WINDOW_TAG_MATCH, self::CEP_RULE_CLOSE_ON_UP,
-			$tag_exists_condition, $extra_tag_via_webhook
+			$tag_exists_condition, $extra_tag_via_webhook, $window_tag_operations
 		);
 	}
 
@@ -2209,10 +2223,10 @@ class testTriggerCEP extends CIntegrationTest {
 	/**
 	 * The body both close-on-up CEP flavours share: the close-on-up trigger prototypes, a single rule of
 	 * $window_type named $name closing the problems (buildCloseOnUpCepRuleParams()) and, optionally, the
-	 * tagging webhook media types.
+	 * tagging webhook media types and the rule's per-component tagging operations.
 	 */
 	private function prepareCloseOnUpCepRule(int $window_type, string $name, bool $tag_exists_condition,
-			bool $extra_tag_via_webhook): bool {
+			bool $extra_tag_via_webhook, bool $window_tag_operations = false): bool {
 		$this->prepareCloseOnUpTriggerPrototypes($tag_exists_condition
 			? [['tag' => self::CEP_STATE_TAG, 'value' => '']]
 			: []
@@ -2226,7 +2240,9 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->deleteCepCorrelations();
 
 		self::$cep_ruleid = $this->upsertCepRule(
-			$this->buildCloseOnUpCepRuleParams($name, $tag_exists_condition, $window_type)
+			$this->buildCloseOnUpCepRuleParams($name, $tag_exists_condition, $window_type,
+				$window_tag_operations
+			)
 		);
 
 		// Optionally add an extra webhook-computed tag to every problem event.
@@ -4837,23 +4853,45 @@ HEREDOC;
 
 	/**
 	 * Create one service per discovered component whose only problem tag is the webhook-applied
-	 * WEB_COMPONENT_TAG (see createExtraTagWebhookAction). Unlike the per-trigger CEP services (which match
-	 * the SERVICE_TAG trigger tag), no trigger tag matches these services: each can enter problem state
-	 * only after the tagging webhook runs for an open problem event and the tags it returns are applied to
-	 * that event. Removed in removeWebTagServices() / clearData().
+	 * WEB_COMPONENT_TAG (see createExtraTagWebhookAction), so each can enter problem state only after the
+	 * tagging webhook ran for an open problem event and the tags it returned were applied to that event.
 	 */
 	private function createWebTagServices(): void {
+		$this->createTagDrivenServices('CEP web tag service ', self::WEB_COMPONENT_TAG, 'web-tag');
+	}
+
+	/**
+	 * Create one service per discovered component whose only problem tag is CEP_WINDOW_COMPONENT_TAG, the tag
+	 * the tagging operations of the close-on-up CEP rule put on every event they match as it occurs (see
+	 * buildCloseOnUpCepRuleParams()), so each can enter problem state only after an operation of the rule
+	 * tagged an open problem event of its component. The webhook counterpart of these services is
+	 * createWebTagServices(); nothing else about them differs, which is what lets both flavours be driven by
+	 * the same runner.
+	 */
+	private function createWindowTagServices(): void {
+		$this->createTagDrivenServices('CEP window tag service ', self::CEP_WINDOW_COMPONENT_TAG, 'window-tag');
+	}
+
+	/**
+	 * The body both tag driven service flavours share: one service per discovered component named
+	 * "$name_prefix<component>", matching its problems on $tag carrying that component as its value and on
+	 * nothing else. Unlike the per-trigger CEP services (which match the SERVICE_TAG trigger tag), no trigger
+	 * tag matches these services at all - only $tag does, and only whatever applies it can bring them into
+	 * problem state. $what names the flavour in the failure message. Removed in removeTagDrivenServices() /
+	 * clearData().
+	 */
+	private function createTagDrivenServices(string $name_prefix, string $tag, string $what): void {
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 
 		$services = [];
 		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
 			$services[] = [
-				'name' => 'CEP web tag service '.$base.$i,
+				'name' => $name_prefix.$base.$i,
 				'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
 				'sortorder' => 0,
 				'problem_tags' => [
 					[
-						'tag' => self::WEB_COMPONENT_TAG,
+						'tag' => $tag,
 						'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL,
 						'value' => $base.$i
 					]
@@ -4864,21 +4902,22 @@ HEREDOC;
 		$response = $this->call('service.create', $services);
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertCount(static::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
-			'Not all web-tag services were created.');
-		self::$web_tag_serviceids = $response['result']['serviceids'];
+			'Not all '.$what.' services were created.');
+		self::$tag_driven_serviceids = $response['result']['serviceids'];
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}
 
 	/**
-	 * Delete the services created by createWebTagServices() so they do not react to the events of later
-	 * scenarios. Guarded, so it is safe in a finally block even if creation failed. The caller is expected
-	 * to follow up with removeExtraTagWebhookAction(), which reloads the configuration cache.
+	 * Delete the services created by createWebTagServices() / createWindowTagServices() so they do not react
+	 * to the events of later scenarios. Guarded, so it is safe in a finally block even if creation failed. The
+	 * caller is expected to follow up with something that reloads the configuration cache -
+	 * removeExtraTagWebhookAction() for the webhook flavour, cleanupCepRules() for the rule tagging one.
 	 */
-	private function removeWebTagServices(): void {
-		if (!empty(self::$web_tag_serviceids)) {
-			$this->call('service.delete', self::$web_tag_serviceids);
-			self::$web_tag_serviceids = [];
+	private function removeTagDrivenServices(): void {
+		if (!empty(self::$tag_driven_serviceids)) {
+			$this->call('service.delete', self::$tag_driven_serviceids);
+			self::$tag_driven_serviceids = [];
 		}
 	}
 
@@ -5278,9 +5317,16 @@ HEREDOC;
 	 * "down_N" event that opened the window is its cause and the "up_N" event that ends it a symptom of that
 	 * cause - and counts the symptoms of a group in the CEP_TAG_SYMPTOM_COUNT tag of its cause, which is what
 	 * waitForCloseOnUpCauseSymptomRanking() asserts.
+	 *
+	 * $window_tag_operations gives the rule the tagging operations of buildWindowComponentTagOperations() on
+	 * top of the two above, so every event the rule matches is also tagged, as it occurs, with
+	 * CEP_WINDOW_COMPONENT_TAG carrying its component. That is the tag the window-tag services
+	 * (createWindowTagServices()) match their problems on, which is what lets the rule itself - rather than a
+	 * tagging webhook - drive those services into problem state.
 	 */
 	private function buildCloseOnUpCepRuleParams(string $name, bool $tag_exists_condition = false,
-			int $window_type = CCepRuleHelper::WINDOW_TAG_MATCH): array {
+			int $window_type = CCepRuleHelper::WINDOW_TAG_MATCH,
+			bool $window_tag_operations = false): array {
 		$close_window_condition = $tag_exists_condition
 			? self::buildUpEventOperationCondition()
 			: [
@@ -5322,7 +5368,7 @@ HEREDOC;
 			// The rule of a close-on-up scenario is the only one there, so where in the order it sits does
 			// not matter - but the API requires the field, so it is given the first place.
 			'sortorder' => 0,
-			'operations' => [
+			'operations' => array_merge([
 				[
 					'sortorder' => 0,
 					'execute_when' => CCepRuleHelper::WHEN_EVENT_ADDED,
@@ -5337,8 +5383,58 @@ HEREDOC;
 					'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
 					'type' => CCepRuleHelper::OP_CLOSE_EVENT
 				]
-			]
+			], $window_tag_operations ? self::buildWindowComponentTagOperations(2) : [])
 		];
+	}
+
+	/**
+	 * Build the tagging operations that put CEP_WINDOW_COMPONENT_TAG on every event the rule matches, carrying
+	 * the value of the event's 'component' tag: one "Add tag" operation per discovered component, filtered on
+	 * the 'component' tag holding that component, so an event is tagged with its own component and with no
+	 * other. Sortorders start at $sortorder, continuing the ones the rule already uses.
+	 *
+	 * One operation per component is what it takes, because an operation resolves macros against the event but
+	 * has no way of reading a tag of it (see cep_event_context_resolve_tag_macros(), which resolves user macros
+	 * and the macros of the event's host, item and trigger - not {EVENT.TAGS.*}), so the tag value cannot be
+	 * copied from the event the way the tagging webhook copies it into WEB_COMPONENT_TAG. Spelling the value out
+	 * per component and letting an operation condition pick the events it belongs to gets there instead, and
+	 * additionally puts the operation conditions themselves under test: a component whose events were tagged by
+	 * the wrong operation, or by all of them, leaves its service matching nothing and fails the run.
+	 *
+	 * They execute when the event occurred, which for a windowed rule is the execution point that comes before
+	 * the event reaches the window at all (see cep_event_process_rules() in cep_rule.c, which runs the operations
+	 * of that point while matching the rules, before the windows are given the event) - so every event the rule
+	 * matches is tagged, the "up" ones that go on to close a window included, exactly like the tagging webhook
+	 * tags the "up" problems it escalates for.
+	 */
+	private static function buildWindowComponentTagOperations(int $sortorder): array {
+		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
+
+		$operations = [];
+		for ($i = 1; $i <= static::LLD_DISCOVERY_COUNT; $i++) {
+			$component = $base.$i;
+
+			$operations[] = [
+				'sortorder' => $sortorder + $i - 1,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_ADD_TAG,
+				'tag' => self::CEP_WINDOW_COMPONENT_TAG,
+				'tag_value' => $component,
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [
+						[
+							'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'tag' => 'component',
+							'tag_value' => $component
+						]
+					]
+				]
+			];
+		}
+
+		return $operations;
 	}
 
 	/**
@@ -8924,13 +9020,14 @@ HEREDOC;
 
 			$this->createWebTagServices();
 
-			// $check_tags sequences each wave on the webhook having tagged the events; $check_web_services
-			// asserts the service state transitions driven by those webhook-applied tags.
+			// $check_tags sequences each wave on the webhook having tagged the events;
+			// $check_tag_driven_services asserts the service state transitions driven by those
+			// webhook-applied tags.
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, true, false, true, true);
 			$this->waitForNoOpenProblems($all);
 		}
 		finally {
-			$this->removeWebTagServices();
+			$this->removeTagDrivenServices();
 			$this->removeExtraTagWebhookAction();
 		}
 	}
@@ -9334,7 +9431,7 @@ HEREDOC;
 			$this->createWebTagServices();
 
 			// $check_tags sequences each wave on the webhook having tagged the events ($up_events_tagged = true:
-			// the CEP-closed "up" problems are tagged too); $check_web_services asserts the service state
+			// the CEP-closed "up" problems are tagged too); $check_tag_driven_services asserts the service state
 			// transitions driven by those webhook-applied tags.
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, true, false, true, true, false,
 				true
@@ -9342,8 +9439,59 @@ HEREDOC;
 			$this->waitForNoOpenProblems($all);
 		}
 		finally {
-			$this->removeWebTagServices();
+			$this->removeTagDrivenServices();
 			$this->removeExtraTagWebhookAction();
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same service scenario as testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpJSServices,
+	 * but what drives the services into problem state is the tagging of the CEP rule itself rather than a
+	 * tagging webhook: no media type is involved at all, and the rule closing the problems is additionally
+	 * given the per-component "Add tag" operations of buildWindowComponentTagOperations(), which put a
+	 * CEP_WINDOW_COMPONENT_TAG tag carrying the event's component on every event the rule matches, as the event
+	 * occurs.
+	 *
+	 * One service per discovered component is created whose only problem tag matches that tag
+	 * (createWindowTagServices()), so a service can go into problem state only after an operation of the rule
+	 * tagged an open problem event of its component - no trigger tag matches these services, and here not even
+	 * an escalation is in play. The run asserts the services start OK, turn DISASTER once the rule has tagged
+	 * the open problems (and stay DISASTER through waves 2 and 3), drop to WARNING once the still-open problems
+	 * are manually downgraded after wave 3 and recover to OK once the CEP rule closes every problem in wave 4.
+	 *
+	 * Afterwards every problem event of the run must carry the tag - the "up" ones included: the operations
+	 * execute when the event occurred, which is before the event reaches the window at all, so an "up" event is
+	 * tagged even though the window it enters is closed right away.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpWindowTagServices$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpWindowTagServices() {
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp(true, false, true);
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		// Every one of the four waves opens a problem event per trigger and every one of them is matched by the
+		// rule and tagged as it occurs, so 4 tagged problem events per trigger (key).
+		$m = count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY))
+			+ count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2));
+
+		try {
+			// Bound the event.get verification below to events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			$this->createWindowTagServices();
+
+			// $check_tag_driven_services asserts the service state transitions driven by the tags the
+			// operations of the rule applied. There is no webhook here, so $check_tags stays false - the tag
+			// assertion of this flavour is the CEP_WINDOW_COMPONENT_TAG count below.
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, false, false, true, true);
+			$this->waitForNoOpenProblems($all);
+
+			$this->waitForProblemEventsTagged($all, self::CEP_WINDOW_COMPONENT_TAG, 4 * $m);
+		}
+		finally {
+			$this->removeTagDrivenServices();
 			$this->cleanupCepRules();
 		}
 	}
@@ -9769,7 +9917,7 @@ HEREDOC;
 			$this->createWebTagServices();
 
 			// $check_tags sequences each wave on the webhook having tagged the events ($up_events_tagged = true:
-			// the CEP-closed "up" problems are tagged too); $check_web_services asserts the service state
+			// the CEP-closed "up" problems are tagged too); $check_tag_driven_services asserts the service state
 			// transitions driven by those webhook-applied tags.
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, true, false, true, true, false,
 				true
@@ -9777,7 +9925,7 @@ HEREDOC;
 			$this->waitForNoOpenProblems($all);
 		}
 		finally {
-			$this->removeWebTagServices();
+			$this->removeTagDrivenServices();
 			$this->removeExtraTagWebhookAction();
 			$this->cleanupCepRules();
 		}
@@ -12935,17 +13083,18 @@ HEREDOC;
 	 * trigger and the correlation service tag pair must close the relevant "down" problem by its id across
 	 * triggers rather than each trigger receiving its own "up".
 	 *
-	 * When $check_web_services is true, the run additionally asserts the per-component web-tag services
-	 * (see createWebTagServices, to be created by the caller) follow the webhook-applied WEB_COMPONENT_TAG
-	 * tag: OK before the first wave, DISASTER once the webhook has tagged the open problems (waves 1-3, the
-	 * triggers have DISASTER priority), WARNING after wave 3 once the still-open problems are manually
-	 * downgraded via event.acknowledge (the services must follow the severity down, not only up) and OK
-	 * again once wave 4 closes everything.
+	 * When $check_tag_driven_services is true, the run additionally asserts the per-component tag driven
+	 * services (see createWebTagServices / createWindowTagServices, to be created by the caller) follow the tag
+	 * their flavour applies - the webhook-applied WEB_COMPONENT_TAG or the CEP_WINDOW_COMPONENT_TAG an
+	 * operation of the rule puts on every event it matches: OK before the first wave, DISASTER once the
+	 * open problems are tagged (waves 1-3, the triggers have DISASTER priority), WARNING after wave 3 once the
+	 * still-open problems are manually downgraded via event.acknowledge (the services must follow the severity
+	 * down, not only up) and OK again once wave 4 closes everything.
 	 */
 	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart,
 			bool $maintenance_after_first = false, bool $check_tags = false,
 			bool $stop_maintenance_and_verify_suppression = false, bool $up_from_other_trigger = true,
-			bool $check_web_services = false, bool $maintenance_by_tag = false,
+			bool $check_tag_driven_services = false, bool $maintenance_by_tag = false,
 			bool $up_events_tagged = false): void {
 		$keys = array_merge(
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
@@ -12981,10 +13130,10 @@ HEREDOC;
 				'All triggers must start in OK state for close-on-up global correlation test.');
 		}
 
-		// The web-tag services (matched only by the webhook-applied WEB_COMPONENT_TAG tag) must start OK:
-		// no problem has been tagged for them yet.
-		if ($check_web_services) {
-			$this->waitForWebTagServicesStatus(ZBX_SEVERITY_OK);
+		// The tag driven services (matched only by the tag their flavour applies) must start OK: no problem has
+		// been tagged for them yet.
+		if ($check_tag_driven_services) {
+			$this->waitForTagDrivenServicesStatus(ZBX_SEVERITY_OK);
 		}
 
 		// 1. Open the first problem on every trigger (unique id per trigger); triggers go TRUE.
@@ -13028,11 +13177,11 @@ HEREDOC;
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, $tagged_after_wave(1));
 		}
 
-		// Wave 1 covered every key, so the webhook has tagged an open problem of every component with
-		// WEB_COMPONENT_TAG and every web-tag service goes to PROBLEM (DISASTER trigger priority) purely
-		// via the webhook-applied tag - no trigger tag matches these services.
-		if ($check_web_services) {
-			$this->waitForWebTagServicesStatus(TRIGGER_SEVERITY_DISASTER);
+		// Wave 1 covered every key, so an open problem of every component has been tagged with the component
+		// tag its flavour applies and every tag driven service goes to PROBLEM (DISASTER trigger priority)
+		// purely via that applied tag - no trigger tag matches these services.
+		if ($check_tag_driven_services) {
+			$this->waitForTagDrivenServicesStatus(TRIGGER_SEVERITY_DISASTER);
 		}
 
 		$this->maybeRestartServer($restart);
@@ -13226,9 +13375,9 @@ HEREDOC;
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, $tagged_after_wave(2));
 		}
 
-		// Wave 2 keeps every component with open webhook-tagged problems, so the services stay DISASTER.
-		if ($check_web_services) {
-			$this->waitForWebTagServicesStatus(TRIGGER_SEVERITY_DISASTER);
+		// Wave 2 keeps every component with open tagged problems, so the services stay DISASTER.
+		if ($check_tag_driven_services) {
+			$this->waitForTagDrivenServicesStatus(TRIGGER_SEVERITY_DISASTER);
 		}
 
 		$this->maybeRestartServer($restart);
@@ -13249,15 +13398,15 @@ HEREDOC;
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, $tagged_after_wave(3));
 		}
 
-		// Wave 2's webhook-tagged problems are still open on every component, so the services stay DISASTER.
-		if ($check_web_services) {
-			$this->waitForWebTagServicesStatus(TRIGGER_SEVERITY_DISASTER);
+		// Wave 2's tagged problems are still open on every component, so the services stay DISASTER.
+		if ($check_tag_driven_services) {
+			$this->waitForTagDrivenServicesStatus(TRIGGER_SEVERITY_DISASTER);
 
 			// Manually downgrade the still-open problems to WARNING: the service manager must recompute
-			// the web-tag service status from the new lower severity, so every service drops
+			// the tag driven service status from the new lower severity, so every service drops
 			// DISASTER -> WARNING without any problem closing.
 			$this->updateOpenProblemsSeverity($all, TRIGGER_SEVERITY_WARNING);
-			$this->waitForWebTagServicesStatus(TRIGGER_SEVERITY_WARNING);
+			$this->waitForTagDrivenServicesStatus(TRIGGER_SEVERITY_WARNING);
 		}
 
 		$this->maybeRestartServer($restart);
@@ -13273,9 +13422,9 @@ HEREDOC;
 			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG2, $tagged_after_wave(4));
 		}
 
-		// No webhook-tagged problem stays open, so every web-tag service recovers to OK.
-		if ($check_web_services) {
-			$this->waitForWebTagServicesStatus(ZBX_SEVERITY_OK);
+		// No tagged problem stays open, so every tag driven service recovers to OK.
+		if ($check_tag_driven_services) {
+			$this->waitForTagDrivenServicesStatus(ZBX_SEVERITY_OK);
 		}
 	}
 
@@ -18956,15 +19105,18 @@ HEREDOC;
 	}
 
 	/**
-	 * Poll the web-tag services (created by createWebTagServices) until every one reports $expected_status.
-	 * Unlike the per-trigger CEP services these are matched to problems only via the webhook-applied
-	 * WEB_COMPONENT_TAG tag, so reaching a problem status here proves the tags returned by the media type
-	 * were applied to the open problem events and picked up by the service manager.
+	 * Poll the tag driven services (created by createWebTagServices or createWindowTagServices) until every one
+	 * reports $expected_status. Unlike the per-trigger CEP services these are matched to problems only via the
+	 * tag their flavour applies - the webhook-applied WEB_COMPONENT_TAG or the CEP_WINDOW_COMPONENT_TAG an
+	 * operation of the rule puts on an event - so reaching a problem status here proves that tag landed on the
+	 * open problem events and was picked up by the service manager.
 	 */
-	private function waitForWebTagServicesStatus(int $expected_status): void {
-		$serviceids = self::$web_tag_serviceids;
+	private function waitForTagDrivenServicesStatus(int $expected_status): void {
+		$serviceids = self::$tag_driven_serviceids;
 
-		$this->assertNotEmpty($serviceids, 'Web-tag services must be created before waiting for their status.');
+		$this->assertNotEmpty($serviceids,
+			'Tag driven services must be created before waiting for their status.'
+		);
 
 		try {
 			$this->callUntilCountIsPresent('service.get', [
@@ -18979,7 +19131,7 @@ HEREDOC;
 			$wrong = array_values(array_filter($response['result'],
 				fn($service) => (int) $service['status'] !== $expected_status
 			));
-			throw new Exception('Expected all '.count($serviceids).' web-tag services to have status '
+			throw new Exception('Expected all '.count($serviceids).' tag driven services to have status '
 				.$expected_status.', but '.count($wrong).' differ, first (max 5): '
 				.json_encode(array_slice($wrong, 0, 5)).'. '.$e->getMessage());
 		}
@@ -19352,11 +19504,11 @@ HEREDOC;
 			self::$serviceids = [];
 		}
 
-		// Remove the web-tag services (created by createWebTagServices) in case a test aborted before its
-		// own teardown ran.
-		if (!empty(self::$web_tag_serviceids)) {
-			CDataHelper::call('service.delete', self::$web_tag_serviceids);
-			self::$web_tag_serviceids = [];
+		// Remove the tag driven services (created by createWebTagServices or createWindowTagServices) in case a
+		// test aborted before its own teardown ran.
+		if (!empty(self::$tag_driven_serviceids)) {
+			CDataHelper::call('service.delete', self::$tag_driven_serviceids);
+			self::$tag_driven_serviceids = [];
 		}
 
 		// The same for the service of the tag driven service scenario.
