@@ -2250,7 +2250,7 @@ function makeActionTableIcon(array $action, array $maintenances, array $ceprules
 				$ceprule_name = array_key_exists($action['cep_ruleid'], $ceprules)
 					? $ceprules[$action['cep_ruleid']]['name']
 					: '*UNKNOWN*';
-				$title = _s('Event processing: %1$s', $ceprule_name);
+				$title = _s('Complex event processing: %1$s', $ceprule_name);
 
 				return (new CCol((new CIcon(ZBX_ICON_CEP))->addClass(ZBX_STYLE_COLOR_ICON)->setTitle($title)))
 						->addClass(ZBX_STYLE_NOWRAP);
