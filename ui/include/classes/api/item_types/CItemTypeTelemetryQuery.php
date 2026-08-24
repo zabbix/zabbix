@@ -54,20 +54,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 		'SpanAttributes', 'ScopeName', 'ScopeVersion', 'StatusCode', 'StatusMessage', 'Events.Attributes', 'Events.Name'
 	];
 
-	// SIGNAL_TYPE_LOGS column names
-	public const LOGS_COLUMNS_COLUMN = [
-		'Timestamp', 'TraceId', 'SpanId', 'TraceFlags', 'SeverityText', 'SeverityNumber', 'ServiceName', 'Body',
-		'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName', 'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes',
-		'LogAttributes', 'EventName'
-	];
-	public const LOGS_AGGREGATED_COLUMN = [
-		'Timestamp', 'SeverityNumber'
-	];
-	public const LOGS_CONDITIONS_COLUMN = [
-		'TraceId', 'SpanId', 'SeverityText', 'ServiceName', 'Body', 'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName',
-		'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes', 'LogAttributes', 'EventName'
-	];
-
 	// SIGNAL_TYPE_METRICS column names
 	public const METRICS_COLUMNS_COLUMN = [
 		self::METRICS_POINT_SUM => [
@@ -126,6 +112,20 @@ class CItemTypeTelemetryQuery extends CItemType {
 		]
 	];
 
+	// SIGNAL_TYPE_LOGS column names
+	public const LOGS_COLUMNS_COLUMN = [
+		'Timestamp', 'TraceId', 'SpanId', 'TraceFlags', 'SeverityText', 'SeverityNumber', 'ServiceName', 'Body',
+		'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName', 'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes',
+		'LogAttributes', 'EventName'
+	];
+	public const LOGS_AGGREGATED_COLUMN = [
+		'Timestamp', 'SeverityNumber'
+	];
+	public const LOGS_CONDITIONS_COLUMN = [
+		'TraceId', 'SpanId', 'SeverityText', 'ServiceName', 'Body', 'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName',
+		'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes', 'LogAttributes', 'EventName'
+	];
+
 	/**
 	 * @inheritDoc
 	 */
@@ -151,9 +151,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
-			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'time_shift')],
+			'time_shift' =>		['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '0:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'time_shift')],
 			'lookback_limit' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(3 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'lookback_limit')],
-			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.(1 * SEC_PER_DAY), 'length' => DB::getFieldLength('items', 'granularity')],
+			'granularity' =>	['type' => API_TIME_UNIT, 'flags' => $flags, 'in' => '1:'.SEC_PER_DAY, 'length' => DB::getFieldLength('items', 'granularity')],
 			'query' =>			['type' => API_OBJECT, 'fields' => self::getQueryFieldValidationRules($db_item)],
 			'timeout' =>		self::getUpdateFieldRule('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
@@ -312,7 +312,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	public static function validateColumnsAggregatedColumnsUnique(array $item, string $path, ?string &$error): bool {
 		$uniq = [];
 
-		foreach ($item['query']['columns'] as $i => $column) {
+		foreach ($item['query']['columns'] as $column) {
 			$uniq_value = in_array($column['column'], self::COMPLEX_COLUMN_NAME, true)
 				? $column['column'].'.'.$column['attribute_key']
 				: $column['column'];
@@ -367,7 +367,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	/**
 	 * Deserialize "item.query" field from JSON string for API output.
 	 *
-	 * @param string $query               JSON encoded string with "item.query" configuration
+	 * @param string $query  JSON encoded string with "item.query" configuration
 	 */
 	public static function prepareQueryFieldForApi(string $query): array {
 		if ($query === '') {
@@ -387,6 +387,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * Convert "query.filter" from expression (database, audit log: "{0} or {1}") to formula (API: "A or B").
 	 *
 	 * @param array $query  Item "query" configuration.
+	 *
 	 * @return array
 	 */
 	public static function convertFilterExpressionToFormula(array $query): array {
@@ -411,6 +412,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * Convert "query.filter" from formula (API: "A or B") to expression (database, audit log: "{0} or {1}").
 	 *
 	 * @param array $query  Item "query" configuration.
+	 *
 	 * @return array
 	 */
 	public static function convertFilterFormulaToExpression(array $query): array {
@@ -436,17 +438,17 @@ class CItemTypeTelemetryQuery extends CItemType {
 				$condition_column = self::TRACES_CONDITIONS_COLUMN;
 				break;
 
-			case self::SIGNAL_TYPE_LOGS:
-				$columns_column = self::LOGS_COLUMNS_COLUMN;
-				$aggregated_column = self::LOGS_AGGREGATED_COLUMN;
-				$condition_column = self::LOGS_CONDITIONS_COLUMN;
-				break;
-
 			case self::SIGNAL_TYPE_METRICS:
 				$point_type = $item['query']['metric_point_type'] ?? self::METRICS_POINT_SUM;
 				$columns_column = self::METRICS_COLUMNS_COLUMN[$point_type] ?? [];
 				$aggregated_column = self::METRICS_AGGREGATED_COLUMN[$point_type] ?? [];
 				$condition_column = self::METRICS_CONDITIONS_COLUMN[$point_type] ?? [];
+				break;
+
+			case self::SIGNAL_TYPE_LOGS:
+				$columns_column = self::LOGS_COLUMNS_COLUMN;
+				$aggregated_column = self::LOGS_AGGREGATED_COLUMN;
+				$condition_column = self::LOGS_CONDITIONS_COLUMN;
 				break;
 
 			default:
