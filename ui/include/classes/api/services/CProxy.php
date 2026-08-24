@@ -338,7 +338,14 @@ class CProxy extends CApiService {
 		DB::insert('proxy_rtdata', $proxy_rtdata, false);
 
 		self::updateHosts($proxies);
-		self::prepareProxiesForApi($proxies);
+
+		foreach ($proxies as &$proxy) {
+			if ($proxy['apm'] == json_encode([], JSON_FORCE_OBJECT)) {
+				unset($proxy['apm']);
+			}
+		}
+
+		self::prepareApmForAuditLog($proxies);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_PROXY, $proxies);
 
@@ -368,9 +375,7 @@ class CProxy extends CApiService {
 		$upd_proxies = [];
 
 		foreach ($proxies as &$proxy) {
-			if (array_key_exists('apm', $proxy)) {
-				self::prepareApmForDb($proxy, $db_proxies);
-			}
+			self::prepareApmForDb($proxy, $db_proxies);
 
 			$upd_proxy = DB::getUpdatedValues('proxy', $proxy, $db_proxies[$proxy['proxyid']]);
 
@@ -387,67 +392,53 @@ class CProxy extends CApiService {
 			DB::update('proxy', $upd_proxies);
 		}
 
-		$update = true;
-
 		self::updateHosts($proxies, $db_proxies);
-		self::prepareProxiesForApi($proxies, $update);
-		self::prepareProxiesForApi($db_proxies);
+		self::prepareApmForAuditLog($proxies);
+		self::prepareApmForAuditLog($db_proxies);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_PROXY, $proxies, $db_proxies);
 
 		return ['proxyids' => array_column($proxies, 'proxyid')];
 	}
 
-	protected static function prepareProxiesForApi(array &$proxies, bool $update = false): void {
+	private static function prepareApmForAuditLog(array &$proxies): void {
 		foreach ($proxies as &$proxy) {
-			self::prepareProxyForApi($proxy, $update);
+			if (!array_key_exists('apm', $proxy)) {
+				continue;
+			}
+
+			$_apm_fields = json_decode($proxy['apm'], true);
+			$apm_fields = [];
+
+			if ($_apm_fields) {
+				$apm_fields['additional_resource_attributes'] = self::prepareApmAttributesForAuditLog($_apm_fields);
+				$apm_fields['data_collection_status'] = $_apm_fields['data_collection_status'];
+				$apm_fields['max_messages_per_second'] = $_apm_fields['max_messages_per_second'];
+			}
+			else {
+				$apm_fields = self::APM_DEFAULT_FIELDS;
+			}
+
+			$proxy['apm'] = $apm_fields;
 		}
 		unset($proxy);
 	}
 
-	protected static function prepareProxyForApi(array &$proxy, bool $update = false): void {
-		if (array_key_exists('apm', $proxy)) {
-			$proxy['apm'] = self::prepareApmFieldsForApi($proxy['apm'], $update);
-		}
-	}
-
-	private static function prepareApmFieldsForApi(string $apm_fields, bool $update = false): array {
-		$_apm_fields = json_decode($apm_fields, true);
+	private static function prepareApmAttributesForAuditLog(array $_apm_fields): array {
 		$apm_fields = [];
 
-		if (json_last_error() == JSON_ERROR_NONE) {
-			if ($_apm_fields) {
-				$apm_fields['additional_resource_attributes'] = self::prepareAttributesForApi($_apm_fields);
-				$apm_fields['data_collection_status'] = $_apm_fields['data_collection_status'];
-				$apm_fields['max_messages_per_second'] = $_apm_fields['max_messages_per_second'];
+		foreach ($_apm_fields['additional_resource_attributes'] as $i => $fields) {
+			if (!$fields) {
+				return $apm_fields;
 			}
-			elseif ($update) {
-				$apm_fields['additional_resource_attributes'] = [];
-				$apm_fields['data_collection_status'] = 0;
-				$apm_fields['max_messages_per_second'] = 0;
-			}
-		}
 
-		return $apm_fields;
-	}
+			$apm_fields[$i + 1] = [
+				'signal_type' => $fields['signal_type'],
+				'key' => (string) ($fields['key'])
+			];
 
-	private static function prepareAttributesForApi(array $_apm_fields): array {
-		$apm_fields = [];
-
-		if (json_last_error() == JSON_ERROR_NONE) {
-			foreach ($_apm_fields['additional_resource_attributes'] as $i => $fields) {
-				if (!$fields) {
-					return $apm_fields;
-				}
-
-				$apm_fields[$i + 1] = [
-					'signal_type' => $fields['signal_type'],
-					'key' => (string) ($fields['key'])
-				];
-
-				if (array_key_exists('value', $fields)) {
-					$apm_fields[$i + 1]['value'] = $fields['value'];
-				}
+			if (array_key_exists('value', $fields)) {
+				$apm_fields[$i + 1]['value'] = $fields['value'];
 			}
 		}
 
@@ -455,14 +446,8 @@ class CProxy extends CApiService {
 	}
 
 	private static function prepareApmForDb(array &$proxy, ?array $db_proxies = null): void {
-		if (array_key_exists('apm', $proxy) && $proxy['apm']
+		if (array_key_exists('apm', $proxy) && array_key_exists('data_collection_status', $proxy['apm'])
 				&& $proxy['apm']['data_collection_status'] === PROXY_APM_STATUS_CONFIGURED) {
-			$default_attributes = [
-				'signal_type' => 0,
-				'key' => 0,
-				'value' => ""
-			];
-
 			$proxy['apm'] = array_merge(self::APM_DEFAULT_FIELDS, $proxy['apm']);
 
 			if ($proxy['apm']['additional_resource_attributes']) {
@@ -471,6 +456,12 @@ class CProxy extends CApiService {
 				$proxy['apm']['additional_resource_attributes'] = array_values(
 					$proxy['apm']['additional_resource_attributes']
 				);
+
+				$default_attributes = [
+					'signal_type' => 0,
+					'key' => 0,
+					'value' => ""
+				];
 
 				foreach ($proxy['apm']['additional_resource_attributes'] as &$attributes) {
 					$attributes = array_merge($default_attributes, $attributes, $attributes);
@@ -482,15 +473,12 @@ class CProxy extends CApiService {
 		}
 		else {
 			if ($db_proxies) {
-				if ($proxy['apm']) {
-					if (array_key_exists('data_collection_status', $proxy['apm'])
-							&& $proxy['apm']['data_collection_status'] === PROXY_APM_STATUS_NOT_CONFIGURED) {
-						$proxy['apm'] = json_encode([], JSON_FORCE_OBJECT);
+				if (array_key_exists('apm', $proxy) && $proxy['apm']
+						&& array_key_exists('data_collection_status', $proxy['apm'])
+						&& $proxy['apm']['data_collection_status'] === PROXY_APM_STATUS_NOT_CONFIGURED) {
+					$proxy['apm'] = json_encode([], JSON_FORCE_OBJECT);
 
-						return;
-					}
-
-					$proxy['apm'] = json_encode($proxy['apm'], JSON_UNESCAPED_UNICODE);
+					return;
 				}
 				else {
 					$proxy['apm'] = $db_proxies[$proxy['proxyid']]['apm'];
