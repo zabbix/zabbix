@@ -322,17 +322,28 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * Serialize "item.query" to JSON string.
 	 * Convert "item.query.filter.formula" from "A or B" like notation to "{0} or {1}" notation
 	 * removing "formulaid" property for each condition.
+	 * Convert integer and float values to string.
 	 *
 	 * @param array $query  Array for "item.query" configuration
 	 */
 	public static function prepareQueryFieldForDb(array $query): string {
+		$query['signal_type'] = (string) $query['signal_type'];
+		$query['metric_point_type'] = (string) $query['metric_point_type'];
+		$query['filter']['evaltype'] = (string) $query['filter']['evaltype'];
+
 		foreach ($query['aggregated_columns'] as &$column) {
+			$column['function'] = (string) $column['function'];
+
 			if ($column['function'] == AGGREGATE_PERCENTILE) {
 				// Server expects "query.aggregated_columns[].parameters" to be stored as array of strings.
 				$column['parameters'] = array_map('strval', $column['parameters']);
 			}
 		}
 		unset($column);
+
+		foreach ($query['filter']['conditions'] as &$condition) {
+			$condition['operator'] = (string) $condition['operator'];
+		}
 
 		return json_encode($query, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 	}
