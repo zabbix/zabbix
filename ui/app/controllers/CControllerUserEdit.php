@@ -104,7 +104,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'theme' => $db_defaults['theme'],
 			'autologin' => $db_defaults['autologin'],
 			'autologout' => '0',
-			'default_maintenance_period' => '1h',
+			'default_maintenance_period' => $db_defaults['default_maintenance_period'],
 			'refresh' => $db_defaults['refresh'],
 			'rows_per_page' => $db_defaults['rows_per_page'],
 			'url' => '',
