@@ -869,7 +869,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'LogSlowQueries' => 10000,
 				'StartEscalators' => 8,
 				'MaxHousekeeperDelete' => 0,
-				'StartTrappers' => 32,
+				'StartTrappers' => 16,
 				'StartAlerters' => 10,
 				'StartTimers' => 2
 			]
@@ -4658,12 +4658,14 @@ HEREDOC;
 			// a simple, a tag correlation and a pattern match window hold rather than closing it - so the window
 			// closed execution point is only reached by a rule that asks for it. This one asks for it
 			// unconditionally and as the event is added to the window, so every event closes the window it has just
-			// entered and
-			// the operations above are performed for it right there: the shortest path from an event to that
-			// execution point, and the same one for every window type.
+			// entered and the operations above are performed for it right there: the shortest path from an event to
+			// that execution point, and the same one for every window type.
 			//
 			// It is listed last only because its sortorder must not collide with the operations above; the order
-			// within a rule is the order of one execution point, and this one is the only operation of its own.
+			// within a rule is the order of one execution point, and this one is the only operation of its own. The
+			// point it belongs to is reached before the one the operations above belong to, which is the order the
+			// API insists the operations of a rule be numbered in - upsertCepRule() puts them in it, so listing it
+			// here is not what decides where it ends up, see groupOperationsByExecuteWhen().
 			$operations[] = [
 				'sortorder' => count($operations),
 				'execute_when' => CCepRuleHelper::WHEN_EVENT_ADDED,
@@ -5019,9 +5021,13 @@ HEREDOC;
 	 * matched execution point unless it has one there of its own: a rule of that window type may not be without
 	 * one, and most flavours of that type are driven by their window and not by a match, see
 	 * addPatternMatchedNoopOperation().
+	 *
+	 * The operations of every rule are then renumbered so their execution points come in the order the server
+	 * reaches them, which is the order the API insists on, see groupOperationsByExecuteWhen().
 	 */
 	private function upsertCepRule(array $rule_params): string {
 		$rule_params = self::addPatternMatchedNoopOperation($rule_params);
+		$rule_params = self::groupOperationsByExecuteWhen($rule_params);
 
 		$existing = $this->call('ceprule.get',
 			['filter' => ['name' => $rule_params['name']], 'output' => ['cep_ruleid']]
@@ -5038,6 +5044,41 @@ HEREDOC;
 		}
 
 		return $cep_ruleid;
+	}
+
+	/**
+	 * The rule parameters $params with the sortorder of every operation renumbered so the operations come grouped
+	 * by their execution point, in the order the server reaches those points: the API refuses a rule whose
+	 * operations, read in sortorder, return to an execution point that comes before the one before them - see
+	 * CCepRule::checkOperationOrder() and CCepRuleHelper::EXECUTE_WHEN_ORDER, the order it holds them to.
+	 *
+	 * Nothing a flavour asked for is changed by the renumbering. The order of operations only means anything
+	 * within one execution point - the points are reached at different moments, so an operation of one is never
+	 * performed beside an operation of another - and the order within a point is left exactly as the flavour
+	 * numbered it: a group is renumbered in the order of the sortorders it came with, so the operations a flavour
+	 * deliberately puts after its own at one point (the suppress point ones of
+	 * prepareDataCepWindowCloseWindowOperations(), numbered above everything else) still come after them.
+	 *
+	 * It is applied to every rule of the suite here in upsertCepRule(), which is what lets a flavour list its
+	 * operations in the order that describes it and know nothing about the order the points themselves are
+	 * numbered in - the operation that gets the events to the window closed point last, after the operations that
+	 * point is about (prepareDataCepWindowOperations()), or the eviction that ends a sliding window after the
+	 * closing that eviction leads to (prepareDataCepWindowCloseOnDurationOperations()).
+	 */
+	private static function groupOperationsByExecuteWhen(array $params): array {
+		$order = array_flip(CCepRuleHelper::EXECUTE_WHEN_ORDER);
+
+		usort($params['operations'],
+			fn(array $a, array $b) => [$order[$a['execute_when']], $a['sortorder']]
+				<=> [$order[$b['execute_when']], $b['sortorder']]
+		);
+
+		foreach ($params['operations'] as $sortorder => &$operation) {
+			$operation['sortorder'] = $sortorder;
+		}
+		unset($operation);
+
+		return $params;
 	}
 
 	/**
