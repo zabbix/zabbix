@@ -85,10 +85,18 @@ window.maintenance_edit = new class {
 			$hostids.on('change', () => this.#updateMultiselect($hostids));
 			this.#updateMultiselect($hostids);
 
-			const $triggerids = $('#triggerids_');
+			const event_names_table = this.form.findFieldByName('event_names')?.getField();
 
-			$triggerids.on('change', () => this.#updateMultiselect($triggerids));
+			const $triggerids = $('#triggerids_');
+			$triggerids.on('change', () => {
+				this.#updateMultiselect($triggerids);
+				this.#updateMaintenanceType($triggerids, event_names_table);
+			});
+
 			this.#updateMultiselect($triggerids);
+			this.#updateMaintenanceType($triggerids, event_names_table);
+
+			event_names_table?.addEventListener('input', () => this.#updateMaintenanceType($triggerids, event_names_table));
 
 			// Update form field state according to the form data.
 			document.getElementById('maintenance_type').addEventListener('change', () => this.#update());
@@ -105,9 +113,34 @@ window.maintenance_edit = new class {
 		this.overlay.recoverFocus();
 	}
 
+	#collectEventNames(event_names_table) {
+		const event_names = [];
+
+		for (const [index, form_row] of Object.entries(event_names_table.querySelectorAll('.form_row'))) {
+			if (form_row.querySelector('.error-container') !== null) {
+				continue;
+			}
+
+			const operator = form_row.querySelector(`[name="event_names[${index}][operator]"]:checked`)?.getAttribute('value');
+			const value = form_row.querySelector(`[name="event_names[${index}][value]"]`)?.getAttribute('value');
+
+			event_names.push({operator, value});
+		}
+
+		return event_names;
+	}
+
+	#updateMaintenanceType($triggerids, event_names_table) {
+		const maintenance_type = this.form.findFieldByName('maintenance_type')?.getField();
+		const triggers = $triggerids.multiSelect('getData');
+		const event_names = event_names_table !== null ? this.#collectEventNames(event_names_table) : [];
+		const without_data_collection_allowed = triggers.length === 0 && event_names.filter(event_name => event_name.value !== '').length === 0;
+
+		maintenance_type?.querySelector(`input[value="${MAINTENANCE_TYPE_NODATA}"]`)?.toggleAttribute('readonly', !without_data_collection_allowed);
+	}
+
 	#update() {
-		const is_enabled = this.form_element
-		.querySelector('[name="maintenance_type"]:checked').value == <?= MAINTENANCE_TYPE_NORMAL ?>;
+		const is_enabled = this.form_element.querySelector('[name="maintenance_type"]:checked').value == <?= MAINTENANCE_TYPE_NORMAL ?>;
 
 		$('#triggerids_').multiSelect(!is_enabled || !this._allowed_edit ? 'disable' : 'enable');
 
