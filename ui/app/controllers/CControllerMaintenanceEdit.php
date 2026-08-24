@@ -243,7 +243,7 @@ class CControllerMaintenanceEdit extends CController {
 			'start_time' => 0,
 			'period' => $default_maintenance_period,
 			'start_date' => strtotime('now'),
-			'formatted_type' => 'One time only',
+			'formatted_type' => _('One time only'),
 			'formatted_period' => zbx_date2age(0, $default_maintenance_period)
 		];
 		$data['timeperiods'][] = $timeperiod
