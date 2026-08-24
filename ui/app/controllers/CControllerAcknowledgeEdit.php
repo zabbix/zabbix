@@ -144,6 +144,7 @@ class CControllerAcknowledgeEdit extends CController {
 			'editable' => true,
 			'preservekeys' => true
 		]);
+		$data['selected_triggers'] = count($editable_triggers);
 
 		$ack_count = 0;
 
