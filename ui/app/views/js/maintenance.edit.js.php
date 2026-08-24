@@ -98,6 +98,12 @@ window.maintenance_edit = new class {
 
 			event_names_table?.addEventListener('input', () => this.#updateMaintenanceType($triggerids, event_names_table));
 
+			event_names_table.addEventListener('click', e => {
+				if (e.target.classList.contains('element-table-remove')) {
+					this.#updateMaintenanceType($triggerids, event_names_table);
+				}
+			});
+
 			// Update form field state according to the form data.
 			document.getElementById('maintenance_type').addEventListener('change', () => this.#update());
 			this.form.findFieldByName('timeperiods').setButtonOnBlur('js-add', 'maintenance-timeperiod-edit');
