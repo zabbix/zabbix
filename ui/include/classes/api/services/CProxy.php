@@ -281,9 +281,11 @@ class CProxy extends CApiService {
 			return;
 		}
 
-		$options['selectApm'] = $options['selectApm'] === API_OUTPUT_EXTEND
+		$selectApm = $options['selectApm'] === API_OUTPUT_EXTEND
 			? array_keys(self::APM_DEFAULT_FIELDS)
 			: array_intersect(array_keys(self::APM_DEFAULT_FIELDS), $options['selectApm']);
+
+		$apmOptionsMap = array_flip($selectApm);
 
 		$resource = DBselect(
 			'SELECT p.proxyid,p.apm'.
@@ -291,7 +293,6 @@ class CProxy extends CApiService {
 			' WHERE '.dbConditionId('p.proxyid', array_keys($result))
 		);
 
-		$apmOptionsMap = array_flip($options['selectApm']);
 
 		while ($row = DBfetch($resource)) {
 			$apm = json_decode($row['apm'], true);
