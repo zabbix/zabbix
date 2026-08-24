@@ -160,12 +160,11 @@ class testTriggerCEP extends CIntegrationTest {
 	// the same webhook). The web-tag services (see createWebTagServices) match problems only on this tag,
 	// so they can go into problem state only via tags applied by the webhook, never via a trigger tag.
 	const WEB_COMPONENT_TAG = 'web_component';
-	// Tag put on every event the window tagging flavour of the close-on-up CEP rule matches, as the event
-	// occurs, by the per-component tagging operations that flavour is given (see
-	// buildCloseOnUpCepRuleParams()), carrying the value of the event's 'component' tag. The window-tag
-	// services (see createWindowTagServices) match problems only on this tag, so they can go into problem
-	// state only via a tag an operation of the rule applied - never via a trigger tag and, unlike the web-tag
-	// services, never via a webhook either.
+	// Tag put on every event the window tagging flavours of the close-on-up CEP rule match by the
+	// per-component tagging operations those flavours are given (see buildCloseOnUpCepRuleParams()), carrying
+	// the value of the event's 'component' tag. The window-tag services (see createWindowTagServices) match
+	// problems only on this tag, so they can go into problem state only via a tag an operation of the rule
+	// applied - never via a trigger tag and, unlike the web-tag services, never via a webhook either.
 	const CEP_WINDOW_COMPONENT_TAG = 'cep_window_component';
 
 	// Name prefix shared by every CEP rule (ceprule API) these scenarios create. deleteCepRules() removes
@@ -416,6 +415,16 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_SERVICE_TAG_VALUE = 'problem';
 	const CEP_SERVICE_NAME = 'CEP tag driven service';
 	const CEP_RULE_SERVICE_TAG = self::CEP_RULE_NAME_PREFIX.'window service tag';
+	// The unsuppress scenario (see prepareDataCepUnsuppress()): a simple window rule that suppresses the event
+	// it matches when the event occurs and takes that very suppression away again when its window evicts the
+	// event, so the event is observably suppressed and then not while its problem stays open the whole time.
+	const CEP_RULE_UNSUPPRESS = self::CEP_RULE_NAME_PREFIX.'window unsuppress';
+	// The window duration that scenario gives its rule, in place of the CEP_RULE_WINDOW_OPS_DURATION the other
+	// windowed operation flavours use: the eviction that lifts the suppression is what the duration running out
+	// causes, so the run has exactly this long to see the problem suppressed first - by the rule and, in the
+	// maintenance flavour, by the maintenance beside it - which three seconds would leave too little room for.
+	// It still has to be waited out within WAIT_ITERATIONS afterwards, so it stays well under that.
+	const CEP_RULE_UNSUPPRESS_WINDOW_DURATION = '10s';
 	// The copy scenario (see prepareDataCepWindowCopy()): a simple window that copies an event when it is
 	// evicted. A copy is a full event of its own, so it matches the same rule, lands in the same window and is
 	// evicted in turn - which would copy it again, and again. The "event copied" operation condition
@@ -2186,14 +2195,15 @@ class testTriggerCEP extends CIntegrationTest {
 	 * up (see createExtraTagWebhookAction), so the CEP flavours of the JS scenarios can assert that tags
 	 * returned by a media type land on the events they were generated for.
 	 *
-	 * $window_tag_operations gives the rule the per-component tagging operations of
-	 * buildWindowComponentTagOperations(), the CEP-side counterpart of that webhook: the rule then tags every
-	 * event it matches with its component, which is what the window-tag services match on.
+	 * $window_tag_execute_when, when it is not null, gives the rule the per-component tagging operations of
+	 * buildWindowComponentTagOperations() at that execution point, the CEP-side counterpart of that webhook:
+	 * the rule then tags every event it matches with its component, which is what the window-tag services match
+	 * on.
 	 */
 	public function prepareDataCepWindowTagCorrelationCloseOnUp(bool $tag_exists_condition = true,
-			bool $extra_tag_via_webhook = false, bool $window_tag_operations = false) {
+			bool $extra_tag_via_webhook = false, ?int $window_tag_execute_when = null) {
 		return $this->prepareCloseOnUpCepRule(CCepRuleHelper::WINDOW_TAG_MATCH, self::CEP_RULE_CLOSE_ON_UP,
-			$tag_exists_condition, $extra_tag_via_webhook, $window_tag_operations
+			$tag_exists_condition, $extra_tag_via_webhook, $window_tag_execute_when
 		);
 	}
 
@@ -2226,7 +2236,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * tagging webhook media types and the rule's per-component tagging operations.
 	 */
 	private function prepareCloseOnUpCepRule(int $window_type, string $name, bool $tag_exists_condition,
-			bool $extra_tag_via_webhook, bool $window_tag_operations = false): bool {
+			bool $extra_tag_via_webhook, ?int $window_tag_execute_when = null): bool {
 		$this->prepareCloseOnUpTriggerPrototypes($tag_exists_condition
 			? [['tag' => self::CEP_STATE_TAG, 'value' => '']]
 			: []
@@ -2241,7 +2251,7 @@ class testTriggerCEP extends CIntegrationTest {
 
 		self::$cep_ruleid = $this->upsertCepRule(
 			$this->buildCloseOnUpCepRuleParams($name, $tag_exists_condition, $window_type,
-				$window_tag_operations
+				$window_tag_execute_when
 			)
 		);
 
@@ -2714,6 +2724,58 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_SERVICE_TAG, [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE, $this->buildWindowOperationsWindow()
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the unsuppress scenario: a windowed rule that suppresses the event it matches when the event
+	 * occurs and takes that suppression away again when its window evicts the event, which happens once the
+	 * window duration has run out. The problem itself is never closed by the rule, so what the run observes -
+	 * suppressed, then not suppressed - can only be the suppression the rule added and removed.
+	 *
+	 * The suppression the "suppress" operation asks for lasts CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD, far longer
+	 * than the window duration the eviction waits out (CEP_RULE_UNSUPPRESS_WINDOW_DURATION), so a suppression
+	 * that lapsed on its own could not be mistaken for one the "unsuppress" operation lifted.
+	 *
+	 * A rule only ever removes a suppression of its own (the entry is keyed on its cep_ruleid, see
+	 * cep_operation_event_execute_unsuppress_event() in cep_rule_operation.c), which is what the maintenance
+	 * flavour of the scenario asserts: with a maintenance suppressing the same problem the unsuppress must
+	 * leave the maintenance entry where it is, see runEventAssessmentTestCepUnsuppress().
+	 *
+	 * The window groups by the 'service' tag, so the one event of the scenario has a window to itself.
+	 */
+	public function prepareDataCepUnsuppress() {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// Only this rule may suppress or close the problem of the scenario - beyond the maintenance the
+		// maintenance flavour adds, which is the whole point of that flavour.
+		$this->deleteCepCorrelations();
+
+		$operations = [
+			[
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'type' => CCepRuleHelper::OP_SUPPRESS,
+				'suppress_duration' => self::CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD
+			],
+			[
+				'sortorder' => 1,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+				'type' => CCepRuleHelper::OP_UNSUPPRESS
+			]
+		];
+
+		// The window of the other windowed operation flavours, with a duration of this scenario's own: the
+		// eviction it decides is what the run watches for, see CEP_RULE_UNSUPPRESS_WINDOW_DURATION.
+		$window = ['duration' => self::CEP_RULE_UNSUPPRESS_WINDOW_DURATION]
+			+ $this->buildWindowOperationsWindow();
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_UNSUPPRESS, [], $operations,
+			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE, $window
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -4862,7 +4924,7 @@ HEREDOC;
 
 	/**
 	 * Create one service per discovered component whose only problem tag is CEP_WINDOW_COMPONENT_TAG, the tag
-	 * the tagging operations of the close-on-up CEP rule put on every event they match as it occurs (see
+	 * the tagging operations of the close-on-up CEP rule put on every event they match (see
 	 * buildCloseOnUpCepRuleParams()), so each can enter problem state only after an operation of the rule
 	 * tagged an open problem event of its component. The webhook counterpart of these services is
 	 * createWebTagServices(); nothing else about them differs, which is what lets both flavours be driven by
@@ -5318,15 +5380,15 @@ HEREDOC;
 	 * cause - and counts the symptoms of a group in the CEP_TAG_SYMPTOM_COUNT tag of its cause, which is what
 	 * waitForCloseOnUpCauseSymptomRanking() asserts.
 	 *
-	 * $window_tag_operations gives the rule the tagging operations of buildWindowComponentTagOperations() on
-	 * top of the two above, so every event the rule matches is also tagged, as it occurs, with
-	 * CEP_WINDOW_COMPONENT_TAG carrying its component. That is the tag the window-tag services
-	 * (createWindowTagServices()) match their problems on, which is what lets the rule itself - rather than a
-	 * tagging webhook - drive those services into problem state.
+	 * $window_tag_execute_when, when it is not null, gives the rule the tagging operations of
+	 * buildWindowComponentTagOperations() at that execution point on top of the two above, so every event the
+	 * rule matches is also tagged with CEP_WINDOW_COMPONENT_TAG carrying its component. That is the tag the
+	 * window-tag services (createWindowTagServices()) match their problems on, which is what lets the rule
+	 * itself - rather than a tagging webhook - drive those services into problem state.
 	 */
 	private function buildCloseOnUpCepRuleParams(string $name, bool $tag_exists_condition = false,
 			int $window_type = CCepRuleHelper::WINDOW_TAG_MATCH,
-			bool $window_tag_operations = false): array {
+			?int $window_tag_execute_when = null): array {
 		$close_window_condition = $tag_exists_condition
 			? self::buildUpEventOperationCondition()
 			: [
@@ -5383,7 +5445,10 @@ HEREDOC;
 					'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED,
 					'type' => CCepRuleHelper::OP_CLOSE_EVENT
 				]
-			], $window_tag_operations ? self::buildWindowComponentTagOperations(2) : [])
+			], $window_tag_execute_when === null
+				? []
+				: self::buildWindowComponentTagOperations(2, $window_tag_execute_when)
+			)
 		];
 	}
 
@@ -5401,13 +5466,20 @@ HEREDOC;
 	 * additionally puts the operation conditions themselves under test: a component whose events were tagged by
 	 * the wrong operation, or by all of them, leaves its service matching nothing and fails the run.
 	 *
-	 * They execute when the event occurred, which for a windowed rule is the execution point that comes before
-	 * the event reaches the window at all (see cep_event_process_rules() in cep_rule.c, which runs the operations
-	 * of that point while matching the rules, before the windows are given the event) - so every event the rule
-	 * matches is tagged, the "up" ones that go on to close a window included, exactly like the tagging webhook
-	 * tags the "up" problems it escalates for.
+	 * $execute_when is the execution point they are performed at, and is what the two flavours of the scenario
+	 * differ in. Either way every event the rule matches is tagged, the "up" ones that go on to close a window
+	 * included - exactly like the tagging webhook tags the "up" problems it escalates for - but what the tagging
+	 * has to survive differs:
+	 *   - WHEN_EVENT_OCCURRED comes before the event reaches the window at all (see cep_event_process_rules() in
+	 *     cep_rule.c, which runs the operations of that point while matching the rules, before the windows are
+	 *     given the event), so the tag is on the event no matter what its window then does with it;
+	 *   - WHEN_EVENT_ADDED comes after the event was taken into the window, and for an "up" event it is the very
+	 *     execution point whose close-window operation ends that window: the tagging and the closing are asked
+	 *     for by the same pass over the operations (the window is only closed once the whole execution point is
+	 *     done, see cep_window_sliding_process_event() in cep_window.c), so the tag must still land on an event
+	 *     the rule is about to close.
 	 */
-	private static function buildWindowComponentTagOperations(int $sortorder): array {
+	private static function buildWindowComponentTagOperations(int $sortorder, int $execute_when): array {
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 
 		$operations = [];
@@ -5416,7 +5488,7 @@ HEREDOC;
 
 			$operations[] = [
 				'sortorder' => $sortorder + $i - 1,
-				'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+				'execute_when' => $execute_when,
 				'type' => CCepRuleHelper::OP_ADD_TAG,
 				'tag' => self::CEP_WINDOW_COMPONENT_TAG,
 				'tag_value' => $component,
@@ -6920,17 +6992,19 @@ HEREDOC;
 	 * getWindowNoneTagOperationCases() splits the tag ones, with the event state each step must leave behind: the
 	 * fields it does not change are the ones the trigger gave the event (getWindowOperationStepTriggerEvent()).
 	 *
-	 * The two severity shifts are the only steps carrying a second operation, a "set severity" ahead of them, and
-	 * they carry it for the reason the windowless flavour chains all of them: the events of these prototypes are at
-	 * DISASTER, the top of the scale, so an "increase severity" performed on one is indistinguishable from an
-	 * "increase severity" that did nothing. Setting the severity first puts the event where a shift has somewhere to
-	 * go and makes the expected severity one only the shift can produce.
+	 * Three steps carry a second operation. The two severity shifts are given a "set severity" ahead of them for
+	 * the reason the windowless flavour chains all of them: the events of these prototypes are at DISASTER, the top
+	 * of the scale, so an "increase severity" performed on one is indistinguishable from an "increase severity" that
+	 * did nothing. Setting the severity first puts the event where a shift has somewhere to go and makes the
+	 * expected severity one only the shift can produce. The "unsuppress" step is given a "suppress" ahead of it for
+	 * the same kind of reason: an event that was never suppressed cannot show that an unsuppress ran, so the step
+	 * suppresses it first and the expected state - not suppressed - is then one only the removal can produce, the
+	 * "suppress" step below leaving the very same operation's suppression in place.
 	 *
 	 * "discard" and "close" are left out here as they are there, although a step of this scenario recovers its
 	 * trigger and could afford a closed problem: the driver reads the outcome of a step off the one problem event
 	 * the step opens, which a discarded event never becomes and a closed one does not stay - see
-	 * prepareDataCepDiscardUp() and the window scenarios for those two. "unsuppress" is left out because an event
-	 * that was never suppressed cannot show it ran.
+	 * prepareDataCepDiscardUp() and the window scenarios for those two.
 	 */
 	private function getWindowNoneEventOperationSteps(): array {
 		$trigger_event = $this->getWindowOperationStepTriggerEvent();
@@ -6979,6 +7053,21 @@ HEREDOC;
 					[CCepRuleHelper::OP_DECREASE_SEVERITY, []]
 				],
 				'event' => ['severity' => TRIGGER_SEVERITY_INFORMATION] + $trigger_event
+			],
+			[
+				// A suppression and its removal from one rule: the operations of a rule are performed in
+				// sortorder, so the second one takes away exactly what the first one added and the event comes
+				// out of the step unsuppressed - which is what tells the pair from a rule that suppressed
+				// nothing at all, the very same "suppress" operation leaving the event suppressed in the step
+				// below. It also leaves nothing behind for the steps after it to run into, unlike that one.
+				'label' => 'unsuppress',
+				'operations' => [
+					[CCepRuleHelper::OP_SUPPRESS,
+						['suppress_duration' => self::CEP_RULE_WINDOW_NONE_SUPPRESS_PERIOD]
+					],
+					[CCepRuleHelper::OP_UNSUPPRESS, []]
+				],
+				'event' => $trigger_event
 			],
 			[
 				// The suppression is a timed one, as in the windowless flavour, and only its first half is
@@ -9450,8 +9539,11 @@ HEREDOC;
 	 * but what drives the services into problem state is the tagging of the CEP rule itself rather than a
 	 * tagging webhook: no media type is involved at all, and the rule closing the problems is additionally
 	 * given the per-component "Add tag" operations of buildWindowComponentTagOperations(), which put a
-	 * CEP_WINDOW_COMPONENT_TAG tag carrying the event's component on every event the rule matches, as the event
-	 * occurs.
+	 * CEP_WINDOW_COMPONENT_TAG tag carrying the event's component on every event the rule matches. This
+	 * flavour has them performed when the event occurred, the execution point that comes before the event
+	 * reaches the window at all, so the tag is on the event whatever its window does with it afterwards - the
+	 * arrival flavour is
+	 * testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpWindowTagServicesAdded.
 	 *
 	 * One service per discovered component is created whose only problem tag matches that tag
 	 * (createWindowTagServices()), so a service can go into problem state only after an operation of the rule
@@ -9459,20 +9551,45 @@ HEREDOC;
 	 * an escalation is in play. The run asserts the services start OK, turn DISASTER once the rule has tagged
 	 * the open problems (and stay DISASTER through waves 2 and 3), drop to WARNING once the still-open problems
 	 * are manually downgraded after wave 3 and recover to OK once the CEP rule closes every problem in wave 4.
-	 *
-	 * Afterwards every problem event of the run must carry the tag - the "up" ones included: the operations
-	 * execute when the event occurred, which is before the event reaches the window at all, so an "up" event is
-	 * tagged even though the window it enters is closed right away.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpWindowTagServices$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpWindowTagServices() {
-		$this->prepareDataCepWindowTagCorrelationCloseOnUp(true, false, true);
+		$this->runEventAssessmentTestCepWindowTagServices(CCepRuleHelper::WHEN_EVENT_OCCURRED);
+	}
+
+	/**
+	 * The arrival flavour of testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpWindowTagServices:
+	 * the same services driven by the same per-component tagging operations of the same rule, only performed
+	 * when the event was added to its window instead of when it occurred.
+	 *
+	 * What that adds is the collision with the closing of the window: for an "up" event the close-window
+	 * operation sits at that very execution point, so the tagging and the closing are asked for by the same
+	 * pass over the operations of the rule, and the tag still has to land on an event the rule is about to
+	 * close. The "down" events - the ones the services actually follow, since they are the problems that stay
+	 * open - are tagged as they are taken into their window, which no closing interferes with.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpWindowTagServicesAdded$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpWindowTagServicesAdded() {
+		$this->runEventAssessmentTestCepWindowTagServices(CCepRuleHelper::WHEN_EVENT_ADDED);
+	}
+
+	/**
+	 * The body both window tagging service flavours share: the close-on-up CEP rule with the per-component
+	 * tagging operations at $window_tag_execute_when, the services matching only the tag those operations
+	 * apply, and the same four-wave run asserting the service states they must reach.
+	 *
+	 * Afterwards every problem event of the run must carry the tag - the "up" ones included, at either
+	 * execution point (see buildWindowComponentTagOperations()).
+	 */
+	private function runEventAssessmentTestCepWindowTagServices(int $window_tag_execute_when): void {
+		$this->prepareDataCepWindowTagCorrelationCloseOnUp(true, false, $window_tag_execute_when);
 
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
 
 		// Every one of the four waves opens a problem event per trigger and every one of them is matched by the
-		// rule and tagged as it occurs, so 4 tagged problem events per trigger (key).
+		// rule and tagged, so 4 tagged problem events per trigger (key).
 		$m = count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY))
 			+ count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2));
 
@@ -9484,7 +9601,7 @@ HEREDOC;
 
 			// $check_tag_driven_services asserts the service state transitions driven by the tags the
 			// operations of the rule applied. There is no webhook here, so $check_tags stays false - the tag
-			// assertion of this flavour is the CEP_WINDOW_COMPONENT_TAG count below.
+			// assertion of these flavours is the CEP_WINDOW_COMPONENT_TAG count below.
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, false, false, true, true);
 			$this->waitForNoOpenProblems($all);
 
@@ -10657,7 +10774,8 @@ HEREDOC;
 	 * these steps runs the moment the event occurs and nothing here acts on a window - and the window is what an
 	 * update has one more thing to get right about: the rule of a step is updated while the window its previous step
 	 * left behind is still around, and the operations of the new rule must be the ones performed for the event that
-	 * enters it.
+	 * enters it. The flavour that performs the same operations at the other execution point a windowed rule has is
+	 * testTriggerCEP_CepWindowSimpleOperationStepsAdded.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleOperationSteps$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -10685,7 +10803,8 @@ HEREDOC;
 	 *
 	 * What this flavour adds to the simple one is the script: it is part of the window of the rule, so every step
 	 * updates it along with the operations, and the window of the step before it is examined by the script of that
-	 * step until the update replaces it.
+	 * step until the update replaces it. The flavour that performs the same operations when the event is added to
+	 * the window instead is testTriggerCEP_CepWindowPatternOperationStepsAdded.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternOperationSteps$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -10694,6 +10813,58 @@ HEREDOC;
 
 		try {
 			$this->runEventAssessmentTestCepWindowOperationSteps($rule);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The simple window flavour of the stepped operation scenario with the operations of every step performed
+	 * when the event was added to the window instead of when it occurred: the same steps, the same rule updates
+	 * between them and the same outcome expected of every one of them, only reached through the other execution
+	 * point a windowed rule has. None of these operations acts on a window, so where in the life of the event
+	 * they are performed may not change what they do to it - which is what makes the two flavours comparable at
+	 * all, and what a difference between them would be a failure of.
+	 *
+	 * The windowless flavour has no counterpart here: a rule without a window never reaches that execution
+	 * point (see CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE), which is also why the point is worth its own
+	 * flavour - it is only ever reached with a window in play, so the update of a step has to replace the
+	 * operations behind it while the window of the step before it is still holding events.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleOperationStepsAdded$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleOperationStepsAdded() {
+		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple added');
+
+		try {
+			$this->runEventAssessmentTestCepWindowOperationSteps($rule, CCepRuleHelper::WHEN_EVENT_ADDED);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The pattern match window flavour of testTriggerCEP_CepWindowSimpleOperationStepsAdded: the operations of
+	 * every step are again performed when the event was added to the window, this time out of a rule whose
+	 * window has a script - one reporting no match however many events it is handed, so the pattern matched
+	 * execution point of every step stays unreached and the "close window" operation sitting behind it
+	 * unperformed, exactly as in testTriggerCEP_CepWindowPatternOperationSteps.
+	 *
+	 * So this flavour has the event added to a window that is examined by a script between the steps, and the
+	 * operations of the step must still be the ones performed for it - and only those of the step, the script
+	 * of the previous step being replaced along with them.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternOperationStepsAdded$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternOperationStepsAdded() {
+		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_PATTERN_MATCH,
+			'pattern added'
+		);
+
+		try {
+			$this->runEventAssessmentTestCepWindowOperationSteps($rule, CCepRuleHelper::WHEN_EVENT_ADDED);
 		}
 		finally {
 			$this->cleanupCepRules();
@@ -11109,6 +11280,71 @@ HEREDOC;
 		finally {
 			$this->cleanupCepRules();
 			$this->deleteCepTagService();
+		}
+	}
+
+	/**
+	 * A suppression a CEP rule adds and takes away again: the rule suppresses the event as it occurs and
+	 * unsuppresses it when the window evicts that event, and the problem stays open from beginning to end - so
+	 * the problem going from suppressed to not suppressed can only be the two operations of the rule, one after
+	 * the other.
+	 *
+	 * The "unsuppress" operation is reached nowhere else: every other suppression scenario of the suite only
+	 * ever adds one (the $suppress_points flavours of testTriggerCEP_CepWindowSimpleCloseWindowSuppressPoints
+	 * and the 'suppress' operation case), and the one wait that sees a suppression go -
+	 * waitForCepWindowNoneUnsuppressed() - waits for a timed one to lapse, which is the housekeeping of an
+	 * expired suppression rather than an operation lifting a live one. The operation is exercised at one
+	 * execution point here and, paired with the suppress operation inside one, by the 'unsuppress' step of the
+	 * stepped operation scenario (see getWindowNoneEventOperationSteps()).
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepUnsuppress$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepUnsuppress() {
+		$this->prepareDataCepUnsuppress();
+
+		try {
+			$this->runEventAssessmentTestCepUnsuppress(false);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The same scenario as testTriggerCEP_CepUnsuppress with the discovered host in maintenance for the whole
+	 * of it, so the one problem is suppressed twice over: once by the maintenance and once by the rule.
+	 *
+	 * What that adds is the reach of the "unsuppress" operation, which must be its own suppression and nothing
+	 * else: an operation removes the entry keyed on the cep_ruleid of its rule (see
+	 * cep_operation_event_execute_unsuppress_event()), so after the eviction the problem must be left with
+	 * exactly the maintenance entry - still suppressed, by one suppressor instead of two. A rule reaching
+	 * further than its own entry would take the maintenance suppression of a problem away, which nothing but
+	 * the maintenance ending may do.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepUnsuppressMaintenance$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepUnsuppressMaintenance() {
+		self::$disc_maintenanceids = [];
+		$this->prepareDataCepUnsuppress();
+
+		try {
+			$this->runEventAssessmentTestCepUnsuppress(true);
+		}
+		finally {
+			$this->cleanupCepRules();
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// Moving the maintenance out of its active window only changes the configuration; the timer process
+			// still has to take the host out of maintenance and clear the suppression it left behind, so the
+			// next test cannot observe a stale one - the same teardown the other maintenance scenarios run, see
+			// testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpMaintenanceAfterFirst().
+			$this->callUntilCountIsPresent('event.get', [
+				'hostids' => [self::$disc_hostid],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'suppressed' => true
+			], 0, 120, self::WAIT_ITERATION_DELAY);
 		}
 	}
 
@@ -13707,8 +13943,20 @@ HEREDOC;
 	 * reads its event, and recovers the trigger with a value matching neither "down" nor "up", which closes that
 	 * problem again. So the step after it starts where this one started and inspects one event of its own - the
 	 * events of the steps before it are left behind the baseline (captureEventBaseline()).
+	 *
+	 * $execute_when is the execution point the operations of every step are performed at, and what a step expects
+	 * is the same at either of them - none of these operations acts on a window, so where in the life of the event
+	 * they are reached may not change what they do to it:
+	 *   - WHEN_EVENT_OCCURRED, the point every rule has, windowless ones included: the operations are performed
+	 *     while the rules are matched, before any window sees the event;
+	 *   - WHEN_EVENT_ADDED, which only a windowed rule has: the operations are performed once the event was taken
+	 *     into the window of its 'service' id, so what a step additionally holds the server to is that an update
+	 *     replaced the operations behind that point as well - and that the window a step is handed, which is the
+	 *     one the step before it left behind until its duration runs out, is no reason for the operations of the
+	 *     previous step to be performed for this event.
 	 */
-	private function runEventAssessmentTestCepWindowOperationSteps(array $rule_template): void {
+	private function runEventAssessmentTestCepWindowOperationSteps(array $rule_template,
+			int $execute_when = CCepRuleHelper::WHEN_EVENT_OCCURRED): void {
 		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
 		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
 		$all = [$triggerid];
@@ -13737,7 +13985,7 @@ HEREDOC;
 			// the one the step expects - and a step whose filter is the 'none' one leaves its operations
 			// unconditional, so the update into it takes the conditions of the step before away, see
 			// getWindowOperationStepOperationFilters().
-			$operations = $this->buildWindowNoneOperations($step['operations']);
+			$operations = $this->buildWindowNoneOperations($step['operations'], $execute_when);
 
 			if ($step['operation_filter'] !== null) {
 				foreach ($operations as &$operation) {
@@ -16677,6 +16925,126 @@ HEREDOC;
 				.json_encode($response['result']).'. '.$e->getMessage()
 			);
 		}
+	}
+
+	/**
+	 * Drive the unsuppress scenario (see prepareDataCepUnsuppress()) on the single discovered item the other
+	 * windowless flavours are driven on:
+	 *   1. the trigger starts in OK state, so there is no problem for the rule to have suppressed yet;
+	 *   2. the problem opens and the rule suppresses its event as the event occurs, so the problem is
+	 *      suppressed by the rule (an entry carrying no maintenanceid);
+	 *   3. the window duration runs out, the event is evicted and the rule takes its own suppression away
+	 *      again, so the problem is not suppressed by it any more - while the problem is still open, which is
+	 *      what shows the suppression went and not the problem.
+	 *
+	 * With $with_maintenance the discovered host is put in maintenance before the problem opens, so the same
+	 * problem is suppressed by the maintenance as well: step 2 must then find two suppressors and step 3
+	 * exactly one - the maintenance one, untouched. The problem therefore stays suppressed throughout that
+	 * flavour, and what the run watches is the suppressors of it rather than the flag.
+	 *
+	 * Nothing in this scenario closes a problem, so the trigger expression has to at the end of it.
+	 */
+	private function runEventAssessmentTestCepUnsuppress(bool $with_maintenance): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the unsuppress test.');
+		}
+
+		// The maintenance is started before the problem opens, so the problem is suppressed by it from the
+		// moment it is created and the rule's own suppression is the only thing that may come and go.
+		$maintenanceids = [];
+
+		if ($with_maintenance) {
+			$this->startDiscHostMaintenances(1);
+			$maintenanceids = self::$disc_maintenanceids;
+		}
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		// 2. The problem opens and is suppressed by the rule as it occurs, on top of the maintenance when
+		//    there is one.
+		$send('down_'.self::CEP_RULE_WINDOW_NONE_SERVICE);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForCepProblemSuppressors($all, $maintenanceids, true,
+			'After the "down" value of the unsuppress test'
+		);
+
+		// 3. Once the window duration has run out the event is evicted and the rule lifts the suppression it
+		//    added - and only that one, so a maintenance suppressing the same problem stays.
+		$this->waitForCepProblemSuppressors($all, $maintenanceids, false,
+			'After the eviction of the unsuppress test'
+		);
+
+		// The problem was never closed - only the suppression went away.
+		$this->waitForOpenProblemCount($all, 1);
+
+		// Nothing in this scenario closes a problem, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the unsuppress test recovery value', false);
+	}
+
+	/**
+	 * Wait until the one open problem of the unsuppress scenario is suppressed by exactly the expected
+	 * suppressors: the maintenances of $maintenanceids and, when $by_rule is true, the CEP rule as well.
+	 *
+	 * A suppression a rule added carries no maintenanceid (only its cep_ruleid, which the API does not expose
+	 * through selectSuppressionData), so what tells the two apart is the maintenanceid of an entry being set:
+	 * the entries with one must be exactly the expected maintenances, and the number of entries says whether
+	 * the rule has one of its own beside them. That is also why the count is asserted rather than the flag -
+	 * with a maintenance in play the problem is suppressed either way, so only its suppressors show that the
+	 * rule lifted its own and nothing else.
+	 */
+	private function waitForCepProblemSuppressors(array $triggerids, array $maintenanceids, bool $by_rule,
+			string $info): void {
+		$expected_ids = array_values($maintenanceids);
+		sort($expected_ids);
+
+		$expected_count = count($expected_ids) + ($by_rule ? 1 : 0);
+
+		$this->callUntilDataIsPresent('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'selectSuppressionData' => ['maintenanceid']
+		], static::WAIT_ITERATIONS_LONGER, self::WAIT_ITERATION_DELAY,
+			function (array $response) use ($expected_ids, $expected_count, $info) {
+				if (count($response['result']) != 1) {
+					return $info.': expected exactly one open problem, got '.count($response['result']);
+				}
+
+				$suppression_data = $response['result'][0]['suppression_data'];
+
+				if (count($suppression_data) != $expected_count) {
+					return $info.': problem '.$response['result'][0]['eventid'].' has '
+						.count($suppression_data).' suppressors, expected '.$expected_count.': '
+						.json_encode($suppression_data);
+				}
+
+				// Only the entries of a maintenance have a maintenanceid; the one the rule added has none, so
+				// it is counted above and left out here.
+				$ids = array_values(array_filter(array_column($suppression_data, 'maintenanceid'),
+					fn($maintenanceid) => (int) $maintenanceid != 0
+				));
+				sort($ids);
+
+				if ($ids !== $expected_ids) {
+					return $info.': problem '.$response['result'][0]['eventid']
+						.' is suppressed by maintenances ['.implode(', ', $ids).'], expected ['
+						.implode(', ', $expected_ids).']';
+				}
+
+				return true;
+			}
+		);
 	}
 
 	/**
