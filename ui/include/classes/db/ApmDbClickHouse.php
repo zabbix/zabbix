@@ -213,6 +213,9 @@ class ApmDbClickHouse {
 		return '['.implode(',', $values).']';
 	}
 
+	/**
+	 * @throws DBException
+	 */
 	private static function encodeScalarParamValue(mixed $value): string {
 		if (is_string($value)) {
 			return self::escapeString($value);
@@ -230,20 +233,11 @@ class ApmDbClickHouse {
 			return (string) $value;
 		}
 
-		throw new DBException(
-			_('Unsupported ClickHouse query parameter type.'),
-			DB::DBEXECUTE_ERROR
-		);
+		throw new DBException(_('Unsupported ClickHouse query parameter type.'), DB::DBEXECUTE_ERROR);
 	}
 
 	private static function escapeString(string $value): string {
-		return strtr($value, [
-			'\\' => '\\\\',
-			"'" => "\\'",
-			"\n" => '\\n',
-			"\r" => '\\r',
-			"\t" => '\\t'
-		]);
+		return strtr($value, ['\\' => '\\\\', "'" => "\\'", "\n" => '\\n', "\r" => '\\r', "\t" => '\\t']);
 	}
 
 	private static function processResponseHeader(CurlHandle $curl, string $header, bool &$http_response_validated,
