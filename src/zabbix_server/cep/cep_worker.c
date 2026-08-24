@@ -25,6 +25,7 @@
 #include "cep_event.h"
 #include "zbx_cep.h"
 #include "zbx_cep_client.h"
+#include "zbxescalations.h"
 #include "zbxmw.h"
 
 #include "zbx_item_constants.h"
@@ -903,8 +904,45 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 
 	if (0 != event_tasks.values_num)
 	{
-		cep_db_flush_events(worker->dbpool, &event_tasks);
-		cep_db_process_actions(worker->dbpool, &event_tasks, &worker->rtc);
+		zbx_vector_escalation_new_ptr_t	escalations;
+		zbx_vector_trigger_diff_ptr_t	trigger_diffs;
+		zbx_dbconn_t			*db;
+		int				ret;
+
+		zbx_vector_trigger_diff_ptr_create(&trigger_diffs);
+		zbx_vector_escalation_new_ptr_create(&escalations);
+
+		db = zbx_dbconn_pool_acquire_connection(worker->dbpool);
+
+		do
+		{
+			zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diffs, zbx_trigger_diff_free);
+			zbx_vector_escalation_new_ptr_clear_ext(&escalations, zbx_escalation_new_ptr_free);
+
+			zbx_dbconn_begin(db);
+
+			cep_db_flush_events(db, &event_tasks, &trigger_diffs);
+			cep_db_process_actions(db, &event_tasks, &escalations);
+		}
+		while (ZBX_DB_DOWN == (ret = zbx_dbconn_commit(db)));
+
+		zbx_dbconn_pool_release_connection(worker->dbpool, db);
+
+		if (ZBX_DB_OK == ret)
+		{
+			cep_db_mark_committed(&event_tasks);
+			zbx_dc_config_triggers_apply_changes(trigger_diffs.values, trigger_diffs.values_num);
+
+			if (0 != escalations.values_num)
+				zbx_start_escalations(&worker->rtc, &escalations);
+		}
+
+		zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diffs, zbx_trigger_diff_free);
+		zbx_vector_trigger_diff_ptr_destroy(&trigger_diffs);
+
+		zbx_vector_escalation_new_ptr_clear_ext(&escalations, zbx_escalation_new_ptr_free);
+		zbx_vector_escalation_new_ptr_destroy(&escalations);
+
 		cep_db_export_events(worker->dbpool, &event_tasks, worker->problem_export);
 
 		for (int i = 0; i < event_tasks.values_num; i++)

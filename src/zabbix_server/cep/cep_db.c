@@ -701,7 +701,7 @@ static void	cep_db_write_trigger_rtdata(zbx_dbconn_t *db, const zbx_vector_mw_ta
  * Parameters: tasks - [IN] committed tasks                                   *
  *                                                                            *
  ******************************************************************************/
-static void	cep_db_mark_committed(const zbx_vector_mw_task_ptr_t *tasks)
+void	cep_db_mark_committed(const zbx_vector_mw_task_ptr_t *tasks)
 {
 	for (int i = 0; i < tasks->values_num; i++)
 	{
@@ -720,18 +720,16 @@ static void	cep_db_mark_committed(const zbx_vector_mw_task_ptr_t *tasks)
  *                                                                            *
  * Purpose: flush events created by tasks to database                         *
  *                                                                            *
- * Parameters: dbpool - [IN] database connection pool                         *
- *             tasks  - [IN] list of tasks containing events                  *
+ * Parameters: db    - [IN] database connection                               *
+ *             tasks - [IN] list of tasks containing events                   *
+ *             trigger_diffs - [OUT] trigger changeset to be applied to cache *
  *                                                                            *
  ******************************************************************************/
-void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
+void	cep_db_flush_events(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks,
+		zbx_vector_trigger_diff_ptr_t *trigger_diffs)
 {
-	zbx_dbconn_t			*db;
-	zbx_vector_trigger_diff_ptr_t	trigger_diffs;
-	int				ret;
-	zbx_vector_uint64_t		ref_eventids;
+	zbx_vector_uint64_t	ref_eventids;
 
-	zbx_vector_trigger_diff_ptr_create(&trigger_diffs);
 	zbx_vector_uint64_create(&ref_eventids);
 
 	for (int i = 0; i < tasks->values_num; i++)
@@ -757,61 +755,39 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 	zbx_vector_uint64_sort(&ref_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&ref_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	db = zbx_dbconn_pool_acquire_connection(dbpool);
+	cep_db_write_events(db, tasks);
 
-	do
-	{
-		zbx_dbconn_begin(db);
+	zbx_dbconn_lock_ids_pk(db, "events", "eventid", &ref_eventids);
 
-		cep_db_write_events(db, tasks);
-
-		zbx_dbconn_lock_ids_pk(db, "events", "eventid", &ref_eventids);
-
-		cep_db_write_problems(db, tasks, &ref_eventids);
-		cep_db_write_symptoms(db, tasks, &ref_eventids);
-		cep_db_write_event_recovery(db, tasks, &ref_eventids);
-		cep_db_write_event_suppress(db, tasks);
-		cep_db_write_trigger_rtdata(db, tasks, &trigger_diffs);
-	}
-	while (ZBX_DB_DOWN == (ret = zbx_dbconn_commit(db)));
-
-	zbx_dbconn_pool_release_connection(dbpool, db);
-
-	if (ZBX_DB_OK == ret)
-	{
-		cep_db_mark_committed(tasks);
-		zbx_dc_config_triggers_apply_changes(trigger_diffs.values, trigger_diffs.values_num);
-	}
+	cep_db_write_problems(db, tasks, &ref_eventids);
+	cep_db_write_symptoms(db, tasks, &ref_eventids);
+	cep_db_write_event_recovery(db, tasks, &ref_eventids);
+	cep_db_write_event_suppress(db, tasks);
+	cep_db_write_trigger_rtdata(db, tasks, trigger_diffs);
 
 	zbx_vector_uint64_destroy(&ref_eventids);
-	zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diffs, zbx_trigger_diff_free);
-	zbx_vector_trigger_diff_ptr_destroy(&trigger_diffs);
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: process CEP task actions for created events                       *
  *                                                                            *
- * Parameters: dbpool - [IN] database connection pool                         *
+ * Parameters: db     - [IN] database connection                              *
  *             tasks  - [IN] list of tasks containing events and actions      *
- *             rtc    - [IN] RTC service socket                               *
+ *             escalations - [OUT] created escalations                        *
  *                                                                            *
  ******************************************************************************/
-void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks,
-		zbx_ipc_async_socket_t *rtc)
+void	cep_db_process_actions(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks,
+	zbx_vector_escalation_new_ptr_t *escalations)
 {
 	zbx_vector_uint64_pair_t	event_recovery;
-	zbx_vector_escalation_new_ptr_t	escalations;
 	zbx_vector_db_event_t		events;
-	zbx_dbconn_t			*db;
-	int				ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
 	zbx_vector_db_event_create(&events);
 	zbx_vector_db_event_reserve(&events, (size_t)tasks->values_num);
 	zbx_vector_uint64_pair_create(&event_recovery);
-	zbx_vector_escalation_new_ptr_create(&escalations);
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
@@ -835,25 +811,8 @@ void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_
 		}
 	}
 	zbx_vector_uint64_pair_sort(&event_recovery, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	process_actions(db, &events, &event_recovery, escalations);
 
-	db = zbx_dbconn_pool_acquire_connection(dbpool);
-
-	do
-	{
-		zbx_vector_escalation_new_ptr_clear_ext(&escalations, zbx_escalation_new_ptr_free);
-
-		zbx_dbconn_begin(db);
-		process_actions(db, &events, &event_recovery, &escalations);
-	}
-	while (ZBX_DB_DOWN == (ret = zbx_dbconn_commit(db)));
-
-	zbx_dbconn_pool_release_connection(dbpool, db);
-
-	if (ZBX_DB_OK == ret && 0 != escalations.values_num)
-			zbx_start_escalations(rtc, &escalations);
-
-	zbx_vector_escalation_new_ptr_clear_ext(&escalations, zbx_escalation_new_ptr_free);
-	zbx_vector_escalation_new_ptr_destroy(&escalations);
 	zbx_vector_uint64_pair_destroy(&event_recovery);
 	zbx_vector_db_event_destroy(&events);
 

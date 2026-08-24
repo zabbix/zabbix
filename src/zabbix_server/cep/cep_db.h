@@ -16,13 +16,16 @@
 #define ZABBIX_CEP_DB_H
 
 #include "zbxmw.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
 #include "zbxexport.h"
 #include "zbxtypes.h"
-#include "zbxipcservice.h"
 
-void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks);
-void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks,
-		zbx_ipc_async_socket_t *rtc);
+void	cep_db_flush_events(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks,
+		zbx_vector_trigger_diff_ptr_t *trigger_diffs);
+void	cep_db_mark_committed(const zbx_vector_mw_task_ptr_t *tasks);
+void	cep_db_process_actions(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks,
+		zbx_vector_escalation_new_ptr_t *escalations);
 void	cep_db_export_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks,
 		zbx_export_file_t *problem_export);
 void	cep_db_add_tags(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks);
