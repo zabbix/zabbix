@@ -631,7 +631,7 @@ class CCepRule extends CApiService {
 				$api_not_empty = API_NOT_EMPTY;
 			}
 
-			if ($api_not_empty == 0 && !array_key_exists('operations', $cep_rule)) {
+			if ($api_required == 0 && !array_key_exists('operations', $cep_rule)) {
 				continue;
 			}
 
