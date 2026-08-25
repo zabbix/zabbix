@@ -120,6 +120,7 @@ $form = (new CForm())
 					' #{execute_when_str} : #{label_str}',
 					new CTag('em', true, ' #{arguments_str}')
 				]))->addClass('text'),
+				(new CCol('#{*condition_description_html}'))->addClass(ZBX_STYLE_WORDBREAK),
 				[
 					(new CButtonLink(_('Edit')))->addClass('js-operation-edit'),
 					(new CButtonLink(_('Remove')))->addClass('js-operation-remove'),
@@ -176,7 +177,9 @@ $form = (new CForm())
 								->addClass(ZBX_STYLE_DISPLAY_NONE)
 						))),
 						(new CTableColumn(new CColHeader(_('Details'))))
-							->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
+							->setAttribute('width', ZBX_TEXTAREA_STANDARD_WIDTH.'px'),
+						(new CTableColumn(new CColHeader(_('Conditions'))))
+							->setAttribute('width', ZBX_TEXTAREA_STANDARD_WIDTH.'px'),
 						(new CTableColumn(new CColHeader('')))
 					])
 					->addItem((new CTag('tfoot', true))

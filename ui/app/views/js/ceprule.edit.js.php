@@ -51,6 +51,15 @@ window.ceprule_edit_popup = new class {
 	/** @type {Template} */
 	#condition_row_template_tag_value;
 
+	/** @type {Template} */
+	#template_operation_table_condition_tag;
+
+	/** @type {Template} */
+	#template_operation_table_condition_tag_value;
+
+	/** @type {Template} */
+	#template_operation_table_condition_property;
+
 	/** @type {Number} */
 	#condition_row_index = 0;
 
@@ -119,6 +128,15 @@ window.ceprule_edit_popup = new class {
 		this.#condition_row_template_tag_value = new Template(
 			`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em></div>`
 		);
+
+		this.#template_operation_table_condition_tag = new Template(
+			`#{name} #{operator} <em>#{tag}</em>`
+		);
+		this.#template_operation_table_condition_tag_value = new Template(
+			`#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em>`
+		);
+		this.#template_operation_table_condition_property = new Template(`#{text}`);
+
 		this.#condition_row_template = new Template(window['ceprule-condition-row-template'].innerHTML);
 		this.#operation_row_template = new Template(window['ceprule-operation-row-template'].innerHTML);
 	}
@@ -732,7 +750,57 @@ window.ceprule_edit_popup = new class {
 					type="hidden" value="#{formulaid}"/>
 			`)).evaluate(condition)).join('');
 
-		const template_args = {execute_when_str, label_str, arguments_str, conditions_input_html, ...operation};
+		const condition_label_names = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getOperationConditionLabels()
+		) ?>');
+
+		const condition_operator_names = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getConditionOperatorLabels()
+		) ?>');
+
+		const descriptions = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getOperationConditionDescriptions()
+		) ?>');
+
+		const condition_descriptions = [];
+
+		Object.values(operation.filter.conditions).forEach(condition => {
+			let description_template = null;
+			const description_view = {};
+
+			switch (Number(condition.type)) {
+				case <?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_SYMPTOM ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_FIRST ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_LAST ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>:
+				case <?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>:
+					description_template = this.#template_operation_table_condition_property;
+					description_view.text = descriptions[condition.type][condition.operator];
+					break;
+
+				case <?= ZBX_CONDITION_TYPE_EVENT_TAG ?>:
+					description_template = this.#template_operation_table_condition_tag;
+					description_view.name = condition_label_names[condition.type];
+					description_view.operator = condition_operator_names[condition.operator].toLocaleLowerCase();
+					description_view.tag = condition.tag;
+					break;
+
+				case <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>:
+					description_template = this.#template_operation_table_condition_tag_value;
+					description_view.name = condition_label_names[condition.type];
+					description_view.operator = condition_operator_names[condition.operator].toLocaleLowerCase();
+					description_view.tag_name = condition.tag_name;
+					description_view.tag_value = condition.tag_value;
+					break;
+			}
+
+			condition_descriptions.push(description_template.evaluate(description_view));
+		});
+
+		const condition_description_html = condition_descriptions.join('<br>');
+		const template_args = {execute_when_str, label_str, arguments_str, conditions_input_html,
+			condition_description_html, ...operation};
 		const row = this.#operation_row_template.evaluateToElement(template_args);
 		const error_container_id = `ceprule-operations-${template_args.sortorder}-error-container`;
 		const rows = new DocumentFragment();

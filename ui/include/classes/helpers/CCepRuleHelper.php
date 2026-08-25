@@ -311,6 +311,36 @@ class CCepRuleHelper {
 		];
 	}
 
+	public static function getOperationConditionDescriptions(): array {
+		return [
+			ZBX_CONDITION_TYPE_EVENT_OPEN => [
+				CONDITION_OPERATOR_YES => _('Problem is opened'),
+				CONDITION_OPERATOR_NO => _('Problem is not opened')
+			],
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM => [
+				CONDITION_OPERATOR_YES => _('Problem is symptom'),
+				CONDITION_OPERATOR_NO => _('Problem is not symptom')
+			],
+			ZBX_CONDITION_TYPE_EVENT_FIRST => [
+				CONDITION_OPERATOR_YES => _('First event in time window'),
+				CONDITION_OPERATOR_NO => _('Not first event in time window')
+			],
+			ZBX_CONDITION_TYPE_EVENT_LAST => [
+				CONDITION_OPERATOR_YES => _('Last event in time window'),
+				CONDITION_OPERATOR_NO => _('Not last event in time window')
+			],
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => [
+				CONDITION_OPERATOR_YES => _('Problem is suppressed'),
+				CONDITION_OPERATOR_NO => _('Problem is not suppressed')
+			],
+			ZBX_CONDITION_TYPE_EVENT_COPIED => [
+				CONDITION_OPERATOR_YES => _('Event is cloned'),
+				CONDITION_OPERATOR_NO => _('Event is not cloned')
+			],
+
+		];
+	}
+
 	public static function getConditionOperatorLabels(): array {
 		return [
 			CONDITION_OPERATOR_IN => _('In'),

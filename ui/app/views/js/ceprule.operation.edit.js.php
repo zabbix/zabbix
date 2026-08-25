@@ -182,32 +182,9 @@ window.ceprule_operation_edit_popup = new class {
 			CCepRuleHelper::getConditionOperatorLabels()
 		) ?>');
 
-		const descriptions = {
-			<?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>: {
-				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('Problem is opened')) ?>,
-				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Problem is not opened')) ?>
-			},
-			<?= ZBX_CONDITION_TYPE_EVENT_SYMPTOM ?>: {
-				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('Problem is symptom')) ?>,
-				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Problem is not symptom')) ?>
-			},
-			<?= ZBX_CONDITION_TYPE_EVENT_FIRST ?>: {
-				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('First event in time window')) ?>,
-				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Not first event in time window')) ?>
-			},
-			<?= ZBX_CONDITION_TYPE_EVENT_LAST ?>: {
-				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('Last event in time window')) ?>,
-				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Not last event in time window')) ?>
-			},
-			<?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>: {
-				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('Problem is suppressed')) ?>,
-				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Problem is not suppressed')) ?>
-			},
-			<?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>: {
-				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('Event is cloned')) ?>,
-				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Event is not cloned')) ?>
-			}
-		};
+		const descriptions = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getOperationConditionDescriptions()
+		) ?>');
 
 		let description_template = null;
 		const description_view = {};
