@@ -706,8 +706,6 @@ void	um_mock_config_destroy(void)
 	zbx_hashset_destroy(&config->strpool);
 	zbx_hashset_destroy(&config->um_hosts);
 
-	zbx_free(config->config);
-
 	zbx_free(config);
 }
 

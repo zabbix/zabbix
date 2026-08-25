@@ -11,7 +11,6 @@ SERVER_tests = \
 	um_cache_sync \
 	um_cache_resolve \
 	um_cache_resolve_cont
-endif
 
 noinst_PROGRAMS = $(SERVER_tests)
 
