@@ -39,7 +39,7 @@ zbx_add_post_js($tags->getPostJS());
 			_("Simple - set up time window based event eviction operations.").PHP_EOL,
 			_("Cause and symptom grouping - first event from the window (fixed) will be treated as cause other symptoms.").PHP_EOL,
 			_("Tag correlation - map past and current window events using tags.").PHP_EOL,
-			_("Event pattern match - execute JavaScript to identify event patterns.")
+			_("Pattern match - execute JavaScript to identify event patterns.")
 		]))
 	)
 	->addItem(new CFormField((new CRadioButtonList('window_type', (int) $data['window_type']))
@@ -48,7 +48,7 @@ zbx_add_post_js($tags->getPostJS());
 		->addValue(_('Simple'), CCepRuleHelper::WINDOW_SIMPLE)
 		->addValue(_('Cause and symptoms grouping'), CCepRuleHelper::WINDOW_CAUSE_SYMPTOM)
 		->addValue(_('Tag correlation'), CCepRuleHelper::WINDOW_TAG_MATCH)
-		->addValue(_('Event pattern match'), CCepRuleHelper::WINDOW_PATTERN_MATCH)
+		->addValue(_('Pattern match'), CCepRuleHelper::WINDOW_PATTERN_MATCH)
 		->setModern(true)
 	))
 
