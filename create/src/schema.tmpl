@@ -1874,7 +1874,7 @@ FIELD		|roleid		|t_id		|	|NOT NULL	|0			|1|role
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value_str	|t_varchar(2048)	|''	|NOT NULL	|0
 FIELD		|value_moduleid	|t_id		|	|NULL		|0			|2|module	|moduleid
 FIELD		|value_serviceid|t_id		|	|NULL	|0			|3|services	|serviceid
 INDEX		|1		|roleid
@@ -2337,4 +2337,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7050090	|7050090
+ROW		|1		|7050091	|7050091
