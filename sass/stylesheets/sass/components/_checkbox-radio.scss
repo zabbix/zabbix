@@ -1,9 +1,9 @@
 .checkbox-radio {
-	position: absolute !important;
-	top: auto !important;
+	position: absolute;
+	top: auto;
 	z-index: 1;
-	width: 16px !important;
-	height: 16px !important;
+	width: 16px;
+	height: 16px;
 	opacity: 0;
 
 	& + label {

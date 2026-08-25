@@ -2110,6 +2110,7 @@ define('ZBX_STYLE_INLINE_FILTER', 'inline-filter');
 define('ZBX_STYLE_INLINE_FILTER_LABEL', 'inline-filter-label');
 define('ZBX_STYLE_INLINE_FILTER_FOOTER', 'inline-filter-footer');
 define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
+define('ZBX_STYLE_INLINE_LIST', 'inline-list');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
