@@ -143,16 +143,16 @@ class IntegrationTests {
 		$suite->addTestSuite('testCalculatedExpression');
 		$suite->addTestSuite('testDiagInfo');
 		$suite->addTestSuite('testHousekeepingConfSync');
+		$suite->addTestSuite('testWebScenarioDynamicVariables');
+		$suite->addTestSuite('testBridgeAdapter');
+		$suite->addTestSuite('testTelnetChecks');
+		$suite->addTestSuite('testHashicorpVault');
 		$suite->addTestSuite('testTriggerCEP');
 		$suite->addTestSuite('testTriggerCEPRestart');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
-		$suite->addTestSuite('testWebScenarioDynamicVariables');
-		$suite->addTestSuite('testBridgeAdapter');
-		$suite->addTestSuite('testTelnetChecks');
-		$suite->addTestSuite('testHashicorpVault');
 
 		return $suite;
 	}
