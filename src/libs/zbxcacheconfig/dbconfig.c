@@ -2192,7 +2192,7 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 {
 	int			found;
 	ZBX_DC_SNMPINTERFACE	*snmp;
-	unsigned char		bulk, version, securitylevel, authprotocol, privprotocol, max_repetitions;
+	unsigned char		bulk, version, securitylevel, authprotocol, privprotocol;
 
 	snmp = (ZBX_DC_SNMPINTERFACE *)DCfind_id(&config->interfaces_snmp, interfaceid, sizeof(ZBX_DC_SNMPINTERFACE),
 			&found);
