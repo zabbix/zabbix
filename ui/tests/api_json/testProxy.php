@@ -253,7 +253,7 @@ class testProxy extends CAPITest {
 						[
 							'key' => 'key_1',
 							'value' => 'value_1',
-							'signal_type' => 1,
+							'signal_type' => 1
 						],
 						[
 							'key' => 'key_2',
@@ -3621,7 +3621,7 @@ class testProxy extends CAPITest {
 							],
 							[
 								'key' => 'key_2',
-								'value' => 'value_2',
+								'value' => 'value_2'
 							]
 						]
 					]
@@ -5525,7 +5525,7 @@ class testProxy extends CAPITest {
 					'proxyid' => 'without_apm',
 					'apm' => [
 						'max_messages_per_second' => 100
-					],
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/apm": unexpected parameter "max_messages_per_second".'
 			]
