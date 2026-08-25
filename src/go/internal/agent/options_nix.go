@@ -47,7 +47,7 @@ type AgentOptions struct {
 	ControlSocket              string   `conf:"optional"`
 	Alias                      []string `conf:"optional"`
 	EnableProfiler             int      `conf:"optional,range=0:1,default=0"`
-	ProfilerDir                string   `conf:"optional,default=/tmp/zabbix_agent2_profiles"`
+	ProfilerDir                string   `conf:"optional,nonempty,default=/tmp/zabbix_agent2_profiles"`
 	ProfilerMaxFilesPerProfile int      `conf:"optional,range=1:100,default=10"`
 	ProfilerInterval           int      `conf:"optional,range=1:86400,default=3600"`
 	TLSConnect                 string   `conf:"optional,nonempty"`
