@@ -550,7 +550,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'itemids' => self::$itemids[$name]
 			])['result'][0];
 
-			if ($item['state'] == $state) {
+			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED)) {
 				break;
 			}
 
