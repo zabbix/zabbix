@@ -28,6 +28,28 @@ class ApmDb {
 		$this->init();
 	}
 
+	public static function getInstance(): self {
+		if (self::$instance === null) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	public function isLocal(): bool {
+		return $this->provider === self::PROVIDER_ZABBIX;
+	}
+
+	public function getConfig(): array {
+		if (self::isLocal()) {
+			throw new DBException(_('Configuration cannot be retrieved if a local database is defined for APM.'),
+				DB::INIT_ERROR
+			);
+		}
+
+		return $this->config;
+	}
+
 	private function init(): void {
 		global $TELEMETRY_PROVIDERS;
 
@@ -63,8 +85,6 @@ class ApmDb {
 
 		CSettings::normalizeAffectedObjects($db_settings);
 
-		unset($db_settings['apm_global_db']['authentication_type']);
-
 		$this->config = self::resolveConfig($db_settings['apm_global_db']);
 	}
 
@@ -80,7 +100,7 @@ class ApmDb {
 
 		if ($config['vault_path'] === '') {
 
-			return array_diff_key($config, array_flip(['status', 'vault_path', 'authentication_type']));
+			return array_diff_key($config, array_flip(['status', 'vault_path', 'authentication_type', 'provider']));
 		}
 
 		if ($DB['VAULT'] === '') {
@@ -107,27 +127,5 @@ class ApmDb {
 		$config['password'] = $credentials['password'];
 
 		return array_diff_key($config, array_flip(['status', 'vault_path', 'authentication_type', 'provider']));
-	}
-
-	public static function getInstance(): self {
-		if (self::$instance === null) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-	}
-
-	public function isLocal(): bool {
-		return $this->provider === self::PROVIDER_ZABBIX;
-	}
-
-	public function getConfig(): array {
-		if (self::isLocal()) {
-			throw new DBException(_('Configuration cannot be retrieved if a local database is defined for APM.'),
-				DB::INIT_ERROR
-			);
-		}
-
-		return $this->config;
 	}
 }
