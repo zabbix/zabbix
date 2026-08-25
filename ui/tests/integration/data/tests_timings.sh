@@ -2,11 +2,12 @@ PERFORMANCE_RATIO_THRESHOLD=3.0
 
 declare -A BASELINE_TIMES=(
   [Integration]=4556
+  [testTriggerCEPRestart]=1800
+  [testTriggerCEP]=900
   [testEscalations]=443
   [testProxyHa]=417
   [testNestedLLD]=385
   [testLLDHistorySyncAtScale]=300
-  [testTriggerCEP]=300
   [testMacros]=279
   [testItemTimeouts]=209
   [testAgentJsonProtocol]=188
