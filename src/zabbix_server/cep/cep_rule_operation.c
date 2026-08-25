@@ -147,6 +147,24 @@ static void	cep_acknowledge_update(zbx_cep_acknowledge_t *ack, int op)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: add an operation entry to an acknowledge, initializing it if      *
+ *          necessary                                                         *
+ *                                                                            *
+ * Parameters: ack - [IN/OUT] acknowledge                                     *
+ *             op  - [IN] operation type                                      *
+ *             suppress_until - [IN] timestamp until which event is           *
+ *                                   suppressed, 0 - indefinitely             *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_acknowledge_update_suppress(zbx_cep_acknowledge_t *ack, int op, int suppress_until)
+{
+	cep_acknowledge_open(ack, op, "suppress");
+	zbx_json_addint64(&ack->json, "until", suppress_until);
+	cep_acknowledge_close(ack);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: add a severity change entry to an acknowledge                     *
  *                                                                            *
  * Parameters: ack       - [IN/OUT] acknowledge                               *
@@ -401,7 +419,7 @@ static int	cep_operation_event_execute_suppress_event(zbx_uint64_t ruleid, const
 		if (0 != suppress_local.until)
 			suppress_local.until += (int)time(NULL);
 
-		cep_acknowledge_update(ack, op->type);
+		cep_acknowledge_update_suppress(ack, op->type, suppress_local.until);
 		cep_event_add_suppress(*event, &suppress_local, 1);
 		ctx->sync_flags |= CEP_SYNC_EVENT_SUPPRESS;
 		ret = SUCCEED;

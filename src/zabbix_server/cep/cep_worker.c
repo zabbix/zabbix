@@ -509,7 +509,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	cep_event_context_init_with_event(&event_ctx, event, db_event, worker->dbpool);
 
 	/* cep config returns NULL handle if there are no cep rules to process */
-	if (NULL != (hconfig = zbx_cep_config_open()))
+if (NULL != (hconfig = zbx_cep_config_open()))
 	{
 		if (SUCCEED != cep_event_process_rules(hconfig, &rules, &rules_num, &event_ctx, tasks))
 		{

@@ -597,9 +597,12 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 				zbx_db_insert_add_values(&db_insert_es, __UINT64_C(0), event->eventid,
 						suppress->maintenanceid, suppress->cep_ruleid, suppress->until);
 
-				zbx_db_insert_add_values(&db_insert_ack, __UINT64_C(0), event->eventid, now,
-						ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS, suppress->until,
-						suppress->maintenanceid);
+				if (0 == suppress->cep_ruleid)
+				{
+					zbx_db_insert_add_values(&db_insert_ack, __UINT64_C(0), event->eventid, now,
+							ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS, suppress->until,
+							suppress->maintenanceid);
+				}
 			}
 		}
 	}
