@@ -385,4 +385,21 @@ class CConditionHelper {
 			return 0;
 		});
 	}
+
+	/**
+	 * Sorts the Telemetry query item filter conditions based on the calculation types And/Or, Or.
+	 *
+	 * @param array $conditions  Filter conditions by reference.
+	 */
+	public static function sortTelemetryQueryFilterConditions(array &$conditions): void {
+		uasort($conditions, static function (array $row1, array $row2) {
+			foreach (['column', 'attribute_key'] as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
+	}
 }

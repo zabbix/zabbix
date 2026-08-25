@@ -326,23 +326,48 @@ class CItemPrototype extends CItemGeneral {
 
 		foreach ($items as &$item) {
 			if (array_key_exists('query', $item) && $item['query']) {
-				$query = CItemTypeTelemetryQuery::convertFilterExpressionToFormula($item['query']);
+				$item['query']['signal_type'] = (string) $item['query']['signal_type'];
+				$item['query']['metric_point_type'] = (string) $item['query']['metric_point_type'];
+				$item['query']['filter']['evaltype'] = (string) $item['query']['filter']['evaltype'];
 
-				$query['signal_type'] = (string) $query['signal_type'];
-				$query['metric_point_type'] = (string) $query['metric_point_type'];
-				$query['filter']['evaltype'] = (string) $query['filter']['evaltype'];
-
-				foreach ($query['aggregated_columns'] as &$column) {
+				foreach ($item['query']['aggregated_columns'] as &$column) {
 					$column['function'] = (string) $column['function'];
 				}
 				unset($column);
 
-				foreach ($query['filter']['conditions'] as &$condition) {
+				foreach ($item['query']['filter']['conditions'] as &$condition) {
 					$condition['operator'] = (string) $condition['operator'];
 				}
 				unset($condition);
 
-				$item['query'] = $query;
+				if ($item['query']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					CConditionHelper::sortConditionsByFormula($item['query']['filter']['conditions'],
+						$item['query']['filter']['formula']
+					);
+
+					$eval_formula = $item['query']['filter']['formula'];
+				}
+				else {
+					CConditionHelper::sortTelemetryQueryFilterConditions($item['query']['filter']['conditions']);
+
+					$eval_formula = CConditionHelper::getEvalFormula(
+						array_map(static fn($c) => ['column' => $c['column'].'.'.$c['attribute_key']],
+							$item['query']['filter']['conditions']
+						),
+						'column',
+						(int) $item['query']['filter']['evaltype']
+					);
+				}
+
+				CConditionHelper::addFormulaIds($item['query']['filter']['conditions'], $eval_formula);
+				CConditionHelper::replaceConditionIds($eval_formula, $item['query']['filter']['conditions']);
+
+				if ($item['query']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					$item['query']['filter']['formula'] = $eval_formula;
+				}
+
+				$item['query']['filter']['eval_formula'] = $eval_formula;
+				$item['query']['filter']['conditions'] = array_values($item['query']['filter']['conditions']);
 			}
 		}
 		unset($item);

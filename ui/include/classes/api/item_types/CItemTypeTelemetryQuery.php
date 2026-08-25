@@ -373,31 +373,6 @@ class CItemTypeTelemetryQuery extends CItemType {
 	}
 
 	/**
-	 * Convert "query.filter" from expression (database, audit log: "{0} or {1}") to formula (API: "A or B").
-	 *
-	 * @param array $query  Item "query" configuration.
-	 *
-	 * @return array
-	 */
-	public static function convertFilterExpressionToFormula(array $query): array {
-		if ($query['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-			return $query;
-		}
-
-		$i = 0;
-
-		foreach ($query['filter']['conditions'] as &$condition) {
-			$condition['formulaid'] = num2letter($i);
-			$i++;
-		}
-		unset($condition);
-
-		CConditionHelper::replaceConditionIds($query['filter']['formula'], $query['filter']['conditions']);
-
-		return $query;
-	}
-
-	/**
 	 * Convert "query.filter" from formula (API: "A or B") to expression (database, audit log: "{0} or {1}").
 	 *
 	 * @param array $query  Item "query" configuration.
