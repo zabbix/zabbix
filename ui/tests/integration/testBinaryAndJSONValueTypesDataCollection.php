@@ -954,10 +954,10 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	/**
 	 * Regression test.
 	 *
-	 * A proxy-monitored log[] item (value_type=JSON) used to have its value silently dropped, with
-	 * no log line at all, when it reported a value together with meta info (lastlogsize/mtime) in
-	 * the same submission - the ordinary case for the very first successful read of a growing log
-	 * file, not a rare corner case.
+	 * A proxy-monitored log[] item if its value_type=JSON (instead of usual type LOG) used to have its
+	 * value silently dropped, with no log line at all, when it reported a value together with meta info
+	 * (lastlogsize/mtime) in the same submission - the ordinary case for the very first successful read
+	 * of a growing log file, not a rare corner case.
 	 *
 	 * @required-components server, proxy, agent
 	 * @configurationDataProvider proxyConfigurationProvider
