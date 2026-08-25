@@ -239,30 +239,65 @@ $datatable-scrollbar-thumb-bg-color: #004fa8;
 // Important! @import string should come after variables
 @import 'screen';
 
-.datatable .datatable-body .row.row-selected {
-	.row-spacer,
-	.cell:not(.cell-bg) {
-		border-bottom-color: #003a7a;
+.btn-grey,
+.btn-grey-icon {
+	&:hover {
+		border-color: #0066d9;
+	}
+
+	&:focus {
+		background-color: #001f42;
+	}
+
+	&:active {
+		background-color: #003a7a;
 	}
 }
 
-.datatable .datatable-header {
-	.datatable-options-link {
-		&,
-		&:hover,
-		&:focus,
-		&.datatable-options-link-opened {
-			color: #0066d9;
-		}
+.btn:active {
+	background-color: #003a7a;
+	border-color: #003a7a;
+}
+
+.btn-alt {
+	&:hover,
+	&:focus {
+		color: #e5f1ff;
 	}
 
-	.datatable-options-button {
-		color: #0066d9;
+	&:active {
+		color: #e5f1ff;
+		background-color: #003a7a;
+		border-color: #003a7a;
 	}
 }
 
 .btn-time-zoomout {
 	color: #3d98ff;
+}
+
+.datatable {
+	.datatable-body .row.row-selected {
+		.row-spacer,
+		.cell:not(.cell-bg) {
+			border-bottom-color: #003a7a;
+		}
+	}
+
+	.datatable-header {
+		.datatable-options-link {
+			&,
+			&:hover,
+			&:focus,
+			&.datatable-options-link-opened {
+				color: #0066d9;
+			}
+		}
+
+		.datatable-options-button {
+			color: #0066d9;
+		}
+	}
 }
 
 .list-table .timeline-axis::before,
@@ -282,17 +317,6 @@ $datatable-scrollbar-thumb-bg-color: #004fa8;
 	}
 }
 
-.dashboard-widget-item {
-	.svg-arrow-up,
-	.svg-arrow-up-down {
-		fill: #10b981;
-	}
-
-	.svg-arrow-down {
-		fill: #ff5555;
-	}
-}
-
 .multiselect[aria-readonly],
 .z-select[readonly] .focusable,
 z-select[readonly] .focusable,
@@ -301,6 +325,11 @@ input[readonly],
 textarea[readonly],
 select[readonly] {
 	border-color: #004fa8;
+
+	&::placeholder {
+		color: #7a858f;
+		-webkit-text-fill-color: #7a858f;
+	}
 }
 
 select[readonly] {
@@ -308,15 +337,11 @@ select[readonly] {
 	-webkit-text-fill-color: #e5f1ff;
 }
 
-.multiselect[aria-readonly]::placeholder,
-.z-select[readonly] .focusable::placeholder,
-z-select[readonly] .focusable::placeholder,
-z-textarea-flexible textarea[readonly]::placeholder,
-input[readonly]::placeholder,
-textarea[readonly]::placeholder,
-select[readonly]::placeholder {
-	color: #7a858f;
-	-webkit-text-fill-color: #7a858f;
+z-select,
+.z-select {
+	.list {
+		border-color: #003a7a;
+	}
 }
 
 .checkbox-radio[readonly] {
@@ -360,21 +385,6 @@ select[readonly]::placeholder {
 	background-color: #00356f;
 }
 
-.btn-grey,
-.btn-grey-icon {
-	&:hover {
-		border-color: #0066d9;
-	}
-
-	&:focus {
-		background-color: #001f42;
-	}
-
-	&:active {
-		background-color: #003a7a;
-	}
-}
-
 .calendar {
 	.arrow-left {
 		border-right-color: #0066d9;
@@ -383,17 +393,38 @@ select[readonly]::placeholder {
 	.arrow-right {
 		border-left-color: #0066d9;
 	}
+
+	table thead {
+		color: #afb5bc;
+	}
+
+	table tbody {
+		td.grey {
+			color: #7a858f;
+		}
+
+		td.selected {
+			background-color: #0066d9;
+			color: #e5f1ff;
+
+			&:hover {
+				background-color: #004fa8;
+			}
+		}
+
+		td.highlighted {
+			background-color: #0066d9;
+			color: #e5f1ff;
+		}
+	}
 }
 
-.dashboard-grid-widget-header h4,
-.dashboard-grid-iterator-header h4,
-.overlay-dialogue .overlay-dialogue-header h4 {
-	color: #e5f1ff;
-}
-
-z-select .list,
-.z-select .list {
-	border-color: #003a7a;
+.dashboard-grid-widget-header,
+.dashboard-grid-iterator-header,
+.overlay-dialogue .overlay-dialogue-header {
+	h4 {
+		color: #e5f1ff;
+	}
 }
 
 .pager a {
@@ -422,26 +453,6 @@ z-select .list,
 		.arrow-right {
 			border-left-color: #0066d9;
 		}
-	}
-}
-
-.calendar table tbody {
-	td.grey {
-		color: #7a858f;
-	}
-
-	td.selected {
-		background-color: #0066d9;
-		color: #e5f1ff;
-
-		&:hover {
-			background-color: #004fa8;
-		}
-	}
-
-	td.highlighted {
-		background-color: #0066d9;
-		color: #e5f1ff;
 	}
 }
 
@@ -494,32 +505,6 @@ z-select .list,
 			color: #626c75;
 		}
 	}
-}
-
-.btn:active {
-	background-color: #003a7a;
-	border-color: #003a7a;
-}
-
-.btn-alt {
-	&:hover,
-	&:focus {
-		color: #e5f1ff;
-	}
-
-	&:active {
-		color: #e5f1ff;
-		background-color: #003a7a;
-		border-color: #003a7a;
-	}
-}
-
-.calendar table thead {
-	color: #afb5bc;
-}
-
-.dashboard-widget-placeholder .dashboard-widget-placeholder-label::before {
-	color: #9eccff;
 }
 
 .status-red {
@@ -596,25 +581,29 @@ z-select .list,
 }
 
 .radio-list-control {
-	input[type="radio"] + label {
-		color: #3d98ff;
-	}
+	input[type="radio"] {
+		& + label {
+			color: #3d98ff;
+		}
 
-	input[type="radio"]:checked:not([readonly]):not([disabled]) + label {
-		color: #e5f1ff;
-		-webkit-text-fill-color: #e5f1ff;
-		border-color: #0066d9;
-	}
+		&:checked:not([readonly]):not([disabled]) + label {
+			color: #e5f1ff;
+			-webkit-text-fill-color: #e5f1ff;
+			border-color: #0066d9;
+		}
 
-	input[type="radio"][disabled]:checked + label {
-		color: #7a858f;
-		-webkit-text-fill-color: #7a858f;
+		&[disabled]:checked + label {
+			color: #7a858f;
+			-webkit-text-fill-color: #7a858f;
+		}
 	}
 }
 
-.menu-main .submenu,
-.menu-user .submenu {
-	background: #001833;
+.menu-main,
+.menu-user {
+	.submenu {
+		background: #001833;
+	}
 }
 
 .tag:hover {
@@ -684,6 +673,26 @@ z-select .list,
 	}
 }
 
+.time-quick {
+	li {
+		a {
+			&:focus,
+			&.selected {
+				color: #e5f1ff;
+			}
+		}
+	}
+}
+
+.totals-list {
+	color: #001833;
+}
+
+// Dashboard, widgets and iterators.
+// To maintain code clarity:
+//   - Do not mix rules for dashboard view mode and dashboard edit mode.
+//   - Do not mix rules for widgets and iterators.
+
 .dashboard-navigation-tabs {
 	.sortable {
 		li div {
@@ -706,10 +715,9 @@ z-select .list,
 	}
 }
 
-// Dashboard, widgets and iterators.
-// To maintain code clarity:
-//   - Do not mix rules for dashboard view mode and dashboard edit mode.
-//   - Do not mix rules for widgets and iterators.
+.dashboard-widget-placeholder .dashboard-widget-placeholder-label::before {
+	color: #9eccff;
+}
 
 .dashboard-grid-widget {
 	&.dashboard-grid-widget-hidden-header {
@@ -718,6 +726,17 @@ z-select .list,
 				box-shadow: 0 -6px 8px -2px $action-shadow-color;
 			}
 		}
+	}
+}
+
+.dashboard-widget-item {
+	.svg-arrow-up,
+	.svg-arrow-up-down {
+		fill: #10b981;
+	}
+
+	.svg-arrow-down {
+		fill: #ff5555;
 	}
 }
 
@@ -797,21 +816,6 @@ z-select .list,
 	.dashboard-grid-widget-placeholder > div {
 		background-color: darken($ui-bg-color, 3%);
 	}
-}
-
-.time-quick {
-	li {
-		a {
-			&:focus,
-			&.selected {
-				color: #e5f1ff;
-			}
-		}
-	}
-}
-
-.totals-list {
-	color: #001833;
 }
 
 div.dashboard-widget-hostavail .host-avail-table {
