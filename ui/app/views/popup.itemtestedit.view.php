@@ -328,6 +328,9 @@ if ($data['is_item_testable']) {
 			->addStyle('text-align: right;')
 	]);
 }
+else {
+	$form->addVar('get_value', 0);
+}
 
 $form_grid->addItem([
 	new CLabel([

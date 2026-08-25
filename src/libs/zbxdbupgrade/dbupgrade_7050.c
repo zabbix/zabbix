@@ -1192,6 +1192,68 @@ static int	DBpatch_7050090(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050091(void)
+{
+	int		i;
+	const char	*values[] = {
+		"web.hosts.host_discovery.filter.active", "web.hosts.lldrules.filter.active",
+		"web.hosts.host_discovery.filter.groupids", "web.hosts.lldrules.filter.groupids",
+		"web.hosts.host_discovery.filter.hostids", "web.hosts.lldrules.filter.hostids",
+		"web.hosts.host_discovery.filter.name", "web.hosts.lldrules.filter.name",
+		"web.hosts.host_discovery.filter.key", "web.hosts.lldrules.filter.key",
+		"web.hosts.host_discovery.filter.type", "web.hosts.lldrules.filter.type",
+		"web.hosts.host_discovery.filter.delay", "web.hosts.lldrules.filter.delay",
+		"web.hosts.host_discovery.filter.lifetime_type", "web.hosts.lldrules.filter.lifetime_type",
+		"web.hosts.host_discovery.filter.lifetime", "web.hosts.lldrules.filter.lifetime",
+		"web.hosts.host_discovery.filter.enabled_lifetime_type",
+		"web.hosts.lldrules.filter.enabled_lifetime_type",
+		"web.hosts.host_discovery.filter.enabled_lifetime", "web.hosts.lldrules.filter.enabled_lifetime",
+		"web.hosts.host_discovery.filter.snmp_oid", "web.hosts.lldrules.filter.snmp_oid",
+		"web.hosts.host_discovery.filter.state", "web.hosts.lldrules.filter.state",
+		"web.hosts.host_discovery.filter.status", "web.hosts.lldrules.filter.status",
+		"web.hosts.host_discovery.php.sort", "web.hosts.lldrules.sort",
+		"web.hosts.host_discovery.php.sortorder", "web.hosts.lldrules.sortorder",
+
+		"web.templates.host_discovery.filter.active", "web.templates.lldrules.filter.active",
+		"web.templates.host_discovery.filter.groupids", "web.templates.lldrules.filter.groupids",
+		"web.templates.host_discovery.filter.hostids", "web.templates.lldrules.filter.hostids",
+		"web.templates.host_discovery.filter.name", "web.templates.lldrules.filter.name",
+		"web.templates.host_discovery.filter.key", "web.templates.lldrules.filter.key",
+		"web.templates.host_discovery.filter.type", "web.templates.lldrules.filter.type",
+		"web.templates.host_discovery.filter.delay", "web.templates.lldrules.filter.delay",
+		"web.templates.host_discovery.filter.lifetime_type", "web.templates.lldrules.filter.lifetime_type",
+		"web.templates.host_discovery.filter.lifetime", "web.templates.lldrules.filter.lifetime",
+		"web.templates.host_discovery.filter.enabled_lifetime_type",
+		"web.templates.lldrules.filter.enabled_lifetime_type",
+		"web.templates.host_discovery.filter.enabled_lifetime",
+		"web.templates.lldrules.filter.enabled_lifetime",
+		"web.templates.host_discovery.filter.snmp_oid", "web.templates.lldrules.filter.snmp_oid",
+		"web.templates.host_discovery.filter.state", "web.templates.lldrules.filter.state",
+		"web.templates.host_discovery.filter.status", "web.templates.lldrules.filter.status",
+		"web.templates.host_discovery.php.sort", "web.templates.lldrules.sort",
+		"web.templates.host_discovery.php.sortorder", "web.templates.lldrules.sortorder",
+
+		"web.hosts.discovery_prototypes.filter.active", "web.hosts.lldrules.prototypes.filter.active",
+		"web.hosts.host_discovery_prototypes.php.sort", "web.hosts.lldrules.prototypes.sort",
+		"web.hosts.host_discovery_prototypes.php.sortorder", "web.hosts.lldrules.prototypes.sortorder",
+
+		"web.templates.discovery_prototypes.filter.active", "web.templates.lldrules.prototypes.filter.active",
+		"web.templates.host_discovery_prototypes.php.sort", "web.templates.lldrules.prototypes.sort",
+		"web.templates.host_discovery_prototypes.php.sortorder", "web.templates.lldrules.prototypes.sortorder"
+	};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1289,5 +1351,6 @@ DBPATCH_ADD(7050087, 0, 1)
 DBPATCH_ADD(7050088, 0, 1)
 DBPATCH_ADD(7050089, 0, 1)
 DBPATCH_ADD(7050090, 0, 1)
+DBPATCH_ADD(7050091, 0, 1)
 
 DBPATCH_END()

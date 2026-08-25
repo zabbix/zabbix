@@ -602,12 +602,14 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
 			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('host_discovery_prototypes.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.prototype.list')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 					->setArgument('context', 'template');
 			}
 			else {
-				$url = (new CUrl('host_discovery.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['hostid']])
 					->setArgument('context', 'template');
@@ -663,17 +665,20 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
 				if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$url = (new CUrl('host_discovery_prototypes.php'))
-						->setArgument('form', 'update')
+					$url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.prototype.edit')
 						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 						->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 						->setArgument('context', 'template');
 				}
 				else {
-					$url = (new CUrl('host_discovery.php'))
-						->setArgument('form', 'update')
-						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-						->setArgument('context', 'template');
+					$url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.edit')
+						->setArgument('context', 'template')
+						->setArgument('hostid', $parent_templates['links'][$itemid]['hostid'])
+						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid']);
 				}
 			}
 			else {
@@ -1991,7 +1996,7 @@ function prepareLldMacroPaths(array $macro_paths): array {
  */
 function prepareLldFilter(array $filter): array {
 	$filter['conditions'] = array_values(array_filter($filter['conditions'], static function (array $condition): bool {
-		return $condition['macro'] !== '' || $condition['value'] !== '';
+		return $condition['macro'] !== '' || (array_key_exists('value', $condition) && $condition['value'] !== '');
 	}));
 
 	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) <= 1) {
@@ -2016,7 +2021,9 @@ function prepareLldOverrides(array $overrides): array {
 	foreach ($overrides as &$override) {
 		$override['filter'] = prepareLldFilter([
 			'evaltype' => $override['filter']['evaltype'],
-			'formula' => $override['filter']['formula'],
+			'formula' => array_key_exists('formula', $override['filter'])
+				? $override['filter']['formula']
+				: '',
 			'conditions' => array_key_exists('conditions', $override['filter'])
 				? $override['filter']['conditions']
 				: []
@@ -2183,6 +2190,9 @@ function getMainItemFieldNames(array $input): array {
 		case ZBX_FLAG_DISCOVERY_CREATED:
 		case ZBX_FLAG_DISCOVERY_RULE_CREATED:
 			return ['status'];
+
+		default:
+			return [];
 	}
 }
 

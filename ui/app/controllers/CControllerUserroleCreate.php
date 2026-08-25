@@ -91,8 +91,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 						['service_write_tag_value', 'not_empty']
 					]
 				]
-			],
-			'form_refresh' => ['integer']
+			]
 		]];
 
 		if (CSettingsHelper::isMobileDevicesEnabled()) {
@@ -140,8 +139,8 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 	 */
 	protected function doAction(): void {
 		$role = [
-			'name' => trim($this->getInput('name')),
-			'type' => $this->getInput('type')
+			'name' => trim($this->getInput('name', '')),
+			'type' => $this->getInput('type', USER_TYPE_ZABBIX_USER)
 		];
 
 		$role['rules'] = $this->getRulesInput((int) $role['type']);
