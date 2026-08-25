@@ -435,12 +435,9 @@ class CProxy extends CApiService {
 
 			$apm_fields[$i + 1] = [
 				'signal_type' => $fields['signal_type'],
-				'key' => (string) ($fields['key'])
+				'key' => (string) ($fields['key']),
+				'value' => (string) $fields['value']
 			];
-
-			if (array_key_exists('value', $fields)) {
-				$apm_fields[$i + 1]['value'] = $fields['value'];
-			}
 		}
 
 		return $apm_fields;
