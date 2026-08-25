@@ -387,6 +387,11 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		$data_host = [];
+
+		if ($this->host && $this->host['status'] != HOST_STATUS_TEMPLATE) {
+			$data_host['hostid'] = $this->host['hostid'];
+		}
+
 		$data_item = [
 			'value_type' => (int) $input['value_type']
 		];
@@ -459,7 +464,6 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_INTERNAL:
 				$data_item += ['key' => $input['key']];
-				$data_host['hostid'] = $this->host['hostid'];
 
 				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
 					$data_host += CArrayHelper::getByKeysStrict($this->host,
@@ -500,7 +504,6 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_IPMI:
 				$data_item += CArrayHelper::getByKeys($input, ['key', 'ipmi_sensor']);
 				$data_host += $this->getInterface($input, ['useip', 'interfaceid', 'ip', 'dns']);
-				$data_host['hostid'] = $this->host['hostid'];
 
 				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
 					$data_host += CArrayHelper::getByKeysStrict($this->host, ['ipmi_authtype', 'ipmi_privilege',
@@ -1174,10 +1177,6 @@ abstract class CControllerPopupItemTest extends CController {
 	protected function prepareTestData(): array {
 		$data = $this->getItemTestProperties($this->getInputAll(), true);
 		$data['item'] = $this->resolveItemPropertyMacros($data['item']);
-
-		if ($data['item']['type'] == ITEM_TYPE_CALCULATED) {
-			$data['host']['hostid'] = $this->getInput('hostid');
-		}
 
 		// Rename form fields according to API conventions.
 		$data['item'] = CArrayHelper::renameKeys($data['item'], [
