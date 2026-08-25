@@ -340,34 +340,7 @@ class CItemPrototype extends CItemGeneral {
 				}
 				unset($condition);
 
-				if ($item['query']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					CConditionHelper::sortConditionsByFormula($item['query']['filter']['conditions'],
-						$item['query']['filter']['formula']
-					);
-
-					$eval_formula = $item['query']['filter']['formula'];
-				}
-				else {
-					CConditionHelper::sortTelemetryQueryFilterConditions($item['query']['filter']['conditions']);
-
-					$eval_formula = CConditionHelper::getEvalFormula(
-						array_map(static fn($c) => ['column' => $c['column'].'.'.$c['attribute_key']],
-							$item['query']['filter']['conditions']
-						),
-						'column',
-						(int) $item['query']['filter']['evaltype']
-					);
-				}
-
-				CConditionHelper::addFormulaIds($item['query']['filter']['conditions'], $eval_formula);
-				CConditionHelper::replaceConditionIds($eval_formula, $item['query']['filter']['conditions']);
-
-				if ($item['query']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$item['query']['filter']['formula'] = $eval_formula;
-				}
-
-				$item['query']['filter']['eval_formula'] = $eval_formula;
-				$item['query']['filter']['conditions'] = array_values($item['query']['filter']['conditions']);
+				$item['query'] = CItemTypeTelemetryQuery::resolveFilterFormulaFields($item['query']);
 			}
 		}
 		unset($item);

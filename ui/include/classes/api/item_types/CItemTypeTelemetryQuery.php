@@ -373,7 +373,48 @@ class CItemTypeTelemetryQuery extends CItemType {
 	}
 
 	/**
-	 * Convert "query.filter" from formula (API: "A or B") to expression (database, audit log: "{0} or {1}").
+	 * Convert "query.filter.formula" from expression (database, audit log: "{0} or {1}") to formula (API: "A or B").
+	 * Add "query.filter.eval_formula" according to value of "query.filter.evaltype".
+	 *
+	 * @param array $query  Item "query" configuration.
+	 *
+	 * @return array
+	 */
+	public static function resolveFilterFormulaFields(array $query): array {
+		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			CConditionHelper::sortConditionsByFormula($query['filter']['conditions'],
+				$query['filter']['formula']
+			);
+
+			$eval_formula = $query['filter']['formula'];
+		}
+		else {
+			CConditionHelper::sortTelemetryQueryFilterConditions($query['filter']['conditions']);
+
+			$eval_formula = CConditionHelper::getEvalFormula(
+				array_map(static fn($c) => ['column' => $c['column'].'.'.$c['attribute_key']],
+					$query['filter']['conditions']
+				),
+				'column',
+				(int) $query['filter']['evaltype']
+			);
+		}
+
+		CConditionHelper::addFormulaIds($query['filter']['conditions'], $eval_formula);
+		CConditionHelper::replaceConditionIds($eval_formula, $query['filter']['conditions']);
+
+		if ($query['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			$query['filter']['formula'] = $eval_formula;
+		}
+
+		$query['filter']['eval_formula'] = $eval_formula;
+		$query['filter']['conditions'] = array_values($query['filter']['conditions']);
+
+		return $query;
+	}
+
+	/**
+	 * Convert "query.filter.formula" from formula (API: "A or B") to expression (database, audit log: "{0} or {1}").
 	 *
 	 * @param array $query  Item "query" configuration.
 	 *
