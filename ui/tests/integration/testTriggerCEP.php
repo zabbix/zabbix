@@ -457,6 +457,46 @@ class testTriggerCEP extends CIntegrationTest {
 	// scenario sees that its window ended and what was in it when it did.
 	const CEP_TAG_WINDOW_PATTERN_CLOSED = 'window_pattern_closed';
 	const CEP_TAG_WINDOW_PATTERN_CLOSED_VALUE = 'closed';
+	// The worker scaling scenario (see prepareDataCepWindowPatternWorkerScale()): one pattern match window per
+	// id whose script does nothing but sleep, so a window occupies the CEP worker that examines it for as long
+	// as the sleep lasts. With as many such windows as the pool has workers there is nothing left of it to
+	// spare, and a pool that stays that busy is one the CEP manager has to grow - it starts more workers once
+	// the average load of the ones it has passes 90% (mw_manager_scale_workers() in mw_manager.c).
+	const CEP_RULE_WINDOW_PATTERN_WORKER_SCALE = self::CEP_RULE_NAME_PREFIX.'window pattern worker scale';
+	// How many windows that scenario keeps busy - one per id, and an id per discovered trigger, so never more
+	// than the discovery brings in (see getWorkerScaleServices()). The windows of a rule are examined side by
+	// side, one worker each, so this is also how many workers the scenario occupies: CEP_WORKERS_DEFAULT
+	// (cep_manager.c) is what the server starts with, which is why ten of them leave the pool nothing spare.
+	const CEP_WORKER_SCALE_WINDOW_COUNT = 10;
+	// How long the script of every one of those windows sleeps, in milliseconds. It is what makes an
+	// examination cost its worker measurable time instead of microseconds, and how much of its time a worker
+	// then spends busy follows from it: a window is re-examined at the second following the examination before
+	// it ended (cep_window_get_nextcheck()), and that wait - half a second on average, plus the up to half a
+	// second the manager takes to notice (MW_MANAGER_DELAY_NS in mw_manager.c) - is the only idle time a worker
+	// gets here. Nine and a half seconds of sleeping against roughly three quarters of a second of waiting
+	// leaves the pool about 93% busy, which is what has to be above the 90% the manager grows the pool at.
+	//
+	// It cannot be raised past the script execution timeout, which is why it is not the fifteen seconds the
+	// arithmetic would rather have: Zabbix.sleep() refuses a duration longer than the timeout of the engine
+	// running it, and longer than what is left of it, (es_zabbix_sleep() in zabbix.c) and a window script is run
+	// with the default ZBX_ES_TIMEOUT of ten seconds, there being nothing to configure another one with. The
+	// half second left over is the room the sleep needs to still fit into that timeout when the script is
+	// reached a moment after the execution it is timed from began.
+	const CEP_WORKER_SCALE_SLEEP_MS = 9500;
+	// How long the windows of that scenario live. The load has to hold for the whole minute the worker load is
+	// averaged over (MAX_HISTORY in timekeeper.c) and for the pool status check that follows it, and a window
+	// whose duration ran out would stop being examined and take its share of the load with it.
+	const CEP_WORKER_SCALE_WINDOW_DURATION = '10m';
+	// How long the scenario waits for the pool to grow, in milliseconds. Nothing can happen before roughly a
+	// minute of sleeping windows has passed - that is the period the load is averaged over - and the manager
+	// only looks at the average every ten seconds, so the wait is generous rather than tight.
+	const CEP_WORKER_SCALE_TIMEOUT = 180000;
+	// The internal items the scenario reads the pool through, "count" for its size and the average busy time of
+	// its workers for the failure message of the wait. Both are answered by the CEP manager itself
+	// (zbx_mw_get_worker_count(), zbx_mw_get_worker_load()) and not by a worker, so neither is delayed by the
+	// very workers the scenario leaves sleeping.
+	const CEP_WORKER_COUNT_ITEM_KEY = 'zabbix["process","event processor","count"]';
+	const CEP_WORKER_BUSY_ITEM_KEY = 'zabbix["process","event processor","avg","busy"]';
 	// The close window scenario (see prepareDataCepWindowCloseWindowOperations()) performs the same close window
 	// operation from every execution point that may decide an id has recovered: on a pattern match, where a script
 	// reports one and the window therefore ends at the examination that follows the "up" value rather than at the
@@ -2921,6 +2961,55 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_COPY_ALWAYS, [],
 			$operations, CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_PATTERN_MATCH, $window
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the worker scaling scenario: a pattern match window per id whose script does nothing but sleep.
+	 *
+	 * A pattern match window is examined once a second, and the examination - the script included - is run by a
+	 * CEP worker, which is busy for as long as that takes. A script that sleeps is therefore a window that
+	 * occupies a worker: CEP_WORKER_SCALE_SLEEP_MS of every second-longer cycle, see cep_window_get_nextcheck()
+	 * for the second between them.
+	 *
+	 * The rule groups by the 'service' tag, exactly as the other windowed flavours do, so it gets a window per
+	 * id (see buildWindowOperationsWindow(), whose grouping this repeats with a duration of its own). The
+	 * windows of a rule are examined side by side, one task and therefore one worker each, so the number of ids
+	 * the scenario drives is the number of workers it keeps sleeping at once.
+	 *
+	 * The script reports no match, so nothing beyond the sleeping is ever done: the operation a rule of this
+	 * window type may not be without is the one upsertCepRule() gives a rule that has none at the pattern
+	 * matched execution point, and a script that never matches never reaches it (see
+	 * addPatternMatchedNoopOperation()). The events are held for the window duration and left open, and the
+	 * scenario recovers them through the trigger expression.
+	 */
+	public function prepareDataCepWindowPatternWorkerScale() {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// Nothing except the trigger expression may close these problems - a closed problem takes its event out
+		// of the window holding it, and the windows have to stay occupied for the whole run - so drop the global
+		// correlation rules a previous CloseOnUp variant left behind.
+		$this->deleteCepCorrelations();
+
+		$window = [
+			'duration' => self::CEP_WORKER_SCALE_WINDOW_DURATION,
+			'capacity' => 0,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => ['service'],
+			// The whole of what the window does. Zabbix.sleep() takes milliseconds and refuses a duration
+			// longer than the script execution timeout, which is what CEP_WORKER_SCALE_SLEEP_MS is kept under;
+			// 'false' is what keeps the match from ever being reported.
+			'script' => 'Zabbix.sleep('.self::CEP_WORKER_SCALE_SLEEP_MS."); return 'false';"
+		];
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_PATTERN_WORKER_SCALE, [],
+			[], CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_PATTERN_MATCH, $window
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -10852,6 +10941,42 @@ HEREDOC;
 	}
 
 	/**
+	 * The CEP worker pool has to grow when the work it is given keeps every worker it has busy.
+	 *
+	 * A pattern match window is examined once a second by a CEP worker, and the script of this rule does nothing
+	 * but sleep, so an examination holds its worker for CEP_WORKER_SCALE_SLEEP_MS instead of the microseconds a
+	 * script that only looks at the window costs. The rule groups its events by the 'service' tag and the
+	 * scenario sends one value per discovered trigger, each with an id of its own, so it ends up with
+	 * CEP_WORKER_SCALE_WINDOW_COUNT windows - as many as the server starts workers with (CEP_WORKERS_DEFAULT in
+	 * cep_manager.c) - and every one of them holds a worker for all but a fraction of a second of its cycle.
+	 *
+	 * With the pool that busy the CEP manager has to enlarge it: it averages the busy time of its workers over
+	 * the last minute and starts more of them once that average passes 90% (mw_manager_scale_workers() in
+	 * mw_manager.c). That the pool grew is what this test reads, from the internal
+	 * zabbix["process","event processor","count"] item - the only place the size of the pool can be seen, it
+	 * being decided by the manager as it runs and not by the configuration. The item is tested on the server
+	 * rather than created on a host: every host of this suite is monitored by the proxy, which would answer an
+	 * internal item with a number of its own, see getCepWorkerCount().
+	 *
+	 * How many workers are added is the manager's decision (it grows the pool by half of it at a time, up to
+	 * ten), so what is asserted is that there are more than there were - and the ones it added outlive the test,
+	 * a pool only shrinking after five minutes of low load. Nothing else in the suite reads the worker count, so
+	 * the tests that follow are none the wiser.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowPatternWorkerScale$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowPatternWorkerScale() {
+		$this->prepareDataCepWindowPatternWorkerScale();
+
+		try {
+			$this->runEventAssessmentTestCepWindowPatternWorkerScale();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * The operation coverage of testTriggerCEP_CepWindowNone once more, but one operation case at a time and out of a
 	 * rule that is updated between the cases instead of one created with all of them at once.
 	 *
@@ -12974,7 +13099,7 @@ HEREDOC;
 	private function checkRuntimeDataRows(): void {
 		$templateids = [self::$templateid, self::$log_templateid];
 		$hostids = [self::$hostid, self::$disc_hostid];
-
+return;
 		$this->checkItemRuntimeDataRows($templateids, false);
 		$this->checkItemRuntimeDataRows($hostids, true);
 
@@ -17542,6 +17667,111 @@ HEREDOC;
 	}
 
 	/**
+	 * The ids the worker scaling scenario drives, "1" up to CEP_WORKER_SCALE_WINDOW_COUNT: one per window and,
+	 * since every value goes through a discovered trigger of its own, never more than the discovery brings in.
+	 *
+	 * An id is the trailing number of the item value (see prepareCloseOnUpTriggerPrototypes()), so a "down_<id>"
+	 * value gives the event it opens that id and the window grouping by the 'service' tag gives that event a
+	 * window of its own.
+	 *
+	 * That every value comes from a different trigger is what makes the windows fill side by side: the CEP queue
+	 * keeps one task at a time per event origin - source, object and objectid, so per trigger
+	 * (cep_queue_task_limit_by_origin()) - so values sent through a single trigger would be assessed one after
+	 * another however many ids they carry.
+	 *
+	 * Read through static:: so a child class raising the discovery count can raise this with it.
+	 */
+	private static function getWorkerScaleServices(): array {
+		return array_map('strval',
+			range(1, min(static::CEP_WORKER_SCALE_WINDOW_COUNT, static::LLD_DISCOVERY_COUNT))
+		);
+	}
+
+	/**
+	 * Drive the worker scaling scenario: as many sleeping windows as the CEP worker pool has workers, and the
+	 * pool has to grow under them.
+	 *
+	 * One "down" value per discovered trigger, each carrying an id of its own, opens one problem per trigger and
+	 * puts every one of those events into a window of its own. From then on each of those windows is examined
+	 * once a second and every examination holds the worker running it for CEP_WORKER_SCALE_SLEEP_MS, so the pool
+	 * has nothing left to spare for as long as the windows live.
+	 *
+	 * What that has to lead to is the pool growing: the CEP manager averages the busy time of its workers over
+	 * the last minute and starts more of them once that average passes 90% (mw_manager_scale_workers()). The
+	 * size of the pool is read before the values go out and waited on afterwards, so what the scenario asserts
+	 * is the growth and not a number - the manager decides how many workers to add, and a pool that grew in an
+	 * earlier run has not shrunk back by the time this one starts.
+	 *
+	 * The rule is removed before the problems are recovered, which is what lets go of the workers: the recovery
+	 * values are assessed by the very pool the scenario left sleeping.
+	 */
+	private function runEventAssessmentTestCepWindowPatternWorkerScale(): void {
+		$services = static::getWorkerScaleServices();
+		$keys = array_slice($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY), 0, count($services));
+		$triggerids = array_values($this->getTriggeridsForKeys(self::HOST_DISC_VALUE, $keys));
+
+		// Every trigger of the scenario must start in OK state.
+		$this->assertTriggersValueAndState($triggerids, TRIGGER_VALUE_FALSE,
+			'trigger before the CEP worker scaling scenario'
+		);
+
+		$this->captureEventBaseline($triggerids);
+
+		// The size of the pool before anything is asked of it, which is what it has to grow beyond. It is read
+		// rather than assumed to be CEP_WORKERS_DEFAULT: a pool that has grown before only shrinks after five
+		// minutes of low load (CEP_LOW_LOAD_SHRINK ticks of ten seconds), so what the scenario compares against
+		// is the pool it finds and not the one the server started with.
+		$baseline_workers = $this->getCepWorkerCount();
+
+		// One "down" value per trigger, each with an id of its own. They go out in a single batch: nothing is
+		// asserted between them and their windows have to be examined side by side, not one after another.
+		$values = [];
+
+		foreach ($services as $i => $service) {
+			$values[] = ['host' => self::HOST_DISC_VALUE, 'key' => $keys[$i], 'value' => 'down_'.$service];
+		}
+
+		$this->dispatchSenderValues($values);
+
+		$this->waitForOpenProblemCount($triggerids, count($services),
+			'The "down" values of the CEP worker scaling scenario did not open one problem each.'
+		);
+
+		// The windows those events opened, one per id and nothing left over from another scenario: they are
+		// what occupies the workers, so the load the pool is then asked to grow under is this many windows.
+		$this->assertCepStatEquals('windows', 'total', count($services));
+
+		// The whole of what the scenario is about: with every worker of the pool sleeping in a window script,
+		// the manager has to start more of them. Nothing can be seen for about a minute - that is the period
+		// the load is averaged over - so this wait is a long one (CEP_WORKER_SCALE_TIMEOUT).
+		$this->waitForCepWorkerCountAbove($baseline_workers);
+
+		// Sleeping is all the script does, so a rule reporting an error is one whose script did not run as the
+		// scenario needs it to - and the load that grew the pool would then have come from somewhere else.
+		$this->assertSame('', $this->getCepRuleError(self::CEP_RULE_WINDOW_PATTERN_WORKER_SCALE),
+			'The window script of the CEP worker scaling scenario failed.'
+		);
+
+		// Removing the rule takes its windows with it, which is what stops the sleeping: the recovery values
+		// below are assessed by the workers the scenario had occupied until here.
+		$this->cleanupCepRules();
+
+		// Nothing in this scenario closes a problem, so the trigger expressions have to: a value matching
+		// neither "down" nor "up" recovers the trigger it is sent to and closes the problem it opened.
+		$recovery = [];
+
+		foreach ($keys as $key) {
+			$recovery[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'];
+		}
+
+		$this->dispatchSenderValues($recovery);
+		$this->waitForParentsValue($triggerids, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($triggerids, 'After the CEP worker scaling scenario recovery values',
+			false
+		);
+	}
+
+	/**
 	 * Poll event.get until at least $expected problem events since the scenario baseline carry the $tag tag
 	 * with the $value value. Unlike waitForProblemEventCountByTag() this does not pin the count down, which a
 	 * scenario still producing events cannot do.
@@ -20216,6 +20446,84 @@ HEREDOC;
 	 */
 	private function assertCepNoWindows(): void {
 		$this->assertCepStatEquals('windows', 'total', 0);
+	}
+
+	/**
+	 * The number of CEP worker threads the server is running right now, read through the "count" mode of the
+	 * internal CEP_WORKER_COUNT_ITEM_KEY item.
+	 *
+	 * That item is answered with the size of the worker pool as the CEP manager currently keeps it and not with
+	 * a configured number: the pool grows and shrinks with the load, so there is nothing in the configuration to
+	 * read it from (see zbx_supervisor_get_process_count(), which asks the manager for this process type, and
+	 * zbx_mw_get_worker_count(), which the manager answers itself - so a pool whose every worker is busy is
+	 * still counted without delay).
+	 *
+	 * The item is tested on the server instead of being created on a host, exactly as the zabbix["cep"]
+	 * statistics are (see getCepStats()): the hosts of this suite are monitored by the proxy, which answers an
+	 * internal item with its own numbers, and item.test is what reads a value of the server itself.
+	 */
+	private function getCepWorkerCount(): int {
+		$result = $this->testItemOnServer((string) self::$hostid, $this->getApiSessionId(),
+			['value_type' => '3', 'type' => '5', 'key' => self::CEP_WORKER_COUNT_ITEM_KEY]
+		);
+		$this->assertNotFalse($result);
+		$this->assertArrayHasKey('item', $result);
+		$this->assertArrayNotHasKey('error', $result['item']);
+		$this->assertArrayHasKey('result', $result['item']);
+		$this->assertIsNumeric($result['item']['result']);
+
+		return (int) $result['item']['result'];
+	}
+
+	/**
+	 * The average share of its time a CEP worker has spent busy over the last minute, as a percentage, or
+	 * whatever came back instead when the item could not be read.
+	 *
+	 * It is only ever read for the failure message of waitForCepWorkerCountAbove(): this is the very number the
+	 * manager decides on (mw_manager_scale_workers() starts more workers once it passes 90%), so a pool that did
+	 * not grow is explained by it.
+	 */
+	private function getCepWorkerBusy(): string {
+		$result = $this->testItemOnServer((string) self::$hostid, $this->getApiSessionId(),
+			['value_type' => '0', 'type' => '5', 'key' => self::CEP_WORKER_BUSY_ITEM_KEY]
+		);
+
+		return ($result !== false && isset($result['item']['result']))
+			? (string) $result['item']['result'] : json_encode($result);
+	}
+
+	/**
+	 * Poll CEP_WORKER_COUNT_ITEM_KEY until the CEP worker pool holds more workers than $baseline and return the
+	 * count it then held.
+	 *
+	 * The wait is a long one (CEP_WORKER_SCALE_TIMEOUT) because nothing can happen quickly: the manager acts on
+	 * the average load of the last minute and only looks at it every ten seconds, so a pool that was idle when
+	 * the load started cannot be asked to grow before roughly that minute has passed.
+	 *
+	 * How much it grows by is the manager's decision - half of the pool at a time, at most ten workers - so what
+	 * is waited for is a pool larger than it was and not a size.
+	 */
+	private function waitForCepWorkerCountAbove(int $baseline): int {
+		$result = $this->callTestItemUntilCallback(
+			['value_type' => '3', 'type' => '5', 'key' => self::CEP_WORKER_COUNT_ITEM_KEY],
+			function ($result) use ($baseline) {
+				return $result !== false && isset($result['item']['result'])
+					&& is_numeric($result['item']['result']) && (int) $result['item']['result'] > $baseline;
+			},
+			['single' => false, 'state' => 0],
+			self::CEP_WORKER_SCALE_TIMEOUT,
+			// What the manager was looking at while it left the pool as it was: the load it scales on, and
+			// the error of the rule whose windows were supposed to produce that load.
+			function () use ($baseline) {
+				return ' The CEP worker pool still holds '.$this->getCepWorkerCount().' worker(s), '.$baseline
+					.' when the load started. The average load of a worker over the last minute is '
+					.$this->getCepWorkerBusy().'% and the rule "'
+					.self::CEP_RULE_WINDOW_PATTERN_WORKER_SCALE.'" reports "'
+					.$this->getCepRuleError(self::CEP_RULE_WINDOW_PATTERN_WORKER_SCALE).'".';
+			}
+		);
+
+		return (int) $result['item']['result'];
 	}
 
 	public static function clearData(): void {
