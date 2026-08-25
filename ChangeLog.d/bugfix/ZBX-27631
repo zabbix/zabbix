@@ -1,1 +1,1 @@
-........S. [ZBX-27631] fixed macro resolution in item names for connector export (vsmelovs)
+........S. [ZBX-27631] fixed macro resolution in exported item names and tags (vsmelovs)
