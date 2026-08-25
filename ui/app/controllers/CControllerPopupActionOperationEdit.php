@@ -38,11 +38,11 @@ class CControllerPopupActionOperationEdit extends CController {
 
 		if (!$ret) {
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
+				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)]))->disableView()
 			);
 		}
 
@@ -80,7 +80,7 @@ class CControllerPopupActionOperationEdit extends CController {
 	protected function doAction(): void {
 		$operation = $this->getInput('data', []) + $this->defaultOperationObject();
 		$eventsource = (int) $this->getInput('eventsource');
-		$recovery = (int) $this->getInput('recovery');
+		$recovery = (int) $this->getInput('recovery', ACTION_OPERATION);
 		$operation_types = $this->popupConfigOperationTypes($eventsource, $recovery);
 
 		$scripts_with_warning = [];
