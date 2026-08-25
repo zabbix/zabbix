@@ -44,4 +44,11 @@ class testTriggerCEPAtScale extends testTriggerCEP {
 	// Larger scale needs longer to settle; override the parent's reduced default back up.
 	const WAIT_ITERATIONS = 60;
 	const WAIT_ITERATIONS_LONGER = 120;
+
+	// The load above needs the server sized for it, so raise the parent's modest process counts: escalations
+	// and notifications are generated per event here, and every value is delivered over a trapper connection.
+	const START_ESCALATORS = 8;
+	const START_TRAPPERS = 8;
+	const START_ALERTERS = 8;
+	const START_TIMERS = 2;
 }

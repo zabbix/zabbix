@@ -855,6 +855,15 @@ class testTriggerCEP extends CIntegrationTest {
 	// internal actions. @see waitForInternalAlertsCompleted().
 	private static $internal_event_baseline_id = 0;
 
+	// How many of each server process the suite starts, see configurationProvider(). Kept modest here - the
+	// load knobs at the top of the class are tiny by default, so a handful of workers is all that load needs
+	// and a CI run does not pay for a crowd of idle processes. testTriggerCEPAtScale raises them to match the
+	// load it generates.
+	const START_ESCALATORS = 2;
+	const START_TRAPPERS = 5;
+	const START_ALERTERS = 3;
+	const START_TIMERS = 1;
+
 	/**
 	 * Component configuration provider.
 	 *
@@ -870,11 +879,12 @@ class testTriggerCEP extends CIntegrationTest {
 				'HistoryIndexCacheSize' => '32M',
 				'ValueCacheSize' => '128M',
 				'LogSlowQueries' => 10000,
-				'StartEscalators' => 8,
+				'StartEscalators' => static::START_ESCALATORS,
 				'MaxHousekeeperDelete' => 0,
-				'StartTrappers' => 16,
-				'StartAlerters' => 10,
-				'StartTimers' => 2
+				'StartTrappers' => static::START_TRAPPERS,
+				'StartAlerters' => static::START_ALERTERS,
+				'StartTimers' => static::START_TIMERS,
+				'StartHistoryPollers' => 1,
 			]
 		];
 	}

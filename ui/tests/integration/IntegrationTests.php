@@ -144,10 +144,10 @@ class IntegrationTests {
 		$suite->addTestSuite('testDiagInfo');
 		$suite->addTestSuite('testHousekeepingConfSync');
 		$suite->addTestSuite('testTriggerCEP');
+		$suite->addTestSuite('testTriggerCEPRestart');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
-		/* $suite->addTestSuite('testTriggerCEPRestart'); */
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testWebScenarioDynamicVariables');
 		$suite->addTestSuite('testBridgeAdapter');
