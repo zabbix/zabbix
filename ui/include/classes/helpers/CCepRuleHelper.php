@@ -503,12 +503,6 @@ class CCepRuleHelper {
 
 		$target_details = $target ? $ceprule_operation[$target] : [];
 		$arguments = match($operation) {
-			self::OP_SUPPRESS
-				=> zbx_date2str(
-					$target_details['until'] > strtotime('today') ? TIME_FORMAT : DATE_TIME_FORMAT,
-					$target_details['until']
-				),
-
 			self::OP_SET_NAME
 				=> array_key_exists('old', $target_details)
 					? sprintf('%s > %s', $target_details['old'], $target_details['new'])
@@ -549,7 +543,10 @@ class CCepRuleHelper {
 
 		$label = match ($operation) {
 			self::OP_SET_CAUSE => _('Set cause for this event'),
-			self::OP_SUPPRESS => _('Suppressed until'),
+			self::OP_SUPPRESS => _s('Suppressed until %s', zbx_date2str(
+				$target_details['until'] > strtotime('today') ? TIME_FORMAT : DATE_TIME_FORMAT,
+				$target_details['until']
+			)),
 			default => CCepRuleHelper::getOperationLabelString(['type' => $operation])
 		};
 
