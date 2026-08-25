@@ -147,6 +147,14 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_UNITS_ITEM_KEY = 'cep.units';
 	const CEP_UNITS_ITEM_UNITS = 'B';
 	const CEP_UNITS_ITEM_VALUE = '1024';
+	// A plain item and a plain trigger over it on the CEP template, created by prepareData() next to the
+	// prototypes: they are the only objects of the template that are neither a prototype nor an LLD rule, and
+	// they are there for the runtime data check (see checkRuntimeDataRows()) - the copies template linking
+	// makes of them on the discovered host need a runtime data row, the originals on the template do not.
+	// Nothing ever sends this item a value, so the trigger over it is never evaluated: it stays out of every
+	// scenario of the suite and generates no event of its own.
+	const TEMPLATE_ITEM_KEY = 'cep.template.plain';
+	const TEMPLATE_TRIGGER_DESCRIPTION = 'CEP template plain trigger';
 	// Stable per-trigger tag (fixed name, value resolved from the LLD macro to the component, e.g.
 	// 'sensor1') used to map each discovered trigger to its own service. Unlike 'component_{ITEM.VALUE}'
 	// the tag name does not contain {ITEM.VALUE}, so it is not rewritten at event time and the service
@@ -814,6 +822,10 @@ class testTriggerCEP extends CIntegrationTest {
 	// The item of the host that exists before the server is started, see CEP_UNITS_ITEM_KEY.
 	private static $units_itemid;
 	private static $templateid;
+	// The plain item and trigger of the CEP template and the copies template linking made of them on the
+	// discovered host, see TEMPLATE_ITEM_KEY.
+	private static $template_itemid;
+	private static $template_triggerid;
 	private static $log_templateid;
 	private static $log_lld_ruleid;
 	private static $log_master_itemid;
@@ -1029,6 +1041,29 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['triggerids']);
 		self::$dep_trigger_prototypeid = $response['result']['triggerids'][0];
+
+		// Plain item of the template - not a prototype, not an LLD rule - and a plain trigger over it, see
+		// TEMPLATE_ITEM_KEY. Both are inherited to the discovered host together with everything else of this
+		// template when the host prototype creates it.
+		$response = $this->call('item.create', [
+			'hostid' => self::$templateid,
+			'name' => 'CEP template plain item',
+			'key_' => self::TEMPLATE_ITEM_KEY,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$template_itemid = $response['result']['itemids'][0];
+
+		$response = $this->call('trigger.create', [
+			'description' => self::TEMPLATE_TRIGGER_DESCRIPTION,
+			'expression' => 'last(/'.self::TEMPLATE_NAME.'/'.self::TEMPLATE_ITEM_KEY.')<>0',
+			'priority' => TRIGGER_SEVERITY_WARNING
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['triggerids']);
+		self::$template_triggerid = $response['result']['triggerids'][0];
 
 		// Create the separate log template with an LLD rule, a master log item, a dependent log item
 		// prototype and a trigger prototype with multiple problem event generation enabled. The value
@@ -7511,6 +7546,12 @@ HEREDOC;
 		// Discover the single log trigger up front (reloads the configuration cache before and after) so
 		// the server is aware of all newly discovered items and the log event tests can drive it directly.
 		$this->discoverLogTrigger();
+
+		// Everything the suite configures exists by now - the templates with their prototypes, the host the
+		// log template is linked to directly, the discovered host the host prototype created with the CEP
+		// template linked to it, and the items and triggers discovered on both - so this is the point where
+		// the runtime data tables can be checked against all of it at once.
+		$this->checkRuntimeDataRows();
 	}
 
 	/**
@@ -12910,6 +12951,219 @@ HEREDOC;
 
 		// Reload config so the server is aware of the newly discovered item and trigger.
 		$this->reloadConfigurationCacheAndWaitForLogLine();
+	}
+
+	/**
+	 * Verify which of the items and triggers of the suite have a runtime data row (item_rtdata, trigger_rtdata)
+	 * and which do not, over everything it configures: the two templates, the host the log template is linked
+	 * to directly, and the discovered host the host prototype created with the CEP template linked to it.
+	 *
+	 * A prototype is configuration only - nothing ever collects a value for it or evaluates it - so no item
+	 * prototype and no trigger prototype may have a runtime data row, neither the ones the API created on the
+	 * templates nor the copies template linking made on the hosts. Runtime data is needed only where there is
+	 * a runtime, and a template has none: nothing on a template may have a row, not its LLD rules, not its
+	 * plain items and not its plain triggers either. On a host it is the other way round - every item, whether
+	 * created directly, inherited from a template or discovered by LLD, and every real trigger has exactly
+	 * one row.
+	 *
+	 * The plain item and the plain trigger of the CEP template (see TEMPLATE_ITEM_KEY) are what pins the
+	 * template side of that down: they are checked by id, both on the template and as the copies template
+	 * linking made of them on the discovered host, so the two sides of the same pair of objects are compared
+	 * rather than only the counts per flags value.
+	 */
+	private function checkRuntimeDataRows(): void {
+		$templateids = [self::$templateid, self::$log_templateid];
+		$hostids = [self::$hostid, self::$disc_hostid];
+
+		$this->checkItemRuntimeDataRows($templateids, false);
+		$this->checkItemRuntimeDataRows($hostids, true);
+
+		$this->checkTriggerRuntimeDataRows($templateids, false);
+		$this->checkTriggerRuntimeDataRows($hostids, true);
+
+		// The plain pair of the template: neither of the two may have a runtime data row.
+		$this->checkRuntimeDataRowsForIds('item_rtdata', 'itemid', [self::$template_itemid], false,
+			'The plain item of the CEP template'
+		);
+		$this->checkRuntimeDataRowsForIds('trigger_rtdata', 'triggerid', [self::$template_triggerid], false,
+			'The plain trigger of the CEP template'
+		);
+
+		// The copies template linking made of that pair on the discovered host: both need one.
+		$response = $this->callUntilDataIsPresent('item.get', [
+			'hostids' => [self::$disc_hostid],
+			'filter' => ['key_' => self::TEMPLATE_ITEM_KEY],
+			'output' => ['itemid']
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		$this->assertCount(1, $response['result'],
+			'The plain item of the CEP template was not inherited to the discovered host.'
+		);
+		$this->checkRuntimeDataRowsForIds('item_rtdata', 'itemid',
+			array_column($response['result'], 'itemid'), true,
+			'The inherited plain item of the discovered host'
+		);
+
+		$response = $this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$disc_hostid],
+			'filter' => ['description' => self::TEMPLATE_TRIGGER_DESCRIPTION],
+			'output' => ['triggerid']
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		$this->assertCount(1, $response['result'],
+			'The plain trigger of the CEP template was not inherited to the discovered host.'
+		);
+		$this->checkRuntimeDataRowsForIds('trigger_rtdata', 'triggerid',
+			array_column($response['result'], 'triggerid'), true,
+			'The inherited plain trigger of the discovered host'
+		);
+	}
+
+	/**
+	 * Compare, for every flags value present on the items of the given hosts, how many of those items exist with
+	 * how many of them have an item_rtdata row. Prototypes must have none; the rest must all have one, but only
+	 * on a real host - $monitored tells the two apart, as the items of a template never get a row.
+	 *
+	 * @param array $hostids    hostids (or templateids) whose items are checked
+	 * @param bool  $monitored  whether those ids are hosts (true) or templates (false)
+	 */
+	private function checkItemRuntimeDataRows(array $hostids, bool $monitored): void {
+		$rows = CDBHelper::getAll(
+			'SELECT i.flags,COUNT(i.itemid) AS total,COUNT(r.itemid) AS with_rtdata'.
+			' FROM items i'.
+			' LEFT JOIN item_rtdata r ON r.itemid=i.itemid'.
+			' WHERE '.dbConditionId('i.hostid', $hostids).
+			' GROUP BY i.flags'
+		);
+		$this->assertNotEmpty($rows, 'No items found on '.$this->describeRuntimeDataHosts($hostids, $monitored).'.');
+
+		$prototypes = 0;
+		$others = 0;
+
+		foreach ($rows as $row) {
+			$flags = (int) $row['flags'];
+			$total = (int) $row['total'];
+			$is_prototype = ($flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) != 0;
+			$expected = ($monitored && !$is_prototype) ? $total : 0;
+
+			$this->assertSame($expected, (int) $row['with_rtdata'], 'Wrong number of item_rtdata rows for the '
+				.$total.' '.$this->describeRuntimeDataFlags($flags).' items (flags '.$flags.') of '
+				.$this->describeRuntimeDataHosts($hostids, $monitored).'.'
+			);
+
+			if ($is_prototype) {
+				$prototypes += $total;
+			}
+			else {
+				$others += $total;
+			}
+		}
+
+		// Both groups the loop above distinguishes must be represented, otherwise their check said nothing.
+		$this->assertGreaterThan(0, $prototypes, 'No item prototypes on '
+			.$this->describeRuntimeDataHosts($hostids, $monitored).', so the item_rtdata check is void.'
+		);
+		$this->assertGreaterThan(0, $others, 'No items other than prototypes on '
+			.$this->describeRuntimeDataHosts($hostids, $monitored).', so the item_rtdata check is void.'
+		);
+	}
+
+	/**
+	 * The same comparison for the triggers of the given hosts and trigger_rtdata: on a template neither a
+	 * trigger prototype nor a plain trigger may have a row, on a host the prototypes must have none and every
+	 * real trigger exactly one.
+	 *
+	 * @param array $hostids    hostids (or templateids) whose triggers are checked
+	 * @param bool  $monitored  whether those ids are hosts (true) or templates (false)
+	 */
+	private function checkTriggerRuntimeDataRows(array $hostids, bool $monitored): void {
+		$rows = CDBHelper::getAll(
+			'SELECT t.flags,COUNT(DISTINCT t.triggerid) AS total,COUNT(DISTINCT r.triggerid) AS with_rtdata'.
+			' FROM triggers t'.
+			' JOIN functions f ON f.triggerid=t.triggerid'.
+			' JOIN items i ON i.itemid=f.itemid'.
+			' LEFT JOIN trigger_rtdata r ON r.triggerid=t.triggerid'.
+			' WHERE '.dbConditionId('i.hostid', $hostids).
+			' GROUP BY t.flags'
+		);
+		$this->assertNotEmpty($rows, 'No triggers found on '
+			.$this->describeRuntimeDataHosts($hostids, $monitored).'.'
+		);
+
+		$prototypes = 0;
+		$others = 0;
+
+		foreach ($rows as $row) {
+			$flags = (int) $row['flags'];
+			$total = (int) $row['total'];
+			$is_prototype = ($flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) != 0;
+			$expected = ($monitored && !$is_prototype) ? $total : 0;
+
+			$this->assertSame($expected, (int) $row['with_rtdata'],
+				'Wrong number of trigger_rtdata rows for the '.$total.' '
+				.$this->describeRuntimeDataFlags($flags).' triggers (flags '.$flags.') of '
+				.$this->describeRuntimeDataHosts($hostids, $monitored).'.'
+			);
+
+			if ($is_prototype) {
+				$prototypes += $total;
+			}
+			else {
+				$others += $total;
+			}
+		}
+
+		// Both groups the loop above distinguishes must be represented, otherwise their check said nothing.
+		$this->assertGreaterThan(0, $prototypes, 'No trigger prototypes on '
+			.$this->describeRuntimeDataHosts($hostids, $monitored).', so the trigger_rtdata check is void.'
+		);
+		$this->assertGreaterThan(0, $others, 'No triggers other than prototypes on '
+			.$this->describeRuntimeDataHosts($hostids, $monitored).', so the trigger_rtdata check is void.'
+		);
+	}
+
+	/**
+	 * Check the runtime data rows of named objects rather than of a whole flags group: assert that each of the
+	 * given ids has a row in the given runtime data table, or that none of them has one.
+	 *
+	 * @param array  $ids       itemids or triggerids to look up
+	 * @param bool   $expected  whether every one of them must have a row
+	 * @param string $what      what those ids are, for the failure message
+	 */
+	private function checkRuntimeDataRowsForIds(string $table, string $field, array $ids, bool $expected,
+			string $what): void {
+		$found = CDBHelper::getColumn(
+			'SELECT '.$field.' FROM '.$table.' WHERE '.dbConditionId($field, $ids), $field
+		);
+
+		$this->assertSame($expected ? $ids : [], array_values(array_intersect($ids, $found)),
+			$what.' must have '.($expected ? 'a' : 'no').' '.$table.' row: looked up '.$field.'s '
+			.implode(',', $ids).', found rows for '.($found ? implode(',', $found) : 'none').'.'
+		);
+	}
+
+	/**
+	 * Name the flags value of an item or a trigger, so a failed runtime data assertion says which kind of
+	 * object it counted instead of only the number the flags field holds.
+	 */
+	private function describeRuntimeDataFlags(int $flags): string {
+		$names = [
+			ZBX_FLAG_DISCOVERY_NORMAL => 'plain',
+			ZBX_FLAG_DISCOVERY_RULE => 'LLD rule',
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => 'prototype',
+			ZBX_FLAG_DISCOVERY_CREATED => 'discovered',
+			ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED => 'prototype of a discovered host',
+			ZBX_FLAG_DISCOVERY_RULE_CREATED => 'discovered LLD rule',
+			ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE => 'LLD rule prototype',
+			ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED => 'LLD rule prototype of a discovered host'
+		];
+
+		return isset($names[$flags]) ? $names[$flags] : 'unrecognized';
+	}
+
+	/**
+	 * Name the set of ids a runtime data check is looking at, for its assertion messages.
+	 */
+	private function describeRuntimeDataHosts(array $hostids, bool $monitored): string {
+		return ($monitored ? 'hostids ' : 'templateids ').implode(',', $hostids);
 	}
 
 	/**
