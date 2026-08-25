@@ -63,7 +63,7 @@ class testFormUserPermissions extends CWebTest {
 				'name' => 'admin_role',
 				'type' => 2,
 				'rules' => [
-					'api.access' => 1,
+					'api.access' => ZBX_ROLE_RULE_ENABLED,
 					'api' => [
 						'host.create'
 					]

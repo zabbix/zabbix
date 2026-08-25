@@ -71,7 +71,7 @@ class testFormUserRoles extends CWebTest {
 				'name' => 'role_for_update',
 				'type' => 1,
 				'rules' => [
-					'api.access' => 1,
+					'api.access' => ZBX_ROLE_RULE_ENABLED,
 					'api' => [
 						'*.create',
 						'host.*',
@@ -83,15 +83,12 @@ class testFormUserRoles extends CWebTest {
 				'name' => 'super_role',
 				'type' => 3,
 				'rules' => [
-					'api.access' => 1
+					'api.access' => ZBX_ROLE_RULE_ENABLED
 				]
 			],
 			[
 				'name' => 'role_for_delete',
-				'type' => 3,
-				'rules' => [
-					'api.access' => 1
-				]
+				'type' => 3
 			]
 		]);
 		$this->assertArrayHasKey('roleids', $response);
@@ -860,7 +857,7 @@ class testFormUserRoles extends CWebTest {
 		$this->assertEquals($roles, $this->query('id:user-type')->one()->asDropdown()->getOptions()->asText());
 
 		// Unchecking API, button and radio button becomes disabled.
-		$form->fill(['Enabled' => false]);
+		$this->assertFalse($this->query('id:api-access')->asCheckbox()->one()->isChecked());
 		$this->assertFalse($form->getField('API methods')->isEnabled());
 		$this->assertFalse($this->query('button:Select')->one()->isClickable());
 		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and @aria-disabled="true"]')->exists());
@@ -1196,7 +1193,8 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'to_user' => true,
 					'fields' => [
-						'User type' => 'User'
+						'User type' => 'User',
+						'Enabled' => true
 					],
 					'message_header' => 'User role updated'
 				]
@@ -1205,9 +1203,7 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enabled' => true
-					],
+					'fields' => [],
 					'api_methods' => '',
 					'message_header' => 'User role updated'
 				]
@@ -1603,20 +1599,7 @@ class testFormUserRoles extends CWebTest {
 			}
 		}
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
-
-		if ($action === 'create') {
-			$this->assertFalse($this->query('id:api-access')->asCheckbox()->one()->isChecked());
-		}
-
-		if ($action === 'update' && array_key_exists('User type', $data['fields'])) {
-			$apiStatusBefore = $this->query('id:api-access')->asCheckbox()->one()->isChecked();
-			$form->fill($data['fields']);
-			$apiStatusAfter = $this->query('id:api-access')->asCheckbox()->one()->isChecked();
-			$this->assertEquals($apiStatusBefore, $apiStatusAfter);
-		}
-		else {
-			$form->fill($data['fields']);
-		}
+		$form->fill($data['fields']);
 
 		if (array_key_exists('write_services', $data) || array_key_exists('read_services', $data)) {
 			$services = array_merge(CTestArrayHelper::get($data, 'write_services', []),
