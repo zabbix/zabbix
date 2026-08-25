@@ -16037,6 +16037,11 @@ HEREDOC;
 		$this->resetCepRule($rule_name);
 		$this->waitForCepTasksDrained();
 
+		// The rule is the only one there is and its three windows were the only ones in the pool, so a reset that
+		// carried them away leaves the pool empty - the one thing about a reset that can be read from the server
+		// directly, rather than from what the rule can and cannot close afterwards.
+		$this->assertCepNoWindows();
+
 		// 2a. Stop and start the server with the reset behind it: the windows of a rule are stored, and the server
 		//     loads them back with the events they held, so a reset that took them out of the window pool without
 		//     taking them out of the database is a reset the restart undoes. Everything the reset is read from
@@ -16183,6 +16188,10 @@ HEREDOC;
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 		$this->waitForCepTasksDrained();
 
+		// The three windows of the deleted rule were the only ones in the pool and a window whose rule is gone is
+		// dropped from it at its next examination, so nothing may be left there.
+		$this->assertCepNoWindows();
+
 		// 2a. Stop and start the server with the delete behind it, unless the restarts are turned off. The windows of
 		//     a rule are rows of cep_window and cep_window_event that the server loads back at startup, so this is
 		//     what "and stay away" comes to: a window that was only taken out of the window pool would be there again
@@ -16294,6 +16303,10 @@ HEREDOC;
 		$this->deleteCepRule($rule_name);
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 		$this->waitForCepTasksDrained();
+
+		// The one window of the deleted rule is out of the pool, script or no script: an examination that was
+		// running when the rule went away does not keep the window it was examining alive.
+		$this->assertCepNoWindows();
 
 		// 3. The window went away with the rule instead of being closed, whether the script was in the middle of it
 		//    or not: the problem it was holding is untouched.
