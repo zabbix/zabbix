@@ -824,7 +824,7 @@ static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int s
  ******************************************************************************/
 void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **str)
 {
-	return cep_event_context_resolve_macros(ctx, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO | ZBX_TOKEN_SEARCH_REFERENCES,
+	cep_event_context_resolve_macros(ctx, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO | ZBX_TOKEN_SEARCH_REFERENCES,
 			zbx_macro_event_name_resolv, str);
 }
 
@@ -838,7 +838,7 @@ void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **
  ******************************************************************************/
 void	cep_event_context_resolve_tag_macros(zbx_cep_event_context_t *ctx, char **str)
 {
-	return cep_event_context_resolve_macros(ctx, 0, zbx_macro_trigger_tag_resolv, str);
+	cep_event_context_resolve_macros(ctx, 0, zbx_macro_trigger_tag_resolv, str);
 }
 
 /******************************************************************************
@@ -858,7 +858,7 @@ void	cep_event_context_init_with_handle(zbx_cep_event_context_t *ctx, zbx_cep_ev
 	ctx->hevent = hevent;
 	ctx->pos = pos;
 	ctx->dbpool = dbpool;
-};
+}
 
 /******************************************************************************
  *                                                                            *
