@@ -585,7 +585,7 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, *buf);
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, buf);
 		}
 	}
 
