@@ -59,6 +59,7 @@ zabbix_agent2 \- Zabbix agent 2
 .IR config\-file ]
 .B \-R
 .I runtime\-option
+.RI [ parameters... ]
 .br
 .B zabbix_agent2
 .RB [ \-c
@@ -74,8 +75,8 @@ is an application for monitoring parameters of various services.
 .SH OPTIONS
 .IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
 Use the alternate \fIconfig\-file\fR instead of the default one.
-.IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime\-option\fR"
-Perform administrative functions according to \fIruntime\-option\fR.
+.IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime\-option\fR [\fIparameters...\fR]"
+Perform administrative functions according to \fIruntime\-option\fR and any parameters it accepts.
 .SS
 .RS 4
 Runtime control options
@@ -98,6 +99,10 @@ Disable periodic profiling
 .TP 4
 \fBperiodic_prof_execute\fR
 Write profiles after a 5-second sample
+
+When periodic profiling is enabled, this command resets its schedule: the next scheduled profile dump occurs one full interval after the command completes.
+CPU profiling is split instead: the current CPU profile is retained, the command writes a separate 5-second CPU profile, and periodic CPU collection continues in a new file.
+This can leave three CPU files around the command; normal file rotation applies.
 .RE
 .RS 4
 .TP 4

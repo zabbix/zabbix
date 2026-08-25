@@ -65,6 +65,13 @@ const usageMessageFormatRuntimeControlFormat = //
       periodic_prof_set_interval <seconds>  Set profiling interval
       metrics                               List available metrics
       version                               Display Agent version
+
+    When periodic profiling is enabled, periodic_prof_execute resets its
+    schedule: the next scheduled profile dump occurs one full interval after
+    the command completes. CPU profiling is split instead: the current CPU
+    profile is retained, the command writes a separate 5-second CPU profile,
+    and periodic CPU collection continues in a new file. This can leave three
+    CPU files around the command; normal file rotation applies.
 `
 
 const usageMessageFormat = //
@@ -73,7 +80,7 @@ const usageMessageFormat = //
   %[1]s [-c config-file] [-v] -p
   %[1]s [-c config-file] [-v] -t item-key
   %[1]s [-c config-file] -T
-  %[1]s [-c config-file] -R runtime-option
+  %[1]s [-c config-file] -R runtime-option [parameters...]
   %[1]s -h
   %[1]s -V
 `
@@ -571,6 +578,10 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 }
 
 func parseArgs() (string, *Arguments, error) {
+	return parseArgsFrom(os.Args[1:])
+}
+
+func parseArgsFrom(arguments []string) (string, *Arguments, error) {
 	fs := flag.NewFlagSet("", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	// set to empty cause lib triggers Usage func on --help/-h and invalid
@@ -671,7 +682,7 @@ func parseArgs() (string, *Arguments, error) {
 
 	f.Register(fs)
 
-	err := fs.Parse(os.Args[1:])
+	err := fs.Parse(arguments)
 	if err != nil {
 		fmt.Fprint(os.Stdout, usageMessage())
 
@@ -679,6 +690,10 @@ func parseArgs() (string, *Arguments, error) {
 			errs.NewCLIError(err.Error(), 1),
 			errs.Wrap(err, "failed to parse command line arguments"),
 		)
+	}
+
+	if args.runtimeCommand != "" && fs.NArg() != 0 {
+		args.runtimeCommand += " " + strings.Join(fs.Args(), " ")
 	}
 
 	return f.Usage(), args, nil
