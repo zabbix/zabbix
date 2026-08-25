@@ -86,7 +86,7 @@ class CItemHelper extends CItemGeneralHelper {
 		// created from inherited item prototypes.
 		if ($item['valuemap'] && bccomp($item['valuemap']['hostid'], $item['hostid']) != 0) {
 			$templates = API::Template()->get(['output' => ['name'], 'templateids' => $item['valuemap']['hostid']]);
-			$item['valuemap']['prefix'] = $templates[0]['name'].NAME_DELIMITER;
+			$item['valuemap']['prefix'] = $templates ? $templates[0]['name'].NAME_DELIMITER : null;
 		}
 
 		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
