@@ -1087,11 +1087,14 @@ class CCepRule extends CApiService {
 	}
 
 	private static function updateOperations(array &$cep_rules, ?array $db_cep_rules = null): void {
+		$filter_defaults = array_intersect_key(DB::getDefaults('cep_operation'), array_flip(['evaltype', 'formula']))
+			+ ['conditions' => []];
+
 		$defaults = array_intersect_key(DB::getDefaults('cep_operation'),
 			array_flip(['execute_when', 'type', 'event_name', 'severity', 'suppress_duration', 'tag', 'new_tag',
 				'tag_value'
 			])
-		) + ['filter' => []];
+		) + ['filter' => $filter_defaults];
 
 		$del_operationids = [];
 		$upd_operations = [];
@@ -1169,10 +1172,7 @@ class CCepRule extends CApiService {
 						];
 
 						if (array_key_exists('filter', $operation)) {
-							$db_operations[$operation['cep_operationid']]['filter'] = [
-								'evaltype' => DB::getDefault('cep_operation', 'evaltype'),
-								'conditions' => []
-							];
+							$db_operations[$operation['cep_operationid']]['filter'] = $filter_defaults;
 						}
 					}
 				}
