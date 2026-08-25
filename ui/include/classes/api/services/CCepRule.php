@@ -648,7 +648,7 @@ class CCepRule extends CApiService {
 
 			$cep_rule_path = '/'.($i1 + 1);
 
-			foreach ($cep_rule['operations'] as $i2 => $operation) {
+			foreach ($cep_rule['operations'] as $i2 => &$operation) {
 				$api_input_rules = self::getOperationValidationRules($operation);
 				$path = $cep_rule_path.'/operations/'.($i2 + 1);
 
@@ -656,6 +656,7 @@ class CCepRule extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
+			unset($operation);
 
 			self::checkPatternMatchOperations($cep_rule, $cep_rule_path);
 			self::checkOperationOrder($cep_rule, $cep_rule_path);
