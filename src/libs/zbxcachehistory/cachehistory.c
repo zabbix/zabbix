@@ -37,7 +37,6 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
-#include "zbxipcservice.h"
 #include "../zbxexpression/datafunc.h"
 #include "zbx_expression_constants.h"
 
