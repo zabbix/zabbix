@@ -187,7 +187,7 @@ class CProxy extends CApiService {
 		$this->addRelatedAssignedHosts($options, $result);
 		$this->addRelatedHosts($options, $result);
 		$this->addRelatedProxyGroup($options, $result);
-		$this->addRelatedAPm($options, $result);
+		$this->addRelatedApm($options, $result);
 
 		return $result;
 	}
@@ -1102,8 +1102,7 @@ class CProxy extends CApiService {
 					continue;
 				}
 
-				$decoded_apm[$proxy['proxyid']] = json_decode($db_proxies[$proxy['proxyid']]['apm'], true);
-				$proxy['apm'] += $decoded_apm[$proxy['proxyid']];
+				$proxy['apm'] += json_decode($db_proxies[$proxy['proxyid']]['apm'], true);
 			}
 		}
 		unset($proxy);
