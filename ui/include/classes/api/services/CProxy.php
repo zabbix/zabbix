@@ -761,22 +761,7 @@ class CProxy extends CApiService {
 			'hosts' =>					['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'apm' =>					['type' => API_OBJECT, 'fields' => [
-				'data_collection_status' =>			['type' => API_INT32, 'in' => implode(',', [PROXY_APM_STATUS_NOT_CONFIGURED, PROXY_APM_STATUS_CONFIGURED])],
-				'max_messages_per_second' => 		['type' => API_MULTIPLE, 'rules' => [
-														['if' => static fn(array $data): bool => array_key_exists('data_collection_status', $data) && $data['data_collection_status'] == PROXY_APM_STATUS_CONFIGURED, 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => 0],
-														['else' => true, 'type' => API_UNEXPECTED]
-				]],
-				'additional_resource_attributes' =>	['type' => API_MULTIPLE, 'rules' => [
-														['if' => static fn(array $data): bool => array_key_exists('data_collection_status', $data) && $data['data_collection_status'] == PROXY_APM_STATUS_CONFIGURED, 'type' => API_OBJECTS, 'uniq' => [['signal_type', 'key']], 'fields' => [
-															'key' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
-															'value' => 			['type' => API_STRING_UTF8, 'length' => 255],
-															'signal_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [PROXY_APM_ATTR_SIGNAL_TYPE_TRACES, PROXY_APM_ATTR_SIGNAL_TYPE_METRICS, PROXY_APM_ATTR_SIGNAL_TYPE_LOGS])]
-
-														]],
-														['else' => true, 'type' => API_UNEXPECTED]
-				]]
-			]]
+			'apm' =>					['type' => API_OBJECT, 'fields' => self::getApmValidationRules()]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
@@ -1126,22 +1111,7 @@ class CProxy extends CApiService {
 										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_subject')]
 			]],
-			'apm' =>					['type' => API_OBJECT, 'fields' => [
-				'data_collection_status' =>			['type' => API_INT32, 'in' => implode(',', [PROXY_APM_STATUS_NOT_CONFIGURED, PROXY_APM_STATUS_CONFIGURED])],
-				'max_messages_per_second' => 		['type' => API_MULTIPLE, 'rules' => [
-														['if' => static fn(array $data): bool => array_key_exists('data_collection_status', $data) && $data['data_collection_status'] == PROXY_APM_STATUS_CONFIGURED, 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => 0],
-														['else' => true, 'type' => API_UNEXPECTED]
-
-				]],
-				'additional_resource_attributes' =>	['type' => API_MULTIPLE, 'rules' => [
-														['if' => static fn(array $data): bool => array_key_exists('data_collection_status', $data) && $data['data_collection_status'] == PROXY_APM_STATUS_CONFIGURED, 'type' => API_OBJECTS, 'uniq' => [['signal_type', 'key']], 'fields' => [
-															'key' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
-															'value' => 			['type' => API_STRING_UTF8, 'length' => 255],
-															'signal_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [PROXY_APM_ATTR_SIGNAL_TYPE_TRACES, PROXY_APM_ATTR_SIGNAL_TYPE_METRICS, PROXY_APM_ATTR_SIGNAL_TYPE_LOGS])]
-														]],
-														['else' => true,  'type' => API_UNEXPECTED]
-				]]
-			]]
+			'apm' =>					['type' => API_OBJECT, 'fields' => self::getApmValidationRules()]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
@@ -1155,6 +1125,25 @@ class CProxy extends CApiService {
 
 		self::addAffectedHosts($proxies, $db_proxies);
 		self::checkHosts($proxies, $db_proxies);
+	}
+
+	private static function getApmValidationRules(): array {
+		return [
+			'data_collection_status' =>			['type' => API_INT32, 'in' => implode(',', [PROXY_APM_STATUS_NOT_CONFIGURED, PROXY_APM_STATUS_CONFIGURED])],
+			'max_messages_per_second' => 		['type' => API_MULTIPLE, 'rules' => [
+													['if' => static fn(array $data): bool => array_key_exists('data_collection_status', $data) && $data['data_collection_status'] == PROXY_APM_STATUS_CONFIGURED, 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => 0],
+													['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'additional_resource_attributes' =>	['type' => API_MULTIPLE, 'rules' => [
+													['if' => static fn(array $data): bool => array_key_exists('data_collection_status', $data) && $data['data_collection_status'] == PROXY_APM_STATUS_CONFIGURED, 'type' => API_OBJECTS, 'uniq' => [['signal_type', 'key']], 'fields' => [
+														'key' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+														'value' => 			['type' => API_STRING_UTF8, 'length' => 255],
+														'signal_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [PROXY_APM_ATTR_SIGNAL_TYPE_TRACES, PROXY_APM_ATTR_SIGNAL_TYPE_METRICS, PROXY_APM_ATTR_SIGNAL_TYPE_LOGS])]
+
+													]],
+													['else' => true, 'type' => API_UNEXPECTED]
+			]]
+		];
 	}
 
 	private static function addRequiredFieldsByProxyGroupid(array &$proxies, array $db_proxies): void {
