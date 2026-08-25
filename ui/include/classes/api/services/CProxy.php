@@ -344,6 +344,7 @@ class CProxy extends CApiService {
 				unset($proxy['apm']);
 			}
 		}
+		unset($proxy);
 
 		self::prepareApmForAuditLog($proxies);
 
