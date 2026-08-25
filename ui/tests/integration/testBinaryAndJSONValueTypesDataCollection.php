@@ -148,9 +148,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_binary_item, self::$invalid_json) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_json_item, self::$invalid_json) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_log_json, self::log_json_line.PHP_EOL) !== false);
-		$this->assertTrue(@chmod(self::$file_name_log_json, 0666) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_log_json_proxy, self::log_json_line.PHP_EOL) !== false);
-		$this->assertTrue(@chmod(self::$file_name_log_json_proxy, 0666) !== false);
 
 		self::$json_image_normalized = self::normalize_json(self::$json_with_image);
 
