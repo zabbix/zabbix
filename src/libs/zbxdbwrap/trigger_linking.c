@@ -1313,7 +1313,12 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 				trigger_copy_template->opdata, trigger_copy_template->discover,
 				trigger_copy_template->event_name);
 
-		zbx_db_insert_add_values(&db_insert_rt, triggerid, (int)TRIGGER_VALUE_OK, (int)TRIGGER_STATE_NORMAL);
+
+		if (0 == (trigger_copy_template->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		{
+			zbx_db_insert_add_values(&db_insert_rt, triggerid, (int)TRIGGER_VALUE_OK,
+					(int)TRIGGER_STATE_NORMAL);
+		}
 
 		zbx_vector_uint64_append(new_triggerids, triggerid);
 
