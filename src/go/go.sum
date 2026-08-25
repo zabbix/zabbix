@@ -109,6 +109,14 @@ golang.zabbix.com/sdk v1.2.2-0.20260806133716-0fc8d18cc91a h1:eCfyLeHvIiJ4fjY3IH
 golang.zabbix.com/sdk v1.2.2-0.20260806133716-0fc8d18cc91a/go.mod h1:AX+B8Va1TaLkJbRT+i4mftQrY/HPjqhErDL7poo95GU=
 golang.zabbix.com/sdk v1.2.2-0.20260810091936-d040412ff86a h1:gASgEPZjk4OwXuMcu7Kq63ZoOs7jQNn16GMxcGKfkYg=
 golang.zabbix.com/sdk v1.2.2-0.20260810091936-d040412ff86a/go.mod h1:AX+B8Va1TaLkJbRT+i4mftQrY/HPjqhErDL7poo95GU=
+golang.zabbix.com/sdk v1.2.2-0.20260825063403-97af713303ec h1:wfPlErJC8j6eY2WJXbWn+p+ymfhUq1qVUlBfRLNIOrk=
+golang.zabbix.com/sdk v1.2.2-0.20260825063403-97af713303ec/go.mod h1:AX+B8Va1TaLkJbRT+i4mftQrY/HPjqhErDL7poo95GU=
+golang.zabbix.com/sdk v1.2.2-0.20260825063733-3504f1a18983 h1:M5DRO18V1fwI6KpXB/yq5xwXJHMQqnLqe5PGLa33GKE=
+golang.zabbix.com/sdk v1.2.2-0.20260825063733-3504f1a18983/go.mod h1:AX+B8Va1TaLkJbRT+i4mftQrY/HPjqhErDL7poo95GU=
+golang.zabbix.com/sdk v1.2.2-0.20260825081001-fef1dcd08fd8 h1:dfdZyhfbb5HcPrE7e6u3hjytyepHWKYSQe6Mk3U+KBA=
+golang.zabbix.com/sdk v1.2.2-0.20260825081001-fef1dcd08fd8/go.mod h1:AX+B8Va1TaLkJbRT+i4mftQrY/HPjqhErDL7poo95GU=
+golang.zabbix.com/sdk v1.2.2-0.20260825081233-f033bc811844 h1:NJ+5GkAuUTgehB+clEuk6dT/uZK1buz1KAw93TxTJgE=
+golang.zabbix.com/sdk v1.2.2-0.20260825081233-f033bc811844/go.mod h1:AX+B8Va1TaLkJbRT+i4mftQrY/HPjqhErDL7poo95GU=
 google.golang.org/protobuf v1.36.6 h1:z1NpPI8ku2WgiWnf+t9wTPsn6eP1L7ksHUlkfLvd9xY=
 google.golang.org/protobuf v1.36.6/go.mod h1:jduwjTPXsFjZGTmRluh+L6NjiWu7pchiJ2/5YcXBHnY=
 gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d h1:TxyelI5cVkbREznMhfzycHdkp5cLA7DpE+GKjSslYhM=
