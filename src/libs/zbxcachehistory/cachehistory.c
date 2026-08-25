@@ -1306,11 +1306,19 @@ static void	item_meta_clean(void *data)
  * Purpose: resolve built-in macros in item tags                              *
  *                                                                            *
  * Parameters: p          - [IN] macro resolution data                        *
- *             args       - [IN] item tag resolution context                  *
- *             replace_to - [OUT] macro replacement                           *
- *             data       - [IN/OUT] input data string                        *
- *             error      - [OUT] error buffer                                *
- *             maxerrlen  - [IN] error buffer size                            *
+ *             args       - [IN] variable arguments containing item ID        *
+ *             replace_to - [OUT] resolved macro value                        *
+ *             data       - [IN/OUT] input data string, unused                *
+ *             error      - [OUT] error buffer, unused                        *
+ *             maxerrlen  - [IN] error buffer size, unused                    *
+ *                                                                            *
+ * Return value: SUCCEED - macro was resolved or is not handled by this       *
+ *                         resolver                                           *
+ *               FAIL    - supported macro could not be resolved              *
+ *                                                                            *
+ * Comments: Resolves supported HOST.* and INVENTORY.* macros using the item  *
+ *           ID passed in args. Macros not handled by this resolver are left  *
+ *           unchanged.                                                       *
  *                                                                            *
  ******************************************************************************/
 static int	item_builtin_macro_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
