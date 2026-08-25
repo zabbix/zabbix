@@ -128,6 +128,7 @@ $form = (new CForm())
 					(new CVar('operations[#{sortorder}][execute_when]', '#{execute_when}'))->removeId(),
 					(new CVar('operations[#{sortorder}][type]', '#{type}'))->removeId(),
 					(new CVar('operations[#{sortorder}][filter][evaltype]', '#{filter.evaltype}'))->removeId(),
+					(new CVar('operations[#{sortorder}][filter][formula]', '#{filter.formula}'))->removeId(),
 					(new CVar('operations[#{sortorder}][event_name]', '#{event_name}'))->removeId(),
 					(new CVar('operations[#{sortorder}][tag]', '#{tag}'))->removeId(),
 					(new CVar('operations[#{sortorder}][old_tag]', '#{old_tag}'))->removeId(),
@@ -223,6 +224,7 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().$this->readJsFile('ceprule.condition.edit.js.php')
+		.$this->readJsFile('ceprule.operation.condition.edit.js.php')
 		.$this->readJsFile('ceprule.operation.edit.js.php')
 		.$this->readJsFile('ceprule.edit.js.php')
 		.'ceprule_edit_popup.init('.json_encode([
@@ -230,6 +232,7 @@ $output = [
 			'rules_for_clone' => $data['js_validation_rules_for_clone'],
 			'condition_rules' => $data['condition_js_validation_rules'],
 			'operation_rules' => $data['operation_js_validation_rules'],
+			'operation_conditon_rules' => $data['operation_condition_js_validation_rules'],
 			'operation_types_by_execute_when' => CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN,
 			'execute_when_by_window_type' => CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE,
 			'ceprule' => $data['ceprule']

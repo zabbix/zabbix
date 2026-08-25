@@ -61,16 +61,20 @@ window.ceprule_edit_popup = new class {
 	#operation_rules;
 
 	/** @type {Object} */
+	#operation_conditon_rules;
+
+	/** @type {Object} */
 	#rules_for_clone;
 
-	init({rules, rules_for_clone, operation_rules, condition_rules, operation_types_by_execute_when,
-			execute_when_by_window_type, ceprule}) {
+	init({rules, rules_for_clone, operation_rules, condition_rules, operation_conditon_rules,
+			operation_types_by_execute_when, execute_when_by_window_type, ceprule}) {
 		this.#rules_for_clone = rules_for_clone;
 		this.#initTemplates();
 		this.#condition_rules = condition_rules;
 		this.#operation_types_by_execute_when = operation_types_by_execute_when;
 		this.#execute_when_by_window_type = execute_when_by_window_type;
 		this.#operation_rules = operation_rules;
+		this.#operation_conditon_rules = operation_conditon_rules;
 		this.#overlay = overlays_stack.getById('ceprule.edit');
 		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 
@@ -527,7 +531,6 @@ window.ceprule_edit_popup = new class {
 
 			operation = {
 				sortorder: 1 + Math.max(0, ...Object.values(operations).map(({sortorder}) => sortorder)),
-				evaltype: '<?= CONDITION_EVAL_TYPE_AND_OR ?>',
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
 				suppress_duration: '',
@@ -539,11 +542,13 @@ window.ceprule_edit_popup = new class {
 				tag_value: '',
 				filter: {
 					evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
+					formula: '',
 					conditions: [{
 						type: <?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>,
-						tag: '',
 						operator: <?= CONDITION_OPERATOR_YES ?>,
-						value: ''
+						tag: '',
+						tag_name: '',
+						tag_value: ''
 					}]
 				}
 			};
@@ -596,7 +601,8 @@ window.ceprule_edit_popup = new class {
 		ceprule_operation_edit_popup.init({rules: this.#operation_rules, operation, overlay,
 			window_type: this.form.findFieldByName('window_type').getValue(),
 			operation_types_by_execute_when: this.#operation_types_by_execute_when,
-			execute_when_by_window_type: this.#execute_when_by_window_type
+			execute_when_by_window_type: this.#execute_when_by_window_type,
+			operation_conditon_rules: this.#operation_conditon_rules
 		});
 	}
 
@@ -714,12 +720,16 @@ window.ceprule_edit_popup = new class {
 			.map((condition, condition_index) => (new Template(`
 				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][type]"
 					type="hidden" value="#{type}"/>
-				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][tag]"
-					type="hidden" value="#{tag}"/>
 				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][operator]"
 					type="hidden" value="#{operator}"/>
-				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][value]"
-					type="hidden" value="#{value}"/>
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][tag]"
+					type="hidden" value="#{tag}"/>
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][tag_name]"
+					type="hidden" value="#{tag_name}"/>
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][tag_value]"
+					type="hidden" value="#{tag_value}"/>
+				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][formulaid]"
+					type="hidden" value="#{formulaid}"/>
 			`)).evaluate(condition)).join('');
 
 		const template_args = {execute_when_str, label_str, arguments_str, conditions_input_html, ...operation};

@@ -53,91 +53,50 @@ foreach ($labels as $option => $label) {
 	->addVar('window_type', '0')
 	->addClass(ZBX_STYLE_DISPLAY_NONE)
 	->addItem((new CFormGrid())
-		->addItem((new CTemplateTag('ceprule-operation-condition-tag-template'))
-			->addItem((new CRow())
-				->setAttribute('data-row_index', '#{row_index}')
-				->addItem((new CCol(_('Tag')))
-					->addClass('js-filter-tag-label')
-					->addClass(ZBX_STYLE_RIGHT)
-					->addClass(ZBX_STYLE_VISIBILITY_HIDDEN)
-				)
-				->addItem((new CCol())
-					->addItem((new CTextAreaFlexible('filter[conditions][#{row_index}][tag]', '#{tag}'))
-						->setMaxlength(DB::getFieldLength('cep_operation_condition', 'tag'))
-						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-						->setAttribute('placeholder', _('tag'))
-						->setErrorContainer('operation-conditions-#{row_index}-error-container')
-					)
-				)
-				->addItem((new CCol())
-					->addItem((new CSelect('filter[conditions][#{row_index}][operator]'))
-						->setValue('#{operator}')
-						->addOptions(CSelect::createOptionsFromArray(
-							CCepRuleHelper::getTagOperators()
-						))
-					)
-					->addItem((new CCol())
-						->addItem((new CTextAreaFlexible('filter[conditions][#{row_index}][value]', '#{value}'))
-						->setMaxlength(DB::getFieldLength('cep_operation_condition', 'tag_value'))
-							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-							->setAttribute('placeholder', _('value'))
-							->setErrorContainer('operation-conditions-#{row_index}-error-container')
-						)
-					)
-					->addItem((new CCol())
-						->addItem((new CButtonLink(_('Remove')))->addClass('js-tag-remove'))
-						->addItem((new CVar('filter[conditions][#{row_index}][type]', '#{type}')))
-					)
-				)
-			)
-		)
-		->addItem((new CTemplateTag('ceprule-operation-condition-property-template'))
-			->addItem((new CRow())
-				->setAttribute('data-row_index', '#{row_index}')
-				->addItem((new CCol(_('Property')))
-					->addClass('js-filter-property-label')
-					->addClass(ZBX_STYLE_RIGHT)
-					->addClass(ZBX_STYLE_VISIBILITY_HIDDEN)
-				)
-				->addItem((new CCol())
-					->addItem((new CSelect('filter[conditions][#{row_index}][type]'))
-						->addClass('js-property-type-select')
-						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-						->setValue('#{type}')
-						->setErrorContainer('operation-conditions-#{row_index}-error-container')
-						->addOptions(CSelect::createOptionsFromArray([
-							ZBX_CONDITION_TYPE_EVENT_OPEN => _('Problem opened'),
-							ZBX_CONDITION_TYPE_EVENT_SYMPTOM => _('Symptom'),
-							ZBX_CONDITION_TYPE_EVENT_FIRST => _('First'),
-							ZBX_CONDITION_TYPE_EVENT_LAST => _('Last'),
-							ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => _('Supressed'),
-							ZBX_CONDITION_TYPE_EVENT_COPIED => _('Cloned')
-						]))
-					)
-				)
-				->addItem(new CCol(_('Equals')))
-				->addItem((new CCol())
-					->addItem((new CRadioButtonList('filter[conditions][#{row_index}][operator]', CONDITION_OPERATOR_YES))
-						->addValue(_('True'), CONDITION_OPERATOR_YES)
-						->addValue(_('False'), CONDITION_OPERATOR_NO)
-						->setModern()
-					)
-				)
-				->addItem((new CCol())
-					->addItem((new CButtonLink(_('Remove')))->addClass('js-property-remove'))
-				)
-			)
-		)
-		->addItem((new CTemplateTag('ceprule-operation-condition-error-row-template'))
-			->addItem((new CRow())
-				->addItem((new CCol()))
-				->addItem((new CCol())
-					->setColSpan(4)
+		->addItem((new CTemplateTag('ceprule-operation-condition-row-template'))->addItem([
+			(new CRow(['#{formulaid}', '#{*description_html}',
+				[
+					(new CButtonLink(_('Edit')))->addClass('js-condition-edit'),
+					(new CButtonLink(_('Remove')))->addClass('js-condition-remove'),
+					(new CInput('hidden', 'filter[conditions][#{row_index}][type]', '#{type}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorLabel(_('Type'))
+						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'filter[conditions][#{row_index}][operator]', '#{operator}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorLabel(_('Operator'))
+						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'filter[conditions][#{row_index}][tag]', '#{tag}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorLabel(_('Tag'))
+						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'filter[conditions][#{row_index}][tag_name]', '#{tag_name}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorLabel(_('Tag'))
+						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
+					(new CInput('hidden', 'filter[conditions][#{row_index}][tag_value]', '#{tag_value}'))
+						->removeId()
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorLabel(_('Tag value'))
+						->setErrorContainer('operation-conditions-#{row_index}-error-container'),
+					(new CVar('filter[conditions][#{row_index}][formulaid]', '#{formulaid}'))->removeId(),
+					(new CVar('filter[conditions][#{row_index}][row_index]', '#{row_index}'))->removeId()
+				]
+			]))->setAttribute('data-row_index', '#{row_index}'),
+			(new CRow(
+				(new CCol())
+					->setColSpan(3)
 					->addClass(ZBX_STYLE_ERROR_CONTAINER)
 					->setId('operation-conditions-#{row_index}-error-container')
-				)
-			)
-		)
+			))
+		]))
+		->addItem((new CTemplateTag('ceprule-operation-condition-modal-template'))->addItem(
+			new CPartial('ceprule.modal.operation.condition')
+		))
 		->addItem(new CLabel(_('Execute when'), 'ceprule-operation-execute-when-label'))
 		->addItem(new CFormField(
 			(new CSelect('execute_when'))
@@ -148,24 +107,51 @@ foreach ($labels as $option => $label) {
 					CCepRuleHelper::getOperationExecuteWhenStrings()
 				))
 		))
-		->addItem(new CLabel(_('Event tag/property filter')))
-		->addItem(new CFormField((new CRadioButtonList('filter[evaltype]', TAG_EVAL_TYPE_AND_OR))
-			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-			->addValue(_('Or'), TAG_EVAL_TYPE_OR)
-			->setModern(true)
-		))
-		->addItem(new CFormField(
-			(new CTable())
-				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
-				->setId('ceprule-operation-filter-table')
-				->setHeader(['', _('Name'), _('Type'), _('Value'), ''])
+		->addItem(new CLabel(_('Type of calculation'), 'ceprule-operation-filter-evaltype-select'))
+		->addItem(new CFormField([
+			(new CDiv(
+				(new CSelect('filter[evaltype]'))
+					->setId('ceprule-operation-filter-evaltype')
+					->setFocusableElementId('ceprule-operation-filter-evaltype-select')
+					->addOptions(CSelect::createOptionsFromArray([
+						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+						CONDITION_EVAL_TYPE_AND => _('And'),
+						CONDITION_EVAL_TYPE_OR => _('Or'),
+						CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+					]))
+					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+			))->addClass(ZBX_STYLE_CELL),
+			(new CDiv([
+				(new CSpan())->setId('ceprule-operation-filter-expression-preview'),
+				(new CTextAreaFlexible('filter[formula]'))
+					->setMaxlength(DB::getFieldLength('cep_rule', 'formula'))
+					->setId('ceprule-operation-filter-expression')
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->setAttribute('placeholder', 'A or (B and C) ...')
+			]))->addClass(ZBX_STYLE_CELL)
+		]))
+		->addItem(new CLabel(_('Conditions'), 'ceprule-operation-filter-conditions'))
+		->addItem((new CFormField())
+			->addItem((new CDiv())
 				->setAttribute('data-field-type', 'set')
 				->setAttribute('data-field-name', 'filter[conditions]')
-				->addItem((new CTag('tfoot', true))->addItem((new CCol([
-					(new CButtonLink(_('Add tag')))->addClass('js-add-tag'),
-					(new CButtonLink(_('Add property')))->addClass('js-add-property')
-				]))->setColSpan(4)))
-		))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addItem((new CTable())
+					->setColumns([
+						new CTableColumn(_('Label')),
+						(new CTableColumn(_('Name')))
+							->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
+						new CTableColumn(_('Actions'))
+					])
+					->setId('ceprule-operation-filter-conditions')
+					->addItem((new CTag('tfoot', true))
+						->addItem((new CCol(
+							(new CButtonLink(_('Add')))->addClass('js-condition-add')
+						))->setColSpan(4))
+					)
+				)
+			)
+		)
 		->addItem(new CLabel(_('Operation'), 'ceprule-operation-type-label'))
 		->addItem((new CFormField())
 			->addItem((new CSelect('type'))

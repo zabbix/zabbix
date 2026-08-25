@@ -59,6 +59,14 @@ abstract class CControllerCepRuleGeneral extends CController {
 					$operation['filter']['conditions'] = [];
 				}
 
+				foreach ($operation['filter']['conditions'] as &$condition) {
+					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE) {
+						$condition['tag'] = $condition['tag_name'];
+						unset($condition['tag_name']);
+					}
+				}
+				unset($condition);
+
 				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS
 						&& array_key_exists('suppress_duration', $operation)
 						&& $operation['suppress_duration'] === '') {
@@ -134,18 +142,49 @@ abstract class CControllerCepRuleGeneral extends CController {
 	}
 
 	public static function getOperationFilterValidationFields(): array {
+
+		$allowed_types_occurred = [ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_SYMPTOM, ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED];
+		$allowed_types_other = [ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM, ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED];
+		$text_allowed_types_occurred = [];
+		$text_allowed_types_other = [];
+
+		foreach (CCepRuleHelper::getOperationConditionLabels() as $key => $label) {
+			if (in_array($key, $allowed_types_occurred)) {
+				$text_allowed_types_occurred[] = $label;
+			}
+			if (in_array($key, $allowed_types_other)) {
+				$text_allowed_types_other[] = $label;
+			}
+		}
+
+		$text_allowed_types_occurred = implode(', ', $text_allowed_types_occurred);
+		$text_allowed_types_other = implode(', ', $text_allowed_types_other);
+
 		return [
 			'evaltype' => ['db cep_operation.evaltype', 'required', 'in' => [
-				CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR
+				CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
+				CONDITION_EVAL_TYPE_EXPRESSION
 			]],
+			'formula' => ['db cep_operation.formula', 'required', 'not_empty',
+				'use' => [CConditionFormulaParser::class, []],
+				'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
+			],
 			'conditions' => ['objects', 'fields' => [
-				'type' => ['integer', 'required', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG,
-					ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_EVENT_OPEN,
-					ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
-					ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
-				]],
-				'tag' => ['db cep_operation_condition.tag', 'required', 'not_empty',
-					'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]]
+				'type' => [
+					[
+						'integer', 'required', 'in' => $allowed_types_occurred,
+						'when' => ['../../execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
+						'messages' => ['in' => _s('Allowed values are %1$s', $text_allowed_types_occurred)]
+					],
+					[
+						'integer', 'required', 'in' => $allowed_types_other,
+						'when' => ['../../execute_when', 'not_in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
+						'messages' => ['in' => _s('Allowed values are %1$s', $text_allowed_types_other)]
+					]
 				],
 				'operator' => [
 					['db cep_operation_condition.operator', 'required',
@@ -156,20 +195,25 @@ abstract class CControllerCepRuleGeneral extends CController {
 						]]
 					],
 					['db cep_operation_condition.operator', 'required',
-						'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_LIKE,
-							CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_NOT_LIKE,
-							CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
+						'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+							CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
 						],
 						'when' => ['type',
 							'in' => [ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]
 						]
 					]
 				],
-				'value' => ['db cep_operation_condition.tag_value', 'required',
-					'when' => [
-						['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]],
-						['operator', 'not_in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]]
-					]
+				'tag' => ['db cep_operation_condition.tag', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG]]
+				],
+				'tag_name' => ['db cep_operation_condition.tag', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]]
+				],
+				'tag_value' => ['db cep_operation_condition.tag_value', 'required',
+					'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]]
+				],
+				'formulaid' => ['string', 'required', 'not_empty',
+					'when' => ['../evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 				]
 			]]
 		];

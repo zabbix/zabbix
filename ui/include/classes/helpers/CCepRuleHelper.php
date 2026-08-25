@@ -298,16 +298,16 @@ class CCepRuleHelper {
 		return $labels[$type];
 	}
 
-	public static function getTagOperators(): array {
+	public static function getOperationConditionLabels(): array {
 		return [
-			CONDITION_OPERATOR_EXISTS => _('Exists'), // TODO VM: remove after operations are updated
-			CONDITION_OPERATOR_EQUAL => _('Equals'),
-			CONDITION_OPERATOR_LIKE => _('Contains'),
-			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist'), // TODO VM: remove after operations are updated
-			CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
-			CONDITION_OPERATOR_NOT_LIKE => _('Does not contain'),
-			CONDITION_OPERATOR_MORE_EQUAL => _('Is more than or equal'),
-			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal')
+			ZBX_CONDITION_TYPE_EVENT_TAG => _('Tag name'),
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE => _('Tag value'),
+			ZBX_CONDITION_TYPE_EVENT_OPEN => _('Problem is opened'),
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM => _('Problem is symptom'),
+			ZBX_CONDITION_TYPE_EVENT_FIRST => _('First event in time window'),
+			ZBX_CONDITION_TYPE_EVENT_LAST => _('Last event in time window'),
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => _('Problem is suppressed'),
+			ZBX_CONDITION_TYPE_EVENT_COPIED => _('Event is cloned')
 		];
 	}
 
@@ -320,7 +320,9 @@ class CCepRuleHelper {
 			CONDITION_OPERATOR_LIKE => _('Contains'),
 			CONDITION_OPERATOR_NOT_LIKE => _('Does not contain'),
 			CONDITION_OPERATOR_MORE_EQUAL => _('Is more than or equal'),
-			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal')
+			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal'),
+			CONDITION_OPERATOR_YES => _('Yes'),
+			CONDITION_OPERATOR_NO => _('No')
 		];
 	}
 

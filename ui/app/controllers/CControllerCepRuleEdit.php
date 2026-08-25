@@ -79,6 +79,7 @@ class CControllerCepRuleEdit extends CController {
 			'js_validation_rules_for_clone' => $rules_for_clone,
 			'condition_js_validation_rules' => self::getConditionPopupValidationRules(),
 			'operation_js_validation_rules' => self::getOperationPopupValidationRules(),
+			'operation_condition_js_validation_rules' => self::getOperationConditionValidationRules(),
 			'ceprule' => $ceprule,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
@@ -152,6 +153,14 @@ class CControllerCepRuleEdit extends CController {
 
 		if (array_key_exists('operations', $ceprule)) {
 			array_walk($ceprule['operations'], function(array &$operation) {
+
+				foreach ($operation['filter']['conditions'] as &$condition) {
+					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE) {
+						$condition['tag_name'] = $condition['tag'];
+						unset($condition['tag']);
+					}
+				}
+				unset($condition);
 
 				switch ($operation['type']) {
 					case CCepRuleHelper::OP_SUPPRESS:
@@ -299,6 +308,47 @@ class CControllerCepRuleEdit extends CController {
 			'time_period' => ['db cep_condition.time_period', 'required', 'not_empty',
 				'use' => [CTimePeriodParser::class, ['usermacros' => false, 'lldmacros' => false]],
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
+			]
+		]]))->getRules();
+	}
+
+	public static function getOperationConditionValidationRules(): array {
+		return (new CFormValidator(['objects', 'fields' => [
+			'type' => [
+				[
+					'integer', 'required', 'in' => [
+						ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+						ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_FIRST,
+						ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+						ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+					]
+				],
+			],
+			'operator' => [
+				['db cep_operation_condition.operator', 'required',
+					'in' => [CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO],
+					'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_FIRST,
+						ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+						ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+					]]
+				],
+				['db cep_operation_condition.operator', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+						CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
+					],
+					'when' => ['type',
+						'in' => [ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]
+					]
+				]
+			],
+			'tag' => ['db cep_operation_condition.tag', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG]]
+			],
+			'tag_name' => ['db cep_operation_condition.tag', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]]
+			],
+			'tag_value' => ['db cep_operation_condition.tag_value', 'required',
+				'when' => ['type', 'in' => [ZBX_CONDITION_TYPE_EVENT_TAG_VALUE]]
 			]
 		]]))->getRules();
 	}

@@ -36,33 +36,42 @@ window.ceprule_operation_edit_popup = new class {
 	/** @type {Overlay} */
 	#overlay;
 
-	/** @type {Template} */
-	#tag_template;
+	/** @type {Object} */
+	#operation_conditon_rules;
+
+	/** @type {Number} */
+	#condition_row_index;
 
 	/** @type {Template} */
-	#property_template;
+	#condition_row_template;
 
 	/** @type {Template} */
-	#error_row_template;
+	#condition_row_template_property;
 
-	init({rules, operation, overlay, window_type, operation_types_by_execute_when, execute_when_by_window_type}) {
+	/** @type {Template} */
+	#condition_row_template_tag;
+
+	/** @type {Template} */
+	#condition_row_template_tag_value;
+
+	init({rules, operation, overlay, window_type, operation_types_by_execute_when, execute_when_by_window_type,
+			operation_conditon_rules}) {
 		this.#operation_types_by_execute_when = operation_types_by_execute_when;
 		this.#execute_when_for_window_type = execute_when_by_window_type[window_type];
+		this.#operation_conditon_rules = operation_conditon_rules;
+		this.#condition_row_index = 0;
 
 		this.#overlay = overlay;
-		this.#tag_template = new Template(window['ceprule-operation-condition-tag-template'].innerHTML);
-		this.#property_template = new Template(window['ceprule-operation-condition-property-template'].innerHTML);
-		this.#error_row_template = new Template(window['ceprule-operation-condition-error-row-template'].innerHTML);
+		this.#initTemplates();
 
 		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 		this.#setValues({...operation, window_type: String(window_type)});
 
+		this.form = new CForm(this.form_element, rules);
+
 		this.#initActions();
 
-		this.form = new CForm(this.form_element, rules);
-		this.#updateAvailablePropertyTypes();
-		this.#updateHoistedLabelsView();
-
+		this.#refreshExpressionPreview();
 		this.#setAvailableOperationOptions();
 		window['ceprule-operation-execute-when'].dispatchEvent(new Event('change'));
 		window['ceprule-operation-type'].dispatchEvent(new Event('change'));
@@ -73,184 +82,169 @@ window.ceprule_operation_edit_popup = new class {
 		});
 	}
 
+	#initTemplates() {
+		this.#condition_row_template_property = new Template(
+			`<div class="text">#{text}</div>`
+		);
+		this.#condition_row_template_tag = new Template(
+			`<div class="text">#{name} #{operator} <em>#{tag}</em></div>`
+		);
+		this.#condition_row_template_tag_value = new Template(
+			`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em></div>`
+		);
+
+		this.#condition_row_template = new Template(window['ceprule-operation-condition-row-template'].innerHTML);
+	}
+
 	#initActions() {
 		this.form_element.addEventListener('change', (e) => {
 			e.target.id === 'ceprule-operation-execute-when' && this.#handleExecuteWhenChanged();
 			e.target.id === 'ceprule-operation-type' && this.#handleOperationTypeChanged(e.target.value);
 		}, {capture: true});
 
+		this.form.findFieldByName('filter[evaltype]').getField()
+			.addEventListener('change', () => this.#refreshExpressionPreview());
+
 		this.form_element.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-add-tag')) {
-				this.#addTagRow({
-					type: <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>,
-					tag: '',
-					operator: <?= TAG_OPERATOR_EQUAL ?>,
-					value: ''
-				});
-				this.#updateHoistedLabelsView();
+			if (e.target.classList.contains('js-condition-add')) {
+				this.#openConditionPopup(undefined, e.target);
 			}
-			else if (e.target.classList.contains('js-add-property')) {
-				const type = this.#nextAvailablePropertyType();
+			else if (e.target.classList.contains('js-condition-edit')) {
+				const row_index = e.target.closest('tr').dataset.row_index;
 
-				if (type !== undefined) {
-					this.#addPropertyRow({type, operator: <?= CONDITION_OPERATOR_YES ?>});
-					this.#updateAvailablePropertyTypes();
-					this.#updateHoistedLabelsView();
-				}
-				else {
-					throw 'No available property types';
-				}
+				this.#openConditionPopup(row_index, e.target);
 			}
-			else if (e.target.classList.contains('js-tag-remove')) {
-				const row = e.target.closest('tr');
-
-				row.nextElementSibling.remove();
-				row.remove();
-
+			else if (e.target.classList.contains('js-condition-remove')) {
+				e.target.closest('tr').remove();
 				this.form.discoverAllFields();
-				this.#updateAvailablePropertyTypes();
-				this.#updateHoistedLabelsView();
-			}
-			else if (e.target.classList.contains('js-property-remove')) {
-				const row = e.target.closest('tr');
+				this.#refreshExpressionPreview();
 
-				row.nextElementSibling.remove();
-				row.remove();
-
-				this.form.discoverAllFields();
-				this.#updateAvailablePropertyTypes();
-				this.#updateHoistedLabelsView();
+				if (!this.form_element.querySelector('#ceprule-operation-filter-conditions [data-row_index]')) {
+					this.#condition_row_index = 0;
+				}
 			}
 		});
 	}
 
-	#nextAvailablePropertyType() {
-		const [available] = this.#getPropertyTypes();
+	#listConditionIdentifiers() {
+		const conditions = Object.values(this.form.findFieldByName('filter[conditions]').getValue() ?? {});
 
-		return available[0];
+		return conditions.map(condition => ({
+			id: condition.formulaid,
+			type: condition.type
+		}));
 	}
 
-	#addPropertyRow(property) {
-		const row_index = this.form_element.querySelectorAll('#ceprule-operation-filter-table tbody tr').length;
-		const last_tag = window['ceprule-operation-filter-table'].querySelector('.js-filter-tag-label:last-child');
-		const row_errors = this.#error_row_template.evaluateToElement({row_index});
-		const target = this.form_element.querySelector('#ceprule-operation-filter-table tbody');
-		const row = this.#buildPropertyRow(property, row_index);
+	#refreshExpressionPreview() {
+		const identifiers = this.#listConditionIdentifiers();
+		const evaltype = Number(this.form.findFieldByName('filter[evaltype]').getValue());
 
-		target.insertAdjacentElement('beforeend', row);
-		target.insertAdjacentElement('beforeend', row_errors);
-	}
-
-	#addTagRow(tag) {
-		const row_index = this.form_element.querySelectorAll('#ceprule-operation-filter-table tbody tr').length;
-		const first_property = window['ceprule-operation-filter-table']
-			.querySelector('.js-filter-property-label:first-child');
-
-		const row = this.#buildTagRow(tag, row_index);
-		const row_errors = this.#error_row_template.evaluateToElement({row_index});
-
-		if (first_property) {
-			const target = first_property.closest('tr');
-
-			target.insertAdjacentElement('beforebegin', row);
-			target.insertAdjacentElement('beforebegin', row_errors);
+		if (evaltype == <?= CONDITION_EVAL_TYPE_AND_OR ?>
+				|| evaltype == <?= CONDITION_EVAL_TYPE_AND ?>
+				|| evaltype == <?= CONDITION_EVAL_TYPE_OR ?>) {
+			window['ceprule-operation-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
+			window['ceprule-operation-filter-expression-preview'].style.display = ''
+			window['ceprule-operation-filter-expression'].disabled = true;
+			window['ceprule-operation-filter-expression'].style.display = 'none';
 		}
 		else {
-			const target = this.form_element.querySelector('#ceprule-operation-filter-table tbody');
+			window['ceprule-operation-filter-expression'].disabled = identifiers.length < 2;
+			window['ceprule-operation-filter-expression'].style.display = '';
+			window['ceprule-operation-filter-expression-preview'].style.display = 'none'
 
-			target.insertAdjacentElement('beforeend', row);
-			target.insertAdjacentElement('beforeend', row_errors);
+			if (identifiers.length < 2) {
+				window['ceprule-operation-filter-evaltype'].value = <?= CONDITION_EVAL_TYPE_AND_OR ?>;
+			}
 		}
+
+		const evaltype_field = window['ceprule-operation-filter-evaltype'].closest('.form-field');
+
+		evaltype_field.style.display = identifiers.length < 2 ? 'none' : '';
+		evaltype_field.previousElementSibling.style.display = identifiers.length < 2 ? 'none' : '';
 	}
 
-	#buildTagRow(tag, row_index) {
-		const tag_row = this.#tag_template.evaluateToElement({...tag, row_index});
-		const textbox = tag_row.querySelector(`[name="filter[conditions][${row_index}][value]"]`);
-		const type = tag_row.querySelector(`[name="filter[conditions][${row_index}][type]"]`);
-		const on_operator_change = value => {
-			const operator_has_value = !([<?= CONDITION_OPERATOR_EXISTS ?>, <?= CONDITION_OPERATOR_NOT_EXISTS ?>]
-				.includes(value));
+	#editConditionRow(condition, index) {
+		this.form_element.querySelector(`#ceprule-operation-filter-conditions [data-row_index="${index}"]`)
+			.replaceWith(this.#buildConditionRow(condition, index));
+	}
 
-			textbox.style.display = operator_has_value ? '' : 'none';
-			textbox.style.disabled = !operator_has_value;
-			type.value = operator_has_value
-				? <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>
-				: <?= ZBX_CONDITION_TYPE_EVENT_TAG ?>;
+	#addConditionRow(condition) {
+		this.form_element.querySelector('#ceprule-operation-filter-conditions tbody')
+			.insertAdjacentElement('beforeend', this.#buildConditionRow(condition, this.#condition_row_index++));
+	}
+
+	#buildConditionRow(condition, row_index) {
+		const label_names = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getOperationConditionLabels()
+		) ?>');
+
+		const operator_names = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getConditionOperatorLabels()
+		) ?>');
+
+		const descriptions = {
+			<?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>: {
+				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('Problem is opened')) ?>,
+				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Problem is not opened')) ?>
+			},
+			<?= ZBX_CONDITION_TYPE_EVENT_SYMPTOM ?>: {
+				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('Problem is symptom')) ?>,
+				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Problem is not symptom')) ?>
+			},
+			<?= ZBX_CONDITION_TYPE_EVENT_FIRST ?>: {
+				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('First event in time window')) ?>,
+				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Not first event in time window')) ?>
+			},
+			<?= ZBX_CONDITION_TYPE_EVENT_LAST ?>: {
+				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('Last event in time window')) ?>,
+				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Not last event in time window')) ?>
+			},
+			<?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>: {
+				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('Problem is suppressed')) ?>,
+				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Problem is not suppressed')) ?>
+			},
+			<?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>: {
+				<?= CONDITION_OPERATOR_YES ?>: <?= json_encode(_('Event is cloned')) ?>,
+				<?= CONDITION_OPERATOR_NO ?>: <?= json_encode(_('Event is not cloned')) ?>
+			}
 		};
 
-		tag_row.querySelector('z-select').addEventListener('change', e => on_operator_change(Number(e.target.value)));
-		on_operator_change(Number(tag.operator));
+		let description_template = null;
+		const description_view = {};
 
-		return tag_row;
-	}
+		switch (Number(condition.type)) {
+			case <?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>:
+			case <?= ZBX_CONDITION_TYPE_EVENT_SYMPTOM ?>:
+			case <?= ZBX_CONDITION_TYPE_EVENT_FIRST ?>:
+			case <?= ZBX_CONDITION_TYPE_EVENT_LAST ?>:
+			case <?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>:
+			case <?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>:
+				description_template = this.#condition_row_template_property;
+				description_view.text = descriptions[condition.type][condition.operator];
+				break;
 
-	#buildPropertyRow(property, row_index) {
-		const property_row = this.#property_template.evaluateToElement({...property, row_index});
+			case <?= ZBX_CONDITION_TYPE_EVENT_TAG ?>:
+				description_template = this.#condition_row_template_tag;
+				description_view.name = label_names[condition.type];
+				description_view.operator = operator_names[condition.operator].toLocaleLowerCase();
+				description_view.tag = condition.tag;
+				break;
 
-		property_row.querySelector('z-select').addEventListener('change', () => this.#updateAvailablePropertyTypes());
+			case <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>:
+				description_template = this.#condition_row_template_tag_value;
+				description_view.name = label_names[condition.type];
+				description_view.operator = operator_names[condition.operator].toLocaleLowerCase();
+				description_view.tag_name = condition.tag_name;
+				description_view.tag_value = condition.tag_value;
+				break;
+		}
 
-		return property_row;
-	}
-
-	#getPropertyTypesForm() {
-		this.form.discoverAllFields();
-
-		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
-		const conditions = this.form.findFieldByName('filter[conditions]').getValue();
-		const used_property_types = Object.values(conditions).map(condition => Number(condition.type));
-
-		return {execute_when, used_property_types};
-	}
-
-	#getPropertyTypes() {
-		const {execute_when, used_property_types} = this.#getPropertyTypesForm();
-		const all_property_types = execute_when == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>
-			? [
-				<?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>,
-				<?= ZBX_CONDITION_TYPE_EVENT_SYMPTOM ?>,
-				<?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>,
-				<?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>
-			]
-			: [
-				<?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>,
-				<?= ZBX_CONDITION_TYPE_EVENT_SYMPTOM ?>,
-				<?= ZBX_CONDITION_TYPE_EVENT_FIRST ?>,
-				<?= ZBX_CONDITION_TYPE_EVENT_LAST ?>,
-				<?= ZBX_CONDITION_TYPE_EVENT_SUPPRESSED ?>,
-				<?= ZBX_CONDITION_TYPE_EVENT_COPIED ?>
-			];
-
-		const unused_property_types = all_property_types.filter(type => !used_property_types.includes(type));
-
-		return [unused_property_types, used_property_types, all_property_types];
-	}
-
-	#updateAvailablePropertyTypes() {
-		const [available, unavailable, all] = this.#getPropertyTypes();
-
-		this.form_element.querySelectorAll('.js-property-type-select')
-			.forEach(zselect => {
-				const options = zselect.options.map(option => (
-					{...option,
-						is_disabled: (unavailable.includes(Number(option.value))
-							|| !all.includes(Number(option.value)))
-							&& zselect.value !== option.value
-					}
-			));
-			zselect.clearOptions();
-			zselect.addOptions(options);
-			zselect.init();
+		return this.#condition_row_template.evaluateToElement({
+			...condition,
+			row_index: row_index,
+			formulaid: num2letter(row_index),
+			description_html: description_template.evaluate(description_view)
 		});
-
-		window['ceprule-operation-filter-table'].querySelector('.js-add-property').disabled = available.length == 0;
-	}
-
-	#updateHoistedLabelsView() {
-		window['ceprule-operation-filter-table'].querySelectorAll('.js-filter-tag-label')
-			.forEach((label, index) => label.classList.toggle('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', index != 0));
-
-		window['ceprule-operation-filter-table'].querySelectorAll('.js-filter-property-label')
-			.forEach((label, index) => label.classList.toggle('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', index != 0));
 	}
 
 	#setAvailableOperationOptions() {
@@ -306,17 +300,13 @@ window.ceprule_operation_edit_popup = new class {
 
 	#setValues(operation) {
 		for (const condition of Object.values(operation.filter.conditions || {})) {
-			if (condition.type == <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>
-					|| condition.type == <?= ZBX_CONDITION_TYPE_EVENT_TAG ?>) {
-				this.#addTagRow(condition);
-			}
-			else {
-				this.#addPropertyRow(condition);
-			}
+			this.#addConditionRow(condition);
 		}
 
 		this.form_element.querySelector(`[name="type"]`).value = operation.type;
 		this.form_element.querySelector(`[name="execute_when"]`).value = operation.execute_when;
+		this.form_element.querySelector(`[name="filter[evaltype]"]`).value = operation.filter.evaltype;
+		this.form_element.querySelector(`[name="filter[formula]"]`).value = operation.filter.formula;
 		this.form_element.querySelector(`[name="window_type"]`).value = operation.window_type;
 		this.form_element.querySelector(`[name="sortorder"]`).value = operation.sortorder;
 		this.form_element.querySelector(`[name="tag"]`).value = operation.tag;
@@ -424,6 +414,64 @@ window.ceprule_operation_edit_popup = new class {
 
 	#handleExecuteWhenChanged() {
 		this.#setAvailableOperationOptions();
-		this.#updateAvailablePropertyTypes();
+	}
+
+	#openConditionPopup(index, trigger_element) {
+		const is_new = index === undefined;
+		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
+		const conditions = this.form.findFieldByName('filter[conditions]').getValue();
+		const condition = is_new ? null : conditions[index];
+		const used_property_types = Object.values(conditions)
+			.filter(({type}) => {
+				const allowed_types = [<?= ZBX_CONDITION_TYPE_EVENT_TAG ?>, <?= ZBX_CONDITION_TYPE_EVENT_TAG_VALUE ?>];
+				if (!is_new) {
+					allowed_types.push(Number(condition.type));
+				}
+
+				return !allowed_types.includes(Number(type));
+			})
+			.map(condition => Number(condition.type));
+
+		const template = document.getElementById('ceprule-operation-condition-modal-template');
+		const form_element = template.content.querySelector('form').cloneNode(true);
+
+		const overlay = overlayDialogue({
+			class: 'modal-popup modal-popup-medium',
+			title: t('Condition details'),
+			content: form_element,
+			buttons: [
+				{
+					title: is_new ? t('Add') : t('Update'),
+					isSubmit: true,
+					action: overlay => ceprule_operation_condition_edit_popup.submit()
+							.then(fields => {
+								if (is_new) {
+									this.#addConditionRow(fields);
+								}
+								else {
+									this.#editConditionRow(fields, index);
+								}
+								this.form.discoverAllFields();
+								this.#refreshExpressionPreview();
+							})
+							.then(() => overlayDialogueDestroy(overlay.dialogueid))
+							.catch(() => overlay.unsetLoading())
+						&& false
+				},
+				{
+					title: t('Cancel'),
+					class: 'btn-alt',
+					cancel: true,
+					action: () => {}
+				}
+			]
+		}, {
+			dialogueid: 'ceprule.operation.condition.edit',
+			trigger_element
+		});
+
+		const rules = this.#operation_conditon_rules;
+
+		ceprule_operation_condition_edit_popup.init({rules, condition, overlay, execute_when, used_property_types});
 	}
 };
