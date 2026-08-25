@@ -46,6 +46,9 @@ window.ceprule_operation_edit_popup = new class {
 	#condition_row_template;
 
 	/** @type {Template} */
+	#condition_error_container_row_template;
+
+	/** @type {Template} */
 	#condition_row_template_property;
 
 	/** @type {Template} */
@@ -94,6 +97,9 @@ window.ceprule_operation_edit_popup = new class {
 		);
 
 		this.#condition_row_template = new Template(window['ceprule-operation-condition-row-template'].innerHTML);
+		this.#condition_error_container_row_template = new Template(
+			window['ceprule-operation-condition-row-error-container-template'].innerHTML
+		);
 	}
 
 	#initActions() {
@@ -115,6 +121,7 @@ window.ceprule_operation_edit_popup = new class {
 				this.#openConditionPopup(row_index, e.target);
 			}
 			else if (e.target.classList.contains('js-condition-remove')) {
+				e.target.closest('tr').nextSibling.remove();
 				e.target.closest('tr').remove();
 				this.form.discoverAllFields();
 				this.#refreshExpressionPreview();
@@ -169,8 +176,13 @@ window.ceprule_operation_edit_popup = new class {
 	}
 
 	#addConditionRow(condition) {
-		this.form_element.querySelector('#ceprule-operation-filter-conditions tbody')
-			.insertAdjacentElement('beforeend', this.#buildConditionRow(condition, this.#condition_row_index++));
+		const row_index = this.#condition_row_index++;
+		const table = this.form_element.querySelector('#ceprule-operation-filter-conditions tbody');
+
+		table.insertAdjacentElement('beforeend', this.#buildConditionRow(condition, row_index))
+		table.insertAdjacentElement('beforeend',
+			this.#condition_error_container_row_template.evaluateToElement({row_index})
+		);
 	}
 
 	#buildConditionRow(condition, row_index) {

@@ -87,6 +87,8 @@ foreach ($labels as $option => $label) {
 					(new CVar('filter[conditions][#{row_index}][row_index]', '#{row_index}'))->removeId()
 				]
 			]))->setAttribute('data-row_index', '#{row_index}'),
+		]))
+		->addItem((new CTemplateTag('ceprule-operation-condition-row-error-container-template'))->addItem([
 			(new CRow(
 				(new CCol())
 					->setColSpan(3)
