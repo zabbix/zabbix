@@ -407,9 +407,10 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if (array_key_exists('query', $item)) {
-					if (!$item_type::validateColumnsAggregatedColumnsUnique($item, $path, $error)
+					if (!$item_type::validateColumns($item, $path, $error)
 							|| !$item_type::validateAggregatedColumns($item, $path, $error)
-							|| !$item_type::validateFilter($item, $path, $error)) {
+							|| !$item_type::validateFilter($item, $path, $error)
+							|| !$item_type::validateColumnsAggregatedColumnsUnique($item, $path, $error)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 					}
 
