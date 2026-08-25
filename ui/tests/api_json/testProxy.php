@@ -242,6 +242,31 @@ class testProxy extends CAPITest {
 				'tls_accept' => HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE,
 				'tls_psk_identity' => 'Test PSK',
 				'tls_psk' => '9b8eafedfaae00cece62e85d5f4792c7d9c9bcc851b23216a1d300311cc4f7cb'
+			],
+			'with_apm' => [
+				'name' => 'API test proxy - with apm',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+				'apm' => [
+					'data_collection_status' => 1,
+					'max_messages_per_second' => 100,
+					'additional_resource_attributes' => [
+						[
+							'key' => 'key_1',
+							'value' => 'value_1',
+							'signal_type' => 1,
+						],
+						[
+							'key' => 'key_2',
+							'value' => 'value_2',
+							'signal_type' => 2
+						]
+
+					]
+				]
+			],
+			'without_apm' => [
+				'name' => 'API test proxy - with empty apm',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 			]
 		];
 		$db_proxies = CDataHelper::call('proxy.create', array_values($proxies));
@@ -612,6 +637,13 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "lastaccess", "version", "compatibility", "state".'
 			],
+			'Test proxy.get: unexpected apm parameter in "output"' => [
+				'request' => [
+					'output' => ['apm']
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "lastaccess", "version", "compatibility", "state".'
+			],
 
 			// Check write-only fields are not returned.
 			'Test proxy.get: write-only field "tls_psk_identity"' => [
@@ -659,6 +691,22 @@ class testProxy extends CAPITest {
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/selectHosts/1": value must be one of "hostid", "host", "monitored_by", "status", "ipmi_authtype", "ipmi_privilege", "ipmi_username", "ipmi_password", "maintenanceid", "maintenance_status", "maintenance_type", "maintenance_from", "name", "flags", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "inventory_mode", "active_available".'
+			],
+
+			// Check "selectApm" option.
+			'Test proxy.get: invalid parameter "selectApm" (string)' => [
+				'request' => [
+					'selectApm' => 'abc'
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/selectApm": value must be "extend".'
+			],
+			'Test proxy.get: unexpected parameter in "selectApm"' => [
+				'request' => [
+					'selectApm' => ['abc']
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/selectApm/1": value must be one of "additional_resource_attributes", "data_collection_status", "max_messages_per_second".'
 			],
 
 			// Check common fields that are not flags, but require strict validation.
@@ -3487,6 +3535,98 @@ class testProxy extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/hosts/2": value (hostid)=(0) already exists.'
+			],
+
+			// Check "apm".
+			'Test proxy.create: invalid "apm" with duplicate unique key' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'apm' => [
+						'data_collection_status' => 1,
+						'max_messages_per_second' => 100,
+						'additional_resource_attributes' => [
+							[
+								'key' => 'key_1',
+								'value' => 'value_1',
+								'signal_type' => 2
+							],
+							[
+								'key' => 'key_1',
+								'value' => 'value_2',
+								'signal_type' => 2
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm/additional_resource_attributes/2": value (signal_type, key)=(2, key_1) already exists.'
+			],
+			'Test proxy.create: invalid "apm" with disabled data_collection_status' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'apm' => [
+						'data_collection_status' => 0,
+						'max_messages_per_second' => 100
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm": unexpected parameter "max_messages_per_second".'
+			],
+			'Test proxy.create: invalid "apm" with missing key in additional_resource_attributes' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'apm' => [
+						'data_collection_status' => 1,
+						'max_messages_per_second' => 100,
+						'additional_resource_attributes' => [
+							[
+								'value' => 'value_1',
+								'signal_type' => 2
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm/additional_resource_attributes/1": the parameter "key" is missing.'
+			],
+			'Test proxy.create: invalid "apm" with missing signal_type in additional_resource_attributes' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'apm' => [
+						'data_collection_status' => 1,
+						'max_messages_per_second' => 100,
+						'additional_resource_attributes' => [
+							[
+								'key' => 'key_1',
+								'value' => 'value_1'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm/additional_resource_attributes/1": the parameter "signal_type" is missing.'
+			],
+			'Test proxy.create: invalid "apm" with missing signal_type in second additional_resource_attributes' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'apm' => [
+						'data_collection_status' => 1,
+						'max_messages_per_second' => 100,
+						'additional_resource_attributes' => [
+							[
+								'key' => 'key_1',
+								'value' => 'value_1',
+								'signal_type' => 2
+							],
+							[
+								'key' => 'key_2',
+								'value' => 'value_2',
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm/additional_resource_attributes/2": the parameter "signal_type" is missing.'
 			]
 		];
 	}
@@ -3543,6 +3683,89 @@ class testProxy extends CAPITest {
 					'timeout_telnet_agent' => '{$TIMEOUT.TELNET.AGENT}',
 					'timeout_script' => '{$TIMEOUT.SCRIPT}',
 					'timeout_browser' => '{$TIMEOUT.BROWSER}'
+				],
+				'expected_error' => null
+			],
+
+			// Check "apm".
+			'Test proxy.create: with "apm" enabled' => [
+				'proxy' => [
+					'name' => 'API create proxy with apm enabled',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'apm' => [
+						'data_collection_status' => 1,
+						'max_messages_per_second' => 100,
+						'additional_resource_attributes' => [
+							[
+								'key' => 'key_1',
+								'value' => 'value_1',
+								'signal_type' => 1
+							],
+							[
+								'key' => 'key_2',
+								'value' => 'value_1',
+								'signal_type' => 1
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test proxy.create: without "max_messages_per_second"' => [
+				'proxy' => [
+					'name' => 'API create proxy without max_messages_per_second',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'apm' => [
+						'data_collection_status' => 1,
+						'additional_resource_attributes' => [
+							[
+								'key' => 'key_1',
+								'value' => 'value_1',
+								'signal_type' => 1
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test proxy.create: with empty "additional_resource_attributes"' => [
+				'proxy' => [
+					'name' => 'API create proxy with empty additional_resource_attributes',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'apm' => [
+						'data_collection_status' => 1,
+						'max_messages_per_second' => 100,
+						'additional_resource_attributes' => []
+					]
+				],
+				'expected_error' => null
+			],
+			'Test proxy.create: without "additional_resource_attributes"' => [
+				'proxy' => [
+					'name' => 'API create proxy without additional_resource_attributes',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'apm' => [
+						'data_collection_status' => 1,
+						'max_messages_per_second' => 100
+					]
+				],
+				'expected_error' => null
+			],
+			'Test proxy.create: with empty "apm"' => [
+				'proxy' => [
+					'name' => 'API create proxy with empty apm',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'apm' => []
+				],
+				'expected_error' => null
+			],
+			'Test proxy.create: with "data_collection_status" disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy with data_collection_status disabled',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'apm' => [
+						'data_collection_status' => 0
+					]
 				],
 				'expected_error' => null
 			]
@@ -5251,6 +5474,60 @@ class testProxy extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/hosts/2": value (hostid)=(0) already exists.'
+			],
+
+			// Check "apm".
+			'Test proxy.update: invalid "additional_resource_attributes"' => [
+				'proxy' => [
+					'proxyid' => 'without_apm',
+					'apm' => [
+						'additional_resource_attributes' => [
+								'key' => 'key',
+								'value' => 'value',
+								'signal_type' => 2
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm": unexpected parameter "additional_resource_attributes".'
+			],
+			'Test proxy.update: missing "signal_type"' => [
+				'proxy' => [
+					'proxyid' => 'without_apm',
+					'apm' => [
+						'data_collection_status' => 1,
+						'additional_resource_attributes' => [
+							[
+								'key' => 'key',
+								'value' => 'value'
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm/additional_resource_attributes/1": the parameter "signal_type" is missing.'
+			],
+			'Test proxy.update: missing "key"' => [
+				'proxy' => [
+					'proxyid' => 'without_apm',
+					'apm' => [
+						'data_collection_status' => 1,
+						'additional_resource_attributes' => [
+							[
+								'value' => 'value',
+								'signal_type' => 2
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm/additional_resource_attributes/1": the parameter "key" is missing.'
+			],
+			'Test proxy.update: invalid "max_messages_per_second"' => [
+				'proxy' => [
+					'proxyid' => 'without_apm',
+					'apm' => [
+						'max_messages_per_second' => 100
+					],
+				],
+				'expected_error' => 'Invalid parameter "/1/apm": unexpected parameter "max_messages_per_second".'
 			]
 		];
 	}
@@ -5359,6 +5636,61 @@ class testProxy extends CAPITest {
 					'hosts' => [
 						['hostid' => 'monitored_by_server_1'],
 						['hostid' => 'monitored_by_server_2']
+					]
+				],
+				'expected_error' => null
+			],
+
+			// Check proxy can be assigned to host.
+			'Test proxy.update: update with empty "apm"' => [
+				'proxy' => [
+					'proxyid' => 'with_apm',
+					'apm' => []
+				],
+				'expected_error' => null
+			],
+			'Test proxy.update: update only "max_messages_per_second" field' => [
+				'proxy' => [
+					'proxyid' => 'with_apm',
+					'apm' => [
+						'max_messages_per_second' => 200
+					]
+				],
+				'expected_error' => null
+			],
+			'Test proxy.update: update "key" field and remove "value" field' => [
+				'proxy' => [
+					'proxyid' => 'with_apm',
+					'apm' => [
+						'additional_resource_attributes' => [
+							[
+								'key' => 'key_3',
+								'signal_type' => 1
+							],
+							[
+								'key' => 'key_2',
+								'value' => 'value_2',
+								'signal_type' => 2
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test proxy.update: update with empty "additional_resource_attributes"' => [
+				'proxy' => [
+					'proxyid' => 'with_apm',
+					'apm' => [
+						'additional_resource_attributes' => []
+					]
+				],
+				'expected_error' => null
+			],
+			'Test proxy.update: update "data_collection_status" to disable' => [
+				'proxy' => [
+					'proxyid' => 'with_apm',
+					'apm' => [
+						'data_collection_status' => 0
 					]
 				],
 				'expected_error' => null
