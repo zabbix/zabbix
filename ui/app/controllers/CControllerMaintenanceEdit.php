@@ -249,119 +249,129 @@ class CControllerMaintenanceEdit extends CController {
 		$data['timeperiods'][] = $timeperiod
 			+ ['formatted_schedule' => CMaintenanceHelper::getTimePeriodSchedule($timeperiod)];
 
-		foreach ($events as $event) {
-			$db_triggers = API::Trigger()->get([
-				'output' => ['triggerid', 'description'],
-				'triggerids' => $event['objectid'],
-				'selectHosts' => ['hostid', 'name'],
-				'selectHostGroups' => ['groupid', 'name'],
-				'selectItems' => ['hostid'],
-				'editable' => true
-			]);
+		$triggerids = array_column($events, 'objectid');
 
-			if ($db_triggers) {
-				$hostids = array_values(array_unique(
-					array_column($db_triggers[0]['items'], 'hostid')
-				));
+		$db_triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'description'],
+			'triggerids' => $triggerids,
+			'selectHosts' => ['hostid', 'name'],
+			'selectHostGroups' => ['groupid'],
+			'editable' => true
+		]);
 
-				$db_hosts = $hostids
-					? API::Host()->get([
-						'output' => ['hostid', 'name'],
-						'hostids' => $hostids,
-						'editable' => true,
-					])
-					: [];
-
-				$groups = $hostids
-					? API::HostGroup()->get([
-						'output' => ['groupid', 'name'],
-						'hostids' => $hostids,
-						'preservekeys' => true
-					])
-					: [];
-
-				$groups_rw = ($groups && CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
-					? API::HostGroup()->get([
-						'output' => [],
-						'groupids' => array_keys($groups),
-						'editable' => true,
-						'preservekeys' => true
-					])
-					: [];
-
-				$host_groups = [];
-				foreach ($groups as $groupid => $group) {
-					$is_editable = array_key_exists($groupid, $groups_rw);
-
-					if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !$is_editable) {
-						continue;
-					}
-
-					$host_groups[$groupid] = $group;
-				}
-
-				CArrayHelper::sort($host_groups, ['name']);
-
-				switch ($this->getInput('context')) {
-					case 'host':
-						foreach (CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']) as $host) {
-							$data['hosts_ms'][$host['id']] = $host;
-						}
-
-						CArrayHelper::sort($data['hosts_ms'], ['name']);
-						break;
-
-					case 'trigger':
-						foreach ($db_triggers as $trigger) {
-							$trigger_groupids = array_column($trigger['hostgroups'], 'groupid');
-
-							foreach ($trigger_groupids as $groupid) {
-								if (!array_key_exists($groupid, $host_groups)) {
-									continue 2;
-								}
-							}
-
-							$data['triggers_ms'][$trigger['triggerid']] = [
-								'id' => $trigger['triggerid'],
-								'name' => $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description']
-							];
-						}
-
-						CArrayHelper::sort($data['triggers_ms'], ['name']);
-						break;
-
-					case 'event_name':
-						foreach (CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']) as $group) {
-							$data['groups_ms'][$group['id']] = $group;
-						}
-
-						CArrayHelper::sort($data['groups_ms'], ['name']);
-
-						$data['event_names'] = [[
-							'operator' => MAINTENANCE_EVENT_NAME_OPERATOR_LIKE,
-							'value' => $event['name']
-						]];
-						break;
-
-					case 'event_tags':
-						foreach (CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']) as $group) {
-							$data['groups_ms'][$group['id']] = $group;
-						}
-
-						CArrayHelper::sort($data['groups_ms'], ['name']);
-
-						if ($event['tags']) {
-							CArrayHelper::sort($event['tags'], ['tag', 'value']);
-							$data['tags'] = array_values($event['tags']);
-
-							foreach ($data['tags'] as &$tag) {
-								$tag['operator'] = MAINTENANCE_TAG_OPERATOR_LIKE;
-							}
-							unset($tag);
-						}
-						break;
+		$hostids = [];
+		foreach ($db_triggers as $trigger) {
+			foreach ($trigger['hosts'] as $host) {
+				if (!in_array($host['hostid'], $hostids)) {
+					$hostids[] = $host['hostid'];
 				}
 			}
+		}
+
+		$db_hosts = $hostids
+			? API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $hostids,
+				'editable' => true,
+			])
+			: [];
+
+		$groups = $hostids
+			? API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'hostids' => $hostids,
+				'preservekeys' => true
+			])
+			: [];
+
+		$groups_rw = ($groups && CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
+			? API::HostGroup()->get([
+				'output' => [],
+				'groupids' => array_keys($groups),
+				'editable' => true,
+				'preservekeys' => true
+			])
+			: [];
+
+		$host_groups = [];
+		foreach ($groups as $groupid => $group) {
+			$is_editable = array_key_exists($groupid, $groups_rw);
+
+			if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !$is_editable) {
+				continue;
+			}
+
+			$host_groups[$groupid] = $group;
+		}
+
+		CArrayHelper::sort($host_groups, ['name']);
+
+		switch ($this->getInput('context')) {
+			case 'host':
+				foreach (CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']) as $host) {
+					$data['hosts_ms'][$host['id']] = $host;
+				}
+
+				CArrayHelper::sort($data['hosts_ms'], ['name']);
+				break;
+
+			case 'trigger':
+				foreach ($db_triggers as $trigger) {
+					$trigger_groupids = array_column($trigger['hostgroups'], 'groupid');
+
+					foreach ($trigger_groupids as $groupid) {
+						if (!array_key_exists($groupid, $host_groups)) {
+							continue 2;
+						}
+					}
+
+					$data['triggers_ms'][$trigger['triggerid']] = [
+						'id' => $trigger['triggerid'],
+						'name' => $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description']
+					];
+				}
+
+				CArrayHelper::sort($data['triggers_ms'], ['name']);
+				break;
+
+			case 'event_name':
+				foreach (CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']) as $group) {
+					$data['groups_ms'][$group['id']] = $group;
+				}
+
+				CArrayHelper::sort($data['groups_ms'], ['name']);
+
+				$data['event_names'] = [];
+
+				foreach ($events as $event) {
+					$data['event_names'][] = [
+						'operator' => MAINTENANCE_EVENT_NAME_OPERATOR_LIKE,
+						'value'    => $event['name']
+					];
+				}
+				break;
+
+			case 'event_tags':
+				foreach (CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']) as $group) {
+					$data['groups_ms'][$group['id']] = $group;
+				}
+
+				CArrayHelper::sort($data['groups_ms'], ['name']);
+
+				$data['tags'] = [];
+
+				foreach ($events as $event) {
+					if ($event['tags']) {
+						CArrayHelper::sort($event['tags'], ['tag', 'value']);
+
+						foreach ($event['tags'] as $tag) {
+							$tag['operator'] = MAINTENANCE_TAG_OPERATOR_LIKE;
+
+							$data['tags'][] = $tag;
+						}
+					}
+				}
+				break;
 		}
 	}
 }
