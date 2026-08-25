@@ -687,6 +687,8 @@ typedef struct
 	zbx_config_hk_t	hk;
 
 	zbx_config_item_type_timeouts_t	item_timeouts;
+
+	zbx_config_apm_global_db_t	apm_global_db;
 }
 zbx_dc_config_table_t;
 

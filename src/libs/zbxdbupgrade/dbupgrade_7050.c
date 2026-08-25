@@ -1246,6 +1246,17 @@ static int	DBpatch_7050097(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050098(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str)"
+			" values ('apm_global_db', %d, '{}')", ZBX_SETTING_TYPE_STR))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1350,5 +1361,6 @@ DBPATCH_ADD(7050094, 0, 1)
 DBPATCH_ADD(7050095, 0, 1)
 DBPATCH_ADD(7050096, 0, 1)
 DBPATCH_ADD(7050097, 0, 1)
+DBPATCH_ADD(7050098, 0, 1)
 
 DBPATCH_END()
