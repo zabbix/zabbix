@@ -39,7 +39,7 @@ class CConfigFile {
 		ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC
 	];
 
-	public const SUPPORTED_TELEMETRY_SOURCE = ['clickhouse', 'zabbix'];
+	public const SUPPORTED_TELEMETRY_SOURCE = ['clickhouse', /* 'zabbix' */];
 
 	private static $supported_db_types = [
 		ZBX_DB_MYSQL => true,
@@ -481,7 +481,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 
 // Uncomment and set to desired values to override the global APM data source configuration.
 // Supported configuration parameters for all providers:
-// \'provider\'   - Telemetry provider type: \'clickhouse\', \'zabbix\'.
+// \'provider\'   - Telemetry provider type: \'clickhouse\'.
 // Additional parameters for ClickHouse:
 // \'url\'        - Telemetry provider URL with http or https scheme.
 // \'db\'         - Database name. Can be empty.
@@ -502,10 +502,6 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 //	\'db\' => \'zabbix\',
 //	\'username\' => \'zabbix\',
 //	\'password\' => \'zabbix\'
-//];
-// Zabbix database:
-//$TELEMETRY_PROVIDERS[] = [
-//	\'provider\' => \'zabbix\'
 //];
 ';
 	}
