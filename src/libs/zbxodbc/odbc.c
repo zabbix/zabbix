@@ -477,7 +477,6 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 				if (0 == query_result->col_num)
 				{
 					query_result->row = NULL;
-
 					goto out;
 				}
 
