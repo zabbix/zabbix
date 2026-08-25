@@ -818,7 +818,11 @@ $formgrid
 				'readonly' => $readonly,
 				'multiple' => false,
 				'data' => $item['valuemap']
-					? [['id' => $item['valuemap']['valuemapid'], 'name' => $item['valuemap']['name']]]
+					? [[
+						'id' => $item['valuemap']['valuemapid'],
+						'prefix' => $item['valuemap']['prefix'] ?? '',
+						'name' => $item['valuemap']['name']
+					]]
 					: [],
 				'popup' => [
 					'parameters' => [
