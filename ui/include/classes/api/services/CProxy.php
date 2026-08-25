@@ -459,12 +459,12 @@ class CProxy extends CApiService {
 
 				$default_attributes = [
 					'signal_type' => 0,
-					'key' => 0,
-					'value' => ""
+					'key' => '',
+					'value' => ''
 				];
 
 				foreach ($proxy['apm']['additional_resource_attributes'] as &$attributes) {
-					$attributes = array_merge($default_attributes, $attributes, $attributes);
+					$attributes = array_merge($default_attributes, $attributes);
 				}
 				unset($attributes);
 			}
