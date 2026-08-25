@@ -644,8 +644,6 @@ int	zbx_db_insert_get_row_count(zbx_db_insert_t *self)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_insert_is_prepared                                        *
- *                                                                            *
  * Purpose: check if database insert structure is prepared                    *
  *                                                                            *
  * Parameters: self - [IN] pointer to the database insert structure           *

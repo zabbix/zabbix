@@ -355,7 +355,7 @@ int	cep_queue_pending_commits_num(zbx_cep_queue_t *queue)
  *                                                                            *
  * Purpose: check whether a queue is empty                                    *
  *                                                                            *
- * Parameters: queue - [IN] queue                                             *
+ * Parameters: queue - [IN] queue instance                                    *
  *                                                                            *
  * Return value: SUCCEED - the queue is empty                                 *
  *               FAIL - the queue has pending, processing, group, or          *

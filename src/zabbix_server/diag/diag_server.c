@@ -12,12 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbx_cep_client.h"
-#include "zbxdiag.h"
 #include "diag_server.h"
+#include "zbxdiag.h"
 
-#include "../lld/lld_protocol.h"
-
+#include "zabbix_server/lld/lld_protocol.h"
+#include "zbx_cep_client.h"
 #include "zbxcachevalue.h"
 #include "zbxalerter.h"
 #include "zbxtime.h"
@@ -512,8 +511,8 @@ out:
  *                                                                            *
  * Purpose: add requested CEP diagnostic information to json data             *
  *                                                                            *
- * Parameters: jp    - [IN] the request                                       *
- *             json  - [IN/OUT] the json to update                            *
+ * Parameters: jp    - [IN] request                                           *
+ *             json  - [IN/OUT] json to update                                *
  *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - the information was added successfully             *

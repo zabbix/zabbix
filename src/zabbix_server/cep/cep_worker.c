@@ -45,12 +45,12 @@
  *                                                                            *
  * Purpose: initialize event processor worker                                 *
  *                                                                            *
- * Parameters: dbpool           - [IN] database connection pool               *
+ * Parameters: dbpool - [IN] database connection pool                         *
  *                                                                            *
  * Return value: created worker                                               *
  *                                                                            *
  ******************************************************************************/
-zbx_cep_worker_t	*cep_worker_create( zbx_dbconn_pool_t *dbpool)
+zbx_cep_worker_t	*cep_worker_create(zbx_dbconn_pool_t *dbpool)
 {
 	zbx_cep_worker_t	*worker;
 
@@ -359,7 +359,8 @@ static void	cep_worker_delete_events(zbx_cep_task_remote_t *task)
  *                                                                            *
  * Purpose: serialize CEP statistics into a remote task response buffer       *
  *                                                                            *
- * Parameters: task - [IN/OUT] remote task with pre-allocated response buffer *
+ * Parameters: worker - [IN]                                                  *
+ *             task - [IN/OUT] remote task with pre-allocated response buffer *
  *                                                                            *
  * Comments: The result is stored in pre-allocated task->response buffer      *
  *                                                                            *
@@ -509,7 +510,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	cep_event_context_init_with_event(&event_ctx, event, db_event, worker->dbpool);
 
 	/* cep config returns NULL handle if there are no cep rules to process */
-if (NULL != (hconfig = zbx_cep_config_open()))
+	if (NULL != (hconfig = zbx_cep_config_open()))
 	{
 		if (SUCCEED != cep_event_process_rules(hconfig, &rules, &rules_num, &event_ctx, tasks))
 		{
@@ -560,8 +561,6 @@ out:
 		zbx_free(rules);
 		zbx_cep_config_close(hconfig);
 	}
-
-	return;
 }
 
 /******************************************************************************
@@ -858,7 +857,8 @@ static int	cep_task_win_sync_compare(const void *a1, const void *a2)
  *                                                                            *
  * Purpose: commit queued finished tasks                                      *
  *                                                                            *
- * Parameters: task - [IN]  commit task                                       *
+ * Parameters: worker - [IN]                                                  *
+ *             task   - [IN]  commit task                                     *
  *                                                                            *
  ******************************************************************************/
 static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_task_commit_t *task)

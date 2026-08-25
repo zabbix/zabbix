@@ -155,7 +155,7 @@ static duk_ret_t	cep_js_event_proxy_get(duk_context *ctx)
  * Purpose: reject property assignment on a CEP event JavaScript proxy object *
  *                                                                            *
  * Parameters: ctx - [IN] Duktape context                                     *
- *                        args: 0=target, 1=key, 2=value, 3=receiver         *
+ *                         args: 0=target, 1=key, 2=value, 3=receiver         *
  *                                                                            *
  * Return value: always throws a TypeError                                    *
  *                                                                            *

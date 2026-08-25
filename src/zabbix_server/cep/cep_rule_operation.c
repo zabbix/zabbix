@@ -185,10 +185,10 @@ static void	cep_acknowledge_update_severity(zbx_cep_acknowledge_t *ack, int op, 
  *                                                                            *
  * Purpose: add a name change entry to an acknowledge                         *
  *                                                                            *
- * Parameters: ack       - [IN/OUT] acknowledge                               *
+ * Parameters: ack       - [IN/OUT]                                           *
  *             op        - [IN] operation type                                *
- *             old_value - [IN] old name                                      *
- *             new_value - [IN] new name                                      *
+ *             old_value - [IN] old event name                                *
+ *             new_value - [IN] new event name                                *
  *                                                                            *
  ******************************************************************************/
 static void	cep_acknowledge_update_name(zbx_cep_acknowledge_t *ack, int op, const char *old_value,
@@ -475,6 +475,7 @@ static char	*cep_str_detach(char **src)
 	char	*str = *src;
 
 	*src = NULL;
+
 	return str;
 }
 
@@ -717,7 +718,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
-
 }
 
 /******************************************************************************

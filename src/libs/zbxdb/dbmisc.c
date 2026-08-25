@@ -1305,9 +1305,9 @@ out:
  *                                                                            *
  * Purpose: locks a records in a table by field name using index hint         *
  *                                                                            *
- * Parameters: db        - [IN] database connection                           *
- *             table      - [IN] the target table                             *
- *             field_name - [IN] field name                                   *
+ * Parameters: db         - [IN] database connection                          *
+ *             table      - [IN] target table name                            *
+ *             field_name - [IN]                                              *
  *             index_hint - [IN] index hint for MYSQL, "" if not used         *
  *             ids        - [IN/OUT] IN - sorted array of IDs to lock         *
  *                                   OUT - resulting array of locked IDs      *

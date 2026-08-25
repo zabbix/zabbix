@@ -571,7 +571,7 @@ void	zbx_db_trigger_get_all_functionids(const zbx_db_trigger *trigger, zbx_vecto
  *                                                                            *
  * Purpose: get the first function ID from a trigger expression               *
  *                                                                            *
- * Parameters: trigger - [IN] trigger                                         *
+ * Parameters: trigger - [IN]                                                 *
  *                                                                            *
  * Return value: first function ID, or 0 if none found                        *
  *                                                                            *

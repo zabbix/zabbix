@@ -93,7 +93,7 @@ static void	cep_guard_destroy(zbx_cep_guard_t *guard)
  *                                                                            *
  * Purpose: acquire the guard lock and expose the protected pointer           *
  *                                                                            *
- * Parameters: guard - [INT]                                                  *
+ * Parameters: guard - [IN]                                                   *
 *              ptr   - [OUT] set to the protected pointer                     *
  *                                                                            *
  * Comments: Must be paired with a call to cep_guard_release().               *
@@ -109,8 +109,8 @@ static void	cep_guard_acquire(zbx_cep_guard_t *guard, void **ptr)
  *                                                                            *
  * Purpose: release the guard lock and nullify the pointer                    *
  *                                                                            *
- * Parameters: guard - [INT]                                                  *
- *              ptr - [IN/OUT] pointer to nullify before releasing            *
+ * Parameters: guard - [IN]                                                   *
+ *             ptr   - [IN/OUT] pointer to nullify before releasing           *
  *                                                                            *
  * Comments: Must be paired with a prior call to cep_guard_acquire().         *
  *                                                                            *
@@ -124,7 +124,6 @@ static void	cep_guard_release(zbx_cep_guard_t *guard, void **ptr)
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize the CEP API and its associated resources               *
- * Purpose: free CEP API handle and its associated resources                  *
  *                                                                            *
  * Parameters: api - [IN] CEP API handle to free                              *
  *                                                                            *
@@ -148,10 +147,12 @@ static void	cep_api_free(zbx_cep_api_t *api)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize CEP API                                                *
+ * Purpose: initialize CEP API by creating cache, window pool and setting     *
+ *          guards                                                            *
  *                                                                            *
- * Parameters: api   - [IN/OUT] CEP API to initialize                         *
- *             error - [OUT] error message                                    *
+ * Parameters: api              - [IN/OUT] CEP API to initialize              *
+ *             config_source_ip - [IN] configured source ip                   *
+ *             error            - [OUT] error message                         *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -179,7 +180,8 @@ static int	cep_api_init(zbx_cep_api_t *api, const char *config_source_ip, char *
  *                                                                            *
  * Purpose: create and initialize the global CEP API handle                   *
  *                                                                            *
- * Parameters: error - [OUT] error message                                    *
+ * Parameters: config_source_ip - [IN] configured source ip                   *
+ *             error            - [OUT] error message                         *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -405,9 +407,11 @@ void	zbx_cep_get_events_by_updates(zbx_cep_event_update_t *updates, int updates_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve all events from the CEP cache                            *
+ * Purpose: retrieve all events from the CEP cache created by the specified   *
+ *          event source                                                      *
  *                                                                            *
- * Parameters: handles - [OUT] vector to store handles of retrieved events    *
+ * Parameters: source  - [IN] required event source                           *
+ *             handles - [OUT] vector to store handles of retrieved events    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_cep_get_events(unsigned char source, zbx_vector_cep_event_handle_t *handles)

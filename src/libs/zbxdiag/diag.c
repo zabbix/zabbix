@@ -12,9 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxcommon.h"
 #include "zbxdiag.h"
-
+#include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxshmem.h"

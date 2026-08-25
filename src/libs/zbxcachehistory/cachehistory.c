@@ -2104,7 +2104,6 @@ static void	zbx_log_sync_trends_cache_progress(void)
  * Purpose: writes updates and new data from history cache to database                 *
  *                                                                                     *
  * Parameters: events_cbs - [IN]                                                       *
- *             rtc        - [IN] RTC socket                                            *
  *             stats      - [OUT]                                                      *
  *                                                                                     *
  ***************************************************************************************/

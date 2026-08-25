@@ -1395,6 +1395,10 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  *                                                                                     *
  * Parameters:                                                                         *
  *   events_cbs                       - [IN]                                           *
+ *   mode                             - [IN] history cache syncing mode,               *
+ *                                         ZBX_HISTORY_SYNC_DEFAULT - default          *
+ *                                         ZBX_HISTORY_SYNC_SKIP_TRIGGERS - skip       *
+ *                                         trigger and internal event processing       *
  *   stats                            - [OUT] flag indicating the cache emptiness:     *
  *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
  *                                            ZBX_SYNC_MORE - more data to sync        *

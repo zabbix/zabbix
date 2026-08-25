@@ -184,9 +184,7 @@ zbx_mw_task_t	*cep_create_task_event_by_correlation(zbx_db_event *event, zbx_uin
  * Parameters: event      - [IN] new event that will close the specified      *
  *                                  event                                     *
  *             eventid    - [IN] id of event to be closed                     *
- *             cep_ruleid - [IN] id of correlation rule closing the event     *
- *             c_eventid  - [IN] id of event that caused correlation          *
- *                                  match                                     *
+ *             cep_ruleid - [IN] id of cep rule closing the event             *
  *                                                                            *
  * Return value: created task                                                 *
  *                                                                            *
@@ -231,7 +229,7 @@ static void	cep_task_event_clear(zbx_cep_task_event_t *task)
  *                                                                            *
  * Purpose: free event task                                                   *
  *                                                                            *
- * Parameters: task - [IN] event task to free                                 *
+ * Parameters: mw_task - [IN] event task to free                              *
  *                                                                            *
  ******************************************************************************/
 static void	cep_task_event_free(void *mw_task)
@@ -388,6 +386,7 @@ static void	cep_task_sync_event_free(void *mw_task)
  * Purpose: create task to process event window                               *
  *                                                                            *
  * Parameters: window - [IN] window to process                                *
+ *             now    - [IN] current time                                     *
  *                                                                            *
  * Return value: created task                                                 *
  *                                                                            *
@@ -459,8 +458,8 @@ static void	cep_task_window_sync_free(void *mw_task)
  * Purpose: create an acknowledge task                                        *
  *                                                                            *
  * Parameters: ack     - [IN/OUT] acknowledge data; reset after transfer      *
- *             ruleid  - [IN] rule identifier                                 *
- *             eventid - [IN] event identifier                                *
+ *             ruleid  - [IN]                                                 *
+ *             eventid - [IN]                                                 *
  *                                                                            *
  * Return value: created task                                                 *
  *                                                                            *
@@ -498,7 +497,7 @@ static void	cep_task_acknowledge_free(void *mw_task)
  *                                                                            *
  * Purpose: create a rule error task                                          *
  *                                                                            *
- * Parameters: ruleid - [IN] rule identifier                                  *
+ * Parameters: ruleid - [IN]                                                  *
  *             error  - [IN] error string or NULL; ownership is transferred   *
  *                          to task                                           *
  *                                                                            *
@@ -536,7 +535,7 @@ static void	cep_task_rule_error_free(void *mw_task)
  *                                                                            *
  * Purpose: create a rule reset task                                          *
  *                                                                            *
- * Parameters: ruleid - [IN] rule identifier                                  *
+ * Parameters: ruleid - [IN]                                                  *
  *                                                                            *
  * Return value: created task                                                 *
  *                                                                            *

@@ -346,7 +346,7 @@ static zbx_cep_event_handle_t	cep_event_handle_acquire(zbx_cep_event_handle_t h)
  *                                                                            *
  * Purpose: acquire (with incremented refcoutn) event handle by event ID      *
  *                                                                            *
- * Parameters: cache   - [IN] cache context                                   *
+ * Parameters: cep     - [IN] cep cache                                       *
  *             eventid - [IN] event ID                                        *
  *                                                                            *
  * Return value: event handle or NULL if not found or being released          *
@@ -366,7 +366,7 @@ zbx_cep_event_handle_t	cep_acquire_event_handle_by_eventid(zbx_cep_t *cep, zbx_u
  *                                                                            *
  * Purpose: get object by origin                                              *
  *                                                                            *
- * Parameters: cache  - [IN] cache context                                    *
+ * Parameters: cep    - [IN] cep cache                                        *
  *             origin - [IN] object origin                                    *
  *                                                                            *
  * Return value: object or NULL if not found                                  *
@@ -381,8 +381,8 @@ static zbx_cep_object_t	*cep_get_object(zbx_cep_t *cep, const zbx_cep_origin_t *
  *                                                                            *
  * Purpose: get object by origin or create it if not found                    *
  *                                                                            *
- * Parameters: cache  - [IN]     cache context                                *
- *             origin - [IN]     object origin                                *
+ * Parameters: cep    - [IN] cep cache                                        *
+ *             origin - [IN] object origin                                    *
  *                                                                            *
  * Return value: existing or newly created object                             *
  *                                                                            *
@@ -464,9 +464,9 @@ void	cep_origin_pending_event_done(zbx_cep_t *cep, zbx_cep_origin_t *origin)
  *                                                                            *
  * Purpose: load open problems from database into cache                       *
  *                                                                            *
- * Parameters: cache - [IN/OUT] cache context                                 *
+ * Parameters: cep   - [IN/OUT] cep cache                                     *
  *             db    - [IN]     database connection                           *
- *             stats  - [OUT] initialization statistics                       *
+ *             stats - [OUT] initialization statistics                        *
  *                                                                            *
  ******************************************************************************/
 static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_stats_t *stats)
@@ -590,9 +590,9 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_sta
  *                                                                            *
  * Purpose: load maintenance data from database into cache                    *
  *                                                                            *
- * Parameters: cache - [IN/OUT] cache context                                 *
+ * Parameters: cep   - [IN/OUT] cep cache                                     *
  *             db    - [IN]     database connection                           *
- *             stats  - [OUT] initialization statistics                       *
+ *             stats - [OUT] initialization statistics                        *
  *                                                                            *
  ******************************************************************************/
 static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_stats_t *stats)
@@ -642,8 +642,8 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init
  *                                                                            *
  * Purpose: load CEP rule errors from database into cache                     *
  *                                                                            *
- * Parameters: cache - [IN/OUT] cache context                                 *
- *             db    - [IN]     database connection                           *
+ * Parameters: cep - [IN/OUT] cep cache                                       *
+ *             db  - [IN]     database connection                             *
  *                                                                            *
  ******************************************************************************/
 static void	cep_load_rule_errors(zbx_cep_t *cep, zbx_dbconn_t *db)
@@ -668,7 +668,7 @@ static void	cep_load_rule_errors(zbx_cep_t *cep, zbx_dbconn_t *db)
  *                                                                            *
  * Purpose: create item diff record marking an item as not supported          *
  *                                                                            *
- * Parameters: itemid - [IN] item ID                                          *
+ * Parameters: itemid - [IN]                                                  *
  *             error  - [IN] error message                                    *
  *                                                                            *
  * Return value: allocated item diff record                                   *
@@ -948,7 +948,7 @@ void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool, zbx_cep_init_stats_t *s
  *                                                                            *
  * Purpose: add event to cache and link it to its object                      *
  *                                                                            *
- * Parameters: cache - [IN/OUT] cache context                                 *
+ * Parameters: cep   - [IN/OUT] cep cache                                     *
  *             event - [IN]     event to add                                  *
  *                                                                            *
  * Return value: event handle, must be released after use                     *
@@ -1212,7 +1212,7 @@ static void	cep_object_pending_event_done(zbx_cep_t *cep, zbx_cep_object_t *obj)
  *                                                                            *
  * Purpose: open problem event for trigger                                    *
  *                                                                            *
- * Parameters: cache          - [IN/OUT] cache context                        *
+ * Parameters: cep            - [IN/OUT] cep cache                            *
  *             triggerid      - [IN]     trigger ID                           *
  *             trigger_type   - [IN]     trigger type                         *
  *             dep_triggerids - [IN]     dependency trigger IDs               *
@@ -1323,7 +1323,7 @@ void	cep_resolve_trigger_events(zbx_cep_t *cep, zbx_cep_event_t *r_event, zbx_ve
  *                                                                            *
  * Purpose: close matching trigger events                                     *
  *                                                                            *
- * Parameters: cache            - [IN/OUT] cache context                      *
+ * Parameters: cep              - [IN/OUT] cep cache                          *
  *             triggerid        - [IN]     trigger ID                         *
  *             dep_triggerids   - [IN]     dependency trigger IDs             *
  *             correlation_mode - [IN]     correlation mode                   *
@@ -1388,7 +1388,7 @@ out:
  *                                                                            *
  * Purpose: close specified trigger event                                     *
  *                                                                            *
- * Parameters: cache     - [IN/OUT] cache context                             *
+ * Parameters: cache     - [IN/OUT] cep cache                                 *
  *             triggerid - [IN]  trigger ID                                   *
  *             eventid   - [IN]  event ID                                     *
  *             handles   - [OUT] handle of event to close                     *
@@ -1442,7 +1442,7 @@ out:
  *                                                                            *
  * Purpose: open internal event                                               *
  *                                                                            *
- * Parameters: cache   - [IN/OUT] cache context                               *
+ * Parameters: cep     - [IN/OUT] cep cache                                   *
  *             object  - [IN]     object type                                 *
  *             objectid- [IN]     object ID                                   *
  *                                                                            *
@@ -1472,7 +1472,7 @@ zbx_uint64_t	cep_open_internal_event(zbx_cep_t *cep, unsigned char object, zbx_u
  *                                                                            *
  * Purpose: close internal event                                              *
  *                                                                            *
- * Parameters: cache    - [IN/OUT] cache context                              *
+ * Parameters: cep      - [IN/OUT] cep cache                                  *
  *             object   - [IN]     object type                                *
  *             objectid - [IN]     object ID                                  *
  *             eventids - [OUT]    closed event ID                            *
@@ -1811,7 +1811,7 @@ zbx_uint64_t	zbx_cep_event_handle_eventid(zbx_cep_event_handle_t h)
  *                                                                            *
  * Purpose: get all active event handles                                      *
  *                                                                            *
- * Parameters: cep     - [IN]  cache context                                  *
+ * Parameters: cep     - [IN]  cep cache                                      *
  *             handles - [OUT] active event handles                           *
  *                                                                            *
  ******************************************************************************/
@@ -1917,9 +1917,9 @@ static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: dump event cache contents for debugging                           *
+ * Purpose: dump cep cache contents for debugging                             *
  *                                                                            *
- * Parameters: cep - [IN]  cache                                              *
+ * Parameters: cep - [IN]  cep cache                                          *
  *             msg - [IN]  description of the cache change                    *
  *                                                                            *
  ******************************************************************************/

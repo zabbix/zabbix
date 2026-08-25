@@ -1133,8 +1133,8 @@ out:
  *                                                                            *
  * Purpose: send event cause to CEP service                                   *
  *                                                                            *
- * Parameters: eventid       - [IN] event ID                                  *
- *             cause_eventid - [IN] cause event ID                            *
+ * Parameters: eventid       - [IN]                                           *
+ *             cause_eventid - [IN]                                           *
  *                                                                            *
  ******************************************************************************/
 void	zbx_cep_set_event_cause(zbx_uint64_t eventid, zbx_uint64_t cause_eventid)

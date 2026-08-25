@@ -97,6 +97,8 @@ static void	cep_db_write_event(const zbx_cep_event_t *event, zbx_dbconn_t *db, z
  *                                 table                                      *
  *             db_insert_tag     - [IN/OUT] insert batch for the problem_tag  *
  *                                 table                                      *
+ *             ref_eventids      - [IN] locked eventids that can be safely    *
+ *                                      referred by problem records           *
  *                                                                            *
  ******************************************************************************/
 static void	cep_db_write_problem(const zbx_cep_event_t *event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_problem,
@@ -388,8 +390,8 @@ static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
  *                                                                            *
  * Purpose: write event recovery records to the database                      *
  *                                                                            *
- * Parameters: db     - [IN]  database connection                             *
- *             tasks  - [IN]  list of tasks containing recovery events        *
+ * Parameters: db           - [IN] database connection                        *
+ *             tasks        - [IN] list of tasks containing recovery events   *
  *             ref_eventids - [IN] referenced eventids                        *
  *                                                                            *
  ******************************************************************************/
@@ -1198,10 +1200,10 @@ static void	cep_db_sync_event_tags_table(zbx_dbconn_t *db, const char *table, co
  * Purpose: synchronize event and problem tag changes to database for the     *
  *          given CEP events                                                  *
  *                                                                            *
- * Parameters: db    - [IN] database connection                               *
- *             htags - [IN] handles of CEP events whose tags need to be       *
- *                     synchronized                                           *
- *             eventids - [IN] locked events                                  *
+ * Parameters: db         - [IN] database connection                          *
+ *             htags      - [IN] handles of CEP events whose tags need to be  *
+ *                               synchronized                                 *
+ *             eventids   - [IN] locked events                                *
  *             problemids - [IN] locked problems                              *
  *                                                                            *
  ******************************************************************************/

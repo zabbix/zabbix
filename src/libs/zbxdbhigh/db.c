@@ -12,8 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbx_trigger_constants.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbx_trigger_constants.h"
 
 #include "zbxcrypto.h"
 #include "zbxdbwrap.h"
@@ -21,7 +22,6 @@
 #include "zbxstr.h"
 #include "zbx_host_constants.h"
 #include "zbxalgo.h"
-#include "zbxdb.h"
 
 #define ZBX_DB_WAIT_DOWN	10
 

@@ -32,7 +32,7 @@
  *                                                                            *
  * Purpose: start specified number of workers                                 *
  *                                                                            *
- * Parameters: manager     - [IN/OUT] manager                                 *
+ * Parameters: manager     - [IN/OUT]                                         *
  *             workers_num - [IN] number of workers to start                  *
  *             error       - [OUT] error message                              *
  *                                                                            *
@@ -77,7 +77,7 @@ static int	mw_manager_start_workers(zbx_mw_manager_t *manager, int workers_num, 
  *                                                                            *
  * Purpose: stop specified number of workers                                  *
  *                                                                            *
- * Parameters: manager     - [IN/OUT] manager                                 *
+ * Parameters: manager     - [IN/OUT]                                         *
  *             workers_num - [IN] number of workers to stop                   *
  *                                                                            *
  * Comments: At least one worker is always kept running. If the requested     *
@@ -186,7 +186,7 @@ out:
  *                                                                            *
  * Purpose: check worker pool scaling status and initiate scaling if needed   *
  *                                                                            *
- * Parameters: manager - [IN/OUT] manager                                     *
+ * Parameters: manager - [IN/OUT]                                             *
  *             now     - [IN] current timestamp                               *
  *                                                                            *
  * Return value: SUCCEED on success, FAIL otherwise                           *
@@ -405,7 +405,7 @@ int	zbx_mw_manager_init(zbx_mw_manager_t *manager, const zbx_thread_info_t *info
  *                                                                            *
  * Purpose: change log level for specified workers                            *
  *                                                                            *
- * Parameters: manager   - [IN/OUT] manager                                   *
+ * Parameters: manager   - [IN/OUT]                                           *
  *             direction - [IN] log level change direction                    *
  *             data      - [IN] RTC command target data                       *
  *                                                                            *
@@ -453,7 +453,7 @@ static void	mw_manager_change_loglevel(zbx_mw_manager_t *manager, int direction,
  *                                                                            *
  * Purpose: send current worker count to IPC client                           *
  *                                                                            *
- * Parameters: manager - [IN] manager                                         *
+ * Parameters: manager - [IN]                                                 *
  *             client  - [IN] IPC client to send response to                  *
  *                                                                            *
  ******************************************************************************/
@@ -470,7 +470,7 @@ static void	mw_manager_reply_worker_count(zbx_mw_manager_t *manager, zbx_ipc_cli
  *                                                                            *
  * Purpose: send worker load statistics to IPC client                         *
  *                                                                            *
- * Parameters: manager - [IN] manager                                         *
+ * Parameters: manager - [IN]                                                 *
  *             client  - [IN] IPC client to send response to                  *
  *                                                                            *
  ******************************************************************************/
@@ -502,7 +502,7 @@ static void	mw_manager_reply_worker_load(zbx_mw_manager_t *manager, zbx_ipc_clie
  *                                                                            *
  * Purpose: receive and dispatch IPC messages                                 *
  *                                                                            *
- * Parameters: manager - [IN/OUT] manager                                     *
+ * Parameters: manager - [IN/OUT]                                             *
  *             client  - [OUT] IPC client that sent the message               *
  *             message - [OUT] received message, NULL if none or handled      *
  *                                                                            *

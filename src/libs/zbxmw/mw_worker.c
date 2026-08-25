@@ -28,11 +28,11 @@ ZBX_PTR_VECTOR_LITE_IMPL(mw_task_ptr, zbx_mw_task_t *)
  *                                                                            *
  * Purpose: initialize worker                                                 *
  *                                                                            *
- * Parameters: worker     - [OUT] worker to initialize                        *
+ * Parameters: worker     - [OUT]                                             *
  *             id         - [IN] worker id                                    *
  *             service    - [IN] IPC service                                  *
  *             queue      - [IN] task queue                                   *
- *             timekeeper - [IN] timekeeper                                   *
+ *             timekeeper - [IN]                                              *
  *                                                                            *
  ******************************************************************************/
 void	mw_worker_init(zbx_mw_worker_t *worker, int id,  zbx_ipc_service_t *service, zbx_mw_queue_t *queue,
@@ -106,7 +106,7 @@ static void	*mw_worker_entry(void *a)
  *                                                                            *
  * Purpose: start worker thread                                               *
  *                                                                            *
- * Parameters: worker       - [IN/OUT] worker to start                        *
+ * Parameters: worker       - [IN/OUT]                                        *
  *             process_type - [IN] worker process type                        *
  *             worker_entry - [IN] worker thread entry point                  *
  *             error        - [OUT] error message                             *
@@ -183,7 +183,7 @@ int	zbx_mw_worker_is_running(zbx_mw_worker_t *worker)
  *                                                                            *
  * Purpose: report worker busy state to timekeeper                            *
  *                                                                            *
- * Parameters: worker - [IN] worker                                           *
+ * Parameters: worker - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_mw_worker_report_busy(zbx_mw_worker_t *worker)
@@ -195,7 +195,7 @@ void	zbx_mw_worker_report_busy(zbx_mw_worker_t *worker)
  *                                                                            *
  * Purpose: report worker idle state to timekeeper                            *
  *                                                                            *
- * Parameters: worker - [IN] worker                                           *
+ * Parameters: worker - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_mw_worker_report_idle(zbx_mw_worker_t *worker)

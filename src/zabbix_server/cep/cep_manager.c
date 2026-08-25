@@ -113,7 +113,7 @@ static int	cep_blocker_object_compare(const void *a1, const void *a2)
  *                                                                            *
  * Purpose: clear CEP manager resources without clearing base manager         *
  *                                                                            *
- * Parameters: manager - [IN] the CEP manager instance                        *
+ * Parameters: manager - [IN] CEP manager instance                            *
  *                                                                            *
  ******************************************************************************/
 static void	cep_manager_clear(zbx_cep_manager_t *manager)
@@ -130,7 +130,7 @@ static void	cep_manager_clear(zbx_cep_manager_t *manager)
  *                                                                            *
  * Purpose: free CEP manager resources                                        *
  *                                                                            *
- * Parameters: manager - [IN] the CEP manager instance                        *
+ * Parameters: manager - [IN] CEP manager instance                            *
  *                                                                            *
  ******************************************************************************/
 static void	cep_manager_free(zbx_cep_manager_t *manager)
@@ -160,10 +160,10 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
  *                                                                            *
  * Purpose: create and initialize CEP manager instance                        *
  *                                                                            *
- * Parameters: workers_num      - [IN] initial number of workers              *
- *             dbpool           - [IN] database connection pool               *
- *             stats            - [OUT] initialization statistics             *
- *             error            - [OUT] error message                         *
+ * Parameters: info   - [IN] startup information                              *
+ *             dbpool - [IN] database connection pool                         *
+ *             stats  - [OUT] initialization statistics                       *
+ *             error  - [OUT] error message                                   *
  *                                                                            *
  * Return value: pointer to the created CEP manager instance or NULL on       *
  *               error                                                        *
@@ -310,7 +310,7 @@ static void	cep_manager_check_trigger_deps(zbx_cep_manager_t *manager, zbx_ipc_c
 }
 
 /******************************************************************************
- *                                                                            *STATS
+ *                                                                            *
  * Purpose: get cep statistics                                                *
  *                                                                            *
  * Parameters: manager - [IN/OUT] CEP manager                                 *
@@ -334,7 +334,7 @@ static void	cep_manager_get_stats(zbx_cep_manager_t *manager, zbx_ipc_client_t *
  * Purpose: get cep statistics                                                *
  *                                                                            *
  * Parameters: manager - [IN] CEP manager                                     *
- *             stats  - [IN/OUT] CEP startup statistics                       *
+ *             stats   - [IN/OUT] CEP startup statistics                      *
  *             client  - [IN/OUT] IPC client requesting the statistics        *
  *                                                                            *
  ******************************************************************************/
@@ -613,7 +613,8 @@ static void	cep_manager_deregister_blocking_task_window_sync(zbx_cep_manager_t *
  *                                                                            *
  * Purpose: deregister blocker task                                           *
  *                                                                            *
- * Parameters: manager - [IN] task    - [IN] task to deregister               *
+ * Parameters: manager - [IN]                                                 *
+ *             task    - [IN] task to deregister                              *
  *                                                                            *
  * Return value: SUCCEED - task type was recognized and deregistered          *
  *               FAIL - task type is not supported for deregistration         *

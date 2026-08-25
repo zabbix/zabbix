@@ -376,7 +376,7 @@ zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *na
  *                                                                            *
  * Purpose: register a pending events for corresponding objects               *
  *                                                                            *
- * Parameters: db_evenst  - [IN] database events to expect                    *
+ * Parameters: db_events  - [IN] database events to expect                    *
  *             events_num - [IN] number of events to expect                   *
  *                                                                            *
  ******************************************************************************/
@@ -413,8 +413,9 @@ int	db_event_suppress_compare(const void *a1, const void *a2)
  *                                                                            *
  * Purpose: add suppress records to event and update suppression time         *
  *                                                                            *
- * Parameters: h         - [IN/OUT] event handle                              *
- *             suppress  - [IN/OUT] event suppress data to add                *
+ * Parameters: event        - [IN/OUT]                                        *
+ *             suppress     - [IN] event suppress data to add                 *
+ *             suppress_num - [IN] number of suppress entries                 *
  *                                                                            *
  ******************************************************************************/
 void	cep_event_add_suppress(zbx_cep_event_t *event, const zbx_db_event_suppress_t *suppress,
@@ -445,8 +446,9 @@ void	cep_event_add_suppress(zbx_cep_event_t *event, const zbx_db_event_suppress_
  *                                                                            *
  * Purpose: remove suppress records from event and update suppression time    *
  *                                                                            *
- * Parameters: h        - [IN/OUT] event handle                               *
- *             suppress - [IN] event supprss data to remove                   *
+ * Parameters: event        - [IN/OUT]                                        *
+ *             suppress     - [IN] event suppress data to remove              *
+ *             suppress_num - [IN] number of suppress entries                 *
  *                                                                            *
  ******************************************************************************/
 void	cep_event_remove_suppress(zbx_cep_event_t *event, const zbx_db_event_suppress_t *suppress,
