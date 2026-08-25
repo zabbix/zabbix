@@ -233,7 +233,9 @@ class CConfigFile {
 				);
 			}
 
-			$this->config['TELEMETRY_PROVIDERS'] = $this->validateTelemetryProviders($TELEMETRY_PROVIDERS);
+			$this->config['TELEMETRY_PROVIDERS'] = $this->validateTelemetryProviders($TELEMETRY_PROVIDERS,
+				$this->config['DB']['VAULT']
+			);
 		}
 
 		if (isset($SSO)) {
@@ -683,11 +685,12 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 	 * Get valid telemetry providers configuration.
 	 *
 	 * @param array $providers
+	 * @param string $vault_type
 	 *
 	 * @throws ConfigFileException
 	 * @return array
 	 */
-	protected function validateTelemetryProviders(array $providers): array {
+	protected function validateTelemetryProviders(array $providers, string $vault_type): array {
 		$expected_fields = [
 			'clickhouse' => ['provider', 'url', 'db', 'username', 'password',
 				'vault_path', 'ssl_verify_peer', 'ssl_verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
@@ -774,10 +777,18 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 
 			$provider['url'] = rtrim($provider['url'], '/');
 
-			if ($provider['vault_path'] !== '' && ($provider['username'] !== '' || $provider['password'] !== '')) {
-				self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path,
-					_s('username and password must be empty if vault path is provided')
-				));
+			if ($provider['vault_path'] !== '') {
+				if ($provider['username'] !== '' || $provider['password'] !== '') {
+					self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.'vault_path',
+						_s('username and password must be empty if vault path is provided')
+					));
+				}
+
+				if ($vault_type === '') {
+					self::exception(_s('Incorrect telemetry provider configuration %1$s: %2$s.', $path.'vault_path',
+						_s('database vault should be configured if vault path is provided')
+					));
+				}
 			}
 
 			$is_https = $https_url_validator->validate($provider['url']);
