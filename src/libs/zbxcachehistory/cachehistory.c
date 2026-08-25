@@ -1334,19 +1334,26 @@ static int	item_builtin_macro_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 	{
 		if (0 == strcmp(p->macro, MVAR_HOST_ID))
 			return zbx_dc_get_host_value(itemid, replace_to, ZBX_DC_REQUEST_HOST_ID);
-		else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
+
+		if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 			return zbx_dc_get_host_value(itemid, replace_to, ZBX_DC_REQUEST_HOST_HOST);
-		else if (0 == strcmp(p->macro, MVAR_HOST_NAME))
+
+		if (0 == strcmp(p->macro, MVAR_HOST_NAME))
 			return zbx_dc_get_host_value(itemid, replace_to, ZBX_DC_REQUEST_HOST_NAME);
-		else if (0 == strcmp(p->macro, MVAR_HOST_IP))
+
+		if (0 == strcmp(p->macro, MVAR_HOST_IP))
 			return zbx_dc_get_interface_value(0, itemid, replace_to, ZBX_DC_REQUEST_HOST_IP);
-		else if (0 == strcmp(p->macro, MVAR_HOST_DNS))
+
+		if (0 == strcmp(p->macro, MVAR_HOST_DNS))
 			return zbx_dc_get_interface_value(0, itemid, replace_to, ZBX_DC_REQUEST_HOST_DNS);
-		else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
+
+		if (0 == strcmp(p->macro, MVAR_HOST_CONN))
 			return zbx_dc_get_interface_value(0, itemid, replace_to, ZBX_DC_REQUEST_HOST_CONN);
-		else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
+
+		if (0 == strcmp(p->macro, MVAR_HOST_PORT))
 			return zbx_dc_get_interface_value(0, itemid, replace_to, ZBX_DC_REQUEST_HOST_PORT);
-		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+
+		if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
 			return zbx_dc_get_host_inventory_by_itemid(p->macro, itemid, replace_to);
 	}
 
