@@ -429,7 +429,7 @@ class CProxy extends CApiService {
 
 		foreach ($_apm_fields['additional_resource_attributes'] as $i => $fields) {
 			if (!$fields) {
-				return $apm_fields;
+				continue;
 			}
 
 			$apm_fields[$i + 1] = [
