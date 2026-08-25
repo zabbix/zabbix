@@ -659,10 +659,6 @@ void	um_mock_config_init(void)
 
 	zbx_hashset_create(&config->gmacro_kv, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&config->hmacro_kv, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	config->config = (zbx_dc_config_table_t *)zbx_malloc(NULL, sizeof(zbx_dc_config_table_t));
-	memset(config->config, 0, sizeof(zbx_dc_config_table_t));
-
 	set_dc_config(config);
 }
 
