@@ -666,6 +666,8 @@ class CProxy extends CApiService {
 	 * @throws APIException
 	 */
 	private static function validateCreate(array &$proxies): void {
+		$apm_rules = self::getApmValidationRules();
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>					['type' => API_H_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('proxy', 'name')],
 			'proxy_groupid' =>			['type' => API_ID, 'default' => 0],
@@ -759,7 +761,7 @@ class CProxy extends CApiService {
 			'hosts' =>					['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'apm' =>					['type' => API_OBJECT, 'fields' => self::getApmValidationRules()]
+			'apm' =>					['type' => API_OBJECT, 'fields' => $apm_rules]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
@@ -1090,6 +1092,8 @@ class CProxy extends CApiService {
 		}
 		unset($proxy);
 
+		$apm_rules = self::getApmValidationRules();
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'tls_connect' =>		['type' => API_ANY],
 			'tls_accept' =>			['type' => API_ANY],
@@ -1109,7 +1113,7 @@ class CProxy extends CApiService {
 										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_subject')]
 			]],
-			'apm' =>					['type' => API_OBJECT, 'fields' => self::getApmValidationRules()]
+			'apm' =>					['type' => API_OBJECT, 'fields' => $apm_rules]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
