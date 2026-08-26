@@ -1554,14 +1554,15 @@ static void	connector_match_filters(const zbx_vector_connector_filter_t *connect
  *                                                                            *
  * Purpose: export trends                                                     *
  *                                                                            *
- * Parameters: trends     - [IN] trends from cache                            *
- *             trends_num - [IN] number of trends                             *
- *             hosts_info - [IN] hosts groups names                           *
- *             items_info - [IN] item names and tags                          *
+ * Parameters: trends          - [IN] trends from cache                       *
+ *             trends_num      - [IN] number of trends                        *
+ *             hosts_info      - [IN] hosts groups names                      *
+ *             items_info      - [IN] item names and tags                     *
+ *             item_meta_cache - [IN] resolved item names and tags            *
  *                                                                            *
  ******************************************************************************/
 static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hashset_t *hosts_info,
-		zbx_hashset_t *items_info)
+		zbx_hashset_t *items_info, zbx_hashset_t *item_meta_cache)
 {
 	struct zbx_json			json;
 	const ZBX_DC_TREND		*trend = NULL;
@@ -1570,17 +1571,9 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 	zbx_host_info_t			*host_info;
 	zbx_item_info_t			*item_info;
 	zbx_uint128_t			avg;	/* calculate the trend average value */
-	zbx_dc_um_handle_t		*um_handle;
-	zbx_hashset_t			item_meta_cache;
 	zbx_item_meta_t			*item_meta;
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_hashset_create_ext(&item_meta_cache, items_info->num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, item_meta_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
-			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-
-	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < trends_num; i++)
 	{
@@ -1597,8 +1590,11 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 			continue;
 		}
 
-		if (NULL == (item_meta = item_meta_get(&item_meta_cache, item_info, um_handle)))
+		if (NULL == (item_meta = (zbx_item_meta_t *)zbx_hashset_search(item_meta_cache, &item->itemid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
+		}
 
 		zbx_json_reset(&json);
 
@@ -1648,24 +1644,24 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 	}
 
 	zbx_trends_export_flush();
-	zbx_hashset_destroy(&item_meta_cache);
 	zbx_json_free(&json);
-	zbx_dc_close_user_macros(um_handle);
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: export history                                                    *
  *                                                                            *
- * Parameters: history     - [IN/OUT] array of history data                   *
- *             history_num - [IN] number of history structures                *
- *             hosts_info  - [IN] hosts groups names                          *
- *             items_info  - [IN] item names and tags                         *
+ * Parameters: history         - [IN/OUT] array of history data               *
+ *             history_num     - [IN] number of history structures            *
+ *             hosts_info      - [IN] hosts groups names                      *
+ *             items_info      - [IN] item names and tags                     *
+ *             item_meta_cache - [IN] resolved item names and tags            *
  *                                                                            *
  ******************************************************************************/
 static void	DCexport_history(const zbx_dc_history_t *history, int history_num, zbx_hashset_t *hosts_info,
-		zbx_hashset_t *items_info, int history_export_enabled, zbx_vector_connector_filter_t *connector_filters,
-		unsigned char **data, size_t *data_alloc, size_t *data_offset)
+		zbx_hashset_t *items_info, zbx_hashset_t *item_meta_cache, int history_export_enabled,
+		zbx_vector_connector_filter_t *connector_filters, unsigned char **data, size_t *data_alloc,
+		size_t *data_offset)
 {
 	const zbx_dc_history_t		*h;
 	const zbx_history_sync_item_t	*item;
@@ -1674,18 +1670,10 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 	zbx_item_info_t			*item_info;
 	struct zbx_json			json;
 	zbx_connector_object_t		connector_object;
-	zbx_dc_um_handle_t		*um_handle;
-	zbx_hashset_t			item_meta_cache;
 	zbx_item_meta_t			*item_meta;
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_vector_uint64_create(&connector_object.ids);
-
-	zbx_hashset_create_ext(&item_meta_cache, items_info->num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, item_meta_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
-			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-
-	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1704,12 +1692,6 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 		item = item_info->item;
 
-		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts_info, &item->host.hostid)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
 		if (FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == h->entry.value_type ||
 				ITEM_VALUE_TYPE_JSON == h->entry.value_type)
 		{
@@ -1717,8 +1699,11 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 				continue;
 		}
 
-		if (NULL == (item_meta = item_meta_get(&item_meta_cache, item_info, um_handle)))
+		if (NULL == (item_meta = (zbx_item_meta_t *)zbx_hashset_search(item_meta_cache, &item->itemid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
+		}
 
 		if (0 != connector_filters->values_num)
 			connector_match_filters(connector_filters, &item_meta->tags, item, &connector_object.ids);
@@ -1727,6 +1712,12 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 				(FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == h->entry.value_type ||
 				ITEM_VALUE_TYPE_JSON == h->entry.value_type))
 		{
+			continue;
+		}
+
+		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts_info, &item->host.hostid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
@@ -1807,10 +1798,8 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 	if (SUCCEED == history_export_enabled)
 		zbx_history_export_flush();
 
-	zbx_hashset_destroy(&item_meta_cache);
 	zbx_vector_uint64_destroy(&connector_object.ids);
 	zbx_json_free(&json);
-	zbx_dc_close_user_macros(um_handle);
 }
 
 /******************************************************************************
@@ -1835,9 +1824,12 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 {
 	int			i, index, *trend_errcodes = NULL;
 	zbx_vector_uint64_t	hostids, item_info_ids, trend_itemids;
-	zbx_hashset_t		hosts_info, items_info;
+	zbx_hashset_t		hosts_info, items_info, item_meta_cache;
 	zbx_history_sync_item_t	*item;
 	zbx_history_sync_item_t	*trend_items = NULL;
+	zbx_dc_um_handle_t	*um_handle;
+	zbx_item_info_t		*item_info;
+	zbx_hashset_iter_t	iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d trends_num:%d", __func__, history_num, trends_num);
 
@@ -1937,15 +1929,29 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 
 	db_get_items_info_by_itemid(&items_info, &item_info_ids);
 
+	zbx_hashset_create_ext(&item_meta_cache, items_info.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, item_meta_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	um_handle = zbx_dc_open_user_macros();
+
+	zbx_hashset_iter_reset(&items_info, &iter);
+
+	while (NULL != (item_info = (zbx_item_info_t *)zbx_hashset_iter_next(&iter)))
+		(void)item_meta_get(&item_meta_cache, item_info, um_handle);
+
+	zbx_dc_close_user_macros(um_handle);
+
 	if (0 != history_num)
 	{
-		DCexport_history(history, history_num, &hosts_info, &items_info, history_export_enabled,
-				connector_filters, data, data_alloc, data_offset);
+		DCexport_history(history, history_num, &hosts_info, &items_info, &item_meta_cache,
+				history_export_enabled, connector_filters, data, data_alloc, data_offset);
 	}
 
 	if (0 != trends_num)
-		DCexport_trends(trends, trends_num, &hosts_info, &items_info);
+		DCexport_trends(trends, trends_num, &hosts_info, &items_info, &item_meta_cache);
 
+	zbx_hashset_destroy(&item_meta_cache);
 	zbx_hashset_destroy(&hosts_info);
 clean:
 	zbx_dc_config_clean_history_sync_items(trend_items, (size_t)trend_itemids.values_num);
