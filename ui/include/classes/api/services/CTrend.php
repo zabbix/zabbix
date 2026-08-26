@@ -213,7 +213,7 @@ class CTrend extends CApiService {
 						'group_by_clock' => [
 							'date_histogram' => [
 								'field' => 'clock',
-								'interval' => '1h',
+								'fixed_interval' => '1h',
 								'min_doc_count' => 1
 							],
 							'aggs' => [
@@ -247,6 +247,7 @@ class CTrend extends CApiService {
 			$query_must[] = [
 				'range' => [
 					'clock' => [
+						'format' => CElasticsearchHelper::DATE_FORMAT,
 						'gte' => $options['time_from']
 					]
 				]
@@ -258,6 +259,7 @@ class CTrend extends CApiService {
 			$query_must[] = [
 				'range' => [
 					'clock' => [
+						'format' => CElasticsearchHelper::DATE_FORMAT,
 						'lte' => $options['time_till']
 					]
 				]

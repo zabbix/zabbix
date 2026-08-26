@@ -21,6 +21,7 @@ class CElasticsearchHelper {
 
 	const MAX_RESULT_WINDOW = 10000;
 	const KEEP_CONTEXT_PERIOD = '10s';
+	const DATE_FORMAT = 'epoch_second';
 
 	private static $scroll_id;
 	private static $scrolls;

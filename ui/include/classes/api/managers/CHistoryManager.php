@@ -272,6 +272,7 @@ class CHistoryManager {
 			$filter[] = [
 				'range' => [
 					'clock' => [
+						'format' => CElasticsearchHelper::DATE_FORMAT,
 						'gt' => (time() - $period)
 					]
 				]
@@ -563,7 +564,7 @@ class CHistoryManager {
 				],
 				[
 					'term' => [
-						'clock' => $clock
+						'clock' => (string) $clock
 					]
 				],
 				[
@@ -583,6 +584,7 @@ class CHistoryManager {
 				[
 					'range' => [
 						'clock' => [
+							'format' => CElasticsearchHelper::DATE_FORMAT,
 							'lt' => $clock,
 							'gte' => $clock - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
 						]
@@ -882,6 +884,7 @@ class CHistoryManager {
 				[
 					'range' => [
 						'clock' => [
+							'format' => CElasticsearchHelper::DATE_FORMAT,
 							'gte' => $time_from,
 							'lte' => $time_to
 						]
@@ -1198,6 +1201,7 @@ class CHistoryManager {
 						[
 							'range' => [
 								'clock' => [
+									'format' => CElasticsearchHelper::DATE_FORMAT,
 									'gte' => $time_from,
 									'lte' => $time_to
 								]
@@ -1259,6 +1263,7 @@ class CHistoryManager {
 				[
 					'range' => [
 						'clock' => [
+							'format' => CElasticsearchHelper::DATE_FORMAT,
 							'gte' => $time_from,
 							'lte' => $time_to
 						]
@@ -1511,7 +1516,8 @@ class CHistoryManager {
 							],
 							[
 								'range' => [
-									'clock' => ['gte' => $time_from] + ($time_to !== null ? ['lte' => $time_to] : [])
+									'clock' => ['format' => CElasticsearchHelper::DATE_FORMAT, 'gte' => $time_from]
+										+ ($time_to !== null ? ['lte' => $time_to] : [])
 								]
 							]
 						]

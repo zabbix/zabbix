@@ -268,6 +268,7 @@ class CHistory extends CApiService {
 			$query['query']['bool']['must'][] = [
 				'range' => [
 					'clock' => [
+						'format' => CElasticsearchHelper::DATE_FORMAT,
 						'gte' => $options['time_from']
 					]
 				]
@@ -279,6 +280,7 @@ class CHistory extends CApiService {
 			$query['query']['bool']['must'][] = [
 				'range' => [
 					'clock' => [
+						'format' => CElasticsearchHelper::DATE_FORMAT,
 						'lte' => $options['time_till']
 					]
 				]
@@ -287,6 +289,10 @@ class CHistory extends CApiService {
 
 		// filter
 		if ($options['filter'] !== null) {
+			if (array_key_exists('clock', $options['filter']) && $options['filter']['clock'] !== null) {
+				$options['filter']['clock'] = array_map('strval', $options['filter']['clock']);
+			}
+
 			$query = CElasticsearchHelper::addFilter($schema, $query, $options);
 		}
 
