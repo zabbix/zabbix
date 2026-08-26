@@ -21,6 +21,7 @@
 #include "zbxthreads.h"
 #include "zbxtimekeeper.h"
 #include "zbxtypes.h"
+#include "zbxalgo.h"
 
 ZBX_PTR_VECTOR_LITE_IMPL(mw_task_ptr, zbx_mw_task_t *)
 

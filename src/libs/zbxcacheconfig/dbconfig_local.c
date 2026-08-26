@@ -14,6 +14,7 @@
 
 #include "dbconfig_local.h"
 #include "dbconfig_correlation.h"
+#include "dbconfig_cep.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"

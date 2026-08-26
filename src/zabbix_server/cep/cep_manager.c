@@ -26,7 +26,6 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxipcservice.h"
-#include "zbxlog.h"
 #include "zbxmw.h"
 #include "zbxserialize.h"
 #include "zbxsupervisor_client.h"

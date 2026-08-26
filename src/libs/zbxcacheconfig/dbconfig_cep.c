@@ -21,7 +21,6 @@
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbxlog.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"

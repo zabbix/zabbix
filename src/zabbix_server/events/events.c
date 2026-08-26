@@ -14,12 +14,11 @@
 
 #include "events.h"
 
-#include "../db_lengths_constants.h"
-#include "../actions/actions.h"
+#include "zabbix_server/db_lengths_constants.h"
+#include "zabbix_server/actions/actions.h"
 
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
-#include "zbxevent.h"
 #include "zbxexport.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
@@ -33,6 +32,7 @@
 #include "zbx_expression_constants.h"
 #include "zbx_cep_client.h"
 #include "zbxtime.h"
+#include "zbxalgo.h"
 
 typedef enum
 {

@@ -14,6 +14,8 @@
 
 #include "dbconfig.h"
 #include "dbconfig_local.h"
+#include "dbconfig_cep.h"
+#include "dbconfig_correlation.h"
 
 #include "proxy_group.h"
 #include "zbxalgo.h"
@@ -60,6 +62,7 @@
 #include "zbx_expression_constants.h"
 #include "module.h"
 #include "zbxhash.h"
+#include "vps_monitor.h"
 
 #define	ZBX_VECTOR_ARRAY_RESERVE	3
 

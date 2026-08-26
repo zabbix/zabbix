@@ -15,6 +15,7 @@
 #include "dbsync.h"
 #include "dbconfig_correlation.h"
 #include "dbconfig_local.h"
+#include "dbconfig.h"
 #include "zbxcacheconfig.h"
 #include "user_macro.h"
 

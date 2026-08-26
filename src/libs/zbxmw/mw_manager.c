@@ -25,6 +25,9 @@
 #include "zbxself.h"
 #include "zbxserialize.h"
 #include "zbxtimekeeper.h"
+#include "zbxalgo.h"
+#include "zbxthreads.h"
+#include "zbxtime.h"
 
 #define MANAGER_SERVICE_TIMEOUT		SEC_PER_MIN
 

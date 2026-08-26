@@ -16,7 +16,7 @@
 
 #include "zbxhistory.h"
 #include "zbxcachevalue.h"
-#include "zbxdb.h"
+#include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
 #include "zbxcalc.h"

@@ -14,6 +14,8 @@
 
 #include "stats.h"
 #include "zbxsysinfo.h"
+#include "cpustat.h"
+#include "diskdevices.h"
 
 #include "zbxlog.h"
 #include "zbxtime.h"

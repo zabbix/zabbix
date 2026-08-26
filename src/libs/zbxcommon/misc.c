@@ -21,6 +21,7 @@
 
 #include "zbxcommon.h"
 #include "zbxtypes.h"
+#include "zbxtypes_ext.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxstr.h"

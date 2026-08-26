@@ -29,6 +29,7 @@
 #include "zbxnix.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
+#include "zbxtypes_ext.h"
 #include "zbxdb.h"
 #include "zbxprof.h"
 #ifdef HAVE_ARES_QUERY_CACHE
