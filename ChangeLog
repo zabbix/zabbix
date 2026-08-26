@@ -1,3 +1,8 @@
+Changes for 7.4.14
+
+7.4.14rc1 was released as 7.4.14 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.4.14rc1
 
 New features:
@@ -1553,6 +1558,11 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.30
+
+7.0.30rc1 was released as 7.0.30 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.30rc1
@@ -5745,6 +5755,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.49rc1
 
 New features:
+A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
 
 Bug fixes:
 
