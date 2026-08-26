@@ -759,7 +759,7 @@ class CSetupWizard extends CForm {
 					: null
 			)
 			->addRow(
-				(new CLabel(_('Vault authentication role id'), 'vault_app_role_id'))->setAsteriskMark(),
+				(new CLabel(_('Vault authentication role ID'), 'vault_app_role_id'))->setAsteriskMark(),
 				(new CTextBox('vault_app_role_id', $this->getConfig('DB_VAULT_APP_ROLE_ID')))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					->setAttribute('maxlength', 2048),
@@ -770,7 +770,7 @@ class CSetupWizard extends CForm {
 					: null
 			)
 			->addRow(
-				(new CLabel(_('Vault authentication secret id'), 'vault_app_secret_id'))->setAsteriskMark(),
+				(new CLabel(_('Vault authentication secret ID'), 'vault_app_secret_id'))->setAsteriskMark(),
 				(new CTextBox('vault_app_secret_id', $this->getConfig('DB_VAULT_APP_SECRET_ID')))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					->setAttribute('maxlength', 2048),
@@ -1090,11 +1090,11 @@ class CSetupWizard extends CForm {
 			else {
 				$table
 					->addRow(
-						(new CSpan(_('Vault authentication role id')))->addClass(ZBX_STYLE_GREY),
+						(new CSpan(_('Vault authentication role ID')))->addClass(ZBX_STYLE_GREY),
 						$this->getConfig('DB_VAULT_APP_ROLE_ID')
 					)
 					->addRow(
-						(new CSpan(_('Vault authentication secret id')))->addClass(ZBX_STYLE_GREY),
+						(new CSpan(_('Vault authentication secret ID')))->addClass(ZBX_STYLE_GREY),
 						$this->getConfig('DB_VAULT_APP_SECRET_ID')
 					);
 			}

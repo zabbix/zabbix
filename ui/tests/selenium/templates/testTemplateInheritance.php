@@ -412,7 +412,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('trends', '55d');
 		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50s');
 		$this->zbxTestAssertElementValue('delay_flex_0_period', '1-7,00:00-24:00');
-		$overlay->asForm()->checkValue(['Value mapping' => 'Template value mapping']);
+		$overlay->asForm()->checkValue(['Value mapping' => $this->templateName.': Template value mapping']);
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);
