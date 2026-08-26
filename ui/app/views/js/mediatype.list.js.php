@@ -183,7 +183,7 @@
 						uncheckTableRows('mediatype');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

@@ -146,7 +146,7 @@
 						uncheckTableRows('connector');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();
