@@ -1122,6 +1122,7 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 
 	$maintenance_names = [];
 	$username = '';
+	$ceprule_names = [];
 
 	foreach ($icon_data as $suppression) {
 		if (array_key_exists('maintenance_name', $suppression)) {
@@ -1130,9 +1131,13 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 		elseif (array_key_exists('username', $suppression)) {
 			$username = $suppression['username'];
 		}
+		elseif (array_key_exists('ceprule_name', $suppression)) {
+			$ceprule_names[] = $suppression['ceprule_name'];
+		}
 	}
 
 	$maintenances = implode(', ', $maintenance_names);
+	$ceprules = implode(', ', array_unique($ceprule_names));
 	$is_suppressed_by_maintenance = $maintenances !== '' && $username === '';
 
 	return (new CButtonIcon(ZBX_ICON_EYE_OFF))
@@ -1140,10 +1145,11 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 		->addClass($blink ? 'js-blink' : null)
 		->setAttribute('aria-label', $is_suppressed_by_maintenance
 			? _('Suppressed by maintenance')
-			: _('Manually suppressed')
+			: ($ceprules === '' ? _('Manually suppressed') : _('Suppressed by complex event processing'))
 		)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
+			($ceprules !== '' ? "\n"._s('Complex event processing: %1$s', $ceprules) : '').
 			($username !== '' ? "\n"._s('Manually by: %1$s', $username) : '').
 			($maintenances !== '' ? "\n"._s('Maintenance: %1$s', $maintenances) : '')
 		);

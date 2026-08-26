@@ -376,6 +376,7 @@ class CScreenProblem extends CScreenBase {
 	public static function addSuppressionNames(array &$problems) {
 		$maintenanceids = [];
 		$userids = [];
+		$cepruleids = [];
 
 		foreach ($problems as $problem) {
 			foreach ($problem['suppression_data'] as $data) {
@@ -384,6 +385,9 @@ class CScreenProblem extends CScreenBase {
 				}
 				elseif ($data['userid'] != 0) {
 					$userids[] = $data['userid'];
+				}
+				elseif ($data['cep_ruleid'] != 0) {
+					$cepruleids[] = $data['cep_ruleid'];
 				}
 			}
 		}
@@ -404,6 +408,14 @@ class CScreenProblem extends CScreenBase {
 			]);
 		}
 
+		if ($cepruleids) {
+			$ceprules = API::CEPRule()->get([
+				'output' => ['name'],
+				'cep_ruleids' => $cepruleids,
+				'preservekeys' => true
+			]);
+		}
+
 		foreach ($problems as &$problem) {
 			foreach ($problem['suppression_data'] as &$data) {
 				if ($data['maintenanceid'] != 0) {
@@ -416,6 +428,12 @@ class CScreenProblem extends CScreenBase {
 					$data['username'] = array_key_exists($data['userid'], $users)
 						? getUserFullname($users[$data['userid']])
 						: _('Inaccessible user');
+				}
+
+				if ($data['cep_ruleid'] != 0) {
+					$data['ceprule_name'] = array_key_exists($data['cep_ruleid'], $ceprules)
+						? $ceprules[$data['cep_ruleid']]['name']
+						: _('Inaccessible complex event processing rule');
 				}
 			}
 			unset($data);
@@ -503,7 +521,7 @@ class CScreenProblem extends CScreenBase {
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
-			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until', 'cep_ruleid'],
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -562,7 +580,7 @@ class CScreenProblem extends CScreenBase {
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
-			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until', 'cep_ruleid'],
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,

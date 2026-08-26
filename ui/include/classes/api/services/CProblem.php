@@ -75,7 +75,7 @@ class CProblem extends CApiService {
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid', 'maintenanceid', 'details', 'cep_ruleid']), 'default' => null],
-			'selectSuppressionData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
+			'selectSuppressionData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid', 'cep_ruleid']), 'default' => null],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
@@ -473,32 +473,26 @@ class CProblem extends CApiService {
 		}
 	}
 
-	private static function addRelatedSuppressionData(array $options, array &$result): void {
+	private static function addRelatedSuppressionData(array $options, array &$problems): void {
 		if ($options['selectSuppressionData'] === null) {
 			return;
 		}
 
-		foreach ($result as &$row) {
-			$row['suppression_data'] = [];
+		foreach ($problems as &$problem) {
+			$problem['suppression_data'] = [];
 		}
-		unset($row);
-
-		$output = $options['selectSuppressionData'] === API_OUTPUT_EXTEND
-			? ['event_suppressid', 'eventid', 'maintenanceid', 'suppress_until', 'userid']
-			: array_unique(array_merge(['event_suppressid', 'eventid'], $options['selectSuppressionData']));
+		unset($problem);
 
 		$sql_options = [
-			'output' => $output,
-			'filter' => ['eventid' => array_keys($result)]
+			'output' => array_merge(['event_suppressid', 'eventid'], $options['selectSuppressionData']),
+			'filter' => ['eventid' => array_keys($problems)]
 		];
-		$db_event_suppress = DBselect(DB::makeSql('event_suppress', $sql_options));
 
-		while ($db_suppression_data = DBfetch($db_event_suppress)) {
-			$eventid = $db_suppression_data['eventid'];
+		$resource = DBselect(DB::makeSql('event_suppress', $sql_options));
 
-			unset($db_suppression_data['event_suppressid'], $db_suppression_data['eventid']);
-
-			$result[$eventid]['suppression_data'][] = $db_suppression_data;
+		while ($row = DBfetch($resource)) {
+			$problems[$row['eventid']]['suppression_data'][] =
+				array_diff_key($row, array_flip(['event_suppressid', 'eventid']));
 		}
 	}
 
