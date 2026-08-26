@@ -130,46 +130,41 @@ class CSettingsHelper {
 	 */
 	public static function get(string $field): string {
 		if (!self::$params) {
-			$parameters = [
-				// GUI.
-				'default_lang', 'default_timezone', 'default_theme', 'search_limit', 'max_overview_table_size',
-				'max_in_table', 'server_check_interval', 'work_period', 'show_technical_errors', 'history_period',
-				'period_default', 'max_period',
+			self::$params = API::Settings()->get([
+				'output' => [
+					// GUI.
+					'default_lang', 'default_timezone', 'default_theme', 'search_limit', 'max_overview_table_size',
+					'max_in_table', 'server_check_interval', 'work_period', 'show_technical_errors', 'history_period',
+					'period_default', 'max_period',
 
-				// Timeouts.
-				'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
-				'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent',
-				'timeout_script', 'timeout_browser', 'socket_timeout', 'connect_timeout', 'media_type_test_timeout',
-				'script_timeout', 'item_test_timeout', 'report_test_timeout', 'device_link_timeout',
+					// Timeouts.
+					'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
+					'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent',
+					'timeout_script', 'timeout_browser', 'socket_timeout', 'connect_timeout', 'media_type_test_timeout',
+					'script_timeout', 'item_test_timeout', 'report_test_timeout', 'device_link_timeout',
 
-				// Trigger displaying options.
-				'custom_color', 'problem_unack_color', 'problem_unack_style', 'problem_ack_color',
-				'problem_ack_style', 'ok_unack_color', 'ok_unack_style', 'ok_ack_color', 'ok_ack_style',
-				'ok_period', 'blink_period', 'severity_name_0', 'severity_color_0', 'severity_name_1',
-				'severity_color_1', 'severity_name_2', 'severity_color_2', 'severity_name_3', 'severity_color_3',
-				'severity_name_4', 'severity_color_4', 'severity_name_5', 'severity_color_5',
+					// Trigger displaying options.
+					'custom_color', 'problem_unack_color', 'problem_unack_style', 'problem_ack_color',
+					'problem_ack_style', 'ok_unack_color', 'ok_unack_style', 'ok_ack_color', 'ok_ack_style',
+					'ok_period', 'blink_period', 'severity_name_0', 'severity_color_0', 'severity_name_1',
+					'severity_color_1', 'severity_name_2', 'severity_color_2', 'severity_name_3', 'severity_color_3',
+					'severity_name_4', 'severity_color_4', 'severity_name_5', 'severity_color_5',
 
-				// Geographical maps.
-				'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_attribution', 'geomaps_max_zoom',
+					// Geographical maps.
+					'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_attribution', 'geomaps_max_zoom',
 
-				// Other configuration parameters.
-				'url', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging',
-				'login_attempts', 'login_block', 'vault_provider', 'proxy_secrets_provider', 'validate_uri_schemes',
-				'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
+					// Other configuration parameters.
+					'url', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging',
+					'login_attempts', 'login_block', 'vault_provider', 'proxy_secrets_provider', 'validate_uri_schemes',
+					'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
 
-				// Audit log.
-				'auditlog_enabled', 'auditlog_mode',
+					// Audit log.
+					'auditlog_enabled', 'auditlog_mode',
 
-				// Read-only parameters.
-				'ha_failover_delay', 'serverid'
-			];
-
-			if (CApiService::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
-				// APM global configuration.
-				$parameters[] = 'apm_global_db';
-			}
-
-			self::$params = API::Settings()->get(['output' => $parameters]);
+					// Read-only parameters.
+					'ha_failover_delay', 'serverid'
+				]
+			]);
 
 			if (self::$params === false) {
 				throw new Exception(_('Unable to load settings API parameters.'));
