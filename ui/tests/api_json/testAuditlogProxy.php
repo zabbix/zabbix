@@ -33,7 +33,18 @@ class testAuditlogProxy extends testAuditlogCommon {
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'allowed_addresses' => 'localhost',
 					'tls_psk_identity' => 'Audit',
-					'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
+					'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478',
+					'apm' => [
+						'data_collection_status' => 1,
+						'max_messages_per_second' => 100,
+						'additional_resource_attributes' => [
+							[
+								'key' => 'key_1',
+								'value' => 'value_1',
+								'signal_type' => 2
+							]
+						]
+					]
 				],
 				[
 					'name' => 'proxy.for.update.audit'
@@ -55,6 +66,13 @@ class testAuditlogProxy extends testAuditlogCommon {
 			'proxy.allowed_addresses' => ['add', 'localhost'],
 			'proxy.tls_psk_identity' => ['add', '******'],
 			'proxy.tls_psk' => ['add', '******'],
+			'proxy.apm.additional_resource_attributes[1]' => ['add'],
+			'proxy.apm.additional_resource_attributes[1].signal_type' => ['add','2'],
+			'proxy.apm.additional_resource_attributes[1].key' => ['add','key_1'],
+			'proxy.apm.additional_resource_attributes[1].value' => ['add','value_1'],
+			'proxy.apm' => ['add'],
+			'proxy.apm.data_collection_status' => ['add','1'],
+			'proxy.apm.max_messages_per_second' => ['add','100'],
 			'proxy.proxyid' => ['add', $proxyid]
 		]);
 
@@ -71,15 +89,33 @@ class testAuditlogProxy extends testAuditlogCommon {
 			'tls_accept' => HOST_ENCRYPTION_PSK,
 			'allowed_addresses' => 'updated_address',
 			'tls_psk_identity' => 'Updated_TSK',
-			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193111'
+			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193111',
+			'apm' => [
+				'data_collection_status' => 1,
+				'max_messages_per_second' => 100,
+				'additional_resource_attributes' => [
+					[
+						'key' => 'key_1',
+						'value' => 'value_1',
+						'signal_type' => 2
+					]
+				]
+			]
 		]];
 		$expected_details = json_encode([
+			'proxy.apm.additional_resource_attributes[1]' => ['add'],
 			'proxy.name' => ['update', 'Updated Audit proxy', 'proxy.for.update.audit'],
 			'proxy.description' => ['update', 'Update proxy audit description', ''],
 			'proxy.tls_accept' => ['update', (string) HOST_ENCRYPTION_PSK, (string) HOST_ENCRYPTION_NONE],
 			'proxy.allowed_addresses' => ['update', 'updated_address', ''],
 			'proxy.tls_psk_identity' => ['update', '******', '******'],
-			'proxy.tls_psk' => ['update', '******', '******']
+			'proxy.tls_psk' => ['update', '******', '******'],
+			'proxy.apm.additional_resource_attributes[1].signal_type' => ['add','2'],
+			'proxy.apm.additional_resource_attributes[1].key' => ['add','key_1'],
+			'proxy.apm.additional_resource_attributes[1].value' => ['add','value_1'],
+			'proxy.apm' => ['update'],
+			'proxy.apm.data_collection_status' => ['update','1','0'],
+			'proxy.apm.max_messages_per_second' => ['update','100','0']
 		]);
 
 		$this->call('proxy.update', $request);
