@@ -50,12 +50,16 @@
 			->setAttribute('data-field-type', 'set')
 			->setAttribute('data-field-name', 'filter[conditions]')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('width: 100%')
 			->addItem((new CTable())
 				->setColumns([
-					new CTableColumn(_('Label')),
-					(new CTableColumn(_('Name')))
-						->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
-					new CTableColumn(_('Actions'))
+					new CTableColumn(
+						(new CColHeader(_('Label')))->setWidth('40')
+					),
+					new CTableColumn(_('Name')),
+					new CTableColumn(
+						(new CColHeader(_('Actions')))->setWidth('75')
+					)
 				])
 				->setId('ceprule-filter-conditions')
 				->addItem((new CTag('tfoot', true))

@@ -90,7 +90,8 @@ $form = (new CForm())
 			new CPartial('ceprule.modal.operation')
 		))
 		->addItem((new CTemplateTag('ceprule-condition-row-template'))->addItem(
-			(new CRow(['#{formulaid}', '#{*description_html}',
+			(new CRow(['#{formulaid}',
+				(new CCol('#{*description_html}'))->addClass(ZBX_STYLE_WORDBREAK),
 				[
 					(new CButtonLink(_('Edit')))->addClass('js-condition-edit'),
 					(new CButtonLink(_('Remove')))->addClass('js-condition-remove'),
@@ -119,8 +120,8 @@ $form = (new CForm())
 					_('Execute when'),
 					' #{execute_when_str} : #{label_str}',
 					new CTag('em', true, ' #{arguments_str}')
-				]))->addClass('text'),
-				(new CCol('#{*condition_description_html}'))->addClass(ZBX_STYLE_WORDBREAK),
+				]))->addClass(ZBX_STYLE_WORDBREAK),
+				'#{*condition_description_html}',
 				[
 					(new CButtonLink(_('Edit')))->addClass('js-operation-edit'),
 					(new CButtonLink(_('Remove')))->addClass('js-operation-remove'),
@@ -161,26 +162,35 @@ $form = (new CForm())
 				->addItem((new CTable())
 					->setId('ceprule-operations-table')
 					->addClass('list-numbered')
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 					->setColumns([
-						(new CTableColumn(new CColHeader((new CDiv())
-								->addItem(makeWarningIcon(
-									_s('Execute when %1$s: There is no "%2$s" operation defined.',
-										CCepRuleHelper::getOperationExecuteWhenString([
-											'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED
-										]),
-										CCepRuleHelper::getOperationLabelString([
-											'type' => CCepRuleHelper::OP_CLOSE_WINDOW
-										])
-									)
-								))
-								->addClass('js-operations-info')
-								->addClass(ZBX_STYLE_DISPLAY_NONE)
-						))),
-						(new CTableColumn(new CColHeader(_('Details'))))
-							->setAttribute('width', ZBX_TEXTAREA_STANDARD_WIDTH.'px'),
-						(new CTableColumn(new CColHeader(_('Conditions'))))
-							->setAttribute('width', ZBX_TEXTAREA_STANDARD_WIDTH.'px'),
-						(new CTableColumn(new CColHeader('')))
+						new CTableColumn(
+							(new CColHeader(
+								(new CDiv())
+									->addItem(makeWarningIcon(
+										_s('Execute when %1$s: There is no "%2$s" operation defined.',
+											CCepRuleHelper::getOperationExecuteWhenString([
+												'execute_when' => CCepRuleHelper::WHEN_WINDOW_CLOSED
+											]),
+											CCepRuleHelper::getOperationLabelString([
+												'type' => CCepRuleHelper::OP_CLOSE_WINDOW
+											])
+										)
+									))
+									->addClass('js-operations-info')
+									->addClass(ZBX_STYLE_DISPLAY_NONE)
+							))
+								->setWidth('30')
+						),
+						(new CTableColumn(
+							(new CColHeader(_('Details')))->setWidth('50%')
+						)),
+						(new CTableColumn(
+							(new CColHeader(_('Conditions')))->setWidth('50%')
+						)),
+						(new CTableColumn(
+							(new CColHeader('Actions'))->setWidth('75')
+						))
 					])
 					->addItem((new CTag('tfoot', true))
 						->addItem((new CCol(

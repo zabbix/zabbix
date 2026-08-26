@@ -54,7 +54,8 @@ foreach ($labels as $option => $label) {
 	->addClass(ZBX_STYLE_DISPLAY_NONE)
 	->addItem((new CFormGrid())
 		->addItem((new CTemplateTag('ceprule-operation-condition-row-template'))->addItem([
-			(new CRow(['#{formulaid}', '#{*description_html}',
+			(new CRow(['#{formulaid}',
+				(new CCol('#{*description_html}'))->addClass(ZBX_STYLE_WORDBREAK),
 				[
 					(new CButtonLink(_('Edit')))->addClass('js-condition-edit'),
 					(new CButtonLink(_('Remove')))->addClass('js-condition-remove'),
@@ -140,10 +141,14 @@ foreach ($labels as $option => $label) {
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addItem((new CTable())
 					->setColumns([
-						new CTableColumn(_('Label')),
+						new CTableColumn(
+							(new CColHeader(_('Label')))->setWidth('40')
+						),
 						(new CTableColumn(_('Name')))
 							->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
-						new CTableColumn(_('Actions'))
+						new CTableColumn(
+							(new CColHeader(_('Actions')))->setWidth('75')
+						)
 					])
 					->setId('ceprule-operation-filter-conditions')
 					->addItem((new CTag('tfoot', true))
