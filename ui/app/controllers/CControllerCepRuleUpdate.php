@@ -140,17 +140,7 @@ class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 					'group_by_host' => ['integer',
 						'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO]
 					],
-					'group_by_tags' => [
-						['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO]],
-						['integer', 'required', 'in' => [CCepRuleHelper::GROUP_BY_YES],
-							'messages' => ['in' => _('At least one of "Group by" options must be selected.')],
-							'when' => [
-								['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]],
-								['group_by_host', 'in' => [CCepRuleHelper::GROUP_BY_NO]],
-								['group_by_host_group', 'in' => [CCepRuleHelper::GROUP_BY_NO]]
-							]
-						]
-					],
+					'group_by_tags' => ['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO]],
 					'tags' => ['array', 'required', 'not_empty',
 						'field' => ['db cep_rule_window.tags', 'not_empty'],
 						'when' => ['group_by_tags', 'in' => [CCepRuleHelper::GROUP_BY_YES]]
