@@ -206,7 +206,7 @@ class CTrend extends CApiService {
 						'group_by_clock' => [
 							'date_histogram' => [
 								'field' => 'clock',
-								'fixed_interval' => '1h',
+								'interval' => '1h',
 								'min_doc_count' => 1
 							],
 							'aggs' => [
