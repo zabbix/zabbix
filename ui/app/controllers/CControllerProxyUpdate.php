@@ -109,21 +109,20 @@ class CControllerProxyUpdate extends CController {
 				['db proxy.tls_subject', 'when' => ['tls_accept_certificate', true]]
 			],
 			'data_collection_status' => ['required', 'boolean',
-				'in' => [PROXY_APM_STATUS_NOT_CONFIGURED, PROXY_APM_STATUS_CONFIGURED]
+				'in' => [PROXY_APM_DATA_COLLECTION_DISABLED, PROXY_APM_DATA_COLLECTION_ENABLED]
 			],
 			'max_messages_per_second' => ['required', 'integer', 'not_empty', 'min' => 0, 'max' => ZBX_MAX_INT32,
-				'when' => [['data_collection_status', 'in' => [PROXY_APM_STATUS_CONFIGURED]]]
+				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]]
 			],
 			'additional_resource_attributes' => ['objects', 'uniq' => ['key', 'signal_type'],
 				'fields' => [
 					'key' => ['required', 'string', 'not_empty'],
 					'value' => ['required', 'string'],
 					'signal_type' => ['required', 'integer',
-						'in' => [PROXY_APM_ATTR_SIGNAL_TYPE_TRACES, PROXY_APM_ATTR_SIGNAL_TYPE_METRICS,
-							PROXY_APM_ATTR_SIGNAL_TYPE_LOGS]
+						'in' => [SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS]
 					]
 				],
-				'when' => [['data_collection_status', 'in' => [PROXY_APM_STATUS_CONFIGURED]]],
+				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]],
 				'messages' => ['uniq' => _('Attribute name and type is not unique.')]
 			],
 			'custom_timeouts' => ['db proxy.custom_timeouts',
@@ -264,7 +263,7 @@ class CControllerProxyUpdate extends CController {
 		$proxy['apm'] = [];
 		$this->getInputs($proxy['apm'], ['data_collection_status']);
 
-		if ($proxy['apm']['data_collection_status'] === PROXY_APM_STATUS_CONFIGURED) {
+		if ($proxy['apm']['data_collection_status'] === PROXY_APM_DATA_COLLECTION_ENABLED) {
 			$this->getInputs($proxy['apm'], ['max_messages_per_second', 'additional_resource_attributes']);
 		}
 

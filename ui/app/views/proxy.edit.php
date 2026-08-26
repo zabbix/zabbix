@@ -252,8 +252,8 @@ $apm_tab = (new CFormGrid())
 		], 'data_collection_status')),
 		new CFormField(
 			(new CCheckBox('data_collection_status'))
-				->setUncheckedValue(PROXY_APM_STATUS_NOT_CONFIGURED)
-				->setChecked($data['form']['data_collection_status'] === PROXY_APM_STATUS_CONFIGURED),
+				->setUncheckedValue(PROXY_APM_DATA_COLLECTION_DISABLED)
+				->setChecked($data['form']['data_collection_status'] === PROXY_APM_DATA_COLLECTION_ENABLED),
 		)
 	])
 	->addItem([
@@ -296,9 +296,9 @@ $apm_tab = (new CFormGrid())
 				'attr_tab_id' => 'proxy-apm-tab',
 				'has_inline_validation' => true,
 				'signal_types' => [
-					PROXY_APM_ATTR_SIGNAL_TYPE_TRACES => _('Traces'),
-					PROXY_APM_ATTR_SIGNAL_TYPE_METRICS => _('Metrics'),
-					PROXY_APM_ATTR_SIGNAL_TYPE_LOGS => _('Logs')
+					SIGNAL_TYPE_TRACES => _('Traces'),
+					SIGNAL_TYPE_METRICS => _('Metrics'),
+					SIGNAL_TYPE_LOGS => _('Logs')
 				]
 			])))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		))->addClass('js-apm-attributes')

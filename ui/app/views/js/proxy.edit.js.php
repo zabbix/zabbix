@@ -241,7 +241,7 @@ window.proxy_edit_popup = new class {
 			fields.clone_proxyid = this.clone_proxyid;
 		}
 
-		if (fields.data_collection_status === PROXY_APM_STATUS_NOT_CONFIGURED) {
+		if (fields.data_collection_status === PROXY_APM_DATA_COLLECTION_DISABLED) {
 			for (const field of ['max_messages_per_second', 'additional_resource_attributes']) {
 				if (field in fields) {
 					delete fields[field];

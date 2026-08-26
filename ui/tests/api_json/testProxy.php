@@ -247,18 +247,18 @@ class testProxy extends CAPITest {
 				'name' => 'API test proxy - with apm',
 				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 				'apm' => [
-					'data_collection_status' => 1,
+					'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 					'max_messages_per_second' => 100,
 					'additional_resource_attributes' => [
 						[
 							'key' => 'key_1',
 							'value' => 'value_1',
-							'signal_type' => 1
+							'signal_type' => SIGNAL_TYPE_METRICS
 						],
 						[
 							'key' => 'key_2',
 							'value' => 'value_2',
-							'signal_type' => 2
+							'signal_type' => SIGNAL_TYPE_LOGS
 						]
 
 					]
@@ -3543,18 +3543,18 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'apm' => [
-						'data_collection_status' => 1,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 						'max_messages_per_second' => 100,
 						'additional_resource_attributes' => [
 							[
 								'key' => 'key_1',
 								'value' => 'value_1',
-								'signal_type' => 2
+								'signal_type' => SIGNAL_TYPE_LOGS
 							],
 							[
 								'key' => 'key_1',
 								'value' => 'value_2',
-								'signal_type' => 2
+								'signal_type' => SIGNAL_TYPE_LOGS
 							]
 						]
 					]
@@ -3566,7 +3566,7 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'apm' => [
-						'data_collection_status' => 0,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_DISABLED,
 						'max_messages_per_second' => 100
 					]
 				],
@@ -3577,12 +3577,12 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'apm' => [
-						'data_collection_status' => 1,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 						'max_messages_per_second' => 100,
 						'additional_resource_attributes' => [
 							[
 								'value' => 'value_1',
-								'signal_type' => 2
+								'signal_type' => SIGNAL_TYPE_LOGS
 							]
 						]
 					]
@@ -3594,7 +3594,7 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'apm' => [
-						'data_collection_status' => 1,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 						'max_messages_per_second' => 100,
 						'additional_resource_attributes' => [
 							[
@@ -3611,13 +3611,13 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'apm' => [
-						'data_collection_status' => 1,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 						'max_messages_per_second' => 100,
 						'additional_resource_attributes' => [
 							[
 								'key' => 'key_1',
 								'value' => 'value_1',
-								'signal_type' => 2
+								'signal_type' => SIGNAL_TYPE_LOGS
 							],
 							[
 								'key' => 'key_2',
@@ -3693,18 +3693,18 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy with apm enabled',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'apm' => [
-						'data_collection_status' => 1,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 						'max_messages_per_second' => 100,
 						'additional_resource_attributes' => [
 							[
 								'key' => 'key_1',
 								'value' => 'value_1',
-								'signal_type' => 1
+								'signal_type' => SIGNAL_TYPE_METRICS
 							],
 							[
 								'key' => 'key_2',
 								'value' => 'value_1',
-								'signal_type' => 1
+								'signal_type' => SIGNAL_TYPE_METRICS
 							]
 						]
 					]
@@ -3716,12 +3716,12 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy without max_messages_per_second',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'apm' => [
-						'data_collection_status' => 1,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 						'additional_resource_attributes' => [
 							[
 								'key' => 'key_1',
 								'value' => 'value_1',
-								'signal_type' => 1
+								'signal_type' => SIGNAL_TYPE_METRICS
 							]
 						]
 					]
@@ -3733,7 +3733,7 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy with empty additional_resource_attributes',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'apm' => [
-						'data_collection_status' => 1,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 						'max_messages_per_second' => 100,
 						'additional_resource_attributes' => []
 					]
@@ -3745,7 +3745,7 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy without additional_resource_attributes',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'apm' => [
-						'data_collection_status' => 1,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 						'max_messages_per_second' => 100
 					]
 				],
@@ -3764,7 +3764,7 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy with data_collection_status disabled',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'apm' => [
-						'data_collection_status' => 0
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_DISABLED
 					]
 				],
 				'expected_error' => null
@@ -5484,7 +5484,7 @@ class testProxy extends CAPITest {
 						'additional_resource_attributes' => [
 								'key' => 'key',
 								'value' => 'value',
-								'signal_type' => 2
+								'signal_type' => SIGNAL_TYPE_LOGS
 						]
 					]
 				],
@@ -5494,7 +5494,7 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'proxyid' => 'without_apm',
 					'apm' => [
-						'data_collection_status' => 1,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 						'additional_resource_attributes' => [
 							[
 								'key' => 'key',
@@ -5509,11 +5509,11 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'proxyid' => 'without_apm',
 					'apm' => [
-						'data_collection_status' => 1,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 						'additional_resource_attributes' => [
 							[
 								'value' => 'value',
-								'signal_type' => 2
+								'signal_type' => SIGNAL_TYPE_LOGS
 							]
 						]
 					]
@@ -5665,12 +5665,12 @@ class testProxy extends CAPITest {
 						'additional_resource_attributes' => [
 							[
 								'key' => 'key_3',
-								'signal_type' => 1
+								'signal_type' => SIGNAL_TYPE_METRICS
 							],
 							[
 								'key' => 'key_2',
 								'value' => 'value_2',
-								'signal_type' => 2
+								'signal_type' => SIGNAL_TYPE_LOGS
 							]
 						]
 					]
@@ -5690,7 +5690,7 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'proxyid' => 'with_apm',
 					'apm' => [
-						'data_collection_status' => 0
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_DISABLED
 					]
 				],
 				'expected_error' => null

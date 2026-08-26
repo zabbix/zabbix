@@ -35,13 +35,13 @@ class testAuditlogProxy extends testAuditlogCommon {
 					'tls_psk_identity' => 'Audit',
 					'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478',
 					'apm' => [
-						'data_collection_status' => 1,
+						'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 						'max_messages_per_second' => 100,
 						'additional_resource_attributes' => [
 							[
 								'key' => 'key_1',
 								'value' => 'value_1',
-								'signal_type' => 2
+								'signal_type' => SIGNAL_TYPE_LOGS
 							]
 						]
 					]
@@ -67,12 +67,12 @@ class testAuditlogProxy extends testAuditlogCommon {
 			'proxy.tls_psk_identity' => ['add', '******'],
 			'proxy.tls_psk' => ['add', '******'],
 			'proxy.apm.additional_resource_attributes[1]' => ['add'],
-			'proxy.apm.additional_resource_attributes[1].signal_type' => ['add','2'],
-			'proxy.apm.additional_resource_attributes[1].key' => ['add','key_1'],
-			'proxy.apm.additional_resource_attributes[1].value' => ['add','value_1'],
+			'proxy.apm.additional_resource_attributes[1].signal_type' => ['add', (string) SIGNAL_TYPE_LOGS],
+			'proxy.apm.additional_resource_attributes[1].key' => ['add', 'key_1'],
+			'proxy.apm.additional_resource_attributes[1].value' => ['add', 'value_1'],
 			'proxy.apm' => ['add'],
-			'proxy.apm.data_collection_status' => ['add','1'],
-			'proxy.apm.max_messages_per_second' => ['add','100'],
+			'proxy.apm.data_collection_status' => ['add', (string) PROXY_APM_DATA_COLLECTION_ENABLED],
+			'proxy.apm.max_messages_per_second' => ['add', '100'],
 			'proxy.proxyid' => ['add', $proxyid]
 		]);
 
@@ -91,13 +91,13 @@ class testAuditlogProxy extends testAuditlogCommon {
 			'tls_psk_identity' => 'Updated_TSK',
 			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193111',
 			'apm' => [
-				'data_collection_status' => 1,
+				'data_collection_status' => PROXY_APM_DATA_COLLECTION_ENABLED,
 				'max_messages_per_second' => 100,
 				'additional_resource_attributes' => [
 					[
 						'key' => 'key_1',
 						'value' => 'value_1',
-						'signal_type' => 2
+						'signal_type' => SIGNAL_TYPE_LOGS
 					]
 				]
 			]
@@ -110,12 +110,14 @@ class testAuditlogProxy extends testAuditlogCommon {
 			'proxy.allowed_addresses' => ['update', 'updated_address', ''],
 			'proxy.tls_psk_identity' => ['update', '******', '******'],
 			'proxy.tls_psk' => ['update', '******', '******'],
-			'proxy.apm.additional_resource_attributes[1].signal_type' => ['add','2'],
-			'proxy.apm.additional_resource_attributes[1].key' => ['add','key_1'],
-			'proxy.apm.additional_resource_attributes[1].value' => ['add','value_1'],
+			'proxy.apm.additional_resource_attributes[1].signal_type' => ['add', (string) SIGNAL_TYPE_LOGS],
+			'proxy.apm.additional_resource_attributes[1].key' => ['add', 'key_1'],
+			'proxy.apm.additional_resource_attributes[1].value' => ['add', 'value_1'],
 			'proxy.apm' => ['update'],
-			'proxy.apm.data_collection_status' => ['update','1','0'],
-			'proxy.apm.max_messages_per_second' => ['update','100','0']
+			'proxy.apm.data_collection_status' => [
+				'update', (string) PROXY_APM_DATA_COLLECTION_ENABLED, (string) PROXY_APM_DATA_COLLECTION_DISABLED
+			],
+			'proxy.apm.max_messages_per_second' => ['update', '100', '0']
 		]);
 
 		$this->call('proxy.update', $request);

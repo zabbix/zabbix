@@ -22,7 +22,7 @@
 $attribute = [
 	'key' => '',
 	'value' => '',
-	'signal_type' => PROXY_APM_ATTR_SIGNAL_TYPE_TRACES
+	'signal_type' => SIGNAL_TYPE_TRACES
 ];
 
 (new CTemplateTag('attr-row-tmpl', renderProxyApmAttrRow('#{rowNum}', $attribute, [
