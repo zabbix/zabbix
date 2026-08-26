@@ -37,9 +37,9 @@ class CProxy extends CApiService {
 		'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'lastaccess', 'version', 'compatibility', 'state'
 	];
 
-	public const APM_DEFAULT_FIELDS = [
+	public const APM_DEFAULTS = [
 		'additional_resource_attributes' => [],
-		'data_collection_status' => 0,
+		'data_collection_status' => PROXY_APM_DATA_COLLECTION_DISABLED,
 		'max_messages_per_second' => 0
 	];
 
@@ -286,8 +286,8 @@ class CProxy extends CApiService {
 		}
 
 		$selectApm = $options['selectApm'] === API_OUTPUT_EXTEND
-			? array_keys(self::APM_DEFAULT_FIELDS)
-			: array_intersect(array_keys(self::APM_DEFAULT_FIELDS), $options['selectApm']);
+			? array_keys(self::APM_DEFAULTS)
+			: array_intersect(array_keys(self::APM_DEFAULTS), $options['selectApm']);
 
 		$apmOptionsMap = array_flip($selectApm);
 
@@ -296,7 +296,7 @@ class CProxy extends CApiService {
 			$apm = json_decode($apm_raw, true);
 
 			if (!$apm) {
-				$apm = self::APM_DEFAULT_FIELDS;
+				$apm = self::APM_DEFAULTS;
 			}
 
 			$row['apm'] = array_intersect_key($apm, $apmOptionsMap);
@@ -416,7 +416,7 @@ class CProxy extends CApiService {
 				$apm_fields['max_messages_per_second'] = $_apm_fields['max_messages_per_second'];
 			}
 			else {
-				$apm_fields = self::APM_DEFAULT_FIELDS;
+				$apm_fields = self::APM_DEFAULTS;
 			}
 
 			$proxy['apm'] = $apm_fields;
@@ -445,7 +445,7 @@ class CProxy extends CApiService {
 	private static function prepareApmForDb(array &$proxy, ?array $db_proxies = null): void {
 		if (array_key_exists('apm', $proxy) && array_key_exists('data_collection_status', $proxy['apm'])
 				&& $proxy['apm']['data_collection_status'] === PROXY_APM_DATA_COLLECTION_ENABLED) {
-			$proxy['apm'] = array_merge(self::APM_DEFAULT_FIELDS, $proxy['apm']);
+			$proxy['apm'] = array_merge(self::APM_DEFAULTS, $proxy['apm']);
 
 			if ($proxy['apm']['additional_resource_attributes']) {
 				CArrayHelper::sort($proxy['apm']['additional_resource_attributes'], ['signal_type', 'key']);
