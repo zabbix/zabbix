@@ -381,8 +381,6 @@ zbx_user_permission_t;
 #	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
-int	zbx_atoi(const char *str);
-
 #define zbx_calloc(old, nmemb, size)	\
 		zbx_calloc2(__FILE__, __LINE__, old, nmemb, size, calloc(MAX(nmemb, 1), MAX(size, 1)))
 #define zbx_malloc(old, size)		zbx_malloc2(__FILE__, __LINE__, old, size, malloc(MAX(size, 1)))

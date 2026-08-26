@@ -2288,3 +2288,22 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
 
 	memcpy(&(*data)[l], value, sz_value);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose:  convert a string representing a number into an integer           *
+ *                                                                            *
+ * Return value: returns the converted integer or 0- if failed                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_atoi(const char *str)
+{
+	int result = 0;
+
+	if (NULL != str)
+	{
+		result = atoi(str);
+	}
+
+	return result;
+}
