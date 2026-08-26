@@ -139,7 +139,7 @@
 					location.href = parameters.serviceid === this.serviceid ? this.parent_url : location.href;
 				}
 				else {
-					location.href = location.href;
+					location.reload();
 				}
 			});
 
@@ -187,7 +187,7 @@
 						uncheckTableRows(chkbxRange.prefix);
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

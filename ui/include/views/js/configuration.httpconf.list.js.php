@@ -104,7 +104,7 @@
 
 				uncheckTableRows('httpconf_'+ view.checkbox_hash, [], false);
 
-				location.href = location.href;
+				location.reload();
 			}
 		}
 	};

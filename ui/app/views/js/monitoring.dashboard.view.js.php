@@ -183,7 +183,7 @@
 			ZABBIX.Dashboard.on(CDashboard.EVENT_FEEDBACK, e => this.#onFeedback(e));
 
 			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, () => {
-				location.href = location.href;
+				location.reload();
 			});
 
 			jqBlink.blink();
@@ -534,7 +534,7 @@
 					}
 				}
 
-				location.href = location.href;
+				location.reload();
 			}
 		};
 

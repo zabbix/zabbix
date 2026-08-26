@@ -74,7 +74,7 @@
 
 			uncheckTableRows('proxygroup');
 
-			location.href = location.href;
+			location.reload();
 		}
 
 		#delete(target, proxy_groupids) {
@@ -123,7 +123,7 @@
 						uncheckTableRows('proxygroup');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

@@ -43,7 +43,7 @@ function submitScheduledReport(overlay) {
 
 			overlayDialogueDestroy(overlay.dialogueid);
 
-			location.href = location.href;
+			location.reload();
 		})
 		.catch((exception) => {
 			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();

@@ -51,7 +51,7 @@
 							postMessageDetails('success', e.detail.success.messages);
 						}
 
-						location.href = location.href;
+						location.reload();
 					});
 				});
 			}

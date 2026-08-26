@@ -82,7 +82,7 @@
 					postMessageDetails('success', e.detail.messages);
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		}
 
@@ -175,7 +175,7 @@
 					postMessageDetails('success', e.detail.messages);
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		}
 
@@ -216,7 +216,7 @@
 						uncheckTableRows('mediatype');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();
