@@ -1488,6 +1488,9 @@ define('ZBX_EOL_LF',	0);
 define('ZBX_EOL_CRLF',	1);
 
 // Time intervals.
+define('SEC_PER_NANOSEC',		1e-9);
+define('SEC_PER_MICROSEC',		1e-6);
+define('SEC_PER_MILLISEC',		1e-3);
 define('SEC_PER_MIN',			60);
 define('SEC_PER_HOUR',			3600);
 define('SEC_PER_DAY',			86400);
@@ -1496,9 +1499,12 @@ define('SEC_PER_MONTH',			2592000);
 define('SEC_PER_YEAR',			31536000);
 
 // Time suffixes and multipliers.
-define('ZBX_TIME_SUFFIXES', 'smhdw');
-define('ZBX_TIME_SUFFIXES_WITH_YEAR', 'smhdwMy');
+define('ZBX_TIME_SUFFIXES', 'ns|us|ms|s|m|h|d|w');
+define('ZBX_TIME_SUFFIXES_WITH_YEAR', 'ns|us|ms|s|m|h|d|w|M|y');
 define('ZBX_TIME_SUFFIX_MULTIPLIERS', [
+	'ns' => SEC_PER_NANOSEC,
+	'us' => SEC_PER_MICROSEC,
+	'ms' => SEC_PER_MILLISEC,
 	's' => 1,
 	'm' => SEC_PER_MIN,
 	'h' => SEC_PER_HOUR,

@@ -16,8 +16,8 @@
 
 class CTimeUnitValidator extends CValidator {
 
-	protected ?int $max = 0;
-	protected ?int $min = 0;
+	protected ?float $max = null;
+	protected ?float $min = null;
 	protected bool $usermacros = false;
 	protected bool $lldmacros = false;
 	protected bool $accept_zero = false;
@@ -25,11 +25,11 @@ class CTimeUnitValidator extends CValidator {
 
 	public function __construct(array $options = []) {
 		if (array_key_exists('min', $options)) {
-			$this->min = $options['min'] === null ? null : (int) $options['min'];
+			$this->min = $options['min'] === null ? null : (float) $options['min'];
 		}
 
 		if (array_key_exists('max', $options)) {
-			$this->max = $options['max'] === null ? null : (int) $options['max'];
+			$this->max = $options['max'] === null ? null : (float) $options['max'];
 		}
 
 		if (array_key_exists('accept_zero', $options)) {
@@ -58,7 +58,7 @@ class CTimeUnitValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	public function validate($value) {
+	public function validate($value): bool {
 		$interval_parser = new CSimpleIntervalParser(['usermacros' => $this->usermacros,
 			'lldmacros' => $this->lldmacros, 'with_year' => $this->with_year
 		]);
@@ -103,11 +103,16 @@ class CTimeUnitValidator extends CValidator {
 		return true;
 	}
 
-	private function getSecondsText(int $seconds): string {
+	private function getSecondsText(float $seconds): string {
 		$convert_options = ['with_year' => $this->with_year];
 
-		return $seconds >= 60
-			? $seconds._x('s', 'second short').' ('.convertUnitsS($seconds, $convert_options) .')'
-			: convertUnitsS($seconds, $convert_options);
+		if ($seconds < 1) {
+			return convertSecondsToTimeUnits($seconds);
+		}
+		elseif ($seconds >= 60) {
+			return $seconds._x('s', 'second short').' ('.convertUnitsS($seconds, $convert_options) .')';
+		}
+
+		return convertUnitsS($seconds, $convert_options);
 	}
 }

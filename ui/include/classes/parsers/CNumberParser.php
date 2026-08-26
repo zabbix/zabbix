@@ -125,7 +125,7 @@ class CNumberParser extends CParser {
 
 			$pattern = $this->options['with_float'] ? ZBX_PREG_NUMBER : ZBX_PREG_INT;
 			$pattern = ($this->options['with_size_suffix'] || $this->options['with_time_suffix'])
-				? '/^'.$pattern.'(?<suffix>['.$this->suffixes.'])?/'
+				? '/^'.$pattern.'(?<suffix>('.$this->suffixes.'))?/'
 				: '/^'.$pattern.'/';
 
 			if (!preg_match($pattern, $fragment, $matches)) {

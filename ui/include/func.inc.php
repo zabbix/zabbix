@@ -502,11 +502,26 @@ function convertUnitsS($value, array $options = []) {
  * The following units will be used: weeks, days, hours, minutes and seconds.
  * Only the 3 most significant units will be displayed: #w #d #h, #d #h #m or #h #m #s, omitting empty ones.
  *
- * @param int $value  Time period in seconds.
+ * @param float $value  Time period in seconds.
  *
  * @return string
  */
-function convertSecondsToTimeUnits(int $value): string {
+function convertSecondsToTimeUnits(float $value): string {
+	if ($value <= 0) {
+		return '0';
+	}
+
+	if ($value < 1) {
+		if ($value >= SEC_PER_MILLISEC) {
+			return round($value / SEC_PER_MILLISEC, ZBX_UNITS_ROUNDOFF_SUFFIXED)._x('ms', 'millisecond short');
+		}
+		elseif ($value >= SEC_PER_MICROSEC) {
+			return round($value / SEC_PER_MICROSEC, ZBX_UNITS_ROUNDOFF_SUFFIXED)._x('us', 'microsecond short');
+		}
+
+		return round($value / SEC_PER_NANOSEC, ZBX_UNITS_ROUNDOFF_SUFFIXED)._x('ns', 'nanosecond short');
+	}
+
 	$parts = [];
 	$start = null;
 
@@ -761,10 +776,10 @@ function convertUnitsRaw(array $options): array {
  * @return int|float|null  Decimal integer seconds or null on error. Returns a floating-point number if the resulting
  *                         value exceeds PHP_INT_MAX.
  */
-function timeUnitToSeconds($time, $with_year = false): int|float|null {
+function timeUnitToSeconds(string $time, bool $with_year = false): int|float|null {
 	$suffixes = $with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
 
-	if (!preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.$suffixes.'])?$/', $time, $matches)) {
+	if (!preg_match('/^'.ZBX_PREG_INT.'(?<suffix>('.$suffixes.'))?$/', $time, $matches)) {
 		return null;
 	}
 

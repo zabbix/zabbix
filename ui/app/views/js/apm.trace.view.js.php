@@ -26,6 +26,12 @@
 		#refresh_interval_id = null;
 		#global_timerange = null;
 		#datatable = null;
+		/** @type {HTMLFormElement|null} */
+		#filter_form_element = null;
+		/** @type {CForm|null} */
+		#filter_form = null;
+		/** @type {HTMLButtonElement|null} */
+		#apply_filter_button = null;
 		#csrf_token = null;
 		#refresh_message_box = null;
 
@@ -38,6 +44,7 @@
 			layout_mode,
 			page,
 			refresh_interval,
+			filter_validation_rules,
 			sort_field,
 			sort_order,
 			storage_idx,
@@ -47,6 +54,12 @@
 			this.#refresh_interval = refresh_interval;
 			this.#csrf_token = csrf_token;
 
+			this.#filter_form_element = document.querySelector('[name="zbx_filter"]');
+			this.#filter_form = new CForm(this.#filter_form_element, filter_validation_rules);
+			this.#apply_filter_button = this.#filter_form_element?.querySelector('[name="filter_set"]');
+
+			this.#validateFormChanges();
+
 			this.#initEvents(filter_options);
 			this.#initFilter(filter_options);
 			this.#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order,
@@ -54,6 +67,16 @@
 		}
 
 		#initEvents(filter_options) {
+			this.#filter_form_element?.addEventListener('input', () => this.#validateFormChanges());
+
+			this.#filter_form_element?.addEventListener('form.validated', () => {
+				const has_errors = this.#filter_form?.hasErrors() ?? false;
+
+				this.#apply_filter_button?.toggleAttribute('disabled', has_errors);
+			});
+
+			this.#apply_filter_button?.addEventListener('click', this.#onFilterSet);
+
 			$.subscribe('event.rank_change', () => this.#refresh());
 
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
@@ -148,6 +171,33 @@
 				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.#unscheduleRefresh())
 				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.#scheduleRefresh())
 				.init(user_configs);
+		}
+
+		#validateFormChanges() {
+			const values = this.#filter_form?.getAllValues() ?? {};
+
+			this.#filter_form?.validateChanges(Object.keys(values), true);
+		}
+
+		#onFilterSet = (e) => {
+			e.preventDefault();
+
+			if (!this.#filter_form_element) {
+				return false;
+			}
+
+			const values = this.#filter_form.getAllValues();
+
+			this.#filter_form.validateSubmit(values).then(result => {
+				if (result) {
+					chkbxRange.clearSelectedOnFilterChange();
+
+					this.#apply_filter_button?.removeEventListener('click', this.#onFilterSet);
+					this.#apply_filter_button?.dispatchEvent(new PointerEvent('click'));
+				}
+			});
+
+			return false;
 		}
 
 		#addRefreshMessage(messages) {

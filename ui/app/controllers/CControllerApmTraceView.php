@@ -17,6 +17,7 @@
 class CControllerApmTraceView extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
@@ -24,30 +25,32 @@ class CControllerApmTraceView extends CController {
 		return $this->checkAccess(CRoleHelper::UI_APM_TRACES);
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'filter_trace_id' =>		'string',
-			'filter_span_id' =>			'string',
-			'filter_service_name' =>	'string',
-			'filter_operation_name' =>	'string',
-			'filter_scope_name' =>		'string',
-			'filter_min_duration' =>	'string',
-			'filter_max_duration' =>	'string',
-			'filter_statuses' =>		'array',
-			'filter_evaltype' =>		'in '.APM_ATTR_EVAL_TYPE_AND_OR.','.APM_ATTR_EVAL_TYPE_OR,
-			'filter_attributes' =>		'array',
-			'from' =>					'range_time',
-			'to' =>						'range_time',
-			'sort' =>					'in start_time',
-			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'page' =>					'ge 1',
-			'filter_name' =>			'string',
-			'filter_custom_time' =>		'in 1,0',
-			'filter_set' =>				'in 1',
-			'filter_rst' =>				'in 1'
-		];
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'filter_trace_id' => ['string'],
+			'filter_span_id' => ['string'],
+			'filter_service_name' => ['string'],
+			'filter_operation_name' => ['string'],
+			'filter_scope_name' => ['string'],
+			'filter_min_duration' => ['string', 'use' => [CTimeUnitValidator::class]],
+			'filter_max_duration' => ['string', 'use' => [CTimeUnitValidator::class,]],
+			'filter_evaltype' => ['integer', 'in' => [APM_ATTR_EVAL_TYPE_AND_OR, APM_ATTR_EVAL_TYPE_OR]],
+			'filter_attributes' => ['array'],
+			'from' => ['string', 'use' => [CRangeTimeValidator::class]],
+			'to' => ['string', 'use' => [CRangeTimeValidator::class]],
+			'sort' => ['string', 'in' => ['start_time']],
+			'sortorder' => ['string', 'in' => [ZBX_SORT_DOWN, ZBX_SORT_UP]],
+			'page' => ['integer', 'min' => 1],
+			'filter_custom_time' => ['integer', 'in' => [0, 1]],
+			'filter_set' => ['integer', 'in' => ['1']],
+			'filter_rst' => ['integer', 'in' => ['1']]
+		]];
+	}
 
-		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateStatuses()
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules())
+			&& $this->validateTimeSelectorPeriod()
+			&& $this->validateStatuses()
 			&& $this->validateAttributes();
 
 		if (!$ret) {
@@ -110,6 +113,7 @@ class CControllerApmTraceView extends CController {
 				'idx' => 'web.apm.trace.filter',
 				'timeselector' => getTimeSelectorPeriod($timeselector_options)
 			],
+			'filter_validation_rules' => (new CFormValidator(self::getValidationRules()))->getRules(),
 			'active_tab' => CProfile::get('web.apm.trace.filter.active', 2),
 			'page' => $this->getInput('page', 1),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
