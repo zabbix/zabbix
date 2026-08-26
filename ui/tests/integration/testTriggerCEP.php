@@ -16189,8 +16189,10 @@ return;
 		// And each of them is due no sooner than that time either: the period a window belongs to ends a multiple of
 		// the duration after the value that started the grid, so the first of the two closings may not happen before
 		// one whole such period is up and the second, held by the window that follows, before two are - whatever the
-		// closing of the first one was observed at.
-		$due = fn(int $periods) => $opened_at + $periods * $period;
+		// closing of the first one was observed at. The last second of each hold is given away rather than asserted
+		// on, so a closing that lands right on its period cannot fail the hold over the second the server and the API
+		// disagree about.
+		$due = fn(int $periods) => $opened_at + $periods * $period - 1;
 
 		try {
 			// 2. Nothing else is sent and nothing else may close them: the window closing when its period is up is
