@@ -293,7 +293,6 @@ class CProxy extends CApiService {
 			' WHERE '.dbConditionId('p.proxyid', array_keys($result))
 		);
 
-
 		while ($row = DBfetch($resource)) {
 			$apm = json_decode($row['apm'], true);
 
