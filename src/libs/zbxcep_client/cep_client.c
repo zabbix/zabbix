@@ -39,16 +39,16 @@ ZBX_VECTOR_IMPL(event_severity, zbx_event_severity_t)
 zbx_uint32_t	zbx_cep_serialize_ids(const zbx_vector_uint64_t *ids, unsigned char **data)
 {
 	unsigned char	*ptr;
-	zbx_uint32_t	size;
+	size_t		size;
 
-	size = sizeof(ids->values_num) + ids->values_num * sizeof(zbx_uint64_t);
+	size = sizeof(ids->values_num) + (size_t)ids->values_num * sizeof(zbx_uint64_t);
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, size);
 
 	ptr += zbx_serialize_value(ptr, ids->values_num);
 	for (int i = 0; i < ids->values_num; i++)
 		ptr += zbx_serialize_value(ptr, ids->values[i]);
 
-	return size;
+	return (zbx_uint32_t)size;
 }
 
 /******************************************************************************
@@ -65,7 +65,7 @@ void	zbx_cep_deserialize_event_queries(const unsigned char *data, zbx_vector_cep
 	const unsigned char	*ptr = data;
 
 	ptr += zbx_deserialize_value(ptr, &queries_num);
-	zbx_vector_cep_assessment_query_reserve(queries, queries_num);
+	zbx_vector_cep_assessment_query_reserve(queries, (size_t)queries_num);
 
 	for (int i = 0; i < queries_num; i++)
 	{
@@ -169,14 +169,14 @@ void	zbx_cep_assess_trigger_events(const zbx_cep_assessment_query_t *queries, in
 		unsigned char **results)
 {
 	unsigned char	*data, *ptr;
-	zbx_uint32_t	data_len = sizeof(queries_num) + queries_num * (sizeof(zbx_uint64_t) + 1);
+	size_t		data_len = sizeof(queries_num) + (size_t)queries_num * (sizeof(zbx_uint64_t) + 1);
 
 	for (int i = 0; i < queries_num; i++)
 	{
 		if (0 == queries[i].dep_triggerids.values_num)
 			continue;
 
-		data_len += sizeof(int) + queries[i].dep_triggerids.values_num * sizeof(zbx_uint64_t);
+		data_len += sizeof(int) + (size_t)queries[i].dep_triggerids.values_num * sizeof(zbx_uint64_t);
 	}
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
@@ -202,7 +202,8 @@ void	zbx_cep_assess_trigger_events(const zbx_cep_assessment_query_t *queries, in
 		}
 	}
 
-	int	ret = zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_ASSESS_TRIGGER_EVENTS, data, data_len);
+	int	ret = zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_ASSESS_TRIGGER_EVENTS, data,
+			(zbx_uint32_t)data_len);
 
 	zbx_free(data);
 	if (SUCCEED != ret)
@@ -263,8 +264,8 @@ static void	cep_buffer_reserve(unsigned char **data, zbx_uint32_t *data_alloc, z
 static void	cep_buffer_serialize_event(unsigned char **data, zbx_uint32_t *data_alloc, zbx_uint32_t *data_offset,
 		const zbx_db_event *event)
 {
-	zbx_uint32_t		data_len = 0, name_len, tags_local_len[32], *tags_len, expr_len, r_expr_len,
-				corr_tag_len;
+	zbx_uint32_t		name_len, tags_local_len[32], *tags_len, expr_len, r_expr_len, corr_tag_len;
+	size_t			data_len = 0;
 	int			maintenances_num;
 	zbx_db_event_suppress_t	sup_local;
 
@@ -306,19 +307,20 @@ static void	cep_buffer_serialize_event(unsigned char **data, zbx_uint32_t *data_
 			zbx_serialize_prepare_str_len(data_len, event->trigger.correlation_tag, corr_tag_len);
 
 		zbx_serialize_prepare_value(data_len, event->trigger.dep_triggerids.values_num);
-		data_len += sizeof(zbx_uint64_t) * event->trigger.dep_triggerids.values_num;
+		data_len += sizeof(zbx_uint64_t) * (size_t)event->trigger.dep_triggerids.values_num;
 
 		data_len += sizeof(int);
 		if (NULL != event->suppress)
 		{
 			maintenances_num = event->suppress->values_num;
-			data_len += (sizeof(sup_local.maintenanceid) + sizeof(sup_local.until)) * maintenances_num;
+			data_len += (sizeof(sup_local.maintenanceid) + sizeof(sup_local.until)) *
+					(size_t)maintenances_num;
 		}
 		else
 			maintenances_num = 0;
 	}
 
-	cep_buffer_reserve(data, data_alloc, *data_offset, data_len);
+	cep_buffer_reserve(data, data_alloc, *data_offset, (zbx_uint32_t)data_len);
 
 	unsigned char	*ptr = *data + *data_offset;
 
@@ -371,7 +373,7 @@ static void	cep_buffer_serialize_event(unsigned char **data, zbx_uint32_t *data_
 	if (tags_len != tags_local_len)
 		zbx_free(tags_len);
 
-	*data_offset += data_len;
+	*data_offset += (zbx_uint32_t)data_len;
 }
 
 /******************************************************************************
@@ -508,7 +510,7 @@ static zbx_uint32_t	cep_deserialize_event(const unsigned char *data, zbx_db_even
 		}
 	}
 
-	return ptr - data;
+	return (zbx_uint32_t)(ptr - data);
 }
 
 /******************************************************************************
@@ -524,7 +526,7 @@ void	zbx_cep_deserialize_events(const unsigned char *data, zbx_vector_db_event_t
 	int	events_num;
 
 	data += zbx_deserialize_value(data, &events_num);
-	zbx_vector_db_event_reserve(events, events_num);
+	zbx_vector_db_event_reserve(events, (size_t)events_num);
 
 	for (int i = 0; i < events_num; i++)
 	{
@@ -553,8 +555,8 @@ void	zbx_cep_close_problem_by_user(const zbx_db_event *event, zbx_uint64_t event
 
 	cep_buffer_serialize_event(&data, &data_alloc, &data_offset, event);
 	cep_buffer_reserve(&data, &data_alloc, data_offset, sizeof(zbx_uint64_t) * 2);
-	data_offset += zbx_serialize_value(data + data_offset, eventid);
-	data_offset += zbx_serialize_value(data + data_offset, userid);
+	data_offset += (zbx_uint32_t)zbx_serialize_value(data + data_offset, eventid);
+	(void)zbx_serialize_value(data + data_offset, userid);
 
 	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_ADD_USER_CLOSE_EVENT, data, data_offset))
 	{
@@ -621,7 +623,7 @@ void	zbx_cep_deserialize_event_maintenance(const unsigned char *data, zbx_vector
 static void	cep_send_event_maintenance(const zbx_event_maintenance_t *events, int events_num, zbx_uint32_t code)
 {
 	unsigned char	*data = NULL, *ptr;
-	zbx_uint32_t	data_len = 3 * sizeof(zbx_uint64_t) * events_num + sizeof(int);
+	zbx_uint32_t	data_len = (zbx_uint32_t)(3 * sizeof(zbx_uint64_t) * (size_t)events_num + sizeof(int));
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)data_len);
 	ptr += zbx_serialize_value(ptr, events_num);
@@ -682,7 +684,7 @@ void	zbx_cep_send_event_severities(const zbx_event_severity_t *events, int event
 	zbx_event_severity_t	es_local;
 
 	data_len = sizeof(events_num);
-	data_len += (zbx_uint32_t)(events_num * (sizeof(es_local.eventid) + sizeof(es_local.severity)));
+	data_len += (zbx_uint32_t)((size_t)events_num * sizeof(es_local.eventid) + sizeof(es_local.severity));
 	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr += zbx_serialize_value(ptr, events_num);
@@ -858,7 +860,7 @@ void	zbx_deserialize_event_tags(const unsigned char *data, zbx_vector_event_tags
  ******************************************************************************/
 void	zbx_cep_send_deleted_events(const zbx_uint64_t *eventids, int eventids_num)
 {
-	zbx_uint32_t	data_len = sizeof(eventids_num) + sizeof(zbx_uint64_t) * eventids_num;
+	zbx_uint32_t	data_len = (zbx_uint32_t)(sizeof(eventids_num) + sizeof(zbx_uint64_t) * (size_t)eventids_num);
 	unsigned char	*data, *ptr;
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);

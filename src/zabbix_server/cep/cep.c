@@ -186,7 +186,7 @@ static int	cep_release_event_handle(zbx_cep_t *cep, zbx_cep_event_handle_t h)
 	return SUCCEED;
 }
 
-static zbx_cep_event_handle_t	cep_create_event_handle(zbx_cep_t *cep, zbx_cep_event_t *event, int state)
+static zbx_cep_event_handle_t	cep_create_event_handle(zbx_cep_t *cep, zbx_cep_event_t *event, zbx_uint32_t state)
 {
 	zbx_cep_event_ptr_t	handle_local = {
 			.eventid = event->eventid,
@@ -237,15 +237,15 @@ static void	cep_object_clear(void *a)
 
 static zbx_hash_t	cep_object_hash(const void *a)
 {
-	zbx_cep_object_t	*object = (zbx_cep_object_t *)a;
+	const zbx_cep_object_t	*object = (const zbx_cep_object_t *)a;
 
 	return cep_origin_hash(&object->origin);
 }
 
 static int	cep_object_compare(const void *a1, const void *a2)
 {
-	zbx_cep_object_t	*o1 = (zbx_cep_object_t *)a1;
-	zbx_cep_object_t	*o2 = (zbx_cep_object_t *)a2;
+	const zbx_cep_object_t	*o1 = (const zbx_cep_object_t *)a1;
+	const zbx_cep_object_t	*o2 = (const zbx_cep_object_t *)a2;
 
 	return cep_origin_compare(&o1->origin, &o2->origin);
 }
@@ -1053,8 +1053,8 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 	for (int i = 0; i < queries->values_num; i++)
 	{
 		zbx_cep_assessment_query_t	*query = &queries->values[i];
-		zbx_cep_object_t	*obj;
-		int			result = CEP_EVENT_ALLOW;
+		zbx_cep_object_t		*obj;
+		zbx_cep_assessment_t		result = CEP_EVENT_ALLOW;
 
 		origin.objectid = query->triggerid;
 

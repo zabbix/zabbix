@@ -1598,7 +1598,7 @@ static void	cep_window_pool_load_windows(zbx_cep_window_pool_t *pool, zbx_dbconn
 			continue;
 		}
 
-		ref_local.group_by = atoi(row[2]);
+		ZBX_STR2UCHAR(ref_local.group_by, row[2]);
 
 		if (0 != (ref_local.group_by & ZBX_CEP_GROUP_BY_HOST))
 			ZBX_STR2UINT64(ref_local.hostid, row[4]);
@@ -1858,11 +1858,11 @@ void	cep_window_pool_get_stats(zbx_cep_window_pool_t *pool, zbx_cep_window_pool_
  *             ref    - [IN] cep window reference to log                      *
  *                                                                            *
  ******************************************************************************/
-static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *ref)
+static void	cep_window_ref_dump(const char *prefix, zbx_cep_window_ref_t *ref)
 {
-	zbx_queue_ptr_iter_t		iter;
-	zbx_cep_event_handle_t		hevent;
-	const zbx_cep_window_t		*window = ref->window;
+	zbx_queue_ptr_iter_t	iter;
+	zbx_cep_event_handle_t	hevent;
+	zbx_cep_window_t	*window = ref->window;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%sruleid:" ZBX_FS_UI64 " type:%d [group_by:%x hostid:" ZBX_FS_UI64 " hostgroupid:"
 			ZBX_FS_UI64 " tag:%s=%s] created:" ZBX_FS_TIME_T " nextcheck:" ZBX_FS_UI64,
@@ -1885,7 +1885,7 @@ static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *
 		while (NULL != (hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_iter_next(&iter)))
 			zbx_vector_cep_event_handle_append(&hevents, hevent);
 
-		events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * hevents.values_num);
+		events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * (size_t)hevents.values_num);
 
 		cep_cache_acquire(&cep);
 		cep_get_events_by_handles(cep, hevents.values, hevents.values_num, events);

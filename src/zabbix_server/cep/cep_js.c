@@ -121,7 +121,7 @@ static duk_ret_t	cep_js_event_proxy_get(duk_context *ctx)
 			duk_push_string(ctx, tag->value);
 			duk_put_prop_string(ctx, obj_idx, "value");
 
-			duk_put_prop_index(ctx, arr_idx, i);
+			duk_put_prop_index(ctx, arr_idx, (duk_uarridx_t)i);
 		}
 		return 1;
 	}
@@ -251,7 +251,8 @@ void	cep_js_ctx_init(zbx_cep_js_ctx_t *js, zbx_vector_cep_event_handle_t *hevent
 
 	if (0 < hevents->values_num)
 	{
-		js->events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * hevents->values_num);
+		js->events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) *
+				(size_t)hevents->values_num);
 		zbx_cep_get_events_by_handles(hevents->values, hevents->values_num, js->events);
 
 		for (int i = 0; i < hevents->values_num; i++)

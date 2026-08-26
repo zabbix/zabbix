@@ -700,7 +700,7 @@ int	zbx_macro_trigger_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char 
 				zbx_dc_get_user_macro(um_handle, p->macro, phostids->values, phostids->values_num,
 						replace_with);
 			}
-			p->pos = p->token.loc.r;
+			p->pos = (int)p->token.loc.r;
 		}
 		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
 		{

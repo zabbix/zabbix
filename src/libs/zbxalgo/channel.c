@@ -32,12 +32,12 @@ static void	chan_reserve(zbx_channel_t *chan, int msg_num)
 	while (chan->capacity < chan->msg_num + msg_num)
 		chan->capacity = (int)((chan->capacity + 1) * GROWTH_FACTOR);
 
-	chan->msgs = zbx_realloc(chan->msgs, (size_t)chan->msg_size * chan->capacity);
+	chan->msgs = zbx_realloc(chan->msgs, (size_t)(chan->msg_size * chan->capacity));
 
 	if (0 != chan->msg_num && chan->head >= chan->tail)
 	{
 		int		move_num = old_capacity - chan->head;
-		size_t		move_size = (size_t)move_num * chan->msg_size;
+		size_t		move_size = (size_t)(move_num * chan->msg_size);
 		unsigned char	*src = chan->msgs + (chan->head * chan->msg_size);
 		unsigned char	*dst = chan->msgs + ((chan->capacity - move_num) * chan->msg_size);
 
@@ -79,7 +79,7 @@ void	zbx_chan_init(zbx_channel_t *chan, int msg_size, int initial_capacity)
 	chan->msg_size = msg_size;
 	if (0 != initial_capacity)
 	{
-		chan->msgs = zbx_malloc(NULL, (size_t)msg_size * initial_capacity);
+		chan->msgs = zbx_malloc(NULL, (size_t)(msg_size * initial_capacity));
 		chan->capacity = initial_capacity;
 	}
 }
@@ -112,7 +112,7 @@ void	zbx_chan_send(zbx_channel_t *chan, const void *msg)
 	pthread_mutex_lock(&chan->lock);
 
 	chan_reserve(chan, 1);
-	memcpy(chan->msgs + (chan->tail * chan->msg_size), msg, chan->msg_size);
+	memcpy(chan->msgs + chan->tail * chan->msg_size, msg, (size_t)chan->msg_size);
 
 	if (++chan->tail >= chan->capacity)
 		chan->tail = 0;
@@ -135,17 +135,17 @@ void	zbx_chan_send_batch(zbx_channel_t *chan, const void *msg, int msg_num)
 
 	if (msg_num <= tail_num)
 	{
-		memcpy(chan->msgs + (chan->tail * chan->msg_size), src, (size_t)msg_num * chan->msg_size);
+		memcpy(chan->msgs + chan->tail * chan->msg_size, src, (size_t)(msg_num * chan->msg_size));
 		chan->tail += msg_num;
 		if (chan->tail == chan->capacity)
 			chan->tail = 0;
 	}
 	else
 	{
-		size_t	size1 = (size_t)tail_num * chan->msg_size;
-		size_t	size2 = (size_t)(msg_num - tail_num) * chan->msg_size;
+		size_t	size1 = (size_t)(tail_num * chan->msg_size);
+		size_t	size2 = (size_t)(msg_num - tail_num) * (size_t)chan->msg_size;
 
-		memcpy(chan->msgs + (chan->tail * chan->msg_size), src, size1);
+		memcpy(chan->msgs + chan->tail * chan->msg_size, src, size1);
 		memcpy(chan->msgs, src + size1, size2);
 
 		chan->tail = msg_num - tail_num;
@@ -189,7 +189,7 @@ int	zbx_chan_recv_batch(zbx_channel_t *chan, void *msgs, int msg_num)
 	{
 		unsigned char	*src = chan->msgs + (chan->head * chan->msg_size);
 
-		memcpy(dst, src, chan->msg_size);
+		memcpy(dst, src, (size_t)chan->msg_size);
 		dst += chan->msg_size;
 		if (++chan->head >= chan->capacity)
 			chan->head = 0;
@@ -260,7 +260,7 @@ int	zbx_chan_recv_timeout(zbx_channel_t *chan, void *message, int timeout_ms)
 		}
 	}
 out:
-	memcpy(message, chan->msgs + (chan->head * chan->msg_size), chan->msg_size);
+	memcpy(message, chan->msgs + (size_t)(chan->head * chan->msg_size), (size_t)chan->msg_size);
 
 	if (++chan->head >= chan->capacity)
 		chan->head = 0;
@@ -341,22 +341,22 @@ void	zbx_chan_compact(zbx_channel_t *chan, int min_capacity)
 		goto out;
 	}
 
-	msgs = zbx_malloc(NULL, (size_t)chan->msg_size * new_capacity);
+	msgs = zbx_malloc(NULL, (size_t)(chan->msg_size * new_capacity));
 
 	if (0 != chan->msg_num)
 	{
 		if (chan->head < chan->tail)
 		{
-			memcpy(msgs, chan->msgs + (size_t)chan->head * chan->msg_size,
-					(size_t)chan->msg_num * chan->msg_size);
+			memcpy(msgs, chan->msgs + (size_t)(chan->head * chan->msg_size),
+					(size_t)(chan->msg_num * chan->msg_size));
 		}
 		else
 		{
 			int	head_num = chan->capacity - chan->head;
-			size_t	head_size = (size_t)head_num * chan->msg_size;
+			size_t	head_size = (size_t)(head_num * chan->msg_size);
 
-			memcpy(msgs, chan->msgs + (size_t)chan->head * chan->msg_size, head_size);
-			memcpy(msgs + head_size, chan->msgs, (size_t)chan->tail * chan->msg_size);
+			memcpy(msgs, chan->msgs + (size_t)(chan->head * chan->msg_size), head_size);
+			memcpy(msgs + head_size, chan->msgs, (size_t)(chan->tail * chan->msg_size));
 		}
 	}
 

@@ -63,15 +63,15 @@ static void	cep_task_group_clear(void *d)
 
 static zbx_hash_t	cep_task_group_hash(const void *d)
 {
-	zbx_cep_task_group_t	*group = (zbx_cep_task_group_t *)d;
+	const zbx_cep_task_group_t	*group = (const zbx_cep_task_group_t *)d;
 
 	return cep_origin_hash(&group->origin);
 }
 
 static int	cep_task_group_compare(const void *d1, const void *d2)
 {
-	zbx_cep_task_group_t	*g1 = (zbx_cep_task_group_t *)d1;
-	zbx_cep_task_group_t	*g2 = (zbx_cep_task_group_t *)d2;
+	const zbx_cep_task_group_t	*g1 = (const zbx_cep_task_group_t *)d1;
+	const zbx_cep_task_group_t	*g2 = (const zbx_cep_task_group_t *)d2;
 
 	return cep_origin_compare(&g1->origin, &g2->origin);
 }
@@ -145,8 +145,8 @@ static void	cep_queue_push_event(zbx_cep_queue_t *queue, zbx_mw_task_t *task, co
 {
 	zbx_cep_task_group_t	pending_local = {
 						.origin = {
-							.source = db_event->source,
-							.object = db_event->object,
+							.source = (unsigned char)db_event->source,
+							.object = (unsigned char)db_event->object,
 							.objectid = db_event->objectid
 						}
 					};
@@ -273,8 +273,8 @@ static void	cep_queue_push_next_event_task(zbx_cep_queue_t *queue, zbx_cep_task_
 {
 	zbx_cep_task_group_t	pending_local = {
 					.origin = {
-						.source = task->db_event->source,
-						.object = task->db_event->object,
+						.source = (unsigned char)task->db_event->source,
+						.object = (unsigned char)task->db_event->object,
 						.objectid = task->db_event->objectid
 					}
 	};

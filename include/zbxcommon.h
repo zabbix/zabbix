@@ -852,7 +852,6 @@ void	zbx_set_exit(zbx_exit_cb_t exit_cb, zbx_atomic_uint32_t *exit_num);
 void	zbx_set_exit_immediate(zbx_exit_cb_t exit_cb);
 
 void	zbx_exit_from_thread(int ret) ZBX_NORETURN;
-int	zbx_get_exit_num(void);
 
 #else
 #	define zbx_exit(status)		exit(status)

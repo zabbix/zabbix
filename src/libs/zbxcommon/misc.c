@@ -66,15 +66,6 @@ void	zbx_exit_from_thread(int ret)
 	pthread_exit((void *)(zbx_int64_t)ret);
 }
 
-int	zbx_get_exit_num(void)
-{
-#if defined(HAVE_STDATOMIC_H)
-	if (NULL != zbx_exit_num)
-		return atomic_load(zbx_exit_num);
-#endif
-	return FAIL;
-}
-
 #endif
 
 #if defined(_WINDOWS) || defined(__MINGW32__)

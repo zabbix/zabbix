@@ -678,8 +678,8 @@ ZBX_PTR_VECTOR_DECL(corr_condition_ptr, zbx_corr_condition_t *)
 #define ZBX_CORR_OPERATION_CLOSE_NEW	1
 
 #define CORRELATION_OP_NONE		0
-#define CORRELATION_OP_CLOSE_NEW	0x01
-#define CORRELATION_OP_CLOSE_OLD	0x02
+#define CORRELATION_OP_CLOSE_NEW	0x01U
+#define CORRELATION_OP_CLOSE_OLD	0x02U
 
 typedef struct
 {
@@ -687,7 +687,7 @@ typedef struct
 	char				*name;
 	char				*formula;
 	unsigned char			evaltype;
-	unsigned char			operations;	/* bitmask of CORRELATION_OP_ defines */
+	zbx_uint32_t			operations;	/* bitmask of CORRELATION_OP_ defines */
 
 	zbx_atomic_uint32_t		refcount;
 

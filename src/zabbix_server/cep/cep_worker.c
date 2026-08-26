@@ -689,7 +689,7 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 	zbx_cep_event_handle_t	h;
 
 	cep_cache_acquire(&cep);
-	eventid = cep_open_internal_event(cep, db_event->object, db_event->objectid);
+	eventid = cep_open_internal_event(cep, (unsigned char)db_event->object, db_event->objectid);
 	cep_cache_release(&cep);
 
 	if (0 == eventid)
@@ -701,9 +701,9 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 	db_event->eventid = eventid;
 
 	/* don't cache tags for internal events since they are not used */
-	zbx_cep_event_t	*event = cep_event_create(db_event->eventid, EVENT_SOURCE_INTERNAL, db_event->object,
-			db_event->objectid, db_event->name, db_event->clock, db_event->ns, db_event->value, 0,
-			ZBX_EVENT_NORMAL, 0, NULL, NULL);
+	zbx_cep_event_t	*event = cep_event_create(db_event->eventid, EVENT_SOURCE_INTERNAL,
+			(unsigned char)db_event->object, db_event->objectid, db_event->name, db_event->clock,
+			db_event->ns, db_event->value, 0, ZBX_EVENT_NORMAL, 0, NULL, NULL);
 
 	cep_cache_acquire(&cep);
 	h = cep_add_event(cep, event);
@@ -733,7 +733,7 @@ static void	cep_worker_close_internal_event(zbx_cep_task_event_t *task)
 	zbx_uint64_t	eventid;
 
 	cep_cache_acquire(&cep);
-	eventid = cep_close_internal_event(cep, db_event->object, db_event->objectid, &task->eventids);
+	eventid = cep_close_internal_event(cep, (unsigned char)db_event->object, db_event->objectid, &task->eventids);
 	cep_cache_release(&cep);
 
 	if (0 == eventid)

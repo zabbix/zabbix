@@ -353,7 +353,7 @@ zbx_uint64_t	zbx_dbconn_get_maxid_num_cached(const char *tablename, int num)
 	if (0 != idcache->lastids[index])
 	{
 		nextid = idcache->lastids[index] + 1;
-		idcache->lastids[index] += num;
+		idcache->lastids[index] += (zbx_uint64_t)num;
 	}
 
 	zbx_mutex_unlock(idcache_mutex);

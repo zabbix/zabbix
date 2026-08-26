@@ -259,7 +259,7 @@ static zbx_correlation_match_result_t	correlation_match_new_event(const zbx_corr
 		value = correlation_condition_match_new_event(condition, event, old_value, db);
 
 		zbx_replace_string(&expression, token.loc.l, &token.loc.r, value);
-		pos = token.loc.r;
+		pos = (int)token.loc.r;
 	}
 
 	if (SUCCEED == zbx_evaluate_unknown(expression, &result, error, sizeof(error)))
@@ -472,7 +472,7 @@ static char	*correlation_condition_get_event_filter(const zbx_corr_condition_t *
 						tag_esc);
 
 				zbx_dbconn_add_str_condition_alloc(db, &filter, &filter_alloc, &filter_offset,
-						"pt.value", (const char **)values.values, values.values_num);
+						"pt.value", (const char **)(void *)values.values, values.values_num);
 
 				zbx_chrcpy_alloc(&filter, &filter_alloc, &filter_offset, ')');
 
@@ -543,7 +543,7 @@ static int	correlation_add_event_filter(char **sql, size_t *sql_alloc, size_t *s
 		}
 
 		zbx_replace_string(&expression, token.loc.l, &token.loc.r, filter);
-		pos = token.loc.r;
+		pos = (int)token.loc.r;
 		zbx_free(filter);
 	}
 
@@ -569,8 +569,11 @@ out:
 static zbx_db_event	*cep_create_close_event(const zbx_db_event *problem)
 {
 	zbx_db_event	*ok;
-	zbx_cep_origin_t	origin = {.source = problem->source, .object = problem->object,
-					.objectid = problem->objectid};
+	zbx_cep_origin_t	origin = {
+					.source = (unsigned char)problem->source,
+					.object = (unsigned char)problem->object,
+					.objectid = problem->objectid
+	};
 
 	ok = cep_db_event_create(&origin, problem->name, problem->clock, problem->ns, problem->severity,
 		TRIGGER_VALUE_OK, NULL);
@@ -652,8 +655,8 @@ static void	correlation_add_close_old_tasks(zbx_dbconn_t *db, zbx_uint64_t c_eve
 	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	triggers = (zbx_dc_trigger_t *)zbx_malloc(NULL, sizeof(zbx_dc_trigger_t) * triggerids.values_num);
-	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * triggerids.values_num);
+	triggers = (zbx_dc_trigger_t *)zbx_malloc(NULL, sizeof(zbx_dc_trigger_t) * (size_t)triggerids.values_num);
+	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)triggerids.values_num);
 
 	zbx_dc_config_get_triggers_by_triggerids(triggers, triggerids.values, errcodes, (size_t)triggerids.values_num);
 
@@ -683,7 +686,7 @@ static void	correlation_add_close_old_tasks(zbx_dbconn_t *db, zbx_uint64_t c_eve
 
 	zbx_db_unstash_connection(db);
 
-	zbx_dc_config_clean_triggers(triggers, errcodes, triggerids.values_num);
+	zbx_dc_config_clean_triggers(triggers, errcodes, (size_t)triggerids.values_num);
 	zbx_free(triggers);
 	zbx_free(errcodes);
 	zbx_vector_uint64_destroy(&triggerids);

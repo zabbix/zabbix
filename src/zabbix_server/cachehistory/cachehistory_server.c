@@ -215,7 +215,7 @@ static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_fu
 		if (ZBX_FLAGS_TRIGGER_DIFF_UNSET != flags)
 		{
 			zbx_append_trigger_diff(trigger_diff, trigger->triggerid, trigger->priority, flags,
-					trigger->new_value, new_state, trigger->timespec.sec, new_error);
+					trigger->new_value, (unsigned char)new_state, trigger->timespec.sec, new_error);
 
 			if (NULL != add_internal_event_cb)
 			{

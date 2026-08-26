@@ -847,7 +847,7 @@ typedef struct
 zbx_queue_ptr_iter_t;
 
 void	zbx_queue_ptr_iter_reset(const zbx_queue_ptr_t *queue, zbx_queue_ptr_iter_t *iter);
-const void	*zbx_queue_ptr_iter_next(zbx_queue_ptr_iter_t *iter);
+void	*zbx_queue_ptr_iter_next(zbx_queue_ptr_iter_t *iter);
 
 /* list item data */
 typedef struct list_item

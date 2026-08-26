@@ -1198,7 +1198,7 @@ static void	cep_sync_windows(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, z
 			group_by |= ZBX_CEP_GROUP_BY_HOST;
 		if (0 != atoi(row[7]))
 			group_by |= ZBX_CEP_GROUP_BY_TAG;
-		window->group_by = group_by;
+		window->group_by = (unsigned char)group_by;
 		ZBX_DBROW2STR(window->group_tag, row[8]);
 		ZBX_DBROW2STR(window->event_count_tag, row[9]);
 	}

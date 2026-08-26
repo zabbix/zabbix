@@ -349,8 +349,8 @@ static zbx_corr_condition_t	*corr_condition_create(zbx_uint64_t conditionid, uns
 
 static int	correlation_compare_by_id(const void *a1, const void *a2)
 {
-	const zbx_correlation_t	*c1 = *(zbx_correlation_t **)a1;
-	const zbx_correlation_t	*c2 = *(zbx_correlation_t **)a2;
+	const zbx_correlation_t	*c1 = *(zbx_correlation_t * const *)a1;
+	const zbx_correlation_t	*c2 = *(zbx_correlation_t * const *)a2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(c1->correlationid, c2->correlationid);
 
@@ -402,8 +402,8 @@ static void	correlation_config_handle_release(zbx_correlation_config_handle_t ha
  ******************************************************************************/
 static int	compare_corr_conditions_by_type(const void *a1, const void *a2)
 {
-	zbx_corr_condition_t	*c1 = *(zbx_corr_condition_t **)a1;
-	zbx_corr_condition_t	*c2 = *(zbx_corr_condition_t **)a2;
+	const zbx_corr_condition_t	*c1 = *(const zbx_corr_condition_t * const *)a1;
+	const zbx_corr_condition_t	*c2 = *(const zbx_corr_condition_t * const *)a2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(c1->type, c2->type);
 

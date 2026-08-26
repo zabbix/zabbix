@@ -687,7 +687,7 @@ static void	cep_db_write_trigger_rtdata(zbx_dbconn_t *db, const zbx_vector_mw_ta
 
 			zbx_append_trigger_diff(trigger_diffs, update->objectid, 0,
 					ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE,
-					update->value, 0, update->lastchange, NULL);
+					(unsigned char)update->value, 0, update->lastchange, NULL);
 		}
 
 		(void)zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
@@ -1214,8 +1214,8 @@ static void	cep_db_update_event_tags(zbx_dbconn_t *db, const zbx_vector_cep_even
 	int			events_num = 0, problems_num = 0;
 	zbx_cep_t		*cep;
 
-	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * htags->values_num);
-	problems = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * htags->values_num);
+	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * (size_t)htags->values_num);
+	problems = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * (size_t)htags->values_num);
 
 	cep_cache_acquire(&cep);
 	cep_get_events_by_handles(cep, htags->values, htags->values_num, events);
@@ -1232,9 +1232,9 @@ static void	cep_db_update_event_tags(zbx_dbconn_t *db, const zbx_vector_cep_even
 			problems[problems_num++] = events[i];
 	}
 
-	cep_db_sync_event_tags_table(db, "event_tag", "eventtagid",  (const zbx_cep_event_t **)events, events_num,
-			eventids);
-	cep_db_sync_event_tags_table(db, "problem_tag", "problemtagid",  (const zbx_cep_event_t **)problems,
+	cep_db_sync_event_tags_table(db, "event_tag", "eventtagid",  (const zbx_cep_event_t **)(void *)events,
+			events_num, eventids);
+	cep_db_sync_event_tags_table(db, "problem_tag", "problemtagid",  (const zbx_cep_event_t **)(void *)problems,
 			problems_num, problemids);
 
 	for (int i = 0; i < events_num; i++)
@@ -1356,7 +1356,7 @@ static void	cep_db_update_events_suppress(zbx_dbconn_t *db, const zbx_vector_cep
 
 	zbx_vector_cep_event_suppress_create(&suppress);
 
-	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * hsuppress->values_num);
+	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * (size_t)hsuppress->values_num);
 
 	cep_cache_acquire(&cep);
 	cep_get_events_by_handles(cep, hsuppress->values, hsuppress->values_num, events);
@@ -1450,7 +1450,7 @@ static void	cep_db_update_events_suppress(zbx_dbconn_t *db, const zbx_vector_cep
 typedef struct
 {
 	zbx_cep_event_handle_t	hevent;
-	zbx_uint32_t		flags;
+	zbx_uint64_t		flags;
 }
 zbx_cep_event_sync_t;
 
@@ -1483,7 +1483,7 @@ static void	cep_db_sync_event(zbx_dbconn_t *db, const zbx_vector_cep_event_sync_
 	for (int i = 0; i < sync->values_num; i++)
 		zbx_vector_cep_event_handle_append(&hevents, sync->values[i].hevent);
 
-	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * sync->values_num);
+	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * (size_t)sync->values_num);
 
 	cep_cache_acquire(&cep);
 	cep_get_events_by_handles(cep, hevents.values, hevents.values_num, events);

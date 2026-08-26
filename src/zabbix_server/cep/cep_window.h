@@ -94,9 +94,9 @@ ZBX_PTR_VECTOR_LITE_DECL(cep_window_ptr, zbx_cep_window_t *)
 struct zbx_cep_window_ref
 {
 	zbx_uint64_t	ruleid;
-	unsigned char	group_by;
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	hostgroupid;
+	zbx_uint32_t	group_by;
 	char		*tag;
 	char		*tag_value;
 

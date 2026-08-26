@@ -236,12 +236,12 @@ void	zbx_queue_ptr_iter_reset(const zbx_queue_ptr_t *queue, zbx_queue_ptr_iter_t
 	iter->queue = queue;
 }
 
-const void	*zbx_queue_ptr_iter_next(zbx_queue_ptr_iter_t *iter)
+void	*zbx_queue_ptr_iter_next(zbx_queue_ptr_iter_t *iter)
 {
 	if (iter->pos == iter->queue->head_pos)
 		return NULL;
 
-	const void	*value = iter->queue->values[iter->pos++];
+	void	*value = iter->queue->values[iter->pos++];
 
 	if (iter->pos == iter->queue->alloc_num)
 		iter->pos = 0;

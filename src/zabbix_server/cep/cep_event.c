@@ -388,8 +388,8 @@ void	cep_events_expect(zbx_db_event * const *db_events, int events_num)
 	for (int i = 0; i < events_num; i++)
 	{
 		zbx_cep_origin_t	origin = {
-			.source = db_events[i]->source,
-			.object = db_events[i]->object,
+			.source = (unsigned char)db_events[i]->source,
+			.object = (unsigned char)db_events[i]->object,
 			.objectid = db_events[i]->objectid
 		};
 

@@ -716,7 +716,7 @@ static void	update_event_maintenances(zbx_vector_db_event_t *cep_events)
 
 	zbx_vector_uint64_create(&maintenanceids);
 	zbx_vector_db_event_create(&problems);
-	zbx_vector_db_event_reserve(&problems, events.values_num);
+	zbx_vector_db_event_reserve(&problems, (size_t)events.values_num);
 
 	/* prepare trigger problem event vector */
 	for (i = 0; i < cep_events->values_num; i++)

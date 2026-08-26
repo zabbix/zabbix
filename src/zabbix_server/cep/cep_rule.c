@@ -1048,7 +1048,7 @@ int	cep_event_process_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t
 	rules = zbx_cep_config_get_rules(handle);
 
 	*matched_rules = (const zbx_cep_rule_t **)zbx_malloc(NULL, sizeof(zbx_cep_rule_t *) *
-			rules->values_num);
+			(size_t)rules->values_num);
 	*matched_rules_num = 0;
 
 	for (int i = 0; i < rules->values_num; i++)

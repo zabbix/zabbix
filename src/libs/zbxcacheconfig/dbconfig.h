@@ -51,8 +51,8 @@ typedef struct
 	const char		*correlation_tag;
 	const char		*opdata;
 	const char		*event_name;
-	const unsigned char	*expression_bin;
-	const unsigned char	*recovery_expression_bin;
+	unsigned char		*expression_bin;
+	unsigned char		*recovery_expression_bin;
 	zbx_uint64_t		revision;
 	zbx_uint64_t		timer_revision;
 	unsigned char		topoindex;

@@ -232,7 +232,7 @@ void	cep_acknowledge_update_tag(zbx_cep_acknowledge_t *oplog, int op, const char
 void	cep_acknowledge_set_cause(zbx_cep_acknowledge_t *oplog, zbx_uint64_t cause_eventid)
 {
 	cep_acknowledge_open(oplog, ZBX_CEP_OP_SET_CAUSE, "cause");
-	zbx_json_addint64(&oplog->json, "eventid", cause_eventid);
+	zbx_json_adduint64(&oplog->json, "eventid", cause_eventid);
 	cep_acknowledge_close(oplog);
 }
 

@@ -96,15 +96,15 @@ zbx_cep_manager_t;
 
 static zbx_hash_t	cep_blocker_object_hash(const void *a)
 {
-	zbx_cep_blocker_object_t	*object = (zbx_cep_blocker_object_t *)a;
+	const zbx_cep_blocker_object_t	*object = (const zbx_cep_blocker_object_t *)a;
 
 	return cep_origin_hash(&object->origin);
 }
 
 static int	cep_blocker_object_compare(const void *a1, const void *a2)
 {
-	zbx_cep_blocker_object_t	*o1 = (zbx_cep_blocker_object_t *)a1;
-	zbx_cep_blocker_object_t	*o2 = (zbx_cep_blocker_object_t *)a2;
+	const zbx_cep_blocker_object_t	*o1 = (const zbx_cep_blocker_object_t *)a1;
+	const zbx_cep_blocker_object_t	*o2 = (const zbx_cep_blocker_object_t *)a2;
 
 	return cep_origin_compare(&o1->origin, &o2->origin);
 }
@@ -482,8 +482,8 @@ static int	cep_manager_block_task_event(zbx_cep_manager_t *manager, zbx_cep_task
 		cep_manager_block_task_on_event(manager,  &task->base, task->eventids.values[i]);
 
 	zbx_cep_origin_t	origin = {
-		.source = task->db_event->source,
-		.object = task->db_event->object,
+		.source = (unsigned char)task->db_event->source,
+		.object = (unsigned char)task->db_event->object,
 		.objectid = task->db_event->objectid
 	};
 
@@ -503,8 +503,8 @@ static int	cep_manager_block_task_event(zbx_cep_manager_t *manager, zbx_cep_task
 	{
 		zbx_cep_blocker_object_t	*bo, bo_local = {
 				.origin = {
-					.source = task->db_event->source,
-					.object = task->db_event->object,
+					.source = (unsigned char)task->db_event->source,
+					.object = (unsigned char)task->db_event->object,
 					.objectid = task->db_event->objectid
 				}
 		};
@@ -582,8 +582,8 @@ static void	cep_manager_deregister_blocking_task_event(zbx_cep_manager_t *manage
 	{
 		zbx_cep_blocker_object_t	*bo;
 		zbx_cep_origin_t		origin = {
-				.source = task->db_event->source,
-				.object = task->db_event->object,
+				.source = (unsigned char)task->db_event->source,
+				.object = (unsigned char)task->db_event->object,
 				.objectid = task->db_event->objectid
 		};
 
