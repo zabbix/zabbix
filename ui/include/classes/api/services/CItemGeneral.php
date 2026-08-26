@@ -315,6 +315,10 @@ abstract class CItemGeneral extends CApiService {
 					$item += array_intersect_key($db_item, array_flip(['publickey', 'privatekey']));
 				}
 
+				if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+					$item += array_intersect_key($db_item, array_flip(['granularity', 'lookback_limit']));
+				}
+
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRules(
 					$item['type'] == ITEM_TYPE_TELEMETRY_QUERY && array_key_exists('query', $item)
 						? ['query' => $item['query']] + $db_item
@@ -394,13 +398,6 @@ abstract class CItemGeneral extends CApiService {
 			if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
 				/** @var CItemTypeTelemetryQuery $item_type */
 				$path = '/'.($i + 1);
-
-				if ($db_item !== null) {
-					$item += [
-						'granularity' => $db_item['granularity'],
-						'lookback_limit' => $db_item['lookback_limit']
-					];
-				}
 
 				if (!$item_type::validateGranularity($item, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
