@@ -49,10 +49,12 @@ class CAction extends CApiService {
 		EVENT_SOURCE_DISCOVERY => [
 			ZBX_CONDITION_TYPE_DHOST_IP, ZBX_CONDITION_TYPE_DSERVICE_TYPE, ZBX_CONDITION_TYPE_DSERVICE_PORT,
 			ZBX_CONDITION_TYPE_DSTATUS, ZBX_CONDITION_TYPE_DUPTIME, ZBX_CONDITION_TYPE_DVALUE, ZBX_CONDITION_TYPE_DRULE,
-			ZBX_CONDITION_TYPE_DCHECK, ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_DOBJECT
+			ZBX_CONDITION_TYPE_DCHECK, ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_PROXY_GROUP,
+			ZBX_CONDITION_TYPE_DOBJECT
 		],
 		EVENT_SOURCE_AUTOREGISTRATION => [
-			ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_HOST_NAME, ZBX_CONDITION_TYPE_HOST_METADATA
+			ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_PROXY_GROUP, ZBX_CONDITION_TYPE_HOST_NAME,
+			ZBX_CONDITION_TYPE_HOST_METADATA
 		],
 		EVENT_SOURCE_INTERNAL => [
 			ZBX_CONDITION_TYPE_HOST_GROUP, ZBX_CONDITION_TYPE_HOST, ZBX_CONDITION_TYPE_TEMPLATE,
@@ -2199,7 +2201,7 @@ class CAction extends CApiService {
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DSTATUS], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN, DOBJECT_STATUS_DISCOVER, DOBJECT_STATUS_LOST])],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.SEC_PER_MONTH],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DVALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('conditions', 'value')],
-					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_DRULE, ZBX_CONDITION_TYPE_DCHECK, ZBX_CONDITION_TYPE_PROXY])], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_DRULE, ZBX_CONDITION_TYPE_DCHECK, ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_PROXY_GROUP])], 'type' => API_ID, 'flags' => API_REQUIRED],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DOBJECT], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE])]
 				];
 				$operator_rules = [
@@ -2212,17 +2214,19 @@ class CAction extends CApiService {
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DRULE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DRULE))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DCHECK], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DCHECK))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_PROXY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_PROXY))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_PROXY_GROUP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_PROXY_GROUP))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DOBJECT], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DOBJECT))]
 				];
 				break;
 
 			case EVENT_SOURCE_AUTOREGISTRATION:
 				$value_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_PROXY], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_PROXY_GROUP])], 'type' => API_ID, 'flags' => API_REQUIRED],
 					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_HOST_NAME, ZBX_CONDITION_TYPE_HOST_METADATA])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')]
 				];
 				$operator_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_PROXY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_PROXY))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_PROXY_GROUP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_PROXY_GROUP))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST_NAME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST_NAME))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST_METADATA], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST_METADATA))]
 				];
@@ -2511,6 +2515,7 @@ class CAction extends CApiService {
 		self::checkTriggersPermissions($actions);
 		self::checkDRulesPermissions($actions);
 		self::checkDChecksPermissions($actions);
+		self::checkProxyGroupsPermissions($actions);
 		self::checkProxiesPermissions($actions);
 		self::checkServicesPermissions($actions);
 	}
@@ -2622,6 +2627,7 @@ class CAction extends CApiService {
 		self::checkTriggersPermissions($actions);
 		self::checkDRulesPermissions($actions);
 		self::checkDChecksPermissions($actions);
+		self::checkProxyGroupsPermissions($actions);
 		self::checkProxiesPermissions($actions);
 		self::checkServicesPermissions($actions);
 	}
@@ -3322,6 +3328,46 @@ class CAction extends CApiService {
 		if ($count != count($proxyids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
+			);
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given proxy groups.
+	 *
+	 * @param array $actions
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given proxy groups.
+	 */
+	private static function checkProxyGroupsPermissions(array $actions): void {
+		$proxy_groupids = [];
+
+		foreach ($actions as $action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_PROXY_GROUP) {
+					$proxy_groupids[$condition['value']] = true;
+				}
+			}
+		}
+
+		if (!$proxy_groupids) {
+			return;
+		}
+
+		$proxy_groupids = array_keys($proxy_groupids);
+
+		$count = API::ProxyGroup()->get([
+			'countOutput' => true,
+			'proxy_groupids' => $proxy_groupids
+		]);
+
+		if ($count != count($proxy_groupids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition proxy group. Proxy group does not exist or you have no access to it.')
 			);
 		}
 	}
