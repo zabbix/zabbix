@@ -582,7 +582,7 @@
 
 					const overflow_ellipsis = document.createElement('span');
 					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					overflow_ellipsis.innerHTML = host_port;
+					overflow_ellipsis.textContent = host_port;
 
 					const flex_wrapper = document.createElement('div');
 					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
