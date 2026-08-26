@@ -1109,7 +1109,7 @@ class CProxy extends CApiService {
 										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_subject')]
 			]],
-			'apm' =>					['type' => API_OBJECT, 'fields' => self::getApmValidationRules();]
+			'apm' =>					['type' => API_OBJECT, 'fields' => self::getApmValidationRules()]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
