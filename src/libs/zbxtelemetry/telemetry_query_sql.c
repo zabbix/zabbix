@@ -743,7 +743,11 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 			(SUCCEED == query_has_columns ? "," : ""), columns_to_select);
 
 	zbx_snprintf_alloc(sql, &alloc, &offset, "FORMAT JSONCompactEachRow ");
-	zbx_snprintf_alloc(sql, &alloc, &offset, "SETTINGS output_format_json_quote_64bit_integers=0;");
+	zbx_snprintf_alloc(sql, &alloc, &offset, "SETTINGS "
+			"output_format_json_quote_64bit_floats=0,"
+			"output_format_json_quote_64bit_integers=0,"
+			"output_format_json_quote_decimals=0,"
+			"output_format_json_quote_denormals=0;");
 
 	zbx_free(columns_to_select);
 	zbx_free(aggr_columns_to_select);
