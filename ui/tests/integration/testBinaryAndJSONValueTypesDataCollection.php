@@ -1050,8 +1050,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$response = $this->call('item.create', [
 			'hostid' => $hostid,
-			'name' => 'TRIGGER_TYPE_CHANGE_ITEM',
-			'key_' => 'trigger.type.change.item',
+			'name' => 'item_for_trigger_with_changing_value_type',
+			'key_' => 'item_for_trigger_with_changing_value_type',
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_TEXT,
 			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
@@ -1060,20 +1060,20 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$itemid = $response['result']['itemids'][0];
 
 		$response = $this->call('trigger.create', [
-			'description' => 'TRIGGER_TYPE_CHANGE_TRIGGER',
-			'expression' => 'last(/simple/trigger.type.change.item)=0'
+			'description' => 'trigger_on_item_with_changing_value_type',
+			'expression' => 'last(/simple/item_for_trigger_with_changing_value_type)=0'
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$triggerid = $response['result']['triggerids'][0];
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
-		$this->sendSenderValue('simple', 'trigger.type.change.item', 'text_value');
+		$this->sendSenderValue('simple', 'item_for_trigger_with_changing_value_type', 'text_value');
 
 		// Confirm the trigger was evaluated (reading the item's value through the value cache)
 		// before the item's value type changes below.
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			"function:'last(/simple/trigger.type.change.item,)'", true, 30, 1);
+			"function:'last(/simple/item_for_trigger_with_changing_value_type,)'", true, 30, 1);
 
 		$this->call('item.update', [
 			'itemid' => $itemid,
@@ -1083,7 +1083,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		// Force the trigger to re-evaluate against the item's new (JSON) type.
-		$this->sendSenderValue('simple', 'trigger.type.change.item', '{"a":1}');
+		$this->sendSenderValue('simple', 'item_for_trigger_with_changing_value_type', '{"a":1}');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'json-type items are not supported in functions');
