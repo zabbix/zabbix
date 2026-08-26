@@ -216,9 +216,6 @@ class CControllerProblemViewData extends CControllerDataTable {
 					);
 				}
 			}
-			elseif (count($data['cep_rules']) > 0) {
-				$info_icons[] = makeInformationIcon(_('Complex event processing rule executed.'));
-			}
 
 			if (array_key_exists('suppression_data', $problem)) {
 				if (count($problem['suppression_data']) == 1
