@@ -571,14 +571,28 @@ class CCepRuleHelper {
 			default => ''
 		};
 
-		$label = match ($operation) {
-			self::OP_SET_CAUSE => _('Set cause for this event'),
-			self::OP_SUPPRESS => _s('Suppressed until %s', zbx_date2str(
-				$target_details['until'] > strtotime('today') ? TIME_FORMAT : DATE_TIME_FORMAT,
-				$target_details['until']
-			)),
-			default => CCepRuleHelper::getOperationLabelString(['type' => $operation])
-		};
+		switch ($operation) {
+			case self::OP_SET_CAUSE:
+				$label = _('Set cause for this event');
+				break;
+
+			case self::OP_SUPPRESS:
+				if ($target_details['until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
+					$suppressed_till = _('Indefinitely');
+				}
+				else {
+					$suppressed_till = $target_details['until'] < strtotime('tomorrow')
+							&& $target_details['until'] > strtotime('today')
+						? zbx_date2str(TIME_FORMAT, $target_details['until'])
+						: zbx_date2str(DATE_TIME_FORMAT, $target_details['until']);
+				}
+
+				$label = _s('Suppressed till: %1$s', $suppressed_till);
+				break;
+
+			default:
+				$label = CCepRuleHelper::getOperationLabelString(['type' => $operation]);
+		}
 
 		return $arguments !== '' ? "$label: $arguments." : "$label.";
 	}
