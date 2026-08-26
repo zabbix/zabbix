@@ -262,7 +262,7 @@ class CPopupManager {
 					if (redirect_url !== null) {
 						history.replaceState(null, '', redirect_url);
 
-						location.href = location.href;
+						location.reload();
 					}
 				}
 				else {
@@ -328,7 +328,7 @@ class CPopupManager {
 						history.replaceState(null, '', redirect_url);
 					}
 
-					location.href = location.href;
+					location.reload();
 				}
 				else {
 					location.href = submit_event.getRedirectUrl() || CPopupManager.#return_url || location.href;
