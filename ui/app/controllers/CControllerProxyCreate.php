@@ -120,7 +120,7 @@ class CControllerProxyCreate extends CController {
 					'key' => ['required', 'string', 'not_empty'],
 					'value' => ['required', 'string'],
 					'signal_type' => ['required', 'integer',
-						'in' => [SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS,SIGNAL_TYPE_LOGS]
+						'in' => [SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS]
 					]
 				],
 				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]]
