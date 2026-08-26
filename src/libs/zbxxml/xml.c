@@ -960,7 +960,7 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 						&attr_loc, &attr_val_loc, &text_loc, nodevalue))
 				{
 					ret = FAIL;
-					goto clean;
+					break;
 				}
 			}
 		}
@@ -979,10 +979,6 @@ static int	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, 
 	}
 	while (NULL != json_string_ptr);
 
-clean:
-	zbx_free(attr_loc);
-	zbx_free(attr_val_loc);
-	zbx_free(text_loc);
 	zbx_free(value);
 	zbx_free(name);
 
