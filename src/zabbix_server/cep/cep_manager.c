@@ -22,9 +22,8 @@
 #include "zbx_cep.h"
 #include "zbx_cep_client.h"
 
-#include "zbx_trigger_constants.h"
-#include "zbxalgo.h"
 #include "zbxcommon.h"
+#include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxipcservice.h"
 #include "zbxlog.h"
@@ -40,6 +39,8 @@
 #include "zbxthreads.h"
 #include "zbxtime.h"
 #include "zbxcachehistory.h"
+#include "zbxregexp.h"
+#include "zbxtypes.h"
 
 #define CEP_WORKERS_MAX		100
 #define CEP_WORKERS_DEFAULT	10

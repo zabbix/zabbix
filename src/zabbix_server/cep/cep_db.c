@@ -16,7 +16,8 @@
 #include "cep.h"
 #include "cep_api.h"
 #include "cep_task.h"
-#include "zabbix_server/cep/cep_window.h"
+#include "cep_window.h"
+#include "cep_event.h"
 #include "zbx_cep.h"
 
 #include "zbx_trigger_constants.h"
@@ -25,15 +26,15 @@
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbxescalations.h"
 #include "zbxconnector.h"
 #include "zbxexport.h"
 #include "zbxnum.h"
 #include "zbxtypes.h"
 #include "zbxstr.h"
-#include "../actions/actions.h"
-#include "../events/events.h"
+#include "zabbix_server/actions/actions.h"
+#include "zabbix_server/events/events.h"
 #include "zbxevent.h"
+#include "zbxjson.h"
 
 typedef struct
 {

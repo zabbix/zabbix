@@ -12,11 +12,14 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "cep.h"
 #include "cep_api.h"
+#include "cep.h"
+#include "cep_window.h"
+#include "zbxcommon.h"
+#include "zbxtypes.h"
+#include "zbxtypes_ext.h"
 #include "zbx_cep.h"
 #include "zbxalgo.h"
-#include "zbxcommon.h"
 
 ZBX_VECTOR_IMPL(cep_event_update, zbx_cep_event_update_t)
 

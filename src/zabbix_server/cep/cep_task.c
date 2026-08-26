@@ -13,6 +13,8 @@
 **/
 
 #include "cep_task.h"
+#include "cep_rule_operation.h"
+#include "cep_window.h"
 #include "zbx_cep.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"

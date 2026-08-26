@@ -20,6 +20,7 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
 
 zbx_hash_t	cep_origin_hash(const zbx_cep_origin_t *origin);
 int	cep_origin_compare(const zbx_cep_origin_t *o1, const zbx_cep_origin_t *o2);

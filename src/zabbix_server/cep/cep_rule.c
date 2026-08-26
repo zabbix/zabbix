@@ -17,6 +17,8 @@
 #include "cep_api.h"
 #include "cep_event.h"
 #include "cep_task.h"
+#include "cep_rule_operation.h"
+#include "zbxtypes.h"
 #include "zbx_cep.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
@@ -1059,7 +1061,7 @@ int	cep_event_process_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t
 		/* only first matching uniq window rules can be processed */
 		if (NULL != rules->values[i]->window)
 		{
-			zbx_uint32_t	flag = CEP_FLAG(rules->values[i]->window->type);
+			zbx_uint32_t	flag = (zbx_uint32_t)CEP_FLAG(rules->values[i]->window->type);
 
 			if (0 != (flag & window_mask & CEP_WINDOW_UNIQ))
 				continue;

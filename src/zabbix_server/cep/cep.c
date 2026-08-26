@@ -28,6 +28,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtypes_ext.h"
+#include "zbxtime.h"
 
 /*
  * Event cache

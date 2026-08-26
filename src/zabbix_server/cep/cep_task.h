@@ -23,6 +23,8 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxmw.h"
+#include "zbxjson.h"
+#include "zbxtypes.h"
 
 typedef enum
 {

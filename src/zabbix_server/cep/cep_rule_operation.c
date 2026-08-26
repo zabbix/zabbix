@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "cep_rule_operation.h"
 #include "cep_api.h"
 #include "cep_rule.h"
 #include "cep.h"
@@ -23,8 +24,12 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
+#include "zbxmw.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 static void	cep_prepare_value(char *value, size_t size)
 {

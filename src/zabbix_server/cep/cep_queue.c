@@ -17,8 +17,9 @@
 #include "cep.h"
 #include "zbx_cep.h"
 
-#include "zbxalgo.h"
 #include "zbxcommon.h"
+#include "zbxtypes.h"
+#include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxmw.h"
 

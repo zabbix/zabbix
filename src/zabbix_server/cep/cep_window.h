@@ -18,7 +18,9 @@
 #include "cep_event.h"
 #include "zbxmw.h"
 #include "zbxcacheconfig.h"
+#include "zbxtypes.h"
 #include "zbxtypes_ext.h"
+#include "zbxalgo.h"
 
 typedef enum
 {

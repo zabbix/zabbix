@@ -14,8 +14,9 @@
 
 #include "zbx_cep_client.h"
 
-#include "zbx_trigger_constants.h"
 #include "zbxcommon.h"
+#include "zbx_trigger_constants.h"
+#include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"

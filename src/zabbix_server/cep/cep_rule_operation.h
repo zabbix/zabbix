@@ -19,6 +19,8 @@
 #include "zbx_cep.h"
 #include "zbxmw.h"
 #include "zbxcacheconfig.h"
+#include "zbxjson.h"
+#include "zbxtypes.h"
 
 typedef struct
 {

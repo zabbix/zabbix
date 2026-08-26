@@ -15,6 +15,7 @@
 #include "cep_correlation.h"
 #include "cep_task.h"
 #include "cep_event.h"
+#include "zbx_cep.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcalc.h"
@@ -26,7 +27,8 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxvariant.h"
-#include "../events/events.h"
+#include "zabbix_server/events/events.h"
+#include "version.h"
 
 typedef enum
 {

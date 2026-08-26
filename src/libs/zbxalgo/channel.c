@@ -14,6 +14,7 @@
 
 #include "zbxalgo.h"
 #include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxtime.h"
 
 /******************************************************************************

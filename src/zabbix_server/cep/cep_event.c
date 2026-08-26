@@ -14,7 +14,8 @@
 
 #include "cep_event.h"
 #include "cep_api.h"
-#include "zabbix_server/cep/cep_task.h"
+#include "cep.h"
+#include "cep_task.h"
 #include "zbx_cep.h"
 #include "zbx_trigger_constants.h"
 #include "zbxcacheconfig.h"
@@ -23,6 +24,8 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxdbwrap.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *

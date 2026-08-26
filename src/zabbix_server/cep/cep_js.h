@@ -17,6 +17,7 @@
 
 #include "zbx_cep.h"
 #include "zbxembed.h"
+#include "zbxalgo.h"
 
 typedef struct
 {

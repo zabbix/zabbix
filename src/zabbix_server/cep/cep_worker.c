@@ -40,6 +40,7 @@
 #include "zbxsupervisor_client.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
 
 /******************************************************************************
  *                                                                            *

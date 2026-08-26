@@ -17,6 +17,8 @@
 
 #include "zbx_cep.h"
 #include "zbxtypes.h"
+#include "zbxalgo.h"
+#include "zbxdbhigh.h"
 
 typedef struct
 {

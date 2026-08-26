@@ -13,11 +13,13 @@
 **/
 
 #include "cep_js.h"
-#include "libs/zbxembed/duktape.h"
 #include "zbx_cep.h"
-#include "libs/zbxembed/embed.h"
-#include "zbxalgo.h"
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxembed.h"
+#include "zbxalgo.h"
+#include "libs/zbxembed/duktape.h"
+#include "libs/zbxembed/embed.h"
 
 #define CEP_EVENTS_STASH_KEY	"cep_events"
 
