@@ -1122,8 +1122,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$response = $this->call('item.create', [
 			'hostid' => $hostid,
-			'name' => 'VALUECACHE_JSON_ITEM',
-			'key_' => 'valuecache.json.item',
+			'name' => 'valuecache_json_item',
+			'key_' => 'valuecache_json_item',
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_JSON,
 			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
@@ -1133,11 +1133,11 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$response = $this->call('item.create', [
 			'hostid' => $hostid,
-			'name' => 'CALC_REFERENCING_JSON',
-			'key_' => 'calc.referencing.json',
+			'name' => 'calc_item_referencing_json_item',
+			'key_' => 'calc_item_referencing_json_item',
 			'type' => ITEM_TYPE_CALCULATED,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
-			'params' => 'last(/simple/valuecache.json.item)',
+			'params' => 'last(/simple/valuecache_json_item)',
 			'delay' => '1s'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -1145,7 +1145,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
-		$this->sendSenderValue('simple', 'valuecache.json.item', '{"a":1}');
+		$this->sendSenderValue('simple', 'valuecache_json_item', '{"a":1}');
 
 		// Confirm the calculated item actually attempted to read the JSON item's value through the
 		// value cache, and was gracefully refused rather than crashing.
