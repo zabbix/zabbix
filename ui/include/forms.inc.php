@@ -1061,7 +1061,7 @@ function renderProxyApmAttrRow($index, array $attribute, array $options = []): a
 				->setEnabled(!$options['readonly'])
 		))
 			->addClass(ZBX_STYLE_NOWRAP)
-			->addClass(ZBX_STYLE_TOP),
+			->addClass(ZBX_STYLE_TOP)
 	]))->addClass('form_row');
 
 	$error_container_row = $options['has_inline_validation']

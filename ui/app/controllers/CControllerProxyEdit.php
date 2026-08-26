@@ -109,7 +109,7 @@ class CControllerProxyEdit extends CController {
 					'custom_timeouts' => (int) $this->proxy['custom_timeouts'],
 					'data_collection_status' => $this->proxy['apm']['data_collection_status'],
 					'max_messages_per_second' => $this->proxy['apm']['max_messages_per_second'],
-					'additional_resource_attributes' => $this->proxy['apm']['additional_resource_attributes'],
+					'additional_resource_attributes' => $this->proxy['apm']['additional_resource_attributes']
 				]
 			];
 
