@@ -49,7 +49,7 @@ class CLegacyAction extends CAction {
 		 * sure to hide left menu and display error in case user has no access to templates or hosts.
 		 */
 		if (in_array(getRequest('context', ''), ['host', 'template'])
-				&& in_array($action, ['host_discovery.php', 'httpconf.php'])) {
+				&& in_array($action, ['httpconf.php'])) {
 			$action = (getRequest('context') === 'host') ? 'host.list' : 'template.list';
 		}
 
@@ -61,9 +61,7 @@ class CLegacyAction extends CAction {
 		}
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
-			$denied = array_merge($denied, ['host_discovery.php', 'host_discovery_prototypes.php',
-				'host.list', 'httpconf.php', 'report4.php', 'template.list'
-			]);
+			$denied = array_merge($denied, ['host.list', 'httpconf.php', 'report4.php', 'template.list']);
 		}
 
 		if (in_array($action, $denied)) {
