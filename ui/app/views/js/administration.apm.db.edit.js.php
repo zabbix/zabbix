@@ -155,14 +155,10 @@ const view = new class {
 		], show_user_fields, true);
 
 		this.#updateDisplayState([
-			...document.querySelectorAll('.js-ssl-verify-peer'),
-			...document.querySelectorAll('.js-ssl-cert-file'),
-			...document.querySelectorAll('.js-ssl-key-file'),
-			...document.querySelectorAll('.js-ssl-key-password')
+			...document.querySelectorAll('.js-ssl-verify-peer')
 		], show_ssl_fields, true);
 
 		this.#updateDisplayState([
-			...document.querySelectorAll('.js-ssl-ca-location'),
 			...document.querySelectorAll('.js-ssl-verify-host')
 		], show_ssl_verify_peer_fields, true);
 

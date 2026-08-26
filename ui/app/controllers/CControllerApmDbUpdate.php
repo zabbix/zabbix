@@ -41,26 +41,8 @@ class CControllerApmDbUpdate extends CController {
 			'password' => ['string', 'required', 'length' => 255, 'when' => [$status_configured, $auth_type_password]],
 			'db' => ['string', 'required', 'length' => 255, 'when' => $status_configured],
 			'ssl_verify_peer' => ['integer', 'required', 'when' => [$status_configured, $url_scheme_https]],
-			'ssl_ca_location' => ['string', 'required', 'length' => 2048,
-				'when' => [$status_configured, $url_scheme_https, $verify_certificate]
-			],
 			'ssl_verify_host' => ['integer', 'required',
 				'when' => [$status_configured, $url_scheme_https, $verify_certificate]
-			],
-			'ssl_cert_file' => ['string', 'required', 'length' => 2048,
-				'when' => [$status_configured, $url_scheme_https]
-			],
-			'ssl_key_file' => ['string', 'required', 'length' => 2048,
-				'when' => [$status_configured, $url_scheme_https]
-			],
-			'ssl_key_password' => [
-				['string', 'length' => 255],
-				['string', 'length' => 255, 'in' => [''],
-					'when' => [$status_configured, $url_scheme_https, ['ssl_key_file', 'in' => ['']]],
-					'messages' => [
-						'in' => _s('Must be empty, if "%s" field is not specified.', _('Client private key file'))
-					]
-				]
 			]
 		]];
 	}
