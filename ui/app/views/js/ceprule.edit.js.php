@@ -268,7 +268,7 @@ window.ceprule_edit_popup = new class {
 		const type = Number(input.value);
 
 
-		// TODO: why are these fields initally in changed state although no interaction yet?
+		// TODO: why are these fields initially in changed state although no interaction yet?
 		if (this.form.findFieldByName('window[group_by_host]')._changed
 				|| this.form.findFieldByName('window[group_by_host_group]')._changed
 				|| this.form.findFieldByName('window[group_by_tags]')._changed) {

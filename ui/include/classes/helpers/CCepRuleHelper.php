@@ -190,7 +190,7 @@ class CCepRuleHelper {
 		$labels = self::getConditionLabels();
 
 		if (!array_key_exists($type, $labels)) {
-			throw new LogicException("Uknown condition type $type.");
+			throw new LogicException("Unknown condition type $type.");
 		}
 
 		return $labels[$type];
@@ -228,7 +228,7 @@ class CCepRuleHelper {
 		$labels = self::getConditionOperatorLabels();
 
 		if (!array_key_exists($operator, $labels)) {
-			throw new LogicException("Uknown condition operator $operator.");
+			throw new LogicException("Unknown condition operator $operator.");
 		}
 
 		return static::getConditionOperatorLabels()[$operator];
