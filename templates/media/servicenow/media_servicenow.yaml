@@ -23,7 +23,7 @@ zabbix_export:
         - name: servicenow_sys_id
           value: '{EVENT.TAGS.__zbx_servicenow_sys_id}'
         - name: servicenow_url
-          value: '{ALERT.SENDTO}'
+          value: '<PLACE URL HERE>'
         - name: servicenow_user
           value: '<PLACE USERNAME HERE>'
         - name: urgency_for_average
