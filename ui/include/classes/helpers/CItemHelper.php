@@ -84,9 +84,11 @@ class CItemHelper extends CItemGeneralHelper {
 
 		// The prefix will be added to a value mapping only for inherited items and item prototypes, or for items
 		// created from inherited item prototypes.
-		if ($item['valuemap'] && bccomp($item['valuemap']['hostid'], $item['hostid']) != 0) {
-			$templates = API::Template()->get(['output' => ['name'], 'templateids' => $item['valuemap']['hostid']]);
-			$item['valuemap']['prefix'] = $templates ? $templates[0]['name'].NAME_DELIMITER : null;
+		if (!array_key_exists('inaccessible', $item['valuemap']) || !$item['valuemap']['inaccessible']) {
+			if ($item['valuemap'] && bccomp($item['valuemap']['hostid'], $item['hostid']) != 0) {
+				$templates = API::Template()->get(['output' => ['name'], 'templateids' => $item['valuemap']['hostid']]);
+				$item['valuemap']['prefix'] = $templates[0]['name'] . NAME_DELIMITER;
+			}
 		}
 
 		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {

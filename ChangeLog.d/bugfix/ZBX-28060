@@ -1,1 +1,1 @@
-..F....... [ZBX-28060] fixed what is displayed in the value mapping field in item form depending on user permissions (scernisenko)
+..F....... [ZBX-28060] implemented 'Inaccessible value mapping' label for Value mapping in items and item prototypes depending on user permissions (scernisenko)

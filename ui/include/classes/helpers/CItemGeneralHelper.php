@@ -294,7 +294,8 @@ JAVASCRIPT;
 					'valuemapid' => 0,
 					'name' => _('Inaccessible value mapping'),
 					'prefix' => '',
-					'hostid' => 0
+					'hostid' => 0,
+					'inaccessible' => true
 				];
 		}
 

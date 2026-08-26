@@ -814,7 +814,9 @@ $formgrid
 					? [[
 						'id' => $item['valuemap']['valuemapid'],
 						'prefix' => $item['valuemap']['prefix'] ?? '',
-						'name' => $item['valuemap']['name']
+						'name' => $item['valuemap']['name'],
+						'inaccessible' => array_key_exists('inaccessible', $item['valuemap'])
+							&& $item['valuemap']['inaccessible']
 					]]
 					: [],
 				'popup' => [
