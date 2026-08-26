@@ -164,6 +164,10 @@ class CProxy extends CApiService {
 				$sql_parts = $this->addQuerySelect($this->fieldId('proxy_groupid'), $sql_parts);
 			}
 
+			if ($options['selectApm'] !== null) {
+				$sql_parts = $this->addQuerySelect($this->fieldId('apm'), $sql_parts);
+			}
+
 			$proxy_rtdata = false;
 
 			foreach (['lastaccess', 'version', 'compatibility', 'state'] as $field) {
@@ -287,21 +291,17 @@ class CProxy extends CApiService {
 
 		$apmOptionsMap = array_flip($selectApm);
 
-		$resource = DBselect(
-			'SELECT p.proxyid,p.apm'.
-			' FROM proxy p'.
-			' WHERE '.dbConditionId('p.proxyid', array_keys($result))
-		);
-
-		while ($row = DBfetch($resource)) {
-			$apm = json_decode($row['apm'], true);
+		foreach ($result as &$row) {
+			$apm_raw = array_key_exists('apm', $row) ? $row['apm'] : null;
+			$apm = json_decode($apm_raw, true);
 
 			if (!$apm) {
 				$apm = self::APM_DEFAULT_FIELDS;
 			}
 
-			$result[$row['proxyid']]['apm'] = array_intersect_key($apm, $apmOptionsMap);
+			$row['apm'] = array_intersect_key($apm, $apmOptionsMap);
 		}
+		unset($row);
 	}
 
 	/**
