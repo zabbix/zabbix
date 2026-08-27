@@ -284,6 +284,8 @@ abstract class CTriggerGeneral extends CApiService {
 						while ($hist_function = prev($hist_functions));
 					}
 
+					$new_trigger['host_status'] = $host['status'];
+
 					if (array_key_exists($host['hostid'], $chd_triggers_all)
 							&& array_key_exists($tpl_trigger['triggerid'], $chd_triggers_all[$host['hostid']])) {
 						$chd_trigger = $chd_triggers_all[$host['hostid']][$tpl_trigger['triggerid']];
@@ -672,6 +674,14 @@ abstract class CTriggerGeneral extends CApiService {
 		return $descriptions;
 	}
 
+	protected static function addHostStatus(array &$triggers, array $descriptions): void {
+		foreach ($descriptions as $_triggers) {
+			foreach ($_triggers as $_trigger) {
+				$triggers[$_trigger['index']]['host_status'] = $_trigger['host']['status'];
+			}
+		}
+	}
+
 	/**
 	 * @param array $triggers
 	 * @param array $descriptions
@@ -683,7 +693,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 		foreach ($descriptions as $_triggers) {
 			foreach ($_triggers as $_trigger) {
-				$triggers[$_trigger['index']]['host_status'] = $_trigger['host']['status'];
 				$triggers_validate_indexes[] = $_trigger['index'];
 			}
 		}
@@ -1153,6 +1162,8 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$descriptions = $this->populateHostIds($descriptions);
 
+		self::addHostStatus($triggers, $descriptions);
+
 		self::validateUuid($triggers, $descriptions);
 
 		self::addUuid($triggers, $descriptions);
@@ -1374,6 +1385,8 @@ abstract class CTriggerGeneral extends CApiService {
 		if ($descriptions) {
 			$descriptions = $this->populateHostIds($descriptions);
 
+			self::addHostStatus($triggers, $descriptions);
+
 			self::validateUuid($triggers, $descriptions);
 
 			self::checkUuidDuplicates($triggers, $db_triggers);
@@ -1420,13 +1433,15 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$result = DBselect(
-			'SELECT DISTINCT f.triggerid,i.hostid'.
-			' FROM functions f,items i'.
-			' WHERE f.itemid=i.itemid'.
-				' AND '.dbConditionId('f.triggerid', $triggerids)
+			'SELECT DISTINCT f.triggerid,i.hostid,h.status'.
+			' FROM functions f'.
+			' JOIN items i ON f.itemid=i.itemid'.
+			' JOIN hosts h ON i.hostid=h.hostid'.
+			' WHERE '.dbConditionId('f.triggerid', $triggerids)
 		);
 
 		while ($row = DBfetch($result)) {
+			$db_triggers[$row['triggerid']]['host_status'] = $row['status'];
 			$db_triggers[$row['triggerid']]['hosts'][$row['hostid']] = true;
 		}
 	}
@@ -1729,7 +1744,7 @@ abstract class CTriggerGeneral extends CApiService {
 			if ($this instanceof CTriggerPrototype) {
 				$new_trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 			}
-			else {
+			elseif (in_array($new_trigger['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
 				$ins_trigger_rtdata[] = ['triggerid' => $new_trigger['triggerid']];
 			}
 
@@ -1741,6 +1756,8 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$triggerid = bcadd($triggerid, 1, 0);
+
+			unset($new_trigger['host_status']);
 		}
 		unset($new_trigger);
 
@@ -1808,6 +1825,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_functions = [];
 		$del_functions_triggerids = [];
 		$triggers_functions = [];
+		$ins_trigger_rtdata = [];
+		$del_trigger_rtdata_triggerids = [];
 		$new_tags = [];
 		$del_triggertagids = [];
 		$upd_discovered_triggers = [];
@@ -1880,6 +1899,18 @@ abstract class CTriggerGeneral extends CApiService {
 				$upd_trigger['values']['manual_close'] = $trigger['manual_close'];
 			}
 
+			if (self::isTrigger() && array_key_exists('host_status', $trigger)
+					&& array_key_exists('host_status', $db_trigger)
+					&& $trigger['host_status'] != $db_trigger['host_status']) {
+				if ($trigger['host_status'] == HOST_STATUS_TEMPLATE) {
+					$del_trigger_rtdata_triggerids[] = $trigger['triggerid'];
+				}
+				elseif ($db_trigger['host_status'] == HOST_STATUS_TEMPLATE) {
+					$ins_trigger_rtdata[] = ['triggerid' => $trigger['triggerid']];
+				}
+			}
+			unset($save_triggers[$tnum]['host_status']);
+
 			if ($upd_trigger['values']) {
 				$upd_triggers[] = $upd_trigger;
 			}
@@ -1933,6 +1964,12 @@ abstract class CTriggerGeneral extends CApiService {
 		if ($new_functions) {
 			DB::insertBatch('functions', $new_functions, false);
 		}
+
+		if ($del_trigger_rtdata_triggerids) {
+			DB::delete('trigger_rtdata', ['triggerid' => $del_trigger_rtdata_triggerids]);
+		}
+		DB::insertBatch('trigger_rtdata', $ins_trigger_rtdata, false);
+
 		if ($del_triggertagids) {
 			DB::delete('trigger_tag', ['triggertagid' => $del_triggertagids]);
 		}
