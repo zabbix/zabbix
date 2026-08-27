@@ -518,10 +518,6 @@ class CCepRule extends CApiService {
 			}
 
 			self::validateSupportedWindow($cep_rule, '/'.($i + 1), $is_update);
-
-			if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_CAUSE_SYMPTOM) {
-				self::checkAnyGroupByFieldIsEnabled($cep_rule, '/'.($i + 1), $db_cep_rule);
-			}
 		}
 	}
 
@@ -545,19 +541,11 @@ class CCepRule extends CApiService {
 	}
 
 	private static function addRequiredWindowFieldsByWindowType(array &$cep_rule, array $db_cep_rule): void {
-		if ($cep_rule['window_type'] != $db_cep_rule['window_type']) {
-			if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_CAUSE_SYMPTOM) {
-				$cep_rule += ['window' => []];
+		if ($cep_rule['window_type'] != $db_cep_rule['window_type']
+				&& $cep_rule['window_type'] == CCepRuleHelper::WINDOW_PATTERN_MATCH) {
+			$cep_rule += ['window' => []];
 
-				$cep_rule['window'] += array_intersect_key($db_cep_rule['window'],
-					array_flip(['group_by_host_group', 'group_by_host', 'group_by_tags'])
-				);
-			}
-			elseif ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_PATTERN_MATCH) {
-				$cep_rule += ['window' => []];
-
-				$cep_rule['window'] += ['script' => $db_cep_rule['window']['script']];
-			}
+			$cep_rule['window'] += ['script' => $db_cep_rule['window']['script']];
 		}
 	}
 
@@ -591,23 +579,6 @@ class CCepRule extends CApiService {
 
 		if (!CApiInputValidator::validate($api_input_rules, $cep_rule['window'], $path.'/window', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-	}
-
-	private static function checkAnyGroupByFieldIsEnabled(array $cep_rule, string $path, ?array $db_cep_rule): void {
-		$group_by_fields = array_intersect_key($cep_rule['window'],
-			array_flip(['group_by_host_group', 'group_by_host', 'group_by_tags'])
-		);
-
-		$group_by_fields += array_intersect_key(
-			$db_cep_rule !== null ? $db_cep_rule['window'] : DB::getDefaults('cep_rule_window'),
-			array_flip(['group_by_host_group', 'group_by_host', 'group_by_tags'])
-		);
-
-		if (!array_filter($group_by_fields, static fn($value): bool => $value == CCepRuleHelper::GROUP_BY_YES)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path.'/window',
-				_('at least one of "group_by_host_group", "group_by_host" or "group_by_tags" parameters must be enabled')
-			));
 		}
 	}
 
