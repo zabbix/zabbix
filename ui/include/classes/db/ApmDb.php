@@ -41,7 +41,7 @@ class ApmDb {
 	}
 
 	public function getConfig(): array {
-		if (self::isLocal()) {
+		if ($this->isLocal()) {
 			throw new DBException(_('Configuration cannot be retrieved if a local database is defined for APM.'),
 				DB::INIT_ERROR
 			);
@@ -80,12 +80,7 @@ class ApmDb {
 
 	private function initFromSettings(): void {
 		$this->provider = self::PROVIDER_CLICKHOUSE;
-
-		$db_settings = CApiSettingsHelper::getParameters(['apm_global_db']);
-
-		CSettings::normalizeAffectedObjects($db_settings);
-
-		$this->config = self::resolveConfig($db_settings['apm_global_db']);
+		$this->config = self::resolveConfig(CSettingsHelper::getPublic(CSettingsHelper::APM_GLOBAL_DB));
 	}
 
 	/**
