@@ -241,8 +241,8 @@ class CConfigFile {
 		if (isset($APM_CA_LOCATION)) {
 			if (!is_string($APM_CA_LOCATION)) {
 				self::exception(_s('Incorrect telemetry Certificate authority (CA) configuration %1$s: %2$s.',
-						'$APM_CA_LOCATION', _('a string is expected'))
-				);
+					'$APM_CA_LOCATION', _('a string is expected')
+				));
 			}
 
 			$this->config['APM_CA_LOCATION'] = $APM_CA_LOCATION;
@@ -251,8 +251,8 @@ class CConfigFile {
 		if (isset($APM_CA_FILE)) {
 			if (!is_string($APM_CA_FILE)) {
 				self::exception(_s('Incorrect telemetry Certificate authority (CA) configuration %1$s: %2$s.',
-						'$APM_CA_FILE', _('a string is expected'))
-				);
+					'$APM_CA_FILE', _('a string is expected')
+				));
 			}
 
 			$this->config['APM_CA_FILE'] = $APM_CA_FILE;
@@ -716,7 +716,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$expected_fields = [
 			'clickhouse' => ['provider', 'url', 'db', 'username', 'password',
 				'vault_path', 'ssl_verify_peer', 'ssl_verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-				'ssl_ca_location'
+				'ssl_ca_location', 'ssl_ca_file'
 			],
 			'zabbix' => ['provider']
 		];
