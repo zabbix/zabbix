@@ -905,9 +905,12 @@ output {
   display: block; }
 
 .wrapper {
-  position: relative; }
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0; }
   .wrapper > [class^="msg-"] + [class^="msg-"] {
-    margin-top: 0; }
+    margin-block-start: 0; }
 
 header {
   height: var(--header-size);
