@@ -287,7 +287,9 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 			if (SUCCEED_PARTIAL == parse_ret)
 			{
 				zabbix_log(LOG_LEVEL_WARNING,
-						"telemetry query result row limit exceeded, result was truncated");
+						"telemetry query result row limit exceeded for item \"%s:%s\", "
+						"result was truncated", item_context->host_host,
+						item_context->key_orig);
 			}
 
 			status = SUCCEED;
