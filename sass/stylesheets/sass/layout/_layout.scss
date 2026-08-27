@@ -26,8 +26,7 @@ body {
 	> .wrapper {
 		grid-area: content;
 
-		overflow-x: hidden;
-		overflow-y: auto;
+		overflow: auto;
 	}
 }
 
