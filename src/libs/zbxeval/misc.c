@@ -614,7 +614,7 @@ int	zbx_eval_query_subtitute_user_macros(const char *itemquery, size_t len, char
 	zbx_eval_compose_expression(&ctx, &filter);
 	zbx_eval_clear(&ctx);
 
-	*out = zbx_dsprintf(NULL, "/%s/%s?[%s]", ZBX_NULL2EMPTY_STR(query.host), query.key, filter);
+	*out = zbx_dsprintf(*out, "/%s/%s?[%s]", ZBX_NULL2EMPTY_STR(query.host), query.key, filter);
 	ret = SUCCEED;
 out:
 	va_end(args);
