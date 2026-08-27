@@ -760,7 +760,7 @@ class CCepRule extends CApiService {
 
 			if (!array_key_exists(CCepRuleHelper::WHEN_PATTERN_MATCHED, $execute_whens)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-					$cep_rule_path.'/operations', _('at least one operation must execute when event pattern matched')
+					$cep_rule_path.'/operations', _('at least one operation must execute when pattern matched')
 				));
 			}
 		}

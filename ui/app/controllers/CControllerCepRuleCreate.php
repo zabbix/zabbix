@@ -170,7 +170,7 @@ class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 					'count_values' => [
 						'field_rules' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_PATTERN_MATCHED]],
 						'min' => 1,
-						'message' => _('At least one operation must execute when event pattern matched.')
+						'message' => _('At least one operation must execute when pattern matched.')
 					]
 				]
 			],
