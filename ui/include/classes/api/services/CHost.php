@@ -1308,8 +1308,8 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Check that no maintenance object will be left without hosts and host groups as the result of the given hosts
-	 * deletion.
+	 * Check that no maintenance object will be left without host groups, hosts and triggers as the result of the
+	 * given hosts deletion.
 	 *
 	 * @param array $hostids
 	 *
@@ -1317,34 +1317,76 @@ class CHost extends CHostGeneral {
 	 */
 	private static function checkMaintenances(array $hostids): void {
 		$maintenance = DBfetch(DBselect(
-			'SELECT DISTINCT mh.maintenanceid,m.name'.
-			' FROM maintenances_hosts mh'.
-			' JOIN maintenances m ON mh.maintenanceid=m.maintenanceid'.
-			' WHERE '.dbConditionId('mh.hostid', $hostids).
+			'SELECT m.maintenanceid,m.name'.
+			' FROM maintenances m'.
+			' WHERE ('.
+				'EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_hosts mh'.
+					' WHERE m.maintenanceid=mh.maintenanceid'.
+						' AND '.dbConditionId('mh.hostid', $hostids).
+				')'.
+				' OR EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenance_trigger mt'.
+					' JOIN functions f ON mt.triggerid=f.triggerid'.
+					' JOIN items i ON f.itemid=i.itemid'.
+					' WHERE m.maintenanceid=mt.maintenanceid'.
+						' AND '.dbConditionId('i.hostid', $hostids).
+				')'.
+			')'.
 				' AND NOT EXISTS ('.
 					'SELECT NULL'.
 					' FROM maintenances_hosts mh1'.
-					' WHERE mh.maintenanceid=mh1.maintenanceid'.
+					' WHERE m.maintenanceid=mh1.maintenanceid'.
 						' AND '.dbConditionId('mh1.hostid', $hostids, true).
 				')'.
 				' AND NOT EXISTS ('.
 					'SELECT NULL'.
 					' FROM maintenances_groups mg'.
-					' WHERE mh.maintenanceid=mg.maintenanceid'.
+					' WHERE m.maintenanceid=mg.maintenanceid'.
+				')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenance_trigger mt1'.
+					' WHERE m.maintenanceid=mt1.maintenanceid'.
+						' AND NOT EXISTS ('.
+							'SELECT NULL'.
+							' FROM functions f1'.
+							' JOIN items i1 ON f1.itemid=i1.itemid'.
+							' WHERE mt1.triggerid=f1.triggerid'.
+								' AND '.dbConditionId('i1.hostid', $hostids).
+						')'.
 				')'
 		, 1));
 
 		if ($maintenance) {
 			$maintenance_hosts = DBfetchColumn(DBselect(
-				'SELECT h.host'.
-				' FROM maintenances_hosts mh,hosts h'.
-				' WHERE mh.hostid=h.hostid'.
-					' AND '.dbConditionId('mh.maintenanceid', [$maintenance['maintenanceid']])
+				'SELECT DISTINCT h.host,h.hostid'.
+				' FROM hosts h'.
+				' WHERE '.dbConditionId('h.hostid', $hostids).
+					' AND ('.
+						'EXISTS ('.
+							'SELECT NULL'.
+							' FROM maintenances_hosts mh'.
+							' WHERE mh.maintenanceid='.zbx_dbstr($maintenance['maintenanceid']).
+								' AND h.hostid=mh.hostid'.
+						')'.
+						' OR EXISTS ('.
+							'SELECT NULL'.
+							' FROM maintenance_trigger mt'.
+							' JOIN functions f ON mt.triggerid=f.triggerid'.
+							' JOIN items i ON f.itemid=i.itemid'.
+							' WHERE mt.maintenanceid='.zbx_dbstr($maintenance['maintenanceid']).
+								' AND h.hostid=i.hostid'.
+						')'.
+					')'.
+				' ORDER BY h.hostid'
 			), 'host');
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
-				'Cannot delete host %1$s because maintenance "%2$s" must contain at least one host or host group.',
-				'Cannot delete hosts %1$s because maintenance "%2$s" must contain at least one host or host group.',
+				'Cannot delete host %1$s because maintenance "%2$s" must contain at least one host group, host or trigger.',
+				'Cannot delete hosts %1$s because maintenance "%2$s" must contain at least one host group, host or trigger.',
 				'"'.implode('", "', $maintenance_hosts).'"', $maintenance['name'], count($maintenance_hosts)
 			));
 		}
