@@ -23,6 +23,7 @@
 #include "zbxregexp.h"
 #include "zbxcfg.h"
 #include "zbxcrypto.h"
+#include "zbxtelemetry.h"
 #include "zbxtypes.h"
 #include "zbxvault.h"
 #include "zbxdbhigh.h"
@@ -12173,6 +12174,53 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
 	return num;
+}
+
+static void	DCget_apm_db_config(zbx_apm_db_config_t *out, const zbx_config_apm_global_db_t *global_config,
+		const zbx_apm_db_config_t *local_config, const char *config_source_ip,
+		const char *config_ssl_ca_location)
+{
+	if (1 == local_config->status) {
+		zbx_apm_db_config_copy(out, local_config);
+		return;
+	}
+
+	memset(out, 0, sizeof(*out));
+
+	out->status = (ZBX_APM_GLOBAL_DB_STATUS_CONFIGURED == global_config->status ? 1 : 0);
+
+	if (0 == out->status)
+		return;
+
+	out->db_type = ZBX_APM_DB_TYPE_CLICKHOUSE;
+	out->url = zbx_strdup(NULL, global_config->url);
+
+	if (ZBX_APM_GLOBAL_DB_AUTHENTICATION_TYPE_USR_PWD == global_config->authentication_type)
+	{
+		out->username = zbx_strdup(NULL, global_config->username);
+		out->password = zbx_strdup(NULL, global_config->password);
+	}
+
+	out->db = zbx_strdup(NULL, global_config->db);
+	out->ssl_verify_peer = (ZBX_APM_GLOBAL_DB_SSL_VERIFY_PEER_ENABLED == global_config->ssl_verify_peer ? 1 : 0);
+	out->ssl_verify_host = (ZBX_APM_GLOBAL_DB_SSL_VERIFY_HOST_ENABLED == global_config->ssl_verify_host ? 1 : 0);
+
+	if (NULL != config_source_ip)
+		out->source_ip = zbx_strdup(NULL, config_source_ip);
+
+	if (NULL != config_ssl_ca_location)
+		out->ssl_ca_location = zbx_strdup(NULL, config_ssl_ca_location);
+}
+
+void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
+		const char *config_source_ip, const char *config_ssl_ca_location)
+{
+	RDLOCK_CACHE;
+
+	DCget_apm_db_config(out, &config->config->apm_global_db, local_apm_db_config, config_source_ip,
+			config_ssl_ca_location);
+
+	UNLOCK_CACHE;
 }
 
 int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type)

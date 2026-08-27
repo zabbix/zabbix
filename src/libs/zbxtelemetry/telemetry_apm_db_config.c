@@ -288,7 +288,7 @@ int	zbx_apm_db_config_init(zbx_apm_db_config_t *apm_db_config, const char *confi
 		goto fail;
 	}
 
-	apm_db_config->have_local_config = 1;
+	apm_db_config->status = 1;
 
 	return SUCCEED;
 fail:
@@ -299,7 +299,7 @@ fail:
 
 void	zbx_apm_db_config_clear(zbx_apm_db_config_t *config)
 {
-	config->have_local_config = 0;
+	config->status = 0;
 
 	zbx_free(config->url);
 	zbx_free(config->username);
@@ -313,4 +313,41 @@ void	zbx_apm_db_config_clear(zbx_apm_db_config_t *config)
 	zbx_free(config->ssl_ca_location);
 	zbx_free(config->ssl_cert_location);
 	zbx_free(config->ssl_key_location);
+}
+
+void	zbx_apm_db_config_copy(zbx_apm_db_config_t *dst, const zbx_apm_db_config_t *src)
+{
+	memset(dst, 0, sizeof(*dst));
+
+	dst->status = src->status;
+	dst->db_type = src->db_type;
+
+	if (NULL != src->url)
+		dst->url = zbx_strdup(NULL, src->url);
+	if (NULL != src->username)
+		dst->username = zbx_strdup(NULL, src->username);
+	if (NULL != src->password)
+		dst->password = zbx_strdup(NULL, src->password);
+	if (NULL != src->db)
+		dst->db = zbx_strdup(NULL, src->db);
+	if (NULL != src->source_ip)
+		dst->source_ip = zbx_strdup(NULL, src->source_ip);
+	if (NULL != src->vault_path)
+		dst->vault_path = zbx_strdup(NULL, src->vault_path);
+	if (NULL != src->ssl_cert_file)
+		dst->ssl_cert_file = zbx_strdup(NULL, src->ssl_cert_file);
+	if (NULL != src->ssl_key_file)
+		dst->ssl_key_file = zbx_strdup(NULL, src->ssl_key_file);
+	if (NULL != src->ssl_key_password)
+		dst->ssl_key_password = zbx_strdup(NULL, src->ssl_key_password);
+
+	dst->ssl_verify_peer	= src->ssl_verify_peer;
+	dst->ssl_verify_host	= src->ssl_verify_host;
+
+	if (NULL != src->ssl_ca_location)
+		dst->ssl_ca_location = zbx_strdup(NULL, src->ssl_ca_location);
+	if (NULL != src->ssl_cert_location)
+		dst->ssl_cert_location = zbx_strdup(NULL, src->ssl_cert_location);
+	if (NULL != src->ssl_key_location)
+		dst->ssl_key_location = zbx_strdup(NULL, src->ssl_key_location);
 }

@@ -140,7 +140,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *ap
 	zbx_vector_str_t	values;
 	char			*error = NULL;
 
-	if (0 == apm_db_config->have_local_config)
+	if (0 == apm_db_config->status)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "APM database is not configured"));
 

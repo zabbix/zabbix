@@ -1075,6 +1075,9 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 		unsigned int connection_type, int now);
 void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 
+void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
+		const char *config_source_ip, const char *config_ssl_ca_location);
+
 int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type);
 void	zbx_dc_config_cached_data_init(zbx_dc_cached_data_t *cached_data);
 
@@ -1630,10 +1633,6 @@ char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type);
 #define ZBX_APM_GLOBAL_DB_TAG_DB			"db"
 #define ZBX_APM_GLOBAL_DB_TAG_SSL_VERIFY_PEER		"ssl_verify_peer"
 #define ZBX_APM_GLOBAL_DB_TAG_SSL_VERIFY_HOST		"ssl_verify_host"
-#define ZBX_APM_GLOBAL_DB_TAG_SSL_CA_LOCATION		"ssl_ca_location"
-#define ZBX_APM_GLOBAL_DB_TAG_SSL_CERT_FILE		"ssl_cert_file"
-#define ZBX_APM_GLOBAL_DB_TAG_SSL_KEY_FILE		"ssl_key_file"
-#define ZBX_APM_GLOBAL_DB_TAG_SSL_KEY_PASSWORD		"ssl_key_password"
 
 #define ZBX_APM_GLOBAL_DB_STATUS_NOT_CONFIGURED		0
 #define ZBX_APM_GLOBAL_DB_STATUS_CONFIGURED		1
@@ -1657,10 +1656,6 @@ typedef struct
 	const char	*db;
 	int		ssl_verify_peer;
 	int		ssl_verify_host;
-	const char	*ssl_ca_location;
-	const char	*ssl_cert_file;
-	const char	*ssl_key_file;
-	const char	*ssl_key_password;
 }
 zbx_config_apm_global_db_t;
 

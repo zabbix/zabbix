@@ -35,6 +35,9 @@ typedef struct
 	int				config_unavailable_delay;
 	int				config_unreachable_delay;
 	int				config_unreachable_period;
+	const zbx_apm_db_config_t	*config_apm_db_config;
+	const char			*config_source_ip;
+	const char			*config_ssl_ca_location;
 
 	zbx_vector_poller_item_t	poller_items;
 	zbx_vector_interface_status_t	interfaces;

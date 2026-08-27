@@ -673,22 +673,6 @@ static void	update_apm_global_db(const char *value_str, int found, zbx_uint64_t 
 	store_apm_global_db_option_int(&jp, ZBX_APM_GLOBAL_DB_TAG_SSL_VERIFY_HOST,
 			&apm_global_db->ssl_verify_host, ZBX_APM_GLOBAL_DB_SSL_VERIFY_HOST_DISABLED, buf,
 			sizeof(buf), status, revision, "apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_SSL_VERIFY_HOST);
-
-	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_SSL_CA_LOCATION, &apm_global_db->ssl_ca_location,
-			"", buf, sizeof(buf), found, status, revision,
-			"apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_SSL_CA_LOCATION);
-
-	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_SSL_CERT_FILE, &apm_global_db->ssl_cert_file,
-			"", buf, sizeof(buf), found, status, revision,
-			"apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_SSL_CERT_FILE);
-
-	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_SSL_KEY_FILE, &apm_global_db->ssl_key_file,
-			"", buf, sizeof(buf), found, status, revision,
-			"apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_SSL_KEY_FILE);
-
-	store_apm_global_db_option_str(&jp, ZBX_APM_GLOBAL_DB_TAG_SSL_KEY_PASSWORD, &apm_global_db->ssl_key_password,
-			"", buf, sizeof(buf), found, status, revision,
-			"apm_global_db_" ZBX_APM_GLOBAL_DB_TAG_SSL_KEY_PASSWORD);
 }
 
 static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uint64_t revision,

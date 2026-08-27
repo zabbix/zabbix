@@ -58,7 +58,7 @@ zbx_apm_db_type_t;
 
 typedef struct zbx_apm_db_config
 {
-	int			have_local_config; /* 0 - disabled, 1 - enabled */
+	int			status; /* 0 - disabled, 1 - enabled */
 	zbx_apm_db_type_t	db_type;
 	char			*url;
 	char			*username;
@@ -82,6 +82,7 @@ int	zbx_apm_db_config_init(zbx_apm_db_config_t *apm_db_config, const char *confi
 		const char *config_ssl_key_location, const zbx_config_vault_t *config_vault, char **error);
 
 void	zbx_apm_db_config_clear(zbx_apm_db_config_t *config);
+void	zbx_apm_db_config_copy(zbx_apm_db_config_t *dst, const zbx_apm_db_config_t *src);
 
 /* telemetry query */
 
