@@ -575,7 +575,7 @@ class CCepRuleHelper {
 
 		switch ($operation) {
 			case self::OP_SET_CAUSE:
-				$label = _('Set cause for this event');
+				$label = _('Set as symptom');
 				break;
 
 			case self::OP_SUPPRESS:
