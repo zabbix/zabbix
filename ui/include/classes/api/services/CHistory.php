@@ -298,7 +298,7 @@ class CHistory extends CApiService {
 
 		// search
 		if ($options['search'] !== null) {
-			$query = CElasticsearchHelper::addSearch($schema, $query, $options);
+			$query = CElasticsearchHelper::addSearch($table, $query, $options);
 		}
 
 		// output

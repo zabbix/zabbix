@@ -274,13 +274,14 @@ class CElasticsearchHelper {
 	/**
 	 * Add search criteria to Elasticsearch query.
 	 *
-	 * @param array $schema     DB schema
-	 * @param array $query      Elasticsearch query
-	 * @param array $options    search options
+	 * @param string $table    Table name
+	 * @param array  $query    Elasticsearch query
+	 * @param array  $options  search options
 	 *
 	 * @return array    Elasticsearch query with added search criteria
 	 */
-	public static function addSearch($schema, $query, $options) {
+	public static function addSearch($table, $query, $options) {
+		$schema = DB::getSchema($table);
 		$start = $options['startSearch'] ? '' : '*';
 		$exclude = $options['excludeSearch'] ? 'must_not' : 'must';
 
@@ -297,6 +298,10 @@ class CElasticsearchHelper {
 			if ($value === null || !array_key_exists($field, $schema['fields'])
 					|| ($schema['fields'][$field]['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) == 0) {
 				continue;
+			}
+
+			if ($field === 'value' && in_array($table, ['history_str', 'history_text', 'history_log'])) {
+				$field .= '.analyzed';
 			}
 
 			foreach ($value as $phrase) {
