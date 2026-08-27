@@ -201,7 +201,7 @@ class CRoleHelper {
 		$rules = [
 			'ui.default_access' => (bool) $role['rules']['ui.default_access'],
 			'profile.redirect.enforce' => (bool) $role['rules']['profile.redirect.enforce'],
-			'profile.redirect.url' => (bool) $role['rules']['profile.redirect.url'],
+			'profile.redirect.url' => $role['rules']['profile.redirect.url'],
 			'modules.default_access' => (bool) $role['rules']['modules.default_access'],
 			'api.access' => (bool) $role['rules']['api.access'],
 			'api.mode' => (bool) $role['rules']['api.mode'],
