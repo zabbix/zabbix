@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050149);
+define('ZABBIX_DB_VERSION',		7050150);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -31,6 +31,7 @@ define('DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING',	7);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2026');
 
+define('ZBX_CLOUD_URL', 'https://cloud.zabbix.com');
 define('ZBX_DOCUMENTATION_URL', 'https://www.zabbix.com/documentation');
 
 define('ZBX_BCRYPT_COST',		10);
@@ -330,12 +331,13 @@ define('ZBX_CONDITION_TYPE_EVENT_TAG',			25);
 define('ZBX_CONDITION_TYPE_EVENT_TAG_VALUE',	26);
 define('ZBX_CONDITION_TYPE_SERVICE',			27);
 define('ZBX_CONDITION_TYPE_SERVICE_NAME',		28);
-define('ZBX_CONDITION_TYPE_EVENT_OPEN',			29);
-define('ZBX_CONDITION_TYPE_EVENT_FIRST',		30);
-define('ZBX_CONDITION_TYPE_EVENT_LAST',			31);
-define('ZBX_CONDITION_TYPE_EVENT_SYMPTOM',		32);
-define('ZBX_CONDITION_TYPE_EVENT_COPIED',		33);
-define('ZBX_CONDITION_TYPE_EVENT_SUPPRESSED',	34);
+define('ZBX_CONDITION_TYPE_PROXY_GROUP',		29);
+define('ZBX_CONDITION_TYPE_EVENT_OPEN',			30);
+define('ZBX_CONDITION_TYPE_EVENT_FIRST',		31);
+define('ZBX_CONDITION_TYPE_EVENT_LAST',			32);
+define('ZBX_CONDITION_TYPE_EVENT_SYMPTOM',		33);
+define('ZBX_CONDITION_TYPE_EVENT_COPIED',		34);
+define('ZBX_CONDITION_TYPE_EVENT_SUPPRESSED',	35);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -2117,6 +2119,7 @@ define('ZBX_STYLE_INLINE_FILTER', 'inline-filter');
 define('ZBX_STYLE_INLINE_FILTER_LABEL', 'inline-filter-label');
 define('ZBX_STYLE_INLINE_FILTER_FOOTER', 'inline-filter-footer');
 define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
+define('ZBX_STYLE_INLINE_LIST', 'inline-list');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');

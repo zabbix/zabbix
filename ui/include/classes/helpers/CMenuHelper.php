@@ -174,10 +174,10 @@ class CMenuHelper {
 					->setAliases([
 						'template.dashboard.list', 'template.dashboard.edit', 'item.list?context=template',
 						'trigger.list?context=template', 'graph.list?context=template',
-						'host_discovery.php?context=template', 'item.prototype.list?context=template',
+						'lldrule.list?context=template', 'item.prototype.list?context=template',
 						'trigger.prototype.list?context=template', 'graph.prototype.list?context=template',
 						'host.prototype.list?context=template', 'httpconf.php?context=template',
-						'host_discovery_prototypes.php?context=template'
+						'lldrule.prototype.list?context=template'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
@@ -185,10 +185,10 @@ class CMenuHelper {
 					->setAction('host.list')
 					->setAliases([
 						'item.list?context=host', 'trigger.list?context=host', 'graph.list?context=host',
-						'host_discovery.php?context=host', 'item.prototype.list?context=host',
+						'lldrule.list?context=host', 'item.prototype.list?context=host',
 						'trigger.prototype.list?context=host', 'graph.prototype.list?context=host',
 						'host.prototype.list?context=host', 'httpconf.php?context=host',
-						'host_discovery_prototypes.php?context=host'
+						'lldrule.prototype.list?context=host'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
