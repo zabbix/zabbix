@@ -131,7 +131,7 @@ $formgrid = (new CFormGrid())
 		]))->setId('js-item-url-field')
 	])
 	->addItem([
-		(new CLabel(_('Query fields')))->setId('js-item-query-fields-label'),
+		(new CLabel(_('Query fields'), 'query-fields-table'))->setId('js-item-query-fields-label'),
 		(new CFormField(
 			(new CDiv([
 				(new CTable())
