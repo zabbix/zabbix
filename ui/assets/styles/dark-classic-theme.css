@@ -3132,10 +3132,13 @@ button {
   flex-wrap: wrap;
   white-space: nowrap;
   background-color: #2b2b2b; }
-  .filter-forms.table, .filter-forms.table > .row {
-    display: flex;
-    gap: 0 40px;
+  .filter-forms.table {
     border-bottom: 1px solid #383838; }
+    .filter-forms.table, .filter-forms.table > .row {
+      display: flex;
+      inline-size: fit-content;
+      justify-self: center;
+      gap: 0 40px; }
   .filter-forms .cell {
     padding-bottom: 5px;
     text-align: left; }

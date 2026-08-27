@@ -69,11 +69,15 @@
 	background-color: $ui-bg-color;
 
 	&.table {
+		border-bottom: 1px solid $table-border-color;
+
 		&,
 		& > .row {
 			display: flex;
+			inline-size: fit-content;
+			justify-self: center;
 			gap: 0 40px;
-			border-bottom: 1px solid $table-border-color;
+
 		}
 	}
 
