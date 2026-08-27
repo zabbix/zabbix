@@ -125,6 +125,88 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				'use' => [CCalcFormulaValidator::class, ['lldmacros' => $allow_lld_macro]],
 				'when' => ['type', 'in' => [ITEM_TYPE_CALCULATED]]
 			],
+			'signal_type' => ['integer', 'required',
+				'in' => [
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
+					CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
+			],
+			'metric_point_type' => ['integer', 'required',
+				'in' => [
+					CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+					CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+					CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
+					CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
+				],
+				'when' => [
+					['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]],
+					['signal_type', 'in' => [CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS]]
+				]
+			],
+			'columns' => ['objects', 'required', 'uniq' => ['column', 'attribute_key'],
+				'messages' => ['uniq' => _('Column and key name combination is not unique.')],
+				'fields' => [
+					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_COLUMNS),
+					'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
+						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+					]
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
+			],
+			'aggregated_columns' => ['objects', 'required', 'not_empty', 'uniq' => ['alias'],
+				'messages' => [
+					'required' => _('At least one aggregated column must be specified.'),
+					'not_empty' => _('At least one aggregated column must be specified.'),
+					'uniq' => _('Alias is not unique.')
+				],
+				'fields' => [
+					'function' => ['integer', 'required',
+						'in' => [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM,
+							AGGREGATE_PERCENTILE
+						]
+					],
+					'column' => CTelemetryHelper::getColumnValidationRules(
+						CTelemetryHelper::SECTION_AGGREGATED_COLUMNS
+					),
+					'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
+						'when' => ['function', 'in' => [AGGREGATE_PERCENTILE]]
+					],
+					'alias' => ['string', 'required', 'length' => 255, 'not_empty']
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
+			],
+			'conditions' => ['objects', 'required', 'uniq' => ['formulaid'],
+				'fields' => [
+					'formulaid' => ['string', 'required', 'not_empty'],
+					'column' => CTelemetryHelper::getColumnValidationRules(CTelemetryHelper::SECTION_CONDITIONS),
+					'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
+						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+					],
+					'operator' => [
+						['integer', 'required',
+							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS],
+							'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+						],
+						['integer', 'required',
+							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+								CONDITION_OPERATOR_NOT_LIKE
+							],
+							'when' => ['column', 'not_in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
+						]
+					],
+					'value' => [
+						['string', 'required', 'length' => 255,
+							'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]]
+						],
+						['string', 'required', 'length' => 255, 'not_empty',
+							'when' => ['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
+						]
+					]
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
+			],
 			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules($allow_lld_macro)
 		]];
 	}
