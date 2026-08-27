@@ -1331,7 +1331,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
 						config_comms->config_trapper_timeout, config_comms->config_source_ip,
-						config_ssh_key_location, get_config_forks, config_enable_global_scripts, zbx_get_program_type_cb());
+						config_ssh_key_location, get_config_forks, config_enable_global_scripts,
+						zbx_get_program_type_cb());
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
