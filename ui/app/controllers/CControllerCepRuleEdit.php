@@ -164,7 +164,7 @@ class CControllerCepRuleEdit extends CController {
 
 				switch ($operation['type']) {
 					case CCepRuleHelper::OP_SUPPRESS:
-						if ($operation['suppress_duration'] === ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
+						if ($operation['suppress_duration'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
 							$operation['suppress_time_option'] = ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE;
 							$operation['suppress_duration'] = '';
 						}
