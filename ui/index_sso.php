@@ -22,13 +22,7 @@ $request = CSessionHelper::get('request');
 CSessionHelper::unset(['request']);
 
 if (hasRequest('request')) {
-	$request = getRequest('request');
-	preg_match('/^\/?(?<filename>[a-z0-9_.]+\.php)(\?.*)?$/i', $request, $test_request);
-
-	if (!array_key_exists('filename', $test_request) || !file_exists('./'.$test_request['filename'])
-			|| $test_request['filename'] === basename(__FILE__)) {
-		$request = '';
-	}
+	$request = (new CFrontendActionValidator())->validate(getRequest('request')) ? getRequest('request') : '';
 
 	if ($request !== '') {
 		$redirect_to->setArgument('request', $request);
