@@ -43,6 +43,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		if ($this->detectTLSLibrary() === 'none') {
+			$this->markTestSkipped('Server compiled without TLS support; skipping PSK autoregistration tests.');
+		}
 
 		if (file_put_contents(self::PSK_FILE_LOWER_CASE, self::PSK_KEY_LOWER_CASE) === false) {
 			throw new Exception('Failed to create lower case PSK file for agent');

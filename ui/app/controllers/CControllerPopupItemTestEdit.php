@@ -125,7 +125,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				'use' => [CCalcFormulaValidator::class, ['lldmacros' => $allow_lld_macro]],
 				'when' => ['type', 'in' => [ITEM_TYPE_CALCULATED]]
 			],
-			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules(allow_lld_macro: true)
+			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules($allow_lld_macro)
 		]];
 	}
 

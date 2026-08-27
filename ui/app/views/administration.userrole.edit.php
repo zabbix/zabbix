@@ -28,7 +28,6 @@ $html_page = (new CHtmlPage())
 $csrf_token = CCsrfTokenHelper::get('userrole');
 
 $form = (new CForm())
-	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('userrole-form')
 	->setName('user_role_form')
@@ -97,13 +96,13 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 				(new CCheckBox('ui[]', $first_rule_key))
 					->setId($first_rule_key)
 					->setChecked(
-						array_key_exists($first_rule_key, $data['rules']['ui'])
-						&& $data['rules']['ui'][$first_rule_key]
+						array_key_exists($first_rule_key, $data['rules']['ui']) && $data['rules']['ui'][$first_rule_key]
 					)
 					->setReadonly($data['readonly'])
 			)
 		]);
-	} else {
+	}
+	else {
 		$ui = [];
 		foreach ($data['labels']['rules'][$section_key] as $rule_key => $rule_label) {
 			$ui[] = [
@@ -410,7 +409,7 @@ foreach ($data['labels']['actions'] as $action => $label) {
 	$actions[] = (new CDiv(
 		(new CCheckBox('actions[]', $action))
 			->setId($action)
-			->setChecked(array_key_exists($action, $data['rules']['actions'])&& $data['rules']['actions'][$action])
+			->setChecked(array_key_exists($action, $data['rules']['actions']) && $data['rules']['actions'][$action])
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 	))
