@@ -804,7 +804,7 @@ $formgrid
 			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	])
 	->addItem([
-		(new CLabel(_('Conditions')))->setId('js-item-conditions-label'),
+		(new CLabel(_('Conditions'), 'conditions-table'))->setId('js-item-conditions-label'),
 		(new CFormField(
 			(new CDiv([
 				(new CTable())
