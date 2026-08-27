@@ -742,12 +742,16 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 	zbx_snprintf_alloc(sql, &alloc, &offset, "ORDER BY rounded_time%s%s ",
 			(SUCCEED == query_has_columns ? "," : ""), columns_to_select);
 
+	zbx_snprintf_alloc(sql, &alloc, &offset, "LIMIT %d ", ZBX_TQ_MAX_RESULT_ROWS + 1);
 	zbx_snprintf_alloc(sql, &alloc, &offset, "FORMAT JSONCompactEachRow ");
 	zbx_snprintf_alloc(sql, &alloc, &offset, "SETTINGS "
 			"output_format_json_quote_64bit_floats=0,"
 			"output_format_json_quote_64bit_integers=0,"
 			"output_format_json_quote_decimals=0,"
-			"output_format_json_quote_denormals=0;");
+			"output_format_json_quote_denormals=0,"
+			"max_rows_to_group_by=%d,"
+			"group_by_overflow_mode='any';",
+			ZBX_TQ_MAX_RESULT_ROWS + 1);
 
 	zbx_free(columns_to_select);
 	zbx_free(aggr_columns_to_select);

@@ -42,6 +42,9 @@
 #define ZBX_TQ_GRANULARITY_MIN		1
 #define ZBX_TQ_GRANULARITY_MAX		SEC_PER_DAY
 
+#define ZBX_TQ_MAX_RESULT_ROWS	10000	/* maximum amount of values saved by a single check, */
+					/* overflow results in partial result being saved    */
+
 /* apm db */
 
 typedef enum zbx_apm_db_type
