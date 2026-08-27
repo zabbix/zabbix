@@ -54,15 +54,7 @@ class ZSplitView extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return [
-			'position', 'min', 'max', 'vertical'
-		];
-	}
-
-	attributeChangedCallback(name, old_value, new_value) {
-		if (old_value !== new_value) {
-			this.#applyAttribute(name, new_value);
-		}
+		return ['position', 'min', 'max', 'vertical'];
 	}
 
 	connectedCallback() {
@@ -83,6 +75,12 @@ class ZSplitView extends HTMLElement {
 
 		this.#removeEventListeners();
 		this.#stopDragging();
+	}
+
+	attributeChangedCallback(name, old_value, new_value) {
+		if (old_value !== new_value) {
+			this.#applyAttribute(name, new_value);
+		}
 	}
 
 	#applyAttributes() {
