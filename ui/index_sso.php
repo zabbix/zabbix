@@ -243,7 +243,8 @@ try {
 
 		CSessionHelper::set('saml_data', $saml_data);
 
-		if (hasRequest('RelayState') && strpos(getRequest('RelayState'), $baseurl) === false) {
+		if (hasRequest('RelayState') && strpos(getRequest('RelayState'), $baseurl) === false
+				&& (new CFrontendActionValidator)->validate(getRequest('RelayState'))) {
 			$relay_state = getRequest('RelayState');
 		}
 	}
@@ -349,7 +350,7 @@ try {
 			CMessageHelper::addError(_('Invalid redirect URL.'));
 		}
 
-		$redirect = array_filter([$request, $redirect['url'], CMenuHelper::getFirstUrl()]);
+		$redirect = array_filter([$request, $redirect['url'], $relay_state, CMenuHelper::getFirstUrl()]);
 
 		$response = new CControllerResponseRedirect(
 			new CUrl(reset($redirect))
