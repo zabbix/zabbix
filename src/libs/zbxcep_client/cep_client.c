@@ -557,7 +557,7 @@ void	zbx_cep_close_problem_by_user(const zbx_db_event *event, zbx_uint64_t event
 	cep_buffer_serialize_event(&data, &data_alloc, &data_offset, event);
 	cep_buffer_reserve(&data, &data_alloc, data_offset, sizeof(zbx_uint64_t) * 2);
 	data_offset += (zbx_uint32_t)zbx_serialize_value(data + data_offset, eventid);
-	(void)zbx_serialize_value(data + data_offset, userid);
+	data_offset += (zbx_uint32_t)zbx_serialize_value(data + data_offset, userid);
 
 	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_ADD_USER_CLOSE_EVENT, data, data_offset))
 	{
