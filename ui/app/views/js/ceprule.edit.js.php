@@ -901,13 +901,7 @@ window.ceprule_edit_popup = new class {
 		window['ceprule-operations-table'].querySelectorAll('[data-row_index]')
 			.forEach(function(row, index) {
 				row.dataset.row_index = index;
-				row.querySelectorAll('[data-field-type="hidden"]').forEach(function(input) {
-					input.name = input.name.replace( /^operations\[\d+\]/, `operations[${index}]`);
-
-					if (input.name === `operations[${index}][sortorder]`) {
-						input.value = index;
-					}
-				});
+				row.querySelector('[name$="[sortorder]"]').value = index;
 			});
 	}
 
