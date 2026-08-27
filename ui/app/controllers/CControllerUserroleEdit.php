@@ -29,9 +29,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		global $ZBX_FEATURE_FLAGS;
 
 		$fields = [
-			'roleid' =>						'db users.roleid',
-			'name' =>						'db role.name',
-			'super_admin_role_clone' =>		'in 1'
+			'roleid' =>					'db users.roleid',
+			'name' =>					'db role.name',
+			'super_admin_role_clone' =>	'in 1'
 		];
 
 		if (!$ZBX_FEATURE_FLAGS['modules_config_enabled']) {
@@ -201,7 +201,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'modules' => [],
 			'modules.default_access' => true,
 			'api' => [],
-			'api.access' => true,
+			'api.access' => false,
 			'api.mode' => 'api.mode',
 			'actions' => array_fill_keys(CRoleHelper::getActionsByUserType($user_type), true),
 			'actions.default_access' => true,
