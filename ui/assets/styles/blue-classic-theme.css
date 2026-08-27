@@ -3114,10 +3114,6 @@ button {
   background-color: #ffffff;
   border: 1px solid #dfe4e7;
   border-radius: var(--surface-border-radius) 0 var(--surface-border-radius) var(--surface-border-radius); }
-  .filter-container .table {
-    display: flex;
-    gap: 0 40px;
-    border-bottom: 1px solid #ebeef0; }
   .filter-container .filter-forms {
     padding: 0 10px; }
   .filter-container .list-table {
@@ -3134,16 +3130,15 @@ button {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  padding-bottom: 5px;
   white-space: nowrap;
   background-color: #ffffff; }
+  .filter-forms.table, .filter-forms.table > .row {
+    display: flex;
+    gap: 0 40px;
+    border-bottom: 1px solid #ebeef0; }
   .filter-forms .cell {
+    padding-bottom: 5px;
     text-align: left; }
-    .filter-forms .cell:first-child {
-      padding-left: 0; }
-    .filter-forms .cell:last-child {
-      padding-right: 0;
-      border-right: 0; }
     .filter-forms .cell button {
       margin: 0; }
     .filter-forms .cell .btn-icon {

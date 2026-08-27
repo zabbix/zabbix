@@ -41,12 +41,6 @@
 	border: 1px solid $ui-border-color;
 	border-radius: var(--surface-border-radius) 0 var(--surface-border-radius) var(--surface-border-radius);
 
-	.table {
-		display: flex;
-		gap: 0 40px;
-		border-bottom: 1px solid $table-border-color;
-	}
-
 	.filter-forms {
 		padding: 0 10px;
 	}
@@ -71,21 +65,21 @@
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
-	padding-bottom: 5px;
 	white-space: nowrap;
 	background-color: $ui-bg-color;
 
+	&.table {
+		&,
+		& > .row {
+			display: flex;
+			gap: 0 40px;
+			border-bottom: 1px solid $table-border-color;
+		}
+	}
+
 	.cell {
+		padding-bottom: 5px;
 		text-align: left;
-
-		&:first-child {
-			padding-left: 0;
-		}
-
-		&:last-child {
-			padding-right: 0;
-			border-right: 0;
-		}
 
 		button {
 			margin: 0;
