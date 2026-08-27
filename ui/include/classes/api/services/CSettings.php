@@ -102,7 +102,7 @@ class CSettings extends CApiService {
 		return $db_settings;
 	}
 
-	public static function prepareApmGlobalDbForApi(array &$settings): void {
+	private static function prepareApmGlobalDbForApi(array &$settings): void {
 		if (!array_key_exists('apm_global_db', $settings)) {
 			return;
 		}
@@ -126,7 +126,7 @@ class CSettings extends CApiService {
 	 * Get the fields of the Settings API object that are used by parts of the UI where authentication is not required.
 	 */
 	public static function getPublic(): array {
-		return CApiSettingsHelper::getParameters([
+		$parameters = CApiSettingsHelper::getParameters([
 			// GUI.
 			'default_lang', 'default_timezone', 'default_theme', 'server_check_interval', 'show_technical_errors',
 
@@ -147,6 +147,10 @@ class CSettings extends CApiService {
 			// APM global configuration.
 			'apm_global_db'
 		]);
+
+		self::prepareApmGlobalDbForApi($parameters);
+
+		return $parameters;
 	}
 
 	/**

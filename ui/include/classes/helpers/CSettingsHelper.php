@@ -111,6 +111,7 @@ class CSettingsHelper {
 	public const SOFTWARE_UPDATE_CHECK_DATA = 'software_update_check_data';
 	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
 	public const SERVER_ID = 'serverid';
+	public const APM_GLOBAL_DB = 'apm_global_db';
 
 	public const APM_GLOBAL_DB_URL_SCHEMA_HTTP = 'http';
 	public const APM_GLOBAL_DB_URL_SCHEMA_HTTPS = 'https';
@@ -179,9 +180,9 @@ class CSettingsHelper {
 	 *
 	 * @param string $field
 	 *
-	 * @return string
+	 * @return string|array
 	 */
-	public static function getPublic(string $field): string {
+	public static function getPublic(string $field): string|array {
 		if (!self::$params_public) {
 			self::$params_public = CSettings::getPublic();
 		}
