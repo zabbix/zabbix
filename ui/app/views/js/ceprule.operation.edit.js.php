@@ -103,10 +103,21 @@ window.ceprule_operation_edit_popup = new class {
 	}
 
 	#initActions() {
-		this.form_element.addEventListener('change', (e) => {
-			e.target.id === 'ceprule-operation-execute-when' && this.#handleExecuteWhenChanged();
-			e.target.id === 'ceprule-operation-type' && this.#handleOperationTypeChanged(e.target.value);
-		}, {capture: true});
+		document.getElementById('ceprule-operation-execute-when').addEventListener('change', () => {
+			this.#handleExecuteWhenChanged();
+		});
+
+		document.getElementById('ceprule-operation-type').addEventListener('change', (e) => {
+			this.#handleOperationTypeChanged(e.target.value);
+		});
+
+		this.form_element.querySelectorAll('input[name="suppress_time_option"]').forEach((radio) => {
+			radio.addEventListener('change', (e) => {
+				if (e.target.checked) {
+					this.#handleSuppressTimeOptionChanged();
+				}
+			});
+		});
 
 		this.form.findFieldByName('filter[evaltype]').getField()
 			.addEventListener('change', () => this.#refreshExpressionPreview());
@@ -269,6 +280,9 @@ window.ceprule_operation_edit_popup = new class {
 		this.form_element.querySelector(`[name="tag_value"]`).value = operation.tag_value;
 		this.form_element.querySelector(`[name="old_tag"]`).value = operation.old_tag;
 		this.form_element.querySelector(`[name="new_tag"]`).value = operation.new_tag;
+		this.form_element.querySelectorAll(`[name="suppress_time_option"]`).forEach(node => {
+			node.checked = node.value === operation.suppress_time_option;
+		});
 		this.form_element.querySelector(`[name="suppress_duration"]`).value = operation.suppress_duration;
 		this.form_element.querySelectorAll(`[name="severity"]`).forEach(node => {
 			node.checked = node.value === operation.severity;
@@ -295,6 +309,7 @@ window.ceprule_operation_edit_popup = new class {
 		const fields = {
 			'event_name': this.form.findFieldByName('event_name').getField(),
 			'tag': this.form.findFieldByName('tag').getField(),
+			'suppress_time_option': this.form.findFieldByName('suppress_time_option').getField(),
 			'suppress_duration': this.form.findFieldByName('suppress_duration').getField(),
 			'old_tag': this.form.findFieldByName('old_tag').getField(),
 			'new_tag': this.form.findFieldByName('new_tag').getField(),
@@ -310,8 +325,8 @@ window.ceprule_operation_edit_popup = new class {
 		Object.entries(fields).forEach(([field_name, field]) => {
 			field.disabled = true;
 
-			if (['event_name', 'tag', 'suppress_duration'].includes(field_name)) {
-				field.style.display = 'none';
+			if (['event_name', 'tag', 'suppress_time_option', 'suppress_duration'].includes(field_name)) {
+				field.parentElement.style.display = 'none';
 			}
 		});
 
@@ -330,8 +345,9 @@ window.ceprule_operation_edit_popup = new class {
 				break;
 
 			case <?= CCepRuleHelper::OP_SUPPRESS ?>:
-				fields.suppress_duration.disabled = false;
-				fields.suppress_duration.style.display = '';
+				fields.suppress_time_option.disabled = false;
+				fields.suppress_time_option.parentElement.style.display = '';
+				this.#handleSuppressTimeOptionChanged();
 				break;
 
 			case <?= CCepRuleHelper::OP_SET_SEVERITY ?>:
@@ -341,14 +357,14 @@ window.ceprule_operation_edit_popup = new class {
 
 			case <?= CCepRuleHelper::OP_SET_NAME ?>:
 				fields.event_name.disabled = false;
-				fields.event_name.style.display = '';
+				fields.event_name.parentElement.style.display = '';
 				break;
 
 			case <?= CCepRuleHelper::OP_DECREASE_TAG_VALUE ?>:
 			case <?= CCepRuleHelper::OP_INCREASE_TAG_VALUE ?>:
 			case <?= CCepRuleHelper::OP_REMOVE_TAG ?>:
 				fields.tag.disabled = false;
-				fields.tag.style.display = '';
+				fields.tag.parentElement.style.display = '';
 				break;
 
 			case <?= CCepRuleHelper::OP_RENAME_TAG ?>:
@@ -364,6 +380,20 @@ window.ceprule_operation_edit_popup = new class {
 				fields.tag_name.disabled = false;
 				fields.tag_value.disabled = false;
 				break;
+		}
+	}
+
+	#handleSuppressTimeOptionChanged() {
+		const suppress_duration_field = this.form.findFieldByName('suppress_duration').getField();
+		const suppress_time_option = Number(this.form.findFieldByName('suppress_time_option').getValue());
+
+		if (suppress_time_option === <?= ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE ?>) {
+			suppress_duration_field.disabled = false;
+			suppress_duration_field.parentElement.style.display = '';
+		}
+		else {
+			suppress_duration_field.disabled = true;
+			suppress_duration_field.parentElement.style.display = 'none';
 		}
 	}
 

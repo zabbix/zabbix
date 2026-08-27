@@ -67,13 +67,14 @@ abstract class CControllerCepRuleGeneral extends CController {
 				}
 				unset($condition);
 
-				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS
-						&& array_key_exists('suppress_duration', $operation)
-						&& $operation['suppress_duration'] === '') {
-					$operation['suppress_duration'] = DB::getDefault('cep_operation', 'suppress_duration');
-				}
-
 				switch ($operation['type']) {
+					case CCepRuleHelper::OP_SUPPRESS:
+						if ($operation['suppress_time_option'] === ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
+							$operation['suppress_duration'] = ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE;
+						}
+						unset($operation['suppress_time_option']);
+						break;
+
 					case CCepRuleHelper::OP_RENAME_TAG:
 						$operation['tag'] = $operation['old_tag'];
 						unset($operation['old_tag']);
@@ -155,11 +156,15 @@ abstract class CControllerCepRuleGeneral extends CController {
 					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SET_SEVERITY]
 			]],
-			'suppress_duration' => ['db cep_operation.suppress_duration',
-				'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_YEAR, 'min' => 1, 'usermacros' => false,
-					'lldmacros' => false, 'accept_zero' => true, 'with_year' => false
-				]],
+			'suppress_time_option' => ['integer', 'required',
+				'in' => [ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE, ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
+			],
+			'suppress_duration' => ['db cep_operation.suppress_duration', 'required', 'not_empty',
+				'use' => [CTimeUnitValidator::class, ['max' => 5 * SEC_PER_YEAR, 'min' => 1, 'usermacros' => false,
+					'lldmacros' => false, 'accept_zero' => false, 'with_year' => true
+				]],
+				'when' => ['suppress_time_option', 'in' => [ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE]]
 			],
 			'sortorder' => ['db cep_operation.sortorder', 'required']
 		];

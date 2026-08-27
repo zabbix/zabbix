@@ -158,27 +158,42 @@ $window_operations = (new CSelectOptionGroup(_('Window')))
 			)
 		)
 		->addItem(new CLabel(_('Operation'), 'ceprule-operation-type-label'))
-		->addItem((new CFormField())
-			->addItem((new CSelect('type'))
-				->setFocusableElementId('ceprule-operation-type-label')
-				->setId('ceprule-operation-type')
-				->addOptionGroup($events_operations)
-				->addOptionGroup($tags_operations)
-				->addOptionGroup($window_operations)
-			)
-			->addItem(new CObject('&nbsp;'))
-			->addItem((new CTextAreaFlexible('event_name'))
-				->setMaxlength(DB::getFieldLength('cep_operation', 'event_name'))
-				->setAttribute('placeholder', 'name')
-			)
-			->addItem((new CTextAreaFlexible('tag'))
-				->setMaxlength(DB::getFieldLength('cep_operation', 'tag'))
-				->setAttribute('placeholder', 'tag')
-			)
-			->addItem((new CTextAreaFlexible('suppress_duration'))
-				->setMaxlength(DB::getFieldLength('cep_operation', 'suppress_duration'))
-			)
-		)
+		->addItem(new CFormField([
+			new CHorList([
+				(new CListItem([
+					(new CSelect('type'))
+						->setFocusableElementId('ceprule-operation-type-label')
+						->setId('ceprule-operation-type')
+						->addOptionGroup($events_operations)
+						->addOptionGroup($tags_operations)
+						->addOptionGroup($window_operations)
+				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				(new CListItem([
+					(new CTextAreaFlexible('event_name'))
+						->addClass(ZBX_STYLE_ALIGN_TOP)
+						->setMaxlength(DB::getFieldLength('cep_operation', 'event_name'))
+						->setAttribute('placeholder', 'name')
+				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				(new CListItem([
+					(new CTextAreaFlexible('tag'))
+						->addClass(ZBX_STYLE_ALIGN_TOP)
+						->setMaxlength(DB::getFieldLength('cep_operation', 'tag'))
+						->setAttribute('placeholder', 'tag')
+				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				(new CListItem([
+					(new CRadioButtonList('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE))
+						->addClass(ZBX_STYLE_ALIGN_TOP)
+						->addValue(_('Indefinitely'), ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE)
+						->addValue(_('Duration'), ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE)
+						->setModern(true)
+				]))->addClass(ZBX_STYLE_ALIGN_TOP),
+				(new CListItem([
+					(new CTextAreaFlexible('suppress_duration'))
+						->addClass(ZBX_STYLE_ALIGN_TOP)
+						->setMaxlength(DB::getFieldLength('cep_operation', 'suppress_duration'))
+				]))->addClass(ZBX_STYLE_ALIGN_TOP)
+			])
+		]))
 		->addItem(
 			(new CFormField([
 				new CHorList([

@@ -138,6 +138,7 @@ $form = (new CForm())
 					(new CVar('operations[#{sortorder}][tag_name]', '#{tag_name}'))->removeId(),
 					(new CVar('operations[#{sortorder}][tag_value]', '#{tag_value}'))->removeId(),
 					(new CVar('operations[#{sortorder}][severity]', '#{severity}'))->removeId(),
+					(new CVar('operations[#{sortorder}][suppress_time_option]', '#{suppress_time_option}'))->removeId(),
 					(new CVar('operations[#{sortorder}][suppress_duration]', '#{suppress_duration}'))->removeId()
 				]
 			]))->setAttribute('data-row_index', '#{sortorder}')

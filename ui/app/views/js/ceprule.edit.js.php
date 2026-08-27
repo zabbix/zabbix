@@ -549,6 +549,7 @@ window.ceprule_edit_popup = new class {
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
 				type: <?= CCepRuleHelper::OP_CLOSE_EVENT ?>,
+				suppress_time_option: '<?= ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE ?>',
 				suppress_duration: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
