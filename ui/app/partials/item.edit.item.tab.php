@@ -804,12 +804,15 @@ $formgrid
 				'readonly' => $readonly,
 				'multiple' => false,
 				'data' => $item['valuemap']
-					? [[
-						'id' => $item['valuemap']['valuemapid'],
-						'name' => $item['valuemap']['name'],
-						'inaccessible' => array_key_exists('inaccessible', $item['valuemap'])
-							&& $item['valuemap']['inaccessible']
-					]] : [],
+					? [
+						[
+							'id' => $item['valuemap']['valuemapid'],
+							'name' => $item['valuemap']['name']
+						] + (array_key_exists('inaccessible', $item['valuemap'])
+							? ['inaccessible' => $item['valuemap']['inaccessible']]
+							: [])
+					]
+					: [],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => $item['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
