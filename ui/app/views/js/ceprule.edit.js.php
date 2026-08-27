@@ -252,9 +252,6 @@ window.ceprule_edit_popup = new class {
 		window['ceprule-operations-label']
 			.classList.toggle('form-label-asterisk', type != <?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>);
 
-		window['ceprule-groupby-label']
-			.classList.toggle('form-label-asterisk', type == <?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>);
-
 		{
 			const form_field = window['ceprule-script'].closest('.form-field');
 			const display = type == <?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?> ? '' : 'none';
