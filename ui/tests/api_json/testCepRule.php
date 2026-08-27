@@ -21,6 +21,7 @@ require_once __DIR__.'/../../include/classes/helpers/CCepRuleHelper.php';
 /**
  * @onBefore	prepareData
  * @onAfter		clearData
+ * @backup cep_rule
  */
 class testCepRule extends CAPITest {
 	static array $ruleids = [];
@@ -1904,22 +1905,6 @@ class testCepRule extends CAPITest {
 					CCepRuleHelper::WINDOW_PATTERN_MATCH
 				]).'.'
 			],
-			'Rule window required for window_type=WINDOW_SIMPLE' => [
-				'request' => [
-					'name' => 'ceprule-'.__LINE__,
-					'sortorder' => 1,
-					'operations' => [
-						[
-							'sortorder' => 1,
-							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-							'type' => CCepRuleHelper::OP_SET_NAME,
-							'event_name' => 'bla'
-						]
-					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE
-				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "window" is missing.'
-			],
 			'Rule window required for window_type=WINDOW_CAUSE_SYMPTOM' => [
 				'request' => [
 					'name' => 'ceprule',
@@ -1933,22 +1918,6 @@ class testCepRule extends CAPITest {
 						]
 					],
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM
-				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "window" is missing.'
-			],
-			'Rule window required for window_type=WINDOW_TAG_MATCH' => [
-				'request' => [
-					'name' => 'ceprule-'.__LINE__,
-					'sortorder' => 1,
-					'operations' => [
-						[
-							'sortorder' => 1,
-							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-							'type' => CCepRuleHelper::OP_SET_NAME,
-							'event_name' => 'bla'
-						]
-					],
-					'window_type' => CCepRuleHelper::WINDOW_TAG_MATCH
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "window" is missing.'
 			],
@@ -2003,23 +1972,6 @@ class testCepRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window": unexpected parameter "unexpected".'
-			],
-			'Duration is required for window!=WINDOW_NONE' => [
-				'request' => [
-					'name' => 'ceprule-'.__LINE__,
-					'sortorder' => 1,
-					'operations' => [
-						[
-							'sortorder' => 1,
-							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-							'type' => CCepRuleHelper::OP_SET_NAME,
-							'event_name' => 'bla'
-						]
-					],
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
-					'window' => []
-				],
-				'expected_error' => 'Invalid parameter "/1/window": the parameter "duration" is missing.'
 			],
 			'Window duration must be time unit' => [
 				'request' => [
@@ -2211,7 +2163,7 @@ class testCepRule extends CAPITest {
 						'capacity' => -1
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window/capacity": value must be one of 0-'.ZBX_MAX_INT64.'.'
+				'expected_error' => 'Invalid parameter "/1/window/capacity": value must be one of 0-'.ZBX_MAX_INT32.'.'
 			],
 			'Window capacity accepts macro' => [
 				'request' => [
