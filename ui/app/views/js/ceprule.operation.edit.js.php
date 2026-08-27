@@ -172,20 +172,20 @@ window.ceprule_operation_edit_popup = new class {
 
 	#editConditionRow(condition, index) {
 		this.form_element.querySelector(`#ceprule-operation-filter-conditions [data-row_index="${index}"]`)
-			.replaceWith(this.#buildConditionRow(condition, index));
+			.replaceWith(this.#buildConditionRow(condition, index, true));
 	}
 
-	#addConditionRow(condition) {
+	#addConditionRow(condition, set_changed) {
 		const row_index = this.#condition_row_index++;
 		const table = this.form_element.querySelector('#ceprule-operation-filter-conditions tbody');
 
-		table.insertAdjacentElement('beforeend', this.#buildConditionRow(condition, row_index))
+		table.insertAdjacentElement('beforeend', this.#buildConditionRow(condition, row_index, set_changed));
 		table.insertAdjacentElement('beforeend',
 			this.#condition_error_container_row_template.evaluateToElement({row_index})
 		);
 	}
 
-	#buildConditionRow(condition, row_index) {
+	#buildConditionRow(condition, row_index, set_changed) {
 		const label_names = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getOperationConditionLabels()
 		) ?>');
@@ -228,12 +228,20 @@ window.ceprule_operation_edit_popup = new class {
 				break;
 		}
 
-		return this.#condition_row_template.evaluateToElement({
+		const element = this.#condition_row_template.evaluateToElement({
 			...condition,
 			row_index: row_index,
 			formulaid: num2letter(row_index),
 			description_html: description_template.evaluate(description_view)
 		});
+
+		if (set_changed) {
+			element.querySelectorAll('input').forEach(input => {
+				input.dataset.changed = '';
+			});
+		}
+
+		return element;
 	}
 
 	#setAvailableOperationOptions() {
@@ -247,7 +255,7 @@ window.ceprule_operation_edit_popup = new class {
 
 	#setValues(operation) {
 		for (const condition of Object.values(operation.filter.conditions || {})) {
-			this.#addConditionRow(condition);
+			this.#addConditionRow(condition, false);
 		}
 
 		this.form_element.querySelector(`[name="type"]`).value = operation.type;
@@ -393,7 +401,7 @@ window.ceprule_operation_edit_popup = new class {
 					action: overlay => ceprule_operation_condition_edit_popup.submit()
 							.then(fields => {
 								if (is_new) {
-									this.#addConditionRow(fields);
+									this.#addConditionRow(fields, true);
 								}
 								else {
 									this.#editConditionRow(fields, index);

@@ -92,7 +92,7 @@ window.ceprule_edit_popup = new class {
 		}
 
 		for (const operation of Object.values(ceprule.operations)) {
-			this.#addOperationRow(operation);
+			this.#addOperationRow(operation, false);
 		}
 
 		jQuery(window['ceprule-script']).multilineInput({
@@ -597,7 +597,7 @@ window.ceprule_edit_popup = new class {
 
 								overlayDialogueDestroy(overlay.dialogueid);
 
-								is_new && this.#addOperationRow(fields) || this.#editOperationRow(fields);
+								is_new && this.#addOperationRow(fields, true) || this.#editOperationRow(fields);
 								this.form.discoverAllFields();
 								this.#toggleOperationsInformation();
 							});
@@ -650,12 +650,12 @@ window.ceprule_edit_popup = new class {
 			.querySelector(`#ceprule-operations-table [data-row_index="${operation.sortorder}"]`);
 
 		row.nextElementSibling.remove();
-		row.replaceWith(this.#buildOperationRow(operation));
+		row.replaceWith(this.#buildOperationRow(operation, true));
 	}
 
-	#addOperationRow(operation) {
+	#addOperationRow(operation, set_changed) {
 		this.form_element.querySelector('#ceprule-operations-table tbody')
-			.append(this.#buildOperationRow(operation));
+			.append(this.#buildOperationRow(operation, set_changed));
 	}
 
 	#toggleOperationsInformation() {
@@ -678,7 +678,7 @@ window.ceprule_edit_popup = new class {
 			.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', hide_warning);
 	}
 
-	#buildOperationRow(operation) {
+	#buildOperationRow(operation, set_changed) {
 		const operation_type = Number(operation.type);
 		const execute_when_str = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getOperationExecuteWhenStrings()
@@ -810,6 +810,13 @@ window.ceprule_edit_popup = new class {
 		const template_args = {execute_when_str, label_str, arguments_str, conditions_input_html,
 			condition_description_html, ...operation};
 		const row = this.#operation_row_template.evaluateToElement(template_args);
+
+		if (set_changed) {
+			row.querySelectorAll('input').forEach(input => {
+				input.dataset.changed = '';
+			});
+		}
+
 		const error_container_id = `ceprule-operations-${template_args.sortorder}-error-container`;
 		const rows = new DocumentFragment();
 
