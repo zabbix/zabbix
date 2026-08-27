@@ -129,7 +129,9 @@ class CControllerCepRuleList extends CController {
 			$result_cep = API::CepRule()->get([
 				'output' => ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'status', 'error'],
 				'selectFilter' => ['conditions'],
-				'selectOperations' => ['execute_when', 'type', 'event_name', 'tag', 'new_tag', 'tag_value', 'severity'],
+				'selectOperations' => ['execute_when', 'type', 'event_name', 'severity', 'suppress_duration', 'tag',
+					'new_tag', 'tag_value'
+				],
 				'search' => ['name' => $filter['name'] === '' ? null : $filter['name']],
 				'filter' => ['status' => $filter['status'] == -1 ? null : $filter['status']],
 				'limit' => $limit

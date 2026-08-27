@@ -715,8 +715,8 @@ window.ceprule_edit_popup = new class {
 		].includes(operation_type)) {
 			arguments_str = operation.suppress_duration
 					&& operation.suppress_duration !== '<?= DB::getDefault('cep_operation', 'suppress_duration') ?>'
-				? <?= json_encode(_('duration')) ?> + ' ' + operation.suppress_duration
-				: <?= json_encode(_('indefinately')) ?>;
+				? sprintf(<?= json_encode(_('duration %1$s')) ?>, operation.suppress_duration)
+				: <?= json_encode(_('Indefinitely')) ?>;
 		}
 		else if ([
 			<?= CCepRuleHelper::OP_INCREASE_TAG_VALUE ?>,

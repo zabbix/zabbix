@@ -444,13 +444,16 @@ class CCepRuleHelper {
 		return match((int) $ceprule_operation['type']) {
 			self::OP_INCREASE_SEVERITY,
 			self::OP_DECREASE_SEVERITY,
-			self::OP_SUPPRESS,
 			self::OP_UNSUPPRESS,
 			self::OP_CLONE_FIRST,
 			self::OP_CLOSE_WINDOW,
 			self::OP_CLONE_LAST,
 			self::OP_DISCARD,
 			self::OP_CLOSE_EVENT => '',
+
+			self::OP_SUPPRESS => $ceprule_operation['suppress_duration'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE
+				? _('Indefinitely')
+				: _s('duration %1$s', $ceprule_operation['suppress_duration']),
 
 			self::OP_INCREASE_TAG_VALUE,
 			self::OP_DECREASE_TAG_VALUE,
