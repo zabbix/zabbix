@@ -605,7 +605,7 @@ class CCepRule extends CApiService {
 		);
 
 		if (!array_filter($group_by_fields, static fn($value): bool => $value == CCepRuleHelper::GROUP_BY_YES)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path.'/window',
 				_('at least one of "group_by_host_group", "group_by_host" or "group_by_tags" parameters must be enabled')
 			));
 		}
