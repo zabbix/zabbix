@@ -498,35 +498,35 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checking and updating scheduled job requests                      *
+ * Purpose: checks and updates scheduled job requests                         *
  *                                                                            *
- * Parameters: service   - [IN] vmware service                                *
+ * Parameters: service   - [IN/OUT] vmware service                            *
  *             job_types - [IN] set of ZBX_VMWARE_UPDATE_* types              *
 *                                                                             *
 ******************************************************************************/
-static void	vmware_service_job_recovery(zbx_vmware_service_t *service, int job_types)
+static void	vmware_service_jobs_request(zbx_vmware_service_t *service, int job_types)
 {
 	int	job_type;
 
 	job_type = job_types & ZBX_VMWARE_UPDATE_CONF;
 
 	if (0 != job_type && 0 == (service->jobs_flag & job_type))
-		service->jobs_flag |= ZBX_VMWARE_REQ(job_type);
+		service->jobs_flag |= ZBX_VMWARE_TO_REQ(job_type);
 
 	job_type = job_types & ZBX_VMWARE_UPDATE_PERFCOUNTERS;
 
 	if (0 != job_type && 0 == (service->jobs_flag & job_type))
-		service->jobs_flag |= ZBX_VMWARE_REQ(job_type);
+		service->jobs_flag |= ZBX_VMWARE_TO_REQ(job_type);
 
 	job_type = job_types & ZBX_VMWARE_UPDATE_REST_TAGS;
 
 	if (0 != job_type && 0 == (service->jobs_flag & job_type))
-		service->jobs_flag |= ZBX_VMWARE_REQ(job_type);
+		service->jobs_flag |= ZBX_VMWARE_TO_REQ(job_type);
 
 	job_type = job_types & ZBX_VMWARE_UPDATE_EVENTLOG;
 
 	if (0 != job_type && 0 == (service->jobs_flag & job_type))
-		service->jobs_flag |= ZBX_VMWARE_REQ(job_type);
+		service->jobs_flag |= ZBX_VMWARE_TO_REQ(job_type);
 }
 
 /******************************************************************************
@@ -536,6 +536,7 @@ static void	vmware_service_job_recovery(zbx_vmware_service_t *service, int job_t
  * Parameters: url       - [IN] vmware service URL                            *
  *             username  - [IN] vmware service username                       *
  *             password  - [IN] vmware service password                       *
+ *             job_types - [IN] set of the ZBX_VMWARE_UPDATE_* flags          *
  *             result    - [OUT]                                              *
  *             ret       - [OUT] operation result code                        *
  *                                                                            *
@@ -571,7 +572,7 @@ static zbx_vmware_service_t	*get_vmware_service(const char *url, const char *use
 		goto out;
 	}
 
-	vmware_service_job_recovery(service, job_types);
+	vmware_service_jobs_request(service, job_types);
 
 	if (0 != (service->state & ZBX_VMWARE_STATE_FAILED))
 	{

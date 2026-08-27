@@ -566,19 +566,34 @@ typedef struct
 	int				jobs_num;
 
 	/* linked jobs types */
-#define ZBX_VMWARE_REQ(t)			((t) << 8)
+#define ZBX_VMWARE_REQ_OFFSET			(8)
+#define ZBX_VMWARE_TO_REQ(t)			((t) << ZBX_VMWARE_REQ_OFFSET)
 #define ZBX_VMWARE_REQ_MASK			(0xFF00)
-#define ZBX_VMWARE_REQ_UPDATE_CONF		ZBX_VMWARE_REQ(ZBX_VMWARE_UPDATE_CONF)
-#define ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS	ZBX_VMWARE_REQ(ZBX_VMWARE_UPDATE_PERFCOUNTERS)
-#define ZBX_VMWARE_REQ_UPDATE_REST_TAGS		ZBX_VMWARE_REQ(ZBX_VMWARE_UPDATE_REST_TAGS)
-#define ZBX_VMWARE_REQ_UPDATE_EVENTLOG		ZBX_VMWARE_REQ(ZBX_VMWARE_UPDATE_EVENTLOG)
+#define ZBX_VMWARE_REQ_UPDATE_CONF		ZBX_VMWARE_TO_REQ(ZBX_VMWARE_UPDATE_CONF)
+#define ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS	ZBX_VMWARE_TO_REQ(ZBX_VMWARE_UPDATE_PERFCOUNTERS)
+#define ZBX_VMWARE_REQ_UPDATE_REST_TAGS		ZBX_VMWARE_TO_REQ(ZBX_VMWARE_UPDATE_REST_TAGS)
+#define ZBX_VMWARE_REQ_UPDATE_EVENTLOG		ZBX_VMWARE_TO_REQ(ZBX_VMWARE_UPDATE_EVENTLOG)
 #define ZBX_VMWARE_REQ_UPDATE_ALL										\
 					(ZBX_VMWARE_REQ_UPDATE_CONF | ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS |	\
 					ZBX_VMWARE_REQ_UPDATE_REST_TAGS | ZBX_VMWARE_REQ_UPDATE_EVENTLOG)
-#define ZBX_VMWARE_JOB(t)			((t) >> 8)
-#define ZBX_VMWARE_JOB_RUN			(8*2)
+
+#define ZBX_VMWARE_FOMREQ_TOJOB(t)		(((t) & ZBX_VMWARE_REQ_MASK) >> ZBX_VMWARE_REQ_OFFSET)
+
+#define ZBX_VMWARE_JOB_RUN_OFFSET		(16)
+#define ZBX_VMWARE_TO_JOB_RUN(t)		((t) << ZBX_VMWARE_JOB_RUN_OFFSET)
+#define ZBX_VMWARE_JOB_RUN_MASK			(0xFF0000)
+	/* CPT stands for CONF, PERFCOUNTERS, REST_TAGS */
 #define ZBX_VMWARE_JOBSET_CPT		(ZBX_VMWARE_UPDATE_CONF | ZBX_VMWARE_UPDATE_PERFCOUNTERS |		\
 					ZBX_VMWARE_UPDATE_REST_TAGS)
+/*******************************************************************************
+ *                                                                             *
+ * +----------------------+----------------------+----------------------+      *
+ * |     bits[23:16]      |      bits[15:8]      |      bits[7:0]       |      *
+ * +----------------------+----------------------+----------------------+      *
+ * |    JOB_RUN_STATUS    |       JOB_REQ        | service capabilities |      *
+ * +----------------------+----------------------+----------------------+      *
+ *                                                                             *
+ ******************************************************************************/
 	int				jobs_flag;
 
 	/* vmware entity (vm, hv etc) and linked tags */
