@@ -336,7 +336,9 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$problem['can_be_closed'] = $can_be_closed;
 
 			$problem['actions'] = (new CDiv(
-				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged))
+				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged,
+					$data['cep_rules']
+				))
 			)
 				->addClass(ZBX_STYLE_ACTION_WRAPPER)
 				->toString();

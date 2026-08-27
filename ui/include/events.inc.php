@@ -384,7 +384,7 @@ function make_small_eventlist(array $start_event, array $allowed): CTableInfo {
 			'cause_eventid'
 		],
 		'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-			'suppress_until', 'taskid'
+			'suppress_until', 'taskid', 'details', 'cep_ruleid'
 		],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
@@ -440,6 +440,14 @@ function make_small_eventlist(array $start_event, array $allowed): CTableInfo {
 		'userids' => array_keys($actions['userids']),
 		'preservekeys' => true
 	]);
+
+	$cep_rules = $actions['cep_ruleids']
+		? API::CepRule()->get([
+			'output' => ['name'],
+			'cep_ruleids' => array_keys($actions['cep_ruleids']),
+			'preservekeys' => true
+		])
+		: [];
 
 	foreach ($events as $event) {
 		$duration = ($event['r_eventid'] != 0)
@@ -503,7 +511,7 @@ function make_small_eventlist(array $start_event, array $allowed): CTableInfo {
 			zbx_date2age($event['clock']),
 			$duration,
 			$problem_update_link,
-			makeEventActionsIcons($event['eventid'], $actions['data'], $users, $is_acknowledged)
+			makeEventActionsIcons($event['eventid'], $actions['data'], $users, $is_acknowledged, $cep_rules)
 		]);
 	}
 

@@ -519,7 +519,7 @@ class CScreenProblem extends CScreenBase {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'r_eventid', 'acknowledged', 'cep_ruleid'],
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-				'suppress_until', 'taskid'
+				'suppress_until', 'taskid', 'details', 'cep_ruleid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until', 'cep_ruleid'],
 			'selectTags' => ['tag', 'value'],
@@ -578,7 +578,7 @@ class CScreenProblem extends CScreenBase {
 				'cep_ruleid'
 			],
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-				'suppress_until', 'taskid'
+				'suppress_until', 'taskid', 'details', 'cep_ruleid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until', 'cep_ruleid'],
 			'selectTags' => ['tag', 'value'],
@@ -722,6 +722,7 @@ class CScreenProblem extends CScreenBase {
 		$actions = getEventsActionsIconsData($data['problems'], $data['triggers']);
 		$data['actions'] = $actions['data'];
 
+		$cep_ruleids = $cep_ruleids + $actions['cep_ruleids'];
 		$data['cep_rules'] = $cep_ruleids
 			? API::CepRule()->get([
 				'output' => ['name'],
