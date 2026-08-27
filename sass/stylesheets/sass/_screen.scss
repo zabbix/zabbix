@@ -2962,6 +2962,12 @@ z-select {
 	.btn-plus-more {
 		margin: 3px 3px 3px 0;
 	}
+
+	.status-green,
+	.status-grey {
+		max-width: 100%;
+		@extend %overflow-ellipsis;
+	}
 }
 
 // Used in form lists to separate input elements on sections.
