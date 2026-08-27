@@ -1814,24 +1814,20 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	db_get_hosts_info_by_hostid(&hosts_info, &hostids);
-
 	db_get_items_info_by_itemid(&items_info, &item_info_ids);
 
 	um_handle = zbx_dc_open_user_macros();
 
 	zbx_hashset_iter_reset(&items_info, &iter);
-
 	while (NULL != (item_info = (zbx_item_info_t *)zbx_hashset_iter_next(&iter)))
 	{
 		item = item_info->item;
-
-		if (NULL != item_info->name)
-		{
-			(void)zbx_dc_expand_user_and_func_macros(um_handle, &item_info->name, &item->host.hostid, 1,
-					NULL);
-		}
-
 		resolve_item_tags(&item_info->item_tags, um_handle, item);
+
+		if (NULL == item_info->name)
+			continue;
+
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &item_info->name, &item->host.hostid, 1, NULL);
 	}
 
 	zbx_dc_close_user_macros(um_handle);
