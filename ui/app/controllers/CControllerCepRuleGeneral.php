@@ -161,9 +161,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
 			],
 			'suppress_duration' => ['db cep_operation.suppress_duration', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['max' => 5 * SEC_PER_YEAR, 'min' => 1, 'usermacros' => false,
-					'lldmacros' => false, 'accept_zero' => false, 'with_year' => true
-				]],
+				'use' => [CTimeUnitValidator::class, ['max' => 5 * SEC_PER_YEAR, 'min' => 1, 'with_year' => true]],
 				'when' => ['suppress_time_option', 'in' => [ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE]]
 			],
 			'sortorder' => ['db cep_operation.sortorder', 'required']
