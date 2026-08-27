@@ -331,7 +331,14 @@ class CPopupManager {
 					location.reload();
 				}
 				else {
-					location.href = submit_event.getRedirectUrl() || CPopupManager.#return_url || location.href;
+					const redirect_url = submit_event.getRedirectUrl() || CPopupManager.#return_url;
+
+					if (redirect_url !== null) {
+						location.href = redirect_url;
+					}
+					else {
+						location.reload();
+					}
 				}
 			};
 
