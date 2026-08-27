@@ -685,7 +685,7 @@ void	zbx_cep_send_event_severities(const zbx_event_severity_t *events, int event
 	zbx_event_severity_t	es_local;
 
 	data_len = sizeof(events_num);
-	data_len += (zbx_uint32_t)((size_t)events_num * sizeof(es_local.eventid) + sizeof(es_local.severity));
+	data_len += (zbx_uint32_t)((size_t)events_num * (sizeof(es_local.eventid) + sizeof(es_local.severity)));
 	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr += zbx_serialize_value(ptr, events_num);
