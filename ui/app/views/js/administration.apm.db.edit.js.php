@@ -49,15 +49,6 @@ const view = new class {
 	/** @type {HTMLButtonElement|null} */
 	#change_password_btn = null;
 
-	/** @type {boolean} */
-	#ssl_key_password_changed = false;
-
-	/** @type {HTMLInputElement|null} */
-	#ssl_key_password_input = null;
-
-	/** @type {HTMLButtonElement|null} */
-	#change_ssl_key_password_btn = null;
-
 	init({rules}) {
 		this.#rules = rules;
 
@@ -69,9 +60,6 @@ const view = new class {
 		this.#password_input = this.#getFormField('password');
 		this.#password_warning = document.querySelector('.js-password-warning');
 		this.#change_password_btn = document.querySelector('.js-change-password');
-
-		this.#ssl_key_password_input = this.#getFormField('ssl_key_password');
-		this.#change_ssl_key_password_btn = document.querySelector('.js-change-ssl-key-password');
 
 		const initial_values = this.#getAllValues();
 		this.#bindEvents({initial_values});
@@ -94,15 +82,6 @@ const view = new class {
 
 			this.#updateDisplayState([this.#password_input], true);
 			this.#password_input?.focus();
-
-			e.target.hidden = true;
-		});
-
-		this.#change_ssl_key_password_btn?.addEventListener('click', e => {
-			this.#ssl_key_password_changed = this.#ssl_key_password_input?.value !== '';
-
-			this.#updateDisplayState([this.#ssl_key_password_input], true);
-			this.#ssl_key_password_input?.focus();
 
 			e.target.hidden = true;
 		});
@@ -138,7 +117,6 @@ const view = new class {
 
 		const show_fields = values.status === APM_GLOBAL_DB_STATUS_CONFIGURED;
 		const show_user_fields = show_fields && values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_PASSWORD;
-		const show_vault_path = show_fields && values.authentication_type === APM_GLOBAL_DB_AUTHTYPE_VAULT;
 		const show_ssl_fields = show_fields && values.url.substring(0, 8) === 'https://';
 		const show_ssl_verify_peer_fields = show_ssl_fields
 			&& values.ssl_verify_peer === APM_GLOBAL_DB_VERIFY_PEER_ENABLED;
@@ -156,18 +134,10 @@ const view = new class {
 		], show_user_fields, true);
 
 		this.#updateDisplayState([
-			...document.querySelectorAll('.js-vault-path')
-		], show_vault_path, true);
-
-		this.#updateDisplayState([
-			...document.querySelectorAll('.js-ssl-verify-peer'),
-			...document.querySelectorAll('.js-ssl-cert-file'),
-			...document.querySelectorAll('.js-ssl-key-file'),
-			...document.querySelectorAll('.js-ssl-key-password')
+			...document.querySelectorAll('.js-ssl-verify-peer')
 		], show_ssl_fields, true);
 
 		this.#updateDisplayState([
-			...document.querySelectorAll('.js-ssl-ca-location'),
 			...document.querySelectorAll('.js-ssl-verify-host')
 		], show_ssl_verify_peer_fields, true);
 
@@ -190,18 +160,6 @@ const view = new class {
 
 		if (this.#change_password_btn !== null) {
 			this.#updateDisplayState([this.#change_password_btn], show_change_password_btn);
-		}
-
-		const show_change_ssl_key_password_btn = initial_values.status === APM_GLOBAL_DB_STATUS_CONFIGURED
-			&& show_ssl_fields
-			&& !this.#ssl_key_password_changed;
-
-		if (this.#ssl_key_password_input !== null) {
-			this.#updateDisplayState([this.#ssl_key_password_input], !show_change_ssl_key_password_btn);
-		}
-
-		if (this.#change_ssl_key_password_btn !== null) {
-			this.#updateDisplayState([this.#change_ssl_key_password_btn], show_change_ssl_key_password_btn);
 		}
 	}
 

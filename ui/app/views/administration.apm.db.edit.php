@@ -62,7 +62,6 @@ $apm_tab = (new CFormGrid())
 		(new CFormField(
 			(new CRadioButtonList('authentication_type', (int) $data['values']['authentication_type']))
 				->addValue(_('Username and password'), APM_GLOBAL_DB_AUTHTYPE_PASSWORD)
-				->addValue(_('Vault path'), APM_GLOBAL_DB_AUTHTYPE_VAULT)
 				->addValue(_('None'), APM_GLOBAL_DB_AUTHTYPE_NONE)
 				->setModern()
 		))->addClass('js-auth-type')
@@ -90,15 +89,6 @@ $apm_tab = (new CFormGrid())
 		]))->addClass('js-password')
 	])
 	->addItem([
-		(new CLabel(_('Vault path'), 'vault_path'))
-			->setAsteriskMark()
-			->addClass('js-vault-path'),
-		(new CFormField(
-			(new CTextBox('vault_path', $data['values']['vault_path']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		))->addClass('js-vault-path')
-	])
-	->addItem([
 		(new CLabel(_('Database'), 'db'))
 			->addClass('js-database'),
 		(new CFormField(
@@ -114,44 +104,6 @@ $apm_tab = (new CFormGrid())
 				->setUncheckedValue(APM_GLOBAL_DB_VERIFY_PEER_DISABLED)
 				->setChecked($data['values']['ssl_verify_peer'] == APM_GLOBAL_DB_VERIFY_PEER_ENABLED),
 		))->addClass('js-ssl-verify-peer')
-	])
-	->addItem([
-		(new CLabel(_('CA certificate file'), 'ssl_ca_location'))
-			->addClass('js-ssl-ca-location'),
-		(new CFormField(
-			(new CTextBox('ssl_ca_location', $data['values']['ssl_ca_location']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setAttribute('maxlength', 2048)
-		))->addClass('js-ssl-ca-location')
-	])
-	->addItem([
-		(new CLabel(_('Client certificate file'), 'ssl_cert_file'))
-			->addClass('js-ssl-cert-file'),
-		(new CFormField(
-			(new CTextBox('ssl_cert_file', $data['values']['ssl_cert_file']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setAttribute('maxlength', 2048)
-		))->addClass('js-ssl-cert-file')
-	])
-	->addItem([
-		(new CLabel(_('Client private key file'), 'ssl_key_file'))
-			->addClass('js-ssl-key-file'),
-		(new CFormField(
-			(new CTextBox('ssl_key_file', $data['values']['ssl_key_file']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setAttribute('maxlength', 2048)
-		))->addClass('js-ssl-key-file')
-	])
-	->addItem([
-		(new CLabel(_('Client private key password'), 'ssl_key_password'))
-			->addClass('js-ssl-key-password'),
-		(new CFormField([
-			(new CPassBox('ssl_key_password'))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-			(new CButton('change_ssl_key_password', _('Change password')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->addClass('js-change-ssl-key-password')
-		]))->addClass('js-ssl-key-password')
 	])
 	->addItem([
 		(new CLabel(_('Verify hostname'), 'ssl_verify_host'))
