@@ -638,8 +638,15 @@ class CCepRule extends CApiService {
 	private static function addOperations(array &$cep_rule, array $db_cep_rule): void {
 		$cep_rule['operations'] = [];
 
-		foreach ($db_cep_rule['operations'] as $operation) {
-			$operation['filter']['conditions'] = array_values($operation['filter']['conditions']);
+		foreach ($db_cep_rule['operations'] as $db_operation) {
+			$operation = array_diff_key($db_operation, array_flip(['cep_operationid', 'filter']));
+
+			$operation['filter'] = array_diff_key($db_operation['filter'], array_flip(['conditions']));
+
+			foreach ($db_operation['filter']['conditions'] as $db_condition) {
+				$operation['filter']['conditions'][] =
+					array_diff_key($db_condition, array_flip(['cep_operation_conditionid']));
+			}
 
 			$cep_rule['operations'][] = $operation;
 		}
