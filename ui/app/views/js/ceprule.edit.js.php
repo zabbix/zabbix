@@ -107,7 +107,6 @@ window.ceprule_edit_popup = new class {
 		this.#refreshExpressionPreview();
 		this.#handleOptgroupTagChange.call(window['ceprule-window-groupby-opt-tag']);
 		this.#handleWindowTypeChanged(Number(ceprule.window_type));
-		this.#toggleOperationsInformation();
 
 		window['ceprule-window-counttag-toggle'].dispatchEvent(new Event('change'));
 		window['ceprule-window-capacity-toggle'].dispatchEvent(new Event('change'));
@@ -316,6 +315,7 @@ window.ceprule_edit_popup = new class {
 		}
 
 		this.#handleOptgroupTagChange.call(window['ceprule-window-groupby-opt-tag']);
+		this.#toggleOperationsInformation();
 	}
 
 	#delete() {
@@ -659,15 +659,22 @@ window.ceprule_edit_popup = new class {
 
 	#toggleOperationsInformation() {
 		const operations = this.form.findFieldByName('operations').getValue();
-		const [has_op_close, has_when_close] = Object.values(operations)
-			.reduce(([has_op_close, has_when_close], {type, execute_when}) => [
-				has_op_close || type == <?= CCepRuleHelper::OP_CLOSE_WINDOW ?>,
-				has_when_close || execute_when == <?= CCepRuleHelper::WHEN_WINDOW_CLOSED ?>
-			], [false, false]
-		);
+		const type = Number(this.form.findFieldByName('window_type').getValue());
+		let hide_warning = type == <?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>;
+
+		if (!hide_warning) {
+			const [has_op_close, has_when_close] = Object.values(operations)
+				.reduce(([has_op_close, has_when_close], {type, execute_when}) => [
+						has_op_close || type == <?= CCepRuleHelper::OP_CLOSE_WINDOW ?>,
+						has_when_close || execute_when == <?= CCepRuleHelper::WHEN_WINDOW_CLOSED ?>
+					], [false, false]
+				);
+
+			hide_warning = !(has_when_close && !has_op_close);
+		}
 
 		window['ceprule-operations-table'].querySelector('.js-operations-info')
-			.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !(has_when_close && !has_op_close));
+			.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', hide_warning);
 	}
 
 	#buildOperationRow(operation) {
