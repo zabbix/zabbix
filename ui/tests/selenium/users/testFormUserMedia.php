@@ -688,7 +688,11 @@ class testFormUserMedia extends CWebTest {
 	 */
 	private function checkEmailNotPresent($email) {
 		$user_form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
-		$row = $user_form->getField('Media')->asTable()->getRow(0);
+		$media_table = $user_form->getField('Media')->asTable();
+
+		// The media row is re-rendered after the media form is submitted, so wait for it before reading the row.
+		$media_table->query('xpath:./tbody/tr[1]')->waitUntilPresent();
+		$row = $media_table->getRow(0);
 		$this->assertStringNotContainsString($email, $row->getColumn('Send to')->getText());
 	}
 
@@ -736,7 +740,7 @@ class testFormUserMedia extends CWebTest {
 			$row = $media_field->getRow(0);
 		}
 		else {
-			$row = $this->query('xpath://tr[@id="medias_0"]')->asTableRow()->one();
+			$row = $this->query('xpath://tr[@id="medias_0"]')->waitUntilPresent()->asTableRow()->one();
 		}
 		$this->assertEquals($row->getColumn('Type')->getText(), $data['fields']['Type']);
 

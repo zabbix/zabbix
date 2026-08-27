@@ -277,14 +277,20 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 		parse_ret = zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values);
 
-		if (SUCCEED == parse_ret)
-		{
-			status = SUCCEED;
-		}
-		else
+		if (FAIL == parse_ret)
 		{
 			error = zbx_strdup(NULL, "Failed to parse data store response");
 			status = FAIL;
+		}
+		else
+		{
+			if (SUCCEED_PARTIAL == parse_ret)
+			{
+				zabbix_log(LOG_LEVEL_WARNING,
+						"telemetry query result row limit exceeded, result was truncated");
+			}
+
+			status = SUCCEED;
 		}
 	}
 	else

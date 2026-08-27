@@ -224,7 +224,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @param string|null $error  Error message when validation fails, set by reference.
 	 */
 	public static function validateColumns(array $item, string $path, ?string &$error = null): bool {
-		foreach ($item['columns'] as $i => $column) {
+		foreach ($item['query']['columns'] as $i => $column) {
 			if (trim($column['attribute_key'], ' ') !== $column['attribute_key']) {
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path.'/query/columns/'.($i + 1).'/attribute_key',
 					_('value cannot start or end with whitespace')

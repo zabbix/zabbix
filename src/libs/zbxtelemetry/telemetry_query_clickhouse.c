@@ -103,6 +103,9 @@ out:
 /******************************************************************************
  *                                                                            *
  * Comments: modifies resp during parsing but returns it to initial state     *
+ * Return value: SUCCEED         - parsed response sucessfully                *
+ *               SUCCEED_PARTIAL - row count exceeded ZBX_TQ_MAX_RESULT_ROWS  *
+ *               FAIL            - failed to parse response                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values)
@@ -126,10 +129,18 @@ int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_ve
 		if (NULL != (end = strchr(start, '\n')))
 			*end = '\0';
 
+		row_count++;
+
 		if (SUCCEED != zbx_json_open(start, &jp) ||
-				NULL == (str = tq_clickhouse_parse_row(query, &jp, ++row_count)))
+				NULL == (str = tq_clickhouse_parse_row(query, &jp, row_count)))
 		{
 			ret = FAIL;
+		}
+
+		if (ZBX_TQ_MAX_RESULT_ROWS < row_count)
+		{
+			ret = SUCCEED_PARTIAL;
+			zbx_free(str);
 		}
 
 		if (NULL != str)
@@ -145,7 +156,7 @@ int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_ve
 			break;
 	}
 
-	if (SUCCEED != ret)
+	if (FAIL == ret)
 	{
 		zbx_vector_str_clear_ext(values, zbx_str_free);
 		zbx_vector_str_destroy(values);

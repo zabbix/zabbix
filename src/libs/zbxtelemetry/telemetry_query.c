@@ -221,6 +221,7 @@ int	tq_validate_result_aggr_column_type(zbx_json_type_t type)
 {
 	switch (type)
 	{
+		case ZBX_JSON_TYPE_STRING:
 		case ZBX_JSON_TYPE_INT:
 		case ZBX_JSON_TYPE_NUMBER:
 		case ZBX_JSON_TYPE_NULL:

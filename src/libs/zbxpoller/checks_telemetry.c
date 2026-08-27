@@ -113,10 +113,14 @@ static int	get_values_telemetry_http(const zbx_dc_item_t *item, time_t now, time
 
 	parse_ret = zbx_tq_clickhouse_parse_resp(query, resp, values);
 
-	if (SUCCEED != parse_ret)
+	if (FAIL == parse_ret)
 	{
 		*error = zbx_strdup(NULL, "Failed to parse data store response");
 		goto out;
+	}
+	else if (SUCCEED_PARTIAL == parse_ret)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "telemetry query result row limit exceeded, result was truncated");
 	}
 
 	ret = SUCCEED;

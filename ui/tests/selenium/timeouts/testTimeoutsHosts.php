@@ -135,7 +135,7 @@ class testTimeoutsHosts extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsHosts_CheckDiscoveryMacros() {
-		$link = 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.
+		$link = 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.
 				self::$hostids['Host for timeouts check'];
 		$this->checkGlobal('global_macros', $link, 'Create discovery rule');
 	}
@@ -153,7 +153,7 @@ class testTimeoutsHosts extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsHosts_CheckDiscoveryCustom() {
-		$link = 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.
+		$link = 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.
 				self::$hostids['Host for timeouts check'];
 		$this->checkGlobal('global_custom', $link, 'Create discovery rule');
 	}
@@ -171,7 +171,7 @@ class testTimeoutsHosts extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsHosts_CheckDiscoveryDefault() {
-		$link = 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.
+		$link = 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.
 				self::$hostids['Host for timeouts check'];
 		$this->checkGlobal('global_default', $link, 'Create discovery rule');
 	}
@@ -189,7 +189,7 @@ class testTimeoutsHosts extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsHosts_CheckDiscoveryProxyDefault() {
-		$link = 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.
+		$link = 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.
 				self::$hostids['Host for timeouts check with proxy'];
 		$this->checkGlobal('global_default', $link, 'Create discovery rule', true);
 	}
@@ -207,7 +207,7 @@ class testTimeoutsHosts extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsHosts_CheckDiscoveryProxyMacros() {
-		$link = 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.
+		$link = 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.
 				self::$hostids['Host for timeouts check with proxy'];
 		$this->checkGlobal('proxy_macros', $link, 'Create discovery rule', true);
 	}
@@ -225,7 +225,7 @@ class testTimeoutsHosts extends testTimeoutsDisplay {
 	}
 
 	public function testTimeoutsHosts_CheckDiscoveryProxyCustom() {
-		$link = 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.
+		$link = 'zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.
 				self::$hostids['Host for timeouts check with proxy'];
 		$this->checkGlobal('proxy_custom', $link, 'Create discovery rule', true);
 	}
