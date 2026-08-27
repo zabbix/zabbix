@@ -66,12 +66,16 @@ const usageMessageFormatRuntimeControlFormat = //
       metrics                               List available metrics
       version                               Display Agent version
 
-    When periodic profiling is enabled, periodic_prof_execute resets its
-    schedule: the next scheduled profile dump occurs one full interval after
-    the command completes. CPU profiling is split instead: the current CPU
-    profile is retained, the command writes a separate 5-second CPU profile,
-    and periodic CPU collection continues in a new file. This can leave three
-    CPU files around the command; normal file rotation applies.
+    Periodic CPU data is collected into a hidden temporary file. When an
+    interval ends, the file is published as a CPU profile and the configured
+    number of completed files is retained. The temporary file does not count
+    toward ProfilerMaxFilesPerProfile.
+
+    When periodic profiling is enabled, periodic_prof_execute finishes the
+    current CPU interval, writes a separate 5-second CPU profile, and starts a
+    new periodic CPU file. Explicitly requested profiles are not rotated; the
+    next scheduled dump enforces ProfilerMaxFilesPerProfile. It occurs one full
+    interval after the command completes.
 `
 
 const usageMessageFormat = //
