@@ -336,8 +336,7 @@ class CCepRuleHelper {
 			ZBX_CONDITION_TYPE_EVENT_COPIED => [
 				CONDITION_OPERATOR_YES => _('Event is cloned'),
 				CONDITION_OPERATOR_NO => _('Event is not cloned')
-			],
-
+			]
 		];
 	}
 

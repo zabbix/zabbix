@@ -157,7 +157,7 @@ window.ceprule_operation_condition_edit_popup = new class {
 			operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 			tag: '',
 			tag_name: '',
-			tag_value: '',
+			tag_value: ''
 		};
 
 		if (condition === null) {
@@ -176,7 +176,7 @@ window.ceprule_operation_condition_edit_popup = new class {
 				break;
 
 			case <?= CCepRuleHelper::CONDITION_TAG_VALUE ?>:
-				keep('type', 'operator', 'tag_name','tag_value');
+				keep('type', 'operator', 'tag_name', 'tag_value');
 				break;
 
 			default:

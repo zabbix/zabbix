@@ -85,7 +85,7 @@ $window_operations = (new CSelectOptionGroup(_('Window')))
 					(new CVar('filter[conditions][#{row_index}][formulaid]', '#{formulaid}'))->removeId(),
 					(new CVar('filter[conditions][#{row_index}][row_index]', '#{row_index}'))->removeId()
 				]
-			]))->setAttribute('data-row_index', '#{row_index}'),
+			]))->setAttribute('data-row_index', '#{row_index}')
 		]))
 		->addItem((new CTemplateTag('ceprule-operation-condition-row-error-container-template'))->addItem([
 			(new CRow(
