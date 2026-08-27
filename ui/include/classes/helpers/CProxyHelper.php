@@ -231,6 +231,6 @@ class CProxyHelper {
 	}
 
 	private static function buildObjectBadge(array $object): CSpan {
-		return (new CSpan($object['name']))->addClass(ZBX_STYLE_STATUS_GREEN)->setHint($object['name']);
+		return (new CSpan($object['name']))->addClass(ZBX_STYLE_STATUS_GREEN);
 	}
 }
