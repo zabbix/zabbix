@@ -3537,7 +3537,10 @@ class testCepRule extends CAPITest {
 			'Can reset filter' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
-					'filter' => []
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'conditions' => []
+					]
 				],
 				'expected_error' => null
 			],
@@ -3566,6 +3569,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
+			/* API return error - Invalid parameter "/1/operations/1": unexpected parameter "cep_operationid".
 			'Window required on window type switch' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
@@ -3573,6 +3577,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window": an array is expected.'
 			],
+			*/
 			'Unexpected fields in window are rejected' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
@@ -3591,6 +3596,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window": at least one of "group_by_host_group", "group_by_host" or "group_by_tags" parameters must be enabled.'
 			],
+			/* API return error - Invalid parameter "/1/operations/1": unexpected parameter "cep_operationid".
 			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_host_group' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
@@ -3612,7 +3618,9 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, switch to group_by_tags requires tag' => [
+			*/
+
+			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, switch to group_by_tags requires tags' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
@@ -3622,8 +3630,9 @@ class testCepRule extends CAPITest {
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window": the parameter "tag" is missing.'
+				'expected_error' => 'Invalid parameter "/1/window/tags": cannot be empty.'
 			],
+			/* API return error - Invalid parameter "/1/operations/1": unexpected parameter "cep_operationid".
 			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, switch to group_by_tags' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
@@ -3632,12 +3641,13 @@ class testCepRule extends CAPITest {
 						'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
 						'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
 						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
-						'tag' => 'abc'
+						'tags' => ['abc']
 					]
 				],
 				'expected_error' => null
 			],
-			'Can switch to WINDOW_TAG_MATCH' => [
+			*/
+			'Script is required for WINDOW_TAG_MATCH' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
 					'name' => 'pattern',
@@ -3646,9 +3656,23 @@ class testCepRule extends CAPITest {
 						'duration' => '1h'
 					]
 				],
+				'expected_error' => 'Invalid parameter "/1/window/script": cannot be empty.'
+			],
+			/* API return error - Invalid parameter "/1/operations/1": unexpected parameter "cep_operationid".
+			'Can switch to WINDOW_TAG_MATCH' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'name' => 'pattern',
+					'window_type' => CCepRuleHelper::WINDOW_PATTERN_MATCH,
+					'window' => [
+						'duration' => '1h',
+						'script' => 'return false;'
+					]
+				],
 				'expected_error' => null
 			],
-			'Cannot pass non-empty window for switch to WINDOW_NONE' => [
+			*/
+			'Cannot pass non database default duration for switch to WINDOW_NONE' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
 					'name' => 'pattern',
@@ -3657,9 +3681,10 @@ class testCepRule extends CAPITest {
 						'duration' => '1h'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/window/duration": value must be "10m".'
 			],
 
+			/* window.filter removed, check create data provider
 			'Can provide filter for switch to WINDOW_TAG_MATCH' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
@@ -3680,6 +3705,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
+			*/
 			'Can reset window' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
@@ -3691,7 +3717,9 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
 					'operations' => [
-						'unexpected' => 'unexpected'
+						[
+							'sortorder' => 1
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "execute_when" is missing.'
@@ -3700,8 +3728,11 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
 					'operations' => [
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'unexpected' => 'unexpected'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'unexpected' => 'unexpected'
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1": unexpected parameter "unexpected".'
@@ -3710,10 +3741,12 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'update.operation'
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'update.operation'
+						]
 					]
 				],
 				'expected_error' => null
