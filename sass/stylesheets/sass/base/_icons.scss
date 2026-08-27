@@ -108,7 +108,7 @@ $zi-square: "\ea69";
 $zi-star-filled: "\ea6a";
 $zi-star: "\ea6b";
 $zi-stop-sign: "\ea6c";
-$zi-support: "\ea6d";
+$zi-subscriptions: "\ea6d";
 $zi-text: "\ea6e";
 $zi-time-period: "\ea6f";
 $zi-times: "\ea70";
@@ -134,10 +134,10 @@ $zi-wrench: "\ea83";
 
 @font-face {
 	font-family: "zabbix-icons";
-	src: url("#{$icons-path}zabbix-icons.woff2?t=1779433480634") format("woff2"),
-	url("#{$icons-path}zabbix-icons.woff?t=1779433480634") format("woff"),
-	url('#{$icons-path}zabbix-icons.ttf?t=1779433480634') format('truetype'),
-	url('#{$icons-path}zabbix-icons.svg?t=1779433480634#zabbix-icons') format('svg');
+	src: url("#{$icons-path}zabbix-icons.woff2?t=1786100546126") format("woff2"),
+	url("#{$icons-path}zabbix-icons.woff?t=1786100546126") format("woff"),
+	url('#{$icons-path}zabbix-icons.ttf?t=1786100546126') format('truetype'),
+	url('#{$icons-path}zabbix-icons.svg?t=1786100546126#zabbix-icons') format('svg');
 }
 
 %icons-font {
@@ -273,7 +273,7 @@ $zi-wrench: "\ea83";
 .zi-star-filled:before { content: "\ea6a"; }
 .zi-star:before { content: "\ea6b"; }
 .zi-stop-sign:before { content: "\ea6c"; }
-.zi-support:before { content: "\ea6d"; }
+.zi-subscriptions:before { content: "\ea6d"; }
 .zi-text:before { content: "\ea6e"; }
 .zi-time-period:before { content: "\ea6f"; }
 .zi-times:before { content: "\ea70"; }

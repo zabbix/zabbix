@@ -1,1 +1,0 @@
-.D........ [ZBX-27746] updated runtime control target lists in Zabbix server and proxy help messages and man pages by adding supervisor and removing unsupported discovery and preprocessing worker targets (rtrizna)

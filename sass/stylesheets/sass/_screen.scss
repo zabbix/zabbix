@@ -50,6 +50,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
 @import "components/datatable";
+@import "components/date-selector";
 @import "components/diff";
 @import "components/entity-count";
 @import "components/expandable-subfilter";
@@ -57,6 +58,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/form-errors";
 @import "components/form-search";
 @import "components/inline-filter";
+@import "components/inline-list";
 @import "components/list-table";
 @import "components/no-data-message";
 @import "components/markdown";
@@ -592,6 +594,8 @@ input {
 	}
 
 	&[type="password"] {
+		--font-stack: var(--font-stack-mono);
+
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
@@ -714,11 +718,7 @@ select {
 	padding: 0;
 	border: 0;
 	vertical-align: middle;
-	position: relative;
-	top: -1px;
 	overflow: hidden;
-	width: 13px;
-	height: 13px;
 	background: none;
 }
 
@@ -821,18 +821,6 @@ select {
 	}
 }
 
-.calendar-control {
-	.btn-icon {
-		&:not(:first-child) {
-			margin-left: 2px;
-		}
-
-		&::before {
-			font-size: 22px;
-		}
-	}
-}
-
 .header-kioskmode-controls {
 	position: fixed;
 	top: 5px;
@@ -927,7 +915,7 @@ select {
 // Installation.
 .setup-container {
 	background-color: $ui-bg-color;
-	width: 766px;
+	width: 816px;
 	height: 420px;
 	margin: 0 auto;
 	margin-top: 5%;
@@ -1724,18 +1712,6 @@ select {
 
 td.inactive-bg {
 	@extend .inactive-bg;
-}
-
-// Filter checkboxes.
-.table-forms-second-column {
-	display: inline-block;
-	width: 50%;
-	min-width: 200px;
-	text-align: right;
-
-	.second-column-label {
-		padding: 0 10px;
-	}
 }
 
 // Event status colors.

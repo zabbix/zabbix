@@ -827,12 +827,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 								]
 							],
 							'update' => [
-								'Media type' => 'Mattermost',
+								'Media type' => 'GLPI',
 								'Use if severity' => ['High', 'Disaster']
 							],
 							'expected' => [
 								'fields' => [
-									'Type' => 'Mattermost',
+									'Type' => 'GLPI',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
 									'Use if severity' => [

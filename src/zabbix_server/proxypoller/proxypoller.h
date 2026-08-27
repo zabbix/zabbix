@@ -34,7 +34,6 @@ typedef struct
 	const zbx_events_funcs_t	*events_cbs;
 	int				proxyconfig_frequency;
 	int				proxydata_frequency;
-	zbx_uint32_t			config_denyitemtypes_mask;
 }
 zbx_thread_proxy_poller_args;
 

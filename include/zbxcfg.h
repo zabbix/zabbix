@@ -78,7 +78,6 @@ void	zbx_addr_copy(zbx_vector_addr_ptr_t *addr_to, const zbx_vector_addr_ptr_t *
 void	zbx_addr_free(zbx_addr_t *addr);
 
 int	zbx_parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int optional, int strict, int noexit, int noenv);
-int	zbx_parse_item_types(const char *itemtypes, zbx_uint32_t *itemtype_mask, char **error);
 
 int	zbx_check_cfg_feature_int(const char *parameter, int value, const char *feature);
 int	zbx_check_cfg_feature_str(const char *parameter, const char *value, const char *feature);

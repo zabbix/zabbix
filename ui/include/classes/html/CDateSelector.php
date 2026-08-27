@@ -21,7 +21,7 @@ class CDateSelector extends CTag {
 	/**
 	 * Default CSS class name for HTML root element.
 	 */
-	const ZBX_STYLE_CLASS = 'calendar-control';
+	const ZBX_STYLE_CLASS = 'date-selector';
 
 	/**
 	 * Input name.
@@ -194,6 +194,7 @@ class CDateSelector extends CTag {
 			->addItem((new CButton($this->name.'_calendar'))
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_CALENDAR)
+				->addClass('calendar-btn')
 				->setEnabled($this->enabled && !$this->readonly)
 				->setAttribute('aria-label', _('Select date'))
 				->setAttribute('aria-expanded', 'false')

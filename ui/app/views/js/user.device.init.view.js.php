@@ -185,6 +185,8 @@ window.user_device_create_popup = new class {
 					throw {error: response.error};
 				}
 
+				this.#removePopupMessages();
+
 				if ('success' in response && this.#device_uuid) {
 					postMessageError(response.success.title);
 

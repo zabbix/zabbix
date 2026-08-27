@@ -901,8 +901,7 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 		const char *config_ssl_key_location, int *vault_ret);
 void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
-		zbx_uint64_t conf_cache_size, const char *hostname, zbx_uint32_t config_denyitemtypes_mask,
-		char **error);
+		zbx_uint64_t conf_cache_size, const char *hostname, char **error);
 void	zbx_free_configuration_cache(void);
 
 void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const zbx_uint64_t *triggerids,
@@ -1706,4 +1705,7 @@ int	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxe
 zbx_uint64_t	zbx_dc_get_cache_size(void);
 
 zbx_uint64_t	zbx_dc_config_get_config_revision(void);
+
+unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type,
+		zbx_get_config_forks_f	get_config_forks, unsigned char *proc_poller);
 #endif

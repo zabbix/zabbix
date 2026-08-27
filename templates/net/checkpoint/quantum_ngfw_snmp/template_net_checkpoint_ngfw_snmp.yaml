@@ -578,11 +578,16 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 9c5b6ef7d033486189e045ad62d13991
-              expression: 'last(/Check Point Next Generation Firewall by SNMP/system.uptime)<10m'
+              expression: 'change(/Check Point Next Generation Firewall by SNMP/system.uptime)<0 and last(/Check Point Next Generation Firewall by SNMP/system.uptime,#2)<42949672.96-(lastclock(/Check Point Next Generation Firewall by SNMP/system.uptime)-lastclock(/Check Point Next Generation Firewall by SNMP/system.uptime,#2))'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/Check Point Next Generation Firewall by SNMP/system.uptime)>{$SNMP.UPTIME.WARN}'
               name: 'Check Point: Device has been restarted'
-              event_name: 'Check Point: {HOST.NAME} has been restarted (uptime < 10m)'
+              event_name: 'Check Point: {HOST.NAME} has been restarted'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: |
+                The uptime counter has decreased, which indicates that the device has been restarted.
+                A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+                The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -2757,6 +2762,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'Time interval for the SNMP availability trigger.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the restart problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '43'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the restart problem auto-resolves.'
         - macro: '{$SW.NAME.MATCHES}'
           value: '.*'
           description: 'Used in Software blade discovery. Can be overridden on the host or linked template level.'

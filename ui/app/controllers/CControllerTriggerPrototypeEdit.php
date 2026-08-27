@@ -26,19 +26,28 @@ class CControllerTriggerPrototypeEdit extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$allow_any = [];
-		foreach (array_keys(CControllerTriggerPrototypeUpdate::getValidationRules()['fields']) as $name) {
-			$allow_any[$name] = [];
-		}
-
-		$ret = $this->validateInput(['object', 'fields' => [
+		$rules = ['object', 'fields' => [
 			'context' => ['string', 'required', 'in' => ['host', 'template']],
 			'show_inherited_tags' => ['integer', 'in' => [0, 1]],
 			'form_refresh' => ['integer', 'in' => [0, 1]]
-		] + $allow_any]);
+		]];
+
+		foreach (array_keys(CControllerTriggerPrototypeUpdate::getValidationRules()['fields']) as $name) {
+			if (!array_key_exists($name, $rules['fields'])) {
+				$rules['fields'][$name] = [];
+			}
+		}
+
+		$ret = $this->validateInput($rules, true);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;

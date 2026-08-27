@@ -212,6 +212,7 @@ func (c *Connector) refreshActiveChecks() bool {
 		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
 			[]*glexpr.Expression{}, []*scheduler.Request{}, now)
 		c.firstActiveChecksRefreshed = true
+		c.configRevision = 0
 
 		return false
 	} else if c.firstActiveChecksLog {

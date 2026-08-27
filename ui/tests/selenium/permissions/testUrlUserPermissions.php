@@ -552,9 +552,9 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// #35.
 			[[
-				'url' => 'host_discovery.php?context=host&hostid=10084',
+				'url' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]=10084&context=host',
 				'title' =>	'Configuration of discovery rules',
-				'no_permissions_to_object' => true,
+				'header' => 'Discovery rules',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -567,7 +567,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			// special permissions that other users don't have.
 			// This user can access the "Discovery rules" section, which regular users can't see.
 			[[
-				'url' => 'host_discovery.php?context=host&hostid=10084',
+				'url' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]=10084&context=host',
 				'title' =>	'Configuration of discovery rules',
 				'header' => 'Discovery rules',
 				'users' => [

@@ -871,6 +871,11 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'type' => 'radio_button',
 							'possible_values' => ['Analog', 'Digital'],
 							'value' => 'Analog'
+						],
+						[
+							'field' => 'Override time zone',
+							'type' => 'dropdown',
+							'value' => 'Local default: (UTC+03:00) Europe/Riga'
 						]
 					],
 					'hidden' => [
@@ -951,6 +956,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								[
 									'field' => 'Colour',
 									'type' => 'color_picker'
+								],
+								[
+									'field' => 'Format',
+									'type' => 'radio_button',
+									'fieldid' => 'tzone_format',
+									'possible_values' => ['Short', 'Full'],
+									'value' => 'Short'
 								]
 							]
 						]
@@ -2580,7 +2592,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			case 'dropdown':
 				$field = $field->asDropdown();
 				$this->assertEquals($default_value, $field->getValue());
-				$this->assertEquals($field_details['possible_values'], $field->getOptions()->asText());
+
+				if (array_key_exists('possible_values', $field_details)) {
+					$this->assertEquals($field_details['possible_values'], $field->getOptions()->asText());
+				}
 				break;
 
 			case 'radio_button':
@@ -2928,7 +2943,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget server time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Server time')
+						'Time type' => 'Server time'
 					]
 				]
 			],
@@ -2939,7 +2954,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time no item',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time')
+						'Time type' => 'Host time'
 					],
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
 				]
@@ -2950,7 +2965,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time',
-						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
+						'Time type' => 'Host time',
 						'Item' => self::TEMPLATE_ITEM
 					],
 					'swap_expected' => [

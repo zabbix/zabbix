@@ -254,7 +254,7 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
 		zbx_get_config_forks_f get_config_forks,
 		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip,
-		zbx_uint32_t config_denyitemtypes_mask, zbx_ipc_async_socket_t *rtc)
+		zbx_ipc_async_socket_t *rtc)
 {
 	ZBX_UNUSED(get_program_type_cb);
 
@@ -282,7 +282,7 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 		zbx_send_proxyconfig(sock, jp, config_vault, config_comms->config_timeout,
 				config_comms->config_trapper_timeout, config_comms->config_source_ip,
 				config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
-				config_comms->config_ssl_key_location, config_denyitemtypes_mask, &vault_ret);
+				config_comms->config_ssl_key_location, &vault_ret);
 
 		if (SUCCEED != vault_ret && NULL != config_vault->token)
 		{
