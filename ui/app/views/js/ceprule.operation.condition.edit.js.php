@@ -119,7 +119,7 @@ window.ceprule_operation_condition_edit_popup = new class {
 			const is_type_option = condition_type_operators[Number(type)].includes(Number(node.value));
 
 			node.disabled = !is_type_option;
-			node.closest('li').style.display = is_type_option ? '' : 'none';
+			node.closest('li').hidden = !is_type_option;
 		});
 
 		const radio_inputs = [...operator_field.querySelectorAll('input:not([disabled])')];
