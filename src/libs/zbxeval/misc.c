@@ -518,7 +518,7 @@ static int	eval_has_usermacro(const char *str, size_t len)
  *                                                                            *
  * Parameters: itemquery    - [IN]                                            *
  *             len          - [IN] item query length                          *
- *             out          - [OUT] item query with expanded macros           *
+ *             out          - [IN/OUT] item query with expanded macros        *
  *             error        - [OUT] Error message, optional. If specified,    *
  *                                  the function will return failure at the   *
  *                                  first failed macro expansion.             *
