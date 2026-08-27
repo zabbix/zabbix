@@ -237,54 +237,12 @@ window.ceprule_operation_edit_popup = new class {
 	}
 
 	#setAvailableOperationOptions() {
-		const type = Number(this.form.findFieldByName('type').getValue());
 		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
-		const zselect = window['ceprule-operation-type'];
-		const events_options = [];
-		const window_options = [];
-		const tags_options = [];
-		const enable_if_allowed = (option) => {
-			option.is_disabled = !this.#operation_types_by_execute_when[execute_when].includes(Number(option.value));
-		};
+		const zselect = document.getElementById('ceprule-operation-type');
 
-		zselect.options.forEach(option => {
-			enable_if_allowed(option);
-
-			if (option.extra.optgroupid === 'optgroup_events') {
-				events_options.push(option);
-			}
-			else if (option.extra.optgroupid === 'optgroup_window') {
-				window_options.push(option);
-			}
-			else if (option.extra.optgroupid === 'optgroup_tags') {
-				tags_options.push(option);
-			}
+		zselect.getOptions().forEach(option => {
+			option.disabled = !this.#operation_types_by_execute_when[execute_when].includes(Number(option.value));
 		});
-
-		const sorter = (option_left, option_right) => {
-			if (option_left.label === option_right.label) {
-				return 0;
-			}
-
-			return option_left.label > option_right.label ? 1 : -1;
-		};
-
-		events_options.sort(sorter);
-		tags_options.sort(sorter);
-		window_options.sort(sorter);
-
-		zselect.clearOptions();
-		zselect.addOptionGroup({label: <?= json_encode(_('Event')) ?>, options: events_options});
-		zselect.addOptionGroup({label: <?= json_encode(_('Tag')) ?>, options: tags_options});
-		zselect.addOptionGroup({label: <?= json_encode(_('Window')) ?>, options: window_options});
-		zselect.value = type;
-
-		// Select first enabled option, if previous selection got disabled.
-		if (!zselect.value.length) {
-			const enabled_option = [...events_options, ...tags_options].find(option => !option.is_disabled);
-
-			zselect.value = enabled_option ? enabled_option.value : events_options[0].value;
-		}
 	}
 
 	#setValues(operation) {

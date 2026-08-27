@@ -128,7 +128,8 @@ abstract class CControllerCepRuleGeneral extends CController {
 			'filter' => ['object', 'fields' => self::getOperationFilterValidationFields()],
 			'type' => array_map(fn(int $execute_when) => ['db cep_operation.type', 'required',
 				'in' => CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN[$execute_when],
-				'when' => ['execute_when', 'in' => [$execute_when]]
+				'when' => ['execute_when', 'in' => [$execute_when]],
+				'messages' => ['in' => _('Invalid operation.')]
 			], array_keys(CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN)),
 			'event_name' => ['db cep_operation.event_name', 'required', 'not_empty', 'when' => ['type',
 				'in' => [CCepRuleHelper::OP_SET_NAME]
@@ -165,28 +166,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 	}
 
 	public static function getOperationFilterValidationFields(): array {
-
-		$allowed_types_occurred = [ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
-			ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_SYMPTOM, ZBX_CONDITION_TYPE_EVENT_COPIED,
-			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED];
-		$allowed_types_other = [ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
-			ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST,
-			ZBX_CONDITION_TYPE_EVENT_SYMPTOM, ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED];
-		$text_allowed_types_occurred = [];
-		$text_allowed_types_other = [];
-
-		foreach (CCepRuleHelper::getOperationConditionLabels() as $key => $label) {
-			if (in_array($key, $allowed_types_occurred)) {
-				$text_allowed_types_occurred[] = $label;
-			}
-			if (in_array($key, $allowed_types_other)) {
-				$text_allowed_types_other[] = $label;
-			}
-		}
-
-		$text_allowed_types_occurred = implode(', ', $text_allowed_types_occurred);
-		$text_allowed_types_other = implode(', ', $text_allowed_types_other);
-
 		return [
 			'evaltype' => ['db cep_operation.evaltype', 'required', 'in' => [
 				CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
@@ -199,14 +178,22 @@ abstract class CControllerCepRuleGeneral extends CController {
 			'conditions' => ['objects', 'fields' => [
 				'type' => [
 					[
-						'integer', 'required', 'in' => $allowed_types_occurred,
+						'integer', 'required', 'in' => [
+							ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_EVENT_OPEN,
+							ZBX_CONDITION_TYPE_EVENT_SYMPTOM, ZBX_CONDITION_TYPE_EVENT_COPIED,
+							ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+						],
 						'when' => ['../../execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
-						'messages' => ['in' => _s('Allowed values are %1$s', $text_allowed_types_occurred)]
+						'messages' => ['in' => _('Invalid value.')]
 					],
 					[
-						'integer', 'required', 'in' => $allowed_types_other,
+						'integer', 'required', 'in' => [
+							ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_EVENT_OPEN,
+							ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+							ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+						],
 						'when' => ['../../execute_when', 'not_in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
-						'messages' => ['in' => _s('Allowed values are %1$s', $text_allowed_types_other)]
+						'messages' => ['in' => _('Invalid value.')]
 					]
 				],
 				'operator' => [

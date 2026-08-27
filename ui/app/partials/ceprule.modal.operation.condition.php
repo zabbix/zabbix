@@ -85,5 +85,10 @@ foreach ($operators as $value => $name) {
 				->setAttribute('data-field-type', 'hidden')
 				->removeId()
 		)
+		->addItem(
+			(new CInput('hidden', 'execute_when', ''))
+				->setAttribute('data-field-type', 'hidden')
+				->removeId()
+		)
 	)
 	->show();

@@ -30,7 +30,7 @@ window.ceprule_operation_condition_edit_popup = new class {
 	init({rules, condition, overlay, execute_when, used_property_types}) {
 		this.form_element = overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
-		this.#setValues(this.#defaultCondition(condition));
+		this.#setValues(this.#defaultCondition(condition), execute_when);
 		this.#setAvailableTypes(execute_when, used_property_types);
 		this.#initActions();
 		document.getElementById('ceprule-condition-type').dispatchEvent(new Event('change'));
@@ -52,32 +52,15 @@ window.ceprule_operation_condition_edit_popup = new class {
 			used_property_types.push(<?= ZBX_CONDITION_TYPE_EVENT_LAST ?>);
 		}
 
-		const type = Number(this.form.findFieldByName('type').getValue());
 		const zselect = document.getElementById('ceprule-condition-type');
-		const enable_if_allowed = (option) => {
-			option.is_disabled = used_property_types.includes(Number(option.value));
-		};
-		const options = [];
-		zselect.options.forEach(option => {
-			enable_if_allowed(option);
-			options.push(option);
+
+		used_property_types.forEach(value => {
+			zselect.getOptionByValue(value).disabled = true;
 		});
-
-		zselect.clearOptions();
-		options.forEach(option => {
-			zselect.addOption(option);
-		});
-		zselect.value = type;
-
-		// Select first enabled option, if previous selection got disabled.
-		if (!zselect.value.length) {
-			const enabled_option = options.find(option => !option.is_disabled);
-
-			zselect.value = enabled_option ? enabled_option.value : options[0].value;
-		}
 	}
 
-	#setValues(condition) {
+	#setValues(condition, execute_when) {
+		condition.execute_when = execute_when;
 		this.form_element.querySelectorAll('[name]').forEach(node => {
 			if (node.type === 'radio') {
 				node.checked = node.value === condition[node.name];
@@ -158,7 +141,10 @@ window.ceprule_operation_condition_edit_popup = new class {
 		const fields = this.form.getAllValues();
 
 		return new Promise((resolve, reject) => this.form.validateSubmit(fields)
-			.then(result => result && resolve(fields) || reject(fields))
+			.then(result => {
+				delete fields['execute_when'];
+				return result ? resolve(fields) : reject(fields);
+			})
 		);
 	}
 

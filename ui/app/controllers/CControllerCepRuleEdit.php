@@ -204,7 +204,8 @@ class CControllerCepRuleEdit extends CController {
 			'filter' => ['object', 'fields' => CControllerCepRuleGeneral::getOperationFilterValidationFields()],
 			'type' => array_map(fn(int $execute_when) => ['db cep_operation.type', 'required',
 				'in' => CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN[$execute_when],
-				'when' => ['execute_when', 'in' => [$execute_when]]
+				'when' => ['execute_when', 'in' => [$execute_when]],
+				'messages' => ['in' => _('Invalid operation.')]
 			], array_keys(CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN)),
 			'event_name' => ['db cep_operation.event_name', 'required', 'not_empty', 'when' => ['type',
 				'in' => [CCepRuleHelper::OP_SET_NAME]
@@ -314,15 +315,30 @@ class CControllerCepRuleEdit extends CController {
 
 	public static function getOperationConditionValidationRules(): array {
 		return (new CFormValidator(['objects', 'fields' => [
+			'execute_when' => ['db cep_operation.execute_when', 'required', 'in' => [
+				CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_ADDED,
+				CCepRuleHelper::WHEN_EVENT_EVICTED, CCepRuleHelper::WHEN_WINDOW_CLOSED,
+				CCepRuleHelper::WHEN_PATTERN_MATCHED
+			]],
 			'type' => [
 				[
 					'integer', 'required', 'in' => [
-						ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
-						ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_FIRST,
-						ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
-						ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
-					]
+						ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_EVENT_OPEN,
+						ZBX_CONDITION_TYPE_EVENT_SYMPTOM, ZBX_CONDITION_TYPE_EVENT_COPIED,
+						ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+					],
+					'when' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
+					'messages' => ['in' => _('Invalid value.')]
 				],
+				[
+					'integer', 'required', 'in' => [
+						ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_EVENT_OPEN,
+						ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+						ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+					],
+					'when' => ['execute_when', 'not_in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
+					'messages' => ['in' => _('Invalid value.')]
+				]
 			],
 			'operator' => [
 				['db cep_operation_condition.operator', 'required',

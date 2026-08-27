@@ -19,32 +19,30 @@
  * @var array    $data
  */
 
-$events_operations = new CSelectOptionGroup(_('Event'));
-$tags_operations = new CSelectOptionGroup(_('Tag'));
-$window_operations = new CSelectOptionGroup(_('Window'));
-$labels = CCepRuleHelper::getOperationLabelStrings();
-
 $events_group_opts = [CCepRuleHelper::OP_SET_NAME, CCepRuleHelper::OP_CLOSE_EVENT, CCepRuleHelper::OP_DISCARD,
 	CCepRuleHelper::OP_SET_SEVERITY, CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY,
-	CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_UNSUPPRESS, CCepRuleHelper::OP_CLONE_LAST,
-	CCepRuleHelper::OP_CLONE_FIRST
+	CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_UNSUPPRESS, CCepRuleHelper::OP_CLONE_FIRST,
+	CCepRuleHelper::OP_CLONE_LAST
 ];
 
-foreach ($labels as $option => $label) {
-	$optgroupid = 'optgroup_tags';
-	$optgroup = $tags_operations;
+$tag_group_opts = [CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE,
+	CCepRuleHelper::OP_INCREASE_TAG_VALUE, CCepRuleHelper::OP_DECREASE_TAG_VALUE, CCepRuleHelper::OP_RENAME_TAG,
+	CCepRuleHelper::OP_REMOVE_TAG
+];
 
-	if (in_array($option, $events_group_opts)) {
-		$optgroupid = 'optgroup_events';
-		$optgroup = $events_operations;
-	}
-	else if ($option == CCepRuleHelper::OP_CLOSE_WINDOW) {
-		$optgroupid = 'optgroup_window';
-		$optgroup = $window_operations;
-	}
-
-	$optgroup->addOption((new CSelectOption($option, $label))->setExtra('optgroupid', $optgroupid));
-}
+$labels = CCepRuleHelper::getOperationLabelStrings();
+$events_operations = (new CSelectOptionGroup(_('Event')))
+	->addOptions(CSelect::createOptionsFromArray(
+		array_intersect_key($labels, array_flip($events_group_opts))
+	));
+$tags_operations = (new CSelectOptionGroup(_('Tag')))
+	->addOptions(CSelect::createOptionsFromArray(
+		array_intersect_key($labels, array_flip($tag_group_opts))
+	));
+$window_operations = (new CSelectOptionGroup(_('Window')))
+	->addOptions(CSelect::createOptionsFromArray([
+		CCepRuleHelper::OP_CLOSE_WINDOW => $labels[CCepRuleHelper::OP_CLOSE_WINDOW]
+	]));
 
 (new CForm())
 	// Enable form submitting on Enter.

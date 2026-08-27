@@ -551,6 +551,7 @@ window.ceprule_edit_popup = new class {
 				sortorder: 1 + Math.max(0, ...Object.values(operations).map(({sortorder}) => sortorder)),
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
+				type: <?= CCepRuleHelper::OP_CLOSE_EVENT ?>,
 				suppress_duration: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
