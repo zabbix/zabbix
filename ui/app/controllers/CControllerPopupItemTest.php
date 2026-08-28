@@ -95,6 +95,13 @@ abstract class CControllerPopupItemTest extends CController {
 	];
 
 	/**
+	 * Item form fields that must be valid before the item test can be opened, per item type.
+	 */
+	public static array $item_types_test_fields = [
+		ITEM_TYPE_TELEMETRY_QUERY => ['columns', 'aggregated_columns', 'conditions']
+	];
+
+	/**
 	 * Item properties where macros are supported.
 	 *
 	 * @var array

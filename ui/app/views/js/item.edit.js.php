@@ -510,25 +510,8 @@ window.item_edit_form = new class {
 	}
 
 	test() {
-		const validate_fields = ['params_f'];
-
-		if (this.field.type.value == <?= ITEM_TYPE_TELEMETRY_QUERY ?>) {
-			validate_fields.push('columns', 'aggregated_columns', 'conditions');
-		}
-
-		for (const name of validate_fields) {
-			const field = this.form.findFieldByName(name);
-
-			field.setChanged();
-
-			if (field instanceof CFieldCollection) {
-				for (const sub_field of Object.values(field.getFields())) {
-					sub_field.setChanged();
-				}
-			}
-		}
-
-		this.#tabs.preprocessing.test(true, true, this.footer.querySelector('.js-test-item'), -2, validate_fields);
+		this.form.findFieldByName('params_f').setChanged();
+		this.#tabs.preprocessing.test(true, true, this.footer.querySelector('.js-test-item'), -2, ['params_f']);
 	}
 
 	delete() {
