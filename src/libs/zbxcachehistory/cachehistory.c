@@ -1447,11 +1447,12 @@ static void	connector_match_filters(const zbx_vector_connector_filter_t *connect
 {
 	for (int i = 0; i < connector_filters->values_num; i++)
 	{
-		if (SUCCEED == match_item_value_type_by_mask(connector_filters->values[i].item_value_type, item) &&
-			SUCCEED == zbx_match_tags(connector_filters->values[i].tags_evaltype,
-				&connector_filters->values[i].connector_tags, resolved_tags))
+		zbx_connector_filter_t	*cf = &connector_filters->values[i];
+
+		if (SUCCEED == match_item_value_type_by_mask(cf->item_value_type, item) &&
+				SUCCEED == zbx_match_tags(cf->tags_evaltype, &cf->connector_tags, resolved_tags))
 		{
-			zbx_vector_uint64_append(matching_ids, connector_filters->values[i].connectorid);
+			zbx_vector_uint64_append(matching_ids, cf->connectorid);
 		}
 	}
 }
