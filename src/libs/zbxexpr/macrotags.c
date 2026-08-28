@@ -109,7 +109,10 @@ int	zbx_macro_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **r
 	const zbx_uint64_t		hostid = va_arg(args, zbx_uint64_t);
 	const zbx_uint64_t		itemid = va_arg(args, zbx_uint64_t);
 
-	return macro_item_tag_resolv_impl(p, um_handle, hostid, itemid, replace_with, data, error, maxerrlen);
+	if (0 == p->indexed)
+		return macro_item_tag_resolv_impl(p, um_handle, hostid, itemid, replace_with, data, error, maxerrlen);
+	else
+		return SUCCEED;
 }
 
 /******************************************************************************
