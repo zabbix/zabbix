@@ -71,6 +71,12 @@ INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (5002
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (55001, 50020, 52005);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (55002, 50020, 52006);
 
+-- role and role_rule
+INSERT INTO role (roleid, name, type) VALUES (5, 'User role with API access', 1);
+INSERT INTO role (roleid, name, type) VALUES (6, 'Admin role with API access', 2);
+INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int) VALUES (36, 5, 0, 'api.access', 1);
+INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int) VALUES (37, 6, 0, 'api.access', 1);
+
 -- user group
 INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'API user group for update with user and rights');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (16, 'API user group delete');
@@ -81,8 +87,8 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (20, 'API user group in actions');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (21, 'API user group in scripts');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (22, 'API user group in configuration');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (23, 'API user group for update');
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '$2a$10$PmEcvov/w84R3sShOV4rX.xJd81bwgaK4o0SfoiSxop2ol7PPGsOi', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '$2a$10$w8oiYEgP3Fy4XuPIE5VCiO2j5snJEopKfTCYa3DC7bNL83ldKlPRS', 0, 0, 'en_US', '30s', 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '$2a$10$PmEcvov/w84R3sShOV4rX.xJd81bwgaK4o0SfoiSxop2ol7PPGsOi', 0, 0, 'en_US', '30s', 6, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '$2a$10$w8oiYEgP3Fy4XuPIE5VCiO2j5snJEopKfTCYa3DC7bNL83ldKlPRS', 0, 0, 'en_US', '30s', 5, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'user-in-two-groups', '$2a$10$GiBCQXAPeTCPR9rEQ/YodOmE7mqvXjYwbEkZLGP7iWU/fzKcB9yF6', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'api-user', '$2a$10$NyZQvuelvUVqpCDYb7cOy.pEewNe9U0MK0ZIdjJeupYbgHU6G7Iea', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 8, 4);
@@ -108,7 +114,7 @@ INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refres
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (14, 'api-user-map', '$2a$10$1uCgmg.SoVtN98NTt/815./E/mFIdJH2r3aF1RFY1QwmFVlnbCXTK', 0, '15m', 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (15, 'api-user-for-unblock', '$2a$10$/a5lFsoEm56b01q1uAoM8ecSmazNhrYbidYeBibtRzUxbIgmIAvR.', 0, '15m', 'en_US', '30s', 2, 'default', 5, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (16, 'api-user-for-password-super-admin', '$2y$10$uh530zmzcd.PIsFjGTOkTuMsfdBAYwco219gbuwoX8ZJXNoTRJKva', 0, '15m', 'en_US', '30s', 3, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (17, 'api-user-for-password-user', '$2y$10$qcklx4y/EpBt2nYNKOafq.69J7kwdyNhoh9WHdlA9zOhZmS2Im.9.', 0, '15m', 'en_US', '30s', 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (17, 'api-user-for-password-user', '$2y$10$qcklx4y/EpBt2nYNKOafq.69J7kwdyNhoh9WHdlA9zOhZmS2Im.9.', 0, '15m', 'en_US', '30s', 5, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (12, 14, 9);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (13, 14, 10);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (14, 14, 11);
