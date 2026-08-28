@@ -125,16 +125,19 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
 		[$db_user] = API::User()->get([
 			'userids' => [$user['userid']],
-			'selectRole' => ['roleid']
+			'selectRole' => array_key_exists('url', $user) ? ['roleid'] : null
 		]);
 
-		$roles = API::Role()->get([
-			'roleids' => $db_user['role']['roleid'],
-			'selectRules' => ['profile.redirect.enforce']
-		]);
+		if (array_key_exists('url', $user)) {
+			$roles = API::Role()->get([
+				'output' => [],
+				'roleids' => $db_user['role']['roleid'],
+				'selectRules' => ['profile.redirect.enforce']
+			]);
 
-		if ($roles[0]['rules']['profile.redirect.enforce'] == ZBX_ROLE_RULE_ENABLED) {
-			unset($user['url']);
+			if ($roles[0]['rules']['profile.redirect.enforce']) {
+				unset($user['url']);
+			}
 		}
 
 		$result = (bool) API::User()->update($user);
