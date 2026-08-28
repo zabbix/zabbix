@@ -21,7 +21,8 @@ class CApm extends CApiService {
 
 	public const ACCESS_RULES = [
 		'getTraces' =>	['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'getSpans' =>	['min_user_type' => USER_TYPE_ZABBIX_USER]
+		'getSpans' =>	['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'getLogs' =>	['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	private const CLICKHOUSE_TRACES_OUTPUT_FIELDS = [
@@ -419,6 +420,179 @@ class CApm extends CApiService {
 				}
 				else {
 					$row_fixed[self::CLICKHOUSE_SPANS_FIELDS[$field]] = $value;
+				}
+			}
+
+			$db_spans[] = $row_fixed;
+		}
+
+		return $db_spans;
+	}
+
+	private const CLICKHOUSE_LOGS_OUTPUT_FIELDS = [
+		'timestamp'				=> 'Timestamp',
+		'traceid'				=> 'TraceId',
+		'spanid'				=> 'SpanId',
+		'trace_flags'			=> 'TraceFlags',
+		'severity_text'			=> 'SeverityText',
+		'severity_number'		=> 'SeverityNumber',
+		'service_name'			=> 'ServiceName',
+		'body'					=> 'Body',
+		'resource_schema_url'	=> 'ResourceSchemaUrl',
+		'resource_attributes'	=> 'ResourceAttributes',
+		'scope_schema_url'		=> 'ScopeSchemaUrl',
+		'scope_name'			=> 'ScopeName',
+		'scope_version'			=> 'ScopeVersion',
+		'scope_attributes'		=> 'ScopeAttributes',
+		'log_attributes'		=> 'LogAttributes',
+		'event_name'			=> 'EventName'
+	];
+
+	private const CLICKHOUSE_LOGS_FIELDS = [
+		'Timestamp'				=> 'timestamp',
+		'TraceId'				=> 'traceid',
+		'SpanId'				=> 'spanid',
+		'TraceFlags'			=> 'trace_flags',
+		'SeverityText'			=> 'severity_text',
+		'SeverityNumber'		=> 'severity_number',
+		'ServiceName'			=> 'service_name',
+		'Body'					=> 'body',
+		'ResourceSchemaUrl'		=> 'resource_schema_url',
+		'ResourceAttributes'	=> 'resource_attributes',
+		'ScopeSchemaUrl'		=> 'scope_schema_url',
+		'ScopeName'				=> 'scope_name',
+		'ScopeVersion'			=> 'scope_version',
+		'ScopeAttributes'		=> 'scope_attributes',
+		'LogAttributes'			=> 'log_attributes',
+		'EventName'				=> 'event_name'
+	];
+
+	/**
+	 * @param array $options
+	 *
+	 * @throws APIException
+	 *
+	 * @return array|string
+	 */
+	public function getLogs(array $options = []): array|string {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter
+			'time_from' =>						['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
+			'time_till' =>						['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
+			'traceids' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'spanids' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'with_sampled_trace_flag' =>		['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
+			]],
+			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'scope_attributes' =>				['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
+			]],
+			'scope_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'log_attributes' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
+			]],
+			'log_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'trace_flags', 'severity_text','severity_number', 'service_name', 'resource_schema_url', 'scope_schema_url', 'scope_name', 'scope_version', 'event_name']],
+			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['severity_text', 'service_name', 'body', 'resource_schema_url', 'scope_schema_url', 'scope_name', 'scope_version', 'event_name']],
+			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>					['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>					['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>			['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>							['type' => API_OUTPUT, 'in' => implode(',', array_keys(self::CLICKHOUSE_LOGS_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>					['type' => API_FLAG, 'default' => false],
+			// sort and limit
+			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['timestamp', 'traceid', 'spanid', 'parent_spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'duration', 'status_code', 'status_message']), 'uniq' => true, 'default' => []],
+			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
+			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		return $this->getLogsFromClickHouse($options);
+	}
+
+	protected function getLogsFromClickHouse(array $options): array|string {
+		$db_schema = CApmData::getClickHouseDbSchema();
+
+		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_LOGS_OUTPUT_FIELDS);
+
+		$query_parts = CClickHouseHelper::getQueryPartsFromOptions('otel_logs', 'l', $db_schema, $options);
+
+		$query_parts['where'][] = 'l.Timestamp>=toDateTime64({time_from:Int32},9)';
+		$query_parts['param']['time_from'] = $options['time_from'];
+
+		$query_parts['where'][] = 'l.Timestamp<toDateTime64({time_till:Int32},9)';
+		$query_parts['param']['time_till'] = $options['time_till'];
+
+		if ($options['traceids'] !== null) {
+			$query_parts['where'][] = 'l.TraceId IN {traceids:Array(String)}';
+			$query_parts['param']['traceids'] = $options['traceids'];
+		}
+
+		if ($options['spanids'] !== null) {
+			$query_parts['where'][] = 'l.SpanId IN {spanids:Array(String)}';
+			$query_parts['param']['spanids'] = $options['spanids'];
+		}
+
+		if (array_key_exists('with_sampled_trace_flag', $options) && $options['with_sampled_trace_flag'] !== null) {
+			$query_parts['where'][] = 'bitAnd(l.TraceFlags, 1)='.($options['with_sampled_trace_flag'] ? '1' : '0');
+		}
+
+		if ($options['resource_attributes'] !== null) {
+			$query_parts = CClickHouseHelper::addAttributeFilter($query_parts, 'l.ResourceAttributes',
+				$options['resource_attributes'], $options['resource_attributes_evaltype']
+			);
+		}
+
+		if ($options['scope_attributes'] !== null) {
+			$query_parts = CClickHouseHelper::addAttributeFilter($query_parts, 'l.ScopeAttributes',
+				$options['scope_attributes'], $options['scope_attributes_evaltype']
+			);
+		}
+
+		if ($options['log_attributes'] !== null) {
+			$query_parts = CClickHouseHelper::addAttributeFilter($query_parts, 'l.LogAttributes',
+				$options['log_attributes'], $options['log_attributes_evaltype']
+			);
+		}
+
+		$query = CClickHouseHelper::buildQueryFromParts($query_parts);
+
+		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
+
+		$db_spans = [];
+
+		foreach ($db->fetch($query, $query_parts['param']) as $row) {
+			if ($options['countOutput']) {
+				return (string) $row['rowscount'];
+			}
+
+			$row_fixed = [];
+
+			foreach ($row as $field => $value) {
+				if (is_array(self::CLICKHOUSE_LOGS_FIELDS[$field])) {
+					if (!array_key_exists(self::CLICKHOUSE_LOGS_FIELDS[$field][0], $row_fixed)) {
+						$row_fixed[self::CLICKHOUSE_LOGS_FIELDS[$field][0]] = [];
+					}
+
+					foreach ($value as $index => $sub_value) {
+						$row_fixed[self::CLICKHOUSE_LOGS_FIELDS[$field][0]][$index]
+							[self::CLICKHOUSE_LOGS_FIELDS[$field][1]] = $sub_value;
+					}
+				}
+				else {
+					$row_fixed[self::CLICKHOUSE_LOGS_FIELDS[$field]] = $value;
 				}
 			}
 

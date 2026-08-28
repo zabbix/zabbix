@@ -41,6 +41,24 @@ class CApmData {
 				'Links.SpanId'			=> ['type' => 'Array'],
 				'Links.TraceState'		=> ['type' => 'Array'],
 				'Links.Attributes'		=> ['type' => 'Array']
+			],
+			'otel_logs' => [
+				'Timestamp'				=> ['type' => 'DateTime64(9)'],
+				'TraceId'				=> ['type' => 'String'],
+				'SpanId'				=> ['type' => 'String'],
+				'TraceFlags'			=> ['type' => 'UInt8'],
+				'SeverityText'			=> ['type' => 'String'],
+				'SeverityNumber'		=> ['type' => 'UInt8'],
+				'ServiceName'			=> ['type' => 'String'],
+				'Body'					=> ['type' => 'String'],
+				'ResourceSchemaUrl'		=> ['type' => 'String'],
+				'ResourceAttributes'	=> ['type' => 'Map'],
+				'ScopeSchemaUrl'		=> ['type' => 'String'],
+				'ScopeName'				=> ['type' => 'String'],
+				'ScopeVersion'			=> ['type' => 'String'],
+				'ScopeAttributes'		=> ['type' => 'Map'],
+				'LogAttributes'			=> ['type' => 'Map'],
+				'EventName'				=> ['type' => 'String']
 			]
 		];
 	}

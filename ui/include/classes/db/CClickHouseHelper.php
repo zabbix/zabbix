@@ -91,41 +91,20 @@ class CClickHouseHelper {
 			$values_prepared = [];
 
 			switch ($field_type) {
+				case 'Int8':
+				case 'Int16':
 				case 'Int32':
-					foreach ($values as $value) {
-						if (!is_int($value) && (!is_string($value) || !ctype_digit($value))) {
-							continue;
-						}
-
-						if ($value < ZBX_MIN_INT32 || $value > ZBX_MAX_INT32) {
-							continue;
-						}
-
-						$values_prepared[] = $value;
-					}
-					break;
-
 				case 'Int64':
-					foreach ($values as $value) {
-						if (!is_int($value) && (!is_string($value) || !ctype_digit($value))) {
-							continue;
-						}
-
-						if ($value < 0 || bccomp((string) $value, ZBX_MAX_INT64) > 0) {
-							continue;
-						}
-
-						$values_prepared[] = $value;
-					}
-					break;
-
+				case 'Int128':
+				case 'Int256':
+				case 'UInt8':
+				case 'UInt16':
+				case 'UInt32':
 				case 'UInt64':
+				case 'UInt128':
+				case 'UInt256':
 					foreach ($values as $value) {
-						if (!is_int($value) && (!is_string($value) || !ctype_digit($value))) {
-							continue;
-						}
-
-						if ($value < 0 || bccomp((string) $value, ZBX_MAX_UINT64) > 0) {
+						if (!is_int($value) && (!is_string($value) || !preg_match('/^'.ZBX_PREG_INT.'$/', $value))) {
 							continue;
 						}
 
