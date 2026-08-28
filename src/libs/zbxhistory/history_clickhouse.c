@@ -1568,8 +1568,14 @@ static void	history_clickhouse_add_value_type_info(zbx_history_provider_info_t *
 		}
 		zbx_free(ttl);
 	}
-	else
+	else if (NULL != strstr(schema, "TTL "))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse TTL information from ClickHouse schema: %s", schema);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "no TTL defined in ClickHouse schema %s", schema);
+	}
 
 	zbx_vector_history_provider_value_type_info_append(&info->value_types, vti);
 }
