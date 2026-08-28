@@ -376,6 +376,9 @@ class CAudit {
 		self::RESOURCE_MFA => ['paths' => ['mfa.client_secret']],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
 		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
+		self::RESOURCE_SETTINGS => [
+			'paths' => ['settings.apm_global_db.password', 'settings.apm_global_db.ssl_key_password']
+		],
 		self::RESOURCE_TEMPLATE => [
 			'paths' => ['template.macros.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]

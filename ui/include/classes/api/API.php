@@ -111,6 +111,13 @@ class API {
 	}
 
 	/**
+	 * @return CApm
+	 */
+	public static function Apm() {
+		return self::getApi('apm');
+	}
+
+	/**
 	 * @return CAuditLog
 	 */
 	public static function AuditLog() {

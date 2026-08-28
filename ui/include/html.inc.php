@@ -1011,6 +1011,27 @@ function getAdministrationGeneralSubmenu(): array {
 	];
 }
 
+function getAdministrationDataSourceSubmenu(): array {
+	$data_source_items = [];
+
+	$menu_items = APP::Component()->get('menu.main')
+		->find(_('Administration'))
+		->getSubMenu()
+		->find(_('Data source'))
+		->getSubMenu()
+		->getMenuItems();
+
+	foreach ($menu_items as $menu_item) {
+		$data_source_items[$menu_item->getUrl()->getUrl()] = $menu_item->getLabel();
+	}
+
+	return [
+		'main_section' => [
+			'items' => array_filter($data_source_items)
+		]
+	];
+}
+
 /**
  * Get drop-down submenu item list for the Administration->Queue section.
  *
