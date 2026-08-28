@@ -11132,6 +11132,37 @@ HEREDOC;
 	}
 
 	/**
+	 * The simple window flavour of the stepped operation scenario with the operations of every step performed as
+	 * the window closes: the same steps, the same rule updates between them and the same outcome expected of
+	 * every one of them, only reached through the execution point an event never arrives at on its own.
+	 *
+	 * Nothing but a "close window" operation closes a window of this type, so the rule of every step asks for the
+	 * closing as the event is added to the window and the "down" value of the step ends the very window it has
+	 * just entered - the shortest path there is from an event to that execution point. The operations of the step
+	 * are then performed for an event the window was holding rather than for one that has just occurred, which is
+	 * a context the server has to build itself, and the tags, the severity and the suppression they leave behind
+	 * must still be the ones every other flavour of the scenario ends up with.
+	 *
+	 * The one thing this flavour cannot repeat is "set name", the single operation of the scenario the server
+	 * does not allow at that point: the step naming the event runs with no operation at all here and its event
+	 * keeps the name of its trigger, see stripSetNameFromOperationStep(). Everything else is unchanged, the
+	 * closing included - the window of a step is gone by the time the step after it opens its own, which is the
+	 * one thing that does differ from the flavours performing their operations while a window is still filling.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleOperationStepsClosed$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleOperationStepsClosed() {
+		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple closed');
+
+		try {
+			$this->runEventAssessmentTestCepWindowOperationSteps($rule, CCepRuleHelper::WHEN_WINDOW_CLOSED);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * The stepped operation scenario of testTriggerCEP_CepWindowSimpleOperationSteps as a stress test: the
 	 * rapid burst of testTriggerCEP_MultEventWindowBurstSingleItem is sent at the one item that flavour is
 	 * driven on, and the whole sequence of rule updates the scenario is made of is then run through on top of
@@ -14421,6 +14452,38 @@ return;
 	}
 
 	/**
+	 * $step of the stepped operation scenario as the window closed flavour has to run it: without its "set name"
+	 * operation and, if it had one, with the event name it expects put back to the one its trigger gave the event.
+	 *
+	 * "set name" is the one operation of the scenario the server does not allow at the window closed execution
+	 * point (CEP_OP_SET_NAME_MASK; every other operation these steps perform is allowed at every point), so the
+	 * step
+	 * naming the event is left with no operation at all there and the event keeps its trigger name - exactly what
+	 * prepareDataCepWindowOperations() leaves out of the all-at-once flavour of that point. What the step still
+	 * asserts is the half only a stepped flavour can: the operations of the step before it are gone from the rule,
+	 * so nothing of theirs may be on this event - and a step whose operations are empty is the strongest form of
+	 * that, an update having to leave the rule performing nothing whatsoever for the event it matches.
+	 *
+	 * A step carrying no such operation is handed back untouched, which is all but the "set name" one and the
+	 * sweep step repeating it.
+	 */
+	private function stripSetNameFromOperationStep(array $step): array {
+		$operations = array_values(array_filter($step['operations'],
+			fn($operation) => $operation[0] != CCepRuleHelper::OP_SET_NAME
+		));
+
+		if (count($operations) == count($step['operations'])) {
+			return $step;
+		}
+
+		// The union keeps the name of the trigger event and the severity and suppression the step itself
+		// expects: the operations that were left in the step are the ones deciding those.
+		return ['operations' => $operations,
+			'event' => ['name' => $this->getWindowOperationStepTriggerEvent()['name']] + $step['event']
+		] + $step;
+	}
+
+	/**
 	 * Drive the stepped operation scenario on the same single discovered item the windowless flavour is driven on,
 	 * running the very operations that flavour performs from one rule - but a step at a time and, from the second
 	 * step on, out of a rule that was updated rather than created: the rule of $rule_template
@@ -14451,15 +14514,25 @@ return;
 	 * events of the steps before it are left behind the baseline (captureEventBaseline()).
 	 *
 	 * $execute_when is the execution point the operations of every step are performed at, and what a step expects
-	 * is the same at either of them - none of these operations acts on a window, so where in the life of the event
-	 * they are reached may not change what they do to it:
+	 * is the same at every one of them - none of these operations acts on a window, so where in the life of the
+	 * event they are reached may not change what they do to it:
 	 *   - WHEN_EVENT_OCCURRED, the point every rule has, windowless ones included: the operations are performed
 	 *     while the rules are matched, before any window sees the event;
 	 *   - WHEN_EVENT_ADDED, which only a windowed rule has: the operations are performed once the event was taken
 	 *     into the window of its 'service' id, so what a step additionally holds the server to is that an update
 	 *     replaced the operations behind that point as well - and that the window a step is handed, which is the
 	 *     one the step before it left behind until its duration runs out, is no reason for the operations of the
-	 *     previous step to be performed for this event.
+	 *     previous step to be performed for this event;
+	 *   - WHEN_WINDOW_CLOSED, which only a windowed rule has as well and which nothing reaches on its own - the
+	 *     duration of a simple, a tag correlation or a pattern match window running out evicts what it holds
+	 *     rather than closing it. So the rule of every step is given an unconditional "close window" as the event
+	 *     is added and the "down" value of a step closes the window it has just entered: the operations of the
+	 *     step are performed for it right there, as that window closes, and the event they act on is the one the
+	 *     window was holding rather than the one that arrived - which is what the server has to build their
+	 *     context from. A step of this point also leaves the window of the step before it nowhere to be seen,
+	 *     every step having closed its own, so what is replaced by an update here is the operations behind the
+	 *     point and the "close window" that reaches it. The one thing such a step gives up is the "set name"
+	 *     operation, which the server does not allow at that point, see stripSetNameFromOperationStep().
 	 */
 	private function runEventAssessmentTestCepWindowOperationSteps(array $rule_template,
 			int $execute_when = CCepRuleHelper::WHEN_EVENT_OCCURRED): void {
@@ -14482,6 +14555,13 @@ return;
 		$service = self::CEP_RULE_WINDOW_NONE_SERVICE;
 
 		foreach ($this->getWindowOperationSteps() as $index => $step) {
+			// At the window closed execution point the step is run without its "set name" operation, that
+			// being the one operation of the scenario the server does not allow there; at every other point
+			// the step is run as it stands.
+			if ($execute_when == CCepRuleHelper::WHEN_WINDOW_CLOSED) {
+				$step = $this->stripSetNameFromOperationStep($step);
+			}
+
 			$label = 'step #'.$index.' ('.$step['label'].')';
 
 			// The operations of a step, each of them carrying the operation filter the step was handed by
@@ -14498,6 +14578,27 @@ return;
 					$operation['filter'] = $step['operation_filter'];
 				}
 				unset($operation);
+			}
+
+			if ($execute_when == CCepRuleHelper::WHEN_WINDOW_CLOSED) {
+				// What brings the operations of the step within reach: nothing but a "close window" operation
+				// ever closes a window of these types - the duration running out evicts what they hold - so
+				// every step asks for the closing itself, unconditionally and as the event is added to the
+				// window. The "down" value of the step therefore closes the window it has just entered and the
+				// operations above are performed for it as that window closes.
+				//
+				// It is appended after the loop above on purpose: it must not carry the operation filter of
+				// the step. That filter is what a step reads its operations through, and this operation is
+				// what puts them within reach at all - a false filter on it would keep the window open and
+				// leave every operation of the step unperformed, which is not a filter being read but an
+				// execution point never arrived at. Its sortorder only has to be unique within the rule:
+				// upsertCepRule() renumbers the operations into the order the API insists on, which is the
+				// order of their execution points, see groupOperationsByExecuteWhen().
+				$operations[] = [
+					'sortorder' => count($operations),
+					'execute_when' => CCepRuleHelper::WHEN_EVENT_ADDED,
+					'type' => CCepRuleHelper::OP_CLOSE_WINDOW
+				];
 			}
 
 			// The one rule of the scenario, brought to the operations and the filter of this step and to no
