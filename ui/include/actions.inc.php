@@ -2318,7 +2318,7 @@ function makeActionTableIcon(array $action, array $maintenances, array $ceprules
 		case ZBX_EVENT_HISTORY_CEP_UPDATE:
 				$ceprule_name = array_key_exists($action['cep_ruleid'], $ceprules)
 					? $ceprules[$action['cep_ruleid']]['name']
-					: '*UNKNOWN*';
+					: _('Inaccessible complex event processing rule');
 				$title = _s('Complex event processing: %1$s', $ceprule_name);
 
 				return (new CCol((new CIcon(ZBX_ICON_CEP))->addClass(ZBX_STYLE_COLOR_ICON)->setTitle($title)))
