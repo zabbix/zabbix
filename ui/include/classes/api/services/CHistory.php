@@ -239,7 +239,7 @@ class CHistory extends CApiService {
 	private static function getTimeRangeSegments(array $options): array {
 		$now = time();
 		$min_time_from = $options['time_from'] !== null ? $options['time_from'] : 0;
-		$max_time_till = $options['time_till'] !== null ? $options['time_till'] : time();
+		$max_time_till = $options['time_till'] !== null ? $options['time_till'] : $now;
 
 		if ($min_time_from > $max_time_till) {
 			return [];
