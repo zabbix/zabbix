@@ -212,7 +212,7 @@ class CItemHelper extends CItemGeneralHelper {
 	 * @return array
 	 */
 	public static function getSourceItems(array $src_options): array {
-		return API::Item()->get([
+		$src_items = API::Item()->get([
 			'output' => ['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status',
 
@@ -251,6 +251,8 @@ class CItemHelper extends CItemGeneralHelper {
 			'selectHosts' => ['status'],
 			'preservekeys' => true
 		] + $src_options);
+
+		return self::prepareSourceItemsForCopy($src_items);
 	}
 
 	/**
