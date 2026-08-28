@@ -112,4 +112,26 @@ out:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: authenticates a DPoP token for offboarding its bound device       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_get_user_from_json_dpop_for_device(const struct zbx_json_parse *jp, const char *device_uuid,
+		zbx_user_t *user)
+{
+	char	auth_token[ZBX_SID_AUTH_TOKEN_LENGTH + 1],
+		hash_res_stringhexes[ZBX_SID_AUTH_TOKEN_LENGTH * 2 + 1];
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, auth_token, sizeof(auth_token), NULL) ||
+			ZBX_SID_AUTH_TOKEN_LENGTH != strlen(auth_token))
+	{
+		return FAIL;
+	}
+
+	format_auth_token_hash(auth_token, hash_res_stringhexes);
+
+	return zbx_db_get_user_by_dpop_token_for_device(hash_res_stringhexes, device_uuid, user);
+}
 #undef	ZBX_SID_AUTH_TOKEN_LENGTH

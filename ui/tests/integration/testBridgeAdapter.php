@@ -423,6 +423,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		}
 
 		if (self::$auth_scheme_test_tokenids) {
+			DB::delete('token_device', ['tokenid' => self::$auth_scheme_test_tokenids]);
 			DB::delete('token', ['tokenid' => self::$auth_scheme_test_tokenids]);
 			self::$auth_scheme_test_tokenids = [];
 		}
@@ -491,7 +492,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		return [$client, CAPIHelper::getSessionId()];
 	}
 
-	private function createAuthSchemeToken(int $auth_scheme): string {
+	private function createAuthSchemeToken(int $auth_scheme, ?string $deviceid = null): string {
 		if ($auth_scheme === ZBX_AUTH_SCHEME_BEARER) {
 			$response = $this->call('token.create', [
 				'name' => 'bridge-adapter-auth-scheme-bearer-'.uniqid(),
@@ -519,6 +520,13 @@ class testBridgeAdapter extends CIntegrationTest {
 			'token' => CApiTokenHelper::hashToken($token),
 			'auth_scheme' => $auth_scheme
 		]], false);
+
+		if ($deviceid !== null) {
+			DB::insertBatch('token_device', [[
+				'tokenid' => $tokenid,
+				'deviceid' => $deviceid
+			]], false);
+		}
 
 		self::$auth_scheme_test_tokenids[] = $tokenid;
 
@@ -1898,6 +1906,43 @@ class testBridgeAdapter extends CIntegrationTest {
 
 		$this->assertFalse($init_response,
 			'A DPoP-scheme token must not authenticate a trapper device.init request.'
+		);
+	}
+
+	/**
+	 * @onBeforeOnce startBridgeAdapterMock
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_offboardWithBoundDpopTokenAccepted(): void {
+		[$client] = $this->getServerClientAndSid();
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_DPOP, self::$deviceids[1]);
+
+		$offboard_response = $client->offboardDevice([
+			'uuid' => self::OFFBOARD_DEVICE_UUID
+		], $token);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_offboard()', true,
+				120, 1);
+
+		$this->assertNotFalse($offboard_response, $client->getError() ?? '');
+		$this->assertAdapterRequest('device.deactivate', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::OFFBOARD_DEVICE_UUID;
+		});
+	}
+
+	public function testBridgeAdapter_offboardWithDpopTokenBoundToAnotherDeviceRejected(): void {
+		[$client] = $this->getServerClientAndSid();
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_DPOP, self::$deviceids[0]);
+
+		$offboard_response = $client->offboardDevice([
+			'uuid' => self::OFFBOARD_DEVICE_UUID
+		], $token);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_OFFBOARD_INVALID_SESSION, true,
+				120, 1);
+
+		$this->assertFalse($offboard_response,
+			'A DPoP token must not offboard a device to which it is not bound.'
 		);
 	}
 

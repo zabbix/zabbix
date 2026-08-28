@@ -558,6 +558,8 @@ ZBX_PTR_VECTOR_DECL(events_ptr, zbx_event_t *)
 
 int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user);
 int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
+int	zbx_db_get_user_by_dpop_token_for_device(const char *formatted_auth_token_hash, const char *device_uuid,
+		zbx_user_t *user);
 void	zbx_user_init(zbx_user_t *user);
 void	zbx_user_free(zbx_user_t *user);
 

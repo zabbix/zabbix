@@ -62,6 +62,8 @@ zbx_thread_trapper_args;
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args);
 
 int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, char **result);
+int	zbx_get_user_from_json_dpop_for_device(const struct zbx_json_parse *jp, const char *device_uuid,
+		zbx_user_t *user);
 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
