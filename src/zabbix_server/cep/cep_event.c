@@ -435,6 +435,8 @@ void	cep_event_add_suppress(zbx_cep_event_t *event, const zbx_db_event_suppress_
 		{
 			zbx_vector_db_event_suppress_append(&event->suppress, suppress[i]);
 		}
+		else
+			event->suppress.values[index].until = suppress[i].until;
 	}
 
 	if (event->suppress.values_num == event_suppress_num)
