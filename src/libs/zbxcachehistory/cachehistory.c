@@ -1276,65 +1276,6 @@ static void	export_add_item_info(zbx_hashset_t *items_info, zbx_vector_uint64_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: resolve built-in macros in item tags                              *
- *                                                                            *
- * Parameters: p          - [IN] macro resolution data                        *
- *             args       - [IN] variable arguments containing item ID        *
- *             replace_to - [OUT] resolved macro value                        *
- *             data       - [IN/OUT] input data string, unused                *
- *             error      - [OUT] error buffer, unused                        *
- *             maxerrlen  - [IN] error buffer size, unused                    *
- *                                                                            *
- * Return value: SUCCEED - macro was resolved or is not handled by this       *
- *                         resolver                                           *
- *               FAIL    - supported macro could not be resolved              *
- *                                                                            *
- * Comments: Resolves supported HOST.* and INVENTORY.* macros using the item  *
- *           ID passed in args. Macros not handled by this resolver are left  *
- *           unchanged.                                                       *
- *                                                                            *
- ******************************************************************************/
-static int	item_builtin_macro_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
-		char *error, size_t maxerrlen)
-{
-	zbx_uint64_t	itemid = va_arg(args, zbx_uint64_t);
-
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(error);
-	ZBX_UNUSED(maxerrlen);
-
-	if (0 == p->indexed && ZBX_TOKEN_MACRO == p->token.type)
-	{
-		if (0 == strcmp(p->macro, MVAR_HOST_ID))
-			return zbx_dc_get_host_value(itemid, replace_to, ZBX_DC_REQUEST_HOST_ID);
-
-		if (0 == strcmp(p->macro, MVAR_HOST_HOST))
-			return zbx_dc_get_host_value(itemid, replace_to, ZBX_DC_REQUEST_HOST_HOST);
-
-		if (0 == strcmp(p->macro, MVAR_HOST_NAME))
-			return zbx_dc_get_host_value(itemid, replace_to, ZBX_DC_REQUEST_HOST_NAME);
-
-		if (0 == strcmp(p->macro, MVAR_HOST_IP))
-			return zbx_dc_get_interface_value(0, itemid, replace_to, ZBX_DC_REQUEST_HOST_IP);
-
-		if (0 == strcmp(p->macro, MVAR_HOST_DNS))
-			return zbx_dc_get_interface_value(0, itemid, replace_to, ZBX_DC_REQUEST_HOST_DNS);
-
-		if (0 == strcmp(p->macro, MVAR_HOST_CONN))
-			return zbx_dc_get_interface_value(0, itemid, replace_to, ZBX_DC_REQUEST_HOST_CONN);
-
-		if (0 == strcmp(p->macro, MVAR_HOST_PORT))
-			return zbx_dc_get_interface_value(0, itemid, replace_to, ZBX_DC_REQUEST_HOST_PORT);
-
-		if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
-			return zbx_dc_get_host_inventory_by_itemid(p->macro, itemid, replace_to);
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: resolve item tags by expanding built-in, user and function macros *
  *                                                                            *
  * Parameters: item_tags - [IN/OUT] item tags to resolve                      *
@@ -1352,10 +1293,10 @@ static void	resolve_item_tags(zbx_vector_tags_ptr_t *item_tags, zbx_dc_um_handle
 	{
 		zbx_tag_t	*item_tag = item_tags->values[i];
 
-		(void)zbx_substitute_macros(&item_tag->tag, NULL, 0, item_builtin_macro_resolv, item->itemid);
-		(void)zbx_substitute_macros(&item_tag->value, NULL, 0, item_builtin_macro_resolv, item->itemid);
-		(void)zbx_dc_expand_user_and_func_macros(um_handle, &item_tag->tag, &item->host.hostid, 1, NULL);
-		(void)zbx_dc_expand_user_and_func_macros(um_handle, &item_tag->value, &item->host.hostid, 1, NULL);
+		zbx_substitute_macros(&item_tag->tag, NULL, 0, &zbx_macro_item_tag_resolv, um_handle,
+				item->host.hostid, item->itemid);
+		zbx_substitute_macros(&item_tag->value, NULL, 0, &zbx_macro_item_tag_resolv, um_handle,
+				item->host.hostid, item->itemid);
 	}
 
 	zbx_vector_tags_ptr_sort(item_tags, zbx_compare_tags);

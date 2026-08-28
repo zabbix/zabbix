@@ -12,4 +12,5 @@ libzbxexpr_a_SOURCES = \
 	token.c \
 	substitute.c \
 	urlencode.c \
-	macrofunc.c
+	macrofunc.c \
+	macrotags.c
