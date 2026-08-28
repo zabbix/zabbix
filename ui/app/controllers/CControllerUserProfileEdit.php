@@ -60,6 +60,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'roleids' => $this->user['roleid']
 		]);
 
+		$enforce_redirect = (bool) $roles[0]['rules']['profile.redirect.enforce'];
+
 		$data = [
 			'change_password' => 0,
 			'allow_empty_password' => !CControllerUserUpdateGeneral::hasInternalAuth($usrgrps),
@@ -73,9 +75,9 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'autologout' => $this->user['autologout'],
 			'refresh' => $this->user['refresh'],
 			'rows_per_page' => $this->user['rows_per_page'],
-			'url' => $this->user['url'],
-			'profile_redirect_enforce' => $roles[0]['rules']['profile.redirect.enforce'] ?? 0,
-			'profile_redirect_url' => $roles[0]['rules']['profile.redirect.url'] ?? '',
+			'url' => $enforce_redirect ? '' : $this->user['url'],
+			'profile_redirect_enforce' => $enforce_redirect,
+			'profile_redirect_url' => $roles[0]['rules']['profile.redirect.url'],
 			'userid' => CWebUser::$data['userid'],
 			'username' => $this->user['username'],
 			'name' => $this->user['name'],

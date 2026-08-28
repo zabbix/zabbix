@@ -292,12 +292,14 @@ if ($data['db_user']['username'] !== ZBX_GUEST_USER) {
 	]);
 }
 
-$is_readonly_url = array_key_exists('profile_redirect_enforce', $data) && $data['profile_redirect_enforce'];
+$is_disabled = array_key_exists('profile_redirect_enforce', $data) && $data['profile_redirect_enforce'];
 
-$default_url_label = !array_key_exists('profile_redirect_url', $data) || $data['profile_redirect_url'] === ''
-	? []
-	: (new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
-		->addClass(ZBX_STYLE_FORM_FIELDS_HINT);
+$default_url_label = array_key_exists('profile_redirect_url', $data) && $data['profile_redirect_url'] !== ''
+	? (new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
+		->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+	: null;
 
 $user_form_list
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
@@ -315,9 +317,8 @@ $user_form_list
 			(new CTextAreaFlexible('url', $data['url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('users', 'url'))
-				->setReadonly($is_readonly_url)
-				->setSingleline($is_readonly_url)
-				->addClass(ZBX_STYLE_FORM_READONLY_TRANSPARENT),
+				->setEnabled(!$is_disabled)
+				->setSingleline($is_disabled),
 			$default_url_label
 		]
 	);

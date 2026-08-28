@@ -5430,13 +5430,10 @@ section {
         padding-bottom: 0; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
       display: flex; }
-    .table-forms .table-forms-td-right .form-readonly-transparent[readonly] textarea {
-      color: transparent;
-      -webkit-text-fill-color: transparent; }
     .table-forms .table-forms-td-right .form-fields-hint {
       font-size: 11px;
       line-height: 16px;
-      white-space: initial;
+      white-space: nowrap;
       color: #5e7988; }
   .table-forms .table-subforms {
     margin-top: -5px;
@@ -5944,22 +5941,6 @@ z-textarea-flexible {
     border-radius: var(--input-border-radius); }
     z-textarea-flexible textarea[readonly]:focus {
       border-color: #02659f; }
-  z-textarea-flexible[singleline] {
-    padding-inline: 8px;
-    overflow: hidden;
-    border: 1px solid #acbbc2;
-    border-radius: var(--input-border-radius); }
-    z-textarea-flexible[singleline] textarea {
-      padding-inline: 0;
-      white-space: nowrap;
-      overflow-x: auto;
-      line-height: 16px;
-      border: 0;
-      scrollbar-width: none; }
-    z-textarea-flexible[singleline][readonly] {
-      background-color: #ebebeb; }
-    z-textarea-flexible[singleline]::-webkit-scrollbar {
-      display: none; }
 
 .widget-field-sparkline {
   display: grid;

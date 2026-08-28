@@ -216,8 +216,12 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 				]);
 				$data['service_read_tag'] = $role['rules']['services.read.tag'];
 
-				$data['profile_redirect_enforce'] = $role['rules']['profile.redirect.enforce'];
+				$data['profile_redirect_enforce'] = (bool) $role['rules']['profile.redirect.enforce'];
 				$data['profile_redirect_url'] = $role['rules']['profile.redirect.url'];
+
+				if ($data['profile_redirect_enforce']) {
+					$data['url'] = '';
+				}
 
 				if ($role['rules']['services.write.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL) {
 					$data['service_write_access'] = CRoleHelper::SERVICES_ACCESS_ALL;

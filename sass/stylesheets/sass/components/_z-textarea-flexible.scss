@@ -27,28 +27,4 @@ z-textarea-flexible {
 			}
 		}
 	}
-
-	&[singleline] {
-		padding-inline: 8px;
-		overflow: hidden;
-		border: 1px solid $form-border-color;
-		border-radius: var(--input-border-radius);
-
-		textarea {
-			padding-inline: 0;
-			white-space: nowrap;
-			overflow-x: auto;
-			line-height: 16px;
-			border: 0;
-			scrollbar-width: none;
-		}
-
-		&[readonly] {
-			background-color: #ebebeb;
-		}
-
-		&::-webkit-scrollbar {
-			display: none;
-		}
-	}
 }

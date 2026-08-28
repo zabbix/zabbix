@@ -2092,7 +2092,6 @@ define('ZBX_STYLE_FORM_DESCRIPTION', 'form-description');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
 define('ZBX_STYLE_FORM_FIELDS_HINT', 'form-fields-hint');
 define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
-define('ZBX_STYLE_FORM_READONLY_TRANSPARENT', 'form-readonly-transparent');
 define('ZBX_STYLE_FORM_SUBFIELD', 'form-subfield');
 define('ZBX_STYLE_FORM_SUBMIT_HIDDEN', 'form-submit-hidden');
 define('ZBX_STYLE_FORMATED_GROUP', 'formated-group');

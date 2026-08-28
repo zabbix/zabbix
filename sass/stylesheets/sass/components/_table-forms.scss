@@ -148,20 +148,11 @@
 			display: flex;
 		}
 
-		.form-readonly-transparent {
-			&[readonly] {
-				textarea {
-					color: transparent;
-					-webkit-text-fill-color: transparent;
-				}
-			}
-		}
-
 		.form-fields-hint {
 			font-size: 11px;
 			line-height: 16px;
-			white-space: initial;
-			color: #5e7988;
+			white-space: nowrap;
+			color: $form-field-hint-color;
 		}
 	}
 
