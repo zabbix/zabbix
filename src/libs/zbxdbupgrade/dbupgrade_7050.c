@@ -1288,26 +1288,26 @@ static int	DBpatch_7050094(void)
 
 static int	DBpatch_7050095(void)
 {
+	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_1", "usrgrpid,proxyid", 1);
+}
+
+static int	DBpatch_7050096(void)
+{
+	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_2", "proxyid", 0);
+}
+
+static int	DBpatch_7050097(void)
+{
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy", 1, &field);
 }
 
-static int	DBpatch_7050096(void)
+static int	DBpatch_7050098(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy", 2, &field);
-}
-
-static int	DBpatch_7050097(void)
-{
-	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_1", "usrgrpid,proxyid", 1);
-}
-
-static int	DBpatch_7050098(void)
-{
-	return DBcreate_index("usrgrp_proxy", "usrgrp_proxy_2", "proxyid", 0);
 }
 
 static int	DBpatch_7050099(void)
@@ -1328,27 +1328,27 @@ static int	DBpatch_7050099(void)
 
 static int	DBpatch_7050100(void)
 {
+	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_1", "usrgrpid,proxy_groupid", 1);
+}
+
+static int	DBpatch_7050101(void)
+{
+	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_2", "proxy_groupid", 0);
+}
+
+static int	DBpatch_7050102(void)
+{
 	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy_group", 1, &field);
 }
 
-static int	DBpatch_7050101(void)
+static int	DBpatch_7050103(void)
 {
 	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("usrgrp_proxy_group", 2, &field);
-}
-
-static int	DBpatch_7050102(void)
-{
-	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_1", "usrgrpid,proxy_groupid", 1);
-}
-
-static int	DBpatch_7050103(void)
-{
-	return DBcreate_index("usrgrp_proxy_group", "usrgrp_proxy_group_2", "proxy_groupid", 0);
 }
 
 static int	DBpatch_7050104(void)

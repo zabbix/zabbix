@@ -702,30 +702,32 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 		if (PERM_READ_WRITE == zbx_get_host_permission(&user, hostid) &&
 				SUCCEED == zbx_dc_get_host_by_hostid(&host, hostid))
 		{
-			switch (host.monitored_by)
+			if (0 == proxyid)
 			{
-				case HOST_MONITORED_BY_SERVER:
-					if (0 == proxyid)
-						monitoring_allowed = SUCCEED;
-					break;
-				case HOST_MONITORED_BY_PROXY_GROUP:
+				if (HOST_MONITORED_BY_SERVER == host.monitored_by)
+					monitoring_allowed = SUCCEED;
+			}
+			else
+			{
+				if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by)
+				{
 					if (FAIL == zbx_dc_get_host_proxyid_by_name(host.host, &host.proxyid))
 						host.proxyid = 0;
-					ZBX_FALLTHROUGH;
-				case HOST_MONITORED_BY_PROXY:
-					if (host.proxyid == proxyid)
-						monitoring_allowed = SUCCEED;
-					break;
+				}
+
+				if (HOST_MONITORED_BY_SERVER != host.monitored_by && host.proxyid == proxyid)
+					monitoring_allowed = SUCCEED;
 			}
 		}
 	}
 
-	if (SUCCEED != monitoring_allowed)
+	if (FAIL == monitoring_allowed)
 	{
 		if (0 == proxyid)
 			*error = zbx_strdup(NULL, "Server monitoring permission denied.");
 		else
 			*error = zbx_strdup(NULL, "Proxy monitoring permission denied.");
+
 		goto out;
 	}
 
