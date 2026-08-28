@@ -9,7 +9,7 @@
 	text-align: center;
 	cursor: pointer;
 	border: 1px solid;
-	border-radius: 2px;
+	border-radius: var(--button-border-radius);
 
 	@if $ui-transitions {
 		transition: color $ui-controls-transition-duration ease-out,
@@ -69,16 +69,24 @@
 	border-color: $btn-border-color;
 
 	&:hover {
-		color: $btn-color;
-		background-color: $btn-hover-bg-color;
-		border-color: $btn-hover-border-color;
+		&,
+		&:link,
+		&:visited {
+			color: $btn-color;
+			background-color: $btn-hover-bg-color;
+			border-color: $btn-hover-border-color;
+		}
 	}
 
 	&:active,
 	&:focus {
-		color: $btn-color;
-		background-color: $btn-focus-bg-color;
-		border-color: $btn-focus-border-color;
+		&,
+		&:link,
+		&:visited {
+			color: $btn-color;
+			background-color: $btn-focus-bg-color;
+			border-color: $btn-focus-border-color;
+		}
 	}
 }
 
@@ -196,6 +204,11 @@ button {
 	@extend %button;
 	@extend %button-alt-colors;
 	@extend %button-disabled;
+
+	&:link,
+	&:visited {
+		color: $btn-alt-color;
+	}
 }
 
 .btn-grey {
@@ -207,6 +220,8 @@ button {
 .btn-icon {
 	@extend %button;
 	@extend %button-icon-colors;
+
+	border-radius: #{"max(0px, calc(var(--button-border-radius) - 2px))"};
 
 	display: inline-block;
 	line-height: 24px;

@@ -1,0 +1,67 @@
+.tags-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px 3px;
+
+	.tag {
+		margin-top: 1px;
+		margin-bottom: 1px;
+	}
+
+	&.form-field {
+		.tag {
+			margin-top: 4px;
+			margin-bottom: 4px;
+		}
+	}
+}
+
+.tag {
+	display: inline-block;
+	color: $font-selected-color;
+	background-color: $ui-bg-selected-color;
+	padding: 2px 3px;
+	line-height: 1em;
+	vertical-align: middle;
+	@extend %overflow-ellipsis;
+	border-radius: var(--badge-border-radius);
+	box-sizing: border-box;
+
+	a.link-action {
+		color: inherit !important;
+		border-bottom: none;
+
+		&:hover {
+			text-decoration: underline;
+			border-bottom: none;
+		}
+	}
+
+	&:last-of-type {
+		margin-right: 0;
+	}
+
+	&.tag-inherited::before,
+	&.tag-inherited-duplicate::before {
+		@extend %icons-font;
+
+		margin-right: 3px;
+		font-size: $icon-smaller-size;
+		line-height: 12px;
+		vertical-align: top;
+		opacity: .6;
+	}
+
+	&.tag-inherited::before {
+		content: $zi-file;
+	}
+
+	&.tag-inherited-duplicate::before {
+		content: $zi-file-filled;
+	}
+}
+
+.tag-inherited-title {
+	margin-bottom: 3px;
+	color: $font-alt-color;
+}

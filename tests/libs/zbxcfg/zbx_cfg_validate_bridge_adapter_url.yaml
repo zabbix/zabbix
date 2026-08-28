@@ -1,0 +1,251 @@
+---
+test case: "basic HTTP with hostname"
+in:
+  url: "http://example.com/rpc"
+out:
+  return: SUCCEED
+---
+test case: "basic HTTPS with hostname"
+in:
+  url: "https://example.com/rpc"
+out:
+  return: SUCCEED
+---
+test case: "HTTP with IPv4"
+in:
+  url: "http://192.168.1.1/rpc"
+out:
+  return: SUCCEED
+---
+test case: "HTTPS with IPv4"
+in:
+  url: "https://10.0.0.1/rpc"
+out:
+  return: SUCCEED
+---
+test case: "HTTP with custom port"
+in:
+  url: "http://example.com:8080/rpc"
+out:
+  return: SUCCEED
+---
+test case: "HTTPS with custom port"
+in:
+  url: "https://proxy.domain.local:8443/rpc"
+out:
+  return: SUCCEED
+---
+test case: "HTTP with non-rpc path"
+in:
+  url: "http://example.com/some/path"
+out:
+  return: FAIL
+---
+test case: "HTTPS with port and query string"
+in:
+  url: "https://example.com:9090/api?param=value"
+out:
+  return: FAIL
+---
+test case: "uppercase HTTP scheme"
+in:
+  url: "HTTP://example.com/rpc"
+out:
+  return: SUCCEED
+---
+test case: "uppercase HTTPS scheme"
+in:
+  url: "HTTPS://example.com/rpc"
+out:
+  return: SUCCEED
+---
+test case: "mixed-case scheme"
+in:
+  url: "hTtPs://example.com/rpc"
+out:
+  return: SUCCEED
+---
+test case: "hyphenated hostname"
+in:
+  url: "http://my-proxy.domain.local/rpc"
+out:
+  return: SUCCEED
+---
+test case: "maximum valid port"
+in:
+  url: "https://example.com:65535/rpc"
+out:
+  return: SUCCEED
+---
+test case: "IPv4 with explicit default HTTP port"
+in:
+  url: "http://10.20.30.40:80/rpc"
+out:
+  return: SUCCEED
+---
+test case: "unsupported scheme ftp"
+in:
+  url: "ftp://example.com/rpc"
+out:
+  return: FAIL
+---
+test case: "no scheme"
+in:
+  url: "example.com/rpc"
+out:
+  return: FAIL
+---
+test case: "empty string"
+in:
+  url: ""
+out:
+  return: FAIL
+---
+test case: "missing host after scheme"
+in:
+  url: "http://"
+out:
+  return: FAIL
+---
+test case: "port zero"
+in:
+  url: "http://example.com:0/rpc"
+out:
+  return: FAIL
+---
+test case: "port above maximum"
+in:
+  url: "http://example.com:65536/rpc"
+out:
+  return: FAIL
+---
+test case: "scheme without double slash"
+in:
+  url: "http:example.com/rpc"
+out:
+  return: FAIL
+---
+test case: "invalid scheme suffix makes regex fail"
+in:
+  url: "httpx://example.com/rpc"
+out:
+  return: FAIL
+---
+test case: "IPv6 URL in brackets with explicit port is valid"
+in:
+  url: "http://[::1]:8080/rpc"
+  ipv: 1
+out:
+  return: SUCCEED
+---
+test case: "URL fragment is rejected after mandatory rpc endpoint"
+in:
+  url: "http://example.com/rpc#section"
+out:
+  return: FAIL
+---
+test case: "percent-encoded non-rpc path is rejected"
+in:
+  url: "http://example.com/%2F/resource"
+out:
+  return: FAIL
+---
+test case: "underscore in hostname is valid"
+in:
+  url: "http://my_server.domain.local/rpc"
+out:
+  return: SUCCEED
+---
+test case: "exclamation mark in host fails hostname check"
+in:
+  url: "http://host!.example.com/rpc"
+out:
+  return: FAIL
+---
+test case: "percent sign in host fails hostname check"
+in:
+  url: "http://host%20name.example.com/rpc"
+out:
+  return: FAIL
+---
+test case: "at-sign credentials rejected by regex"
+in:
+  url: "http://user:pass@example.com/rpc"
+out:
+  return: FAIL
+---
+test case: "trailing colon without port digits rejected by regex"
+in:
+  url: "http://example.com:/rpc"
+out:
+  return: FAIL
+---
+test case: "space in host rejected by hostname check"
+in:
+  url: "http://host name.example.com/rpc"
+out:
+  return: FAIL
+---
+test case: "double-slash after host is rejected before mandatory rpc endpoint"
+in:
+  url: "http://example.com//double/slash"
+out:
+  return: FAIL
+---
+test case: "purely numeric label is not a valid hostname"
+in:
+  url: "http://123.456.789/rpc"
+out:
+  return: FAIL
+---
+test case: "hostname starting with hyphen is invalid"
+in:
+  url: "http://-bad.example.com/rpc"
+out:
+  return: FAIL
+---
+test case: "hostname with double dot is invalid"
+in:
+  url: "http://host..example.com/rpc"
+out:
+  return: FAIL
+---
+test case: "IPv6 URL in brackets without explicit port is valid"
+in:
+  url: "http://[::1]/rpc"
+  ipv: 1
+out:
+  return: SUCCEED
+---
+test case: "IPv6 HTTPS URL in brackets with explicit port is valid"
+in:
+  url: "https://[2001:db8::1]:443/rpc"
+  ipv: 1
+out:
+  return: SUCCEED
+---
+test case: "IPv6 URL in brackets with non-rpc path fails"
+in:
+  url: "http://[::1]/some/path"
+out:
+  return: FAIL
+---
+test case: "bare IPv6 without brackets rejected by regex"
+in:
+  url: "http://::1/rpc"
+out:
+  return: FAIL
+---
+test case: "IPv4-mapped IPv6 URL in brackets is valid"
+in:
+  url: "https://[::ffff:192.168.1.1]:8080/rpc"
+  ipv: 1
+out:
+  return: SUCCEED
+---
+test case: "emoji in hostname rejected by hostname validator"
+in:
+  url: "http://\U0001F600.example.com/rpc"
+out:
+  return: FAIL
+...

@@ -26,6 +26,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$SNMP.UPTIME.WARN}|<p>Uptime threshold above which the "Host has been restarted" problem auto-resolves.</p>|`10m`|
 |{$BATTERY.TEMP.MIN.WARN}|<p>Battery low temperature warning value</p>|`0`|
 |{$BATTERY.TEMP.MAX.WARN}|<p>Battery high temperature warning value</p>|`45`|
 |{$BATTERY.TEMP.MIN.CRIT}|<p>Battery low temperature critical value</p>|`-20`|
@@ -70,7 +71,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Morningstar ProStar PWM: Status: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Morningstar ProStar PWM by SNMP/status.hw.uptime)>0 and last(/Morningstar ProStar PWM by SNMP/status.hw.uptime)<10m) or (last(/Morningstar ProStar PWM by SNMP/status.hw.uptime)=0 and last(/Morningstar ProStar PWM by SNMP/status.net.uptime)<10m)`|Info|**Manual close**: Yes|
+|Morningstar ProStar PWM: Status: Device has been restarted|<p>The uptime counter has decreased, which indicates that the host has been restarted.<br>A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.<br>The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.</p>|`(last(/Morningstar ProStar PWM by SNMP/status.hw.uptime)>0 and change(/Morningstar ProStar PWM by SNMP/status.hw.uptime)<0 and last(/Morningstar ProStar PWM by SNMP/status.hw.uptime,#2)<42949672.96-(lastclock(/Morningstar ProStar PWM by SNMP/status.hw.uptime)-lastclock(/Morningstar ProStar PWM by SNMP/status.hw.uptime,#2))) or (last(/Morningstar ProStar PWM by SNMP/status.hw.uptime)=0 and change(/Morningstar ProStar PWM by SNMP/status.net.uptime)<0 and last(/Morningstar ProStar PWM by SNMP/status.net.uptime,#2)<42949672.96-(lastclock(/Morningstar ProStar PWM by SNMP/status.net.uptime)-lastclock(/Morningstar ProStar PWM by SNMP/status.net.uptime,#2)))`|Info|**Manual close**: Yes|
 |Morningstar ProStar PWM: Status: Failed to fetch data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/Morningstar ProStar PWM by SNMP/status.net.uptime,5m)=1`|Warning|**Manual close**: Yes|
 |Morningstar ProStar PWM: Battery: Device charge in warning state||`last(/Morningstar ProStar PWM by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar ProStar PWM: Battery: Device charge in critical state</li></ul>|
 |Morningstar ProStar PWM: Battery: Device charge in critical state||`last(/Morningstar ProStar PWM by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}`|High||

@@ -8,7 +8,7 @@ wildcard_match_SOURCES = \
 	../../zbxmocktest.h
 
 REGEXP_LIBS = \
-	$(REGEXP_DEPS) \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

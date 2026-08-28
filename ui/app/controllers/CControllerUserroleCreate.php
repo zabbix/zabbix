@@ -29,7 +29,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			['role.get', ['name' => '{name}']]
 		];
 
-		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+		$rules = ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'name' => ['db role.name', 'required', 'not_empty'],
 			'type' => ['db role.type', 'required', 'in' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN,
 				USER_TYPE_SUPER_ADMIN
@@ -91,9 +91,20 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 						['service_write_tag_value', 'not_empty']
 					]
 				]
-			],
-			'form_refresh' => ['integer']
+			]
 		]];
+
+		if (CSettingsHelper::isMobileDevicesEnabled()) {
+			$rules['fields'] += [
+				'devices_access' => ['boolean'],
+				'devices_actions' => ['array', 'required',
+					'field' => ['string', 'in' => CRoleHelper::getDeviceActionsByUserType(USER_TYPE_SUPER_ADMIN)]
+				],
+				'devices_actions_default_access' => ['boolean']
+			];
+		}
+
+		return $rules;
 	}
 
 	protected function checkInput(): bool {
@@ -128,8 +139,8 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 	 */
 	protected function doAction(): void {
 		$role = [
-			'name' => trim($this->getInput('name')),
-			'type' => $this->getInput('type')
+			'name' => trim($this->getInput('name', '')),
+			'type' => $this->getInput('type', USER_TYPE_ZABBIX_USER)
 		];
 
 		$role['rules'] = $this->getRulesInput((int) $role['type']);

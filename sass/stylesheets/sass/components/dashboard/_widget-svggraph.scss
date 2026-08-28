@@ -18,7 +18,13 @@ form.dashboard-widget-svggraph {
 			position: sticky;
 			top: 0;
 			background: $header-bg-color;
+			border-top-left-radius: var(--surface-border-radius);
+			border-top-right-radius: var(--surface-border-radius);
 			z-index: 3;
+
+			> li:first-child a:hover {
+				border-top-left-radius: var(--surface-border-radius);
+			}
 		}
 	}
 
@@ -290,7 +296,7 @@ form.dashboard-widget-svggraph {
 			> div {
 				padding: 1px 0 1px 1px;
 				background-color: $ui-bg-selected-color;
-				border-radius: 2px;
+				border-radius: var(--badge-border-radius);
 				line-height: 22px;
 
 				span {

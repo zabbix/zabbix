@@ -68,7 +68,7 @@ $html_page
 	->addItem(
 		(new CForm())
 			->setName('host_view')
-			->addItem((new CDataTable())->setId('hosts'))
+			->addItem((new CDataTable())->setId('datatable-hosts'))
 	);
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

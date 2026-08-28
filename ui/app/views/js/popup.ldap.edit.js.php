@@ -55,6 +55,8 @@ window.ldap_edit_popup = new class {
 			this.toggleGroupConfiguration();
 		});
 
+		this.#form.findFieldByName('provision_groups').setButtonOnBlur('js-add', 'user_group_edit');
+
 		this.provision_groups_table.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-add')) {
 				this.editProvisionGroup();

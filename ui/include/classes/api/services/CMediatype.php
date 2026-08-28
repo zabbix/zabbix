@@ -674,7 +674,7 @@ class CMediatype extends CApiService {
 	private static function getCommonTypeValidationFields(): array {
 		return [
 			'maxsessions' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK])], 'type' => API_INT32, 'in' => '0:100'],
+									['if' => ['field' => 'type', 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK, MEDIA_TYPE_PUSH])], 'type' => API_INT32, 'in' => '0:100'],
 									['else' => true] + self::getDefaultTypeValidationRules('maxsessions')
 			]],
 			'parameters' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -814,11 +814,11 @@ class CMediatype extends CApiService {
 		$api_required = $is_update ? 0 : API_REQUIRED;
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'redirection_url' =>		['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'redirection_url')],
+			'redirection_url' =>		['type' => API_URL, 'flags' => $api_required | API_NOT_EMPTY, 'schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES, 'length' => DB::getFieldLength('media_type_oauth', 'redirection_url')],
 			'client_id' =>				['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'client_id')],
 			'client_secret' =>			['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'client_secret')],
-			'authorization_url' =>		['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'authorization_url')],
-			'token_url' =>				['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'token_url')],
+			'authorization_url' =>		['type' => API_URL, 'flags' => $api_required | API_NOT_EMPTY, 'schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES, 'length' => DB::getFieldLength('media_type_oauth', 'authorization_url')],
+			'token_url' =>				['type' => API_URL, 'flags' => $api_required | API_NOT_EMPTY, 'schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES, 'length' => DB::getFieldLength('media_type_oauth', 'token_url')],
 			'tokens_status' =>			['type' => API_INT32, 'in' => implode(':', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID])],
 			'access_token' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'access_token')],
 			'access_token_updated' =>	['type' => API_TIMESTAMP],
@@ -1023,7 +1023,8 @@ class CMediatype extends CApiService {
 			MEDIA_TYPE_EMAIL => array_keys(self::getEmailTypeValidationFields()),
 			MEDIA_TYPE_SMS => array_keys(self::getSmsTypeValidationFields()),
 			MEDIA_TYPE_EXEC => array_keys(self::getScriptTypeValidationFields()),
-			MEDIA_TYPE_WEBHOOK => array_keys(self::getWebhookTypeValidationFields())
+			MEDIA_TYPE_WEBHOOK => array_keys(self::getWebhookTypeValidationFields()),
+			MEDIA_TYPE_PUSH => []
 		};
 	}
 

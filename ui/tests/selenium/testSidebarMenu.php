@@ -387,8 +387,8 @@ class testSidebarMenu extends CWebTest {
 				$this->query('xpath://aside[@class="sidebar is-hidden"]')->one(false)->waitUntilNotVisible();
 			}
 
-			$this->query('id', $id)->one()->click();
-			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->waitUntilReady()->exists());
+			$this->query('id', $id)->waitUntilClickable()->one()->click();
+			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->waitUntilPresent()->exists());
 
 			// Checking that collapsed, hidden sidemenu appears on clicking.
 			$this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->one()->waitUntilVisible();
@@ -403,8 +403,8 @@ class testSidebarMenu extends CWebTest {
 		return [
 			[
 				[
-					'section' => 'Support',
-					'link' => 'https://www.zabbix.com/support'
+					'section' => 'Subscriptions',
+					'link' => 'https://www.zabbix.com/subscriptions'
 				]
 			],
 			[
@@ -416,7 +416,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Help',
-					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/'
+					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/en/manual'
 				]
 			],
 			[

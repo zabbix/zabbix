@@ -26,8 +26,8 @@ if (array_key_exists('actions', $data)) {
 			(new CDiv(
 				(new CDiv($data['foot_note']))
 					->addClass(ZBX_STYLE_TABLE_STATS)
-			))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-		))->addClass(ZBX_STYLE_TABLE_PAGING)
+			))->addClass(ZBX_STYLE_PAGER_CONTAINER)
+		))->addClass(ZBX_STYLE_PAGER)
 		: null;
 
 	$output['data'] = (new CObject([

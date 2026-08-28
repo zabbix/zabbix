@@ -24,10 +24,14 @@ class CControllerOauthCheck extends CController {
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'mediatypeid' => ['db media_type_oauth.mediatypeid'],
-			'redirection_url' => ['db media_type_oauth.redirection_url', 'required', 'not_empty'],
+			'redirection_url' => ['db media_type_oauth.redirection_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]]
+			],
 			'client_id' => ['db media_type_oauth.client_id', 'required', 'not_empty'],
 			'client_secret' => ['db media_type_oauth.client_secret', 'not_empty'],
-			'authorization_url' => ['string', 'not_empty'],
+			'authorization_url' => ['string', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]]
+			],
 			'authorization_url_parameters' => ['objects', 'uniq' => ['value', 'name'],
 				'fields' => [
 					'value' => ['string'],
@@ -35,7 +39,9 @@ class CControllerOauthCheck extends CController {
 				],
 				'messages' => ['uniq' => _('Name and value combination is not unique.')]
 			],
-			'token_url' => ['string', 'not_empty'],
+			'token_url' => ['string', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]]
+			],
 			'token_url_parameters' => ['objects', 'uniq' => ['value', 'name'],
 				'fields' => [
 					'value' => ['string'],

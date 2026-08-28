@@ -182,7 +182,7 @@ func Test_prepareConnectString(t *testing.T) {
 	type args = struct {
 		tnsType        TNSNameType
 		cd             *ConnDetails
-		connectTimeout time.Duration
+		connectTimeout int
 	}
 
 	type want struct {
@@ -201,7 +201,7 @@ func Test_prepareConnectString(t *testing.T) {
 			args{
 				tnsKey,
 				newConnDetHostname(t, "zbx_tns", "XE"), //hostname any
-				1,                                      //any
+				0,                                      //any
 			},
 			want{"zbx_tns", false, false},
 		},
@@ -210,7 +210,7 @@ func Test_prepareConnectString(t *testing.T) {
 			args{
 				tnsValue,
 				newConnDetHostname(t, "(DESCRIPTION=..", "XE"),
-				1, //any
+				0, //any
 			},
 			want{"(DESCRIPTION=..", false, false},
 		},
@@ -219,7 +219,7 @@ func Test_prepareConnectString(t *testing.T) {
 			args{
 				tnsNone,
 				newConnDetHostname(t, "tcp://myhost:1521", "XE"),
-				1000000000, //any
+				1, //any
 			},
 			want{
 				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=myhost)(PORT=1521))` +
@@ -233,7 +233,7 @@ func Test_prepareConnectString(t *testing.T) {
 			args{
 				tnsNone,
 				newConnDetHostname(t, "localhost", ""), //hostname any
-				1,
+				0,
 			},
 			want{
 				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))` +
@@ -249,7 +249,7 @@ func Test_prepareConnectString(t *testing.T) {
 				// service name can only be [a...z] [A...Z] [0...9] _ with first alphanumeric.
 				// QueryEscape removes the hashtag in the result.
 				newConnDetHostname(t, "localhost", "XE#"),
-				1,
+				0,
 			},
 			want{
 				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))` +
@@ -263,7 +263,7 @@ func Test_prepareConnectString(t *testing.T) {
 			args{
 				tnsNone,
 				newConnDetHostname(t, "tcps://myhost:2484", "XE"),
-				1000000000, //any
+				1, //any
 			},
 			want{
 				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=myhost)(PORT=2484))` +
@@ -277,7 +277,7 @@ func Test_prepareConnectString(t *testing.T) {
 			args{
 				tnsNone,
 				newConnDetHostname(t, "localhost", "XE%ZZ"),
-				1, //any
+				0, //any
 			},
 			want{
 				"(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))" +
@@ -291,7 +291,7 @@ func Test_prepareConnectString(t *testing.T) {
 			args{
 				TNSNameType(100),
 				newConnDetHostname(t, "any", "any"),
-				1, //any
+				0, //any
 			},
 			want{
 				"",

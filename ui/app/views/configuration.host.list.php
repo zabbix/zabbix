@@ -42,7 +42,7 @@ $html_page = (new CHtmlPage())
 						->onClick(
 							'return PopUp("popup.import", {
 								rules_preset: "host", '.
-								CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
+							CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
 							'"}, {
 								dialogueid: "popup_import",
 								dialogue_class: "modal-popup-generic"
@@ -206,7 +206,7 @@ $csrf_token = CCsrfTokenHelper::get('host');
 
 $form = (new CForm())->setName('hosts');
 $form->addItem([
-	(new CDataTable())->setId('hosts'),
+	(new CDataTable())->setId('datatable-hosts'),
 	(new CActionButtonList('action', 'hostids', [
 		'host.enable' => [
 			'content' => (new CSimpleButton(_('Enable')))

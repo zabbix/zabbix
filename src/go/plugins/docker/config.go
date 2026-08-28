@@ -19,17 +19,17 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	"time"
 
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
 
 // Options is a plugin configuration.
 type Options struct {
-	Endpoint string `conf:"default=unix:///var/run/docker.sock"`
-	Timeout  int    `conf:"optional,range=1:30"`
+	Endpoint      string `conf:"default=unix:///var/run/docker.sock"`
+	LegacyTimeout int    `conf:"name=Timeout,optional,range=1:30"`
 }
 
 // Configure implements the plugin.Configurator interface.
@@ -40,8 +40,12 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
+	if p.options.LegacyTimeout != 0 {
+		log.Debugf("config value 'Timeout' is deprecated")
+	}
+
+	if p.options.LegacyTimeout == 0 {
+		p.options.LegacyTimeout = global.Timeout
 	}
 
 	socketPath := strings.Split(p.options.Endpoint, "://")[1]
@@ -55,7 +59,6 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 
 	p.client = &http.Client{
 		Transport: transport,
-		Timeout:   time.Duration(p.options.Timeout) * time.Second,
 	}
 }
 

@@ -126,7 +126,7 @@ $form = (new CForm())
 	->setName('templates');
 
 $form->addItem([
-	(new CDataTable())->setId('templates'),
+	(new CDataTable())->setId('datatable-templates'),
 	(new CActionButtonList('action', 'templates', [
 		'template.export' => [
 			'content' => new CButtonExport('export.templates',

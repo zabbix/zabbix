@@ -24,6 +24,9 @@ set the required parameters.
  
 **Plugins.Docker.Timeout** — the maximum time (in seconds) for 
 waiting when a request has to be done.
+
+> The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
+
 *Default value:* equals the global Timeout configuration parameter.    
 *Limits:* 1-30
 

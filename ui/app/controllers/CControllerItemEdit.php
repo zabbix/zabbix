@@ -171,7 +171,7 @@ class CControllerItemEdit extends CControllerItem {
 
 		$data = [
 			'js_test_validation_rules' => (new CFormValidator(
-				CControllerPopupItemTestSend::getValidationRules(allow_lld_macro: false)
+				CControllerPopupItemTestEdit::getValidationRules(allow_lld_macro: false)
 			))->getRules(),
 			'js_validation_rules' => !$this->hasInput('itemid') || $this->hasInput('clone')
 				? (new CFormValidator(CControllerItemCreate::getValidationRules()))->getRules()

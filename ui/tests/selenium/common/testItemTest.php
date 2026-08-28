@@ -88,8 +88,8 @@ class testItemTest extends CWebTest {
 		$context = $is_host ? 'host' : 'template';
 
 		if ($item_type === 'Discovery rule') {
-			$create_link = 'host_discovery.php?form=create&hostid='.$id.'&context='.$context;
-			$saved_link = $items.'.php?form=update&context=host&hostid='.$id.'&itemid=';
+			$create_link = 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[]='.$id.'&context='.$context;
+			$saved_link = 'zabbix.php?action=popup&popup='.$items.'.edit&context='.$context.'&itemid=';
 		}
 		else {
 			$create_link = ($items === null)
@@ -98,15 +98,9 @@ class testItemTest extends CWebTest {
 		}
 
 		$this->page->login()->open($create_link);
-
-		if ($item_type !== 'Discovery rule') {
-			$this->query('button:'.(($items === null) ? 'Create item prototype' : 'Create item'))->one()->click();
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-			$item_form = $dialog->asForm();
-		}
-		else {
-			$item_form = $this->query('name:itemForm')->asForm()->waitUntilReady()->one();
-		}
+		$this->query('button:Create '.lcfirst($item_type))->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$item_form = $dialog->asForm();
 
 		// Create item.
 		$item_form->fill([
@@ -166,19 +160,10 @@ class testItemTest extends CWebTest {
 				}
 
 				$this->query('link', $item_name)->waitUntilClickable()->one()->click();
-
-				if ($item_type === 'Discovery rule') {
-					$button = $this->query('button:Execute now')->waitUntilVisible()->one();
-				}
-				else {
-					$button = COverlayDialogElement::find()->one()->waitUntilReady()->query('button:Execute now')->one();
-				}
+				$button = COverlayDialogElement::find()->one()->waitUntilReady()->query('button:Execute now')->one();
 
 				$this->assertTrue($button->isEnabled($enabled));
-
-				if ($item_type !== 'Discovery rule') {
-					COverlayDialogElement::find()->one()->close();
-				}
+				COverlayDialogElement::find()->one()->close();
 			}
 		}
 	}
@@ -756,21 +741,21 @@ class testItemTest extends CWebTest {
 	 * @param array		$data			data provider
 	 * @param boolean	$is_host		true if host, false if template
 	 * @param string	$id				id of a host, template or LLD rule
-	 * @param string	$items			pointer to form in URL
-	 * @param boolean   $lld            true if lld, false if item or item prototype
+	 * @param string	$item_type		pointer to form in URL
 	 */
-	public function checkTestItem($data, $is_host, $id, $items = null, $lld = false) {
+	public function checkTestItem($data, $is_host, $id, $item_type = null) {
+		$lld = ($item_type === 'lldrule');
 		$context = ($is_host === true) ? 'host' : 'template';
-		$create_link = ($items === null)
+		$create_link = ($item_type === 'item prototype')
 			? 'zabbix.php?action=item.prototype.list&context='.$context.'&parent_discoveryid='.$id
-			: 'zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$id;
+			: 'zabbix.php?action='.$item_type.'.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$id;
 
 		if (!$is_host && $data['fields']['Type'] === 'IPMI agent') {
 			return;
 		}
 
 		$this->page->login()->open($create_link);
-		$this->query('button:'.(($items === null) ? 'Create item prototype' : 'Create item'))->one()->click();
+		$this->query('button:'.(($lld) ? 'Create discovery rule' : 'Create '.$item_type))->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$item_form = $dialog->asForm();
 		$item_form->fill($data['fields']);
@@ -1064,63 +1049,75 @@ class testItemTest extends CWebTest {
 						['Zabbix internal', 'External check', 'Database monitor', 'HTTP agent', 'JMX agent',
 						'Calculated', 'Script', 'Browser'])) {
 					$details = 'Connection to Zabbix server "localhost:10051" refused. Possible reasons:';
-				}
-				else {
-					$details = ($data['fields']['Type'] === 'SNMP agent')
-						? 'Incorrect value for field "SNMP community": cannot be empty.'
-						: 'Incorrect value for field "Host address": cannot be empty.';
-				}
 
-				// Click Get value button.
-				$button = $test_form->query('button:Get value')->one();
-				$button->click();
-				$this->assertMessage(TEST_BAD, null, $details);
-				$test_form->getOverlayMessage()->close();
-
-				// Click Test button in test form.
-				$overlay->query('button:Get value and test')->one()->waitUntilVisible()->click();
-				$this->assertMessage(TEST_BAD, null, $details);
-				$test_form->getOverlayMessage()->close();
-
-				// Check empty interface fields.
-				if (in_array($data['fields']['Type'], ['Zabbix agent', 'SNMP agent', 'IPMI agent', 'Simple check'])) {
-					if ($data['fields']['Type'] !== 'Simple check') {
-						$elements['port']->clear();
-						$button->click();
-
-						if (!$is_host && !array_key_exists('interface', $data)) {
-							$details = ($data['fields']['Type'] === 'SNMP agent')
-								? 'Incorrect value for field "SNMP community": cannot be empty.'
-								: 'Incorrect value for field "Host address": cannot be empty.';
-						}
-						else {
-							$details = 'Incorrect value for field "Port": cannot be empty.';
-						}
-
-						$this->assertMessage(TEST_BAD, null, $details);
-						$test_form->getOverlayMessage()->close();
-					}
-
-					$elements['address']->clear();
-					$button->click();
-					$details = (!$is_host && $data['fields']['Type'] === 'SNMP agent')
-						? 'Incorrect value for field "SNMP community": cannot be empty.'
-						: 'Incorrect value for field "Host address": cannot be empty.';
+					// Click Get value button.
+					$test_form->query('button:Get value')->one()->click();
 					$this->assertMessage(TEST_BAD, null, $details);
 					$test_form->getOverlayMessage()->close();
 
-					// Check SNMP empty fields for Template.
-					if (!$is_host && (CTestArrayHelper::get($data, 'snmp_fields.community'))) {
-						$test_form->fill(['id:interface_details_community' => $data['snmp_fields']['community']]);
-						$button->click();
-						$this->assertMessage(TEST_BAD, null, 'Incorrect value for field "Host address": cannot be empty.');
-						$test_form->getOverlayMessage()->close();
+					// Click Test button in test form.
+					$overlay->query('button:Get value and test')->one()->waitUntilVisible()->click();
+					$this->assertMessage(TEST_BAD, null, $details);
+					$test_form->getOverlayMessage()->close();
+				}
+				else {
+					$fields = ($data['fields']['Type'] === 'SNMP agent')
+						? ['id:interface_address' => '127.0.0.1', 'id:interface_details_community' => 'public']
+						: ['id:interface_address' => '127.0.0.1'];
 
-						$elements['address']->fill('127.0.0.1');
-						$button->click();
-						$this->assertMessage(TEST_BAD, null, 'Incorrect value for field "Port": cannot be empty.');
-						$test_form->getOverlayMessage()->close();
+					$expected_errors = array_fill_keys(array_keys($fields), 'This field cannot be empty.');
+
+					// Click Get value button and assert inline errors.
+					$test_form->query('button:Get value')->one()->click();
+					$this->assertInlineError($test_form, $expected_errors);
+
+					// Check that inline errors are removed after specifying valid values and removing focus.
+					foreach ($fields as $locator => $value) {
+						$field = $test_form->getField($locator);
+
+						// Fill fields with values to remove inline errors.
+						$field->fill($value);
+						$this->page->removeFocus();
+						$field->waitUntilClassesNotPresent('has-error');
+
+						// Clear field values to invoke inline errors again.
+						$field->fill('');
 					}
+
+					// Click Test button in test form and assert inline errors.
+					$overlay->query('button:Get value and test')->one()->waitUntilVisible()->click();
+					$this->assertInlineError($test_form, $expected_errors);
+				}
+
+				// Check empty interface fields for item types that use network interface and has IP address and port fields.
+				if (in_array($data['fields']['Type'], ['Zabbix agent', 'SNMP agent', 'IPMI agent', 'Simple check'])) {
+
+					// Array for IDs of fields that will have inline validation error.
+					$error_ids = [];
+
+					$elements['address']->clear();
+					$error_ids[] = 'id:interface_address';
+
+					if ($data['fields']['Type'] !== 'Simple check') {
+						$elements['port']->clear();
+
+						if (array_key_exists('interface', $data)) {
+							$error_ids[] = 'id:interface_port';
+						}
+					}
+
+					if (!$is_host && $data['fields']['Type'] === 'SNMP agent') {
+						$error_ids[] = 'id:interface_details_community';
+					}
+
+					$test_form->query('button:Get value')->one()->click();
+
+					// Convert the flat array of IDs into the associative array format required by assertInlineError.
+					// Example output: ['id:interface_address' => 'This field cannot be empty.', ...]
+					$expected_errors = array_fill_keys($error_ids, 'This field cannot be empty.');
+
+					// Assert all inline errors at once
+					$this->assertInlineError($test_form, $expected_errors);
 				}
 
 				// Uncheck "Get value from host" checkbox.
@@ -1131,7 +1128,7 @@ class testItemTest extends CWebTest {
 					foreach (['address', 'port', 'proxy'] as $field) {
 						$elements[$field]->waitUntilNotVisible();
 					}
-					$button->waitUntilNotVisible();
+					$test_form->query('button:Get value')->waitUntilNotVisible();
 					// Check that Test button changed its name.
 					$this->assertFalse($overlay->query('button:Get value and test')->one(false)->isValid());
 					$overlay->query('button:Test')->waitUntilVisible()->one();
@@ -1241,7 +1238,7 @@ class testItemTest extends CWebTest {
 					}
 				}
 			}
-			if ($lld === false){
+			if ($lld === false) {
 				$not_supported->check();
 				$this->assertFalse($value->isEnabled());
 			}
@@ -1264,16 +1261,9 @@ class testItemTest extends CWebTest {
 	 * @param int		$i			index number of preprocessing step
 	 */
 	private function checkTestButtonInPreprocessing($item_type, $enabled = true, $i = 0) {
-
-		if ($item_type == 'Discovery rule') {
-			$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-			$test_button = $this->query('id:test_item')->waitUntilVisible()->one();
-		}
-		else {
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-			$item_form = $dialog->asForm();
-			$test_button = $dialog->getFooter()->query('button:Test')->one();
-		}
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$item_form = $dialog->asForm();
+		$test_button = $dialog->getFooter()->query('button:Test')->one();
 
 		$this->assertTrue($test_button->isEnabled($enabled));
 		$item_form->selectTab('Preprocessing');
@@ -1284,11 +1274,13 @@ class testItemTest extends CWebTest {
 		$item_form->selectTab($item_type);
 	}
 
-	private function saveFormAndCheckMessage($message, $lld = 'false') {
-
-		$item_form = $lld
-			? $this->query('name:itemForm')->waitUntilPresent()->asForm()->one()
-			: COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
+	private function saveFormAndCheckMessage($message, $lld = false) {
+		if ($lld) {
+			$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		}
+		else {
+			$item_form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
+		}
 
 		$item_form->submit();
 		$this->page->waitUntilReady();

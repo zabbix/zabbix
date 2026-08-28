@@ -310,6 +310,12 @@ a.btn-icon,
 	}
 }
 
+.skip-link {
+	&:focus-visible {
+		border-bottom-width: 1px;
+	}
+}
+
 // components/menu-user
 .menu-user {
 	a {
@@ -620,7 +626,7 @@ a.link-action {
 	}
 }
 
-.table-paging {
+.pager {
 	a {
 		&:focus {
 			background-color: $link-hover-color;
@@ -634,13 +640,13 @@ a.link-action {
 			}
 		}
 	}
-}
 
-.paging-selected {
-	color: #000000 !important;
+	.selected {
+		color: #000000 !important;
 
-	&:focus {
-		background-color: $link-hover-color !important;
+		&:focus {
+			background-color: $link-hover-color !important;
+		}
 	}
 }
 
@@ -1098,7 +1104,7 @@ td.inactive-bg {
 			height: $icon-medium-size;
 			vertical-align: top;
 			margin-right: 4px;
-			border-radius: 3px;
+			border-radius: var(--badge-border-radius);
 			content: '';
 		}
 	}
@@ -1194,65 +1200,56 @@ td.inactive-bg {
 
 .datatable {
 	.datatable-body {
-		.row {
-			&:not(.row-disabled):hover {
-				.cell {
-					&.cell-data {
-						background-color: $ui-hover-bg-color !important;
-					}
-				}
-			}
-		}
-	}
-
-	.cell {
-		&.cell-data {
+		.cell.cell-data {
+			&.na-bg,
+			&.info-bg,
 			&.warning-bg,
 			&.average-bg,
 			&.high-bg,
 			&.disaster-bg {
 				border-bottom-color: $ui-border-color;
+				color: #ffffff;
 				padding-left: 42px;
+			}
+		}
 
-				.cell-inner {
-					color: $font-color;
-				}
+		.row.row-selected .cell.cell-data {
+			border-bottom-color: $ui-border-color;
+
+			&.na-bg,
+			&.info-bg,
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				background-color: $ui-hover-bg-color !important;
+			}
+		}
+
+		.row:not(.row-disabled):hover .cell.cell-data {
+			background-color: $ui-hover-bg-color !important;
+
+			&.na-bg,
+			&.info-bg,
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				background-color: $ui-hover-bg-color !important;
 			}
 		}
 	}
 
-	&.compact-view {
-		.cell {
-			&.cell-data {
-				&.warning-bg,
-				&.average-bg,
-				&.high-bg,
-				&.disaster-bg {
-					&:before {
-						font-size: 22px;
-						padding-top: 0;
-						padding-bottom: 0;
-					}
-				}
-			}
-		}
-	}
-
-	&.has-highlighted-rows {
-		.cell {
-			&.cell-data {
-				&:not(.cell-bg) {
-					&.warning-bg,
-					&.average-bg,
-					&.high-bg,
-					&.disaster-bg {
-						padding-left: 8px;
-
-						&:before {
-							display: none;
-						}
-					}
-				}
+	&.compact-view .datatable-body .cell.cell-data {
+		&.na-bg,
+		&.info-bg,
+		&.warning-bg,
+		&.average-bg,
+		&.high-bg,
+		&.disaster-bg {
+			&::after {
+				background-position: center 0;
+				background-size: 22px;
 			}
 		}
 	}

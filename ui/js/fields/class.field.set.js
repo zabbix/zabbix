@@ -13,137 +13,7 @@
 **/
 
 
-class CFieldSet extends CField {
-
-	/**
-	 * Object of input field references that particular FieldSet instance holds.
-	 *
-	 * @type {Object}
-	 */
-	#fields = Object.create(null);
-
-	init() {
-		super.init();
-
-		this.#discoverAllFields();
-
-		const observer = new MutationObserver(observations => {
-			let node_change = false;
-			let attribute_change = false;
-
-			for (const obs of observations) {
-				if (obs.type === 'childList') {
-					node_change = [...obs.addedNodes, ...obs.removedNodes]
-						.some(node => {
-							const is_field = '[data-field-type]:not([data-temp-field])';
-
-							return node.nodeType == Node.ELEMENT_NODE
-								&& (node.matches(is_field) || node.querySelector(is_field));
-						});
-
-					if (node_change) {
-						break;
-					}
-				}
-				else if (obs.type === 'attributes') {
-					attribute_change = attribute_change || obs.attributeName === 'data-skip-from-submit';
-				}
-			}
-
-			if (node_change) {
-				this.#discoverAllFields();
-			}
-
-			if (node_change || attribute_change) {
-				this.onBlur();
-			}
-		});
-
-		observer.observe(this._field, {
-			attributeFilter: ['data-skip-from-submit'],
-			childList: true,
-			subtree: true
-		});
-	}
-
-	onBlur() {
-		const child_fields = Object.values(this.#fields).map((field) => field.getName());
-
-		this._field.dispatchEvent(new CustomEvent('field.change', {detail: {
-			source_fields: [this.getName(), ...child_fields]
-		}}));
-	}
-
-	/**
-	 * Attaches blur handling to a button. Validation is done when the button loses focus, unless the blur
-	 * was caused by opening the related overlay.
-	 *
-	 * @param {string} button_class	 Class name for the button.
-	 * @param {string} dialogue_id   ID for a dialogue opened by the button.
-	 */
-	setButtonOnBlur(button_class, dialogue_id) {
-		const button = this._field.querySelector('.' + button_class);
-		let timeout_id = null;
-
-		button.addEventListener('blur', () => {
-			clearTimeout(timeout_id);
-			timeout_id = setTimeout(() => {
-				if (document.activeElement !== button && overlays_stack.getById(dialogue_id) === undefined) {
-					this.onBlur();
-				}
-			}, 250);
-		});
-	}
-
-	#discoverAllFields() {
-		const fields = Object.create(null);
-		const fields_rediscovered = [];
-
-		for (const discovered_field of CForm.findAllFields(this._field)) {
-			const field_type = discovered_field.getAttribute('data-field-type');
-
-			if (field_type in CForm.field_types) {
-				let field_instance = null;
-
-				for (const existing_field of Object.values(this.#fields)) {
-					if (existing_field.isSameField(discovered_field)) {
-						existing_field.updateState();
-						fields_rediscovered.push(existing_field.getName());
-						field_instance = existing_field;
-						break;
-					}
-				}
-
-				if (field_instance === null) {
-					field_instance = new CForm.field_types[field_type](discovered_field);
-					field_instance.init();
-					field_instance.setTabId(this._tab_id);
-
-					discovered_field.addEventListener('field.change', (e) => {
-						if (!e.target.hasAttribute('data-prevent-validation-on-change')) {
-							this.fieldChanged(e.detail.source_fields);
-						}
-					});
-				}
-
-				const name = field_instance.getName().replace(new RegExp(`^${this.getName()}`), '');
-
-				fields[name] = field_instance;
-			}
-		}
-
-		for (const field of Object.values(this.#fields)) {
-			if (field.hasErrorHint() && fields_rediscovered.includes(field.getName()) === false) {
-				field.removeErrorHint();
-			}
-		}
-
-		this.#fields = fields;
-	}
-
-	getName() {
-		return this._field.getAttribute('data-field-name');
-	}
+class CFieldSet extends CFieldCollection {
 
 	#subFieldNameParts(sub_field_name) {
 		if (!sub_field_name.startsWith(this.getName())) {
@@ -160,7 +30,7 @@ class CFieldSet extends CField {
 		let result = Object.create(null);
 		let simple_fields = Object.create(null);
 
-		for (const field of Object.values(this.#fields)) {
+		for (const field of Object.values(this.getFields())) {
 			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
 				continue;
 			}
@@ -188,56 +58,6 @@ class CFieldSet extends CField {
 		return result;
 	}
 
-	getValue() {
-		return this.getInnerValue(false);
-	}
-
-	getValueTrimmed() {
-		return this.getInnerValue(true);
-	}
-
-	updateState() {
-		this.#discoverAllFields();
-	}
-
-	hasErrors() {
-		for (const field of Object.values(this.#fields)) {
-			if (field.hasErrors()) {
-				return true;
-			}
-		}
-
-		return super.hasErrors();
-	}
-
-	setErrors(errors, force_display_errors) {
-		if (typeof errors === 'object' && '' in errors) {
-			errors[''].forEach((error) => super.setErrors(error));
-			delete errors[''];
-		}
-
-		this.#fieldsSetErrors(errors, force_display_errors);
-	}
-
-	unsetErrors() {
-		const errors = Object.create(null);
-		errors[''] = [{message: '', level: -1}];
-
-		for (const field of Object.values(this.#fields)) {
-			errors[field.getName().replace(new RegExp(`^${this.getName()}`), '')] = [{message: '', level: -1}];
-		}
-
-		this.setErrors(errors);
-	}
-
-	showErrors() {
-		super.showErrors();
-
-		for (const field of Object.values(this.#fields)) {
-			field.showErrors();
-		}
-	}
-
 	_appendErrorHint(error_hint) {
 		let target_insert_after = this._field.closest('.table-forms-separator')
 			? this._field.closest('.table-forms-separator')
@@ -246,21 +66,26 @@ class CFieldSet extends CField {
 		target_insert_after.after(error_hint);
 	}
 
-	#fieldsSetErrors(errors, force_display_errors) {
+	_fieldsSetErrors(errors, force_display_errors) {
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.charAt(0) === '[' ? key : `[${key}]`;
 
-			if (key_full in this.#fields) {
+			if (key_full in this.getFields()) {
+				const field = this.getFields()[key_full];
 				// These errors need to be added even if field is not changed, but smaller index one was.
 				const error_levels = [CFormValidator.ERROR_LEVEL_UNIQ,
 					CFormValidator.ERROR_LEVEL_OBJECTS_COUNT
 				];
 
-				if (this.#fields[key_full].hasChanged() || this.#hasObjectChanged(key_full) || force_display_errors
+				if (field instanceof CFieldCollection) {
+					field.setErrors(field_errors, force_display_errors);
+					this._global_errors = {...this._global_errors, ...field.getGlobalErrors()};
+				}
+				else if (field.hasChanged() || this.#hasObjectChanged(key_full) || force_display_errors
 						|| field_errors.some((error) => error.message === '' || error_levels.includes(error.level))) {
-					field_errors.forEach((error) => this.#fields[key_full].setErrors(error));
+					field_errors.forEach((error) => field.setErrors(error));
 
-					this._global_errors = {...this._global_errors, ...this.#fields[key_full].getGlobalErrors()};
+					this._global_errors = {...this._global_errors, ...field.getGlobalErrors()};
 				}
 			}
 			else if (errors[key] !== '') {
@@ -277,17 +102,8 @@ class CFieldSet extends CField {
 		}
 	}
 
-	focusErrorField() {
-		for (const field of Object.values(this.#fields)) {
-			if (field.hasErrors()) {
-				field.focusErrorField();
-				break;
-			}
-		}
-	}
-
 	findFieldByName(name) {
-		for (const field of Object.values(this.#fields)) {
+		for (const field of Object.values(this.getFields())) {
 			if (name.startsWith(field.getName())) {
 				if (field.getName() === name) {
 					return field;
@@ -301,25 +117,11 @@ class CFieldSet extends CField {
 		return null;
 	}
 
-	getFields() {
-		return this.#fields;
-	}
-
-	hasChanged() {
-		for (const field of Object.values(this.#fields)) {
-			if (field.hasChanged()) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	#hasObjectChanged(field_key) {
 		// Object name must be in form X[Y][Z]. This function returns `Y`. `Y` is equal for all same object fields.
 		const getObjKey = (n) => n.replace(new RegExp(`^${this.getName()}`), '').replace(/]$/, '').split(/\]\[|\[/)[1];
 
-		return Object.values(this.#fields).filter((field) => {
+		return Object.values(this.getFields()).filter((field) => {
 			return getObjKey(field.getName()) == getObjKey(field_key);
 		}).some(field => field.hasChanged());
 	}

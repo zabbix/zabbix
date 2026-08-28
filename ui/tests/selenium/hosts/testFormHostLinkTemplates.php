@@ -137,7 +137,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
 		$this->page->waitUntilReady();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		// Additional 50px scrolling needed because host name is behindthe horizontal scrollbar.
 		$this->query('link', self::HOST_VISIBLE_NAME)->waitUntilClickable()->one()->scrollIntoView(50)->click();

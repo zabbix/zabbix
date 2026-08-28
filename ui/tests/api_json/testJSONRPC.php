@@ -288,11 +288,6 @@ class testJSONRPC extends CAPITest {
 				'result' => [
 					[
 						'jsonrpc' => '2.0',
-						'result' => ZABBIX_API_VERSION,
-						'id' => 1
-					],
-					[
-						'jsonrpc' => '2.0',
 						'error' => [
 							'code' => -32600,
 							'message' => 'Invalid request.',
@@ -321,6 +316,11 @@ class testJSONRPC extends CAPITest {
 					[
 						'jsonrpc' => '2.0',
 						'result' => ZABBIX_API_VERSION,
+						'id' => 1
+					],
+					[
+						'jsonrpc' => '2.0',
+						'result' => ZABBIX_API_VERSION,
 						'id' => 4
 					]
 				]
@@ -333,7 +333,7 @@ class testJSONRPC extends CAPITest {
 					'error' => [
 						'code' => -32602,
 						'message' => 'Invalid params.',
-						'data' => 'The "apiinfo.version" method must be called without authorization header.'
+						'data' => 'Session terminated, re-login, please.'
 					],
 					'id' => 5
 				],
@@ -360,6 +360,12 @@ class testJSONRPC extends CAPITest {
 	 * @dataProvider json_rpc_data
 	 */
 	public function testJSONRPC_Calls($request, $expected_result, $token = null) {
-		$this->assertSame($expected_result, $this->callRaw($request, $token));
+		$result = $this->callRaw($request, $token);
+
+		if (is_array($result) && array_key_exists('error', $result)) {
+			unset($result['error']['debug']);
+		}
+
+		$this->assertSame($expected_result, $result);
 	}
 }

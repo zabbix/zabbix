@@ -305,7 +305,7 @@ class testFormHost extends CWebTest {
 		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 
 		// Assert text.
-		$this->assertEquals('Max repetition count is applicable to discovery and walk only.', $hint->one()->getText());
+		$this->assertEquals('Max repetition count is applicable to walk only.', $hint->one()->getText());
 
 		// Close the hintbox.
 		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
