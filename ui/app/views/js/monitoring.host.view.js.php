@@ -151,8 +151,7 @@
 						.setFields(['interface'])
 						.setRenderer('interface'),
 					new CDataTableColumn('availability', <?= json_encode(_('Availability')); ?>)
-						.setFields(['availability', 'active_available'])
-						.setRenderer('availability'),
+						.setFields(['availability', 'active_available']),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
@@ -254,11 +253,6 @@
 					flex_wrapper.appendChild(overflow_ellipsis);
 
 					cell.appendChild(flex_wrapper);
-				})
-				.setCellRenderer('availability', ({cell_data, cell}) => {
-					const [availability] = cell_data;
-
-					cell.innerHTML = availability;
 				})
 				.setCellRenderer('status', ({cell_data, cell}) => {
 					const [status] = cell_data;
