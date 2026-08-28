@@ -327,6 +327,21 @@ trait traitItemTelemetryQueryTests {
 			null
 		];
 
+		yield '"storage_mode" value fail' => [
+			[
+				'lookback_limit' => '10s',
+				'storage_mode' => 0,
+				'granularity' => '30s',
+				'query' => [
+					'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+					'columns' => [],
+					'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+					'filter' => ['evaltype' => CONDITION_EVAL_TYPE_AND_OR, 'conditions' => []]
+				]
+			],
+			'Invalid parameter "/1": unexpected parameter "storage_mode".'
+		];
+
 		yield '"granularity" value greater than "lookback_limit" value fail' => [
 			[
 				'lookback_limit' => '10s',
@@ -814,6 +829,11 @@ trait traitItemTelemetryQueryTests {
 				]
 			],
 			null
+		];
+
+		yield '"storage_mode" value fail' => [
+			['storage_mode' => 0],
+			'Invalid parameter "/1": unexpected parameter "storage_mode".'
 		];
 
 		yield '"query" empty fail' => [

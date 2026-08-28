@@ -493,6 +493,8 @@ class CItem extends CItemGeneral {
 
 			// Items share table with item prototypes. Therefore remove item unrelated fields.
 			unset($item['discover']);
+			// Make telemetry query field storage_mode inaccessible.
+			unset($item['storage_mode']);
 		}
 		unset($item);
 	}
