@@ -135,6 +135,8 @@ src/zabbix_sender/zabbix_sender
 src/zabbix_server/zabbix_server
 src/libs/test_zbxcommon/test_libzbxcommon_bin
 src/go/bin/zabbix_web_service
+tests/libs/**/grouped-libs-generated.mk
+tests/zabbix_server/**/grouped-libs-generated.mk
 tests/libs/zbxalgo/queue
 tests/libs/zbxalgo/zbx_binary_heap_direct
 tests/libs/zbxalgo/zbx_binary_heap
@@ -144,6 +146,8 @@ tests/libs/zbxalgo/zbx_mode_code
 tests/libs/zbxalgo/zbx_int128
 tests/libs/zbxalgo/zbx_vector
 tests/libs/zbxcfg/parse_cfg_file
+tests/libs/zbxcfg/zbx_cfg_prepare_bridge_adapter_connect_to
+tests/libs/zbxcfg/zbx_cfg_validate_bridge_adapter_url
 tests/libs/zbxcommon/init_library_common
 tests/libs/zbxcommon/zbx_calloc
 tests/libs/zbxcommon/zbx_malloc

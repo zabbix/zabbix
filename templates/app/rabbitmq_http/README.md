@@ -177,6 +177,7 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 |{$RABBITMQ.API.USER}|<p>RabbitMQ API username.</p>|`zbx_monitor`|
 |{$RABBITMQ.API.PASSWORD}|<p>RabbitMQ API password.</p>|`zabbix`|
 |{$RABBITMQ.CLUSTER.NAME}|<p>The name of the RabbitMQ cluster.</p>|`rabbit`|
+|{$RABBITMQ.NODE.NAME}|<p>The name of the RabbitMQ node.</p>||
 |{$RABBITMQ.API.PORT}|<p>The port of the RabbitMQ API endpoint.</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>The request scheme, which may be HTTP or HTTPS.</p>|`http`|
 |{$RABBITMQ.API.HOST}|<p>The hostname or IP of the API endpoint for the RabbitMQ.</p>||

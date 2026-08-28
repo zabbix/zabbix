@@ -25,6 +25,8 @@ $DB['VAULT_URL']		= '';
 $DB['VAULT_PREFIX']		= '';
 $DB['VAULT_DB_PATH']		= '';
 $DB['VAULT_TOKEN']		= '';
+$DB['VAULT_APP_ROLE_ID']	= '';
+$DB['VAULT_APP_SECRET_ID']	= '';
 $DB['VAULT_CERT_FILE']		= '';
 $DB['VAULT_KEY_FILE']		= '';
 // Uncomment to bypass local caching of credentials.
@@ -99,7 +101,7 @@ $SSO['CERT_STORAGE']		= 'database';
 //$ZBX_FEATURE_FLAGS['modules_config_enabled'] = true;
 
 // Uncomment and set to desired values to disable editing of specific media types.
-// Possible values: 'email', 'script', 'sms', 'webhook'. One or more values can be set.
+// Possible values: 'email', 'script', 'sms', 'webhook', 'push'. One or more values can be set.
 //$ZBX_FEATURE_FLAGS['media_type_denylist'] = [];
 
 $ZBX_SERVER_TLS['ACTIVE'] = false;

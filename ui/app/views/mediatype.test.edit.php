@@ -103,6 +103,45 @@ switch ($data['type']) {
 			]);
 		break;
 
+	case MEDIA_TYPE_PUSH:
+		$form_grid
+			->addItem([
+				(new CLabel(_('Send to'), 'sendto_deviceuuids__ms'))->setAsteriskMark(),
+				new CFormField(
+					(new CMultiSelect([
+						'name' => 'sendto_deviceuuids[]',
+						'object_name' => 'devices',
+						'readonly' => !$data['enabled'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'devices',
+								'srcfld1' => 'uuid',
+								'dstfrm' => 'mediatypetest_form',
+								'dstfld1' => 'sendto_deviceuuids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				)
+			])
+			->addItem([
+				new CLabel(_('Subject'), 'subject'),
+				new CFormField(
+					(new CTextBox('subject', $data['subject'], false, 1024))
+						->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+						->setEnabled($data['enabled'])
+				)
+			])
+			->addItem([
+				(new CLabel(_('Message'), 'message')),
+				new CFormField(
+					(new CTextArea('message', $data['message'], ['rows' => 10]))
+						->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+						->setAriaRequired()
+						->setEnabled($data['enabled'])
+				)
+			]);
+		break;
+
 	default:
 		$form_grid
 			->addItem([

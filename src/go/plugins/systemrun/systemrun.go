@@ -53,7 +53,7 @@ func init() {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
-	systemrunPlugin.SetHandleTimeout(true)
+	systemrunPlugin.SetForceEffectiveTimeoutExtension(true)
 }
 
 // Configure configures plugin based on options and other required initialization.

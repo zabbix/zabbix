@@ -3385,6 +3385,26 @@ class CFormValidatorTest extends TestCase {
 				['/value' => [
 					['message' => 'This value does not match pattern.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string'],
+					'object' => ['object', 'fields' => [
+						'value2' => ['string', 'required', 'when' => ['../value', 'in' => ['test']]]
+					]],
+					'object2' => ['object', 'fields' => [
+						'value2' => ['string', 'required', 'when' => ['../value', 'in' => ['test']]]
+					]]
+				]],
+				[
+					'value' => 'test',
+					'object' => []
+				],
+				[],
+				CFormValidator::ERROR,
+				['/object/value2' => [
+					['message' => 'Required field is missing.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
 			]
 		];
 	}
