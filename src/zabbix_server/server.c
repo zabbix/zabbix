@@ -1735,7 +1735,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.zbx_get_value_internal_ext_cb = zbx_get_value_internal_ext_server,
 			.config_ssh_key_location = config_ssh_key_location,
 			.config_webdriver_url = config_webdriver_url,
-			.apm_db_config = &config_apm_db_config,
+			.config_apm_db_config = &config_apm_db_config,
 			.trapper_process_request_func_cb = zbx_trapper_process_request_server,
 			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
 			.config_frontend_allowed_ip = config_frontend_allowed_ip,
@@ -2779,9 +2779,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_apm_db_config_init(&config_apm_db_config, config_apm_provider, zbx_config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &zbx_config_vault,
-			&error))
+	if (SUCCEED != zbx_apm_db_config_init_local_config(&config_apm_db_config, config_apm_provider,
+			zbx_config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			&zbx_config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize APM database configuration: %s", error);
 		zbx_free(error);

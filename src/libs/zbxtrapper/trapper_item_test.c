@@ -629,7 +629,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
 		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
-		const zbx_apm_db_config_t *apm_db_config, struct zbx_json *json,
+		const zbx_apm_db_config_t *config_apm_db_config, struct zbx_json *json,
 		char **error)
 {
 	zbx_user_t		user;
@@ -638,6 +638,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	zbx_uint64_t		proxyid = 0;
 	int			ret = FAIL, state = 0, value_found;
 	size_t			value_size = 0, key_size = 0;
+	zbx_apm_db_config_t	apm_db_config;
 
 	zbx_user_init(&user);
 
@@ -702,10 +703,15 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(proxyid, tmp);
 
+	zbx_dc_config_get_apm_db_config(&apm_db_config, config_apm_db_config, config_comms->config_source_ip,
+			config_comms->config_ssl_ca_location);
+
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
 			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
 			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location,
-			config_webdriver_url, apm_db_config);
+			config_webdriver_url, &apm_db_config);
+
+	zbx_apm_db_config_clear(&apm_db_config);
 
 	if (FAIL == ret)
 		state = ITEM_STATE_NOTSUPPORTED;
@@ -760,7 +766,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
 		const char *config_webdriver_url, const zbx_config_tls_t *config_tls,
-		const char *config_frontend_allowed_ip, const zbx_apm_db_config_t *apm_db_config)
+		const char *config_frontend_allowed_ip, const zbx_apm_db_config_t *config_apm_db_config)
 {
 	struct zbx_json	json;
 	int		ret;
@@ -776,7 +782,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	if (SUCCEED == (ret = trapper_item_test(jp, config_comms, config_startup_time, program_type, progname,
 			get_config_forks, config_java_gateway, config_java_gateway_port, config_externalscripts,
 			get_value_internal_ext_cb, config_ssh_key_location, config_webdriver_url,
-			apm_db_config, &json, &error)))
+			config_apm_db_config, &json, &error)))
 	{
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout))
 			zabbix_log(LOG_LEVEL_TRACE, "%s() failed sending item.test response", __func__);

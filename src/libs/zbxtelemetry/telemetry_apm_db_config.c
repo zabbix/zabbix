@@ -263,7 +263,7 @@ static int	validate_config(const zbx_apm_db_config_t *apm_db_config, char **erro
 	return SUCCEED;
 }
 
-int	zbx_apm_db_config_init(zbx_apm_db_config_t *apm_db_config, const char *config_apm_provider,
+int	zbx_apm_db_config_init_local_config(zbx_apm_db_config_t *apm_db_config, const char *config_apm_provider,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, const zbx_config_vault_t *config_vault, char **error)
 {
