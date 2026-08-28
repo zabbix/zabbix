@@ -143,27 +143,17 @@ static void	process_trigger_tag(zbx_db_event* event, const zbx_tag_t *tag)
 	validate_and_add_tag(event, t);
 }
 
-static void	substitute_item_tag_macro(const zbx_db_event* event, const zbx_dc_item_t *dc_item, char **str)
+static void	process_item_tag(zbx_db_event* event, const zbx_item_tag_t *item_tag, zbx_dc_um_handle_t *um_handle)
 {
-	zbx_substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, dc_item, NULL,
-			NULL, NULL, NULL, NULL, str, ZBX_MACRO_TYPE_ITEM_TAG, NULL, 0);
-}
+	zbx_tag_t	*t = duplicate_tag(&item_tag->tag);
 
-static void	process_item_tag(zbx_db_event* event, const zbx_item_tag_t *item_tag)
-{
-	zbx_tag_t	*t;
-	zbx_dc_item_t	dc_item; /* used to pass data into zbx_substitute_simple_macros() function */
+	zbx_substitute_macros(&t->tag, NULL, 0, &zbx_macro_event_item_tag_resolv, um_handle, event, item_tag->hostid,
+			item_tag->itemid);
+	zbx_substitute_macros(&t->value, NULL, 0, &zbx_macro_event_item_tag_resolv, um_handle, event, item_tag->hostid,
+			item_tag->itemid);
 
-	t = duplicate_tag(&item_tag->tag);
-
-	dc_item.host.hostid = item_tag->hostid;
-	dc_item.itemid = item_tag->itemid;
-
-	substitute_item_tag_macro(event, &dc_item, &t->tag);
-	substitute_item_tag_macro(event, &dc_item, &t->value);
 	validate_and_add_tag(event, t);
 }
-
 static void	get_item_tags_by_expression(const zbx_db_trigger *trigger, zbx_vector_item_tag_t *item_tags)
 {
 	zbx_vector_uint64_t	functionids;
@@ -274,7 +264,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 
 		for (int i = 0; i < item_tags.values_num; i++)
 		{
-			process_item_tag(event, item_tags.values[i]);
+			process_item_tag(event, item_tags.values[i], um_handle);
 			zbx_free_item_tag(item_tags.values[i]);
 		}
 
@@ -313,7 +303,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 
 		for (int i = 0; i < item_tags.values_num; i++)
 		{
-			process_item_tag(event, item_tags.values[i]);
+			process_item_tag(event, item_tags.values[i], um_handle);
 			zbx_free_item_tag(item_tags.values[i]);
 		}
 
