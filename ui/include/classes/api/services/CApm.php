@@ -186,7 +186,7 @@ class CApm extends CApiService {
 			$query_parts['select'][$field] = match($field) {
 				'TraceId' => 't.TraceId',
 				'span_count' => 'count()',
-				'error_count' => 'countIf(t.StatusCode=\'Error\')',
+				'error_count' => 'countIf(t.StatusCode=\'STATUS_CODE_ERROR\')',
 				default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
 			};
 		}
