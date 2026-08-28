@@ -162,18 +162,19 @@ class CControllerCepRuleEdit extends CController {
 				}
 				unset($condition);
 
+
+				if ($operation['suppress_duration'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
+					$operation['suppress_time_option'] = ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE;
+					$operation['suppress_duration'] = '';
+				}
+				else {
+					$operation['suppress_time_option'] = ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE;
+				}
+
+				$operation['old_tag'] = '';
+				$operation['tag_name'] = '';
+
 				switch ($operation['type']) {
-					case CCepRuleHelper::OP_SUPPRESS:
-						if ($operation['suppress_duration'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
-							$operation['suppress_time_option'] = ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE;
-							$operation['suppress_duration'] = '';
-						}
-						else {
-							$operation['suppress_time_option'] = ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE;
-						}
-
-						break;
-
 					case CCepRuleHelper::OP_RENAME_TAG:
 						$operation['old_tag'] = $operation['tag'];
 						$operation['tag'] = '';
