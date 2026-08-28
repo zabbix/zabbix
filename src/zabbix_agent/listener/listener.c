@@ -154,7 +154,8 @@ static void	process_listener(zbx_socket_t *s, int config_timeout)
 {
 	int	ret;
 
-	s->max_len_limit = ZBX_MAX_PASSIVE_CHECK_DATA_SIZE;
+	if (0 == s->max_len_limit || ZBX_MAX_PASSIVE_CHECK_DATA_SIZE < s->max_len_limit)
+		s->max_len_limit = ZBX_MAX_PASSIVE_CHECK_DATA_SIZE;
 
 	if (SUCCEED == (ret = zbx_tcp_recv_to(s, config_timeout)))
 	{
