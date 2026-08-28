@@ -282,9 +282,50 @@ static int	match_mountpoint(const char *current, const char *requested)
 	return (NULL == requested || 0 == strcmp(current, requested)) ? SUCCEED : FAIL;
 }
 
+static int	vfs_fs_get_short(const char *mountpoint, AGENT_RESULT *result)
+{
+	struct statfs	*mntbuf;
+	struct zbx_json	j;
+	zbx_fsname_t	fsname;
+	char		*options;
+	int		rc;
+
+	if (0 == (rc = getmntinfo(&mntbuf, MNT_NOWAIT)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	for (int i = 0; i < rc; i++)
+	{
+		fsname.mpoint = mntbuf[i].f_mntonname;
+
+		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
+			continue;
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname.mpoint, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mntbuf[i].f_fstypename, ZBX_JSON_TYPE_STRING);
+		options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flags & MNT_VISFLAGMASK);
+		zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, options, ZBX_JSON_TYPE_STRING);
+		zbx_free(options);
+		zbx_json_close(&j);
+	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+}
+
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			rc, ret = SYSINFO_RET_FAIL, mode_short = 0;
+	int			rc, ret = SYSINFO_RET_FAIL;
 	struct statfs		*mntbuf;
 	struct zbx_json		j;
 	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
@@ -294,74 +335,30 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_mpoint_t		*mntpoint;
 	zbx_fsname_t		fsname;
 
-	/* validate parameter count */
 	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	/* parse parameters */
 	mode = get_rparam(request, 0);
 	mountpoint = get_rparam(request, 1);
 
-	/* validate mode */
+	if (NULL != mountpoint && '\0' == *mountpoint)
+		mountpoint = NULL;
+
 	if (NULL != mode && '\0' != *mode)
 	{
 		if (0 == strcmp(mode, "short"))
-			mode_short = 1;
-		else if (0 != strcmp(mode, "full"))
+			return vfs_fs_get_short(mountpoint, result);
+
+		if (0 != strcmp(mode, "full"))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 			return SYSINFO_RET_FAIL;
 		}
 	}
 
-	/* empty mountpoint means no filter */
-	if (NULL != mountpoint && '\0' == *mountpoint)
-		mountpoint = NULL;
-
-	/* process short mode */
-	if (1 == mode_short)
-	{
-		if (0 == (rc = getmntinfo(&mntbuf, MNT_NOWAIT)))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",
-					zbx_strerror(errno)));
-			return SYSINFO_RET_FAIL;
-		}
-
-		zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
-
-		for (int i = 0; i < rc; i++)
-		{
-			char *options;
-
-			fsname.mpoint = mntbuf[i].f_mntonname;
-
-			/* apply mountpoint filter */
-			if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
-				continue;
-
-			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, fsname.mpoint, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mntbuf[i].f_fstypename, ZBX_JSON_TYPE_STRING);
-			options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flags & MNT_VISFLAGMASK);
-			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, options, ZBX_JSON_TYPE_STRING);
-			zbx_free(options);
-			zbx_json_close(&j);
-		}
-
-		zbx_json_close(&j);
-
-		SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
-
-		zbx_json_free(&j);
-
-		return SYSINFO_RET_OK;
-	}
-
-	/* process full mode */
 	if (0 == (rc = getmntinfo(&mntbuf, MNT_NOWAIT)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
@@ -374,7 +371,6 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		fsname.mpoint = mntbuf[i].f_mntonname;
 
-		/* apply mountpoint filter */
 		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 			continue;
 
@@ -424,7 +420,6 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		fsname.mpoint = mntbuf[i].f_mntonname;
 		fsname.type = mntbuf[i].f_fstypename;
 
-		/* apply mountpoint filter */
 		if (FAIL == match_mountpoint(fsname.mpoint, mountpoint))
 			continue;
 
