@@ -462,8 +462,6 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$roleids = [];
-
 		foreach ($users as $i => &$user) {
 			$user = $this->checkLoginOptions($user);
 
@@ -474,10 +472,6 @@ class CUser extends CApiService {
 			if (array_key_exists('passwd', $user)) {
 				$user['passwd'] = password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST]);
 			}
-
-			if (array_key_exists('url', $user)) {
-				$roleids[$user['roleid']] = $user['roleid'];
-			}
 		}
 		unset($user);
 
@@ -487,7 +481,7 @@ class CUser extends CApiService {
 		$db_roles = self::getDbRoles($users);
 		self::checkRoles($users, $db_roles);
 		self::addRoleType($users, $db_roles);
-		self::validateRedirectUrlEnforce($users, $roleids);
+		self::validateRedirectUrlEnforce($users);
 
 		self::checkUserGroups($users, $db_user_groups);
 		self::checkEmptyPassword($users, $db_user_groups);
@@ -616,7 +610,6 @@ class CUser extends CApiService {
 
 		$superadminids_to_update = [];
 		$usernames = [];
-		$roleids = [];
 
 		foreach ($users as $i => &$user) {
 			$db_user = $db_users[$user['userid']];
@@ -659,15 +652,6 @@ class CUser extends CApiService {
 			if (array_key_exists('roleid', $user) && $user['roleid'] && $user['roleid'] != $db_user['roleid']) {
 				if ($db_user['roleid'] == $readonly_superadmin_role['roleid']) {
 					$superadminids_to_update[] = $user['userid'];
-				}
-			}
-
-			if (array_key_exists('url', $user)) {
-				if (array_key_exists('roleid', $user)) {
-					$roleids[$user['roleid']] = $user['roleid'];
-				}
-				else {
-					$roleids[$db_user['roleid']] = $db_user['roleid'];
 				}
 			}
 
@@ -720,7 +704,7 @@ class CUser extends CApiService {
 		$db_roles = self::getDbRoles($users, $db_users);
 		self::checkRoles($users, $db_roles, $db_users);
 		self::addRoleType($users, $db_roles, $db_users);
-		self::validateRedirectUrlEnforce($users, $roleids, $db_users);
+		self::validateRedirectUrlEnforce($users, $db_users);
 
 		self::addAffectedObjects($users, $db_users);
 
@@ -1404,17 +1388,9 @@ class CUser extends CApiService {
 
 	/**
 	 * @param array      $users
-	 * @param array      $roleids
 	 * @param array|null $db_users
 	 */
-	private static function validateRedirectUrlEnforce(array $users, array $roleids, ?array $db_users = null): void {
-		$roles = API::Role()->get([
-			'output' => [],
-			'roleids' => $roleids,
-			'selectRules' => ['profile.redirect.enforce'],
-			'preservekeys' => true
-		]);
-
+	private static function validateRedirectUrlEnforce(array $users, ?array $db_users = null): void {
 		foreach ($users as $i => $user) {
 			if (!array_key_exists('url', $user)) {
 				continue;
@@ -1429,7 +1405,7 @@ class CUser extends CApiService {
 				$roleid = $db_users[$user['userid']]['roleid'];
 			}
 
-			if ($roleid !== null && $roles[$roleid]['rules']['profile.redirect.enforce']) {
+			if ($roleid !== null && CRoleHelper::checkAccess('profile.redirect.enforce', $roleid)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/url',
 					_s('you do not have permission to update the parameter while redirect url is enforced by role rule')
 				));
