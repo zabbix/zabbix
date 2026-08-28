@@ -941,85 +941,173 @@ int	zbx_db_settings_set_value(const char *name, const void *value, int type)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate user permissions for proxy access                        *
+ * Purpose: validate user permissions for monitoring on server                *
+ *                                                                            *
+ * Parameters: user - [IN] user information                                   *
+ *                                                                            *
+ * Return value: SUCCEED - monitoring on server is allowed                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: USER_TYPE_ZABBIX_USER can't have server monitoring permission,   *
+ *           for USER_TYPE_ZABBIX_ADMIN and USER_TYPE_SUPER_ADMIN             *
+ *           monitoring on server is alowed by default                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_server_allowed_for_monitoring(zbx_user_t *user)
+{
+	int		ret = FAIL;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() user:%s userid:" ZBX_FS_UI64, __func__, user->username, user->userid);
+
+	if (USER_TYPE_ZABBIX_ADMIN > user->type)
+		goto out;
+
+	if (NULL != (result = zbx_db_select(
+			"select value_int"
+			" from role_rule"
+			" where roleid=" ZBX_FS_UI64
+				" and name" ZBX_SQL_STRCMP,
+			user->roleid, ZBX_SQL_STRVAL_EQ("actions.select_server_for_monitoring"))))
+	{
+		if (NULL == (row = zbx_db_fetch(result)) || 1 == atoi(row[0]))
+			ret = SUCCEED;
+	}
+	zbx_db_free_result(result);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate user permissions for monitoring on proxy                 *
  *                                                                            *
  * Parameters: user    - [IN] user information                                *
  *             proxyid - [IN]                                                 *
  *                                                                            *
- * Return value:  SUCCEED - access to proxy is allowed                        *
- *                FAIL    - otherwise                                         *
+ * Return value: SUCCEED - monitoring on proxy is allowed                     *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: USER_TYPE_SUPER_ADMIN is always allowed to monitor on proxies    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_user_access_to_proxy_check(zbx_user_t *user, zbx_uint64_t proxyid)
+int	zbx_db_proxy_allowed_for_monitoring(zbx_user_t *user, zbx_uint64_t proxyid)
 {
 #	define PROXY_MODE_DENY		"0"
 #	define PROXY_MODE_ALLOW		"1"
 #	define PROXY_GROUP_MODE_DENY	"0"
 #	define PROXY_GROUP_MODE_ALLOW	"1"
 
-	int		ret = FAIL;
-	zbx_db_result_t	result;
+	int			ret = FAIL;
+	zbx_db_query_mask_t	old_queries;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_uint64_t		proxy_groupid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() user:%s userid:" ZBX_FS_UI64 " proxyid:" ZBX_FS_UI64, __func__,
-			user->username, user->userid, proxyid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() user:%s userid:" ZBX_FS_UI64 " proxyid:" ZBX_FS_UI64,
+			__func__, user->username, user->userid, proxyid);
 
-	zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
+	if (USER_TYPE_SUPER_ADMIN == user->type)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
 
-	if (NULL != (result = zbx_db_select(
-			"select null"
+	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
+
+	result = zbx_db_select(
+			"select p.proxy_groupid"
 			" from proxy p"
-			" where p.proxyid=" ZBX_FS_UI64
-				" and ("
-					"("
-						" p.proxy_groupid is null"
-						" and not exists ("
-							" select null"
-							" from usrgrp_proxy ugp"
+			" where exists ("
+				" select NULL"
+				" from users_groups uug"
+				" where uug.userid=" ZBX_FS_UI64
+			" ) and p.proxyid=" ZBX_FS_UI64,
+			user->userid, proxyid);
+
+	if (NULL == (row = zbx_db_fetch(result)))
+		goto clean;
+
+	ZBX_DBROW2UINT64(proxy_groupid, row[0]);
+
+	zbx_db_free_result(result);
+
+	if (0 == proxy_groupid)
+	{
+		result = zbx_db_select(
+				"select null"
+				" from proxy p"
+				" where p.proxyid=" ZBX_FS_UI64
+					" and not exists ("
+						" select null"
+						" from usrgrp_proxy ugp"
 							" join users_groups uug on ugp.usrgrpid=uug.usrgrpid"
 							" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
-							" where p.proxyid=ugp.proxyid"
-								" and uug.userid=" ZBX_FS_UI64
-								" and ug.proxy_mode=" PROXY_MODE_DENY
-						")"
-						" and exists ("
+						" where p.proxyid=ugp.proxyid"
+							" and uug.userid=" ZBX_FS_UI64
+							" and ug.proxy_mode=" PROXY_MODE_DENY
+					") and ("
+						"not exists ("
+							" select null"
+							" from users_groups uug"
+							" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
+							" where uug.userid=" ZBX_FS_UI64
+								" and ug.proxy_mode=" PROXY_MODE_ALLOW
+						") or exists ("
 							" select null"
 							" from usrgrp_proxy ugp"
-							" join users_groups uug on ugp.usrgrpid=uug.usrgrpid"
-							" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
+								" join users_groups uug on ugp.usrgrpid=uug.usrgrpid"
+								" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
 							" where p.proxyid=ugp.proxyid"
 								" and uug.userid=" ZBX_FS_UI64
 								" and ug.proxy_mode=" PROXY_MODE_ALLOW
-							")"
-					") or ("
-						" p.proxy_groupid is not null"
-						" and not exists ("
-							" select null"
-							" from usrgrp_proxy_group ugpg"
+						")"
+					")",
+				proxyid, user->userid, user->userid, user->userid);
+	}
+	else
+	{
+		result = zbx_db_select(
+				"select null"
+				" from proxy_group pg"
+				" where pg.proxy_groupid=" ZBX_FS_UI64
+					" and not exists ("
+						" select null"
+						" from usrgrp_proxy_group ugpg"
 							" join users_groups uug on ugpg.usrgrpid=uug.usrgrpid"
 							" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
-							" where p.proxy_groupid=ugpg.proxy_groupid"
-								" and uug.userid=" ZBX_FS_UI64
-								" and ug.proxy_group_mode=" PROXY_GROUP_MODE_DENY
-						")"
-						" and exists ("
+						" where pg.proxy_groupid=ugpg.proxy_groupid"
+							" and uug.userid=" ZBX_FS_UI64
+							" and ug.proxy_group_mode=" PROXY_GROUP_MODE_DENY
+					") and ("
+						"not exists ("
+							" select null"
+							" from users_groups uug"
+								" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
+							" where uug.userid=" ZBX_FS_UI64
+								" and ug.proxy_group_mode=" PROXY_GROUP_MODE_ALLOW
+						") or exists ("
 							" select null"
 							" from usrgrp_proxy_group ugpg"
-							" join users_groups uug ON ugpg.usrgrpid=uug.usrgrpid"
-							" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
-							" where p.proxy_groupid=ugpg.proxy_groupid"
+								" join users_groups uug on ugpg.usrgrpid=uug.usrgrpid"
+								" join usrgrp ug on uug.usrgrpid=ug.usrgrpid"
+							" where pg.proxy_groupid=ugpg.proxy_groupid"
 								" and uug.userid=" ZBX_FS_UI64
 								" and ug.proxy_group_mode=" PROXY_GROUP_MODE_ALLOW
 						")"
-					")"
-				")", proxyid, user->userid, user->userid, user->userid, user->userid)))
-	{
-		if (NULL != zbx_db_fetch(result))
-			ret = SUCCEED;
+					")",
+				proxy_groupid, user->userid, user->userid, user->userid);
 	}
 
+	if (NULL != zbx_db_fetch(result))
+		ret = SUCCEED;
+clean:
 	zbx_db_free_result(result);
 	zbx_db_set_log_masked_values(old_queries);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

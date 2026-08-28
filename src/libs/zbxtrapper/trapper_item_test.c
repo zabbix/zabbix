@@ -19,6 +19,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxdbschema.h"
+#include "zbxdbwrap.h"
 #include "zbxeval.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
@@ -32,6 +33,7 @@
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
+#include "zbx_host_constants.h"
 #include "zbxalgo.h"
 #include "zbxexpr.h"
 
@@ -617,10 +619,11 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 		char **error)
 {
 	zbx_user_t		user;
+	zbx_dc_host_t		host;
 	struct zbx_json_parse	jp_data, jp_item, jp_host, jp_options, jp_steps;
 	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL, buffer[MAX_STRING_LEN], *key = NULL;
-	zbx_uint64_t		proxyid = 0;
-	int			ret = FAIL, state = 0, value_found;
+	zbx_uint64_t		proxyid = 0, hostid = 0;
+	int			ret = FAIL, state = 0, value_found, monitoring_allowed;
 	size_t			value_size = 0, key_size = 0;
 
 	zbx_user_init(&user);
@@ -686,9 +689,43 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(proxyid, tmp);
 
-	if (0 != proxyid && 1 != user.userid && FAIL == zbx_db_user_access_to_proxy_check(&user, proxyid))
+	if (0 == proxyid)
+		monitoring_allowed = zbx_db_server_allowed_for_monitoring(&user);
+	else
+		monitoring_allowed = zbx_db_proxy_allowed_for_monitoring(&user, proxyid);
+
+	if (FAIL == monitoring_allowed &&
+			SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL))
 	{
-		*error = zbx_strdup(NULL, "Proxy access permission denied.");
+		ZBX_STR2UINT64(hostid, tmp);
+
+		if (PERM_READ_WRITE == zbx_get_host_permission(&user, hostid) &&
+				SUCCEED == zbx_dc_get_host_by_hostid(&host, hostid))
+		{
+			switch (host.monitored_by)
+			{
+				case HOST_MONITORED_BY_SERVER:
+					if (0 == proxyid)
+						monitoring_allowed = SUCCEED;
+					break;
+				case HOST_MONITORED_BY_PROXY_GROUP:
+					if (FAIL == zbx_dc_get_host_proxyid_by_name(host.host, &host.proxyid))
+						host.proxyid = 0;
+					ZBX_FALLTHROUGH;
+				case HOST_MONITORED_BY_PROXY:
+					if (host.proxyid == proxyid)
+						monitoring_allowed = SUCCEED;
+					break;
+			}
+		}
+	}
+
+	if (SUCCEED != monitoring_allowed)
+	{
+		if (0 == proxyid)
+			*error = zbx_strdup(NULL, "Server monitoring permission denied.");
+		else
+			*error = zbx_strdup(NULL, "Proxy monitoring permission denied.");
 		goto out;
 	}
 
