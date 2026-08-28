@@ -255,7 +255,7 @@ class CElasticsearchHelper {
 
 			if ($options['searchByAny']) {
 				$type = 'should';
-				$query['minimum_should_match'] = 1;
+				$query['query']['bool']['minimum_should_match'] = 1;
 			}
 			else {
 				$type = 'must';
@@ -290,7 +290,7 @@ class CElasticsearchHelper {
 				$exclude = 'should';
 			}
 
-			$query['minimum_should_match'] = 1;
+			$query['query']['bool']['minimum_should_match'] = 1;
 		}
 
 		foreach ($options['search'] as $field => $value) {
