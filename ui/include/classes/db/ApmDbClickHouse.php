@@ -170,8 +170,12 @@ class ApmDbClickHouse {
 			];
 		}
 
+		if ($this->config['ssl_ca_file'] !== '') {
+			$curl_options[CURLOPT_CAINFO] = $this->config['ssl_ca_file'];
+		}
+
 		if ($this->config['ssl_ca_location'] !== '') {
-			$curl_options[CURLOPT_CAINFO] = $this->config['ssl_ca_location'];
+			$curl_options[CURLOPT_CAPATH] = $this->config['ssl_ca_location'];
 		}
 
 		if ($this->config['ssl_cert_file'] !== '') {

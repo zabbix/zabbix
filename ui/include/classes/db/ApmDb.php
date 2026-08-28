@@ -19,6 +19,15 @@ class ApmDb {
 	private const PROVIDER_ZABBIX = 'zabbix';
 	private const PROVIDER_CLICKHOUSE = 'clickhouse';
 
+	private const CONFIG_DEFAULTS = [
+		'vault_path' => '',
+		'ssl_cert_file' => '',
+		'ssl_key_file' => '',
+		'ssl_key_password' => '',
+		'ssl_ca_file' => '',
+		'ssl_ca_location' => ''
+	];
+
 	private static ?self $instance = null;
 
 	private string $provider;
@@ -87,39 +96,43 @@ class ApmDb {
 	 * @throws DBException|JsonException
 	 */
 	private static function resolveConfig(array $config): array {
-		global $DB;
+		global $DB, $APM_CA_FILE, $APM_CA_LOCATION;
 
 		if (array_key_exists('status', $config) && $config['status'] == APM_GLOBAL_DB_STATUS_NOT_CONFIGURED) {
 			throw new DBException(_('APM DB is not configured.'), DB::INIT_ERROR);
 		}
 
-		if ($config['vault_path'] === '') {
+		$config += self::CONFIG_DEFAULTS;
 
-			return array_diff_key($config, array_flip(['status', 'vault_path', 'authentication_type', 'provider']));
+		if ($config['vault_path'] !== '') {
+			if ($DB['VAULT'] === '') {
+				throw new DBException(_('Vault is not configured.'), DB::INIT_ERROR);
+			}
+
+			$vault = $DB['VAULT'] === CVaultHashiCorp::NAME
+				? new CVaultHashiCorp($DB['VAULT_URL'], $DB['VAULT_PREFIX'], $config['vault_path'], $DB['VAULT_TOKEN'],
+					$DB['VAULT_APP_ROLE_ID'], $DB['VAULT_APP_SECRET_ID']
+				)
+				: new CVaultCyberArk($DB['VAULT_URL'], $DB['VAULT_PREFIX'], $config['vault_path'], $DB['VAULT_CERT_FILE'],
+					$DB['VAULT_KEY_FILE']
+				);
+
+			$credentials = $vault->getCredentials();
+
+			if ($credentials === null) {
+				$errors = $vault->getErrors();
+
+				throw new DBException(reset($errors), DB::INIT_ERROR);
+			}
+
+			$config['username'] = $credentials['user'];
+			$config['password'] = $credentials['password'];
 		}
 
-		if ($DB['VAULT'] === '') {
-			throw new DBException(_('Vault is not configured.'), DB::INIT_ERROR);
+		if ($config['ssl_verify_peer'] && $config['ssl_ca_file'] === '' && $config['ssl_ca_location'] === '') {
+			$config['ssl_ca_file'] = $APM_CA_FILE;
+			$config['ssl_ca_location'] = $APM_CA_LOCATION;
 		}
-
-		$vault = $DB['VAULT'] === CVaultHashiCorp::NAME
-			? new CVaultHashiCorp($DB['VAULT_URL'], $DB['VAULT_PREFIX'], $config['vault_path'], $DB['VAULT_TOKEN'],
-				$DB['VAULT_APP_ROLE_ID'], $DB['VAULT_APP_SECRET_ID']
-			)
-			: new CVaultCyberArk($DB['VAULT_URL'], $DB['VAULT_PREFIX'], $config['vault_path'], $DB['VAULT_CERT_FILE'],
-				$DB['VAULT_KEY_FILE']
-			);
-
-		$credentials = $vault->getCredentials();
-
-		if ($credentials === null) {
-			$errors = $vault->getErrors();
-
-			throw new DBException(reset($errors), DB::INIT_ERROR);
-		}
-
-		$config['username'] = $credentials['user'];
-		$config['password'] = $credentials['password'];
 
 		return array_diff_key($config, array_flip(['status', 'vault_path', 'authentication_type', 'provider']));
 	}
