@@ -1208,9 +1208,9 @@ function getEventsSuppressions(array $events): array {
 				$userids[$ack['userid']] = true;
 			}
 			elseif (($ack['action'] & ZBX_PROBLEM_UPDATE_CEP) == ZBX_PROBLEM_UPDATE_CEP) {
-				$details = json_decode($ack['details'], true);
+				$operations = array_reverse(json_decode($ack['details'], true)['cep']);
 
-				foreach ($details['cep'] as $operation) {
+				foreach ($operations as $operation) {
 					if ($operation['operation'] == CCepRuleHelper::OP_SUPPRESS) {
 						$event_suppressions[] = [
 							'suppress_until' => $operation['suppress']['until'],
