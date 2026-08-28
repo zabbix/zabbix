@@ -1308,6 +1308,13 @@ static int	DBpatch_7050098(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050099(void)
+{
+	const zbx_db_field_t	field = {"storage_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1413,5 +1420,6 @@ DBPATCH_ADD(7050095, 0, 1)
 DBPATCH_ADD(7050096, 0, 1)
 DBPATCH_ADD(7050097, 0, 1)
 DBPATCH_ADD(7050098, 0, 1)
+DBPATCH_ADD(7050099, 0, 1)
 
 DBPATCH_END()
