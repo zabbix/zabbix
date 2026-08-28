@@ -934,7 +934,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 		// Change host group.
 		if (array_key_exists('hostgroup', $data)) {
-			$this->zbxTestClickXpathWait('//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
 			$form->fill(['Host groups' => $data['hostgroup']]);
 		}
 		// Change host group prototype.
