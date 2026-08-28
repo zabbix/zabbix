@@ -502,7 +502,4 @@ zbx_eval_variant_to_value_type_LDADD += @SERVER_LIBS@
 zbx_eval_variant_to_value_type_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_eval_variant_to_value_type_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
-
-
 endif

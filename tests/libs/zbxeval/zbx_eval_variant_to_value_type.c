@@ -17,8 +17,8 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxvariant.h"
 #include "zbxeval.h"
+#include "zbxvariant.h"
 
 #include "zbxmockvariant.h"
 

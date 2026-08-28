@@ -63,6 +63,8 @@ int	zbx_eval_variant_to_value_type(zbx_variant_t *value, unsigned char value_typ
 			ret = zbx_variant_convert(value, ZBX_VARIANT_STR);
 			break;
 		case ITEM_VALUE_TYPE_JSON:
+			/* Although JSON to string conversion is infallible an ill-formed JSON */
+			/* will cause problems later. Therefore JSON validation is here.       */
 			if (SUCCEED == (ret = zbx_variant_convert(value, ZBX_VARIANT_STR)))
 			{
 				ret = zbx_json_validate_ext(value->data.str, errmsg);
