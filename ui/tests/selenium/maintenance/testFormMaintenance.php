@@ -179,7 +179,7 @@ class testFormMaintenance extends CWebTest {
 				'id:groupids__ms' => ['placeholder' => 'type here to search'],
 				'id:hostids__ms' => ['placeholder' => 'type here to search'],
 				'id:triggerids__ms' => ['placeholder' => 'type here to search'],
-				'id:event_names_0_value' =>  ['maxlength' => 255, 'placeholder' => 'value'],
+				'id:event_names_0_value' =>  ['maxlength' => 2048, 'placeholder' => 'value'],
 				'id:tags_0_tag' => ['maxlength' => 255, 'placeholder' => 'tag'],
 				'id:tags_0_value' => ['maxlength' => 255, 'placeholder' => 'value'],
 				'Description' => ['maxlength' => 65535]
