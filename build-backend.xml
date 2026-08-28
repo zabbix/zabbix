@@ -3,7 +3,7 @@
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 
-	<property name="ZBX_BASE_FLAGS" value="--enable-server --enable-agent --enable-proxy --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent  --with-ldap  --with-libcurl"/>
+	<property name="ZBX_BASE_FLAGS" value="--enable-server --enable-agent --enable-proxy --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent  --with-ldap  --with-libcurl --with-stacksize=128"/>
 
 	<!-- Initialize database related options based on the database type -->
 	<switch value="${DBTYPE}" caseinsensitive="true">
@@ -19,19 +19,19 @@
 
 	<!-- Zabbix various configuration parameters -->
 	<target name="init-conf-options">
-		<property name="conf1" value="--enable-agent"/>
-		<property name="conf2" value="--enable-server ${with.db}"/>
-		<property name="conf3" value="--enable-proxy ${with.db}"/>
-		<property name="conf4" value="--enable-server --enable-agent --enable-proxy ${with.db}"/>
+		<property name="conf1" value="--enable-agent --with-stacksize=128"/>
+		<property name="conf2" value="--enable-server ${with.db} --with-stacksize=128"/>
+		<property name="conf3" value="--enable-proxy ${with.db} --with-stacksize=128"/>
+		<property name="conf4" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-stacksize=128"/>
 		<property name="conf6" value="${ZBX_BASE_FLAGS} ${with.db} --with-openipmi --with-openssl"/>
 		<property name="conf7" value="${ZBX_BASE_FLAGS} ${with.db} --with-openipmi --with-gnutls"/>
 	</target>
 
 	<!-- Additional Zabbix configuration parameters -->
 	<target name="init-conf-options-2">
-		<property name="conf8" value="--enable-agent2"/>
-		<property name="conf9" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-ssh"/>
-		<property name="conf10" value="--enable-agent --with-libmodbus"/>
+		<property name="conf8" value="--enable-agent2 --with-stacksize=128"/>
+		<property name="conf9" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-ssh --with-stacksize=128"/>
+		<property name="conf10" value="--enable-agent --with-libmodbus --with-stacksize=128"/>
 	</target>
 
 	<!-- Cppcheck static analyzer target -->
@@ -212,9 +212,9 @@
 		<!-- Configuration option name must consist of prefix 'cmocka-', configuration order number
 			and configuration title: cmocka-<number>-<title> -->
 		<property name="cmocka-1-default" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q ${ZBX_BASE_FLAGS} --enable-ipv6 --with-mysql --with-openipmi --with-openssl --with-iconv"/>
-		<property name="cmocka-2-agent-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-agent"/>
-		<property name="cmocka-3-server-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-server --with-mysql --with-libcurl"/>
-		<property name="cmocka-4-proxy-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-proxy --with-sqlite3 --with-libcurl"/>
+		<property name="cmocka-2-agent-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-agent --with-stacksize=128"/>
+		<property name="cmocka-3-server-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-server --with-mysql --with-libcurl --with-stacksize=128"/>
+		<property name="cmocka-4-proxy-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-proxy --with-sqlite3 --with-libcurl --with-stacksize=128"/>
 		<property name="cmocka-5-sanitizer" value="CONFIG_SITE='share/config.site.d/clang-debug-sanitize' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-libmodbus --with-iconv --with-zlib"/>
 
 	</target>
