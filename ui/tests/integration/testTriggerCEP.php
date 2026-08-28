@@ -6873,19 +6873,19 @@ HEREDOC;
 	 * a CEP rule filter can be evaluated by, each of them holding the conditions it combines, the evaltype
 	 * combining them and the formula only a custom expression has.
 	 *
-	 * All four match the one event a step opens - the "down_0" event of the one discovered trigger, at DISASTER and
-	 * on the discovered host - so the operations of a step are performed whichever filter that step carries and
-	 * every step expects the very same outcome under all of them. What differs is the way the server had to arrive
-	 * at the match, and the three beyond the plain AND one hold their conditions together in a way the evaltypes
-	 * around them cannot:
+	 * All four match every event a step opens - the "down_0" event of each discovered trigger of the host, all of
+	 * them at DISASTER and on that one host - so the operations of a step are performed whichever filter that step
+	 * carries and every step expects the very same outcome under all of them. What differs is the way the server
+	 * had to arrive at the match, and the three beyond the plain AND one hold their conditions together in a way
+	 * the evaltypes around them cannot:
 	 *   - 'and' is the filter of every other flavour of the scenario, the 'type' Equals "cep" guard alone, which
 	 *     buildWindowNoneCepRuleParams() adds under this evaltype and under no other;
 	 *   - 'or' matches through its first condition alone: the second one asks for the event name of another id and
 	 *     is false for this event, and the two are of distinct types, so AND and AND_OR would both AND them and
 	 *     match nothing;
 	 *   - 'and_or' OR-s its two same-type conditions into one group - the id of the event and an id it never has -
-	 *     and AND-s the severity, of another type, with the result; plain AND would ask the one event for both ids
-	 *     at once and match nothing;
+	 *     and AND-s the severity, of another type, with the result; plain AND would ask an event for both ids at
+	 *     once and match nothing;
 	 *   - 'expression' groups conditions of three distinct types as "A and (B or C)" (the same formula the
 	 *     combining rule of the windowless scenario uses), OR-ing two of DISTINCT types, which no other evaltype
 	 *     can express: AND_OR, finding no two conditions of one type, would AND all three and match nothing.
@@ -7127,10 +7127,17 @@ HEREDOC;
 	 * scenario opens: the event name they build from the value that opened it, their DISASTER priority and no
 	 * suppression. It is what a step whose operations leave the event itself alone must end up with, and what the
 	 * event operation steps are expected to change one field of.
+	 *
+	 * $component is the discovered component whose trigger opened the event, which is part of the name that
+	 * trigger builds ('CEP trigger <component> <item value>'): a step of the scenario drives every discovered
+	 * trigger, so it has a name per trigger to expect and the driver asks for each of them in turn, see
+	 * localizeOperationStepEvent(). The default is the component of the first of them, which is the name the steps
+	 * carry until they are localized. The severity and the suppression are the same whichever trigger it was, one
+	 * prototype having discovered all of them.
 	 */
-	private function getWindowOperationStepTriggerEvent(): array {
+	private function getWindowOperationStepTriggerEvent(string $component = self::COMPONENT_VALUE): array {
 		return [
-			'name' => 'CEP trigger '.self::COMPONENT_VALUE.' down_'.self::CEP_RULE_WINDOW_NONE_SERVICE,
+			'name' => 'CEP trigger '.$component.' down_'.self::CEP_RULE_WINDOW_NONE_SERVICE,
 			'severity' => TRIGGER_SEVERITY_DISASTER,
 			'suppressed' => false
 		];
@@ -10980,12 +10987,13 @@ HEREDOC;
 	 * The operation coverage of testTriggerCEP_CepWindowNone once more, but one operation case at a time and out of a
 	 * rule that is updated between the cases instead of one created with all of them at once.
 	 *
-	 * Every step brings the one rule of the scenario to the operations of a single case, opens one problem with one
-	 * value, reads the event it produced and recovers the trigger again, and the step after it updates that same rule
-	 * to the operations of the next case - so the whole operation set is walked through as a sequence of rule
-	 * updates. What each step expects of its event is what the all-at-once flavour expects of the case it is running
-	 * plus, for every other case of the set, the state its tags are in without it: the operations of the step before
-	 * are no longer in the rule, so the tags they left behind may not be on this event. That is the half a create can
+	 * Every step brings the one rule of the scenario to the operations of a single case, opens one problem per
+	 * discovered trigger with the one value it sends each of them, reads the events they produced and recovers the
+	 * triggers again, and the step after it updates that same rule to the operations of the next case - so the
+	 * whole operation set is walked through as a sequence of rule updates. What each step expects of its events is
+	 * what the all-at-once flavour expects of the case it is running plus, for every other case of the set, the
+	 * state its tags are in without it: the operations of the step before are no longer in the rule, so the tags
+	 * they left behind may not be on these events. That is the half a create can
 	 * never check - a server that kept processing the rule as it stood before the update would go on adding them -
 	 * and it is checked for every operation of the set, the ones changing the event itself included (see
 	 * getWindowOperationSteps()).
@@ -10994,9 +11002,9 @@ HEREDOC;
 	 * condition alone under CONDITION_EVAL_TYPE_AND, two conditions OR-ed under CONDITION_EVAL_TYPE_OR, three
 	 * grouped by type under CONDITION_EVAL_TYPE_AND_OR and three grouped as "A and (B or C)" under
 	 * CONDITION_EVAL_TYPE_EXPRESSION, cycled over the steps in an order making every transition from one of them
-	 * into another (see getWindowOperationStepFilters()). All four match the one event a step opens, so what every
-	 * step expects of it stays the same - which is what makes the operations the reading of the filter: a filter the
-	 * server did not end up evaluating, or one whose formula or conditions an update left half replaced, matches
+	 * into another (see getWindowOperationStepFilters()). All four match every event a step opens, so what every
+	 * step expects of them stays the same - which is what makes the operations the reading of the filter: a filter
+	 * the server did not end up evaluating, or one whose formula or conditions an update left half replaced, matches
 	 * nothing and the operations of the step are not performed at all.
 	 *
 	 * The operations of a step carry a filter of their own on top of that, cycled the same way over the states an
@@ -11148,6 +11156,11 @@ HEREDOC;
 	 * keeps the name of its trigger, see stripSetNameFromOperationStep(). Everything else is unchanged, the
 	 * closing included - the window of a step is gone by the time the step after it opens its own, which is the
 	 * one thing that does differ from the flavours performing their operations while a window is still filling.
+	 *
+	 * As in every flavour of the scenario the value of a step goes out through every discovered trigger of the
+	 * host, so the window that closes here is one holding the events of that many triggers and the operations of
+	 * the step must have been performed for every one of them, see
+	 * runEventAssessmentTestCepWindowOperationSteps().
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleOperationStepsClosed$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -14452,6 +14465,37 @@ return;
 	}
 
 	/**
+	 * $step of the stepped operation scenario as the trigger of the discovered item on $key must have left its
+	 * event: the very step, with the event name that trigger builds in place of the one the first discovered
+	 * trigger builds.
+	 *
+	 * The component is the only thing these steps expect of one discovered trigger and not of another, and it is
+	 * the parameter of the item key ("cep.trap[sensor3]"), the discovery having named the two after each other.
+	 * Everything else a step is built from is shared by every discovered trigger of the host - one host, so the
+	 * macros an operation resolves come out the same; one item value, so the 'service' id, the 'state' tag and the
+	 * trigger tags are the same; one trigger prototype, so the severity is - and the name an operation writes is a
+	 * name of its own and no trigger's, so a step that writes one is handed back untouched (see
+	 * getWindowOperationStepTriggerEvent()).
+	 *
+	 * Called for the first discovered item it changes nothing, that component being what the steps expect by
+	 * default - which is also what the burst flavour reads its one event against, driving that item alone (see
+	 * runStressTestCepWindowOperationStepsBurst()).
+	 */
+	private function localizeOperationStepEvent(array $step, string $key): array {
+		if ($step['event']['name'] !== $this->getWindowOperationStepTriggerEvent()['name']) {
+			return $step;
+		}
+
+		$component = substr($key, strpos($key, '[') + 1, -1);
+
+		// Only the name is replaced: the severity and the suppression are the ones the step itself expects, which
+		// for the event operation steps is not what the trigger left behind.
+		return ['event' => ['name' => $this->getWindowOperationStepTriggerEvent($component)['name']]
+			+ $step['event']
+		] + $step;
+	}
+
+	/**
 	 * $step of the stepped operation scenario as the window closed flavour has to run it: without its "set name"
 	 * operation and, if it had one, with the event name it expects put back to the one its trigger gave the event.
 	 *
@@ -14484,11 +14528,11 @@ return;
 	}
 
 	/**
-	 * Drive the stepped operation scenario on the same single discovered item the windowless flavour is driven on,
-	 * running the very operations that flavour performs from one rule - but a step at a time and, from the second
-	 * step on, out of a rule that was updated rather than created: the rule of $rule_template
-	 * (prepareDataCepWindowOperationSteps()) is brought to the operations of one step of getWindowOperationSteps(),
-	 * the step is read off the one event it opens, and the rule is then brought to the operations of the next one.
+	 * Drive the stepped operation scenario on the discovered items of the host, running the very operations the
+	 * windowless flavour performs from one rule - but a step at a time and, from the second step on, out of a rule
+	 * that was updated rather than created: the rule of $rule_template (prepareDataCepWindowOperationSteps()) is
+	 * brought to the operations of one step of getWindowOperationSteps(), the step is read off the event every one
+	 * of those items opened, and the rule is then brought to the operations of the next one.
 	 *
 	 * Every step therefore asserts two things at once: that its own operations produce exactly what the case they
 	 * come from expects - the same expectations the all-at-once flavour makes - and that the operations of the step
@@ -14508,10 +14552,19 @@ return;
 	 * The outcome a step expects is the same under all of them, so a filter the server did not end up evaluating -
 	 * of the rule or of an operation - shows as the operations of that step not having been performed at all.
 	 *
-	 * A step is self contained: it takes the trigger from OK to one open problem with the one "down" value it sends,
-	 * reads its event, and recovers the trigger with a value matching neither "down" nor "up", which closes that
-	 * problem again. So the step after it starts where this one started and inspects one event of its own - the
-	 * events of the steps before it are left behind the baseline (captureEventBaseline()).
+	 * A step is self contained: it takes every trigger it drives from OK to one open problem with the one "down"
+	 * value it sends each of them, reads their events, and recovers them with a value matching neither "down" nor
+	 * "up", which closes those problems again. So the step after it starts where this one started and inspects
+	 * events of its own - the events of the steps before it are left behind the baseline (captureEventBaseline()).
+	 *
+	 * A step drives every discovered trigger of the host, LLD_DISCOVERY_COUNT of them: its value goes out through
+	 * all of them in one sender batch and the step is read off the event of each. What that buys is scale - one
+	 * rule update processed for that many events at once rather than for a single one - and, for the windowed
+	 * flavours, depth: every value carries the same 'service' id, so the events of every trigger belong to the one
+	 * window group the rule keeps, and what a window holds and what the operations of an execution point are
+	 * performed for are the events of that many triggers. The events differ in the name their trigger built, which
+	 * is what localizeOperationStepEvent() expects of each of them; everything else a step expects is the same for
+	 * all of them, one host and one item value being what they are built from.
 	 *
 	 * $execute_when is the execution point the operations of every step are performed at, and what a step expects
 	 * is the same at every one of them - none of these operations acts on a window, so where in the life of the
@@ -14536,22 +14589,27 @@ return;
 	 */
 	private function runEventAssessmentTestCepWindowOperationSteps(array $rule_template,
 			int $execute_when = CCepRuleHelper::WHEN_EVENT_OCCURRED): void {
-		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
-		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
-		$all = [$triggerid];
+		// The discovered items a step is driven through - every one of them - and the trigger of each, resolved
+		// in one request rather than one per item (getTriggeridsForKeys()).
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = $this->getTriggeridsForKeys(self::HOST_DISC_VALUE, $keys);
+		$all = array_values($triggerids);
 
-		// The one trigger must start in OK state.
+		// Every trigger a value will go through must start in OK state: a step counts the problems its value
+		// opened, so a problem another scenario left open on one of them would be counted with them.
 		foreach ($this->getTriggers($all) as $t) {
 			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
 				'Trigger must start in OK state for the stepped CEP operation test.');
 		}
 
-		$send = fn(string $value) => $this->dispatchSenderValues([
-			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
-		]);
+		// One value per driven trigger, all of them the same value and therefore the same 'service' id, in a
+		// single sender batch: what a step varies is the trigger the value came through and nothing else.
+		$send = fn(string $value) => $this->dispatchSenderValues(array_map(
+			fn(string $key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value], $keys
+		));
 
-		// Every step sends the same id, so what tells its event apart from the events of the steps before it is
-		// the baseline and not the id: one step, one problem, one event to read.
+		// Every step sends the same id, so what tells its events apart from the events of the steps before it is
+		// the baseline and not the id: one step, one problem per driven trigger, one event of each to read.
 		$service = self::CEP_RULE_WINDOW_NONE_SERVICE;
 
 		foreach ($this->getWindowOperationSteps() as $index => $step) {
@@ -14624,13 +14682,20 @@ return;
 			$this->captureEventBaseline($all);
 
 			$send('down_'.$service);
-			$this->waitForOpenProblemCount($all, 1, 'After the "down" value of '.$label);
+			$this->waitForOpenProblemCount($all, count($all), 'After the "down" value of '.$label);
 			$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
-			$this->waitForCepOperationStepEvent($triggerid, $service, $step, $label);
+			// The one event every driven trigger opened, read trigger by trigger: the operations of the step
+			// are the same for all of them and so is everything they expect but the event name, which every
+			// trigger builds from its own component (localizeOperationStepEvent()).
+			foreach ($triggerids as $key => $triggerid) {
+				$this->waitForCepOperationStepEvent($triggerid, $service,
+					$this->localizeOperationStepEvent($step, $key), $label.' on "'.$key.'"'
+				);
+			}
 
-			// The trigger goes back to where the step found it, which closes the problem the step opened: the
-			// next step opens one problem of its own from an expression that is false again.
+			// The triggers go back to where the step found them, which closes the problems the step opened:
+			// the next step opens one problem of its own per trigger from an expression that is false again.
 			//
 			// Whether the CEP cache drained with it is not asked here: that counter is global and the window
 			// of a step outlives the problems it held (it is dropped once its own duration has run out), so a
@@ -14641,7 +14706,7 @@ return;
 			$this->waitForNoOpenProblems($all, 'After the recovery value of '.$label, false);
 		}
 
-		// Every step closed the problem it opened, so once the last one has, nothing of the scenario is left
+		// Every step closed the problems it opened, so once the last one has, nothing of the scenario is left
 		// cached: the events are gone with their problems and the windows that held them with their duration.
 		$this->assertCepStatEquals('cache', 'events', 0);
 		$this->assertCepStatEquals('cache', 'objects', 0);
@@ -14650,8 +14715,8 @@ return;
 	/**
 	 * Drive the stressed flavour of the stepped operation scenario (see
 	 * testTriggerCEP_CepWindowSimpleOperationStepsBurst()): the rapid burst of
-	 * testTriggerCEP_MultEventWindowBurstSingleItem is sent at the single discovered item the stepped scenario is
-	 * driven on, and the steps of getWindowOperationSteps() are then walked through the way
+	 * testTriggerCEP_MultEventWindowBurstSingleItem is sent at the first of the discovered items the stepped
+	 * scenario drives, and the steps of getWindowOperationSteps() are then walked through the way
 	 * runEventAssessmentTestCepWindowOperationSteps() walks them - the rule of $rule_template brought to the
 	 * operations, the filters and the window of one step after another - but with the value sending, the event
 	 * reading and every wait of a step left out, so nothing separates one update from the next but the
