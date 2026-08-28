@@ -208,6 +208,7 @@ static int	trapper_device_authorize(zbx_socket_t *sock, const struct zbx_json_pa
 {
 	struct zbx_json_parse	jp_data;
 	char			id_str[ZBX_UUID_LEN];
+	int			auth_ret = FAIL;
 
 	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_comms->config_tls, config_frontend_allowed_ip))
 		return FAIL;
@@ -220,25 +221,23 @@ static int	trapper_device_authorize(zbx_socket_t *sock, const struct zbx_json_pa
 		return FAIL;
 	}
 
-	if (FAIL == zbx_get_user_from_json(jp, user, NULL))
+	/* device.offboard is forwarded after frontend DPoP proof validation. Limit fallback to bound UUID. */
+	if (0 == strcmp(request, ZBX_PROTO_VALUE_DEVICE_OFFBOARD) && 0 != id_is_uuid &&
+			SUCCEED == zbx_json_brackets_by_name(jp, "data", &jp_data) &&
+			SUCCEED == zbx_json_value_by_name(&jp_data, id_field, id_str, sizeof(id_str), NULL))
 	{
-		int	dpop_ret = FAIL;
+		auth_ret = zbx_get_user_from_json_dpop_for_device(jp, id_str, user);
+	}
 
-		/* device.offboard is forwarded after frontend DPoP proof validation. Limit fallback to bound UUID. */
-		if (0 == strcmp(request, ZBX_PROTO_VALUE_DEVICE_OFFBOARD) && 0 != id_is_uuid &&
-				SUCCEED == zbx_json_brackets_by_name(jp, "data", &jp_data) &&
-				SUCCEED == zbx_json_value_by_name(&jp_data, id_field, id_str, sizeof(id_str), NULL))
-		{
-			dpop_ret = zbx_get_user_from_json_dpop_for_device(jp, id_str, user);
-		}
+	if (FAIL == auth_ret)
+		auth_ret = zbx_get_user_from_json(jp, user, NULL);
 
-		if (FAIL == dpop_ret)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot %s device: failed to get user from request", action);
-			trapper_device_send_response(sock, FAIL, "Permission denied.", NULL, NULL,
-					config_comms->config_timeout, __func__, request);
-			return FAIL;
-		}
+	if (FAIL == auth_ret)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot %s device: failed to get user from request", action);
+		trapper_device_send_response(sock, FAIL, "Permission denied.", NULL, NULL,
+				config_comms->config_timeout, __func__, request);
+		return FAIL;
 	}
 
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_data))
