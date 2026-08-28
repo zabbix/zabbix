@@ -54,7 +54,7 @@ class testFormTestItem extends testItemTest {
 	 * @depends testFormTestItem_CheckButtonStateHost
 	 */
 	public function testFormTestItem_TestItemHost($data) {
-		$this->checkTestItem($data, true, self::HOST_ID, 'items');
+		$this->checkTestItem($data, true, self::HOST_ID, 'item');
 	}
 
 	/**
@@ -65,6 +65,6 @@ class testFormTestItem extends testItemTest {
 	 * @depends testFormTestItem_CheckButtonStateTemplate
 	 */
 	public function testFormTestItem_TestItemTemplate($data) {
-		$this->checkTestItem($data, false, self::TEMPLATE_ID, 'items');
+		$this->checkTestItem($data, false, self::TEMPLATE_ID, 'item');
 	}
 }

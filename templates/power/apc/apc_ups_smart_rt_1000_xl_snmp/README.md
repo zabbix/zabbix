@@ -42,6 +42,7 @@ This template has been tested on:
 |{$UPS.INPUT_VOLT.MAX.WARN}|<p>Maximum input voltage for trigger expression.</p>|`243`|
 |{$TIME.PERIOD}|<p>Time period for trigger expression.</p>|`15m`|
 |{$SNMP.TIMEOUT}|<p>The time interval for SNMP agent availability trigger expression.</p>|`5m`|
+|{$SNMP.UPTIME.WARN}|<p>Uptime threshold above which the "Host has been restarted" problem auto-resolves.</p>|`10m`|
 
 ### Items
 
@@ -97,7 +98,7 @@ This template has been tested on:
 |APC Smart-UPS: UPS is Off||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=7`|Average||
 |APC Smart-UPS: UPS is Emergency Static Bypass||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=16`|Average||
 |APC Smart-UPS: UPS is Hardware Failure Bypass||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=10`|Average||
-|APC Smart-UPS: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/APC Smart-UPS RT 1000 XL by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>APC Smart-UPS: No SNMP data collection</li></ul>|
+|APC Smart-UPS: Host has been restarted|<p>The uptime counter has decreased, which indicates that the host has been restarted.<br>A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.<br>The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.</p>|`(last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0],#2))) or (last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/APC Smart-UPS RT 1000 XL by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/APC Smart-UPS RT 1000 XL by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/APC Smart-UPS RT 1000 XL by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/APC Smart-UPS RT 1000 XL by SNMP/system.net.uptime[sysUpTime.0],#2)))`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>APC Smart-UPS: No SNMP data collection</li></ul>|
 |APC Smart-UPS: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/system.name[sysName.0],#1)<>last(/APC Smart-UPS RT 1000 XL by SNMP/system.name[sysName.0],#2) and length(last(/APC Smart-UPS RT 1000 XL by SNMP/system.name[sysName.0]))>0`|Info|**Manual close**: Yes|
 |APC Smart-UPS: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/APC Smart-UPS RT 1000 XL by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
 
