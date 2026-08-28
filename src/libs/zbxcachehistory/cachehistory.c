@@ -1451,6 +1451,36 @@ static void	connector_match_filters(const zbx_vector_connector_filter_t *connect
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: determine whether a history record has a possible destination     *
+ *                                                                            *
+ * Parameters: history                - [IN] history record                   *
+ *             history_export_enabled - [IN] local history export flag        *
+ *             connector_filters      - [IN] connector filters                *
+ *             item                   - [IN] item configuration               *
+ *                                                                            *
+ * Return value: SUCCEED - record can be exported locally or at least one     *
+ *                         Connector accepts the configured item value type   *
+ *               FAIL    - record has no possible export destination          *
+ *                                                                            *
+ * Comments: Local export eligibility is based on the history value type.     *
+ *           Connector eligibility is based on the configured item value      *
+ *           type. Connector tag filters are evaluated later against resolved *
+ *           item tags.                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	history_record_has_possible_destination(const zbx_dc_history_t *history, int history_export_enabled,
+		const zbx_vector_connector_filter_t *connector_filters, const zbx_history_sync_item_t *item)
+{
+	if (FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == history->value_type)
+	{
+		return SUCCEED;
+	}
+
+	return connector_match_value_type(connector_filters, item);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: export trends                                                     *
  *                                                                            *
  * Parameters: trends     - [IN] trends from cache                            *
@@ -1573,18 +1603,12 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 			continue;
 
 		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &h->itemid)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
-		}
 
 		item = item_info->item;
 
-		if (FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == h->value_type)
-		{
-			if (FAIL == connector_match_value_type(connector_filters, item))
-				continue;
-		}
+		if (FAIL == history_record_has_possible_destination(h, history_export_enabled, connector_filters, item))
+			continue;
 
 		if (0 != connector_filters->values_num)
 			connector_match_filters(connector_filters, &item_info->item_tags, item, &connector_object.ids);
@@ -1732,6 +1756,9 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 			continue;
 
 		item = &items[index];
+
+		if (FAIL == history_record_has_possible_destination(h, history_export_enabled, connector_filters, item))
+			continue;
 
 		export_add_item_info(&items_info, &hostids, &item_info_ids, item);
 	}
