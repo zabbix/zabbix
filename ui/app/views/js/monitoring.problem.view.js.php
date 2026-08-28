@@ -423,9 +423,10 @@
 								maintenance_description = '';
 							}
 
-							let hint = `${escapeHtml(maintenance_name)} [${maintenance_type
-								? <?= json_encode(_('Maintenance without data collection')); ?>
-								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
+							let hint = `${escapeHtml(maintenance_name)} [${
+								Number(maintenance_type) === MAINTENANCE_TYPE_NODATA
+									? <?= json_encode(_('Maintenance without data collection')); ?>
+									: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance_description) {
 								hint += `\n${escapeHtml(maintenance_description)}`;
