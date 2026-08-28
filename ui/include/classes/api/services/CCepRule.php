@@ -643,6 +643,8 @@ class CCepRule extends CApiService {
 
 			$operation['filter'] = array_diff_key($db_operation['filter'], array_flip(['conditions']));
 
+			$operation['filter']['conditions'] = [];
+
 			foreach ($db_operation['filter']['conditions'] as $db_condition) {
 				$operation['filter']['conditions'][] =
 					array_diff_key($db_condition, array_flip(['cep_operation_conditionid']));
