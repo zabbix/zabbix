@@ -100,7 +100,7 @@ class CApm extends CApiService {
 			'span_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
 			'min_duration' =>					['type' => API_UINT64, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'max_duration' =>					['type' => API_UINT64, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'parent_spanid', 'span_kind', 'status_code', 'service_name', 'scope_name']],
+			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'span_kind', 'status_code', 'service_name', 'scope_name']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['trace_state', 'span_name', 'service_name', 'scope_name', 'scope_version', 'status_message']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>					['type' => API_FLAG, 'default' => false],
@@ -110,7 +110,7 @@ class CApm extends CApiService {
 			'output' =>							['type' => API_OUTPUT, 'in' => implode(',', array_keys(self::CLICKHOUSE_TRACES_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>					['type' => API_FLAG, 'default' => false],
 			// sort and limit
-			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['timestamp', 'traceid', 'spanid', 'parent_spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'duration', 'status_code', 'status_message']), 'uniq' => true, 'default' => []],
+			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['timestamp', 'traceid', 'spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'duration', 'status_code', 'status_message']), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
 			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 		]];
@@ -227,7 +227,9 @@ class CApm extends CApiService {
 
 			foreach ($row as $field => $value) {
 				if (is_array(self::CLICKHOUSE_TRACES_FIELDS[$field])) {
-					$row_fixed[self::CLICKHOUSE_TRACES_FIELDS[$field][0]] = [];
+					if (!array_key_exists(self::CLICKHOUSE_TRACES_FIELDS[$field][0], $row_fixed)) {
+						$row_fixed[self::CLICKHOUSE_TRACES_FIELDS[$field][0]] = [];
+					}
 
 					foreach ($value as $index => $sub_value) {
 						$row_fixed[self::CLICKHOUSE_TRACES_FIELDS[$field][0]][$index]
@@ -406,7 +408,9 @@ class CApm extends CApiService {
 
 			foreach ($row as $field => $value) {
 				if (is_array(self::CLICKHOUSE_SPANS_FIELDS[$field])) {
-					$row_fixed[self::CLICKHOUSE_SPANS_FIELDS[$field][0]] = [];
+					if (!array_key_exists(self::CLICKHOUSE_SPANS_FIELDS[$field][0], $row_fixed)) {
+						$row_fixed[self::CLICKHOUSE_SPANS_FIELDS[$field][0]] = [];
+					}
 
 					foreach ($value as $index => $sub_value) {
 						$row_fixed[self::CLICKHOUSE_SPANS_FIELDS[$field][0]][$index]
@@ -442,29 +446,28 @@ class CApm extends CApiService {
 
 		$options['output'] = $output;
 
-		$options['filter'] = self::flipKeysOrNull($options['filter'], $output_fields);
-		$options['search'] = self::flipKeysOrNull($options['search'], $output_fields);
+		if ($options['filter'] !== null) {
+			$filter = [];
 
-		$options['sortfield'] = self::flipValues($options['sortfield'], $output_fields);
+			foreach ($options['filter'] as $key => $value) {
+				$filter[$output_fields[$key]] = $value;
+			}
+
+			$options['filter'] = $filter;
+		}
+
+		if ($options['search'] !== null) {
+			$search = [];
+
+			foreach ($options['search'] as $key => $value) {
+				$search[$output_fields[$key]] = $value;
+			}
+
+			$options['search'] = $search;
+		}
+
+		$options['sortfield'] = array_map(static fn ($value) => $output_fields[$value], $options['sortfield']);
 
 		return $options;
-	}
-
-	private static function flipKeysOrNull(?array $array, array $dictionary): ?array {
-		if ($array === null) {
-			return null;
-		}
-
-		$result = [];
-
-		foreach ($array as $key => $value) {
-			$result[$dictionary[$key]] = $value;
-		}
-
-		return $result;
-	}
-
-	private static function flipValues(array $array, array $dictionary): array {
-		return array_map(static fn ($value) => $dictionary[$value], $array);
 	}
 }
