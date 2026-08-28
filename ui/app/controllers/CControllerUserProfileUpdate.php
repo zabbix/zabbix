@@ -123,21 +123,8 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
 		DBstart();
 
-		[$db_user] = API::User()->get([
-			'userids' => [$user['userid']],
-			'selectRole' => array_key_exists('url', $user) ? ['roleid'] : null
-		]);
-
-		if (array_key_exists('url', $user)) {
-			$roles = API::Role()->get([
-				'output' => [],
-				'roleids' => $db_user['role']['roleid'],
-				'selectRules' => ['profile.redirect.enforce']
-			]);
-
-			if ($roles[0]['rules']['profile.redirect.enforce']) {
-				unset($user['url']);
-			}
+		if (array_key_exists('url', $user) && CWebUser::checkAccess('profile.redirect.enforce')) {
+			unset($user['url']);
 		}
 
 		$result = (bool) API::User()->update($user);
