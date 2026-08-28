@@ -249,7 +249,7 @@ class CClickHouseHelper {
 
 	public static function buildQueryFromParts(array $query_parts): string {
 		$select = array_map(
-			static fn ($field, $expression) => $expression.(is_string($field) ? ' AS '.$field : ''),
+			static fn ($field, $expression) => $expression.(is_string($field) ? ' AS `'.$field.'`' : ''),
 			array_keys($query_parts['select']),
 			$query_parts['select']
 		);
