@@ -25,6 +25,7 @@ void	zbx_async_check_telemetry_query_clean(zbx_telemetry_query_context *telemetr
 {
 	zbx_http_context_destroy(&telemetry_query_context->http_context);
 
+	zbx_free(telemetry_query_context->item_context.key_orig);
 	zbx_free(telemetry_query_context->item_context.posts);
 
 	if (NULL != telemetry_query_context->item_context.query)
@@ -58,6 +59,9 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 	zbx_http_context_create(&telemetry_query_context->http_context);
 
 	telemetry_query_context->item_context.itemid = item->itemid;
+	telemetry_query_context->item_context.key_orig = item->key_orig;
+	item->key_orig = NULL;
+	zbx_strscpy(telemetry_query_context->item_context.host_host, item->host_host);
 	telemetry_query_context->item_context.value_type = item->value_type;
 	telemetry_query_context->item_context.flags = item->flags;
 	telemetry_query_context->item_context.preprocessing = item->preprocessing;

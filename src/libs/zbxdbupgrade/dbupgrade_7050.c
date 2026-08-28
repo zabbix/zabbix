@@ -1310,6 +1310,13 @@ static int	DBpatch_7050098(void)
 
 static int	DBpatch_7050099(void)
 {
+	const zbx_db_field_t	field = {"storage_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050100(void)
+{
 	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str)"
 			" values ('apm_global_db', %d, '{}')", ZBX_SETTING_TYPE_STR))
 	{
@@ -1425,5 +1432,6 @@ DBPATCH_ADD(7050096, 0, 1)
 DBPATCH_ADD(7050097, 0, 1)
 DBPATCH_ADD(7050098, 0, 1)
 DBPATCH_ADD(7050099, 0, 1)
+DBPATCH_ADD(7050100, 0, 1)
 
 DBPATCH_END()

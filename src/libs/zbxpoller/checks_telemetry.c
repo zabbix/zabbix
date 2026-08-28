@@ -120,7 +120,8 @@ static int	get_values_telemetry_http(const zbx_dc_item_t *item, time_t now, time
 	}
 	else if (SUCCEED_PARTIAL == parse_ret)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "telemetry query result row limit exceeded, result was truncated");
+		zabbix_log(LOG_LEVEL_WARNING, "telemetry query result row limit exceeded for item with key \"%s\", "
+				"result was truncated", item->key_orig);
 	}
 
 	ret = SUCCEED;

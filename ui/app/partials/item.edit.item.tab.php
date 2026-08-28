@@ -131,7 +131,7 @@ $formgrid = (new CFormGrid())
 		]))->setId('js-item-url-field')
 	])
 	->addItem([
-		(new CLabel(_('Query fields')))->setId('js-item-query-fields-label'),
+		(new CLabel(_('Query fields'), 'query-fields-table'))->setId('js-item-query-fields-label'),
 		(new CFormField(
 			(new CDiv([
 				(new CTable())
@@ -804,7 +804,7 @@ $formgrid
 			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	])
 	->addItem([
-		(new CLabel(_('Conditions')))->setId('js-item-conditions-label'),
+		(new CLabel(_('Conditions'), 'conditions-table'))->setId('js-item-conditions-label'),
 		(new CFormField(
 			(new CDiv([
 				(new CTable())
