@@ -100,15 +100,9 @@ class CWebUser {
 	public static function getRedirectUrl(): array {
 		$validator = new CFrontendActionValidator();
 
-		$roles = API::Role()->get([
-			'output' => [],
-			'selectRules' => ['profile.redirect.enforce', 'profile.redirect.url'],
-			'roleids' => self::$data['roleid']
-		]);
-
 		$user_url = self::$data['url'];
-		$role_url = $roles ? $roles[0]['rules']['profile.redirect.url'] : '';
-		$enforce = $roles && $roles[0]['rules']['profile.redirect.enforce'] != 0;
+		$role_url = self::checkAccess('profile.redirect.url');
+		$enforce = self::checkAccess('profile.redirect.enforce');
 		$redirect = ['url' => $role_url, 'error' => false];
 
 		if ($enforce) {
@@ -150,11 +144,11 @@ class CWebUser {
 	 *
 	 * @param string $rule_name  Rule name.
 	 *
-	 * @return bool  Returns true if user has access to specified rule, false - otherwise.
+	 * @return mixed  Returns value if user has access to specified rule, false - otherwise.
 	 *
 	 * @throws Exception
 	 */
-	public static function checkAccess(string $rule_name): bool {
+	public static function checkAccess(string $rule_name): mixed {
 		if (empty(self::$data) || self::$data['roleid'] == 0) {
 			return false;
 		}

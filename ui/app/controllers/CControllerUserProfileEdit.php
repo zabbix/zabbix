@@ -54,13 +54,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'userids' => CWebUser::$data['userid']
 		]);
 
-		$roles = API::Role()->get([
-			'output' => [],
-			'selectRules' => ['profile.redirect.enforce', 'profile.redirect.url'],
-			'roleids' => $this->user['roleid']
-		]);
-
-		$enforce_redirect = (bool) $roles[0]['rules']['profile.redirect.enforce'];
+		$redirect_enforce = CWebUser::checkAccess('profile.redirect.enforce');
 
 		$data = [
 			'change_password' => 0,
@@ -75,9 +69,9 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'autologout' => $this->user['autologout'],
 			'refresh' => $this->user['refresh'],
 			'rows_per_page' => $this->user['rows_per_page'],
-			'url' => $enforce_redirect ? '' : $this->user['url'],
-			'profile_redirect_enforce' => $enforce_redirect,
-			'profile_redirect_url' => $roles[0]['rules']['profile.redirect.url'],
+			'url' => $redirect_enforce ? '' : $this->user['url'],
+			'profile_redirect_enforce' => $redirect_enforce,
+			'profile_redirect_url' => CWebUser::checkAccess('profile.redirect.url'),
 			'userid' => CWebUser::$data['userid'],
 			'username' => $this->user['username'],
 			'name' => $this->user['name'],

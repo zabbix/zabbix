@@ -132,11 +132,11 @@ class CRoleHelper {
 	 * @param string $rule_name  Name of the rule to check access for.
 	 * @param string $roleid     ID of the role where check of access is necessary to perform.
 	 *
-	 * @return bool  Returns true if role have access to specified rule, false - otherwise.
+	 * @return mixed  Returns value if role have access to specified rule, false - otherwise.
 	 *
 	 * @throws Exception
 	 */
-	public static function checkAccess(string $rule_name, string $roleid): bool {
+	public static function checkAccess(string $rule_name, string $roleid): mixed {
 		self::loadRoleRules($roleid);
 
 		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === 'api') {
