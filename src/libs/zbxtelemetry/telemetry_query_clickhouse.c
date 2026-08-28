@@ -103,7 +103,7 @@ out:
 /******************************************************************************
  *                                                                            *
  * Comments: modifies resp during parsing but returns it to initial state     *
- * Return value: SUCCEED         - parsed response sucessfully                *
+ * Return value: SUCCEED         - parsed response successfully                *
  *               SUCCEED_PARTIAL - row count exceeded ZBX_TQ_MAX_RESULT_ROWS  *
  *               FAIL            - failed to parse response                   *
  *                                                                            *
