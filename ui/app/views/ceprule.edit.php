@@ -113,9 +113,9 @@ $form = (new CForm())
 		->addItem((new CTemplateTag('ceprule-operation-row-template'))->addItem(
 			(new CRow([
 				(new CCol([
-					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-					(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)
+					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 				]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 				(new CCol([
 					_('Execute when'),
 					' #{execute_when_str} : #{label_str}',
@@ -181,8 +181,11 @@ $form = (new CForm())
 									->addClass('js-operations-info')
 									->addClass(ZBX_STYLE_DISPLAY_NONE)
 							))
-								->setWidth('30')
+								->setWidth('12')
 						),
+						(new CTableColumn(
+							(new CColHeader())->setWidth('17')
+						)),
 						(new CTableColumn(
 							(new CColHeader(_('Details')))->setWidth('50%')
 						)),

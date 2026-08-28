@@ -821,7 +821,7 @@ window.ceprule_edit_popup = new class {
 		row.querySelector('[name$="[execute_when]"]').setAttribute('data-error-container', error_container_id);
 		rows.append(row);
 		rows.append((new Template(`
-			<tr class="error-container-row"><td colspan="3" id="${error_container_id}"></td></tr>
+			<tr class="error-container-row"><td colspan="5" id="${error_container_id}"></td></tr>
 		`)).evaluateToElement());
 
 		return rows;

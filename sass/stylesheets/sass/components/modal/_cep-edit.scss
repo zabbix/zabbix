@@ -15,6 +15,15 @@
 
 #ceprule-operations-table {
 	td {
-		line-height: 1.4;
+		line-height: $body-line-height;
+		padding-top: 9px;
+		padding-bottom: 4px;
+	}
+
+	.error-container-row {
+		td:empty {
+			padding-top: 0;
+			padding-bottom: 0;
+		}
 	}
 }

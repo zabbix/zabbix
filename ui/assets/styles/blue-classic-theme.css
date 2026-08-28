@@ -7874,7 +7874,12 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   display: inline; }
 
 #ceprule-operations-table td {
-  line-height: 1.4; }
+  line-height: 1.4em;
+  padding-top: 9px;
+  padding-bottom: 4px; }
+#ceprule-operations-table .error-container-row td:empty {
+  padding-top: 0;
+  padding-bottom: 0; }
 
 .link-action {
   color: #1f2c33;
