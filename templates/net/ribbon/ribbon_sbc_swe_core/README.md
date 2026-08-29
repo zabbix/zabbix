@@ -58,6 +58,21 @@ This template has been tested on:
 |{$RIBBON.CE.DISCOVERY.HW.TYPE.NOT_MATCHES}|<p>Sets the regex string of call engine hardware types to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$RIBBON.SYNC.MODULE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of sync module names to be allowed in discovery.</p>|`.*`|
 |{$RIBBON.SYNC.MODULE.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of sync module names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.FAN.DISCOVERY.ID.MATCHES}|<p>Sets the regex string of fan IDs to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.FAN.DISCOVERY.ID.NOT_MATCHES}|<p>Sets the regex string of fan IDs to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.FAN.DISCOVERY.SERVER.MATCHES}|<p>Sets the regex string of fan server names to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.FAN.DISCOVERY.SERVER.NOT_MATCHES}|<p>Sets the regex string of fan server names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.DISK.DISCOVERY.NUMBER.MATCHES}|<p>Sets the regex string of disk numbers to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.DISK.DISCOVERY.NUMBER.NOT_MATCHES}|<p>Sets the regex string of disk numbers to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.DISK.DISCOVERY.SERVER.MATCHES}|<p>Sets the regex string of disk server names to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.DISK.DISCOVERY.SERVER.NOT_MATCHES}|<p>Sets the regex string of disk server names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.PSU.DISCOVERY.ID.MATCHES}|<p>Sets the regex string of power supply IDs to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.PSU.DISCOVERY.ID.NOT_MATCHES}|<p>Sets the regex string of power supply IDs to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.PSU.DISCOVERY.SERVER.MATCHES}|<p>Sets the regex string of power supply server names to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.PSU.DISCOVERY.SERVER.NOT_MATCHES}|<p>Sets the regex string of power supply server names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.ALARM.DISCOVERY.SEVERITY.MATCHES}|<p>Ribbon alarm severities to discover.</p>|`^(Info\|Warning\|Minor\|Major\|Critical)$`|
+|{$RIBBON.ALARM.DISCOVERY.SEVERITY.NOT_MATCHES}|<p>Ribbon alarm severities to exclude from discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.ALARM.CLEAR.RETENTION}|<p>Number of seconds to continue discovering a cleared Ribbon alarm so the corresponding Zabbix problem can recover.</p>|`3600`|
 |{$RIBBON.LICENSE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of license names to be allowed in discovery.</p>|`.*`|
 |{$RIBBON.LICENSE.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of license names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$RIBBON.DNS.GROUP.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of DNS group names to be allowed in discovery.</p>|`.*`|
@@ -144,6 +159,97 @@ This template has been tested on:
 |Call engine [{#CE.NAME}]: HW type|<p>HW type of the server.</p>|Dependent item|ribbon.ce.hw.type[{#CE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverAdmin.[?(@.name == "{#CE.NAME}")].hwType.first()`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Call engine [{#CE.NAME}]: HW sub-type|<p>HW sub-type of the server.</p>|Dependent item|ribbon.ce.hw.sub.type[{#CE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverAdmin.[?(@.name == "{#CE.NAME}")].hwSubType.first()`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
+### LLD rule Fan discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Fan discovery|<p>Discovers physical fans. Applicable to SBC platforms that expose `fanStatus`; no fan items are created when the endpoint is unavailable.</p>|Dependent item|ribbon.fan.discovery|
+
+### Item prototypes for Fan discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Fan [{#FAN.SERVER}][{#FAN.ID}]: Speed|<p>Fan speed in RPM.</p>|Dependent item|ribbon.fan.speed[{#FAN.SERVER}/{#FAN.ID}]|
+
+### Trigger prototypes for Fan discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Ribbon: Fan [{#FAN.SERVER}][{#FAN.ID}]: Speed is zero|<p>Fan speed is zero or could not be parsed from the RESTCONF output.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.fan.speed[{#FAN.SERVER}/{#FAN.ID}])<=0`|Average||
+
+### LLD rule Hard disk discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Hard disk discovery|<p>Discovers physical hard disks when `hardDiskStatus` is available.</p>|Dependent item|ribbon.disk.discovery|
+
+### Item prototypes for Hard disk discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Disk [{#DISK.SERVER}][{#DISK.NUMBER}]: Status|<p>Current disk operational status.</p>|Dependent item|ribbon.disk.status[{#DISK.SERVER}/{#DISK.NUMBER}]|
+|Disk [{#DISK.SERVER}][{#DISK.NUMBER}]: Health test|<p>Result of the disk health test.</p>|Dependent item|ribbon.disk.health.test[{#DISK.SERVER}/{#DISK.NUMBER}]|
+|Disk [{#DISK.SERVER}][{#DISK.NUMBER}]: Present|<p>Indicates whether the disk is present.</p>|Dependent item|ribbon.disk.present[{#DISK.SERVER}/{#DISK.NUMBER}]|
+|Disk [{#DISK.SERVER}][{#DISK.NUMBER}]: Capacity|<p>Disk capacity reported by RESTCONF.</p>|Dependent item|ribbon.disk.capacity[{#DISK.SERVER}/{#DISK.NUMBER}]|
+|Disk [{#DISK.SERVER}][{#DISK.NUMBER}]: Product ID|<p>Disk product ID.</p>|Dependent item|ribbon.disk.product.id[{#DISK.SERVER}/{#DISK.NUMBER}]|
+|Disk [{#DISK.SERVER}][{#DISK.NUMBER}]: Revision|<p>Disk firmware revision.</p>|Dependent item|ribbon.disk.revision[{#DISK.SERVER}/{#DISK.NUMBER}]|
+|Disk [{#DISK.SERVER}][{#DISK.NUMBER}]: Life remaining|<p>Disk life remaining. Some platforms report `n/a`.</p>|Dependent item|ribbon.disk.life.remaining[{#DISK.SERVER}/{#DISK.NUMBER}]|
+
+### Trigger prototypes for Hard disk discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Ribbon: Disk [{#DISK.SERVER}][{#DISK.NUMBER}]: Status is not "online"|<p>The disk operational status is not online.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.disk.status[{#DISK.SERVER}/{#DISK.NUMBER}])<>"online"`|High||
+|Ribbon: Disk [{#DISK.SERVER}][{#DISK.NUMBER}]: Health test is not "PASSED"|<p>The health test must return either `PASSED` or `OK`.</p>|`find(/Ribbon SBC SWe Core by HTTP/ribbon.disk.health.test[{#DISK.SERVER}/{#DISK.NUMBER}],,"regexp","^(PASSED\|OK)$")=0`|High||
+|Ribbon: Disk [{#DISK.SERVER}][{#DISK.NUMBER}]: Disk is not present|<p>The disk is reported as not present.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.disk.present[{#DISK.SERVER}/{#DISK.NUMBER}])<>"true"`|Average||
+
+### LLD rule Power supply discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Power supply discovery|<p>Discovers physical power supplies when `powerSupplyStatus` is available.</p>|Dependent item|ribbon.power.supply.discovery|
+
+### Item prototypes for Power supply discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Power supply [{#PSU.SERVER}][{#PSU.ID}]: Present|<p>Indicates whether the power supply is present.</p>|Dependent item|ribbon.power.supply.present[{#PSU.SERVER}/{#PSU.ID}]|
+|Power supply [{#PSU.SERVER}][{#PSU.ID}]: Power fault|<p>Indicates whether a power fault is present.</p>|Dependent item|ribbon.power.supply.power.fault[{#PSU.SERVER}/{#PSU.ID}]|
+|Power supply [{#PSU.SERVER}][{#PSU.ID}]: Voltage fault|<p>Indicates whether a voltage fault is present.</p>|Dependent item|ribbon.power.supply.voltage.fault[{#PSU.SERVER}/{#PSU.ID}]|
+|Power supply [{#PSU.SERVER}][{#PSU.ID}]: Product name|<p>Power supply product name.</p>|Dependent item|ribbon.power.supply.product.name[{#PSU.SERVER}/{#PSU.ID}]|
+|Power supply [{#PSU.SERVER}][{#PSU.ID}]: Serial number|<p>Power supply serial number.</p>|Dependent item|ribbon.power.supply.serial[{#PSU.SERVER}/{#PSU.ID}]|
+|Power supply [{#PSU.SERVER}][{#PSU.ID}]: Part number|<p>Power supply part number.</p>|Dependent item|ribbon.power.supply.part.number[{#PSU.SERVER}/{#PSU.ID}]|
+
+### Trigger prototypes for Power supply discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Ribbon: Power supply [{#PSU.SERVER}][{#PSU.ID}]: Power supply is not present|<p>The power supply is reported as not present.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.power.supply.present[{#PSU.SERVER}/{#PSU.ID}])<>"true"`|Average||
+|Ribbon: Power supply [{#PSU.SERVER}][{#PSU.ID}]: Power fault detected|<p>The power supply reports a power fault.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.power.supply.power.fault[{#PSU.SERVER}/{#PSU.ID}])="true"`|High||
+|Ribbon: Power supply [{#PSU.SERVER}][{#PSU.ID}]: Voltage fault detected|<p>The power supply reports a voltage fault.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.power.supply.voltage.fault[{#PSU.SERVER}/{#PSU.ID}])="true"`|High||
+
+### LLD rule Ribbon alarm history discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Ribbon alarm history discovery|<p>Discovers active and recently cleared alarms from the Ribbon alarm manager `historyStatus` endpoint. Active alarms remain discovered regardless of age. Cleared alarms remain discovered for `{$RIBBON.ALARM.CLEAR.RETENTION}` seconds so their Zabbix problems can recover.</p>|Dependent item|ribbon.alarm.discovery|
+
+### Item prototypes for Ribbon alarm history discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Alarm [{#ALARM.ID}]: {#ALARM.DESCRIPTION}|<p>Ribbon alarm state. Value mapping: Clear=0, Info=1, Warning=2, Minor=3, Major=4 and Critical=5.</p>|Dependent item|ribbon.alarm.status[{#ALARM.ID}]|
+
+### Trigger prototypes for Ribbon alarm history discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Ribbon alarm [{#ALARM.ID}]: {#ALARM.DESCRIPTION}|<p>Information-level Ribbon alarm.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.alarm.status[{#ALARM.ID}])=1`|Info||
+|Ribbon alarm [{#ALARM.ID}]: {#ALARM.DESCRIPTION}|<p>Warning-level Ribbon alarm.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.alarm.status[{#ALARM.ID}])=2`|Warning||
+|Ribbon alarm [{#ALARM.ID}]: {#ALARM.DESCRIPTION}|<p>Minor Ribbon alarm.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.alarm.status[{#ALARM.ID}])=3`|Average||
+|Ribbon alarm [{#ALARM.ID}]: {#ALARM.DESCRIPTION}|<p>Major Ribbon alarm.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.alarm.status[{#ALARM.ID}])=4`|High||
+|Ribbon alarm [{#ALARM.ID}]: {#ALARM.DESCRIPTION}|<p>Critical Ribbon alarm.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.alarm.status[{#ALARM.ID}])=5`|Disaster||
+
 ### LLD rule License discovery
 
 |Name|Description|Type|Key and additional info|
@@ -214,6 +320,13 @@ This template has been tested on:
 |Ribbon: Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: State is not "inService"|<p>Indicates that the trunk is not in service.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.trunk.state[{#TRUNK.GROUP}/{#TRUNK.ZONE}])<>"inService"`|Warning||
 |Ribbon: Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Packet out detect state is not "normal"|<p>Indicates that a packet outage has been declared on this trunk.</p>|`last(/Ribbon SBC SWe Core by HTTP/ribbon.trunk.packet.out.detect.state[{#TRUNK.GROUP}/{#TRUNK.ZONE}])<>1`|Average||
 
+### Graph prototypes for Trunk group discovery
+
+|Name|Items|
+|----|-----|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Call usage|Inbound call usage, outbound call usage, priority call usage and total available calls|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Bandwidth usage|Inbound bandwidth usage, outbound bandwidth usage, available bandwidth and current bandwidth limit|
+
 # Ribbon SBC SWe CE by HTTP
 
 ## Overview
@@ -255,9 +368,10 @@ This template has been tested on:
 {$RIBBON.USERNAME}
 {$RIBBON.PASSWORD}
 ```
-6. Set the host macros (on the host level) with the name of the call engine (CE).
+6. Set the host macros (on the host level) with the name of the call engine (CE) and Ribbon SBC node (For cloud-based virtual SBCs, the node name is generally vsbc1, vsbc2 and so on):
 ```text
 {$RIBBON.CE.NAME}
+{$RIBBON.SBC.NODE.NAME}
 ```
 
 ### Macros used
@@ -269,6 +383,7 @@ This template has been tested on:
 |{$RIBBON.URL}|<p>Ribbon SBC API IP.</p>||
 |{$RIBBON.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$RIBBON.CE.NAME}|<p>Ribbon SBC CE name.</p>||
+|{$RIBBON.SBC.NODE.NAME}|<p>Ribbon SBC node name used to select node-specific data. For cloud-based virtual SBCs, this is generally `vsbc1` or `vsbc2`.</p>||
 |{$RIBBON.CPU.UTIL.CRIT}|<p>The threshold of CPU usage in percent.</p>|`90`|
 |{$RIBBON.MEMORY.UTIL.CRIT}|<p>The threshold of memory usage in percent.</p>|`90`|
 |{$RIBBON.SWAP.UTIL.CRIT}|<p>The threshold of swap usage in percent.</p>|`90`|
