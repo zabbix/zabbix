@@ -10729,7 +10729,7 @@ return [
 				'length' => 255,
 				'default' => ''
 			],
-			'nextcheck' => [
+			'created_at' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -10749,6 +10749,12 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
+			],
+			'event_index' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_UINT,
+				'length' => 20,
+				'default' => '0'
 			]
 		]
 	],
@@ -10784,6 +10790,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'formula' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
 			],
 			'event_name' => [
 				'null' => false,
