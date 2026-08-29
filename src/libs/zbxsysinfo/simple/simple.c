@@ -19,6 +19,7 @@
 #include "../common/net.h"
 #include "ntp.h"
 
+#include "zbxip.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
