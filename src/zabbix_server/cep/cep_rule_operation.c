@@ -41,7 +41,7 @@ static void	cep_prepare_value(char *value, size_t size)
 	zbx_rtrim(value, ZBX_WHITESPACE);
 }
 
-static int	cep_acknowledge_is_set(zbx_cep_acknowledge_t *ack)
+int	cep_acknowledge_is_set(zbx_cep_acknowledge_t *ack)
 {
 	return (0 == ack->json.buffer_size ? FAIL : SUCCEED);
 }
@@ -1090,6 +1090,7 @@ out:
  *             ctx          - [IN/OUT] event context                          *
  *             event        - [IN/OUT] resolved mutable event, resolved and   *
  *                            reused across operations                        *
+ *             ack          - [IN/OUT] acknowledge data                       *
  *             tasks        - [OUT] vector to append tasks created by         *
  *                            operations to                                   *
  *                                                                            *
@@ -1097,30 +1098,33 @@ out:
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
-		zbx_cep_event_t **event, zbx_vector_mw_task_ptr_t *tasks)
+		zbx_cep_event_t **event, zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_cep_acknowledge_t	ack = {0};
+	zbx_cep_acknowledge_t	ack_local = {0};
 	zbx_uint64_t		opmask = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64 " operations:%d when:%d", __func__, rule->ruleid,
 			rule->operations.values_num, execute_when);
+
+	if (NULL == ack)
+		ack = &ack_local;
 
 	for (int i = 0; i < rule->operations.values_num; i++)
 	{
 		if (rule->operations.values[i].execute_when == execute_when)
 		{
 			if (SUCCEED == cep_operation_event_execute(&rule->operations.values[i], execute_when,
-					rule->ruleid, ctx, &ack, tasks, event))
+					rule->ruleid, ctx, ack, tasks, event))
 			{
 				opmask |= CEP_FLAG(rule->operations.values[i].type);
 			}
 		}
 	}
 
-	if (SUCCEED == cep_acknowledge_is_set(&ack))
+	if (ack == &ack_local && SUCCEED == cep_acknowledge_is_set(ack))
 	{
 		/* acknowledge data is moved to the created task */
-		zbx_mw_task_t	*t = cep_create_task_acknowledge(&ack, rule->ruleid, cep_event_context_eventid(ctx));
+		zbx_mw_task_t	*t = cep_create_task_acknowledge(ack, rule->ruleid, cep_event_context_eventid(ctx));
 
 		zbx_vector_mw_task_ptr_append(tasks, t);
 	}
@@ -1138,6 +1142,7 @@ zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_
  * Parameters: rule         - [IN] rule whose operations are executed         *
  *             ctx          - [IN/OUT] event context                          *
  *             execute_when - [IN] execution phase                            *
+ *             ack    - [IN/OUT] acknowledge data                             *
  *             tasks        - [OUT] vector to append tasks created by the     *
  *                            operations to                                   *
  *                                                                            *
@@ -1148,14 +1153,14 @@ zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	cep_rule_event_context_execute_ops(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
-		int execute_when, zbx_vector_mw_task_ptr_t *tasks)
+		int execute_when, zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_event_t	*event = NULL;
 	zbx_uint64_t	opmask = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
-	opmask = cep_rule_event_execute_ops(rule, execute_when, ctx, &event, tasks);
+	opmask = cep_rule_event_execute_ops(rule, execute_when, ctx, &event, ack, tasks);
 
 	if (NULL != event)
 	{

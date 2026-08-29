@@ -883,4 +883,3 @@ void	cep_event_context_init_with_event(zbx_cep_event_context_t *ctx, zbx_cep_eve
 	ctx->sync_flags = CEP_SYNC_IGNORE;
 	ctx->dbpool = dbpool;
 }
-

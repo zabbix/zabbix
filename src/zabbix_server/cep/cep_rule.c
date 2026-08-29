@@ -1080,7 +1080,7 @@ int	cep_event_process_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t
 		(*matched_rules)[(*matched_rules_num)++] = rules->values[i];
 
 		(void)cep_rule_event_execute_ops(rules->values[i], ZBX_CEP_WHEN_EVENT_OCCURRED, ctx, &ctx->event,
-				tasks);
+				NULL, tasks);
 
 		if (0 != rules->values[i]->stop)
 			break;

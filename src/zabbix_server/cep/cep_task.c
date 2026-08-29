@@ -459,7 +459,7 @@ static void	cep_task_window_sync_free(void *mw_task)
  *                                                                            *
  * Purpose: create an acknowledge task                                        *
  *                                                                            *
- * Parameters: ack     - [IN/OUT] acknowledge data; reset after transfer      *
+ * Parameters: ack     - [IN/OUT] acknowledge data                            *
  *             ruleid  - [IN]                                                 *
  *             eventid - [IN]                                                 *
  *                                                                            *
