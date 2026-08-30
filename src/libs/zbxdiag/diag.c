@@ -745,6 +745,9 @@ static void	diag_log_preprocessing(struct zbx_json_parse *jp, char **out, size_t
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "%s", msg);
 	zbx_free(msg);
 
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset,
+		"== Counter scope: queued/direct count and size are cumulative since preprocessing manager start ==");
+
 	diag_log_top_view(jp, "top.sequences", "$.top.sequences", out, out_alloc, out_offset);
 	diag_log_top_view(jp, "top.peak", "$.top.peak", out, out_alloc, out_offset);
 	diag_log_top_view(jp, "top.values_num", "$.top.values_num", out, out_alloc, out_offset);
