@@ -1059,7 +1059,7 @@ class testCepRule extends CAPITest {
 							[
 								'type' => CCepRuleHelper::CONDITION_EVENT_NAME,
 								'formulaid' => 'A',
-								'operator' => CONDITION_OPERATOR_EQUAL,
+								'operator' => CONDITION_OPERATOR_EQUAL
 							]
 						]
 					]

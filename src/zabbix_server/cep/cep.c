@@ -2041,7 +2041,7 @@ int	cep_rule_check_error(zbx_cep_t *cep, zbx_uint64_t ruleid, const char *error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: udpate rule error in cache                                        *
+ * Purpose: update rule error in cache                                        *
  *                                                                            *
  * Parameters: cep    - [IN] CEP instance                                     *
  *             ruleid - [IN] rule identifier                                  *

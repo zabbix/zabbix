@@ -92,7 +92,7 @@ zbx_uint64_t	cep_event_context_get_hostgroupid(zbx_cep_event_context_t *ctx);
 void	cep_event_context_set_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent);
 
 zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *name, int clock, int ns,
-	int serverity, int value, const zbx_vector_lite_tag_t *tags);
+	int severity, int value, const zbx_vector_lite_tag_t *tags);
 void	cep_events_expect(zbx_db_event * const *db_events, int events_num);
 
 int	db_event_suppress_compare(const void *a1, const void *a2);

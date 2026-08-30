@@ -936,7 +936,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'StartTrappers' => static::START_TRAPPERS,
 				'StartAlerters' => static::START_ALERTERS,
 				'StartTimers' => static::START_TIMERS,
-				'StartHistoryPollers' => 1,
+				'StartHistoryPollers' => 1
 			]
 		];
 	}
@@ -11834,7 +11834,7 @@ HEREDOC;
 		}
 	}
 
-	/* Close window operation (event pattern match) - test abbility to close window for each type of window */
+	/* Close window operation (event pattern match) - test ability to close window for each type of window */
 
 	/**
 	 * The close window operation driven by an event pattern match instead of by an arriving event: the script of
@@ -12080,7 +12080,7 @@ HEREDOC;
 		}
 	}
 
-	/* Close window operation - test abbility to close window for each type of window */
+	/* Close window operation - test ability to close window for each type of window */
 
 	/**
 	 * The same close window scenario with a simple window, whose close window operation is performed when an

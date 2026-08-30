@@ -990,7 +990,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: attempt to add event to parrent match window, triggering          *
+ * Purpose: attempt to add event to parent match window, triggering           *
  *          corresponding operations if window is at capacity limit           *
  *                                                                            *
  * Parameters: rule  - [IN] cep rule owning the window                        *
@@ -1799,7 +1799,7 @@ void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool
 		zbx_vector_uint64_create(&delete_windowids);
 		zbx_vector_uint64_create(&delete_eventids);
 
-		/* clear the hashset in the case loading was retried beacuse of database connection failure */
+		/* clear the hashset in the case loading was retried because of database connection failure */
 		zbx_hashset_iter_reset(&pool->windows, &iter);
 		while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
 			zbx_hashset_iter_remove(&iter);

@@ -326,7 +326,7 @@ static int	cep_operation_eval_or(const zbx_cep_operation_t *op, zbx_cep_event_co
  * Parameters: op    - [IN] operation whose tag conditions to evaluate        *
  *             ctx   - [IN/OUT] event context for caching resolved values     *
  *                                                                            *
- * Return value: SUCCEED if alls conditions is are, FAIL otherwise            *
+ * Return value: SUCCEED if all conditions is are, FAIL otherwise             *
  *                                                                            *
  ******************************************************************************/
 static int	cep_operation_eval_and(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx)

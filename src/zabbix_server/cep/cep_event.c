@@ -311,7 +311,7 @@ int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *
  *                                                                            *
  ******************************************************************************/
 zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *name, int clock, int ns,
-		int serverity, int value, const zbx_vector_lite_tag_t *tags)
+		int severity, int value, const zbx_vector_lite_tag_t *tags)
 {
 	zbx_db_event	*db_event;
 
@@ -322,7 +322,7 @@ zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *na
 	db_event->objectid = origin->objectid;
 	db_event->clock = clock;
 	db_event->ns = ns;
-	db_event->severity = serverity;
+	db_event->severity = severity;
 	db_event->value = value;
 	db_event->name = zbx_strdup(NULL, name);
 

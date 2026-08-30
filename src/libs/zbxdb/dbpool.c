@@ -413,7 +413,7 @@ zbx_dbconn_pool_t	*zbx_dbconn_pool_create(char **error)
 void	zbx_dbconn_pool_free(zbx_dbconn_pool_t *pool)
 {
 	if (pool->available.values_num != pool->conns.values_num)
-		zabbix_log(LOG_LEVEL_WARNING, "database connection pool is being freed whith unreleased connections");
+		zabbix_log(LOG_LEVEL_WARNING, "database connection pool is being freed with unreleased connections");
 
 	pthread_mutex_destroy(&pool->lock);
 	pthread_cond_destroy(&pool->event);
