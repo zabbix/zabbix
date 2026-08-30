@@ -63,6 +63,9 @@ window.ceprule_edit_popup = new class {
 	/** @type {Number} */
 	#condition_row_index = 0;
 
+	/** @type {Number} */
+	#operation_row_index = 0;
+
 	/** @type {Template} */
 	#operation_row_template;
 
@@ -170,15 +173,20 @@ window.ceprule_edit_popup = new class {
 				this.#openOperationPopup(undefined, e.target);
 			}
 			else if (e.target.classList.contains('js-operation-edit')) {
-				const {
-					[e.target.closest('[data-row_index]').getAttribute('data-row_index')]: operation
-				} = this.form.findFieldByName('operations').getValue();
+				const row_index = Number(e.target.closest('tr').dataset.row_index);
+				const operation = this.form.findFieldByName('operations').getValue()[row_index];
+
 				this.#openOperationPopup(operation, e.target);
 			}
 			else if (e.target.classList.contains('js-operation-remove')) {
 				const row = e.target.closest('tr');
 				row.nextElementSibling.remove();
 				row.remove();
+
+				if (!document.getElementById('ceprule-operations-table').querySelector('[data-row_index]')) {
+					this.#operation_row_index = 0;
+				}
+
 				this.#renumberOperationRows();
 				this.form.discoverAllFields();
 				this.#toggleOperationsInformation();
@@ -216,7 +224,6 @@ window.ceprule_edit_popup = new class {
 			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
 		}).on(CSortable.EVENT_SORT, () => {
 			this.#renumberOperationRows();
-			this.form.discoverAllFields();
 		});
 
 		// Confirm / cancel dialog.
@@ -540,12 +547,11 @@ window.ceprule_edit_popup = new class {
 
 	#openOperationPopup(operation, trigger_element) {
 		const is_new = operation === undefined;
+		const row_index = is_new ? null : operation.row_index;
 
 		if (is_new) {
-			const operations = this.form.findFieldByName('operations').getValue();
-
 			operation = {
-				sortorder: 1 + Math.max(0, ...Object.values(operations).map(({sortorder}) => sortorder)),
+				sortorder: this.#getNextSortorder(),
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
 				type: <?= CCepRuleHelper::OP_CLOSE_EVENT ?>,
@@ -569,6 +575,9 @@ window.ceprule_edit_popup = new class {
 					}]
 				}
 			};
+		}
+		else {
+			delete operation.row_index;
 		}
 
 		const template = document.getElementById('ceprule-operation-modal-template');
@@ -595,7 +604,14 @@ window.ceprule_edit_popup = new class {
 
 								overlayDialogueDestroy(overlay.dialogueid);
 
-								is_new && this.#addOperationRow(fields, true) || this.#editOperationRow(fields);
+								if (is_new) {
+									this.#addOperationRow(fields, true)
+								}
+								else {
+									fields.row_index = row_index;
+									this.#editOperationRow(fields);
+								}
+
 								this.form.discoverAllFields();
 								this.#toggleOperationsInformation();
 							});
@@ -643,15 +659,22 @@ window.ceprule_edit_popup = new class {
 		this.#overlay.unsetLoading();
 	}
 
+	#getNextSortorder() {
+		return document.getElementById('ceprule-operations-table').querySelectorAll('[data-row_index]').length;
+	}
+
 	#editOperationRow(operation) {
 		const row = this.form_element
-			.querySelector(`#ceprule-operations-table [data-row_index="${operation.sortorder}"]`);
+			.querySelector(`#ceprule-operations-table [data-row_index="${operation.row_index}"]`);
 
 		row.nextElementSibling.remove();
 		row.replaceWith(this.#buildOperationRow(operation, true));
 	}
 
 	#addOperationRow(operation, set_changed) {
+		operation.row_index = this.#operation_row_index++;
+		operation.sortorder = this.#getNextSortorder();
+
 		this.form_element.querySelector('#ceprule-operations-table tbody')
 			.append(this.#buildOperationRow(operation, set_changed));
 	}
@@ -742,17 +765,17 @@ window.ceprule_edit_popup = new class {
 
 		const conditions_input_html = Object.values(operation.filter.conditions)
 			.map((condition, condition_index) => (new Template(`
-				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][type]"
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][type]"
 					type="hidden" value="#{type}"/>
-				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][operator]"
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][operator]"
 					type="hidden" value="#{operator}"/>
-				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][tag]"
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][tag]"
 					type="hidden" value="#{tag}"/>
-				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][tag_name]"
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][tag_name]"
 					type="hidden" value="#{tag_name}"/>
-				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][tag_value]"
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][tag_value]"
 					type="hidden" value="#{tag_value}"/>
-				<input data-field-type="hidden" name="operations[${operation.sortorder}][filter][conditions][${condition_index}][formulaid]"
+				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][formulaid]"
 					type="hidden" value="#{formulaid}"/>
 			`)).evaluate(condition)).join('');
 
@@ -815,7 +838,7 @@ window.ceprule_edit_popup = new class {
 			});
 		}
 
-		const error_container_id = `ceprule-operations-${template_args.sortorder}-error-container`;
+		const error_container_id = `ceprule-operations-${template_args.row_index}-error-container`;
 		const rows = new DocumentFragment();
 
 		row.querySelector('[name$="[execute_when]"]').setAttribute('data-error-container', error_container_id);
@@ -896,9 +919,8 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#renumberOperationRows() {
-		window['ceprule-operations-table'].querySelectorAll('[data-row_index]')
+		document.getElementById('ceprule-operations-table').querySelectorAll('[data-row_index]')
 			.forEach(function(row, index) {
-				row.dataset.row_index = index;
 				row.querySelector('[name$="[sortorder]"]').value = index;
 			});
 	}
