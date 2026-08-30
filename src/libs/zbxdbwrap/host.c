@@ -6424,11 +6424,12 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 		const zbx_uint64_t hostid, int audit_context_mode)
 {
 	char			*community_esc, *securityname_esc, *authpassphrase_esc, *privpassphrase_esc,
-				*contextname_esc, *max_repetitions_esc;
+				*contextname_esc;
 	unsigned char		db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	char			*max_repetitions = NULL;
+	const char		*max_repetitions_esc;
 	int			break_loop = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64, __func__, interfaceid);
