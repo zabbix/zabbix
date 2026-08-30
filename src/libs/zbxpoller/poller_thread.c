@@ -516,7 +516,7 @@ static int	xml_traverse_item_resolver(char **data, char *error, int maxerrlen,
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros)
 {
-	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
+	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL, *max_repetitions = NULL;
 	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
@@ -617,8 +617,15 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_dc_expand_user_and_func_macros(um_handle_secure, &items[i].snmp_community,
 						&items[i].host.hostid, 1, NULL);
 
-				zbx_dc_expand_user_and_func_macros(um_handle_secure, &items[i].snmp_max_repetitions,
+				ZBX_STRDUP(max_repetitions, items[i].snmp_max_repetitions_orig);
+				zbx_dc_expand_user_and_func_macros(um_handle, &max_repetitions,
 						&items[i].host.hostid, 1, NULL);
+
+				if (NULL != max_repetitions)
+				{
+					items[i].snmp_max_repetitions = atoi(max_repetitions);
+				}
+				zbx_free(max_repetitions);
 
 				if (SUCCEED != zbx_substitute_snmp_oid_params(&items[i].snmp_oid, error, sizeof(error),
 						zbx_snmp_oid_subst_cb, um_handle, &items[i].host.hostid))
@@ -842,7 +849,7 @@ void	zbx_prepare_agent_items(zbx_dc_agent_item_t *items, int *errcodes, int num,
 
 void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, AGENT_RESULT *results)
 {
-	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
+	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL, *max_repetitions = NULL;
 	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
@@ -916,8 +923,15 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 		zbx_dc_expand_user_and_func_macros(um_handle_secure, &items[i].snmp_community,
 				&items[i].hostid, 1, NULL);
 
-		zbx_dc_expand_user_and_func_macros(um_handle_secure, &items[i].snmp_max_repetitions,
-				&items[i].hostid, 1, NULL);
+		ZBX_STRDUP(max_repetitions, items[i].snmp_max_repetitions_orig);
+
+		zbx_dc_expand_user_and_func_macros(um_handle, &max_repetitions, &items[i].hostid, 1, NULL);
+
+		if (NULL != max_repetitions)
+		{
+			items[i].snmp_max_repetitions = atoi(max_repetitions);
+		}
+		zbx_free(max_repetitions);
 
 		if (SUCCEED != zbx_substitute_snmp_oid_params(&items[i].snmp_oid, error, sizeof(error),
 				zbx_snmp_oid_subst_cb, um_handle, &items[i].hostid))
@@ -1221,7 +1235,6 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 
 				zbx_free(items[i].snmp_community);
 				zbx_free(items[i].snmp_oid);
-				zbx_free(items[i].snmp_max_repetitions);
 				break;
 			case ITEM_TYPE_HTTPAGENT:
 				zbx_free(items[i].url);
@@ -1291,7 +1304,6 @@ void	zbx_clean_snmp_items(zbx_dc_snmp_item_t *items, int num, AGENT_RESULT *resu
 
 		zbx_free(items[i].snmp_community);
 		zbx_free(items[i].snmp_oid);
-		zbx_free(items[i].snmp_max_repetitions);
 
 		zbx_free_agent_result(&results[i]);
 	}

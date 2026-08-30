@@ -216,7 +216,8 @@ typedef struct
 	char			granularity_orig[ZBX_ITEM_GRANULARITY_LEN_MAX];
 	int			granularity;
 	zbx_tq_query_t		*telemetry_query;
-	char			*snmp_max_repetitions;
+	char			snmp_max_repetitions_orig[ZBX_ITEM_SNMP_MAXREPETITIONS_LEN_MAX];
+	int			snmp_max_repetitions;
 	unsigned char		preprocessing;
 }
 zbx_dc_item_t;
@@ -261,7 +262,8 @@ typedef struct
 	char			snmpv3_contextname_orig[ZBX_ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
 	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
 	int			timeout;
-	char			*snmp_max_repetitions;
+	char			snmp_max_repetitions_orig[ZBX_ITEM_SNMP_MAXREPETITIONS_LEN_MAX];
+	int			snmp_max_repetitions;
 	unsigned char		preprocessing;
 }
 zbx_dc_snmp_item_t;

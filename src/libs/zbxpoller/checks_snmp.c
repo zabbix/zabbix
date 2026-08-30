@@ -3940,7 +3940,7 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 
 	snmp_context->item.version = item->interface.version;
 	snmp_context->config_timeout = item->timeout;
-	snmp_context->snmp_max_repetitions = zbx_atoi(item->snmp_max_repetitions);
+	snmp_context->snmp_max_repetitions = item->snmp_max_repetitions;
 	snmp_context->snmp_version = item->snmp_version;
 	snmp_context->snmp_community = item->snmp_community;
 	item->snmp_community = NULL;
@@ -4000,7 +4000,7 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 
 	snmp_context->item.version = item->interface.version;
 	snmp_context->config_timeout = item->timeout;
-	snmp_context->snmp_max_repetitions = zbx_atoi(item->snmp_max_repetitions);
+	snmp_context->snmp_max_repetitions = item->snmp_max_repetitions;
 	snmp_context->snmp_version = item->snmp_version;
 	snmp_context->snmp_community = item->snmp_community;
 	item->snmp_community = NULL;
