@@ -41,6 +41,7 @@ This template has been tested on:
 |{$DELL.HTTP.API.USER}|<p>The Dell iDRAC username.</p>|`<Put your username here>`|
 |{$DELL.HTTP.API.PASSWORD}|<p>The Dell iDRAC user password.</p>|`<Put your password here>`|
 |{$DELL.HTTP.PROXY}|<p>Set an HTTP proxy for Redfish API requests if needed.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "DELL PowerEdge", e.g. {$HTTP.TLS.VERIFY:"DELL PowerEdge"}.</p>|`full`|
 |{$DELL.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200", but can vary, for example, if a proxy is used.</p>|`200`|
 |{$DELL.HTTP.REQUEST.TIMEOUT}|<p>Set the timeout for HTTP requests.</p>|`10s`|
 |{$DELL.HTTP.IFCONTROL}|<p>Link status trigger will be fired only for interfaces that have the context macro equal to "1".</p>|`1`|

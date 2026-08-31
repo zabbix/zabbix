@@ -86,6 +86,7 @@ Additional information about metrics and used API methods:
 |{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.AUTH.FREQUENCY}|<p>The update interval for the GCP Authorization item, which also equals to the access token regeneration request frequency.</p><p>Check the template documentation notes carefully for more details.</p>|`45m`|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items and JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP", e.g. {$HTTP.TLS.VERIFY:"GCP"}.</p>|`full`|
 |{$GCP.GCE.INST.NAME.MATCHES}|<p>The filter to include GCP Compute Engine instances by namespace.</p>|`.*`|
 |{$GCP.GCE.INST.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Compute Engine instances by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.GCE.ZONE.MATCHES}|<p>The filter to include GCP Compute Engine instances by zone.</p>|`.*`|
@@ -214,6 +215,7 @@ This template will be automatically connected to discovered entities with all th
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>Supported usage type:</p><p>1. The default update interval for most of the items.</p><p>2. The minimal time window for the data requested in the Monitoring Query Language REST API request.</p>|`5m`|
 |{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Compute Engine Instance", e.g. {$HTTP.TLS.VERIFY:"GCP Compute Engine Instance"}.</p>|`full`|
 |{$GCE.DISK.NAME.MATCHES}|<p>The filter to include GCP Compute Engine disks by namespace.</p>|`.*`|
 |{$GCE.DISK.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Compute Engine disks by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$GCE.DISK.DEV_TYPE.MATCHES}|<p>The filter to include GCP Compute Engine disks by device type.</p>|`.*`|
@@ -317,6 +319,7 @@ This template will be automatically connected to discovered entities with all th
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>Supported usage type:</p><p>1. The default update interval for most of the items.</p><p>2. The minimal time window for the data requested in the Monitoring Query Language REST API request.</p>|`5m`|
 |{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL MySQL", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL MySQL"}.</p>|`full`|
 |{$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}|<p>GCP Cloud SQL MySQL instance warning disk usage threshold.</p>|`80`|
 |{$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}|<p>GCP Cloud SQL MySQL instance critical disk usage threshold.</p>|`90`|
 |{$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}|<p>GCP Cloud SQL MySQL instance CPU usage threshold.</p>|`95`|
@@ -405,6 +408,7 @@ This template will be automatically connected to discovered entities with all th
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>Supported usage type:</p><p>1. The default update interval for most of the items.</p><p>2. The minimal time window for the data requested in the Monitoring Query Language REST API request.</p>|`5m`|
 |{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL MySQL Replica", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL MySQL Replica"}.</p>|`full`|
 
 ### Items
 
@@ -450,6 +454,7 @@ This template will be automatically connected to discovered entities with all th
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>Supported usage type:</p><p>1. The default update interval for most of the items.</p><p>2. The minimal time window for the data requested in the Monitoring Query Language REST API request.</p>|`5m`|
 |{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL PostgreSQL", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL PostgreSQL"}.</p>|`full`|
 |{$GCP.CLOUD_SQL.DB.NAME.MATCHES}|<p>The filter to include GCP Cloud SQL PostgreSQL databases by namespace.</p>|`.*`|
 |{$GCP.CLOUD_SQL.DB.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL PostgreSQL databases by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}|<p>GCP Cloud SQL PostgreSQL instance warning disk usage threshold.</p>|`80`|
@@ -560,6 +565,7 @@ This template will be automatically connected to discovered entities with all th
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>Supported usage type:</p><p>1. The default update interval for most of the items.</p><p>2. The minimal time window for the data requested in the Monitoring Query Language REST API request.</p>|`5m`|
 |{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL PostgreSQL Replica", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL PostgreSQL Replica"}.</p>|`full`|
 
 ### Items
 
@@ -607,6 +613,7 @@ This template will be automatically connected to discovered entities with all th
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>Supported usage type:</p><p>1. The default update interval for most of the items.</p><p>2. The minimal time window for the data requested in the Monitoring Query Language REST API request.</p>|`5m`|
 |{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL MSSQL", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL MSSQL"}.</p>|`full`|
 |{$CLOUD_SQL.MSSQL.RES.NAME.MATCHES}|<p>The filter to include GCP Cloud SQL MSSQL resources by namespace.</p>|`.*`|
 |{$CLOUD_SQL.MSSQL.RES.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MSSQL resources by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$CLOUD_SQL.MSSQL.DB.NAME.MATCHES}|<p>The filter to include GCP Cloud SQL MSSQL databases by namespace.</p>|`.*`|
@@ -759,6 +766,7 @@ This template will be automatically connected to discovered entities with all th
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>Supported usage type:</p><p>1. The default update interval for most of the items.</p><p>2. The minimal time window for the data requested in the Monitoring Query Language REST API request.</p>|`5m`|
 |{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL MSSQL Replica", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL MSSQL Replica"}.</p>|`full`|
 
 ### Items
 
