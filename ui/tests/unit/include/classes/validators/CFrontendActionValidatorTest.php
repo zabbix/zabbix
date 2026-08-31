@@ -35,10 +35,6 @@ class CFrontendActionValidatorTest extends TestCase {
 			['httpdetails.php',																		null],
 			['image.php',																			null],
 			['imgstore.php',																		null],
-			['index.php',																			null],
-			['index_http.php',																		null],
-			['index_mfa.php',																		null],
-			['index_sso.php',																		null],
 			['jsrpc.php',																			null],
 			['map.php',																				null],
 			['report4.php',																			null],
@@ -77,7 +73,13 @@ class CFrontendActionValidatorTest extends TestCase {
 			['zabbix.php?action[123]=invalid',														'a relative URL to the frontend is expected'],
 			['zabbix.php?action[123][456]=invalid',													'a relative URL to the frontend is expected'],
 			['zabbix.php?no_action=123',															'a relative URL to the frontend is expected'],
-			['zabbix.php?action=invalid',															'invalid action in the frontend URL']
+			['zabbix.php?action=invalid',															'invalid action in the frontend URL'],
+
+			// Excluded legacy controllers
+			['index.php',																			'a relative URL to the frontend is expected'],
+			['index_http.php',																		'a relative URL to the frontend is expected'],
+			['index_mfa.php',																		'a relative URL to the frontend is expected'],
+			['index_sso.php',																		'a relative URL to the frontend is expected'],
 		];
 	}
 

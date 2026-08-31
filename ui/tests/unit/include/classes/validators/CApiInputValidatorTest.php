@@ -8986,7 +8986,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_FRONTEND_ACTION],
 				'index.php',
 				'/1/action_url',
-				'index.php'
+				'Invalid parameter "/1/action_url": a relative URL to the frontend is expected.'
 			],
 			[
 				['type' => API_FRONTEND_ACTION],
