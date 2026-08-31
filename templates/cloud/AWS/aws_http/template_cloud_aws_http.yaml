@@ -5692,7 +5692,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Check result of the alarm data has been got correctly.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -7207,13 +7207,13 @@ zabbix_export:
             - tag: component
               value: metadata
         - uuid: 7c264d8d5d934f898f7c745acd429d25
-          name: 'Get metrics check'
+          name: 'EC2 metrics check'
           type: DEPENDENT
           key: aws.ec2.metrics.check
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Check result of the instance metric data has been got correctly.'
+          description: 'Checks whether EC2 metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -7427,7 +7427,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Check result of the volume information has been got correctly.'
+          description: 'Checks whether the volume information was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -7591,7 +7591,7 @@ zabbix_export:
               parameters:
                 - 3h
         - uuid: 6cf7fc98fea44b0789a5aaa837042699
-          name: 'Instance Volumes discovery'
+          name: 'EC2 volumes discovery'
           type: DEPENDENT
           key: aws.ec2.volumes.discovery
           delay: '0'
@@ -8648,7 +8648,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Data collection check.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -9837,13 +9837,13 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: a214cef0377b4901afc2cb90186e5e46
-          name: 'Get metrics check'
+          name: 'ECS metrics check'
           type: DEPENDENT
           key: aws.ecs.metrics.check
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Data collection check.'
+          description: 'Checks whether ECS metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -11093,7 +11093,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Data collection check.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -12328,13 +12328,13 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 852512ccdd9e48f9849ac019d94cdf55
-          name: 'Get metrics check'
+          name: 'ECS metrics check'
           type: DEPENDENT
           key: aws.ecs.metrics.check
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Data collection check.'
+          description: 'Checks whether ECS metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -13711,7 +13711,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Check that the alarm data has been received correctly.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -15081,13 +15081,13 @@ zabbix_export:
             - tag: component
               value: http
         - uuid: 7fdd931458ba4fa5b3baff1d67e4a32f
-          name: 'Get metrics check'
+          name: 'ALB metrics check'
           type: DEPENDENT
           key: aws.elb.alb.metrics.check
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Check that the Application Load Balancer metrics data has been received correctly.'
+          description: 'Checks whether ALB metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -16766,7 +16766,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Check that the alarm data has been received correctly.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -17899,13 +17899,13 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 13516270f6124bf09a308bc20565528c
-          name: 'Get metrics check'
+          name: 'NLB metrics check'
           type: DEPENDENT
           key: aws.elb.nlb.metrics.check
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Check that the Network Load Balancer metrics data has been received correctly.'
+          description: 'Checks whether NLB metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -19298,7 +19298,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Check that the alarm data has been received correctly.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -20134,13 +20134,13 @@ zabbix_export:
             - tag: component
               value: invocation
         - uuid: 2bfa15a2c1ef4f66a8b2065e34a1a690
-          name: 'Get metrics check'
+          name: 'Lambda metrics check'
           type: DEPENDENT
           key: aws.lambda.metrics.check
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Check that the Lambda function metrics data has been received correctly.'
+          description: 'Checks whether Lambda metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -20552,7 +20552,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Data collection check.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -20901,7 +20901,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Data collection check.'
+          description: 'Checks whether the instance event data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -22405,7 +22405,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Data collection check.'
+          description: 'Checks whether the instance information was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -22430,13 +22430,13 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 8f651a01cd1d4639b6a4ef443285b24c
-          name: 'Get metrics check'
+          name: 'RDS metrics check'
           type: DEPENDENT
           key: aws.rds.metrics.check
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Data collection check.'
+          description: 'Checks whether RDS metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -24116,7 +24116,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Data collection check.'
+          description: 'Checks whether the alarm data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -24961,13 +24961,13 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0e22c196ae834d2899068f25316ffed2
-          name: 'Get metrics check'
+          name: 'S3 metrics check'
           type: DEPENDENT
           key: aws.s3.metrics.check
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Data collection check.'
+          description: 'Checks whether S3 metric data was retrieved correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:

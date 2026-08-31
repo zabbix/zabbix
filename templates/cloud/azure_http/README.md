@@ -20,6 +20,7 @@
 - *Azure Microsoft SQL Database by HTTP*
 - *Azure SQL Managed Instance by HTTP*
 - *Azure Cost Management by HTTP*
+- *Azure Cosmos DB for MongoDB by HTTP*
 - *Azure Backup Jobs by HTTP*
 
 ## Requirements
