@@ -228,9 +228,9 @@ static int	trapper_device_authorize(zbx_socket_t *sock, const struct zbx_json_pa
 	{
 		auth_ret = zbx_get_user_from_json_dpop_for_device(jp, id_str, user);
 	}
-
-	if (FAIL == auth_ret)
+	else
 		auth_ret = zbx_get_user_from_json(jp, user, NULL);
+
 
 	if (FAIL == auth_ret)
 	{

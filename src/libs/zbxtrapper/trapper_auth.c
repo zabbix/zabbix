@@ -20,6 +20,13 @@
 
 #define	ZBX_SID_AUTH_TOKEN_LENGTH	64
 
+typedef enum
+{
+	ZBX_JSON_USER_LOOKUP_GENERIC,
+	ZBX_JSON_USER_LOOKUP_DEVICE_OFFBOARD
+}
+zbx_json_user_lookup_mode_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Takes a string token, hashes it with sha-512 and then formats the *
@@ -49,17 +56,21 @@ static void	format_auth_token_hash(const char *auth_token, char *hash_res_string
 
 /******************************************************************************
  *                                                                            *
- * Purpose: authenticates and initializes user data from supplied json        *
+ * Purpose: authenticates user data from supplied JSON using the requested    *
+ *          lookup mode                                                       *
  *                                                                            *
- * Parameters: jp     - [IN] request                                          *
- *             user   - [OUT] user data                                       *
- *             result - [OUT] error logging                                   *
+ * Parameters: jp          - [IN] request                                     *
+ *             user        - [OUT] user data                                  *
+ *             result      - [OUT] error logging                              *
+ *             mode        - [IN] lookup mode                                 *
+ *             device_uuid - [IN] device UUID for offboard lookup             *
  *                                                                            *
  * Return value: SUCCEED - managed to find and authenticate user              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, char **result)
+static int	get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, char **result,
+		zbx_json_user_lookup_mode_t mode, const char *device_uuid)
 {
 	char	buffer[MAX_STRING_LEN];
 	int	ret;
@@ -79,7 +90,11 @@ int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, ch
 			char	hash_res_stringhexes[ZBX_SID_AUTH_TOKEN_LENGTH * 2 + 1];
 
 			format_auth_token_hash(buffer, hash_res_stringhexes);
-			ret = zbx_db_get_user_by_auth_token(hash_res_stringhexes, user);
+
+			if (ZBX_JSON_USER_LOOKUP_DEVICE_OFFBOARD == mode)
+				ret = zbx_db_get_user_by_dpop_token_for_device(hash_res_stringhexes, device_uuid, user);
+			else
+				ret = zbx_db_get_user_by_auth_token(hash_res_stringhexes, user);
 		}
 		else
 		{
@@ -113,25 +128,19 @@ out:
 	return ret;
 }
 
+int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, char **result)
+{
+	return get_user_from_json(jp, user, result, ZBX_JSON_USER_LOOKUP_GENERIC, NULL);
+}
+
 /******************************************************************************
  *                                                                            *
- * Purpose: authenticates a DPoP token for offboarding its bound device       *
+ * Purpose: authenticates a device.offboard request                           *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_user_from_json_dpop_for_device(const struct zbx_json_parse *jp, const char *device_uuid,
 		zbx_user_t *user)
 {
-	char	auth_token[ZBX_SID_AUTH_TOKEN_LENGTH + 1],
-		hash_res_stringhexes[ZBX_SID_AUTH_TOKEN_LENGTH * 2 + 1];
-
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, auth_token, sizeof(auth_token), NULL) ||
-			ZBX_SID_AUTH_TOKEN_LENGTH != strlen(auth_token))
-	{
-		return FAIL;
-	}
-
-	format_auth_token_hash(auth_token, hash_res_stringhexes);
-
-	return zbx_db_get_user_by_dpop_token_for_device(hash_res_stringhexes, device_uuid, user);
+	return get_user_from_json(jp, user, NULL, ZBX_JSON_USER_LOOKUP_DEVICE_OFFBOARD, device_uuid);
 }
 #undef	ZBX_SID_AUTH_TOKEN_LENGTH

@@ -613,49 +613,73 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate that token is not expired and is active and then get     *
- *          associated user data                                              *
+ * Purpose: validate that token is not expired and is active, optionally      *
+ *          checking that a DPoP token is bound to the specified device, and  *
+ *          get associated user data                                          *
  *                                                                            *
  * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
+ *             device_uuid               - [IN] device UUID for DPoP binding  *
  *             user                      - [OUT] user information             *
  *                                                                            *
  * Return value:  SUCCEED - token is valid and user data was retrieved        *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
+static int	db_get_user_by_auth_token(const char *formatted_auth_token_hash, const char *device_uuid,
+		zbx_user_t *user)
 {
-	int		ret = FAIL;
-	zbx_db_result_t	result = NULL;
-	zbx_db_row_t	row;
-	time_t		t;
+	char			*device_uuid_esc = NULL;
+	int			ret = FAIL;
+	zbx_db_result_t		result = NULL;
+	zbx_db_row_t		row;
+	time_t			t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
 
-	t = time(NULL);
-
-	if ((time_t) - 1 == t)
+	if ((time_t) - 1 == (t = time(NULL)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to get time: %s", __func__, zbx_strerror(errno));
 		goto out;
 	}
 
-	if (NULL == (result = zbx_db_select(
-			"select u.userid,u.roleid,u.username,r.type"
-				" from token t,users u,role r"
-			" where t.userid=u.userid"
-				" and t.token='%s'"
-				" and u.roleid=r.roleid"
-				" and t.status=%d"
-				" and t.auth_scheme=%d"
-				" and (t.expires_at=%d or t.expires_at > %lu)",
-			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_SCHEME_BEARER,
-			ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t)))
+	if (NULL == device_uuid)
 	{
-		goto out;
+		result = zbx_db_select(
+				"select u.userid,u.roleid,u.username,r.type"
+					" from token t,users u,role r"
+				" where t.userid=u.userid"
+					" and t.token='%s'"
+					" and u.roleid=r.roleid"
+					" and t.status=%d"
+					" and t.auth_scheme=%d"
+					" and (t.expires_at=%d or t.expires_at > %lu)",
+				formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_SCHEME_BEARER,
+				ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t);
+	}
+	else
+	{
+		device_uuid_esc = zbx_db_dyn_escape_string(device_uuid);
+		result = zbx_db_select(
+				"select u.userid,u.roleid,u.username,r.type"
+					" from token t,users u,role r"
+				" where t.userid=u.userid"
+					" and t.token='%s'"
+					" and u.roleid=r.roleid"
+					" and t.status=%d"
+					" and (t.expires_at=%d or t.expires_at > %lu)"
+					" and (t.auth_scheme=%d or (t.auth_scheme=%d and exists ("
+						"select null from token_device td,device d"
+						" where td.tokenid=t.tokenid"
+							" and td.deviceid=d.deviceid"
+							" and d.uuid='%s'"
+							" and d.userid=t.userid"
+							" and d.status=%d)))",
+				formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED,
+				ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t, ZBX_AUTH_SCHEME_BEARER,
+				ZBX_AUTH_SCHEME_DPOP, device_uuid_esc, ZBX_DEVICE_STATUS_ACTIVATED);
 	}
 
-	if (NULL == (row = zbx_db_fetch(result)))
+	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
 		goto out;
 
 	ZBX_STR2UINT64(user->userid, row[0]);
@@ -665,10 +689,16 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 	ret = SUCCEED;
 out:
 	zbx_db_free_result(result);
+	zbx_free(device_uuid_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
+{
+	return db_get_user_by_auth_token(formatted_auth_token_hash, NULL, user);
 }
 
 /******************************************************************************
@@ -677,8 +707,8 @@ out:
  *          get associated user data                                          *
  *                                                                            *
  * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
- *             device_uuid              - [IN] device UUID                    *
- *             user                     - [OUT] user information              *
+ *             device_uuid               - [IN] device UUID                   *
+ *             user                      - [OUT] user information             *
  *                                                                            *
  * Return value:  SUCCEED - token is valid and bound to the device            *
  *                FAIL    - otherwise                                         *
@@ -687,56 +717,7 @@ out:
 int	zbx_db_get_user_by_dpop_token_for_device(const char *formatted_auth_token_hash, const char *device_uuid,
 		zbx_user_t *user)
 {
-	char		*device_uuid_esc;
-	int		ret = FAIL;
-	zbx_db_result_t	result = NULL;
-	zbx_db_row_t	row;
-	time_t		t;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s device uuid:%s", __func__,
-			formatted_auth_token_hash, device_uuid);
-
-	if ((time_t) - 1 == (t = time(NULL)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to get time: %s", __func__, zbx_strerror(errno));
-		goto out;
-	}
-
-	device_uuid_esc = zbx_db_dyn_escape_string(device_uuid);
-
-	result = zbx_db_select(
-			"select u.userid,u.roleid,u.username,r.type"
-				" from token t,token_device td,device d,users u,role r"
-			" where t.tokenid=td.tokenid"
-				" and td.deviceid=d.deviceid"
-				" and t.userid=u.userid"
-				" and u.roleid=r.roleid"
-				" and t.token='%s'"
-				" and t.status=%d"
-				" and t.auth_scheme=%d"
-				" and (t.expires_at=%d or t.expires_at > %lu)"
-				" and d.uuid='%s'"
-				" and d.userid=t.userid"
-				" and d.status=%d",
-			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_SCHEME_DPOP,
-			ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t, device_uuid_esc,
-			ZBX_DEVICE_STATUS_ACTIVATED);
-
-	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
-		goto clean;
-
-	ZBX_STR2UINT64(user->userid, row[0]);
-	ZBX_STR2UINT64(user->roleid, row[1]);
-	user->username = zbx_strdup(NULL, row[2]);
-	user->type = atoi(row[3]);
-	ret = SUCCEED;
-clean:
-	zbx_db_free_result(result);
-	zbx_free(device_uuid_esc);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
+	return db_get_user_by_auth_token(formatted_auth_token_hash, device_uuid, user);
 }
 
 void	zbx_user_init(zbx_user_t *user)
