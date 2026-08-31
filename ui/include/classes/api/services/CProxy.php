@@ -459,21 +459,29 @@ class CProxy extends CApiService {
 
 			if (array_key_exists('additional_resource_attributes', $proxy['apm'])) {
 				$attributes_schema = self::APM_SCHEMA['additional_resource_attributes']['fields'];
-				$db_attributes = $db_proxy !== null ? $db_proxy['apm']['additional_resource_attributes'] : [];
-				$last_id = array_reduce(array_keys($db_attributes),
-					static function (string $prev_id, $id): string {
-						return bccomp((string) $id, $prev_id, 0) == 1 ? (string) $id : $prev_id;
-					},
-					'-1'
-				);
+
+				$db_attributes = [];
+				$last_id = '-1';
+
+				if ($db_proxy !== null) {
+					foreach ($db_proxy['apm']['additional_resource_attributes'] as $db_attribute) {
+						$db_attributes[$db_attribute['signal_type']][$db_attribute['key']] = $db_attribute;
+
+						if (bccomp($db_attribute['id'], $last_id, 0) == 1) {
+							$last_id = $db_attribute['id'];
+						}
+					}
+				}
 
 				foreach ($proxy['apm']['additional_resource_attributes'] as &$attribute) {
 					$attribute += array_map(static fn(array $field) => $field['default'], $attributes_schema);
 					$attribute = array_merge($attributes_schema, $attribute);
 
-					if ($db_attributes) {
-						$id = (string) key($db_attributes);
-						unset($db_attributes[$id]);
+					if (array_key_exists($attribute['signal_type'], $db_attributes)
+							&& array_key_exists($attribute['key'], $db_attributes[$attribute['signal_type']])) {
+						$id = $db_attributes[$attribute['signal_type']][$attribute['key']]['id'];
+
+						unset($db_attributes[$attribute['signal_type']][$attribute['key']]);
 					}
 					else {
 						$id = bcadd($last_id, '1', 0);
@@ -1210,12 +1218,7 @@ class CProxy extends CApiService {
 				continue;
 			}
 
-			$apm = json_decode($row['apm'], true);
-
-			$apm['additional_resource_attributes'] = array_column($apm['additional_resource_attributes'], null, 'id');
-			CArrayHelper::sort($apm['additional_resource_attributes'], ['signal_type', 'key']);
-
-			$db_proxies[$row['proxyid']]['apm'] = $apm;
+			$db_proxies[$row['proxyid']]['apm'] = json_decode($row['apm'], true);
 		}
 	}
 
