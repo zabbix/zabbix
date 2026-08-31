@@ -211,6 +211,10 @@ abstract class CItemGeneral extends CApiService {
 					$item += array_intersect_key($db_item, array_flip(['publickey', 'privatekey']));
 				}
 
+				if ($item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+					$item += array_intersect_key($db_item, array_flip(['granularity', 'lookback_limit']));
+				}
+
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesInherited($db_item);
 			}
 			elseif (in_array($db_item['flags'], [ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_RULE_CREATED])) {
