@@ -228,7 +228,10 @@ class CProxy extends CApiService {
 
 		foreach ($result as &$row) {
 			if ($row['apm'] === DB::getDefault('proxy', 'apm')) {
-				$row['apm'] = array_map(static fn(array $field) => $field['default'], self::APM_SCHEMA);
+				$row['apm'] = array_intersect_key(
+					array_map(static fn(array $field) => $field['default'], self::APM_SCHEMA),
+					array_flip($options['selectApm'])
+				);
 
 				continue;
 			}
@@ -1240,7 +1243,7 @@ class CProxy extends CApiService {
 			'additional_resource_attributes' =>	['type' => API_MULTIPLE, 'rules' => [
 													['if' => ['field' => 'data_collection_status', 'in' => PROXY_APM_DATA_COLLECTION_ENABLED], 'type' => API_OBJECTS, 'uniq' => [['signal_type', 'key']], 'fields' => [
 				'key' =>								['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => $attributes_schema['key']['length']],
-				'value' => 								['type' => API_STRING_UTF8, 'length' => $attributes_schema['key']['length']],
+				'value' => 								['type' => API_STRING_UTF8, 'length' => $attributes_schema['value']['length']],
 				'signal_type' =>						['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS])]
 													]],
 													['else' => true, 'type' => API_OBJECTS, 'length' => 0]
