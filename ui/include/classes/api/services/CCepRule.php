@@ -101,9 +101,9 @@ class CCepRule extends CApiService {
 
 		if (!$options['countOutput']) {
 			if (in_array('window_type', $options['output'])) {
-				$sql_parts['join']['cw'] = ['type' => 'left', 'table' => 'cep_rule_window', 'using' => 'cep_ruleid'];
+				$sql_parts['join']['crw'] = ['type' => 'left', 'table' => 'cep_rule_window', 'using' => 'cep_ruleid'];
 				$sql_parts['select']['window_type'] =
-					dbConditionCoalesce('cw.type', CCepRuleHelper::WINDOW_NONE, 'window_type');
+					dbConditionCoalesce('crw.type', CCepRuleHelper::WINDOW_NONE, 'window_type');
 			}
 
 			if (in_array('error', $options['output'])) {
@@ -131,17 +131,19 @@ class CCepRule extends CApiService {
 				$window_type_values = (array) $options['filter']['window_type'];
 
 				if ($window_type_values) {
-					$sql_parts['join']['cw'] = ['type' => 'left', 'table' => 'cep_rule_window', 'using' => 'cep_ruleid'];
+					$sql_parts['join']['crw'] = ['type' => 'left', 'table' => 'cep_rule_window',
+						'using' => 'cep_ruleid'
+					];
 					$sql_parts['where']['window_type'] = in_array(CCepRuleHelper::WINDOW_NONE, $window_type_values)
-						? dbConditionInt('cw.type', $window_type_values).' OR cw.cep_ruleid IS NULL'
-						: dbConditionInt('cw.type', $window_type_values);
+						? dbConditionInt('crw.type', $window_type_values).' OR crw.cep_ruleid IS NULL'
+						: dbConditionInt('crw.type', $window_type_values);
 				}
 			}
 		}
 
 		if ($options['search'] !== null) {
 			if (array_key_exists('error', $options['search']) && $options['search']['error'] !== null) {
-				$sql_parts['join']['crr'] = ['type' => 'left', 'table' => 'cep_rule_rtdata', 'using' => 'cep_ruleid'];
+				$sql_parts['join']['crr'] = ['table' => 'cep_rule_rtdata', 'using' => 'cep_ruleid'];
 				zbx_db_search('cep_rule_rtdata crr', ['search' => ['error' => $options['search']['error']]] + $options,
 					$sql_parts
 				);
@@ -1348,9 +1350,9 @@ class CCepRule extends CApiService {
 
 		$db_cep_rules = DBfetchArrayAssoc(DBselect(
 			'SELECT cr.cep_ruleid,cr.name,cr.stop,cr.sortorder,cr.description,cr.status,'.
-				dbConditionCoalesce('cw.type', CCepRuleHelper::WINDOW_NONE, 'window_type').
+				dbConditionCoalesce('crw.type', CCepRuleHelper::WINDOW_NONE, 'window_type').
 			' FROM cep_rule cr'.
-			' LEFT JOIN cep_rule_window cw ON cr.cep_ruleid=cw.cep_ruleid'.
+			' LEFT JOIN cep_rule_window crw ON cr.cep_ruleid=crw.cep_ruleid'.
 			' WHERE '.dbConditionId('cr.cep_ruleid', array_column($cep_rules, 'cep_ruleid'))
 		), 'cep_ruleid');
 
@@ -1493,7 +1495,7 @@ class CCepRule extends CApiService {
 			'filter' => ['cep_ruleid' => $cep_ruleids],
 			'sortfield' => ['sortorder']
 		];
-		$resource = DBSelect(DB::makeSql('cep_operation', $options));
+		$resource = DBselect(DB::makeSql('cep_operation', $options));
 		$db_operations = [];
 
 		while ($row = DBfetch($resource)) {
