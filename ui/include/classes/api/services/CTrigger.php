@@ -966,10 +966,11 @@ class CTrigger extends CTriggerGeneral {
 			do {
 				// Fetch all dependency records where "down" trigger IDs are in current iteration trigger IDs.
 				$dbResult = DBselect(
-					'SELECT d.triggerid_down,d.triggerid_up,tr.value'.
-					' FROM trigger_depends d,trigger_rtdata tr'.
-					' WHERE d.triggerid_up=tr.triggerid'.
-					' AND '.dbConditionInt('d.triggerid_down', $triggerIds)
+					'SELECT d.triggerid_down,d.triggerid_up,'.
+						dbConditionCoalesce('tr.value', DB::getDefault('trigger_rtdata', 'value'), 'value').
+					' FROM trigger_depends d'.
+					' LEFT JOIN trigger_rtdata tr ON tr.triggerid=d.triggerid_up'.
+					' WHERE '.dbConditionInt('d.triggerid_down', $triggerIds)
 				);
 
 				// Add trigger IDs as keys and empty arrays as values.
