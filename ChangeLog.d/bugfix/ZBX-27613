@@ -1,1 +1,1 @@
-A......... [ZBX-27613] fixed webhook media type detection (vskalbins)
+A......... [ZBX-27613] fixed the mandatory script parameter not being required when changing media type to webhook (vskalbins)
