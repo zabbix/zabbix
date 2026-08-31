@@ -99,6 +99,18 @@ class testItemPrototype extends CAPITest {
 		$this->call('itemprototype.update', $item, $expected_error);
 	}
 
+	/**
+	 * @dataProvider dataProviderItemDiscoveredTelemetryQueryUpdate
+	 */
+	public function testItemDiscoveredTelemetryQueryUpdate(array $item, ?string $expected_error) {
+		$item += [
+			'itemid' => ':discovered_item:host_discovered_telemetry_query[A]',
+		];
+		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
+
+		$this->call('item.update', $item, $expected_error);
+	}
+
 	public static function getItemPrototypeCreateData() {
 		$valid_item_types = [
 			ITEM_TYPE_ZABBIX => '50022',

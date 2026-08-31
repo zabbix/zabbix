@@ -143,6 +143,22 @@ trait traitItemTelemetryQueryTests {
 											'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 											'conditions' => []
 										]
+									],
+									'discovered_items' => [
+										[
+											'type' => ITEM_TYPE_TELEMETRY_QUERY,
+											'key_' => 'host_discovered_telemetry_query[A]',
+											'delay' => '1m',
+											'query' => [
+												'signal_type' => CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+												'columns' => [],
+												'aggregated_columns' => [['column' => 'Timestamp', 'function' => AGGREGATE_MIN, 'alias' => 'Timestamp']],
+												'filter' => [
+													'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+													'conditions' => []
+												]
+											],
+										]
 									]
 								]
 							]
@@ -167,6 +183,34 @@ trait traitItemTelemetryQueryTests {
 				]
 			],
 			null
+		];
+	}
+
+	public static function dataProviderItemDiscoveredTelemetryQueryUpdate() {
+		yield 'without changes' => [
+			[],
+			null
+		];
+
+		yield '"time_shift" fail' => [
+			[
+				'time_shift' => '{$M}'
+			],
+			'Invalid parameter "/1": unexpected parameter "time_shift".'
+		];
+
+		yield '"lookback_limit" fail' => [
+			[
+				'lookback_limit' => '{$M}'
+			],
+			'Invalid parameter "/1": unexpected parameter "lookback_limit".'
+		];
+
+		yield '"granularity" fail' => [
+			[
+				'granularity' => '{$M}'
+			],
+			'Invalid parameter "/1": unexpected parameter "granularity".'
 		];
 	}
 

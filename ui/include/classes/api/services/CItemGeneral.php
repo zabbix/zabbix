@@ -403,7 +403,8 @@ abstract class CItemGeneral extends CApiService {
 				/** @var CItemTypeTelemetryQuery $item_type */
 				$path = '/'.($i + 1);
 
-				if (!$item_type::validateGranularity($item, $path, $error)) {
+				if (array_key_exists('granularity', $item)
+						&& !$item_type::validateGranularity($item, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
