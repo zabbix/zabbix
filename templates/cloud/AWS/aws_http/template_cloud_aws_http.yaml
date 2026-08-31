@@ -6752,7 +6752,7 @@ zabbix_export:
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -9943,7 +9943,7 @@ zabbix_export:
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-6
+        version: 7.4-7
       groups:
         - name: Templates/Cloud
       items:
@@ -12640,7 +12640,7 @@ zabbix_export:
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-6
+        version: 7.4-7
       groups:
         - name: Templates/Cloud
       items:
@@ -15493,7 +15493,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -18706,7 +18706,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -21530,7 +21530,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -23019,7 +23019,7 @@ zabbix_export:
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
@@ -26781,7 +26781,7 @@ zabbix_export:
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-6
       groups:
         - name: Templates/Cloud
       items:
