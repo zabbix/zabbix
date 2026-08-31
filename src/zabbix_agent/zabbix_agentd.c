@@ -973,7 +973,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"Timeout",			&zbx_config_timeout,			ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	1,			30},
 		{"ListenPort",			&zbx_config_listen_port,		ZBX_CFG_TYPE_INT,
-				ZBX_CONF_PARM_OPT,	1024,			32767},
+				ZBX_CONF_PARM_OPT,	1024,			65535},
 		{"ListenIP",			&zbx_config_listen_ip,			ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"SourceIP",			&zbx_config_source_ip,			ZBX_CFG_TYPE_STRING,
