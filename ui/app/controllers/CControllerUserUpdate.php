@@ -146,7 +146,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		];
 
 		$this->getInputs($user, ['userid', 'username', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
-			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
+			'autologout', 'refresh', 'rows_per_page', 'roleid'
 		]);
 
 		if ($this->hasInput('autologout_visible') && $this->getInput('autologout_visible') == 0) {
@@ -175,8 +175,8 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'userids' => [$user['userid']]
 		]);
 
-		if (array_key_exists('url', $user) && CRoleHelper::checkAccess('profile.redirect.enforce', $user['roleid'])) {
-			unset($user['url']);
+		if ($this->hasInput('url') && !CRoleHelper::checkAccess('profile.redirect.enforce', $user['roleid'])) {
+			$user['url'] = $this->getInput('url');
 		}
 
 		if ($db_user['userdirectoryid']) {

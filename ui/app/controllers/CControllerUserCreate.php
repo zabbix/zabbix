@@ -125,7 +125,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 	protected function doAction(): void {
 		$user = [];
 
-		$this->getInputs($user, ['username', 'name', 'surname', 'url', 'autologin', 'autologout', 'theme', 'refresh',
+		$this->getInputs($user, ['username', 'name', 'surname', 'autologin', 'autologout', 'theme', 'refresh',
 			'rows_per_page', 'lang', 'timezone', 'roleid'
 		]);
 
@@ -137,6 +137,10 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 
 		if ($this->getInput('password1', '') !== '' || !$this->allow_empty_password) {
 			$user['passwd'] = $this->getInput('password1');
+		}
+
+		if ($this->hasInput('url') && !CRoleHelper::checkAccess('profile.redirect.enforce', $user['roleid'])) {
+			$user['url'] = $this->getInput('url');
 		}
 
 		if ($this->checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA)) {

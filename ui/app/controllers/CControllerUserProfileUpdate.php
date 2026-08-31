@@ -101,9 +101,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 	protected function doAction(): void {
 		$user = [];
 
-		$this->getInputs($user, ['lang', 'timezone', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page',
-			'url'
-		]);
+		$this->getInputs($user, ['lang', 'timezone', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page']);
 
 		if ($this->getInput('autologout_visible') == 0) {
 			$user['autologout'] = 0;
@@ -123,8 +121,8 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
 		DBstart();
 
-		if (array_key_exists('url', $user) && CWebUser::checkAccess('profile.redirect.enforce')) {
-			unset($user['url']);
+		if ($this->hasInput('url') && !CWebUser::checkAccess('profile.redirect.enforce')) {
+			$user['url'] = $this->getInput('url');
 		}
 
 		$result = (bool) API::User()->update($user);
