@@ -378,163 +378,35 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			/*
-			 * "operations[].tags" do not exists anymore
-			'Operation tags must be array' => [
+			'Operation tag must be set for operation type OP_SET_TAG' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => 'abc'
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags": an array is expected.'
-			],
-			'Operation tags cannot have unexpected fields' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'unexpected' => true
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_TAG
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1": unexpected parameter "unexpected".'
+				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "tag" is missing.'
 			],
-			'Operation tags must have tag name' => [
+			'Operation tag cannot be empty' => [
 				'request' => [
 					'name' => 'ceprule',
+					'sortorder' => 1,
 					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'value' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1": the parameter "tag" is missing.'
-			],
-			'Operation tags name must be string' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'tag' => 1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1/tag": a character string is expected.'
-			],
-			'Operation tags name cannot be empty' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SET_TAG,
 							'tag' => ''
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1/tag": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/operations/1/tag": cannot be empty.'
 			],
-			'Operation tags operator must be integer' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'sortorder' => 1,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'tag' => 'tag',
-							'operator' => 'abc'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1/operator": an integer is expected.'
-			],
-			'Operation tags operator must be of known range' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'tag' => 'tag',
-							'operator' => 99
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1/operator": value must be one of '.
-					implode(', ', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]).'.'
-			],
-			'Operation tags value must be string' => [
-				'request' => [
-					'name' => 'ceprule',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							'tag' => 'tag',
-							'value' => 123
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/1/value": a character string is expected.'
-			],
-			'Multiple operation tags accepted' => [
-				'request' => [
-					'name' => 'ceprule.operation.tags.multiple',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							['tag' => 'tag1'],
-							['tag' => 'tag2']
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			'Operation tags must be unique' => [
-				'request' => [
-					'name' => 'ceprule.operation.tags.multiple.unique',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name',
-						'tags' => [
-							['tag' => 'tag1', 'value' => ''],
-							['tag' => 'tag1', 'value' => '']
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/tags/2": value (tag, value)=(tag1, ) already exists.'
-			],
-			*/
 			'Operation tag must be string' => [
 				'request' => [
 					'name' => 'ceprule',
@@ -543,8 +415,7 @@ class testCepRule extends CAPITest {
 						[
 							'sortorder' => 1,
 							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-							'type' => CCepRuleHelper::OP_SET_NAME,
-							'event_name' => 'Event name',
+							'type' => CCepRuleHelper::OP_SET_TAG,
 							'tag' => 123
 						]
 					]
