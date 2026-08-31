@@ -460,17 +460,24 @@ class CProxy extends CApiService {
 			if (array_key_exists('additional_resource_attributes', $proxy['apm'])) {
 				$attributes_schema = self::APM_SCHEMA['additional_resource_attributes']['fields'];
 				$db_attributes = $db_proxy !== null ? $db_proxy['apm']['additional_resource_attributes'] : [];
+				$last_id = array_reduce(array_keys($db_attributes),
+					static function (string $prev_id, $id): string {
+						return bccomp((string) $id, $prev_id, 0) == 1 ? (string) $id : $prev_id;
+					},
+					'-1'
+				);
 
-				foreach ($proxy['apm']['additional_resource_attributes'] as $i => &$attribute) {
+				foreach ($proxy['apm']['additional_resource_attributes'] as &$attribute) {
 					$attribute += array_map(static fn(array $field) => $field['default'], $attributes_schema);
 					$attribute = array_merge($attributes_schema, $attribute);
 
 					if ($db_attributes) {
-						$id = key($db_attributes);
+						$id = (string) key($db_attributes);
 						unset($db_attributes[$id]);
 					}
 					else {
-						$id = $i;
+						$id = bcadd($last_id, '1', 0);
+						$last_id = $id;
 					}
 
 					$attribute = ['id' => $id] + $attribute;
