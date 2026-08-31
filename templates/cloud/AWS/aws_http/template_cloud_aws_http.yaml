@@ -13115,7 +13115,7 @@ zabbix_export:
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Cloud
       items:
@@ -16304,7 +16304,7 @@ zabbix_export:
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.0-6
       groups:
         - name: Templates/Cloud
       items:
@@ -18999,7 +18999,7 @@ zabbix_export:
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.0-6
       groups:
         - name: Templates/Cloud
       items:
@@ -21850,7 +21850,7 @@ zabbix_export:
         For more information about managing access keys, see [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Cloud
       items:
@@ -25061,7 +25061,7 @@ zabbix_export:
         For more information about managing access keys, see [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Cloud
       items:
@@ -27883,7 +27883,7 @@ zabbix_export:
         For more information about managing access keys, see the [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Cloud
       items:
@@ -29370,7 +29370,7 @@ zabbix_export:
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Cloud
       items:
@@ -33130,7 +33130,7 @@ zabbix_export:
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Cloud
       items:

@@ -12938,7 +12938,7 @@ zabbix_export:
         Threshold macros could be used with a context to fine tune threshold for different services, compartments, region and budgets.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
