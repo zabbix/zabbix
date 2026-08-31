@@ -220,6 +220,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			if (array_key_exists('suppression_data', $problem)) {
 				if (count($problem['suppression_data']) == 1
 						&& $problem['suppression_data'][0]['maintenanceid'] == 0
+						&& $problem['suppression_data'][0]['cep_ruleid'] == 0
 						&& isEventRecentlyUnsuppressed($problem['acknowledges'], $unsuppression_action)) {
 					// Show blinking button if the last manual suppression was recently revoked.
 					$user_unsuppressed = array_key_exists($unsuppression_action['userid'], $data['users'])
