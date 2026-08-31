@@ -299,6 +299,7 @@
 		<exec executable="./configure" failonerror="on">
 			<env key="CONFIG_SITE" value="share/config.site.d/gcc-release"/>
 			<arg line="--quiet"/>
+			<arg line="--enable-java"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-s"/>
@@ -334,5 +335,13 @@
 		</exec>
 	</target>
 
-	<target name="build" depends="make-dist"/>
+	<target name="java-tests" depends="make-dist">
+		<exec executable="make" failonerror="on">
+			<arg line="-C"/>
+			<arg line="src/zabbix_java"/>
+			<arg line="test"/>
+		</exec>
+	</target>
+
+	<target name="build" depends="make-dist,java-tests"/>
 </project>

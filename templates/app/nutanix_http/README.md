@@ -49,6 +49,7 @@ This template has been tested on:
 |{$NUTANIX.USER}|<p>Nutanix API username.</p>||
 |{$NUTANIX.PASSWORD}|<p>Nutanix API password.</p>||
 |{$NUTANIX.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Nutanix Prism Element", e.g. {$HTTP.TLS.VERIFY:"Nutanix Prism Element"}.</p>|`full`|
 |{$NUTANIX.CLUSTER.DISCOVERY.NAME.MATCHES}|<p>Filter of discoverable Nutanix clusters by name.</p>|`.*`|
 |{$NUTANIX.CLUSTER.DISCOVERY.NAME.NOT_MATCHES}|<p>Filter to exclude discovered Nutanix clusters by name.</p>|`CHANGE_IF_NEEDED`|
 |{$NUTANIX.HOST.DISCOVERY.NAME.MATCHES}|<p>Filter of discoverable Nutanix hosts by name.</p>|`.*`|
@@ -157,6 +158,7 @@ This template has been tested on:
 |{$NUTANIX.USER}|<p>Nutanix API username.</p>||
 |{$NUTANIX.PASSWORD}|<p>Nutanix API password.</p>||
 |{$NUTANIX.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Nutanix Cluster Prism Element", e.g. {$HTTP.TLS.VERIFY:"Nutanix Cluster Prism Element"}.</p>|`full`|
 |{$NUTANIX.CLUSTER.UUID}|<p>UUID of the cluster.</p>||
 |{$NUTANIX.TIMEOUT}|<p>API response timeout.</p>|`10s`|
 |{$NUTANIX.ALERT.DISCOVERY.NAME.MATCHES}|<p>Filter of discoverable Nutanix alerts by name.</p>|`.*`|
@@ -348,6 +350,7 @@ This template has been tested on:
 |{$NUTANIX.USER}|<p>Nutanix API username.</p>||
 |{$NUTANIX.PASSWORD}|<p>Nutanix API password.</p>||
 |{$NUTANIX.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Nutanix Host Prism Element", e.g. {$HTTP.TLS.VERIFY:"Nutanix Host Prism Element"}.</p>|`full`|
 |{$NUTANIX.HOST.UUID}|<p>UUID of the host.</p>||
 |{$NUTANIX.TIMEOUT}|<p>API response timeout.</p>|`10s`|
 |{$NUTANIX.ALERT.DISCOVERY.NAME.MATCHES}|<p>Filter of discoverable Nutanix alerts by name.</p>|`.*`|

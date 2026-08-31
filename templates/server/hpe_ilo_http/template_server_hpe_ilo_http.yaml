@@ -37,7 +37,7 @@ zabbix_export:
         4. Set the password of the user that you created in step 1 in the `Password` host wizard configuration field.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: 'Templates/Server hardware'
       items:
@@ -49,6 +49,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var ilo = {
             	params: {},
             	session_token: "",
@@ -67,10 +92,13 @@ zabbix_export:
             		if (typeof ilo.params.ilo_url === 'string' && !ilo.params.ilo_url.endsWith('/')) {
             			ilo.params.ilo_url += '/';
             		}
+            
+            		ilo.tls = new CTlsConfig(params.tls_verify);
+            		ilo.tls.checkURL(ilo.params.ilo_url);
             	},
             
             	apiAuth: function () {
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(ilo.tls.options),
             			response,
             			headers,
             			url = encodeURI(ilo.params.ilo_url + 'redfish/v1/SessionService/Sessions/'),
@@ -123,7 +151,7 @@ zabbix_export:
             	},
             
             	apiLogout: function () {
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(ilo.tls.options),
             			response,
             			url = encodeURI(ilo.session_url);
             
@@ -148,7 +176,7 @@ zabbix_export:
             	},
             
             	apiRequest: function (query) {
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(ilo.tls.options),
             			response,
             			url = encodeURI(ilo.params.ilo_url + query);
             
@@ -361,6 +389,8 @@ zabbix_export:
               value: '{$ILO.URL}'
             - name: password
               value: '{$ILO.PASSWORD}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"HPE iLO"}'
             - name: user
               value: '{$ILO.USER}'
           tags:
@@ -2487,12 +2517,28 @@ zabbix_export:
         - tag: target
           value: ilo
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "HPE iLO", e.g. {$HTTP.TLS.VERIFY:"HPE iLO"}.'
+          config:
+            type: LIST
+            priority: '5'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.MATCHES}'
           value: .+
           description: 'The computer system hostname regex filter to use in computer systems related metrics discovery for including. Can be used with the following context to include metrics of the particular entity: System, Storage, Controller, Drive, Volume.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Computer hostname filter (include)'
             description: 'The computer system hostname regex filter to use in computer systems related metrics discovery for including. Can be used with the following context to include metrics of the particular entity: System, Storage, Controller, Drive, Volume.'
@@ -2501,7 +2547,7 @@ zabbix_export:
           description: 'The computer system hostname regex filter to use in computer systems related metrics discovery for excluding. Can be used with the following context to exclude metrics of the particular entity: System, Storage, Controller, Drive, Volume.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Computer hostname filter (exclude)'
             description: 'The computer system hostname regex filter to use in computer systems related metrics discovery for excluding. Can be used with the following context to exclude metrics of the particular entity: System, Storage, Controller, Drive, Volume.'
@@ -2510,7 +2556,7 @@ zabbix_export:
           description: 'The computer system type regex filter to use in computer systems related metrics discovery for including. Can be used with the following context to include metrics of the particular entity: System, Storage, Controller, Drive, Volume.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Computer type filter (include)'
             description: 'The computer system type regex filter to use in computer systems related metrics discovery for including. Can be used with the following context to include metrics of the particular entity: System, Storage, Controller, Drive, Volume.'
@@ -2519,7 +2565,7 @@ zabbix_export:
           description: 'The computer system type regex filter to use in computer systems related metrics discovery for excluding. Can be used with the following context to exclude metrics of the particular entity: System, Storage, Controller, Drive, Volume.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Computer type filter (exclude)'
             description: 'The computer system type regex filter to use in computer systems related metrics discovery for excluding. Can be used with the following context to exclude metrics of the particular entity: System, Storage, Controller, Drive, Volume.'
@@ -2536,7 +2582,7 @@ zabbix_export:
           description: 'The update interval for the script item that retrieves data from API.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Other
             label: 'API data update interval'
             description: 'The update interval for the script item that retrieves data from API.'
@@ -2554,7 +2600,7 @@ zabbix_export:
           description: 'The sensor physical context regex filter to use in temperature sensors discovery for including.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Temperature sensor location filter (include)'
             description: 'The sensor physical context regex filter to use in temperature sensors discovery for including.'
@@ -2563,7 +2609,7 @@ zabbix_export:
           description: 'The sensor physical context regex filter to use in temperature sensors discovery for excluding.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Temperature sensor location filter (exclude)'
             description: 'The sensor physical context regex filter to use in temperature sensors discovery for excluding.'
@@ -2572,7 +2618,7 @@ zabbix_export:
           description: 'The sensor name regex filter to use in temperature sensors discovery for including.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Temperature sensor name filter (include)'
             description: 'The sensor name regex filter to use in temperature sensors discovery for including.'
@@ -2581,7 +2627,7 @@ zabbix_export:
           description: 'The sensor name regex filter to use in temperature sensors discovery for excluding.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Temperature sensor name filter (exclude)'
             description: 'The sensor name regex filter to use in temperature sensors discovery for excluding.'
@@ -2590,7 +2636,7 @@ zabbix_export:
           description: 'The timeout threshold for the script item that retrieves data from API.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Other
             label: 'API data timeout'
             description: 'The timeout threshold for the script item that retrieves data from API.'
