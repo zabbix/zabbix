@@ -29,8 +29,6 @@ class CFrontendActionValidatorTest extends TestCase {
 			['chart6.php',																			null],
 			['chart7.php',																			null],
 			['history.php',																			null],
-			['host_discovery.php',																	null],
-			['host_discovery_prototypes.php',														null],
 			['hostinventories.php',																	null],
 			['hostinventoriesoverview.php',															null],
 			['httpconf.php',																		null],
