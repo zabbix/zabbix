@@ -62,15 +62,6 @@ type FsInfo struct {
 	FsOptions  *string  `json:"{#FSOPTIONS},omitempty"`
 }
 
-// FsInfoShort contains basic filesystem metadata returned by short mode.
-type FsInfoShort struct {
-	FsName     *string `json:"fsname,omitempty"`
-	FsType     *string `json:"fstype,omitempty"`
-	DriveLabel *string `json:"fslabel,omitempty"`
-	DriveType  *string `json:"fsdrivetype,omitempty"`
-	FsOptions  *string `json:"options,omitempty"`
-}
-
 type FsInfoNew struct {
 	FsName     *string  `json:"fsname,omitempty"`
 	FsType     *string  `json:"fstype,omitempty"`
@@ -92,7 +83,7 @@ func (p *Plugin) exportDiscovery(params []string) (value interface{}, err error)
 		return nil, errInvalidParameters
 	}
 
-	d, getErr := p.getFsInfo()
+	d, getErr := p.getMountedFilesystems()
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -105,54 +96,42 @@ func (p *Plugin) exportDiscovery(params []string) (value interface{}, err error)
 	return string(b), nil
 }
 
-func (p *Plugin) exportGet(params []string) (value interface{}, err error) {
+func (p *Plugin) exportGet(params []string) (interface{}, error) {
 	if len(params) > 2 {
 		return nil, errTooManyParameters
 	}
 
 	var mode, mountpoint string
 
-	if len(params) >= 1 {
+	if len(params) > 0 {
 		mode = params[0]
 	}
 
-	if len(params) >= 2 {
+	if len(params) > 1 {
 		mountpoint = params[1]
 	}
 
-	/* validate mode */
-	if mode != "" && mode != "full" && mode != "short" {
+	var (
+		data []*FsInfoNew
+		err  error
+	)
+
+	switch mode {
+	case "", "full":
+		data, err = p.getFsInfoStats(mountpoint)
+	case "short":
+		data, err = p.getFsInfoShort(mountpoint)
+	default:
 		return nil, errInvalidFirstParameter
 	}
 
-	/* empty mode defaults to full */
-	if mode == "" {
-		mode = "full"
+	if err != nil {
+		return nil, err
 	}
 
-	if mode == "short" {
-		d, getErr := p.getFsInfoShort(mountpoint)
-		if getErr != nil {
-			return nil, getErr
-		}
-
-		b, marshalErr := json.Marshal(&d)
-		if marshalErr != nil {
-			return nil, fmt.Errorf("cannot marshal filesystem data: %w", marshalErr)
-		}
-
-		return string(b), nil
-	}
-
-	/* full mode */
-	d, getErr := p.getFsInfoStats(mountpoint)
-	if getErr != nil {
-		return nil, getErr
-	}
-
-	b, marshalErr := json.Marshal(&d)
-	if marshalErr != nil {
-		return nil, fmt.Errorf("cannot marshal filesystem data: %w", marshalErr)
+	b, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("cannot marshal filesystem data: %w", err)
 	}
 
 	return string(b), nil

@@ -58,15 +58,13 @@ func filterByMountpoint(data []*FsInfo, mountpoint string) []*FsInfo {
 }
 
 func (p *Plugin) getFsInfoStats(mountpoint string) ([]*FsInfoNew, error) {
-	allData, err := p.getFsInfo()
+	allData, err := p.getMountedFilesystems()
 	if err != nil {
 		return nil, err
 	}
 
-	// Apply mountpoint filter before stat calls
 	allData = filterByMountpoint(allData, mountpoint)
 
-	fsmap := make(map[string]*FsInfoNew)
 	fsStatCaller := p.newFSCaller(getFsStats, len(allData))
 	fsInodeCaller := p.newFSCaller(getFsInode, len(allData))
 
@@ -84,30 +82,29 @@ func (p *Plugin) getFsInfoStats(mountpoint string) ([]*FsInfoNew, error) {
 			continue
 		}
 
-		fsmap[*info.FsName+*info.FsType] = &FsInfoNew{info.FsName, info.FsType, nil, nil, bytes, inodes, info.FsOptions}
-	}
-
-	for _, info := range allData {
-		if fsInfo, ok := fsmap[*info.FsName+*info.FsType]; ok {
-			data = append(data, fsInfo)
-		}
+		data = append(data, &FsInfoNew{
+			FsName:    info.FsName,
+			FsType:    info.FsType,
+			Bytes:     bytes,
+			Inodes:    inodes,
+			FsOptions: info.FsOptions,
+		})
 	}
 
 	return data, nil
 }
 
-func (p *Plugin) getFsInfoShort(mountpoint string) ([]*FsInfoShort, error) {
-	allData, err := p.getFsInfo()
+func (p *Plugin) getFsInfoShort(mountpoint string) ([]*FsInfoNew, error) {
+	allData, err := p.getMountedFilesystems()
 	if err != nil {
 		return nil, err
 	}
 
-	// Apply mountpoint filter before returning
 	allData = filterByMountpoint(allData, mountpoint)
 
-	data := make([]*FsInfoShort, 0)
+	data := make([]*FsInfoNew, 0)
 	for _, info := range allData {
-		data = append(data, &FsInfoShort{
+		data = append(data, &FsInfoNew{
 			FsName:    info.FsName,
 			FsType:    info.FsType,
 			FsOptions: info.FsOptions,
@@ -140,7 +137,7 @@ func (p *Plugin) readMounts(file io.Reader) ([]*FsInfo, error) {
 	return data, nil
 }
 
-func (p *Plugin) getFsInfo() ([]*FsInfo, error) {
+func (p *Plugin) getMountedFilesystems() ([]*FsInfo, error) {
 	file, err := os.Open("/proc/mounts")
 	if err != nil {
 		return nil, err
