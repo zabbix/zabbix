@@ -2375,7 +2375,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window/tags": value must be empty.'
 			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_host_group' => [
+			'Properties group_by* are optional' => [
 				'request' => [
 					'name' => 'ceprule.window.symptom.group_by_host_group',
 					'sortorder' => 1,
@@ -2389,49 +2389,7 @@ class testCepRule extends CAPITest {
 					],
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 					'window' => [
-						'duration' => '1h',
-						'group_by_host_group' => CCepRuleHelper::GROUP_BY_YES
-					]
-				],
-				'expected_error' => null
-			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_host' => [
-				'request' => [
-					'name' => 'ceprule.window.symptom.group_by_host',
-					'sortorder' => 1,
-					'operations' => [
-						[
-							'sortorder' => 1,
-							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-							'type' => CCepRuleHelper::OP_SET_NAME,
-							'event_name' => 'bla'
-						]
-					],
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'duration' => '1h',
-						'group_by_host' => CCepRuleHelper::GROUP_BY_YES
-					]
-				],
-				'expected_error' => null
-			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_tags' => [
-				'request' => [
-					'name' => 'ceprule.window.symptom.group_by_tags',
-					'sortorder' => 1,
-					'operations' => [
-						[
-							'sortorder' => 1,
-							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-							'type' => CCepRuleHelper::OP_SET_NAME,
-							'event_name' => 'bla'
-						]
-					],
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'duration' => '1h',
-						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
-						'tags' => ['abc']
+						'duration' => '1h'
 					]
 				],
 				'expected_error' => null
