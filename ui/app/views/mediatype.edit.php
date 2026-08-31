@@ -438,6 +438,7 @@ $mediatype_form_grid
 				->setMaxlength(DB::getFieldLength('media_type', 'event_menu_url'))
 				->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 				->addClass($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW ? '' : 'js-inactive')
+				->addClass(ZBX_STYLE_ALIGN_TOP)
 				->setAriaRequired($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 		))->setId('webhook_event_menu_url_field')
 	])
