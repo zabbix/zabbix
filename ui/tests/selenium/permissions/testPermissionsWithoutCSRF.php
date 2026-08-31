@@ -361,7 +361,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 							]
 						]
 					],
-					'message_locator' => 'class:msg-bad'
+					'multiple_messages' => true
 				]
 			],
 			// #25 Event correlation update.
@@ -370,7 +370,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'db' => 'SELECT * FROM correlation',
 					'link' => 'zabbix.php?action=ceprule.list',
 					'overlay' => 'update',
-					'message_locator' => 'class:msg-bad'
+					'multiple_messages' => true
 				]
 			],
 			// #26 Discovery create.
@@ -881,7 +881,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 		// Check the error message depending on case.
 		$error = CTestArrayHelper::get($data, 'incorrect_request') ? self::INCORRECT_REQUEST : self::ACCESS_DENIED;
-		$this->assertMessage(TEST_BAD, $error['message'], $error['details'], CTestArrayHelper::get($data, 'message_locator'));
+
+		// Event correlation form has multiple messages, so the "msg-bad" message is checked specifically.
+		if (CTestArrayHelper::get($data, 'multiple_messages')) {
+			$message = $this->query('class:msg-bad')->waitUntilVisible()->asMessage()->one();
+			$this->assertTrue($message->isBad());
+			$this->assertEquals($error['message'], $message->getTitle());
+			$this->assertTrue($message->hasLine($error['details']));
+		}
+		else {
+			$this->assertMessage(TEST_BAD, $error['message'], $error['details']);
+		}
 		$this->checkReturnButton($data);
 
 		// Compare db hashes to check that form didn't make any changes.

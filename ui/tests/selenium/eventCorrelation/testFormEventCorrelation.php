@@ -1304,12 +1304,13 @@ class testFormEventCorrelation extends CWebTest {
 			COverlayDialogElement::closeAll();
 		}
 		else {
-			// When expecting an error in the 'New event correlation' modal.
+			// Correlation form has multiple messages, so if no inline validation, the "msg-bad" message is checked specifically.
 			// TODO: Remove the condition and the part for checking regular errors after DEV-4267 is fixed.
 			if (array_key_exists('errors', $data)) {
-				$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'create').' event correlation',
-						$data['errors'], 'class:msg-bad'
-				);
+				$message = $this->query('class:msg-bad')->waitUntilVisible()->asMessage()->one();
+				$this->assertTrue($message->isBad());
+				$this->assertEquals('Cannot '.($update ? 'update' : 'create').' event correlation', $message->getTitle());
+				$this->assertEquals($data['errors'], $message->getLines()->asText());
 			}
 			else {
 				$this->assertInlineError($form, $data['inline_errors']);
