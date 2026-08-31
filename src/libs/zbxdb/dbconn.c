@@ -837,6 +837,33 @@ int	db_is_escape_sequence(char c)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Returns a version of the query capped to MAX_BUFFER_LEN           *
+ *          characters, for debug logging.                                    *
+ *                                                                            *
+ * Parameters: sql            - [IN] query to truncate                        *
+ *             sql_offset     - [IN] length of sql in bytes                   *
+ *             sql_trunc_buf  - [OUT] set to an allocated buffer holding the  *
+ *                              truncated copy of sql, or to NULL if sql was  *
+ *                              short enough that no copy was needed. Caller  *
+ *                              must zbx_free() a non-NULL value.             *
+ *                                                                            *
+ * Return value: sql itself, or the truncated copy stored in *sql_trunc_buf.  *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*dbconn_debug_query_str(const char *sql, size_t sql_offset, char **sql_trunc_buf)
+{
+	*sql_trunc_buf = NULL;
+
+	if (MAX_BUFFER_LEN >= sql_offset)
+		return sql;
+
+	*sql_trunc_buf = (char *)zbx_malloc(NULL, MAX_BUFFER_LEN + 1);
+
+	return zbx_truncate_value(sql, MAX_BUFFER_LEN, *sql_trunc_buf, MAX_BUFFER_LEN + 1);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Execute SQL statement. For non-select statements only.            *
  *                                                                            *
  * Return value: ZBX_DB_FAIL (on error) or ZBX_DB_DOWN (on recoverable error) *
@@ -877,16 +904,8 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		char		*sql_trunc_buf = NULL;
-		const char	*sql_trunc = sql;
-
-		/* Only allocate the truncation buffer when the query is actually long enough to need it.       */
-		/* So a fixed-size buffer is not reserved on the stack for every call regardless of query size. */
-		if (MAX_BUFFER_LEN < sql_offset)
-		{
-			sql_trunc_buf = (char *)zbx_malloc(NULL, MAX_BUFFER_LEN + 1);
-			sql_trunc = zbx_truncate_value(sql, MAX_BUFFER_LEN, sql_trunc_buf, MAX_BUFFER_LEN + 1);
-		}
+		char		*sql_trunc_buf;
+		const char	*sql_trunc = dbconn_debug_query_str(sql, sql_offset, &sql_trunc_buf);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", db->txn_level,
 				db_replace_nonprintable_chars(sql_trunc, &sql_printable));
