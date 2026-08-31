@@ -488,7 +488,7 @@ window.ceprule_edit_popup = new class {
 		else {
 			window['ceprule-filter-expression'].disabled = identifiers.length < 2;
 			window['ceprule-filter-expression'].style.display = '';
-			window['ceprule-filter-expression-preview'].style.display = 'none'
+			window['ceprule-filter-expression-preview'].style.display = 'none';
 
 			if (identifiers.length < 2) {
 				window['ceprule-filter-evaltype'].value = <?= CONDITION_EVAL_TYPE_AND_OR ?>;
