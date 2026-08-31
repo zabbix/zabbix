@@ -18,6 +18,7 @@ require_once dirname(__FILE__).'/testProxyConfSync.php';
 require_once dirname(__FILE__).'/testTimescaleDb.php';
 require_once dirname(__FILE__).'/testDataCollection.php';
 require_once dirname(__FILE__).'/testBinaryValueTypeDataCollection.php';
+require_once dirname(__FILE__).'/testEncryptionDataCollection.php';
 require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
@@ -83,6 +84,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testBinaryValueTypeDataCollection');
+		$suite->addTestSuite('testEncryptionDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
