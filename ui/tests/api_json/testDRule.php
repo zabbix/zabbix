@@ -14,7 +14,6 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
-require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
  * @onBefore prepareTestData
@@ -84,7 +83,11 @@ class testDRule extends CAPITest {
 			],
 			'roles' => [
 				['name' => 'perm.user.role', 'type' => USER_TYPE_ZABBIX_USER],
-				['name' => 'perm.admin.role', 'type' => USER_TYPE_ZABBIX_ADMIN]
+				[
+					'name' => 'perm.admin.role',
+					'type' => USER_TYPE_ZABBIX_ADMIN,
+					'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
+				]
 			],
 			'users' => [
 				[

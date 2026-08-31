@@ -25,6 +25,7 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"IBM Maximo Service Request"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "IBM Maximo Service Request", e.g. {$HTTP.TLS.VERIFY:"IBM Maximo Service Request"}.|
 |api_endpoint|\<ENTER YOUR API ENDPOINT\>|IBM Maximo API endpoint.|
 |api_key|\<ENTER YOUR API KEY\>|API key that will be used to access IBM Maximo.|
 |reported_priority||Use a custom reported priority here instead of event severity.|

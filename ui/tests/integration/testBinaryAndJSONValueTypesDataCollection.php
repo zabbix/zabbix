@@ -32,6 +32,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	const json_data_http_response = "200";
 	const tls_handshake = 230;
 	const error_message = "assertion failed: element id top-header not found";
+	const log_json_line = '{"active_check":"log_json"}';
 
 	static $file_name_json_with_image_for_binary_item;
 	static $file_name_json_with_image_for_json_item;
@@ -40,6 +41,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	static $json_with_image;
 	static $invalid_json;
 	static $json_image_normalized;
+	static $file_name_log_json;
+	static $file_name_log_json_proxy;
 
 	public static function ksort_recursive(&$array) {
 		if (!is_array($array)) {
@@ -74,6 +77,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		self::$file_name_json_with_image_for_json_item = "/tmp/json_with_image2.txt".time();
 		self::$file_name_invalid_json_for_binary_item = "/tmp/invalid_JSON.txt".time();
 		self::$file_name_invalid_json_for_json_item = "/tmp/invalid_JSON_2.txt".time();
+		self::$file_name_log_json = PHPUNIT_COMPONENT_DIR.'log_json.txt'.time();
+		self::$file_name_log_json_proxy = PHPUNIT_COMPONENT_DIR.'log_json_proxy.txt'.time();
 
 		$base64_image = self::base64_image;
 		$base64_empty = self::base64_empty;
@@ -130,10 +135,20 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			unlink(self::$file_name_invalid_json_for_json_item);
 		}
 
+		if (file_exists(self::$file_name_log_json)) {
+			unlink(self::$file_name_log_json);
+		}
+
+		if (file_exists(self::$file_name_log_json_proxy)) {
+			unlink(self::$file_name_log_json_proxy);
+		}
+
 		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_binary_item, self::$json_with_image) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_json_item, self::$json_with_image) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_binary_item, self::$invalid_json) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_json_item, self::$invalid_json) !== false);
+		$this->assertTrue(@file_put_contents(self::$file_name_log_json, self::log_json_line.PHP_EOL) !== false);
+		$this->assertTrue(@file_put_contents(self::$file_name_log_json_proxy, self::log_json_line.PHP_EOL) !== false);
 
 		self::$json_image_normalized = self::normalize_json(self::$json_with_image);
 
@@ -379,6 +394,13 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_invalid_json_for_json_item.',]'],
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '0s'
+				],
+				[
+						'name' => 'LOG_JSON_VALUE_TYPE',
+						'key_' => 'log['.self::$file_name_log_json.']',
+						'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '1s'
 				]
 				]
 			]
@@ -462,6 +484,13 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'error_handler' => 0,
 						'error_handler_params' => ''
 					]]
+				],
+				[
+						'name' => 'LOG_JSON_VALUE_TYPE_PROXY',
+						'key_' => 'log['.self::$file_name_log_json_proxy.']',
+						'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '1s'
 				]
 				]
 			]
@@ -505,7 +534,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => 'agent',
-				'ServerActive' => '127.0.0.1'
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'RefreshActiveChecks' => 5
 			]
 		];
 	}
@@ -520,7 +550,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'itemids' => self::$itemids[$name]
 			])['result'][0];
 
-			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED)) {
+			if ($item['state'] == $state) {
 				break;
 			}
 
@@ -790,6 +820,54 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	}
 
 	/**
+	 * Regression test.
+	 *
+	 * The item key is "log[]" (a check that natively supports metadata-only updates, i.e. lastlogsize/
+	 * mtime with no new line to report), but the item's *value type* is configured as JSON - not LOG.
+	 * That combination used to cause the server to log an internal error and silently drop the
+	 * metadata-only update instead of storing it, without crashing.
+	 *
+	 * Reproduction: the server hands out the already advanced lastlogsize/mtime to the agent on every
+	 * active check refresh. After an agent restart the log[] metric is "new" for the freshly started
+	 * agent process, so even though there is nothing new to read from the log file, the agent still
+	 * sends a metadata-only update (no value, only lastlogsize/mtime).
+	 *
+	 * This test only reproduces the scenario; detecting the resulting error in the server log is
+	 * handled independently by the CI environment.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider agentConfigurationProvider
+	 * @hosts agent
+	 */
+	public function testLogValueTypeJSON_agentRestart() {
+		// The "agent" host is toggled NOT_MONITORED/MONITORED around every test case that declares
+		// "@hosts agent", so the server config cache must be refreshed before relying on the host's
+		// active checks being processed.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->checkItemState('agent:log['.self::$file_name_log_json.']', ITEM_STATE_NORMAL);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['agent:log['.self::$file_name_log_json.']'],
+			'history'	=>	ITEM_VALUE_TYPE_JSON
+		]);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertNotEmpty($response['result']);
+		$this->assertEquals(self::normalize_json(self::log_json_line), self::normalize_json($response['result'][0]['value']));
+
+		// Restart the agent without changing the log file. The server already knows the lastlogsize
+		// for this item, so the agent will find nothing new to read but, being a freshly started
+		// process, will still report a meta-only update for it.
+		// A stop+start cycle is often quick enough that the server never observes a large enough
+		// gap to log an availability transition for it, so don't wait on that log line here - rely
+		// on checkItemState()'s own retry loop instead.
+		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->startComponent(self::COMPONENT_AGENT);
+
+		$this->checkItemState('agent:log['.self::$file_name_log_json.']', ITEM_STATE_NORMAL);
+	}
+
+	/**
 	 * Component configuration provider for proxy related tests.
 	 *
 	 * @return array
@@ -874,6 +952,28 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	}
 
 	/**
+	 * Regression test.
+	 *
+	 * A proxy-monitored log[] item if its value_type=JSON (instead of usual type LOG) used to have its
+	 * value silently dropped, with no log line at all, when it reported a value together with meta info
+	 * (lastlogsize/mtime) in the same submission - the ordinary case for the very first successful read
+	 * of a growing log file, not a rare corner case.
+	 *
+	 * @required-components server, proxy, agent
+	 * @configurationDataProvider proxyConfigurationProvider
+	 * @hosts proxy_agent
+	 */
+	public function testLogValueTypeJSON_proxyMetaWithValue() {
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['proxy_agent:log['.self::$file_name_log_json_proxy.']'],
+			'history'	=>	ITEM_VALUE_TYPE_JSON
+		]);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertNotEmpty($response['result']);
+		$this->assertEquals(self::normalize_json(self::log_json_line), self::normalize_json($response['result'][0]['value']));
+	}
+
+	/**
 	 * Test simple items with JSON
 	 *
 	 * @required-components server
@@ -924,5 +1024,146 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('result', $response);
 		$this->assertNotEmpty($response['result']);
 		$this->assertEquals('AAAAAAAAAAAAAAAA', $response['result'][0]['value']);
+	}
+
+	/**
+	 * Regression test.
+	 *
+	 * The API refuses to create a trigger function referencing a JSON value type item directly
+	 * (intentional limitation - JSON is not an allowed value type for trigger functions), so a
+	 * JSON item can't get into the value cache that way. But an item's value type can be changed
+	 * after a trigger already references it: create the item as TEXT, reference it in a trigger,
+	 * let the value cache pick it up, then change the item to JSON via item.update. The trigger
+	 * must end up in an unknown state - it must not crash the server.
+	 *
+	 * @required-components server
+	 * @configurationDataProvider simpleConfigurationProvider
+	 * @hosts simple
+	 */
+	public function testLogValueTypeJSON_triggerTypeChangeGraceful() {
+		$host = $this->call('host.get', [
+			'output' => ['hostid'],
+			'filter' => ['host' => 'simple']
+		]);
+		$this->assertArrayHasKey(0, $host['result']);
+		$hostid = $host['result'][0]['hostid'];
+
+		$response = $this->call('item.create', [
+			'hostid' => $hostid,
+			'name' => 'item_for_trigger_with_changing_value_type',
+			'key_' => 'item_for_trigger_with_changing_value_type',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_TEXT,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$itemid = $response['result']['itemids'][0];
+
+		$response = $this->call('trigger.create', [
+			'description' => 'trigger_on_item_with_changing_value_type',
+			'expression' => 'last(/simple/item_for_trigger_with_changing_value_type)=0'
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$triggerid = $response['result']['triggerids'][0];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->sendSenderValue('simple', 'item_for_trigger_with_changing_value_type', 'text_value');
+
+		// Confirm the trigger was evaluated (reading the item's value through the value cache)
+		// before the item's value type changes below.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			"function:'last(/simple/item_for_trigger_with_changing_value_type,)'", true, 30, 1);
+
+		$this->call('item.update', [
+			'itemid' => $itemid,
+			'value_type' => ITEM_VALUE_TYPE_JSON
+		]);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// Force the trigger to re-evaluate against the item's new (JSON) type.
+		$this->sendSenderValue('simple', 'item_for_trigger_with_changing_value_type', '{"a":1}');
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'json-type items are not supported in functions');
+
+		$trigger = $this->call('trigger.get', [
+			'output' => ['value', 'state'],
+			'triggerids' => [$triggerid]
+		]);
+		$this->assertArrayHasKey(0, $trigger['result']);
+		$this->assertEquals(TRIGGER_STATE_UNKNOWN, $trigger['result'][0]['state']);
+	}
+
+	/**
+	 * Regression test.
+	 *
+	 * The value cache does not support caching JSON value type items at all, so a JSON item can
+	 * never actually populate it - this confirms removing such an item afterwards continues to be
+	 * handled cleanly, with no adverse effect on the server.
+	 *
+	 * Unlike trigger functions, a calculated item's formula is not validated against the
+	 * referenced item's value type, so a calculated item can reference a JSON value type item via
+	 * last() directly - this is how a JSON item's value would be read through the value cache, were
+	 * it supported.
+	 *
+	 * @required-components server
+	 * @configurationDataProvider simpleConfigurationProvider
+	 * @hosts simple
+	 */
+	public function testLogValueTypeJSON_valueCacheCrash() {
+		$host = $this->call('host.get', [
+			'output' => ['hostid'],
+			'filter' => ['host' => 'simple']
+		]);
+		$this->assertArrayHasKey(0, $host['result']);
+		$hostid = $host['result'][0]['hostid'];
+
+		$response = $this->call('item.create', [
+			'hostid' => $hostid,
+			'name' => 'valuecache_json_item',
+			'key_' => 'valuecache_json_item',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_JSON,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$itemid = $response['result']['itemids'][0];
+
+		$response = $this->call('item.create', [
+			'hostid' => $hostid,
+			'name' => 'calc_item_referencing_json_item',
+			'key_' => 'calc_item_referencing_json_item',
+			'type' => ITEM_TYPE_CALCULATED,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'params' => 'last(/simple/valuecache_json_item)',
+			'delay' => '1s'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$calc_itemid = $response['result']['itemids'][0];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->sendSenderValue('simple', 'valuecache_json_item', '{"a":1}');
+
+		// Confirm the calculated item actually attempted to read the JSON item's value through the
+		// value cache, and was gracefully refused rather than crashing.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'cannot get values from value cache');
+
+		// The item's new state is only persisted to the database on the next history cache flush,
+		// so wait for one to complete before reading it back.
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_db_mass_update_items()');
+
+		$calc_item = $this->call('item.get', [
+			'output' => ['state'],
+			'itemids' => [$calc_itemid]
+		]);
+		$this->assertArrayHasKey(0, $calc_item['result']);
+		$this->assertEquals(ITEM_STATE_NOTSUPPORTED, $calc_item['result'][0]['state']);
+
+		$this->call('item.delete', [$itemid]);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 	}
 }

@@ -334,8 +334,7 @@ int	trapper_process_request_proxy(const char *request, zbx_socket_t *sock, const
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
 		zbx_get_config_forks_f get_config_forks, const zbx_config_tls_t *config_tls,
-		const char *config_frontend_allowed_ip, zbx_uint32_t config_denyitemtypes_mask,
-		zbx_ipc_async_socket_t *rtc)
+		const char *config_frontend_allowed_ip, zbx_ipc_async_socket_t *rtc)
 {
 	ZBX_UNUSED(jp);
 	ZBX_UNUSED(ts);
@@ -344,7 +343,6 @@ int	trapper_process_request_proxy(const char *request, zbx_socket_t *sock, const
 	ZBX_UNUSED(get_config_forks);
 	ZBX_UNUSED(config_tls);
 	ZBX_UNUSED(config_frontend_allowed_ip);
-	ZBX_UNUSED(config_denyitemtypes_mask);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{

@@ -37,7 +37,6 @@ typedef struct
 	int				config_enable_global_scripts;
 	const char			*config_ssh_key_location;
 	const char			*config_webdriver_url;
-	zbx_uint32_t			config_denyitemtypes_mask;
 }
 zbx_thread_taskmanager_args;
 

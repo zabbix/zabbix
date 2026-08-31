@@ -44,7 +44,7 @@ zabbix_export:
         Test availability: `zabbix_get -s mongos.node -k 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]"`
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Databases
       items:
@@ -58,7 +58,10 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  data = JSON.parse(value);
+                  var data = JSON.parse(value);
+                  if (typeof data.sharding === 'undefined') {
+                    throw 'The metric is available for a sharded cluster only.';
+                  }
                   return (data["$clusterTime"].clusterTime.T - data.sharding.lastSeenConfigServerOpTime.ts.T);
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
@@ -318,6 +321,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sharding.lastSeenConfigServerOpTime.ts.T
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'The metric is available for a sharded cluster only.'
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:

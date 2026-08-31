@@ -30,8 +30,7 @@ typedef int	(*zbx_trapper_process_request_func_t)(const char *request, zbx_socke
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
 		zbx_get_config_forks_f get_config_forks, const zbx_config_tls_t *config_tls,
-		const char *config_frontend_allowed_ip, zbx_uint32_t config_denyitemtypes_mask,
-		zbx_ipc_async_socket_t *rtc);
+		const char *config_frontend_allowed_ip, zbx_ipc_async_socket_t *rtc);
 
 typedef struct
 {
@@ -57,7 +56,6 @@ typedef struct
 	zbx_autoreg_update_host_func_t		autoreg_update_host_cb;
 	const char				*config_bridge_adapter_url;
 	const char				*config_bridge_adapter_connect_to;
-	zbx_uint32_t				config_denyitemtypes_mask;
 }
 zbx_thread_trapper_args;
 
@@ -70,7 +68,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
-		const char *config_webdriver_url, zbx_uint32_t config_denyitemtypes_mask);
+		const char *config_webdriver_url);
 
 int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct zbx_json_parse *jp_options,
 		const struct zbx_json_parse *jp_steps, char *value, size_t value_size, int state, struct zbx_json *json,

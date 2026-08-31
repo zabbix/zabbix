@@ -32,6 +32,8 @@ zabbix_export:
           value: P5
         - name: severity_warning
           value: P4
+        - name: tls_verify
+          value: '{$HTTP.TLS.VERIFY:"TOPdesk"}'
         - name: topdesk_api
           value: '<put your TOPdesk API URL>'
         - name: topdesk_issue_key
@@ -48,6 +50,31 @@ zabbix_export:
           value: '{$ZABBIX.URL}'
       status: DISABLED
       script: |
+        const CTlsConfig = function (raw_value) {
+        	raw_value = String(raw_value).trim().toLowerCase();
+        
+        	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+        		raw_value = 'full';
+        	}
+        
+        	this.options = {
+        		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+        		SSLVerifyHost: (raw_value === 'full')
+        	};
+        
+        	this.enabled = (raw_value !== 'none');
+        
+        	this.checkURL = function (url) {
+        		if (this.enabled && !/^https:\/\//i.test(url)) {
+        			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+        			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+        		}
+        
+        		return url;
+        	};
+        }
+        
+        
         var Media = {
         	params: {},
         	name: '',
@@ -79,7 +106,7 @@ zabbix_export:
         
         		var response,
         			url = Media.params.api + query,
-        			request = new HttpRequest();
+        			request = new HttpRequest(tls.options);
         
         		request.addHeader('Content-Type: application/json');
         		request.addHeader('Accept: application/json');
@@ -95,15 +122,15 @@ zabbix_export:
         
         		switch (method) {
         			case 'get':
-        				response = request.get(url, data);
+        				response = request.get(tls.checkURL(url), data);
         				break;
         
         			case 'post':
-        				response = request.post(url, data);
+        				response = request.post(tls.checkURL(url), data);
         				break;
         
         			case 'put':
-        				response = request.put(url, data);
+        				response = request.put(tls.checkURL(url), data);
         				break;
         
         			default:
@@ -151,6 +178,7 @@ zabbix_export:
         try {
         	var result = {tags: {}},
         		params = JSON.parse(value),
+        		tls = new CTlsConfig(params.tls_verify),
         		media = {},
         		fields = {},
         		resp = {},
@@ -259,7 +287,7 @@ zabbix_export:
         		Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket updating.');
         		fields.action = params.alert_message.replace(/\n/g, '<br>');
         
-        		resp = Media.request('put', 'tas/api/incidents/number/' + encodeURIComponent(Media.params.issue_key), fields);
+        		resp = Media.request('put', 'tas/api/incidents/number/' + Media.params.issue_key, fields);
         		if (typeof resp.response !== 'object' || typeof resp.response.id === 'undefined'
         				|| resp.response.number !== Media.params.issue_key) {
         			throw 'Cannot update ' + Media.name + ' issue. Check debug log for more information.';

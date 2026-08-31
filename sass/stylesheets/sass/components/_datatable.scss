@@ -26,6 +26,7 @@
 				padding: 2px 8px;
 
 				.symptoms {
+					margin-top: 0;
 					height: calc(var(--datatable-compact-row-height) - 4px);
 
 					.btn-icon {
@@ -39,13 +40,29 @@
 					padding: 0;
 				}
 
-				.cell-inner {
-					min-height: auto;
-					padding: 0;
+				.flex-wrapper {
+					column-gap: 0;
 
-					.tags-wrapper {
-						flex-wrap: nowrap;
+					& > .link-action {
+						@extend %overflow-ellipsis;
 					}
+				}
+
+				.tags-wrapper {
+					flex-wrap: nowrap;
+
+					.tag {
+						@extend %overflow-ellipsis;
+						min-width: 24px;
+					}
+				}
+
+				.opdata {
+					@extend %overflow-ellipsis;
+				}
+
+				&.cell-checkbox .flex-wrapper {
+					column-gap: 5px;
 				}
 			}
 
@@ -57,16 +74,6 @@
 	}
 
 	&.has-highlighted-rows .datatable-body .row:not(.row-disabled) {
-		.cell.cell-data {
-			a.link-action {
-				color: $font-color;
-			}
-
-			a:hover {
-				color: $btn-alt-color;
-			}
-		}
-
 		&:not(.row-selected) {
 			&:not(:hover) {
 				.btn-icon,
@@ -76,21 +83,9 @@
 			}
 
 			&:hover .cell.cell-data {
-				a:not(.link-action) {
-					color: $btn-alt-color;
-				}
-
 				&:not(.cell-bg) {
 					background-color: $ui-hover-bg-color;
 					border-bottom-color: $ui-border-color;
-				}
-			}
-
-			&:not(:hover) .cell.cell-data {
-				color: $font-color;
-
-				a {
-					color: $font-color;
 				}
 			}
 		}
@@ -131,19 +126,21 @@
 					margin-top: 0;
 
 					& + label span {
-						margin-top: -1px;
 						vertical-align: middle;
+						flex-shrink: 0;
+						margin: 2px 4px 2px 2px;
 					}
 				}
 
 				label {
+					align-items: center;
 					display: flex;
+					overflow: hidden;
 
 					.datatable-options-list-item-label {
 						@extend %overflow-ellipsis;
 						display: inline-block;
 						flex-grow: 1;
-						max-width: 140px;
 						vertical-align: middle;
 						cursor: pointer;
 					}
@@ -164,14 +161,13 @@
 	.datatable-options-popup {
 		position: absolute;
 		top: calc(var(--datatable-row-height) + 1px);
-		z-index: 200;
+		z-index: 2000;
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
 		gap: 5px;
 		width: 220px;
 		min-height: 40px;
-		max-height: 90vh;
 		padding: 10px;
 		overflow-y: auto;
 		outline: none;
@@ -180,6 +176,14 @@
 		border: 1px solid $ui-border-color;
 		border-radius: var(--surface-border-radius);
 		box-shadow: 0 4px 20px 0 $action-shadow-color;
+
+		&.is-loading {
+			pointer-events: all;
+		}
+
+		&.datatable-options {
+			width: 230px;
+		}
 
 		&:focus {
 			outline: none;
@@ -315,7 +319,7 @@
 		.row {
 			display: contents;
 
-			&:not(.row-disabled):hover {
+			&:not(.row-selected):not(.row-disabled):hover {
 				.row-spacer,
 				.cell.cell-data:not(.cell-bg) {
 					background-color: $ui-hover-bg-color;
@@ -332,6 +336,10 @@
 
 				&.nested-small {
 					font-size: 11px;
+
+					.cell.cell-data .flex-wrapper {
+						justify-content: flex-end;
+					}
 				}
 			}
 
@@ -346,6 +354,11 @@
 			.table-stats.table-stats-small {
 				font-size: 11px;
 			}
+		}
+
+		&:focus,
+		&:focus-visible {
+			outline: none;
 		}
 	}
 
@@ -413,13 +426,12 @@
 	.cell {
 		position: relative;
 		box-sizing: border-box;
-		display: flex;
-		align-items: center;
 		height: 100%;
 		min-width: 0;
 		min-height: calc(var(--datatable-row-height) + 1px);
 		text-align: left;
 		border-bottom: 1px solid $ui-border-color;
+		padding: 7px 8px;
 
 		&:not(.cell-bg) {
 			color: $font-color;
@@ -441,6 +453,10 @@
 			background-color: $ui-bg-color;
 			border-right: 1px solid $ui-border-color;
 
+			.header-name {
+				@extend %overflow-ellipsis;
+			}
+
 			&:last-of-type {
 				border-right: 0;
 			}
@@ -459,10 +475,6 @@
 
 			&.cell-header-link {
 				padding: 0;
-
-				.cell-inner {
-					padding: 0 8px;
-				}
 
 				.header-link {
 					@extend %overflow-ellipsis;
@@ -519,17 +531,10 @@
 				}
 			}
 
-			.cell-inner {
-				flex-grow: 1;
-				padding: 0 8px;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
-
-			.cell-header-resizer {
+			.header-resizer {
 				position: absolute;
 				right: -6px;
+				top: 0;
 				z-index: 2;
 				width: 11px;
 				height: calc(var(--datatable-row-height) + 1px);
@@ -550,6 +555,15 @@
 					border-color: $datatable-resizer-border-color;
 				}
 			}
+
+			&.cell-context {
+				padding: 0;
+
+				.header-name {
+					flex-grow: 1;
+					padding: 7px 8px;
+				}
+			}
 		}
 
 		&.cell-sticky {
@@ -559,7 +573,7 @@
 
 		&.cell-data {
 			align-items: flex-start;
-			padding: 0 8px;
+			overflow: hidden;
 
 			&.cell-sticky:not(.cell-bg-hover) {
 				background-color: $ui-bg-color;
@@ -597,38 +611,48 @@
 				border-right: 1px solid transparent;
 			}
 
-			.cell-inner {
-				box-sizing: border-box;
-				display: block;
-				height: 100%;
-				min-height: var(--datatable-row-height);
-				padding: 7px 0;
+			.wordbreak {
+				white-space: normal;
+			}
 
-				& + .timeline-axis {
-					margin-left: 5px;
+			.flex-wrapper {
+				display: flex;
+				column-gap: 5px;
+				height: 16px;
+			}
+
+			.tags-wrapper {
+				.tag {
+					margin: 0;
+					height: 16px;
 				}
 
-				.btn-icon,
-				.icon,
-				.link-action {
-					&:not(.no-indent):not(:first-child) {
-						margin-left: 5px;
-					}
-				}
-
-				.link-alt {
-					white-space: wrap;
-					text-overflow: initial;
-				}
-
-				.problem-icon-link {
-					vertical-align: middle;
+				.btn-icon {
+					height: 16px;
 				}
 			}
 
 			.btn-icon {
 				min-width: 18px;
 				height: 18px;
+
+				&:not(.no-indent):not(:first-child) {
+					margin-left: 2px;
+				}
+			}
+
+			&:not(.cell-checkbox) .btn-icon:not(.no-indent):not(:first-child) {
+				margin-left: 5px;
+			}
+
+			.action-wrapper {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1px 5px;
+
+				.btn-icon:not(.no-indent):not(:first-child) {
+					margin-left: 0;
+				}
 			}
 
 			.symptoms {
@@ -637,7 +661,7 @@
 				align-items: center;
 				flex-shrink: 0;
 				gap: 3px;
-				height: var(--datatable-row-height);
+				margin-top: 2px;
 
 				.symptoms-left {
 					min-width: 17px;
@@ -649,6 +673,7 @@
 				.symptoms-right {
 					width: 18px;
 					height: 16px;
+					margin: 5px 0 0 2px;
 				}
 			}
 
@@ -710,12 +735,7 @@
 		&.cell-checkbox {
 			position: sticky;
 			justify-content: flex-start;
-			padding: 0 8px;
-
-			.cell-inner {
-				min-width: 23px;
-				text-overflow: initial;
-			}
+			padding: 6px 8px;
 
 			.checkbox-radio {
 				margin: 0;
@@ -733,85 +753,12 @@
 		}
 
 		&.cell-timeline {
-			padding-right: 0;
-		}
+			display: flex;
+			padding: 0;
 
-		.cell-inner {
-			width: 100%;
-			overflow: hidden;
-			text-overflow: ellipsis;
-
-			.btn-icon:not(.btn-small) {
-				min-width: 18px;
-				height: 18px;
-
-				&:first-of-type {
-					margin-left: 2px;
-				}
-
-				&:last-of-type {
-					margin-right: 2px;
-				}
-			}
-
-			.link-action {
-				@extend %overflow-ellipsis;
-			}
-
-			.action-container {
-				display: flex;
-				width: 100%;
-
-				.link-action {
-					height: 16px;
-					min-width: 1ch;
-				}
-
-				.rel-container {
-					display: flex;
-				}
-
-				.separator {
-					flex-shrink: 0;
-					margin-right: 4px;
-				}
-			}
-
-			.tags-wrapper {
-				display: flex;
-				align-items: center;
-				min-height: 18px;
-
-				.tag {
-					min-width: 24px;
-
-					&.tag-inherited {
-						min-width: 35px;
-					}
-				}
-			}
-
-			.status-container {
-				@extend %overflow-ellipsis;
-				display: flex;
-				gap: 0;
-
-				.in,
-				.out {
-					display: flex;
-					gap: 0;
-				}
-
-				.out {
-					margin-left: 3px;
-				}
-
-				span {
-					min-width: 24px;
-					overflow: inherit;
-					text-overflow: inherit;
-					white-space: inherit;
-				}
+			.timeline-date {
+				flex-grow: 1;
+				padding: 7px 8px;
 			}
 		}
 	}
@@ -871,8 +818,9 @@
 	.datatable {
 		user-select: none;
 		pointer-events: none;
+		-webkit-user-select: none;
 
-		.cell.cell-resizing .cell-header-resizer {
+		.cell.cell-resizing .header-resizer {
 			z-index: 4;
 		}
 	}

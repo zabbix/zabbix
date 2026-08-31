@@ -85,17 +85,13 @@ class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsP
 				input.disabled = compact_view.checked;
 			}
 
-			input.addEventListener('input', e => e.stopPropagation());
-
-			input.addEventListener('change', e => {
+			input.addEventListener('input', e => {
 				e.stopPropagation();
 
-				const column_options = {
+				this.getColumn().setColumnOptions({
 					...this.getColumn().getColumnOptions(),
 					[field]: e.target.checked ? 1 : 0
-				};
-
-				this.getColumn().setColumnOptions(column_options);
+				});
 
 				this.getDataTable().updateUserConfig();
 

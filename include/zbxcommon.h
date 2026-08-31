@@ -154,31 +154,6 @@ typedef enum
 }
 zbx_item_type_t;
 
-#define ZBX_ITEM_TYPE_NAME					\
-{								\
-	{"agent",		ITEM_TYPE_ZABBIX},		\
-	{"agent_active",	ITEM_TYPE_ZABBIX_ACTIVE},	\
-	{"trapper",		ITEM_TYPE_TRAPPER},		\
-	{"simple",		ITEM_TYPE_SIMPLE},		\
-	{"internal",		ITEM_TYPE_INTERNAL},		\
-	{"external",		ITEM_TYPE_EXTERNAL},		\
-	{"db_monitor",		ITEM_TYPE_DB_MONITOR},		\
-	{"ipmi",		ITEM_TYPE_IPMI},		\
-	{"ssh",			ITEM_TYPE_SSH},			\
-	{"telnet",		ITEM_TYPE_TELNET},		\
-	{"calculated",		ITEM_TYPE_CALCULATED},		\
-	{"jmx",			ITEM_TYPE_JMX},			\
-	{"snmptrap",		ITEM_TYPE_SNMPTRAP},		\
-	{"dependent",		ITEM_TYPE_DEPENDENT},		\
-	{"httpagent",		ITEM_TYPE_HTTPAGENT},		\
-	{"snmp",		ITEM_TYPE_SNMP},		\
-	{"script",		ITEM_TYPE_SCRIPT},		\
-	{"browser",		ITEM_TYPE_BROWSER},		\
-	{NULL,			0}				\
-}
-
-#define ZBX_ITEM_TYPE_DENIED(mask, type)	((mask) & (1u << (type)))
-
 #define SNMP_BULK_DISABLED	0
 #define SNMP_BULK_ENABLED	1
 
@@ -691,6 +666,8 @@ int	MAIN_ZABBIX_ENTRY(int flags);
 #define ZBX_AUTH_TOKEN_ENABLED		0
 #define ZBX_AUTH_TOKEN_DISABLED		1
 #define ZBX_AUTH_TOKEN_NEVER_EXPIRES	0
+#define ZBX_AUTH_SCHEME_BEARER		0
+#define ZBX_AUTH_SCHEME_DPOP		1
 
 #define ZBX_DO_NOT_SEND_RESPONSE	0
 #define ZBX_SEND_RESPONSE		1

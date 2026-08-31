@@ -26,6 +26,7 @@ The configurable parameters are intended to be changed according to the webhook 
 |severity_information|P5|Information severity.|
 |severity_not_classified|P5|Not classified severity.|
 |severity_warning|P4|Warning severity.|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"TOPdesk"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "TOPdesk", e.g. {$HTTP.TLS.VERIFY:"TOPdesk"}.|
 |topdesk_api|\<put your TOPdesk API URL\>|TOPdesk API URL.|
 |topdesk_password|\<put your TOPdesk application password\>|TOPdesk application password.|
 |topdesk_status|\<put default status for new tickets\>|Default status for new TOPdesk tickets.|

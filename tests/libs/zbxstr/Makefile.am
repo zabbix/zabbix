@@ -34,8 +34,7 @@ BINARIES_tests = \
 	zbx_escape_string \
 	zbx_strdcatf \
 	zbx_strcasestr \
-	zbx_dyn_escape_shell_single_quote \
-	zbx_str_list_next
+	zbx_dyn_escape_shell_single_quote
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -556,20 +555,5 @@ zbx_dyn_escape_shell_single_quote_LDADD += @SERVER_LIBS@
 zbx_dyn_escape_shell_single_quote_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_dyn_escape_shell_single_quote_CFLAGS = $(STR_COMPILER_FLAGS)
-
-#zbx_str_list_next
-
-zbx_str_list_next_SOURCES = \
-	zbx_str_list_next.c \
-	$(COMMON_SRC_FILES)
-
-zbx_str_list_next_LDADD = \
-	$(STR_LIBS)
-
-zbx_str_list_next_LDADD += @SERVER_LIBS@
-
-zbx_str_list_next_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
-
-zbx_str_list_next_CFLAGS = $(STR_COMPILER_FLAGS)
 
 #endif
