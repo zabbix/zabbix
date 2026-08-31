@@ -472,10 +472,11 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('Template for');
-		$filter->submit();
 		$table = $this->query('id:datatable-templates')->asDatatable()->one()->waitUntilReady();
+		$filter->submit();
+		$table->waitUntilReloaded();
 
-		$table_rows_count = $table->getRows()->count();
+		$table_rows_count = $table->waitUntilReady()->getRows()->count();
 		$this->assertDatatableStats($table_rows_count);
 		$delete_button = $this->query('button:Delete')->one();
 

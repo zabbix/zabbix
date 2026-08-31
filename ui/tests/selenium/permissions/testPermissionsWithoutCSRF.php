@@ -360,7 +360,8 @@ class testPermissionsWithoutCSRF extends CWebTest {
 								'id:tag' => 'event_tag'
 							]
 						]
-					]
+					],
+					'message_locator' => 'class:msg-bad'
 				]
 			],
 			// #25 Event correlation update.
@@ -368,7 +369,8 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM correlation',
 					'link' => 'zabbix.php?action=ceprule.list',
-					'overlay' => 'update'
+					'overlay' => 'update',
+					'message_locator' => 'class:msg-bad'
 				]
 			],
 			// #26 Discovery create.
@@ -879,7 +881,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 		// Check the error message depending on case.
 		$error = CTestArrayHelper::get($data, 'incorrect_request') ? self::INCORRECT_REQUEST : self::ACCESS_DENIED;
-		$this->assertMessage(TEST_BAD, $error['message'], $error['details']);
+		$this->assertMessage(TEST_BAD, $error['message'], $error['details'], CTestArrayHelper::get($data, 'message_locator'));
 		$this->checkReturnButton($data);
 
 		// Compare db hashes to check that form didn't make any changes.

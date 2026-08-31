@@ -26,9 +26,15 @@ class CMessageBehavior extends CBehavior {
 	 * @param constant			$expected	constant that defines whether the message should be good or bad
 	 * @param string			$title		reference title
 	 * @param string, array		$details	reference array or string values of which should be present in message details
+	 * @param string			$locator	locator of the message element, used when if multiple messages are present
 	 */
-	public function assertMessage($expected, $title = null, $details = null) {
-		$message = CMessageElement::find()->waitUntilVisible()->one();
+	public function assertMessage($expected, $title = null, $details = null, $locator = null) {
+		if ($locator) {
+			$message = $this->test->query($locator)->waitUntilVisible()->asMessage()->one();
+		}
+		else {
+			$message = CMessageElement::find()->waitUntilVisible()->one();
+		}
 
 		if ($expected === TEST_GOOD) {
 			$this->test->assertTrue($message->isGood());

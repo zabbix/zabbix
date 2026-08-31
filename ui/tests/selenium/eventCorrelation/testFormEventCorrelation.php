@@ -1209,7 +1209,7 @@ class testFormEventCorrelation extends CWebTest {
 
 		foreach (CTestArrayHelper::get($data, 'conditions', []) as $condition) {
 			$add_button->click();
-			$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+			$condition_dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
 			$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
 			$this->fillConditionForm($condition_form, $condition);
 			$condition_form->submit();
@@ -1305,7 +1305,9 @@ class testFormEventCorrelation extends CWebTest {
 			// When expecting an error in the 'New event correlation' modal.
 			// TODO: Remove the condition and the part for checking regular errors after DEV-4267 is fixed.
 			if (array_key_exists('errors', $data)) {
-				$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'create').' event correlation', $data['errors']);
+				$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'create').' event correlation',
+						$data['errors'], 'class:msg-bad'
+				);
 			}
 			else {
 				$this->assertInlineError($form, $data['inline_errors']);
