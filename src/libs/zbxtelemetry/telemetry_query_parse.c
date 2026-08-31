@@ -946,11 +946,16 @@ static int tq_validate_time_param(const char *str, int *out, int min, int max, c
 	int tmp;
 
 	if (NULL == str)
-		return ret_errf(FAIL, error, max_error_len, "%s is not set", error_name);
+		return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set", error_name);
+
 	if (FAIL == zbx_is_time_suffix(str, &tmp, ZBX_LENGTH_UNLIMITED))
-		return ret_errf(FAIL, error, max_error_len, "unsupported %s value", error_name);
+		return ret_errf(FAIL, error, max_error_len, "Unsupported \"%s\" value", error_name);
+
 	if (min > tmp || tmp > max)
-		return ret_errf(FAIL, error, max_error_len, "%s must be within range %ds-%ds", error_name, min, max);
+	{
+		return ret_errf(FAIL, error, max_error_len, "\"%s\" must be within range %ds-%ds",
+				error_name, min, max);
+	}
 
 	if (NULL != out)
 		*out = tmp;
@@ -962,14 +967,14 @@ int	zbx_tq_validate_time_shift(const char *time_shift_str, int *time_shift_out, 
 		size_t max_error_len)
 {
 	return tq_validate_time_param(time_shift_str, time_shift_out, ZBX_TQ_TIME_SHIFT_MIN,
-			ZBX_TQ_TIME_SHIFT_MAX, "time shift", error, max_error_len);
+			ZBX_TQ_TIME_SHIFT_MAX, "time_shift", error, max_error_len);
 }
 
 int	zbx_tq_validate_lookback_limit(const char *lookback_limit_str, int *lookback_limit_out, char *error,
 		size_t max_error_len)
 {
 	return tq_validate_time_param(lookback_limit_str, lookback_limit_out, ZBX_TQ_LOOKBACK_LIMIT_MIN,
-			ZBX_TQ_LOOKBACK_LIMIT_MAX, "lookback limit", error, max_error_len);
+			ZBX_TQ_LOOKBACK_LIMIT_MAX, "lookback_limit", error, max_error_len);
 }
 
 int	zbx_tq_validate_granularity(const char *granularity_str, int *granularity_out, char *error,
@@ -993,7 +998,7 @@ int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out,
 		return FAIL;
 
 	if (granularity_tmp > lookback_limit_tmp)
-		return ret_errf(FAIL, error, max_error_len, "granularity cannot be larger than lookback limit");
+		return ret_errf(FAIL, error, max_error_len, "\"granularity\" cannot be larger than \"lookback_limit\"");
 
 	if (NULL != time_shift_out)
 		*time_shift_out = time_shift_tmp;

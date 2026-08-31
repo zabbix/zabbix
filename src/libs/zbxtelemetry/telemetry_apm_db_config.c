@@ -128,12 +128,12 @@ static void	log_unsupported_options(const zbx_vector_config_option_t *options)
 	}
 }
 
-static int	parse_apm_provider(zbx_apm_db_config_t *apm_db_config, const char *config_apm_provider,
+static int	parse_apm_provider(zbx_apm_db_config_t *apm_db_config, const char *apm_provider,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **error)
 {
 	int		ret = FAIL;
-	const char	*p = config_apm_provider;
+	const char	*p = apm_provider;
 	const char	*p2;
 
 	zbx_vector_config_option_t	options;
@@ -142,7 +142,7 @@ static int	parse_apm_provider(zbx_apm_db_config_t *apm_db_config, const char *co
 
 	if (NULL == (p2 = strchr(p, ';')))
 	{
-		*error = zbx_dsprintf(NULL, "invalid TelemetryProvider value \"%s\"", config_apm_provider);
+		*error = zbx_dsprintf(NULL, "invalid TelemetryProvider value \"%s\"", apm_provider);
 		goto out;
 	}
 
@@ -263,16 +263,26 @@ static int	validate_config(const zbx_apm_db_config_t *apm_db_config, char **erro
 	return SUCCEED;
 }
 
-int	zbx_apm_db_config_init_local_config(zbx_apm_db_config_t *apm_db_config, const char *config_apm_provider,
+int	zbx_apm_db_config_init_local_config(zbx_apm_db_config_t *apm_db_config, char **config_telemetry_providers,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, const zbx_config_vault_t *config_vault, char **error)
 {
+	const char	*apm_provider;
+
 	memset(apm_db_config, 0, sizeof(*apm_db_config));
 
-	if (NULL == config_apm_provider)
+	if (NULL == config_telemetry_providers || NULL == *config_telemetry_providers)
 		return SUCCEED;
 
-	if (SUCCEED != parse_apm_provider(apm_db_config, config_apm_provider, config_source_ip, config_ssl_ca_location,
+	if (NULL != *(config_telemetry_providers + 1))
+	{
+		*error = zbx_dsprintf(NULL, "TelemetryProvider cannot be set multiple times");
+		goto fail;
+	}
+
+	apm_provider = *config_telemetry_providers;
+
+	if (SUCCEED != parse_apm_provider(apm_db_config, apm_provider, config_source_ip, config_ssl_ca_location,
 			config_ssl_cert_location, config_ssl_key_location, error))
 		goto fail;
 
