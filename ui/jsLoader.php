@@ -94,6 +94,7 @@ $available_js = [
 	'component.z-color-picker.js' => '',
 	'component.z-select.js' => '',
 	'component.z-sparkline.js' => '',
+	'component.z-split-view.js' => '',
 	'component.z-textarea-flexible.js' => '',
 	'component.z-vertical.js' => '',
 	'class.event-hub.js' => '',
@@ -718,12 +719,6 @@ if (empty($_GET['files'])) {
 		'jquery-ui.js',
 		'main.js',
 		'common.js',
-		'component.z-bar-gauge.js',
-		'component.z-color-picker.js',
-		'component.z-select.js',
-		'component.z-sparkline.js',
-		'component.z-textarea-flexible.js',
-		'component.z-vertical.js',
 		'class.event-hub.js',
 		'class.event-hub.event.js',
 		'class.base-component.js',
@@ -885,6 +880,17 @@ if (empty($_GET['files'])) {
 	}
 
 	$js .= 'ZBX_NOREFERER = '.ZBX_NOREFERER.";\n";
+}
+elseif ($_GET['files'] === 'components') {
+	$files = [
+		'component.z-bar-gauge.js',
+		'component.z-color-picker.js',
+		'component.z-select.js',
+		'component.z-sparkline.js',
+		'component.z-split-view.js',
+		'component.z-textarea-flexible.js',
+		'component.z-vertical.js'
+	];
 }
 else {
 	$files = $_GET['files'];

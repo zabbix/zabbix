@@ -1,52 +1,59 @@
 html,
 body {
-	height: 100vh;
+	block-size: 100dvh;
 }
 
 body {
-	display: flex;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	grid-template-rows: auto minmax(0, 1fr);
+	grid-template-areas:
+		"sidebar header"
+		"sidebar content";
+	margin: 0;
 	overflow: hidden;
+
+	> z-split-view {
+		--min-content-size: 768px;
+
+		.side-drawer {
+			position: sticky;
+			inset-block-start: 0;
+		}
+	}
+
+	> z-split-view,
+	> .wrapper {
+		grid-area: content;
+
+		overflow: auto;
+	}
 }
 
-aside,
-.wrapper {
-	box-sizing: border-box;
-}
+header {
+	grid-area: header;
 
-.wrapper {
-	display: flex;
-	flex: 1;
-	flex-direction: column;
-	overflow: auto;
 	position: relative;
-
-	& > [class^="msg-"] + [class^="msg-"] {
-		margin-top: 0;
-	}
-
-	& > .debug-output {
-		flex-shrink: 0;
-	}
-
-	& > output {
-		min-width: 1200px;
-	}
+	box-sizing: border-box;
+	z-index: 15;
 }
 
-header,
-footer {
-	flex-shrink: 0;
-	min-width: 1200px;
+aside {
+	grid-area: sidebar;
+
+	&.is-compact {
+		& ~ header,
+		& ~ z-split-view,
+		& ~ .wrapper {
+			margin-left: 48px;
+		}
+	}
 }
 
 main {
-	position: relative;
-	min-width: 1200px;
+	box-sizing: border-box;
+	min-inline-size: var(--min-content-size);
 	padding: 10px;
-
-	> .container:not(:first-of-type) {
-		margin-top: 10px;
-	}
 }
 
 footer {
@@ -57,6 +64,13 @@ output {
 	display: block;
 }
 
-.container {
-	background: $ui-bg-color;
+.wrapper {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-block-size: 0;
+
+	> [class^="msg-"] + [class^="msg-"] {
+		margin-block-start: 0;
+	}
 }

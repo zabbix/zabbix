@@ -41,10 +41,6 @@
 	border: 1px solid $ui-border-color;
 	border-radius: var(--surface-border-radius) 0 var(--surface-border-radius) var(--surface-border-radius);
 
-	.table {
-		border-bottom: 1px solid $table-border-color;
-	}
-
 	.filter-forms {
 		padding: 0 10px;
 	}
@@ -66,23 +62,28 @@
 }
 
 .filter-forms {
-	margin: 0 auto;
-	text-align: center;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
 	white-space: nowrap;
 	background-color: $ui-bg-color;
 
+	&.table {
+		border-bottom: 1px solid $table-border-color;
+
+		&,
+		& > .row {
+			display: flex;
+			inline-size: fit-content;
+			justify-self: center;
+			gap: 0 40px;
+
+		}
+	}
+
 	.cell {
+		padding-bottom: 5px;
 		text-align: left;
-		padding: 0 20px 5px;
-
-		&:first-child {
-			padding-left: 0;
-		}
-
-		&:last-child {
-			padding-right: 0;
-			border-right: 0;
-		}
 
 		button {
 			margin: 0;
