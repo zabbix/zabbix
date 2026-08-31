@@ -20,10 +20,181 @@ zabbix_export:
         This is an official Windows template. It requires Zabbix agent 8.0 or newer.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: 'Templates/Operating systems'
       items:
+        - uuid: 706783a4a2904c2dbec210c1cfb739d4
+          name: 'Windows activation: Client machine ID'
+          type: DEPENDENT
+          key: activation.client.id
+          value_type: CHAR
+          description: 'The KMS client machine identifier (from `ClientMachineID`).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].ClientMachineID'
+              error_handler: CUSTOM_VALUE
+          master_item:
+            key: 'wmi.getall[root\CIMV2,"select Version,KeyManagementServiceMachine,KeyManagementServicePort,ClientMachineID,IsKeyManagementServiceMachine from SoftwareLicensingService"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 6d8d50148a2a40beaae5d14861452f2c
+          name: 'Windows activation: Grace period remaining'
+          type: DEPENDENT
+          key: activation.grace
+          units: s
+          description: 'The time remaining in the current licensing grace period.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].GracePeriodRemaining'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: MULTIPLIER
+              parameters:
+                - '60'
+          master_item:
+            key: 'wmi.getall[root\CIMV2,"select Name,Description,LicenseStatus,PartialProductKey,GracePeriodRemaining,LicenseStatusReason from SoftwareLicensingProduct where PartialProductKey is not null and ApplicationID=''55c92734-d682-4d71-983e-d6ec3f16059f''"]'
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 1182ca347a9c4b99a0fa24fe5d59ef6b
+              expression: 'last(/Windows by Zabbix agent/activation.grace)>0 and last(/Windows by Zabbix agent/activation.grace)<{$WINDOWS.SECURITY.ACTIVATION.GRACE.MIN.WARN}'
+              name: 'Windows: Activation grace period running out'
+              event_name: 'Windows: Activation grace period running out (less than {$WINDOWS.SECURITY.ACTIVATION.GRACE.MIN.WARN} left, current: {ITEM.VALUE1})'
+              priority: WARNING
+              description: 'The Windows activation grace period is about to expire. Activate Windows before the grace period ends.'
+              tags:
+                - tag: scope
+                  value: compliance
+        - uuid: b6e32f2a2a6f41bbb3329b8ad843a3d0
+          name: 'Windows activation: Is KMS host'
+          type: DEPENDENT
+          key: activation.kms.host
+          description: 'Whether this machine is a KMS host (from `IsKeyManagementServiceMachine`).'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].IsKeyManagementServiceMachine'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: 'wmi.getall[root\CIMV2,"select Version,KeyManagementServiceMachine,KeyManagementServicePort,ClientMachineID,IsKeyManagementServiceMachine from SoftwareLicensingService"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 7d86225090d54586b74c988df6411fcc
+          name: 'Windows activation: KMS port'
+          type: DEPENDENT
+          key: activation.kms.port
+          description: 'The Key Management Service (KMS) port (from `KeyManagementServicePort`).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].KeyManagementServicePort'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: 'wmi.getall[root\CIMV2,"select Version,KeyManagementServiceMachine,KeyManagementServicePort,ClientMachineID,IsKeyManagementServiceMachine from SoftwareLicensingService"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 281a68d668bb414ba72f7a6894399d6e
+          name: 'Windows activation: KMS server'
+          type: DEPENDENT
+          key: activation.kms.server
+          value_type: CHAR
+          description: 'The Key Management Service (KMS) host name used for activation (from `KeyManagementServiceMachine`).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].KeyManagementServiceMachine'
+              error_handler: CUSTOM_VALUE
+          master_item:
+            key: 'wmi.getall[root\CIMV2,"select Version,KeyManagementServiceMachine,KeyManagementServicePort,ClientMachineID,IsKeyManagementServiceMachine from SoftwareLicensingService"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: a330ab1032bc4b00a4d3ae0123e68456
+          name: 'Windows activation: License status'
+          type: DEPENDENT
+          key: activation.license.status
+          description: 'The Windows license status (0 - Unlicensed, 1 - Licensed, 2 - OOB grace, 3 - OOT grace, 4 - Non-genuine grace, 5 - Notification, 6 - Extended grace).'
+          valuemap:
+            name: 'Windows license status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].LicenseStatus'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: 'wmi.getall[root\CIMV2,"select Name,Description,LicenseStatus,PartialProductKey,GracePeriodRemaining,LicenseStatusReason from SoftwareLicensingProduct where PartialProductKey is not null and ApplicationID=''55c92734-d682-4d71-983e-d6ec3f16059f''"]'
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 34184edc165b4d39b543b4c00f20b8d4
+              expression: 'last(/Windows by Zabbix agent/activation.license.status)<>1'
+              name: 'Windows: Is not licensed'
+              priority: WARNING
+              description: 'The Windows license status is not "Licensed". The system may be unlicensed, in a grace period, or in notification mode.'
+              tags:
+                - tag: scope
+                  value: compliance
+        - uuid: 514e85eeacb14a6a80ba9aaecdbac0f5
+          name: 'Windows activation: Partial product key'
+          type: DEPENDENT
+          key: activation.product.key
+          value_type: CHAR
+          description: 'The last five characters of the installed product key (from `PartialProductKey`).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].PartialProductKey'
+              error_handler: CUSTOM_VALUE
+          master_item:
+            key: 'wmi.getall[root\CIMV2,"select Name,Description,LicenseStatus,PartialProductKey,GracePeriodRemaining,LicenseStatusReason from SoftwareLicensingProduct where PartialProductKey is not null and ApplicationID=''55c92734-d682-4d71-983e-d6ec3f16059f''"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 67a9bd1a348c4c8a9009dca1495e018a
+          name: 'Windows activation: Product name'
+          type: DEPENDENT
+          key: activation.product.name
+          value_type: CHAR
+          description: 'The licensed product name (from `Name`).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].Name'
+              error_handler: CUSTOM_VALUE
+          master_item:
+            key: 'wmi.getall[root\CIMV2,"select Name,Description,LicenseStatus,PartialProductKey,GracePeriodRemaining,LicenseStatusReason from SoftwareLicensingProduct where PartialProductKey is not null and ApplicationID=''55c92734-d682-4d71-983e-d6ec3f16059f''"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 843f8e9e505943e0b0c7d003a6e9945b
+          name: 'Windows activation: Status reason code'
+          type: DEPENDENT
+          key: activation.status.reason
+          description: 'The licensing status reason code (from `LicenseStatusReason`).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].LicenseStatusReason'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: 'wmi.getall[root\CIMV2,"select Name,Description,LicenseStatus,PartialProductKey,GracePeriodRemaining,LicenseStatusReason from SoftwareLicensingProduct where PartialProductKey is not null and ApplicationID=''55c92734-d682-4d71-983e-d6ec3f16059f''"]'
+          tags:
+            - tag: component
+              value: security
         - uuid: af550a1bfe74428eb24492d8af3b405e
           name: 'Host name of Zabbix agent running'
           key: agent.hostname
@@ -57,6 +228,317 @@ zabbix_export:
           tags:
             - tag: component
               value: application
+        - uuid: 987adcf884714198b68ef3ccbe5b01f5
+          name: 'Windows Defender: AM service enabled'
+          type: DEPENDENT
+          key: defender.amservice.enabled
+          description: 'Whether the Defender antimalware service is running (from `AMServiceEnabled`).'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].AMServiceEnabled'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: 'False'
+            - type: BOOL_TO_DECIMAL
+          master_item:
+            key: 'wmi.getall[root\Microsoft\Windows\Defender,"select AMServiceEnabled,AntispywareEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AntispywareSignatureLastUpdated,AntivirusSignatureLastUpdated,QuickScanAge,FullScanAge,AntivirusSignatureVersion from MSFT_MpComputerStatus"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 9a1008add4694ac6948f7c8073c86bea
+          name: 'Windows Defender: Antispyware enabled'
+          type: DEPENDENT
+          key: defender.as.enabled
+          description: 'Whether antispyware protection is enabled (from `AntispywareEnabled`).'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].AntispywareEnabled'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: 'False'
+            - type: BOOL_TO_DECIMAL
+          master_item:
+            key: 'wmi.getall[root\Microsoft\Windows\Defender,"select AMServiceEnabled,AntispywareEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AntispywareSignatureLastUpdated,AntivirusSignatureLastUpdated,QuickScanAge,FullScanAge,AntivirusSignatureVersion from MSFT_MpComputerStatus"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 05cf5b47b3f74220805827b4d9500f68
+          name: 'Windows Defender: Antispyware signature age'
+          type: DEPENDENT
+          key: defender.as.signature.age
+          value_type: FLOAT
+          units: s
+          description: 'Time since the antispyware signatures were last updated.'
+          valuemap:
+            name: 'Data quality'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var defender_label = 'AS signature age',
+                  	defender_field = 'AntispywareSignatureLastUpdated';
+                  
+                  
+                  var status;
+                  
+                  try {
+                    status = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] Defender ' + defender_label + ': cannot parse master JSON: ' + error);
+                  
+                    return -1;
+                  }
+                  
+                  if (!status.length) {
+                    return 0;
+                  }
+                  
+                  var updated_string = String(status[0][defender_field]),
+                  	dmtf_match = updated_string.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.\d+([+-]\d+)?/);
+                  
+                  if (!dmtf_match) {
+                    Zabbix.log(4, '[Windows] Defender ' + defender_label + ': unrecognized date/time format');
+                  
+                    return -2;
+                  }
+                  
+                  var updated_epoch = Date.UTC(+dmtf_match[1], +dmtf_match[2] - 1, +dmtf_match[3], +dmtf_match[4], +dmtf_match[5], +dmtf_match[6]) / 1000;
+                  
+                  updated_epoch -= (dmtf_match[7] ? parseInt(dmtf_match[7], 10) : 0) * 60;
+                  
+                  var signature_age = Math.floor(Date.now() / 1000 - updated_epoch);
+                  
+                  return signature_age < 0 ? 0 : signature_age;
+          master_item:
+            key: 'wmi.getall[root\Microsoft\Windows\Defender,"select AMServiceEnabled,AntispywareEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AntispywareSignatureLastUpdated,AntivirusSignatureLastUpdated,QuickScanAge,FullScanAge,AntivirusSignatureVersion from MSFT_MpComputerStatus"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 2249750f6b0041a6ba86a012229ce2c5
+          name: 'Windows Defender: Antivirus enabled'
+          type: DEPENDENT
+          key: defender.av.enabled
+          description: 'Whether antivirus protection is enabled (from `AntivirusEnabled`).'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].AntivirusEnabled'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: 'False'
+            - type: BOOL_TO_DECIMAL
+          master_item:
+            key: 'wmi.getall[root\Microsoft\Windows\Defender,"select AMServiceEnabled,AntispywareEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AntispywareSignatureLastUpdated,AntivirusSignatureLastUpdated,QuickScanAge,FullScanAge,AntivirusSignatureVersion from MSFT_MpComputerStatus"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 6e5be8d81cec48e7862ef69bd9538be4
+          name: 'Windows Defender: Antivirus signature age'
+          type: DEPENDENT
+          key: defender.av.signature.age
+          value_type: FLOAT
+          units: s
+          description: 'Time since the antivirus signatures were last updated.'
+          valuemap:
+            name: 'Data quality'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var defender_label = 'AV signature age',
+                  	defender_field = 'AntivirusSignatureLastUpdated';
+                  
+                  
+                  var status;
+                  
+                  try {
+                    status = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] Defender ' + defender_label + ': cannot parse master JSON: ' + error);
+                  
+                    return -1;
+                  }
+                  
+                  if (!status.length) {
+                    return 0;
+                  }
+                  
+                  var updated_string = String(status[0][defender_field]),
+                  	dmtf_match = updated_string.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.\d+([+-]\d+)?/);
+                  
+                  if (!dmtf_match) {
+                    Zabbix.log(4, '[Windows] Defender ' + defender_label + ': unrecognized date/time format');
+                  
+                    return -2;
+                  }
+                  
+                  var updated_epoch = Date.UTC(+dmtf_match[1], +dmtf_match[2] - 1, +dmtf_match[3], +dmtf_match[4], +dmtf_match[5], +dmtf_match[6]) / 1000;
+                  
+                  updated_epoch -= (dmtf_match[7] ? parseInt(dmtf_match[7], 10) : 0) * 60;
+                  
+                  var signature_age = Math.floor(Date.now() / 1000 - updated_epoch);
+                  
+                  return signature_age < 0 ? 0 : signature_age;
+          master_item:
+            key: 'wmi.getall[root\Microsoft\Windows\Defender,"select AMServiceEnabled,AntispywareEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AntispywareSignatureLastUpdated,AntivirusSignatureLastUpdated,QuickScanAge,FullScanAge,AntivirusSignatureVersion from MSFT_MpComputerStatus"]'
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 6cbe12e076f841de94143781a47d3329
+              expression: 'min(/Windows by Zabbix agent/defender.av.signature.age,5m)>{$WINDOWS.SECURITY.DEFENDER.SIGNATURE.MAX.WARN}'
+              name: 'Windows: Defender signatures are out of date'
+              event_name: 'Windows: Defender signatures are out of date (older than {$WINDOWS.SECURITY.DEFENDER.SIGNATURE.MAX.WARN}, current: {ITEM.VALUE1})'
+              priority: WARNING
+              description: 'The Microsoft Defender antivirus signatures have not been updated within the expected interval.'
+              tags:
+                - tag: scope
+                  value: security
+        - uuid: 6058af9ab5aa4e198adba3a35db299c1
+          name: 'Windows Defender: Antivirus signature version'
+          type: DEPENDENT
+          key: defender.av.signature.version
+          value_type: CHAR
+          description: 'The antivirus signature package version (from `AntivirusSignatureVersion`).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].AntivirusSignatureVersion'
+              error_handler: CUSTOM_VALUE
+          master_item:
+            key: 'wmi.getall[root\Microsoft\Windows\Defender,"select AMServiceEnabled,AntispywareEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AntispywareSignatureLastUpdated,AntivirusSignatureLastUpdated,QuickScanAge,FullScanAge,AntivirusSignatureVersion from MSFT_MpComputerStatus"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: ef8fe5dd3af54d9bb8c87fcbf340ab3b
+          name: 'Windows Defender: Full scan age'
+          type: DEPENDENT
+          key: defender.fullscan.age
+          value_type: FLOAT
+          units: s
+          description: 'Time since the last full scan. Reads as "Never scanned" if no full scan has ever run.'
+          valuemap:
+            name: 'Data quality'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var defender_label = 'full scan age',
+                  	defender_field = 'FullScanAge';
+                  
+                  
+                  var status;
+                  
+                  try {
+                    status = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] Defender ' + defender_label + ': cannot parse master JSON: ' + error);
+                  
+                    return -1;
+                  }
+                  
+                  if (!status.length) {
+                    return -3;
+                  }
+                  
+                  var scan_days = Number(status[0][defender_field]);
+                  
+                  if (!isFinite(scan_days) || scan_days > 1e12) {
+                    return -3;
+                  }
+                  
+                  return scan_days * 86400;
+          master_item:
+            key: 'wmi.getall[root\Microsoft\Windows\Defender,"select AMServiceEnabled,AntispywareEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AntispywareSignatureLastUpdated,AntivirusSignatureLastUpdated,QuickScanAge,FullScanAge,AntivirusSignatureVersion from MSFT_MpComputerStatus"]'
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: a57e4e67758d4479bdcff6ef80c6247e
+              expression: 'last(/Windows by Zabbix agent/defender.fullscan.age)>{$WINDOWS.SECURITY.DEFENDER.FULLSCAN.MAX.WARN}'
+              name: 'Windows: Defender full scan overdue'
+              event_name: 'Windows: Defender full scan overdue (older than {$WINDOWS.SECURITY.DEFENDER.FULLSCAN.MAX.WARN}, current: {ITEM.VALUE1})'
+              priority: WARNING
+              description: 'A full Microsoft Defender scan has not been completed within the expected interval.'
+              tags:
+                - tag: scope
+                  value: security
+        - uuid: 2a3103bebf294afb970fe5b42827546b
+          name: 'Windows Defender: Quick scan age'
+          type: DEPENDENT
+          key: defender.quickscan.age
+          value_type: FLOAT
+          units: s
+          description: 'Time since the last quick scan. Reads as "Never scanned" if no quick scan has ever run.'
+          valuemap:
+            name: 'Data quality'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var defender_label = 'quick scan age',
+                  	defender_field = 'QuickScanAge';
+                  
+                  
+                  var status;
+                  
+                  try {
+                    status = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] Defender ' + defender_label + ': cannot parse master JSON: ' + error);
+                  
+                    return -1;
+                  }
+                  
+                  if (!status.length) {
+                    return -3;
+                  }
+                  
+                  var scan_days = Number(status[0][defender_field]);
+                  
+                  if (!isFinite(scan_days) || scan_days > 1e12) {
+                    return -3;
+                  }
+                  
+                  return scan_days * 86400;
+          master_item:
+            key: 'wmi.getall[root\Microsoft\Windows\Defender,"select AMServiceEnabled,AntispywareEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AntispywareSignatureLastUpdated,AntivirusSignatureLastUpdated,QuickScanAge,FullScanAge,AntivirusSignatureVersion from MSFT_MpComputerStatus"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 37432dbaaacc4ebfacf80725b80b4ba5
+          name: 'Windows Defender: Real-time protection enabled'
+          type: DEPENDENT
+          key: defender.rtp.enabled
+          description: 'Whether real-time protection is enabled (from `RealTimeProtectionEnabled`).'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].RealTimeProtectionEnabled'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: 'False'
+            - type: BOOL_TO_DECIMAL
+          master_item:
+            key: 'wmi.getall[root\Microsoft\Windows\Defender,"select AMServiceEnabled,AntispywareEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AntispywareSignatureLastUpdated,AntivirusSignatureLastUpdated,QuickScanAge,FullScanAge,AntivirusSignatureVersion from MSFT_MpComputerStatus"]'
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 3fe4b07b373a4fd1be03932d4f98a871
+              expression: 'last(/Windows by Zabbix agent/defender.rtp.enabled)=0'
+              name: 'Windows: Defender real-time protection is off'
+              priority: AVERAGE
+              description: 'Microsoft Defender real-time protection is disabled. The system is not actively protected against malware.'
+              tags:
+                - tag: scope
+                  value: security
         - uuid: 5219a246de0641a89685a961cdd08c0b
           name: 'Cache bytes'
           key: 'perf_counter_en["\Memory\Cache Bytes"]'
@@ -81,7 +563,7 @@ zabbix_export:
               description: '`Memory\Free System Page Table Entries` has been less than `{$MEM.PAGE_TABLE_CRIT.MIN}` for 5 minutes. If the number is less than 5,000, there may be a memory leak.'
               dependencies:
                 - name: 'Windows: High memory utilization'
-                  expression: 'min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Windows by Zabbix agent/vm.memory.size[pused],5m)>{$MEMORY.UTIL.MAX}'
               tags:
                 - tag: scope
                   value: capacity
@@ -112,7 +594,7 @@ zabbix_export:
               description: 'The Memory Pages/sec in the last 5 minutes exceeds `{$MEM.PAGE_SEC.CRIT.MAX}`. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.'
               dependencies:
                 - name: 'Windows: High memory utilization'
-                  expression: 'min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Windows by Zabbix agent/vm.memory.size[pused],5m)>{$MEMORY.UTIL.MAX}'
               tags:
                 - tag: scope
                   value: capacity
@@ -235,6 +717,27 @@ zabbix_export:
           tags:
             - tag: component
               value: os
+        - uuid: e1a8def47c944b4ea4d22f5fb83f6cee
+          name: 'Windows SecureBoot: State'
+          key: 'registry.data[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecureBoot\State,UEFISecureBootEnabled]'
+          delay: 1h
+          description: |
+            The UEFI Secure Boot state (0 - disabled, 1 - enabled).
+            On legacy BIOS/CSM hosts the registry key does not exist and the item becomes NOTSUPPORTED; set `{$WINDOWS.SECURITY.SECUREBOOT.IGNORE}=1` on such hosts.
+          valuemap:
+            name: 'SecureBoot state'
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 986b824bae164f17a24177f419938ff3
+              expression: 'last(/Windows by Zabbix agent/registry.data[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecureBoot\State,UEFISecureBootEnabled])=0 and {$WINDOWS.SECURITY.SECUREBOOT.IGNORE}=0'
+              name: 'Windows: SecureBoot is disabled'
+              priority: WARNING
+              description: 'UEFI Secure Boot is disabled. It helps prevent malicious software from loading during the boot process. If this host legitimately runs without Secure Boot (e.g. legacy BIOS/CSM), set `{$WINDOWS.SECURITY.SECUREBOOT.IGNORE}=1`.'
+              tags:
+                - tag: scope
+                  value: security
         - uuid: c2ed8e2efab04564b6c70ee8ad14730f
           name: 'CPU utilization'
           key: system.cpu.util
@@ -282,25 +785,12 @@ zabbix_export:
                   value: notice
         - uuid: 94c4dfe23e2e4c6e995a3a715941a8eb
           name: 'System local time'
-          key: system.localtime
-          units: unixtime
+          key: 'system.localtime[local]'
+          value_type: CHAR
           description: 'The local system time of the host.'
           tags:
             - tag: component
               value: system
-          triggers:
-            - uuid: 37ca2366c8474cc8a49a605e93377601
-              expression: 'fuzzytime(/Windows by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'fuzzytime(/Windows by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MIN})=1'
-              name: 'Windows: System time is out of sync'
-              event_name: 'Windows: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX})'
-              priority: WARNING
-              description: 'The host''s system time is different from Zabbix server time.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: notice
         - uuid: 7e8b3476db6d4322a10cd1a28cbdb7ea
           name: 'Operating system architecture'
           key: system.sw.arch
@@ -340,18 +830,6 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
-        - uuid: 11cac38334544e5cbb028cfd473cb39e
-          name: 'Free swap space'
-          type: CALCULATED
-          key: system.swap.free
-          units: B
-          params: 'last(//system.swap.size[,total]) - last(//system.swap.size[,total]) / 100 * last(//perf_counter_en["\Paging file(_Total)\% Usage"])'
-          description: 'The free space of the swap volume/file expressed in bytes.'
-          tags:
-            - tag: component
-              value: memory
-            - tag: component
-              value: storage
         - uuid: 9c7e3c843a3045df81dddc5d18de267c
           name: 'Free swap space in %'
           type: DEPENDENT
@@ -365,6 +843,16 @@ zabbix_export:
                 - 'return (100 - value)'
           master_item:
             key: 'perf_counter_en["\Paging file(_Total)\% Usage"]'
+          tags:
+            - tag: component
+              value: memory
+            - tag: component
+              value: storage
+        - uuid: 11cac38334544e5cbb028cfd473cb39e
+          name: 'Free swap space'
+          key: 'system.swap.size[,free]'
+          units: B
+          description: 'The free space of the swap volume/file expressed in bytes.'
           tags:
             - tag: component
               value: memory
@@ -414,6 +902,562 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: 3cb86c4beb024479b0cd5a6929892b00
+          name: 'Windows TPM: Activated'
+          type: DEPENDENT
+          key: tpm.activated
+          description: 'Whether the TPM is activated (from `IsActivated_InitialValue`).'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].IsActivated_InitialValue'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: 'False'
+            - type: BOOL_TO_DECIMAL
+          master_item:
+            key: 'wmi.getall[root\CIMV2\Security\MicrosoftTpm,"select IsEnabled_InitialValue,IsActivated_InitialValue,IsOwned_InitialValue,SpecVersion,ManufacturerVersion from Win32_Tpm"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 4efd1c8d59674ac888eb63e0c87785e0
+          name: 'Windows TPM: Enabled'
+          type: DEPENDENT
+          key: tpm.enabled
+          description: 'Whether the TPM is enabled (from `IsEnabled_InitialValue`).'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].IsEnabled_InitialValue'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: 'False'
+            - type: BOOL_TO_DECIMAL
+          master_item:
+            key: 'wmi.getall[root\CIMV2\Security\MicrosoftTpm,"select IsEnabled_InitialValue,IsActivated_InitialValue,IsOwned_InitialValue,SpecVersion,ManufacturerVersion from Win32_Tpm"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 5f66dcd6ab134d3c9f0381b55058e620
+          name: 'Windows TPM: Manufacturer version'
+          type: DEPENDENT
+          key: tpm.manufacturer.version
+          value_type: CHAR
+          description: 'The TPM firmware (manufacturer) version (from `ManufacturerVersion`).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].ManufacturerVersion'
+              error_handler: CUSTOM_VALUE
+          master_item:
+            key: 'wmi.getall[root\CIMV2\Security\MicrosoftTpm,"select IsEnabled_InitialValue,IsActivated_InitialValue,IsOwned_InitialValue,SpecVersion,ManufacturerVersion from Win32_Tpm"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 0f26f59c213847d584882b02645a60c9
+          name: 'Windows TPM: Owned'
+          type: DEPENDENT
+          key: tpm.owned
+          description: 'Whether the TPM is owned (from `IsOwned_InitialValue`).'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[0].IsOwned_InitialValue'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: 'False'
+            - type: BOOL_TO_DECIMAL
+          master_item:
+            key: 'wmi.getall[root\CIMV2\Security\MicrosoftTpm,"select IsEnabled_InitialValue,IsActivated_InitialValue,IsOwned_InitialValue,SpecVersion,ManufacturerVersion from Win32_Tpm"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 1080526d4de84a17afda687f46ba3f11
+          name: 'Windows TPM: Presence'
+          type: DEPENDENT
+          key: tpm.presence
+          value_type: FLOAT
+          description: 'Whether a TPM chip is present on the host (derived from the number of `Win32_Tpm` instances returned by the master item).'
+          valuemap:
+            name: 'TPM presence'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var tpm;
+                  
+                  try {
+                    tpm = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] TPM presence: cannot parse master JSON: ' + error);
+                  
+                    return -1;
+                  }
+                  
+                  return tpm.length;
+          master_item:
+            key: 'wmi.getall[root\CIMV2\Security\MicrosoftTpm,"select IsEnabled_InitialValue,IsActivated_InitialValue,IsOwned_InitialValue,SpecVersion,ManufacturerVersion from Win32_Tpm"]'
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 16721190b57b4d9181445d7153d7ac71
+              expression: 'last(/Windows by Zabbix agent/tpm.presence)=0'
+              name: 'Windows: TPM is not present'
+              priority: INFO
+              description: 'No TPM chip was detected on the host. A TPM is required for some security features (BitLocker, virtualization-based security, Windows 11 readiness).'
+              tags:
+                - tag: scope
+                  value: security
+        - uuid: 02659e6cf17f409fb3d809d3dd8acd48
+          name: 'Windows TPM: Spec version'
+          type: DEPENDENT
+          key: tpm.spec.version
+          value_type: CHAR
+          description: 'The TPM specification version (the leading part of `SpecVersion`, e.g. "2.0").'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var tpm;
+                  
+                  try {
+                    tpm = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] TPM spec version: cannot parse master JSON: ' + error);
+                  
+                    return 'Parse error';
+                  }
+                  
+                  return tpm.length ? String(tpm[0].SpecVersion).split(',')[0] : '';
+          master_item:
+            key: 'wmi.getall[root\CIMV2\Security\MicrosoftTpm,"select IsEnabled_InitialValue,IsActivated_InitialValue,IsOwned_InitialValue,SpecVersion,ManufacturerVersion from Win32_Tpm"]'
+          tags:
+            - tag: component
+              value: security
+        - uuid: 6e7f6c0f16c944b7aef02107c4ea8773
+          name: 'Windows updates: Days since last KB'
+          type: DEPENDENT
+          key: updates.kb.days
+          value_type: FLOAT
+          description: 'The number of whole days since the most recently installed update.'
+          valuemap:
+            name: 'Data quality'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  function parseInstalledOn(installed_on) {
+                    var date_string = String(installed_on),
+                  	  dmtf_match = date_string.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.\d+([+-]\d+)?/),
+                  	  short_match;
+                  
+                    if (dmtf_match) {
+                  	return Date.UTC(+dmtf_match[1], +dmtf_match[2] - 1, +dmtf_match[3], +dmtf_match[4], +dmtf_match[5], +dmtf_match[6]) / 1000 - (dmtf_match[7] ? parseInt(dmtf_match[7], 10) : 0) * 60;
+                    }
+                  
+                    short_match = date_string.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                  
+                    if (short_match) {
+                  	return Date.UTC(+short_match[3], +short_match[1] - 1, +short_match[2]) / 1000;
+                    }
+                  
+                    return 0;
+                  }
+                  
+                  var updates;
+                  
+                  try {
+                    updates = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] Days since last KB: cannot parse master JSON: ' + error);
+                  
+                    return -1;
+                  }
+                  
+                  if (!updates.length) {
+                    return -4;
+                  }
+                  
+                  var latest_time = 0;
+                  
+                  for (var i = 0; i < updates.length; i++) {
+                    var installed_time = parseInstalledOn(updates[i].InstalledOn);
+                  
+                    if (installed_time > latest_time) {
+                  	latest_time = installed_time;
+                    }
+                  }
+                  
+                  if (latest_time === 0) {
+                    Zabbix.log(4, '[Windows] Days since last KB: unrecognized date/time format');
+                  
+                    return -2;
+                  }
+                  
+                  return Math.floor((Date.now() / 1000 - latest_time) / 86400);
+          master_item:
+            key: 'wmi.getall[root\cimv2,"select HotFixID,Description,InstalledOn,Caption from Win32_QuickFixEngineering"]'
+          tags:
+            - tag: component
+              value: os
+          triggers:
+            - uuid: f51bd0fc119240eea087eba839aa37a2
+              expression: 'last(/Windows by Zabbix agent/updates.kb.days)>{$WINDOWS.UPDATES.STALE.MAX.WARN}'
+              name: 'Windows updates: No KB installed recently'
+              event_name: 'Windows updates: No KB installed in the last {$WINDOWS.UPDATES.STALE.MAX.WARN} days (current: {ITEM.VALUE1} days)'
+              priority: WARNING
+              description: 'No Windows update (KB) has been installed within the configured number of days.'
+              tags:
+                - tag: scope
+                  value: compliance
+        - uuid: aa1d318755144c238023eface6290cf3
+          name: 'Windows updates: Last KB install date'
+          type: DEPENDENT
+          key: updates.kb.last.date
+          value_type: FLOAT
+          units: unixtime
+          description: 'The install date of the most recently installed update.'
+          valuemap:
+            name: 'Data quality'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  function parseInstalledOn(installed_on) {
+                    var date_string = String(installed_on),
+                  	  dmtf_match = date_string.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.\d+([+-]\d+)?/),
+                  	  short_match;
+                  
+                    if (dmtf_match) {
+                  	return Date.UTC(+dmtf_match[1], +dmtf_match[2] - 1, +dmtf_match[3], +dmtf_match[4], +dmtf_match[5], +dmtf_match[6]) / 1000 - (dmtf_match[7] ? parseInt(dmtf_match[7], 10) : 0) * 60;
+                    }
+                  
+                    short_match = date_string.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                  
+                    if (short_match) {
+                  	return Date.UTC(+short_match[3], +short_match[1] - 1, +short_match[2]) / 1000;
+                    }
+                  
+                    return 0;
+                  }
+                  
+                  var updates;
+                  
+                  try {
+                    updates = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] Last KB date: cannot parse master JSON: ' + error);
+                  
+                    return -1;
+                  }
+                  
+                  if (!updates.length) {
+                    return -4;
+                  }
+                  
+                  var latest_time = 0;
+                  
+                  for (var i = 0; i < updates.length; i++) {
+                    var installed_time = parseInstalledOn(updates[i].InstalledOn);
+                  
+                    if (installed_time > latest_time) {
+                  	latest_time = installed_time;
+                    }
+                  }
+                  
+                  if (latest_time === 0) {
+                    Zabbix.log(4, '[Windows] Last KB date: unrecognized date/time format');
+                  
+                    return -2;
+                  }
+                  
+                  return latest_time;
+          master_item:
+            key: 'wmi.getall[root\cimv2,"select HotFixID,Description,InstalledOn,Caption from Win32_QuickFixEngineering"]'
+          tags:
+            - tag: component
+              value: os
+        - uuid: 91301c1ae1d3480788436fb50c81019d
+          name: 'Windows updates: Last KB ID'
+          type: DEPENDENT
+          key: updates.kb.last.id
+          value_type: CHAR
+          description: 'The HotFixID of the most recently installed update.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  function parseInstalledOn(installed_on) {
+                    var date_string = String(installed_on),
+                  	  dmtf_match = date_string.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.\d+([+-]\d+)?/),
+                  	  short_match;
+                  
+                    if (dmtf_match) {
+                  	return Date.UTC(+dmtf_match[1], +dmtf_match[2] - 1, +dmtf_match[3], +dmtf_match[4], +dmtf_match[5], +dmtf_match[6]) / 1000 - (dmtf_match[7] ? parseInt(dmtf_match[7], 10) : 0) * 60;
+                    }
+                  
+                    short_match = date_string.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                  
+                    if (short_match) {
+                  	return Date.UTC(+short_match[3], +short_match[1] - 1, +short_match[2]) / 1000;
+                    }
+                  
+                    return 0;
+                  }
+                  
+                  var updates;
+                  
+                  try {
+                    updates = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] Last KB ID: cannot parse master JSON: ' + error);
+                  
+                    return 'Parse error';
+                  }
+                  
+                  var latest_time = 0,
+                  	latest_id = '';
+                  
+                  for (var i = 0; i < updates.length; i++) {
+                    var installed_time = parseInstalledOn(updates[i].InstalledOn);
+                  
+                    if (installed_time >= latest_time) {
+                  	latest_time = installed_time;
+                  	latest_id = updates[i].HotFixID;
+                    }
+                  }
+                  
+                  return latest_id;
+          master_item:
+            key: 'wmi.getall[root\cimv2,"select HotFixID,Description,InstalledOn,Caption from Win32_QuickFixEngineering"]'
+          tags:
+            - tag: component
+              value: os
+        - uuid: e3eb57f8ee17498d9f9d588360bce207
+          name: 'Windows updates: Security KBs installed'
+          type: DEPENDENT
+          key: updates.kb.security
+          value_type: FLOAT
+          description: 'The number of installed updates whose description is "Security Update".'
+          valuemap:
+            name: 'Data quality'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var updates;
+                  
+                  try {
+                    updates = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] Security KBs: cannot parse master JSON: ' + error);
+                  
+                    return -1;
+                  }
+                  
+                  var security_count = 0;
+                  
+                  for (var i = 0; i < updates.length; i++) {
+                    if (updates[i].Description === 'Security Update') {
+                  	security_count++;
+                    }
+                  }
+                  
+                  return security_count;
+          master_item:
+            key: 'wmi.getall[root\cimv2,"select HotFixID,Description,InstalledOn,Caption from Win32_QuickFixEngineering"]'
+          tags:
+            - tag: component
+              value: os
+        - uuid: 58b6a1df514a44a8aea91e732e04982f
+          name: 'Windows updates: KBs installed (total)'
+          type: DEPENDENT
+          key: updates.kb.total
+          value_type: FLOAT
+          description: 'The total number of installed updates (KBs).'
+          valuemap:
+            name: 'Data quality'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var updates;
+                  
+                  try {
+                    updates = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] KBs total: cannot parse master JSON: ' + error);
+                  
+                    return -1;
+                  }
+                  
+                  return updates.length;
+          master_item:
+            key: 'wmi.getall[root\cimv2,"select HotFixID,Description,InstalledOn,Caption from Win32_QuickFixEngineering"]'
+          tags:
+            - tag: component
+              value: os
+        - uuid: 7669dba2bcaa4b869c69a79138f9605e
+          name: 'Windows updates: Days since last Security KB'
+          type: DEPENDENT
+          key: updates.security.days
+          value_type: FLOAT
+          description: 'The number of whole days since the most recently installed "Security Update".'
+          valuemap:
+            name: 'Data quality'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  function parseInstalledOn(installed_on) {
+                    var date_string = String(installed_on),
+                  	  dmtf_match = date_string.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.\d+([+-]\d+)?/),
+                  	  short_match;
+                  
+                    if (dmtf_match) {
+                  	return Date.UTC(+dmtf_match[1], +dmtf_match[2] - 1, +dmtf_match[3], +dmtf_match[4], +dmtf_match[5], +dmtf_match[6]) / 1000 - (dmtf_match[7] ? parseInt(dmtf_match[7], 10) : 0) * 60;
+                    }
+                  
+                    short_match = date_string.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                  
+                    if (short_match) {
+                  	return Date.UTC(+short_match[3], +short_match[1] - 1, +short_match[2]) / 1000;
+                    }
+                  
+                    return 0;
+                  }
+                  
+                  var updates;
+                  
+                  try {
+                    updates = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] Days since last security KB: cannot parse master JSON: ' + error);
+                  
+                    return -1;
+                  }
+                  
+                  var latest_time = 0,
+                  	security_seen = 0;
+                  
+                  for (var i = 0; i < updates.length; i++) {
+                    if (updates[i].Description !== 'Security Update') {
+                  	continue;
+                    }
+                  
+                    security_seen++;
+                  
+                    var installed_time = parseInstalledOn(updates[i].InstalledOn);
+                  
+                    if (installed_time > latest_time) {
+                  	latest_time = installed_time;
+                    }
+                  }
+                  
+                  if (!security_seen) {
+                    return -4;
+                  }
+                  
+                  if (latest_time === 0) {
+                    Zabbix.log(4, '[Windows] Days since last security KB: unrecognized date/time format');
+                  
+                    return -2;
+                  }
+                  
+                  return Math.floor((Date.now() / 1000 - latest_time) / 86400);
+          master_item:
+            key: 'wmi.getall[root\cimv2,"select HotFixID,Description,InstalledOn,Caption from Win32_QuickFixEngineering"]'
+          tags:
+            - tag: component
+              value: os
+          triggers:
+            - uuid: 069aa195b5ad489f8e78b2840ef89bb0
+              expression: 'last(/Windows by Zabbix agent/updates.security.days)>{$WINDOWS.UPDATES.SECURITY.STALE.MAX.WARN}'
+              name: 'Windows updates: No Security KB installed recently'
+              event_name: 'Windows updates: No Security KB installed in the last {$WINDOWS.UPDATES.SECURITY.STALE.MAX.WARN} days (current: {ITEM.VALUE1} days)'
+              priority: AVERAGE
+              description: 'No Windows security update (KB) has been installed within the configured number of days.'
+              tags:
+                - tag: scope
+                  value: security
+        - uuid: 047b33bb35eb43ddb7794e0d279a308c
+          name: 'Windows updates: Last Security KB install date'
+          type: DEPENDENT
+          key: updates.security.last.date
+          value_type: FLOAT
+          units: unixtime
+          description: 'The install date of the most recently installed "Security Update".'
+          valuemap:
+            name: 'Data quality'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  function parseInstalledOn(installed_on) {
+                    var date_string = String(installed_on),
+                  	  dmtf_match = date_string.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.\d+([+-]\d+)?/),
+                  	  short_match;
+                  
+                    if (dmtf_match) {
+                  	return Date.UTC(+dmtf_match[1], +dmtf_match[2] - 1, +dmtf_match[3], +dmtf_match[4], +dmtf_match[5], +dmtf_match[6]) / 1000 - (dmtf_match[7] ? parseInt(dmtf_match[7], 10) : 0) * 60;
+                    }
+                  
+                    short_match = date_string.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                  
+                    if (short_match) {
+                  	return Date.UTC(+short_match[3], +short_match[1] - 1, +short_match[2]) / 1000;
+                    }
+                  
+                    return 0;
+                  }
+                  
+                  var updates;
+                  
+                  try {
+                    updates = JSON.parse(value);
+                  } catch (error) {
+                    Zabbix.log(4, '[Windows] Last security KB date: cannot parse master JSON: ' + error);
+                  
+                    return -1;
+                  }
+                  
+                  var latest_time = 0,
+                  	security_seen = 0;
+                  
+                  for (var i = 0; i < updates.length; i++) {
+                    if (updates[i].Description !== 'Security Update') {
+                  	continue;
+                    }
+                  
+                    security_seen++;
+                  
+                    var installed_time = parseInstalledOn(updates[i].InstalledOn);
+                  
+                    if (installed_time > latest_time) {
+                  	latest_time = installed_time;
+                    }
+                  }
+                  
+                  if (!security_seen) {
+                    return -4;
+                  }
+                  
+                  if (latest_time === 0) {
+                    Zabbix.log(4, '[Windows] Last security KB date: unrecognized date/time format');
+                  
+                    return -2;
+                  }
+                  
+                  return latest_time;
+          master_item:
+            key: 'wmi.getall[root\cimv2,"select HotFixID,Description,InstalledOn,Caption from Win32_QuickFixEngineering"]'
+          tags:
+            - tag: component
+              value: os
         - uuid: f59d6794a6b94e93aced78a688507677
           name: 'Get filesystems'
           key: vfs.fs.get
@@ -423,6 +1467,27 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: 3b1e4ecaa04a46e9b0aee956918f0713
+          name: 'Memory utilization'
+          key: 'vm.memory.size[pused]'
+          value_type: FLOAT
+          units: '%'
+          description: 'Memory utilization in %.'
+          tags:
+            - tag: component
+              value: memory
+          triggers:
+            - uuid: b442993bb2a6404a8ebcb7be39d16ce6
+              expression: 'min(/Windows by Zabbix agent/vm.memory.size[pused],5m)>{$MEMORY.UTIL.MAX}'
+              name: 'Windows: High memory utilization'
+              event_name: 'Windows: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+              tags:
+                - tag: scope
+                  value: capacity
+                - tag: scope
+                  value: performance
         - uuid: 09e9a345a0f445b1a65685911f5eb9b0
           name: 'Total memory'
           key: 'vm.memory.size[total]'
@@ -439,29 +1504,34 @@ zabbix_export:
           tags:
             - tag: component
               value: memory
-        - uuid: 3b1e4ecaa04a46e9b0aee956918f0713
-          name: 'Memory utilization'
-          type: CALCULATED
-          key: vm.memory.util
-          value_type: FLOAT
-          units: '%'
-          params: 'last(//vm.memory.size[used]) / last(//vm.memory.size[total]) * 100'
-          description: 'Memory utilization in %.'
+        - uuid: 92a9c767557044f2b0eb4c1904a07cf1
+          name: 'Windows updates: Get installed KBs'
+          key: 'wmi.getall[root\cimv2,"select HotFixID,Description,InstalledOn,Caption from Win32_QuickFixEngineering"]'
+          delay: 1h
+          history: '0'
+          value_type: TEXT
+          description: 'Raw list of installed Windows updates (hotfixes) from the `Win32_QuickFixEngineering` WMI class.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
           tags:
             - tag: component
-              value: memory
-          triggers:
-            - uuid: b442993bb2a6404a8ebcb7be39d16ce6
-              expression: 'min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Windows: High memory utilization'
-              event_name: 'Windows: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
-              priority: AVERAGE
-              description: 'The system is running out of free memory.'
-              tags:
-                - tag: scope
-                  value: capacity
-                - tag: scope
-                  value: performance
+              value: raw
+        - uuid: 777b010b618648b99b6da57cf9ab2be2
+          name: 'Windows activation: Get product info'
+          key: 'wmi.getall[root\CIMV2,"select Name,Description,LicenseStatus,PartialProductKey,GracePeriodRemaining,LicenseStatusReason from SoftwareLicensingProduct where PartialProductKey is not null and ApplicationID=''55c92734-d682-4d71-983e-d6ec3f16059f''"]'
+          delay: 12h
+          history: '0'
+          value_type: TEXT
+          description: 'Raw Windows licensing product data from the `SoftwareLicensingProduct` WMI class (filtered to the active Windows OS product).'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: raw
         - uuid: 08b70a5b80fd435ba393e3deb3ca5adb
           name: 'Windows: Network interfaces WMI get'
           key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
@@ -475,10 +1545,112 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: 8669dea52a3b4dc4b1047442e6c0ffcc
+          name: 'Windows activation: Get service info'
+          key: 'wmi.getall[root\CIMV2,"select Version,KeyManagementServiceMachine,KeyManagementServicePort,ClientMachineID,IsKeyManagementServiceMachine from SoftwareLicensingService"]'
+          delay: 12h
+          history: '0'
+          value_type: TEXT
+          description: 'Raw Windows licensing service data from the `SoftwareLicensingService` WMI class (KMS configuration).'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 2a04a1a0766542348d77db4fff076822
+          name: 'Windows TPM: Get info'
+          key: 'wmi.getall[root\CIMV2\Security\MicrosoftTpm,"select IsEnabled_InitialValue,IsActivated_InitialValue,IsOwned_InitialValue,SpecVersion,ManufacturerVersion from Win32_Tpm"]'
+          delay: 1h
+          history: '0'
+          value_type: TEXT
+          description: |
+            Raw TPM (Trusted Platform Module) data from the `Win32_Tpm` WMI class.
+            The classic Windows agent does not invoke WMI methods, so the current state is read from the `*_InitialValue` properties captured at the most recent provisioning/clear event; on a stable system this matches the actual state.
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: raw
+        - uuid: c4304a71abba47abb3884b724bcde278
+          name: 'Windows BitLocker: Get encryptable volumes'
+          key: 'wmi.getall[root\CIMV2\Security\MicrosoftVolumeEncryption,"select DeviceID,DriveLetter,ProtectionStatus,EncryptionMethod,ConversionStatus,VolumeType,IsVolumeInitializedForProtection from Win32_EncryptableVolume"]'
+          delay: 30m
+          history: '0'
+          value_type: TEXT
+          description: 'Raw BitLocker volume data from the `Win32_EncryptableVolume` WMI class.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: raw
+        - uuid: cc8b2d71285a494a8038705c3a3a489e
+          name: 'Windows Defender: Get status'
+          key: 'wmi.getall[root\Microsoft\Windows\Defender,"select AMServiceEnabled,AntispywareEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AntispywareSignatureLastUpdated,AntivirusSignatureLastUpdated,QuickScanAge,FullScanAge,AntivirusSignatureVersion from MSFT_MpComputerStatus"]'
+          delay: 30m
+          history: '0'
+          value_type: TEXT
+          description: 'Raw Microsoft Defender antimalware status from the `MSFT_MpComputerStatus` WMI class.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: raw
+        - uuid: d716ebe5daec45aeb4a0df3ef56e29ec
+          name: 'Windows scheduled tasks: Get tasks'
+          key: 'wmi.getall[root\Microsoft\Windows\TaskScheduler,"select TaskName,TaskPath,State,URI from MSFT_ScheduledTask"]'
+          delay: 30m
+          history: '0'
+          value_type: TEXT
+          description: 'Raw Windows scheduled task data from the `MSFT_ScheduledTask` WMI class.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 1e64e2e799d04a0b88793f7af7bb683d
+          name: 'Windows Firewall: Get profiles'
+          key: 'wmi.getall[root\StandardCimv2,"select Name,Enabled,DefaultInboundAction,DefaultOutboundAction from MSFT_NetFirewallProfile"]'
+          delay: 30m
+          history: '0'
+          value_type: TEXT
+          description: 'Raw Windows Firewall profile data from the `MSFT_NetFirewallProfile` WMI class.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: raw
         - uuid: 83c8c6f15b524a2fb04fc90d04d3e8a2
           name: 'Number of cores'
           key: 'wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"]'
           description: 'The number of logical processors available on the computer.'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - (\d+)
+                - \1
+              error_handler: DISCARD_VALUE
           tags:
             - tag: component
               value: cpu
@@ -504,6 +1676,197 @@ zabbix_export:
                 - tag: scope
                   value: availability
       discovery_rules:
+        - uuid: f921597d1d2d4c7b8db28f6afd71e447
+          name: 'Windows BitLocker: Volume discovery'
+          type: DEPENDENT
+          key: bitlocker.volume.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#FSNAME}'
+                value: '{$WINDOWS.SECURITY.BITLOCKER.FSNAME.MATCHES}'
+              - macro: '{#FSNAME}'
+                value: '{$WINDOWS.SECURITY.BITLOCKER.FSNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'Discovery of BitLocker encryptable volumes. On hosts where BitLocker is unavailable it returns no volumes, so the per-volume items are not created instead of becoming unsupported.'
+          item_prototypes:
+            - uuid: aa84e2ce448147deaa455cef8ad315b5
+              name: 'BitLocker [{#FSNAME}]: Conversion status'
+              type: DEPENDENT
+              key: 'bitlocker.conversion["{#FSNAME}"]'
+              description: 'The BitLocker conversion (encryption/decryption progress) status of volume "{#FSNAME}".'
+              valuemap:
+                name: 'BitLocker conversion status'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.DriveLetter == "{#FSNAME}")].ConversionStatus.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'wmi.getall[root\CIMV2\Security\MicrosoftVolumeEncryption,"select DeviceID,DriveLetter,ProtectionStatus,EncryptionMethod,ConversionStatus,VolumeType,IsVolumeInitializedForProtection from Win32_EncryptableVolume"]'
+              tags:
+                - tag: component
+                  value: security
+                - tag: filesystem
+                  value: '{#FSNAME}'
+            - uuid: 227de49d38e247f9af2874f2bc71ddc8
+              name: 'BitLocker [{#FSNAME}]: Encryption method'
+              type: DEPENDENT
+              key: 'bitlocker.method["{#FSNAME}"]'
+              description: 'The BitLocker encryption method of volume "{#FSNAME}".'
+              valuemap:
+                name: 'BitLocker encryption method'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.DriveLetter == "{#FSNAME}")].EncryptionMethod.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'wmi.getall[root\CIMV2\Security\MicrosoftVolumeEncryption,"select DeviceID,DriveLetter,ProtectionStatus,EncryptionMethod,ConversionStatus,VolumeType,IsVolumeInitializedForProtection from Win32_EncryptableVolume"]'
+              tags:
+                - tag: component
+                  value: security
+                - tag: filesystem
+                  value: '{#FSNAME}'
+            - uuid: 69a56079c43a444cb0d7754f10629f7a
+              name: 'BitLocker [{#FSNAME}]: Protection status'
+              type: DEPENDENT
+              key: 'bitlocker.protection["{#FSNAME}"]'
+              description: 'The BitLocker protection status of volume "{#FSNAME}".'
+              valuemap:
+                name: 'BitLocker protection status'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.DriveLetter == "{#FSNAME}")].ProtectionStatus.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '2'
+              master_item:
+                key: 'wmi.getall[root\CIMV2\Security\MicrosoftVolumeEncryption,"select DeviceID,DriveLetter,ProtectionStatus,EncryptionMethod,ConversionStatus,VolumeType,IsVolumeInitializedForProtection from Win32_EncryptableVolume"]'
+              tags:
+                - tag: component
+                  value: security
+                - tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                - uuid: 90916f56419644babcc2dabfb7d00854
+                  expression: 'last(/Windows by Zabbix agent/bitlocker.protection["{#FSNAME}"])<>1'
+                  name: 'Windows: BitLocker [{#FSNAME}] is not enabled on enforced volume'
+                  priority: AVERAGE
+                  description: 'BitLocker protection is not enabled on volume "{#FSNAME}", which is required by `{$WINDOWS.SECURITY.BITLOCKER.ENFORCE.MATCHES}`.'
+                  tags:
+                    - tag: scope
+                      value: security
+          master_item:
+            key: 'wmi.getall[root\CIMV2\Security\MicrosoftVolumeEncryption,"select DeviceID,DriveLetter,ProtectionStatus,EncryptionMethod,ConversionStatus,VolumeType,IsVolumeInitializedForProtection from Win32_EncryptableVolume"]'
+          lld_macro_paths:
+            - lld_macro: '{#FSNAME}'
+              path: $.DriveLetter
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          overrides:
+            - name: 'BitLocker enforce scope'
+              step: '1'
+              filter:
+                conditions:
+                  - macro: '{#FSNAME}'
+                    value: '{$WINDOWS.SECURITY.BITLOCKER.ENFORCE.MATCHES}'
+                    operator: NOT_MATCHES_REGEX
+              operations:
+                - operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: BitLocker
+                  discover: NO_DISCOVER
+        - uuid: eada4c9958e949179bc8ba0a8b826df9
+          name: 'Windows Firewall: Profiles discovery'
+          type: DEPENDENT
+          key: firewall.profiles.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#FW.PROFILE}'
+                value: '{$WINDOWS.SECURITY.FW.PROFILE.MATCHES}'
+              - macro: '{#FW.PROFILE}'
+                value: '{$WINDOWS.SECURITY.FW.PROFILE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'Discovery of Windows Firewall profiles.'
+          item_prototypes:
+            - uuid: 9e1ca405daba4c6483a14d6d026e0934
+              name: 'Windows Firewall [{#FW.PROFILE}]: Enabled'
+              type: DEPENDENT
+              key: 'firewall.enabled["{#FW.PROFILE}"]'
+              description: 'Whether the "{#FW.PROFILE}" firewall profile is enabled.'
+              valuemap:
+                name: 'Firewall state'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name == "{#FW.PROFILE}")].Enabled.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'wmi.getall[root\StandardCimv2,"select Name,Enabled,DefaultInboundAction,DefaultOutboundAction from MSFT_NetFirewallProfile"]'
+              tags:
+                - tag: component
+                  value: security
+              trigger_prototypes:
+                - uuid: eac1500b2d9a4dcca5ed98b5fe138047
+                  expression: 'last(/Windows by Zabbix agent/firewall.enabled["{#FW.PROFILE}"])<>1'
+                  name: 'Windows: Firewall [{#FW.PROFILE}] is disabled'
+                  priority: WARNING
+                  description: 'The "{#FW.PROFILE}" Windows Firewall profile is not enabled.'
+                  tags:
+                    - tag: scope
+                      value: security
+            - uuid: 29fb790c0a5d4d54a97dd6db9bd2630d
+              name: 'Windows Firewall [{#FW.PROFILE}]: Default inbound action'
+              type: DEPENDENT
+              key: 'firewall.inbound["{#FW.PROFILE}"]'
+              description: 'The default inbound action of the "{#FW.PROFILE}" firewall profile.'
+              valuemap:
+                name: 'Firewall action'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name == "{#FW.PROFILE}")].DefaultInboundAction.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'wmi.getall[root\StandardCimv2,"select Name,Enabled,DefaultInboundAction,DefaultOutboundAction from MSFT_NetFirewallProfile"]'
+              tags:
+                - tag: component
+                  value: security
+            - uuid: 2388e355fbcc42fca4c6cc8569623714
+              name: 'Windows Firewall [{#FW.PROFILE}]: Default outbound action'
+              type: DEPENDENT
+              key: 'firewall.outbound["{#FW.PROFILE}"]'
+              description: 'The default outbound action of the "{#FW.PROFILE}" firewall profile.'
+              valuemap:
+                name: 'Firewall action'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.Name == "{#FW.PROFILE}")].DefaultOutboundAction.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'wmi.getall[root\StandardCimv2,"select Name,Enabled,DefaultInboundAction,DefaultOutboundAction from MSFT_NetFirewallProfile"]'
+              tags:
+                - tag: component
+                  value: security
+          master_item:
+            key: 'wmi.getall[root\StandardCimv2,"select Name,Enabled,DefaultInboundAction,DefaultOutboundAction from MSFT_NetFirewallProfile"]'
+          lld_macro_paths:
+            - lld_macro: '{#FW.PROFILE}'
+              path: $.Name
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: ba19d6566fdb4a668d4363769d1fee01
           name: 'Network interfaces discovery'
           type: DEPENDENT
@@ -818,18 +2181,16 @@ zabbix_export:
                     key: 'net.if.in["{#IFGUID}",dropped]'
           master_item:
             key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
+          lld_macro_paths:
+            - lld_macro: '{#IFALIAS}'
+              path: $.NetConnectionID
+            - lld_macro: '{#IFDESCR}'
+              path: $.Description
+            - lld_macro: '{#IFGUID}'
+              path: $.GUID
+            - lld_macro: '{#IFNAME}'
+              path: $.Name
           preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  output = JSON.parse(value).map(function(net){
-                  	return {
-                  		"{#IFNAME}": net.Name,
-                  		"{#IFDESCR}": net.Description,
-                  		"{#IFALIAS}": net.NetConnectionID,
-                  		"{#IFGUID}": net.GUID
-                  	}})
-                  return JSON.stringify({"data": output})
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -1037,23 +2398,41 @@ zabbix_export:
           key: service.discovery
           delay: 1h
           filter:
-            evaltype: AND
+            evaltype: FORMULA
+            formula: '(A and B and C and D and E and F) or G'
             conditions:
               - macro: '{#SERVICE.NAME}'
                 value: '{$SERVICE.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#SERVICE.NAME}'
                 value: '{$SERVICE.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#SERVICE.STARTUPNAME}'
                 value: '{$SERVICE.STARTUPNAME.MATCHES}'
+                formulaid: C
               - macro: '{#SERVICE.STARTUPNAME}'
                 value: '{$SERVICE.STARTUPNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'Used for the discovery of Windows services of different types as defined in the template''s macros.'
+                formulaid: D
+              - macro: '{#SERVICE.STARTUPTRIGGER}'
+                value: '{$SERVICE.STARTUPTRIGGER.MATCHES}'
+                formulaid: E
+              - macro: '{#SERVICE.STARTUPTRIGGER}'
+                value: '{$SERVICE.STARTUPTRIGGER.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#SERVICE.NAME}'
+                value: '{$SERVICE.FORBIDDEN.MATCHES}'
+                formulaid: G
+          description: |
+            Used for the discovery of Windows services of different types as defined in the template's macros.
+            Services matching `{$SERVICE.FORBIDDEN.MATCHES}` are discovered regardless of their startup type, so that a service which must stay stopped can be watched as well.
           item_prototypes:
             - uuid: dd5a027d75fc4ff1a3bb6e69c0d8d592
               name: 'State of service "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME})'
               key: 'service.info["{#SERVICE.NAME}",state]'
+              description: '{#SERVICE.DESCRIPTION}'
               valuemap:
                 name: 'Windows service state'
               tags:
@@ -1064,15 +2443,111 @@ zabbix_export:
                 - tag: service
                   value: '{#SERVICE.NAME}'
               trigger_prototypes:
-                - uuid: 4708592603db4577b26cb6daade41754
-                  expression: 'min(/Windows by Zabbix agent/service.info["{#SERVICE.NAME}",state],#3)<>0'
-                  name: 'Windows: "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running'
-                  event_name: 'Windows: "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running (startup type {#SERVICE.STARTUPNAME})'
-                  priority: AVERAGE
-                  description: 'The service has a state other than "Running" for the last three times.'
+                - uuid: 5ae9cac922d54985b653d06b80c11d86
+                  expression: 'min(/Windows by Zabbix agent/service.info["{#SERVICE.NAME}",state],#3)=0'
+                  name: 'Windows: "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) must not be running'
+                  event_name: 'Windows: "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) must not be running (startup type {#SERVICE.STARTUPNAME})'
+                  discover: NO_DISCOVER
+                  priority: WARNING
+                  description: |
+                    The service matches `{$SERVICE.FORBIDDEN.MATCHES}` and is expected to stay stopped, but it has been running for the last three times.
+                    The trigger is discovered only for the services listed in that macro.
+                  tags:
+                    - tag: scope
+                      value: security
+          trigger_prototypes:
+            - uuid: 4708592603db4577b26cb6daade41754
+              expression: 'min(/Windows by Zabbix agent/service.info["{#SERVICE.NAME}",state],#3)<>0 and last(/Windows by Zabbix agent/system.uptime)>{$SERVICE.STARTUP.GRACE:"{#SERVICE.NAME}"}'
+              name: 'Windows: "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running'
+              event_name: 'Windows: "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running (startup type {#SERVICE.STARTUPNAME})'
+              priority: AVERAGE
+              description: |
+                The service has a state other than "Running" for the last three times.
+                The check is suppressed until the system uptime exceeds `{$SERVICE.STARTUP.GRACE}`, so that services with the "automatic delayed" startup type are given time to start after a reboot.
+              tags:
+                - tag: scope
+                  value: notice
+          overrides:
+            - name: 'Services that must not run'
+              step: '1'
+              filter:
+                conditions:
+                  - macro: '{#SERVICE.NAME}'
+                    value: '{$SERVICE.FORBIDDEN.MATCHES}'
+              operations:
+                - operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: 'is not running'
+                  discover: NO_DISCOVER
+                - operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: 'must not be running'
+                  discover: DISCOVER
+        - uuid: 8b1466252fa542449ba917b99cfb6877
+          name: 'Windows scheduled tasks discovery'
+          type: DEPENDENT
+          key: task.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#TASK.NAME}'
+                value: '{$WINDOWS.TASK.NAME.MATCHES}'
+              - macro: '{#TASK.NAME}'
+                value: '{$WINDOWS.TASK.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#TASK.PATH}'
+                value: '{$WINDOWS.TASK.PATH.MATCHES}'
+              - macro: '{#TASK.PATH}'
+                value: '{$WINDOWS.TASK.PATH.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: |
+            Discovery of Windows scheduled tasks. No task is discovered until `{$WINDOWS.TASK.NAME.MATCHES}` is set, because a stock Windows installation carries about 200 tasks.
+            On hosts where the Task Scheduler WMI namespace is unavailable the master item returns an empty list, so no items are created instead of becoming unsupported.
+          item_prototypes:
+            - uuid: 17dc208c0a6f4a9393758d79e5fe115e
+              name: 'Scheduled task [{#TASK.PATH}{#TASK.NAME}]: State'
+              type: DEPENDENT
+              key: 'task.state["{#TASK.URI}"]'
+              description: 'The current state of the "{#TASK.NAME}" scheduled task.'
+              valuemap:
+                name: 'Windows scheduled task state'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.URI == "{#TASK.URI}")].State.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'wmi.getall[root\Microsoft\Windows\TaskScheduler,"select TaskName,TaskPath,State,URI from MSFT_ScheduledTask"]'
+              tags:
+                - tag: component
+                  value: os
+              trigger_prototypes:
+                - uuid: 372e11a2c4d24cdc812f5ccfb3382486
+                  expression: '{$WINDOWS.TASK.CONTROL:"{#TASK.NAME}"}=1 and last(/Windows by Zabbix agent/task.state["{#TASK.URI}"])=1'
+                  name: 'Windows: Scheduled task [{#TASK.PATH}{#TASK.NAME}] is disabled'
+                  priority: WARNING
+                  description: 'The "{#TASK.NAME}" scheduled task is disabled and will not run.'
+                  manual_close: 'YES'
                   tags:
                     - tag: scope
                       value: notice
+          master_item:
+            key: 'wmi.getall[root\Microsoft\Windows\TaskScheduler,"select TaskName,TaskPath,State,URI from MSFT_ScheduledTask"]'
+          lld_macro_paths:
+            - lld_macro: '{#TASK.NAME}'
+              path: $.TaskName
+            - lld_macro: '{#TASK.PATH}'
+              path: $.TaskPath
+            - lld_macro: '{#TASK.URI}'
+              path: $.URI
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: c22b79b52f9148728095bda2796a753e
           name: 'Mounted filesystem discovery'
           type: DEPENDENT
@@ -1116,6 +2591,26 @@ zabbix_export:
                   value: '{#FSNAME}'
                 - tag: fstype
                   value: '{#FSTYPE}'
+            - uuid: 1fdad2a803cb4a9db0eb8b3ed02c28e9
+              name: 'FS [{#FSLABEL}({#FSNAME})]: Space: Available, in %'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},pfree]'
+              value_type: FLOAT
+              units: '%'
+              description: 'Calculated as the percentage of currently available space compared to the maximum available space.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.bytes.pfree
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: filesystem
+                  value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: 7bf3bd42cdf444389e6953090900c620
               name: 'FS [{#FSLABEL}({#FSNAME})]: Space: Used, in %'
               type: DEPENDENT
@@ -1138,7 +2633,7 @@ zabbix_export:
                   value: '{#FSTYPE}'
               trigger_prototypes:
                 - uuid: d3e99134a1d04894918f2c92ff38cb92
-                  expression: 'min(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSLABEL}({#FSNAME})"}'
+                  expression: '{$FSCONTROL:"{#FSNAME}"}=1 and min(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSLABEL}({#FSNAME})"}'
                   name: 'Windows: FS [{#FSLABEL}({#FSNAME})]: Space is critically low'
                   event_name: 'Windows: FS [{#FSLABEL}({#FSNAME})]: Space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSLABEL}({#FSNAME})"}%, total {{?last(//vfs.fs.dependent.size[{#FSNAME},total])/1024/1024/1024}.fmtnum(1)}GB)'
                   opdata: 'Space used: {{ITEM.LASTVALUE1}.fmtnum(1)}%'
@@ -1154,7 +2649,7 @@ zabbix_export:
                     - tag: scope
                       value: capacity
                 - uuid: 97115bbe4f6b4a8cb2873b8fa01f95d3
-                  expression: 'min(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.WARN:"{#FSLABEL}({#FSNAME})"}'
+                  expression: '{$FSCONTROL:"{#FSNAME}"}=1 and min(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.WARN:"{#FSLABEL}({#FSNAME})"}'
                   name: 'Windows: FS [{#FSLABEL}({#FSNAME})]: Space is low'
                   event_name: 'Windows: FS [{#FSLABEL}({#FSNAME})]: Space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSLABEL}({#FSNAME})"}%, total {{?last(//vfs.fs.dependent.size[{#FSNAME},total])/1024/1024/1024}.fmtnum(1)}GB)'
                   opdata: 'Space used: {{ITEM.LASTVALUE1}.fmtnum(1)}%'
@@ -1166,7 +2661,7 @@ zabbix_export:
                   manual_close: 'YES'
                   dependencies:
                     - name: 'Windows: FS [{#FSLABEL}({#FSNAME})]: Space is critically low'
-                      expression: 'min(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSLABEL}({#FSNAME})"}'
+                      expression: '{$FSCONTROL:"{#FSNAME}"}=1 and min(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSLABEL}({#FSNAME})"}'
                   tags:
                     - tag: scope
                       value: availability
@@ -1214,7 +2709,7 @@ zabbix_export:
               name: 'FS [{#FSLABEL}({#FSNAME})]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.dependent[{#FSNAME},data]'
-              history: 1h
+              history: '0'
               value_type: TEXT
               description: 'Intermediate data of `{#FSNAME}` filesystem.'
               preprocessing:
@@ -1246,31 +2741,6 @@ zabbix_export:
                   item:
                     host: 'Windows by Zabbix agent'
                     key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
-            - uuid: f80e47b8d4db4c378f25056c02b72382
-              name: 'FS [{#FSLABEL}({#FSNAME})]: Space utilization chart'
-              width: '600'
-              height: '340'
-              type: PIE
-              show_3d: 'YES'
-              graph_items:
-                - color: '787878'
-                  calc_fnc: LAST
-                  type: GRAPH_SUM
-                  item:
-                    host: 'Windows by Zabbix agent'
-                    key: 'vfs.fs.dependent.size[{#FSNAME},total]'
-                - sortorder: '1'
-                  color: F63100
-                  calc_fnc: LAST
-                  item:
-                    host: 'Windows by Zabbix agent'
-                    key: 'vfs.fs.dependent.size[{#FSNAME},used]'
-                - sortorder: '2'
-                  color: 199C09
-                  calc_fnc: LAST
-                  item:
-                    host: 'Windows by Zabbix agent'
-                    key: 'vfs.fs.dependent.size[{#FSNAME},free]'
           master_item:
             key: vfs.fs.get
           lld_macro_paths:
@@ -1283,21 +2753,6 @@ zabbix_export:
             - lld_macro: '{#FSTYPE}'
               path: $.fstype
           preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var filesystems = JSON.parse(value);
-                  
-                  result = filesystems.map(function (filesystem) {
-                  	return {
-                  		'fsname': filesystem.fsname,
-                  		'fstype': filesystem.fstype,
-                  		'fslabel': filesystem.fslabel,
-                  		'fsdrivetype': filesystem.fsdrivetype
-                  	};
-                  });
-                  
-                  return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -1308,8 +2763,8 @@ zabbix_export:
           value: windows
       macros:
         - macro: '{$AGENT.TIMEOUT}'
-          value: 3m
-          description: 'Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).'
+          value: 5m
+          description: 'Timeout after which agent is considered unavailable.'
           config:
             type: TEXT
             priority: '1'
@@ -1355,12 +2810,23 @@ zabbix_export:
             label: 'Threshold of the CPU utilization'
             description: 'Critical threshold of the CPU utilization expressed in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$FSCONTROL}'
+          value: '1'
+          description: 'Macro for the filesystem space triggers. Can be used with the filesystem name as context.'
+          config:
+            type: CHECKBOX
+            priority: '10'
+            label: 'Filesystems control'
+            description: 'Fire a trigger when the filesystem space usage exceeds the threshold.'
+            options:
+              - checked: '1'
+                unchecked: '0'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
           description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '26'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
             description: 'Warning threshold of error packet rate. In the range from 0 to 100 inclusive.'
@@ -1370,7 +2836,7 @@ zabbix_export:
           description: 'Used as a threshold in the interface utilization trigger.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '25'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
             description: 'Used as a threshold in the interface utilization trigger. In the range from 0 to 100 inclusive.'
@@ -1380,7 +2846,7 @@ zabbix_export:
           description: 'Macro for the interface operational state for the "link down" trigger. Can be used with interface name as context.'
           config:
             type: CHECKBOX
-            priority: '25'
+            priority: '24'
             label: 'Interfaces control'
             description: 'Fire a trigger when the interface operational status changes to "Link down".'
             options:
@@ -1395,6 +2861,7 @@ zabbix_export:
             section_name: Thresholds
             label: 'Threshold of the Memory Pages/sec counter (critical)'
             description: 'Critical threshold of the Memory Pages/sec counter.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MEM.PAGE_TABLE_CRIT.MIN}'
           value: '5000'
           description: 'The warning threshold of the Free System Page Table Entries counter.'
@@ -1404,6 +2871,7 @@ zabbix_export:
             section_name: Thresholds
             label: 'Threshold of the Free System Page Table Entries counter (critical)'
             description: 'Critical threshold of the Free System Page Table Entries counter.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
           description: 'The warning threshold of the Memory util item.'
@@ -1419,16 +2887,16 @@ zabbix_export:
           description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '29'
             section_name: Filters
             label: 'Filter for network interfaces by alias'
             description: 'Regex string to include discovered interface by alias.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
-          value: CHANGE_THIS
+          value: CHANGE_IF_NEEDED
           description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '30'
             section_name: Filters
             label: 'Filter for network interfaces by alias (exclude)'
             description: 'Regex string to exclude discovered interface by alias.'
@@ -1437,16 +2905,16 @@ zabbix_export:
           description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '31'
             section_name: Filters
             label: 'Filter for network interfaces by description'
             description: 'Regex string to include discovered interface by description.'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-          value: CHANGE_THIS
+          value: CHANGE_IF_NEEDED
           description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '32'
             section_name: Filters
             label: 'Filter for network interfaces by description (exclude)'
             description: 'Regex string to exclude discovered interface by description.'
@@ -1455,25 +2923,34 @@ zabbix_export:
           description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '27'
             section_name: Filters
-            label: 'Filter for network interface by name.'
+            label: 'Filter for network interface by name'
             description: 'Regex string to include discovered interface by name.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: Miniport|Virtual|Teredo|Kernel|Loopback|Bluetooth|HTTPS|6to4|QoS|Layer
           description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '28'
             section_name: Filters
-            label: 'Filter for network interface by name (exclude).'
+            label: 'Filter for network interface by name (exclude)'
             description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
+        - macro: '{$SERVICE.FORBIDDEN.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Used in Service discovery to list the services that must not be running. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '39'
+            section_name: Filters
+            label: 'Filter for services that must not run'
+            description: 'Regex string to match the services that are expected to stay stopped. Such services are discovered regardless of their startup type and raise a problem when they are running.'
         - macro: '{$SERVICE.NAME.MATCHES}'
           value: '^.*$'
           description: 'Used in Service discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '33'
             section_name: Filters
             label: 'Filter for service by name'
             description: 'Regex string to include discovered service by name.'
@@ -1482,16 +2959,26 @@ zabbix_export:
           description: 'Used in Service discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '34'
             section_name: Filters
             label: 'Filter for service by name (exclude)'
             description: 'Regex string to exclude discovered service by name.'
+        - macro: '{$SERVICE.STARTUP.GRACE}'
+          value: 10m
+          description: 'The grace period after a system boot during which the service state is not checked. Can be used with the service name as context.'
+          config:
+            type: TEXT
+            priority: '40'
+            section_name: Thresholds
+            label: 'Grace period after boot for services'
+            description: 'Services with the "automatic delayed" startup type may legitimately stay stopped for a while after a reboot. The "is not running" trigger is suppressed until the system uptime exceeds this value.'
+            regex: '^[0-9]+[smhd]?$'
         - macro: '{$SERVICE.STARTUPNAME.MATCHES}'
           value: '^(?:automatic|automatic delayed)$'
           description: 'Used in Service discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '35'
             section_name: Filters
             label: 'Filter for service by startup name'
             description: 'Regex string to include discovered service by startup name.'
@@ -1500,10 +2987,28 @@ zabbix_export:
           description: 'Used in Service discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '37'
+            priority: '36'
             section_name: Filters
             label: 'Filter for service by startup name (exclude)'
             description: 'Regex string to exclude discovered service by startup name.'
+        - macro: '{$SERVICE.STARTUPTRIGGER.MATCHES}'
+          value: '^.*$'
+          description: 'Used in Service discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '37'
+            section_name: Filters
+            label: 'Filter for service by start trigger'
+            description: 'Regex string to include discovered service by its start trigger flag: `1` for services configured for Trigger Start, `0` otherwise.'
+        - macro: '{$SERVICE.STARTUPTRIGGER.NOT_MATCHES}'
+          value: ^1$
+          description: 'Used in Service discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '38'
+            section_name: Filters
+            label: 'Filter for service by start trigger (exclude)'
+            description: 'Regex string to exclude discovered service by its start trigger flag. By default Trigger Start services are excluded: they are started on demand and stop normally when idle.'
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '20'
           description: 'The warning threshold of the minimum free swap.'
@@ -1514,30 +3019,12 @@ zabbix_export:
             label: 'Threshold of the minimum free swap'
             description: 'Warning threshold of the minimum free swap. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
-        - macro: '{$SYSTEM.FUZZYTIME.MAX}'
-          value: 60s
-          description: 'The upper threshold for difference of system time.'
-          config:
-            type: TEXT
-            priority: '24'
-            section_name: Thresholds
-            label: 'The upper threshold for difference of system time.'
-            description: 'Upper threshold for difference of system time.'
-        - macro: '{$SYSTEM.FUZZYTIME.MIN}'
-          value: 10s
-          description: 'The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.'
-          config:
-            type: TEXT
-            priority: '23'
-            section_name: Thresholds
-            label: 'The lower threshold for difference of system time.'
-            description: 'Lower threshold for difference of system time.'
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: '.*'
           description: 'Used in physical disk discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Filter for physical disk by name'
             description: 'Regex string to include discovered physical disk by name.'
@@ -1546,7 +3033,7 @@ zabbix_export:
           description: 'Used in physical disk discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Filter for physical disk by name (exclude)'
             description: 'Regex string to exclude discovered physical disk by name.'
@@ -1555,7 +3042,7 @@ zabbix_export:
           description: 'Disk read average response time (in s) before the trigger fires.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Thresholds
             label: 'Disk read average response time (in s)'
             description: 'Disk read average response time (in s) before the trigger fires. No less than 0.'
@@ -1565,7 +3052,7 @@ zabbix_export:
           description: 'The warning threshold of disk time utilization in percent.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Thresholds
             label: 'Threshold for disk time utilization'
             description: 'Warning threshold of disk time utilization in percent. In the range from 0 to 100 inclusive.'
@@ -1575,7 +3062,7 @@ zabbix_export:
           description: 'Disk write average response time (in s) before the trigger fires.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Thresholds
             label: 'Disk write average response time (in s)'
             description: 'Disk write average response time (in s) before the trigger fires. No less than 0.'
@@ -1585,7 +3072,7 @@ zabbix_export:
           description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Filter for filesystems by drive type'
             description: 'Regex string to include discovered filesystems by drive type.'
@@ -1594,7 +3081,7 @@ zabbix_export:
           description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Filter for filesystems by drive type (exclude)'
             description: 'Regex string to exclude discovered filesystems by drive type.'
@@ -1603,16 +3090,16 @@ zabbix_export:
           description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Filter for filesystems by name'
             description: 'Regex string to include discovered filesystems by name.'
         - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
-          value: '^(?:/dev|/sys|/run|/proc|.+/shm$)'
+          value: ^\s$
           description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Filter for filesystems by name (exclude)'
             description: 'Regex string to exclude discovered filesystems by name.'
@@ -1621,7 +3108,7 @@ zabbix_export:
           description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Filter for filesystems by type'
             description: 'Regex string to include discovered filesystems by type.'
@@ -1630,7 +3117,7 @@ zabbix_export:
           description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Filter for filesystems by type (exclude)'
             description: 'Regex string to exclude discovered filesystems by type.'
@@ -1639,7 +3126,7 @@ zabbix_export:
           description: 'The critical threshold of the filesystem utilization.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Thresholds
             label: 'Threshold for filesystem utilization (critical)'
             description: 'Critical threshold of the filesystem utilization. In the range from 0 to 100 inclusive.'
@@ -1649,192 +3136,1164 @@ zabbix_export:
           description: 'The warning threshold of the filesystem utilization.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Thresholds
             label: 'Threshold for filesystem utilization (warning)'
             description: 'Warning threshold of the filesystem utilization. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$WINDOWS.SECURITY.ACTIVATION.GRACE.MIN.WARN}'
+          value: 30d
+          description: 'The minimum remaining Windows activation grace period before the trigger fires.'
+          config:
+            type: TEXT
+            priority: '47'
+            section_name: Security
+            label: 'Minimum activation grace period'
+            description: 'Minimum remaining Windows activation grace period before the trigger fires.'
+        - macro: '{$WINDOWS.SECURITY.BITLOCKER.ENFORCE.MATCHES}'
+          value: '^C:$'
+          description: 'Volumes (by drive letter, e.g. "C:") on which BitLocker is enforced. The "BitLocker is not enabled" trigger fires only for matching volumes.'
+          config:
+            type: TEXT
+            priority: '56'
+            section_name: Filters
+            label: 'Filter for BitLocker-enforced volumes'
+            description: 'Regex string of volumes (by drive letter) on which BitLocker protection is required.'
+        - macro: '{$WINDOWS.SECURITY.BITLOCKER.FSNAME.MATCHES}'
+          value: '^[A-Za-z]:'
+          description: 'Filter for the volumes to discover for BitLocker, by drive letter (e.g. "C:").'
+          config:
+            type: TEXT
+            priority: '54'
+            section_name: Filters
+            label: 'Filter for BitLocker volumes by name'
+            description: 'Regex string to include discovered BitLocker volumes by drive letter.'
+        - macro: '{$WINDOWS.SECURITY.BITLOCKER.FSNAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Used in BitLocker volume discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '55'
+            section_name: Filters
+            label: 'Filter for BitLocker volumes by name (exclude)'
+            description: 'Regex string to exclude discovered BitLocker volumes by drive letter.'
+        - macro: '{$WINDOWS.SECURITY.DEFENDER.FULLSCAN.MAX.WARN}'
+          value: 30d
+          description: 'The maximum age of the last Microsoft Defender full scan before the trigger fires.'
+          config:
+            type: TEXT
+            priority: '49'
+            section_name: Security
+            label: 'Maximum Defender full scan age'
+            description: 'Maximum age of the last Microsoft Defender full scan before the trigger fires.'
+        - macro: '{$WINDOWS.SECURITY.DEFENDER.SIGNATURE.MAX.WARN}'
+          value: 7d
+          description: 'The maximum age of Microsoft Defender signatures before the trigger fires.'
+          config:
+            type: TEXT
+            priority: '48'
+            section_name: Security
+            label: 'Maximum Defender signature age'
+            description: 'Maximum age of Microsoft Defender signatures before the trigger fires.'
+        - macro: '{$WINDOWS.SECURITY.FW.PROFILE.MATCHES}'
+          value: ^(Domain|Private|Public)$
+          description: 'Filter for the Windows Firewall profiles to discover, by profile name.'
+          config:
+            type: TEXT
+            priority: '52'
+            section_name: Filters
+            label: 'Filter for firewall profiles by name'
+            description: 'Regex string to include discovered firewall profiles by name.'
+        - macro: '{$WINDOWS.SECURITY.FW.PROFILE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Used in Windows Firewall profiles discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '53'
+            section_name: Filters
+            label: 'Filter for firewall profiles by name (exclude)'
+            description: 'Regex string to exclude discovered firewall profiles by name.'
+        - macro: '{$WINDOWS.SECURITY.SECUREBOOT.IGNORE}'
+          value: '0'
+          description: 'Set to "1" to suppress the "SecureBoot is disabled" trigger on hosts that legitimately run without UEFI Secure Boot (e.g. legacy BIOS/CSM).'
+          config:
+            type: CHECKBOX
+            priority: '46'
+            section_name: Security
+            label: 'Ignore SecureBoot disabled state'
+            description: 'Suppress the SecureBoot disabled trigger (for legacy BIOS/CSM hosts).'
+            options:
+              - checked: '1'
+                unchecked: '0'
+        - macro: '{$WINDOWS.TASK.CONTROL}'
+          value: '1'
+          description: 'Macro for the scheduled task state trigger. Can be used with the task name as context.'
+          config:
+            type: CHECKBOX
+            priority: '45'
+            label: 'Scheduled tasks control'
+            description: 'Fire a trigger when a discovered scheduled task is disabled.'
+            options:
+              - checked: '1'
+                unchecked: '0'
+        - macro: '{$WINDOWS.TASK.NAME.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Used in Windows scheduled tasks discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '41'
+            section_name: Filters
+            label: 'Filter for scheduled tasks by name'
+            description: 'Regex string to include discovered scheduled tasks by name. No task is discovered until this macro is set, because a stock Windows installation carries about 200 tasks.'
+        - macro: '{$WINDOWS.TASK.NAME.NOT_MATCHES}'
+          value: ^\s$
+          description: 'Used in Windows scheduled tasks discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '42'
+            section_name: Filters
+            label: 'Filter for scheduled tasks by name (exclude)'
+            description: 'Regex string to exclude discovered scheduled tasks by name.'
+        - macro: '{$WINDOWS.TASK.PATH.MATCHES}'
+          value: '.*'
+          description: 'Used in Windows scheduled tasks discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '43'
+            section_name: Filters
+            label: 'Filter for scheduled tasks by path'
+            description: 'Regex string to include discovered scheduled tasks by folder path. Note that the WMI provider returns doubled backslashes, for example: `\\Microsoft\\Windows\\`.'
+        - macro: '{$WINDOWS.TASK.PATH.NOT_MATCHES}'
+          value: ^\s$
+          description: 'Used in Windows scheduled tasks discovery. Can be overridden on the host or linked template level.'
+          config:
+            type: TEXT
+            priority: '44'
+            section_name: Filters
+            label: 'Filter for scheduled tasks by path (exclude)'
+            description: 'Regex string to exclude discovered scheduled tasks by folder path. Note that the WMI provider returns doubled backslashes, for example: `\\Microsoft\\Windows\\`.'
+        - macro: '{$WINDOWS.UPDATES.SECURITY.STALE.MAX.WARN}'
+          value: '60'
+          description: 'The maximum number of days since the last installed security update (KB) before the trigger fires.'
+          config:
+            type: TEXT
+            priority: '51'
+            section_name: Security
+            label: 'Maximum days since last Security KB'
+            description: 'Maximum number of days since the last installed security update (KB) before the trigger fires.'
+            regex: '^[0-9]+$'
+        - macro: '{$WINDOWS.UPDATES.STALE.MAX.WARN}'
+          value: '45'
+          description: 'The maximum number of days since the last installed update (KB) before the trigger fires.'
+          config:
+            type: TEXT
+            priority: '50'
+            section_name: Security
+            label: 'Maximum days since last KB'
+            description: 'Maximum number of days since the last installed update (KB) before the trigger fires.'
+            regex: '^[0-9]+$'
       dashboards:
-        - uuid: 4959d0164ef44866a529ba390a997666
-          name: Filesystems
-          pages:
-            - name: Overview
-              widgets:
-                - type: graphprototype
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '3'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Windows by Zabbix agent'
-                        name: 'FS [{#FSLABEL}({#FSNAME})]: Space utilization chart'
-                    - type: STRING
-                      name: reference
-                      value: AAAEB
-                - type: graphprototype
-                  'y': '5'
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Windows by Zabbix agent'
-                        name: 'FS [{#FSLABEL}({#FSNAME})]: Space usage graph, in %'
-                    - type: STRING
-                      name: reference
-                      value: AAAEC
-        - uuid: 49212562a208434d9766aa82240230fd
-          name: 'Network interfaces'
-          pages:
-            - name: Overview
-              widgets:
-                - type: graphprototype
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Windows by Zabbix agent'
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: STRING
-                      name: reference
-                      value: AAAAI
         - uuid: 5f494fac9dc94bf3827b67ea212240f2
-          name: 'System performance'
+          name: Windows
           pages:
-            - widgets:
-                - type: graph
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Windows by Zabbix agent'
-                        name: 'Windows: CPU usage'
-                    - type: STRING
-                      name: reference
-                      value: AAAAA
-                - type: graph
-                  'y': '5'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Windows by Zabbix agent'
-                        name: 'Windows: Memory utilization'
-                    - type: STRING
-                      name: reference
-                      value: AAAAC
-                - type: graphprototype
-                  'y': '10'
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '3'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Windows by Zabbix agent'
-                        name: 'FS [{#FSLABEL}({#FSNAME})]: Space utilization chart'
-                    - type: STRING
-                      name: reference
-                      value: AAAEA
-                - type: graphprototype
-                  'y': '15'
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Windows by Zabbix agent'
-                        name: '{#DEVNAME}: Disk read/write rates'
-                    - type: STRING
-                      name: reference
-                      value: AAAAF
-                - type: graphprototype
-                  'y': '20'
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Windows by Zabbix agent'
-                        name: '{#DEVNAME}: Disk utilization and queue'
-                    - type: STRING
-                      name: reference
-                      value: AAAAG
-                - type: graphprototype
-                  'y': '25'
-                  width: '72'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid.0
-                      value:
-                        host: 'Windows by Zabbix agent'
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: STRING
-                      name: reference
-                      value: AAAAH
-                - type: graph
-                  x: '36'
-                  width: '36'
-                  height: '5'
+            - name: Overview
+              widgets:
+                - type: item
+                  width: '49'
+                  height: '1'
+                  hide_header: 'YES'
                   fields:
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Windows by Zabbix agent'
-                        key: 'perf_counter_en["\System\Processor Queue Length"]'
+                        key: system.uname
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: INTEGER
+                      name: value_h_pos
+                      value: '0'
+                - type: gauge
+                  'y': '1'
+                  width: '10'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: system.cpu.util
+                    - type: STRING
+                      name: max
+                      value: '100'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: show.3
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '80'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                - type: gauge
+                  'y': '4'
+                  width: '10'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'vm.memory.size[pused]'
+                    - type: STRING
+                      name: max
+                      value: '100'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: INTEGER
+                      name: show.3
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '80'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                - type: itemnavigator
+                  name: 'Disk performance'
+                  'y': '7'
+                  width: '10'
+                  height: '6'
+                  fields:
+                    - type: INTEGER
+                      name: group_by.0.attribute
+                      value: '3'
+                    - type: STRING
+                      name: group_by.0.tag_name
+                      value: disk
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: storage
+                    - type: INTEGER
+                      name: item_tags.1.operator
+                      value: '4'
+                    - type: STRING
+                      name: item_tags.1.tag
+                      value: disk
+                    - type: STRING
+                      name: item_tags.1.value
+                      value: ''
+                    - type: INTEGER
+                      name: problems
+                      value: '0'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: PBTWV
                     - type: INTEGER
-                      name: source_type
+                      name: show_lines
+                      value: '500'
+                - type: svggraph
+                  name: CPU
+                  x: '10'
+                  'y': '1'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 4FC3F7
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: system.cpu.util
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: EF5350
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'perf_counter_en["\Processor Information(_total)\% User Time"]'
+                    - type: INTEGER
+                      name: ds.1.pointsize
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.type
                       value: '1'
-                - type: graph
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '2'
+                    - type: INTEGER
+                      name: percentile_left
+                      value: '1'
+                    - type: STRING
+                      name: percentile_left_value
+                      value: '80'
+                    - type: STRING
+                      name: reference
+                      value: PPZRN
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Memory
+                  x: '10'
+                  'y': '4'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 2196F3
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'vm.memory.size[pused]'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: INTEGER
+                      name: percentile_left
+                      value: '1'
+                    - type: STRING
+                      name: percentile_left_value
+                      value: '80'
+                    - type: STRING
+                      name: reference
+                      value: QTGYC
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Disk
+                  x: '10'
+                  'y': '7'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7CB342
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.itemids.0._reference
+                      value: PBTWV._itemid
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: GTYHI
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: svggraph
+                  name: Network
+                  x: '10'
+                  'y': '10'
+                  width: '39'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.color_palette
+                      value: '9'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Bits sent'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '6'
+                    - type: INTEGER
+                      name: ds.0.invert_values
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Interface *(*): Bits sent'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.stacked
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.color_palette
+                      value: '5'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Bits received'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '6'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Interface *(*): Bits received'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.stacked
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: FPGPW
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: item
+                  x: '49'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '49'
+                  'y': '2'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'perf_counter_en["\System\Context Switches/sec"]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '49'
+                  'y': '4'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'perf_counter_en["\System\Processor Queue Length"]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                - type: item
+                  x: '49'
+                  'y': '6'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'vm.memory.size[used]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                - type: piechart
+                  name: 'Used storage'
+                  x: '49'
+                  'y': '8'
+                  width: '16'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: draw_type
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.color_palette
+                      value: '11'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: Available
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'FS [*]: Space: Available'
+                    - type: INTEGER
+                      name: ds.1.color_palette
+                      value: '9'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: Used
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'FS [*]: Space: Used'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '8'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                    - type: INTEGER
+                      name: space
+                      value: '10'
+                    - type: INTEGER
+                      name: stroke
+                      value: '10'
+                    - type: INTEGER
+                      name: total_show
+                      value: '1'
+                    - type: INTEGER
+                      name: units_show
+                      value: '1'
+                - type: clock
+                  name: 'Host time'
+                  x: '57'
+                  width: '15'
+                  fields:
+                    - type: INTEGER
+                      name: clock_type
+                      value: '1'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'system.localtime[local]'
+                    - type: INTEGER
+                      name: rf_rate
+                      value: '10'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '3'
+                    - type: INTEGER
+                      name: time_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: time_type
+                      value: '2'
+                    - type: STRING
+                      name: tzone_timezone
+                      value: local
+                - type: item
+                  x: '57'
+                  'y': '2'
+                  width: '15'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: system.uptime
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '600'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '3600'
+                - type: item
+                  x: '57'
+                  'y': '4'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'proc.num[]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '57'
+                  'y': '6'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'vm.memory.size[total]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '4'
+                  width: '7'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'perf_counter_en["\System\Threads"]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '6'
+                  width: '7'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'perf_counter_en["\Memory\Cache Bytes"]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '8'
+                  width: '7'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: 'system.swap.size[,free]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                - type: item
+                  x: '65'
+                  'y': '10'
+                  width: '7'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: aggregate_function
+                      value: '3'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Windows by Zabbix agent'
+                        key: system.swap.pfree
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: STRING
+                      name: time_period._reference
+                      value: PPZRN._timeperiod
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+            - name: Problems
+              widgets:
+                - type: problems
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: reference
+                      value: YHGQK
+                    - type: INTEGER
+                      name: show_opdata
+                      value: '1'
+                    - type: INTEGER
+                      name: show_suppressed
+                      value: '1'
+                    - type: INTEGER
+                      name: show_symptoms
+                      value: '1'
+                - type: toptriggers
+                  'y': '5'
+                  width: '36'
+                  height: '8'
+                - type: problemsbysv
                   x: '36'
                   'y': '5'
                   width: '36'
-                  height: '5'
                   fields:
-                    - type: GRAPH
-                      name: graphid.0
-                      value:
-                        host: 'Windows by Zabbix agent'
-                        name: 'Windows: Swap usage'
                     - type: STRING
                       name: reference
-                      value: AAAAD
+                      value: DXSKC
+                - type: honeycomb
+                  name: 'Service state'
+                  x: '36'
+                  'y': '7'
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: INTEGER
+                      name: interpolation
+                      value: '1'
+                    - type: STRING
+                      name: items.0
+                      value: 'State of service "*" (*)'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("^(State of service \")(.*)(\" \()(.*)(\))$", "\2")}'
+                    - type: STRING
+                      name: reference
+                      value: ONWWZ
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '6'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: 455A64
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '7'
       valuemaps:
+        - uuid: 5fcb9a38f64a4094a49fb2a37397f9ed
+          name: 'BitLocker conversion status'
+          mappings:
+            - value: '0'
+              newvalue: 'Fully decrypted'
+            - value: '1'
+              newvalue: 'Fully encrypted'
+            - value: '2'
+              newvalue: 'Encryption in progress'
+            - value: '3'
+              newvalue: 'Decryption in progress'
+            - value: '4'
+              newvalue: 'Encryption paused'
+            - value: '5'
+              newvalue: 'Decryption paused'
+        - uuid: 907ba34d15224b9fa96a7c9386621629
+          name: 'BitLocker encryption method'
+          mappings:
+            - value: '0'
+              newvalue: None
+            - value: '1'
+              newvalue: 'AES 128 with Diffuser'
+            - value: '2'
+              newvalue: 'AES 256 with Diffuser'
+            - value: '3'
+              newvalue: 'AES 128'
+            - value: '4'
+              newvalue: 'AES 256'
+            - value: '5'
+              newvalue: 'Hardware encryption'
+            - value: '6'
+              newvalue: 'XTS-AES 128'
+            - value: '7'
+              newvalue: 'XTS-AES 256'
+        - uuid: 8ad321eeb63248c19516f44e3c8d3c15
+          name: 'BitLocker protection status'
+          mappings:
+            - value: '0'
+              newvalue: 'Protection off'
+            - value: '1'
+              newvalue: 'Protection on'
+            - value: '2'
+              newvalue: 'Protection unknown'
+        - uuid: 42f18a860a4640308b1f67f8c4c7f17d
+          name: Boolean
+          mappings:
+            - value: '0'
+              newvalue: 'False'
+            - value: '1'
+              newvalue: 'True'
+        - uuid: 86d3dcd5b746492088ee08d92fecc345
+          name: 'Data quality'
+          mappings:
+            - value: '-1'
+              newvalue: 'Parse error'
+            - value: '-2'
+              newvalue: 'Unknown date/time format'
+            - value: '-3'
+              newvalue: 'Never scanned'
+            - value: '-4'
+              newvalue: 'No updates found'
+        - uuid: 5996320ac0c2404b92342fbd36d0884a
+          name: 'Firewall action'
+          mappings:
+            - value: '0'
+              newvalue: 'Not configured'
+            - value: '2'
+              newvalue: Allow
+            - value: '4'
+              newvalue: Block
+        - uuid: 7a16ec43dc7f408da3ec500cda0c6d56
+          name: 'Firewall state'
+          mappings:
+            - value: '0'
+              newvalue: 'Not configured'
+            - value: '1'
+              newvalue: Enabled
+            - value: '2'
+              newvalue: Disabled
+        - uuid: cb0ada6aba5244f8a6dbfac5c57b1c8f
+          name: 'SecureBoot state'
+          mappings:
+            - value: '0'
+              newvalue: Disabled
+            - value: '1'
+              newvalue: Enabled
+        - uuid: 2b6bf9dd14df420da3417fa3ad4d496e
+          name: 'TPM presence'
+          mappings:
+            - value: '-1'
+              newvalue: 'Parse error'
+            - value: '0'
+              newvalue: 'Not present'
+            - value: '1'
+              newvalue: Present
         - uuid: 9b087b9bfa09434ea0d0b5c32577abcc
           name: 'Win32_NetworkAdapter::AdapterTypeId'
           mappings:
@@ -1895,6 +4354,36 @@ zabbix_export:
               newvalue: 'Invalid Address'
             - value: '12'
               newvalue: 'Credentials Required'
+        - uuid: 553fcc3e4a45407ab6dbab2efd5af7ea
+          name: 'Windows license status'
+          mappings:
+            - value: '0'
+              newvalue: Unlicensed
+            - value: '1'
+              newvalue: Licensed
+            - value: '2'
+              newvalue: 'Out-of-box grace period'
+            - value: '3'
+              newvalue: 'Out-of-tolerance grace period'
+            - value: '4'
+              newvalue: 'Non-genuine grace period'
+            - value: '5'
+              newvalue: Notification
+            - value: '6'
+              newvalue: 'Extended grace period'
+        - uuid: a039311f4ac54cb1b49813b6a93d9748
+          name: 'Windows scheduled task state'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: Disabled
+            - value: '2'
+              newvalue: Queued
+            - value: '3'
+              newvalue: Ready
+            - value: '4'
+              newvalue: Running
         - uuid: 3f685167f97c492598ad445fc938560f
           name: 'Windows service state'
           mappings:
@@ -1952,7 +4441,7 @@ zabbix_export:
       description: 'This trigger is ignored, if there is no swap configured'
       dependencies:
         - name: 'Windows: High memory utilization'
-          expression: 'min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+          expression: 'min(/Windows by Zabbix agent/vm.memory.size[pused],5m)>{$MEMORY.UTIL.MAX}'
       tags:
         - tag: scope
           value: performance
@@ -2003,14 +4492,14 @@ zabbix_export:
           color: 199C0D
           item:
             host: 'Windows by Zabbix agent'
-            key: vm.memory.util
+            key: 'vm.memory.size[pused]'
     - uuid: 518f6bcdcefc4cf493244798ccd09ec1
       name: 'Windows: Swap usage'
       graph_items:
         - color: 199C0D
           item:
             host: 'Windows by Zabbix agent'
-            key: system.swap.free
+            key: 'system.swap.size[,free]'
         - sortorder: '1'
           color: F63100
           item:

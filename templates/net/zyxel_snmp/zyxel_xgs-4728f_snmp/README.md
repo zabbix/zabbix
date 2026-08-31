@@ -34,6 +34,7 @@ Refer to the vendor documentation.
 |----|-----------|-------|
 |{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}|<p>Triggers will be created only for interfaces whose description contains the value of this macro</p>|`CHANGE_IF_NEEDED`|
 |{$SNMP.TIMEOUT}|<p>The time interval for SNMP agent availability trigger expression.</p>|`5m`|
+|{$SNMP.UPTIME.WARN}|<p>Uptime threshold above which the "Host has been restarted" problem auto-resolves.</p>|`10m`|
 |{$CPU.UTIL.CRIT}||`90`|
 |{$MEMORY.UTIL.MAX}||`90`|
 |{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}|<p>Filter by discoverable interface names.</p>|`.*`|
@@ -50,7 +51,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]|
 |Hardware model name|<p>MIB: RFC1213-MIB</p><p>A textual description of the entity.  This value</p><p>should include the full name and version</p><p>identification of the system's hardware type,</p><p>software operating-system, and networking</p><p>software.  It is mandatory that this only contain</p><p>printable ASCII characters.</p>|SNMP agent|zyxel.4728f.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Contact|<p>MIB: RFC1213-MIB</p><p>The textual identification of the contact person</p><p>for this managed node, together with information</p><p>on how to contact this person.</p>|SNMP agent|zyxel.4728f.contact<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Host name|<p>MIB: RFC1213-MIB</p><p>An administratively-assigned name for this</p><p>managed node.  By convention, this is the node's</p><p>fully-qualified domain name.</p>|SNMP agent|zyxel.4728f.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
@@ -68,7 +69,7 @@ Refer to the vendor documentation.
 |----|-----------|----------|--------|--------------------------------|
 |ZYXEL: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/ZYXEL XGS-4728F by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
 |ZYXEL: Template does not match hardware|<p>This template is for Zyxel XGS-4728F, but connected to {ITEM.VALUE}</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.model)<>"XGS-4728F"`|Info|**Manual close**: Yes|
-|ZYXEL: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)>0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)<10m) or (last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)=0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.uptime)<10m)`|Info|**Manual close**: Yes|
+|ZYXEL: Host has been restarted|<p>The uptime counter has decreased, which indicates that the host has been restarted.<br>A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.<br>The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.</p>|`(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)>0 and change(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)<0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime,#2)<42949672.96-(lastclock(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)-lastclock(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime,#2))) or (last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)=0 and change(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.uptime)<0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.uptime,#2)<42949672.96-(lastclock(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.uptime)-lastclock(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.uptime,#2)))`|Info|**Manual close**: Yes|
 |ZYXEL: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion,#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion,#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion))>0`|Info|**Manual close**: Yes|
 |ZYXEL: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber,#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber,#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber))>0`|Info|**Manual close**: Yes|
 |ZYXEL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.cpuusage,5m)>{$CPU.UTIL.CRIT}`|Warning||

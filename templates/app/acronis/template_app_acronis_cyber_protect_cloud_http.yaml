@@ -207,7 +207,7 @@ zabbix_export:
         This is the default behaviour.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -397,6 +397,31 @@ zabbix_export:
           history: '0'
           trends: '0'
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             
             const request_path = '/api/integration_management/v2/status';
             const app_id = '5619386d-de56-49ec-8508-f5c399d3b9bd';
@@ -411,7 +436,7 @@ zabbix_export:
             }
             
             function getHttpData(url, register, params, api_token, tenant_uuid) {
-            	const request = new HttpRequest();
+            	const request = new HttpRequest(tls.options);
             
             	request.addHeader('Content-Type: application/json');
             	request.addHeader('Authorization: Bearer ' + api_token);
@@ -487,7 +512,8 @@ zabbix_export:
             }
             
             const params = checkParams(JSON.parse(value)),
-            	url = params.api_url,
+            	tls = new CTlsConfig(params.tls_verify),
+            	url = tls.checkURL(params.api_url),
             	api_token = params.api_token,
             	tenant_uuid = params.tenant_uuid;
             
@@ -507,6 +533,8 @@ zabbix_export:
               value: '{$ACRONIS.CPC.DATACENTER.URL}'
             - name: tenant_uuid
               value: '{$ACRONIS.CPC.MSP.TENANT.UUID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Acronis Cyber Protect Cloud MSP"}'
           tags:
             - tag: component
               value: raw
@@ -1421,7 +1449,7 @@ zabbix_export:
           description: 'API access token.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             label: 'API access token'
             required: 'YES'
         - macro: '{$ACRONIS.CPC.ALERT.DISCOVERY.CATEGORY.MATCHES}'
@@ -1429,7 +1457,7 @@ zabbix_export:
           description: 'Sets the alert category regex filter to use in alert discovery for including.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Alert category include filter'
             description: 'Sets the alert category regex filter to use in alert discovery for including.'
@@ -1438,7 +1466,7 @@ zabbix_export:
           description: 'Sets the alert category regex filter to use in alert discovery for excluding.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Alert category exclude filter'
             description: 'Sets the alert category regex filter to use in alert discovery for excluding.'
@@ -1447,7 +1475,7 @@ zabbix_export:
           description: 'Sets the alert resource name regex filter to use in alert discovery for including.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Alert resource name include filter'
             description: 'Sets the alert resource name regex filter to use in alert discovery for including.'
@@ -1456,7 +1484,7 @@ zabbix_export:
           description: 'Sets the alert resource name regex filter to use in alert discovery for excluding.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Alert resource name exclude filter'
             description: 'Sets the alert resource name regex filter to use in alert discovery for excluding.'
@@ -1465,7 +1493,7 @@ zabbix_export:
           description: 'Sets the alert severity regex filter to use in alert discovery for including.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Alert severity include filter'
             description: 'Sets the alert severity regex filter to use in alert discovery for including.'
@@ -1474,7 +1502,7 @@ zabbix_export:
           description: 'Sets the alert severity regex filter to use in alert discovery for excluding.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Alert severity exclude filter'
             description: 'Sets the alert severity regex filter to use in alert discovery for excluding.'
@@ -1483,7 +1511,7 @@ zabbix_export:
           description: 'Sets the customer name regex filter to use in customer discovery for including.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Customer kind include filter'
             description: 'Sets the customer name regex filter to use in customer discovery for including.'
@@ -1492,7 +1520,7 @@ zabbix_export:
           description: 'Sets the customer name regex filter to use in customer discovery for including.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Customer name include filter'
             description: 'Sets the customer name regex filter to use in customer discovery for including.'
@@ -1501,7 +1529,7 @@ zabbix_export:
           description: 'Sets the customer name regex filter to use in customer discovery for excluding.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Customer name exclude filter'
             description: 'Sets the customer name regex filter to use in customer discovery for excluding.'
@@ -1510,7 +1538,7 @@ zabbix_export:
           description: 'CyberFit score threshold for "high" severity trigger.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Thresholds
             label: 'CyberFit high threshold'
             description: 'CyberFit score threshold for "high" severity trigger.'
@@ -1520,7 +1548,7 @@ zabbix_export:
           description: 'CyberFit score threshold for "warning" severity trigger.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             section_name: Thresholds
             label: 'CyberFit warning threshold'
             description: 'CyberFit score threshold for "warning" severity trigger.'
@@ -1538,7 +1566,7 @@ zabbix_export:
           description: 'Sets the tenant name regex filter to use in device discovery for including.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Tenant name include filter'
             description: 'Sets the tenant name regex filter to use in device discovery for including.'
@@ -1547,7 +1575,7 @@ zabbix_export:
           description: 'Sets the tenant name regex filter to use in device discovery for excluding.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Tenant name exclude filter'
             description: 'Sets the tenant name regex filter to use in device discovery for excluding.'
@@ -1556,7 +1584,7 @@ zabbix_export:
           description: 'Comma separated list of resource types for devices retrieval.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Other
             label: 'Device resource types'
             description: 'Comma separated list of resource types for devices retrieval.'
@@ -1572,14 +1600,14 @@ zabbix_export:
           description: 'UUID for MSP.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             label: 'MSP UUID'
         - macro: '{$ACRONIS.CPC.OFFSET.SCHEDULED.ANTIMALWARE}'
           value: '-180'
           description: 'Offset time in seconds for scheduled antimalware scan trigger check.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Thresholds
             label: 'Antimalware scan offset (sec)'
             description: 'Offset time in seconds for scheduled antimalware scan trigger check.'
@@ -1589,7 +1617,7 @@ zabbix_export:
           description: 'Offset time in seconds for scheduled backup run trigger check.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'Backup run offset (sec)'
             description: 'Offset time in seconds for scheduled backup run trigger check.'
@@ -1599,7 +1627,7 @@ zabbix_export:
           description: 'Offset time in seconds for scheduled patch management run trigger check.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Thresholds
             label: 'Patch management offset (sec)'
             description: 'Offset time in seconds for scheduled patch management run trigger check.'
@@ -1609,7 +1637,7 @@ zabbix_export:
           description: 'Offset time in seconds for scheduled vulnerability assessment run trigger check.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Thresholds
             label: 'Vulnerability assessment offset (sec)'
             description: 'Offset time in seconds for scheduled vulnerability assessment run trigger check.'
@@ -1619,7 +1647,7 @@ zabbix_export:
           description: 'Sub-path for the Account Management API.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             label: 'Account Management API path'
             description: 'Sub-path for the Account Management API.'
         - macro: '{$ACRONIS.CPC.PATH.AGENTS}'
@@ -1627,7 +1655,7 @@ zabbix_export:
           description: 'Sub-path for the Agents API.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             label: 'Agents API path'
             description: 'Sub-path for the Agents API.'
         - macro: '{$ACRONIS.CPC.PATH.ALERTS}'
@@ -1635,7 +1663,7 @@ zabbix_export:
           description: 'Sub-path for the Alerts API.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             label: 'Alerts API path'
             description: 'Sub-path for the Alerts API.'
         - macro: '{$ACRONIS.CPC.PATH.RESOURCE.MANAGEMENT}'
@@ -1643,9 +1671,25 @@ zabbix_export:
           description: 'Sub-path for the Resource Management API.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             label: 'Resource Management API path'
             description: 'Sub-path for the Resource Management API.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Acronis Cyber Protect Cloud MSP", e.g. {$HTTP.TLS.VERIFY:"Acronis Cyber Protect Cloud MSP"}.'
+          config:
+            type: LIST
+            priority: '3'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 711853342bbe4a5b8d145fc96644d1e5
           name: 'Acronis Cyber Protect Cloud Overview'

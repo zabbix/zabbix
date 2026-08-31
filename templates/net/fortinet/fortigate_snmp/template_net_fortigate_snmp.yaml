@@ -21,7 +21,7 @@ zabbix_export:
       wizard_ready: 'YES'
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -675,11 +675,16 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 5c16d6334cea466386455a7c5d071d18
-              expression: 'last(/FortiGate by SNMP/system.uptime[fgSysUpTime.0])<10m'
+              expression: 'change(/FortiGate by SNMP/system.uptime[fgSysUpTime.0])<0 and last(/FortiGate by SNMP/system.uptime[fgSysUpTime.0],#2)<42949672.96-(lastclock(/FortiGate by SNMP/system.uptime[fgSysUpTime.0])-lastclock(/FortiGate by SNMP/system.uptime[fgSysUpTime.0],#2))'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/FortiGate by SNMP/system.uptime[fgSysUpTime.0])>{$SNMP.UPTIME.WARN}'
               name: 'FortiGate: Device has been restarted'
-              event_name: 'FortiGate: {HOST.NAME} has been restarted (uptime < 10m)'
+              event_name: 'FortiGate: {HOST.NAME} has been restarted'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: |
+                The uptime counter has decreased, which indicates that the device has been restarted.
+                A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+                The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -3232,11 +3237,16 @@ zabbix_export:
                   value: wireless
               trigger_prototypes:
                 - uuid: 753d2ca60faa4bc99cafbbdafb54309e
-                  expression: 'last(/FortiGate by SNMP/wc.session.uptime[fgWcWtpSessionWtpSessionUpTime.{#SNMPINDEX}])<10m'
+                  expression: 'change(/FortiGate by SNMP/wc.session.uptime[fgWcWtpSessionWtpSessionUpTime.{#SNMPINDEX}])<0 and last(/FortiGate by SNMP/wc.session.uptime[fgWcWtpSessionWtpSessionUpTime.{#SNMPINDEX}],#2)<42949672.96-(lastclock(/FortiGate by SNMP/wc.session.uptime[fgWcWtpSessionWtpSessionUpTime.{#SNMPINDEX}])-lastclock(/FortiGate by SNMP/wc.session.uptime[fgWcWtpSessionWtpSessionUpTime.{#SNMPINDEX}],#2))'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/FortiGate by SNMP/wc.session.uptime[fgWcWtpSessionWtpSessionUpTime.{#SNMPINDEX}])>{$SNMP.UPTIME.WARN}'
                   name: 'FortiGate: WTP {#WC.NAME}: Session has been restarted'
-                  event_name: 'FortiGate: WTP {#WC.NAME}: Session has been restarted (uptime < 10m)'
+                  event_name: 'FortiGate: WTP {#WC.NAME}: Session has been restarted'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes.'
+                  description: |
+                    The uptime counter has decreased, which indicates that the session has been restarted.
+                    A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+                    The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -3658,6 +3668,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'The time interval for SNMP availability trigger.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the restart problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '40'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the restart problem auto-resolves.'
         - macro: '{$VDOM.NAME.MATCHES}'
           value: '.*'
           description: 'Used in Virtual domain discovery. Can be overridden on the host or linked template level.'

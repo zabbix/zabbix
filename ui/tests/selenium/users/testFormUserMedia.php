@@ -56,7 +56,7 @@ class testFormUserMedia extends CWebTest {
 		]);
 
 		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('Email', 'SMS',".
-				"'Test script', 'MS Teams', 'Slack', 'Zendesk')"
+				"'Test script', 'MS Teams Workflow', 'Slack', 'Zendesk')"
 		);
 
 		foreach ($mediatypeids as $mediatype) {
@@ -128,7 +128,7 @@ class testFormUserMedia extends CWebTest {
 					],
 					'additional media' => [
 						[
-							'Type' => 'MS Teams',
+							'Type' => 'MS Teams Workflow',
 							'Send to' => 'MS Teams channel 666'
 						],
 						[
@@ -245,12 +245,12 @@ class testFormUserMedia extends CWebTest {
 					'error_message' => ['id:sendto_list_0' => 'Invalid email address "person @zabbix.com".']
 				]
 			],
-			// Empty MS Teams channel name.
+			// Empty MS Teams Workflow channel name.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'MS Teams',
+						'Type' => 'MS Teams Workflow',
 						'Send to' => ''
 					],
 					'error_message' => ['Send to' => 'This field cannot be empty.']
@@ -688,7 +688,11 @@ class testFormUserMedia extends CWebTest {
 	 */
 	private function checkEmailNotPresent($email) {
 		$user_form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
-		$row = $user_form->getField('Media')->asTable()->getRow(0);
+		$media_table = $user_form->getField('Media')->asTable();
+
+		// The media row is re-rendered after the media form is submitted, so wait for it before reading the row.
+		$media_table->query('xpath:./tbody/tr[1]')->waitUntilPresent();
+		$row = $media_table->getRow(0);
 		$this->assertStringNotContainsString($email, $row->getColumn('Send to')->getText());
 	}
 
@@ -736,7 +740,7 @@ class testFormUserMedia extends CWebTest {
 			$row = $media_field->getRow(0);
 		}
 		else {
-			$row = $this->query('xpath://tr[@id="medias_0"]')->asTableRow()->one();
+			$row = $this->query('xpath://tr[@id="medias_0"]')->waitUntilPresent()->asTableRow()->one();
 		}
 		$this->assertEquals($row->getColumn('Type')->getText(), $data['fields']['Type']);
 

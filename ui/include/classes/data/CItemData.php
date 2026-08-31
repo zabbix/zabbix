@@ -934,9 +934,9 @@ final class CItemData {
 					'js-item-public-key-label',
 					'js-item-public-key-field',
 					'publickey',
-					$data['is_discovery_rule'] ? 'js-item-password-label' : 'js-item-passphrase-label',
-					$data['is_discovery_rule'] ? 'js-item-password-field' : 'js-item-passphrase-field',
-					$data['is_discovery_rule'] ? 'password' : 'passphrase'
+					'js-item-passphrase-label',
+					'js-item-passphrase-field',
+					'passphrase'
 				]
 			],
 			'for_http_auth_type' => [

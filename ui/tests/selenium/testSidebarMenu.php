@@ -403,8 +403,8 @@ class testSidebarMenu extends CWebTest {
 		return [
 			[
 				[
-					'section' => 'Support',
-					'link' => 'https://www.zabbix.com/support'
+					'section' => 'Subscriptions',
+					'link' => 'https://www.zabbix.com/subscriptions'
 				]
 			],
 			[
@@ -416,7 +416,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Help',
-					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/'
+					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/en/manual'
 				]
 			],
 			[
