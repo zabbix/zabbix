@@ -177,10 +177,10 @@ static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable
 	{
 		*sql_printable = zbx_strdup(NULL, sql);
 		zbx_replace_invalid_utf8_and_nonprintable(*sql_printable);
-	}
 
-	if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
-		db_mask_printable_sql_values(sql_printable);
+		if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
+			db_mask_printable_sql_values(sql_printable);
+	}
 
 	return *sql_printable;
 }
@@ -188,7 +188,7 @@ static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable
 static void	dbconn_errlog(zbx_dbconn_t *db, zbx_err_codes_t zbx_errno, int db_errno, const char *db_error,
 		const char *context)
 {
-	char	*s;
+	char	*s, *sql_printable = NULL;
 
 	db->last_db_errcode = zbx_errno;
 
@@ -224,7 +224,7 @@ static void	dbconn_errlog(zbx_dbconn_t *db, zbx_err_codes_t zbx_errno, int db_er
 			break;
 		case ERR_Z3008:
 			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s [%s]", db_errno,
-					db->last_db_strerror, context);
+					db->last_db_strerror, db_replace_nonprintable_chars(context, &sql_printable));
 			break;
 		case ERR_Z3009:
 			s = zbx_dsprintf(NULL, "query failed due to read-only transaction: [%d] %s", db_errno,
@@ -237,6 +237,7 @@ static void	dbconn_errlog(zbx_dbconn_t *db, zbx_err_codes_t zbx_errno, int db_er
 	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", (int)zbx_errno, s);
 
 	zbx_free(s);
+	zbx_free(sql_printable);
 }
 
 #if defined(HAVE_MYSQL)
