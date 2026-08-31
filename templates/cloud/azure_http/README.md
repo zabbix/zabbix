@@ -3,9 +3,9 @@
 
 ## Overview
 
-- This template is designed to monitor Microsoft Azure by HTTP.
-- It works without any external scripts and uses the script item.
-- Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
+This template is designed to monitor Microsoft Azure by HTTP.
+It works without any external scripts and uses the script item.
+Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, MySQL and PostgreSQL servers, Microsoft SQL databases and managed instances, and Cosmos DB for MongoDB, as well as the monitoring of Backup Jobs and Cost Management data.
 
 ## Included Monitoring Templates
 
@@ -20,6 +20,7 @@
 - *Azure Microsoft SQL Database by HTTP*
 - *Azure SQL Managed Instance by HTTP*
 - *Azure Cost Management by HTTP*
+- *Azure Cosmos DB for MongoDB by HTTP*
 - *Azure Backup Jobs by HTTP*
 
 ## Requirements
