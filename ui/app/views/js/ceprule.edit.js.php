@@ -605,7 +605,7 @@ window.ceprule_edit_popup = new class {
 								overlayDialogueDestroy(overlay.dialogueid);
 
 								if (is_new) {
-									this.#addOperationRow(fields, true)
+									this.#addOperationRow(fields, true);
 								}
 								else {
 									fields.row_index = row_index;
