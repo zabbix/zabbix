@@ -106,7 +106,7 @@ class CControllerAcknowledgeEdit extends CController {
 				'suppress_until', 'maintenanceid', 'details', 'cep_ruleid'
 			],
 			'selectSuppressionData' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
-				? ['maintenanceid', 'suppress_until']
+				? ['maintenanceid', 'suppress_until', 'cep_ruleid']
 				: null,
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -171,7 +171,7 @@ class CControllerAcknowledgeEdit extends CController {
 			// Only manually suppressed problems can be unsuppressed.
 			if ($this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {
 				foreach ($event['suppression_data'] as $suppression) {
-					if ($suppression['maintenanceid'] == 0) {
+					if ($suppression['maintenanceid'] == 0 && $suppression['cep_ruleid'] == 0) {
 						$can_be_unsuppressed = true;
 					}
 				}
