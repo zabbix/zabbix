@@ -57,6 +57,7 @@ This template has been tested on:
 |{$AZURE.PASSWORD}|<p>Client secret of the Azure service principal used for API authentication.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>Maximum time to wait for Azure API responses before request fails.</p>|`15s`|
 |{$AZURE.PROXY}|<p>HTTP proxy used for Azure API requests (leave empty to connect directly).</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure", e.g. {$HTTP.TLS.VERIFY:"Azure"}.</p>|`full`|
 |{$AZURE.VM.NAME.MATCHES}|<p>Regex string to include discovered virtual machines by name.</p>|`.*`|
 |{$AZURE.VM.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered virtual machines by name.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.VM.LOCATION.MATCHES}|<p>Regex string to include discovered virtual machine locations by name.</p>|`.*`|
@@ -273,6 +274,7 @@ This template has been tested on:
 |{$AZURE.SCALESET.CPU.UTIL.CRIT}|<p>The critical threshold of CPU utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure VM Scale Set", e.g. {$HTTP.TLS.VERIFY:"Azure VM Scale Set"}.</p>|`full`|
 
 ### Items
 
@@ -387,6 +389,7 @@ This template has been tested on:
 |{$AZURE.VM.CPU.UTIL.CRIT}|<p>The critical threshold of CPU utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Virtual Machine", e.g. {$HTTP.TLS.VERIFY:"Azure Virtual Machine"}.</p>|`full`|
 
 ### Items
 
@@ -510,6 +513,7 @@ This template has been tested on:
 |{$AZURE.DB.ABORTED.CONN.MAX.WARN}|<p>The number of failed attempts to connect to the MySQL server for a trigger expression.</p>|`25`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure MySQL Flexible Server", e.g. {$HTTP.TLS.VERIFY:"Azure MySQL Flexible Server"}.</p>|`full`|
 
 ### Items
 
@@ -596,6 +600,7 @@ This template has been tested on:
 |{$AZURE.DB.FAILED.CONN.MAX.WARN}|<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p>|`25`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure MySQL Single Server", e.g. {$HTTP.TLS.VERIFY:"Azure MySQL Single Server"}.</p>|`full`|
 
 ### Items
 
@@ -681,6 +686,7 @@ This template has been tested on:
 |{$AZURE.DB.STORAGE.PUSED.CRIT}|<p>The critical threshold of storage utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure PostgreSQL Flexible Server", e.g. {$HTTP.TLS.VERIFY:"Azure PostgreSQL Flexible Server"}.</p>|`full`|
 
 ### Items
 
@@ -771,6 +777,7 @@ This template has been tested on:
 |{$AZURE.DB.STORAGE.PUSED.CRIT}|<p>The critical threshold of storage utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure PostgreSQL Single Server", e.g. {$HTTP.TLS.VERIFY:"Azure PostgreSQL Single Server"}.</p>|`full`|
 
 ### Items
 
@@ -856,6 +863,7 @@ This template has been tested on:
 |{$AZURE.DB.STORAGE.PUSED.CRIT}|<p>The critical threshold of storage utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Microsoft SQL Serverless Database", e.g. {$HTTP.TLS.VERIFY:"Azure Microsoft SQL Serverless Database"}.</p>|`full`|
 
 ### Items
 
@@ -947,6 +955,7 @@ This template has been tested on:
 |{$AZURE.DB.STORAGE.PUSED.CRIT}|<p>The critical threshold of storage utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Microsoft SQL DTU Database", e.g. {$HTTP.TLS.VERIFY:"Azure Microsoft SQL DTU Database"}.</p>|`full`|
 
 ### Items
 
@@ -1039,6 +1048,7 @@ This template has been tested on:
 |{$AZURE.DB.STORAGE.PUSED.CRIT}|<p>The critical threshold of storage utilization, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Microsoft SQL Database", e.g. {$HTTP.TLS.VERIFY:"Azure Microsoft SQL Database"}.</p>|`full`|
 
 ### Items
 
@@ -1127,6 +1137,7 @@ This template has been tested on:
 |{$AZURE.DB.COSMOS.MONGO.AVAILABILITY}|<p>The warning threshold of the Cosmos DB for MongoDB service availability.</p>|`70`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Cosmos DB for MongoDB", e.g. {$HTTP.TLS.VERIFY:"Azure Cosmos DB for MongoDB"}.</p>|`full`|
 
 ### Items
 
@@ -1209,6 +1220,7 @@ This template has been tested on:
 |{$AZURE.LLD.FILTER.RESOURCE.GROUP.NOT_MATCHES}|<p>Filter to exclude discovered resource groups by name.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Cost Management", e.g. {$HTTP.TLS.VERIFY:"Azure Cost Management"}.</p>|`full`|
 
 ### Items
 
@@ -1332,6 +1344,7 @@ This template has been tested on:
 |{$AZURE.SQL.INST.SPACE.CRIT}|<p>Storage space critical threshold, expressed in %.</p>|`90`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure SQL Managed Instance", e.g. {$HTTP.TLS.VERIFY:"Azure SQL Managed Instance"}.</p>|`full`|
 
 ### Items
 
@@ -1412,6 +1425,7 @@ This template has been tested on:
 |{$AZURE.VAULT.PERIOD}|<p>The number of days over which to retrieve backup jobs.</p>|`7`|
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Backup Jobs", e.g. {$HTTP.TLS.VERIFY:"Azure Backup Jobs"}.</p>|`full`|
 |{$AZURE.JOBS.FRIENDLY.NAME.MATCHES}|<p>Set the regex string to include backup jobs based on `entityFriendlyName`.</p>|`.*`|
 |{$AZURE.JOBS.FRIENDLY.NAME.NOT.MATCHES}|<p>Set the regex string to exclude backup jobs based on `entityFriendlyName`.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.JOBS.STATUS.MATCHES}|<p>Set the regex string to include backup jobs based on status.</p>|`.*`|

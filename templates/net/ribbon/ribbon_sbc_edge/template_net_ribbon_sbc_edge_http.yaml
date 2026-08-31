@@ -38,7 +38,7 @@ zabbix_export:
         5. Set the host wizard configuration fields `Ribbon SBC user` and `Ribbon SBC password` with the login and password of the user created earlier.
       vendor:
         name: Zabbix
-        version: 7.4-0
+        version: 7.4-1
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -50,9 +50,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Ribbon = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             
             	setParams: function (params) {
             		['url', 'username', 'password'].forEach(function (field) {
@@ -69,6 +94,9 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
+            		Ribbon.request = new HttpRequest(Ribbon.tls.options);
             	},
             
             	getRequest: function (url) {
@@ -177,6 +205,8 @@ zabbix_export:
               value: '{$RIBBON.PASSWORD}'
             - name: proxy
               value: '{$RIBBON.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -192,9 +222,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Ribbon = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             
             	setParams: function (params) {
             		['url', 'username', 'password'].forEach(function (field) {
@@ -211,6 +266,9 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
+            		Ribbon.request = new HttpRequest(Ribbon.tls.options);
             	},
             
             	getRequest: function (url) {
@@ -319,6 +377,8 @@ zabbix_export:
               value: '{$RIBBON.PASSWORD}'
             - name: proxy
               value: '{$RIBBON.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -592,9 +652,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Ribbon = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             
             	setParams: function (params) {
             		['url', 'username', 'password'].forEach(function (field) {
@@ -611,6 +696,9 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
+            		Ribbon.request = new HttpRequest(Ribbon.tls.options);
             	},
             
             	getRequest: function (url) {
@@ -719,6 +807,8 @@ zabbix_export:
               value: '{$RIBBON.PASSWORD}'
             - name: proxy
               value: '{$RIBBON.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -734,9 +824,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Ribbon = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             
             	setParams: function (params) {
             		['url', 'username', 'password'].forEach(function (field) {
@@ -753,6 +868,9 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
+            		Ribbon.request = new HttpRequest(Ribbon.tls.options);
             	},
             
             	getRequest: function (url) {
@@ -862,6 +980,8 @@ zabbix_export:
               value: '{$RIBBON.PASSWORD}'
             - name: proxy
               value: '{$RIBBON.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -877,9 +997,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Ribbon = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             
             	setParams: function (params) {
             		['url', 'username', 'password'].forEach(function (field) {
@@ -896,6 +1041,9 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
+            		Ribbon.request = new HttpRequest(Ribbon.tls.options);
             	},
             
             	getRequest: function (url) {
@@ -1004,6 +1152,8 @@ zabbix_export:
               value: '{$RIBBON.PASSWORD}'
             - name: proxy
               value: '{$RIBBON.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -1194,9 +1344,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Ribbon = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             
             	setParams: function (params) {
             		['url', 'username', 'password'].forEach(function (field) {
@@ -1213,6 +1388,9 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
+            		Ribbon.request = new HttpRequest(Ribbon.tls.options);
             	},
             
             	getRequest: function (url) {
@@ -1321,6 +1499,8 @@ zabbix_export:
               value: '{$RIBBON.PASSWORD}'
             - name: proxy
               value: '{$RIBBON.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -1401,9 +1581,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Ribbon = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             
             	setParams: function (params) {
             		['url', 'username', 'password'].forEach(function (field) {
@@ -1420,6 +1625,9 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
+            		Ribbon.request = new HttpRequest(Ribbon.tls.options);
             	},
             
             	getRequest: function (url) {
@@ -1528,6 +1736,8 @@ zabbix_export:
               value: '{$RIBBON.PASSWORD}'
             - name: proxy
               value: '{$RIBBON.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -1543,9 +1753,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Ribbon = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             
             	setParams: function (params) {
             		['url', 'username', 'password'].forEach(function (field) {
@@ -1562,6 +1797,9 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
+            		Ribbon.request = new HttpRequest(Ribbon.tls.options);
             	},
             
             	getRequest: function (url) {
@@ -1676,6 +1914,8 @@ zabbix_export:
               value: '{$RIBBON.PASSWORD}'
             - name: proxy
               value: '{$RIBBON.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -1691,9 +1931,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Ribbon = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             
             	setParams: function (params) {
             		['url', 'username', 'password'].forEach(function (field) {
@@ -1710,6 +1975,9 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
+            		Ribbon.request = new HttpRequest(Ribbon.tls.options);
             	},
             
             	getRequest: function (url) {
@@ -1819,6 +2087,8 @@ zabbix_export:
               value: '{$RIBBON.PASSWORD}'
             - name: proxy
               value: '{$RIBBON.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -1964,9 +2234,34 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Ribbon = {
             	params: {},
-            	request: new HttpRequest(),
+            	request: null,
             
             	setParams: function (params) {
             		['url', 'username', 'password'].forEach(function (field) {
@@ -1983,6 +2278,9 @@ zabbix_export:
             			}
             		}
             
+            		Ribbon.tls = new CTlsConfig(params.tls_verify);
+            		Ribbon.tls.checkURL(Ribbon.params.url);
+            		Ribbon.request = new HttpRequest(Ribbon.tls.options);
             	},
             
             	getRequest: function (url) {
@@ -2081,6 +2379,8 @@ zabbix_export:
               value: '{$RIBBON.PASSWORD}'
             - name: proxy
               value: '{$RIBBON.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}'
             - name: url
               value: '{$RIBBON.URL}'
             - name: username
@@ -3732,12 +4032,28 @@ zabbix_export:
         - tag: target
           value: ribbon-sbc-edge
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Ribbon SBC Edge", e.g. {$HTTP.TLS.VERIFY:"Ribbon SBC Edge"}.'
+          config:
+            type: LIST
+            priority: '5'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$RIBBON.ALARM.DISCOVERY.EVENT.ID.MATCHES}'
           value: '.*'
           description: 'Sets of the alarm event ID to be allowed in discovery. See the https://publicdoc.rbbn.com/spaces/UXDOC70/pages/122292177/Alarms+and+Events+Reference for possible values.'
           config:
             type: TEXT
-            priority: '39'
+            priority: '40'
             section_name: Filters
             label: 'Include alarm event ID filter'
             description: 'Regex string to include alarm event by ID.'
@@ -3746,7 +4062,7 @@ zabbix_export:
           description: 'Sets of the alarm event ID to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '40'
+            priority: '41'
             section_name: Filters
             label: 'Exclude alarm event ID filter'
             description: 'Regex string to exclude alarm event by ID.'
@@ -3755,7 +4071,7 @@ zabbix_export:
           description: 'Sets of the alarm state to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '37'
+            priority: '38'
             section_name: Filters
             label: 'Include alarm state filter'
             description: 'Regex string to include alarm by state.'
@@ -3764,7 +4080,7 @@ zabbix_export:
           description: 'Sets of the alarm state to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '38'
+            priority: '39'
             section_name: Filters
             label: 'Exclude alarm state filter'
             description: 'Regex string to exclude alarm by state.'
@@ -3773,7 +4089,7 @@ zabbix_export:
           description: 'Sets the regex string of the certificate name to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Filters
             label: 'Include certificate name filter'
             description: 'Regex string to include certificate by name.'
@@ -3782,7 +4098,7 @@ zabbix_export:
           description: 'Sets the regex string of the certificate name to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '37'
             section_name: Filters
             label: 'Exclude certificate name filter'
             description: 'Regex string to exclude certificate by name.'
@@ -3791,7 +4107,7 @@ zabbix_export:
           description: 'The threshold of CPU usage in percent.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Thresholds
             label: 'Warning CPU usage threshold'
             description: 'CPU usage threshold. In the range from 0 to 100 inclusive.'
@@ -3801,7 +4117,7 @@ zabbix_export:
           description: 'Sets the regex string of the disk name to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'Include disk name filter'
             description: 'Regex string to include disk by name.'
@@ -3810,7 +4126,7 @@ zabbix_export:
           description: 'Sets the regex string of the disk name to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'Exclude disk name filter'
             description: 'Regex string to exclude disk by name.'
@@ -3819,7 +4135,7 @@ zabbix_export:
           description: 'Sets the regex string of the disk type to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'Include disk type filter'
             description: 'Regex string to include disk by type.'
@@ -3828,7 +4144,7 @@ zabbix_export:
           description: 'Sets the regex string of the disk type to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Exclude disk type filter'
             description: 'Regex string to exclude disk by type.'
@@ -3837,7 +4153,7 @@ zabbix_export:
           description: 'The threshold of the disk usage in percent.'
           config:
             type: TEXT
-            priority: '41'
+            priority: '42'
             section_name: Thresholds
             label: 'Warning disk usage threshold'
             description: 'Threshold of disk usage in percent. In the range from 0 to 100 inclusive.'
@@ -3847,7 +4163,7 @@ zabbix_export:
           description: 'The threshold of DSP card CPU usage in percent.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Thresholds
             label: 'Warning DSP card CPU usage threshold'
             description: 'DSP card CPU usage threshold. In the range from 0 to 100 inclusive.'
@@ -3857,7 +4173,7 @@ zabbix_export:
           description: 'Sets the regex string of the interface name to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Include interface name filter'
             description: 'Regex string to include interface by name.'
@@ -3866,7 +4182,7 @@ zabbix_export:
           description: 'Sets the regex string of the interface name to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Exclude interface name filter'
             description: 'Regex string to exclude interface by name.'
@@ -3875,7 +4191,7 @@ zabbix_export:
           description: 'Sets the regex string of the interface type to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Include interface type filter'
             description: 'Regex string to include interface by type.'
@@ -3884,7 +4200,7 @@ zabbix_export:
           description: 'Sets the regex string of the interface type to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Exclude interface type filter'
             description: 'Regex string to exclude interface by type.'
@@ -3893,7 +4209,7 @@ zabbix_export:
           description: 'The update interval for the script items that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Other
             label: 'Update interval'
             description: 'The interval for retrieving request metrics.'
@@ -3902,7 +4218,7 @@ zabbix_export:
           description: 'The update interval for the script item that retrieve the active alarms.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Other
             label: 'Update interval for get active alarms'
             description: 'The interval for retrieving the active alarms.'
@@ -3911,7 +4227,7 @@ zabbix_export:
           description: 'The update interval for the script item that retrieve the certificate info.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Other
             label: 'Update interval for get certificate info'
             description: 'The interval for retrieving the system stats metrics.'
@@ -3920,7 +4236,7 @@ zabbix_export:
           description: 'The update interval for the script item that retrieve the disk partition data.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Other
             label: 'Update interval for get disk partition data'
             description: 'The interval for retrieving the disk partition metrics.'
@@ -3929,7 +4245,7 @@ zabbix_export:
           description: 'The update interval for the script item that retrieve the DSP card data.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Other
             label: 'Update interval for get DSP card metrics'
             description: 'The interval for retrieving the DSP card metrics.'
@@ -3938,7 +4254,7 @@ zabbix_export:
           description: 'The update interval for the script item that retrieve the fan data.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Other
             label: 'Update interval for get fan data'
             description: 'The interval for retrieving the fan metrics.'
@@ -3947,7 +4263,7 @@ zabbix_export:
           description: 'The update interval for the script item that retrieve the interface data.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Other
             label: 'Update interval for get interface data'
             description: 'The interval for retrieving the interface metrics.'
@@ -3956,7 +4272,7 @@ zabbix_export:
           description: 'The update interval for the script item that retrieve the power supply data.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Other
             label: 'Update interval for get power supply data'
             description: 'The interval for retrieving the power supply metrics.'
@@ -3965,7 +4281,7 @@ zabbix_export:
           description: 'The update interval for the script item that retrieve the SIP server data.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Other
             label: 'Update interval for get SIP server metrics'
             description: 'The interval for retrieving the SIP server metrics.'
@@ -3974,7 +4290,7 @@ zabbix_export:
           description: 'The update interval for the script item that retrieve the system stats.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Other
             label: 'Update interval'
             description: 'The interval for retrieving the system stats metrics.'
@@ -3983,7 +4299,7 @@ zabbix_export:
           description: 'The threshold of memory usage in percent.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Thresholds
             label: 'Warning memory usage threshold'
             description: 'Memory usage threshold In the range from 0 to 100 inclusive.'
@@ -4008,7 +4324,7 @@ zabbix_export:
           description: 'Sets the regex string of the SIP server name to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'Include SIP server name filter'
             description: 'Regex string to include SIP server by name.'
@@ -4017,7 +4333,7 @@ zabbix_export:
           description: 'Sets the regex string of the SIP server name to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'Exclude SIP server name filter'
             description: 'Regex string to exclude SIP server by name.'
@@ -4026,7 +4342,7 @@ zabbix_export:
           description: 'The threshold of the SIP server failed transactions.'
           config:
             type: TEXT
-            priority: '42'
+            priority: '43'
             section_name: Thresholds
             label: 'Warning SIP server failed transactions threshold'
             description: 'Threshold of SIP server failed transactions. No less than 0.'
@@ -4036,7 +4352,7 @@ zabbix_export:
           description: 'Sets the regex string of the SIP signal group description to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Filters
             label: 'Include SIP signal group description filter'
             description: 'Regex string to include SIP signal group by description.'
@@ -4045,7 +4361,7 @@ zabbix_export:
           description: 'Sets the regex string of the SIP signal group description to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Filters
             label: 'Exclude SIP signal group description filter'
             description: 'Regex string to exclude SIP signal group by description.'
@@ -4054,7 +4370,7 @@ zabbix_export:
           description: 'The threshold of temperature on the bottom of the main board in degrees Celsius.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Thresholds
             label: 'Warning temperature on the bottom of the main board in degrees celsius threshold'
             description: 'Temperature on the bottom of the main board in degrees celsius threshold.'
@@ -4064,7 +4380,7 @@ zabbix_export:
           description: 'The threshold of core switch temperature in degrees Celsius.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Thresholds
             label: 'Warning core switch temperature in degrees celsius threshold'
             description: 'Core switch temperature in degrees celsius threshold.'
@@ -4074,7 +4390,7 @@ zabbix_export:
           description: 'The threshold of power supply temperature in degrees Celsius.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Thresholds
             label: 'Warning power supply temperature in degrees celsius threshold'
             description: 'Power supply temperature in degrees celsius threshold.'
@@ -4084,7 +4400,7 @@ zabbix_export:
           description: 'The threshold of temperature on the top of the main board in degrees Celsius.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Thresholds
             label: 'Warning temperature on the top of the main board in degrees celsius threshold'
             description: 'Temperature on the top of the main board in degrees celsius threshold.'
@@ -4094,7 +4410,7 @@ zabbix_export:
           description: 'The timeout threshold for the script items that retrieve data from the API.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             label: 'API response timeout'
             description: 'Timeout for API responses in seconds.'
         - macro: '{$RIBBON.URL}'
