@@ -69,7 +69,7 @@ func NewPlugin(
 		Logger: log.New(name),
 	}
 	base.SetExternal(true)
-	base.SetHandleTimeout(true)
+	base.SetForceEffectiveTimeoutExtension(true)
 
 	return &Plugin{
 		Base:          base,
@@ -390,15 +390,18 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		respTimeout = time.Second*time.Duration(ctx.Timeout()) + time.Millisecond*500
 	}
 
+	useLegacyTimeout := ctx.LegacyTimeout()
+
 	resp, err := DoWithResponseAs[comms.ExportResponse](
 		p.broker,
 		&comms.ExportRequest{
 			Common: comms.Common{
 				Type: comms.ExportRequestType,
 			},
-			Key:     key,
-			Params:  params,
-			Timeout: ctx.Timeout(),
+			Key:           key,
+			Params:        params,
+			Timeout:       ctx.Timeout(),
+			LegacyTimeout: &useLegacyTimeout,
 		},
 		respTimeout,
 	)
@@ -414,35 +417,60 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func getConnection(listener net.Listener, timeout time.Duration) (net.Conn, error) {
-	var (
-		connC = make(chan net.Conn)
-		errC  = make(chan error)
-		t     = time.NewTimer(timeout)
-	)
+	type acceptResult struct {
+		conn net.Conn
+		err  error
+	}
 
-	defer func() {
-		close(connC)
-		close(errC)
-		t.Stop()
-	}()
+	resultC := make(chan acceptResult, 1)
 
 	go func() {
 		conn, err := listener.Accept()
-		if err != nil {
-			errC <- err
-		}
-
-		connC <- conn
+		resultC <- acceptResult{conn: conn, err: err}
 	}()
 
+	timer := time.NewTimer(timeout)
+	defer timer.Stop()
+
 	select {
-	case conn := <-connC:
-		return conn, nil
-	case err := <-errC:
-		return nil, err
-	case <-t.C:
-		return nil, errs.Errorf(
-			"failed to get connection within the time limit %d", timeout,
-		)
+	case result := <-resultC:
+		return result.conn, result.err
+	case <-timer.C:
 	}
+
+	// Accept may have completed at the same time as the timer. Check its result
+	// before attempting cancellation because there may no longer be a pending
+	// Accept to unblock. This is particularly important on Windows, where
+	// cancelAccept connects a synthetic client to the listener.
+	select {
+	case result := <-resultC:
+		if result.conn != nil {
+			closeErr := result.conn.Close()
+			if closeErr != nil {
+				log.Debugf("failed to close timed-out external plugin connection: %s", closeErr)
+			}
+		}
+
+		return nil, errs.Errorf("failed to get connection within the time limit %s", timeout)
+	default:
+	}
+
+	cleanup, err := cancelAccept(listener)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to cancel timed out accept")
+	}
+	defer cleanup()
+
+	// Wait for the canceled Accept and close its server-side connection.
+	// cleanup handles a different resource: it resets the listener deadline on
+	// Linux or closes the synthetic client connection on Windows.
+	result := <-resultC
+	if result.conn != nil {
+		closeErr := result.conn.Close()
+		if closeErr != nil {
+			log.Debugf("failed to close canceled external plugin connection: %s", closeErr)
+		}
+	}
+
+	return nil, errs.Errorf("failed to get connection within the time limit %s", timeout)
 }

@@ -39,7 +39,7 @@ zabbix_export:
         Device: ZYXEL IES-500x
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -49,10 +49,6 @@ zabbix_export:
           key: 'zabbix[host,snmp,available]'
           valuemap:
             name: 'SNMP available'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           tags:
             - tag: component
               value: network
@@ -1939,12 +1935,21 @@ zabbix_export:
             section_name: Thresholds
             label: 'Time interval'
             description: 'The time interval for SNMP agent availability trigger expression.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '3'
+            section_name: Thresholds
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
         - macro: '{$ZYXEL.ADSL.ATN.MAX}'
           value: '40'
           description: 'Type the maximum signal attenuation'
           config:
             type: TEXT
-            priority: '4'
+            priority: '5'
             section_name: Thresholds
             label: 'Max signal attenuation'
             description: 'Type the maximum signal attenuation'
@@ -1954,7 +1959,7 @@ zabbix_export:
           description: 'Type the minimum signal to noise margin (0-31 dB)'
           config:
             type: TEXT
-            priority: '3'
+            priority: '4'
             section_name: Thresholds
             label: 'Min signal-to-noise margin (0-31 dB)'
             description: 'Type the minimum signal to noise margin (0-31 dB)'
@@ -1973,7 +1978,7 @@ zabbix_export:
           description: 'Filter by discoverable interface names.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Filters
             label: 'Filter for interface description (include)'
             description: 'Filter by discoverable interface names.'
@@ -1982,7 +1987,7 @@ zabbix_export:
           description: 'Filter to exclude discovered interfaces by name.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Filters
             label: 'Filter for interface description (exclude)'
             description: 'Filter to exclude discovered interfaces by name.'
@@ -1991,7 +1996,7 @@ zabbix_export:
           description: 'Filter of discoverable link types.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Filter for interface link status (include)'
             description: 'Filter of discoverable link types.'
@@ -2000,7 +2005,7 @@ zabbix_export:
           description: 'Filter to exclude discovered by link types.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Filter for interface link status (exclude)'
             description: 'Filter to exclude discovered by link types.'
@@ -2010,7 +2015,7 @@ zabbix_export:
           description: 'Filter by discoverable slot status.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Filter for slot status (include)'
             description: 'Filter by discoverable slot status.'
@@ -2019,7 +2024,7 @@ zabbix_export:
           description: 'Filter to exclude discovered slots by status.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Filter for slot status (exclude)'
             description: 'Filter to exclude discovered slots by status.'
@@ -2151,11 +2156,20 @@ zabbix_export:
               newvalue: lowerLayerDown
   triggers:
     - uuid: d618295a763f42cd9063fad5cd600c34
-      expression: '(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)>0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)<10m) or (last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)=0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime)<10m)'
+      expression: |
+        (last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)>0 and change(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)<0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime,#2)<42949672.96-(lastclock(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)-lastclock(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime,#2)))
+        or (last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)=0 and change(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime)<0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime,#2)<42949672.96-(lastclock(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime)-lastclock(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime,#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)>{$SNMP.UPTIME.WARN}
+        or last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime)>{$SNMP.UPTIME.WARN}
       name: 'ZYXEL: Host has been restarted'
-      event_name: 'ZYXEL: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'ZYXEL: {HOST.NAME} has been restarted'
       priority: INFO
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       tags:
         - tag: scope

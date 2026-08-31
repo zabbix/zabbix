@@ -86,7 +86,7 @@ $html_page
 			->setId('problem_form')
 			->setName('problem')
 			->addItem([
-				(new CDataTable())->setId('problems'),
+				(new CDataTable())->setId('datatable-problems'),
 				(new CActionButtonList('action', 'eventids', [
 					'acknowledge.edit' => [
 						'content' => (new CSimpleButton(_('Mass update')))
@@ -113,6 +113,7 @@ $html_page->show();
 		'filter' => $data['filter'],
 		'filter_defaults' => $data['filter_defaults'],
 		'filter_options' => $data['filter_options'],
+		'highlight_row_enabled' => $data['highlight_row_enabled'],
 		'layout_mode' => $web_layout_mode,
 		'page' => $data['page'],
 		'refresh_interval' => $data['refresh_interval'],

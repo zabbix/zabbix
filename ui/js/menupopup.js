@@ -225,7 +225,8 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// discovery
-			url = new Curl('host_discovery.php');
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'lldrule.list');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -1122,18 +1123,17 @@ function getMenuPopupItem(options) {
 			}
 		});
 
-		url = new Curl('host_discovery.php');
-		url.setArgument('form', 'create');
-		url.setArgument('hostid', options.hostid);
-		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
-		url.setArgument('master_itemid', options.itemid);
-		url.setArgument('backurl', options.backurl);
-		url.setArgument('context', options.context);
-
 		config_urls.push({
 			label: t('Create dependent discovery rule'),
-			url: url.getUrl(),
-			disabled: options.isDiscovery
+			disabled: options.isDiscovery,
+			clickCallback: () => {
+				ZABBIX.PopupManager.open('lldrule.edit', {
+					context: options.context,
+					hostid: options.hostid,
+					master_itemid: options.itemid,
+					type: 18 // ITEM_TYPE_DEPENDENT
+				});
+			}
 		});
 
 		sections.push({
@@ -1756,7 +1756,7 @@ jQuery(function($) {
 			// Close other action menus and prevent focus jumping before opening a new popup.
 			$('.menu-popup-top').menuPopup('close', null, false);
 
-			$opener.attr('aria-expanded', 'true');
+			event.target.setAttribute('aria-expanded', 'true');
 
 			let $menu_popup = $('<ul>', {
 				'role': 'menu',
@@ -1767,6 +1767,11 @@ jQuery(function($) {
 			// Add custom class, if specified.
 			if ('class' in options) {
 				$menu_popup.addClass(options.class);
+			}
+
+			// Add dynamic ID, if specified.
+			if ('id' in options) {
+				$menu_popup.prop('id', options.id);
 			}
 
 			$opener.data({

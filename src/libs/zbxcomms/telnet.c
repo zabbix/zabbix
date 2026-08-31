@@ -304,15 +304,13 @@ static char	telnet_lastchar(const char *buf, size_t offset)
 
 static int	telnet_rm_echo(char *buf, size_t *offset, const char *echo, size_t len)
 {
-	if (0 == memcmp(buf, echo, len))
-	{
-		*offset -= len;
-		memmove(&buf[0], &buf[len], *offset * sizeof(char));
+	if (*offset < len || 0 != memcmp(buf, echo, len))
+		return FAIL;
 
-		return SUCCEED;
-	}
+	*offset -= len;
+	memmove(&buf[0], &buf[len], *offset * sizeof(char));
 
-	return FAIL;
+	return SUCCEED;
 }
 
 static void	telnet_rm_prompt(const char *buf, size_t *offset)

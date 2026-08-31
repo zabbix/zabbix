@@ -104,7 +104,7 @@ zabbix_export:
             - Since version 7.2.0, you can also connect to the MSSQL instance using its name. To do this, set the connection string in the `MSSQL URI` host wizard configuration field as `<protocol://host/instance_name>`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Databases
       items:
@@ -1094,7 +1094,7 @@ zabbix_export:
             - uuid: e47d0eeac246490cbeedb8ba1cf77e94
               expression: 'max(/MSSQL by Zabbix agent 2/mssql.page_life_expectancy,15m)<{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}'
               name: 'MSSQL: Page life expectancy is low'
-              event_name: 'MSSQL: Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}min for 15m)'
+              event_name: 'MSSQL: Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}sec for 15m)'
               priority: HIGH
               description: 'The page stays in the buffer pool without references for less time than the threshold value.'
               tags:
@@ -3914,13 +3914,13 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}'
           value: '300'
-          description: 'The minimum page life expectancy - for the trigger expression.'
+          description: 'The minimum page life (in seconds) expectancy - for the trigger expression.'
           config:
             type: TEXT
             priority: '13'
             section_name: Thresholds
             label: 'Page life expectancy threshold'
-            description: 'Threshold of the minimum page life expectancy. No less than 0.'
+            description: 'The minimum page life (in seconds) expectancy - for the trigger expression. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MSSQL.PAGE_READS.MAX}'
           value: '90'
