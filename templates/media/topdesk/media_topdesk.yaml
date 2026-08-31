@@ -287,7 +287,7 @@ zabbix_export:
         		Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket updating.');
         		fields.action = params.alert_message.replace(/\n/g, '<br>');
         
-        		resp = Media.request('put', 'tas/api/incidents/number/' + Media.params.issue_key, fields);
+        		resp = Media.request('put', 'tas/api/incidents/number/' + encodeURIComponent(Media.params.issue_key), fields);
         		if (typeof resp.response !== 'object' || typeof resp.response.id === 'undefined'
         				|| resp.response.number !== Media.params.issue_key) {
         			throw 'Cannot update ' + Media.name + ' issue. Check debug log for more information.';
