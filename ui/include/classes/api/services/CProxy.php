@@ -37,10 +37,35 @@ class CProxy extends CApiService {
 		'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'lastaccess', 'version', 'compatibility', 'state'
 	];
 
-	public const APM_DEFAULTS = [
-		'additional_resource_attributes' => [],
-		'data_collection_status' => PROXY_APM_DATA_COLLECTION_DISABLED,
-		'max_messages_per_second' => 0
+	public const APM_SCHEMA = [
+		'data_collection_status' => [
+			'type' => API_INT32,
+			'default' => PROXY_APM_DATA_COLLECTION_DISABLED
+		],
+		'max_messages_per_second' => [
+			'type' => API_INT32,
+			'default' => 0
+		],
+		'additional_resource_attributes' => [
+			'type' => API_OBJECTS,
+			'default' => [],
+			'fields' => [
+				'key' => [
+					'type' => API_STRING_UTF8,
+					'default' => '',
+					'length' => 255
+				],
+				'value' => [
+					'type' => API_STRING_UTF8,
+					'default' => '',
+					'length' => 255
+				],
+				'signal_type' => [
+					'type' => API_INT32,
+					'default' => SIGNAL_TYPE_TRACES,
+				]
+			]
+		]
 	];
 
 	/**
@@ -74,10 +99,10 @@ class CProxy extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			'selectApm' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', array_keys(self::APM_SCHEMA)), 'default' => null],
 			'selectAssignedHosts' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', array_diff(CHost::OUTPUT_FIELDS, ['proxyid', 'proxy_groupid', 'assigned_proxyid'])), 'default' => null],
 			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', array_diff(CHost::OUTPUT_FIELDS, ['proxyid', 'proxy_groupid', 'assigned_proxyid'])), 'default' => null],
 			'selectProxyGroup' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff(CProxyGroup::OUTPUT_FIELDS, ['proxy_groupid'])), 'default' => null],
-			'selectApm' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['additional_resource_attributes', 'data_collection_status', 'max_messages_per_second']), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
@@ -188,12 +213,42 @@ class CProxy extends CApiService {
 	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
+		$this->addRelatedApms($options, $result);
 		$this->addRelatedAssignedHosts($options, $result);
 		$this->addRelatedHosts($options, $result);
 		$this->addRelatedProxyGroup($options, $result);
-		$this->addRelatedApm($options, $result);
 
 		return $result;
+	}
+
+	private function addRelatedApms(array $options, array &$result): void {
+		if ($options['selectApm'] === null) {
+			return;
+		}
+
+		foreach ($result as &$row) {
+			if ($row['apm'] === DB::getDefault('proxy', 'apm')) {
+				$row['apm'] = array_map(static fn(array $field) => $field['default'], self::APM_SCHEMA);
+
+				continue;
+			}
+
+			$apm = json_decode($row['apm'], true);
+
+			if (in_array('additional_resource_attributes', $options['selectApm'])) {
+				CArrayHelper::sort($apm['additional_resource_attributes'], ['signal_type', 'key']);
+
+				foreach ($apm['additional_resource_attributes'] as &$attribute) {
+					unset($attribute['id']);
+				}
+				unset($attribute);
+
+				$apm['additional_resource_attributes'] = array_values($apm['additional_resource_attributes']);
+			}
+
+			$row['apm'] = array_intersect_key($apm, array_flip($options['selectApm']));
+		}
+		unset($row);
 	}
 
 	private function addRelatedAssignedHosts(array $options, array &$result): void {
@@ -280,30 +335,6 @@ class CProxy extends CApiService {
 		$result = $relation_map->mapOne($result, $db_proxy_groups, 'proxyGroup');
 	}
 
-	private function addRelatedApm(array $options, array &$result): void {
-		if ($options['selectApm'] === null) {
-			return;
-		}
-
-		$selectApm = $options['selectApm'] === API_OUTPUT_EXTEND
-			? array_keys(self::APM_DEFAULTS)
-			: array_intersect(array_keys(self::APM_DEFAULTS), $options['selectApm']);
-
-		$apmOptionsMap = array_flip($selectApm);
-
-		foreach ($result as &$row) {
-			$apm_raw = array_key_exists('apm', $row) ? $row['apm'] : null;
-			$apm = json_decode($apm_raw, true);
-
-			if (!$apm) {
-				$apm = self::APM_DEFAULTS;
-			}
-
-			$row['apm'] = array_intersect_key($apm, $apmOptionsMap);
-		}
-		unset($row);
-	}
-
 	/**
 	 * @param array $proxies
 	 *
@@ -320,12 +351,13 @@ class CProxy extends CApiService {
 
 		self::validateCreate($proxies);
 
-		foreach ($proxies as &$proxy) {
-			self::prepareApmForDb($proxy);
-		}
-		unset($proxy);
+		$ins_proxies = [];
 
-		$proxyids = DB::insert('proxy', $proxies);
+		foreach ($proxies as $proxy) {
+			$ins_proxies[] = array_diff_key($proxy, array_flip(['apm']));
+		}
+
+		$proxyids = DB::insert('proxy', $ins_proxies);
 		$proxy_rtdata = [];
 
 		foreach ($proxies as $index => &$proxy) {
@@ -336,16 +368,8 @@ class CProxy extends CApiService {
 
 		DB::insert('proxy_rtdata', $proxy_rtdata, false);
 
+		self::updateApms($proxies);
 		self::updateHosts($proxies);
-
-		foreach ($proxies as &$proxy) {
-			if ($proxy['apm'] == json_encode([], JSON_FORCE_OBJECT)) {
-				unset($proxy['apm']);
-			}
-		}
-		unset($proxy);
-
-		self::prepareApmForAuditLog($proxies);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_PROXY, $proxies);
 
@@ -375,9 +399,9 @@ class CProxy extends CApiService {
 		$upd_proxies = [];
 
 		foreach ($proxies as &$proxy) {
-			self::prepareApmForDb($proxy, $db_proxies);
-
-			$upd_proxy = DB::getUpdatedValues('proxy', $proxy, $db_proxies[$proxy['proxyid']]);
+			$upd_proxy = DB::getUpdatedValues('proxy', array_diff_key($proxy, array_flip(['apm'])),
+				$db_proxies[$proxy['proxyid']]
+			);
 
 			if ($upd_proxy) {
 				$upd_proxies[] = [
@@ -392,102 +416,78 @@ class CProxy extends CApiService {
 			DB::update('proxy', $upd_proxies);
 		}
 
+		self::updateApms($proxies, $db_proxies);
 		self::updateHosts($proxies, $db_proxies);
-		self::prepareApmForAuditLog($proxies);
-		self::prepareApmForAuditLog($db_proxies);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_PROXY, $proxies, $db_proxies);
 
 		return ['proxyids' => array_column($proxies, 'proxyid')];
 	}
 
-	private static function prepareApmForAuditLog(array &$proxies): void {
+	private static function updateApms(array &$proxies, ?array $db_proxies = null): void {
+		$upd_proxies = [];
+
 		foreach ($proxies as &$proxy) {
-			if (!array_key_exists('apm', $proxy)) {
+			if (!array_key_exists('apm', $proxy) || !$proxy['apm']) {
 				continue;
 			}
 
-			$_apm_fields = json_decode($proxy['apm'], true);
-			$apm_fields = [];
+			$db_proxy = $db_proxies !== null ? $db_proxies[$proxy['proxyid']] : null;
 
-			if ($_apm_fields) {
-				$apm_fields['additional_resource_attributes'] = self::prepareApmAttributesForAuditLog($_apm_fields);
-				$apm_fields['data_collection_status'] = $_apm_fields['data_collection_status'];
-				$apm_fields['max_messages_per_second'] = $_apm_fields['max_messages_per_second'];
-			}
-			else {
-				$apm_fields = self::APM_DEFAULTS;
+			if ($proxy['apm']['data_collection_status'] == PROXY_APM_DATA_COLLECTION_DISABLED) {
+				if ($db_proxy !== null
+						&& $proxy['apm']['data_collection_status'] != $db_proxy['apm']['data_collection_status']) {
+					$upd_proxies[] = [
+						'values' => ['apm' => DB::getDefault('proxy', 'apm')],
+						'where' => ['proxyid' => $proxy['proxyid']]
+					];
+
+					$proxy['apm'] += array_map(static fn(array $field) => $field['default'], self::APM_SCHEMA);
+				}
+
+				continue;
 			}
 
-			$proxy['apm'] = $apm_fields;
+			$proxy['apm'] += $db_proxy !== null
+				? $db_proxy['apm']
+				: array_map(static fn(array $field) => $field['default'], self::APM_SCHEMA);
+
+			$proxy['apm'] = array_merge(self::APM_SCHEMA, $proxy['apm']);
+
+			if (array_key_exists('additional_resource_attributes', $proxy['apm'])) {
+				$attributes_schema = self::APM_SCHEMA['additional_resource_attributes']['fields'];
+				$db_attributes = $db_proxy !== null ? $db_proxy['apm']['additional_resource_attributes'] : [];
+
+				foreach ($proxy['apm']['additional_resource_attributes'] as $i => &$attribute) {
+					$attribute += array_map(static fn(array $field) => $field['default'], $attributes_schema);
+					$attribute = array_merge($attributes_schema, $attribute);
+
+					if ($db_attributes) {
+						$id = key($db_attributes);
+						unset($db_attributes[$id]);
+					}
+					else {
+						$id = $i;
+					}
+
+					$attribute = ['id' => $id] + $attribute;
+				}
+				unset($attribute);
+			}
+
+			if ($db_proxy === null || $proxy['apm'] != $db_proxy['apm']) {
+				$upd_proxies[] = [
+					'values' => ['apm' => json_encode($proxy['apm'], JSON_UNESCAPED_UNICODE)],
+					'where' => ['proxyid' => $proxy['proxyid']]
+				];
+			}
 		}
 		unset($proxy);
-	}
 
-	private static function prepareApmAttributesForAuditLog(array $_apm_fields): array {
-		$apm_fields = [];
-
-		foreach ($_apm_fields['additional_resource_attributes'] as $i => $fields) {
-			if (!$fields) {
-				continue;
-			}
-
-			$apm_fields[$i + 1] = [
-				'signal_type' => $fields['signal_type'],
-				'key' => (string) ($fields['key']),
-				'value' => (string) $fields['value']
-			];
-		}
-
-		return $apm_fields;
-	}
-
-	private static function prepareApmForDb(array &$proxy, ?array $db_proxies = null): void {
-		if (array_key_exists('apm', $proxy) && array_key_exists('data_collection_status', $proxy['apm'])
-				&& $proxy['apm']['data_collection_status'] === PROXY_APM_DATA_COLLECTION_ENABLED) {
-			$proxy['apm'] = array_merge(self::APM_DEFAULTS, $proxy['apm']);
-
-			if ($proxy['apm']['additional_resource_attributes']) {
-				CArrayHelper::sort($proxy['apm']['additional_resource_attributes'], ['signal_type', 'key']);
-
-				$proxy['apm']['additional_resource_attributes'] = array_values(
-					$proxy['apm']['additional_resource_attributes']
-				);
-
-				$default_attributes = [
-					'signal_type' => 0,
-					'key' => '',
-					'value' => ''
-				];
-
-				foreach ($proxy['apm']['additional_resource_attributes'] as &$attributes) {
-					$attributes = array_merge($default_attributes, $attributes);
-				}
-				unset($attributes);
-			}
-
-			$proxy['apm'] = json_encode($proxy['apm'], JSON_UNESCAPED_UNICODE);
-		}
-		else {
-			if ($db_proxies) {
-				if (array_key_exists('apm', $proxy) && $proxy['apm']
-						&& array_key_exists('data_collection_status', $proxy['apm'])
-						&& $proxy['apm']['data_collection_status'] === PROXY_APM_DATA_COLLECTION_DISABLED) {
-					$proxy['apm'] = json_encode([], JSON_FORCE_OBJECT);
-
-					return;
-				}
-				else {
-					$proxy['apm'] = $db_proxies[$proxy['proxyid']]['apm'];
-
-					return;
-				}
-			}
-
-			$proxy['apm'] = json_encode([], JSON_FORCE_OBJECT);
+		if ($upd_proxies) {
+			DB::update('proxy', $upd_proxies);
 		}
 	}
-
 
 	/**
 	 * @param array      $proxies
@@ -714,6 +714,7 @@ class CProxy extends CApiService {
 											['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_subject')]
 			]],
+			'apm' =>					self::getApmValidationRules(),
 			'custom_timeouts' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]), 'default' => DB::getDefault('proxy', 'custom_timeouts')],
 			'timeout_zabbix_agent' =>	['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_zabbix_agent')],
@@ -757,8 +758,7 @@ class CProxy extends CApiService {
 			]],
 			'hosts' =>					['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'apm' =>					['type' => API_OBJECT, 'fields' => self::getApmValidationRules()]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
@@ -969,8 +969,7 @@ class CProxy extends CApiService {
 				'allowed_addresses', 'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
 				'tls_subject', 'tls_psk_identity', 'tls_psk', 'custom_timeouts', 'timeout_zabbix_agent',
 				'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
-				'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser',
-				'apm'
+				'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
 			],
 			'proxyids' => array_column($proxies, 'proxyid'),
 			'preservekeys' => true
@@ -1021,6 +1020,7 @@ class CProxy extends CApiService {
 			'tls_psk' =>				['type' => API_ANY],
 			'tls_issuer' =>				['type' => API_ANY],
 			'tls_subject' =>			['type' => API_ANY],
+			'apm' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
 			'custom_timeouts' =>		['type' => API_ANY],
 			'timeout_zabbix_agent' =>	['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_zabbix_agent')],
@@ -1064,8 +1064,7 @@ class CProxy extends CApiService {
 			]],
 			'hosts' =>					['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'apm' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
@@ -1076,18 +1075,6 @@ class CProxy extends CApiService {
 		$proxies = $this->extendObjectsByKey($proxies, $db_proxies, 'proxyid', ['tls_connect', 'tls_accept']);
 
 		self::addRequiredFieldsByTls($proxies, $db_proxies);
-
-		foreach ($proxies as &$proxy) {
-			if (array_key_exists('apm', $proxy) && $proxy['apm'] && $db_proxies[$proxy['proxyid']]['apm'] !== '{}') {
-				if (array_key_exists('data_collection_status', $proxy['apm'])
-						&& $proxy['apm']['data_collection_status'] == PROXY_APM_DATA_COLLECTION_DISABLED) {
-					continue;
-				}
-
-				$proxy['apm'] += json_decode($db_proxies[$proxy['proxyid']]['apm'], true);
-			}
-		}
-		unset($proxy);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'tls_connect' =>		['type' => API_ANY],
@@ -1107,13 +1094,15 @@ class CProxy extends CApiService {
 			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'tls_subject')]
-			]],
-			'apm' =>					['type' => API_OBJECT, 'fields' => self::getApmValidationRules()]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		self::addAffectedApms($proxies, $db_proxies);
+		self::validateApms($proxies, $db_proxies);
 
 		self::checkDuplicates($proxies, $db_proxies);
 		self::checkProxyGroups($proxies, $db_proxies);
@@ -1122,25 +1111,6 @@ class CProxy extends CApiService {
 
 		self::addAffectedHosts($proxies, $db_proxies);
 		self::checkHosts($proxies, $db_proxies);
-	}
-
-	private static function getApmValidationRules(): array {
-		return [
-			'data_collection_status' =>			['type' => API_INT32, 'in' => implode(',', [PROXY_APM_DATA_COLLECTION_DISABLED, PROXY_APM_DATA_COLLECTION_ENABLED])],
-			'max_messages_per_second' => 		['type' => API_MULTIPLE, 'rules' => [
-													['if' => static fn(array $data): bool => array_key_exists('data_collection_status', $data) && $data['data_collection_status'] == PROXY_APM_DATA_COLLECTION_ENABLED, 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => 0],
-													['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'additional_resource_attributes' =>	['type' => API_MULTIPLE, 'rules' => [
-													['if' => static fn(array $data): bool => array_key_exists('data_collection_status', $data) && $data['data_collection_status'] == PROXY_APM_DATA_COLLECTION_ENABLED, 'type' => API_OBJECTS, 'uniq' => [['signal_type', 'key']], 'fields' => [
-														'key' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
-														'value' => 			['type' => API_STRING_UTF8, 'length' => 255],
-														'signal_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS])]
-
-													]],
-													['else' => true, 'type' => API_UNEXPECTED]
-			]]
-		];
 	}
 
 	private static function addRequiredFieldsByProxyGroupid(array &$proxies, array $db_proxies): void {
@@ -1200,6 +1170,82 @@ class CProxy extends CApiService {
 			}
 		}
 		unset($proxy);
+	}
+
+
+	private static function addAffectedApms(array $proxies, array &$db_proxies): void {
+		$proxyids = [];
+
+		foreach ($proxies as $proxy) {
+			if (array_key_exists('apm', $proxy)) {
+				$proxyids[] = $proxy['proxyid'];
+			}
+		}
+
+		if (!$proxyids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['proxyid', 'apm'],
+			'proxyids' => $proxyids
+		];
+		$resource = DBselect(DB::makeSql('proxy', $options));
+
+		while ($row = DBfetch($resource)) {
+			if ($row['apm'] === DB::getDefault('proxy', 'apm')) {
+				$db_proxies[$row['proxyid']]['apm'] =
+					array_map(static fn(array $field) => $field['default'], self::APM_SCHEMA);
+
+				continue;
+			}
+
+			$apm = json_decode($row['apm'], true);
+
+			$apm['additional_resource_attributes'] = array_column($apm['additional_resource_attributes'], null, 'id');
+			CArrayHelper::sort($apm['additional_resource_attributes'], ['signal_type', 'key']);
+
+			$db_proxies[$row['proxyid']]['apm'] = $apm;
+		}
+	}
+
+	private static function validateApms(array &$proxies, array $db_proxies): void {
+		foreach ($proxies as &$proxy) {
+			if (!array_key_exists('apm', $proxy)) {
+				continue;
+			}
+
+			$db_proxy = $db_proxies[$proxy['proxyid']];
+
+			$proxy['apm'] += ['data_collection_status' => $db_proxy['apm']['data_collection_status']];
+
+			$api_input_rules = self::getApmValidationRules(true);
+
+			if (!CApiInputValidator::validate($api_input_rules, $proxy['apm'], '/apm', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+		unset($proxy);
+	}
+
+	private static function getApmValidationRules(bool $is_update = false): array {
+		$attributes_schema = self::APM_SCHEMA['additional_resource_attributes']['fields'];
+
+		return ['type' => API_OBJECT, 'fields' => [
+			'data_collection_status' =>			['type' => API_INT32, 'in' => implode(',', [PROXY_APM_DATA_COLLECTION_DISABLED, PROXY_APM_DATA_COLLECTION_ENABLED])] + ($is_update ? [] : ['default' => self::APM_SCHEMA['data_collection_status']['default']]),
+			'max_messages_per_second' => 		['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'data_collection_status', 'in' => PROXY_APM_DATA_COLLECTION_ENABLED], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
+													['else' => true, 'type' => API_INT32, 'in' => self::APM_SCHEMA['max_messages_per_second']['default']]
+			]],
+			'additional_resource_attributes' =>	['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'data_collection_status', 'in' => PROXY_APM_DATA_COLLECTION_ENABLED], 'type' => API_OBJECTS, 'uniq' => [['signal_type', 'key']], 'fields' => [
+				'key' =>								['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => $attributes_schema['key']['length']],
+				'value' => 								['type' => API_STRING_UTF8, 'length' => $attributes_schema['key']['length']],
+				'signal_type' =>						['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS])]
+													]],
+													['else' => true, 'type' => API_OBJECTS, 'length' => 0]
+			]]
+		]];
 	}
 
 	/**

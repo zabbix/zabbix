@@ -607,7 +607,7 @@ class CAudit {
 		'mediatype.message_templates' => 'mediatype_messageid',
 		'mediatype.parameters' => 'mediatype_paramid',
 		'proxy.hosts' => 'hostid',
-		'proxy.apm.additional_resource_attributes' => null,
+		'proxy.apm.additional_resource_attributes' => 'id',
 		'regexp.expressions' => 'expressionid',
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',

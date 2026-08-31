@@ -170,7 +170,7 @@ class CControllerProxyEdit extends CController {
 					'timeout_telnet_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
 					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
 					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
-				] + CProxy::APM_DEFAULTS
+				] + array_map(static fn(array $field) => $field['default'], CProxy::APM_SCHEMA)
 			];
 		}
 
