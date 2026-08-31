@@ -37,6 +37,7 @@ class CTextAreaFlexible extends CTag {
 			->setName($name)
 			->setAttribute('value', $value)
 			->setAttribute('data-field-type', 'z-textarea-flexible')
+			->setAttribute('singleline', 'singleline')
 			->setAttribute('maxlength', $this->default_maxlength);
 	}
 

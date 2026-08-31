@@ -188,7 +188,7 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#updateHeight() {
-		if (!this.isConnected || this.#is_resize_locked || this.#singleline) {
+		if (!this.isConnected || this.#is_resize_locked) {
 			return;
 		}
 
