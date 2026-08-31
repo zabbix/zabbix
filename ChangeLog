@@ -1,3 +1,12 @@
+Changes for 7.0.31rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-27924] fixed trigger recovery expression for Dell PowerEdge by HTTP templates (mruszczyk)
+..F....... [ZBX-28065] fixed missing ellipsis for 'Result' field in Test Item form (scernisenko)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.30
 
 7.0.30rc1 was released as 7.0.30 without any changes

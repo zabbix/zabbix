@@ -19,6 +19,7 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"Discord"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "Discord", e.g. {$HTTP.TLS.VERIFY:"Discord"}.|
 |zabbix_url|\{$ZABBIX\.URL\}|The URL of the Zabbix frontend.|
 |user_agent|ZabbixServer \(zabbix\.com, 7\.0\)|The user agent to use in the request.|
 
