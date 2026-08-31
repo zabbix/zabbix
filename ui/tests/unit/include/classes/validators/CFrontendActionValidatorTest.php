@@ -75,11 +75,11 @@ class CFrontendActionValidatorTest extends TestCase {
 			['zabbix.php?no_action=123',															'a relative URL to the frontend is expected'],
 			['zabbix.php?action=invalid',															'invalid action in the frontend URL'],
 
-			// Excluded legacy controllers
+			// Excluded legacy controllers.
 			['index.php',																			'a relative URL to the frontend is expected'],
 			['index_http.php',																		'a relative URL to the frontend is expected'],
 			['index_mfa.php',																		'a relative URL to the frontend is expected'],
-			['index_sso.php',																		'a relative URL to the frontend is expected'],
+			['index_sso.php',																		'a relative URL to the frontend is expected']
 		];
 	}
 
