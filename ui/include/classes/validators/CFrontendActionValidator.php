@@ -27,7 +27,7 @@ class CFrontendActionValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($value): bool {
-		$value = explode('#', $value)[0];
+		$value = explode('#', $value, 2)[0];
 
 		preg_match('/^(?<filename>[a-z0-9_.]+\.php)(?<query>\?.*)?$/i', $value, $match);
 
