@@ -1113,9 +1113,11 @@ class testFormEventCorrelation extends CWebTest {
 
 		$name = 'Event correlation for delete';
 		$table->query('link', $name)->one()->click();
-		COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Delete')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->assertEquals('Delete event correlation?', $this->page->getAlertText());
 		$this->page->acceptAlert();
+		$dialog->ensureNotPresent();
 
 		$this->assertMessage(TEST_GOOD, 'Event processing rule deleted');
 		$this->assertTableStats($row_count_before - 1);
