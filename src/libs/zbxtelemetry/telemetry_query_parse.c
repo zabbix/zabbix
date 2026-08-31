@@ -998,7 +998,7 @@ int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out,
 		return FAIL;
 
 	if (granularity_tmp > lookback_limit_tmp)
-		return ret_errf(FAIL, error, max_error_len, "granularity cannot be larger than lookback limit");
+		return ret_errf(FAIL, error, max_error_len, "\"granularity\" cannot be larger than \"lookback_limit\"");
 
 	if (NULL != time_shift_out)
 		*time_shift_out = time_shift_tmp;
