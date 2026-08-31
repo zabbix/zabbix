@@ -797,6 +797,18 @@ class testTriggerCEP extends CIntegrationTest {
 	// see prepareDataCepWindowCloseWindowOperations() with $unsuppress_on_close.
 	const CEP_RULE_WINDOW_SIMPLE_CLOSE_UNSUPPRESS_POINTS = self::CEP_RULE_NAME_PREFIX
 		.'window simple close window unsuppress points';
+	// The rule of the flavour a user suppresses and unsuppresses beside: the rule of the first of them operation
+	// for operation, driven by an assessment that additionally suppresses every problem of the run manually and
+	// takes that suppression away again - a suppression of a user and one of a rule are separate records
+	// (event_suppress holds one per eventid and cep_ruleid, and a manual one carries neither a cep_ruleid nor a
+	// maintenanceid), so neither of them may touch the other. See runEventAssessmentTestCepWindowCloseWindow()
+	// with $manual_suppress.
+	const CEP_RULE_WINDOW_SIMPLE_CLOSE_MANUAL_SUPPRESS_POINTS = self::CEP_RULE_NAME_PREFIX
+		.'window simple close window manual suppress points';
+	// How long the manual suppression of that flavour is asked for. It has to outlast the run exactly as the
+	// period of the rule does: a manual suppression that lapsed on its own could otherwise be mistaken for one
+	// the manual unsuppress took away.
+	const CEP_RULE_WINDOW_CLOSE_MANUAL_SUPPRESS_SECONDS = self::CEP_RULE_WINDOW_CLOSE_SUPPRESS_SECONDS;
 	// The close window flavours compute both limits of their windows instead, from the number of ids they drive and
 	// the number of values each of them is sent, see getCloseWindowDuration() and getCloseWindowCapacity().
 	// They, like the windowed flavours of the operations scenario, also hand those limits to the window as user
@@ -3772,6 +3784,19 @@ HEREDOC;
 		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
 			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_ADDED, false, false,
 			false, false, false, true
+		);
+	}
+
+	/**
+	 * The same rule once more, for the flavour a user suppresses and unsuppresses beside: nothing about the rule
+	 * differs - what the manual suppression adds is done by the assessment while the windows are full, see
+	 * runEventAssessmentTestCepWindowCloseWindow() with $manual_suppress. It is a rule of its own only so that the
+	 * two flavours never share one, the rule being what a suppression is keyed on.
+	 */
+	public function prepareDataCepWindowSimpleCloseWindowManualSuppressPoints() {
+		return $this->prepareDataCepWindowCloseWindowOperations(CCepRuleHelper::WINDOW_SIMPLE,
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_MANUAL_SUPPRESS_POINTS, CCepRuleHelper::WHEN_EVENT_ADDED, false,
+			false, false, false, false, true
 		);
 	}
 
@@ -11599,6 +11624,32 @@ HEREDOC;
 	}
 
 	/**
+	 * The same run with a user suppressing beside the rule: while every window is full - every event suppressed by
+	 * the rule at the points it reached and nothing closed yet - every open problem of the run is suppressed
+	 * manually through event.acknowledge and then unsuppressed again. A manual suppression is a record of its own,
+	 * carrying neither a cep_ruleid nor a maintenanceid, so suppressing has to add a second record beside the one
+	 * of the rule and unsuppressing has to remove that one alone: the server deletes only the records of neither a
+	 * maintenance nor a rule, so the suppression of the rule must come out of the cycle untouched. Everything after
+	 * it is what the flavour without a user asserts - the windows close as they do there and every event comes out
+	 * suppressed once, by the rule, at exactly the points it reached - which is what shows the two suppressions
+	 * left each other alone. See runEventAssessmentTestCepWindowCloseWindow() and runCepManualSuppressionCycle().
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCloseWindowManualSuppressPoints$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCloseWindowManualSuppressPoints() {
+		$this->prepareDataCepWindowSimpleCloseWindowManualSuppressPoints();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCloseWindow(
+				self::CEP_RULE_WINDOW_SIMPLE_CLOSE_MANUAL_SUPPRESS_POINTS, false, false, false, true, true
+			);
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * The same with the window ended by the eviction of the "up" event: that event never entered the window, so it
 	 * is the one event of the run suppressed at the eviction point and at neither of the points of an event a
 	 * window held - see runEventAssessmentTestCepWindowCloseWindow().
@@ -15582,6 +15633,155 @@ return;
 	}
 
 	/**
+	 * Suppress every open problem of the run manually, through event.acknowledge as a user does it, and take that
+	 * suppression away again - the cycle the $manual_suppress flavour of the close window family adds while its
+	 * windows are full, see runEventAssessmentTestCepWindowCloseWindow().
+	 *
+	 * Both halves are read against the suppression the rule of that flavour has already put on every one of those
+	 * events: a manual suppression is a record of its own, carrying neither a cep_ruleid nor a maintenanceid (see
+	 * the temporary suppression task in taskmanager_server.c), so suppressing has to add a second record beside the
+	 * one of the rule, and unsuppressing has to remove that second one alone - the server deletes only the records
+	 * of neither a maintenance nor a rule, so what every event is left with is the one of the rule, untouched.
+	 *
+	 * $expected_count is how many open problems there have to be to suppress, so a cycle that ran on fewer events
+	 * than the run has open fails here instead of passing for the events it did reach.
+	 *
+	 * The suppression is asked for until a moment that outlasts the whole run
+	 * (CEP_RULE_WINDOW_CLOSE_MANUAL_SUPPRESS_SECONDS), so a manual suppression that is gone at the end of the cycle
+	 * cannot be one that lapsed on its own - only the unsuppress could have taken it away. Both halves are carried
+	 * out by a task the server picks up rather than by the API call itself, hence the waits.
+	 */
+	private function runCepManualSuppressionCycle(array $triggerids, int $expected_count): void {
+		$response = $this->call('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'output' => ['eventid']
+		]);
+		$eventids = array_column($response['result'], 'eventid');
+
+		$this->assertCount($expected_count, $eventids,
+			'Expected '.$expected_count.' open problem(s) to suppress manually: '.json_encode($response['result'])
+		);
+
+		// The user asks for a deadline rather than for a period, and it has to outlast the run for the same reason
+		// the period of the rule does - see CEP_RULE_WINDOW_CLOSE_MANUAL_SUPPRESS_SECONDS.
+		$suppress_until = time() + self::CEP_RULE_WINDOW_CLOSE_MANUAL_SUPPRESS_SECONDS;
+
+		$this->call('event.acknowledge', [
+			'eventids' => $eventids,
+			'action' => ZBX_PROBLEM_UPDATE_SUPPRESS,
+			'suppress_until' => $suppress_until
+		]);
+
+		// Two records on every event now: the one the rule added at the points it suppressed at, and the one of the
+		// user beside it - with the deadline the user asked for and with neither a rule nor a maintenance to it.
+		$this->waitForCepManualSuppression($eventids, $suppress_until, 'After the manual suppression');
+
+		$this->call('event.acknowledge', [
+			'eventids' => $eventids,
+			'action' => ZBX_PROBLEM_UPDATE_UNSUPPRESS
+		]);
+
+		// And one again: the manual record is gone and the one of the rule is where it was, which is what the run
+		// carries on with - every assertion after this point is the one the flavour without a user makes.
+		$this->waitForCepManualSuppression($eventids, null, 'After the manual unsuppression');
+	}
+
+	/**
+	 * Poll event.get until every event of $eventids is suppressed by exactly the expected records: the single one
+	 * of the CEP rule always, and a manual one beside it when $suppress_until says the user has suppressed them -
+	 * with that very deadline, which is what tells the record of the user from the one of the rule beyond the
+	 * fields that name their owner. See runCepManualSuppressionCycle(), which is the only caller.
+	 */
+	private function waitForCepManualSuppression(array $eventids, ?int $suppress_until, string $info): void {
+		$this->callUntilDataIsPresent('event.get', [
+			'eventids' => $eventids,
+			'output' => ['eventid', 'name', 'suppressed'],
+			'selectSuppressionData' => ['maintenanceid', 'suppress_until', 'userid', 'cep_ruleid']
+		], static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+			function ($response) use ($eventids, $suppress_until, $info) {
+				if (count($response['result']) !== count($eventids)) {
+					return $info.': expected '.count($eventids).' event(s), got '.count($response['result']);
+				}
+
+				foreach ($response['result'] as $event) {
+					$error = $this->checkCepManualSuppressionEvent($event, $suppress_until, $info);
+
+					if ($error !== null) {
+						return $error;
+					}
+				}
+
+				return true;
+			}
+		);
+	}
+
+	/**
+	 * Check one event of the manual suppression cycle against the records it must be suppressed by, returning null
+	 * when it matches and a description of the mismatch otherwise. What is checked and why is in
+	 * runCepManualSuppressionCycle(), which is the only caller.
+	 */
+	private function checkCepManualSuppressionEvent(array $event, ?int $suppress_until, string $info): ?string {
+		$description = $info.': event '.$event['eventid'].' ('.$event['name'].') suppressed by '
+			.json_encode($event['suppression_data']);
+
+		// Neither half of the cycle takes the suppression of the rule away, so the event is suppressed throughout -
+		// what the user changes is only how many records say so.
+		if ((int) $event['suppressed'] !== 1) {
+			return $description.': suppressed '.$event['suppressed'].', expected 1 - the suppression of the rule is'
+				.' there whatever the user did';
+		}
+
+		$rule_records = [];
+		$manual_records = [];
+
+		foreach ($event['suppression_data'] as $suppression) {
+			// Both of the columns that name an owner are nullable, so a record that belongs to neither a
+			// maintenance nor a rule comes back with nulls rather than with zeroes.
+			$maintenanceid = isset($suppression['maintenanceid']) ? (int) $suppression['maintenanceid'] : 0;
+			$cep_ruleid = isset($suppression['cep_ruleid']) ? (int) $suppression['cep_ruleid'] : 0;
+			$userid = isset($suppression['userid']) ? (int) $suppression['userid'] : 0;
+
+			if ($maintenanceid != 0) {
+				return $description.': suppressed by maintenance '.$maintenanceid.', expected only the rule and'
+					.' the user';
+			}
+
+			if ($cep_ruleid != 0) {
+				$rule_records[] = $suppression;
+			}
+			elseif ($userid != 0) {
+				$manual_records[] = $suppression;
+			}
+			else {
+				return $description.': suppression '.json_encode($suppression).' belongs to neither the rule nor'
+					.' a user';
+			}
+		}
+
+		if (count($rule_records) !== 1) {
+			return $description.': '.count($rule_records).' suppression record(s) of a rule, expected the single'
+				.' one the rule of the flavour added - the user may neither add one nor take it away';
+		}
+
+		$expected_manual = $suppress_until === null ? 0 : 1;
+
+		if (count($manual_records) !== $expected_manual) {
+			return $description.': '.count($manual_records).' manual suppression record(s), expected '
+				.$expected_manual;
+		}
+
+		if ($suppress_until !== null && (int) $manual_records[0]['suppress_until'] !== $suppress_until) {
+			return $description.': manually suppressed until '.$manual_records[0]['suppress_until'].', expected '
+				.$suppress_until.', the deadline the user asked for';
+		}
+
+		return null;
+	}
+
+	/**
 	 * Drive the capacity flavour: one window with room for a single event, so every event after the first one
 	 * is evicted the moment it arrives, and the rule closes what it evicts.
 	 *
@@ -16107,9 +16307,28 @@ return;
 	 * reporting an error. That both rules really were processed for those events is read from the tags they add as an
 	 * event occurs, one of its own per rule (CEP_TAG_WINDOW_FIRST and CEP_TAG_WINDOW_SECOND): every problem event of
 	 * the run must carry both of them, so neither rule can have been left out of the events the other one closed.
+	 *
+	 * $manual_suppress adds a user to the suppress every execution point flavour it is given, so it means nothing
+	 * without $suppress_points. With the windows full - every event suppressed by the rule and nothing closed yet -
+	 * every open problem of the run is suppressed manually through event.acknowledge and then unsuppressed again,
+	 * which must leave the suppression of the rule exactly as it was: a manual suppression is a record of its own
+	 * (no cep_ruleid and no maintenanceid, see the taskmanager), so suppressing adds a second record beside the one
+	 * of the rule and unsuppressing removes that one alone - the server deletes only the records of neither a
+	 * maintenance nor a rule. The manual period outlasts the run as the one of the rule does, so a manual
+	 * suppression that is gone can only be one the unsuppress took away. Everything after the cycle is what the
+	 * flavour without a user does, the closing and the suppression of the rule alike, which is what shows that
+	 * neither of the two suppressions disturbed the other - see runCepManualSuppressionCycle().
 	 */
 	private function runEventAssessmentTestCepWindowCloseWindow(string $rule_name, bool $discarded = false,
-			bool $single_service = false, bool $doubled = false, bool $suppress_points = false): void {
+			bool $single_service = false, bool $doubled = false, bool $suppress_points = false,
+			bool $manual_suppress = false): void {
+		// The manual suppression is added beside the one of the rule and read against it, so the flavour it is
+		// asked for has to be one that suppresses at every execution point - there is nothing to leave alone
+		// otherwise.
+		$this->assertFalse($manual_suppress && !$suppress_points,
+			'The manual suppression of "'.$rule_name.'" has no suppression of a rule to be added beside.'
+		);
+
 		// The rules whose errors are reported when an assertion of the scenario fails: a doubled flavour has two, and
 		// either of them failing is what would leave the problems never closing.
 		$rule_names = $doubled ? [$rule_name, self::buildSecondRuleName($rule_name)] : [$rule_name];
@@ -16257,6 +16476,15 @@ return;
 				fn(array $event) => [self::CEP_SUPPRESS_POINT_OCCURRED, self::CEP_SUPPRESS_POINT_ADDED],
 				$suppress_from, self::CEP_RULE_WINDOW_CLOSE_SUPPRESS_SECONDS, $unsuppressed_at
 			);
+
+			if ($manual_suppress) {
+				// 1a. A user suppresses every one of those problems and takes that suppression away again, while
+				//     the rule keeps its own on all of them: the two are separate records, so the manual one is
+				//     added beside the one of the rule and removed without it. What the rule does afterwards -
+				//     the closing of every window and the suppressions read once it is over - is what the flavour
+				//     without a user does, which is what shows that neither suppression disturbed the other.
+				$this->runCepManualSuppressionCycle($all, $open);
+			}
 		}
 
 		// None of the windows has closed anything yet either, which is where the restarts stop and start the server:
