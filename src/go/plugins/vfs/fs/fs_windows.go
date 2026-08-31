@@ -148,22 +148,16 @@ func getFsStats(path string) (stats *FsStats, err error) {
 	return
 }
 
-func filterByMountpoint(paths []string, mountpoint string) []string {
+func matchMountpoint(path, mountpoint string) bool {
 	if mountpoint == "" {
-		return paths
+		return true
 	}
-	var filtered []string
-	for _, path := range paths {
-		fsname := path
-		if len(fsname) > 0 && fsname[len(fsname)-1] == '\\' {
-			fsname = fsname[:len(fsname)-1]
-		}
-		// Case-insensitive comparison for Windows
-		if strings.EqualFold(fsname, mountpoint) {
-			filtered = append(filtered, path)
-		}
+	fsname := path
+	if len(fsname) > 0 && fsname[len(fsname)-1] == '\\' {
+		fsname = fsname[:len(fsname)-1]
 	}
-	return filtered
+	// Case-insensitive comparison for Windows
+	return strings.EqualFold(fsname, mountpoint)
 }
 
 func (p *Plugin) getFsInfoStats(mountpoint string) (data []*FsInfoNew, err error) {
@@ -171,11 +165,12 @@ func (p *Plugin) getFsInfoStats(mountpoint string) (data []*FsInfoNew, err error
 	if paths, err = getMountPaths(); err != nil {
 		return
 	}
-	// Apply mountpoint filter before stat calls
-	paths = filterByMountpoint(paths, mountpoint)
-	fsmap := make(map[string]*FsInfoNew)
+
 	data = make([]*FsInfoNew, 0)
 	for _, path := range paths {
+		if !matchMountpoint(path, mountpoint) {
+			continue
+		}
 		var info FsInfoNew
 		if fsname, fstype, drivetype, drivelabel, fserr := getFsInfo(path); fserr == nil {
 			info.FsName = &fsname
@@ -188,31 +183,28 @@ func (p *Plugin) getFsInfoStats(mountpoint string) (data []*FsInfoNew, err error
 		}
 		if stats, fserr := getFsStats(path); fserr == nil {
 			info.Bytes = stats
-			fsmap[path] = &info
+			data = append(data, &info)
 		} else {
 			p.Debugf(`cannot obtain file system statistics for "%s": %s`, path, fserr)
 			continue
 		}
 	}
-	for _, path := range paths {
-		if info, ok := fsmap[path]; ok {
-			data = append(data, info)
-		}
-	}
 	return
 }
 
-func (p *Plugin) getFsInfoShort(mountpoint string) (data []*FsInfoShort, err error) {
+func (p *Plugin) getFsInfoShort(mountpoint string) (data []*FsInfoNew, err error) {
 	var paths []string
 	if paths, err = getMountPaths(); err != nil {
 		return
 	}
-	// Apply mountpoint filter before processing
-	paths = filterByMountpoint(paths, mountpoint)
-	data = make([]*FsInfoShort, 0)
+
+	data = make([]*FsInfoNew, 0)
 	for _, path := range paths {
+		if !matchMountpoint(path, mountpoint) {
+			continue
+		}
 		if fsname, fstype, drivetype, drivelabel, fserr := getFsInfo(path); fserr == nil {
-			data = append(data, &FsInfoShort{
+			data = append(data, &FsInfoNew{
 				FsName:     &fsname,
 				FsType:     &fstype,
 				DriveType:  &drivetype,
@@ -225,7 +217,7 @@ func (p *Plugin) getFsInfoShort(mountpoint string) (data []*FsInfoShort, err err
 	return
 }
 
-func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
+func (p *Plugin) getMountedFilesystems() (data []*FsInfo, err error) {
 	var paths []string
 	if paths, err = getMountPaths(); err != nil {
 		return
