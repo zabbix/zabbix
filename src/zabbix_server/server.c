@@ -13,6 +13,7 @@
 **/
 
 #include "config.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_SQLITE3
 #	error SQLite is not supported as a main Zabbix database backend.
@@ -367,7 +368,7 @@ static char	*CONFIG_USER		= NULL;
 
 static char	**config_history_providers = NULL;
 
-static char			*config_apm_provider = NULL;
+static char			**config_telemetry_providers = NULL;
 static zbx_apm_db_config_t	apm_db_config;
 
 /* web monitoring */
@@ -1293,7 +1294,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"BridgeAdapterConnectTo",	&config_bridge_adapter_connect_to,	ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"TelemetryProvider",		&config_apm_provider,			ZBX_CFG_TYPE_STRING,
+		{"TelemetryProvider",		&config_telemetry_providers,		ZBX_CFG_TYPE_MULTISTRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
@@ -1301,6 +1302,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
 	zbx_strarr_init(&config_history_providers);
+	zbx_strarr_init(&config_telemetry_providers);
 
 	zbx_parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE,
 			ZBX_CFG_ENVVAR_USE);
@@ -1327,6 +1329,7 @@ static void	zbx_free_config(void)
 {
 	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 	zbx_strarr_free(&config_history_providers);
+	zbx_strarr_free(&config_telemetry_providers);
 }
 
 static void	zbx_on_exit(int ret, void *on_exit_args)
@@ -2770,8 +2773,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	zbx_free_config();
-
 	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
@@ -2779,7 +2780,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_apm_db_config_init(&apm_db_config, config_apm_provider, zbx_config_source_ip,
+	if (SUCCEED != zbx_apm_db_config_init(&apm_db_config, config_telemetry_providers, zbx_config_source_ip,
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &zbx_config_vault,
 			&error))
 	{
@@ -2787,6 +2788,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	zbx_free_config();
 
 	zbx_unset_exit_on_terminate(zbx_on_exit_rtc);
 
