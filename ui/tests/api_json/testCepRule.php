@@ -2377,7 +2377,7 @@ class testCepRule extends CAPITest {
 			],
 			'Properties group_by* are optional' => [
 				'request' => [
-					'name' => 'ceprule.window.symptom.group_by_host_group',
+					'name' => 'ceprule.window.symptom.group_by',
 					'sortorder' => 1,
 					'operations' => [
 						[
@@ -2386,10 +2386,6 @@ class testCepRule extends CAPITest {
 							'type' => CCepRuleHelper::OP_SET_NAME,
 							'event_name' => 'bla'
 						]
-					],
-					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-					'window' => [
-						'duration' => '1h'
 					]
 				],
 				'expected_error' => null
