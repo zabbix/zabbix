@@ -226,7 +226,7 @@
 
 		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
-			<arg line="CONFIG_SITE='share/config.site.d/clang-debug-sanitize'"/>
+			<arg line="CONFIG_SITE='share/config.site.d/clang-debug'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
@@ -759,7 +759,7 @@
 
 		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
-			<arg line="CONFIG_SITE='share/config.site.d/clang-debug-sanitize'"/>
+			<arg line="CONFIG_SITE='share/config.site.d/clang-debug'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
