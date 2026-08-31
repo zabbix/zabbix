@@ -27,6 +27,8 @@
 static char	captured[MAX_BUFFER_LEN + 4096];
 static int	captured_calls = 0;
 
+void	__wrap_zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+
 void	__wrap_zbx_error(const char *fmt, ...)
 {
 	va_list	args;
