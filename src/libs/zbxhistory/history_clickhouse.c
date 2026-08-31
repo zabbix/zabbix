@@ -1540,7 +1540,7 @@ static int	history_clickhouse_fetch_batch(void *data, zbx_vector_item_history_t 
 }
 
 static void	history_clickhouse_add_value_type_info(zbx_history_provider_info_t *info, unsigned char value_type,
-		const char *schema)
+		const char *schema, char **local_table_name)
 {
 	zbx_history_provider_value_type_info_t	vti = {.value_type = value_type};
 	char					*ttl = NULL;
@@ -1568,55 +1568,72 @@ static void	history_clickhouse_add_value_type_info(zbx_history_provider_info_t *
 		}
 		zbx_free(ttl);
 	}
-	else if (NULL != strstr(schema, "TTL "))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot parse TTL information from ClickHouse schema: %s", schema);
-	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "no TTL defined in ClickHouse schema %s", schema);
+		if (NULL != local_table_name && SUCCEED == zbx_mregexp_sub(schema,
+				"ENGINE *= *Distributed\\([^,]+, *[^,]+, *['\\\\]+(\\w+)", "\\1",
+				ZBX_REGEXP_GROUP_CHECK_DISABLE, local_table_name))
+		{
+			return;
+		}
+
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse TTL information from ClickHouse schema: \"%s\"", schema);
 	}
 
 	zbx_vector_history_provider_value_type_info_append(&info->value_types, vti);
 }
 
-static void	history_clickhouse_get_value_type_data(zbx_clickhouse_data_t *d, CURLM *mhandle,
-		zbx_clickhouse_conn_t *conn, zbx_history_provider_info_t *info)
+static void	history_clickhouse_get_table_ttl(zbx_clickhouse_data_t *d, CURLM *mhandle,
+		zbx_clickhouse_conn_t *conn, zbx_history_provider_info_t *info, unsigned char value_type,
+		const char *table_name, char **local_table_name)
 {
 	char	*error = NULL;
 	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset;
+	size_t	sql_alloc = 0, sql_offset = 0;
 
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "show create table %s", table_name);
+
+	if (FAIL == clickhouse_conn_post(conn, d, mhandle, d->fetch_url, sql, CLICKHOUSE_RETRIES_OFF, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get TTL information for table %s from ClickHouse: %s",
+				table_name, error);
+		zbx_free(error);
+	}
+	else if (NULL == conn->resp.page.data)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get TTL information for table %s:"
+				" empty response received from ClickHouse", table_name);
+	}
+	else
+	{
+		history_clickhouse_add_value_type_info(info, value_type, conn->resp.page.data, local_table_name);
+	}
+
+	zbx_free(sql);
+}
+
+static void	history_clickhouse_get_value_type_data(zbx_clickhouse_data_t *d, CURLM *mhandle,
+		zbx_clickhouse_conn_t *conn, zbx_history_provider_info_t *info)
+{
 	zbx_vector_history_provider_value_type_info_reserve(&info->value_types, ITEM_VALUE_TYPE_COUNT);
 
 	for (unsigned char i = 0; i < ITEM_VALUE_TYPE_NONE; i++)
 	{
+		char	*local_table = NULL;
+
 		if (FAIL == ZBX_HISTORY_CHECK_TYPE_FLAGS(d->value_type_flags, i))
 			continue;
 
-		sql_offset = 0;
+		history_clickhouse_get_table_ttl(d, mhandle, conn, info, i, clickhouse_history_tables[i], &local_table);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "show create table %s", clickhouse_history_tables[i]);
-
-		if (FAIL == clickhouse_conn_post(conn, d, mhandle, d->fetch_url, sql, CLICKHOUSE_RETRIES_OFF, &error))
+		if (NULL != local_table)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get TTL information for table %s from ClickHouse: %s",
-					clickhouse_history_tables[i], error);
-			zbx_free(error);
-			continue;
-		}
+			if ('\0' != *local_table)
+				history_clickhouse_get_table_ttl(d, mhandle, conn, info, i, local_table, NULL);
 
-		if (NULL == conn->resp.page.data)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get TTL information for table %s:"
-					" empty response received from ClickHouse", clickhouse_history_tables[i]);
-			continue;
+			zbx_free(local_table);
 		}
-
-		history_clickhouse_add_value_type_info(info, i, conn->resp.page.data);
 	}
-
-	zbx_free(sql);
 }
 
 /******************************************************************************
