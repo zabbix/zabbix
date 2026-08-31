@@ -42,8 +42,37 @@ class testCepRule extends CAPITest {
 					]
 				],
 				[
-					'name' => 'update.fail',
+					'name' => 'window_type=simple',
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'sortorder' => 2,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_ADDED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'event'
+						]
+					]
+				],
+				[
+					'name' => 'window_type=pattern_match',
+					'window_type' => CCepRuleHelper::WINDOW_PATTERN_MATCH,
+					'window' => [
+						'script' => 'return 0;'
+					],
+					'sortorder' => 3,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_PATTERN_MATCHED,
+							'type' => CCepRuleHelper::OP_SET_SEVERITY,
+							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+						]
+					]
+				],
+				[
+					'name' => 'update.fail',
+					'sortorder' => 4,
 					'operations' => [
 						[
 							'sortorder' => 1,
@@ -2593,15 +2622,6 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			/* API return error - Invalid parameter "/1/operations/1": unexpected parameter "cep_operationid".
-			'Window required on window type switch' => [
-				'request' => [
-					'cep_ruleid' => ':ceprule:update.fail',
-					'window_type' => CCepRuleHelper::WINDOW_SIMPLE
-				],
-				'expected_error' => 'Invalid parameter "/1/window": an array is expected.'
-			],
-			*/
 			'Unexpected fields in window are rejected' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
@@ -2611,6 +2631,20 @@ class testCepRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window": unexpected parameter "unexpected".'
+			],
+			'Cannot change window_type from WINDOW_SIMPLE to WINDOW_NONE when operations[].execute_when is not supported' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:window_type=simple',
+					'window_type' => CCepRuleHelper::WINDOW_NONE
+				],
+				'Invalid parameter "/1/operations/1/execute_when": value must be 0.'
+			],
+			'Cannot change window_type from WINDOW_PATTERN_MATCH to WINDOW_NONE when operations[].execute_when is not supported' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:window_type=pattern_match',
+					'window_type' => CCepRuleHelper::WINDOW_NONE
+				],
+				'Invalid parameter "/1/operations/1/execute_when": value must be 0.'
 			],
 			'Switch to group_by_tags requires tags' => [
 				'request' => [
