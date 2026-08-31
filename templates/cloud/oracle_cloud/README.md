@@ -3,22 +3,20 @@
 
 ## Overview
 
-This template is designed as a master template that discovers various Oracle Cloud Infrastructure (OCI) services
-and resources, such as:
+This template is designed to monitor Oracle Cloud by HTTP.
+It works without any external scripts and uses the script item.
+Currently, the template supports the discovery of Compute instances, Autonomous Databases, Virtual Cloud Networks (VCNs), Block Volumes, Boot Volumes, and Object Storage resources.
 
-* OCI Compute;
+## Included Monitoring Templates
 
-* OCI Autonomous Database (serverless);
+- *Oracle Cloud Autonomous Database by HTTP*
+- *Oracle Cloud Block Volume by HTTP*
+- *Oracle Cloud Boot Volume by HTTP*
+- *Oracle Cloud Compute by HTTP*
+- *Oracle Cloud Networking by HTTP*
+- *Oracle Cloud Object Storage by HTTP*
 
-* OCI Object Storage;
-
-* OCI Virtual Cloud Networks (VCNs);
-
-* OCI Block Volumes;
-
-* OCI Boot Volumes.
-
-For communication with OCI, this template utilizes script items which execute HTTP `GET` and `POST` requests. 
+For communication with OCI, this template utilizes script items which execute HTTP `GET` and `POST` requests.
 `POST` requests are required for OCI Monitoring API as it utilizes Monitoring Query Language (MQL) which uses an
 HTTP request body for queries.
 

@@ -139,8 +139,8 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertTrue($this->query('button:Sign in')->waitUntilClickable()->one()->isClickable());
 				$this->page->assertTitle('Zabbix');
-				$this->assertTrue($this->query('button:Sign in')->one()->isClickable());
 				$this->page->userLogin('Admin', $data['password1']);
 				$this->assertTrue($this->query('xpath://a[@title="Admin (Zabbix Administrator)" and text()='.
 						'"User settings"]')->exists()

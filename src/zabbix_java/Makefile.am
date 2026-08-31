@@ -9,7 +9,7 @@ EXTRA_DIST = \
 	startup.sh
 
 ZJG = bin/zabbix-java-gateway-$(VERSION).jar
-LIB = lib/android-json-4.3_r3.1.jar:lib/logback-core-1.5.16.jar:lib/logback-classic-1.5.16.jar:lib/slf4j-api-2.0.16.jar:lib/dnsjava-3.6.4.jar
+LIB = lib/android-json-4.3_r3.1.jar:lib/logback-core-1.5.25.jar:lib/logback-classic-1.5.25.jar:lib/slf4j-api-2.0.16.jar:lib/dnsjava-3.6.4.jar
 
 JUNIT = tests/junit-4.8.2.jar
 
@@ -21,7 +21,7 @@ $(ZJG): class src/com/zabbix/gateway/*.java
 	$(JAVAC) -d class/src -classpath $(LIB) src/com/zabbix/gateway/*.java
 	$(JAR) cf $(ZJG) -C class/src .
 
-test: class
+test: $(ZJG)
 	echo "badger useruser" > tests/com/zabbix/gateway/jmx_test_beans/jmxremote.password
 	chmod 600 tests/com/zabbix/gateway/jmx_test_beans/jmxremote.password
 	$(JAVAC) tests/com/zabbix/gateway/jmx_test_beans/*.java
