@@ -908,6 +908,12 @@ static int	cep_operation_event_copy(const zbx_cep_operation_t *op, zbx_cep_event
 	if (NULL == (event = cep_event_context_get_event(ctx)))
 		goto out;
 
+	if (ZBX_EVENT_COPIED == event->flags)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot clone cloned event");
+		goto out;
+	}
+
 	zbx_timespec(&ts);
 
 	if (NULL == (db_event = cep_db_event_create(&event->origin, event->name, ts.sec, ts.ns, event->severity,
