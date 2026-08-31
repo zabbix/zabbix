@@ -218,7 +218,7 @@
 
 						if (maintenance.status == HOST_MAINTENANCE_STATUS_ON) {
 							let hint = `${escapeHtml(maintenance.name)} [${
-								Number(maintenance.type) === MAINTENANCE_TYPE_NODATA
+								maintenance.type == MAINTENANCE_TYPE_NODATA
 									? <?= json_encode(_('Maintenance without data collection')); ?>
 									: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 

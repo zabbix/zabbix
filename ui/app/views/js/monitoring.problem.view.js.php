@@ -424,7 +424,7 @@
 							}
 
 							let hint = `${escapeHtml(maintenance_name)} [${
-								Number(maintenance_type) === MAINTENANCE_TYPE_NODATA
+								maintenance_type == MAINTENANCE_TYPE_NODATA
 									? <?= json_encode(_('Maintenance without data collection')); ?>
 									: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
