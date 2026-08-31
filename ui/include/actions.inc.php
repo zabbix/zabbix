@@ -1155,8 +1155,7 @@ function getEventsActionsIconsData(array $events, array $triggers): array {
 			'severities' => $severities['data'],
 			'actions' => $actions
 		],
-		'userids' => $messages['userids'] + $severities['userids'] + $suppressions['userids'],
-		'cep_ruleids' => $suppressions['cep_ruleids']
+		'userids' => $messages['userids'] + $severities['userids'] + $suppressions['userids']
 	];
 }
 
@@ -1183,7 +1182,6 @@ function getEventsActionsIconsData(array $events, array $triggers): array {
 function getEventsSuppressions(array $events): array {
 	$suppressions = [];
 	$userids = [];
-	$cep_ruleids = [];
 
 	// Create array of suppressions for each event.
 	foreach ($events as $event) {
@@ -1207,29 +1205,6 @@ function getEventsSuppressions(array $events): array {
 
 				$userids[$ack['userid']] = true;
 			}
-			elseif (($ack['action'] & ZBX_PROBLEM_UPDATE_CEP) == ZBX_PROBLEM_UPDATE_CEP) {
-				$operations = array_reverse(json_decode($ack['details'], true)['cep']);
-
-				foreach ($operations as $operation) {
-					if ($operation['operation'] == CCepRuleHelper::OP_SUPPRESS) {
-						$event_suppressions[] = [
-							'suppress_until' => $operation['suppress']['until'],
-							'cep_ruleid' => $ack['cep_ruleid'],
-							'clock' => $ack['clock']
-						];
-
-						$cep_ruleids[$ack['cep_ruleid']] = true;
-					}
-					elseif ($operation['operation'] == CCepRuleHelper::OP_UNSUPPRESS) {
-						$event_suppressions[] = [
-							'cep_ruleid' => $ack['cep_ruleid'],
-							'clock' => $ack['clock']
-						];
-
-						$cep_ruleids[$ack['cep_ruleid']] = true;
-					}
-				}
-			}
 		}
 
 		$suppressions[$event['eventid']] = [
@@ -1240,8 +1215,7 @@ function getEventsSuppressions(array $events): array {
 
 	return [
 		'data' => $suppressions,
-		'userids' => $userids,
-		'cep_ruleids' => $cep_ruleids
+		'userids' => $userids
 	];
 }
 
@@ -1643,12 +1617,11 @@ function getSingleEventActions(array $event, array $r_events, array $alerts): ar
  * @param array $users  User name, surname and username.
  *
  * @param bool $is_acknowledged  Is the event currently acknowledged. If true, display icon.
- * @param array $ceprules  CEP rule name.
  *
  * @return CCol|string
  */
-function makeEventActionsIcons(string $eventid, array $actions, array $users, bool $is_acknowledged, array $ceprules) {
-	$suppression_icon = makeEventSuppressionsProblemIcon($actions['suppressions'][$eventid], $users, $ceprules);
+function makeEventActionsIcons(string $eventid, array $actions, array $users, bool $is_acknowledged) {
+	$suppression_icon = makeEventSuppressionsProblemIcon($actions['suppressions'][$eventid], $users);
 	$messages_icon = makeEventMessagesIcon($actions['messages'][$eventid], $users);
 	$severities_icon = makeEventSeverityChangesIcon($actions['severities'][$eventid], $users);
 	$actions_icon = makeEventActionsIcon($actions['actions'][$eventid], $eventid);
@@ -1694,11 +1667,10 @@ function makeEventActionsIcons(string $eventid, array $actions, array $users, bo
  * ]]
  *
  * @param array $users  User name, surname and username.
- * @param array $ceprules  CEP rule name.
  *
  * @return CButtonIcon|null
  */
-function makeEventSuppressionsProblemIcon(array $data, array $users, array $ceprules): ?CButtonIcon {
+function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIcon {
 	if ($data['count'] == 0) {
 		return null;
 	}
@@ -1707,26 +1679,13 @@ function makeEventSuppressionsProblemIcon(array $data, array $users, array $cepr
 
 	for ($i = 0; $i < $data['count'] && $i < ZBX_WIDGET_ROWS; $i++) {
 		$suppression = $data['suppress_until'][$i];
-		$ceprule_name = '';
 
 		// Added in order to reuse makeActionTableUser().
-		if (array_key_exists('cep_ruleid', $suppression)) {
-			$suppression['action_type'] = ZBX_EVENT_HISTORY_CEP_UPDATE;
-			$ceprule_name = array_key_exists($suppression['cep_ruleid'], $ceprules)
-				? $ceprules[$suppression['cep_ruleid']]['name']
-				: _('Inaccessible complex event processing rule');
-		}
-		else {
-			$suppression['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
-		}
+		$suppression['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		if (array_key_exists('suppress_until', $suppression)) {
-			$title = $suppression['action_type'] == ZBX_EVENT_HISTORY_CEP_UPDATE
-				? _s('Suppressed by complex event processing: %1$s', $ceprule_name)
-				: _('Manually suppressed');
-
-			$icon = (new CIcon(ZBX_ICON_EYE_OFF, $title))
-				->setAttribute('aria-label', $title);
+			$icon = (new CIcon(ZBX_ICON_EYE_OFF, _('Manually suppressed')))
+				->setAttribute('aria-label', _('Manually suppressed'));
 
 			if ($suppression['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
 				$suppress_until = _s('Indefinitely');
@@ -1739,12 +1698,8 @@ function makeEventSuppressionsProblemIcon(array $data, array $users, array $cepr
 			}
 		}
 		else {
-			$title = $suppression['action_type'] == ZBX_EVENT_HISTORY_CEP_UPDATE
-				? _s('Unsuppressed by complex event processing: %1$s', $ceprule_name)
-				: _('Manually unsuppressed');
-
-			$icon = (new CIcon(ZBX_ICON_EYE, $title))
-				->setAttribute('aria-label', $title);
+			$icon = (new CIcon(ZBX_ICON_EYE, _('Manually unsuppressed')))
+				->setAttribute('aria-label', _('Manually unsuppressed'));
 			$suppress_until = '';
 		}
 

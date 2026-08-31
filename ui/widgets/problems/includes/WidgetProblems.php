@@ -143,7 +143,6 @@ class WidgetProblems extends CTableInfo {
 	 * @param int        $data['today']                         Timestamp of today's date.
 	 * @param array      $data['tasks']                         List of tasks. Used to determine current problem status.
 	 * @param array      $data['users']                         List of users.
-	 * @param array      $data['cep_rules']                     List of CEP rules.
 	 * @param array      $data['correlations']                  List of event correlations.
 	 * @param array      $data['fields']                        Problem widget filter fields.
 	 * @param int        $data['fields']['show']                "Show" filter option.
@@ -518,9 +517,7 @@ class WidgetProblems extends CTableInfo {
 							))
 					))->addClass(ZBX_STYLE_NOWRAP),
 					$problem_update_link,
-					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged,
-						$data['cep_rules']
-					),
+					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
 					$data['fields']['show_tags']
 						? (new CDiv($data['tags'][$problem['eventid']] ))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 						: null

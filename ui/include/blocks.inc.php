@@ -116,7 +116,7 @@ function getSystemStatusData(array $filter) {
 
 	$options = [
 		'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged', 'severity'],
-		'selectAcknowledges' => ['action', 'clock', 'userid', 'details', 'cep_ruleid'],
+		'selectAcknowledges' => ['action', 'clock', 'userid'],
 		'groupids' => array_keys($data['groups']),
 		'hostids' => $filter_hostids,
 		'evaltype' => $filter_evaltype,
@@ -136,7 +136,7 @@ function getSystemStatusData(array $filter) {
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 		unset($options['suppressed']);
-		$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until', 'userid', 'cep_ruleid'];
+		$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until', 'userid'];
 	}
 
 	if ($filter_ext_ack == EXTACK_OPTION_UNACK) {
@@ -254,7 +254,7 @@ function getSystemStatusData(array $filter) {
 		$problems_data = API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'severity'],
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-				'suppress_until', 'details', 'cep_ruleid'
+				'suppress_until'
 			],
 			'selectTags' => ['tag', 'value'],
 			'eventids' => array_keys($visible_problems),
@@ -291,13 +291,6 @@ function getSystemStatusData(array $filter) {
 		$actions = getEventsActionsIconsData($problems_data, $data['triggers']);
 		$data['actions'] = [
 			'all_actions' => $actions['data'],
-			'cep_rules' => $actions['cep_ruleids']
-				? API::CepRule()->get([
-					'output' => ['name'],
-					'cep_ruleids' => array_keys($actions['cep_ruleids']),
-					'preservekeys' => true
-				])
-				: [],
 			'users' => API::User()->get([
 				'output' => ['username', 'name', 'surname'],
 				'userids' => array_keys($actions['userids']),
@@ -791,9 +784,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 			zbx_date2age($problem['clock']),
 			$problem_update_link,
-			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['users'], $is_acknowledged,
-				$actions['cep_rules']
-			),
+			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['users'], $is_acknowledged),
 			(new CDiv($tags[$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 		]));
 	}
