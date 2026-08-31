@@ -1946,6 +1946,65 @@ class testBridgeAdapter extends CIntegrationTest {
 		);
 	}
 
+	/**
+	 * A regular Bearer-scheme API token must also be accepted for device.offboard, the same as it already
+	 * is for device.init - the DPoP token bound to a specific device is only an additional accepted
+	 * credential for offboarding, not a replacement for the existing authentication methods.
+	 *
+	 * @onBeforeOnce startBridgeAdapterMock
+	 * @onAfterOnce stopBridgeAdapterMock
+	 */
+	public function testBridgeAdapter_offboardWithBearerTokenAccepted(): void {
+		[$client] = $this->getServerClientAndSid();
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_BEARER);
+
+		$offboard_response = $client->offboardDevice([
+			'uuid' => self::OFFBOARD_DEVICE_UUID
+		], $token);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_trapper_device_offboard()', true,
+				120, 1);
+
+		$error = $client->getError();
+		$this->assertNotFalse($offboard_response, $error !== null ? $error : '');
+		$this->assertAdapterRequest('device.deactivate', static function (array $request): bool {
+			return $request['body']['params']['device_id'] === self::OFFBOARD_DEVICE_UUID;
+		});
+	}
+
+	/**
+	 * A DPoP-scheme token must not authenticate a trapper request unrelated to mobile devices at all, to
+	 * show the additional acceptance carved out for device.offboard did not loosen authentication for
+	 * trapper requests in general.
+	 */
+	public function testBridgeAdapter_dpopTokenRejectedForItemTest(): void {
+		[$client] = $this->getServerClientAndSid();
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_DPOP);
+
+		$result = $client->testItem([], $token);
+
+		$this->assertFalse($result,
+			'A DPoP-scheme token must not authenticate an item test request.'
+		);
+		$this->assertSame(self::ERROR_PERMISSION_DENIED, $client->getError());
+	}
+
+	/**
+	 * Same check as above, against a second unrelated trapper request, to confirm the restriction is not
+	 * tied to one specific request handler.
+	 */
+	public function testBridgeAdapter_dpopTokenRejectedForExpressionsEvaluate(): void {
+		[$client] = $this->getServerClientAndSid();
+		$token = $this->createAuthSchemeToken(ZBX_AUTH_SCHEME_DPOP);
+
+		$result = $client->expressionsEvaluate([], $token);
+
+		$this->assertFalse($result,
+			'A DPoP-scheme token must not authenticate an expression evaluation request.'
+		);
+		$this->assertSame(self::ERROR_PERMISSION_DENIED, $client->getError());
+	}
+
 	public function testBridgeAdapter_initMissingUserid(): void {
 		[$client, $sid] = $this->getServerClientAndSid();
 
