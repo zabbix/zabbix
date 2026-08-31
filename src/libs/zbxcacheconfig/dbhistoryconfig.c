@@ -1221,8 +1221,8 @@ int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock,
  *                                                                            *
  * Parameters: host     - [IN] host name                                      *
  *             sock     - [IN] connection socket                              *
- *             hostinfo - [OUT] host information                              *
  *             redirect - [OUT] host redirection data (optional)              *
+ *             hostinfo - [OUT]                                               *
  *                                                                            *
  * Return value: SUCCEED         - host found                                 *
  *               SUCCEED_PARTIAL - redirection data was specified and host is *

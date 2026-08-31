@@ -1697,7 +1697,7 @@ int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *so
 	zbx_session_t		*session;
 	size_t			token_alloc = 0;
 	zbx_host_rights_t	rights = {0};
-	zbx_history_recv_host_t hostinfo;
+	zbx_history_recv_host_t	hostinfo;
 	char			*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
