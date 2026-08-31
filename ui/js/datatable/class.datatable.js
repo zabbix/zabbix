@@ -18,6 +18,7 @@ class CDataTable {
 	static EVENT_INIT = 'init';
 	static EVENT_BEFORE_RENDER = 'render:before';
 	static EVENT_RENDER = 'render';
+	static EVENT_AFTER_RENDER = 'render:after';
 	static EVENT_RESET = 'reset';
 	static EVENT_SAVE = 'save';
 	static EVENT_SCROLL = 'scroll';
@@ -70,6 +71,7 @@ class CDataTable {
 	static ZBX_STYLE_CELL_FOCUSED = 'cell-focused';
 	static ZBX_STYLE_CELL_RESIZING = 'cell-resizing';
 	static ZBX_STYLE_CELL_CHECKBOX = 'cell-checkbox';
+	static ZBX_STYLE_CELL_COMPACT = 'cell-compact';
 
 	static ZBX_STYLE_HEADER_NAME = 'header-name';
 	static ZBX_STYLE_HEADER_LINK = 'header-link';
@@ -1362,6 +1364,8 @@ class CDataTable {
 				this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
 
 				onSuccess(response);
+
+				this.dispatchEvent(CDataTable.EVENT_AFTER_RENDER, {response});
 			})
 			.catch(error => {
 				if (window.unloading) {
@@ -2852,7 +2856,11 @@ class CDataTable {
 			? Math.max(0, Math.min(table_options_button.clientWidth, right_edge - right_boundary))
 			: 0;
 
-		header_cell.target.style.paddingRight = `${right_offset}px`;
+		if (right_offset > 0) {
+			header_cell.target.style.paddingRight = `${right_offset}px`;
+		} else {
+			header_cell.target.style.paddingRight = null;
+		}
 
 		if (header_resizer) {
 			header_resizer.style.marginRight = `${right_offset}px`;

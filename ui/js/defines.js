@@ -154,6 +154,13 @@ const ZBX_STYLE_SELECTED_ITEM_COUNT = 'selected-item-count';
 const ZBX_STYLE_HINTBOX_RAW_DATA = 'hintbox-raw-data';
 const ZBX_STYLE_HINTBOX_WRAP = 'hintbox-wrap';
 
+const ZBX_STYLE_SPAN_COUNT = 'span-count';
+const ZBX_STYLE_ERROR_COUNT = 'error-count';
+
+const ZBX_STYLE_DURATION = 'duration';
+const ZBX_STYLE_DURATION_BAR = 'duration-bar';
+const ZBX_STYLE_DURATION_TIME_UNITS = 'duration-time-units';
+
 const ZBX_ICON_ALERT_WITH_CONTENT = 'zi-alert-with-content';
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';

@@ -25,6 +25,7 @@
 		#refresh_interval = null;
 		#refresh_interval_id = null;
 		#global_timerange = null;
+		/** @type {CDataTable|null} */
 		#datatable = null;
 		/** @type {HTMLFormElement|null} */
 		#filter_form_element = null;
@@ -121,20 +122,26 @@
 			this.#datatable = new CDataTable(document.getElementById('datatable-traces'), data_provider)
 				.setColumns([
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)
-						.setFields(['service_name'])
+						.setFields(['service_name', 'span_count', 'error_count'])
+						.setRenderer('service_name')
 						.setWidth('auto'),
 					new CDataTableColumn('operation_name', <?= json_encode(_('Operation name')); ?>)
-						.setFields(['operation_name'])
+						.setFields(['span_name'])
+						.setRenderer('operation_name')
 						.setWidth('auto'),
-					new CDataTableColumn('start_time', <?= json_encode(_('Start time')); ?>)
-						.setFields(['start_time'])
+					new CDataTableColumn('timestamp', <?= json_encode(_('Start time')); ?>)
+						.setFields(['timestamp'])
 						.setSortable(true)
-						.setWidth('auto'),
+						.setRenderer('timestamp'),
 					new CDataTableColumn('attributes', <?= json_encode(_('Attributes')); ?>)
-						.setFields(['attributes'])
-						.setWidth('auto'),
+						.setColumnOptions({
+							number_of_attributes: 3
+						})
+						.setFields(['span_attributes'])
+						.setRenderer('attributes'),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
-						.setFields(['duration'])
+						.setFields(['duration_time_units', 'duration_percentage'])
+						.setRenderer('duration')
 						.setWidth('auto')
 				])
 				.setPage(page)
@@ -144,6 +151,132 @@
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
+				.setStickyHeader(true)
+				.setStickyFooter(true)
+				.setCellRenderer('service_name', ({cell, cell_data}) => {
+					const [service_name, span_count, error_count] = cell_data;
+
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
+					const name = document.createElement('div');
+					name.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					name.textContent = service_name;
+
+					const spans = document.createElement('div');
+					spans.classList.add(ZBX_STYLE_SPAN_COUNT);
+					spans.textContent = span_count;
+
+					flex_wrapper.append(name, spans);
+
+					if (error_count > 0) {
+						const errors = document.createElement('div');
+						errors.classList.add(ZBX_STYLE_ERROR_COUNT);
+						errors.textContent = error_count;
+
+						flex_wrapper.appendChild(errors);
+					}
+
+					cell.appendChild(flex_wrapper);
+				})
+				.setCellRenderer('operation_name', ({cell, cell_data}) => {
+					const [operation_name] = cell_data;
+
+					const name = document.createElement('div');
+					name.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					name.textContent = operation_name;
+
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					flex_wrapper.appendChild(name);
+
+					cell.appendChild(flex_wrapper);
+				})
+				.setCellRenderer('timestamp', ({cell, cell_data}) => {
+					const [timestamp] = cell_data;
+
+					/** @type {HTMLDivElement} */
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK, 'wordbreak-clamp');
+					wordbreak.style.setProperty('--line-clamp', '2');
+					wordbreak.textContent = timestamp;
+
+					cell.appendChild(wordbreak);
+				})
+				.setCellRenderer('attributes', ({column, cell, cell_data}) => {
+					const [span_attributes] = cell_data;
+
+					if (!span_attributes || span_attributes.length === 0) {
+						return;
+					}
+
+					const span_attribute_labels = [];
+
+					const tags_wrapper = document.createElement('div');
+					tags_wrapper.classList.add(ZBX_STYLE_TAGS_WRAPPER);
+
+					const column_options = column.getColumnOptions();
+
+					let count = column_options.number_of_attributes;
+
+					for (const [attr_name, attr_value] of Object.entries(span_attributes)) {
+						const span_attribute_label = document.createElement('span');
+						span_attribute_label.classList.add(ZBX_STYLE_TAG);
+						span_attribute_label.textContent = `${attr_name}: ${attr_value}`;
+
+						span_attribute_labels.push(span_attribute_label);
+
+						if (count > 0) {
+							tags_wrapper.appendChild(span_attribute_label);
+
+							count--;
+						}
+					}
+
+					if (Object.keys(span_attributes).length > column_options.number_of_attributes) {
+						const more_attributes_hintbox = document.createElement('div');
+
+						for (const tag_label of span_attribute_labels) {
+							more_attributes_hintbox.appendChild(tag_label.cloneNode(true));
+						}
+
+						const more_attributes = document.createElement('button');
+						more_attributes.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE);
+						more_attributes.setAttribute('data-hintbox-html', more_attributes_hintbox.innerHTML);
+						more_attributes.setAttribute('data-hintbox-class', `${ZBX_STYLE_HINTBOX_WRAP} ${ZBX_STYLE_TAGS_WRAPPER}`);
+						more_attributes.setAttribute('data-hintbox', '1');
+						more_attributes.setAttribute('data-hintbox-static', '1');
+						more_attributes.setAttribute('aria-expanded', 'false');
+						more_attributes.setAttribute('aria-label', t('Show all span attributes'));
+
+						tags_wrapper.appendChild(more_attributes);
+					}
+
+					cell.appendChild(tags_wrapper);
+				})
+				.setCellRenderer('duration', ({cell, cell_data}) => {
+					const [duration_time_units, duration_percentage] = cell_data;
+
+					/** @type {HTMLDivElement} */
+					const bar = document.createElement('div');
+					bar.classList.add(ZBX_STYLE_DURATION_BAR);
+					bar.style.width = `${duration_percentage}%`;
+
+					const overflow_ellipsis = document.createElement('div');
+					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					overflow_ellipsis.textContent = duration_time_units;
+
+					const time_units = document.createElement('div');
+					time_units.classList.add(ZBX_STYLE_DURATION_TIME_UNITS);
+					time_units.appendChild(overflow_ellipsis);
+
+					const duration = document.createElement('div');
+					duration.classList.add(ZBX_STYLE_DURATION);
+					duration.append(bar, time_units);
+
+					cell.classList.add(CDataTable.ZBX_STYLE_CELL_COMPACT);
+					cell.appendChild(duration);
+				})
 				.on(CMessageHelper.EVENT_MESSAGE, e => {
 					e.stopPropagation();
 
@@ -163,6 +296,11 @@
 
 					if ('debug' in response) {
 						this.#refreshDebug(response.debug);
+					}
+				})
+				.on(CDataTable.EVENT_AFTER_RENDER, () => {
+					for (const row of this.#datatable.getElement().querySelectorAll(`.${CDataTable.ZBX_STYLE_ROW}`)) {
+						row.addEventListener('click', () => alert('TODO'));
 					}
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())

@@ -516,7 +516,7 @@ function convertSecondsToTimeUnits(float $value): string {
 			return round($value / SEC_PER_MILLISEC, ZBX_UNITS_ROUNDOFF_SUFFIXED)._x('ms', 'millisecond short');
 		}
 		elseif ($value >= SEC_PER_MICROSEC) {
-			return round($value / SEC_PER_MICROSEC, ZBX_UNITS_ROUNDOFF_SUFFIXED)._x('us', 'microsecond short');
+			return round($value / SEC_PER_MICROSEC, ZBX_UNITS_ROUNDOFF_SUFFIXED)._x('μs', 'microsecond short');
 		}
 
 		return round($value / SEC_PER_NANOSEC, ZBX_UNITS_ROUNDOFF_SUFFIXED)._x('ns', 'nanosecond short');

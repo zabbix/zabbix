@@ -38,7 +38,7 @@ class CControllerApmTraceView extends CController {
 			'filter_attributes' => ['array'],
 			'from' => ['string', 'use' => [CRangeTimeValidator::class]],
 			'to' => ['string', 'use' => [CRangeTimeValidator::class]],
-			'sort' => ['string', 'in' => ['start_time']],
+			'sort' => ['string', 'in' => ['timestamp']],
 			'sortorder' => ['string', 'in' => [ZBX_SORT_DOWN, ZBX_SORT_UP]],
 			'page' => ['integer', 'min' => 1],
 			'filter_custom_time' => ['integer', 'in' => [0, 1]],
@@ -68,8 +68,11 @@ class CControllerApmTraceView extends CController {
 			$this->deleteProfiles();
 		}
 
-		$sort_field = $this->getInput('sort', 'start_time');
-		$sort_order = $this->getInput('sortorder', ZBX_SORT_DOWN);
+		$sort_field = $this->getInput('sort', CProfile::get('web.apm.trace.sort', 'timestamp'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.apm.trace.sortorder', ZBX_SORT_DOWN));
+
+		CProfile::update('web.apm.trace.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$storage_idx = 'web.apm.traces.datatable';
 
@@ -106,7 +109,7 @@ class CControllerApmTraceView extends CController {
 
 		$data = [
 			'action' => $this->getAction(),
-			'default_sort_field' => 'start_time',
+			'default_sort_field' => 'timestamp',
 			'default_sort_order' => ZBX_SORT_DOWN,
 			'filter' => $filter,
 			'filter_options' => [

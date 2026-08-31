@@ -16,7 +16,8 @@
 
 class CControllerApmTraceViewData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['service_name', 'operation_name', 'start_time', 'attributes', 'duration'];
+	protected array $allowed_data_fields = ['service_name', 'span_count', 'error_count', 'span_name', 'timestamp',
+		'span_attributes', 'duration_time_units', 'duration_percentage'];
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_APM_TRACES);
@@ -24,7 +25,44 @@ class CControllerApmTraceViewData extends CControllerDataTable {
 
 	protected function getData(): array
 	{
+		$page = $this->getInput('page', 1);
+
+		$sort_field = $this->getInput('sort_field', 'timestamp');
+		$sort_order = $this->getInput('sort_order', ZBX_SORT_DOWN);
+
+		CProfile::update('web.apm.trace.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.sortorder', $sort_order, PROFILE_TYPE_STR);
+
+		$timeline = getTimeSelectorPeriod([
+			'profileIdx' => 'web.apm.trace.filter',
+			'profileIdx2' => 0,
+			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+			'to' => $this->hasInput('to') ? $this->getInput('to') : null
+		]);
+
+		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+		$traces = API::Apm()->getTraces([
+			'time_from' => $timeline['from_ts'],
+			'time_till' => $timeline['to_ts'],
+			'sortfield' => $sort_field,
+			'sortorder' => $sort_order,
+			'limit' => $limit
+		]);
+
 		$rows = [];
+
+		if ($traces) {
+			$this->paging = $this->paginate($traces, $page, $sort_order);
+
+			foreach ($traces as &$trace) {
+				$trace['duration_time_units'] = convertSecondsToTimeUnits(
+					bcmul($trace['duration'], sprintf('%f', SEC_PER_MICROSEC)));
+				$trace['duration_percentage'] = round(bcdiv($trace['duration'], 86_400_000_000) * 100);
+			}
+			unset($trace);
+
+			$rows = array_values(array_map(static fn (array $trace) => [[], $trace], $traces));
+		}
 
 		$output = [
 			'data_fields' => $this->getDataFields(),

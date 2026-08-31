@@ -493,6 +493,16 @@ form {
 .wordbreak {
 	white-space: pre-wrap;
 	word-break: break-word;
+
+	&.wordbreak-clamp {
+		--line-clamp: none;
+
+		display: -webkit-box;
+		overflow-wrap: break-word;
+		overflow: hidden;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: var(--line-clamp);
+	}
 }
 
 .line-clamp {

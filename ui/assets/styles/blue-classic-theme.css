@@ -2520,6 +2520,7 @@ button {
       right: 0;
       padding: 0; }
     .datatable.compact-view .datatable-body .cell.cell-data .flex-wrapper {
+      flex-wrap: nowrap;
       column-gap: 0; }
     .datatable.compact-view .datatable-body .cell.cell-data .tags-wrapper {
       flex-wrap: nowrap; }
@@ -2870,8 +2871,9 @@ button {
         white-space: normal; }
       .datatable .cell.cell-data .flex-wrapper {
         display: flex;
+        flex-wrap: wrap;
         column-gap: 5px;
-        height: 16px; }
+        min-height: 16px; }
       .datatable .cell.cell-data .tags-wrapper .tag {
         margin: 0;
         height: 16px; }
@@ -2961,6 +2963,8 @@ button {
       .datatable .cell.cell-timeline .timeline-date {
         flex-grow: 1;
         padding: 7px 8px; }
+    .datatable .cell.cell-compact {
+      padding: 0; }
   .datatable .row-spacer {
     box-sizing: border-box;
     height: 100%;
@@ -3000,6 +3004,44 @@ button {
   -webkit-user-select: none; }
   .datatable-resizing .datatable .cell.cell-resizing .header-resizer {
     z-index: 4; }
+
+#datatable-traces .row:hover {
+  cursor: pointer; }
+  #datatable-traces .row:hover .cell {
+    background-color: #fcf7c2;
+    border-bottom-color: rgba(31, 44, 51, 0.1); }
+#datatable-traces .span-count {
+  color: #768d99; }
+#datatable-traces .error-count {
+  background-color: #e33734;
+  border-radius: 2px;
+  color: #ffffff;
+  display: flex;
+  font-size: 12px;
+  font-weight: 700;
+  height: 16px;
+  justify-content: center;
+  width: 16px; }
+#datatable-traces .duration {
+  display: flex;
+  height: 100%;
+  position: relative; }
+  #datatable-traces .duration .duration-bar {
+    align-items: center;
+    background-color: #ebebeb;
+    display: flex;
+    height: inherit;
+    left: 0;
+    position: absolute;
+    top: 0; }
+  #datatable-traces .duration .duration-time-units {
+    align-items: center;
+    display: flex;
+    height: inherit;
+    min-width: 0;
+    padding: 0 8px;
+    width: 100%;
+    z-index: 1; }
 
 .date-selector .btn-icon.calendar-btn:not(:first-child) {
   margin-left: 2px; }
@@ -8113,6 +8155,13 @@ form.is-loading {
 .wordbreak {
   white-space: pre-wrap;
   word-break: break-word; }
+  .wordbreak.wordbreak-clamp {
+    --line-clamp: none;
+    display: -webkit-box;
+    overflow-wrap: break-word;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--line-clamp); }
 
 .line-clamp {
   display: -webkit-box;

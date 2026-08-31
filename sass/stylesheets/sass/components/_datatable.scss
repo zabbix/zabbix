@@ -41,6 +41,7 @@
 				}
 
 				.flex-wrapper {
+					flex-wrap: nowrap;
 					column-gap: 0;
 
 					& > .link-action {
@@ -620,8 +621,9 @@
 
 			.flex-wrapper {
 				display: flex;
+				flex-wrap: wrap;
 				column-gap: 5px;
-				height: 16px;
+				min-height: 16px;
 			}
 
 			.tags-wrapper {
@@ -764,6 +766,10 @@
 				padding: 7px 8px;
 			}
 		}
+
+		&.cell-compact {
+			padding: 0;
+		}
 	}
 
 	.row-spacer {
@@ -825,6 +831,59 @@
 
 		.cell.cell-resizing .header-resizer {
 			z-index: 4;
+		}
+	}
+}
+
+#datatable-traces {
+	.row:hover {
+		cursor: pointer;
+
+		.cell {
+			background-color: $lighter-yellow;
+			border-bottom-color: rgba(31, 44, 51, .1);
+		}
+	}
+
+	.span-count {
+		color: $font-alt-color;
+	}
+
+	.error-count {
+		background-color: $red;
+		border-radius: 2px;
+		color: $white;
+		display: flex;
+		font-size: 12px;
+		font-weight: 700;
+		height: 16px;
+		justify-content: center;
+		width: 16px;
+	}
+
+	.duration {
+		display: flex;
+		height: 100%;
+		position: relative;
+
+		.duration-bar {
+			align-items: center;
+			background-color: $disabled-bg-color;
+			display: flex;
+			height: inherit;
+			left: 0;
+			position: absolute;
+			top: 0;
+		}
+
+		.duration-time-units {
+			align-items: center;
+			display: flex;
+			height: inherit;
+			min-width: 0;
+			padding: 0 8px;
+			width: 100%;
+			z-index: 1;
 		}
 	}
 }
