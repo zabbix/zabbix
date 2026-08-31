@@ -156,6 +156,8 @@ Threshold macros could be used with a context to fine tune threshold for differe
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
+|Get month cost|<p>Collects Oracle month cost.</p>|Dependent item|oci_cost.month.cost.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.monthly_cost_history`</p></li></ul>|
+|Daily average cost|<p>Oracle daily average cost.</p>|Calculated|oci_cost.daily.average.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Usage, get data|<p>Master item to get usage info.</p>|Script|oci_cost.usage.get|
 |Budgets, get data|<p>Master item to get budget info.</p>|Script|oci_cost.budget.get|
 |Total: Hourly cost|<p>The hourly cost of the total.</p>|Dependent item|oci_cost.usage.total.cost.hourly<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage.hourly.items[*].computedAmount.sum()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -183,6 +185,19 @@ Threshold macros could be used with a context to fine tune threshold for differe
 |OCI Costs: Current day costs exceeded previous|<p>Current day costs exceeded previous.</p>|`last(/Oracle Cloud Costs by HTTP/oci_cost.usage.total.cost.daily.delta.percentage)>{$OCI.COST.TOTAL.DAILY.DELTA.PERCENTAGE.WARN}`|Warning|**Manual close**: Yes|
 |OCI Costs: Number of compartments has changed|<p>Number of compartments has changed.</p>|`change(/Oracle Cloud Costs by HTTP/oci_cost.compartment.count)<>0`|Info|**Manual close**: Yes|
 |OCI Costs: Number of regions has changed|<p>Number of regions has changed.</p>|`change(/Oracle Cloud Costs by HTTP/oci_cost.region.count)<>0`|Warning|**Manual close**: Yes|
+
+### LLD rule Month discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month discovery|<p>Discovers month cost history.</p>|Dependent item|oci_cost.month.discovery|
+
+### Item prototypes for Month discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Month [{#OCI.MONTH}]: Get data|<p>Collects month cost history.</p>|Dependent item|oci_cost.month.cost.data.get[{#OCI.MONTH}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.month=="{#OCI.MONTH}")].first()`</p></li></ul>|
+|Month [{#OCI.MONTH}]: Total cost|<p>Oracle `{#OCI.MONTH}` month total cost.</p>|Dependent item|oci_cost.month.total.cost[{#OCI.MONTH}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cost`</p></li></ul>|
 
 ### LLD rule Budget discovery
 
@@ -294,22 +309,20 @@ Threshold macros could be used with a context to fine tune threshold for differe
 
 ## Overview
 
-This template is designed as a master template that discovers various Oracle Cloud Infrastructure (OCI) services
-and resources, such as:
+This template is designed to monitor Oracle Cloud by HTTP.
+It works without any external scripts and uses the script item.
+Currently, the template supports the discovery of Compute instances, Autonomous Databases, Object Storage, Virtual Cloud Networks (VCNs), Block Volumes, Boot Volumes, and Load Balancers, as well as the collection of OCI cost data.
 
-* OCI Compute;
+## Included Monitoring Templates
 
-* OCI Autonomous Database (serverless);
-
-* OCI Object Storage;
-
-* OCI Virtual Cloud Networks (VCNs);
-
-* OCI Block Volumes;
-
-* OCI Boot Volumes.
-
-* OCI Load Balancers.
+- *Oracle Cloud Autonomous Database by HTTP*
+- *Oracle Cloud Block Volume by HTTP*
+- *Oracle Cloud Boot Volume by HTTP*
+- *Oracle Cloud Compute by HTTP*
+- *Oracle Cloud Costs by HTTP*
+- *Oracle Cloud Load Balancer by HTTP*
+- *Oracle Cloud Networking by HTTP*
+- *Oracle Cloud Object Storage by HTTP*
 
 For communication with OCI, this template utilizes script items which execute HTTP `GET` and `POST` requests.
 `POST` requests are required for OCI Monitoring API as it utilizes Monitoring Query Language (MQL) which uses an

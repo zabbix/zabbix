@@ -3,10 +3,25 @@
 
 ## Overview
 
-This template is designed to monitor Google Cloud Platform (GCP) using Zabbix.
+This template is designed to monitor GCP by HTTP.
 It works without any external scripts and uses the script item.
+Currently, the template supports the discovery of Compute Engine instances, Cloud SQL instances (Microsoft SQL Server, MySQL, and PostgreSQL, including replicas), Cloud Run services, Application Load Balancers, Cost Monitoring, and Cloud Storage resources.
 
-The template currently supports the discovery of [Compute Engine](https://cloud.google.com/compute)/[Cloud SQL](https://cloud.google.com/sql)/[Cloud Run services](https://cloud.google.com/run) and Compute Engine project quota metrics.
+## Included Monitoring Templates
+
+- *GCP Application Load Balancer by HTTP*
+- *GCP Cost Monitoring by HTTP*
+- *GCP Compute Engine Instance by HTTP*
+- *GCP Cloud SQL MSSQL by HTTP*
+- *GCP Cloud SQL MSSQL Replica by HTTP*
+- *GCP Cloud SQL MySQL by HTTP*
+- *GCP Cloud SQL MySQL Replica by HTTP*
+- *GCP Cloud SQL PostgreSQL by HTTP*
+- *GCP Cloud SQL PostgreSQL Replica by HTTP*
+- *GCP Cloud Run Service by HTTP*
+- *GCP Cloud Storage Bucket by HTTP*
+
+The template additionally supports the collection of [Compute Engine](https://cloud.google.com/compute) project quota metrics.
 
 
 ## Requirements
@@ -1125,6 +1140,7 @@ More on metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
+|GCP annual cost|<p>GCP annual cost.</p>|Calculated|gcp.annual.cost<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined.</p><p>Returns a signed authorization token with 1 hour lifetime; it is required only once, and is used for all the dependent script items.</p><p>Check the template documentation for the details.</p>|Script|gcp.cost.authorization|
 |Authorization errors check|<p>A list of errors from authorization requests.</p>|Dependent item|gcp.cost.auth.err.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li></ul>|
 |Get monthly costs|<p>Get raw monthly cost data aggregated by service and project from the BigQuery billing export.</p>|Dependent item|gcp.get.monthly.costs<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|

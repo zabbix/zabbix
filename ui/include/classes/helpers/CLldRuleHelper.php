@@ -17,6 +17,70 @@
 class CLldRuleHelper extends CItemGeneralHelper {
 
 	/**
+	 * Get lld rules fields default values.
+	 */
+	public static function getDefaults(): array {
+		$item = parent::getDefaults();
+
+		$item['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
+		$item['overrides'] = [];
+		$item['lld_macro_paths'] = [];
+		$item['filter'] = [
+			'evaltype' => DB::getDefault('items', 'evaltype'),
+			'formula' => DB::getDefault('items', 'formula'),
+			'conditions'=> []
+		];
+		$item['discovered_lld'] = false;
+		$item['lifetime_type'] = DB::getDefault('items', 'lifetime_type');
+		$item['lifetime'] = DB::getDefault('items', 'lifetime');
+		$item['enabled_lifetime_type'] = DB::getDefault('items', 'enabled_lifetime_type');
+		$item['enabled_lifetime'] = DB::getDefault('items', 'enabled_lifetime');
+
+		return $item;
+	}
+
+	/**
+	 * Convert API data to be ready to use for edit or create form.
+	 *
+	 * @param array $item  Array of API fields data.
+	 */
+	public static function convertApiInputForForm(array $item): array {
+		$item = parent::convertApiInputForForm($item);
+		$item['parent_items'] = makeItemTemplatesHtml(
+			$item['itemid'],
+			getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL),
+			ZBX_FLAG_DISCOVERY_NORMAL,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+		$update_interval_parser = new CUpdateIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => false
+		]);
+
+		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+			$item = static::addDelayWithFlexibleIntervals($update_interval_parser, $item);
+		}
+		else {
+			$item['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
+			$item['delay_flex'] = [];
+		}
+
+		$item['discovered_lld'] = $item['flags'] & ZBX_FLAG_DISCOVERY_CREATED
+			&& ($item['flags'] & ZBX_FLAG_DISCOVERY_PROTOTYPE || $item['flags'] & ZBX_FLAG_DISCOVERY_RULE);
+
+		if ($item['master_itemid']) {
+			$master_item = API::Item()->get([
+				'output' => ['itemid', 'name'],
+				'itemids' => $item['master_itemid'],
+				'webitems' => true
+			]);
+			$item['master_item'] = $master_item ? reset($master_item) : [];
+		}
+
+		return $item;
+	}
+
+	/**
 	 * @param string $src_templateid
 	 * @param array  $dst_host
 	 *
@@ -201,5 +265,33 @@ class CLldRuleHelper extends CItemGeneralHelper {
 		unset($src_item);
 
 		return $src_items;
+	}
+
+	public static function convertFormInputForApi(array $input): array {
+		$input['filter'] = prepareLldFilter($input['filter']);
+		$input['lld_macro_paths'] = prepareLldMacroPaths($input['lld_macro_paths']);
+		$input['overrides'] = prepareLldOverrides($input['overrides']);
+
+		return parent::convertFormInputForApi($input);
+	}
+
+	public static function normalizeFormData(array $input): array {
+		if (array_key_exists('conditions', $input)) {
+			$input['filter'] = [
+				'evaltype' => array_key_exists('evaltype', $input)
+					? $input['evaltype']
+					: DB::getDefault('items', 'evaltype'),
+				'formula' => array_key_exists('formula', $input)
+					? $input['formula']
+					: DB::getDefault('items', 'formula'),
+				'conditions' => array_key_exists('conditions', $input) ? $input['conditions'] : []
+			];
+		}
+
+		unset($input['evaltype']);
+		unset($input['formula']);
+		unset($input['conditions']);
+
+		return parent::normalizeFormData($input);
 	}
 }

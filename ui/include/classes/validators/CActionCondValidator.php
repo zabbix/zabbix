@@ -56,6 +56,7 @@ class CActionCondValidator extends CValidator {
 			case ZBX_CONDITION_TYPE_HOST:
 			case ZBX_CONDITION_TYPE_DRULE:
 			case ZBX_CONDITION_TYPE_PROXY:
+			case ZBX_CONDITION_TYPE_PROXY_GROUP:
 			case ZBX_CONDITION_TYPE_SERVICE:
 				if (zbx_empty($condition['value']) || $condition['value'] == 0) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));

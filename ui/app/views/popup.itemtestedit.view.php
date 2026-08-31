@@ -328,6 +328,9 @@ if ($data['is_item_testable']) {
 			->addStyle('text-align: right;')
 	]);
 }
+else {
+	$form->addVar('get_value', 0);
+}
 
 $form_grid->addItem([
 	new CLabel([
@@ -560,10 +563,10 @@ $form->addItem([
 			(new CSpan('#{result}'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->setHint('#{result_hint}', 'hintbox-wrap')
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 		))
 			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->addClass('item-test-result')
-			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 	),
 	(new CTemplateTag('preprocessing-step-result-empty'))->addItem(
 		(new CSpan('#{result}'))->addClass(ZBX_STYLE_GREY)

@@ -13636,6 +13636,20 @@ zabbix_export:
       groups:
         - name: Templates/Cloud
       items:
+        - uuid: 307a854507ee40bf8d9060640697fd83
+          name: 'GCP annual cost'
+          type: CALCULATED
+          key: gcp.annual.cost
+          value_type: FLOAT
+          params: 'sum(last_foreach(//gcp.cost.monthly[*]))'
+          description: 'GCP annual cost.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: cost
         - uuid: 5cc3faa82f404b38b513948f333f3d7c
           name: 'Authorization errors check'
           type: DEPENDENT

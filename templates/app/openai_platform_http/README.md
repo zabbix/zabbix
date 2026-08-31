@@ -45,6 +45,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
+|Daily project count|<p>Total daily project count.</p>|Dependent item|openai.daily.project.count<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get data|<p>Item for gathering OpenAI Platform data.</p>|Script|openai.platform_data.get|
 |Get data item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.platform_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get costs|<p>Item for gathering cost data from the OpenAI Platform.</p>|Script|openai.costs_data.get|
