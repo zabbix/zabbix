@@ -265,11 +265,13 @@ class CTrigger extends CTriggerGeneral {
 
 		// lastChangeSince
 		if ($options['lastChangeSince'] !== null) {
+			$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
 			$sqlParts['where']['lastchangesince'] = 'tr.lastchange>'.zbx_dbstr($options['lastChangeSince']);
 		}
 
 		// lastChangeTill
 		if ($options['lastChangeTill'] !== null) {
+			$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
 			$sqlParts['where']['lastchangetill'] = 'tr.lastchange<'.zbx_dbstr($options['lastChangeTill']);
 		}
 
@@ -344,6 +346,7 @@ class CTrigger extends CTriggerGeneral {
 		// search
 		if (is_array($options['search'])) {
 			if (array_key_exists('error', $options['search']) && $options['search']['error'] !== null) {
+				$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
 				zbx_db_search('trigger_rtdata tr', ['search' => ['error' => $options['search']['error']]] + $options,
 					$sqlParts
 				);
@@ -358,30 +361,6 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		if (is_array($options['filter'])) {
-			if (array_key_exists('value', $options['filter']) && $options['filter']['value'] !== null) {
-				$this->dbFilter('trigger_rtdata tr', ['filter' => ['value' => $options['filter']['value']]] + $options,
-					$sqlParts
-				);
-			}
-
-			if (array_key_exists('state', $options['filter']) && $options['filter']['state'] !== null) {
-				$this->dbFilter('trigger_rtdata tr', ['filter' => ['state' => $options['filter']['state']]] + $options,
-					$sqlParts
-				);
-			}
-
-			if (array_key_exists('lastchange', $options['filter']) && $options['filter']['lastchange'] !== null) {
-				$this->dbFilter('trigger_rtdata tr', ['filter' => ['lastchange' => $options['filter']['lastchange']]] + $options,
-					$sqlParts
-				);
-			}
-
-			if (array_key_exists('error', $options['filter']) && $options['filter']['error'] !== null) {
-				$this->dbFilter('trigger_rtdata tr', ['filter' => ['error' => $options['filter']['error']]] + $options,
-					$sqlParts
-				);
-			}
-
 			if (!array_key_exists('flags', $options['filter'])) {
 				$options['filter']['flags'] = [
 					ZBX_FLAG_DISCOVERY_NORMAL,
@@ -407,6 +386,19 @@ class CTrigger extends CTriggerGeneral {
 				$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['filter']['hostid']);
 			}
+
+			$rt_filter = [];
+
+			foreach (['value', 'state', 'lastchange', 'error'] as $field) {
+				if (array_key_exists($field, $options['filter']) && $options['filter'][$field] !== null) {
+					$rt_filter[$field] = $options['filter'][$field];
+				}
+			}
+
+			if ($rt_filter) {
+				$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+				$this->dbFilter('trigger_rtdata tr', ['filter' => $rt_filter] + $options, $sqlParts);
+			}
 		}
 
 		// group
@@ -428,6 +420,7 @@ class CTrigger extends CTriggerGeneral {
 
 		// only_true
 		if ($options['only_true'] !== null) {
+			$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
 			$sqlParts['where']['ot'] = '((tr.value='.TRIGGER_VALUE_TRUE.')'.
 				' OR ((tr.value='.TRIGGER_VALUE_FALSE.')'.
 					' AND (tr.lastchange>'.
@@ -563,6 +556,33 @@ class CTrigger extends CTriggerGeneral {
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+	}
+
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (!$options['countOutput']) {
+			if ($options['expandDescription'] !== null || $options['expandComment'] !== null) {
+				$sql_parts = $this->addQuerySelect('t.expression', $sql_parts);
+			}
+
+			$trigger_rtdata = false;
+
+			foreach (['value', 'state', 'lastchange', 'error'] as $field) {
+				if ($this->outputIsRequested($field, $options['output'])) {
+					$sql_parts = $this->addQuerySelect(
+						dbConditionCoalesce('tr.'.$field, DB::getDefault('trigger_rtdata', $field), $field), $sql_parts
+					);
+					$trigger_rtdata = true;
+				}
+			}
+
+			if ($trigger_rtdata) {
+				$sql_parts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+			}
+		}
+
+		return $sql_parts;
 	}
 
 	/**
@@ -750,47 +770,6 @@ class CTrigger extends CTriggerGeneral {
 		 *  - The template of the trigger-up is linked to all child templates of the new trigger's template.
 		 */
 		self::checkDependenciesOfTemplateTriggers($trigger_dependencies, $trigger_hosts);
-	}
-
-	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
-		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
-
-		if ((!$options['countOutput'] && array_filter([
-				$this->outputIsRequested('value', $options['output']),
-				$this->outputIsRequested('state', $options['output']),
-				$this->outputIsRequested('lastchange', $options['output']),
-				$this->outputIsRequested('error', $options['output'])
-			]))
-				|| (is_array($options['filter'])
-					&& array_intersect_key($options['filter'], array_flip(['value', 'state', 'lastchange', 'error'])))
-				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
-				|| array_intersect_key($options, array_flip(['lastChangeSince', 'lastChangeTill', 'only_true']))) {
-			$sql_parts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
-		}
-
-		if (!$options['countOutput'] && $options['expandDescription'] !== null || $options['expandComment'] !== null) {
-			$sql_parts = $this->addQuerySelect($this->fieldId('expression'), $sql_parts);
-		}
-
-		if (!$options['countOutput']) {
-			if ($this->outputIsRequested('value', $options['output'])) {
-				$sql_parts = $this->addQuerySelect('tr.value', $sql_parts);
-			}
-
-			if ($this->outputIsRequested('state', $options['output'])) {
-				$sql_parts = $this->addQuerySelect('tr.state', $sql_parts);
-			}
-
-			if ($this->outputIsRequested('lastchange', $options['output'])) {
-				$sql_parts = $this->addQuerySelect('tr.lastchange', $sql_parts);
-			}
-
-			if ($this->outputIsRequested('error', $options['output'])) {
-				$sql_parts = $this->addQuerySelect('tr.error', $sql_parts);
-			}
-		}
-
-		return $sql_parts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
