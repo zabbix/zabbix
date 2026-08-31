@@ -135,7 +135,7 @@ class CCepRule extends CApiService {
 						'using' => 'cep_ruleid'
 					];
 					$sql_parts['where']['window_type'] = in_array(CCepRuleHelper::WINDOW_NONE, $window_type_values)
-						? dbConditionInt('crw.type', $window_type_values).' OR crw.cep_ruleid IS NULL'
+						? '('.dbConditionInt('crw.type', $window_type_values).' OR crw.cep_ruleid IS NULL)'
 						: dbConditionInt('crw.type', $window_type_values);
 				}
 			}
