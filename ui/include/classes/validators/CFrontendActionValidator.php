@@ -38,6 +38,12 @@ class CFrontendActionValidator extends CValidator {
 		}
 
 		if (CRouter::getInstance()->isLegacyActionFile($match['filename'])) {
+			if (in_array($match['filename'], ['index_sso.php', 'index.php', 'index_mfa.php', 'index_http.php'])) {
+				$this->setError(_('a relative URL to the frontend is expected'));
+
+				return false;
+			}
+
 			return true;
 		}
 
