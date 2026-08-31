@@ -442,6 +442,43 @@ class testTriggerCEP extends CIntegrationTest {
 	// (ZBX_CONDITION_TYPE_EVENT_COPIED) is what tells a copy apart from what the trigger sent, and conditioning
 	// the operation on it is the only thing that ends the chain.
 	const CEP_RULE_WINDOW_COPY = self::CEP_RULE_NAME_PREFIX.'window simple copy';
+	// The unconditioned copy scenario (see prepareDataCepWindowCopyUnconditional()): the same rule with that
+	// condition left off, so nothing in the rule tells a copy apart from an event the trigger sent. The chain
+	// stops at the one copy all the same, because the server does not copy a copy: cep_operation_event_copy()
+	// (cep_rule_operation.c) refuses an event flagged ZBX_EVENT_COPIED, so the copy goes into the window, is
+	// evicted from it in its turn and nothing is made of it. The counts of this flavour are therefore the counts
+	// of the conditioned one, two events per id, and the condition is what spares the rule that check rather
+	// than what keeps the events from being made.
+	const CEP_RULE_WINDOW_COPY_UNCONDITIONAL = self::CEP_RULE_NAME_PREFIX.'window simple copy unconditional';
+	// How long the run waits, once the copies have been through the window, before reading the counts one last
+	// time. A copy of a copy would be made one CEP_RULE_WINDOW_OPS_DURATION after the copy entered the window, so
+	// the wait has to be longer than that duration for the events that must not be there to have had the time
+	// they would need to appear - reaching the expected counts says only that nothing extra had arrived yet.
+	const CEP_RULE_WINDOW_COPY_UNCONDITIONAL_SETTLE = 10;
+	// The capacity copy scenario (see prepareDataCepWindowCopyCapacity()): the unconditioned copy again, this
+	// time with a window that has room for one event and a "copy last" operation. A window at its capacity limit
+	// does not take the arriving event in at all - it runs the eviction operations on that very event instead, and
+	// on the spot (see cep_window_sliding_process_event() in cep_window.c) - so what the operation copies is the
+	// event that did not fit, and the position it is presented at is the last one, which is why this flavour needs
+	// "copy last" where the duration flavours need "copy first". The event that fills the window is not the one
+	// evicted, so the scenario sends two values - the second is the first that does not fit.
+	//
+	// This is the flavour where copying a copy would cost nothing: the copy does not fit either and is turned
+	// away the moment it arrives, so no event would have to age out of a window before the next copy was made and
+	// the rule would produce them as fast as the server could carry them round. What stops it at the one copy is
+	// the ZBX_EVENT_COPIED check in cep_operation_event_copy(), and the scenario waits
+	// CEP_RULE_WINDOW_COPY_CAPACITY_SETTLE seconds before reading the count once more - a rule still copying would
+	// have made thousands of events in that time, so it takes no longer than that to see one.
+	const CEP_RULE_WINDOW_COPY_CAPACITY = self::CEP_RULE_NAME_PREFIX.'window simple copy capacity';
+	// Room for a single event, which the value's event takes: everything after it - every copy - is turned away.
+	const CEP_RULE_WINDOW_COPY_CAPACITY_LIMIT = 1;
+	// The window has to keep that first event for the whole run, since a window that empties would let a copy in
+	// and end the turning away, so the duration is one nothing of the scenario comes near.
+	const CEP_RULE_WINDOW_COPY_CAPACITY_DURATION = '2m';
+	const CEP_RULE_WINDOW_COPY_CAPACITY_SETTLE = 2;
+	// What the id of the scenario ends up with: the value that filled the window, the value that did not fit, and
+	// the one copy made of that second value.
+	const CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS = 3;
 	// The runaway copy scenario (see prepareDataCepWindowPatternCopyAlways()): a pattern whose script always
 	// reports a match. Its window is examined once a second and nothing ever leaves it, so the copy operation
 	// runs again on every examination - the rule keeps producing events for as long as it exists. The scenario
@@ -2924,6 +2961,101 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_COPY, [], $operations,
 			CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE, $this->buildWindowOperationsWindow()
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the unconditioned copy scenario: prepareDataCepWindowCopy() with the "event copied" condition left
+	 * off its operation, so the rule copies every event its window evicts without telling a copy apart from what
+	 * the trigger sent.
+	 *
+	 * That is the chain the condition of prepareDataCepWindowCopy() ends, and the scenario is here for the fact
+	 * that it also ends without it: a copy is flagged ZBX_EVENT_COPIED, and cep_operation_event_copy()
+	 * (cep_rule_operation.c) makes nothing of an event carrying that flag, so the copy enters the same window as
+	 * the event it was made from, is evicted from it in its turn and is not copied. Each id therefore ends up
+	 * with the same two events the conditioned flavour leaves it - the value's event and the one copy of it -
+	 * which is what runEventAssessmentTestCepWindowCopyUnconditional() waits for.
+	 *
+	 * Everything else is what the conditioned flavour uses - the same "copy first" operation at the same
+	 * execution point, and the same window grouping by the 'service' tag, so each id is copied independently of
+	 * the others.
+	 */
+	public function prepareDataCepWindowCopyUnconditional() {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// Only this rule may add events; nothing may close a problem.
+		$this->deleteCepCorrelations();
+
+		// An event evicted because the window duration ran out is presented as the first event of the window, so
+		// "copy first" is the operation that acts on it - "copy last" would never fire here.
+		$operations = [
+			[
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+				'type' => CCepRuleHelper::OP_CLONE_FIRST
+			]
+		];
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_COPY_UNCONDITIONAL, [],
+			$operations, CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE,
+			$this->buildWindowOperationsWindow()
+		));
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Prepare the capacity copy scenario: the unconditioned copy operation on a window with room for a single
+	 * event, so what evicts an event here is the window being full and not its duration running out.
+	 *
+	 * The two are not the same eviction. A duration eviction takes the oldest event of the window, presents it as
+	 * the first event and lets it go; a window at its capacity limit never takes the arriving event in - it runs
+	 * the eviction operations on that event, as the last event, and does so while the event is being processed,
+	 * with nothing to wait for. That is why the operation here is "copy last": "copy first" is bound to the first
+	 * position and would not fire on this path at all (cep_operation_event_copy() in cep_rule_operation.c).
+	 *
+	 * So it takes two values: the first fills the window and the second no longer fits, which is the event the
+	 * rule copies. Its copy does not fit either and is turned away as soon as it arrives - no window duration has
+	 * to pass first - so a rule that copied a copy would produce events here as fast as the server could carry
+	 * them round. It does not: the copy carries the ZBX_EVENT_COPIED flag that cep_operation_event_copy() refuses
+	 * to copy, so exactly one copy is made, and runEventAssessmentTestCepWindowCopyCapacity() reads the count
+	 * again a moment later to see that it stayed.
+	 */
+	public function prepareDataCepWindowCopyCapacity() {
+		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
+
+		// Only this rule may add events; nothing may close a problem.
+		$this->deleteCepCorrelations();
+
+		// The window of the other copy flavours, grouped by the 'service' tag so each id is copied on its own, with
+		// a capacity in place of their unlimited one and a duration the run cannot outlast.
+		$window = [
+			'duration' => self::CEP_RULE_WINDOW_COPY_CAPACITY_DURATION,
+			'capacity' => self::CEP_RULE_WINDOW_COPY_CAPACITY_LIMIT,
+			'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
+			'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
+			'tags' => ['service']
+		];
+
+		// An event evicted for not fitting is presented as the last event of the window, so "copy last" is the
+		// operation that acts on it - "copy first" would never fire here.
+		$operations = [
+			[
+				'sortorder' => 0,
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
+				'type' => CCepRuleHelper::OP_CLONE_LAST
+			]
+		];
+
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_COPY_CAPACITY, [],
+			$operations, CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE, $window
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -11754,6 +11886,56 @@ HEREDOC;
 	}
 
 	/**
+	 * The same scenario as testTriggerCEP_CepWindowSimpleCopy with the operation condition that stops its chain
+	 * left off, so the rule is asked to copy every event its window evicts - the copies it made included.
+	 *
+	 * The chain has to stop at the one copy per id all the same, and this test is what says so: the server
+	 * refuses to copy an event that is itself a copy (the ZBX_EVENT_COPIED check in cep_operation_event_copy()),
+	 * so an unconditioned rule ends up with exactly what the conditioned one does. The counts are therefore the
+	 * counts of testTriggerCEP_CepWindowSimpleCopy, two events per id and no more, and they are read the same
+	 * way - a second id, whose copy takes another window duration, is what gives the copy of the first id time to
+	 * go through the window and be evicted, which is the eviction that would copy it again.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCopyUnconditional$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCopyUnconditional() {
+		$this->prepareDataCepWindowCopyUnconditional();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCopyUnconditional();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
+	 * The unconditioned copy on a window that evicts by capacity instead of by duration: the window has room for
+	 * one event, the first value takes it, and the second value is turned away for not fitting - which is the
+	 * event the rule copies.
+	 *
+	 * What sets this apart from testTriggerCEP_CepWindowSimpleCopyUnconditional is that nothing here would pace a
+	 * chain. There a copy had to sit in the window for a whole duration before it was evicted; here it is refused
+	 * the moment it arrives, so a rule that copied a copy would go round as fast as the server carries events -
+	 * thousands of them in the seconds this test runs. It is the strictest place to see the ZBX_EVENT_COPIED
+	 * check of cep_operation_event_copy() hold: the test waits for the one copy, waits
+	 * CEP_RULE_WINDOW_COPY_CAPACITY_SETTLE seconds more and fails if there is a single event beyond
+	 * CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS by then.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCopyCapacity$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCopyCapacity() {
+		$this->prepareDataCepWindowCopyCapacity();
+
+		try {
+			$this->runEventAssessmentTestCepWindowCopyCapacity();
+		}
+		finally {
+			$this->cleanupCepRules();
+		}
+	}
+
+	/**
 	 * The same copy operation as testTriggerCEP_CepWindowPatternMatch, from a pattern whose script always
 	 * reports a match: the window is examined once a second and a match does not consume it, so the rule
 	 * copies its oldest event again at every examination and the copies never stop coming.
@@ -17939,6 +18121,161 @@ return;
 	}// burst
 
 	/**
+	 * Drive the unconditioned copy scenario: one value opens one problem, the window evicts its event once the
+	 * duration has run out and the rule copies it, so that id ends up with two problem events although only one
+	 * value was ever sent for it - and the copy, which the rule is not told to leave alone, still comes out of the
+	 * window unchanged, because the server will not copy a copy.
+	 *
+	 * This is runEventAssessmentTestCepWindowCopy() with nothing in the rule to stop the chain, so it is driven
+	 * the same way and expects the same counts. The second id is what makes the check safe: waiting for its copy
+	 * takes another window duration, by which time the copy of the first id has been evicted as well, so if copies
+	 * were being copied the first id would have more than two events by then.
+	 *
+	 * The counts are then read once more, CEP_RULE_WINDOW_COPY_UNCONDITIONAL_SETTLE seconds later, instead of only
+	 * being waited for. A copy is not made when its event is evicted but a window duration later, when the copy is
+	 * evicted in turn, so a count that is right at the moment it is reached is not yet a count that stays - the
+	 * wait is what gives an event that must not exist the time it would need to appear.
+	 */
+	private function runEventAssessmentTestCepWindowCopyUnconditional(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the unconditioned copy test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$first = self::CEP_RULE_WINDOW_NONE_SERVICE;
+		$second = self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT;
+
+		// 1. One value, one problem - and then a second problem for the same id that no value was sent for, the
+		//    copy made when the window evicted the first one.
+		$send('down_'.$first);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForProblemEventCountByTag($all, 'service', $first, 2);
+
+		// 2. The same for another id, which also gives the copy of the first one time to be evicted - the
+		//    eviction that would copy it again, the operation having nothing to tell it apart from the event the
+		//    trigger sent.
+		$send('down_'.$second);
+		$this->waitForProblemEventCountByTag($all, 'service', $second, 2);
+
+		// 3. Two events per id and no more: the copies went through the window without being copied, which here
+		//    is the server refusing to copy an event that is itself a copy and not the rule declining to ask.
+		$this->waitForProblemEventCountByTag($all, 'service', $first, 2);
+		$this->waitForOpenProblemCount($all, 4);
+		$this->waitForAllTriggerEventCounts($all, 4);
+
+		// 4. And it stays there. The counts above are reached as soon as the copies are made, so on their own
+		//    they would also be reached by a rule that was about to make more: the wait is longer than the window
+		//    duration a copy of a copy would take to appear, so by the time the counts are read again the events
+		//    that must not exist would have been made.
+		sleep(self::CEP_RULE_WINDOW_COPY_UNCONDITIONAL_SETTLE);
+
+		foreach ([$first, $second] as $id) {
+			$count = $this->getProblemEventCountByTag($all, 'service', $id);
+
+			$this->assertEquals(2, $count, 'Expected id '.$id.' to be left with 2 problem event(s) - the value\'s'
+				.' event and the one copy of it - '.self::CEP_RULE_WINDOW_COPY_UNCONDITIONAL_SETTLE.'s after that'
+				.' copy was in its turn evicted from the window, got '.$count
+			);
+		}
+
+		// Nothing in this scenario closes a problem, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the unconditioned copy scenario recovery value', false);
+	}
+
+	/**
+	 * Drive the capacity copy scenario: the first value fills the window, the second one no longer fits and is
+	 * copied on the spot, and its copy does not fit either - so the id ends up with
+	 * CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS events and stays there.
+	 *
+	 * Two values are what it takes to start: a capacity eviction is done to an event arriving at a full window, so
+	 * the event that fills the window is not itself evicted by it, and the window duration that would evict it is
+	 * one the run does not outlast.
+	 *
+	 * The count is then held rather than merely reached. Nothing paces this flavour - a copy is turned away as
+	 * soon as it is made, with no duration to wait out - so a rule copying its own copies would be adding events
+	 * for every second of the hold, and the hold fails on the first one past the expected count.
+	 */
+	private function runEventAssessmentTestCepWindowCopyCapacity(): void {
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for the capacity copy test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		$send = fn(string $value) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value]
+		]);
+
+		$service = self::CEP_RULE_WINDOW_NONE_SERVICE;
+
+		// 1. The first value fills the window of that id: it has room for CEP_RULE_WINDOW_COPY_CAPACITY_LIMIT
+		//    event and keeps it for CEP_RULE_WINDOW_COPY_CAPACITY_DURATION, so from here on the window is full
+		//    for the whole run. Nothing is copied yet - a capacity eviction happens to an event that arrives at a
+		//    full window, and only the duration, which the run does not outlast, would evict this one.
+		$send('down_'.$service);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForProblemEventCountByTag($all, 'service', $service, 1);
+
+		// 2. The second value for the same id is the one that does not fit, so it is evicted and copied on the
+		//    spot. The trigger generates an event per value (TRIGGER_MULT_EVENT_ENABLED, see
+		//    prepareCloseOnUpTriggerPrototypes()), and the id of the value is the 'service' tag the window groups
+		//    by, so the second event lands in the very window the first one filled.
+		$send('down_'.$service);
+
+		// 3. Three events for the id: the two values and the one copy of the second. The copy did not fit either
+		//    and was turned away as it arrived, which is the eviction that would copy it again.
+		$this->waitForProblemEventCountByTag($all, 'service', $service,
+			self::CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS
+		);
+		$this->waitForOpenProblemCount($all, self::CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS);
+		$this->waitForAllTriggerEventCounts($all, self::CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS);
+
+		// 4. And it stays there. This is the flavour with nothing to slow a chain down - no event has to age out
+		//    of a window before the next copy is made - so a rule copying its own copies would be thousands of
+		//    events past this count a couple of seconds later, and waiting that long is enough to catch it.
+		sleep(self::CEP_RULE_WINDOW_COPY_CAPACITY_SETTLE);
+
+		$count = $this->getProblemEventCountByTag($all, 'service', $service);
+
+		$this->assertEquals(self::CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS, $count,
+			'Expected the id to be left with '.self::CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS.' problem event(s) - the'
+				.' two values and the one copy of the second - '.self::CEP_RULE_WINDOW_COPY_CAPACITY_SETTLE
+				.'s after the copy was itself refused by the full window, got '.$count
+		);
+
+		// The rule goes before the recovery value, unlike in the duration flavours: their windows are empty by
+		// the time the value is sent, this one still holds the event that filled it for the rest of its two
+		// minutes, and an "up" event arriving at a full window is one more event the operation would copy.
+		$this->cleanupCepRules();
+
+		// Nothing in this scenario closes a problem, so the trigger expression has to.
+		$send('0');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->waitForNoOpenProblems($all, 'After the capacity copy scenario recovery value', false);
+	}
+
+	/**
 	 * Drive the runaway copy scenario: one value, and then a copy of it every time the pattern window is
 	 * examined, because the script always reports a match and a match does not consume the window.
 	 *
@@ -18757,6 +19094,27 @@ return;
 			'filter' => ['value' => TRIGGER_VALUE_TRUE],
 			'tags' => [['tag' => $tag, 'value' => $value, 'operator' => TAG_OPERATOR_EQUAL]]
 		], $expected, static::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * The number of problem events since the scenario baseline on $triggerids that carry the $tag tag with the
+	 * $value value, as a count from the server. The waits above poll this until it reaches a number the scenario
+	 * knows in advance; this is for reading it once, where what a scenario has to see is that a count it already
+	 * reached is still the same one, see runEventAssessmentTestCepWindowCopyUnconditional() and
+	 * runEventAssessmentTestCepWindowCopyCapacity().
+	 */
+	private function getProblemEventCountByTag(array $triggerids, string $tag, string $value): int {
+		$response = $this->call('event.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'filter' => ['value' => TRIGGER_VALUE_TRUE],
+			'tags' => [['tag' => $tag, 'value' => $value, 'operator' => TAG_OPERATOR_EQUAL]],
+			'countOutput' => true
+		]);
+
+		return (int) $response['result'];
 	}
 
 	/**
