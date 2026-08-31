@@ -3058,8 +3058,8 @@ static void	process_event_updates(zbx_service_manager_t *service_manager, zbx_ce
 
 				break;
 			default:
-				zabbix_log(LOG_LEVEL_ERR, "unsupported update %d for event \"" ZBX_FS_UI64,
-						updates[i].op, event->eventid, event->value);
+				zabbix_log(LOG_LEVEL_ERR, "unsupported update %d for event \"" ZBX_FS_UI64 "\""
+						" with value %d", updates[i].op, event->eventid, event->value);
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 	}
