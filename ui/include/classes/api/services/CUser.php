@@ -481,7 +481,7 @@ class CUser extends CApiService {
 		$db_roles = self::getDbRoles($users);
 		self::checkRoles($users, $db_roles);
 		self::addRoleType($users, $db_roles);
-		self::validateRedirectUrlEnforce($users);
+		self::checkRedirectUrlEnforce($users);
 
 		self::checkUserGroups($users, $db_user_groups);
 		self::checkEmptyPassword($users, $db_user_groups);
@@ -704,7 +704,7 @@ class CUser extends CApiService {
 		$db_roles = self::getDbRoles($users, $db_users);
 		self::checkRoles($users, $db_roles, $db_users);
 		self::addRoleType($users, $db_roles, $db_users);
-		self::validateRedirectUrlEnforce($users, $db_users);
+		self::checkRedirectUrlEnforce($users, $db_users);
 
 		self::addAffectedObjects($users, $db_users);
 
@@ -1390,7 +1390,7 @@ class CUser extends CApiService {
 	 * @param array      $users
 	 * @param array|null $db_users
 	 */
-	private static function validateRedirectUrlEnforce(array $users, ?array $db_users = null): void {
+	private static function checkRedirectUrlEnforce(array $users, ?array $db_users = null): void {
 		foreach ($users as $i => $user) {
 			if (!array_key_exists('url', $user)) {
 				continue;
