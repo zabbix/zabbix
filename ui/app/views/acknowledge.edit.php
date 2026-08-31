@@ -173,7 +173,8 @@ $form_list
 			->setEnabled($data['allowed_close'] && $data['problem_can_be_closed'])
 	);
 
-if ($data['allowed_edit_maintenance'] && $data['problem_severity_can_be_changed']) {
+if ($data['allowed_edit_maintenance'] && $data['trigger_can_be_suppressed']
+		&& $data['problem_severity_can_be_changed']) {
 	$form_list->addRow('',
 		(new CLink(_n('Suppress trigger', 'Suppress triggers', $data['selected_triggers']), $maintenance_url))
 	);
