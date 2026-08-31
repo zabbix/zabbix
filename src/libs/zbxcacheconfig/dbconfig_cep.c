@@ -49,6 +49,8 @@ static void	cep_operation_condition_clear(zbx_cep_op_condition_t *condition)
 			zbx_free(condition->args.tag_value.value);
 			break;
 	}
+
+	memset(&condition->args, 0, sizeof(condition->args));
 }
 
 static int	cep_op_condition_compare_by_id(const void *a1, const void *a2)
