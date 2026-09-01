@@ -56,8 +56,8 @@ static void	format_auth_token_hash(const char *auth_token, char *hash_res_string
  *             result      - [OUT] error logging                              *
  *             mode        - [IN] which token schemes to accept - see         *
  *                                zbx_auth_lookup_mode_t                      *
- *             device_uuid - [IN] device UUID a DPoP-scheme token must be     *
- *                                bound to; only used, and required, in       *
+ *             device_uuid - [IN] device DPoP-scheme token must bind to;      *
+ *                                only used, and required, in                 *
  *                                ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD mode        *
  *                                                                            *
  * Return value: SUCCEED - managed to find and authenticate user              *

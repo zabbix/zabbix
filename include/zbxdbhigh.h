@@ -558,7 +558,7 @@ ZBX_PTR_VECTOR_DECL(events_ptr, zbx_event_t *)
 
 typedef enum
 {
-	ZBX_AUTH_LOOKUP_GENERIC,
+	ZBX_AUTH_LOOKUP_GENERIC = 0,
 	ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD
 }
 zbx_auth_lookup_mode_t;

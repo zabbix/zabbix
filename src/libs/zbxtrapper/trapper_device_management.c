@@ -188,12 +188,11 @@ static int	device_get_userid_by_uuid(const char *uuid, zbx_uint64_t *target_user
  *             request                    - [IN] ZBX_PROTO_VALUE_DEVICE_*     *
  *             action                     - [IN] "initialize" or "offboard",  *
  *                                                for log messages            *
- *             id_field                   - [IN] "userid" or "uuid"           *
- *             id_is_uuid                 - [IN] 0 - id_field is a userid;    *
- *                                                otherwise a device uuid,    *
- *                                                resolved to its owner       *
  *             auth_mode                  - [IN] which token schemes to       *
- *                                                accept - see                *
+ *                                                accept, and whether         *
+ *                                                request identifies target   *
+ *                                                by userid or by device      *
+ *                                                uuid - see                  *
  *                                                zbx_auth_lookup_mode_t      *
  *             user                       - [OUT]                             *
  *             target_userid              - [OUT] device owner userid         *
@@ -206,11 +205,12 @@ static int	device_get_userid_by_uuid(const char *uuid, zbx_uint64_t *target_user
  ******************************************************************************/
 static int	trapper_device_authorize(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, const char *config_frontend_allowed_ip,
-		const char *request, const char *action, const char *id_field, int id_is_uuid,
-		zbx_auth_lookup_mode_t auth_mode, zbx_user_t *user, zbx_uint64_t *target_userid)
+		const char *request, const char *action, zbx_auth_lookup_mode_t auth_mode, zbx_user_t *user,
+		zbx_uint64_t *target_userid)
 {
 	struct zbx_json_parse	jp_data;
 	char			id_str[ZBX_UUID_LEN];
+	const char		*id_field = (ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD == auth_mode ? "uuid" : "userid");
 	int			auth_ret;
 
 	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_comms->config_tls, config_frontend_allowed_ip))
@@ -256,7 +256,7 @@ static int	trapper_device_authorize(zbx_socket_t *sock, const struct zbx_json_pa
 		return FAIL;
 	}
 
-	if (0 != id_is_uuid)
+	if (ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD == auth_mode)
 	{
 		if (FAIL == device_get_userid_by_uuid(id_str, target_userid))
 		{
@@ -618,8 +618,7 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 	zbx_user_init(&user);
 
 	if (FAIL == trapper_device_authorize(sock, jp, config_comms, config_frontend_allowed_ip,
-			ZBX_PROTO_VALUE_DEVICE_INIT, "initialize", "userid", 0, ZBX_AUTH_LOOKUP_GENERIC, &user,
-			&target_userid))
+			ZBX_PROTO_VALUE_DEVICE_INIT, "initialize", ZBX_AUTH_LOOKUP_GENERIC, &user, &target_userid))
 	{
 		goto out;
 	}
@@ -747,8 +746,8 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 	zbx_user_init(&user);
 
 	if (FAIL == trapper_device_authorize(sock, jp, config_comms, config_frontend_allowed_ip,
-			ZBX_PROTO_VALUE_DEVICE_OFFBOARD, "offboard", "uuid", 1, ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD,
-			&user, &target_userid))
+			ZBX_PROTO_VALUE_DEVICE_OFFBOARD, "offboard", ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD, &user,
+			&target_userid))
 	{
 		goto out;
 	}

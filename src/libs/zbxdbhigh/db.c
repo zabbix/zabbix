@@ -620,11 +620,11 @@ out:
  *             mode                      - [IN] which token schemes to        *
  *                                              accept - see                  *
  *                                              zbx_auth_lookup_mode_t        *
- *             device_uuid               - [IN] device UUID a DPoP-scheme     *
- *                                              token must be bound to;       *
- *                                              only used, and required, in   *
- *                                              device.offboard lookup mode   *
- *             user                      - [OUT] user information             *
+ *             device_uuid               - [IN] (optional) device DPoP-       *
+ *                                              scheme token must bind to;    *
+ *                                              required in device.offboard   *
+ *                                              lookup mode, unused otherwise *
+ *             user                      - [OUT]                              *
  *                                                                            *
  * Return value:  SUCCEED - a token matching an accepted scheme was found     *
  *                          (a DPoP-scheme match additionally requires it     *
@@ -647,41 +647,45 @@ static int	db_get_user_by_token(const char *formatted_auth_token_hash, zbx_auth_
 		goto out;
 	}
 
-	if (ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD != mode)
+	switch (mode)
 	{
-		result = zbx_db_select(
-				"select u.userid,u.roleid,u.username,r.type"
-					" from token t,users u,role r"
-				" where t.userid=u.userid"
-					" and t.token='%s'"
-					" and u.roleid=r.roleid"
-					" and t.status=%d"
-					" and t.auth_scheme=%d"
-					" and (t.expires_at=%d or t.expires_at > %lu)",
-				formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_SCHEME_BEARER,
-				ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t);
-	}
-	else
-	{
-		device_uuid_esc = zbx_db_dyn_escape_string(device_uuid);
-		result = zbx_db_select(
-				"select u.userid,u.roleid,u.username,r.type"
-					" from token t,users u,role r"
-				" where t.userid=u.userid"
-					" and t.token='%s'"
-					" and u.roleid=r.roleid"
-					" and t.status=%d"
-					" and (t.expires_at=%d or t.expires_at > %lu)"
-					" and (t.auth_scheme=%d or (t.auth_scheme=%d and exists ("
-						"select null from token_device td,device d"
-						" where td.tokenid=t.tokenid"
-							" and td.deviceid=d.deviceid"
-							" and d.uuid='%s'"
-							" and d.userid=t.userid"
-							" and d.status=%d)))",
-				formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
-				(unsigned long)t, ZBX_AUTH_SCHEME_BEARER, ZBX_AUTH_SCHEME_DPOP, device_uuid_esc,
-				ZBX_DEVICE_STATUS_ACTIVATED);
+		case ZBX_AUTH_LOOKUP_GENERIC:
+			result = zbx_db_select(
+					"select u.userid,u.roleid,u.username,r.type"
+						" from token t,users u,role r"
+					" where t.userid=u.userid"
+						" and t.token='%s'"
+						" and u.roleid=r.roleid"
+						" and t.status=%d"
+						" and t.auth_scheme=%d"
+						" and (t.expires_at=%d or t.expires_at > %lu)",
+					formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_SCHEME_BEARER,
+					ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t);
+			break;
+		case ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD:
+			device_uuid_esc = zbx_db_dyn_escape_string(device_uuid);
+			result = zbx_db_select(
+					"select u.userid,u.roleid,u.username,r.type"
+						" from token t,users u,role r"
+					" where t.userid=u.userid"
+						" and t.token='%s'"
+						" and u.roleid=r.roleid"
+						" and t.status=%d"
+						" and (t.expires_at=%d or t.expires_at > %lu)"
+						" and (t.auth_scheme=%d or (t.auth_scheme=%d and exists ("
+							"select null from token_device td,device d"
+							" where td.tokenid=t.tokenid"
+								" and td.deviceid=d.deviceid"
+								" and d.uuid='%s'"
+								" and d.userid=t.userid"
+								" and d.status=%d)))",
+					formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
+					(unsigned long)t, ZBX_AUTH_SCHEME_BEARER, ZBX_AUTH_SCHEME_DPOP, device_uuid_esc,
+					ZBX_DEVICE_STATUS_ACTIVATED);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected auth lookup mode:%d", (int)mode);
+			goto out;
 	}
 
 	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
@@ -705,7 +709,7 @@ out:
  *          associated user data                                              *
  *                                                                            *
  * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
- *             user                      - [OUT] user information             *
+ *             user                      - [OUT]                              *
  *                                                                            *
  * Return value:  SUCCEED - token is valid and user data was retrieved        *
  *                FAIL    - otherwise                                         *
@@ -730,8 +734,8 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
  *          data, in a single query                                           *
  *                                                                            *
  * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
- *             device_uuid               - [IN] device UUID                   *
- *             user                      - [OUT] user information             *
+ *             device_uuid               - [IN]                               *
+ *             user                      - [OUT]                              *
  *                                                                            *
  * Comments: a Bearer-scheme token is accepted unconditionally, the same as   *
  *           for any other trapper request. A DPoP-scheme token is accepted   *
