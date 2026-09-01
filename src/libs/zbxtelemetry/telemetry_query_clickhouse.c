@@ -136,8 +136,7 @@ int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_ve
 		{
 			ret = FAIL;
 		}
-
-		if (ZBX_TQ_MAX_RESULT_ROWS < row_count)
+		else if (ZBX_TQ_MAX_RESULT_ROWS < row_count)
 		{
 			ret = SUCCEED_PARTIAL;
 			zbx_free(str);
