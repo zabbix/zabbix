@@ -2294,10 +2294,10 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
  * Purpose: compares substring at the specified location with the specified   *
  *          text                                                              *
  *                                                                            *
- * Parameters: src      - [IN] the source string                              *
- *             loc      - [IN] the substring location                         *
- *             text     - [IN] the text to compare with                       *
- *             text_len - [IN] the text length                                *
+ * Parameters: src      - [IN] source string                                  *
+ *             loc      - [IN] substring location                             *
+ *             text     - [IN] text to compare with                           *
+ *             text_len - [IN] text length                                    *
  *                                                                            *
  * Return value: -1 - the substring is less than the specified text           *
  *                0 - the substring is equal to the specified text            *
