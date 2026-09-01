@@ -32,8 +32,8 @@ import (
 )
 
 // Get makes a GET request to the provided web page url, using an http client, provides a response dump if dump
-// parameter is set
-func Get(url string, timeout time.Duration, dump bool) (string, error) {
+// parameter is set. At most redirectLimit redirects are followed, zero means that redirects are not followed.
+func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return "", fmt.Errorf("Cannot create new request: %w", err)
@@ -53,7 +53,7 @@ func Get(url string, timeout time.Duration, dump bool) (string, error) {
 			}).DialContext,
 		},
 		Timeout:       timeout,
-		CheckRedirect: disableRedirect,
+		CheckRedirect: redirectPolicy(redirectLimit),
 	}
 
 	resp, err := client.Do(req)
@@ -93,6 +93,17 @@ func Get(url string, timeout time.Duration, dump bool) (string, error) {
 	return string(h) + string(b), nil
 }
 
-func disableRedirect(req *http.Request, via []*http.Request) error {
-	return http.ErrUseLastResponse
+// redirectPolicy returns function that follows at most limit redirects.
+func redirectPolicy(limit int) func(req *http.Request, via []*http.Request) error {
+	return func(_ *http.Request, via []*http.Request) error {
+		if limit <= 0 {
+			return http.ErrUseLastResponse
+		}
+
+		if len(via) > limit {
+			return fmt.Errorf("Maximum (%d) redirects followed.", limit)
+		}
+
+		return nil
+	}
 }

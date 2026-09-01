@@ -29,6 +29,8 @@ import (
 	"golang.zabbix.com/sdk/plugin"
 )
 
+const maxRedirectLimit = 1000
+
 var impl Plugin
 
 type Plugin struct {
@@ -78,7 +80,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		var length *int
 		var output string
 
-		if len(params) > 6 {
+		if len(params) > 7 {
 			return nil, fmt.Errorf("Too many parameters.")
 		}
 
@@ -105,7 +107,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			output = "\\0"
 		}
 
-		s, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true)
+		redirectLimit, err := parseRedirectLimit(params, 6)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid seventh parameter: %s", err)
+		}
+
+		s, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, redirectLimit)
 		if err != nil {
 			return nil, err
 		}
@@ -122,23 +129,51 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		return "", nil
 	case "web.page.perf":
-		if len(params) > 3 {
+		if len(params) > 4 {
 			return nil, fmt.Errorf("Too many parameters.")
+		}
+
+		redirectLimit, err := parseRedirectLimit(params, 3)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid fourth parameter: %s", err)
 		}
 
 		start := time.Now()
 
-		_, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, false)
+		_, err = web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, false, redirectLimit)
 		if err != nil {
 			return nil, err
 		}
 
 		return time.Since(start).Seconds(), nil
 	default:
-		if len(params) > 3 {
+		if len(params) > 4 {
 			return nil, fmt.Errorf("Too many parameters.")
 		}
 
-		return web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true)
+		redirectLimit, err := parseRedirectLimit(params, 3)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid fourth parameter: %s", err)
+		}
+
+		return web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true, redirectLimit)
 	}
+}
+
+// parseRedirectLimit returns the value or zero of the optional "redirect_limit" parameter.
+func parseRedirectLimit(params []string, index int) (int, error) {
+	if len(params) <= index || params[index] == "" {
+		return 0, nil
+	}
+
+	limit, err := strconv.Atoi(params[index])
+	if err != nil {
+		return 0, err
+	}
+
+	if limit < 0 || limit > maxRedirectLimit {
+		return 0, errs.Errorf("value must be between 0 and %d", maxRedirectLimit)
+	}
+
+	return limit, nil
 }
