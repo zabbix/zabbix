@@ -681,7 +681,11 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('columns-table')
-					->setHeader(['', _('Name'), '', ''])
+					->setHeader([
+						(new CColHeader(_('Name')))->setColSpan(2)->setWidth('43%'),
+						(new CColHeader())->setWidth('35%'),
+						(new CColHeader())->setWidth('22%')
+					])
 					->setFooter(new CRow(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')->setEnabled(!$readonly)
@@ -734,7 +738,11 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('aggregated-columns-table')
-					->setHeader([_('Function'), _('Alias'), _('Actions')])
+					->setHeader([
+						(new CColHeader(_('Function')))->setWidth('20%'),
+						(new CColHeader(_('Alias')))->setWidth('58%'),
+						(new CColHeader(_('Actions')))->setWidth('22%')
+					])
 					->setFooter(new CRow(
 						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-aggregated-column')
 							->setEnabled(!$readonly)
@@ -809,7 +817,11 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('conditions-table')
-					->setHeader([_('Label'), _('Name'), _('Action')])
+					->setHeader([
+						(new CColHeader(_('Label')))->setWidth('20%'),
+						(new CColHeader(_('Name')))->setWidth('58%'),
+						(new CColHeader(_('Action')))->setWidth('22%')
+					])
 					->setFooter(new CRow(
 						(new CCol((new CButtonLink(_('Add')))->addClass('js-add-condition')
 							->setEnabled(!$readonly)
