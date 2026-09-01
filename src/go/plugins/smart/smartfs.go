@@ -15,7 +15,6 @@
 package smart
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -271,8 +270,7 @@ func (p *Plugin) execute(byID, jsonRunner bool) (*runner, error) {
 		r.devices = make(map[string]deviceParser)
 	}
 
-	// Create an error group with the context.
-	g, ctx := errgroup.WithContext(context.Background())
+	var g errgroup.Group
 
 	g.SetLimit(p.cpuCount)
 
@@ -291,21 +289,16 @@ func (p *Plugin) execute(byID, jsonRunner bool) (*runner, error) {
 		name := device.Name
 
 		g.Go(func() error {
-			select {
-			case <-ctx.Done():
-				return errs.Wrap(ctx.Err(), "errgroup context canceled") // Return error if context is canceled
-			default:
-				deviceInfo, err := getBasicDeviceInfo(p.ctl, name) //nolint:govet
-				if err != nil {
-					p.Debugf("failed to collect SMART data for device %q, skipping it: %s", name, err)
-
-					return nil
-				}
-
-				resultChan <- deviceInfo
+			deviceInfo, err := getBasicDeviceInfo(p.ctl, name) //nolint:govet
+			if err != nil {
+				p.Debugf("failed to collect SMART data for device %q, skipping it: %s", name, err)
 
 				return nil
 			}
+
+			resultChan <- deviceInfo
+
+			return nil
 		})
 	}
 
@@ -343,13 +336,9 @@ func (p *Plugin) execute(byID, jsonRunner bool) (*runner, error) {
 		})
 	}
 
-	err = g.Wait()
+	g.Wait() //nolint:errcheck,gosec // Workers always return nil.
 
 	close(resultChan)
-
-	if err != nil {
-		return nil, errs.Wrap(err, "got error executing worker pool")
-	}
 
 	<-collectorDone
 
@@ -498,19 +487,19 @@ func getAllDeviceInfoByType(
 	}, nil
 }
 
-func (p *Plugin) getRaidDevices(deviceName string, deviceType deviceType) []*smartCtlDeviceData {
-	switch deviceType {
+func (p *Plugin) getRaidDevices(deviceName string, devType deviceType) []*smartCtlDeviceData {
+	switch devType {
 	case sat, scsi:
-		return p.getSingleRaidDevice(deviceName, deviceType)
+		return p.getSingleRaidDevice(deviceName, devType)
 	default:
-		return p.getBoundedRaidDevices(deviceName, deviceType)
+		return p.getBoundedRaidDevices(deviceName, devType)
 	}
 }
 
 func (p *Plugin) getSingleRaidDevice(
-	deviceName string, deviceType deviceType,
+	deviceName string, devType deviceType,
 ) []*smartCtlDeviceData {
-	data, err := p.getRaidDevice(deviceName, string(deviceType))
+	data, err := p.getRaidDevice(deviceName, string(devType))
 	if err != nil {
 		return []*smartCtlDeviceData{}
 	}
@@ -519,17 +508,17 @@ func (p *Plugin) getSingleRaidDevice(
 }
 
 func (p *Plugin) getBoundedRaidDevices(
-	deviceName string, deviceType deviceType,
+	deviceName string, devType deviceType,
 ) []*smartCtlDeviceData {
 	var (
 		devices           []*smartCtlDeviceData
 		consecutiveErrors int
 	)
 
-	indexRange := deviceType.indexRange()
+	indexRange := devType.indexRange()
 
 	for i := indexRange.first; i <= indexRange.last; i++ {
-		data, err := p.getRaidDevice(deviceName, fmt.Sprintf("%s,%d", deviceType, i))
+		data, err := p.getRaidDevice(deviceName, fmt.Sprintf("%s,%d", devType, i))
 		if err != nil {
 			if isUnsupportedRaidDevice(err) {
 				return devices
@@ -552,12 +541,12 @@ func (p *Plugin) getBoundedRaidDevices(
 	return devices
 }
 
-func (p *Plugin) getRaidDevice(deviceName, raidType string) (*smartCtlDeviceData, error) {
-	data, err := getAllDeviceInfoByType(p.ctl, deviceName, raidType)
+func (p *Plugin) getRaidDevice(deviceName, devType string) (*smartCtlDeviceData, error) {
+	data, err := getAllDeviceInfoByType(p.ctl, deviceName, devType)
 	if err != nil {
 		p.Debugf(
 			"failed to get device %q info by type %q: %s",
-			deviceName, raidType, err.Error(),
+			deviceName, devType, err.Error(),
 		)
 
 		return nil, err
@@ -566,6 +555,10 @@ func (p *Plugin) getRaidDevice(deviceName, raidType string) (*smartCtlDeviceData
 	return data, nil
 }
 
+// isUnsupportedRaidDevice identifies smartctl diagnostics which mean that a RAID type cannot be
+// used on the current platform or device. smartctl does not expose structured reason codes for
+// these failures. If its diagnostic text changes, the consecutive-error limit remains the fallback
+// which bounds discovery; this check only avoids unnecessary probes for known diagnostics.
 func isUnsupportedRaidDevice(err error) bool {
 	message := err.Error()
 
