@@ -22,6 +22,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @configurationDataProvider agentConfigurationProvider
  * @hosts agentd, agent2
  * @backup history
+ * @suite-components-reuse true
  */
 class testVfsFsGet extends CIntegrationTest {
 
@@ -210,7 +211,8 @@ class testVfsFsGet extends CIntegrationTest {
 	];
 
 	/**
-	 * Negative test cases for vfs.fs.get (expected to become unsupported).
+	 * Negative test cases for vfs.fs.get.
+	 * These cases are expected to result in ITEM_STATE_NOTSUPPORTED.
 	 *
 	 * @var array
 	 */
@@ -351,7 +353,7 @@ class testVfsFsGet extends CIntegrationTest {
 	}
 
 	/**
-	 * Get item state for unsupported cases (negative cases only).
+	 * Create an active item and wait until it becomes unsupported.
 	 *
 	 * @param string $key
 	 * @param string $component
@@ -399,7 +401,11 @@ class testVfsFsGet extends CIntegrationTest {
 			}
 
 			$lastStateText = $lastState === null ? 'unknown' : $lastState;
-			$this->fail("$component: $key - Item did not become unsupported after ".self::WAIT_ITERATIONS." iterations. Last observed state: $lastStateText");
+			$this->fail(
+				"$component: $key - Item did not become unsupported after ".
+				self::WAIT_ITERATIONS.
+				" iterations. Last observed state: $lastStateText"
+			);
 		} finally {
 			$this->call('item.delete', [$itemid]);
 		}
@@ -414,19 +420,7 @@ class testVfsFsGet extends CIntegrationTest {
 	 * @param array  $case
 	 */
 	private function validatePositiveResult($key, $value, $agentName, $case) {
-		$json = json_decode($value, true);
-
-		$jsonError = json_last_error();
-		$jsonErrorMessage = json_last_error_msg();
-		if ($jsonError !== JSON_ERROR_NONE) {
-			$this->fail("$agentName: $key - Invalid JSON response: $jsonErrorMessage");
-		}
-
-		if ($json === null) {
-			$this->fail("$agentName: $key - Response is null, expected JSON array");
-		}
-
-		$this->assertIsArray($json, "$agentName: $key - Response is not a JSON array");
+		$json = $this->decodeJsonResult($key, $value, $agentName);
 
 		if (!empty($case['nonexistent'])) {
 			$this->assertSame([], $json, "$agentName: $key - Nonexistent mountpoint should return []");
@@ -443,9 +437,18 @@ class testVfsFsGet extends CIntegrationTest {
 			$this->validateFullMode($key, $json, $agentName);
 		}
 
-		if (!empty($case['mountpoint']) && empty($case['nonexistent']) && empty($case['unfiltered'])) {
-			$this->assertCount($case['expected_count'], $json, "$agentName: $key - Mountpoint filter should return exactly {$case['expected_count']} item(s)");
-			$this->assertEquals($case['mountpoint'], $json[0]['fsname'] ?? '', "$agentName: $key - Mountpoint filter returned wrong fsname");
+		if (!empty($case['mountpoint']) && empty($case['unfiltered'])) {
+			$this->assertCount(
+				$case['expected_count'],
+				$json,
+				"$agentName: $key - Mountpoint filter should return exactly ".
+				"{$case['expected_count']} item(s)"
+			);
+			$this->assertEquals(
+				$case['mountpoint'],
+				$json[0]['fsname'] ?? '',
+				"$agentName: $key - Mountpoint filter returned wrong fsname"
+			);
 		}
 	}
 
@@ -458,7 +461,11 @@ class testVfsFsGet extends CIntegrationTest {
 	 * @param array  $case
 	 */
 	private function validateUnsupportedResult($key, $state, $agentName, $case) {
-		$this->assertEquals($case['expected_state'], $state, "$agentName: $key - Expected state {$case['expected_state']}, got $state");
+		$this->assertEquals(
+			$case['expected_state'],
+			$state,
+			"$agentName: $key - Expected state {$case['expected_state']}, got $state"
+		);
 	}
 
 	/**
@@ -470,11 +477,16 @@ class testVfsFsGet extends CIntegrationTest {
 	 */
 	private function validateShortMode($key, $json, $agentName) {
 		foreach ($json as $item) {
-			$this->assertArrayHasKey('fsname', $item, "$agentName: $key - Short mode item missing fsname");
-			$this->assertArrayHasKey('fstype', $item, "$agentName: $key - Short mode item missing fstype");
-			$this->assertArrayHasKey('options', $item, "$agentName: $key - Short mode item missing options");
-			$this->assertArrayNotHasKey('bytes', $item, "$agentName: $key - Short mode should not contain bytes");
-			$this->assertArrayNotHasKey('inodes', $item, "$agentName: $key - Short mode should not contain inodes");
+			$this->assertArrayHasKey('fsname',
+				$item, "$agentName: $key - Short mode item missing fsname");
+			$this->assertArrayHasKey('fstype',
+				$item, "$agentName: $key - Short mode item missing fstype");
+			$this->assertArrayHasKey('options',
+				$item, "$agentName: $key - Short mode item missing options");
+			$this->assertArrayNotHasKey('bytes', $item,
+				"$agentName: $key - Short mode should not contain bytes");
+			$this->assertArrayNotHasKey('inodes', $item,
+				"$agentName: $key - Short mode should not contain inodes");
 		}
 	}
 
@@ -502,12 +514,18 @@ class testVfsFsGet extends CIntegrationTest {
 
 			if (isset($item['inodes'])) {
 				$inodes = $item['inodes'];
-				$this->assertIsArray($inodes, "$agentName: $key - Full mode inodes is not an object");
-				$this->assertArrayHasKey('total', $inodes, "$agentName: $key - Full mode inodes missing total");
-				$this->assertArrayHasKey('free', $inodes, "$agentName: $key - Full mode inodes missing free");
-				$this->assertArrayHasKey('used', $inodes, "$agentName: $key - Full mode inodes missing used");
-				$this->assertArrayHasKey('pfree', $inodes, "$agentName: $key - Full mode inodes missing pfree");
-				$this->assertArrayHasKey('pused', $inodes, "$agentName: $key - Full mode inodes missing pused");
+				$this->assertIsArray($inodes,
+					"$agentName: $key - Full mode inodes is not an object");
+				$this->assertArrayHasKey('total', $inodes,
+					"$agentName: $key - Full mode inodes missing total");
+				$this->assertArrayHasKey('free', $inodes,
+					"$agentName: $key - Full mode inodes missing free");
+				$this->assertArrayHasKey('used', $inodes,
+					"$agentName: $key - Full mode inodes missing used");
+				$this->assertArrayHasKey('pfree', $inodes,
+					"$agentName: $key - Full mode inodes missing pfree");
+				$this->assertArrayHasKey('pused', $inodes,
+					"$agentName: $key - Full mode inodes missing pused");
 			}
 		}
 	}
@@ -515,7 +533,8 @@ class testVfsFsGet extends CIntegrationTest {
 	/**
 	 * Test backward compatibility of vfs.fs.get aliases.
 	 *
-	 * Verifies that equivalent forms produce equivalent filesystem metadata and JSON structure.
+	 * Verifies that equivalent aliases produce identical normalized filesystem
+	 * metadata while ignoring volatile byte and inode values.
 	 */
 	public function testVfsFsGetBackwardCompatibility() {
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
@@ -540,7 +559,8 @@ class testVfsFsGet extends CIntegrationTest {
 				$this->assertEquals(
 					$unfilteredResults[$firstKey],
 					$unfilteredResults[$key],
-					"$componentName: Backward compatibility mismatch between '$firstKey' and '$key'"
+					"$componentName: Backward compatibility mismatch between "
+						."'$firstKey' and '$key'"
 				);
 			}
 
@@ -561,15 +581,20 @@ class testVfsFsGet extends CIntegrationTest {
 			$this->assertEquals(
 				$rootResults[$firstRootKey],
 				$rootResults[$secondRootKey],
-				"$componentName: Backward compatibility mismatch between '$firstRootKey' and '$secondRootKey'"
+				"$componentName: Backward compatibility mismatch between "
+					."'$firstRootKey' and '$secondRootKey'"
 			);
 
 			foreach ($rootResults as $key => $result) {
-				$this->assertCount(1, $result, "$componentName: $key - Root filter should return exactly 1 item");
-				$this->assertEquals('/', $result[0]['fsname'], "$componentName: $key - Root filter fsname should be '/'");
-				$this->assertArrayHasKey('has_bytes', $result[0], "$componentName: $key - Normalized root result is missing has_bytes");
-				$this->assertTrue($result[0]['has_bytes'], "$componentName: $key - Root filter should have bytes");
-				$this->assertArrayHasKey('options', $result[0], "$componentName: $key - Root filter should have options");
+				$this->assertCount(1, $result, "$componentName:
+					$key - Root filter should return exactly 1 item"
+				);
+				$this->assertEquals('/', $result[0]['fsname'], "$componentName:
+					$key - Root filter fsname should be '/'"
+				);
+				$this->assertTrue($result[0]['has_bytes'],
+					"$componentName: $key - Root filter should have bytes"
+				);
 			}
 		}
 	}
