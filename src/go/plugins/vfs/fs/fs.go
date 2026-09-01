@@ -31,16 +31,13 @@ const (
 )
 
 var (
-	//nolint:revive,staticcheck // Keep error text compatible with C agent.
+	//nolint:revive,staticcheck
 	errInvalidParameters = errors.New("Invalid number of parameters.")
-
-	//nolint:revive,staticcheck // Keep error text compatible with C agent.
+	//nolint:revive,staticcheck
 	errTooManyParameters = errors.New("Too many parameters.")
-
-	//nolint:revive,staticcheck // Keep error text compatible with C agent.
+	//nolint:revive,staticcheck
 	errInvalidFirstParameter = errors.New("Invalid first parameter.")
-
-	//nolint:revive,staticcheck // Keep error text compatible with C agent.
+	//nolint:revive,staticcheck
 	errInvalidSecondParameter = errors.New("Invalid second parameter.")
 )
 
@@ -78,7 +75,23 @@ type Plugin struct {
 
 var impl Plugin
 
-func (p *Plugin) exportDiscovery(params []string) (value interface{}, err error) {
+// Export returns the value of the requested filesystem metric.
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
+	switch key {
+	case "vfs.fs.discovery":
+		return p.exportDiscovery(params)
+	case "vfs.fs.get":
+		return p.exportGet(params)
+	case "vfs.fs.size":
+		return p.export(params, getFsStats)
+	case "vfs.fs.inode":
+		return p.export(params, getFsInode)
+	default:
+		return nil, plugin.UnsupportedMetricError
+	}
+}
+
+func (p *Plugin) exportDiscovery(params []string) (any, error) {
 	if len(params) != 0 {
 		return nil, errInvalidParameters
 	}
@@ -96,7 +109,7 @@ func (p *Plugin) exportDiscovery(params []string) (value interface{}, err error)
 	return string(b), nil
 }
 
-func (p *Plugin) exportGet(params []string) (interface{}, error) {
+func (p *Plugin) exportGet(params []string) (any, error) {
 	if len(params) > 2 {
 		return nil, errTooManyParameters
 	}
@@ -137,7 +150,7 @@ func (p *Plugin) exportGet(params []string) (interface{}, error) {
 	return string(b), nil
 }
 
-func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)) (value interface{}, err error) {
+func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)) (any, error) {
 	if len(params) < 1 || params[0] == "" {
 		return nil, errInvalidFirstParameter
 	}
@@ -145,21 +158,9 @@ func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)
 		return nil, errTooManyParameters
 	}
 
-	mode := statModeTotal
-	if len(params) == 2 {
-		switch params[1] {
-		case "total":
-		case "free":
-			mode = statModeFree
-		case "used":
-			mode = statModeUsed
-		case "pfree":
-			mode = statModePFree
-		case "pused":
-			mode = statModePUsed
-		default:
-			return nil, errInvalidSecondParameter
-		}
+	mode, err := getMode(params)
+	if err != nil {
+		return nil, err
 	}
 
 	fsCaller := p.newFSCaller(getStats, 1)
@@ -169,6 +170,32 @@ func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)
 		return nil, runErr
 	}
 
+	return getStatValue(stats, mode)
+}
+
+// getMode returns the filesystem statistics mode specified in params.
+func getMode(params []string) (int, error) {
+	if len(params) < 2 {
+		return statModeTotal, nil
+	}
+
+	switch params[1] {
+	case "total":
+		return statModeTotal, nil
+	case "free":
+		return statModeFree, nil
+	case "used":
+		return statModeUsed, nil
+	case "pfree":
+		return statModePFree, nil
+	case "pused":
+		return statModePUsed, nil
+	default:
+		return 0, errInvalidSecondParameter
+	}
+}
+
+func getStatValue(stats *FsStats, mode int) (any, error) {
 	switch mode {
 	case statModeTotal:
 		return stats.Total, nil
@@ -180,22 +207,7 @@ func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)
 		return stats.PFree, nil
 	case statModePUsed:
 		return stats.PUsed, nil
-	}
-
-	return nil, errInvalidSecondParameter
-}
-
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	switch key {
-	case "vfs.fs.discovery":
-		return p.exportDiscovery(params)
-	case "vfs.fs.get":
-		return p.exportGet(params)
-	case "vfs.fs.size":
-		return p.export(params, getFsStats)
-	case "vfs.fs.inode":
-		return p.export(params, getFsInode)
 	default:
-		return nil, plugin.UnsupportedMetricError
+		return nil, errInvalidSecondParameter
 	}
 }
