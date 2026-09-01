@@ -152,12 +152,11 @@ func matchMountpoint(path, mountpoint string) bool {
 	if mountpoint == "" {
 		return true
 	}
-	fsname := path
-	if len(fsname) > 0 && fsname[len(fsname)-1] == '\\' {
-		fsname = fsname[:len(fsname)-1]
-	}
-	// Case-insensitive comparison for Windows
-	return strings.EqualFold(fsname, mountpoint)
+
+	path = strings.TrimSuffix(path, `\`)
+	mountpoint = strings.TrimSuffix(mountpoint, `\`)
+
+	return strings.EqualFold(path, mountpoint)
 }
 
 func (p *Plugin) getFsInfoStats(mountpoint string) (data []*FsInfoNew, err error) {
