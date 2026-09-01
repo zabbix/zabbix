@@ -1029,6 +1029,7 @@ static zbx_cep_assessment_t	cep_check_trigger_dependency(zbx_cep_t *cep, const z
  *                                                                            *
  * Parameters: cep     - [IN/OUT] cep cache                                   *
  *             queries - [IN]     trigger assessment queries                  *
+ *             triggerids   - [IN] trigger IDs processed in current batch     *
  *             results - [OUT]    assessment results                          *
  *                                                                            *
  * Comments: Uses cache state and trigger dependencies to decide whether      *
@@ -1037,19 +1038,12 @@ static zbx_cep_assessment_t	cep_check_trigger_dependency(zbx_cep_t *cep, const z
  *                                                                            *
  ******************************************************************************/
 void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_query_t *queries,
-		unsigned char *results)
+		const zbx_hashset_t *triggerids, unsigned char *results)
 {
 	int			dropped_num = 0;
-	zbx_hashset_t		triggerids;
 	zbx_cep_origin_t	origin = {.source = EVENT_SOURCE_TRIGGERS, .object = EVENT_OBJECT_TRIGGER};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queries:%d", __func__, queries->values_num);
-
-	zbx_hashset_create(&triggerids, (size_t)queries->values_num, ZBX_DEFAULT_ID_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	for (int i = 0; i < queries->values_num; i++)
-		zbx_hashset_insert(&triggerids, &queries->values[i].triggerid, sizeof(queries->values[i].triggerid));
 
 	for (int i = 0; i < queries->values_num; i++)
 	{
@@ -1060,7 +1054,7 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 		origin.objectid = query->triggerid;
 
 		if (0 != (query->flags & CEP_QUERY_FLAG_DEPS) &&
-				CEP_EVENT_ALLOW != (result = cep_check_trigger_dependency(cep, &triggerids,
+				CEP_EVENT_ALLOW != (result = cep_check_trigger_dependency(cep, triggerids,
 						&query->dep_triggerids)))
 		{
 			if (CEP_EVENT_DEPENDENCY_DENY == result)
@@ -1124,8 +1118,6 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 		else
 			obj->pending_events_num++;
 	}
-
-	zbx_hashset_destroy(&triggerids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() dropped:%d", __func__, dropped_num);
 }

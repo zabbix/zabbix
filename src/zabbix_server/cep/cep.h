@@ -42,7 +42,7 @@ void	cep_destroy(void *a);
 void	cep_sync_object_state(zbx_cep_t *cep, zbx_dbconn_t *db);
 
 void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_query_t *queries,
-		unsigned char *results);
+		const zbx_hashset_t *triggerids, unsigned char *results);
 zbx_cep_assessment_t	cep_check_trigger_deps(zbx_cep_t *cep, const zbx_vector_uint64_t *triggerids);
 
 zbx_uint64_t	cep_open_trigger_event(zbx_cep_t *cep, zbx_uint64_t triggerid, unsigned char trigger_type,

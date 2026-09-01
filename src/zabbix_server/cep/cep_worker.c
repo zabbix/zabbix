@@ -72,17 +72,26 @@ static void	cep_worker_assess_trigger_events(zbx_cep_task_remote_t *task)
 {
 	zbx_vector_cep_assessment_query_t	queries;
 	zbx_cep_t				*cep;
+	zbx_hashset_t				triggerids;
 
 	zbx_vector_cep_assessment_query_create(&queries);
 
 	zbx_cep_deserialize_event_queries(task->message->data, &queries);
 
+	zbx_hashset_create(&triggerids, (size_t)queries.values_num, ZBX_DEFAULT_ID_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (int i = 0; i < queries.values_num; i++)
+		zbx_hashset_insert(&triggerids, &queries.values[i].triggerid, sizeof(queries.values[i].triggerid));
+
 	cep_cache_acquire(&cep);
-	cep_assess_trigger_events(cep, &queries, task->response);
+	cep_assess_trigger_events(cep, &queries, &triggerids, task->response);
 	cep_cache_release(&cep);
 
 	for (int i = 0; i < queries.values_num; i++)
 		zbx_cep_assessment_query_clear(&queries.values[i]);
+
+	zbx_hashset_destroy(&triggerids);
 
 	cep_stats_update_events_accessed((zbx_uint64_t)queries.values_num);
 	zbx_vector_cep_assessment_query_destroy(&queries);
