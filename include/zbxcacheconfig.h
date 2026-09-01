@@ -1714,10 +1714,6 @@ zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correl
 #define ZBX_CEP_WINDOW_CORRELATION	3
 #define ZBX_CEP_WINDOW_PATTERN		4
 
-#define ZBX_CEP_WINDOW_CONDITION_TAG_PAIR	1
-#define ZBX_CEP_WINDOW_CONDITION_OLD_TAG	2
-#define ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE	3
-
 #define ZBX_CEP_OP_SET_NAME		1
 #define ZBX_CEP_OP_CLOSE		2
 #define ZBX_CEP_OP_DISCARD		3
