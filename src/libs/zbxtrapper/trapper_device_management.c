@@ -192,6 +192,9 @@ static int	device_get_userid_by_uuid(const char *uuid, zbx_uint64_t *target_user
  *             id_is_uuid                 - [IN] 0 - id_field is a userid;    *
  *                                                otherwise a device uuid,    *
  *                                                resolved to its owner       *
+ *             auth_mode                  - [IN] which token schemes to       *
+ *                                                accept - see                *
+ *                                                zbx_auth_lookup_mode_t      *
  *             user                       - [OUT]                             *
  *             target_userid              - [OUT] device owner userid         *
  *                                                                            *
@@ -203,12 +206,12 @@ static int	device_get_userid_by_uuid(const char *uuid, zbx_uint64_t *target_user
  ******************************************************************************/
 static int	trapper_device_authorize(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, const char *config_frontend_allowed_ip,
-		const char *request, const char *action, const char *id_field, int id_is_uuid, zbx_user_t *user,
-		zbx_uint64_t *target_userid)
+		const char *request, const char *action, const char *id_field, int id_is_uuid,
+		zbx_auth_lookup_mode_t auth_mode, zbx_user_t *user, zbx_uint64_t *target_userid)
 {
 	struct zbx_json_parse	jp_data;
 	char			id_str[ZBX_UUID_LEN];
-	int			auth_ret = FAIL;
+	int			auth_ret;
 
 	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_comms->config_tls, config_frontend_allowed_ip))
 		return FAIL;
@@ -217,25 +220,6 @@ static int	trapper_device_authorize(zbx_socket_t *sock, const struct zbx_json_pa
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot %s device: mobile devices are disabled", action);
 		trapper_device_send_response(sock, FAIL, "Mobile devices are disabled.", NULL, NULL,
-				config_comms->config_timeout, __func__, request);
-		return FAIL;
-	}
-
-	/* device.offboard is forwarded after frontend DPoP proof validation. Limit fallback to bound UUID. */
-	if (0 == strcmp(request, ZBX_PROTO_VALUE_DEVICE_OFFBOARD) && 0 != id_is_uuid &&
-			SUCCEED == zbx_json_brackets_by_name(jp, "data", &jp_data) &&
-			SUCCEED == zbx_json_value_by_name(&jp_data, id_field, id_str, sizeof(id_str), NULL))
-	{
-		auth_ret = zbx_get_user_from_json_dpop_for_device(jp, id_str, user);
-	}
-	else
-		auth_ret = zbx_get_user_from_json(jp, user, NULL);
-
-
-	if (FAIL == auth_ret)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot %s device: failed to get user from request", action);
-		trapper_device_send_response(sock, FAIL, "Permission denied.", NULL, NULL,
 				config_comms->config_timeout, __func__, request);
 		return FAIL;
 	}
@@ -251,6 +235,22 @@ static int	trapper_device_authorize(zbx_socket_t *sock, const struct zbx_json_pa
 	if (FAIL == zbx_json_value_by_name(&jp_data, id_field, id_str, sizeof(id_str), NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot %s device: missing %s in request data", action, id_field);
+		trapper_device_send_response(sock, FAIL, "Permission denied.", NULL, NULL,
+				config_comms->config_timeout, __func__, request);
+		return FAIL;
+	}
+
+	/* device.offboard is forwarded after frontend DPoP proof validation, so its request additionally    */
+	/* accepts a DPoP-scheme token bound to the target device (id_str, a device uuid in that mode), in   */
+	/* the same lookup as the Bearer-scheme token every other request accepts.                           */
+	if (ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD == auth_mode)
+		auth_ret = zbx_get_user_from_json_for_device_offboard(jp, id_str, user);
+	else
+		auth_ret = zbx_get_user_from_json(jp, user, NULL);
+
+	if (FAIL == auth_ret)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot %s device: failed to get user from request", action);
 		trapper_device_send_response(sock, FAIL, "Permission denied.", NULL, NULL,
 				config_comms->config_timeout, __func__, request);
 		return FAIL;
@@ -618,7 +618,8 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 	zbx_user_init(&user);
 
 	if (FAIL == trapper_device_authorize(sock, jp, config_comms, config_frontend_allowed_ip,
-			ZBX_PROTO_VALUE_DEVICE_INIT, "initialize", "userid", 0, &user, &target_userid))
+			ZBX_PROTO_VALUE_DEVICE_INIT, "initialize", "userid", 0, ZBX_AUTH_LOOKUP_GENERIC, &user,
+			&target_userid))
 	{
 		goto out;
 	}
@@ -746,7 +747,8 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 	zbx_user_init(&user);
 
 	if (FAIL == trapper_device_authorize(sock, jp, config_comms, config_frontend_allowed_ip,
-			ZBX_PROTO_VALUE_DEVICE_OFFBOARD, "offboard", "uuid", 1, &user, &target_userid))
+			ZBX_PROTO_VALUE_DEVICE_OFFBOARD, "offboard", "uuid", 1, ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD,
+			&user, &target_userid))
 	{
 		goto out;
 	}

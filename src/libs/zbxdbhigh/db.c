@@ -613,28 +613,33 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Validate that token is not expired and is active. Optionally      *
- *          checks that a DPoP token is bound to the specified device, and    *
- *          get associated user data.                                         *
+ * Purpose: validate a token for the given lookup mode and get associated     *
+ *          user data                                                         *
  *                                                                            *
  * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
- *             device_uuid               - [IN]                               *
- *             user                      - [OUT]                              *
+ *             mode                      - [IN] which token schemes to        *
+ *                                              accept - see                  *
+ *                                              zbx_auth_lookup_mode_t        *
+ *             device_uuid               - [IN] device UUID a DPoP-scheme     *
+ *                                              token must be bound to;       *
+ *                                              only used, and required, in   *
+ *                                              device.offboard lookup mode   *
+ *             user                      - [OUT] user information             *
  *                                                                            *
- * Return value:  SUCCEED - token is valid and user data was retrieved        *
+ * Return value:  SUCCEED - a token matching an accepted scheme was found     *
+ *                          (a DPoP-scheme match additionally requires it     *
+ *                          to be bound to device_uuid)                       *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-static int	db_get_user_by_auth_token(const char *formatted_auth_token_hash, const char *device_uuid,
-		zbx_user_t *user)
+static int	db_get_user_by_token(const char *formatted_auth_token_hash, zbx_auth_lookup_mode_t mode,
+		const char *device_uuid, zbx_user_t *user)
 {
-	char			*device_uuid_esc = NULL;
-	int			ret = FAIL;
-	zbx_db_result_t		result = NULL;
-	zbx_db_row_t		row;
-	time_t			t;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
+	char		*device_uuid_esc = NULL;
+	int		ret = FAIL;
+	zbx_db_result_t	result = NULL;
+	zbx_db_row_t	row;
+	time_t		t;
 
 	if ((time_t) - 1 == (t = time(NULL)))
 	{
@@ -642,7 +647,7 @@ static int	db_get_user_by_auth_token(const char *formatted_auth_token_hash, cons
 		goto out;
 	}
 
-	if (NULL == device_uuid)
+	if (ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD != mode)
 	{
 		result = zbx_db_select(
 				"select u.userid,u.roleid,u.username,r.type"
@@ -674,9 +679,9 @@ static int	db_get_user_by_auth_token(const char *formatted_auth_token_hash, cons
 							" and d.uuid='%s'"
 							" and d.userid=t.userid"
 							" and d.status=%d)))",
-				formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED,
-				ZBX_AUTH_TOKEN_NEVER_EXPIRES, (unsigned long)t, ZBX_AUTH_SCHEME_BEARER,
-				ZBX_AUTH_SCHEME_DPOP, device_uuid_esc, ZBX_DEVICE_STATUS_ACTIVATED);
+				formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
+				(unsigned long)t, ZBX_AUTH_SCHEME_BEARER, ZBX_AUTH_SCHEME_DPOP, device_uuid_esc,
+				ZBX_DEVICE_STATUS_ACTIVATED);
 	}
 
 	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
@@ -691,33 +696,66 @@ out:
 	zbx_db_free_result(result);
 	zbx_free(device_uuid_esc);
 
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate that token is not expired and is active and then get     *
+ *          associated user data                                              *
+ *                                                                            *
+ * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
+ *             user                      - [OUT] user information             *
+ *                                                                            *
+ * Return value:  SUCCEED - token is valid and user data was retrieved        *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
+
+	ret = db_get_user_by_token(formatted_auth_token_hash, ZBX_AUTH_LOOKUP_GENERIC, NULL, user);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
-int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
-{
-	return db_get_user_by_auth_token(formatted_auth_token_hash, NULL, user);
-}
-
 /******************************************************************************
  *                                                                            *
- * Purpose: Validate a DPoP token bound to the specified active device and    *
- *          get associated user data.                                         *
+ * Purpose: validate a token for device.offboard and get associated user      *
+ *          data, in a single query                                           *
  *                                                                            *
  * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
- *             device_uuid               - [IN]                               *
- *             user                      - [OUT]                              *
+ *             device_uuid               - [IN] device UUID                   *
+ *             user                      - [OUT] user information             *
  *                                                                            *
- * Return value:  SUCCEED - token is valid and bound to the device            *
+ * Comments: a Bearer-scheme token is accepted unconditionally, the same as   *
+ *           for any other trapper request. A DPoP-scheme token is accepted   *
+ *           only if it is bound (via token_device) to the given active       *
+ *           device.                                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - token is valid (and, if DPoP-scheme, bound to     *
+ *                          the device)                                       *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_get_user_by_dpop_token_for_device(const char *formatted_auth_token_hash, const char *device_uuid,
+int	zbx_db_get_user_by_offboard_token(const char *formatted_auth_token_hash, const char *device_uuid,
 		zbx_user_t *user)
 {
-	return db_get_user_by_auth_token(formatted_auth_token_hash, device_uuid, user);
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s device uuid:%s", __func__,
+			formatted_auth_token_hash, device_uuid);
+
+	ret = db_get_user_by_token(formatted_auth_token_hash, ZBX_AUTH_LOOKUP_DEVICE_OFFBOARD, device_uuid, user);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 void	zbx_user_init(zbx_user_t *user)
