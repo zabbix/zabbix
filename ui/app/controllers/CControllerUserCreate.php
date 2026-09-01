@@ -139,7 +139,8 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		if ($this->hasInput('url') && !CRoleHelper::checkAccess('profile.redirect.enforce', $user['roleid'])) {
+		if ($this->hasInput('url')
+				&& !CRoleHelper::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE, $user['roleid'])) {
 			$user['url'] = $this->getInput('url');
 		}
 

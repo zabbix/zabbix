@@ -121,7 +121,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
 		DBstart();
 
-		if ($this->hasInput('url') && !CWebUser::checkAccess('profile.redirect.enforce')) {
+		if ($this->hasInput('url') && !CWebUser::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE)) {
 			$user['url'] = $this->getInput('url');
 		}
 

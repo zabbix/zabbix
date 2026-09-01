@@ -97,6 +97,9 @@ class CRoleHelper {
 	public const UI_SECTION_USERS = 'ui.users';
 	public const UI_SECTION_ADMINISTRATION = 'ui.administration';
 
+	public const PROFILE_REDIRECT_ENFORCE = 'profile.redirect.enforce';
+	public const PROFILE_REDIRECT_URL = 'profile.redirect.url';
+
 	public const API_ANY_METHOD = '.*';
 	public const API_ANY_SERVICE = '*.';
 

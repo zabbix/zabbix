@@ -1405,7 +1405,7 @@ class CUser extends CApiService {
 				$roleid = $db_users[$user['userid']]['roleid'];
 			}
 
-			if ($roleid !== null && CRoleHelper::checkAccess('profile.redirect.enforce', $roleid)) {
+			if ($roleid !== null && CRoleHelper::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE, $roleid)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/url',
 					_s('you do not have permission to update the parameter while redirect url is enforced by role rule')
 				));

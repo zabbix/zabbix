@@ -101,8 +101,8 @@ class CWebUser {
 		$validator = new CFrontendActionValidator();
 
 		$user_url = self::$data['url'];
-		$role_url = self::checkAccess('profile.redirect.url');
-		$enforce = self::checkAccess('profile.redirect.enforce');
+		$role_url = self::checkAccess(CRoleHelper::PROFILE_REDIRECT_URL);
+		$enforce = self::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE);
 		$redirect = ['url' => $role_url, 'error' => false];
 
 		if ($enforce) {
