@@ -603,11 +603,17 @@ window.item_edit_form = new class {
 		select.clearOptions();
 		select.addOptions(names.map((name) => ({value: name, label: name})));
 
-		if (value !== null && value !== '' && !names.includes(value)) {
+		if (value === null || value === '') {
+			select.preselectHightlighted();
+
+			return;
+		}
+
+		if (!names.includes(value)) {
 			select.addOption({value: value, label: value});
 		}
 
-		select.preselectHightlighted();
+		select.value = value;
 	}
 
 	#toggleAttributeKey(select) {
