@@ -1,0 +1,13 @@
+---
+test case: "1. threshold sensor that no longer exists is rejected, not read via a stale pointer"
+in:
+  reading_type: 1  # IPMI_EVENT_READING_TYPE_THRESHOLD
+---
+test case: "2. discrete sensor that no longer exists is rejected, not read via a stale pointer"
+in:
+  reading_type: 3  # IPMI_EVENT_READING_TYPE_DISCRETE_STATE
+---
+test case: "3. unsupported reading type builds its error message from the cached description string"
+in:
+  reading_type: 0  # unassigned - takes the 'default' branch
+...

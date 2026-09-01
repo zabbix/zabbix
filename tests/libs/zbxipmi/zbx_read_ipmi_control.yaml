@@ -1,0 +1,9 @@
+---
+test case: "1. reading a control that no longer exists is rejected, not read via a stale pointer"
+in:
+  op: "read"
+---
+test case: "2. setting a control that no longer exists is rejected, not set via a stale pointer"
+in:
+  op: "set"
+...

@@ -4,7 +4,9 @@ if HAVE_IPMI
 
 BINARIES_tests = \
 	zbx_get_ipmi_host \
-	zbx_domain_closed_cb
+	zbx_domain_closed_cb \
+	zbx_read_ipmi_sensor \
+	zbx_read_ipmi_control
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -69,5 +71,37 @@ zbx_domain_closed_cb_LDADD += @SERVER_LIBS@
 zbx_domain_closed_cb_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_domain_closed_cb_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_read_ipmi_sensor
+
+zbx_read_ipmi_sensor_SOURCES = \
+	zbx_read_ipmi_sensor.c \
+	$(COMMON_SRC_FILES)
+
+zbx_read_ipmi_sensor_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_read_ipmi_sensor_LDADD += @SERVER_LIBS@
+
+zbx_read_ipmi_sensor_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_read_ipmi_sensor_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_read_ipmi_control
+
+zbx_read_ipmi_control_SOURCES = \
+	zbx_read_ipmi_control.c \
+	$(COMMON_SRC_FILES)
+
+zbx_read_ipmi_control_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_read_ipmi_control_LDADD += @SERVER_LIBS@
+
+zbx_read_ipmi_control_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_read_ipmi_control_CFLAGS = $(IPMI_COMPILER_FLAGS)
 
 endif
