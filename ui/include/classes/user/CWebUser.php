@@ -101,7 +101,7 @@ class CWebUser {
 		$validator = new CFrontendActionValidator();
 
 		$user_url = self::$data['url'];
-		$role_url = self::checkAccess(CRoleHelper::PROFILE_REDIRECT_URL);
+		$role_url = self::checkAccess(CRoleHelper::PROFILE_REDIRECT_URL) ?: '';
 		$enforce = self::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE);
 
 		if ($enforce || $user_url === '') {

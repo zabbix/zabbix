@@ -71,7 +71,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'rows_per_page' => $this->user['rows_per_page'],
 			'url' => $redirect_enforce ? '' : $this->user['url'],
 			'profile_redirect_enforce' => $redirect_enforce,
-			'profile_redirect_url' => CWebUser::checkAccess(CRoleHelper::PROFILE_REDIRECT_URL),
+			'profile_redirect_url' => CWebUser::checkAccess(CRoleHelper::PROFILE_REDIRECT_URL) ?: '',
 			'userid' => CWebUser::$data['userid'],
 			'username' => $this->user['username'],
 			'name' => $this->user['name'],
