@@ -52,7 +52,7 @@ func readControllerFixture(t *testing.T, fixture string) []byte {
 
 	data, err := controllerFixtures.ReadFile("testdata/controller/" + fixture)
 	if err != nil {
-		t.Fatalf("failed to read fixture %q: %v", fixture, err)
+		t.Fatalf("failed to read fixture %q: %s", fixture, err)
 	}
 
 	return data
