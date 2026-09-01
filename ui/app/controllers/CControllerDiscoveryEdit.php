@@ -77,7 +77,7 @@ class CControllerDiscoveryEdit extends CController {
 
 				foreach ($drule['dchecks'] as $dcheck) {
 					if ($dcheck['uniq']) {
-						$uniqueness_criteria = $dcheck['dcheckid'];
+						$uniqueness_criteria = '_'.$dcheck['dcheckid'];
 					}
 
 					if ($dcheck['host_source'] == ZBX_DISCOVERY_VALUE) {
@@ -140,6 +140,14 @@ class CControllerDiscoveryEdit extends CController {
 				'proxyids' => $data['drule']['proxyid']
 			]), ['proxyid' => 'id']);
 		}
+
+		$data['js_validation_rules'] = $data['drule']['druleid'] === null
+			? CControllerDiscoveryCreate::getValidationRules()
+			: CControllerDiscoveryUpdate::getValidationRules();
+
+		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
+		$data['js_clone_validation_rules'] = (new CFormValidator(CControllerDiscoveryCreate::getValidationRules()))
+			->getRules();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));

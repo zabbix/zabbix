@@ -5,8 +5,7 @@ noinst_PROGRAMS = \
 	http_process_variables
 
 HTTPPOLLER_LIBS = \
-	$(XML_DEPS) \
-	$(EXPR_DEPS) \
+	$(ANY_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

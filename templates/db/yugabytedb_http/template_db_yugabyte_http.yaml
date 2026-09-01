@@ -53,7 +53,7 @@ zabbix_export:
           The value of the `{$YUGABYTEDB.ACCESS.TOKEN}` macro is stored as plain (not secret) text by default.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Databases
       items:
@@ -65,6 +65,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var YugabyteDB = {
             	params: {},
             	clusters: [],
@@ -78,6 +103,7 @@ zabbix_export:
             		});
             
             		YugabyteDB.params = params;
+            		YugabyteDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -86,7 +112,7 @@ zabbix_export:
             			data = '';
             		}
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(YugabyteDB.tls.options);
             		if (typeof YugabyteDB.params.proxy !== 'undefined' && YugabyteDB.params.proxy !== '') {
             			request.setProxy(YugabyteDB.params.proxy);
             		}
@@ -139,6 +165,8 @@ zabbix_export:
               value: '{$YUGABYTEDB.PROJECT.ID}'
             - name: proxy
               value: '{$YUGABYTEDB.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"YugabyteDB"}'
             - name: token
               value: '{$YUGABYTEDB.ACCESS.TOKEN}'
           tags:
@@ -232,6 +260,22 @@ zabbix_export:
         - tag: target
           value: yugabytedb
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "YugabyteDB", e.g. {$HTTP.TLS.VERIFY:"YugabyteDB"}.'
+          config:
+            type: LIST
+            priority: '5'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$YUGABYTEDB.ACCESS.TOKEN}'
           type: SECRET_TEXT
           description: 'Access token for the YugabyteDB API.'
@@ -279,7 +323,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Databases
       items:
@@ -579,6 +623,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var YugabyteDB = {
             	params: {},
             	clusters: [],
@@ -592,6 +661,7 @@ zabbix_export:
             		});
             
             		YugabyteDB.params = params;
+            		YugabyteDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -600,7 +670,7 @@ zabbix_export:
             			data = '';
             		}
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(YugabyteDB.tls.options);
             		if (typeof YugabyteDB.params.proxy !== 'undefined' && YugabyteDB.params.proxy !== '') {
             			request.setProxy(YugabyteDB.params.proxy);
             		}
@@ -655,6 +725,8 @@ zabbix_export:
               value: '{$YUGABYTEDB.PROJECT.ID}'
             - name: proxy
               value: '{$YUGABYTEDB.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"YugabyteDB Cluster"}'
             - name: token
               value: '{$YUGABYTEDB.ACCESS.TOKEN}'
           tags:
@@ -811,6 +883,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var YugabyteDB = {
             	params: {},
             	metrics: {},
@@ -824,6 +921,7 @@ zabbix_export:
             		});
             
             		YugabyteDB.params = params;
+            		YugabyteDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -832,7 +930,7 @@ zabbix_export:
             			data = '';
             		}
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(YugabyteDB.tls.options);
             		if (typeof YugabyteDB.params.proxy !== 'undefined' && YugabyteDB.params.proxy !== '') {
             			request.setProxy(YugabyteDB.params.proxy);
             		}
@@ -936,6 +1034,8 @@ zabbix_export:
               value: '{$YUGABYTEDB.PROJECT.ID}'
             - name: proxy
               value: '{$YUGABYTEDB.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"YugabyteDB Cluster"}'
             - name: token
               value: '{$YUGABYTEDB.ACCESS.TOKEN}'
           tags:
@@ -1081,6 +1181,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var YugabyteDB = {
             	params: {},
             	metrics: {},
@@ -1094,6 +1219,7 @@ zabbix_export:
             		});
             
             		YugabyteDB.params = params;
+            		YugabyteDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -1102,7 +1228,7 @@ zabbix_export:
             			data = '';
             		}
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(YugabyteDB.tls.options);
             		if (typeof YugabyteDB.params.proxy !== 'undefined' && YugabyteDB.params.proxy !== '') {
             			request.setProxy(YugabyteDB.params.proxy);
             		}
@@ -1209,6 +1335,8 @@ zabbix_export:
               value: '{$YUGABYTEDB.PROJECT.ID}'
             - name: proxy
               value: '{$YUGABYTEDB.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"YugabyteDB Cluster"}'
             - name: token
               value: '{$YUGABYTEDB.ACCESS.TOKEN}'
           tags:
@@ -1995,6 +2123,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var YugabyteDB = {
             	params: {},
             	keyspaces: {},
@@ -2008,6 +2161,7 @@ zabbix_export:
             		});
             
             		YugabyteDB.params = params;
+            		YugabyteDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -2016,7 +2170,7 @@ zabbix_export:
             			data = '';
             		}
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(YugabyteDB.tls.options);
             		if (typeof YugabyteDB.params.proxy !== 'undefined' && YugabyteDB.params.proxy !== '') {
             			request.setProxy(YugabyteDB.params.proxy);
             		}
@@ -2095,6 +2249,8 @@ zabbix_export:
               value: '{$YUGABYTEDB.PROJECT.ID}'
             - name: proxy
               value: '{$YUGABYTEDB.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"YugabyteDB Cluster"}'
             - name: token
               value: '{$YUGABYTEDB.ACCESS.TOKEN}'
           tags:
@@ -2127,6 +2283,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var YugabyteDB = {
             	params: {},
             	nodes: {},
@@ -2140,6 +2321,7 @@ zabbix_export:
             		});
             
             		YugabyteDB.params = params;
+            		YugabyteDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -2148,7 +2330,7 @@ zabbix_export:
             			data = '';
             		}
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(YugabyteDB.tls.options);
             		if (typeof YugabyteDB.params.proxy !== 'undefined' && YugabyteDB.params.proxy !== '') {
             			request.setProxy(YugabyteDB.params.proxy);
             		}
@@ -2202,6 +2384,8 @@ zabbix_export:
               value: '{$YUGABYTEDB.PROJECT.ID}'
             - name: proxy
               value: '{$YUGABYTEDB.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"YugabyteDB Cluster"}'
             - name: token
               value: '{$YUGABYTEDB.ACCESS.TOKEN}'
           tags:
@@ -2809,6 +2993,22 @@ zabbix_export:
         - tag: target
           value: yugabytedb
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "YugabyteDB Cluster", e.g. {$HTTP.TLS.VERIFY:"YugabyteDB Cluster"}.'
+          config:
+            type: LIST
+            priority: '14'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$YUGABYTEDB.CLUSTER.ID}'
           description: 'ID of cluster.'
           config:

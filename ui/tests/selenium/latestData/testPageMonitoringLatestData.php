@@ -684,6 +684,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				$this->query('xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
 						CXPathHelper::escapeQuotes($value).']')->waitUntilVisible()->one()->click();
 				$this->page->waitUntilReady();
+				$this->query('id:datatable-latest')->asDatatable()->one()->waitUntilReady();
 			}
 		}
 
@@ -735,9 +736,9 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
 
 		if ($kiosk_mode) {
-			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+			$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent();
+			$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent();
 		}
 
 		$this->query('id:datatable-latest')->one()->asDatatable()->waitUntilReady()->query('button', $tag['tag'].$tag['value'])
@@ -759,9 +760,9 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->assertDatatableData($data);
 
 		if ($kiosk_mode) {
-			$this->query('xpath://button[@title="Normal view"]')->one()->click();
+			$this->query('xpath://button[@aria-label="Exit full screen mode"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilVisible();
+			$this->query('xpath://button[@aria-label="Enter full screen mode"]')->waitUntilVisible();
 			$this->assertDatatableData($data);
 		}
 		else {

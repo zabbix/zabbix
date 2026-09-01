@@ -14,14 +14,81 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once __DIR__.'/../include/CAPITest.php';
+require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
  * @onBefore prepareTestData
- *
- * @backup role
+ * @onAfter  cleanTestData
  */
 class testRole extends CAPITest {
+
+	private static array $roleids = [];
+
+	public static function prepareTestData(): void {
+		CTestDataHelper::createObjects([
+			'roles' => [
+				['name' => 'used-role', 'type' => USER_TYPE_ZABBIX_ADMIN],
+				['name' => 'deletable-role', 'type' => USER_TYPE_ZABBIX_USER],
+				['name' => 'first-role-for-update', 'type' => USER_TYPE_SUPER_ADMIN],
+				['name' => 'second-role-for-update', 'type' => USER_TYPE_SUPER_ADMIN, 'rules' => [
+					'ui' => [
+						[
+							'name' => 'administration.macros',
+							'status' => '0'
+						],
+						[
+							'name' => 'administration.housekeeping',
+							'status' => '1'
+						]
+					],
+					'ui.default_access' => '0'
+				]],
+				['name' => 'role-for-get', 'type' => USER_TYPE_SUPER_ADMIN, 'rules' => [
+					'ui' => [
+						[
+							'name' => 'configuration.discovery_actions',
+							'status' => '0'
+						],
+						[
+							'name' => 'configuration.internal_actions',
+							'status' => '1'
+						]
+					],
+					'ui.default_access' => '0'
+				]],
+				['name' => 'zabbix-user-role', 'type' => USER_TYPE_ZABBIX_USER, 'rules' => [
+					'ui' => [
+						[
+							'name' => 'monitoring.dashboard',
+							'status' => '1'
+						]
+					]
+				]],
+				['name' => 'zabbix-admin-role', 'type' => USER_TYPE_ZABBIX_ADMIN, 'rules' => [
+					'ui' => [
+						[
+							'name' => 'monitoring.dashboard',
+							'status' => '1'
+						]
+					]
+				]]
+			],
+			'user_groups' => [
+				['name' => 'user-group-used-for-role.delete-tests']
+			],
+			'users' => [
+				[
+					'username' => 'user-used-for-role.delete-tests',
+					'roleid' => ':role:used-role',
+					'passwd' => 'Z@bb1x1234',
+					'usrgrps' => [
+						['usrgrpid' => ':user_group:user-group-used-for-role.delete-tests']
+					]
+				]
+			]
+		]);
+	}
 
 	public static function role_create() {
 		return [
@@ -174,6 +241,10 @@ class testRole extends CAPITest {
 							],
 							[
 								'name' => 'administration.authentication',
+								'status' => '1'
+							],
+							[
+								'name' => 'administration.linked_devices',
 								'status' => '1'
 							],
 							[
@@ -412,6 +483,72 @@ class testRole extends CAPITest {
 		];
 	}
 
+	public static function dataProviderCreateRuleApiAccess() {
+		yield '"api.access" default for USER_TYPE_ZABBIX_USER is ZBX_ROLE_RULE_DISABLED' => [
+			[[
+				'name' => 'default "api.access" for USER_TYPE_ZABBIX_USER',
+				'type' => USER_TYPE_ZABBIX_USER
+			]],
+			[
+				'default "api.access" for USER_TYPE_ZABBIX_USER' => ['api.access' => (string) ZBX_ROLE_RULE_DISABLED]
+			]
+		];
+
+		yield '"api.access" ZBX_ROLE_RULE_ENABLED for user "type" USER_TYPE_ZABBIX_USER' => [
+			[[
+				'name' => '"api.access" ZBX_ROLE_RULE_ENABLED for USER_TYPE_ZABBIX_USER',
+				'type' => USER_TYPE_ZABBIX_USER,
+				'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
+			]],
+			[
+				'"api.access" ZBX_ROLE_RULE_ENABLED for USER_TYPE_ZABBIX_USER' => ['api.access' => (string) ZBX_ROLE_RULE_ENABLED]
+			]
+		];
+
+		yield '"api.access" is disabled by default' => [
+			[
+				[
+					'name' => 'bulk create default "api.access" for USER_TYPE_SUPER_ADMIN',
+					'type' => USER_TYPE_SUPER_ADMIN
+				],
+				[
+					'name' => 'bulk create default "api.access" for USER_TYPE_ZABBIX_USER',
+					'type' => USER_TYPE_ZABBIX_USER
+				],
+				[
+					'name' => 'bulk create default "api.access" for USER_TYPE_ZABBIX_ADMIN',
+					'type' => USER_TYPE_ZABBIX_ADMIN
+				]
+			],
+			[
+				'bulk create default "api.access" for USER_TYPE_SUPER_ADMIN' => ['api.access' => (string) ZBX_ROLE_RULE_DISABLED],
+				'bulk create default "api.access" for USER_TYPE_ZABBIX_USER' => ['api.access' => (string) ZBX_ROLE_RULE_DISABLED],
+				'bulk create default "api.access" for USER_TYPE_ZABBIX_ADMIN' => ['api.access' => (string) ZBX_ROLE_RULE_DISABLED]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataProviderCreateRuleApiAccess
+	 */
+	public function testCreateRuleApiAccess(array $roles, array $expected) {
+		['roleids' => $roleids] = $this->call('role.create', $roles)['result'];
+		self::$roleids = array_merge(self::$roleids, $roleids);
+
+		$db_roles = $this->call('role.get', [
+			'output' => ['name'],
+			'selectRules' => ['api.access'],
+			'roleids' => $roleids
+		])['result'];
+		$actual = [];
+
+		foreach ($db_roles as $db_role) {
+			$actual[$db_role['name']] = $db_role['rules'];
+		}
+
+		$this->assertEquals($expected, $actual);
+	}
+
 	/**
 	* @dataProvider role_create
 	*/
@@ -420,6 +557,8 @@ class testRole extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['roleids'] as $roleid) {
+				self::$roleids[] = $roleid;
+
 				$dbRow = CDBHelper::getRow('SELECT name,type FROM role WHERE roleid='.zbx_dbstr($roleid));
 				$this->assertEquals($dbRow['name'], $role['name']);
 				$this->assertEquals($dbRow['type'], $role['type']);
@@ -443,38 +582,38 @@ class testRole extends CAPITest {
 	public static function role_delete() {
 		return [
 			[
-				'role' => [
-					'roleid_2'
+				'roleids' => [
+					':role:deletable-role'
 				],
 				'expected_error' => null
 			],
 			[
-				'role' => [
+				'roleids' => [
 					''
 				],
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
-				'role' => [
+				'roleids' => [
 					'123456'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
-				'role' => [
+				'roleids' => [
 					'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
-				'role' => [
+				'roleids' => [
 					'.'
 				],
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
-				'role' => [
-					'roleid_1'
+				'roleids' => [
+					':role:used-role'
 				],
 				'expected_error' => 'Cannot delete assigned user role "used-role".'
 			]
@@ -484,15 +623,14 @@ class testRole extends CAPITest {
 	/**
 	* @dataProvider role_delete
 	*/
-	public function testRole_Delete($role, $expected_error) {
+	public function testRole_Delete($roleids, $expected_error) {
+		$converted_roleids = CTestDataHelper::getConvertedValueReferences($roleids);
 
-		if ($role[0] === 'roleid_1' || $role[0] === 'roleid_2') {
-			$role = [self::$data['roleids'][$role[0]]];
-		}
-
-		$result = $this->call('role.delete', $role, $expected_error);
+		$result = $this->call('role.delete', $converted_roleids, $expected_error);
 
 		if ($expected_error === null) {
+			CTestDataHelper::unsetDeletedObjectIds(array_diff($roleids, $converted_roleids));
+
 			foreach ($result['result']['roleids'] as $id) {
 				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM role WHERE roleid='.zbx_dbstr($id)));
 			}
@@ -504,7 +642,7 @@ class testRole extends CAPITest {
 			// Check successful update.
 			[
 				'role' => [
-					'roleid' => 'roleid_4',
+					'roleid' => ':role:second-role-for-update',
 					'name' => 'Successfully updated role',
 					'type' => '2' // USER_TYPE_ZABBIX_ADMIN
 				],
@@ -512,7 +650,7 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'roleid_4',
+					'roleid' => ':role:second-role-for-update',
 					'name' => 'Successfully updated role',
 					'type' => '3',
 					'rules' => [
@@ -533,7 +671,28 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'zabbix-admin-role',
+					'roleid' => ':role:second-role-for-update',
+					'name' => 'Successfully updated role',
+					'type' => '3',
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'administration.macros',
+								'status' => '1'
+							],
+							[
+								'name' => 'administration.housekeeping',
+								'status' => '1'
+							]
+						],
+						'ui.default_access' => '0'
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'role' => [
+					'roleid' => ':role:zabbix-admin-role',
 					'name' => 'zabbix-admin-role',
 					'type' => 2, // USER_TYPE_ZABBIX_ADMIN
 					'rules' => [
@@ -549,7 +708,7 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'roleid_3',
+					'roleid' => ':role:first-role-for-update',
 					'name' => 'non existent parameter',
 					'type' => '4'
 				],
@@ -597,7 +756,7 @@ class testRole extends CAPITest {
 			// Check name.
 			[
 				'role' => [
-					'roleid' => 'roleid_3',
+					'roleid' => ':role:first-role-for-update',
 					'name' => '',
 					'type' => '3'
 				],
@@ -605,7 +764,7 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'roleid_3',
+					'roleid' => ':role:first-role-for-update',
 					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
 					'type' => '3'
 				],
@@ -613,7 +772,7 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'roleid_3',
+					'roleid' => ':role:first-role-for-update',
 					'name' => 'Super admin role',
 					'type' => '3'
 				],
@@ -622,7 +781,7 @@ class testRole extends CAPITest {
 			// Check for removed ui elements
 			[
 				'role' => [
-					'roleid' => 'roleid_3',
+					'roleid' => ':role:first-role-for-update',
 					'name' => 'Unknown ui element',
 					'type' => '3',
 					'rules' => [
@@ -644,7 +803,7 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'zabbix-user-role',
+					'roleid' => ':role:zabbix-user-role',
 					'name' => 'zabbix-user-role',
 					'type' => 1, // USER_TYPE_ZABBIX_USER
 					'rules' => [
@@ -664,9 +823,9 @@ class testRole extends CAPITest {
 	/**
 	* @dataProvider role_update
 	*/
-	public function testRole_Update(array $role, ?string $expected_error) {
-		if (array_key_exists('roleid', $role) && array_key_exists($role['roleid'], self::$data['roleids'])) {
-			$role['roleid'] = self::$data['roleids'][$role['roleid']];
+	public function testRole_Update($role, $expected_error) {
+		if (isset($role['roleid'])) {
+			$role['roleid'] = CTestDataHelper::getConvertedValueReference($role['roleid']);
 		}
 
 		$result = $this->call('role.update', $role, $expected_error);
@@ -701,12 +860,12 @@ class testRole extends CAPITest {
 			[
 				'params' => [
 					'output' => ['roleid', 'name', 'type'],
-					'roleids' => ['roleid_5']
+					'roleids' => [':role:role-for-get']
 				],
 				'expected_result' => [
 					'jsonrpc' => '2.0',
 					'result' => [
-						'roleid' => 'roleid_5',
+						'roleid' => ':role:role-for-get',
 						'name' => 'role-for-get',
 						'type' => '3'
 					],
@@ -718,12 +877,12 @@ class testRole extends CAPITest {
 				'params' => [
 					'output' => ['roleid', 'name', 'type'],
 					'selectRules' => ['ui', 'ui.default_access'],
-					'roleids' => ['roleid_5']
+					'roleids' => [':role:role-for-get']
 				],
 				'expected_result' => [
 					'jsonrpc' => '2.0',
 					'result' => [
-						'roleid' => 'roleid_5',
+						'roleid' => ':role:role-for-get',
 						'name' => 'role-for-get',
 						'type' => '3',
 						'rules' => [
@@ -873,6 +1032,10 @@ class testRole extends CAPITest {
 									'status' => '1'
 								],
 								[
+									'name' => 'administration.linked_devices',
+									'status' => '1'
+								],
+								[
 									'name' => 'administration.general',
 									'status' => '1'
 								],
@@ -952,11 +1115,13 @@ class testRole extends CAPITest {
 	 * @dataProvider role_get
 	 */
 	public function testRole_Get($params, $expected_result, $expected_error) {
-		if (isset($params['roleids']) && $params['roleids'] === ['roleid_5']) {
-			$params['roleids'] = [(int) self::$data['roleids'][$params['roleids'][0]]];
+		if (isset($params['roleids']) && is_array($params['roleids'])) {
+			$params['roleids'] = CTestDataHelper::getConvertedValueReferences($params['roleids']);
 		}
-		if (isset($expected_result['result']['roleid']) && $expected_result['result']['roleid'] === 'roleid_5') {
-			$expected_result['result']['roleid'] = self::$data['roleids'][$expected_result['result']['roleid']];
+		if (isset($expected_result['result']['roleid'])) {
+			$expected_result['result']['roleid'] = CTestDataHelper::getConvertedValueReference(
+				$expected_result['result']['roleid']
+			);
 		}
 
 		$result = $this->call('role.get', $params, $expected_error);
@@ -965,118 +1130,15 @@ class testRole extends CAPITest {
 			foreach ($result['result'] as $role) {
 				foreach ($expected_result['result'] as $field => $expected_value){
 					$this->assertArrayHasKey($field, $role, 'Field should be present.');
-					$this->assertEquals($role[$field], $expected_value, 'Returned value should match.');
+					$this->assertEquals($expected_value, $role[$field], 'Returned value should match.');
 				}
 			}
 		}
 	}
 
-	/**
-	 * Test data used by tests.
-	 */
-	protected static $data = [
-		'roleids' => ['roleid_1', 'roleid_2', 'roleid_3', 'roleid_4', 'roleid_5', 'zabbix-user-role', 'zabbix-admin-role'],
-		'usergroupids' => ['usergroupid_1']
-	];
+	public static function cleanTestData(): void {
+		CDataHelper::call('role.delete', self::$roleids);
 
-	/**
-	 * Prepare data for tests.
-	 */
-	public function prepareTestData() {
-
-		$response = CDataHelper::call('role.create', [
-			[
-				'name' => 'used-role',
-				'type' => 2
-			],
-			[
-				'name' => 'deletable-role',
-				'type' => 1
-			],
-			[
-				'name' => 'first-role-for-update',
-				'type' => 3
-			],
-			[
-				'name' => 'second-role-for-update',
-				'type' => 3,
-				'rules' => [
-					'ui' => [
-						[
-							'name' => 'administration.macros',
-							'status' => '0'
-						],
-						[
-							'name' => 'administration.housekeeping',
-							'status' => '1'
-						]
-					],
-					'ui.default_access' => '0'
-				]
-			],
-			[
-				'name' => 'role-for-get',
-				'type' => 3,
-				'rules' => [
-					'ui' => [
-						[
-							'name' => 'configuration.discovery_actions',
-							'status' => '0'
-						],
-						[
-							'name' => 'configuration.internal_actions',
-							'status' => '1'
-						]
-					],
-					'ui.default_access' => '0'
-				]
-			],
-			[
-				'name' => 'zabbix-user-role',
-				'type' => 1, // USER_TYPE_ZABBIX_USER
-				'rules' => [
-					'ui' => [
-						[
-							'name' => 'monitoring.dashboard',
-							'status' => '1'
-						]
-					]
-				]
-			],
-			[
-				'name' => 'zabbix-admin-role',
-				'type' => 2, // USER_TYPE_ZABBIX_ADMIN
-				'rules' => [
-					'ui' => [
-						[
-							'name' => 'monitoring.dashboard',
-							'status' => '1'
-						]
-					]
-				]
-			]
-		]);
-
-		$this->assertArrayHasKey('roleids', $response);
-		self::$data['roleids'] = array_combine(self::$data['roleids'], $response['roleids']);
-
-		$response = CDataHelper::call('usergroup.create', [
-			[
-				'name' => 'user-group-used-for-role.delete-tests'
-			]
-		]);
-
-		$userGroupId = (int) $response['usrgrpids'][0];
-
-		CDataHelper::call('user.create', [
-			[
-				'username' => 'user-used-for-role.delete-tests',
-				'roleid' => self::$data['roleids']['roleid_1'],
-				'passwd' => 'Z@bb1x1234',
-				'usrgrps' => [
-						['usrgrpid' => $userGroupId]
-					]
-			]
-		]);
+		CTestDataHelper::cleanUp();
 	}
 }

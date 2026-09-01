@@ -108,6 +108,8 @@ class CControllerProblemView extends CControllerProblem {
 
 		$storage_idx = 'web.monitoring.problem.datatable';
 
+		$highlight_row_enabled = !in_array(CWebUser::$data['theme'], ['hc-light', 'hc-dark']);
+
 		$data = [
 			'action' => $this->getAction(),
 			'default_sort_field' => CControllerProblem::DEFAULT_SORT,
@@ -116,6 +118,7 @@ class CControllerProblemView extends CControllerProblem {
 			'filter_defaults' => $profile->filter_defaults,
 			'filter_tabs' => $filter_tabs,
 			'filter_view' => 'monitoring.problem.filter',
+			'highlight_row_enabled' => $highlight_row_enabled,
 			'inventories' => array_column(getHostInventories(), 'title', 'db_field'),
 			'page' => $this->getInput('page', 1),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,

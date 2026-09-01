@@ -167,6 +167,13 @@ class API {
 	}
 
 	/**
+	 * @return CDevice
+	 */
+	public static function Device() {
+		return self::getApi('device');
+	}
+
+	/**
 	 * @return CDHost
 	 */
 	public static function DHost() {

@@ -217,6 +217,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_CONNECTOR => _('Connector'),
 			CAudit::RESOURCE_CORRELATION => _('Event correlation'),
 			CAudit::RESOURCE_DASHBOARD => _('Dashboard'),
+			CAudit::RESOURCE_DEVICE => _('Device'),
 			CAudit::RESOURCE_DISCOVERY_RULE => _('Discovery rule'),
 			CAudit::RESOURCE_GRAPH => _('Graph'),
 			CAudit::RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),

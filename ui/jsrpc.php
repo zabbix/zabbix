@@ -481,6 +481,19 @@ switch ($data['method']) {
 					$options['filter']['userdirectoryid'] = 0;
 				}
 
+				if (array_key_exists('has_devices_access', $data) && $data['has_devices_access']) {
+					$roles = API::Role()->get([
+						'output' => ['roleid'],
+						'selectRules' => [CRoleHelper::DEVICES_ACCESS]
+					]);
+
+					$roles = array_filter($roles, static fn($role) =>
+						$role['rules'][CRoleHelper::DEVICES_ACCESS] == 1
+					);
+
+					$options['filter']['roleid'] = array_column($roles, 'roleid');
+				}
+
 				$users = API::User()->get($options);
 
 				if (array_key_exists('context', $data) && stripos('system', $data['search']) !== false) {
@@ -611,33 +624,16 @@ switch ($data['method']) {
 
 			case 'valuemaps':
 			case 'template_valuemaps':
-				if ($data['context'] === 'host') {
-					$hosts = API::Host()->get([
-						'output' => ['name'],
-						'hostids' => $data['hostids'],
-						'preservekeys' => true
-					]);
-				}
-				else {
-					$hosts = API::Template()->get([
-						'output' => ['name'],
-						'templateids' => $data['hostids'],
-						'preservekeys' => true
-					]);
+				if (!array_key_exists('hostids', $data)) {
+					break;
 				}
 
 				$valuemaps = API::ValueMap()->get([
-					'output' => ['valuemapid', 'name', 'hostid'],
+					'output' => ['valuemapid', 'name'],
 					'hostids' => $data['hostids'],
-					'search' => ['name' => $data['search'] ? $data['search'] : null],
+					'search' => ['name' => $data['search'] ?: null],
 					'limit' => $limit
 				]);
-
-				foreach ($valuemaps as &$valuemap) {
-					$valuemap['prefix'] = $hosts[$valuemap['hostid']]['name'].NAME_DELIMITER;
-					unset($valuemap['hostid']);
-				}
-				unset($valuemap);
 
 				$result = CArrayHelper::renameObjectsKeys($valuemaps, ['valuemapid' => 'id']);
 				CArrayHelper::sort($result, ['name']);
@@ -782,6 +778,34 @@ switch ($data['method']) {
 				foreach (array_slice($inventory_fields, 0, $limit, true) as $nr => $title) {
 					$result[] = ['id' => (string) $nr, 'name' => $title];
 				}
+				break;
+
+			case 'devices':
+				$options = [
+					'output' => ['uuid', 'name'],
+					'filter' => ['status' => ZBX_DEVICE_STATUS_ACTIVATED],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				];
+
+				if (array_key_exists('userid', $data)) {
+					$options['userids'] = [$data['userid']];
+				}
+
+				$devices = API::Device()->get($options);
+
+				if ($devices) {
+					CArrayHelper::sort($devices, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$devices = array_slice($devices, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($devices, ['uuid' => 'id']);
+				}
+
 				break;
 		}
 		break;

@@ -57,7 +57,7 @@ class testFormTestItemPrototype extends testItemTest {
 	 * @depends testFormTestItemPrototype_CheckButtonStateHost
 	 */
 	public function testFormTestItemPrototype_TestItemHost($data) {
-		$this->checkTestItem($data, true, self::HOST_LLD_ID, null, false);
+		$this->checkTestItem($data, true, self::HOST_LLD_ID, 'item prototype', false);
 	}
 
 	/**
@@ -68,6 +68,6 @@ class testFormTestItemPrototype extends testItemTest {
 	 * @depends testFormTestItemPrototype_CheckButtonStateTemplate
 	 */
 	public function testFormTestItemPrototype_TestItemTemplate($data) {
-		$this->checkTestItem($data, false, self::TEMPLATE_LLD_ID, null, false);
+		$this->checkTestItem($data, false, self::TEMPLATE_LLD_ID, 'item prototype', false);
 	}
 }

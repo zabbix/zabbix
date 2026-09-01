@@ -298,6 +298,54 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format global regexes.
+	 *
+	 * @param array $schema      Tag schema from validation class.
+	 * @param array $global_regexes  Export data.
+	 */
+	public function buildGlobalRegexes(array $schema, array $global_regexes): void {
+		$global_regexes = $this->formatGlobalRegexes($global_regexes);
+
+		$this->data['global_regexes'] = self::build($schema, $global_regexes, 'global_regexes');
+	}
+
+	/**
+	 * Format global regexes.
+	 *
+	 * @param array $global_regexes
+	 *
+	 * @return array
+	 */
+	protected function formatGlobalRegexes(array $global_regexes): array {
+		$result = [];
+
+		CArrayHelper::sort($global_regexes, ['name']);
+
+		foreach ($global_regexes as $i => $global_regex) {
+			$expressions = [];
+
+			foreach ($global_regex['expressions'] as $expression) {
+				$expressions[] = [
+					'type' => $expression['expression_type'],
+					'expression' => $expression['expression'],
+					'exp_delimiter' => $expression['exp_delimiter'],
+					'case_sensitive' => $expression['case_sensitive']
+				];
+			}
+
+			CArrayHelper::sort($expressions, ['type', 'expression']);
+
+			$result[$i] = [
+				'name' => $global_regex['name'],
+				'expressions' => $expressions,
+				'description' => $global_regex['description']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Separate simple triggers.
 	 *
 	 * @param array $triggers
