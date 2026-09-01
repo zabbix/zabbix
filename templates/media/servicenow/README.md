@@ -21,6 +21,7 @@ The configurable parameters are intended to be changed according to the webhook 
 |Name|Value|Description|
 |----|-----|-----------|
 |servicenow_password|\<PLACE PASSWORD HERE\>|Servicenow user password.|
+|servicenow_url|\<PLACE URL HERE\>|Servicenow URL.|
 |servicenow_user|\<PLACE USERNAME HERE\>|Service now user.|
 |tls_verify|\{$HTTP\.TLS\.VERIFY:"ServiceNow"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "ServiceNow", e.g. {$HTTP.TLS.VERIFY:"ServiceNow"}.|
 |urgency_for_average|2|Average urgency.|
@@ -44,7 +45,6 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 |event_update_status|\{EVENT\.UPDATE\.STATUS\}|Numeric value of the problem update status. Possible values: 0 - Webhook was called because of problem/recovery event, 1 - Update operation.|
 |event_value|\{EVENT\.VALUE\}|Numeric value of the event that triggered an action (1 for problem, 0 for recovering).|
 |servicenow_sys_id|\{EVENT\.TAGS\.\_\_zbx\_servicenow\_sys\_id\}||
-|servicenow_url|\{ALERT\.SENDTO\}|Servicenow URL.|
 
 > Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
 
@@ -69,6 +69,7 @@ As an example, this macro can be used to populate ServiceNow's custom field with
 The following parameters are required:
 **servicenow_user** - login of the ServiceNow user created earlier
 **servicenow_password** - user's password
+**servicenow_url** - the full URL of your ServiceNow instance (https://\<INSTANCE>.service-now.com/)
 
 To export information into a ServiceNow custom field, add a parameter with the custom field ID as a key (if you need help finding custom field ID, see [this page](https://community.servicenow.com/community?id=community_question&sys_id=c8aa472ddb5cdbc01dcaf3231f96190a) in ServiceNow community).
 [![](images/thumb.2.png?raw=true)](images/2.png)
@@ -81,7 +82,7 @@ To export information into a ServiceNow custom field, add a parameter with the c
 [![](images/thumb.3.png?raw=true)](images/3.png)
 
 4\. Create a **Zabbix user** and add **Media** with the **ServiceNow** media type.
-The **Send to** field must contain the full URL of your ServiceNow instance (https://\<INSTANCE>.service-now.com/).
+Though the *Send to* field is not used in the ServiceNow webhook, it cannot be left empty. To comply with frontend requirements, enter any symbol in the field.
 Make sure this user has access to all hosts for which you would like problem notifications to be converted into ServiceNow tasks.
 
 For more information see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [ServiceNow](https://docs.servicenow.com/) documentations.
