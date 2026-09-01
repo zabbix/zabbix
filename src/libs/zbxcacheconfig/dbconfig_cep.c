@@ -821,14 +821,15 @@ static void	cep_operation_dump(zbx_cep_operation_t *operation)
 			{
 				case ZBX_CONDITION_TYPE_EVENT_TAG:
 					zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
-							operation->args.set_tag.tag);
+							operation->conditions.values[i].args.tag_name.tag);
 					break;
 				case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 					zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
-						operation->args.set_tag.tag, operation->args.set_tag.value);
+							operation->conditions.values[i].args.tag_value.tag,
+							operation->conditions.values[i].args.tag_value.value);
 					break;
 				default:
-					zbx_strcpy_alloc(&args, &args_alloc, &args_offset, "unknown");
+					zbx_strcpy_alloc(&args, &args_alloc, &args_offset, "");
 					break;
 			}
 
