@@ -179,8 +179,9 @@ class testTriggerCEP extends CIntegrationTest {
 	const CEP_WINDOW_COMPONENT_TAG = 'cep_window_component';
 
 	// Name prefix shared by every CEP rule (ceprule API) these scenarios create. deleteCepRules() removes
-	// every rule whose name starts with it, so a rule left behind by an aborted test cannot keep closing
-	// the problems of the scenarios that run afterwards.
+	// every rule whose name starts with it, which is how a scenario takes the rules of the one before it
+	// away - a rule left behind, by the scenario before or by a test that aborted, cannot keep closing the
+	// problems of the scenarios that run afterwards.
 	const CEP_RULE_NAME_PREFIX = 'CEP rule ';
 	// The single CEP rule used by the close-on-up complex event processing scenario, see
 	// buildCloseOnUpCepRuleParams().
@@ -961,6 +962,9 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $correlationid;
 	private static $correlationid2;
 	private static $cep_ruleid;
+	// The CEP rules the running scenario has asked upsertCepRule() for since beginCepScenario(): every other
+	// rule of the suite is deleted by the next upsert, these are the ones kept and updated in place.
+	private static $cep_rule_names = [];
 	private static $disc_maintenanceids = [];
 	private static $serviceids = [];
 	private static $service_actionid;
@@ -2057,10 +2061,12 @@ class testTriggerCEP extends CIntegrationTest {
 				'Discovered trigger '.$trigger['triggerid'].' was not updated to multiple-event mode.');
 		}
 
-		// Start from a clean correlation slate so rules left over from other CEP scenarios (parity
-		// "odd"/"even", "close on up", ...) cannot stay active during this test. The rule below is then
-		// (re)created as the only CEP correlation rule.
+		// Start from a clean slate so rules left over from other CEP scenarios (parity "odd"/"even", "close
+		// on up", ...) cannot stay active during this test. The correlation rule below is then (re)created as
+		// the only CEP correlation rule, and the CEP rules go for good: this scenario creates none of its
+		// own, so there is nothing here to keep them from closing its problems.
 		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
 
 		// Create a global event correlation rule: close old events whose 'service' tag value
 		// is 'down' when a new event arrives with 'service' tag value 'up'.
@@ -2143,6 +2149,11 @@ class testTriggerCEP extends CIntegrationTest {
 	public function prepareDataGlobalCorrelationCloseOnUp($evaltype = CONDITION_EVAL_TYPE_AND_OR,
 			$extra_tag_via_webhook = false, $recreate_correlation = false) {
 		$this->prepareCloseOnUpTriggerPrototypes();
+
+		// The CEP rules of the scenario that ran before have to go whatever $recreate_correlation says: this
+		// scenario is driven by a global correlation rule and creates no CEP rule that would take them away,
+		// and a leftover one would close the very problems the correlation rule is here to close.
+		$this->deleteCepRules();
 
 		// Create (or update in place) the single "close old down when new up" rule. When
 		// $recreate_correlation is set the existing CEP correlation rules are deleted first, so the rule is
@@ -2409,9 +2420,8 @@ class testTriggerCEP extends CIntegrationTest {
 		// This rule must be the only thing closing problems in this scenario: drop the global correlation
 		// rules a previous CloseOnUp variant left behind, otherwise they would close the same problems and
 		// the run would pass regardless of what the CEP rule does. The rule of the other CEP flavour, which
-		// matches the very same events, is gone already - every scenario removes its own rules in
-		// cleanupCepRules() before the next one prepares.
-		$this->deleteCepCorrelations();
+		// matches the very same events, is taken away by the upsertCepRule() below.
+		$this->beginCepScenario();
 
 		self::$cep_ruleid = $this->upsertCepRule(
 			$this->buildCloseOnUpCepRuleParams($name, $tag_exists_condition, $window_type,
@@ -2531,7 +2541,7 @@ class testTriggerCEP extends CIntegrationTest {
 		// Nothing except the trigger expression may close these problems - the scenario asserts they all stay
 		// open - so drop the global correlation rules a previous CloseOnUp variant left behind; they would
 		// close the problems this scenario opens.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		// The rules of a flavour are named after it, and the ones of a flavour that gives them a window all
 		// get the same one, grouped by the 'service' tag, with its limits handed to it as user macros.
@@ -2608,7 +2618,7 @@ class testTriggerCEP extends CIntegrationTest {
 			string $name_infix = 'none'): array {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 		$this->prepareWindowOperationMacros();
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		// As in the other windowed flavours, the limits of the window are handed to it as user macros.
 		$window = $window_type === null ? [] : $this->macroizeWindowLimits($this->buildWindowOperationsWindow());
@@ -2733,7 +2743,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function prepareDataCepDiscardUp() {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		$operations = $this->buildWindowNoneOperations([
 			[CCepRuleHelper::OP_DISCARD, [
@@ -2782,7 +2792,7 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// Only the rule of the flavour may close these problems: the scenario asserts all of them stay open,
 		// ranked but untouched, until its "up" value ends their window.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		$window = [
 			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
@@ -2851,7 +2861,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// Only this rule may touch the problems and the tag the service watches.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 		$this->deleteCepTagService();
 
 		$response = $this->call('service.create', [
@@ -2917,7 +2927,7 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// Only this rule may suppress or close the problem of the scenario - beyond the maintenance the
 		// maintenance flavour adds, which is the whole point of that flavour.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		$operations = [
 			[
@@ -2975,7 +2985,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// Only this rule may add events; nothing may close a problem.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		// An event evicted because the window duration ran out is presented as the first event of the window,
 		// so "copy first" is the operation that acts on it - "copy last" would never fire here.
@@ -3023,7 +3033,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// Only this rule may add events; nothing may close a problem.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		// An event evicted because the window duration ran out is presented as the first event of the window, so
 		// "copy first" is the operation that acts on it - "copy last" would never fire here.
@@ -3066,7 +3076,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// Only this rule may add events; nothing may close a problem.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		// The window of the other copy flavours, grouped by the 'service' tag so each id is copied on its own, with
 		// a capacity in place of their unlimited one and a duration the run cannot outlast.
@@ -3115,7 +3125,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// Only this rule may add events; nothing may close a problem.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		$window = [
 			'duration' => self::CEP_RULE_WINDOW_CAPACITY_DURATION,
@@ -3165,7 +3175,7 @@ class testTriggerCEP extends CIntegrationTest {
 		// Nothing except the trigger expression may close these problems - a closed problem takes its event out
 		// of the window holding it, and the windows have to stay occupied for the whole run - so drop the global
 		// correlation rules a previous CloseOnUp variant left behind.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		$window = [
 			'duration' => self::CEP_WORKER_SCALE_WINDOW_DURATION,
@@ -3226,7 +3236,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// Only the copies may change what is open; nothing else may close a problem.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		$events_num = self::CEP_RULE_WINDOW_PATTERN_EVENTS;
 		$name_prefix = 'CEP trigger '.self::COMPONENT_VALUE.' ';
@@ -4011,7 +4021,7 @@ HEREDOC;
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this flavour is the only thing that may close a problem.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		// Both limits reach the window as user macros rather than as the values written here, so what the rule
 		// stores are the macro names and these are only what the macros are set to, see macroizeWindowLimits().
@@ -4462,7 +4472,7 @@ HEREDOC;
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this scenario is the only thing that may close a problem.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		$window = [
 			// The restarts of these scenarios land while the windows are supposed to be holding their problems (a
@@ -4563,7 +4573,7 @@ HEREDOC;
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this scenario is the only thing that may close a problem.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		$window = [
 			// The cause and symptom flavour waits out two periods in a row, so it gets the shorter of the two
@@ -4696,7 +4706,7 @@ HEREDOC;
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this scenario is the only thing that may close a problem.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		// Neither limit may resolve when the scenario starts, whatever the flavour that ran before it left behind.
 		$this->deleteGlobalMacros([self::CEP_WINDOW_DURATION_MACRO, self::CEP_WINDOW_CAPACITY_MACRO]);
@@ -4843,7 +4853,7 @@ HEREDOC;
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// The rule of this flavour is the only thing that may close a problem.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		// By default grouped by the 'component' tag, which every event of the driven trigger carries with the
 		// same value: they all compete for the one place of a single window, and the grouping a tag
@@ -4989,7 +4999,7 @@ HEREDOC;
 		$this->prepareWindowOperationMacros();
 
 		// As in the windowless flavour, nothing except the trigger expression may close these problems.
-		$this->deleteCepCorrelations();
+		$this->beginCepScenario();
 
 		// The limits of the window are given to it as user macros, as in the windowless flavour's windowed runs.
 		$window = $this->macroizeWindowLimits($this->buildWindowOperationsWindow());
@@ -5344,7 +5354,7 @@ HEREDOC;
 	 * Delete the services created by createWebTagServices() / createWindowTagServices() so they do not react
 	 * to the events of later scenarios. Guarded, so it is safe in a finally block even if creation failed. The
 	 * caller is expected to follow up with something that reloads the configuration cache -
-	 * removeExtraTagWebhookAction() for the webhook flavour, cleanupCepRules() for the rule tagging one.
+	 * removeExtraTagWebhookAction() for the webhook flavour, the reload itself for the rule tagging one.
 	 */
 	private function removeTagDrivenServices(): void {
 		if (!empty(self::$tag_driven_serviceids)) {
@@ -5380,11 +5390,11 @@ HEREDOC;
 	 * Create the CEP rule described by $rule_params, or update it in place if one with the same name already
 	 * exists. Returns the CEP rule id so the caller can track it for cleanup.
 	 *
-	 * The usual case is a create: the scenario that ran before removed its rules in cleanupCepRules(), so a
-	 * prepareData* method starts with none of its own in place. The update is what makes a rule left behind by
-	 * a run that never reached its teardown - an aborted test, a killed server - harmless: the rule the
-	 * scenario needs is brought to the parameters it asks for instead of the create failing on the duplicate
-	 * name.
+	 * The usual case is a create: the rules of the scenario before are deleted here (see beginCepScenario())
+	 * and a prepareData* method finds none of its own in place. The update is what makes a rule left behind by
+	 * a run that never reached its end - an aborted test, a killed server - harmless: the rule the scenario
+	 * needs is brought to the parameters it asks for instead of the create failing on the duplicate name, and
+	 * a scenario asking for its rule again keeps the windows that rule holds.
 	 *
 	 * A rule of a pattern match window is additionally given the operation that does nothing at the pattern
 	 * matched execution point unless it has one there of its own: a rule of that window type may not be without
@@ -5397,6 +5407,14 @@ HEREDOC;
 	private function upsertCepRule(array $rule_params): string {
 		$rule_params = self::addPatternMatchedNoopOperation($rule_params);
 		$rule_params = self::groupOperationsByExecuteWhen($rule_params);
+
+		// The rules of the scenario that ran before go here: they match the very same events and would keep
+		// closing the problems of this one. Everything this scenario has asked for since beginCepScenario()
+		// is kept - a rule it asks for again is updated in place rather than deleted and created anew, so the
+		// events its windows hold survive a prepare that is run again between the parts of a multi-part
+		// scenario (see prepareMultEventWindow()).
+		self::$cep_rule_names[] = $rule_params['name'];
+		$this->deleteCepRules(self::$cep_rule_names);
 
 		$existing = $this->call('ceprule.get',
 			['filter' => ['name' => $rule_params['name']], 'output' => ['cep_ruleid']]
@@ -7674,14 +7692,32 @@ HEREDOC;
 				'Discovered trigger '.$trigger['triggerid'].' has unexpected parity tag value.');
 		}
 
-		// Start from a clean correlation slate: remove any CEP correlation rules left over from earlier
-		// scenarios so that no rule is active while the run method opens the initial problems. The
-		// "even" and "odd" rules are then created one at a time during the run.
+		// Start from a clean slate: remove the CEP correlation rules left over from earlier scenarios so that
+		// no rule is active while the run method opens the initial problems, and the CEP rules with them -
+		// this scenario creates none of its own, so nothing else would take them away. The "even" and "odd"
+		// correlation rules are then created one at a time during the run.
 		$this->deleteCepCorrelations();
+		$this->deleteCepRules();
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		return true;
+	}
+
+	/**
+	 * Start a CEP scenario from a clean slate, the first thing every prepareData* method of one does: the
+	 * global correlation rules of the scenario before are deleted here, its CEP rules by the first
+	 * upsertCepRule() of this one - which deletes every rule of the suite except the ones it has been asked
+	 * for since this call.
+	 *
+	 * Cleaning up before rather than after is what keeps the scenarios independent of each other without a
+	 * teardown of their own: a run that never reached its end - an aborted test, a killed server - leaves
+	 * nothing behind that the next scenario would have to cope with, and the configuration cache is reloaded
+	 * once, by the prepare that put the new rules in place, instead of once more by every scenario that ends.
+	 */
+	private function beginCepScenario(): void {
+		$this->deleteCepCorrelations();
+		self::$cep_rule_names = [];
 	}
 
 	/**
@@ -7702,30 +7738,43 @@ HEREDOC;
 	}
 
 	/**
-	 * Delete every CEP rule (ceprule API) created by these scenarios - their names all start with
-	 * CEP_RULE_NAME_PREFIX - and reset the tracked CEP rule id. A leftover rule would keep closing the
-	 * problems of the scenarios that run afterwards, which is why every CEP scenario calls this through
-	 * cleanupCepRules() from a finally block: the rules of a scenario must not outlive it even when it failed.
-	 * The prepareData* methods therefore find no rules of their own and none of another flavour, and create
-	 * theirs with upsertCepRule() without clearing anything first.
+	 * Delete the CEP rules (ceprule API) created by these scenarios - their names all start with
+	 * CEP_RULE_NAME_PREFIX - except the ones named in $keep, and reset the tracked CEP rule id when they all
+	 * go. A leftover rule would keep closing the problems of the scenarios that run afterwards, so every
+	 * scenario takes the rules of the one before away before it opens its first problem: upsertCepRule()
+	 * keeps what the scenario has asked for so far and deletes the rest, the global correlation scenarios,
+	 * which create no CEP rule at all, delete every one of them.
 	 */
-	private function deleteCepRules(): void {
+	private function deleteCepRules(array $keep = []): void {
 		$response = $this->call('ceprule.get', [
-			'output' => ['cep_ruleid'],
+			'output' => ['cep_ruleid', 'name'],
 			'search' => ['name' => self::CEP_RULE_NAME_PREFIX]
 		]);
-		$ids = array_column($response['result'], 'cep_ruleid');
+		$ids = [];
+
+		foreach ($response['result'] as $rule) {
+			if (!in_array($rule['name'], $keep)) {
+				$ids[] = $rule['cep_ruleid'];
+			}
+		}
+
 		if ($ids) {
 			$this->call('ceprule.delete', $ids);
 		}
-		self::$cep_ruleid = null;
+
+		if (!$keep) {
+			self::$cep_ruleid = null;
+			self::$cep_rule_names = [];
+		}
 	}
 
 	/**
-	 * Teardown every CEP window scenario must run, even when it failed: the CEP rule closes every problem
-	 * carrying a 'state' tag, so it must not survive the test - the global correlation variants that run
-	 * afterwards use the same trigger prototypes and would have their problems closed by this rule instead of
-	 * by their correlation rule. The configuration cache is reloaded so the server drops the rule right away.
+	 * Take the rules of the scenario away from the running server: they are deleted and the configuration
+	 * cache is reloaded, so the server stops assessing events against them right away. This is not a
+	 * teardown - the next scenario removes what this one leaves behind, see
+	 * deleteCepCorrelationsAndRules() - but a step of the few scenarios that have to go on without their
+	 * rule: the copying flavours, whose copies would answer every recovery with more of them, and the worker
+	 * scaling one, whose windows keep its workers asleep until the rule is gone.
 	 */
 	private function cleanupCepRules(): void {
 		$this->deleteCepRules();
@@ -9808,13 +9857,8 @@ HEREDOC;
 
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
 
-		try {
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
-			$this->waitForNoOpenProblems($all);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+		$this->waitForNoOpenProblems($all);
 	}
 
 	/**
@@ -9832,13 +9876,8 @@ HEREDOC;
 
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
 
-		try {
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
-			$this->waitForNoOpenProblems($all);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+		$this->waitForNoOpenProblems($all);
 	}
 
 	/**
@@ -9855,13 +9894,8 @@ HEREDOC;
 	public function testTriggerCEP_EventAssessmentCepWindowTagCorrelationCloseOnUpSingleItem() {
 		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
 
-		try {
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
-			$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
 	}
 
 	/**
@@ -9877,13 +9911,8 @@ HEREDOC;
 
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
 
-		try {
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, false, false, false);
-			$this->waitForNoOpenProblems($all);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, false, false, false);
+		$this->waitForNoOpenProblems($all);
 	}
 
 	/**
@@ -9922,7 +9951,6 @@ HEREDOC;
 		}
 		finally {
 			$this->removeExtraTagWebhookAction();
-			$this->cleanupCepRules();
 		}
 	}
 
@@ -9955,7 +9983,6 @@ HEREDOC;
 		}
 		finally {
 			$this->removeExtraTagWebhookAction();
-			$this->cleanupCepRules();
 		}
 	}
 
@@ -9993,7 +10020,6 @@ HEREDOC;
 		finally {
 			$this->removeTagDrivenServices();
 			$this->removeExtraTagWebhookAction();
-			$this->cleanupCepRules();
 		}
 	}
 
@@ -10072,7 +10098,7 @@ HEREDOC;
 		}
 		finally {
 			$this->removeTagDrivenServices();
-			$this->cleanupCepRules();
+			$this->reloadConfigurationCacheAndWaitForLogLine();
 		}
 	}
 
@@ -10090,13 +10116,8 @@ HEREDOC;
 
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
 
-		try {
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true);
-			$this->waitForNoOpenProblems($all);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true);
+		$this->waitForNoOpenProblems($all);
 	}
 
 	/**
@@ -10114,13 +10135,8 @@ HEREDOC;
 
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
 
-		try {
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSeverity(false);
-			$this->waitForNoOpenProblems($all);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSeverity(false);
+		$this->waitForNoOpenProblems($all);
 	}
 
 	/**
@@ -10140,7 +10156,6 @@ HEREDOC;
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
-			$this->cleanupCepRules();
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -10173,7 +10188,6 @@ HEREDOC;
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
-			$this->cleanupCepRules();
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -10205,8 +10219,6 @@ HEREDOC;
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true, false, true);
 		}
 		finally {
-			$this->cleanupCepRules();
-
 			// Clean up: ensure maintenance is stopped
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
@@ -10226,8 +10238,6 @@ HEREDOC;
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true, false, true);
 		}
 		finally {
-			$this->cleanupCepRules();
-
 			// Clean up: ensure maintenance is stopped
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
@@ -10253,8 +10263,6 @@ HEREDOC;
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true, false, true, true, false, true);
 		}
 		finally {
-			$this->cleanupCepRules();
-
 			// Clean up: ensure maintenance is stopped
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
@@ -10275,8 +10283,6 @@ HEREDOC;
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true, false, true, true, false, true);
 		}
 		finally {
-			$this->cleanupCepRules();
-
 			// Clean up: ensure maintenance is stopped
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
@@ -10305,18 +10311,13 @@ HEREDOC;
 		$m = count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY))
 			+ count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2));
 
-		try {
-			// Bound the ranking verification below to the events generated by this run only.
-			$this->captureEventBaseline($all);
+		// Bound the ranking verification below to the events generated by this run only.
+		$this->captureEventBaseline($all);
 
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
-			$this->waitForNoOpenProblems($all);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+		$this->waitForNoOpenProblems($all);
 
-			$this->waitForCloseOnUpCauseSymptomRanking($all, 2 * $m);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->waitForCloseOnUpCauseSymptomRanking($all, 2 * $m);
 	}
 
 	/**
@@ -10333,13 +10334,8 @@ HEREDOC;
 
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
 
-		try {
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
-			$this->waitForNoOpenProblems($all);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+		$this->waitForNoOpenProblems($all);
 	}
 
 	/**
@@ -10359,19 +10355,14 @@ HEREDOC;
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0]
 		);
 
-		try {
-			// Bound the ranking verification below to the events generated by this run only.
-			$this->captureEventBaseline([$triggerid]);
+		// Bound the ranking verification below to the events generated by this run only.
+		$this->captureEventBaseline([$triggerid]);
 
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
-			$this->waitForNoOpenProblems([$triggerid]);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+		$this->waitForNoOpenProblems([$triggerid]);
 
-			// The single-item run sends two ids, so the one trigger fills two windows.
-			$this->waitForCloseOnUpCauseSymptomRanking([$triggerid], 2);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		// The single-item run sends two ids, so the one trigger fills two windows.
+		$this->waitForCloseOnUpCauseSymptomRanking([$triggerid], 2);
 	}
 
 	/**
@@ -10390,18 +10381,13 @@ HEREDOC;
 		$m = count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY))
 			+ count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2));
 
-		try {
-			// Bound the ranking verification below to the events generated by this run only.
-			$this->captureEventBaseline($all);
+		// Bound the ranking verification below to the events generated by this run only.
+		$this->captureEventBaseline($all);
 
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, false, false, false);
-			$this->waitForNoOpenProblems($all);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, false, false, false);
+		$this->waitForNoOpenProblems($all);
 
-			$this->waitForCloseOnUpCauseSymptomRanking($all, 2 * $m);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->waitForCloseOnUpCauseSymptomRanking($all, 2 * $m);
 	}
 
 	/**
@@ -10438,7 +10424,6 @@ HEREDOC;
 		}
 		finally {
 			$this->removeExtraTagWebhookAction();
-			$this->cleanupCepRules();
 		}
 	}
 
@@ -10469,7 +10454,6 @@ HEREDOC;
 		}
 		finally {
 			$this->removeExtraTagWebhookAction();
-			$this->cleanupCepRules();
 		}
 	}
 
@@ -10507,7 +10491,6 @@ HEREDOC;
 		finally {
 			$this->removeTagDrivenServices();
 			$this->removeExtraTagWebhookAction();
-			$this->cleanupCepRules();
 		}
 	}
 
@@ -10528,20 +10511,15 @@ HEREDOC;
 		$m = count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY))
 			+ count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2));
 
-		try {
-			// Bound the ranking verification below to the events generated by this run only.
-			$this->captureEventBaseline($all);
+		// Bound the ranking verification below to the events generated by this run only.
+		$this->captureEventBaseline($all);
 
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true);
-			$this->waitForNoOpenProblems($all);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true);
+		$this->waitForNoOpenProblems($all);
 
-			// A restarted window has to keep ranking where it left off: the "up" event of an id arrives after
-			// the restart that followed its "down" event, so it may only become a symptom of it.
-			$this->waitForCloseOnUpCauseSymptomRanking($all, 2 * $m);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		// A restarted window has to keep ranking where it left off: the "up" event of an id arrives after
+		// the restart that followed its "down" event, so it may only become a symptom of it.
+		$this->waitForCloseOnUpCauseSymptomRanking($all, 2 * $m);
 	}
 
 	/**
@@ -10559,13 +10537,8 @@ HEREDOC;
 
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
 
-		try {
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSeverity(false);
-			$this->waitForNoOpenProblems($all);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSeverity(false);
+		$this->waitForNoOpenProblems($all);
 	}
 
 	/**
@@ -10586,7 +10559,6 @@ HEREDOC;
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
-			$this->cleanupCepRules();
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -10617,7 +10589,6 @@ HEREDOC;
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
-			$this->cleanupCepRules();
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -10649,8 +10620,6 @@ HEREDOC;
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true, false, true);
 		}
 		finally {
-			$this->cleanupCepRules();
-
 			// Clean up: ensure maintenance is stopped
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
@@ -10670,8 +10639,6 @@ HEREDOC;
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true, false, true);
 		}
 		finally {
-			$this->cleanupCepRules();
-
 			// Clean up: ensure maintenance is stopped
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
@@ -10696,8 +10663,6 @@ HEREDOC;
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true, false, true, true, false, true);
 		}
 		finally {
-			$this->cleanupCepRules();
-
 			// Clean up: ensure maintenance is stopped
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
@@ -10720,8 +10685,6 @@ HEREDOC;
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true, false, true, true, false, true);
 		}
 		finally {
-			$this->cleanupCepRules();
-
 			// Clean up: ensure maintenance is stopped
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
@@ -10765,13 +10728,7 @@ HEREDOC;
 	 * @depends testTriggerCEP_MultEventOpenSecondProblem
 	 */
 	public function testTriggerCEP_MultEventCloseByWindow() {
-		try {
-			$this->runMultEventCloseByWindowTest(false);
-		}
-		finally {
-			// The sequence closed every problem itself; only the rule must not survive it.
-			$this->cleanupCepRules();
-		}
+		$this->runMultEventCloseByWindowTest(false);
 	}
 
 	/**
@@ -10804,13 +10761,7 @@ HEREDOC;
 	public function testTriggerCEP_MultEventCloseByWindowRestart() {
 		$this->skipIfRestartTestsDisabled();
 
-		try {
-			$this->runMultEventCloseByWindowTest(true);
-		}
-		finally {
-			// The sequence closed every problem itself; only the rule must not survive it.
-			$this->cleanupCepRules();
-		}
+		$this->runMultEventCloseByWindowTest(true);
 	}
 
 	/**
@@ -10821,15 +10772,9 @@ HEREDOC;
 	 * @depends testTriggerCEP_AddServices
 	 */
 	public function testTriggerCEP_MultEventCloseByWindowWithServices() {
-		try {
-			$this->runMultEventOpenProblemTest(false);
-			$this->runMultEventOpenSecondProblemTest(false);
-			$this->runMultEventCloseByWindowTest(false, true);
-		}
-		finally {
-			// The sequence closed every problem itself; only the rule must not survive it.
-			$this->cleanupCepRules();
-		}
+		$this->runMultEventOpenProblemTest(false);
+		$this->runMultEventOpenSecondProblemTest(false);
+		$this->runMultEventCloseByWindowTest(false, true);
 	}
 
 	/**
@@ -10847,44 +10792,38 @@ HEREDOC;
 	public function testTriggerCEP_MultEventWindowBurstSingleItem() {
 		$this->prepareMultEventWindow();
 
-		try {
-			// Drive a single discovered item, so the whole burst lands on one event stream.
-			$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
-			$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
-			$all = [$triggerid];
+		// Drive a single discovered item, so the whole burst lands on one event stream.
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::getTriggeridForKey(self::HOST_DISC_VALUE, $key);
+		$all = [$triggerid];
 
-			$this->captureEventBaseline($all);
+		$this->captureEventBaseline($all);
 
-			// One "down"/"up" pair per cycle, each pair with an id no other pair uses, sent in a single
-			// batch: every value gets a strictly increasing (clock, ns), so CEP has to work through the
-			// whole burst in order.
-			$cycles = static::RECOVERY_CYCLES_COUNT;
-			$data = [];
+		// One "down"/"up" pair per cycle, each pair with an id no other pair uses, sent in a single
+		// batch: every value gets a strictly increasing (clock, ns), so CEP has to work through the
+		// whole burst in order.
+		$cycles = static::RECOVERY_CYCLES_COUNT;
+		$data = [];
 
-			for ($i = 0; $i < $cycles; $i++) {
-				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down_'.$i];
-				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'up_'.$i];
-			}
-
-			$vps_written = $this->getVpsWritten();
-			$this->dispatchSenderValues($data);
-			$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
-
-			// Four events per cycle: the "down" and the "up" are a problem event each, and closing the window
-			// they share closes both of them, which is a recovery event each as well. Waiting for the exact
-			// number fails on a dropped or a duplicated one alike.
-			$this->waitForAllTriggerEventCounts($all, 4 * $cycles);
-
-			// Each "up" closed the window of its own id, so nothing is left open and the trigger is back to
-			// OK although its expression never turned false.
-			$this->waitForNoOpenProblems($all, 'after the paired burst');
-			$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
-			$this->assertCepStatEquals('cache', 'events', 0);
+		for ($i = 0; $i < $cycles; $i++) {
+			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down_'.$i];
+			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'up_'.$i];
 		}
-		finally {
-			// The sequence closed every problem itself; only the rule must not survive it.
-			$this->cleanupCepRules();
-		}
+
+		$vps_written = $this->getVpsWritten();
+		$this->dispatchSenderValues($data);
+		$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
+
+		// Four events per cycle: the "down" and the "up" are a problem event each, and closing the window
+		// they share closes both of them, which is a recovery event each as well. Waiting for the exact
+		// number fails on a dropped or a duplicated one alike.
+		$this->waitForAllTriggerEventCounts($all, 4 * $cycles);
+
+		// Each "up" closed the window of its own id, so nothing is left open and the trigger is back to
+		// OK although its expression never turned false.
+		$this->waitForNoOpenProblems($all, 'after the paired burst');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_FALSE);
+		$this->assertCepStatEquals('cache', 'events', 0);
 	}
 
 	/**
@@ -10901,65 +10840,60 @@ HEREDOC;
 	public function testTriggerCEP_MultEventWindowValueWaves() {
 		$this->prepareMultEventWindow();
 
-		try {
-			$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
-			$triggerids = self::$discovered_triggerids;
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
 
-			$this->captureEventBaseline($triggerids);
+		$this->captureEventBaseline($triggerids);
 
-			$first = self::CEP_RULE_WINDOW_NONE_SERVICE;
-			$second = self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT;
-			$data = [];
+		$first = self::CEP_RULE_WINDOW_NONE_SERVICE;
+		$second = self::CEP_RULE_WINDOW_NONE_SERVICE_NEXT;
+		$data = [];
 
-			foreach (['down_'.$first, 'up_'.$first, 'down_'.$second] as $value) {
-				foreach ($keys as $key) {
-					$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
-				}
-			}
-
-			$vps_written = $this->getVpsWritten();
-			$this->dispatchSenderValues($data);
-			$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
-
-			// Five events per trigger: the three waves are a problem event each, and the "up" wave closed the
-			// window of the first id with two events in it, which recovered both of them.
-			$this->waitForAllTriggerEventCounts($triggerids, 5);
-
-			// The "up" wave closed the first id's window on every trigger - its own event and the "down" it
-			// paired with - so exactly the problem of the second id is left open on each of them.
-			$this->waitForOpenProblemCount($triggerids, count($keys));
-			$this->assertAllTriggerValues($triggerids, TRIGGER_VALUE_TRUE,
-				'must be PROBLEM after the batch, with the second id still open'
-			);
-
-			// The closing wave, sent once the batch has been worked through, takes the rest.
-			$data = [];
-
+		foreach (['down_'.$first, 'up_'.$first, 'down_'.$second] as $value) {
 			foreach ($keys as $key) {
-				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'up_'.$second];
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
 			}
-
-			$vps_written = $this->getVpsWritten();
-			$this->dispatchSenderValues($data);
-			$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
-
-			// Three more: the closing wave itself, and the recovery of the two events its window held.
-			$this->waitForAllTriggerEventCounts($triggerids, 8);
-			$this->waitForNoOpenProblems($triggerids, 'after the closing up wave');
-			$this->waitForParentsValue($triggerids, TRIGGER_VALUE_FALSE);
-			$this->assertCepStatEquals('cache', 'events', 0);
 		}
-		finally {
-			// The sequence closed every problem itself; only the rule must not survive it.
-			$this->cleanupCepRules();
+
+		$vps_written = $this->getVpsWritten();
+		$this->dispatchSenderValues($data);
+		$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
+
+		// Five events per trigger: the three waves are a problem event each, and the "up" wave closed the
+		// window of the first id with two events in it, which recovered both of them.
+		$this->waitForAllTriggerEventCounts($triggerids, 5);
+
+		// The "up" wave closed the first id's window on every trigger - its own event and the "down" it
+		// paired with - so exactly the problem of the second id is left open on each of them.
+		$this->waitForOpenProblemCount($triggerids, count($keys));
+		$this->assertAllTriggerValues($triggerids, TRIGGER_VALUE_TRUE,
+			'must be PROBLEM after the batch, with the second id still open'
+		);
+
+		// The closing wave, sent once the batch has been worked through, takes the rest.
+		$data = [];
+
+		foreach ($keys as $key) {
+			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'up_'.$second];
 		}
+
+		$vps_written = $this->getVpsWritten();
+		$this->dispatchSenderValues($data);
+		$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
+
+		// Three more: the closing wave itself, and the recovery of the two events its window held.
+		$this->waitForAllTriggerEventCounts($triggerids, 8);
+		$this->waitForNoOpenProblems($triggerids, 'after the closing up wave');
+		$this->waitForParentsValue($triggerids, TRIGGER_VALUE_FALSE);
+		$this->assertCepStatEquals('cache', 'events', 0);
 	}
 
 	/**
 	 * Put the close-on-up prototypes and the tag correlation window rule in place for the multiple event
 	 * scenarios above. Every part calls it, so each of them can also be run on its own; it changes nothing
 	 * when it is already in place, and in particular it neither closes the problems a previous part opened
-	 * nor replaces the rule that is to close them.
+	 * nor replaces the rule that is to close them - the rule is updated in place and keeps the events its
+	 * windows hold, which is what the parts that follow go on with (see upsertCepRule()).
 	 */
 	private function prepareMultEventWindow(): void {
 		$this->prepareDataCepWindowTagCorrelationCloseOnUp();
@@ -11123,12 +11057,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowNone() {
 		$this->prepareDataCepWindowNoneTagOperations();
 
-		try {
-			$this->runEventAssessmentTestCepWindowNone();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowNone();
 	}
 
 	/**
@@ -11147,12 +11076,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimple() {
 		$this->prepareDataCepWindowNoneTagOperations(CCepRuleHelper::WINDOW_SIMPLE, 'simple all');
 
-		try {
-			$this->runEventAssessmentTestCepWindowNone();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowNone();
 	}
 
 	/**
@@ -11171,12 +11095,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPattern() {
 		$this->prepareDataCepWindowNoneTagOperations(CCepRuleHelper::WINDOW_PATTERN_MATCH, 'pattern all');
 
-		try {
-			$this->runEventAssessmentTestCepWindowNone();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowNone();
 	}
 
 	/**
@@ -11220,12 +11139,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowNoneOperationSteps() {
 		$rule = $this->prepareDataCepWindowOperationSteps();
 
-		try {
-			$this->runEventAssessmentTestCepWindowOperationSteps($rule);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowOperationSteps($rule);
 	}
 
 	/**
@@ -11246,12 +11160,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleOperationSteps() {
 		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple');
 
-		try {
-			$this->runEventAssessmentTestCepWindowOperationSteps($rule);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowOperationSteps($rule);
 	}
 
 	/**
@@ -11275,12 +11184,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternOperationSteps() {
 		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_PATTERN_MATCH, 'pattern');
 
-		try {
-			$this->runEventAssessmentTestCepWindowOperationSteps($rule);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowOperationSteps($rule);
 	}
 
 	/**
@@ -11301,12 +11205,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleOperationStepsAdded() {
 		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple added');
 
-		try {
-			$this->runEventAssessmentTestCepWindowOperationSteps($rule, CCepRuleHelper::WHEN_EVENT_ADDED);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowOperationSteps($rule, CCepRuleHelper::WHEN_EVENT_ADDED);
 	}
 
 	/**
@@ -11327,12 +11226,7 @@ HEREDOC;
 			'pattern added'
 		);
 
-		try {
-			$this->runEventAssessmentTestCepWindowOperationSteps($rule, CCepRuleHelper::WHEN_EVENT_ADDED);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowOperationSteps($rule, CCepRuleHelper::WHEN_EVENT_ADDED);
 	}
 
 	/**
@@ -11363,12 +11257,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleOperationStepsClosed() {
 		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple closed');
 
-		try {
-			$this->runEventAssessmentTestCepWindowOperationSteps($rule, CCepRuleHelper::WHEN_WINDOW_CLOSED);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowOperationSteps($rule, CCepRuleHelper::WHEN_WINDOW_CLOSED);
 	}
 
 	/**
@@ -11394,12 +11283,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleOperationStepsBurst() {
 		$rule = $this->prepareDataCepWindowOperationSteps(CCepRuleHelper::WINDOW_SIMPLE, 'simple burst');
 
-		try {
-			$this->runStressTestCepWindowOperationStepsBurst($rule);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runStressTestCepWindowOperationStepsBurst($rule);
 	}
 
 	/**
@@ -11418,12 +11302,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleOperations() {
 		$this->prepareDataCepWindowSimpleOperations();
 
-		try {
-			$this->runEventAssessmentTestCepWindowOperations(true);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowOperations(true);
 	}
 
 	/**
@@ -11440,12 +11319,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagOperations() {
 		$this->prepareDataCepWindowTagOperations();
 
-		try {
-			$this->runEventAssessmentTestCepWindowOperations(false);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowOperations(false);
 	}
 
 	/**
@@ -11460,12 +11334,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleEvictedOperations() {
 		$this->prepareDataCepWindowSimpleEvictedOperations();
 
-		try {
-			$this->runEventAssessmentTestCepWindowEvictedOperations();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowEvictedOperations();
 	}
 
 	/**
@@ -11477,12 +11346,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagEvictedOperations() {
 		$this->prepareDataCepWindowTagEvictedOperations();
 
-		try {
-			$this->runEventAssessmentTestCepWindowEvictedOperations();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowEvictedOperations();
 	}
 
 	/**
@@ -11498,12 +11362,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternEvictedOperations() {
 		$this->prepareDataCepWindowPatternEvictedOperations();
 
-		try {
-			$this->runEventAssessmentTestCepWindowEvictedOperations();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowEvictedOperations();
 	}
 
 	/**
@@ -11522,12 +11381,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleClosedOperations() {
 		$this->prepareDataCepWindowSimpleClosedOperations();
 
-		try {
-			$this->runEventAssessmentTestCepWindowClosedOperations();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowClosedOperations();
 	}
 
 	/**
@@ -11540,12 +11394,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagClosedOperations() {
 		$this->prepareDataCepWindowTagClosedOperations();
 
-		try {
-			$this->runEventAssessmentTestCepWindowClosedOperations();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowClosedOperations();
 	}
 
 	/**
@@ -11560,12 +11409,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptomClosedOperations() {
 		$this->prepareDataCepWindowCauseSymptomClosedOperations();
 
-		try {
-			$this->runEventAssessmentTestCepWindowClosedOperations();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowClosedOperations();
 	}
 
 	/**
@@ -11579,12 +11423,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternClosedOperations() {
 		$this->prepareDataCepWindowPatternClosedOperations();
 
-		try {
-			$this->runEventAssessmentTestCepWindowClosedOperations();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowClosedOperations();
 	}
 
 	/**
@@ -11600,14 +11439,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowSuppressPoints() {
 		$this->prepareDataCepWindowSimpleCloseWindowSuppressPoints();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::CEP_RULE_WINDOW_SIMPLE_CLOSE_SUPPRESS_POINTS, false, false, false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_SUPPRESS_POINTS, false, false, false, true
+		);
 	}
 
 	/**
@@ -11626,14 +11460,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowManualSuppressPoints() {
 		$this->prepareDataCepWindowSimpleCloseWindowManualSuppressPoints();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::CEP_RULE_WINDOW_SIMPLE_CLOSE_MANUAL_SUPPRESS_POINTS, false, false, false, true, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_MANUAL_SUPPRESS_POINTS, false, false, false, true, true
+		);
 	}
 
 	/**
@@ -11646,14 +11475,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedSuppressPoints() {
 		$this->prepareDataCepWindowSimpleCloseWindowOnEvictedSuppressPoints();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED_SUPPRESS_POINTS, false, false, false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED_SUPPRESS_POINTS, false, false, false, true
+		);
 	}
 
 	/**
@@ -11666,14 +11490,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagCloseWindowSuppressPoints() {
 		$this->prepareDataCepWindowTagCloseWindowSuppressPoints();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::CEP_RULE_WINDOW_TAG_CLOSE_SUPPRESS_POINTS, false, false, false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_TAG_CLOSE_SUPPRESS_POINTS, false, false, false, true
+		);
 	}
 
 	/**
@@ -11687,14 +11506,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptomCloseWindowSuppressPoints() {
 		$this->prepareDataCepWindowCauseSymptomCloseWindowSuppressPoints();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::CEP_RULE_WINDOW_CAUSE_CLOSE_SUPPRESS_POINTS, false, false, false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_SUPPRESS_POINTS, false, false, false, true
+		);
 	}
 
 	/**
@@ -11708,14 +11522,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowSuppressPoints() {
 		$this->prepareDataCepWindowPatternCloseWindowSuppressPoints();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::CEP_RULE_WINDOW_PATTERN_CLOSE_SUPPRESS_POINTS, false, false, false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_SUPPRESS_POINTS, false, false, false, true
+		);
 	}
 
 	/**
@@ -11730,14 +11539,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowAgedSuppressPoints() {
 		$this->prepareDataCepWindowSimpleCloseWindowAgedSuppressPoints();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindowAged(
-				self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED_SUPPRESS_POINTS, false, false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindowAged(
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED_SUPPRESS_POINTS, false, false, true
+		);
 	}
 
 	/**
@@ -11756,14 +11560,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowUnsuppressPoints() {
 		$this->prepareDataCepWindowSimpleCloseWindowUnsuppressPoints();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::CEP_RULE_WINDOW_SIMPLE_CLOSE_UNSUPPRESS_POINTS, false, false, false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_UNSUPPRESS_POINTS, false, false, false, true
+		);
 	}
 
 	/**
@@ -11781,12 +11580,7 @@ HEREDOC;
 	public function testTriggerCEP_CepDiscardOnUp() {
 		$this->prepareDataCepDiscardUp();
 
-		try {
-			$this->runEventAssessmentTestCepDiscard();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepDiscard();
 	}
 
 	/**
@@ -11804,12 +11598,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptom() {
 		$this->prepareDataCepWindowCauseSymptom();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCauseSymptom();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCauseSymptom();
 	}
 
 	/**
@@ -11830,7 +11619,6 @@ HEREDOC;
 			$this->runEventAssessmentTestCepServiceTag();
 		}
 		finally {
-			$this->cleanupCepRules();
 			$this->deleteCepTagService();
 		}
 	}
@@ -11854,12 +11642,7 @@ HEREDOC;
 	public function testTriggerCEP_CepUnsuppress() {
 		$this->prepareDataCepUnsuppress();
 
-		try {
-			$this->runEventAssessmentTestCepUnsuppress(false);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepUnsuppress(false);
 	}
 
 	/**
@@ -11883,7 +11666,6 @@ HEREDOC;
 			$this->runEventAssessmentTestCepUnsuppress(true);
 		}
 		finally {
-			$this->cleanupCepRules();
 			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -11915,12 +11697,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCopy() {
 		$this->prepareDataCepWindowCopy();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCopy();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCopy();
 	}
 
 	/**
@@ -11939,12 +11716,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCopyUnconditional() {
 		$this->prepareDataCepWindowCopyUnconditional();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCopyUnconditional();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCopyUnconditional();
 	}
 
 	/**
@@ -11965,12 +11737,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCopyCapacity() {
 		$this->prepareDataCepWindowCopyCapacity();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCopyCapacity();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCopyCapacity();
 	}
 
 	/**
@@ -11988,12 +11755,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCopyAlways() {
 		$this->prepareDataCepWindowPatternCopyAlways();
 
-		try {
-			$this->runEventAssessmentTestCepWindowPatternCopyAlways();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowPatternCopyAlways();
 	}
 
 	/**
@@ -12020,12 +11782,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternMatch() {
 		$this->prepareDataCepWindowPattern();
 
-		try {
-			$this->runEventAssessmentTestCepWindowPattern();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowPattern();
 	}
 
 	/**
@@ -12039,12 +11796,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCapacity() {
 		$this->prepareDataCepWindowSimpleCapacity();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCapacity();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCapacity();
 	}
 
 	/**
@@ -12058,12 +11810,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagCapacity() {
 		$this->prepareDataCepWindowTagCapacity();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCapacity();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCapacity();
 	}
 
 	/**
@@ -12077,12 +11824,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCapacityPerService() {
 		$this->prepareDataCepWindowSimpleCapacityPerService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCapacityPerService();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCapacityPerService();
 	}
 
 	/**
@@ -12094,12 +11836,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagCapacityPerService() {
 		$this->prepareDataCepWindowTagCapacityPerService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCapacityPerService();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCapacityPerService();
 	}
 
 	/**
@@ -12124,12 +11861,7 @@ HEREDOC;
 		return;
 		$this->prepareDataCepWindowCapacityDiscardUp();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCapacityDiscard();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCapacityDiscard();
 	}
 
 	/* Close window operation (event pattern match) - test ability to close window for each type of window */
@@ -12144,12 +11876,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindow() {
 		$this->prepareDataCepWindowPatternCloseWindow();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE);
 	}
 
 	/**
@@ -12165,12 +11892,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowOnEvent() {
 		$this->prepareDataCepWindowPatternCloseWindowOnEvent();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT);
 	}
 
 	/**
@@ -12185,12 +11907,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowOnEvicted() {
 		$this->prepareDataCepWindowPatternCloseWindowOnEvicted();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED);
 	}
 
 	/**
@@ -12206,12 +11923,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowDiscardOnDown() {
 		$this->prepareDataCepWindowPatternCloseWindowDiscardDown();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE_DISCARD, true);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE_DISCARD, true);
 	}
 
 	/**
@@ -12230,14 +11942,9 @@ HEREDOC;
 
 		$this->prepareDataCepWindowPatternCloseWindowDiscardDownTagValue();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::CEP_RULE_WINDOW_PATTERN_CLOSE_DISCARD_TAG_VALUE, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_DISCARD_TAG_VALUE, true
+		);
 	}
 
 	/**
@@ -12259,14 +11966,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowSingleService() {
 		$this->prepareDataCepWindowPatternCloseWindowSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE), false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE), false, true
+		);
 	}
 
 	/**
@@ -12280,14 +11982,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowOnEventSingleService() {
 		$this->prepareDataCepWindowPatternCloseWindowOnEventSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT), false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT), false, true
+		);
 	}
 
 	/**
@@ -12302,14 +11999,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowOnEvictedSingleService() {
 		$this->prepareDataCepWindowPatternCloseWindowOnEvictedSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED), false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED), false, true
+		);
 	}
 
 	/**
@@ -12330,12 +12022,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowDoubleRule() {
 		$this->prepareDataCepWindowPatternCloseWindowDoubleRule();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE, false, false, true);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_PATTERN_CLOSE, false, false, true);
 	}
 
 	/**
@@ -12348,14 +12035,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowOnEventDoubleRule() {
 		$this->prepareDataCepWindowPatternCloseWindowOnEventDoubleRule();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT, false, false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVENT, false, false, true
+		);
 	}
 
 	/**
@@ -12368,14 +12050,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowOnEvictedDoubleRule() {
 		$this->prepareDataCepWindowPatternCloseWindowOnEvictedDoubleRule();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED, false, false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_PATTERN_CLOSE_EVICTED, false, false, true
+		);
 	}
 
 	/* Close window operation - test ability to close window for each type of window */
@@ -12394,12 +12071,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindow() {
 		$this->prepareDataCepWindowSimpleCloseWindow();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE);
 	}
 
 	/**
@@ -12415,12 +12087,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowOnEvicted() {
 		$this->prepareDataCepWindowSimpleCloseWindowOnEvicted();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED);
 	}
 
 	/**
@@ -12434,12 +12101,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowDiscardOnDown() {
 		$this->prepareDataCepWindowSimpleCloseWindowDiscardDown();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DISCARD, true);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DISCARD, true);
 	}
 
 	/**
@@ -12457,14 +12119,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowSingleService() {
 		$this->prepareDataCepWindowSimpleCloseWindowSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE), false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE), false, true
+		);
 	}
 
 	/**
@@ -12477,14 +12134,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedSingleService() {
 		$this->prepareDataCepWindowSimpleCloseWindowOnEvictedSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED), false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED), false, true
+		);
 	}
 
 	/**
@@ -12499,12 +12151,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowDoubleRule() {
 		$this->prepareDataCepWindowSimpleCloseWindowDoubleRule();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE, false, false, true);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_SIMPLE_CLOSE, false, false, true);
 	}
 
 	/**
@@ -12517,14 +12164,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowOnEvictedDoubleRule() {
 		$this->prepareDataCepWindowSimpleCloseWindowOnEvictedDoubleRule();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED, false, false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::CEP_RULE_WINDOW_SIMPLE_CLOSE_EVICTED, false, false, true
+		);
 	}
 
 	/**
@@ -12541,12 +12183,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagCloseWindow() {
 		$this->prepareDataCepWindowTagCloseWindow();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE);
 	}
 
 	/**
@@ -12562,12 +12199,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagCloseWindowOnEvicted() {
 		$this->prepareDataCepWindowTagCloseWindowOnEvicted();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE_EVICTED);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE_EVICTED);
 	}
 
 	/**
@@ -12581,12 +12213,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagCloseWindowDiscardOnDown() {
 		$this->prepareDataCepWindowTagCloseWindowDiscardDown();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE_DISCARD, true);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_TAG_CLOSE_DISCARD, true);
 	}
 
 	/**
@@ -12600,14 +12227,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagCloseWindowSingleService() {
 		$this->prepareDataCepWindowTagCloseWindowSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE), false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE), false, true
+		);
 	}
 
 	/**
@@ -12620,14 +12242,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagCloseWindowOnEvictedSingleService() {
 		$this->prepareDataCepWindowTagCloseWindowOnEvictedSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE_EVICTED), false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE_EVICTED), false, true
+		);
 	}
 
 	/**
@@ -12644,12 +12261,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptomCloseWindow() {
 		$this->prepareDataCepWindowCauseSymptomCloseWindow();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE);
 	}
 
 	/**
@@ -12665,12 +12277,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptomCloseWindowOnEvicted() {
 		$this->prepareDataCepWindowCauseSymptomCloseWindowOnEvicted();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED);
 	}
 
 	/**
@@ -12685,12 +12292,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptomCloseWindowDiscardOnDown() {
 		$this->prepareDataCepWindowCauseSymptomCloseWindowDiscardDown();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE_DISCARD, true);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(self::CEP_RULE_WINDOW_CAUSE_CLOSE_DISCARD, true);
 	}
 
 	/**
@@ -12706,14 +12308,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptomCloseWindowSingleService() {
 		$this->prepareDataCepWindowCauseSymptomCloseWindowSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_CAUSE_CLOSE), false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_CAUSE_CLOSE), false, true
+		);
 	}
 
 	/**
@@ -12727,14 +12324,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptomCloseWindowOnEvictedSingleService() {
 		$this->prepareDataCepWindowCauseSymptomCloseWindowOnEvictedSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindow(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED), false, true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindow(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_CAUSE_CLOSE_EVICTED), false, true
+		);
 	}
 
 	/* The window ended by its duration instead of by an operation of the rule */
@@ -12751,14 +12343,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptomCloseOnDuration() {
 		$this->prepareDataCepWindowCauseSymptomCloseOnDuration();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration(
-				self::CEP_RULE_WINDOW_CAUSE_CLOSE_DURATION
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCauseSymptomCloseOnDuration(
+			self::CEP_RULE_WINDOW_CAUSE_CLOSE_DURATION
+		);
 	}
 
 	/**
@@ -12772,12 +12359,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseOnDuration() {
 		$this->prepareDataCepWindowSimpleCloseOnDuration();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseOnDuration(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DURATION);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseOnDuration(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_DURATION);
 	}
 
 	/**
@@ -12790,12 +12372,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagCloseOnDuration() {
 		$this->prepareDataCepWindowTagCloseOnDuration();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseOnDuration(self::CEP_RULE_WINDOW_TAG_CLOSE_DURATION);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseOnDuration(self::CEP_RULE_WINDOW_TAG_CLOSE_DURATION);
 	}
 
 	/* The close window family driven by the window duration instead of by an "up" value */
@@ -12812,12 +12389,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowAged() {
 		$this->prepareDataCepWindowSimpleCloseWindowAged();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED);
 	}
 
 	/**
@@ -12830,12 +12402,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagCloseWindowAged() {
 		$this->prepareDataCepWindowTagCloseWindowAged();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_TAG_CLOSE_AGED);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_TAG_CLOSE_AGED);
 	}
 
 	/**
@@ -12850,14 +12417,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowAgedSingleService() {
 		$this->prepareDataCepWindowSimpleCloseWindowAgedSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindowAged(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED), true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindowAged(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED), true
+		);
 	}
 
 	/**
@@ -12869,14 +12431,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagCloseWindowAgedSingleService() {
 		$this->prepareDataCepWindowTagCloseWindowAgedSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindowAged(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE_AGED), true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindowAged(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_TAG_CLOSE_AGED), true
+		);
 	}
 
 	/**
@@ -12892,14 +12449,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleCloseWindowAgedDoubleRule() {
 		$this->prepareDataCepWindowSimpleCloseWindowAgedDoubleRule();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED, false,
-				true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_SIMPLE_CLOSE_AGED, false,
+			true
+		);
 	}
 
 	/**
@@ -12915,12 +12467,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowAged() {
 		$this->prepareDataCepWindowPatternCloseWindowAged();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED);
 	}
 
 	/**
@@ -12933,14 +12480,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowAgedSingleService() {
 		$this->prepareDataCepWindowPatternCloseWindowAgedSingleService();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindowAged(
-				self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED), true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindowAged(
+			self::buildSingleServiceRuleName(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED), true
+		);
 	}
 
 	/**
@@ -12953,14 +12495,9 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCloseWindowAgedDoubleRule() {
 		$this->prepareDataCepWindowPatternCloseWindowAgedDoubleRule();
 
-		try {
-			$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED, false,
-				true
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowCloseWindowAged(self::CEP_RULE_WINDOW_PATTERN_CLOSE_AGED, false,
+			true
+		);
 	}
 
 	/* Reset of a rule - test that the windows of each window type are thrown away with it */
@@ -12975,12 +12512,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleReset() {
 		$this->prepareDataCepWindowSimpleReset();
 
-		try {
-			$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_SIMPLE_RESET);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_SIMPLE_RESET);
 	}
 
 	/**
@@ -12993,12 +12525,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagReset() {
 		$this->prepareDataCepWindowTagReset();
 
-		try {
-			$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_TAG_RESET);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_TAG_RESET);
 	}
 
 	/**
@@ -13012,12 +12539,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptomReset() {
 		$this->prepareDataCepWindowCauseSymptomReset();
 
-		try {
-			$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_CAUSE_RESET);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_CAUSE_RESET);
 	}
 
 	/**
@@ -13030,12 +12552,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternReset() {
 		$this->prepareDataCepWindowPatternReset();
 
-		try {
-			$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_PATTERN_RESET);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowReset(self::CEP_RULE_WINDOW_PATTERN_RESET);
 	}
 
 	/* Deletion of a rule - test that the windows of each window type are thrown away with it, and stay away */
@@ -13051,12 +12568,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleDelete() {
 		$this->prepareDataCepWindowSimpleDelete();
 
-		try {
-			$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_SIMPLE_DELETE);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_SIMPLE_DELETE);
 	}
 
 	/**
@@ -13069,12 +12581,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagDelete() {
 		$this->prepareDataCepWindowTagDelete();
 
-		try {
-			$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_TAG_DELETE);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_TAG_DELETE);
 	}
 
 	/**
@@ -13088,12 +12595,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptomDelete() {
 		$this->prepareDataCepWindowCauseSymptomDelete();
 
-		try {
-			$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_CAUSE_DELETE);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_CAUSE_DELETE);
 	}
 
 	/**
@@ -13106,12 +12608,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternDelete() {
 		$this->prepareDataCepWindowPatternDelete();
 
-		try {
-			$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_PATTERN_DELETE);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowDelete(self::CEP_RULE_WINDOW_PATTERN_DELETE);
 	}
 
 	/**
@@ -13125,12 +12622,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternDeleteDuringScript() {
 		$this->prepareDataCepWindowPatternDeleteSleep();
 
-		try {
-			$this->runEventAssessmentTestCepWindowDeleteDuringScript(self::CEP_RULE_WINDOW_PATTERN_DELETE_SLEEP);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowDeleteDuringScript(self::CEP_RULE_WINDOW_PATTERN_DELETE_SLEEP);
 	}
 
 	/* Unresolved window limits - test that each window type reports them and recovers once they resolve */
@@ -13146,12 +12638,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowSimpleUnresolvedLimits() {
 		$this->prepareDataCepWindowSimpleUnresolvedLimits();
 
-		try {
-			$this->runEventAssessmentTestCepWindowUnresolvedLimits(self::CEP_RULE_WINDOW_SIMPLE_LIMITS);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowUnresolvedLimits(self::CEP_RULE_WINDOW_SIMPLE_LIMITS);
 	}
 
 	/**
@@ -13164,12 +12651,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowTagUnresolvedLimits() {
 		$this->prepareDataCepWindowTagUnresolvedLimits();
 
-		try {
-			$this->runEventAssessmentTestCepWindowUnresolvedLimits(self::CEP_RULE_WINDOW_TAG_LIMITS);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowUnresolvedLimits(self::CEP_RULE_WINDOW_TAG_LIMITS);
 	}
 
 	/**
@@ -13183,12 +12665,7 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowCauseSymptomUnresolvedLimits() {
 		$this->prepareDataCepWindowCauseSymptomUnresolvedLimits();
 
-		try {
-			$this->runEventAssessmentTestCepWindowUnresolvedLimits(self::CEP_RULE_WINDOW_CAUSE_LIMITS);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowUnresolvedLimits(self::CEP_RULE_WINDOW_CAUSE_LIMITS);
 	}
 
 	/**
@@ -13204,15 +12681,10 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternDurationUnresolved() {
 		$this->prepareDataCepWindowPatternDurationUnresolved();
 
-		try {
-			$this->runEventAssessmentTestCepWindowSingleUnresolvedLimit(
-				self::CEP_RULE_WINDOW_PATTERN_DURATION_LIMIT, self::CEP_WINDOW_DURATION_MACRO,
-				self::CEP_RULE_WINDOW_LIMITS_DURATION
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowSingleUnresolvedLimit(
+			self::CEP_RULE_WINDOW_PATTERN_DURATION_LIMIT, self::CEP_WINDOW_DURATION_MACRO,
+			self::CEP_RULE_WINDOW_LIMITS_DURATION
+		);
 	}
 
 	/**
@@ -13226,15 +12698,10 @@ HEREDOC;
 	public function testTriggerCEP_CepWindowPatternCapacityUnresolved() {
 		$this->prepareDataCepWindowPatternCapacityUnresolved();
 
-		try {
-			$this->runEventAssessmentTestCepWindowSingleUnresolvedLimit(
-				self::CEP_RULE_WINDOW_PATTERN_CAPACITY_LIMIT, self::CEP_WINDOW_CAPACITY_MACRO,
-				(string) self::CEP_RULE_WINDOW_LIMITS_CAPACITY
-			);
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowSingleUnresolvedLimit(
+			self::CEP_RULE_WINDOW_PATTERN_CAPACITY_LIMIT, self::CEP_WINDOW_CAPACITY_MACRO,
+			(string) self::CEP_RULE_WINDOW_LIMITS_CAPACITY
+		);
 	}
 
 	/**
@@ -13317,6 +12784,13 @@ HEREDOC;
 	 * restarted before the burst is sent.
 	 */
 	private function openLogProblemBurst(bool $restart): void {
+		// The log trigger has to be assessed with no CEP rule in place. The rules of the last scenario that
+		// created any are still there - a scenario hands its rules over to the next one that creates rules of
+		// its own (see beginCepScenario()) and the log scenarios create none - and a rule whose filter holds
+		// for every event would act on the log events too.
+		$this->deleteCepRules();
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
 		$this->maybeRestartServer($restart);
 
 		$triggerids = [self::$discovered_log_triggerid];
@@ -13655,12 +13129,7 @@ return;
 	public function testTriggerCEP_CepWindowPatternWorkerScaleAgain() {
 		$this->prepareDataCepWindowPatternWorkerScale();
 
-		try {
-			$this->runEventAssessmentTestCepWindowPatternWorkerScale();
-		}
-		finally {
-			$this->cleanupCepRules();
-		}
+		$this->runEventAssessmentTestCepWindowPatternWorkerScale();
 	}
 
 	/**
@@ -21560,8 +21029,9 @@ return;
 			self::$correlationid2 = null;
 		}
 
-		// Remove the CEP rules (created by prepareDataCepWindowTagCorrelationCloseOnUp) in case a test aborted
-		// before its own teardown ran; a rule left behind would keep closing problems of later suites.
+		// Remove the CEP rules of the last scenario that created any: they are taken away by the scenario that
+		// runs next and not by one of their own, so the last of them is still there when the suite ends and a
+		// rule left behind would keep closing problems of later suites.
 		$cep_rules = CDataHelper::call('ceprule.get', [
 			'output' => ['cep_ruleid'],
 			'search' => ['name' => self::CEP_RULE_NAME_PREFIX]
