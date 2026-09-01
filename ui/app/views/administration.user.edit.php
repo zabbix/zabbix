@@ -296,6 +296,7 @@ $is_disabled = array_key_exists('profile_redirect_enforce', $data) && $data['pro
 
 $default_url_label = array_key_exists('profile_redirect_url', $data) && $data['profile_redirect_url'] !== ''
 	? (new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
+		->setTitle($data['profile_redirect_url'])
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 		->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)

@@ -250,6 +250,7 @@ if ($data['username'] !== ZBX_GUEST_USER) {
 
 $default_url_label = $data['profile_redirect_url'] !== ''
 	?  (new CDiv(sprintf('%1$s: %2$s', _('Default'), $data['profile_redirect_url'])))
+		->setTitle($data['profile_redirect_url'])
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 		->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
