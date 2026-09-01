@@ -1,0 +1,37 @@
+---
+test case: "1. info"
+in:
+  log_type: "info"
+---
+test case: "2. warning"
+in:
+  log_type: "warning"
+---
+test case: "3. severe"
+in:
+  log_type: "severe"
+---
+test case: "4. fatal"
+in:
+  log_type: "fatal"
+---
+test case: "5. err_info"
+in:
+  log_type: "err_info"
+---
+test case: "6. debug_start"
+in:
+  log_type: "debug_start"
+---
+test case: "7. debug"
+in:
+  log_type: "debug"
+---
+test case: "8. debug_cont"
+in:
+  log_type: "debug_cont"
+---
+test case: "9. debug_end"
+in:
+  log_type: "debug_end"
+...

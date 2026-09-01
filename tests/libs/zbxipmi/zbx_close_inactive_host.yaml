@@ -1,0 +1,17 @@
+---
+test case: "1. closing a host whose domain is not found frees it and returns SUCCEED"
+in:
+  scenario: "close_directly"
+---
+test case: "2. zbx_delete_inactive_ipmi_hosts removes only the inactive host"
+in:
+  scenario: "delete_inactive"
+---
+test case: "3. a host exactly at the inactivity boundary is not removed"
+in:
+  scenario: "boundary_not_deleted"
+---
+test case: "4. multiple stale hosts are all removed, active host survives"
+in:
+  scenario: "multiple_stale"
+...

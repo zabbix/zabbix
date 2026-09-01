@@ -2,8 +2,24 @@
 test case: "1. reading a control that no longer exists is rejected, not read via a stale pointer"
 in:
   op: "read"
+  is_readable: 1
+  is_settable: 1
 ---
 test case: "2. setting a control that no longer exists is rejected, not set via a stale pointer"
 in:
   op: "set"
+  is_readable: 1
+  is_settable: 1
+---
+test case: "3. reading a non-readable control is rejected before touching the id"
+in:
+  op: "read"
+  is_readable: 0
+  is_settable: 1
+---
+test case: "4. setting a non-settable control is rejected before touching the id"
+in:
+  op: "set"
+  is_readable: 1
+  is_settable: 0
 ...

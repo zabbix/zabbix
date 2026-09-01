@@ -1,0 +1,13 @@
+---
+test case: "1. get_value_ipmi() before zbx_init_ipmi()"
+in:
+  func: "get_value_ipmi"
+---
+test case: "2. get_discovery_ipmi() before zbx_init_ipmi()"
+in:
+  func: "get_discovery_ipmi"
+---
+test case: "3. zbx_set_ipmi_control_value() before zbx_init_ipmi()"
+in:
+  func: "zbx_set_ipmi_control_value"
+...

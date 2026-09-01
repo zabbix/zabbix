@@ -49,9 +49,9 @@ void	zbx_mock_test_entry(void **state)
 	c.c_name = "test control";
 	c.num_values = 1;
 	c.val = &val;
-	/* as if cached at allocation time as a readable, settable control - see the file header comment */
-	c.is_readable = 1;
-	c.is_settable = 1;
+	/* as if cached at allocation time - see the file header comment */
+	c.is_readable = zbx_mock_get_parameter_int("in.is_readable");
+	c.is_settable = zbx_mock_get_parameter_int("in.is_settable");
 	/* stands in for a control OpenIPMI has already destroyed - see the file header comment */
 	c.control_id = (ipmi_control_id_t)IPMI_CONTROL_ID_INVALID;
 

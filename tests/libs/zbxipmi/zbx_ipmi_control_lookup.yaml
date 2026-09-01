@@ -1,0 +1,82 @@
+---
+test case: "1. by_pointer: matching control is found"
+in:
+  func: "by_pointer"
+  lookup: "b"
+out:
+  found: "yes"
+  full_name: "Control B"
+---
+test case: "2. by_pointer: no matching control"
+in:
+  func: "by_pointer"
+  lookup: "c"
+out:
+  found: "no"
+---
+test case: "3. by_name: matching control is found"
+in:
+  func: "by_name"
+  lookup: "ctrl-a"
+out:
+  found: "yes"
+  full_name: "Control A"
+---
+test case: "4. by_name: no matching control"
+in:
+  func: "by_name"
+  lookup: "ctrl-z"
+out:
+  found: "no"
+---
+test case: "5. by_full_name: matching control is found"
+in:
+  func: "by_full_name"
+  lookup: "Control B"
+out:
+  found: "yes"
+  full_name: "Control B"
+---
+test case: "6. by_full_name: no matching control"
+in:
+  func: "by_full_name"
+  lookup: "Control Z"
+out:
+  found: "no"
+---
+test case: "7. delete: removing the first of two controls shifts the second one down"
+in:
+  func: "delete"
+  lookup: "a"
+  three_controls: "no"
+out:
+  control_count: 1
+  surviving_full_name: "Control B"
+---
+test case: "8. delete: removing the last control leaves the first untouched"
+in:
+  func: "delete"
+  lookup: "b"
+  three_controls: "no"
+out:
+  control_count: 1
+  surviving_full_name: "Control A"
+---
+test case: "9. delete: unregistered pointer deletes nothing"
+in:
+  func: "delete"
+  lookup: "c"
+  three_controls: "no"
+out:
+  control_count: 2
+  surviving_full_name: "Control A"
+---
+test case: "10. delete: removing the first of three shifts both survivors down (memmove of >1 element)"
+in:
+  func: "delete"
+  lookup: "a"
+  three_controls: "yes"
+out:
+  control_count: 2
+  surviving_full_name: "Control B"
+...

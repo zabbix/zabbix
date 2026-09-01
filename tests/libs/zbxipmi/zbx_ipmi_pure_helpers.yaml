@@ -1,0 +1,162 @@
+---
+test case: "1. has_name_prefix: 'name:' prefix is recognized"
+in:
+  func: "has_name_prefix"
+  str: "name:foo"
+out:
+  ret: "1"
+  prefix_len: 5
+---
+test case: "2. has_name_prefix: 'id:' prefix is recognized but reported as no match"
+in:
+  func: "has_name_prefix"
+  str: "id:foo"
+out:
+  ret: "0"
+  prefix_len: 3
+---
+test case: "3. has_name_prefix: no prefix"
+in:
+  func: "has_name_prefix"
+  str: "foo"
+out:
+  ret: "0"
+  prefix_len: 0
+---
+test case: "4. has_name_prefix: empty string has no prefix"
+in:
+  func: "has_name_prefix"
+  str: ""
+out:
+  ret: "0"
+  prefix_len: 0
+---
+test case: "5. get_domain_offset: full_name starts with the domain number"
+in:
+  func: "get_domain_offset"
+  domain_nr: 3
+  full_name: "3temperature"
+out:
+  offset: 1
+---
+test case: "6. get_domain_offset: full_name does not start with the domain number"
+in:
+  func: "get_domain_offset"
+  domain_nr: 3
+  full_name: "temperature"
+out:
+  offset: 0
+---
+test case: "7. get_domain_offset: full_name is shorter than the domain number"
+in:
+  func: "get_domain_offset"
+  domain_nr: 100
+  full_name: "1"
+out:
+  offset: 0
+---
+test case: "8. get_domain_offset: full_name is exactly the domain number, nothing left to skip"
+in:
+  func: "get_domain_offset"
+  domain_nr: 5
+  full_name: "5"
+out:
+  offset: 0
+---
+test case: "9. add_threshold_ipmi: enabled finite threshold is added"
+in:
+  func: "add_threshold_ipmi"
+  status: "enabled"
+  val: 42.5
+out:
+  present: "yes"
+---
+test case: "10. add_threshold_ipmi: disabled threshold is not added"
+in:
+  func: "add_threshold_ipmi"
+  status: "disabled"
+  val: 42.5
+out:
+  present: "no"
+---
+test case: "11. add_threshold_ipmi: enabled but non-finite (infinity) threshold is not added"
+in:
+  func: "add_threshold_ipmi"
+  status: "enabled"
+  val: "infinity"
+out:
+  present: "no"
+---
+test case: "12. zbx_parse_ipmi_command: empty command is rejected"
+in:
+  func: "parse_ipmi_command"
+  command: "   "
+out:
+  ret: "FAIL"
+---
+test case: "13. zbx_parse_ipmi_command: name with no value defaults to 'on'"
+in:
+  func: "parse_ipmi_command"
+  command: "fan1"
+out:
+  ret: "SUCCEED"
+  c_name: "fan1"
+  val: 1
+---
+test case: "14. zbx_parse_ipmi_command: explicit 'off'"
+in:
+  func: "parse_ipmi_command"
+  command: "fan1 off"
+out:
+  ret: "SUCCEED"
+  c_name: "fan1"
+  val: 0
+---
+test case: "15. zbx_parse_ipmi_command: numeric value"
+in:
+  func: "parse_ipmi_command"
+  command: "fan1 7"
+out:
+  ret: "SUCCEED"
+  c_name: "fan1"
+  val: 7
+---
+test case: "16. zbx_parse_ipmi_command: unsupported value is rejected"
+in:
+  func: "parse_ipmi_command"
+  command: "fan1 not-a-number"
+out:
+  ret: "FAIL"
+---
+test case: "17. zbx_parse_ipmi_command: 'on'/'off' are case-insensitive"
+in:
+  func: "parse_ipmi_command"
+  command: "fan1 ON"
+out:
+  ret: "SUCCEED"
+  c_name: "fan1"
+  val: 1
+---
+test case: "18. zbx_parse_ipmi_command: negative numeric value is rejected"
+in:
+  func: "parse_ipmi_command"
+  command: "fan1 -5"
+out:
+  ret: "FAIL"
+---
+test case: "19. zbx_parse_ipmi_command: leading whitespace and multiple separating spaces are skipped"
+in:
+  func: "parse_ipmi_command"
+  command: "  fan1  3"
+out:
+  ret: "SUCCEED"
+  c_name: "fan1"
+  val: 3
+---
+test case: "20. zbx_parse_ipmi_command: command name at the length limit is too long"
+in:
+  func: "parse_ipmi_command"
+  command: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+out:
+  ret: "FAIL"
+...

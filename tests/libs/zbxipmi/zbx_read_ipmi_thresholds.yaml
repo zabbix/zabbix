@@ -1,0 +1,13 @@
+---
+test case: "1. thresholds are not accessible at all - exits before touching the sensor"
+in:
+  thr_access: 0  # IPMI_THRESHOLD_ACCESS_SUPPORT_NONE
+---
+test case: "2. thresholds are fixed (not readable) - exits before touching the sensor"
+in:
+  thr_access: 3  # IPMI_THRESHOLD_ACCESS_SUPPORT_FIXED
+---
+test case: "3. thresholds are readable, but the sensor no longer exists"
+in:
+  thr_access: 1  # IPMI_THRESHOLD_ACCESS_SUPPORT_READABLE
+...

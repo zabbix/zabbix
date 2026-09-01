@@ -1,0 +1,22 @@
+---
+test case: "1. reading: err!=0 is reported without touching the control"
+in:
+  cb: "reading"
+  scenario: "err"
+out:
+  ret: -2  # NOTSUPPORTED
+---
+test case: "2. setting: err!=0 is reported without touching the control"
+in:
+  cb: "setting"
+  scenario: "err"
+out:
+  ret: -2  # NOTSUPPORTED
+---
+test case: "3. setting: success only logs already-owned data, never touches 'control'"
+in:
+  cb: "setting"
+  scenario: "success"
+out:
+  ret: 0  # SUCCEED
+...

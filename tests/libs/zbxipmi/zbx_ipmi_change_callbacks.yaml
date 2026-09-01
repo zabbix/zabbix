@@ -1,0 +1,32 @@
+---
+test case: "1. control_change: IPMI_ADDED for an already-known control is a no-op"
+in:
+  cb: "control_change"
+  op: "added"
+out:
+  control_count: 1
+---
+test case: "2. control_change: IPMI_DELETED removes the control"
+in:
+  cb: "control_change"
+  op: "deleted"
+out:
+  control_count: 0
+---
+test case: "3. control_change: IPMI_CHANGED is a no-op"
+in:
+  cb: "control_change"
+  op: "changed"
+out:
+  control_count: 1
+---
+test case: "4. entity_change: IPMI_DELETED does nothing observable"
+in:
+  cb: "entity_change"
+  op: "deleted"
+---
+test case: "5. entity_change: IPMI_CHANGED does nothing observable"
+in:
+  cb: "entity_change"
+  op: "changed"
+...

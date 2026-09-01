@@ -1,0 +1,92 @@
+---
+test case: "1. by_pointer: matching sensor is found"
+in:
+  func: "by_pointer"
+  lookup: "b"
+out:
+  found: "yes"
+  full_name: "Sensor B"
+---
+test case: "2. by_pointer: no matching sensor"
+in:
+  func: "by_pointer"
+  lookup: "c"
+out:
+  found: "no"
+---
+test case: "3. by_id: matching sensor is found"
+in:
+  func: "by_id"
+  lookup: "id-a"
+out:
+  found: "yes"
+  full_name: "Sensor A"
+---
+test case: "4. by_id: no matching sensor"
+in:
+  func: "by_id"
+  lookup: "id-z"
+out:
+  found: "no"
+---
+test case: "5. by_full_name: matching sensor is found"
+in:
+  func: "by_full_name"
+  lookup: "Sensor B"
+out:
+  found: "yes"
+  full_name: "Sensor B"
+---
+test case: "6. by_full_name: no matching sensor"
+in:
+  func: "by_full_name"
+  lookup: "Sensor Z"
+out:
+  found: "no"
+---
+test case: "7. delete: removing the first of two sensors shifts the second one down"
+in:
+  func: "delete"
+  lookup: "a"
+  three_sensors: "no"
+out:
+  sensor_count: 1
+  surviving_full_name: "Sensor B"
+---
+test case: "8. delete: removing the last sensor leaves the first untouched"
+in:
+  func: "delete"
+  lookup: "b"
+  three_sensors: "no"
+out:
+  sensor_count: 1
+  surviving_full_name: "Sensor A"
+---
+test case: "9. delete: unregistered pointer deletes nothing"
+in:
+  func: "delete"
+  lookup: "c"
+  three_sensors: "no"
+out:
+  sensor_count: 2
+  surviving_full_name: "Sensor A"
+---
+test case: "10. delete: removing the first of three shifts both survivors down (memmove of >1 element)"
+in:
+  func: "delete"
+  lookup: "a"
+  three_sensors: "yes"
+out:
+  sensor_count: 2
+  surviving_full_name: "Sensor B"
+---
+test case: "11. by_id: duplicate id prefers the threshold sensor when it is listed first"
+in:
+  func: "by_id_prefers_threshold"
+  order: "threshold_first"
+---
+test case: "12. by_id: duplicate id prefers the threshold sensor even when it is listed second"
+in:
+  func: "by_id_prefers_threshold"
+  order: "discrete_first"
+...

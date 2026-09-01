@@ -6,7 +6,17 @@ BINARIES_tests = \
 	zbx_get_ipmi_host \
 	zbx_domain_closed_cb \
 	zbx_read_ipmi_sensor \
-	zbx_read_ipmi_control
+	zbx_read_ipmi_control \
+	zbx_ipmi_pure_helpers \
+	zbx_ipmi_sensor_lookup \
+	zbx_ipmi_control_lookup \
+	zbx_close_inactive_host \
+	zbx_read_ipmi_thresholds \
+	zbx_ipmi_control_callbacks \
+	zbx_ipmi_sensor_callbacks \
+	zbx_ipmi_change_callbacks \
+	zbx_vlog \
+	zbx_ipmi_uninitialized_entry
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -103,5 +113,165 @@ zbx_read_ipmi_control_LDADD += @SERVER_LIBS@
 zbx_read_ipmi_control_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_read_ipmi_control_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_ipmi_pure_helpers
+
+zbx_ipmi_pure_helpers_SOURCES = \
+	zbx_ipmi_pure_helpers.c \
+	$(COMMON_SRC_FILES)
+
+zbx_ipmi_pure_helpers_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_ipmi_pure_helpers_LDADD += @SERVER_LIBS@
+
+zbx_ipmi_pure_helpers_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_ipmi_pure_helpers_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_ipmi_sensor_lookup
+
+zbx_ipmi_sensor_lookup_SOURCES = \
+	zbx_ipmi_sensor_lookup.c \
+	$(COMMON_SRC_FILES)
+
+zbx_ipmi_sensor_lookup_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_ipmi_sensor_lookup_LDADD += @SERVER_LIBS@
+
+zbx_ipmi_sensor_lookup_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_ipmi_sensor_lookup_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_ipmi_control_lookup
+
+zbx_ipmi_control_lookup_SOURCES = \
+	zbx_ipmi_control_lookup.c \
+	$(COMMON_SRC_FILES)
+
+zbx_ipmi_control_lookup_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_ipmi_control_lookup_LDADD += @SERVER_LIBS@
+
+zbx_ipmi_control_lookup_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_ipmi_control_lookup_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_close_inactive_host
+
+zbx_close_inactive_host_SOURCES = \
+	zbx_close_inactive_host.c \
+	$(COMMON_SRC_FILES)
+
+zbx_close_inactive_host_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_close_inactive_host_LDADD += @SERVER_LIBS@
+
+zbx_close_inactive_host_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_close_inactive_host_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_read_ipmi_thresholds
+
+zbx_read_ipmi_thresholds_SOURCES = \
+	zbx_read_ipmi_thresholds.c \
+	$(COMMON_SRC_FILES)
+
+zbx_read_ipmi_thresholds_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_read_ipmi_thresholds_LDADD += @SERVER_LIBS@
+
+zbx_read_ipmi_thresholds_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_read_ipmi_thresholds_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_ipmi_control_callbacks
+
+zbx_ipmi_control_callbacks_SOURCES = \
+	zbx_ipmi_control_callbacks.c \
+	$(COMMON_SRC_FILES)
+
+zbx_ipmi_control_callbacks_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_ipmi_control_callbacks_LDADD += @SERVER_LIBS@
+
+zbx_ipmi_control_callbacks_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_ipmi_control_callbacks_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_ipmi_sensor_callbacks
+
+zbx_ipmi_sensor_callbacks_SOURCES = \
+	zbx_ipmi_sensor_callbacks.c \
+	$(COMMON_SRC_FILES)
+
+zbx_ipmi_sensor_callbacks_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_ipmi_sensor_callbacks_LDADD += @SERVER_LIBS@
+
+zbx_ipmi_sensor_callbacks_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_ipmi_sensor_callbacks_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_ipmi_change_callbacks
+
+zbx_ipmi_change_callbacks_SOURCES = \
+	zbx_ipmi_change_callbacks.c \
+	$(COMMON_SRC_FILES)
+
+zbx_ipmi_change_callbacks_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_ipmi_change_callbacks_LDADD += @SERVER_LIBS@
+
+zbx_ipmi_change_callbacks_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_ipmi_change_callbacks_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_vlog
+
+zbx_vlog_SOURCES = \
+	zbx_vlog.c \
+	$(COMMON_SRC_FILES)
+
+zbx_vlog_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_vlog_LDADD += @SERVER_LIBS@
+
+zbx_vlog_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_vlog_CFLAGS = $(IPMI_COMPILER_FLAGS)
+
+#zbx_ipmi_uninitialized_entry
+
+zbx_ipmi_uninitialized_entry_SOURCES = \
+	zbx_ipmi_uninitialized_entry.c \
+	$(COMMON_SRC_FILES)
+
+zbx_ipmi_uninitialized_entry_LDADD = \
+	$(IPMI_LIBS) \
+	$(OPENIPMI_LIBS)
+
+zbx_ipmi_uninitialized_entry_LDADD += @SERVER_LIBS@
+
+zbx_ipmi_uninitialized_entry_LDFLAGS = @SERVER_LDFLAGS@ $(OPENIPMI_LDFLAGS) $(MOCKDATA_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_ipmi_uninitialized_entry_CFLAGS = $(IPMI_COMPILER_FLAGS)
 
 endif

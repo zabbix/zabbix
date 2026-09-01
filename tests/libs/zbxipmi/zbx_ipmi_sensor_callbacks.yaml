@@ -1,0 +1,57 @@
+---
+test case: "1. thresh_reading: err!=0 is reported without touching sensor or states"
+in:
+  cb: "thresh_reading"
+  scenario: "err"
+out:
+  ret: -2  # NOTSUPPORTED
+---
+test case: "2. thresh_reading: scanning disabled"
+in:
+  cb: "thresh_reading"
+  scenario: "scanning_disabled"
+out:
+  ret: -2  # NOTSUPPORTED
+---
+test case: "3. thresh_reading: initial update in progress"
+in:
+  cb: "thresh_reading"
+  scenario: "initial_update"
+out:
+  ret: -2  # NOTSUPPORTED
+---
+test case: "4. thresh_reading: no value present"
+in:
+  cb: "thresh_reading"
+  scenario: "no_values_present"
+out:
+  ret: -2  # NOTSUPPORTED
+---
+test case: "5. discrete_states: scanning disabled"
+in:
+  cb: "discrete_states"
+  scenario: "scanning_disabled"
+out:
+  ret: -2  # NOTSUPPORTED
+---
+test case: "6. discrete_states: initial update in progress"
+in:
+  cb: "discrete_states"
+  scenario: "initial_update"
+out:
+  ret: -2  # NOTSUPPORTED
+---
+test case: "7. discrete_states: err!=0 is reported using only already-owned sensor id data"
+in:
+  cb: "discrete_states"
+  scenario: "err"
+out:
+  ret: -2  # NOTSUPPORTED
+---
+test case: "8. thresholds: err!=0 is reported without touching the sensor"
+in:
+  cb: "thresholds"
+  scenario: "err"
+out:
+  ret: -2  # NOTSUPPORTED
+...
