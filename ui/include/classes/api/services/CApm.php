@@ -22,7 +22,8 @@ class CApm extends CApiService {
 	public const ACCESS_RULES = [
 		'getTraces' =>	['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'getSpans' =>	['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'getLogs' =>	['min_user_type' => USER_TYPE_ZABBIX_USER]
+		'getLogs' =>	['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'getMetrics' =>	['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	private const CLICKHOUSE_TRACES_OUTPUT_FIELDS = [
@@ -128,72 +129,69 @@ class CApm extends CApiService {
 
 		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_TRACES_OUTPUT_FIELDS);
 
-		$inner_query_parts = CClickHouseHelper::getQueryParts('otel_traces', 'ti');
-
-		$inner_query_parts['select'][] = 'ti.TraceId';
-
-		$inner_query_parts['where'][] = 'ti.Timestamp>=toDateTime64({time_from:Int32},9)';
-		$inner_query_parts['param']['time_from'] = $options['time_from'];
-
-		$inner_query_parts['where'][] = 'ti.Timestamp<toDateTime64({time_till:Int32},9)';
-		$inner_query_parts['param']['time_till'] = $options['time_till'];
+		$inner_query = (new CClickHouseQuery())
+			->from('otel_traces', 'ti')
+			->select('ti.TraceId')
+			->where('ti.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
+			->where('ti.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']])
+			->group('ti.TraceId');
 
 		if ($options['traceids'] !== null) {
-			$inner_query_parts['where'][] = 'ti.TraceId IN {traceids:Array(String)}';
-			$inner_query_parts['param']['traceids'] = $options['traceids'];
+			$inner_query
+				->where('ti.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
 		}
 
 		if ($options['min_duration'] !== null) {
-			$inner_query_parts['where'][] = 'ti.Duration>={min_duration:Int64}';
-			$inner_query_parts['param']['min_duration'] = $options['min_duration'];
+			$inner_query->where('ti.Duration>={min_duration:Int64}', ['min_duration' => $options['min_duration']]);
 		}
 
 		if ($options['max_duration'] !== null) {
-			$inner_query_parts['where'][] = 'ti.Duration<={max_duration:Int64}';
-			$inner_query_parts['param']['max_duration'] = $options['max_duration'];
+			$inner_query->where('ti.Duration<={max_duration:Int64}', ['max_duration' => $options['max_duration']]);
 		}
 
-		$inner_query_parts['group'][] = 'ti.TraceId';
-
-		$inner_query = CClickHouseHelper::buildQueryFromParts($inner_query_parts);
-
-		if ($options['filter'] || $options['search']) {
-			$outer_query_parts = CClickHouseHelper::getQueryPartsFromOptions('otel_traces', 'to', $db_schema, [
+		if ($options['filter'] || $options['search']
+				|| $options['resource_attributes'] !== null || $options['span_attributes'] !== null) {
+			$outer_query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 'to', $db_schema, [
 				'output' => ['TraceId'],
 				...array_intersect_key($options, array_flip(
 					['filter', 'search', 'searchByAny', 'startSearch', 'excludeSearch', 'searchWildcardsEnabled']
 				))
-			]);
+			]))
+				->linkQuery($inner_query)
+				->where('to.TraceId IN ('.$inner_query->getSql().')')
+				->group('to.TraceId');
 
-			$outer_query_parts['param'] += $inner_query_parts['param'];
+			if ($options['resource_attributes'] !== null) {
+				CClickHouseHelper::addAttributeFilter($outer_query, 'to.ResourceAttributes',
+					$options['resource_attributes'], $options['resource_attributes_evaltype']
+				);
+			}
 
-			$outer_query_parts['where'][] = 'to.TraceId IN ('.$inner_query.')';
-			$outer_query_parts['group'][] = 'to.TraceId';
-
-			$outer_query = CClickHouseHelper::buildQueryFromParts($outer_query_parts);
+			if ($options['span_attributes'] !== null) {
+				CClickHouseHelper::addAttributeFilter($outer_query, 'to.SpanAttributes',
+					$options['span_attributes'], $options['span_attributes_evaltype']
+				);
+			}
 		}
 		else {
-			$outer_query_parts = $inner_query_parts;
 			$outer_query = $inner_query;
 		}
 
-		$query_parts = CClickHouseHelper::getQueryPartsFromOptions('otel_traces', 't', $db_schema,
+		$query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 't', $db_schema,
 			array_intersect_key($options, array_flip(['countOutput', 'limit']))
-		);
-
-		$query_parts['param'] += $outer_query_parts['param'];
+		))
+			->linkQuery($outer_query)
+			->where('t.TraceId IN ('.$outer_query->getSql().')')
+			->group('t.TraceId');
 
 		foreach (array_intersect(array_keys(self::CLICKHOUSE_TRACES_FIELDS), $options['output']) as $field) {
-			$query_parts['select'][$field] = match($field) {
+			$query->select(match($field) {
 				'TraceId' => 't.TraceId',
 				'span_count' => 'count()',
 				'error_count' => 'countIf(t.StatusCode=\'Error\')',
 				default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
-			};
+			}, $field);
 		}
-
-		$query_parts['where'][] = 't.TraceId IN ('.$outer_query.')';
-		$query_parts['group'][] = 't.TraceId';
 
 		foreach ($options['sortfield'] as $i => $field) {
 			$order_by = match($field) {
@@ -203,23 +201,21 @@ class CApm extends CApiService {
 				default => 'anyIf(t.'.$field.',t.ParentSpanId=\'\')'
 			};
 
-			$sortorder = $options['sortorder'];
-			$sortorder = match(true) {
-				is_string($sortorder) => $sortorder,
-				is_array($sortorder) && array_key_exists($i, $sortorder) => $sortorder[$i],
+			$sort_order = $options['sortorder'];
+			$sort_order = match(true) {
+				is_string($sort_order) => $sort_order,
+				is_array($sort_order) && array_key_exists($i, $sort_order) => $sort_order[$i],
 				default => ZBX_SORT_UP
 			};
 
-			$query_parts['order'][] = $order_by.($sortorder === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '');
+			$query->order($order_by, $sort_order);
 		}
-
-		$query = CClickHouseHelper::buildQueryFromParts($query_parts);
 
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
 
 		$db_traces = [];
 
-		foreach ($db->fetch($query, $query_parts['param']) as $row) {
+		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
 				return (string) $row['rowscount'];
 			}
@@ -349,58 +345,49 @@ class CApm extends CApiService {
 
 		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_SPANS_OUTPUT_FIELDS);
 
-		$query_parts = CClickHouseHelper::getQueryPartsFromOptions('otel_traces', 't', $db_schema, $options);
-
-		$query_parts['where'][] = 't.Timestamp>=toDateTime64({time_from:Int32},9)';
-		$query_parts['param']['time_from'] = $options['time_from'];
-
-		$query_parts['where'][] = 't.Timestamp<toDateTime64({time_till:Int32},9)';
-		$query_parts['param']['time_till'] = $options['time_till'];
+		$query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 't', $db_schema, $options))
+			->where('t.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
+			->where('t.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']]);
 
 		if ($options['traceids'] !== null) {
-			$query_parts['where'][] = 't.TraceId IN {traceids:Array(String)}';
-			$query_parts['param']['traceids'] = $options['traceids'];
+			$query->where('t.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
 		}
 
 		if ($options['spanids'] !== null) {
-			$query_parts['where'][] = 't.SpanId IN {spanids:Array(String)}';
-			$query_parts['param']['spanids'] = $options['spanids'];
+			$query->where('t.SpanId IN {spanids:Array(String)}', ['spanids' => $options['spanids']]);
 		}
 
 		if ($options['parent_spanids'] !== null) {
-			$query_parts['where'][] = 't.ParentSpanId IN {parent_spanids:Array(String)}';
-			$query_parts['param']['parent_spanids'] = $options['parent_spanids'];
+			$query->where('t.ParentSpanId IN {parent_spanids:Array(String)}', [
+				'parent_spanids' => $options['parent_spanids']
+			]);
 		}
 
 		if ($options['resource_attributes'] !== null) {
-			$query_parts = CClickHouseHelper::addAttributeFilter($query_parts, 't.ResourceAttributes',
-				$options['resource_attributes'], $options['resource_attributes_evaltype']
+			CClickHouseHelper::addAttributeFilter($query, 't.ResourceAttributes', $options['resource_attributes'],
+				$options['resource_attributes_evaltype']
 			);
 		}
 
 		if ($options['span_attributes'] !== null) {
-			$query_parts = CClickHouseHelper::addAttributeFilter($query_parts, 't.SpanAttributes',
-				$options['span_attributes'], $options['span_attributes_evaltype']
+			CClickHouseHelper::addAttributeFilter($query, 't.SpanAttributes', $options['span_attributes'],
+				$options['span_attributes_evaltype']
 			);
 		}
 
 		if ($options['min_duration'] !== null) {
-			$query_parts['where'][] = 't.Duration>={min_duration:Int64}';
-			$query_parts['param']['min_duration'] = $options['min_duration'];
+			$query->where('t.Duration>={min_duration:Int64}', ['min_duration' => $options['min_duration']]);
 		}
 
 		if ($options['max_duration'] !== null) {
-			$query_parts['where'][] = 't.Duration<={max_duration:Int64}';
-			$query_parts['param']['max_duration'] = $options['max_duration'];
+			$query->where('t.Duration<={max_duration:Int64}', ['max_duration' => $options['max_duration']]);
 		}
-
-		$query = CClickHouseHelper::buildQueryFromParts($query_parts);
 
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
 
 		$db_spans = [];
 
-		foreach ($db->fetch($query, $query_parts['param']) as $row) {
+		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
 				return (string) $row['rowscount'];
 			}
@@ -500,7 +487,7 @@ class CApm extends CApiService {
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
 			'log_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
-			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'trace_flags', 'severity_text','severity_number', 'service_name', 'resource_schema_url', 'scope_schema_url', 'scope_name', 'scope_version', 'event_name']],
+			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'trace_flags', 'severity_text', 'severity_number', 'service_name', 'resource_schema_url', 'scope_schema_url', 'scope_name', 'scope_version', 'event_name']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['severity_text', 'service_name', 'body', 'resource_schema_url', 'scope_schema_url', 'scope_name', 'scope_version', 'event_name']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>					['type' => API_FLAG, 'default' => false],
@@ -527,53 +514,45 @@ class CApm extends CApiService {
 
 		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_LOGS_OUTPUT_FIELDS);
 
-		$query_parts = CClickHouseHelper::getQueryPartsFromOptions('otel_logs', 'l', $db_schema, $options);
-
-		$query_parts['where'][] = 'l.Timestamp>=toDateTime64({time_from:Int32},9)';
-		$query_parts['param']['time_from'] = $options['time_from'];
-
-		$query_parts['where'][] = 'l.Timestamp<toDateTime64({time_till:Int32},9)';
-		$query_parts['param']['time_till'] = $options['time_till'];
+		$query = (CClickHouseHelper::createQueryFromOptions('otel_logs', 'l', $db_schema, $options))
+			->where('l.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
+			->where('l.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']]);
 
 		if ($options['traceids'] !== null) {
-			$query_parts['where'][] = 'l.TraceId IN {traceids:Array(String)}';
-			$query_parts['param']['traceids'] = $options['traceids'];
+			$query->where('l.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
 		}
 
 		if ($options['spanids'] !== null) {
-			$query_parts['where'][] = 'l.SpanId IN {spanids:Array(String)}';
-			$query_parts['param']['spanids'] = $options['spanids'];
+			$query->where('l.SpanId IN {spanids:Array(String)}', ['spanids' => $options['spanids']]);
 		}
 
 		if (array_key_exists('with_sampled_trace_flag', $options) && $options['with_sampled_trace_flag'] !== null) {
-			$query_parts['where'][] = 'bitAnd(l.TraceFlags, 1)='.($options['with_sampled_trace_flag'] ? '1' : '0');
+			$query->where('bitAnd(l.TraceFlags, 1)='.($options['with_sampled_trace_flag'] ? '1' : '0'));
 		}
 
 		if ($options['resource_attributes'] !== null) {
-			$query_parts = CClickHouseHelper::addAttributeFilter($query_parts, 'l.ResourceAttributes',
-				$options['resource_attributes'], $options['resource_attributes_evaltype']
+			CClickHouseHelper::addAttributeFilter($query, 'l.ResourceAttributes', $options['resource_attributes'],
+				$options['resource_attributes_evaltype']
 			);
 		}
 
 		if ($options['scope_attributes'] !== null) {
-			$query_parts = CClickHouseHelper::addAttributeFilter($query_parts, 'l.ScopeAttributes',
-				$options['scope_attributes'], $options['scope_attributes_evaltype']
+			CClickHouseHelper::addAttributeFilter($query, 'l.ScopeAttributes', $options['scope_attributes'],
+				$options['scope_attributes_evaltype']
 			);
 		}
 
 		if ($options['log_attributes'] !== null) {
-			$query_parts = CClickHouseHelper::addAttributeFilter($query_parts, 'l.LogAttributes',
-				$options['log_attributes'], $options['log_attributes_evaltype']
+			CClickHouseHelper::addAttributeFilter($query, 'l.LogAttributes', $options['log_attributes'],
+				$options['log_attributes_evaltype']
 			);
 		}
 
-		$query = CClickHouseHelper::buildQueryFromParts($query_parts);
-
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
 
-		$db_spans = [];
+		$db_logs = [];
 
-		foreach ($db->fetch($query, $query_parts['param']) as $row) {
+		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
 				return (string) $row['rowscount'];
 			}
@@ -596,10 +575,319 @@ class CApm extends CApiService {
 				}
 			}
 
-			$db_spans[] = $row_fixed;
+			$db_logs[] = $row_fixed;
 		}
 
-		return $db_spans;
+		return $db_logs;
+	}
+
+	private const CLICKHOUSE_METRICS_OUTPUT_FIELDS = [
+		'type'						=> 'Type',
+		'resource_attributes'		=> 'ResourceAttributes',
+		'resource_schema_url'		=> 'ResourceSchemaUrl',
+		'scope_name'				=> 'ScopeName',
+		'scope_version'				=> 'ScopeVersion',
+		'scope_attributes'			=> 'ScopeAttributes',
+		'scope_schema_url'			=> 'ScopeSchemaUrl',
+		'service_name'				=> 'ServiceName',
+		'metric_name'				=> 'MetricName',
+		'metric_description'		=> 'MetricDescription',
+		'metric_unit'				=> 'MetricUnit',
+		'attributes'				=> 'Attributes',
+		'start_time_unix'			=> 'StartTimeUnix',
+		'time_unix'					=> 'TimeUnix',
+		'value'						=> 'Value',
+		'flags'						=> 'Flags',
+		'exemplars'					=> ['Exemplars.FilteredAttributes', 'Exemplars.TimeUnix', 'Exemplars.Value', 'Exemplars.SpanId', 'Exemplars.TraceId'],
+		'aggregation_temporality'	=> 'AggregationTemporality',
+		'is_monotonic'				=> 'IsMonotonic',
+		'count'						=> 'Count',
+		'sum'						=> 'Sum',
+		'bucket_counts'				=> 'BucketCounts',
+		'explicit_bounds'			=> 'ExplicitBounds',
+		'min'						=> 'Min',
+		'max'						=> 'Max',
+		'scale'						=> 'Scale',
+		'zero_count'				=> 'ZeroCount',
+		'positive_offset'			=> 'PositiveOffset',
+		'positive_bucket_counts'	=> 'PositiveBucketCounts',
+		'negative_offset'			=> 'NegativeOffset',
+		'negative_bucket_counts'	=> 'NegativeBucketCounts'
+	];
+
+	private const CLICKHOUSE_METRICS_FIELDS = [
+		'Type'							=> 'type',
+		'ResourceAttributes'			=> 'resource_attributes',
+		'ResourceSchemaUrl'				=> 'resource_schema_url',
+		'ScopeName'						=> 'scope_name',
+		'ScopeVersion'					=> 'scope_version',
+		'ScopeAttributes'				=> 'scope_attributes',
+		'ScopeSchemaUrl'				=> 'scope_schema_url',
+		'ServiceName'					=> 'service_name',
+		'MetricName'					=> 'metric_name',
+		'MetricDescription'				=> 'metric_description',
+		'MetricUnit'					=> 'metric_unit',
+		'Attributes'					=> 'attributes',
+		'StartTimeUnix'					=> 'start_time_unix',
+		'TimeUnix'						=> 'time_unix',
+		'Value'							=> 'value',
+		'Flags'							=> 'flags',
+		'Exemplars.FilteredAttributes'	=> ['exemplars', 'filtered_attributes'],
+		'Exemplars.TimeUnix'			=> ['exemplars', 'time_unix'],
+		'Exemplars.Value'				=> ['exemplars', 'value'],
+		'Exemplars.SpanId'				=> ['exemplars', 'spanid'],
+		'Exemplars.TraceId'				=> ['exemplars', 'traceid'],
+		'AggregationTemporality'		=> 'aggregation_temporality',
+		'IsMonotonic'					=> 'is_monotonic',
+		'Count'							=> 'count',
+		'Sum'							=> 'sum',
+		'BucketCounts'					=> 'bucket_counts',
+		'ExplicitBounds'				=> 'explicit_bounds',
+		'Min'							=> 'min',
+		'Max'							=> 'max',
+		'Scale'							=> 'scale',
+		'ZeroCount'						=> 'zero_count',
+		'PositiveOffset'				=> 'positive_offset',
+		'PositiveBucketCounts'			=> 'positive_bucket_counts',
+		'NegativeOffset'				=> 'negative_offset',
+		'NegativeBucketCounts'			=> 'negative_bucket_counts'
+	];
+
+	private const CLICKHOUSE_METRICS_FIELDS_DEFAULTS = [
+		'ResourceAttributes'			=> [],
+		'ResourceSchemaUrl'				=> '',
+		'ScopeName'						=> '',
+		'ScopeVersion'					=> '',
+		'ScopeAttributes'				=> [],
+		'ScopeSchemaUrl'				=> '',
+		'ServiceName'					=> '',
+		'MetricName'					=> '',
+		'MetricDescription'				=> '',
+		'MetricUnit'					=> '',
+		'Attributes'					=> [],
+		'StartTimeUnix'					=> '1970-01-01 00:00:00.000000000',
+		'TimeUnix'						=> '1970-01-01 00:00:00.000000000',
+		'Value'							=> 0,
+		'Flags'							=> 0,
+		'Exemplars.FilteredAttributes'	=> [],
+		'Exemplars.TimeUnix'			=> [],
+		'Exemplars.Value'				=> [],
+		'Exemplars.SpanId'				=> [],
+		'Exemplars.TraceId'				=> [],
+		'AggregationTemporality'		=> 0,
+		'IsMonotonic'					=> false,
+		'Count'							=> 0,
+		'Sum'							=> 0,
+		'BucketCounts'					=> [],
+		'ExplicitBounds'				=> [],
+		'Min'							=> 0,
+		'Max'							=> 0,
+		'Scale'							=> 0,
+		'ZeroCount'						=> 0,
+		'PositiveOffset'				=> 0,
+		'PositiveBucketCounts'			=> [],
+		'NegativeOffset'				=> 0,
+		'NegativeBucketCounts'			=> []
+	];
+
+	/**
+	 * @param array $options
+	 *
+	 * @throws APIException
+	 *
+	 * @return array|string
+	 */
+	public function getMetrics(array $options = []): array|string {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter
+			'time_from' =>						['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
+			'time_till' =>						['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
+			'types' =>							['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [APM_METRIC_TYPE_GAUGE, APM_METRIC_TYPE_SUM, APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM]), 'uniq' => true, 'default' => null],
+			'with_no_recorded_value_flag' =>	['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
+			]],
+			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'scope_attributes' =>				['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
+			]],
+			'scope_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'attributes' =>						['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
+			]],
+			'attributes_evaltype' =>			['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit']],
+			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_description', 'metric_unit']],
+			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>					['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>					['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>			['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>							['type' => API_OUTPUT, 'in' => implode(',', array_keys(self::CLICKHOUSE_METRICS_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>					['type' => API_FLAG, 'default' => false],
+			// sort and limit
+			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['type', 'resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit', 'time_unix']), 'uniq' => true, 'default' => []],
+			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
+			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		return $this->getMetricsFromClickHouse($options);
+	}
+
+	private const CLICKHOUSE_METRICS_TABLES = [
+		APM_METRIC_TYPE_GAUGE					=> ['table' => 'otel_metrics_gauge', 'table_alias' => 'mg'],
+		APM_METRIC_TYPE_SUM						=> ['table' => 'otel_metrics_sum', 'table_alias' => 'ms'],
+		APM_METRIC_TYPE_HISTOGRAM				=> ['table' => 'otel_metrics_histogram', 'table_alias' => 'mh'],
+		APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM	=> ['table' => 'otel_metrics_exponential_histogram', 'table_alias' => 'mx']
+	];
+
+	private function getMetricsFromClickHouse(array $options): array|string {
+		$db_schema = CApmData::getClickHouseDbSchema();
+
+		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_METRICS_OUTPUT_FIELDS);
+
+		if ($options['types'] !== null && !$options['types']) {
+			return $options['countOutput'] ? '0' : [];
+		}
+
+		$select_tables = $options['types'] !== null
+			? array_intersect_key(self::CLICKHOUSE_METRICS_TABLES, array_flip($options['types']))
+			: self::CLICKHOUSE_METRICS_TABLES;
+
+		$sub_queries = [];
+
+		foreach ($select_tables as $type => ['table' => $table, 'table_alias' => $table_alias]) {
+			$sub_query = (CClickHouseHelper::createQueryFromOptions($table, $table_alias, $db_schema,
+				array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'limit']))
+			))
+				->where($table_alias.'.TimeUnix>=toDateTime64({time_from:Int32},9)', [
+					'time_from' => $options['time_from']
+				])
+				->where($table_alias.'.TimeUnix<toDateTime64({time_till:Int32},9)', [
+					'time_till' => $options['time_till']
+				]);
+
+			if ($options['resource_attributes'] !== null) {
+				CClickHouseHelper::addAttributeFilter($sub_query, $table_alias.'.ResourceAttributes',
+					$options['resource_attributes'], $options['resource_attributes_evaltype']
+				);
+			}
+
+			if ($options['scope_attributes'] !== null) {
+				CClickHouseHelper::addAttributeFilter($sub_query, $table_alias.'.ScopeAttributes',
+					$options['scope_attributes'], $options['scope_attributes_evaltype']
+				);
+			}
+
+			if ($options['attributes'] !== null) {
+				CClickHouseHelper::addAttributeFilter($sub_query, $table_alias.'.Attributes', $options['attributes'],
+					$options['attributes_evaltype']
+				);
+			}
+
+			if (!$options['countOutput']) {
+				// Type inclusion is mandatory for sorting capability.
+				$sub_query->select($type, 'Type');
+
+				foreach (array_intersect(array_keys(self::CLICKHOUSE_METRICS_FIELDS), $options['output']) as $field) {
+					if ($field === 'Type') {
+						continue;
+					}
+
+					if (array_key_exists($field, $db_schema[$table])) {
+						$sub_query->select($table_alias.'.'.$field);
+					}
+					else {
+						$sub_query->select(self::CLICKHOUSE_METRICS_FIELDS_DEFAULTS[$field], $field);
+					}
+				}
+			}
+
+			$sub_queries[] = $sub_query;
+		}
+
+		$query = new CClickHouseQuery();
+		$sub_queries_sql = [];
+
+		foreach ($sub_queries as $sub_query) {
+			$query->linkQuery($sub_query);
+			$sub_queries_sql[] = $sub_query->getSQL();
+		}
+
+		$query->from('('.implode(' UNION ALL ', $sub_queries_sql).')', 'u');
+
+		if ($options['countOutput']) {
+			$query->select('sum(rowscount)', 'rowscount');
+		}
+		else {
+			// Type inclusion is mandatory for sorting capability.
+			$query->select('u.Type');
+
+			foreach (array_intersect(array_keys(self::CLICKHOUSE_METRICS_FIELDS), $options['output']) as $field) {
+				if ($field === 'Type') {
+					continue;
+				}
+
+				$query->select('u.'.$field);
+			}
+
+			foreach ($options['sortfield'] as $i => $field) {
+				$sort_order = $options['sortorder'];
+				$sort_order = match(true) {
+					is_string($sort_order) => $sort_order,
+					is_array($sort_order) && array_key_exists($i, $sort_order) => $sort_order[$i],
+					default => ZBX_SORT_UP
+				};
+
+				$query->order('u.'.$field, $sort_order);
+			}
+		}
+
+		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
+
+		$db_metrics = [];
+
+		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
+			if ($options['countOutput']) {
+				return (string) $row['rowscount'];
+			}
+
+			if (!in_array('Type', $options['output'], true)) {
+				unset($row['Type']);
+			}
+
+			$row_fixed = [];
+
+			foreach ($row as $field => $value) {
+				if (is_array(self::CLICKHOUSE_METRICS_FIELDS[$field])) {
+					if (!array_key_exists(self::CLICKHOUSE_METRICS_FIELDS[$field][0], $row_fixed)) {
+						$row_fixed[self::CLICKHOUSE_METRICS_FIELDS[$field][0]] = [];
+					}
+
+					foreach ($value as $index => $sub_value) {
+						$row_fixed[self::CLICKHOUSE_METRICS_FIELDS[$field][0]][$index]
+							[self::CLICKHOUSE_METRICS_FIELDS[$field][1]] = $sub_value;
+					}
+				}
+				else {
+					$row_fixed[self::CLICKHOUSE_METRICS_FIELDS[$field]] = $value;
+				}
+			}
+
+			$db_metrics[] = $row_fixed;
+		}
+
+		return $db_metrics;
 	}
 
 	private static function fixOptionsForClickHouse(array $options, array $output_fields): array {

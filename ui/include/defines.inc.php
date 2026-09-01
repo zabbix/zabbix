@@ -2532,6 +2532,11 @@ define('ZBX_DEVICE_STATUS_ORPHANED',	2);
 define('MOBILE_KEY_SCOPE_IDENTITY',		0);
 define('MOBILE_KEY_SCOPE_ENCRYPTION',	1);
 
+define('APM_METRIC_TYPE_GAUGE',					0);
+define('APM_METRIC_TYPE_SUM',					1);
+define('APM_METRIC_TYPE_HISTOGRAM',				2);
+define('APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM',	3);
+
 // init $_REQUEST
 ini_set('variables_order', 'GP');
 $_REQUEST = $_POST + $_GET;
