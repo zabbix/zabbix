@@ -839,6 +839,7 @@ static int	cep_task_ack_compare(const void *a1, const void *a2)
 	const zbx_cep_task_acknowledge_t	*ack2 = *(const zbx_cep_task_acknowledge_t * const *)a2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(ack1->eventid, ack2->eventid);
+	ZBX_RETURN_IF_NOT_EQUAL(ack1->index, ack2->index);
 
 	return 0;
 }
@@ -896,6 +897,7 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 				zbx_vector_mw_task_ptr_append(&sync_tasks, task->tasks.values[i]);
 				break;
 			case CEP_TASK_ACKNOWLEDGE:
+				((zbx_cep_task_acknowledge_t *)task->tasks.values[i])->index = i;
 				zbx_vector_mw_task_ptr_append(&ack_tasks, task->tasks.values[i]);
 				break;
 			case CEP_TASK_RULE_ERROR:

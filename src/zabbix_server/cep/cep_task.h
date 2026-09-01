@@ -136,6 +136,8 @@ typedef struct
 	zbx_cep_task_t		base;
 	zbx_uint64_t		ruleid;
 	zbx_uint64_t		eventid;
+	int			index;		/* temporary index during committing to preserve */
+						/* acknowledge ordering for each event           */
 	struct zbx_json		details;
 }
 zbx_cep_task_acknowledge_t;
