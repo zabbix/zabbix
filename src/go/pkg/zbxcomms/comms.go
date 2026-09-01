@@ -229,7 +229,7 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 			)
 		}
 
-		if c.maxRecvSize > 0 && reservedSize > c.maxRecvSize {
+		if c.maxRecvSize != 0 && reservedSize > c.maxRecvSize {
 			return nil, errs.Errorf(
 				"uncompressed message size %d exceeds the maximum size %d bytes",
 				reservedSize,
@@ -240,7 +240,7 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 
 	if int(expectedSize) == total-headerSize {
 		if 0 != (flags & zlibCompress) {
-			return c.uncompress(s[headerSize:total], reservedSize, c.maxRecvSize)
+			return c.uncompress(s[headerSize:total], reservedSize)
 		}
 		return s[headerSize:total], nil
 	}
@@ -270,7 +270,7 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 	}
 
 	if 0 != (flags & zlibCompress) {
-		return c.uncompress(s[:total], reservedSize, c.maxRecvSize)
+		return c.uncompress(s[:total], reservedSize)
 	}
 	return s[:total], nil
 }
@@ -365,31 +365,18 @@ func (c *Connection) SetMaxRecvSize(maxSize uint32) {
 	c.maxRecvSize = maxSize
 }
 
-func (*Connection) uncompress(data []byte, expLen, maxSize uint32) ([]byte, error) {
+func (*Connection) uncompress(data []byte, expLen uint32) ([]byte, error) {
 	const uncompressError = "unable to uncompress message"
 
 	var b bytes.Buffer
-
-	if maxSize > 0 && expLen > maxSize {
-		return nil, errs.Errorf(
-			"uncompressed message size %d exceeds the maximum size %d bytes",
-			expLen,
-			maxSize,
-		)
-	}
-
-	b.Grow(int(expLen))
 
 	z, err := zlib.NewReader(bytes.NewReader(data))
 	if err != nil {
 		return nil, errs.Wrap(err, uncompressError)
 	}
 
-	var r io.Reader = z
-	if maxSize > 0 {
-		r = io.LimitReader(z, int64(maxSize)+1)
-	}
-
+	r := io.LimitReader(z, int64(expLen)+1)
+	b.Grow(int(expLen))
 	length, readErr := b.ReadFrom(r)
 	closeErr := z.Close()
 
@@ -401,19 +388,10 @@ func (*Connection) uncompress(data []byte, expLen, maxSize uint32) ([]byte, erro
 		return nil, errs.Wrap(closeErr, uncompressError)
 	}
 
-	if maxSize > 0 && length > int64(maxSize) {
-		return nil, errs.Errorf(
-			"uncompressed message size %d exceeds the maximum size %d bytes",
-			length,
-			maxSize,
-		)
-	}
-
 	if length != int64(expLen) {
-		return nil, errs.Errorf(
-			"uncompressed message size %d instead of expected %d",
-			length,
-			expLen,
+		return nil, errs.Wrap(
+			errs.Errorf("uncompressed message size %d instead of expected %d", length, expLen),
+			uncompressError,
 		)
 	}
 

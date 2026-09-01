@@ -347,7 +347,7 @@ func TestUncompressMaxSize(t *testing.T) {
 
 			c := &Connection{}
 
-			data, err := c.uncompress(test.data, test.expLen, test.maxSize)
+			data, err := c.uncompress(test.data, test.expLen)
 			if test.wantErr == "" {
 				if err != nil {
 					t.Fatalf("uncompress() unexpected error: %s", err)
