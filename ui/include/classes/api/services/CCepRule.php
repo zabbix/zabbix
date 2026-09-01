@@ -128,15 +128,28 @@ class CCepRule extends CApiService {
 
 		if ($options['filter'] !== null) {
 			if (array_key_exists('window_type', $options['filter']) && $options['filter']['window_type'] !== null) {
-				$window_type_values = (array) $options['filter']['window_type'];
+				$window_types = (array) $options['filter']['window_type'];
 
-				if ($window_type_values) {
+				if ($window_types) {
 					$sql_parts['join']['crw'] = ['type' => 'left', 'table' => 'cep_rule_window',
 						'using' => 'cep_ruleid'
 					];
-					$sql_parts['where']['window_type'] = in_array(CCepRuleHelper::WINDOW_NONE, $window_type_values)
-						? '('.dbConditionInt('crw.type', $window_type_values).' OR crw.cep_ruleid IS NULL)'
-						: dbConditionInt('crw.type', $window_type_values);
+
+					$window_type_conditions = [];
+					$window_type_none_index = array_search(CCepRuleHelper::WINDOW_NONE, $window_types);
+
+					if ($window_type_none_index !== false) {
+						unset($window_types[$window_type_none_index]);
+						$window_type_conditions[] = 'crw.type IS NULL';
+					}
+
+					if ($window_types) {
+						$window_type_conditions[] = dbConditionInt('crw.type', $window_types);
+					}
+
+					$sql_parts['where'][] = count($window_type_conditions) > 1
+						? '('.implode(' OR ', $window_type_conditions).')'
+						: $window_type_conditions[0];
 				}
 			}
 		}
