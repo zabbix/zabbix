@@ -568,6 +568,7 @@ static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, const
 		return zbx_strdup(NULL, "");
 	}
 
+	zbx_vector_tq_condition_ptr_create(&conditions_sorted);
 	tq_get_conditions_and_or_sorted(query, &conditions_sorted);
 
 	zbx_chrcpy_alloc(&str, &alloc, &offset, '(');

@@ -195,8 +195,6 @@ int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b)
 
 void	tq_get_conditions_and_or_sorted(const zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted)
 {
-	zbx_vector_tq_condition_ptr_create(conditions_sorted);
-
 	for (int i = 0; i < query->conditions.values_num; i++)
 		zbx_vector_tq_condition_ptr_append(conditions_sorted, &query->conditions.values[i]);
 

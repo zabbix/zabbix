@@ -136,6 +136,7 @@ out:
 
 int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_config, AGENT_RESULT *result)
 {
+	int			ret = NOTSUPPORTED;
 	time_t			now, lasttimestamp;
 	int			values_ret;
 	zbx_vector_str_t	values;
@@ -152,6 +153,8 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *ap
 	/* when testing the item, the time range being queried is restricted only by the lookback limit */
 	lasttimestamp = 0;
 
+	zbx_vector_str_create(&values);
+
 	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type)
 	{
 #ifdef HAVE_LIBCURL
@@ -161,8 +164,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *ap
 		ZBX_UNUSED(lasttimestamp);
 		ZBX_UNUSED(now);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "cURL library was not compiled in"));
-
-		return NOTSUPPORTED;
+		goto out;
 #endif
 	}
 	else
@@ -175,7 +177,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *ap
 	if (SUCCEED != values_ret)
 	{
 		SET_MSG_RESULT(result, error);
-		return NOTSUPPORTED;
+		goto out;
 	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
@@ -196,8 +198,10 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *ap
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): no buckets, not setting value", __func__);
 	}
 
+	ret = SUCCEED;
+out:
 	zbx_vector_str_clear_ext(&values, zbx_str_free);
 	zbx_vector_str_destroy(&values);
 
-	return SUCCEED;
+	return ret;
 }
