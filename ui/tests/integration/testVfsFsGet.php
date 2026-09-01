@@ -592,8 +592,8 @@ class testVfsFsGet extends CIntegrationTest {
 				$this->assertEquals('/', $result[0]['fsname'], "$componentName:
 					$key - Root filter fsname should be '/'"
 				);
-				$this->assertTrue($result[0]['has_bytes'],
-					"$componentName: $key - Root filter should have bytes"
+				$this->assertTrue($result[0]['has_bytes'], "$componentName:
+					$key - Root filter should have bytes"
 				);
 			}
 		}
