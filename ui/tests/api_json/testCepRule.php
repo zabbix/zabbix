@@ -94,7 +94,267 @@ class testCepRule extends CAPITest {
 		CTestDataHelper::cleanUp();
 	}
 
-	public function cepRuleCreateValidationData(): array {
+	public static function dataProviderCreateOperationFilter() {
+		yield 'Operation filter formula cannot be empty with CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "formula" is missing.'
+		];
+
+		yield 'Operation filter formula must contain identifier' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'abc'
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/formula": incorrect syntax near "abc".'
+		];
+
+		yield 'Operation filter conditions required for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A'
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "conditions" is missing.'
+		];
+
+		yield 'Operation filter conditions required for CONDITION_EVAL_TYPE_AND_OR' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_AND_OR
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "conditions" is missing.'
+		];
+
+		yield 'Operation filter conditions cannot define non existing formulaid for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'A'
+								],
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'B'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/2/formulaid": an identifier is not defined in the formula.'
+		];
+
+		yield 'Operation filter cannot reference non existing condition for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'B'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/formula": missing filter condition "A".'
+		];
+
+		yield 'Operation filter conditions must have formulaid for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_EVENT_NAME
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1": the parameter "formulaid" is missing.'
+		];
+
+		yield 'Operation filter conditions formulaid must be string for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								'formulaid' => 123
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": a character string is expected.'
+		];
+
+		yield 'Operation filter conditions formulaid cannot be empty' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'formulaid' => ''
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": cannot be empty.'
+		];
+
+		yield 'Operation filter conditions formulaid must be uppercase' => [
+			[
+				'name' => 'ceprule.operations.filter.create-'.__LINE__,
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'formulaid' => 'b'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": uppercase identifier expected.'
+		];
+
+		yield 'Operation filter conditions can be empty unless CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'name' => 'ceprule.operations.filter.create.valid',
+				'sortorder' => 1,
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+							'conditions' => []
+						]
+					]
+				]
+			],
+			null
+		];
+	}
+
+	public static function cepRuleCreateValidationData(): array {
 		return [
 			'Non-empty object is required' => [
 				'request' => [],
@@ -400,24 +660,6 @@ class testCepRule extends CAPITest {
 					]
 				],
 				'expected_error' => null
-			],
-			'Cant pass operation filter without conditions' => [
-				'request' => [
-					'name' => 'ceprule.operation.tags',
-					'sortorder' => 1,
-					'operations' => [
-						[
-							'sortorder' => 1,
-							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-							'type' => CCepRuleHelper::OP_SET_NAME,
-							'event_name' => 'Event name',
-							'filter' => [
-								'evaltype' => CONDITION_EVAL_TYPE_AND_OR
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/filter": the parameter "conditions" is missing.'
 			],
 			'Can pass tags for operation' => [
 				'request' => [
@@ -2523,6 +2765,7 @@ class testCepRule extends CAPITest {
 
 	/**
 	 * @dataProvider cepRuleCreateValidationData
+	 * @dataProvider dataProviderCreateOperationFilter
 	 */
 	public function testCepRule_CreateValidation(array $request, ?string $expected_error = null) {
 		$result = $this->call('ceprule.create', $request, $expected_error);
@@ -2532,7 +2775,229 @@ class testCepRule extends CAPITest {
 		}
 	}
 
-	public function cepRuleUpdateValidation(): array {
+	public static function dataProviderUpdateOperationFilter() {
+		yield 'Operation filter formula cannot be empty with CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "formula" is missing.'
+		];
+
+		yield 'Operation filter formula must contain identifier' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'abc'
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/formula": incorrect syntax near "abc".'
+		];
+
+		yield 'Operation filter conditions required for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A'
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "conditions" is missing.'
+		];
+
+		yield 'Operation filter conditions required for CONDITION_EVAL_TYPE_AND_OR' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_AND_OR
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter": the parameter "conditions" is missing.'
+		];
+
+		yield 'Operation filter conditions cannot define non existing formulaid for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'A'
+								],
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'B'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/2/formulaid": an identifier is not defined in the formula.'
+		];
+
+		yield 'Operation filter cannot reference non existing condition for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_TAG,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'tag' => 'tag',
+									'formulaid' => 'B'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/formula": missing filter condition "A".'
+		];
+
+		yield 'Operation filter conditions must have formulaid for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'type' => CCepRuleHelper::CONDITION_EVENT_NAME
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1": the parameter "formulaid" is missing.'
+		];
+
+		yield 'Operation filter conditions formulaid must be string for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								'formulaid' => 123
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": a character string is expected.'
+		];
+
+		yield 'Operation filter conditions formulaid cannot be empty' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'formulaid' => ''
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": cannot be empty.'
+		];
+
+		yield 'Operation filter conditions formulaid must be uppercase' => [
+			[
+				'cep_ruleid' => ':ceprule:update.fail',
+				'operations' => [
+					[
+						'sortorder' => 1,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+						'type' => CCepRuleHelper::OP_SET_NAME,
+						'event_name' => 'Event name',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+							'formula' => 'A',
+							'conditions' => [
+								[
+									'formulaid' => 'b'
+								]
+							]
+						]
+					]
+				]
+			],
+			'Invalid parameter "/1/operations/1/filter/conditions/1/formulaid": uppercase identifier expected.'
+		];
+	}
+
+	public static function cepRuleUpdateValidation(): array {
 		return [
 			'Ruleid(s) required' => [
 				'request' => [],
@@ -2772,6 +3237,7 @@ class testCepRule extends CAPITest {
 
 	/**
 	 * @dataProvider cepRuleUpdateValidation
+	 * @dataProvider dataProviderUpdateOperationFilter
 	 */
 	public function testCepRule_UpdateValidation(array $request, ?string $expected_error = null) {
 		if (!is_numeric(key($request))) {

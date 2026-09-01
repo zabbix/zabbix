@@ -644,6 +644,7 @@ class CCepRule extends CApiService {
 			}
 			unset($operation);
 
+			CConditionHelper::checkFilterFormula($cep_rule['operations'], $cep_rule_path.'/operations');
 			self::checkPatternMatchOperations($cep_rule, $cep_rule_path);
 			self::checkOperationOrder($cep_rule, $cep_rule_path);
 		}
