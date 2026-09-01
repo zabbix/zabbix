@@ -22,6 +22,7 @@ As an example, this macro can be used to populate ServiceNow's custom field with
 The following parameters are required:<br>
 **servicenow_user** - login of the ServiceNow user created earlier<br>
 **servicenow_password** - user's password<br>
+**servicenow_url** - the full URL of your ServiceNow instance (https://\<INSTANCE>.service-now.com/)<br>
 
 To export information into a ServiceNow custom field, add a parameter with the custom field ID as a key (if you need help finding custom field ID, see [this page](https://community.servicenow.com/community?id=community_question&sys_id=c8aa472ddb5cdbc01dcaf3231f96190a) in ServiceNow community).<br>
 [![](images/thumb.2.png?raw=true)](images/2.png)
@@ -34,7 +35,7 @@ To export information into a ServiceNow custom field, add a parameter with the c
 [![](images/thumb.3.png?raw=true)](images/3.png)<br>
 
 4\. Create a **Zabbix user** and add **Media** with the **ServiceNow** media type.<br>
-The **Send to** field must contain the full URL of your ServiceNow instance (https://\<INSTANCE>.service-now.com/).<br>
+Though the *Send to* field is not used in the ServiceNow webhook, it cannot be left empty. To comply with frontend requirements, enter any symbol in the field.<br>
 Make sure this user has access to all hosts for which you would like problem notifications to be converted into ServiceNow tasks.
 
 For more information see [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [ServiceNow](https://docs.servicenow.com/) documentations.
