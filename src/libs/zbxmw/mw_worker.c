@@ -129,6 +129,8 @@ int	mw_worker_start(zbx_mw_worker_t *worker, unsigned char process_type, void *(
 	args->process_type = process_type;
 	args->worker_entry = worker_entry;
 
+	zbx_timekeeper_reset(worker->timekeeper, worker->id - 1);
+
 	if (0 != (err = pthread_create(&worker->thread, &attr, mw_worker_entry, (void *)args)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
