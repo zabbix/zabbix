@@ -167,7 +167,7 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 	if pending != nil {
 		total = len(pending)
 		if total > len(b) {
-			return nil, errors.New("pending data exceeds limit of 2KB bytes")
+			return nil, errors.New("Pending data exceeds limit of 2KB bytes")
 		}
 		copy(s, pending)
 	}
@@ -205,7 +205,7 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 
 	if c.maxRecvSize > 0 && expectedSize > c.maxRecvSize {
 		return nil, errs.Errorf(
-			"message size %d exceeds the maximum size %d bytes",
+			"Message size %d exceeds the maximum size %d bytes",
 			expectedSize,
 			c.maxRecvSize,
 		)
@@ -223,7 +223,7 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 		reservedSize = binary.LittleEndian.Uint32(s[9:13])
 		if reservedSize > maxRecvDataSize {
 			return nil, errs.Errorf(
-				"message size %d exceeds the maximum size %d bytes",
+				"Message size %d exceeds the maximum size %d bytes",
 				reservedSize,
 				maxRecvDataSize,
 			)
@@ -231,7 +231,7 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 
 		if c.maxRecvSize != 0 && reservedSize > c.maxRecvSize {
 			return nil, errs.Errorf(
-				"uncompressed message size %d exceeds the maximum size %d bytes",
+				"Uncompressed message size %d exceeds the maximum size %d bytes",
 				reservedSize,
 				c.maxRecvSize,
 			)
@@ -366,7 +366,7 @@ func (c *Connection) SetMaxRecvSize(maxSize uint32) {
 }
 
 func (*Connection) uncompress(data []byte, expLen uint32) ([]byte, error) {
-	const uncompressError = "unable to uncompress message"
+	const uncompressError = "Unable to uncompress message"
 
 	var b bytes.Buffer
 
