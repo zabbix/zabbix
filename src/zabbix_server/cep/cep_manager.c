@@ -41,6 +41,7 @@
 #include "zbxregexp.h"
 #include "zbxtypes.h"
 
+#define CEP_WORKERS_MIN		2
 #define CEP_WORKERS_MAX		100
 #define CEP_WORKERS_DEFAULT	10
 
@@ -196,8 +197,8 @@ static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_
 	manager->blocked_commit_num = 0;
 
 	if (SUCCEED != zbx_mw_manager_init(&manager->base, info, ZBX_IPC_SERVICE_CEP, ZBX_PROCESS_TYPE_CEP_WORKER,
-			(zbx_mw_worker_t **)workers, CEP_WORKERS_MAX, CEP_WORKERS_DEFAULT, cep_worker_entry,
-			(zbx_mw_queue_t *)queue, error))
+			(zbx_mw_worker_t **)workers, CEP_WORKERS_MIN, CEP_WORKERS_MAX, CEP_WORKERS_DEFAULT,
+			cep_worker_entry, (zbx_mw_queue_t *)queue, error))
 	{
 		goto out;
 	}

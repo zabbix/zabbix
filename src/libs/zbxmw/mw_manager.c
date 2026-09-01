@@ -167,7 +167,7 @@ static int	mw_manager_scale_workers(zbx_mw_manager_t *manager)
 		else if (CEP_LOW_LOAD_SHRINK <= manager->low_load_ticks)
 		{
 			manager->low_load_ticks = 0;
-			if (1 != manager->workers_num)
+			if (manager->workers_num > manager->workers_min)
 			{
 				double	projected_usage = usage * manager->workers_num / (manager->workers_num - 1);
 
@@ -293,6 +293,7 @@ void	zbx_mw_manager_clear(zbx_mw_manager_t *manager)
  *             process_type        - [IN] manager process type                *
  *             worker_process_type - [IN] worker process type                 *
  *             workers             - [IN] pre-allocated worker array          *
+ *             workers_min         - [IN] minimum number of workers           *
  *             workers_max         - [IN] maximum number of workers           *
  *             workers_num         - [IN] number of workers to start          *
  *             worker_entry        - [IN] worker thread entry point           *
@@ -303,8 +304,8 @@ void	zbx_mw_manager_clear(zbx_mw_manager_t *manager)
  *                                                                            *
  ******************************************************************************/
 static int	mw_manager_init(zbx_mw_manager_t *manager, const char *service, unsigned char process_type,
-		unsigned char worker_process_type, zbx_mw_worker_t **workers, int workers_max, int workers_num,
-		void *(*worker_entry)(void *), zbx_mw_queue_t *queue, char **error)
+		unsigned char worker_process_type, zbx_mw_worker_t **workers, int workers_min, int workers_max,
+		int workers_num, void *(*worker_entry)(void *), zbx_mw_queue_t *queue, char **error)
 {
 	char	*errmsg = NULL;
 
@@ -332,8 +333,17 @@ static int	mw_manager_init(zbx_mw_manager_t *manager, const char *service, unsig
 				MANAGER_SERVICE_TIMEOUT, service);
 	}
 
+	if (workers_min > workers_max)
+		workers_min = workers_max;
+
+	if (workers_num < workers_min)
+		workers_num = workers_min;
+	else if (workers_num > workers_max)
+		workers_num = workers_max;
+
 	manager->timekeeper = zbx_timekeeper_create(workers_max, NULL);
 	manager->worker_entry = worker_entry;
+	manager->workers_min = workers_min;
 	manager->workers_max = workers_max;
 
 	if (FAIL == mw_queue_init(queue, &errmsg))
@@ -370,6 +380,7 @@ static int	mw_manager_init(zbx_mw_manager_t *manager, const char *service, unsig
  *             service             - [IN] IPC service name (optional)         *
  *             worker_process_type - [IN] worker process type                 *
  *             workers             - [IN] pre-allocated worker array          *
+ *             workers_min         - [IN] minimum number of workers           *
  *             workers_max         - [IN] maximum number of workers           *
  *             workers_num         - [IN] number of workers to start          *
  *             worker_entry        - [IN] worker thread entry point           *
@@ -380,7 +391,7 @@ static int	mw_manager_init(zbx_mw_manager_t *manager, const char *service, unsig
  *                                                                            *
  ******************************************************************************/
 int	zbx_mw_manager_init(zbx_mw_manager_t *manager, const zbx_thread_info_t *info, const char *service,
-	unsigned char worker_process_type, zbx_mw_worker_t **workers, int workers_max, int workers_num,
+	unsigned char worker_process_type, zbx_mw_worker_t **workers, int workers_min, int workers_max, int workers_num,
 	void *(*worker_entry)(void *), zbx_mw_queue_t *queue, char **error)
 {
 	int	ret = FAIL;
@@ -390,7 +401,7 @@ int	zbx_mw_manager_init(zbx_mw_manager_t *manager, const zbx_thread_info_t *info
 	memset(manager, 0, sizeof(zbx_mw_manager_t));
 
 	if (SUCCEED != (ret = mw_manager_init(manager, service, info->process_type, worker_process_type, workers,
-			workers_max, workers_num, worker_entry, queue, error)))
+			workers_min, workers_max, workers_num, worker_entry, queue, error)))
 	{
 		zbx_mw_manager_clear(manager);
 	}
