@@ -50,8 +50,21 @@ static int	permission_groupsets_make(zbx_dbconn_t *db, zbx_vector_uint64_t *ids,
 	{
 		zbx_group_set_t	gset;
 
+		if (!ZBX_IS_RUNNING())
+		{
+			ret = FAIL;
+			goto out;
+		}
+
 		result = zbx_dbconn_select(db, "select %s from %s where %s=" ZBX_FS_UI64 " order by %s",
 				fld_name_groupid, tbl_name_groups, fld_name_id, ids->values[i], fld_name_groupid);
+
+		if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot fetch %s, from %s", fld_name_groupid, tbl_name_groups);
+			ret = FAIL;
+			goto out;
+		}
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -83,15 +96,21 @@ static int	permission_groupsets_make(zbx_dbconn_t *db, zbx_vector_uint64_t *ids,
 
 			if (NULL == (gset_ptr = zbx_hashset_insert(group_sets, &gset, sizeof(zbx_group_set_t))))
 			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot insert groupset %s, %s", fld_name_groupid,
+						tbl_name_groups);
+
+				zbx_vector_uint64_destroy(&gset.groupids);
+				zbx_vector_uint64_destroy(&gset.ids);
+
 				ret = FAIL;
-				break;
+				goto out;
 			}
 		}
 
 		zbx_vector_uint64_append(&gset_ptr->ids, ids->values[i]);
 		zbx_vector_uint64_clear(&groupids);
 	}
-
+out:
 	zbx_vector_uint64_destroy(&groupids);
 
 	return ret;
@@ -114,6 +133,9 @@ static int	permission_groupsets_insert(zbx_dbconn_t *db, const char *tbl_name, z
 	while (NULL != (gset_ptr = (zbx_group_set_t *)zbx_hashset_iter_next(&iter)))
 	{
 		int	i;
+
+		if (!ZBX_IS_RUNNING())
+			return FAIL;
 
 		zbx_db_insert_add_values(db_gset, gsetid, gset_ptr->hash_str);
 
@@ -154,7 +176,7 @@ static int	permission_group_set_compare(const void *d1, const void *d2)
 static void	permission_groupsets_destroy(zbx_hashset_t *group_sets)
 {
 	zbx_hashset_iter_t	iter;
-	zbx_group_set_t	 *gset_ptr;
+	zbx_group_set_t		*gset_ptr;
 
 	zbx_hashset_iter_reset(group_sets, &iter);
 
@@ -222,6 +244,39 @@ static int	permission_ugsets_add(zbx_dbconn_t *db, zbx_vector_uint64_t *ids)
 
 /******************************************************************************
  *                                                                            *
+ * Parameters: sql - [IN] SQL statement                                       *
+ *             ids - [OUT] sorted list of selected uint64 values              *
+ *                                                                            *
+ * Comments: Checks select query result assuming a ZBX_DB_CONNECT_ONCE        *
+ *           connection is used.                                              *
+ *                                                                            *
+ *****************************************************************************/
+static int	dbconn_select_uint64_once(zbx_dbconn_t *db, const char *sql, zbx_vector_uint64_t *ids)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_uint64_t	id;
+
+	result = zbx_dbconn_select(db, "%s", sql);
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+		return FAIL;
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+
+		zbx_vector_uint64_append(ids, id);
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: rebuilds permission cache tables from scratch                     *
  *                                                                            *
  * Comments: It is a long running task and it should be executed in a         *
@@ -234,6 +289,7 @@ static int	permissions_rebuild_task(void)
 {
 	int			ret = SUCCEED;
 	zbx_vector_uint64_t	ids;
+	char			*sql = NULL;
 	static const char	*tables[] = {"user_ugset", "host_hgset", "permission", "ugset_group", "ugset",
 			"hgset_group", "hgset"};
 
@@ -271,11 +327,15 @@ static int	permissions_rebuild_task(void)
 		}
 	}
 
-	zbx_dbconn_select_uint64(db, "select hostid from hosts where (flags & 2) = 0", &ids);
+	sql = zbx_dsprintf(NULL, "select hostid from hosts where (flags & %d) = 0", ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-	ret = permission_hgsets_add(db, &ids);
+	if (SUCCEED != (ret = dbconn_select_uint64_once(db, sql, &ids)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot fetch hosts");
+		goto out;
+	}
 
-	if (SUCCEED != ret)
+	if (SUCCEED != (ret = permission_hgsets_add(db, &ids)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add permission hgsets");
 		goto out;
@@ -283,19 +343,23 @@ static int	permissions_rebuild_task(void)
 
 	zbx_vector_uint64_clear(&ids);
 
-	zbx_dbconn_select_uint64(db,
+	sql = zbx_dsprintf(sql,
 			"select u.userid"
 			" from users u"
 				" join role r on u.roleid=r.roleid"
-			" where r.type<>3"
+			" where r.type<>%d"
 				" and u.userid in ("
 					"select userid"
 					" from users_groups"
-				")", &ids);
+				")", USER_TYPE_SUPER_ADMIN);
 
-	ret = permission_ugsets_add(db, &ids);
+	if (SUCCEED != (ret = dbconn_select_uint64_once(db, sql, &ids)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot fetch users");
+		goto out;
+	}
 
-	if (SUCCEED != ret)
+	if (SUCCEED != (ret = permission_ugsets_add(db, &ids)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add permission ugsets");
 		goto out;
@@ -320,6 +384,16 @@ static int	permissions_rebuild_task(void)
 			" group by u.ugsetid,h.hgsetid"
 			" having min(r.permission)>0"
 			" order by u.ugsetid,h.hgsetid");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot fetch user groups, host groups and their permissions");
+
+		zbx_db_insert_clean(&db_insert);
+
+		ret = FAIL;
+		goto out;
+	}
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -347,10 +421,10 @@ out:
 	}
 	else
 		zbx_dbconn_rollback(db);
-
 skip:
 	zbx_vector_uint64_destroy(&ids);
 	zbx_dbconn_free(db);
+	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -381,7 +455,6 @@ static void	*permissions_rebuild_entry(void *args)
 
 	return NULL;
 }
-
 
 /******************************************************************************
  *                                                                            *
