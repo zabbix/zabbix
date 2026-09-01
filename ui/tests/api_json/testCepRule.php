@@ -326,6 +326,37 @@ class testCepRule extends CAPITest {
 					CCepRuleHelper::OP_REMOVE_TAG
 				]).'.'
 			],
+			'Operation suppress_duration is required' => [
+				'request' => [
+					'name' => 'ceprule',
+					'sortorder' => 1,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SUPPRESS
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "suppress_duration" is missing.'
+			],
+			'Operation suppress_duration is in range' => [
+				'request' => [
+					'name' => 'ceprule',
+					'sortorder' => 1,
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
+							'type' => CCepRuleHelper::OP_SUPPRESS,
+							'suppress_duration' => -1
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1/suppress_duration": value must be one of 0-157680000.'
+			],
 			'Need event_name for WHEN_EVENT_OCCURRED' => [
 				'request' => [
 					'name' => 'ceprule',
