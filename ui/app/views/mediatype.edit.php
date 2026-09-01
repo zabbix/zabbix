@@ -322,27 +322,27 @@ $mediatype_form_grid
 	->addItem([
 		(new CLabel(_('Menu entry name'), 'event_menu_name'))
 			->setId('webhook_url_name_label')
-			->setAsteriskMark(),
+			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
 		(new CFormField(
 			(new CTextBox('event_menu_name', $data['event_menu_name'], false,
 				DB::getFieldLength('media_type', 'event_menu_name')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
-				->setAriaRequired()
+				->setAriaRequired($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 		))->setId('webhook_url_name_field')
 	])
 	->addItem([
 		(new CLabel(_('Menu entry URL'), 'event_menu_url'))
 			->setId('webhook_event_menu_url_label')
-			->setAsteriskMark(),
+			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
 		(new CFormField(
 			(new CTextBox('event_menu_url', $data['event_menu_url'], false,
 				DB::getFieldLength('media_type', 'event_menu_url')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
-				->setAriaRequired()
+				->setAriaRequired($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 		))->setId('webhook_event_menu_url_field')
 	])
 	->addItem([
