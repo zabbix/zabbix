@@ -143,7 +143,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$discovery_count = CViewHelper::showNum($host['discoveryRules']);
 	$discovery_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
-		? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
+		? [new CLink(_('Discovery'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'lldrule.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 			->setArgument('context', 'host')
@@ -342,7 +343,8 @@ if ($data['admin']) {
 			: _('Dashboards');
 
 		$discovery_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
-			? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
+			? [new CLink(_('Discovery'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'lldrule.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 				->setArgument('context', 'template')

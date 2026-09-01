@@ -263,16 +263,20 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'link' => 'host_discovery.php?form=update&itemid=400430&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]=50001&context=host',
+					'overlay' => 'update'
 				]
 			],
 			// #17 Discovery rule create.
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'link' => 'host_discovery.php?form=create&hostid=50001&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]=50001&context=host',
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation LLD create',
+						'id:key' => 'csrf.test.key.lld'
+					]
 				]
 			],
 			// #18 Web scenario update.
@@ -372,7 +376,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM drules',
 					'link' => 'zabbix.php?action=discovery.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF discovery create'
+					],
+					'secondary_dialog' => [
+						'field' => 'id:dcheckList',
+						'fill' => []
+					]
 				]
 			],
 			// #27 Discovery update.
@@ -447,14 +458,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'link' => 'zabbix.php?action=regex.edit&regexpid=2'
+					'link' => 'zabbix.php?action=popup&popup=regex.edit&regexpid=2'
 				]
 			],
 			// #35 Regular expression create.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'link' => 'zabbix.php?action=regex.edit',
+					'link' => 'zabbix.php?action=popup&popup=regex.edit',
 					'fields' => [
 						'id:name' => 'CSRF regex test name',
 						'id:expressions_0_expression' => 'abc'
@@ -885,11 +896,18 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'token' => true,
-					'token_url' => 'host_discovery.php?form=update&hostid=50001&itemid=400430&context=host',
+					'token_url' => 'httpconf.php?form=update&hostid=50001&httptestid=102&context=host',
 					'db' => 'SELECT * FROM items',
-					'link' => 'host_discovery.php?form=update&hostid=50001&itemid=400430&context=host&name=test'.
-						'&description=&key=trap%5B4%5D&type=2&value_type=3&inventory_link=0&trapper_hosts=&units=UNIT'.
-						'&lifetime=1&formula=test&evaltype=1&update=Update&_csrf_token=',
+					'link' => 'httpconf.php?form_refresh=1&form=update&hostid=50001&templated=&httptestid=102&name=1A2B3C'.
+							'&delay=666s&retries=3&agent=Zabbix&agent_other=&http_proxy=&variables%5B0%5D%5Bname%5D='.
+							'&variables%5B0%5D%5Bvalue%5D=&headers%5B0%5D%5Bname%5D=&headers%5B0%5D%5Bvalue%5D=&status=0'.
+							'&steps%5B0%5D%5Bhttpstepid%5D=15008&steps%5B0%5D%5Bname%5D=111&steps%5B0%5D%5Burl%5D=222'.
+							'&steps%5B0%5D%5Btimeout%5D=15s&steps%5B0%5D%5Bposts%5D=&steps%5B0%5D%5Brequired%5D=200'.
+							'&steps%5B0%5D%5Bstatus_codes%5D=&steps%5B0%5D%5Bfollow_redirects%5D=0'.
+							'&steps%5B0%5D%5Bretrieve_mode%5D=0&steps%5B0%5D%5Bpost_type%5D=1&show_inherited_tags=0'.
+							'&tags%5B0%5D%5Btag%5D=aaa&tags%5B0%5D%5Bvalue%5D=bbb&authentication=0&http_user='.
+							'&http_password=&ssl_cert_file=&context=host&ssl_key_file=&ssl_key_password=&update=Update'.
+							'&_csrf_token=',
 					'error' => self::INCORRECT_REQUEST
 				]
 			],

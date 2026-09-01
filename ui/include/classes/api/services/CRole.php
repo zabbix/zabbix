@@ -32,6 +32,12 @@ class CRole extends CApiService {
 
 	public const OUTPUT_FIELDS = ['roleid', 'name', 'type', 'readonly'];
 
+	private const RULES_OUTPUT_FIELDS = ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list',
+		'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag', 'modules',
+		'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access',
+		'devices.access', 'devices.actions', 'devices.actions.default_access'
+	];
+
 	/**
 	 * Rule types.
 	 */
@@ -65,6 +71,7 @@ class CRole extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'roleids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'current' =>				['type' => API_BOOLEAN, 'default' => false],
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['roleid', 'name', 'type', 'readonly']],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
@@ -72,10 +79,10 @@ class CRole extends CApiService {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'selectRules' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag', 'modules', 'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access']), 'default' => null],
-			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $user_output_fields), 'default' => null],
+			'selectRules' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::RULES_OUTPUT_FIELDS), 'default' => null],
+			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_ALLOW_COUNT, 'in' => implode(',', $user_output_fields), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
@@ -165,49 +172,62 @@ class CRole extends CApiService {
 		global $ZBX_FEATURE_FLAGS;
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
-			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
-			'rules' =>			['type' => API_OBJECT, 'default' => [], 'fields' => [
-				'ui' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
+			'name' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
+			'type' =>							['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
+			'rules' =>							['type' => API_OBJECT, 'default' => [], 'fields' => [
+				'ui' =>								['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'name' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'status' =>							['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'ui.default_access' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
-				'services.read.mode' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
-				'services.read.list' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+				'ui.default_access' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'services.read.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
+				'services.read.list' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'serviceid' =>						['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
-				'services.read.tag' =>		['type' => API_OBJECT, 'fields' => [
-					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
+				'services.read.tag' =>				['type' => API_OBJECT, 'fields' => [
+					'tag' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'value' =>							['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
 				]],
-				'services.write.mode' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
-				'services.write.list' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+				'services.write.mode' =>			['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
+				'services.write.list' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'serviceid' =>						['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
-				'services.write.tag' =>		['type' => API_OBJECT, 'fields' => [
-					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
+				'services.write.tag' =>				['type' => API_OBJECT, 'fields' => [
+					'tag' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'value' =>							['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
 				]],
-				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
+				'modules' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+				'moduleid' =>							['type' => API_ID, 'flags' => API_REQUIRED],
+					'status' =>							['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'modules.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
-				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
-				'api.access' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
-				'api.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_API_MODE_DENY.','.ZBX_ROLE_RULE_API_MODE_ALLOW],
-				'actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
+				'modules.default_access' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'api' =>							['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
+				'api.access' =>						['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'api.mode' =>						['type' => API_INT32, 'in' => ZBX_ROLE_RULE_API_MODE_DENY.','.ZBX_ROLE_RULE_API_MODE_ALLOW],
+				'actions' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'name' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'status' =>							['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'actions.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
+				'actions.default_access' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED],
+				'devices.access' =>					['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'devices.actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'name' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'status' =>							['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
+				]],
+				'devices.actions.default_access' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])]
 			]]
 		]];
 
 		if (!$ZBX_FEATURE_FLAGS['modules_config_enabled']) {
 			unset($api_input_rules['fields']['rules']['fields']['modules'],
 				$api_input_rules['fields']['rules']['fields']['modules.default_access']);
+		}
+
+		if (!CSettingsHelper::isMobileDevicesEnabled()) {
+			unset($api_input_rules['fields']['rules']['fields']['devices.access'],
+				$api_input_rules['fields']['rules']['fields']['devices.actions'],
+				$api_input_rules['fields']['rules']['fields']['devices.actions.default_access']
+			);
 		}
 
 		if (!CApiInputValidator::validate($api_input_rules, $roles, '/', $error)) {
@@ -271,44 +291,50 @@ class CRole extends CApiService {
 		global $ZBX_FEATURE_FLAGS;
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
-			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
-			'rules' =>			['type' => API_OBJECT, 'fields' => [
-				'ui' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
+			'roleid' =>							['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>							['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
+			'type' =>							['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
+			'rules' =>							['type' => API_OBJECT, 'fields' => [
+				'ui' =>								['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'name' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'status' =>							['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'ui.default_access' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
-				'services.read.mode' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
-				'services.read.list' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+				'ui.default_access' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'services.read.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
+				'services.read.list' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'serviceid' =>						['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
-				'services.read.tag' =>		['type' => API_OBJECT, 'fields' => [
-					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
+				'services.read.tag' =>				['type' => API_OBJECT, 'fields' => [
+					'tag' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'value' =>							['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
 				]],
-				'services.write.mode' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
-				'services.write.list' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+				'services.write.mode' =>			['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
+				'services.write.list' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'serviceid' =>						['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
-				'services.write.tag' =>		['type' => API_OBJECT, 'fields' => [
-					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
+				'services.write.tag' =>				['type' => API_OBJECT, 'fields' => [
+					'tag' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'value' =>							['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
 				]],
-				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
+				'modules' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'moduleid' =>						['type' => API_ID, 'flags' => API_REQUIRED],
+					'status' =>							['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'modules.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
-				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
-				'api.access' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
-				'api.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_API_MODE_DENY.','.ZBX_ROLE_RULE_API_MODE_ALLOW],
-				'actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
+				'modules.default_access' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'api' =>							['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
+				'api.access' =>						['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'api.mode' =>						['type' => API_INT32, 'in' => ZBX_ROLE_RULE_API_MODE_DENY.','.ZBX_ROLE_RULE_API_MODE_ALLOW],
+				'actions' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'name' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'status' =>							['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'actions.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED]
+				'actions.default_access' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'devices.access' =>					['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])],
+				'devices.actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'name' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'status' =>							['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
+				]],
+				'devices.actions.default_access' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])]
 			]]
 		]];
 
@@ -317,17 +343,21 @@ class CRole extends CApiService {
 				$api_input_rules['fields']['rules']['fields']['modules.default_access']);
 		}
 
+		if (!CSettingsHelper::isMobileDevicesEnabled()) {
+			unset($api_input_rules['fields']['rules']['fields']['devices.access'],
+				$api_input_rules['fields']['rules']['fields']['devices.actions'],
+				$api_input_rules['fields']['rules']['fields']['devices.actions.default_access']
+			);
+		}
+
 		if (!CApiInputValidator::validate($api_input_rules, $roles, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_roles = $this->get([
-			'output' => ['roleid', 'name', 'type', 'readonly'],
+			'output' => self::OUTPUT_FIELDS,
 			'roleids' => array_column($roles, 'roleid'),
-			'selectRules' => ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list',
-				'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag', 'modules',
-				'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access'
-			],
+			'selectRules' => self::RULES_OUTPUT_FIELDS,
 			'preservekeys' => true
 		]);
 
@@ -448,6 +478,7 @@ class CRole extends CApiService {
 			$this->checkModulesRules($name, $role['rules']);
 			self::checkApiRules($name, (int) $type, $role['rules']);
 			$this->checkActionsRules($name, (int) $type, $role['rules']);
+			self::checkDeviceActionsRules($name, (int) $type, $role['rules'], $db_rules);
 		}
 	}
 
@@ -778,6 +809,49 @@ class CRole extends CApiService {
 	}
 
 	/**
+	 * @throws APIException
+	 */
+	private static function checkDeviceActionsRules(string $name, int $type, array $rules, ?array $db_rules): void {
+		if (!array_key_exists('devices.actions', $rules)) {
+			return;
+		}
+
+		$device_actions = array_column($rules['devices.actions'], null, 'name');
+		$db_device_actions = $db_rules !== null ? array_column($db_rules['devices.actions'], null, 'name') : [];
+		$all_device_actions = CRoleHelper::getDeviceActionsByUserType($type);
+
+		foreach ($device_actions as $action_name => $rule) {
+			if (!in_array('devices.actions.'.$action_name, $all_device_actions)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Device action "%2$s" is not available for user role "%1$s".', $name, $action_name)
+				);
+			}
+		}
+
+		if (array_key_exists('devices.access', $rules)) {
+			$device_access = $rules['devices.access'];
+		}
+		elseif ($db_rules !== null) {
+			$device_access = $db_rules['devices.access'];
+		}
+		else {
+			$device_access = ZBX_ROLE_RULE_DISABLED;
+		}
+
+		$manage_own_devices = $device_actions['manage_own']['status']
+			?? $db_device_actions['manage_own']['status']
+			?? ZBX_ROLE_RULE_DISABLED;
+
+		if ($device_access == ZBX_ROLE_RULE_DISABLED && $manage_own_devices == ZBX_ROLE_RULE_ENABLED) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot enable device action "%2$s" for user role "%1$s" because device access is disabled.',
+					$name, 'manage_own'
+				)
+			);
+		}
+	}
+
+	/**
 	 * @param array $db_roles
 	 *
 	 * @throws APIException
@@ -868,10 +942,13 @@ class CRole extends CApiService {
 			'modules' => [],
 			'modules.default_access' => ZBX_ROLE_RULE_ENABLED,
 			'api' => [],
-			'api.access' => ZBX_ROLE_RULE_ENABLED,
+			'api.access' => ZBX_ROLE_RULE_DISABLED,
 			'api.mode' => ZBX_ROLE_RULE_API_MODE_DENY,
 			'actions' => [],
-			'actions.default_access' => ZBX_ROLE_RULE_ENABLED
+			'actions.default_access' => ZBX_ROLE_RULE_ENABLED,
+			'devices.access' => ZBX_ROLE_RULE_DISABLED,
+			'devices.actions' => [],
+			'devices.actions.default_access' => ZBX_ROLE_RULE_DISABLED
 		];
 
 		$rules = [];
@@ -887,7 +964,8 @@ class CRole extends CApiService {
 				self::compileServicesWriteRules($new_rules),
 				self::compileModulesRules($old_rules, $new_rules),
 				self::compileApiRules((int) $type, $new_rules),
-				self::compileActionsRules((int) $type, $old_rules, $new_rules)
+				self::compileActionsRules((int) $type, $old_rules, $new_rules),
+				self::compileDeviceActionsRules((int) $type, $old_rules, $new_rules)
 			);
 		}
 
@@ -1209,6 +1287,52 @@ class CRole extends CApiService {
 		return $compiled_rules;
 	}
 
+	private static function compileDeviceActionsRules(int $type, array $old_rules, array $new_rules): array {
+		$old_actions_rules = array_column($old_rules['devices.actions'], null, 'name');
+		$new_actions_rules = array_column($new_rules['devices.actions'], null, 'name');
+
+		$compiled_rules = [];
+
+		$compiled_rules[] = [
+			'name' => 'devices.access',
+			'type' => self::RULE_TYPE_INT32,
+			'value' => $new_rules['devices.access']
+		];
+
+		foreach (CRoleHelper::getDeviceActionsByUserType($type) as $action_rule_name) {
+			$action_element = substr($action_rule_name, strlen('devices.actions.'));
+
+			if ($new_rules['devices.access'] == ZBX_ROLE_RULE_DISABLED && $action_element === 'manage_own') {
+				$action_rule_status = ZBX_ROLE_RULE_DISABLED;
+			}
+			elseif (array_key_exists($action_element, $new_actions_rules)) {
+				$action_rule_status = $new_actions_rules[$action_element]['status'];
+			}
+			elseif (array_key_exists($action_element, $old_actions_rules)) {
+				$action_rule_status = $old_actions_rules[$action_element]['status'];
+			}
+			else {
+				$action_rule_status = $old_rules['devices.actions.default_access'];
+			}
+
+			if ($action_rule_status != $new_rules['devices.actions.default_access']) {
+				$compiled_rules[] = [
+					'name' => $action_rule_name,
+					'type' => self::RULE_TYPE_INT32,
+					'value' => $action_rule_status
+				];
+			}
+		}
+
+		$compiled_rules[] = [
+			'name' => 'devices.actions.default_access',
+			'type' => self::RULE_TYPE_INT32,
+			'value' => $new_rules['devices.actions.default_access']
+		];
+
+		return $compiled_rules;
+	}
+
 	/**
 	 * @param string $table_name
 	 * @param string $table_alias
@@ -1220,7 +1344,7 @@ class CRole extends CApiService {
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || $options['current']) {
 			$sql_parts['join']['u'] = ['table' => 'users', 'using' => 'roleid'];
 			$sql_parts['where'][] = 'u.userid='.self::$userData['userid'];
 		}
@@ -1260,16 +1384,7 @@ class CRole extends CApiService {
 		$roleids = array_keys($result);
 
 		if ($options['selectRules'] !== null) {
-			if ($options['selectRules'] === API_OUTPUT_EXTEND) {
-				$output = ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag',
-					'services.write.mode', 'services.write.list', 'services.write.tag', 'modules',
-					'modules.default_access', 'api', 'api.access', 'api.mode', 'actions', 'actions.default_access'
-				];
-			}
-			else {
-				$output = $options['selectRules'];
-			}
-
+			$output = $options['selectRules'];
 			$rules = DB::select('role_rule', [
 				'output' => ['role_ruleid', 'roleid', 'type', 'name', 'value_int', 'value_str', 'value_moduleid',
 					'value_serviceid'
@@ -1290,7 +1405,8 @@ class CRole extends CApiService {
 					$this->getRelatedServicesWriteRules($roles_rules[$roleid], $output),
 					$this->getRelatedModulesRules($roles_rules[$roleid], $output),
 					$this->getRelatedApiRules($roles_rules[$roleid], $output),
-					$this->getRelatedActionsRules($roles_rules[$roleid], $output, (int) $role['type'])
+					$this->getRelatedActionsRules($roles_rules[$roleid], $output, (int) $role['type']),
+					$this->getRelatedDeviceActionsRules($roles_rules[$roleid], $output, (int) $role['type'])
 				);
 			}
 			unset($role);
@@ -1489,9 +1605,7 @@ class CRole extends CApiService {
 		$result = [];
 
 		if (in_array('api.access', $output, true)) {
-			$result['api.access'] = array_key_exists('api.access', $rules)
-				? $rules['api.access']
-				: (string) ZBX_ROLE_RULE_ENABLED;
+			$result['api.access'] = $rules['api.access'];
 		}
 
 		if (in_array('api.mode', $output, true)) {
@@ -1550,6 +1664,40 @@ class CRole extends CApiService {
 		return $result;
 	}
 
+	private function getRelatedDeviceActionsRules(array $rules, array $output, int $type): array {
+		$result = [];
+
+		if (in_array('devices.access', $output, true)) {
+			$result['devices.access'] = array_key_exists('devices.access', $rules)
+				? $rules['devices.access']
+				: (string) ZBX_ROLE_RULE_DISABLED;
+		}
+
+		$actions_default_access = array_key_exists('devices.actions.default_access', $rules)
+			? $rules['devices.actions.default_access']
+			: (string) ZBX_ROLE_RULE_DISABLED;
+
+		if (in_array('devices.actions', $output, true)) {
+			$actions = array_fill_keys(CRoleHelper::getDeviceActionsByUserType($type), $actions_default_access);
+			$actions = array_intersect_key($rules, $actions) + $actions;
+
+			$result['devices.actions'] = [];
+
+			foreach ($actions as $action => $status) {
+				$result['devices.actions'][] = [
+					'name' => substr($action, strlen('devices.actions.')),
+					'status' => $status
+				];
+			}
+		}
+
+		if (in_array('devices.actions.default_access', $output, true)) {
+			$result['devices.actions.default_access'] = $actions_default_access;
+		}
+
+		return $result;
+	}
+
 	private function addRelatedUsers(array $options, array &$result): void {
 		if ($options['selectUsers'] === null) {
 			return;
@@ -1557,11 +1705,6 @@ class CRole extends CApiService {
 
 		if ($options['selectUsers'] === API_OUTPUT_COUNT) {
 			$output = ['userid', 'roleid'];
-		}
-		elseif ($options['selectUsers'] === API_OUTPUT_EXTEND) {
-			$output = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
-				? CUser::OUTPUT_FIELDS
-				: CUser::OWN_LIMITED_OUTPUT_FIELDS;
 		}
 		else {
 			$output = array_unique(array_merge(['userid', 'roleid'], $options['selectUsers']));

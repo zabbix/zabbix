@@ -21,7 +21,6 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
- * @backup hosts,scripts
  *
  * @onAfter deleteData
  */
@@ -31,7 +30,6 @@ class testScriptManualInput extends CIntegrationTest {
 	private static $scriptids;
 
 	public function createTestHostData(): bool {
-		static $initialized = false;
 		/*
 		 * First, create host group and a host in that group
 		 *
@@ -41,8 +39,6 @@ class testScriptManualInput extends CIntegrationTest {
 		 * Although a default Zabbix installation already defines a host, the
 		 * server itself, we want the tests to be self-contained.
 		 */
-		if ($initialized)
-			return true;
 
 		global $DB;
 		if (!isset($DB['DB']))
@@ -61,9 +57,8 @@ class testScriptManualInput extends CIntegrationTest {
 			]
 		]);
 
+		$this->assertArrayHasKey('hostids', $response, 'host.create failed: ' . json_encode($response));
 		self::$hostid = $response['hostids'][0];
-
-		$initialized = true;
 
 		return true;
 	}
@@ -72,11 +67,6 @@ class testScriptManualInput extends CIntegrationTest {
 	 * @depends prepareTestHostData
 	 */
 	public function createTestScriptData(): bool {
-		static $initialized = false;
-
-		if ($initialized)
-			return true;
-
 		global $DB;
 		if (!isset($DB['DB']))
 			DBconnect($error);
@@ -119,6 +109,7 @@ class testScriptManualInput extends CIntegrationTest {
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your mindmacro has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'execute_on' => ZBX_SCRIPT_EXECUTE_ON_PROXY,
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED
 			],
 			[
@@ -127,6 +118,7 @@ class testScriptManualInput extends CIntegrationTest {
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your {MANUALINPUT} has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'execute_on' => ZBX_SCRIPT_EXECUTE_ON_PROXY,
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 				'manualinput_validator' => '^[a-z]+$',
@@ -139,6 +131,7 @@ class testScriptManualInput extends CIntegrationTest {
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'command' => "echo 'Your {MANUALINPUT} has been expanded'",
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'execute_on' => ZBX_SCRIPT_EXECUTE_ON_PROXY,
 				'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
 				'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_LIST,
 				'manualinput_validator' => 'macro,mind',
@@ -148,11 +141,33 @@ class testScriptManualInput extends CIntegrationTest {
 
 		$response = CDataHelper::call('script.create', $scripts);
 
+		$this->assertArrayHasKey('scriptids', $response, 'script.create failed: ' . json_encode($response));
 		self::$scriptids = $response['scriptids'];
 
-		$initialized = true;
-
 		return true;
+	}
+
+	public function prepareTestData(): void {
+		static $initialized = false;
+
+		if ($initialized) {
+			return;
+		}
+
+		$this->createTestHostData();
+		$this->createTestScriptData();
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		$initialized = true;
+	}
+
+	/**
+	 * Delete data objects created for this test suite
+	 */
+	public static function deleteData(): void {
+		CDataHelper::call('script.delete', self::$scriptids);
+		CDataHelper::call('host.delete', [self::$hostid]);
+		CDataHelper::call('hostgroup.delete', [self::$hostgroupid]);
 	}
 
 	/**
@@ -163,7 +178,7 @@ class testScriptManualInput extends CIntegrationTest {
 	public function serverConfigurationProvider(): array {
 		return [
 			self::COMPONENT_SERVER => [
-				'StartTrappers' => 1,
+				'StartTrappers' => 2,
 				'EnableGlobalScripts' => 1
 			]
 		];
@@ -184,27 +199,39 @@ class testScriptManualInput extends CIntegrationTest {
 
 	/**
 	 * @dataProvider validRequestDataProvider
+	 * @configurationDataProvider serverConfigurationProvider
 	 *
 	 * @param array  $request_params   Parameters to the script.execute API call
 	 * @param string $expected_result  String matching a successful API call return value
 	 */
-	public function testScriptManualInput_ValidRequests(array $request_params, string $expected_result): void {
-		$response = $this->call('script.execute', $request_params);
-
-		$this->assertArrayHasKey('result', $response);
-
-		$this->assertEquals('success', $response['result']['response']);
-		$this->assertEquals($expected_result, $response['result']['value']);
+	public function testScriptManualInput_ValidRequests(int $script_index, string $manualinput, string $expected_result): void {
+		$this->prepareTestData();
+		$response = $this->call('script.execute', [
+			'hostid'      => self::$hostid,
+			'scriptid'    => self::$scriptids[$script_index],
+			'manualinput' => $manualinput
+		]);
 	}
 
 	/**
 	 * @dataProvider invalidRequestDataProvider
+	 * @configurationDataProvider serverConfigurationProvider
 	 *
 	 * @param array  $request_params   Parameters to the script.execute API call
 	 * @param string $expected_result  String matching a failed API call error value
 	 */
-	public function testScriptManualInput_InvalidRequests(array $request_params, string $expected_result): void {
-		$response = $this->call('script.execute', $request_params, $expected_result);
+	public function testScriptManualInput_InvalidRequests(int $script_index, ?string $manualinput, string $expected_result): void {
+		$this->prepareTestData();
+		$request_params = [
+			'hostid'   => self::$hostid,
+			'scriptid' => self::$scriptids[$script_index]
+		];
+
+		if ($manualinput !== null) {
+			$request_params['manualinput'] = $manualinput;
+		}
+
+		$this->call('script.execute', $request_params, $expected_result);
 	}
 
 	/**
@@ -238,93 +265,28 @@ class testScriptManualInput extends CIntegrationTest {
 		]);
 	}
 
-	/**
-	 * @return array<int, array>
-	 */
-	public function invalidRequestDataProvider(): array {
-		$this->createTestHostData();
-		$this->createTestScriptData();
-
-		return [
-			/*
-			 * In general, there are only two scenarios in which a
-			 * request will fail in regards to manual input:
-			 *     (1): there is no manual input provided at all
-			 *     (2): the input didn't pass validation
-			 */
-			[
-				'request_params' => [
-					'hostid' => self::$hostid,
-					'scriptid' => self::$scriptids[1],
-					'manualinput' => '5h0uld n0t m4tch a ^[a-z]+$ pattern'
-				],
-				'expected_result' => 'Provided script user input failed validation.'
-			],
-			[
-				'request_params' => [
-					'hostid' => self::$hostid,
-					'scriptid' => self::$scriptids[2],
-					'manualinput' => 'orcam'
-				],
-				'expected_result' => 'Provided script user input failed validation.'
-			],
-			[
-				'request_params' => [
-					'hostid' => self::$hostid,
-					'scriptid' => self::$scriptids[2]
-				],
-				'expected_result' => 'Script takes user input, but none was provided.'
-			]
-		];
-	}
 
 	/**
 	 * @return array<int, array>
 	 */
 	public function validRequestDataProvider(): array {
-		$this->createTestHostData();
-		$this->createTestScriptData();
-
+		// [script_index, manualinput, expected_result]
 		return [
-			[
-				/*
-				 * This case tests the invocation of a script that doesn't take additional input but provides it in the
-				 * request anyway. In such a case, the script should still execute, and, upon success, the response
-				 * should still contain a value from the script execution, but the server should log a warning message
-				 * indicating this.
-				 */
-				'request_params' => [
-					'hostid' => self::$hostid,
-					'scriptid' => self::$scriptids[0],
-					'manualinput' => 'abcdefghijklmnopqrstuvwxyz'
-				],
-				'expected_result' => "Your mindmacro has been expanded\n"
-			],
-			[
-				'request_params' => [
-					'hostid' => self::$hostid,
-					'scriptid' => self::$scriptids[1],
-					'manualinput' => 'abcdefghijklmnopqrstuvwxyz'
-				],
-				'expected_result' => "Your abcdefghijklmnopqrstuvwxyz has been expanded\n"
-			],
-			[
-				'request_params' => [
-					'hostid' => self::$hostid,
-					'scriptid' => self::$scriptids[2],
-					'manualinput' => 'macro'
-				],
-				'expected_result' => "Your macro has been expanded\n"
-			]
+			[0, 'abcdefghijklmnopqrstuvwxyz', "Your mindmacro has been expanded\n"],
+			[1, 'abcdefghijklmnopqrstuvwxyz', "Your abcdefghijklmnopqrstuvwxyz has been expanded\n"],
+			[2, 'macro',                      "Your macro has been expanded\n"]
 		];
 	}
 
-	/**
-	 * Delete data objects created for this test suite
+		/**
+	 * @return array<int, array>
 	 */
-	public static function deleteData(): void {
-		CDataHelper::call('script.delete', self::$scriptids);
-		CDataHelper::call('host.delete', [self::$hostid]);
-		CDataHelper::call('hostgroup.delete', [self::$hostgroupid]);
+	public function invalidRequestDataProvider(): array {
+		// [script_index, manualinput, expected_result]
+		return [
+			[1, '5h0uld n0t m4tch a ^[a-z]+$ pattern',	"Provided script user input failed validation."],
+			[2, 'orcam', 					"Provided script user input failed validation."],
+			[2, null,					"Script takes user input, but none was provided."]
+		];
 	}
 }

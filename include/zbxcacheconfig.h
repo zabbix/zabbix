@@ -589,6 +589,7 @@ typedef struct
 	int		auditlog_enabled;
 	int		auditlog_mode;
 	int		proxy_secrets_provider;
+	int		enable_mobile_devices;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
@@ -613,6 +614,7 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER		__UINT64_C(0x0000000000000800)
 #define ZBX_CONFIG_FLAGS_ALERT_USRGRPID			__UINT64_C(0x0000000000001000)
 #define ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION		__UINT64_C(0x0000000000002000)
+#define ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES		__UINT64_C(0x0000000000004000)
 
 typedef struct
 {
@@ -896,7 +898,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		int proxyconfig_frequency);
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location);
+		const char *config_ssl_key_location, int *vault_ret);
 void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
 		zbx_uint64_t conf_cache_size, const char *hostname, char **error);
@@ -1703,4 +1705,7 @@ int	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxe
 zbx_uint64_t	zbx_dc_get_cache_size(void);
 
 zbx_uint64_t	zbx_dc_config_get_config_revision(void);
+
+unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type,
+		zbx_get_config_forks_f	get_config_forks, unsigned char *proc_poller);
 #endif

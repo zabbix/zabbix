@@ -1068,7 +1068,7 @@ class testFormAction extends CLegacyWebTest {
 		$operation_details->getField('Custom message')->set(true);
 		$this->assertEquals(255, $operation_details->getField('id:operation-opmessage-subject')->waitUntilVisible()->getAttribute('maxlength'));
 		$this->assertEquals(65535, $operation_details->getField('id:operation_opmessage_message')->waitUntilVisible()->getAttribute('maxlength'));
-		$this->zbxTestClickXpath("//div[@class='overlay-dialogue modal modal-popup modal-popup-medium']//button[@title='Close']");
+		$this->zbxTestClickXpath("//div[@class='overlay-dialogue modal modal-popup modal-popup-medium']//button[@aria-label='Close modal window']");
 	}
 
 	public static function update() {
@@ -1104,7 +1104,8 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->page->login()->open('zabbix.php?action=action.list&eventsource='.$eventsource);
 		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickButtonText('Update');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->getFooter()->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
 		$this->zbxTestCheckHeader($this->event_sources[$data['eventsource']]);
@@ -1479,7 +1480,7 @@ class testFormAction extends CLegacyWebTest {
 		else {
 			$title = CTestArrayHelper::get($data, 'error_title', 'Cannot add action');
 			$this->assertMessage(TEST_BAD, $title, $data['errors']);
-			$this->query('xpath://output[@aria-label="Error message"]//button[@title="Close"]')->one()->click();
+			$this->query('xpath://output[@aria-label="Error message"]//button[@aria-label="Close notification"]')->one()->click();
 			$this->assertEquals(0, CDBHelper::getCount($sql), 'Action has not been created in the DB.');
 			$this->query('xpath://button[text()="Cancel"]')->waitUntilVisible()->one()->click();
 		}
@@ -1618,7 +1619,7 @@ class testFormAction extends CLegacyWebTest {
 				'FROM actions a '.
 				'INNER JOIN conditions c ON c.actionid = a.actionid '.
 				'INNER JOIN operations o on o.actionid = c.actionid '.
-				'WHERE a.actionid='.zbx_dbstr($id).' ORDER BY o.operationid';
+				'WHERE a.actionid='.zbx_dbstr($id).' ORDER BY o.operationid, c.conditionid';
 
 		$original_hash = CDBHelper::getHash($sql);
 

@@ -969,7 +969,7 @@ zabbix_export:
           - [Cloud Run](https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z#gcp-run)
       vendor:
         name: Zabbix
-        version: 8.0-6
+        version: 8.0-8
       groups:
         - name: Templates/Cloud
       items:
@@ -1008,6 +1008,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var auth_url = 'https://oauth2.googleapis.com/token',
             	issued = Math.floor(new Date().getTime() / 1000),
             	expires = issued + 3600,
@@ -1043,7 +1068,8 @@ zabbix_export:
             
             function exchangeJwtForAccessToken(signed_jwt) {
             
-            	var request = new HttpRequest(),
+            	var tls = new CTlsConfig(script_params.tls_verify),
+            		request = new HttpRequest(tls.options),
             		params = {
             			grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
             			assertion: signed_jwt
@@ -1135,6 +1161,8 @@ zabbix_export:
               value: '{$GCP.PRIVATE.KEY.ID}'
             - name: proxy
               value: '{$GCP.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP"}'
           tags:
             - tag: component
               value: raw
@@ -1149,7 +1177,33 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var token = value;
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
+                  var token = value,
+                  	tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"GCP"}.regsub("^(none|peer|full)$", "\1")}');
                   
                   function getField(data, path) {
                   	var steps = path.split('.');
@@ -1180,7 +1234,7 @@ zabbix_export:
                   }
                   
                   function getHttpData(url, token) {
-                  	var request = new HttpRequest(),
+                  	var request = new HttpRequest(tls.options),
                   		proxy = '{$GCP.PROXY}';
                   
                   	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
@@ -1361,7 +1415,33 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var token = value;
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
+                  var token = value,
+                  	tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"GCP"}.regsub("^(none|peer|full)$", "\1")}');
                   
                   function getField(data, path) {
                   	var steps = path.split('.');
@@ -1392,7 +1472,7 @@ zabbix_export:
                   }
                   
                   function getHttpData(url, token) {
-                  	var request = new HttpRequest(),
+                  	var request = new HttpRequest(tls.options),
                   		proxy = '{$GCP.PROXY}';
                   
                   	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
@@ -1500,6 +1580,8 @@ zabbix_export:
           tags:
             - tag: component
               value: environment
+            - tag: component
+              value: gce
         - uuid: c4f17331815345bcb0ac6ea98413b2b5
           name: 'Project quotas get'
           type: DEPENDENT
@@ -1511,7 +1593,33 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var token = value;
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
+                  var token = value,
+                  	tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"GCP"}.regsub("^(none|peer|full)$", "\1")}');
                   
                   function checkMacro(macro) {
                   	if (!macro || macro.match(/^\{\$.*\}$/)) {
@@ -1535,7 +1643,7 @@ zabbix_export:
                   }
                   
                   function getHttpData(url, token) {
-                  	var request = new HttpRequest(),
+                  	var request = new HttpRequest(tls.options),
                   		proxy = '{$GCP.PROXY}';
                   	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
                   		request.setProxy(proxy);
@@ -1604,7 +1712,33 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var token = value;
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
+                  var token = value,
+                  	tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"GCP"}.regsub("^(none|peer|full)$", "\1")}');
                   
                   function getField(data, path) {
                   	var steps = path.split('.');
@@ -1635,7 +1769,7 @@ zabbix_export:
                   }
                   
                   function getHttpData(url, token) {
-                  	var request = new HttpRequest(),
+                  	var request = new HttpRequest(tls.options),
                   		proxy = '{$GCP.PROXY}';
                   
                   	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
@@ -1872,7 +2006,33 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var token = value;
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
+                  var token = value,
+                  	tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"GCP"}.regsub("^(none|peer|full)$", "\1")}');
                   
                   function getField(data, path) {
                   	var steps = path.split('.');
@@ -1903,7 +2063,7 @@ zabbix_export:
                   }
                   
                   function getHttpData(url, token) {
-                  	var request = new HttpRequest(),
+                  	var request = new HttpRequest(tls.options),
                   		proxy = '{$GCP.PROXY}';
                   
                   	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
@@ -2004,7 +2164,33 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var token = value;
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
+                  var token = value,
+                  	tls = new CTlsConfig('{{$HTTP.TLS.VERIFY:"GCP"}.regsub("^(none|peer|full)$", "\1")}');
                   
                   function getField(data, path) {
                   	var steps = path.split('.');
@@ -2035,7 +2221,7 @@ zabbix_export:
                   }
                   
                   function getHttpData(url, token) {
-                  	var request = new HttpRequest(),
+                  	var request = new HttpRequest(tls.options),
                   		proxy = '{$GCP.PROXY}';
                   
                   	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
@@ -2508,7 +2694,7 @@ zabbix_export:
           host_prototypes:
             - uuid: cb22d82a12814afb8ba833c649d575c4
               host: '{#GCE.INSTANCE.ID}'
-              name: '{#GCE.INSTANCE.NAME}'
+              name: 'GCE - {#GCE.INSTANCE.NAME}'
               group_links:
                 - group:
                     name: 'Virtual machines'
@@ -3048,7 +3234,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud Storage buckets by name.'
           config:
             type: TEXT
-            priority: '39'
+            priority: '40'
             section_name: Filters
             label: 'Include GCP Cloud Storage bucket name filter'
             description: 'Filter to include GCP Cloud Storage buckets by name.'
@@ -3057,7 +3243,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud Storage buckets by name.'
           config:
             type: TEXT
-            priority: '40'
+            priority: '41'
             section_name: Filters
             label: 'Exclude GCP Cloud Storage bucket name filter'
             description: 'Filter to exclude GCP Cloud Storage buckets by name.'
@@ -3074,7 +3260,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud Run services by condition.'
           config:
             type: TEXT
-            priority: '37'
+            priority: '38'
             section_name: Filters
             label: 'Include GCP Cloud Run service condition filter'
             description: 'Filter to include GCP Cloud Run services by condition.'
@@ -3083,7 +3269,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud Run services by condition.'
           config:
             type: TEXT
-            priority: '38'
+            priority: '39'
             section_name: Filters
             label: 'Exclude GCP Cloud Run service condition filter'
             description: 'Filter to exclude GCP Cloud Run services by condition.'
@@ -3092,7 +3278,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud Run services by name.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Filters
             label: 'Include GCP Cloud Run service name filter'
             description: 'Filter to include GCP Cloud Run services by name.'
@@ -3101,7 +3287,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud Run services by name.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '37'
             section_name: Filters
             label: 'Exclude GCP Cloud Run service name filter'
             description: 'Filter to exclude GCP Cloud Run services by name.'
@@ -3119,7 +3305,7 @@ zabbix_export:
           description: 'The filter to include GCP Compute Engine instances by namespace.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Include GCP Compute Engine namespace filter'
             description: 'Filter to include GCP Compute Engine instances by namespace.'
@@ -3128,7 +3314,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Compute Engine instances by namespace.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Exclude GCP Compute Engine namespace filter'
             description: 'Filter to exclude GCP Compute Engine instances by namespace.'
@@ -3137,7 +3323,7 @@ zabbix_export:
           description: 'The filter to include GCP Compute Engine project quotas by namespace.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Filters
             label: 'Include GCP Compute Engine project quotas by namespace filter'
             description: 'Filter to include GCP Compute Engine project quotas by namespace.'
@@ -3146,7 +3332,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Compute Engine project quotas by namespace.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Filters
             label: 'Exclude GCP Compute Engine project quotas by namespace filter'
             description: 'Filter to exclude GCP Compute Engine project quotas by namespace.'
@@ -3175,7 +3361,7 @@ zabbix_export:
           description: 'The filter to include GCP Compute Engine instances by zone.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Include GCP Compute Engine zone filter'
             description: 'Filter to include GCP Compute Engine instances by zone.'
@@ -3184,7 +3370,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Compute Engine instances by zone.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Exclude GCP Compute Engine zone filter'
             description: 'Filter to exclude GCP Compute Engine instances by zone.'
@@ -3193,7 +3379,7 @@ zabbix_export:
           description: 'The filter to include load balancers by name.'
           config:
             type: TEXT
-            priority: '41'
+            priority: '42'
             section_name: Filters
             label: 'Include load balancer name filter'
             description: 'Filter to include load balancers by name.'
@@ -3202,7 +3388,7 @@ zabbix_export:
           description: 'The filter to exclude load balancers by name.'
           config:
             type: TEXT
-            priority: '42'
+            priority: '43'
             section_name: Filters
             label: 'Exclude load balancer name filter'
             description: 'Filter to exclude load balancers by name.'
@@ -3211,7 +3397,7 @@ zabbix_export:
           description: 'The filter to include load balancers by protocol.'
           config:
             type: TEXT
-            priority: '45'
+            priority: '46'
             section_name: Filters
             label: 'Include load balancer protocol filter'
             description: 'Filter to include load balancers by protocol.'
@@ -3220,7 +3406,7 @@ zabbix_export:
           description: 'The filter to exclude load balancers by protocol.'
           config:
             type: TEXT
-            priority: '46'
+            priority: '47'
             section_name: Filters
             label: 'Exclude load balancer protocol filter'
             description: 'Filter to exclude load balancers by protocol.'
@@ -3229,7 +3415,7 @@ zabbix_export:
           description: 'The filter to include load balancers by scheme.'
           config:
             type: TEXT
-            priority: '43'
+            priority: '44'
             section_name: Filters
             label: 'Include load balancer scheme filter'
             description: 'Filter to include load balancers by scheme (INTERNAL/EXTERNAL).'
@@ -3238,7 +3424,7 @@ zabbix_export:
           description: 'The filter to exclude load balancers by scheme.'
           config:
             type: TEXT
-            priority: '44'
+            priority: '45'
             section_name: Filters
             label: 'Exclude load balancer scheme filter'
             description: 'Filter to exclude load balancers by scheme (INTERNAL/EXTERNAL).'
@@ -3247,7 +3433,7 @@ zabbix_export:
           description: 'The filter to include load balancers by scope.'
           config:
             type: TEXT
-            priority: '47'
+            priority: '48'
             section_name: Filters
             label: 'Include load balancer scope filter'
             description: 'Filter to include load balancers by scope.'
@@ -3256,7 +3442,7 @@ zabbix_export:
           description: 'The filter to exclude load balancers by scope.'
           config:
             type: TEXT
-            priority: '48'
+            priority: '49'
             section_name: Filters
             label: 'Exclude load balancer scope filter'
             description: 'Filter to exclude load balancers by scope.'
@@ -3265,7 +3451,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MSSQL instances by namespace.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'Include GCP Cloud SQL MSSQL namespace filter'
             description: 'Filter to include GCP Cloud SQL MSSQL instances by namespace.'
@@ -3274,7 +3460,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL MSSQL instances by namespace.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MSSQL namespace filter'
             description: 'Filter to exclude GCP Cloud SQL MSSQL instances by namespace.'
@@ -3283,7 +3469,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MSSQL instances by type (standalone/replica).'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'Include GCP Cloud SQL MSSQL instances by type filter'
             description: 'Filter to include GCP Cloud SQL MSSQL instances by type (standalone/replica).'
@@ -3294,7 +3480,7 @@ zabbix_export:
             Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MSSQL instances by type filter'
             description: 'Filter to exclude GCP Cloud SQL MSSQL instances by type (standalone/replica).'
@@ -3303,7 +3489,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MSSQL instances by zone.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'Include GCP Cloud SQL MSSQL zone filter'
             description: 'Filter to include GCP Cloud SQL MSSQL instances by zone.'
@@ -3312,7 +3498,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL MSSQL instances by zone.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MSSQL zone filter'
             description: 'Filter to exclude GCP Cloud SQL MSSQL instances by zone.'
@@ -3321,7 +3507,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MySQL instances by namespace.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Include GCP Cloud SQL MySQL namespace filter'
             description: 'Filter to include GCP Cloud SQL MySQL instances by namespace.'
@@ -3330,7 +3516,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL MySQL instances by namespace.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MySQL namespace filter'
             description: 'Filter to exclude GCP Cloud SQL MySQL instances by namespace.'
@@ -3339,7 +3525,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MySQL instances by type (standalone/replica).'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Include GCP Cloud SQL MySQL instances by type filter'
             description: 'Filter to include GCP Cloud SQL MySQL instances by type (standalone/replica).'
@@ -3350,7 +3536,7 @@ zabbix_export:
             Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MySQL instances by type filter'
             description: 'Filter to exclude GCP Cloud SQL MySQL instances by type (standalone/replica).'
@@ -3359,7 +3545,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MySQL instances by zone.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Include GCP Cloud SQL MySQL zone filter'
             description: 'Filter to include GCP Cloud SQL MySQL instances by zone.'
@@ -3368,7 +3554,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL MySQL instances by zone.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MySQL zone filter'
             description: 'Filter to exclude GCP Cloud SQL MySQL instances by zone.'
@@ -3377,7 +3563,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL PostgreSQL instances by namespace.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Include GCP Cloud SQL PostgreSQL namespace filter'
             description: 'Filter to include GCP Cloud SQL PostgreSQL instances by namespace.'
@@ -3386,7 +3572,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL PostgreSQL instances by namespace.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL PostgreSQL namespace filter'
             description: 'Filter to exclude GCP Cloud SQL PostgreSQL instances by namespace.'
@@ -3395,7 +3581,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL PostgreSQL instances by type (standalone/replica).'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Include GCP Cloud SQL PostgreSQL instances by type filter'
             description: 'Filter to include GCP Cloud SQL PostgreSQL instances by type (standalone/replica).'
@@ -3406,7 +3592,7 @@ zabbix_export:
             Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL PostgreSQL instances by type filter'
             description: 'Filter to exclude GCP Cloud SQL PostgreSQL instances by type (standalone/replica).'
@@ -3415,7 +3601,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL PostgreSQL instances by zone.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Include GCP Cloud SQL PostgreSQL zone filter'
             description: 'Filter to include GCP Cloud SQL PostgreSQL instances by zone.'
@@ -3424,7 +3610,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL PostgreSQL instances by zone.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL PostgreSQL zone filter'
             description: 'Filter to exclude GCP Cloud SQL PostgreSQL instances by zone.'
@@ -3477,6 +3663,22 @@ zabbix_export:
               The value must be a string. The operator must be either `=, !=, >, <, <=, >= or :`.
               Example: `name="europe-west1" OR name="europe-north1" OR name="asia-southeast2"`, `name!= "us-central1"`, `name!= "me-*`.
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items and JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP", e.g. {$HTTP.TLS.VERIFY:"GCP"}.'
+          config:
+            type: LIST
+            priority: '11'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 71df4601171e471ea74a291242028394
           name: 'Project resources'
@@ -5175,7 +5377,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -5348,6 +5550,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/transactions/',
             	arr = [],
             	base_paths = [
@@ -5382,7 +5609,8 @@ zabbix_export:
             }
             
             function getHttpData(url, token, body) {
-            	var request = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify),
+            		request = new HttpRequest(tls.options);
             	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
             		request.setProxy(params.proxy);
             	};
@@ -5452,6 +5680,8 @@ zabbix_export:
               value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Cloud SQL MSSQL"}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -5920,6 +6150,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var base_path = 'cloudsql.googleapis.com/database/',
             	mssql_path = 'cloudsql.googleapis.com/database/sqlserver/',
             	obj = {},
@@ -6002,7 +6257,8 @@ zabbix_export:
             }
             
             function getHttpData(url, token, body) {
-            	var request = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify),
+            		request = new HttpRequest(tls.options);
             	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
             		request.setProxy(params.proxy);
             	};
@@ -6126,6 +6382,8 @@ zabbix_export:
               value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Cloud SQL MSSQL"}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -6189,6 +6447,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/transactions/',
             	arr = [],
             	base_paths = [
@@ -6224,7 +6507,8 @@ zabbix_export:
             }
             
             function getHttpData(url, token, body) {
-            	var request = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify),
+            		request = new HttpRequest(tls.options);
             	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
             		request.setProxy(params.proxy);
             	};
@@ -6294,6 +6578,8 @@ zabbix_export:
               value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Cloud SQL MSSQL"}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -6307,6 +6593,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/schedulers/',
             	arr = [],
             	base_paths = ['active_workers', 'current_tasks', 'current_workers', 'pending_disk_io', 'runnable_tasks', 'work_queue'];
@@ -6338,7 +6649,8 @@ zabbix_export:
             }
             
             function getHttpData(url, token, body) {
-            	var request = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify),
+            		request = new HttpRequest(tls.options);
             	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
             		request.setProxy(params.proxy);
             	};
@@ -6408,6 +6720,8 @@ zabbix_export:
               value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Cloud SQL MSSQL"}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -6884,6 +7198,22 @@ zabbix_export:
             Supported usage types:
             - Default update interval for most items.
             - Minimal time window for data requested in Monitoring Query Language REST API request.
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL MSSQL", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL MSSQL"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 4233430037fc4570b3a5eb3f23ef02e6
           name: 'MSSQL instance'
@@ -7112,7 +7442,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -7171,6 +7501,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/replication/',
             	obj = {},
             	base_paths = [
@@ -7209,7 +7564,8 @@ zabbix_export:
             }
             
             function getHttpData(url, token, body) {
-            	var request = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify),
+            		request = new HttpRequest(tls.options);
             	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
             		request.setProxy(params.proxy);
             	};
@@ -7279,6 +7635,8 @@ zabbix_export:
               value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Cloud SQL MSSQL Replica"}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -7361,6 +7719,22 @@ zabbix_export:
             Supported usage types:
             - Default update interval for most items.
             - Minimal time window for data requested in Monitoring Query Language REST API request.
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL MSSQL Replica", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL MSSQL Replica"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: f50d9889ca3c4f6b91dd9e40902e37fb
           name: 'MSSQL replica'
@@ -7412,7 +7786,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -7926,6 +8300,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var base_path = 'cloudsql.googleapis.com/database/',
             	mysql_path = 'cloudsql.googleapis.com/database/mysql/',
             	obj = {},
@@ -7986,7 +8385,8 @@ zabbix_export:
             }
             
             function getHttpData(url, token, body) {
-            	var request = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify),
+            		request = new HttpRequest(tls.options);
             	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
             		request.setProxy(params.proxy);
             	};
@@ -8076,6 +8476,8 @@ zabbix_export:
               value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Cloud SQL MySQL"}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -8259,6 +8661,22 @@ zabbix_export:
             Supported usage types:
             - Default update interval for most items.
             - Minimal time window for data requested in Monitoring Query Language REST API request.
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL MySQL", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL MySQL"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 5932cc56f6f146db8fac121b3817a407
           name: 'MySQL instance'
@@ -8457,7 +8875,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -8497,6 +8915,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var base_path = 'cloudsql.googleapis.com/database/replication/',
             	mysql_path = 'cloudsql.googleapis.com/database/mysql/replication/',
             	raw_metrics,
@@ -8536,7 +8979,8 @@ zabbix_export:
             }
             
             function getHttpData(url, token, body) {
-            	var request = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify),
+            		request = new HttpRequest(tls.options);
             	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
             		request.setProxy(params.proxy);
             	};
@@ -8622,6 +9066,8 @@ zabbix_export:
               value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Cloud SQL MySQL Replica"}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -8760,6 +9206,22 @@ zabbix_export:
             Supported usage types:
             - Default update interval for most items.
             - Minimal time window for data requested in Monitoring Query Language REST API request.
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL MySQL Replica", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL MySQL Replica"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 76eda12212f045388bef22cb382eff6b
           name: 'MySQL replica'
@@ -8890,7 +9352,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -9292,6 +9754,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var base_path = 'cloudsql.googleapis.com/database/',
             	pgsql_path = 'cloudsql.googleapis.com/database/postgresql/',
             	obj = {},
@@ -9324,7 +9811,8 @@ zabbix_export:
             }
             
             function getHttpData(url, token, body) {
-            	var request = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify),
+            		request = new HttpRequest(tls.options);
             	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
             		request.setProxy(params.proxy);
             	};
@@ -9452,6 +9940,8 @@ zabbix_export:
               value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Cloud SQL PostgreSQL"}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -9709,6 +10199,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 var base_path = 'cloudsql.googleapis.com/database/postgresql/',
                 	obj = {};
                 
@@ -9739,7 +10254,8 @@ zabbix_export:
                 }
                 
                 function getHttpData(url, token, body) {
-                	var request = new HttpRequest();
+                	var tls = new CTlsConfig(params.tls_verify),
+                		request = new HttpRequest(tls.options);
                 	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
                 		request.setProxy(params.proxy);
                 	};
@@ -9829,6 +10345,8 @@ zabbix_export:
                   value: '{$GCP.PROXY}'
                 - name: time_window
                   value: '{$GCP.TIME.WINDOW}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"GCP Cloud SQL PostgreSQL"}'
                 - name: token
                   value: '{$GCP.AUTH.TOKEN}'
               tags:
@@ -10085,6 +10603,22 @@ zabbix_export:
             Supported usage types:
             - Default update interval for most items.
             - Minimal time window for data requested in Monitoring Query Language REST API request.
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL PostgreSQL", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL PostgreSQL"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 21636cfe7d2f4de28d07af09c9812075
           name: 'PostgreSQL instance'
@@ -10319,7 +10853,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -10374,6 +10908,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var base_path = 'cloudsql.googleapis.com/database/replication/',
             	pgsql_path = 'cloudsql.googleapis.com/database/postgresql/replication/',
             	obj = {},
@@ -10406,7 +10965,8 @@ zabbix_export:
             }
             
             function getHttpData(url, token, body) {
-            	var request = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify),
+            		request = new HttpRequest(tls.options);
             	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
             		request.setProxy(params.proxy);
             	};
@@ -10497,6 +11057,8 @@ zabbix_export:
               value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Cloud SQL PostgreSQL Replica"}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -10636,6 +11198,22 @@ zabbix_export:
             Supported usage types:
             - Default update interval for most items.
             - Minimal time window for data requested in Monitoring Query Language REST API request.
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cloud SQL PostgreSQL Replica", e.g. {$HTTP.TLS.VERIFY:"GCP Cloud SQL PostgreSQL Replica"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: acb71f4a818d43e0b045ba87c2daa989
           name: 'PostgreSQL replica'
@@ -11604,7 +12182,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Cloud
       items:
@@ -11723,6 +12301,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var base_path = 'compute.googleapis.com/instance/disk/',
             	base_paths = ['read_ops_count', 'read_bytes_count', 'write_bytes_count', 'write_ops_count'];
             
@@ -11753,7 +12356,8 @@ zabbix_export:
             }
             
             function getHttpData(url, token, body) {
-            	var request = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify),
+            		request = new HttpRequest(tls.options);
             	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
             		request.setProxy(params.proxy);
             	};
@@ -11826,6 +12430,8 @@ zabbix_export:
               value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Compute Engine Instance"}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -12131,6 +12737,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var base_path = 'compute.googleapis.com/',
             	value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'],
             	re = /(^t_\d+\.value\.)/g,
@@ -12213,7 +12844,8 @@ zabbix_export:
             }
             
             function getHttpData(url, token, body) {
-            	var request = new HttpRequest();
+            	var tls = new CTlsConfig(params.tls_verify),
+            		request = new HttpRequest(tls.options);
             	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
             		request.setProxy(params.proxy);
             	};
@@ -12351,6 +12983,8 @@ zabbix_export:
               value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Compute Engine Instance"}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -12808,6 +13442,22 @@ zabbix_export:
             Supported usage types:
             - Default update interval for most items.
             - Minimal time window for data requested in Monitoring Query Language REST API request.
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Compute Engine Instance", e.g. {$HTTP.TLS.VERIFY:"GCP Compute Engine Instance"}.'
+          config:
+            type: LIST
+            priority: '4'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: b8b09f6833ec4ea78c4ac7d15cdb0cc5
           name: Hardware
@@ -12982,10 +13632,24 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
+        - uuid: 307a854507ee40bf8d9060640697fd83
+          name: 'GCP annual cost'
+          type: CALCULATED
+          key: gcp.annual.cost
+          value_type: FLOAT
+          params: 'sum(last_foreach(//gcp.cost.monthly[*]))'
+          description: 'GCP annual cost.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: cost
         - uuid: 5cc3faa82f404b38b513948f333f3d7c
           name: 'Authorization errors check'
           type: DEPENDENT
@@ -13022,6 +13686,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var auth_url = 'https://oauth2.googleapis.com/token',
             	issued = Math.floor(new Date().getTime() / 1000),
             	expires = issued + 3600,
@@ -13057,7 +13746,8 @@ zabbix_export:
             
             function exchangeJwtForAccessToken(signed_jwt) {
             
-            	var request = new HttpRequest(),
+            	var tls = new CTlsConfig(script_params.tls_verify),
+            		request = new HttpRequest(tls.options),
             		params = {
             			grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
             			assertion: signed_jwt
@@ -13149,6 +13839,8 @@ zabbix_export:
               value: '{$GCP.PRIVATE.KEY.ID}'
             - name: proxy
               value: '{$GCP.PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"GCP Cost Monitoring"}'
           tags:
             - tag: component
               value: raw
@@ -13437,6 +14129,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   function getField(data, path, separator, default_value) {
                   	if (typeof separator === 'undefined') {
                   		separator = '.';
@@ -13464,6 +14181,7 @@ zabbix_export:
                   
                   var GcpCost = {
                   	token: null,
+                  	tls: new CTlsConfig('{{$HTTP.TLS.VERIFY:"GCP Cost Monitoring"}.regsub("^(none|peer|full)$", "\1")}'),
                   	bq_job_project_id: null,
                   	table_path: null,
                   	proxy: null,
@@ -13496,7 +14214,7 @@ zabbix_export:
                   	},
                   
                   	request: function (url, body) {
-                  		var req = new HttpRequest(),
+                  		var req = new HttpRequest(GcpCost.tls.options),
                   			response;
                   
                   		if (GcpCost.proxy !== '{' + '$GCP.PROXY}' && GcpCost.proxy !== '') {
@@ -13536,7 +14254,7 @@ zabbix_export:
                   
                   		attempts = 6;
                   		while (attempts > 0) {
-                  			poll_req = new HttpRequest();
+                  			poll_req = new HttpRequest(GcpCost.tls.options);
                   			if (GcpCost.proxy !== '{' + '$GCP.PROXY}' && GcpCost.proxy !== '') {
                   				poll_req.setProxy(GcpCost.proxy);
                   			}
@@ -13770,6 +14488,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
+                  const CTlsConfig = function (raw_value) {
+                  	raw_value = String(raw_value).trim().toLowerCase();
+                  
+                  	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                  		raw_value = 'full';
+                  	}
+                  
+                  	this.options = {
+                  		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                  		SSLVerifyHost: (raw_value === 'full')
+                  	};
+                  
+                  	this.enabled = (raw_value !== 'none');
+                  
+                  	this.checkURL = function (url) {
+                  		if (this.enabled && !/^https:\/\//i.test(url)) {
+                  			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                  			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                  		}
+                  
+                  		return url;
+                  	};
+                  }
+                  
+                  
                   function getField(data, path, separator, default_value) {
                   	if (typeof separator === 'undefined') {
                   		separator = '.';
@@ -13797,6 +14540,7 @@ zabbix_export:
                   
                   var GcpCost = {
                   	token: null,
+                  	tls: new CTlsConfig('{{$HTTP.TLS.VERIFY:"GCP Cost Monitoring"}.regsub("^(none|peer|full)$", "\1")}'),
                   	bq_job_project_id: null,
                   	start_month: null,
                   	table_path: null,
@@ -13841,7 +14585,7 @@ zabbix_export:
                   	},
                   
                   	request: function (url, body) {
-                  		var req = new HttpRequest(),
+                  		var req = new HttpRequest(GcpCost.tls.options),
                   			response;
                   
                   		if (GcpCost.proxy !== '{' + '$GCP.PROXY}' && GcpCost.proxy !== '') {
@@ -13881,7 +14625,7 @@ zabbix_export:
                   
                   		attempts = 6;
                   		while (attempts > 0) {
-                  			poll_req = new HttpRequest();
+                  			poll_req = new HttpRequest(GcpCost.tls.options);
                   			if (GcpCost.proxy !== '{' + '$GCP.PROXY}' && GcpCost.proxy !== '') {
                   				poll_req.setProxy(GcpCost.proxy);
                   			}
@@ -14657,6 +15401,22 @@ zabbix_export:
             section_name: Other
             label: 'HTTP proxy'
             description: 'HTTP proxy to use for requests.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items and JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GCP Cost Monitoring", e.g. {$HTTP.TLS.VERIFY:"GCP Cost Monitoring"}.'
+          config:
+            type: LIST
+            priority: '22'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 5cc3faa82f404b38b523949f322f3d3b
           name: 'GCP Cost: Overview'

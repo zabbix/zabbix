@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',	7050063);
+define('ZABBIX_DB_VERSION',	7050091);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -31,6 +31,7 @@ define('DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING',	7);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2026');
 
+define('ZBX_CLOUD_URL', 'https://cloud.zabbix.com');
 define('ZBX_DOCUMENTATION_URL', 'https://www.zabbix.com/documentation');
 
 define('ZBX_BCRYPT_COST',		10);
@@ -241,6 +242,9 @@ define('DB_STORE_CREDS_CONFIG', 0);
 define('DB_STORE_CREDS_VAULT_HASHICORP', 1);
 define('DB_STORE_CREDS_VAULT_CYBERARK',  2);
 
+define('DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN',	0);
+define('DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE',	1);
+
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_JS',					3); // javascript
@@ -327,6 +331,7 @@ define('ZBX_CONDITION_TYPE_EVENT_TAG',			25);
 define('ZBX_CONDITION_TYPE_EVENT_TAG_VALUE',	26);
 define('ZBX_CONDITION_TYPE_SERVICE',			27);
 define('ZBX_CONDITION_TYPE_SERVICE_NAME',		28);
+define('ZBX_CONDITION_TYPE_PROXY_GROUP',		29);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -913,6 +918,7 @@ define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);
 define('MEDIA_TYPE_WEBHOOK',	4);
+define('MEDIA_TYPE_PUSH',		5);
 
 define('SMTP_SECURITY_NONE',		0);
 define('SMTP_SECURITY_STARTTLS',	1);
@@ -1202,10 +1208,10 @@ define('ZBX_EVENT_HISTORY_MANUAL_UPDATE',	2);
 define('ZBX_EVENT_HISTORY_ALERT',			3);
 define('ZBX_EVENT_HISTORY_MAINTENANCE',		4);
 
-define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
-define('ZBX_TM_TASK_ACKNOWLEDGE',	4);
-define('ZBX_TM_TASK_CHECK_NOW',		6);
-define('ZBX_TM_TASK_DATA',			7);
+define('ZBX_TM_TASK_CLOSE_PROBLEM', 	1);
+define('ZBX_TM_TASK_ACKNOWLEDGE',		4);
+define('ZBX_TM_TASK_CHECK_NOW',			6);
+define('ZBX_TM_TASK_DATA',				7);
 
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);
@@ -1407,11 +1413,11 @@ define('DHOST_STATUS_DISABLED', 1);
 define('TRIGGER_EXPRESSION',			0);
 define('TRIGGER_RECOVERY_EXPRESSION',	1);
 
-define('EXPRESSION_TYPE_INCLUDED',		0);
-define('EXPRESSION_TYPE_ANY_INCLUDED',	1);
-define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
-define('EXPRESSION_TYPE_TRUE',			3);
-define('EXPRESSION_TYPE_FALSE',			4);
+define('REGEX_TYPE_CONTAINS_STRING',		0);
+define('REGEX_TYPE_CONTAINS_ANY_SUBSTRING',	1);
+define('REGEX_TYPE_NOT_CONTAINS_STRING',	2);
+define('REGEX_TYPE_MATCHES_REGEX',			3);
+define('REGEX_TYPE_NOT_MATCHES_REGEX',		4);
 
 define('HOST_INVENTORY_DISABLED',	-1);
 define('HOST_INVENTORY_MANUAL',		0);
@@ -1640,6 +1646,7 @@ define('API_NUMBER',				71);
 define('API_SELEMENTID',			72);
 define('API_SSL_CERTIFICATE',		73);
 define('API_SSL_PRIVATE_KEY',		74);
+define('API_UUID_V7',				75);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1674,6 +1681,7 @@ define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_DB',			112);
 define('ZBX_API_ERROR_PARAMETERS',	100);
 define('ZBX_API_ERROR_NO_ENTITY',	101);
+define('ZBX_API_ERROR_NO_EXTERNAL_ENTITY',	102);
 define('ZBX_API_ERROR_PERMISSIONS',	120);
 define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
@@ -1685,10 +1693,11 @@ define('API_ERR_DISCOVERED', 1);
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
+define('ZBX_AUTH_SCHEME_BEARER',	0);
+define('ZBX_AUTH_SCHEME_DPOP',		1);
+
 define('ZBX_AUTH_TOKEN_ENABLED', 0);
 define('ZBX_AUTH_TOKEN_DISABLED', 1);
-
-define('ZBX_API_HEADER_AUTHENTICATE_PREFIX', 'Bearer ');
 
 define('ZBX_JAN_2038', 2145916800);
 
@@ -1945,6 +1954,7 @@ define('ZBX_COLOR_SCHEME_LIGHT', 'light');
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ACTION_CONTAINER', 'action-container');
+define('ZBX_STYLE_ACTION_WRAPPER', 'action-wrapper');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
 define('ZBX_STYLE_ALIGN_TOP', 'align-top');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
@@ -2013,9 +2023,7 @@ define('ZBX_STYLE_COLOR_ICON', 'color-icon');
 define('ZBX_STYLE_COLOR_NEGATIVE', 'color-negative');
 define('ZBX_STYLE_COLOR_POSITIVE', 'color-positive');
 define('ZBX_STYLE_COLOR_WARNING', 'color-warning');
-define('ZBX_STYLE_COLUMN_TAGS_1', 'column-tags-1');
-define('ZBX_STYLE_COLUMN_TAGS_2', 'column-tags-2');
-define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
+define('ZBX_STYLE_COLUMN_TAGS', 'column-tags');
 define('ZBX_STYLE_COMPACT_VIEW', 'compact-view');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
 define('ZBX_STYLE_DASHBOARD', 'dashboard');
@@ -2060,6 +2068,7 @@ define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
 define('ZBX_STYLE_FILTER_FORMS', 'filter-forms');
 define('ZBX_STYLE_FILTER_SPACE', 'filter-space');
 define('ZBX_STYLE_FILTER_TRIGGER', 'filter-trigger');
+define('ZBX_STYLE_FLEX_WRAPPER', 'flex-wrapper');
 define('ZBX_STYLE_FLH_AVERAGE_BG', 'flh-average-bg');
 define('ZBX_STYLE_FLH_DISASTER_BG', 'flh-disaster-bg');
 define('ZBX_STYLE_FLH_HIGH_BG', 'flh-high-bg');
@@ -2101,6 +2110,7 @@ define('ZBX_STYLE_INLINE_FILTER', 'inline-filter');
 define('ZBX_STYLE_INLINE_FILTER_LABEL', 'inline-filter-label');
 define('ZBX_STYLE_INLINE_FILTER_FOOTER', 'inline-filter-footer');
 define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
+define('ZBX_STYLE_INLINE_LIST', 'inline-list');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
@@ -2113,7 +2123,6 @@ define('ZBX_STYLE_LINK_EXTERNAL', 'link-external');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_DASHED', 'list-dashed');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
-define('ZBX_STYLE_LIST_TABLE_FIXED', 'fixed');
 define('ZBX_STYLE_LIST_TABLE_ACTIONS', 'list-table-actions');
 define('ZBX_STYLE_LIST_TABLE_FOOTER', 'list-table-footer');
 define('ZBX_STYLE_LIST_TABLE_STICKY_HEADER', 'sticky-header');
@@ -2174,7 +2183,6 @@ define('ZBX_STYLE_VALUEMAP_CHECKBOX', 'valuemap-checkbox');
 define('ZBX_STYLE_VALUEMAP_MAPPINGS_TABLE', 'mappings-table');
 define('ZBX_STYLE_SEARCH', 'search');
 define('ZBX_STYLE_FORM_SEARCH', 'form-search');
-define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');
 define('ZBX_STYLE_SELECTED', 'selected');
 define('ZBX_STYLE_SELECTED_ITEM_COUNT', 'selected-item-count');
 define('ZBX_STYLE_SERVER_NAME', 'server-name');
@@ -2220,7 +2228,6 @@ define('ZBX_STYLE_TABLE', 'table');
 define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
 define('ZBX_STYLE_TABLE_SUBFORMS', 'table-subforms');
 define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
-define('ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN', 'table-forms-second-column');
 define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK', 'overflow-break');
@@ -2250,7 +2257,6 @@ define('ZBX_STYLE_PROBLEM_EXPAND_TD', 'problem-expand-td');
 define('ZBX_STYLE_PROBLEM_NESTED', 'problem-nested');
 define('ZBX_STYLE_PROBLEM_NESTED_SMALL', 'problem-nested-small');
 define('ZBX_STYLE_NO_HOVER_PROBLEM_NESTED', 'hover-nobg-problem-nested');
-define('ZBX_STYLE_SECOND_COL', 'second-col');
 define('ZBX_STYLE_TOC', 'toc');
 define('ZBX_STYLE_TOC_ARROW', 'toc-arrow');
 define('ZBX_STYLE_TOC_ITEM', 'toc-item');
@@ -2427,7 +2433,7 @@ define('ZBX_ICON_SPEAKER', 'zi-speaker');
 define('ZBX_ICON_SPEAKER_OFF', 'zi-speaker-off');
 define('ZBX_ICON_STAR', 'zi-star');
 define('ZBX_ICON_STAR_FILLED', 'zi-star-filled');
-define('ZBX_ICON_SUPPORT', 'zi-support');
+define('ZBX_ICON_SUBSCRIPTIONS', 'zi-subscriptions');
 define('ZBX_ICON_SQUARE', 'zi-square');
 define('ZBX_ICON_TEXT', 'zi-text');
 define('ZBX_ICON_TIME_PERIOD', 'zi-time-period');
@@ -2496,6 +2502,15 @@ define('ZBX_STYLE_DATATABLE', 'datatable');
 
 // Limit amount of validations per request in CControllerValidateUse
 define('VALIDATE_USE_CHUNK_SIZE', 500);
+
+define('ZABBIX_MOBILE_VERSION',			1);
+
+define('ZBX_DEVICE_STATUS_NEW',			0);
+define('ZBX_DEVICE_STATUS_ACTIVATED',	1);
+define('ZBX_DEVICE_STATUS_ORPHANED',	2);
+
+define('MOBILE_KEY_SCOPE_IDENTITY',		0);
+define('MOBILE_KEY_SCOPE_ENCRYPTION',	1);
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');

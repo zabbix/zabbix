@@ -1,6 +1,30 @@
 Changes for 8.0.0rc1
 
 New features:
+.........T [ZBXNEXT-10556] added trend function cache monitoring to Zabbix health templates (kbruvers)
+A.F....... [ZBXNEXT-10469] turned off API access for all user roles by default (jfreibergs, vskalbins)
+.......PS. [ZBXNEXT-10578] removed legacy protocols from trapper (sboidenko)
+.........T [ZBXNEXT-10622] updated AIX by Zabbix agent template to use vfs.dev.get (kbruvers)
+..F....... [ZBXNEXT-10630] fixed the 'Clock' widget time zone setting not being displayed until the 'Show: Time zone' option is selected (aluchko)
+..F.....S. [ZBXNEXT-9399] added new condition type "Proxy Group" for auto-registration and discovery actions (isharha, wiper)
+..F....... [ZBXNEXT-10730] implemented "Create proxy in Cloud" button with external link for proxies page (scernisenko)
+..F....... [ZBXNEXT-9851] implemented inline validation, moved to MVC and modal for discovery rules and discovery prototypes (gberzina)
+..F....... [ZBXNEXT-10733] implemented Subscriptions menu option with new icon instead of obsolete Support option (scernisenko)
+A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
+.........T [ZBXNEXT-10313] updated PostgreSQL by Zabbix agent template (smansurovs)
+.........T [ZBXNEXT-10154] updated Linux templates with the latest features: new dashboards for all and new keys for Agent templates (abrosimovs)
+.........T [ZBXNEXT-5564] improved device uptime trigger in SNMP templates (kflorowski)
+.........T [ZBXNEXT-10316] updated Windows by Zabbix agent templates (abakaldin)
+.........T [ZBXNEXT-10655] improved dashboard for 'Azure Cost Management by HTTP' template (smansurovs)
+.........T [ZBXNEXT-10602] improved dashboard for 'AWS Cost Explorer by HTTP' template (smansurovs)
+..F....... [ZBXNEXT-8792] implemented inline form validation in discovery rules page (uolekss)
+..F....... [ZBXNEXT-10732] implemented update for the Help URL path (scernisenko)
+..F....PS. [ZBXNEXT-10224] Added HashiCorp Vault AppRole authentication (dfofanovs, sboidenko)
+A.F.I..... [ZBXNEXT-10390] improved UX for global regular expressions (msnihach)
+.........T [ZBXNEXT-8895] adjusted version regex in Cisco templates (kflorowski)
+.........T [ZBXNEXT-10598] added changes for global multicloud VM dashboard (kbruvers)
+A.F.I...S. [ZBXNEXT-10357] implemented Zabbix server, API and frontend changes for mobile application (agriscenko, gberzina, rtrizna, wczerneha)
+.........T [ZBXNEXT-10644] added Oracle Cloud Costs by HTTP template (abrosimovs)
 .........T [ZBXNEXT-10639] added template GCP Cost monitoring by HTTP (kflorowski)
 .........T [ZBXNEXT-10328] added Percona by Zabbix agent template (mruszczyk)
 .........T [ZBXNEXT-10326] added MariaDB by Zabbix agent template (mruszczyk)
@@ -8,6 +32,44 @@ New features:
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+.........T [ZBX-27924] fixed trigger recovery expression for Dell PowerEdge by HTTP templates (mruszczyk)
+..F....... [ZBX-28065] fixed missing ellipsis for 'Result' field in Test Item form (scernisenko)
+.........T [ZBX-26954] adjusted mongo template to newer version (kflorowski)
+..F....... [ZBX-27204] fixed width of the edit tree element popup in the Map navigation tree widget (gklavins)
+..F....... [ZBX-28066] fixed inline validation to display error in case set field validation depends on parent field value (gberzina)
+..F....... [ZBX-27580] fixed misaligned checkbox and other icons in problem update form (kastafjevs)
+..F....... [ZBX-19211] fixed ambiguity between host- and template-level value mappings with identical names (aluchko)
+..F....... [ZBX-27992] fixed extra spacing after disabled z-textarea-flexible input (scernisenko)
+..F....... [ZBX-28012] fixed spacing between Host Wizard template tags in the expanded hintbox (scernisenko)
+..F....... [ZBX-27836] fixed PHP runtime errors in user role edit form (Ivo)
+...G...... [ZBX-28045] fixed active checks in case of failed response on Zabbix agent 2 (aetatsu)
+.........T [ZBX-23057] fixed memory fragmentation trigger and added RSS overhead triggers in Redis by Zabbix agent 2 template (mruszczyk)
+A......... [ZBX-28019] fixed undefined array key "type" warning in C74ImportConverter during import compare (msnihach)
+.........T [ZBX-27791] added multiplier to percent_used metric in Ceph by Zabbix agent 2 template (mruszczyk)
+..F....... [ZBX-27932] fixed pop-up open via link to display information about incorrect parameters on failure (gberzina)
+.........T [ZBX-27646] removed MS Teams webhook in default data (egordymov)
+.........T [ZBX-25042] removed DISCARD option for SNMP health status items (kflorowski)
+.........T [ZBX-25663] added node name macro to RabbitMQ node templates (abrosimovs)
+.........T [ZBX-26229] fixed CPU user and idle time OIDs in Check Point NGFW SNMP template (mruszczyk)
+.D........ [ZBX-27746] updated runtime control target lists in Zabbix server and proxy help messages and man pages by adding supervisor and removing unsupported discovery and preprocessing worker targets (rtrizna)
+..F....... [ZBX-26465] improved aria-label text for all functional buttons and icons and aria-expanded of side menu elements for Screen Reader users (aluchko)
+.........T [ZBX-25608] fixed missing precision for temperature sensors for Cisco template (kflorowski)
+.........T [ZBX-22458] fixed cache hit ratio base typo in MSSQL by ODBC template (mruszczyk)
+.........T [ZBX-21236] improved metrics filtering in API response for the 'Elasticsearch Cluster by HTTP' template (smansurovs)
+.........T [ZBX-25484] fixed incorrect item configuration in default data (egordymov)
+.........T [ZBX-24512] fixed memory items in Cisco Nexus 9000 Series by SNMP template (kflorowski)
+..F....... [ZBX-27892] fixed dynamic row counter initialization when tags are read-only in host items (uolekss)
+..F....PS. [ZBX-27637] fixed leading zeroes in database version numbers (mprihodko)
+..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
+.........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
+..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
+..F....... [ZBX-27920] fixed event menu entry parameters being marked as required when they are disabled (scernisenko)
+..F....... [ZBX-27942] fixed time filter error for Dashboard in Kiosk mode (scernisenko)
+..F....... [ZBX-25485] fixed language change to work for different environments (gberzina)
+..F....... [ZBX-27921] fixed item and item prototype validation of intervals for trapper and dependent items (gberzina)
+.........T [ZBX-24343] fixed temperature threshold trigger duplication for Cisco IOS by SNMP (kflorowski)
+..F....... [ZBX-27386] fixed select dropdown not collapsing after sorting items (gklavins)
+..F....... [ZBX-27984] fixed item test when prometheus pattern preprocessing step is used (gberzina)
 A......... [ZBX-27875] fixed the display of the "Show templates" filter in the "Host wizard" form (Sasha)
 ..F....... [ZBX-27961] fixed delete cancel confirmation in API tokens and proxy group edit forms (scernisenko)
 ..F....... [ZBX-27825] fixed to set correct mode parameter for nodata function in trigger expression edit form (gberzina)
@@ -432,6 +494,62 @@ Bug fixes:
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
 A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 .......PS. [ZBX-27638] prohibited to modify or override global system JavaScript objects via user script for preprocessing subsystem and zabbix_js (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.15rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-27924] fixed trigger recovery expression for Dell PowerEdge by HTTP templates (mruszczyk)
+..F....... [ZBX-28065] fixed missing ellipsis for 'Result' field in Test Item form (scernisenko)
+..F....... [ZBX-27204] fixed width of the edit tree element popup in the Map navigation tree widget (gklavins)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.14
+
+7.4.14rc1 was released as 7.4.14 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.4.14rc1
+
+New features:
+A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
+..F....... [ZBXNEXT-10732] updated help URL from the frontend to documentation (scernisenko)
+
+Bug fixes:
+..F....... [ZBX-28012] fixed spacing between Host Wizard template tags in the expanded hintbox (scernisenko)
+..F....... [ZBX-27836] fixed PHP runtime errors in user role edit form (Ivo)
+...G...... [ZBX-28045] fixed active checks in case of failed response on Zabbix agent 2 (aetatsu)
+.........T [ZBX-23057] fixed memory fragmentation trigger and added RSS overhead triggers in Redis by Zabbix agent 2 template (mruszczyk)
+.D........ [ZBX-27746] removed unsupported discovery worker targets and preprocessing worker profiling targets from Zabbix server and proxy help messages and man pages (rtrizna)
+.........T [ZBX-27791] added multiplier to percent_used metric in Ceph by Zabbix agent 2 template (mruszczyk)
+.........T [ZBX-27646] removed MS Teams webhook in default data (egordymov)
+.........T [ZBX-25042] removed discard option for SNMP status items (kflorowski)
+.........T [ZBX-25663] added node name macro to RabbitMQ node templates (abrosimovs)
+.........T [ZBX-26229] fixed CPU user and idle time OIDs in Check Point NGFW SNMP template (mruszczyk)
+.........T [ZBX-25608] fixed missing precision for temperature sensors for Cisco template (kflorowski)
+.........T [ZBX-22458] fixed cache hit ratio base typo in MSSQL by ODBC template (mruszczyk)
+.........T [ZBX-25484] fixed incorrect item configuration in default data (egordymov)
+.........T [ZBX-21236] improved metrics filtering in API response for the Elasticsearch Cluster by HTTP template (smansurovs)
+.........T [ZBX-24512] fixed memory items in Cisco Nexus 9000 Series by SNMP template (kflorowski)
+.........T [ZBX-24343] fixed temperature threshold trigger duplication for Cisco IOS by SNMP (kflorowski)
+..F....... [ZBX-27892] fixed dynamic row counter initialization when tags are read-only in host items (uolekss)
+..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
+.........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
+..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
+..F....... [ZBX-26465] improved aria-label text for all functional buttons and icons and aria-expanding of side menu elements for Screen Reader users (aluchko)
+..F....... [ZBX-27920] fixed event menu entry parameters being marked as required when they are disabled (scernisenko)
+..F....... [ZBX-25485] fixed language change to work for different environments (gberzina)
+..F....... [ZBX-27921] fixed item and item prototype interval validation for trapper and dependent items (gberzina)
+..F....... [ZBX-27942] fixed time filter error for dashboard in Kiosk mode (scernisenko)
+..F....... [ZBX-25815] removed mention of discovery from SNMP max_repetition help note (vskalbins)
+..F....... [ZBX-27140] fixed overall hintbox positioning (dfofanovs)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.13
+
+7.4.13rc1 was released as 7.4.13 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.4.13rc1
@@ -1948,6 +2066,57 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.31rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-27924] fixed trigger recovery expression for Dell PowerEdge by HTTP templates (mruszczyk)
+..F....... [ZBX-28065] fixed missing ellipsis for 'Result' field in Test Item form (scernisenko)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.30
+
+7.0.30rc1 was released as 7.0.30 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.30rc1
+
+New features:
+A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
+..F....... [ZBXNEXT-10732] updated help URL from the frontend to documentation (scernisenko)
+
+Bug fixes:
+..F....... [ZBX-27836] fixed PHP runtime errors in user role edit form (Ivo)
+...G...... [ZBX-28045] fixed active checks in case of failed response on Zabbix agent 2 (aetatsu)
+.........T [ZBX-23057] fixed memory fragmentation trigger and added RSS overhead triggers in Redis by Zabbix agent 2 template (mruszczyk)
+.D........ [ZBX-27746] removed unsupported discovery worker targets and preprocessing worker profiling targets from Zabbix server and proxy help messages and man pages (rtrizna)
+.........T [ZBX-27791] added multiplier to percent_used metric in Ceph by Zabbix agent 2 template (mruszczyk)
+.........T [ZBX-27646] removed MS Teams webhook in default data (egordymov)
+.........T [ZBX-25042] removed discard option for SNMP status items (kflorowski)
+.........T [ZBX-25663] added node name macro to RabbitMQ node templates (abrosimovs)
+.........T [ZBX-26229] fixed CPU user and idle time OIDs in Check Point NGFW SNMP template (mruszczyk)
+..F....... [ZBX-27861] fixed correct shape form layout corruption in Safari on reopen (msnihach)
+.........T [ZBX-25608] fixed missing precision for temperature sensors for Cisco template (kflorowski)
+.........T [ZBX-22458] fixed cache hit ratio base typo in MSSQL by ODBC template (mruszczyk)
+.........T [ZBX-25484] fixed incorrect item configuration in default data (egordymov)
+.........T [ZBX-21236] improved metrics filtering in API response for the Elasticsearch Cluster by HTTP template (smansurovs)
+.........T [ZBX-24512] fixed memory items in Cisco Nexus 9000 Series by SNMP template (kflorowski)
+.........T [ZBX-24343] fixed temperature threshold trigger duplication for Cisco IOS by SNMP (kflorowski)
+..F....... [ZBX-27893] fixed infinite loop for graphs in hosts monitoring when working time period in GUI is 00:00-24:00 (scernisenko)
+.........T [ZBX-27646] removed MS Teams webhook based on retired Office 365 Connector (mruszczyk)
+..F....... [ZBX-27908] fixed icon mapping order for individual list item (scernisenko)
+..F....... [ZBX-27920] fixed event menu entry parameters being marked as required when they are disabled (scernisenko)
+..F....... [ZBX-25485] fixed language change to work for different environments (gberzina)
+..F....... [ZBX-25815] removed mention of discovery from SNMP max_repetition help note (vskalbins)
+..F....... [ZBX-27140] fixed overall hintbox positioning (dfofanovs)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.29
+
+7.0.29rc1 was released as 7.0.29 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.29rc1
@@ -6098,6 +6267,19 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.49rc1
+
+New features:
+A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.48
+
+6.0.48rc1 was released as 6.0.48 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.48rc1

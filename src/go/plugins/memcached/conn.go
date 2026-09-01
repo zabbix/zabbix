@@ -90,18 +90,16 @@ type ConnManager struct {
 	connMutex   sync.Mutex
 	connections map[uri.URI]*MCConn
 	keepAlive   time.Duration
-	timeout     time.Duration
 	Destroy     context.CancelFunc
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(keepAlive, timeout, hkInterval time.Duration) *ConnManager {
+func NewConnManager(keepAlive, hkInterval time.Duration) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
 		connections: make(map[uri.URI]*MCConn),
 		keepAlive:   keepAlive,
-		timeout:     timeout,
 		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
 	}
 
@@ -152,25 +150,27 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI) *MCConn {
+//
+//nolint:gocritic,funcorder // we'll keep this in until the next refactor.
+func (c *ConnManager) create(connectionURI uri.URI, connectionTimeout int) *MCConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if _, ok := c.connections[uri]; ok {
+	if _, ok := c.connections[connectionURI]; ok {
 		// Should never happen.
 		panic("connection already exists")
 	}
 
 	client := mc.NewMCwithConfig(
-		uri.String(),
-		uri.User(),
-		uri.Password(),
+		connectionURI.String(),
+		connectionURI.User(),
+		connectionURI.Password(),
 		&mc.Config{
 			Hasher:             mc.NewModuloHasher(),
 			Retries:            2,
 			RetryDelay:         200 * time.Millisecond,
 			Failover:           true,
-			ConnectionTimeout:  c.timeout,
+			ConnectionTimeout:  time.Duration(connectionTimeout) * time.Second,
 			DownRetryDelay:     60 * time.Second,
 			PoolSize:           poolSize,
 			TcpKeepAlive:       true,
@@ -179,22 +179,24 @@ func (c *ConnManager) create(uri uri.URI) *MCConn {
 		},
 	)
 
-	c.connections[uri] = &MCConn{
+	c.connections[connectionURI] = &MCConn{
 		client:         *client,
 		lastTimeAccess: time.Now(),
 	}
 
-	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())
+	log.Debugf("[%s] Created new connection: %s", pluginName, connectionURI.Addr())
 
-	return c.connections[uri]
+	return c.connections[connectionURI]
 }
 
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *ConnManager) get(uri uri.URI) *MCConn {
+//
+//nolint:gocritic,funcorder // we'll keep this in until the next refactor.
+func (c *ConnManager) get(connectionURI uri.URI, _ int) *MCConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if conn, ok := c.connections[uri]; ok {
+	if conn, ok := c.connections[connectionURI]; ok {
 		conn.updateAccessTime()
 		return conn
 	}
@@ -203,15 +205,17 @@ func (c *ConnManager) get(uri uri.URI) *MCConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI) (conn *MCConn) {
+//
+//nolint:gocritic // we'll keep this in until the next refactor.
+func (c *ConnManager) GetConnection(connectionURI uri.URI, connectionTimeout int) *MCConn {
 	c.Lock()
 	defer c.Unlock()
 
-	conn = c.get(uri)
+	conn := c.get(connectionURI, connectionTimeout)
 
 	if conn == nil {
-		conn = c.create(uri)
+		conn = c.create(connectionURI, connectionTimeout)
 	}
 
-	return
+	return conn
 }

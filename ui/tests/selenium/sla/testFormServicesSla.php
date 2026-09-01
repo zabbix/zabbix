@@ -219,6 +219,8 @@ class testFormServicesSla extends CWebTest {
 		$this->checkTableElements($downtimes_table_elements, $downtimes_table);
 
 		$downtimes_table->query('button:Add')->one()->click();
+		$downtime_start = date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00';
+
 		$downtimes_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$this->assertEquals('New excluded downtime', $downtimes_dialog->getTitle());
 
@@ -229,7 +231,7 @@ class testFormServicesSla extends CWebTest {
 
 		$downtime_default_values = [
 			'Name' => '',
-			'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
+			'Start time' => $downtime_start,
 			'id:duration_days' => '0',
 			'name:duration_hours' => '1',
 			'name:duration_minutes' => '0'
@@ -262,7 +264,7 @@ class testFormServicesSla extends CWebTest {
 				'field' => 'id:start_time',
 				'maxlength' => 16,
 				'placeholder' => 'YYYY-MM-DD hh:mm',
-				'value' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00'
+				'value' => $downtime_start
 			],
 			[
 				'field' => 'id:duration_days',
@@ -287,7 +289,7 @@ class testFormServicesSla extends CWebTest {
 
 		$table_data = [
 			[
-				'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
+				'Start time' => $downtime_start,
 				'Duration' => '1h',
 				'Name' => '!@#$%^&*()_+123Zabbix',
 				'Actions' => 'EditRemove'
@@ -399,7 +401,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// #7 TODO: move "Schedule", days and period fields to the end of the fields array when DEV-4776 is merged.
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1128,6 +1130,10 @@ class testFormServicesSla extends CWebTest {
 		}
 
 		if (array_key_exists('inline_errors', $data)) {
+			// An additional submit is required for #7 case. This validation is triggered only on form submission.
+			if (in_array('At least one entry should be selected.', $data['inline_errors'])) {
+				$form->submit();
+			}
 			$this->page->removeFocus();
 			$selector = (array_keys($data['inline_errors'])[0]);
 			$field = (strpos($selector, ':') === false) ? $form->getField($selector) : $form->query($selector)->one();

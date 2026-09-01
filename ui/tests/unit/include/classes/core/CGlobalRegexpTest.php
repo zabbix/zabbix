@@ -23,13 +23,13 @@ class CGlobalRegexpTest extends TestCase
 		return [
 			// "character string included", case-sensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_INCLUDED, 'testString', 1),
+				'expression' => $this->expr(REGEX_TYPE_CONTAINS_STRING, 'testString', 1),
 				'success' => ['This is testString', 'testString starts here', 'orendswithtestString'],
 				'fail' => ['', 'This is teststring', 'TeStString maybe?', 'orendswithTestString']
 			],
 			// "character string included", case-insensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_INCLUDED, 'testString', 0),
+				'expression' => $this->expr(REGEX_TYPE_CONTAINS_STRING, 'testString', 0),
 				'success' => ['This is testStrinGG', 'TestStrinG starts here', 'orendswithtestString',
 					'This is teststring', 'TeStString maybe?'
 				],
@@ -37,13 +37,13 @@ class CGlobalRegexpTest extends TestCase
 			],
 			// "character string NOT included", case-sensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_NOT_INCLUDED, 'testString', 1),
+				'expression' => $this->expr(REGEX_TYPE_NOT_CONTAINS_STRING, 'testString', 1),
 				'success' => ['', 'This is teststring', 'TeStString maybe?', 'orendswithTestString'],
 				'fail' => ['This is testString', 'testString starts here', 'orendswithtestString']
 			],
 			// "character string NOT included", case-insensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_NOT_INCLUDED, 'testString', 0),
+				'expression' => $this->expr(REGEX_TYPE_NOT_CONTAINS_STRING, 'testString', 0),
 				'success' => ['', 'orendswithTest String', 'this is not a TEST string'],
 				'fail' => ['This is testStrinGG', 'TestStrinG starts here', 'orendswithtestString',
 					'This is teststring', 'TeStString maybe?'
@@ -51,13 +51,13 @@ class CGlobalRegexpTest extends TestCase
 			],
 			// ANY character string included, case-sensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_ANY_INCLUDED, 'Error,Disaster,Critical', 1),
+				'expression' => $this->expr(REGEX_TYPE_CONTAINS_ANY_SUBSTRING, 'Error,Disaster,Critical', 1),
 				'success' => ['Error message', 'Object has Error', 'Status: Critical', 'Disaster Errors'],
 				'fail' => ['ERROR: error', 'Object state: CRITICAL']
 			],
 			// ANY character string included, case-insensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_ANY_INCLUDED, 'Error,Disaster,Critical', 0),
+				'expression' => $this->expr(REGEX_TYPE_CONTAINS_ANY_SUBSTRING, 'Error,Disaster,Critical', 0),
 				'success' => ['Error message', 'Object has Error', 'Status: Critical', 'Disaster Errors',
 					'ERROR: error', 'Object state: CRITICAL', 'Log levels: DISASTER', 'Log levels: error'
 				],
@@ -65,55 +65,55 @@ class CGlobalRegexpTest extends TestCase
 			],
 			// regular expressions, TRUE, case-sensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, '^Log entry [0-9]+', 1),
+				'expression' => $this->expr(REGEX_TYPE_MATCHES_REGEX, '^Log entry [0-9]+', 1),
 				'success' => ['Log entry 29', 'Log entry 0', "line\nLog entry 5"],
 				'fail' => [' Log entry 171', 'Log entry', 'lineLog entry 5']
 			],
 			// regular expressions, TRUE, case-insensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, '^Log entry [0-9]+', 0),
+				'expression' => $this->expr(REGEX_TYPE_MATCHES_REGEX, '^Log entry [0-9]+', 0),
 				'success' => ['LOG ENTRY 71', 'log entry 161: something bad happened', "line\nLog entry 5"],
 				'fail' => [' Log entry 171', 'log entry', 'lineLog entry 5']
 			],
 			// regular expressions, TRUE, case-sensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, '^\\/var\\/(log|lib)', 1),
+				'expression' => $this->expr(REGEX_TYPE_MATCHES_REGEX, '^\\/var\\/(log|lib)', 1),
 				'success' => ['/var/log', '/var/lib', "/var/log/messages"],
 				'fail' => [' /var/log', '/var/li', 'var/log/messages']
 			],
 			// regular expressions, TRUE, case-insensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, '^\\/var\\/(log|lib)', 0),
+				'expression' => $this->expr(REGEX_TYPE_MATCHES_REGEX, '^\\/var\\/(log|lib)', 0),
 				'success' => ['/vAr/lOg', '/vAr/lib', "/vAr/lOg/messages"],
 				'fail' => [' /vAr/lOg', '/vAr/lI', 'vAr/lOg/messages']
 			],
 			// regular expressions, FALSE, case-sensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_FALSE, 'server state (1|3|5)', 1),
+				'expression' => $this->expr(REGEX_TYPE_NOT_MATCHES_REGEX, 'server state (1|3|5)', 1),
 				'success' => ['server state 2', 'server state OK'],
 				'fail' => ['server state 3', 'server state 1 - power failure']
 			],
 			// regular expressions, FALSE, case-insensitive
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_FALSE, 'server state (fail|outage)', 0),
+				'expression' => $this->expr(REGEX_TYPE_NOT_MATCHES_REGEX, 'server state (fail|outage)', 0),
 				'success' => ['server state 3', 'server state NOT OK - power failure'],
 				'fail' => ['Server state FAIL', 'server state outage of cooling liquid']
 			],
 			// extra tests, should verify both escaped and non-escaped slashes
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, 'http://example.com/', 0),
+				'expression' => $this->expr(REGEX_TYPE_MATCHES_REGEX, 'http://example.com/', 0),
 				'success' => ['referrer: http://example.com/', 'request to http://example.com/test'],
 				'fail' => ['example.com']
 			],
 			// empty part of search string is ignored during match
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_ANY_INCLUDED, '/', 0, '/'),
+				'expression' => $this->expr(REGEX_TYPE_CONTAINS_ANY_SUBSTRING, '/', 0, '/'),
 				'success' => ['/'],
 				'fail' => []
 			],
 			// empty part of search string is ignored during match
 			[
-				'expression' => $this->expr(EXPRESSION_TYPE_ANY_INCLUDED, '/0/a/ /', 0, '/'),
+				'expression' => $this->expr(REGEX_TYPE_CONTAINS_ANY_SUBSTRING, '/0/a/ /', 0, '/'),
 				'success' => ['d// e', '1/0// '],
 				'fail' => ['/', 'b//	b']
 			]
@@ -125,25 +125,25 @@ class CGlobalRegexpTest extends TestCase
 			// Char '/' is escaped before preg_match call.
 			[
 				'expression' => '/',
-				'type' => EXPRESSION_TYPE_TRUE,
+				'type' => REGEX_TYPE_MATCHES_REGEX,
 				'string' => 'test\/string'
 			],
 			// Char '/' is already escaped and should not be escaped before preg_match call.
 			[
 				'expression' => '\\/',
-				'type' => EXPRESSION_TYPE_TRUE,
+				'type' => REGEX_TYPE_MATCHES_REGEX,
 				'string' => 'test/string'
 			],
 			// Char '/' should not be escaped if used as part of regex pattern.
 			[
 				'expression' => '^[a-z/]+$',
-				'type' => EXPRESSION_TYPE_TRUE,
+				'type' => REGEX_TYPE_MATCHES_REGEX,
 				'string' => 'test/string'
 			],
 			// Char '/' should not be escaped if used as part of regex pattern.
 			[
 				'expression' => '^[a-z\\\\/]+$',
-				'type' => EXPRESSION_TYPE_TRUE,
+				'type' => REGEX_TYPE_MATCHES_REGEX,
 				'string' => 'test/\\string'
 			]
 		];
@@ -169,7 +169,7 @@ class CGlobalRegexpTest extends TestCase
 	public function testMatchMethod($expression, $expression_type, $string) {
 		$expr = new CGlobalRegexp($expression);
 
-		if ($expression_type == EXPRESSION_TYPE_TRUE) {
+		if ($expression_type == REGEX_TYPE_MATCHES_REGEX) {
 			$this->assertTrue($expr->match($string));
 		}
 		else {

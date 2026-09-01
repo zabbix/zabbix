@@ -39,11 +39,13 @@ This template has been tested on:
 |{$OPENAI.MODEL.NAME.NOT_MATCHES}|<p>This macro is used in OpenAI Platform model discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$OPENAI.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
 |{$OPENAI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "OpenAI Platform", e.g. {$HTTP.TLS.VERIFY:"OpenAI Platform"}.</p>|`full`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
+|Daily project count|<p>Total daily project count.</p>|Dependent item|openai.daily.project.count<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get data|<p>Item for gathering OpenAI Platform data.</p>|Script|openai.platform_data.get|
 |Get data item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|openai.platform_data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get costs|<p>Item for gathering cost data from the OpenAI Platform.</p>|Script|openai.costs_data.get|

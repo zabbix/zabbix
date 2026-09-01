@@ -170,9 +170,15 @@
 						chkbxRange.clearSelectedOnFilterChange();
 					}
 
-					if (data.submit.success?.action === 'delete') {
-						const url = new URL('host_discovery.php', location.href);
 
+					if (data.submit?.redirect_url) {
+						const url = new URL(data.submit.redirect_url, location.href);
+						event.setRedirectUrl(url.href);
+					}
+					else if (data.submit.success?.action === 'delete') {
+						const url = new URL('zabbix.php', location.href);
+
+						url.searchParams.set('action', 'lldrule.list');
 						url.searchParams.set('context', this.context);
 
 						event.setRedirectUrl(url.href);
@@ -201,10 +207,12 @@
 				}
 
 				if (response.success.action === 'delete') {
-					let list_url = new Curl('host_discovery.php');
+					const url = new URL('zabbix.php', location.href);
 
-					list_url.setArgument('context', this.context);
-					new_href = list_url.getUrl();
+					url.searchParams.set('action', 'lldrule.list');
+					url.searchParams.set('context', this.context);
+
+					new_href = url.href;
 				}
 			}
 
