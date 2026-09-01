@@ -80,10 +80,6 @@ class CCepRuleHelper {
 		self::WHEN_PATTERN_MATCHED
 	];
 
-	public const WINDOW_CONDITION_TAG_PAIR = 0;
-	public const WINDOW_CONDITION_OLD_TAG = 1;
-	public const WINDOW_CONDITION_OLD_TAG_VALUE = 2;
-
 	public const GROUP_BY_NO = 0;
 	public const GROUP_BY_YES = 1;
 
