@@ -157,7 +157,7 @@ trait traitItemTelemetryQueryTests {
 													'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 													'conditions' => []
 												]
-											],
+											]
 										]
 									]
 								]

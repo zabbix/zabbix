@@ -104,7 +104,7 @@ class testItemPrototype extends CAPITest {
 	 */
 	public function testItemDiscoveredTelemetryQueryUpdate(array $item, ?string $expected_error) {
 		$item += [
-			'itemid' => ':discovered_item:host_discovered_telemetry_query[A]',
+			'itemid' => ':discovered_item:host_discovered_telemetry_query[A]'
 		];
 		$item['itemid'] = CTestDataHelper::getConvertedValueReference($item['itemid']);
 
