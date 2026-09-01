@@ -613,13 +613,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate that token is not expired and is active, optionally      *
- *          checking that a DPoP token is bound to the specified device, and  *
- *          get associated user data                                          *
+ * Purpose: Validate that token is not expired and is active. Optionally      *
+ *          checks that a DPoP token is bound to the specified device, and    *
+ *          get associated user data.                                         *
  *                                                                            *
  * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
- *             device_uuid               - [IN] device UUID for DPoP binding  *
- *             user                      - [OUT] user information             *
+ *             device_uuid               - [IN]                               *
+ *             user                      - [OUT]                              *
  *                                                                            *
  * Return value:  SUCCEED - token is valid and user data was retrieved        *
  *                FAIL    - otherwise                                         *
@@ -703,12 +703,12 @@ int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_use
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate a DPoP token bound to the specified active device and    *
- *          get associated user data                                          *
+ * Purpose: Validate a DPoP token bound to the specified active device and    *
+ *          get associated user data.                                         *
  *                                                                            *
  * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
- *             device_uuid               - [IN] device UUID                   *
- *             user                      - [OUT] user information             *
+ *             device_uuid               - [IN]                               *
+ *             user                      - [OUT]                              *
  *                                                                            *
  * Return value:  SUCCEED - token is valid and bound to the device            *
  *                FAIL    - otherwise                                         *
