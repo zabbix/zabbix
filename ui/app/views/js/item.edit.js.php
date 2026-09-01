@@ -265,6 +265,14 @@ window.item_edit_form = new class {
 			else if (e.target.classList.contains('element-table-remove')) {
 				e.target.closest('tr').nextSibling.remove();
 				e.target.closest('tr').remove();
+
+				this.#updateTelemetryIndicators();
+			}
+		});
+
+		table.addEventListener('input', e => {
+			if (e.target.matches('[name$="[delay]"]')) {
+				this.#updateTelemetryIndicators();
 			}
 		});
 	}
@@ -830,7 +838,7 @@ window.item_edit_form = new class {
 			return;
 		}
 
-		const delay = timeUnitToSeconds(this.form_element.querySelector('[name="delay"]').value.trim(), false);
+		const delay = this.#getCurrentDelay();
 		const lookback_limit = timeUnitToSeconds(
 			this.form_element.querySelector('[name="lookback_limit"]').value.trim(), false
 		);
@@ -845,6 +853,25 @@ window.item_edit_form = new class {
 		this.label.lookback_limit_error.style.display = lookback_too_small ? '' : 'none';
 		this.label.lookback_limit_hint.style.display = data_gaps ? '' : 'none';
 		this.label.granularity_hint.style.display = data_overlap ? '' : 'none';
+	}
+
+	#getCurrentDelay() {
+		const delay = timeUnitToSeconds(this.form_element.querySelector('[name="delay"]').value.trim(), false);
+		let current_delay = delay > 0 ? delay : null;
+
+		for (const row of this.form_element.querySelectorAll('#delay-flex-table .form_row')) {
+			if (row.querySelector('[name$="[type]"]:checked').value != ITEM_DELAY_FLEXIBLE) {
+				continue;
+			}
+
+			const flexible_delay = timeUnitToSeconds(row.querySelector('[name$="[delay]"]').value.trim(), false);
+
+			if (flexible_delay > 0 && (current_delay === null || flexible_delay < current_delay)) {
+				current_delay = flexible_delay;
+			}
+		}
+
+		return current_delay;
 	}
 
 	#showErrorDialog(body, trigger_element) {
@@ -1181,6 +1208,8 @@ window.item_edit_form = new class {
 		row.querySelector('[name$="[delay]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 		row.querySelector('[name$="[period]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 		row.querySelector('[name$="[schedule]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, flexible);
+
+		this.#updateTelemetryIndicators();
 	}
 
 	#valueTypeChangeHandler(e) {
