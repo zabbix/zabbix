@@ -103,28 +103,14 @@ class CWebUser {
 		$user_url = self::$data['url'];
 		$role_url = self::checkAccess(CRoleHelper::PROFILE_REDIRECT_URL);
 		$enforce = self::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE);
-		$redirect = ['url' => $role_url, 'error' => false];
 
-		if ($enforce) {
+		if ($enforce || $user_url === '') {
 			if ($role_url === '' || $validator->validate($role_url)) {
-				return $redirect;
+				return ['url' => $role_url, 'error' => false];
 			}
-
-			return ['url' => '', 'error' => true];
 		}
-
-		if ($user_url !== '') {
-			if ($validator->validate($user_url)) {
-				$redirect['url'] = $user_url;
-
-				return $redirect;
-			}
-
-			$redirect['error'] = true;
-		}
-
-		if ($role_url === '' || $validator->validate($role_url)) {
-			return $redirect;
+		elseif ($validator->validate($user_url)) {
+			return ['url' => $user_url, 'error' => false];
 		}
 
 		return ['url' => '', 'error' => true];
