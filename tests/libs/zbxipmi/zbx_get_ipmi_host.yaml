@@ -1,0 +1,87 @@
+---
+test case: "1. Second of two registered hosts is found by matching criteria"
+in:
+  host_a:
+    ip: "192.168.1.10"
+    port: 623
+    authtype: 2
+    privilege: 4
+    username: "admin"
+    password: "secretA"
+  host_b:
+    ip: "192.168.1.20"
+    port: 623
+    authtype: 2
+    privilege: 4
+    username: "guest"
+    password: "secretB"
+  lookup:
+    ip: "192.168.1.20"
+    port: 623
+    authtype: 2
+    privilege: 4
+    username: "guest"
+    password: "secretB"
+out:
+  found: "yes"
+  ip: "192.168.1.20"
+  port: 623
+  username: "guest"
+  password: "secretB"
+---
+test case: "2. First of two registered hosts is found by matching criteria"
+in:
+  host_a:
+    ip: "192.168.1.10"
+    port: 623
+    authtype: 2
+    privilege: 4
+    username: "admin"
+    password: "secretA"
+  host_b:
+    ip: "192.168.1.20"
+    port: 623
+    authtype: 2
+    privilege: 4
+    username: "guest"
+    password: "secretB"
+  lookup:
+    ip: "192.168.1.10"
+    port: 623
+    authtype: 2
+    privilege: 4
+    username: "admin"
+    password: "secretA"
+out:
+  found: "yes"
+  ip: "192.168.1.10"
+  port: 623
+  username: "admin"
+  password: "secretA"
+---
+test case: "3. Lookup with no matching host returns NULL"
+in:
+  host_a:
+    ip: "192.168.1.10"
+    port: 623
+    authtype: 2
+    privilege: 4
+    username: "admin"
+    password: "secretA"
+  host_b:
+    ip: "192.168.1.20"
+    port: 623
+    authtype: 2
+    privilege: 4
+    username: "guest"
+    password: "secretB"
+  lookup:
+    ip: "10.0.0.1"
+    port: 623
+    authtype: 2
+    privilege: 4
+    username: "admin"
+    password: "secretA"
+out:
+  found: "no"
+...

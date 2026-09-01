@@ -1,0 +1,19 @@
+---
+test case: "1. NULL cb_data is rejected without touching any host"
+in:
+  cb_data: "null"
+out:
+  processed: "no"
+---
+test case: "2. cb_data for a still-registered host is processed"
+in:
+  cb_data: "registered"
+out:
+  processed: "yes"
+---
+test case: "3. cb_data for a host removed from hostset (stale OpenIPMI callback) is rejected"
+in:
+  cb_data: "unregistered"
+out:
+  processed: "no"
+...

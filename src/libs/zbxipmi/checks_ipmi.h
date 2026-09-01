@@ -19,8 +19,8 @@
 
 #ifdef HAVE_OPENIPMI
 
-int	zbx_init_ipmi_handler(void);
-void	zbx_free_ipmi_handler(void);
+int	zbx_init_ipmi(void);
+void	zbx_deinit_ipmi(void);
 
 int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, signed char authtype,
 		unsigned char privilege, const char *username, const char *password, const char *sensor, char **value);

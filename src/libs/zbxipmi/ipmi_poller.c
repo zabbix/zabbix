@@ -184,7 +184,7 @@ ZBX_THREAD_ENTRY(zbx_ipmi_poller_thread, args)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	zbx_init_ipmi_handler();
+	zbx_init_ipmi();
 
 	ipmi_poller_register(&ipmi_socket);
 
