@@ -612,7 +612,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change template.
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestClickXpathWait('//button[contains(@onclick,"unlink")]');
+			$this->query('xpath://button[contains(@onclick,"unlink")]')->waitUntilClickable()->one()->click()
+					->waitUntilNotPresent();
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			COverlayDialogElement::find()->one()->setDataContext('Templates');
@@ -989,9 +990,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $host]);
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $host)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 
 		$this->zbxTestClickLinkTextWait($discovery_rule);
 		$this->zbxTestClickLinkTextWait('Host prototypes');

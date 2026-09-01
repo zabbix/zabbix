@@ -93,7 +93,7 @@ zabbix_export:
         You can also set up evaluation periods for replica mismatch triggers (Deployments, ReplicaSets, StatefulSets) with the field `Replica Mismatch Evaluation Period`, which supports context and regular expressions.
       vendor:
         name: Zabbix
-        version: 7.4-5
+        version: 7.4-6
       groups:
         - name: Templates/Applications
       items:
@@ -123,6 +123,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Kube = {
             	params: {},
             
@@ -139,10 +164,13 @@ zabbix_export:
             		if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
             			Kube.params.api_url += '/';
             		}
+            
+            		Kube.tls = new CTlsConfig(params.tls_verify);
+            		Kube.tls.checkURL(Kube.params.api_url);
             	},
             
             	apiRequest: function (query) {
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(Kube.tls.options),
             			response,
             			url = encodeURI(Kube.params.api_url + query);
             		if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
@@ -265,6 +293,8 @@ zabbix_export:
               value: '{$KUBE.SCHEDULER.PORT}'
             - name: scheduler_scheme
               value: '{$KUBE.SCHEDULER.SCHEME}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Kubernetes cluster state"}'
           tags:
             - tag: component
               value: raw
@@ -409,6 +439,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Kube = {
             	params: {},
             
@@ -430,10 +485,12 @@ zabbix_export:
             			Kube.params.api_url += '/';
             		}
             
+            		Kube.tls = new CTlsConfig(params.tls_verify);
+            		Kube.tls.checkURL(Kube.params.api_url);
             	},
             
             	apiRequest: function (query) {
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(Kube.tls.options),
             			response,
             			url = encodeURI(Kube.params.api_url + query);
             
@@ -602,6 +659,8 @@ zabbix_export:
               value: '{$KUBE.KUBELET.FILTER.ANNOTATIONS}'
             - name: node_filter_labels
               value: '{$KUBE.KUBELET.FILTER.LABELS}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Kubernetes cluster state"}'
           tags:
             - tag: component
               value: raw
@@ -661,6 +720,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Kube = {
             	params: {},
             
@@ -676,10 +760,13 @@ zabbix_export:
             		if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
             			Kube.params.api_url += '/';
             		}
+            
+            		Kube.tls = new CTlsConfig(params.tls_verify);
+            		Kube.tls.checkURL(Kube.params.api_url);
             	},
             
             	apiRequest: function (query) {
-            		var request = new HttpRequest(),
+            		var request = new HttpRequest(Kube.tls.options),
             			response,
             			url = encodeURI(Kube.params.api_url + query);
             
@@ -768,7 +855,7 @@ zabbix_export:
             		var metrics_endpoint = Kube.getMetricsEndpoint(),
             			IPv4 = /(?:\d{1,3}\.){3}\d{1,3}/,
             			result = '',
-            			request = new HttpRequest();
+            			request = new HttpRequest(Kube.tls.options);
             
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
@@ -825,6 +912,8 @@ zabbix_export:
               value: '{$OPENSHIFT.STATE.ENDPOINT.NAME}'
             - name: state_endpoint_name
               value: '{$KUBE.STATE.ENDPOINT.NAME}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Kubernetes cluster state"}'
           tags:
             - tag: component
               value: raw
@@ -3820,6 +3909,22 @@ zabbix_export:
         - tag: target
           value: kubernetes
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Kubernetes cluster state", e.g. {$HTTP.TLS.VERIFY:"Kubernetes cluster state"}.'
+          config:
+            type: LIST
+            priority: '7'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}'
           value: /api/v1/componentstatuses
           description: 'Kubernetes API componentstatuses endpoint /api/v1/componentstatuses'
@@ -3867,7 +3972,7 @@ zabbix_export:
           description: 'Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             label: 'API Server Port'
             description: 'The port for the Kubernetes API server metrics endpoint. In the range from 1 to 65535 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -3876,7 +3981,7 @@ zabbix_export:
           description: 'Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.'
           config:
             type: LIST
-            priority: '9'
+            priority: '10'
             label: 'API Server Scheme'
             description: 'The scheme for the Kubernetes API server metrics endpoint.'
             options:
@@ -3889,7 +3994,7 @@ zabbix_export:
           description: 'Kubernetes Controller manager metrics endpoint port. Used in ControlPlane LLD.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             label: 'Controller Manager Port'
             description: 'The port for the Kubernetes Controller Manager metrics endpoint. In the range from 1 to 65535 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -3898,7 +4003,7 @@ zabbix_export:
           description: 'Kubernetes Controller manager metrics endpoint scheme. Used in ControlPlane LLD.'
           config:
             type: LIST
-            priority: '12'
+            priority: '13'
             label: 'Controller Manager Scheme'
             description: 'The scheme for the Kubernetes Controller Manager metrics endpoint.'
             options:
@@ -3911,7 +4016,7 @@ zabbix_export:
           description: 'Taint that applies to control plane nodes. Change if needed. Used in ControlPlane LLD.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             label: 'Control Plane Taint'
             description: 'The taint for control plane nodes.'
         - macro: '{$KUBE.HTTP.PROXY}'
@@ -3926,7 +4031,7 @@ zabbix_export:
           description: 'Node annotations to filter Kubelets (regex in values are supported). See the template''s README.md for details.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Kubelet Annotations Filter'
             description: 'Node annotations to filter Kubelets.'
@@ -3934,7 +4039,7 @@ zabbix_export:
           description: 'Node labels to filter Kubelets (regex in values are supported). See the template''s README.md for details.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Kubelet Labels Filter'
             description: 'Node labels to filter Kubelets.'
@@ -3943,7 +4048,7 @@ zabbix_export:
           description: 'Kubernetes Kubelet metrics endpoint port. Used in Kubelet LLD.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             label: 'Kubelet Port'
             description: 'The port for the Kubernetes Kubelet metrics endpoint. In the range from 1 to 65535 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -3952,7 +4057,7 @@ zabbix_export:
           description: 'Kubernetes Kubelet metrics endpoint scheme. Used in Kubelet LLD.'
           config:
             type: LIST
-            priority: '16'
+            priority: '17'
             label: 'Kubelet Scheme'
             description: 'The scheme for the Kubernetes Kubelet metrics endpoint.'
             options:
@@ -3965,7 +4070,7 @@ zabbix_export:
           description: 'Filter of discoverable Kubelets by nodename.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Kubelet Node Matches Filter'
             description: 'A regex to filter discoverable Kubelets by nodename.'
@@ -3974,7 +4079,7 @@ zabbix_export:
           description: 'Filter to exclude discovered Kubelets by nodename.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Kubelet Node Exclude Filter'
             description: 'A regex to exclude discovered Kubelets by nodename.'
@@ -3983,7 +4088,7 @@ zabbix_export:
           description: 'Filter of discoverable metrics by namespace.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Namespace Matches Filter'
             description: 'A regex to filter discoverable metrics by namespace.'
@@ -3992,7 +4097,7 @@ zabbix_export:
           description: 'Filter to exclude discovered metrics by namespace.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Namespace Exclude Filter'
             description: 'A regex to exclude discovered metrics by namespace.'
@@ -4001,7 +4106,7 @@ zabbix_export:
           description: 'Filter of discoverable nodes by nodename.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Node Matches Filter'
             description: 'A regex to filter discoverable nodes by nodename.'
@@ -4010,7 +4115,7 @@ zabbix_export:
           description: 'Filter to exclude discovered nodes by nodename.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Node Exclude Filter'
             description: 'A regex to exclude discovered nodes by nodename.'
@@ -4019,7 +4124,7 @@ zabbix_export:
           description: 'Filter of discoverable persistent volumes by name.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Persistent Volume Matches Filter'
             description: 'A regex to filter discoverable persistent volumes by name.'
@@ -4028,7 +4133,7 @@ zabbix_export:
           description: 'Filter to exclude discovered persistent volumes by name.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'Persistent Volume Exclude Filter'
             description: 'A regex to exclude discovered persistent volumes by name.'
@@ -4037,7 +4142,7 @@ zabbix_export:
           description: 'The evaluation period range which is used for calculation of expressions in trigger prototypes (time period or value range). Can be used with context.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Other
             label: 'Replica Mismatch Evaluation Period'
             description: 'The evaluation period range for trigger prototype calculations.'
@@ -4046,7 +4151,7 @@ zabbix_export:
           description: 'Kubernetes Scheduler metrics endpoint port. Used in ControlPlane LLD.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             label: 'Scheduler Port'
             description: 'The port for the Kubernetes Scheduler metrics endpoint. In the range from 1 to 65535 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
@@ -4055,7 +4160,7 @@ zabbix_export:
           description: 'Kubernetes Scheduler metrics endpoint scheme. Used in ControlPlane LLD.'
           config:
             type: LIST
-            priority: '14'
+            priority: '15'
             label: 'Scheduler Scheme'
             description: 'The scheme for the Kubernetes Scheduler metrics endpoint.'
             options:
@@ -4068,7 +4173,7 @@ zabbix_export:
           description: 'Endpoint name for kube-state-metrics service (check with `kubectl get ep -n monitoring -owide`).'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             label: 'State Endpoint Name'
             description: 'The name of the Kubernetes state endpoint.'
         - macro: '{$OPENSHIFT.STATE.ENDPOINT.NAME}'
@@ -4076,7 +4181,7 @@ zabbix_export:
           description: 'OpenShift state endpoint name.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             label: 'OpenShift State Endpoint Name'
             description: 'The name of the OpenShift state endpoint.'
       valuemaps:

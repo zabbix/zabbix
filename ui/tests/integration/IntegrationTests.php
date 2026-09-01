@@ -18,6 +18,7 @@ require_once dirname(__FILE__).'/testProxyConfSync.php';
 require_once dirname(__FILE__).'/testTimescaleDb.php';
 require_once dirname(__FILE__).'/testDataCollection.php';
 require_once dirname(__FILE__).'/testBinaryValueTypeDataCollection.php';
+require_once dirname(__FILE__).'/testEncryptionDataCollection.php';
 require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
@@ -66,6 +67,7 @@ require_once dirname(__FILE__).'/testCalculatedExpression.php';
 require_once dirname(__FILE__).'/testDiagInfo.php';
 require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
+require_once dirname(__FILE__).'/testTelnetChecks.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -82,6 +84,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testBinaryValueTypeDataCollection');
+		$suite->addTestSuite('testEncryptionDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
@@ -128,6 +131,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testDiagInfo');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
+		$suite->addTestSuite('testTelnetChecks');
 		return $suite;
 	}
 }

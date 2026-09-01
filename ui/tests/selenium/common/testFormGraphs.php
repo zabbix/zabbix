@@ -94,7 +94,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'check_defaults' => true,
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Normal')
+						'Graph type' => 'Normal'
 					],
 					'check_fields' => [
 						'id:name' => ['value' => '', 'maxlength' => 128],
@@ -129,7 +129,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Stacked')
+						'Graph type' => 'Stacked'
 					],
 					'check_fields' => [
 						'id:name' => ['value' => ''],
@@ -163,7 +163,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Pie')
+						'Graph type' => 'Pie'
 					],
 					'check_fields' => [
 						'id:name' => ['value' => ''],
@@ -196,7 +196,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
+						'Graph type' => 'Exploded'
 					],
 					'check_fields' => [
 						'id:name' => ['value' => ''],
@@ -231,7 +231,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
+						'Graph type' => 'Normal',
 						'id:visible_percent_left' => true, // Percentile line (left) checkbox.
 						'id:visible_percent_right' => true // Percentile line (right) checkbox.
 					],
@@ -244,9 +244,9 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'), // Y axis MIN value dropdown.
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed') // Y axis MAX value dropdown.
+						'Graph type' => 'Normal',
+						'id:ymin_type' => 'Fixed', // Y axis MIN value dropdown.
+						'id:ymax_type' => 'Fixed' // Y axis MAX value dropdown.
 					],
 					'check_fields' => [
 						'id:yaxismin' => ['value' => 0, 'visible' => true], // Y axis MIN fixed value input.
@@ -257,9 +257,9 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'), // Y axis MIN value dropdown.
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item') // Y axis MAX value dropdown.
+						'Graph type' => 'Normal',
+						'id:ymin_type' => 'Item', // Y axis MIN value dropdown.
+						'id:ymax_type' => 'Item' // Y axis MAX value dropdown.
 					],
 					'check_fields' => [
 						'id:ymin_itemid' => ['value' => '', 'visible' => true], // Y axis MIN item input.
@@ -401,8 +401,8 @@ class testFormGraphs extends CWebTest {
 						'id:visible_percent_right' => true,
 						'id:percent_left' => -2,
 						'id:percent_right' => -200,
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismin' => '',
 						'id:yaxismax' => ''
 					],
@@ -629,7 +629,7 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Comma in "Y axis MIN value" field'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
 						'id:yaxismin' => '88,9'
 					],
 					'items' => [
@@ -653,7 +653,7 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'String in "Y axis MIN value" field'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
 						'id:yaxismin' => 'text'
 					],
 					'items' => [
@@ -677,7 +677,7 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Comma in "Y axis MAX value" field'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismax' => '88,9'
 					],
 					'items' => [
@@ -701,7 +701,7 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'String in "Y axis MAX value" field'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismax' => 'value'
 					],
 					'items' => [
@@ -725,8 +725,8 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Y_min is greater than Y_max'.($this->prototype ? ' {#KEY}' : NULL),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismin' => 10,
 						'id:yaxismax' => 9
 					],
@@ -799,8 +799,8 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty Y MIN and MAX items',
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+						'id:ymin_type' => 'Item',
+						'id:ymax_type' => 'Item'
 					],
 					'items' => [
 						[
@@ -997,12 +997,12 @@ class testFormGraphs extends CWebTest {
 						'Name' => 'New Cloned graph name with Items in Y axis',
 						'Width' => 205,
 						'Height' => 399,
-						'Graph type' => CFormElement::RELOADABLE_FILL('Stacked'),
+						'Graph type' => 'Stacked',
 						'Show legend' => false,
 						'Show working time' => false,
 						'Show triggers' => false,
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
+						'id:ymin_type' => 'Item',
+						'id:ymax_type' => 'Item'
 					],
 					'yaxis_items' => [
 						'min' => 'Failed step of scenario "Scenario for Update".',
@@ -1027,8 +1027,8 @@ class testFormGraphs extends CWebTest {
 						'id:visible_percent_right' => true,
 						'id:percent_left' => 3,
 						'id:percent_right' => 20,
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'),
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed'),
+						'id:ymin_type' => 'Fixed',
+						'id:ymax_type' => 'Fixed',
 						'id:yaxismin' => 1,
 						'id:yaxismax' => 99
 					],

@@ -1650,7 +1650,7 @@ function makeMessageBox(string $class, array $messages, mixed $title = null, boo
 			(new CSimpleButton())
 				->addClass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
-				->setTitle(_('Close'))
+				->setAttribute('aria-label', _('Close notification'))
 		);
 	}
 
