@@ -90,24 +90,20 @@ abstract class CControllerCepRuleGeneral extends CController {
 			});
 
 			usort($request['operations'], static function (array $operation_a, array $operation_b): int {
-				if ($operation_a['execute_when'] < $operation_b['execute_when']) {
-					return -1;
-				}
-				elseif ($operation_a['execute_when'] > $operation_b['execute_when']) {
-					return 1;
-				}
-				elseif ($operation_a['sortorder'] < $operation_b['sortorder']) {
-					return -1;
+				if ($operation_a['execute_when'] != $operation_b['execute_when']) {
+					$index_a = array_search($operation_a['execute_when'], CCepRuleHelper::EXECUTE_WHEN_ORDER);
+					$index_b = array_search($operation_b['execute_when'], CCepRuleHelper::EXECUTE_WHEN_ORDER);
+
+					return $index_a <=> $index_b;
 				}
 
-				return 1;
+				return $operation_a['sortorder'] <=> $operation_b['sortorder'];
 			});
 
 			$sortorder = 1;
 
 			foreach ($request['operations'] as &$operation) {
-				$operation['sortorder'] = $sortorder;
-				$sortorder++;
+				$operation['sortorder'] = $sortorder++;
 			}
 			unset($operation);
 
