@@ -144,7 +144,6 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *ap
 	if (0 == apm_db_config->have_local_config)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "APM database is not configured"));
-
 		return NOTSUPPORTED;
 	}
 
@@ -176,12 +175,16 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *ap
 	if (SUCCEED != values_ret)
 	{
 		SET_MSG_RESULT(result, error);
-		error = NULL;
 		return NOTSUPPORTED;
 	}
 
-	for (int i = 0; i < values.values_num; i++)
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): row #%d: '%s'", __func__, i + 1, values.values[i]);
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		for (int i = 0; i < values.values_num; i++)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): row #%d: '%s'", __func__, i + 1, values.values[i]);
+		}
+	}
 
 	if (0 != values.values_num)
 	{
