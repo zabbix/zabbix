@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"compress/zlib"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"testing"
@@ -281,59 +282,53 @@ func TestReceiveMaxSize(t *testing.T) {
 	}
 }
 
-func TestUncompressMaxSize(t *testing.T) {
+func TestUncompressExpectedLength(t *testing.T) {
 	t.Parallel()
 
-	const maxSize = 100
+	const expLenFixture = 100
 
 	tests := []struct {
-		name     string
-		data     []byte
-		expLen   uint32
-		maxSize  uint32
-		wantErr  string
-		wantData []byte
+		name            string
+		data            []byte
+		expLen          uint32
+		wantErr         string
+		wantInvalidZlib bool
+		wantData        []byte
 	}{
 		{
-			name:    "expLen exceeding maxSize rejected before decompression",
-			data:    []byte("test"),
-			expLen:  maxSize + 1,
-			maxSize: maxSize,
-			wantErr: "Uncompressed message size 101 exceeds the maximum size 100 bytes.",
-		},
-		{
-			name:    "actual output exactly maxSize accepted",
-			data:    makeCompressedPayload(t, make([]byte, maxSize)),
-			expLen:  maxSize,
-			maxSize: maxSize,
+			name:    "actual output exactly expLen accepted",
+			data:    makeCompressedPayload(t, make([]byte, expLenFixture)),
+			expLen:  expLenFixture,
 			wantErr: "",
 		},
 		{
-			name:    "actual output maxSize+1 rejected",
-			data:    makeCompressedPayload(t, make([]byte, maxSize+1)),
-			expLen:  maxSize,
-			maxSize: maxSize,
-			wantErr: "Uncompressed message size 101 exceeds the maximum size 100 bytes.",
+			name:    "actual output expLen+1 rejected",
+			data:    makeCompressedPayload(t, make([]byte, expLenFixture+1)),
+			expLen:  expLenFixture,
+			wantErr: "Unable to uncompress message: uncompressed message size 101 instead of expected 100.",
 		},
 		{
-			name:    "actual output larger than maxSize+1 rejected",
-			data:    makeCompressedPayload(t, make([]byte, maxSize+2)),
-			expLen:  maxSize,
-			maxSize: maxSize,
-			wantErr: "Uncompressed message size 101 exceeds the maximum size 100 bytes.",
+			name:    "actual output expLen+2 rejected",
+			data:    makeCompressedPayload(t, make([]byte, expLenFixture+2)),
+			expLen:  expLenFixture,
+			wantErr: "Unable to uncompress message: uncompressed message size 101 instead of expected 100.",
 		},
 		{
-			name:    "actual output below limit but different from expLen returns size-mismatch error",
+			name:    "actual output below expLen rejected",
 			data:    makeCompressedPayload(t, []byte("test")),
 			expLen:  10,
-			maxSize: maxSize,
-			wantErr: "Uncompressed message size 4 instead of expected 10.",
+			wantErr: "Unable to uncompress message: uncompressed message size 4 instead of expected 10.",
 		},
 		{
-			name:     "no maxSize limit preserves previous behavior",
+			name:            "invalid zlib payload rejected",
+			data:            []byte("not-zlib-data"),
+			expLen:          4,
+			wantInvalidZlib: true,
+		},
+		{
+			name:     "valid compressed payload accepted",
 			data:     makeCompressedPayload(t, []byte("test")),
 			expLen:   4,
-			maxSize:  0,
 			wantErr:  "",
 			wantData: []byte("test"),
 		},
@@ -348,7 +343,7 @@ func TestUncompressMaxSize(t *testing.T) {
 			c := &Connection{}
 
 			data, err := c.uncompress(test.data, test.expLen)
-			if test.wantErr == "" {
+			if test.wantErr == "" && !test.wantInvalidZlib {
 				if err != nil {
 					t.Fatalf("uncompress() unexpected error: %s", err)
 				}
@@ -366,6 +361,14 @@ func TestUncompressMaxSize(t *testing.T) {
 
 			if err == nil {
 				t.Fatal("uncompress() expected error, got nil")
+			}
+
+			if test.wantInvalidZlib {
+				if !errors.Is(err, zlib.ErrHeader) {
+					t.Errorf("expected error to wrap zlib.ErrHeader, got: %s", err)
+				}
+
+				return
 			}
 
 			if err.Error() != test.wantErr {
