@@ -32,6 +32,7 @@ Set values for the `macros` according to your monitoring requirements.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Domain RDAP", e.g. {$HTTP.TLS.VERIFY:"Domain RDAP"}.</p>|`full`|
 |{$RDAP.DOMAINS}|<p>List of domains separated by commas.</p>||
 |{$RDAP.LLD.ADDITIONAL.INFO.ENABLED}|<p>Enable discovery additional information in LLD (1 - enabled, 0 - disabled).</p>|`1`|
 |{$RDAP.EXPIRATION.WARNING.DAYS}|<p>Number of days before expiration to trigger a warning.</p>|`7`|
