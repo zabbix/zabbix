@@ -157,20 +157,20 @@ $form_grid
 					_('Disabled: Users can set personal URL (after login), Redirect URL after login is used as fallback.')
 				))
 			],
-			$data['readonly'] ? '' : 'profile.redirect.enforce'
+			$data['readonly'] ? '' : CRoleHelper::PROFILE_REDIRECT_ENFORCE
 		),
 		new CFormField(
 			(new CCheckBox('profile_redirect_enforce', 1))
 				->setId('profile-redirect-enforce')
-				->setChecked($data['rules']['profile.redirect.enforce'])
+				->setChecked($data['rules'][CRoleHelper::PROFILE_REDIRECT_ENFORCE])
 				->setReadonly($data['readonly'])
 				->setUncheckedValue(0)
 		)
 	])
 	->addItem([
-		(new CLabel(_('Redirect URL after login'), 'profile.redirect.url')),
+		(new CLabel(_('Redirect URL after login'), CRoleHelper::PROFILE_REDIRECT_URL)),
 		new CFormField(
-			(new CTextAreaFlexible('profile_redirect_url', $data['rules']['profile.redirect.url']))
+			(new CTextAreaFlexible('profile_redirect_url', $data['rules'][CRoleHelper::PROFILE_REDIRECT_URL]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('role_rule', 'value_str'))
 				->setReadonly($data['readonly'])
