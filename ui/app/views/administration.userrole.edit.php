@@ -168,9 +168,10 @@ $form_grid
 		)
 	])
 	->addItem([
-		(new CLabel(_('Redirect URL after login'), CRoleHelper::PROFILE_REDIRECT_URL)),
+		(new CLabel(_('Redirect URL after login'), 'profile-redirect-url')),
 		new CFormField(
 			(new CTextAreaFlexible('profile_redirect_url', $data['rules'][CRoleHelper::PROFILE_REDIRECT_URL]))
+				->setId('profile-redirect-url')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('role_rule', 'value_str'))
 				->setReadonly($data['readonly'])
