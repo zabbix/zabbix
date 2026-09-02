@@ -1010,3 +1010,85 @@ in:
 out:
   return: SYSINFO_RET_FAIL
   error: 'Invalid or missing host in URL.'
+---
+test case: 'Redirect limit is not set [127.0.0.1,,,]'
+in:
+  key: 'web.page.get[127.0.0.1,,,]'
+  test_type: both
+out:
+  return: SYSINFO_RET_OK
+  req: "GET / HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: close\r\n\r\n"
+  url: "http://127.0.0.1:80/"
+---
+test case: 'Redirect limit is 0 [127.0.0.1,,,0]'
+in:
+  key: 'web.page.get[127.0.0.1,,,0]'
+  test_type: both
+out:
+  return: SYSINFO_RET_OK
+  req: "GET / HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: close\r\n\r\n"
+  url: "http://127.0.0.1:80/"
+---
+test case: 'Redirect limit is 10 [127.0.0.1,,,10]'
+in:
+  key: 'web.page.get[127.0.0.1,,,10]'
+  test_type: libcurl
+out:
+  return: SYSINFO_RET_OK
+  url: "http://127.0.0.1:80/"
+---
+test case: 'Redirect limit is at maximum [127.0.0.1,,,1000]'
+in:
+  key: 'web.page.get[127.0.0.1,,,1000]'
+  test_type: libcurl
+out:
+  return: SYSINFO_RET_OK
+  url: "http://127.0.0.1:80/"
+---
+test case: 'Redirect limit is not supported without cURL [127.0.0.1,,,10]'
+in:
+  key: 'web.page.get[127.0.0.1,,,10]'
+  test_type: legacy
+out:
+  return: SYSINFO_RET_FAIL
+  error: 'Zabbix agent was compiled without cURL library required for following redirects.'
+---
+test case: 'Redirect limit at maximum is not supported without cURL [127.0.0.1,,,1000]'
+in:
+  key: 'web.page.get[127.0.0.1,,,1000]'
+  test_type: legacy
+out:
+  return: SYSINFO_RET_FAIL
+  error: 'Zabbix agent was compiled without cURL library required for following redirects.'
+---
+test case: 'Redirect limit is above maximum [127.0.0.1,,,1001]'
+in:
+  key: 'web.page.get[127.0.0.1,,,1001]'
+  test_type: both
+out:
+  return: SYSINFO_RET_FAIL
+  error: 'Invalid fourth parameter: value must be between 0 and 1000.'
+---
+test case: 'Redirect limit is negative [127.0.0.1,,,-1]'
+in:
+  key: 'web.page.get[127.0.0.1,,,-1]'
+  test_type: both
+out:
+  return: SYSINFO_RET_FAIL
+  error: 'Invalid fourth parameter: value must be between 0 and 1000.'
+---
+test case: 'Redirect limit is not a number [127.0.0.1,,,abc]'
+in:
+  key: 'web.page.get[127.0.0.1,,,abc]'
+  test_type: both
+out:
+  return: SYSINFO_RET_FAIL
+  error: 'Invalid fourth parameter: value must be between 0 and 1000.'
+---
+test case: 'Too many parameters [127.0.0.1,,,0,extra]'
+in:
+  key: 'web.page.get[127.0.0.1,,,0,extra]'
+  test_type: both
+out:
+  return: SYSINFO_RET_FAIL
+  error: 'Too many parameters.'
