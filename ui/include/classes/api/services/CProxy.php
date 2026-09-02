@@ -62,7 +62,7 @@ class CProxy extends CApiService {
 				],
 				'signal_type' => [
 					'type' => API_INT32,
-					'default' => SIGNAL_TYPE_TRACES,
+					'default' => SIGNAL_TYPE_TRACES
 				]
 			]
 		]
