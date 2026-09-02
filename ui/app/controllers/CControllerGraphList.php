@@ -166,7 +166,7 @@ class CControllerGraphList extends CController {
 		$data['graphs'] = API::Graph()->get([
 			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectDiscoveryData' => ['status', 'ts_delete'],
+			'selectDiscoveryData' => ['parent_graphid', 'status', 'ts_delete'],
 			'selectHosts' => ['name'],
 			'graphids' => array_column($data['graphs'], 'graphid'),
 			'preservekeys' => true

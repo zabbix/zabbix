@@ -36,7 +36,6 @@ abstract class testFormPreprocessing extends CWebTest {
 	}
 
 	public $link;
-	public $ready_link;
 	public $success_message;
 	public $button;
 	public $fail_message;
@@ -1167,8 +1166,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: This field cannot be empty.',
 						'id:preprocessing_0_params_1' => 'Output: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			[
@@ -1183,8 +1181,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			[
@@ -1199,8 +1196,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_1' => 'Output: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
+					]
 				]
 			],
 			// Text - Replace.
@@ -1216,8 +1212,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Search string: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			// Structured data - XML XPath.
@@ -1233,8 +1228,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'XPath: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			// Structured data - JSONPath.
@@ -1250,8 +1244,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'JSON path: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			// SNMP - SNMP walk value.
@@ -1267,8 +1260,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'OID: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			// SNMP - SNMP walk to JSON.
@@ -1285,8 +1277,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'inline_errors' => [
 						'name:preprocessing[0][params_set_snmp][0][name]' => 'Field name: This field cannot be empty.',
 						'name:preprocessing[0][params_set_snmp][0][oid_prefix]' => 'OID prefix: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			[
@@ -1301,8 +1292,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'name:preprocessing[0][params_set_snmp][0][name]' => 'Field name: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			[
@@ -1317,8 +1307,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'name:preprocessing[0][params_set_snmp][0][oid_prefix]' => 'OID prefix: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
+					]
 				]
 			],
 			// Custom scripts - JavaScript.
@@ -1334,8 +1323,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Script: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			[
@@ -1377,8 +1365,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			// Validation - Check for error in JSON.
@@ -1394,8 +1381,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'JSON path: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			// Throttling - Discard unchanged with heartbeat.
@@ -1412,9 +1398,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_1_type' => 'One "Throttling" step allowed per item.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist '.
-						'within the combinations of (type)=((19, 20)).'
+					]
 				]
 			],
 			[
@@ -1429,8 +1413,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Seconds: This field cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					]
 				]
 			],
 			[
@@ -1445,8 +1428,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Seconds: A time unit is expected.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
+					]
 				]
 			],
 			[
@@ -1461,8 +1443,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Seconds: A time unit is expected.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
+					]
 				]
 			],
 			[
@@ -1477,8 +1458,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Seconds: A time unit is expected.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
+					]
 				]
 			],
 			[
@@ -1493,8 +1473,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Seconds: A time unit is expected.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
+					]
 				]
 			],
 			[
@@ -1509,8 +1488,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Seconds: A time unit is expected.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
+					]
 				]
 			],
 			[
@@ -1525,8 +1503,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Seconds: Value must be between 1s and 788400000s (9125d).'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
+					]
 				]
 			],
 			[
@@ -1541,8 +1518,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Seconds: Value must be between 1s and 788400000s (9125d).'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
+					]
 				]
 			]
 		];
@@ -1962,8 +1938,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -1978,8 +1953,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -1994,8 +1968,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -2010,8 +1983,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -2026,8 +1998,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -2042,8 +2013,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -2058,8 +2028,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -2074,8 +2043,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -2090,8 +2058,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -2107,8 +2074,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -2124,8 +2090,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -2141,8 +2106,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -2158,8 +2122,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
+					]
 				]
 			],
 			[
@@ -2175,9 +2138,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'inline_errors' => [
 						'id:preprocessing_1_type' => 'One "Prometheus" step allowed per item.'
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-							'the combinations of (type)=((22, 23)).'
+					]
 				]
 			],
 			[
@@ -3099,18 +3060,14 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * Add item and preprocessing steps.
 	 *
 	 * @param array   $data    data provider
-	 * @param boolean $lld     true if item is lld, false if item or item prototype
 	 *
 	 * @return CFormElement|CGridFormElement
-	 *
 	 */
-	protected function addItemWithPreprocessing($data, $lld = false) {
+	protected function addItemWithPreprocessing($data) {
 		$this->page->login()->open($this->link);
 		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
 
-		$form = $lld
-			? $this->query('name:itemForm')->waitUntilPresent()->asForm()->one()
-			: COverlayDialogElement::find()->one()->waitUntilready()->asForm();
+		$form = COverlayDialogElement::find()->one()->waitUntilready()->asForm();
 
 		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
@@ -3122,13 +3079,13 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check creating items, item prototypes or LLD rules with preprocessing steps.
 	 */
-	protected function checkCreate($data, $lld = false) {
+	protected function checkCreate($data) {
 		if ($data['expected'] === TEST_BAD) {
 			$sql_items = 'SELECT * FROM items ORDER BY itemid';
 			$old_hash = CDBHelper::getHash($sql_items);
 		}
 
-		$form = $this->addItemWithPreprocessing($data, $lld);
+		$form = $this->addItemWithPreprocessing($data);
 
 		// Take a screenshot to test draggable object position of preprocessing steps.
 		if (array_key_exists('screenshot', $data)) {
@@ -3146,21 +3103,14 @@ abstract class testFormPreprocessing extends CWebTest {
 			$this->assertMessage(TEST_GOOD, $this->success_message);
 
 			// Check result in frontend form.
-			$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
-
-			if ($lld == true) {
-				$this->page->open($this->ready_link.$id);
-			}
-			else {
-				$this->page->open($this->link)->waitUntilReady();
-				$this->query('link:'.$data['fields']['Name'])->one()->click();
-			}
+			$this->page->open($this->link)->waitUntilReady();
+			$this->query('link:'.$data['fields']['Name'])->one()->click();
 
 			$form->selectTab('Preprocessing')->waitUntilReady();
 			$this->assertPreprocessingSteps($data['preprocessing']);
 		}
 		else {
-			if (array_key_exists('inline_errors', $data) && !$lld) {
+			if (array_key_exists('inline_errors', $data)) {
 				$overlay = COverlayDialogElement::find(0)->waitUntilReady()->one();
 				$overlay->getFooter()->query('button:Add')->one()->waitUntilClassesNotPresent('is-loading');
 
@@ -3173,10 +3123,7 @@ abstract class testFormPreprocessing extends CWebTest {
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql_items));
 		}
-
-		if (!$lld) {
-			COverlayDialogElement::find()->one()->close();
-		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/*
@@ -3302,8 +3249,8 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check spaces in preprocessing steps.
 	 */
-	protected function checkTrailingSpaces($data, $lld = false) {
-		$form = $this->addItemWithPreprocessing($data, $lld);
+	protected function checkTrailingSpaces($data) {
+		$form = $this->addItemWithPreprocessing($data);
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $this->success_message);
@@ -3324,22 +3271,13 @@ abstract class testFormPreprocessing extends CWebTest {
 		unset($options);
 
 		// Check result in frontend form.
-		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
-
-		if ($lld == true) {
-			$this->page->open($this->ready_link.$id);
-		}
-		else {
-			$this->page->open($this->link)->waitUntilReady();
-			$this->query('link:'.$data['fields']['Name'])->one()->click();
-		}
+		$this->page->open($this->link)->waitUntilReady();
+		$this->query('link:'.$data['fields']['Name'])->one()->click();
 
 		$form->selectTab('Preprocessing');
 		$this->assertPreprocessingSteps($data['preprocessing']);
 
-		if (!$lld) {
-			COverlayDialogElement::find()->one()->close();
-		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/*
@@ -3506,8 +3444,8 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check "Custom on fail" fields and checkbox state.
 	 */
-	public function checkCustomOnFail($data, $lld = null) {
-		$form = $this->addItemWithPreprocessing($data, $lld);
+	public function checkCustomOnFail($data) {
+		$form = $this->addItemWithPreprocessing($data);
 		$steps = $this->getPreprocessingSteps();
 
 		foreach ($data['preprocessing'] as $i => $options) {
@@ -3529,13 +3467,8 @@ abstract class testFormPreprocessing extends CWebTest {
 		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
 		$item_name = CDBHelper::getValue('SELECT name FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
 
-		if ($lld == true) {
-			$this->page->open($this->ready_link.$itemid);
-		}
-		else {
-			$this->page->open($this->link)->waitUntilReady();
-			$this->query('link:'.$item_name)->one()->click()->waitUntilReady();
-		}
+		$this->page->open($this->link)->waitUntilReady();
+		$this->query('link:'.$item_name)->one()->click()->waitUntilReady();
 
 		$form->selectTab('Preprocessing');
 		$steps = $this->assertPreprocessingSteps($data['preprocessing']);
@@ -3577,9 +3510,7 @@ abstract class testFormPreprocessing extends CWebTest {
 			}
 		}
 
-		if (!$lld) {
-			COverlayDialogElement::find()->one()->close();
-		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getCustomOnFailValidationData() {
@@ -3642,8 +3573,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				],
 				'inline_errors' => [
 					'id:preprocessing_1_error_handler_params' => 'Error message: This field cannot be empty.'
-				],
-				'error' => 'Invalid parameter "/1/preprocessing/1/error_handler_params": cannot be empty.'
+				]
 			],
 			[
 				'expected' => TEST_GOOD,
@@ -3846,9 +3776,9 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * @param array		$data		data provider
 	 * @param string	$host_link	URL of host configuration
 	 */
-	protected function checkPreprocessingInheritance($data, $host_link, $lld = false) {
+	protected function checkPreprocessingInheritance($data, $host_link) {
 		// Create item on template.
-		$form = $this->addItemWithPreprocessing($data, $lld);
+		$form = $this->addItemWithPreprocessing($data);
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $this->success_message);
@@ -3896,9 +3826,7 @@ abstract class testFormPreprocessing extends CWebTest {
 			}
 		}
 
-		if (!$lld) {
-			COverlayDialogElement::find()->one()->close();
-		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -3918,7 +3846,8 @@ abstract class testFormPreprocessing extends CWebTest {
 		$this->page->login()->open($link)->waitUntilReady();
 
 		if ($item === 'Discovery rule') {
-			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+			$form = $dialog->asForm();
 		}
 		else {
 			$item_name = ($item === 'Item')
@@ -3941,13 +3870,8 @@ abstract class testFormPreprocessing extends CWebTest {
 		$form->selectTab($item);
 
 		// Clone item.
-		if ($item === 'Item' || $item === 'Item prototype') {
-			$dialog->getFooter()->query('button:Clone')->one()->click();
-			COverlayDialogElement::find()->one()->waitUntilReady();
-		}
-		else {
-			$form->query('button:Clone')->waitUntilPresent()->one()->click()->waitUntilNotVisible();
-		}
+		$dialog->getFooter()->query('button:Clone')->one()->click();
+		COverlayDialogElement::find()->waitUntilReady();
 
 		$form->invalidate();
 		$form->fill($cloned_values);
@@ -3957,24 +3881,20 @@ abstract class testFormPreprocessing extends CWebTest {
 		$message = ($item === 'Discovery rule') ? $item.' created' : $item.' added';
 		$this->assertMessage(TEST_GOOD, $message);
 
-		// Open cloned item and check preprocessing steps in saved form.
-		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($cloned_values['Key']));
-
+		// Open cloned item and check preprocessing steps in saved form. LLD list requires to remove filtering by host.
 		if ($item === 'Discovery rule') {
-			$this->page->open($this->ready_link.$id);
-		}
-		else {
-			$this->page->open($link);
-			$this->query('link', $cloned_values['Name'])->one()->click();
+			$filter = $this->query('name:zbx_filter')->one()->asForm();
+			$filter->getField('Hosts')->fill('');
+			$filter->submit();
+			$this->page->waitUntilReady();
 		}
 
+		$this->query('link', $cloned_values['Name'])->waitUntilCLickable()->one()->click();
 		$form->invalidate();
 		$this->assertEquals($cloned_values['Name'], $form->getField('Name')->getValue());
 		$this->checkPreprocessingSteps($form, $original_steps);
 
-		if ($item === 'Item' || $item === 'Item prototype') {
-			COverlayDialogElement::find()->one()->close();
-		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -4258,18 +4178,26 @@ abstract class testFormPreprocessing extends CWebTest {
 				->one(false)->isVisible(!$lld)
 		);
 
-		// Hint is present only for Items and Item prototypes.
-		if (!$lld) {
-			$form->getLabel('Preprocessing steps')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilReady();
-			$this->assertEquals("Preprocessing is a transformation before saving the value to the database.".
-					" It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.".
-					"\n\nHowever, if \"Check for not supported value\" steps are configured, they are always placed and".
-					" executed first (with \"any error\" being the last of them).", $hint->getText()
-			);
-			$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+		// Check hintbox content.
+		$form->getLabel('Preprocessing steps')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
+		$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilReady();
 
-			// Check 'Type of information' options.
+		$expected_text = ($lld)
+			? 'Preprocessing is a transformation before saving the value to the database. It is possible to define a'.
+				' sequence of preprocessing steps, and those are executed in the order they are set.'
+			: "Preprocessing is a transformation before saving the value to the database.".
+				" It is possible to define a sequence of preprocessing steps, and those are executed in the order they".
+				" are set.\n\nHowever, if \"Check for not supported value\" steps are configured, they are always placed and".
+				" executed first (with \"any error\" being the last of them).";
+
+		$this->assertEquals($expected_text, $hint->getText());
+		$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+
+		// Check 'Type of information' options.
+		if ($lld) {
+			$this->assertFalse($form->query('name:value_type_steps')->one(false)->isValid());
+		}
+		else {
 			$this->assertEquals(['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'JSON'],
 					$form->query('name:value_type_steps')->asDropdown()->one()->getOptions()->asText()
 			);
