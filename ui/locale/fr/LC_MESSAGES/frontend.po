@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-07-31 21:39+0000\n"
+"PO-Revision-Date: 2026-08-23 11:32+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -8848,8 +8848,8 @@ msgstr "Type d'événement"
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:273
 msgid "Event updated"
 msgid_plural "Events updated"
-msgstr[0] "Mettre à jour l'événement"
-msgstr[1] "Mettre à jour les événements"
+msgstr[0] "Evénement mis à jour"
+msgstr[1] "Evénements mis à jour"
 
 #: app/views/connector.edit.php:58 app/views/connector.list.php:100
 msgid "Events"
@@ -13723,7 +13723,7 @@ msgstr "Liste les instances d'objet des compteurs de performances Windows. Retou
 
 #: include/classes/html/CTabFilter.php:382
 msgid "List of open filter tabs"
-msgstr ""
+msgstr "Liste des onglets de filtre ouverts"
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
@@ -14355,7 +14355,7 @@ msgstr "Le nombre maximal de répétitions s'applique uniquement à la découver
 #: app/partials/configuration.host.interface.row.php:57
 #: app/views/host.wizard.edit.php:752
 msgid "Max repetition count is applicable to walk only."
-msgstr ""
+msgstr "Le nombre maximal de répétitions s'applique uniquement à walk."
 
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
