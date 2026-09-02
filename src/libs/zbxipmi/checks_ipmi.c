@@ -32,7 +32,7 @@
 /* "...Since you can use BCD and the field is 16 bytes max, you can get up to 32 bytes in the ID string. Adding the */
 /* sensor sharing and that's another three bytes (I believe 142 is the maximum number you can get), so 35 bytes is  */
 /* the maximum, I believe." */
-#define IPMI_SENSOR_ID_SZ	36
+#define ZBX_IPMI_SENSOR_ID_SZ	36
 
 #define MAX_DISCRETE_STATES	15
 
@@ -44,6 +44,7 @@
 #include <OpenIPMI/ipmi_lan.h>
 #include <OpenIPMI/ipmi_auth.h>
 
+/* for diagnostic of invalid data passed to callback functions */
 #define RETURN_IF_CB_DATA_INVALID(x)										\
 	do													\
 	{													\
@@ -82,7 +83,7 @@ typedef struct
 	/* ipmi_sensor_pointer_cb()/ipmi_sensor_id_get_*() instead. */
 	ipmi_sensor_t			*sensor;
 	ipmi_sensor_id_t		sensor_id;
-	char				id[IPMI_SENSOR_ID_SZ];
+	char				id[ZBX_IPMI_SENSOR_ID_SZ];
 	enum ipmi_str_type_e		id_type;	/* For sensors IPMI specifications mention Unicode, BCD plus, */
 							/* 6-bit ASCII packed, 8-bit ASCII+Latin1.  */
 	int				id_sz;		/* "id" value length in bytes */
@@ -166,7 +167,7 @@ static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum
 		return str;
 	}
 
-	if (IPMI_SENSOR_ID_SZ < id_sz)
+	if (ZBX_IPMI_SENSOR_ID_SZ < id_sz)
 	{
 		zbx_strlcpy(str, "ILLEGAL-SENSOR-ID-SIZE", str_sz);
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -384,9 +385,9 @@ static char	*zbx_get_ipmi_units(ipmi_sensor_t *sensor);
 
 static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
-	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
+	char			id_str[2 * ZBX_IPMI_SENSOR_ID_SZ + 1];
 	zbx_ipmi_sensor_t	*s;
-	char			id[IPMI_SENSOR_ID_SZ];
+	char			id[ZBX_IPMI_SENSOR_ID_SZ];
 	enum ipmi_str_type_e	id_type;
 	int			id_sz;
 	size_t			sz;
@@ -467,7 +468,7 @@ static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, const ipmi_sensor_t *sens
 			continue;
 
 		size_t	sz = sizeof(zbx_ipmi_sensor_t);
-		char	id_str[2 * IPMI_SENSOR_ID_SZ + 1];
+		char	id_str[2 * ZBX_IPMI_SENSOR_ID_SZ + 1];
 
 		zabbix_log(LOG_LEVEL_DEBUG, "sensor '%s@[%s]:%d' deleted",
 				zbx_sensor_id_to_str(id_str, sizeof(id_str), h->sensors[i].id, h->sensors[i].id_type,
@@ -654,8 +655,8 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *sensor, int err, ipmi_threshold
 
 	if (NULL == (s = zbx_get_ipmi_sensor(h, sensor)))
 	{
-		char			id[IPMI_SENSOR_ID_SZ];
-		char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
+		char			id[ZBX_IPMI_SENSOR_ID_SZ];
+		char			id_str[2 * ZBX_IPMI_SENSOR_ID_SZ + 1];
 		int			id_sz;
 		enum ipmi_str_type_e	id_type;
 
@@ -726,7 +727,7 @@ static char	*zbx_get_ipmi_units(ipmi_sensor_t *sensor)
 static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_value_present_e value_present,
 		unsigned int raw_value, double val, ipmi_states_t *states, void *cb_data)
 {
-	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
+	char			id_str[2 * ZBX_IPMI_SENSOR_ID_SZ + 1];
 	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
 	zbx_ipmi_sensor_t	*s;
 
@@ -819,7 +820,7 @@ out:
 /* callback function invoked from OpenIPMI */
 static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_states_t *states, void *cb_data)
 {
-	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
+	char			id_str[2 * ZBX_IPMI_SENSOR_ID_SZ + 1];
 	int			id, val, ret, is_state_set;
 	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
 	zbx_ipmi_sensor_t	*s;
@@ -965,7 +966,7 @@ void	zbx_perform_all_openipmi_ops(int timeout)
 
 static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 {
-	char	id_str[2 * IPMI_SENSOR_ID_SZ + 1];
+	char	id_str[2 * ZBX_IPMI_SENSOR_ID_SZ + 1];
 	int	ret;
 
 	/* copy sensor details at start - it can go away and we won't be able to make an error message */
@@ -1040,7 +1041,7 @@ out:
 
 static void	zbx_read_ipmi_thresholds(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 {
-	char	id_str[2 * IPMI_SENSOR_ID_SZ + 1];
+	char	id_str[2 * ZBX_IPMI_SENSOR_ID_SZ + 1];
 	int 	ret;
 
 	/* copy sensor details at start - it can go away and we won't be able to make an error message */
