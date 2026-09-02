@@ -27,6 +27,10 @@ const ZBX_PROPERTY_BOTH = 0x03;
 const ZBX_SORT_UP = 'ASC';
 const ZBX_SORT_DOWN = 'DESC';
 
+const ZBX_LAYOUT_NORMAL = 0;
+const ZBX_LAYOUT_KIOSKMODE = 1;
+const ZBX_LAYOUT_MODE = 'layout-mode';
+
 const ZBX_STYLE_LOADING = 'is-loading';
 const ZBX_STYLE_LOADING_FADEIN = 'is-loading-fadein';
 
@@ -45,6 +49,7 @@ const ZBX_STYLE_NO_INDENT = 'no-indent';
 const ZBX_STYLE_WORDBREAK = 'wordbreak';
 
 const ZBX_STYLE_LAYOUT_WRAPPER = 'wrapper';
+const ZBX_STYLE_LAYOUT_KIOSKMODE = 'layout-kioskmode';
 
 const ZBX_STYLE_BTN = 'btn';
 const ZBX_STYLE_BTN_ALT = 'btn-alt';
@@ -172,6 +177,7 @@ const ZBX_ICON_CHEVRON_RIGHT = 'zi-chevron-right';
 const ZBX_ICON_CHEVRON_UP = 'zi-chevron-up';
 const ZBX_ICON_COG_FILLED = 'zi-cog-filled';
 const ZBX_ICON_CONTEXT = 'zi-context';
+const ZBX_ICON_CLOSE = 'zi-close';
 const ZBX_ICON_COPY = 'zi-copy';
 const ZBX_ICON_CROSS = 'zi-cross';
 const ZBX_ICON_EYE_OFF = 'zi-eye-off';

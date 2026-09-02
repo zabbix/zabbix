@@ -369,6 +369,7 @@
 	.datatable-scrollbar {
 		position: sticky;
 		bottom: calc(var(--datatable-row-height) + 1px);
+		grid-column: 1 / -1;
 		margin-top: -1px;
 		z-index: 10;
 		height: var(--datatable-scrollbar-height);
@@ -399,6 +400,7 @@
 	.datatable-footer {
 		z-index: 10;
 		display: grid;
+		grid-column: 1 / -1;
 		grid-template-columns: 1fr auto 1fr;
 		align-items: center;
 		height: var(--datatable-row-height);

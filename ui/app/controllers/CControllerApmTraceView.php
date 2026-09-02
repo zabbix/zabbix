@@ -27,8 +27,8 @@ class CControllerApmTraceView extends CController {
 
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'filter_trace_id' => ['string'],
-			'filter_span_id' => ['string'],
+			'filter_traceid' => ['string'],
+			'filter_spanid' => ['string'],
 			'filter_service_name' => ['string'],
 			'filter_operation_name' => ['string'],
 			'filter_scope_name' => ['string'],
@@ -95,8 +95,8 @@ class CControllerApmTraceView extends CController {
 		}
 
 		$filter = [
-			'trace_id' => CProfile::get('web.apm.trace.filter_trace_id', ''),
-			'span_id' => CProfile::get('web.apm.trace.filter_span_id', ''),
+			'traceid' => CProfile::get('web.apm.trace.filter_traceid', ''),
+			'spanid' => CProfile::get('web.apm.trace.filter_spanid', ''),
 			'service_name' => CProfile::get('web.apm.trace.filter_service_name', ''),
 			'operation_name' => CProfile::get('web.apm.trace.filter_operation_name', ''),
 			'scope_name' => CProfile::get('web.apm.trace.filter_scope_name', ''),
@@ -142,8 +142,8 @@ class CControllerApmTraceView extends CController {
 			}
 		}
 
-		CProfile::update('web.apm.trace.filter_trace_id', $this->getInput('filter_trace_id', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.apm.trace.filter_span_id', $this->getInput('filter_span_id', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.filter_traceid', $this->getInput('filter_traceid', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.apm.trace.filter_spanid', $this->getInput('filter_spanid', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.apm.trace.filter_service_name', $this->getInput('filter_service_name', ''),
 			PROFILE_TYPE_STR);
 		CProfile::update('web.apm.trace.filter_operation_name', $this->getInput('filter_operation_name', ''),
@@ -166,8 +166,8 @@ class CControllerApmTraceView extends CController {
 	}
 
 	private function deleteProfiles(): void {
-		CProfile::delete('web.apm.trace.filter_trace_id');
-		CProfile::delete('web.apm.trace.filter_span_id');
+		CProfile::delete('web.apm.trace.filter_traceid');
+		CProfile::delete('web.apm.trace.filter_spanid');
 		CProfile::delete('web.apm.trace.filter_service_name');
 		CProfile::delete('web.apm.trace.filter_operation_name');
 		CProfile::delete('web.apm.trace.filter_scope_name');

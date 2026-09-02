@@ -35,6 +35,8 @@
 		#apply_filter_button = null;
 		#csrf_token = null;
 		#refresh_message_box = null;
+		/** @type {CSideDrawer|null} */
+		#side_drawer = null;
 
 		init({
 			csrf_token,
@@ -132,13 +134,15 @@
 					new CDataTableColumn('timestamp', <?= json_encode(_('Start time')); ?>)
 						.setFields(['timestamp'])
 						.setSortable(true)
-						.setRenderer('timestamp'),
+						.setRenderer('timestamp')
+						.setWidth('auto'),
 					new CDataTableColumn('attributes', <?= json_encode(_('Attributes')); ?>)
 						.setColumnOptions({
 							number_of_attributes: 3
 						})
 						.setFields(['span_attributes'])
-						.setRenderer('attributes'),
+						.setRenderer('attributes')
+						.setWidth('minmax(auto, max-content)'),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
 						.setFields(['duration_time_units', 'duration_percentage'])
 						.setRenderer('duration')
@@ -277,6 +281,13 @@
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_COMPACT);
 					cell.appendChild(duration);
 				})
+				.setRowRenderer('trace', ({columns, data_fields, row, row_data, row_index, response}) => {
+					const traceid = data_fields.indexOf('traceid');
+
+					row.setAttribute('data-traceid', row_data[traceid] ?? null);
+
+					this.#datatable.renderDataCells({columns, data_fields, row, row_data, row_index, response});
+				})
 				.on(CMessageHelper.EVENT_MESSAGE, e => {
 					e.stopPropagation();
 
@@ -299,8 +310,21 @@
 					}
 				})
 				.on(CDataTable.EVENT_AFTER_RENDER, () => {
-					for (const row of this.#datatable.getElement().querySelectorAll(`.${CDataTable.ZBX_STYLE_ROW}`)) {
-						row.addEventListener('click', () => alert('TODO'));
+					const datatable_element = this.#datatable.getElement();
+					const rows = datatable_element.querySelectorAll(`.${CDataTable.ZBX_STYLE_ROW}`);
+
+					for (const row of rows) {
+						row.addEventListener('click', () => {
+							const row_selected = datatable_element.querySelector(`.${ZBX_STYLE_ROW_SELECTED}`);
+							row_selected?.classList.remove(ZBX_STYLE_ROW_SELECTED);
+
+							row.classList.add(ZBX_STYLE_ROW_SELECTED);
+
+							const wrapper = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
+							const traceid = row.getAttribute('data-traceid');
+
+							this.#openSideDrawer(wrapper, traceid);
+						});
 					}
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
@@ -309,6 +333,40 @@
 				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.#unscheduleRefresh())
 				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.#scheduleRefresh())
 				.init(user_configs);
+		}
+
+		#openSideDrawer(container, traceid) {
+			const url = new URL('zabbix.php', location.href);
+			url.searchParams.set('action', 'apm.trace.side.view');
+
+			this.#side_drawer = new CSideDrawer(container, {
+				split_view_class: 'trace-split-view',
+				content_pane_class: ZBX_STYLE_LAYOUT_WRAPPER
+			});
+
+			this.#side_drawer.on(CSideDrawer.EVENT_OPEN, this.#onSideDrawerOpen);
+			this.#side_drawer.on(CSideDrawer.EVENT_CLOSE, this.#onSideDrawerClose);
+
+			this.#side_drawer.open(url.toString(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({traceid})
+			});
+		}
+
+		#onSideDrawerOpen = (e) => {
+			const { side_drawer } = e.detail;
+			const element = side_drawer.getElement();
+
+			element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
+
+			const copy_button = element.querySelector('.js-copy-button');
+			copy_button?.addEventListener('click', e => writeTextClipboard(e.target.getAttribute('data-traceid')));
+		}
+
+		#onSideDrawerClose = () => {
+			const row_selected = this.#datatable.getElement().querySelector(`.${ZBX_STYLE_ROW_SELECTED}`);
+			row_selected?.classList.remove(ZBX_STYLE_ROW_SELECTED);
 		}
 
 		#validateFormChanges() {

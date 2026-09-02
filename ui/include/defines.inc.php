@@ -407,10 +407,10 @@ define('APM_TRACE_STATUS_OK',		0);
 define('APM_TRACE_STATUS_ERROR',	1);
 define('APM_TRACE_STATUS_UNSET',	2);
 
-define('APM_METRIC_TYPE_COUNTER',	0);
-define('APM_METRIC_TYPE_GAUGE',		1);
-define('APM_METRIC_TYPE_HISTOGRAM',	2);
-define('APM_METRIC_TYPE_SUMMARY',	3);
+define('APM_METRIC_TYPE_GAUGE',					0);
+define('APM_METRIC_TYPE_SUM',					1);
+define('APM_METRIC_TYPE_HISTOGRAM',				2);
+define('APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM',	3);
 
 define('APM_LOG_SEVERITY_TRACE',	0);
 define('APM_LOG_SEVERITY_DEBUG',	1);
@@ -2432,6 +2432,7 @@ define('ZBX_ICON_COG_FILLED', 'zi-cog-filled');
 define('ZBX_ICON_CONTEXT', 'zi-context');
 define('ZBX_ICON_COLLAPSE', 'zi-collapse');
 define('ZBX_ICON_COMMAND', 'zi-command');
+define('ZBX_ICON_CLOSE', 'zi-close');
 define('ZBX_ICON_COPY', 'zi-copy');
 define('ZBX_ICON_CROSS', 'zi-cross');
 define('ZBX_ICON_DASHBOARDS', 'zi-dashboards');
@@ -2565,11 +2566,6 @@ define('ZBX_DEVICE_STATUS_ORPHANED',	2);
 
 define('MOBILE_KEY_SCOPE_IDENTITY',		0);
 define('MOBILE_KEY_SCOPE_ENCRYPTION',	1);
-
-define('APM_METRIC_TYPE_GAUGE',					0);
-define('APM_METRIC_TYPE_SUM',					1);
-define('APM_METRIC_TYPE_HISTOGRAM',				2);
-define('APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM',	3);
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');

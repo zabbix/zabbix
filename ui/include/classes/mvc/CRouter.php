@@ -61,6 +61,7 @@ class CRouter {
 		'apm.metric.view.data'						=> [CControllerApmMetricViewData::class,							'layout.json',			null],
 		'apm.trace.view'							=> [CControllerApmTraceView::class,									'layout.htmlpage',		'apm.trace.view'],
 		'apm.trace.view.data'						=> [CControllerApmTraceViewData::class,								'layout.json',			null],
+		'apm.trace.side.view'						=> [CControllerApmTraceSideView::class,								'layout.json',			null],
 		'audit.settings.edit'						=> [CControllerAuditSettingsEdit::class,							'layout.htmlpage',		'administration.audit.settings.edit'],
 		'audit.settings.update'						=> [CControllerAuditSettingsUpdate::class, 							'layout.json',			null],
 		'auditlog.csv'								=> [CControllerAuditLogList::class,									'layout.csv',			'reports.auditlog.list.csv'],

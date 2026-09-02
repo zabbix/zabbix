@@ -27,8 +27,8 @@ class CControllerApmLogView extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'filter_body' =>			'string',
-			'filter_trace_id' =>		'string',
-			'filter_span_id' =>			'string',
+			'filter_traceid' =>			'string',
+			'filter_spanid' =>			'string',
 			'filter_service_name' =>	'string',
 			'filter_scope_name' =>		'string',
 			'filter_severities' =>		'array',
@@ -88,8 +88,8 @@ class CControllerApmLogView extends CController {
 
 		$filter = [
 			'body' => CProfile::get('web.apm.log.filter_body', ''),
-			'trace_id' => CProfile::get('web.apm.log.filter_trace_id', ''),
-			'span_id' => CProfile::get('web.apm.log.filter_span_id', ''),
+			'traceid' => CProfile::get('web.apm.log.filter_traceid', ''),
+			'spanid' => CProfile::get('web.apm.log.filter_spanid', ''),
 			'service_name' => CProfile::get('web.apm.log.filter_service_name', ''),
 			'scope_name' => CProfile::get('web.apm.log.filter_scope_name', ''),
 			'severities' =>	CProfile::getArray('web.apm.log.filter_severities', []),
@@ -132,8 +132,8 @@ class CControllerApmLogView extends CController {
 		}
 
 		CProfile::update('web.apm.log.filter_body', $this->getInput('filter_body', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.apm.log.filter_trace_id', $this->getInput('filter_trace_id', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.apm.log.filter_span_id', $this->getInput('filter_span_id', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.apm.log.filter_traceid', $this->getInput('filter_traceid', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.apm.log.filter_spanid', $this->getInput('filter_spanid', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.apm.log.filter_service_name', $this->getInput('filter_service_name', ''),
 			PROFILE_TYPE_STR);
 		CProfile::update('web.apm.log.filter_scope_name', $this->getInput('filter_scope_name', ''), PROFILE_TYPE_STR);
@@ -151,8 +151,8 @@ class CControllerApmLogView extends CController {
 
 	private function deleteProfiles(): void {
 		CProfile::delete('web.apm.log.filter_body');
-		CProfile::delete('web.apm.log.filter_trace_id');
-		CProfile::delete('web.apm.log.filter_span_id');
+		CProfile::delete('web.apm.log.filter_traceid');
+		CProfile::delete('web.apm.log.filter_spanid');
 		CProfile::delete('web.apm.log.filter_service_name');
 		CProfile::delete('web.apm.log.filter_scope_name');
 		CProfile::deleteIdx('web.apm.log.filter_severities');

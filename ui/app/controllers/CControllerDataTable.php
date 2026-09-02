@@ -165,8 +165,10 @@ abstract class CControllerDataTable extends CController {
 		]));
 	}
 
-	protected function getDataFields(): array {
-		return array_values(array_intersect($this->getInput('data_fields'), $this->allowed_data_fields));
+	protected function getDataFields(array $additional_data_fields = []): array {
+		$data_fields = array_merge($this->getInput('data_fields'), $additional_data_fields);
+
+		return array_values(array_intersect($data_fields, $this->allowed_data_fields));
 	}
 
 	protected function getUserConfigs(string $storage_idx): array {

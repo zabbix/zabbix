@@ -16,8 +16,8 @@
 
 class CControllerApmTraceViewData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['service_name', 'span_count', 'error_count', 'span_name', 'timestamp',
-		'span_attributes', 'duration_time_units', 'duration_percentage'];
+	protected array $allowed_data_fields = ['traceid', 'service_name', 'span_count', 'error_count', 'span_name',
+		'timestamp', 'span_attributes', 'duration_time_units', 'duration_percentage'];
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_APM_TRACES);
@@ -61,11 +61,11 @@ class CControllerApmTraceViewData extends CControllerDataTable {
 			}
 			unset($trace);
 
-			$rows = array_values(array_map(static fn (array $trace) => [[], $trace], $traces));
+			$rows = array_values(array_map(static fn (array $trace) => [['renderer' => 'trace'], $trace], $traces));
 		}
 
 		$output = [
-			'data_fields' => $this->getDataFields(),
+			'data_fields' => $this->getDataFields(['traceid']),
 			'rows' => $rows
 		];
 

@@ -56,16 +56,16 @@ $filter = (new CFilter())
 				)
 			])
 			->addItem([
-				(new CLabel(_('Trace ID'), 'filter_trace_id')),
+				(new CLabel(_('Trace ID'), 'filter_traceid')),
 				new CFormField(
-					(new CTextBox('filter_trace_id', $data['filter']['trace_id']))
+					(new CTextBox('filter_traceid', $data['filter']['traceid']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 			])
 			->addItem([
-				(new CLabel(_('Span ID'), 'filter_span_id')),
+				(new CLabel(_('Span ID'), 'filter_spanid')),
 				new CFormField(
-					(new CTextBox('filter_span_id', $data['filter']['span_id']))
+					(new CTextBox('filter_spanid', $data['filter']['spanid']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 			])
