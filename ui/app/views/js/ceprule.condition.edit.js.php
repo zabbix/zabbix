@@ -75,12 +75,6 @@ window.ceprule_condition_edit_popup = new class {
 				<?= CONDITION_OPERATOR_LIKE ?>,
 				<?= CONDITION_OPERATOR_NOT_LIKE ?>
 			],
-			[<?= CCepRuleHelper::CONDITION_HOST ?>]: [
-				<?= CONDITION_OPERATOR_EQUAL ?>,
-				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
-				<?= CONDITION_OPERATOR_LIKE ?>,
-				<?= CONDITION_OPERATOR_NOT_LIKE ?>
-			],
 			[<?= CCepRuleHelper::CONDITION_TAG ?>]: [
 				<?= CONDITION_OPERATOR_EQUAL ?>,
 				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
