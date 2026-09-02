@@ -282,6 +282,55 @@ func TestReceiveMaxSize(t *testing.T) {
 	}
 }
 
+func checkSuccessfulUncompress(t *testing.T, data []byte, expLen uint32, wantData []byte, err error) {
+	t.Helper()
+
+	if err != nil {
+		t.Fatalf("uncompress() unexpected error: %s", err)
+	}
+
+	if len(data) != int(expLen) {
+		t.Errorf("uncompress() output length = %d, want %d", len(data), expLen)
+	}
+
+	if wantData != nil && !bytes.Equal(data, wantData) {
+		t.Errorf("uncompress() output = %q, want %q", data, wantData)
+	}
+}
+
+func checkUncompressError(t *testing.T, err error, wantErr string, wantInvalidZlib bool) {
+	t.Helper()
+
+	if err == nil {
+		t.Fatal("uncompress() expected error, got nil")
+	}
+
+	if wantInvalidZlib {
+		if !errors.Is(err, zlib.ErrHeader) {
+			t.Errorf("expected error to wrap zlib.ErrHeader, got: %s", err)
+		}
+
+		return
+	}
+
+	if err.Error() != wantErr {
+		t.Errorf("expected error %q, got: %s", wantErr, err)
+	}
+}
+
+func checkUncompressResult(t *testing.T, data []byte, expLen uint32, wantData []byte, err error, wantErr string,
+	wantInvalidZlib bool) {
+	t.Helper()
+
+	if wantErr == "" && !wantInvalidZlib {
+		checkSuccessfulUncompress(t, data, expLen, wantData, err)
+
+		return
+	}
+
+	checkUncompressError(t, err, wantErr, wantInvalidZlib)
+}
+
 func TestUncompressExpectedLength(t *testing.T) {
 	t.Parallel()
 
@@ -343,37 +392,9 @@ func TestUncompressExpectedLength(t *testing.T) {
 			c := &Connection{}
 
 			data, err := c.uncompress(test.data, test.expLen)
-			if test.wantErr == "" && !test.wantInvalidZlib {
-				if err != nil {
-					t.Fatalf("uncompress() unexpected error: %s", err)
-				}
 
-				if len(data) != int(test.expLen) {
-					t.Errorf("uncompress() output length = %d, want %d", len(data), test.expLen)
-				}
-
-				if test.wantData != nil && !bytes.Equal(data, test.wantData) {
-					t.Errorf("uncompress() output = %q, want %q", data, test.wantData)
-				}
-
-				return
-			}
-
-			if err == nil {
-				t.Fatal("uncompress() expected error, got nil")
-			}
-
-			if test.wantInvalidZlib {
-				if !errors.Is(err, zlib.ErrHeader) {
-					t.Errorf("expected error to wrap zlib.ErrHeader, got: %s", err)
-				}
-
-				return
-			}
-
-			if err.Error() != test.wantErr {
-				t.Errorf("expected error %q, got: %s", test.wantErr, err)
-			}
+			checkUncompressResult(t, data, test.expLen, test.wantData, err, test.wantErr,
+				test.wantInvalidZlib)
 		})
 	}
 }
