@@ -17,6 +17,7 @@ package web
 import (
 	"bytes"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -31,9 +32,15 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
+var errTooManyRedirects = errors.New("too many redirects")
+
 // Get makes a GET request to the provided web page url, using an http client, provides a response dump if dump
 // parameter is set. At most redirectLimit redirects are followed, zero means that redirects are not followed.
+// When redirects are followed the dump contains the headers of every response in the chain, followed by the
+// body of the last one.
 func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (string, error) {
+	var chain [][]byte
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return "", fmt.Errorf("Cannot create new request: %w", err)
@@ -53,11 +60,15 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 			}).DialContext,
 		},
 		Timeout:       timeout,
-		CheckRedirect: redirectPolicy(redirectLimit),
+		CheckRedirect: redirectPolicy(redirectLimit, &chain),
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
+		if errors.Is(err, errTooManyRedirects) {
+			return "", fmt.Errorf("Maximum (%d) redirects followed.", redirectLimit)
+		}
+
 		return "", fmt.Errorf("Cannot get content of web page: %w", err)
 	}
 
@@ -90,19 +101,27 @@ func Get(url string, timeout time.Duration, dump bool, redirectLimit int) (strin
 		return "", fmt.Errorf("Cannot get header of web page: %w", err)
 	}
 
-	return string(h) + string(b), nil
+	return string(bytes.Join(chain, nil)) + string(h) + string(b), nil
 }
 
-// redirectPolicy returns function that follows at most limit redirects.
-func redirectPolicy(limit int) func(req *http.Request, via []*http.Request) error {
-	return func(_ *http.Request, via []*http.Request) error {
+// redirectPolicy returns function that follows at most limit redirects, to be compatible with cURL,
+// append the headers of every response that is redirected to chain.
+func redirectPolicy(limit int, chain *[][]byte) func(req *http.Request, via []*http.Request) error {
+	return func(req *http.Request, via []*http.Request) error {
 		if limit <= 0 {
 			return http.ErrUseLastResponse
 		}
 
 		if len(via) > limit {
-			return fmt.Errorf("Maximum (%d) redirects followed.", limit)
+			return errTooManyRedirects
 		}
+
+		h, err := httputil.DumpResponse(req.Response, false)
+		if err != nil {
+			return fmt.Errorf("Cannot get header of web page: %w", err)
+		}
+
+		*chain = append(*chain, h)
 
 		return nil
 	}

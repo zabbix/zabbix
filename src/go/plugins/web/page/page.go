@@ -167,12 +167,8 @@ func parseRedirectLimit(params []string, index int) (int, error) {
 	}
 
 	limit, err := strconv.Atoi(params[index])
-	if err != nil {
-		return 0, err
-	}
-
-	if limit < 0 || limit > maxRedirectLimit {
-		return 0, errs.Errorf("value must be between 0 and %d", maxRedirectLimit)
+	if err != nil || limit < 0 || limit > maxRedirectLimit {
+		return 0, fmt.Errorf("value must be between 0 and %d.", maxRedirectLimit)
 	}
 
 	return limit, nil
