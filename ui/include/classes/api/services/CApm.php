@@ -817,6 +817,7 @@ class CApm extends CApiService {
 		}
 
 		$query = new CClickHouseQuery();
+
 		$sub_queries_sql = [];
 
 		foreach ($sub_queries as $sub_query) {
