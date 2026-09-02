@@ -169,7 +169,7 @@ static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum
 
 	if (ZBX_IPMI_SENSOR_ID_SZ < id_sz)
 	{
-		zbx_strlcpy(str, "ILLEGAL-SENSOR-ID-SIZE", str_sz);
+		zbx_strlcpy(str, "INVALID-SENSOR-ID-SIZE", str_sz);
 		THIS_SHOULD_NEVER_HAPPEN;
 		return str;
 	}
@@ -195,7 +195,7 @@ static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum
 			*p = '\0';
 			break;
 		default:
-			zbx_strlcpy(str, "ILLEGAL-SENSOR-ID-TYPE", str_sz);
+			zbx_strlcpy(str, "INVALID-SENSOR-ID-TYPE", str_sz);
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
 	return str;
