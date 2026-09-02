@@ -111,10 +111,31 @@ class API {
 	}
 
 	/**
-	 * @return CApm
+	 * @return CApmTrace
 	 */
-	public static function Apm() {
-		return self::getApi('apm');
+	public static function ApmTrace() {
+		return self::getApi('apmtrace');
+	}
+
+	/**
+	 * @return CApmSpan
+	 */
+	public static function ApmSpan() {
+		return self::getApi('apmspan');
+	}
+
+	/**
+	 * @return CApmLog
+	 */
+	public static function ApmLog() {
+		return self::getApi('apmlog');
+	}
+
+	/**
+	 * @return CApmMetric
+	 */
+	public static function ApmMetric() {
+		return self::getApi('apmmetric');
 	}
 
 	/**
