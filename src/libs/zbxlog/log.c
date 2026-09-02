@@ -379,7 +379,7 @@ void	zbx_close_log(void)
  *           reach this function.                                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_log_dispatch_formatted(int level, const char *component, const char *fmt, va_list args)
+static void	zbx_log_dispatch_formatted(int level, const char *component, const char *fmt, va_list args)
 {
 	char		message[MAX_BUFFER_LEN];
 #ifdef _WINDOWS

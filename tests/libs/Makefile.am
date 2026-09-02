@@ -36,5 +36,4 @@ SUBDIRS = \
 	zbxhttp \
 	zbxip \
 	zbxproxybuffer \
-	zbxhttppoller \
-	zbxlog
+	zbxhttppoller
