@@ -1100,7 +1100,7 @@ func (c *tlsConn) Close() (err error) {
 }
 
 func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
-	if cfg.Connect == ConnCert && (cfg.ServerCertIssuer != "" || cfg.ServerCertSubject != "") {
+	if cfg.ServerCertIssuer != "" || cfg.ServerCertSubject != "" {
 		var cSubject, cIssuer *C.char
 		if cfg.ServerCertIssuer != "" {
 			cIssuer = C.CString(cfg.ServerCertIssuer)
@@ -1249,9 +1249,17 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bo
 		c.conn.Close()
 		return
 	}
-	if err = c.verifyIssuerSubject(cfg); err != nil {
-		c.Close()
-		return
+
+	if cfg.Connect == ConnCert {
+		err = c.verifyIssuerSubject(cfg)
+		if err != nil {
+			closeErr := c.Close()
+			if closeErr != nil {
+				log.Debugf("failed to close client: %s", closeErr)
+			}
+
+			return nil, err
+		}
 	}
 
 	// explicit conversion needed to avoid nested calls to logging
