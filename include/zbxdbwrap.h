@@ -35,6 +35,13 @@ typedef enum
 }
 zbx_host_template_link_type;
 
+typedef enum
+{
+	ROLE_PERM_DENY = 0,
+	ROLE_PERM_ALLOW = 1,
+}
+zbx_user_role_permission_t;
+
 typedef int (*zbx_evaluate_function_trigger_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t *, const char *,
 		const char *, const zbx_timespec_t *, zbx_history_selector_t *selector, char **);
 typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
@@ -157,6 +164,10 @@ void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index,
 
 int	zbx_db_check_user_perm2system(zbx_uint64_t userid);
 char	*zbx_db_get_user_timezone(zbx_uint64_t userid);
+int	zbx_db_user_has_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
+		const char *role_rule);
+int	zbx_db_server_allowed_for_monitoring(const zbx_user_t *user);
+int	zbx_db_proxy_allowed_for_monitoring(const zbx_user_t *user, zbx_uint64_t proxyid);
 
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
