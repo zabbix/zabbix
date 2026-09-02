@@ -86,6 +86,12 @@
 #	define ZBX_NORETURN
 #endif
 
+#if (defined(__GNUC__) && __GNUC__ >= 3) || defined(__clang__)
+#	define ZBX_ATTR_NOINLINE	__attribute__((__noinline__))
+#else
+#	define ZBX_ATTR_NOINLINE
+#endif
+
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);
 const char	*zbx_result_string(int result);
