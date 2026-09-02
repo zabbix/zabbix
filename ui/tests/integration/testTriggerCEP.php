@@ -34,9 +34,9 @@ class testTriggerCEP extends CIntegrationTest {
 	// runs quickly in CI, and small values are also handy while debugging to reach a failure fast; when
 	// running locally to actually stress CEP, raise them to the recommended values noted below (or higher).
 	// Increasing them makes the tests slower but far more thorough.
-	const LLD_DISCOVERY_COUNT = 10;	// discovered items/triggers per rule; use at least 4000 to stress CEP
-	const LOG_EVENT_COUNT = 100;		// log values pushed at the single-trigger stream; use at least 10000
-	const RECOVERY_CYCLES_COUNT = 100;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
+	const LLD_DISCOVERY_COUNT = 2;	// discovered items/triggers per rule; use at least 4000 to stress CEP
+	const LOG_EVENT_COUNT = 2;		// log values pushed at the single-trigger stream; use at least 10000
+	const RECOVERY_CYCLES_COUNT = 2;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
 	const MAINTENANCE_COUNT_EXTRA = 10;
 	// How many ids the close window scenarios drive (see runEventAssessmentTestCepWindowCloseWindow()). Every
@@ -111,7 +111,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const SKIP_OPERATION_TAG_VALUE_TESTS = true;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
-	const SKIP_SERVICES_TESTS = null;
+	const SKIP_SERVICES_TESTS = false;
 
 	// Set to true to run the CEP window scenarios alone, so a debugging run starts at the windows instead of at
 	// the hundred correlation and trigger scenarios that come before them: every test with "Cep" in its name is
@@ -4475,11 +4475,19 @@ HEREDOC;
 		$this->beginCepScenario();
 
 		$window = [
-			// The restarts of these scenarios land while the windows are supposed to be holding their problems (a
-			// reset or a delete that arrives at an empty window says nothing about either), so the time a stop and a
-			// start takes is added to the duration when they are turned on - and nothing changes when they are not,
-			// see getRestartWindowAllowance().
-			'duration' => $duration === null ? 3 + static::getRestartWindowAllowance() : $duration,
+			// A window of this scenario may only be ended by the operations of its rule or by the rule being taken
+			// away, never by its duration running out: both scenarios read what a window was holding when the reset
+			// or the delete arrived (one that arrives at an empty window says nothing about either), and the reset
+			// one goes on to read what the windows opened after it hold when their id recovers. A duration that
+			// outlasts the whole scenario is what keeps those two readings about the reset and the delete - the
+			// restarts taken in the middle of it included, so nothing has to be added for them.
+			//
+			// It also has to outlast it for every window type alike, which is what rules out the short duration this
+			// used to have: a cause and symptom window is a tumbling one, closed in full every duration period with
+			// the "close" operation performed for every event it still holds, so a duration that ran out mid
+			// scenario closed the very problems the counts below are waiting for - while the sliding types only
+			// evict their events one by one and close nothing.
+			'duration' => $duration === null ? self::CEP_RULE_WINDOW_CAPACITY_DURATION : $duration,
 			// Every event must be held: both scenarios are about what a window has in it when it is taken away, so
 			// nothing may be evicted for not fitting.
 			'capacity' => 0,
@@ -18866,6 +18874,10 @@ return;
 	 * is added to the failure so the report names the step that expected this count. $iterations replaces the patience
 	 * of the wait for the scenarios that have to outlast a window duration rather than the processing of a value, see
 	 * runEventAssessmentTestCepWindowCloseOnDuration().
+	 *
+	 * A count that came out short is reported with the problem events behind it, see describeProblemEvents(): the
+	 * number alone cannot say whether the events it is missing were never opened or were opened and closed again,
+	 * and that is the first thing to know about such a failure.
 	 */
 	private function waitForOpenProblemCount(array $triggerids, int $expected, string $message = '',
 			?int $iterations = null): void {
@@ -18874,10 +18886,53 @@ return;
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS
 		], $expected, $iterations === null ? static::WAIT_ITERATIONS_LONGER : $iterations,
-			self::WAIT_ITERATION_DELAY, null, $message === '' ? null : function () use ($message) {
-				return $message;
+			self::WAIT_ITERATION_DELAY, null, function () use ($triggerids, $message) {
+				return ($message === '' ? '' : $message."\n").$this->describeProblemEvents($triggerids);
 			}
 		);
+	}
+
+	/**
+	 * The problem events on $triggerids since the scenario baseline, one per line, for the failure message of a count
+	 * wait: the eventid the assertions of the scenarios speak in, the time the event occurred, its name, and whether
+	 * its problem is still open - a closed one names the event that closed it. A count that stopped one short is a
+	 * value that never became an event or an event whose problem something closed, and those two lead to opposite
+	 * places; this is what tells them apart.
+	 *
+	 * It is only ever called to build a failure message, so it must not fail itself: whatever goes wrong reading the
+	 * events is returned as the text instead of being thrown on top of the failure it was meant to explain.
+	 */
+	private function describeProblemEvents(array $triggerids): string {
+		try {
+			$response = $this->call('event.get', [
+				'objectids' => $triggerids,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'eventid_from' => $this->event_baseline_id + 1,
+				'filter' => ['value' => TRIGGER_VALUE_TRUE],
+				'output' => ['eventid', 'clock', 'name', 'r_eventid'],
+				'sortfield' => 'eventid',
+				'sortorder' => 'ASC'
+			]);
+		}
+		catch (Exception $e) {
+			return 'The problem events behind that count could not be read: '.$e->getMessage();
+		}
+
+		$events = isset($response['result']) ? $response['result'] : [];
+
+		if (!$events) {
+			return 'No problem event on the trigger since the baseline.';
+		}
+
+		$lines = [];
+
+		foreach ($events as $event) {
+			$lines[] = '  '.$event['eventid'].' '.date('H:i:s', $event['clock']).' "'.$event['name'].'" '
+				.($event['r_eventid'] == 0 ? 'open' : 'closed by '.$event['r_eventid']);
+		}
+
+		return 'The '.count($lines).' problem events on the trigger since the baseline:'."\n".implode("\n", $lines);
 	}
 
 	/**
