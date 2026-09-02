@@ -105,8 +105,8 @@ Disable periodic profiling
 Write profiles after a 5-second sample
 
 When periodic profiling is enabled, this command finishes the current CPU interval, writes a separate 5-second CPU profile, and starts a new periodic CPU file.
-Explicitly requested profiles are not rotated; the next scheduled dump enforces ProfilerMaxFilesPerProfile.
-It occurs one full interval after the command completes.
+Explicitly requested profiles are rotated according to ProfilerMaxFilesPerProfile when the command completes.
+While this command is collecting profiles, all profiler runtime commands are rejected with "profiler is busy".
 .RE
 .RS 4
 .TP 4

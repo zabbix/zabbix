@@ -73,9 +73,11 @@ const usageMessageFormatRuntimeControlFormat = //
 
     When periodic profiling is enabled, periodic_prof_execute finishes the
     current CPU interval, writes a separate 5-second CPU profile, and starts a
-    new periodic CPU file. Explicitly requested profiles are not rotated; the
-    next scheduled dump enforces ProfilerMaxFilesPerProfile. It occurs one full
-    interval after the command completes.
+    new periodic CPU file. Explicitly requested profiles are rotated according
+    to ProfilerMaxFilesPerProfile when the command completes.
+
+    While periodic_prof_execute is collecting profiles, all profiler runtime
+    commands are rejected with "profiler is busy".
 `
 
 const usageMessageFormat = //

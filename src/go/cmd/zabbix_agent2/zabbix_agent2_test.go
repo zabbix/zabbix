@@ -18,6 +18,8 @@ import (
 	"testing"
 )
 
+const profilerSetIntervalCommand = "periodic_prof_set_interval 10"
+
 func TestParseArgs(t *testing.T) {
 	t.Parallel()
 
@@ -72,11 +74,11 @@ func TestParseArgs(t *testing.T) {
 		},
 		{
 			name: "+quotedCommand",
-			args: []string{"-R", "periodic_prof_set_interval 10"},
+			args: []string{"-R", profilerSetIntervalCommand},
 			want: Arguments{
 				configPath:     confDefault,
 				foreground:     true,
-				runtimeCommand: "periodic_prof_set_interval 10",
+				runtimeCommand: profilerSetIntervalCommand,
 			},
 		},
 		{
@@ -115,7 +117,7 @@ func TestParseArgs(t *testing.T) {
 			want: Arguments{
 				configPath:     confDefault,
 				foreground:     true,
-				runtimeCommand: "periodic_prof_set_interval 10",
+				runtimeCommand: profilerSetIntervalCommand,
 			},
 		},
 		{
