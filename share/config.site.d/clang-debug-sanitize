@@ -8,7 +8,7 @@ fi
 if [ -z "$CFLAGS" ]
 then
 	CFLAGS="-std=gnu11"
-	CFLAGS+=" -O0 -ggdb3"
+	CFLAGS+=" -O2 -ggdb3"
 	CFLAGS+=" -Wall"
 	CFLAGS+=" -Wextra"
 	CFLAGS+=" -Winit-self"
