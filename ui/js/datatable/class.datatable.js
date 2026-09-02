@@ -1293,8 +1293,6 @@ class CDataTable {
 			...e.detail
 		};
 
-		console.error('Stack trace');
-
 		if (loading) {
 			this.#element.classList.add(ZBX_STYLE_LOADING);
 
