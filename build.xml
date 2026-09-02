@@ -226,7 +226,7 @@
 
 		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
-			<arg line="CONFIG_SITE='share/config.site.d/clang-debug'"/>
+			<arg line="CONFIG_SITE='share/config.site.d/clang-debug-sanitize'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
@@ -234,7 +234,7 @@
 			<arg line="--with-postgresql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
-			<arg line="--with-stacksize=128"/>
+			<arg line="--with-stacksize=512"/>
 			<arg line="--with-ares"/>
 			<arg line="${with.encryption}"/>
 			<arg line="--with-ares"/>
@@ -759,7 +759,7 @@
 
 		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
-			<arg line="CONFIG_SITE='share/config.site.d/clang-debug'"/>
+			<arg line="CONFIG_SITE='share/config.site.d/clang-debug-sanitize'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
@@ -767,7 +767,7 @@
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
-			<arg line="--with-stacksize=128"/>
+			<arg line="--with-stacksize=512"/>
 			<arg line="--with-ares"/>
 			<arg line="${with.encryption}"/>
 			<arg line="--with-net-snmp"/>
