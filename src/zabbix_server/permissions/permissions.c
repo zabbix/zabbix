@@ -18,6 +18,7 @@
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
 #include "zbxdbwrap.h"
+#include "zbxnix.h"
 
 static pid_t	rebuild_pid = ZBX_THREAD_HANDLE_NULL;
 
@@ -43,6 +44,12 @@ static int	permission_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_n
 	for (int i = 0; i < ids->values_num; i++)
 	{
 		zbx_group_set_t	gset;
+
+		if (!ZBX_IS_RUNNING())
+		{
+			ret = FAIL;
+			goto out;
+		}
 
 		result = zbx_db_select("select %s from %s where %s=" ZBX_FS_UI64 " order by %s",
 				fld_name_groupid, tbl_name_groups, fld_name_id, ids->values[i], fld_name_groupid);
@@ -77,8 +84,14 @@ static int	permission_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_n
 
 			if (NULL == (gset_ptr = zbx_hashset_insert(group_sets, &gset, sizeof(zbx_group_set_t))))
 			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot insert groupset %s, %s", fld_name_groupid,
+						tbl_name_groups);
+
+				zbx_vector_uint64_destroy(&gset.groupids);
+				zbx_vector_uint64_destroy(&gset.ids);
+
 				ret = FAIL;
-				break;
+				goto out;
 			}
 		}
 
@@ -87,7 +100,7 @@ static int	permission_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_n
 	}
 
 	zbx_vector_uint64_destroy(&groupids);
-
+out:
 	return ret;
 }
 
@@ -108,6 +121,9 @@ static int	permission_groupsets_insert(const char *tbl_name, zbx_hashset_t *grou
 	while (NULL != (gset_ptr = (zbx_group_set_t *)zbx_hashset_iter_next(&iter)))
 	{
 		int	i;
+
+		if (!ZBX_IS_RUNNING())
+			return FAIL;
 
 		zbx_db_insert_add_values(db_gset, gsetid, gset_ptr->hash_str);
 
@@ -148,7 +164,7 @@ static int	permission_group_set_compare(const void *d1, const void *d2)
 static void	permission_groupsets_destroy(zbx_hashset_t *group_sets)
 {
 	zbx_hashset_iter_t	iter;
-	zbx_group_set_t	 *gset_ptr;
+	zbx_group_set_t		*gset_ptr;
 
 	zbx_hashset_iter_reset(group_sets, &iter);
 
@@ -221,6 +237,9 @@ static void	permissions_rebuild_task(void)
 {
 	int			res = SUCCEED;
 	zbx_vector_uint64_t	ids;
+	char			*sql = NULL;
+	static const char	*tables[] = {"user_ugset", "host_hgset", "permission", "ugset_group", "ugset",
+			"hgset_group", "hgset"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -228,9 +247,6 @@ static void	permissions_rebuild_task(void)
 
 	(void)zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	zbx_db_begin();
-
-	static const char	*tables[] = {"user_ugset", "host_hgset", "permission", "ugset_group", "ugset",
-			"hgset_group", "hgset"};
 
 	for (int i = 0; i < (int)ARRSIZE(tables); i++)
 	{
@@ -242,7 +258,8 @@ static void	permissions_rebuild_task(void)
 		}
 	}
 
-	zbx_db_select_uint64("select hostid from hosts where flags<>2", &ids);
+	sql = zbx_dsprintf(NULL, "select hostid from hosts where flags<>%d", ZBX_FLAG_DISCOVERY_PROTOTYPE);
+	zbx_db_select_uint64(sql, &ids);
 
 	res = permission_hgsets_add(&ids);
 
@@ -254,15 +271,16 @@ static void	permissions_rebuild_task(void)
 
 	zbx_vector_uint64_clear(&ids);
 
-	zbx_db_select_uint64(
+	sql = zbx_dsprintf(sql,
 			"select u.userid"
 			" from users u"
 				" join role r on u.roleid=r.roleid"
-			" where r.type<>3"
+			" where r.type<>%d"
 				" and u.userid in ("
 					"select userid"
 					" from users_groups"
-				")", &ids);
+				")", USER_TYPE_SUPER_ADMIN);
+	zbx_db_select_uint64(sql, &ids);
 
 	res = permission_ugsets_add(&ids);
 
@@ -319,7 +337,7 @@ out:
 		zbx_db_rollback();
 
 	zbx_db_close();
-
+	zbx_free(sql);
 	zbx_vector_uint64_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_WARNING, "permissions rebuild: %s", zbx_result_string(res));
