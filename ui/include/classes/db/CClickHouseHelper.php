@@ -60,7 +60,7 @@ final class CClickHouseHelper {
 	}
 
 	private static function addQueryFilterOptions(CClickHouseQuery $query, array $options, array $db_schema,
-		string $table, string $table_alias): void {
+			string $table, string $table_alias): void {
 		$table_schema = $db_schema[$table];
 
 		$filter = array_intersect_key($table_schema, $options['filter']);
@@ -129,7 +129,7 @@ final class CClickHouseHelper {
 	}
 
 	private static function addQuerySearchOptions(CClickHouseQuery $query, array $options, array $db_schema,
-		string $table, string $table_alias): void {
+			string $table, string $table_alias): void {
 		$table_schema = $db_schema[$table];
 
 		$search = array_intersect_key($table_schema, $options['search']);
@@ -173,7 +173,7 @@ final class CClickHouseHelper {
 	}
 
 	private static function addQuerySortOptions(CClickHouseQuery $query, array $options, array $db_schema,
-		string $table, string $table_alias): void {
+			string $table, string $table_alias): void {
 		$table_schema = $db_schema[$table];
 
 		foreach ($options['sortfield'] as $i => $field) {
@@ -193,13 +193,13 @@ final class CClickHouseHelper {
 	}
 
 	private static function addQueryOutputOptions(CClickHouseQuery $query, array $options, array $db_schema,
-		string $table, string $table_alias): void {
+			string $table, string $table_alias): void {
 		$table_schema = $db_schema[$table];
 
 		$output = array_intersect(array_keys($table_schema), $options['output']);
 
 		foreach ($output as $field) {
-			$query->select($field);
+			$query->select($table_alias.'.'.$field);
 		}
 	}
 
@@ -217,17 +217,17 @@ final class CClickHouseHelper {
 
 		foreach ($list_grouped as $key => $operators) {
 			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_EXISTS, $operators)
-				&& array_key_exists(APM_ATTRIBUTE_OPERATOR_NOT_EXISTS, $operators)) {
+					&& array_key_exists(APM_ATTRIBUTE_OPERATOR_NOT_EXISTS, $operators)) {
 				continue;
 			}
 
 			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_EQUAL, $operators)
-				|| array_key_exists(APM_ATTRIBUTE_OPERATOR_LIKE, $operators)) {
+					|| array_key_exists(APM_ATTRIBUTE_OPERATOR_LIKE, $operators)) {
 				unset($operators[APM_ATTRIBUTE_OPERATOR_EXISTS]);
 			}
 
 			if (array_key_exists(APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, $operators)
-				|| array_key_exists(APM_ATTRIBUTE_OPERATOR_NOT_LIKE, $operators)) {
+					|| array_key_exists(APM_ATTRIBUTE_OPERATOR_NOT_LIKE, $operators)) {
 				unset($operators[APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]);
 			}
 
