@@ -933,7 +933,7 @@ void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
  *                                                                            *
  * Purpose: retrieves TimescaleDB (TSDB) license information                  *
  *                                                                            *
- * Return value: license information from datase as string                    *
+ * Return value: license information from database as string                  *
  *               "apache"    for TimescaleDB Apache 2 Edition                 *
  *               "timescale" for TimescaleDB Community Edition                *
  *                                                                            *
@@ -3088,7 +3088,7 @@ static void	decode_and_escape_binary_value_for_sql(char **sql_insert_data)
 
 	zbx_base64_decode(*sql_insert_data, binary_data, binary_data_max_len, &binary_data_len);
 #if defined (HAVE_MYSQL)
-	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
+	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len + 1);
 	zbx_mysql_escape_bin(binary_data, escaped_binary, binary_data_len);
 #elif defined (HAVE_POSTGRESQL)
 	zbx_postgresql_escape_bin(binary_data, &escaped_binary, binary_data_len);

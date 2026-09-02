@@ -146,7 +146,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		}
 
 		$filter->getLabel('Display actions')->query('xpath:./button[@data-hintbox]')->one()->click();
-		$popup = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+		$popup = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()->waitUntilPresent()->one();
 		$popup_text = "Filter actions by the scope of media type usage:\n".
 				"All - display all actions\n".
 				"All available - display only actions where All available media types are used in action operation\n".
@@ -348,6 +348,8 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		}
 
 		if (array_key_exists('Display actions', $data['filter'])) {
+			$table->waitUntilReloaded();
+
 			// Get the list of expected actions from DB and compare it to the value in the "Used in actions" column.
 			$sql = 'SELECT name FROM actions WHERE actionid IN (SELECT DISTINCT actionid FROM operations WHERE'.
 					' operationid IN (SELECT operationid FROM opmessage'.$data['sql_part'].')) ORDER BY name';

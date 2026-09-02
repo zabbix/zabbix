@@ -246,7 +246,7 @@ if ($data['filtered_count'] > 1) {
 						->setAttribute('data-name', $name)
 						->setAttribute('data-value', $value)
 					: (new CSpan($value_label))->addClass(ZBX_STYLE_GREY),
-				$is_selected ? new CInput('hidden', $name, $value) : null,
+				$is_selected ? (new CInput('hidden', $name, $value))->removeId() : null,
 				' ',
 				new CSup($prefix.$count)
 			]))

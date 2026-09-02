@@ -1,15 +1,51 @@
-
+![](images/logo.png?raw=true)
 # Redmine webhook
-![](images/redmine_logo_v1.png?raw=true)
+
+## Overview
 
 This guide describes how to integrate your Zabbix 7.0 installation with Redmine using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Requirements
 
-- Redmine with enabled REST API and Authentication
-- Zabbix version 7.0 or higher
+Zabbix version: 7.0 and higher.
 
-## Setting up a Redmine
+## Parameters
+
+After importing the webhook, you can configure it using webhook parameters.
+
+### Configurable parameters
+
+The configurable parameters are intended to be changed according to the webhook setup as well as the user's preferences and environment.
+
+|Name|Value|Description|
+|----|-----|-----------|
+|redmine_access_key|\<PUT YOUR ACCESS KEY\>|Redmine access key.|
+|redmine_project|\<PUT YOUR PROJECT ID OR NAME\>|Redmine project ID or name.|
+|redmine_tracker_id|\<PUT YOUR TRACKER ID\>|Redmine tracker ID.|
+|redmine_url|\<PUT YOUR REDMINE URL\>|Redmine URL.|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"Redmine"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "Redmine", e.g. {$HTTP.TLS.VERIFY:"Redmine"}.|
+|zabbix_url|\{$ZABBIX\.URL\}|Current Zabbix URL.|
+
+### Internal parameters
+
+Internal parameters are reserved for predefined macros that are not meant to be changed.
+
+|Name|Value|Description|
+|----|-----|-----------|
+|alert_message|\{ALERT\.MESSAGE\}|'Default message' value from action configuration.|
+|alert_subject|\{ALERT\.SUBJECT\}|'Default subject' value from action configuration.|
+|event_id|\{EVENT\.ID\}|Numeric ID of the event that triggered an action.|
+|event_nseverity|\{EVENT\.NSEVERITY\}|Numeric value of the event severity. Possible values: 0 - Not classified, 1 - Information, 2 - Warning, 3 - Average, 4 - High, 5 - Disaster.|
+|event_source|\{EVENT\.SOURCE\}|Numeric value of the event source. Possible values: 0 - Trigger, 1 - Discovery, 2 - Autoregistration, 3 - Internal, 4 - Service.|
+|event_update_message|\{EVENT\.UPDATE\.MESSAGE\}|Problem update message.|
+|event_update_status|\{EVENT\.UPDATE\.STATUS\}|Numeric value of the problem update status. Possible values: 0 - Webhook was called because of problem/recovery event, 1 - Update operation.|
+|event_value|\{EVENT\.VALUE\}|Numeric value of the event that triggered an action (1 for problem, 0 for recovering).|
+|redmine_issue_key|\{EVENT\.TAGS\.\_\_zbx\_redmine\_issue\_id\}|Redmine issue ID.|
+|trigger_id|\{TRIGGER\.ID\}|Numeric ID of the trigger of this action.|
+
+> Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
+
+## Service setup
 
 1\. Enable **REST API** in Administration > Settings > API. 
 
@@ -19,7 +55,7 @@ This guide describes how to integrate your Zabbix 7.0 installation with Redmine 
 
 [![](images/thumb.03.png?raw=true)](images/03.png)
 
-## Zabbix Webhook configuration
+## Zabbix configuration
 
 ### Create a global macro
 
@@ -33,7 +69,7 @@ This guide describes how to integrate your Zabbix 7.0 installation with Redmine 
 
 - **redmine_access_key** to the your **API key**
 - **redmine_url** to the **frontend URL** of your **Redmine** installation
-- **redmine_project** to your numeric Project ID or its name. Important: if you specify a project name, each time an additional API call will be made to get its identifier.<br>
+- **redmine_project** to your numeric Project ID or its name. Important: if you specify a project name, each time an additional API call will be made to get its identifier.
 You can find Project ID on *http://&lt;YOR_REDMINE_URL&gt;/projects.xml*
 - **redmine_tracker_id** to your Tracker ID
 
@@ -59,6 +95,8 @@ For **Send to**: enter any text, as this value is not used, but is required.
 
 For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.0/manual/config/notifications) and [Redmine](https://www.redmine.org/projects/redmine/wiki/) documentations.
 
-## Supported Versions
+## Feedback
 
-Zabbix 7.0
+Please report any issues with the media type at [`https://support.zabbix.com`](https://support.zabbix.com).
+
+You can also provide feedback, discuss the media type, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
