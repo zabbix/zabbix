@@ -331,6 +331,7 @@ define('ZBX_CONDITION_TYPE_EVENT_TAG',			25);
 define('ZBX_CONDITION_TYPE_EVENT_TAG_VALUE',	26);
 define('ZBX_CONDITION_TYPE_SERVICE',			27);
 define('ZBX_CONDITION_TYPE_SERVICE_NAME',		28);
+define('ZBX_CONDITION_TYPE_PROXY_GROUP',		29);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -2109,6 +2110,7 @@ define('ZBX_STYLE_INLINE_FILTER', 'inline-filter');
 define('ZBX_STYLE_INLINE_FILTER_LABEL', 'inline-filter-label');
 define('ZBX_STYLE_INLINE_FILTER_FOOTER', 'inline-filter-footer');
 define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
+define('ZBX_STYLE_INLINE_LIST', 'inline-list');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
