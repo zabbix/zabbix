@@ -137,8 +137,7 @@ class CApm extends CApiService {
 			->group('ti.TraceId');
 
 		if ($options['traceids'] !== null) {
-			$inner_query
-				->where('ti.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
+			$inner_query->where('ti.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
 		}
 
 		if ($options['min_duration'] !== null) {
@@ -853,14 +852,7 @@ class CApm extends CApiService {
 			$query->select('sum(rowscount)', 'rowscount');
 		}
 		else {
-			// Type inclusion is mandatory for sorting capability.
-			$query->select('u.Type');
-
 			foreach (array_intersect(array_keys(self::CLICKHOUSE_METRICS_FIELDS), $options['output']) as $field) {
-				if ($field === 'Type') {
-					continue;
-				}
-
 				$query->select('u.'.$field);
 			}
 
@@ -885,10 +877,6 @@ class CApm extends CApiService {
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
 				return (string) $row['rowscount'];
-			}
-
-			if (!in_array('Type', $options['output'], true)) {
-				unset($row['Type']);
 			}
 
 			$row_fixed = [];
@@ -953,7 +941,7 @@ class CApm extends CApiService {
 			$options['search'] = $search;
 		}
 
-		$options['sortfield'] = array_map(static fn ($value) => $output_fields[$value], $options['sortfield']);
+		$options['sortfield'] = array_map(static fn (string $value) => $output_fields[$value], $options['sortfield']);
 
 		return $options;
 	}
