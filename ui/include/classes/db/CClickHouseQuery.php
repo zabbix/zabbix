@@ -30,7 +30,7 @@ class CClickHouseQuery {
 	public function __construct() {}
 
 	public function select(string $select, ?string $alias = null): static {
-		$this->select[] = $alias !== null ? $select.' AS '.$alias : $select;
+		$this->select[] = $alias !== null ? $select.' AS `'.$alias.'`' : $select;
 
 		return $this;
 	}
@@ -94,14 +94,8 @@ class CClickHouseQuery {
 	}
 
 	public function getSql(): string {
-		$select = array_map(
-			static fn ($alias, $expression) => $expression.(is_string($alias) ? ' AS `'.$alias.'`' : ''),
-			array_keys($this->select),
-			$this->select
-		);
-
 		return
-			'SELECT '.implode(',', $select).
+			'SELECT '.implode(',', $this->select).
 			' FROM '.implode(',', $this->from).
 			($this->join ? ' '.implode(' ', $this->join) : '').
 			($this->where ? ' WHERE '.implode(' AND ', $this->where) : '').
