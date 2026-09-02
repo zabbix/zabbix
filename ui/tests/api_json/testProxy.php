@@ -706,7 +706,7 @@ class testProxy extends CAPITest {
 					'selectApm' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/selectApm/1": value must be one of "additional_resource_attributes", "data_collection_status", "max_messages_per_second".'
+				'expected_error' => 'Invalid parameter "/selectApm/1": value must be one of "data_collection_status", "max_messages_per_second", "additional_resource_attributes".'
 			],
 
 			// Check common fields that are not flags, but require strict validation.
@@ -3570,7 +3570,7 @@ class testProxy extends CAPITest {
 						'max_messages_per_second' => 100
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/apm": unexpected parameter "max_messages_per_second".'
+				'expected_error' => 'Invalid parameter "/1/apm/max_messages_per_second": value must be 0.'
 			],
 			'Test proxy.create: invalid "apm" with missing key in additional_resource_attributes' => [
 				'proxy' => [
@@ -5488,7 +5488,7 @@ class testProxy extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/apm": unexpected parameter "additional_resource_attributes".'
+				'expected_error' => 'Invalid parameter "/apm/additional_resource_attributes": should be empty.'
 			],
 			'Test proxy.update: missing "signal_type"' => [
 				'proxy' => [
@@ -5503,7 +5503,7 @@ class testProxy extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/apm/additional_resource_attributes/1": the parameter "signal_type" is missing.'
+				'expected_error' => 'Invalid parameter "/apm/additional_resource_attributes/1": the parameter "signal_type" is missing.'
 			],
 			'Test proxy.update: missing "key"' => [
 				'proxy' => [
@@ -5518,7 +5518,7 @@ class testProxy extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/apm/additional_resource_attributes/1": the parameter "key" is missing.'
+				'expected_error' => 'Invalid parameter "/apm/additional_resource_attributes/1": the parameter "key" is missing.'
 			],
 			'Test proxy.update: invalid "max_messages_per_second"' => [
 				'proxy' => [
@@ -5527,7 +5527,7 @@ class testProxy extends CAPITest {
 						'max_messages_per_second' => 100
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/apm": unexpected parameter "max_messages_per_second".'
+				'expected_error' => 'Invalid parameter "/apm/max_messages_per_second": value must be 0.'
 			]
 		];
 	}

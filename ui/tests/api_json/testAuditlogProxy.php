@@ -66,13 +66,14 @@ class testAuditlogProxy extends testAuditlogCommon {
 			'proxy.allowed_addresses' => ['add', 'localhost'],
 			'proxy.tls_psk_identity' => ['add', '******'],
 			'proxy.tls_psk' => ['add', '******'],
-			'proxy.apm.additional_resource_attributes[1]' => ['add'],
-			'proxy.apm.additional_resource_attributes[1].signal_type' => ['add', (string) SIGNAL_TYPE_LOGS],
-			'proxy.apm.additional_resource_attributes[1].key' => ['add', 'key_1'],
-			'proxy.apm.additional_resource_attributes[1].value' => ['add', 'value_1'],
 			'proxy.apm' => ['add'],
 			'proxy.apm.data_collection_status' => ['add', (string) PROXY_APM_DATA_COLLECTION_ENABLED],
 			'proxy.apm.max_messages_per_second' => ['add', '100'],
+			'proxy.apm.additional_resource_attributes[0]' => ['add'],
+			'proxy.apm.additional_resource_attributes[0].id' => ['add', '0'],
+			'proxy.apm.additional_resource_attributes[0].key' => ['add', 'key_1'],
+			'proxy.apm.additional_resource_attributes[0].value' => ['add', 'value_1'],
+			'proxy.apm.additional_resource_attributes[0].signal_type' => ['add', (string) SIGNAL_TYPE_LOGS],
 			'proxy.proxyid' => ['add', $proxyid]
 		]);
 
@@ -103,21 +104,22 @@ class testAuditlogProxy extends testAuditlogCommon {
 			]
 		]];
 		$expected_details = json_encode([
-			'proxy.apm.additional_resource_attributes[1]' => ['add'],
+			'proxy.apm.additional_resource_attributes[0]' => ['add'],
 			'proxy.name' => ['update', 'Updated Audit proxy', 'proxy.for.update.audit'],
 			'proxy.description' => ['update', 'Update proxy audit description', ''],
 			'proxy.tls_accept' => ['update', (string) HOST_ENCRYPTION_PSK, (string) HOST_ENCRYPTION_NONE],
 			'proxy.allowed_addresses' => ['update', 'updated_address', ''],
 			'proxy.tls_psk_identity' => ['update', '******', '******'],
 			'proxy.tls_psk' => ['update', '******', '******'],
-			'proxy.apm.additional_resource_attributes[1].signal_type' => ['add', (string) SIGNAL_TYPE_LOGS],
-			'proxy.apm.additional_resource_attributes[1].key' => ['add', 'key_1'],
-			'proxy.apm.additional_resource_attributes[1].value' => ['add', 'value_1'],
 			'proxy.apm' => ['update'],
 			'proxy.apm.data_collection_status' => [
 				'update', (string) PROXY_APM_DATA_COLLECTION_ENABLED, (string) PROXY_APM_DATA_COLLECTION_DISABLED
 			],
-			'proxy.apm.max_messages_per_second' => ['update', '100', '0']
+			'proxy.apm.max_messages_per_second' => ['update', '100', '0'],
+			'proxy.apm.additional_resource_attributes[0].id' => ['add', '0'],
+			'proxy.apm.additional_resource_attributes[0].key' => ['add', 'key_1'],
+			'proxy.apm.additional_resource_attributes[0].value' => ['add', 'value_1'],
+			'proxy.apm.additional_resource_attributes[0].signal_type' => ['add', (string) SIGNAL_TYPE_LOGS]
 		]);
 
 		$this->call('proxy.update', $request);
