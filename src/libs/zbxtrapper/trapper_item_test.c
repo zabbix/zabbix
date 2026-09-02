@@ -252,9 +252,9 @@ static int	fill_test_item_host(zbx_dc_item_t *item, const struct zbx_json_parse 
 				goto out;
 			}
 		}
-
-		ret = SUCCEED;
 	}
+
+	ret = SUCCEED;
 
 	if (NULL == table_hosts)
 		table_hosts = zbx_db_get_table("hosts");
