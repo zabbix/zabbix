@@ -37,6 +37,7 @@ class testProxyGroup extends CAPITest {
 		'proxyids' => [],
 		'groupids' => [],
 		'hostids' => [],
+		'actionids' => [],
 
 		// Created proxy groups during proxygroup.create test (deleted at the end).
 		'created' => []
@@ -50,6 +51,7 @@ class testProxyGroup extends CAPITest {
 		$this->prepareTestDataProxies();
 		$this->prepareTestDataHostGroups();
 		$this->prepareTestDataHosts();
+		$this->prepareTestDataActions();
 	}
 
 	/**
@@ -78,6 +80,9 @@ class testProxyGroup extends CAPITest {
 			],
 			'state_degrading' => [
 				'name' => 'API test proxy group - state degrading'
+			],
+			'used_in_action' => [
+				'name' => 'API test proxy group - used in action'
 			]
 		];
 
@@ -147,6 +152,10 @@ class testProxyGroup extends CAPITest {
 				'name' => 'API test proxy group - with proxy group 3',
 				'proxy_groupid' => self::$data['proxy_groupids']['with_3_proxies'],
 				'local_address' => 'proxy3.lan',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+			],
+			'used_in_action' => [
+				'name' => 'API test proxy group - used in action',
 				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 			]
 		];
@@ -243,6 +252,44 @@ class testProxyGroup extends CAPITest {
 		];
 
 		DB::insert('host_proxy', $host_proxy);
+	}
+
+	/**
+	 * Create actions.
+	 */
+	private function prepareTestDataActions(): void {
+		$actions = [
+			'name' => 'API test proxy group - discovery action',
+			'eventsource' => EVENT_SOURCE_DISCOVERY,
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value' => self::$data['proxy_groupids']['used_in_action']
+					]
+				]
+			],
+			'operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage_grp' => [
+						[
+							'usrgrpid' => 7
+						]
+					],
+					'opmessage' => [
+						'mediatypeid' => 0,
+						'default_msg' => 1
+					]
+				]
+			]
+		];
+		$db_actions = CDataHelper::call('action.create', $actions);
+		$this->assertArrayHasKey('actionids', $db_actions, __FUNCTION__.'() failed: Could not create actions.');
+
+		self::$data['actionids'] = $db_actions['actionids'];
 	}
 
 	/**
@@ -786,11 +833,26 @@ class testProxyGroup extends CAPITest {
 	}
 
 	/**
+	 * Data provider for proxygroup.delete. Array contains invalid proxy group that are not possible to delete.
+	 *
+	 * @return array
+	 */
+	public static function getProxyGroupDeleteDataInvalid(): array {
+		return [
+			// Check if deleted proxy group used in actions.
+			'Test proxygroup.delete: used in action' => [
+				'proxy_groupids' => ['used_in_action'],
+				'expected_error' => 'Proxy group "API test proxy group - used in action" is used by action "API test proxy group - discovery action".'
+			]
+		];
+	}
+
+	/**
 	 * Data provider for proxygroup.delete.
 	 *
 	 * @return array
 	 */
-	public static function getProxyGroupDeleteData(): array {
+	public static function getProxyGroupDeleteDataValid(): array {
 		return [
 			'Test proxygroup.delete: delete single' => [
 				'proxygroup' => ['state_offline'],
@@ -810,7 +872,8 @@ class testProxyGroup extends CAPITest {
 	/**
 	 * Test proxygroup.delete method.
 	 *
-	 * @dataProvider getProxyGroupDeleteData
+	 * @dataProvider getProxyGroupDeleteDataInvalid
+	 * @dataProvider getProxyGroupDeleteDataValid
 	 */
 	public function testProxyGroup_Delete(array $proxy_groupids, ?string $expected_error): void {
 		// Replace ID placeholders with real IDs.

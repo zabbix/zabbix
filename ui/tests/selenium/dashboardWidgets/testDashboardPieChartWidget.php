@@ -1017,7 +1017,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			$form->submit();
 		}
 		else {
-			COverlayDialogElement::find()->one()->query('button:Cancel')->one()->click();
+			COverlayDialogElement::find()->one()->query('button:Cancel')->waitUntilClickable()->one()->click();
 		}
 
 		// Save the dashboard if needed.

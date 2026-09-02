@@ -1406,11 +1406,11 @@ button, .btn {
   color: #ffffff;
   background-color: #555555;
   border-color: #555555; }
-  button:hover, .btn:hover {
+  button:hover, .btn:hover, button:hover:link, .btn:hover:link, button:hover:visited, .btn:hover:visited {
     color: #ffffff;
     background-color: #484848;
     border-color: #484848; }
-  button:active, .btn:active, button:focus, .btn:focus {
+  button:active, .btn:active, button:active:link, .btn:active:link, button:active:visited, .btn:active:visited, button:focus, .btn:focus, button:focus:link, .btn:focus:link, button:focus:visited, .btn:focus:visited {
     color: #ffffff;
     background-color: #6f6f6f;
     border-color: #484848; }
@@ -1482,6 +1482,9 @@ button {
   display: inline-block; }
   .btn:link, .btn:visited {
     color: #ffffff; }
+
+.btn-alt:link, .btn-alt:visited {
+  color: #000000; }
 
 .btn-icon {
   border-radius: max(0px, calc(var(--button-border-radius) - 2px));
@@ -1732,11 +1735,11 @@ button {
     line-height: 24px; }
 
 .checkbox-radio {
-  position: absolute !important;
-  top: auto !important;
+  position: absolute;
+  top: auto;
   z-index: 1;
-  width: 16px !important;
-  height: 16px !important;
+  width: 16px;
+  height: 16px;
   opacity: 0; }
   .checkbox-radio + label span {
     position: relative;
@@ -2929,6 +2932,11 @@ button {
   .datatable-resizing .datatable .cell.cell-resizing .header-resizer {
     z-index: 4; }
 
+.date-selector .btn-icon.calendar-btn:not(:first-child) {
+  margin-left: 2px; }
+.date-selector .btn-icon.calendar-btn::before {
+  font-size: 22px; }
+
 .diff {
   padding: 4px;
   background: #ffffff; }
@@ -3222,6 +3230,25 @@ z-color-picker.has-error .color-picker-box {
   justify-content: space-between; }
   .inline-filter-footer > li.inline-filter-stats {
     color: #333333; }
+
+.inline-list {
+  display: inline-flex;
+  gap: 6px; }
+  .inline-list .checkbox-radio {
+    position: initial;
+    margin: 4px 4px 4px 0;
+    vertical-align: top; }
+    .inline-list .checkbox-radio + label {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin: 4px 4px 4px -20px;
+      vertical-align: top; }
+      .inline-list .checkbox-radio + label span {
+        margin: 0; }
+  .inline-list input[type="text"] {
+    padding: 4px 5px;
+    line-height: 14px; }
 
 .list-table {
   width: 100%;
@@ -8133,11 +8160,7 @@ input[type="radio"] {
   padding: 0;
   border: 0;
   vertical-align: middle;
-  position: relative;
-  top: -1px;
   overflow: hidden;
-  width: 13px;
-  height: 13px;
   background: none; }
 
 input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"] {
@@ -8207,11 +8230,6 @@ z-select .list, z-textarea-flexible textarea, input[type="text"], input[type="pa
       color: #ffffff;
       background-color: #333333;
       border-bottom: 0; }
-
-.calendar-control .btn-icon:not(:first-child) {
-  margin-left: 2px; }
-.calendar-control .btn-icon::before {
-  font-size: 22px; }
 
 .header-kioskmode-controls {
   position: fixed;

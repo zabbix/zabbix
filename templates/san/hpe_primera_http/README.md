@@ -38,6 +38,7 @@ WSAPI 1.8+ introduces a separate `New` disk state `state = 3` and reports `Faile
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "HPE Primera", e.g. {$HTTP.TLS.VERIFY:"HPE Primera"}.</p>|`full`|
 |{$HPE.PRIMERA.API.PASSWORD}|<p>Specify password for WSAPI.</p>||
 |{$HPE.PRIMERA.API.USERNAME}|<p>Specify user name for WSAPI.</p>|`zabbix`|
 |{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.MATCHES}|<p>Filter of discoverable tasks by name.</p>|`CHANGE_IF_NEEDED`|

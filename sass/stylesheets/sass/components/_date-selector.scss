@@ -1,0 +1,11 @@
+.date-selector {
+	.btn-icon.calendar-btn {
+		&:not(:first-child) {
+			margin-left: 2px;
+		}
+
+		&::before {
+			font-size: 22px;
+		}
+	}
+}
