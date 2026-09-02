@@ -30,6 +30,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "HPE MSA 2040 Storage", e.g. {$HTTP.TLS.VERIFY:"HPE MSA 2040 Storage"}.</p>|`full`|
 |{$HPE.MSA.API.SCHEME}|<p>Connection scheme for API.</p>|`https`|
 |{$HPE.MSA.API.HOST}|<p>The hostname or IP address of the API host.</p>||
 |{$HPE.MSA.API.PORT}|<p>Connection port for API.</p>|`443`|
