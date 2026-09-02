@@ -756,7 +756,7 @@ class CWidgetNavTree extends CWidget {
 
 				overlayDialogue({
 					title: t('Edit tree element'),
-					class: 'modal-popup',
+					class: 'modal-popup modal-popup-small',
 					content,
 					buttons: [
 						{
