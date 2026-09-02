@@ -245,7 +245,7 @@ window.ceprule_edit_popup = new class {
 				this.#clone();
 			}
 			else if (class_list.contains('js-reset-time-windows')) {
-				this.#resetTimeWindwos();
+				this.#resetTimeWindows();
 			}
 		});
 	}
@@ -359,7 +359,7 @@ window.ceprule_edit_popup = new class {
 			});
 	}
 
-	#resetTimeWindwos() {
+	#resetTimeWindows() {
 		this.#removePopupMessages();
 		fetch(zabbixUrl({action: 'ceprule.resettimewindows'}), {
 			method: 'POST',
