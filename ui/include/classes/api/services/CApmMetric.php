@@ -184,7 +184,7 @@ class CApmMetric extends CApmGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		return $this->getMetricsFromClickHouse($options);
+		return $this->getFromClickHouse($options);
 	}
 
 	private const CLICKHOUSE_METRICS_TABLES = [
@@ -194,7 +194,7 @@ class CApmMetric extends CApmGeneral {
 		APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM	=> ['table' => 'otel_metrics_exponential_histogram', 'table_alias' => 'mx']
 	];
 
-	private function getMetricsFromClickHouse(array $options): array|string {
+	private function getFromClickHouse(array $options): array|string {
 		$db_schema = CApmData::getClickHouseDbSchema();
 
 		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);

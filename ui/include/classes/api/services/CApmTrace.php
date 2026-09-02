@@ -118,10 +118,10 @@ class CApmTrace extends CApmGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		return $this->getTracesFromClickHouse($options);
+		return $this->getFromClickHouse($options);
 	}
 
-	protected function getTracesFromClickHouse(array $options): array|string {
+	protected function getFromClickHouse(array $options): array|string {
 		$db_schema = CApmData::getClickHouseDbSchema();
 
 		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
