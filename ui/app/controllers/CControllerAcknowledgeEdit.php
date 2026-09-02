@@ -126,7 +126,7 @@ class CControllerAcknowledgeEdit extends CController {
 			$data['problem_name'] = $event['name'];
 
 			$ceprule_actions = array_filter($event['acknowledges'],
-				fn (array $ack) => $ack['action'] == ZBX_PROBLEM_UPDATE_CEP
+				fn (array $ack) => ($ack['action'] & ZBX_PROBLEM_UPDATE_CEP) == ZBX_PROBLEM_UPDATE_CEP
 			);
 			$data['ceprules'] = $ceprule_actions
 				? API::CepRule()->get([
