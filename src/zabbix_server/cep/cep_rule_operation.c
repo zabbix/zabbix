@@ -952,7 +952,7 @@ static int	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL != (event = cep_event_context_get_event(ctx)))
+	if (NULL != (event = cep_event_context_get_event(ctx)) && NULL == event->r_event)
 	{
 		zbx_mw_task_t	*t;
 		zbx_db_event	*db_event;
