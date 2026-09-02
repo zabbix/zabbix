@@ -514,28 +514,11 @@ class CControllerProblemViewData extends CControllerDataTable {
 				static fn($userid) => $userid != 0
 			);
 
-			$is_cep_suppressed = array_filter(array_column($problem['suppression_data'], 'cep_ruleid'),
-				static fn($cep_ruleid) => $cep_ruleid != 0
-			);
-
 			if ($is_manually_suppressed) {
 				$actions_performed[] = _('Manually suppressed');
 			}
-
-			if ($is_cep_suppressed) {
-				$actions_performed[] = _('Suppressed by complex event processing');
-			}
-
-			if (!$is_cep_suppressed && !$is_manually_suppressed
-					&& $data['actions']['suppressions'][$problem['eventid']]['count'] > 0) {
-				$last_action = reset($data['actions']['suppressions'][$problem['eventid']]['suppress_until']);
-
-				if (array_key_exists('cep_ruleid', $last_action)) {
-					$actions_performed[] = _('Unsuppressed by complex event processing');
-				}
-				else {
-					$actions_performed[] = _('Manually unsuppressed');
-				}
+			elseif ($data['actions']['suppressions'][$problem['eventid']]['count'] > 0) {
+				$actions_performed[] = _('Manually unsuppressed');
 			}
 
 			if ($data['actions']['actions'][$problem['eventid']]['count'] > 0) {
