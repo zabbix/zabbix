@@ -48,6 +48,10 @@ class CCepRule extends CApiService {
 	public function get(array $options = []): array|string {
 		$this->validateGet($options);
 
+		if ($options['editable'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			return $options['countOutput'] ? '0' : [];
+		}
+
 		$resource = DBselect($this->createSelectQuery('cep_rule', $options), $options['limit']);
 
 		if ($options['countOutput']) {
@@ -88,6 +92,7 @@ class CCepRule extends CApiService {
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// Flags.
+			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
 
