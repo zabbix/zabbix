@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_SERVER 8 "2022\-01\-06" Zabbix
+.TH ZABBIX_SERVER 8 "2026\-08\-27" Zabbix
 .SH NAME
 zabbix_server \- Zabbix server daemon
 .SH SYNOPSIS
@@ -118,7 +118,7 @@ Disable profiling, affects all processes if target is not specified
 .RS 4
 .TP 4
 .B ha_status
-Display high availability cluster status. 
+Display high availability cluster status.
 Can be performed only on active node.
 .RE
 .RS 4
@@ -144,6 +144,14 @@ Increase log level, affects all processes if target is not specified
 .TP 4
 \fBlog_level_decrease\fR[=\fItarget\fR]
 Decrease log level, affects all processes if target is not specified
+.RE
+.RS 4
+.TP 4
+.B permissions_rebuild
+Rebuild the cache of user group and host group permissions. Run this runtime control option if the granted permissions do not match what users actually see.
+The cache rebuild may take a long time.
+During the rebuild, the permission cache tables can be modified by the Zabbix frontend, the Zabbix API, or low-level discovery, which can lead to database errors and failed operations.
+Use this runtime control option only when necessary, and avoid using it while someone else is configuring user group or host group permissions.
 .RE
 .RE
 .SS
