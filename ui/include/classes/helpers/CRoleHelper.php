@@ -65,6 +65,9 @@ class CRoleHelper {
 	public const UI_ADMINISTRATION_SCRIPTS = 'ui.administration.scripts';
 	public const UI_ADMINISTRATION_QUEUE = 'ui.administration.queue';
 
+	public const PROFILE_REDIRECT_ENFORCE = 'profile.redirect.enforce';
+	public const PROFILE_REDIRECT_URL = 'profile.redirect.url';
+
 	public const ACTIONS_EDIT_DASHBOARDS = 'actions.edit_dashboards';
 	public const ACTIONS_EDIT_MAPS = 'actions.edit_maps';
 	public const ACTIONS_EDIT_MAINTENANCE = 'actions.edit_maintenance';
@@ -96,9 +99,6 @@ class CRoleHelper {
 	public const UI_SECTION_ALERTS = 'ui.alerts';
 	public const UI_SECTION_USERS = 'ui.users';
 	public const UI_SECTION_ADMINISTRATION = 'ui.administration';
-
-	public const PROFILE_REDIRECT_ENFORCE = 'profile.redirect.enforce';
-	public const PROFILE_REDIRECT_URL = 'profile.redirect.url';
 
 	public const API_ANY_METHOD = '.*';
 	public const API_ANY_SERVICE = '*.';
