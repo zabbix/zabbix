@@ -874,6 +874,8 @@ class CApm extends CApiService {
 
 				$query->order('u.'.$field, $sort_order);
 			}
+
+			$query->limit($options['limit']);
 		}
 
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
