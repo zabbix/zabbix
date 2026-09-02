@@ -254,8 +254,15 @@ class CCepRule extends CApiService {
 			return;
 		}
 
+		$defaults = self::getWindowDefaults();
+		$window_defaults = [];
+
+		foreach ($options['selectWindow'] as $field) {
+			$window_defaults[$field] = $defaults[$field];
+		}
+
 		foreach ($cep_rules as &$cep_rule) {
-			$cep_rule['window'] = self::getWindowDefaults();
+			$cep_rule['window'] = $window_defaults;
 		}
 		unset($cep_rule);
 
