@@ -91,14 +91,12 @@ class CControllerCepRuleEnable extends CController {
 
 			$keep_cepruleids = array_column(API::CepRule()->get([
 				'output' => ['cep_ruleid'],
-				'cep_ruleids' => $cepruleids,
-				'editable' => true
+				'cep_ruleids' => $cepruleids
 			]), 'cep_ruleid');
 
 			$keep_correlationids = array_column(API::Correlation()->get([
 				'output' => ['correlationid'],
-				'correlationids' => $correlationids,
-				'editable' => true
+				'correlationids' => $correlationids
 			]), 'correlationid');
 
 			$output['keepids'] = [...$keep_cepruleids,

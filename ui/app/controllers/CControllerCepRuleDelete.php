@@ -80,8 +80,7 @@ class CControllerCepRuleDelete extends CController {
 
 			$keep_correlationids = array_column(API::Correlation()->get([
 				'output' => ['correlationid'],
-				'correlationids' => $correlationids,
-				'editable' => true
+				'correlationids' => $correlationids
 			]), 'correlationid');
 
 			$output['keepids'] = [...$keep_cepruleids,
