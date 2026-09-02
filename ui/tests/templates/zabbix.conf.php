@@ -27,6 +27,8 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 
 $ZBX_FEATURE_FLAGS['banners_enabled'] = false;
 
+$NO_AUTH_DEBUG_MODE = true;
+
 // PHP runtime error log file for unit tests.
 define('PHPUNIT_ERROR_LOG', '{PHPUNIT_ERROR_LOG}');
 

@@ -22,9 +22,7 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 		];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
-			'type' => ['db media_type.type', 'required',
-				'in' => CMediatypeHelper::getSupportedMediaTypes()
-			],
+			'type' => ['db media_type.type', 'required', 'in' => CMediatypeHelper::getSupportedMediaTypes()],
 			'name' => ['db media_type.name', 'required', 'not_empty'],
 			'provider' => ['db media_type.provider', 'in' => array_keys(CMediatypeHelper::getEmailProviders()),
 				'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL]]
@@ -251,7 +249,7 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 				'message' => ['db media_type_message.message']
 			]],
 			'maxsessions' => ['db media_type.maxsessions', 'min' => 0, 'max' => 100,
-				'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK]]
+				'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK, MEDIA_TYPE_PUSH]]
 			],
 			'maxattempts' => ['db media_type.maxattempts', 'min' => 1, 'max' => 100],
 			'attempt_interval' => ['db media_type.attempt_interval', 'required', 'not_empty',

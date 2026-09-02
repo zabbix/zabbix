@@ -484,7 +484,21 @@ static int	cmp_key_id(const char *key_1, const char *key_2)
 	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
 }
 
-static unsigned char	poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return the type of poller responsible for the item type           *
+ *                                                                            *
+ * Parameters: type              - [IN] item type [ITEM_TYPE_* flag]          *
+ *             key               - [IN] item key                              *
+ *             snmp_oid_type     - [IN] [ZBX_SNMP_OID_TYPE* flag]             *
+ *             get_config_forks  - [IN] call-back function for access to conf *
+ *             proc_type         - [OUT] [ZBX_PROCESS_TYPE_* flag]            *
+ *                                                                            *
+ * Return value: [ZBX_POLLER_TYPE_*] flag                                     *
+ *                                                                            *
+ ******************************************************************************/
+unsigned char	zbx_poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type,
+		zbx_get_config_forks_f	get_config_forks, unsigned char *proc_type)
 {
 	switch (type)
 	{
@@ -494,7 +508,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGLOSS_KEY) ||
 					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGRETRY_KEY))
 			{
-				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_PINGER))
+				if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_PINGER))
 					break;
 
 				return ZBX_POLLER_TYPE_PINGER;
@@ -504,60 +518,63 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_SCRIPT:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_POLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
 		case ITEM_TYPE_BROWSER:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_BROWSERPOLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_BROWSERPOLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_BROWSER;
 		case ITEM_TYPE_INTERNAL:
+			*proc_type = ZBX_PROCESS_TYPE_INTERNAL_POLLER;
 			return ZBX_POLLER_TYPE_INTERNAL;
 		case ITEM_TYPE_DB_MONITOR:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_ODBCPOLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_ODBCPOLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_ODBC;
 		case ITEM_TYPE_CALCULATED:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_HISTORYPOLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_HISTORYPOLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_HISTORY;
 		case ITEM_TYPE_IPMI:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_IPMIPOLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_IPMIPOLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_IPMI;
 		case ITEM_TYPE_JMX:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_JAVAPOLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_JAVAPOLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_JAVA;
 		case ITEM_TYPE_HTTPAGENT:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_HTTPAGENT_POLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_HTTPAGENT_POLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_HTTPAGENT;
 		case ITEM_TYPE_ZABBIX:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_AGENT_POLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_AGENT_POLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_AGENT;
 		case ITEM_TYPE_SNMP:
 			if (ZBX_SNMP_OID_TYPE_WALK == snmp_oid_type || ZBX_SNMP_OID_TYPE_GET == snmp_oid_type)
 			{
-				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_SNMP_POLLER))
+				if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_SNMP_POLLER))
 					break;
 
 				return ZBX_POLLER_TYPE_SNMP;
 			}
 
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
+			if (0 == get_config_forks(*proc_type = ZBX_PROCESS_TYPE_POLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
+		default:
+			*proc_type = ZBX_PROCESS_TYPE_UNKNOWN;
 	}
 
 	return ZBX_NO_POLLER;
@@ -799,7 +816,7 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
 {
-	unsigned char	poller_type;
+	unsigned char	poller_type, proc_type;
 	unsigned char	snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO; /* oid type is only used by ITEM_TYPE_SNMP*/
 
 	if (HOST_MONITORED_BY_SERVER != dc_host->monitored_by &&
@@ -812,7 +829,7 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 	if (ITEM_TYPE_SNMP == dc_item->type)
 		snmp_oid_type = dc_item->itemtype.snmpitem->snmp_oid_type;
 
-	poller_type = poller_by_item(dc_item->type, dc_item->key, snmp_oid_type);
+	poller_type = zbx_poller_by_item(dc_item->type, dc_item->key, snmp_oid_type, get_config_forks_cb, &proc_type);
 
 	if (0 != (flags & ZBX_HOST_UNREACHABLE))
 	{
@@ -1881,7 +1898,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location)
+		const char *config_ssl_key_location, int *vault_ret)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -1912,11 +1929,15 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 			}
 		}
 		else if (FAIL == zbx_vault_get_kvs(dc_kvs_path->path, &kvs, config_vault, config_source_ip,
-				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
+				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+				vault_ret, &error))
 		{
 			if (NULL == dc_kvs_path->last_error || 0 != strcmp(dc_kvs_path->last_error, error))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
+				int	log_level = (NULL != vault_ret && FAIL == *vault_ret) ?
+						LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
+
+				zabbix_log(log_level, "cannot get secrets for path \"%s\": %s",
 						dc_kvs_path->path, error);
 			}
 			START_SYNC;
@@ -3279,52 +3300,29 @@ static void	dc_item_value_type_update(int found, ZBX_DC_ITEM *item, zbx_item_val
 	}
 }
 
-static void	make_item_unsupported_if_zero_pollers(ZBX_DC_ITEM *item, unsigned char poller_type,
-		const char *start_poller_config_name)
+static void	make_item_unsupported(ZBX_DC_ITEM *item, const char *msg)
 {
-	if (0 == get_config_forks_cb(poller_type))
-	{
-		time_t		now = time(NULL);
-		zbx_timespec_t	ts = {now, 0};
-		char		*msg = zbx_dsprintf(NULL, "%s are disabled in configuration", start_poller_config_name);
+	time_t		now = time(NULL);
+	zbx_timespec_t	ts = {(int)now, 0};
 
-		zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
-
-		zbx_free(msg);
-	}
+	zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
 }
 
 static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
 {
-	switch (item->type)
+	unsigned char	proc_type, snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
+
+	if (ITEM_TYPE_SNMP == item->type)
+		snmp_oid_type = item->itemtype.snmpitem->snmp_oid_type;
+
+	if (ZBX_NO_POLLER == zbx_poller_by_item(item->type, item->key, snmp_oid_type, get_config_forks_cb, &proc_type)
+			&& ZBX_PROCESS_TYPE_UNKNOWN != proc_type)
 	{
-		case ITEM_TYPE_ZABBIX:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_AGENT_POLLER, "Agent pollers");
-			break;
-		case ITEM_TYPE_JMX:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_JAVAPOLLER, "Java pollers");
-			break;
-		case ITEM_TYPE_DB_MONITOR:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_ODBCPOLLER, "ODBC pollers");
-			break;
-		case ITEM_TYPE_HTTPAGENT:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_HTTPAGENT_POLLER,
-					"HTTPAgent pollers");
-			break;
-		case ITEM_TYPE_SNMP:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_SNMP_POLLER, "SNMP pollers");
-			break;
-		case ITEM_TYPE_BROWSER:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_BROWSERPOLLER, "Browser pollers");
-			break;
-		case ITEM_TYPE_SCRIPT:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "pollers");
-			break;
-		case ITEM_TYPE_IPMI:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_IPMIPOLLER, "IPMI pollers");
-			break;
-		default:
-			return;
+		char	msg[MAX_STRING_LEN];
+
+		zbx_snprintf(msg, sizeof(msg),
+				"\"%s\" is disabled in configuration", get_process_type_string(proc_type));
+		make_item_unsupported(item, msg);
 	}
 }
 
@@ -6244,8 +6242,8 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
  *                                                                            *
  * Purpose: calculate nextcheck timestamp                                     *
  *                                                                            *
- * Parameters: seend - [IN] the seed                                          *
- *             delay - [IN] the delay in seconds                              *
+ * Parameters: seed  - [IN]                                                   *
+ *             delay - [IN] delay in seconds                                  *
  *             now   - [IN] current timestamp                                 *
  *                                                                            *
  * Return value: nextcheck value                                              *
@@ -14335,6 +14333,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER))
 		cfg->proxy_secrets_provider = config->config->proxy_secrets_provider;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES))
+		cfg->enable_mobile_devices = config->config->enable_mobile_devices;
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 

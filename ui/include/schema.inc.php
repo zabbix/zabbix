@@ -4247,6 +4247,12 @@ return [
 				'type' => DB::FIELD_TYPE_TEXT,
 				'length' => 65535,
 				'default' => ''
+			],
+			'description' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
 			]
 		]
 	],
@@ -4268,7 +4274,7 @@ return [
 			'expression' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => ''
 			],
 			'expression_type' => [
@@ -8463,6 +8469,12 @@ return [
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
+			],
+			'auth_scheme' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
@@ -10254,6 +10266,160 @@ return [
 				'type' => DB::FIELD_TYPE_TEXT,
 				'length' => 65535,
 				'default' => ''
+			]
+		]
+	],
+	'dpop_jti_cache' => [
+		'key' => 'jti',
+		'fields' => [
+			'jti' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 36,
+				'default' => ''
+			],
+			'expires_at' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			]
+		]
+	],
+	'device' => [
+		'key' => 'deviceid',
+		'fields' => [
+			'deviceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'userid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid'
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 36,
+				'default' => ''
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'push_token' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'activated_at' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			]
+		]
+	],
+	'token_device' => [
+		'key' => 'tokenid',
+		'fields' => [
+			'tokenid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'token',
+				'ref_field' => 'tokenid'
+			],
+			'deviceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'device',
+				'ref_field' => 'deviceid'
+			]
+		]
+	],
+	'device_key' => [
+		'key' => 'device_keyid',
+		'fields' => [
+			'device_keyid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'deviceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'device',
+				'ref_field' => 'deviceid'
+			],
+			'scope' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'kid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'key_' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 512,
+				'default' => ''
+			],
+			'active' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'created_at' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			]
+		]
+	],
+	'device_enrollment_token' => [
+		'key' => 'deviceid',
+		'fields' => [
+			'deviceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'device',
+				'ref_field' => 'deviceid'
+			],
+			'token' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => ''
+			],
+			'expires_at' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],

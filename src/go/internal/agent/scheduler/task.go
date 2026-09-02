@@ -15,6 +15,7 @@
 package scheduler
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -40,6 +41,14 @@ const (
 	priorityStopperTaskNs
 )
 
+var (
+	_ context.Context        = (*taskBase)(nil)
+	_ plugin.ContextProvider = (*exporterTask)(nil)
+	_ plugin.ContextProvider = (*directExporterTask)(nil)
+	_ plugin.ContextProvider = (*watcherTask)(nil)
+	_ plugin.ContextProvider = (*commandTask)(nil)
+)
+
 // exporterTaskAccessor is used by clients to track item exporter tasks .
 type exporterTaskAccessor interface {
 	task() *exporterTask
@@ -52,6 +61,31 @@ type taskBase struct {
 	index     int
 	active    bool
 	recurring bool
+}
+
+// Done is implementing the context.Context interface.
+func (*taskBase) Done() <-chan struct{} {
+	return nil
+}
+
+// Err is implementing the context.Context interface.
+func (*taskBase) Err() error {
+	return nil
+}
+
+// Value is implementing the context.Context interface.
+func (*taskBase) Value(_ any) any {
+	return nil
+}
+
+// Deadline is implementing the context.Context interface.
+func (*taskBase) Deadline() (time.Time, bool) {
+	return time.Time{}, false
+}
+
+// LegacyTimeout is implementing the context.Context interface.
+func (*taskBase) LegacyTimeout() bool {
+	return false
 }
 
 func (t *taskBase) getPlugin() *pluginAgent {
@@ -169,11 +203,7 @@ type exporterTask struct {
 
 func invokeExport(a plugin.Accessor, key string, params []string, ctx plugin.ContextProvider) (any, error) {
 	exporter, _ := a.(plugin.Exporter)
-	timeout := ctx.Timeout()
-
-	if a.HandleTimeout() {
-		timeout = maxItemTimeout
-	}
+	ctx = plugin.StartTimeout(ctx, time.Now())
 
 	var ret any
 	var err error
@@ -185,11 +215,22 @@ func invokeExport(a plugin.Accessor, key string, params []string, ctx plugin.Con
 		tc <- true
 	}()
 
+	// from an architectural standpoint we should not be supporting something
+	// like this, but alas, this evil hack was left behind by our predecessors
+	if a.ForceEffectiveTimeoutExtension() {
+		select {
+		case <-tc:
+			return ret, err //nolint:wrapcheck
+		case <-time.After(time.Duration(maxItemTimeout) * time.Second):
+			return nil, errs.New("timeout occurred while gathering data")
+		}
+	}
+
 	select {
 	case <-tc:
 		return ret, err //nolint:wrapcheck
-	case <-time.After(time.Second * time.Duration(timeout)):
-		return nil, errs.New("timeout occurred while gathering data")
+	case <-ctx.Done():
+		return nil, errs.Wrap(ctx.Err(), "timeout occurred while gathering data")
 	}
 }
 
@@ -292,6 +333,11 @@ func (t *exporterTask) Timeout() int {
 
 func (t *exporterTask) Delay() string {
 	return t.item.delay
+}
+
+// LegacyTimeout is implementing the context.Context interface.
+func (t *exporterTask) LegacyTimeout() bool {
+	return t.item.legacyTimeout
 }
 
 // directExporterTask represents an on-demand exporter request.
@@ -411,6 +457,11 @@ func (t *directExporterTask) Timeout() int {
 
 func (t *directExporterTask) Delay() string {
 	return t.item.delay
+}
+
+// LegacyTimeout is implementing the context.Context interface.
+func (t *directExporterTask) LegacyTimeout() bool {
+	return t.item.legacyTimeout
 }
 
 // starterTask represents plugin startup work for an inactive Runner plugin.
@@ -612,7 +663,10 @@ func (t *commandTask) perform(s Scheduler) {
 
 		var cr *resultcache.CommandResult
 
-		if ret, err := e.Export("system.run", t.params, t); err == nil {
+		exportStartedCtx := plugin.StartTimeout(t, time.Now())
+
+		ret, err := e.Export("system.run", t.params, exportStartedCtx)
+		if err == nil {
 			if ret != nil {
 				cr = &resultcache.CommandResult{
 					ID:     t.id,

@@ -1314,7 +1314,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Graphs' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
-					'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+					'Discovery' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D=10084&context=host'
 				],
 				'SCRIPTS' => [

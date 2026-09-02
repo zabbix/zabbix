@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Zabbix" default="build" basedir=".">
+	<!-- Initialize TLS library option based on the ENCRYPTION variable: openssl (default), gnutls, or none -->
+	<condition property="with.encryption" value="--with-gnutls">
+		<equals arg1="${ENCRYPTION}" arg2="GNUTLS" casesensitive="false"/>
+	</condition>
+	<condition property="with.encryption" value="">
+		<equals arg1="${ENCRYPTION}" arg2="NONE" casesensitive="false"/>
+	</condition>
+	<property name="with.encryption" value="--with-openssl"/>
+
 	<target name="init-common">
 		<condition property="phpunit_filter" value=" --filter='${PHPUNIT_FILTER}'" else="">
 			<and>
@@ -108,6 +117,16 @@
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_LDAP_USER_PASSWORD}" value="${phpunit_ldap_user_password}"/>
 	</target>
 
+	<target name="create-hashicorp-configs">
+		<property name="phpunit_hashicorp_address" value="${PHPUNIT_HASHICORP_ADDRESS}"/>
+		<property name="phpunit_hashicorp_root_token_id" value="${PHPUNIT_HASHICORP_ROOT_TOKEN_ID}"/>
+
+		<!-- HashiCorp settings -->
+		<replace file="ui/tests/bootstrap.php" token="'PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED', false" value="'PHPUNIT_HASHICORP_VAULT_TESTS_ENABLED', true"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_HASHICORP_ADDRESS}" value="${phpunit_hashicorp_address}"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_HASHICORP_ROOT_TOKEN_ID}" value="${phpunit_hashicorp_root_token_id}"/>
+	</target>
+
 	<target name="init-integration">
 		<exec executable="go" failonerror="on">
 			<arg line="clean -cache"/>
@@ -147,7 +166,7 @@
 	<target name="make-gettext">
 		<!-- Build translation strings -->
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="gettext"/>
 		</exec>
@@ -170,7 +189,7 @@
 			<arg line="--prefix=${basedir}"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="install"/>
 		</exec>
@@ -194,7 +213,7 @@
 			<arg line="--with-ssh2"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="install"/>
 		</exec>
@@ -217,18 +236,18 @@
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=512"/>
 			<arg line="--with-ares"/>
-			<arg line="--with-openssl"/>
+			<arg line="${with.encryption}"/>
 			<arg line="--with-ares"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="dbschema"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="install"/>
 		</exec>
@@ -716,7 +735,7 @@
 	<target name="create-frontend-nosql-configs" depends="create-frontend-elasticsearch-configs,create-frontend-clickhouse-configs"/>
 	<target name="create-db-nosql" depends="create-db-elasticsearch,create-db-clickhouse"/>
 
-	<target name="init-integration-postgresql" depends="create-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-postgresql,create-db-nosql,init-proxy-postgresql">
+	<target name="init-integration-postgresql" depends="create-configs,create-hashicorp-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-postgresql,create-db-nosql,init-proxy-postgresql">
 		<exec executable="psql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -729,7 +748,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-tsdb" depends="create-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-tsdb,create-db-nosql,init-proxy-postgresql"/>
+	<target name="init-integration-tsdb" depends="create-configs,create-hashicorp-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-tsdb,create-db-nosql,init-proxy-postgresql"/>
 
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
 
@@ -750,23 +769,37 @@
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=512"/>
 			<arg line="--with-ares"/>
-			<arg line="--with-openssl"/>
+			<arg line="${with.encryption}"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="dbschema"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="install"/>
 		</exec>
 	</target>
 
-	<target name="create-db-mysql" depends="drop-db-mysql">
+	<target name="detect-db-check-command">
+		<property environment="env"/>
+
+		<condition property="db-check-command" value="mysqlcheck">
+			<available file="mysqlcheck" filepath="${env.PATH}" type="file"/>
+		</condition>
+
+		<condition property="db-check-command" value="mariadb-check">
+			<available file="mariadb-check" filepath="${env.PATH}" type="file"/>
+		</condition>
+
+		<fail unless="db-check-command" message="Neither mysqlcheck nor mariadb-check was found in PATH."/>
+	</target>
+
+	<target name="create-db-mysql" depends="drop-db-mysql,detect-db-check-command">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
@@ -791,6 +824,15 @@
 		</exec>
 		<exec executable="mysql" input="database/mysql/data.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
+			<arg line="--host=${dbhost}"/>
+			<arg line="--port=${dbport}"/>
+			<arg line="--user=${dbuser}"/>
+			<arg line="${dbname}"/>
+		</exec>
+		<exec executable="${db-check-command}" failonerror="on">
+			<env key="MYSQL_PWD" value="${dbpassword}"/>
+			<arg line="--analyze"/>
+			<arg line="--silent"/>
 			<arg line="--host=${dbhost}"/>
 			<arg line="--port=${dbport}"/>
 			<arg line="--user=${dbuser}"/>
@@ -875,7 +917,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-mysql" depends="create-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-mysql,create-db-mysql,create-db-nosql,init-proxy-mysql">
+	<target name="init-integration-mysql" depends="create-configs,create-hashicorp-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-mysql,create-db-mysql,create-db-nosql,init-proxy-mysql">
 		<exec executable="mysql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
@@ -920,6 +962,7 @@
 	<target name="test-integration">
 		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<env key="UBSAN_OPTIONS" value="print_stacktrace=1:suppressions=../tests/ubsan.supp"/>
+			<env key="LSAN_OPTIONS" value="suppressions=${basedir}/tests/lsan.supp"/>
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
 			<arg line="--do-not-cache-result"/>

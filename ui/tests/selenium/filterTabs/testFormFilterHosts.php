@@ -23,7 +23,7 @@ require_once __DIR__.'/../common/testFormFilter.php';
 class testFormFilterHosts extends testFormFilter {
 
 	public $url = 'zabbix.php?action=host.view';
-	public $table_selector = 'id:hosts';
+	public $table_selector = 'id:datatable-hosts';
 
 	public static function getCheckCreatedFilterData() {
 		return [

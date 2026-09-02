@@ -1139,7 +1139,7 @@ class testToken extends CAPITest {
 		);
 
 		// The generated token hash matches record in DB.
-		$this->assertEquals(hash('sha512', $token),
+		$this->assertEquals(CApiTokenHelper::hashToken($token),
 				CDBHelper::getValue('SELECT token FROM token WHERE tokenid='.zbx_dbstr($user_tokenid)),
 				'User token value updated'
 		);
@@ -1158,11 +1158,11 @@ class testToken extends CAPITest {
 		);
 
 		// The generated token hash matches record in DB.
-		$this->assertEquals(hash('sha512', $user_token),
+		$this->assertEquals(CApiTokenHelper::hashToken($user_token),
 				CDBHelper::getValue('SELECT token FROM token WHERE tokenid='.zbx_dbstr($user_tokenid)),
 				'User token value updated'
 		);
-		$this->assertEquals(hash('sha512', $admin_token),
+		$this->assertEquals(CApiTokenHelper::hashToken($admin_token),
 				CDBHelper::getValue('SELECT token FROM token WHERE tokenid='.zbx_dbstr($admin_tokenid)),
 				'Admin token value re-updated'
 		);

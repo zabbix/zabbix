@@ -41,7 +41,9 @@ class WidgetProblems extends CTableInfo {
 	public function __construct(array $data) {
 		$this->data = $data;
 
-		$this->highlight_rows = $this->data['fields']['highlight_row'] == ZBX_HIGHLIGHT_ON;
+		$this->highlight_rows = array_key_exists('highlight_row', $this->data['fields'])
+			? $this->data['fields']['highlight_row'] == ZBX_HIGHLIGHT_ON
+			: ZBX_HIGHLIGHT_OFF;
 
 		parent::__construct();
 	}

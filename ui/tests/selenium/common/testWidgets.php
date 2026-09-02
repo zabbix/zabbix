@@ -80,8 +80,8 @@ class testWidgets extends CWebTest {
 				break;
 
 			case 'Clock':
-				$widget_form->fill(['Time type' => CFormElement::RELOADABLE_FILL('Host time')]);
-				$this->assertTrue($widget_form->getField('Item')->isVisible());
+				$widget_form->fill(['Time type' => 'Host time']);
+				$this->assertTrue($widget_form->getField('Item')->waitUntilVisible()->isVisible());
 				break;
 
 			case 'Graph':

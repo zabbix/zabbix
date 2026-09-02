@@ -210,7 +210,7 @@ out:
   value: 0
   return: 'SUCCEED'
 ---
-test case: 'strings comparison, operands are are brackets'
+test case: 'strings comparison, operands are brackets'
 in:
   expression: '"()"="()"'
 out:
