@@ -159,7 +159,7 @@ out:
 	return ret;
 
 #undef ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS
-#undef ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS
+#undef ZBX_USER_ROLE_PERMISSION_ACTIONS_SELECT_SERVER_FOR_MONITORING
 }
 
 /******************************************************************************
