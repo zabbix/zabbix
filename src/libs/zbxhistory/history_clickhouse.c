@@ -1617,7 +1617,7 @@ static void	history_clickhouse_get_value_type_data(zbx_clickhouse_data_t *d, CUR
 {
 	zbx_vector_history_provider_value_type_info_reserve(&info->value_types, ITEM_VALUE_TYPE_COUNT);
 
-	for (unsigned char i = 0; i < ITEM_VALUE_TYPE_NONE; i++)
+	for (int i = 0; i < ITEM_VALUE_TYPE_NONE; i++)
 	{
 		char	*local_table = NULL;
 
