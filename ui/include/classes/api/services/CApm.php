@@ -468,7 +468,8 @@ class CApm extends CApiService {
 			'time_till' =>						['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
 			'traceids' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'spanids' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'with_sampled_trace_flag' =>		['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+			'with_flags_on' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'with_flags_off' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
@@ -526,8 +527,16 @@ class CApm extends CApiService {
 			$query->where('l.SpanId IN {spanids:Array(String)}', ['spanids' => $options['spanids']]);
 		}
 
-		if (array_key_exists('with_sampled_trace_flag', $options) && $options['with_sampled_trace_flag'] !== null) {
-			$query->where('bitAnd(l.TraceFlags, 1)='.($options['with_sampled_trace_flag'] ? '1' : '0'));
+		if ($options['with_flags_on'] !== null) {
+			$query->where('bitAnd(l.TraceFlags, {flags_on:Int32})={flags_on:Int32}', [
+				'flags_on' => $options['with_flags_on']
+			]);
+		}
+
+		if ($options['with_flags_off'] !== null) {
+			$query->where('bitAnd(l.TraceFlags, {flags_off:Int32})=0', [
+				'flags_off' => $options['with_flags_off']
+			]);
 		}
 
 		if ($options['resource_attributes'] !== null) {
@@ -703,7 +712,8 @@ class CApm extends CApiService {
 			'time_from' =>						['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
 			'time_till' =>						['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
 			'types' =>							['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [APM_METRIC_TYPE_GAUGE, APM_METRIC_TYPE_SUM, APM_METRIC_TYPE_HISTOGRAM, APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM]), 'uniq' => true, 'default' => null],
-			'with_no_recorded_value_flag' =>	['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+			'with_flags_on' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'with_flags_off' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
@@ -776,6 +786,18 @@ class CApm extends CApiService {
 				->where($table_alias.'.TimeUnix<toDateTime64({time_till:Int32},9)', [
 					'time_till' => $options['time_till']
 				]);
+
+			if ($options['with_flags_on'] !== null) {
+				$sub_query->where('bitAnd('.$table_alias.'.Flags, {flags_on:Int32})={flags_on:Int32}', [
+					'flags_on' => $options['with_flags_on']
+				]);
+			}
+
+			if ($options['with_flags_off'] !== null) {
+				$sub_query->where('bitAnd('.$table_alias.'.Flags, {flags_off:Int32})=0', [
+					'flags_off' => $options['with_flags_off']
+				]);
+			}
 
 			if ($options['resource_attributes'] !== null) {
 				CClickHouseHelper::addAttributeFilter($sub_query, $table_alias.'.ResourceAttributes',
