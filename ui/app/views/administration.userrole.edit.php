@@ -157,7 +157,7 @@ $form_grid
 					_('Disabled: Users can set personal URL (after login), Redirect URL after login is used as fallback.')
 				))
 			],
-			$data['readonly'] ? '' : CRoleHelper::PROFILE_REDIRECT_ENFORCE
+			$data['readonly'] ? '' : 'profile-redirect-enforce'
 		),
 		new CFormField(
 			(new CCheckBox('profile_redirect_enforce', 1))
